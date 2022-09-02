@@ -67,6 +67,7 @@ than (MAX_YEAR - CURR_YEAR) where MAX_YEAR is the output from the line above and
 CURR_YEAR is the current year.
 
    ./internal/tzdata -l           : to get a list of all the zones that need modules
+                                    *** see NOTE 4 below ***
    ./internal/tzdata -d           : to dump all zones
    ./internal/tzdata -m           : to create the individual zone modules
                                     *** see NOTE 2 below ***
@@ -129,6 +130,10 @@ added to the data.alias.pl or data.abbrev.pl file.
 
 After adding a new value, rerun the command to make sure there are no more
 problems.
+
+NOTE 4: If you see an error:
+   [do_list] unknown alias [ZONE: Alias]
+removed the key/value pair in data.alias.pl
 
 #########################################################################
 Clean up stuff that shouldn't be in the manifest

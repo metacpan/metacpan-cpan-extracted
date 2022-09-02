@@ -1,4 +1,3 @@
-use 5.016;
 use Test2::V0 '-target' => 'JSON::Path';
 
 my $json = '{

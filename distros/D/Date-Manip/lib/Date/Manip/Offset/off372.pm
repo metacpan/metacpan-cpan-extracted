@@ -6,9 +6,9 @@ Date::Manip::Offset::off372;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  1 10:57:00 EDT 2022
-#    Data version: tzdata2022a
-#    Code version: tzcode2022a
+#    Generated on: Thu Sep  1 10:36:29 EDT 2022
+#    Data version: tzdata2022c
+#    Code version: tzcode2022c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.88';
+$VERSION='6.89';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -28,76 +28,38 @@ END {
    undef %Offset;
 }
 
-$Offset        = '-06:00:00';
+$Offset        = '-08:00:00';
 
 %Offset        = (
    0 => [
-      'america/chicago',
-      'america/indiana/knox',
-      'america/indiana/tell_city',
-      'america/menominee',
-      'america/winnipeg',
-      'america/rainy_river',
-      'america/belize',
-      'america/guatemala',
-      'america/costa_rica',
-      'america/el_salvador',
-      'america/tegucigalpa',
-      'america/matamoros',
-      'america/merida',
-      'america/monterrey',
+      'america/los_angeles',
+      'america/vancouver',
+      'america/tijuana',
+      'pacific/pitcairn',
+      'etc/gmt-8',
+      'h',
+      'america/whitehorse',
+      'america/dawson',
+      'america/metlakatla',
+      'america/fort_nelson',
+      'america/juneau',
+      'america/sitka',
+      'america/inuvik',
+      'america/dawson_creek',
       'america/bahia_banderas',
-      'america/mexico_city',
-      'america/managua',
-      'america/resolute',
-      'america/rankin_inlet',
-      'america/regina',
-      'america/swift_current',
-      'pacific/easter',
-      'pacific/galapagos',
-      'america/north_dakota/center',
-      'america/north_dakota/new_salem',
-      'america/north_dakota/beulah',
-      'etc/gmt-6',
-      'f',
-      'america/cancun',
-      'america/indiana/petersburg',
-      'america/indiana/vincennes',
-      'america/indiana/winamac',
-      'america/cambridge_bay',
-      'america/kentucky/monticello',
-      'america/iqaluit',
-      'america/pangnirtung',
-      'america/chihuahua',
-      'america/ojinaga',
-      'america/indiana/marengo',
-      'america/kentucky/louisville',
-      'america/indiana/indianapolis',
-      'america/indiana/vevay',
       'america/hermosillo',
       'america/mazatlan',
-      'america/detroit',
-      'america/thunder_bay',
+      'america/boise',
       ],
    1 => [
-      'america/denver',
-      'america/edmonton',
-      'america/boise',
-      'america/cambridge_bay',
-      'america/yellowknife',
-      'america/inuvik',
-      'america/mazatlan',
-      'america/chihuahua',
-      'america/ojinaga',
-      'america/north_dakota/beulah',
-      'america/bahia_banderas',
-      'america/north_dakota/new_salem',
-      'america/hermosillo',
-      'america/north_dakota/center',
-      'pacific/easter',
-      'america/phoenix',
-      'america/swift_current',
-      'america/regina',
+      'america/juneau',
+      'america/yakutat',
+      'america/anchorage',
+      'america/nome',
+      'america/sitka',
+      'america/metlakatla',
+      'america/dawson',
+      'america/whitehorse',
       ],
 );
 

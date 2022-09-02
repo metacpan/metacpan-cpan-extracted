@@ -8,7 +8,7 @@ use File::chdir;
 use Path::Tiny ();
 
 # ABSTRACT: Plugin for fetching a local file
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 has '+url' => '';
@@ -66,8 +66,9 @@ sub init
     if(-d $path)
     {
       return {
-        type => 'list',
-        list => [
+        type     => 'list',
+        protocol => 'file',
+        list     => [
           map { { filename => $_->basename, url => $_->stringify } }
           sort { $a->basename cmp $b->basename } $path->children,
         ],
@@ -80,6 +81,7 @@ sub init
         filename => $path->basename,
         path     => $path->stringify,
         tmp      => 0,
+        protocol => 'file',
       };
     }
     else
@@ -105,7 +107,7 @@ Alien::Build::Plugin::Fetch::Local - Plugin for fetching a local file
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 

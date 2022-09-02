@@ -17,8 +17,7 @@ terms as Perl itself.
 
 =cut
 
-use Test::More tests => 5;
-BEGIN { use_ok('JSON::Path') }
+use Test2::V0 '-target' => 'JSON::Path';
 
 use JSON::MaybeXS;
 my $data = <<"JSON";
@@ -62,3 +61,4 @@ my $path2    = JSON::Path->new('$.store.book[1].author');
 my @results2 = $path2->values($object);
 is( $results2[0], "\x{61}\x{0300}\x{0320}. u. thor", "basic value result" );
 
+done_testing;

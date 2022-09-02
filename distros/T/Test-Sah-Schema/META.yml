@@ -19,7 +19,7 @@ name: Test-Sah-Schema
 provides:
   Test::Sah::Schema:
     file: lib/Test/Sah/Schema.pm
-    version: '0.011'
+    version: '0.012'
 recommends:
   Perinci::Sub::Wrapper: '0.83'
 requires:
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Sah-Schema
   homepage: https://metacpan.org/release/Test-Sah-Schema
   repository: git://github.com/perlancar/perl-Test-Sah-Schema.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

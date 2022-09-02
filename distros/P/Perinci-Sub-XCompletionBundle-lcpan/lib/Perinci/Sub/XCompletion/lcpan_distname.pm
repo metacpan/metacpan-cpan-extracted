@@ -1,10 +1,5 @@
 package Perinci::Sub::XCompletion::lcpan_distname;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-01'; # DATE
-our $DIST = 'Perinci-Sub-XCompletionBundle-lcpan'; # DIST
-our $VERSION = '0.002'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -12,6 +7,11 @@ use Log::ger;
 
 use Perinci::Sub::XCompletionBundle::lcpan;
 use Complete::Util qw(complete_array_elem);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-02'; # DATE
+our $DIST = 'Perinci-Sub-XCompletionBundle-lcpan'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 our %SPEC;
 
@@ -28,17 +28,23 @@ sub gen_completion {
         my $r       = $cargs{r};
 
         my $dbh = Perinci::Sub::XCompletionBundle::lcpan::_connect_lcpan()
-            or return undef;
+            or return;
 
         my $sth;
         $sth = $dbh->prepare(
-            "SELECT DISTINCT dist_name FROM file WHERE dist_name IS NOT NULL ORDER BY dist_name");
+            "SELECT DISTINCT dist_name,dist_abstract FROM file WHERE dist_name IS NOT NULL ORDER BY dist_name");
         $sth->execute;
         my @all_distnames;
+        my @all_distabstracts;
         while (my @row = $sth->fetchrow_array) {
             push @all_distnames, $row[0];
+            push @all_distabstracts, $row[1];
         }
-        return complete_array_elem(array=>\@all_distnames, word=>$word);
+        return complete_array_elem(
+            array     => \@all_distnames,
+            summaries => \@all_distabstracts,
+            word      => $word,
+        );
     }
 }
 
@@ -57,31 +63,9 @@ Perinci::Sub::XCompletion::lcpan_distname - Generate completion of CPAN distribu
 
 =head1 VERSION
 
-This document describes version 0.002 of Perinci::Sub::XCompletion::lcpan_distname (from Perl distribution Perinci-Sub-XCompletionBundle-lcpan), released on 2020-01-01.
+This document describes version 0.003 of Perinci::Sub::XCompletion::lcpan_distname (from Perl distribution Perinci-Sub-XCompletionBundle-lcpan), released on 2022-09-02.
 
-=head1 FUNCTIONS
-
-
-=head2 gen_completion
-
-Usage:
-
- gen_completion() -> [status, msg, payload, meta]
-
-This function is not exported.
-
-No arguments.
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
+=for Pod::Coverage ^(.+)$
 
 =head1 HOMEPAGE
 
@@ -91,23 +75,41 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-XCompletionBundle-lcpan>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-Sub-XCompletionBundle-lcpan/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-XCompletionBundle-lcpan>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

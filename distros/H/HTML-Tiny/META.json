@@ -1,0 +1,57 @@
+{
+   "abstract" : "Lightweight, dependency free HTML/XML generation",
+   "author" : [
+      "Andy Armstrong <andy@hexten.net>",
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Tiny"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ap/HTML-Tiny.git",
+         "web" : "https://github.com/ap/HTML-Tiny"
+      }
+   },
+   "version" : "1.07",
+   "x_copyright" : {
+      "holder" : "Andy Armstrong",
+      "year" : 2008
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

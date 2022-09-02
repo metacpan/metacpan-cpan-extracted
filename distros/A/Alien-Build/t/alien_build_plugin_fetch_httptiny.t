@@ -106,6 +106,14 @@ subtest 'fetch' => sub {
   my $url = http_url;
   skip_all http_error unless $url;
 
+  my($proto) = $url =~ /^([a-z]+):/;
+
+  # tests usually in CI only against a real http server on localhost
+  local $ENV{ALIEN_DOWNLOAD_RULE} = $ENV{ALIEN_DOWNLOAD_RULE};
+  $ENV{ALIEN_DOWNLOAD_RULE} = 'warn' if $proto ne 'https';
+
+  like $proto, qr/^https?$/, "protocol is either http or https (url = $url)";
+
   my $plugin = Alien::Build::Plugin::Fetch::HTTPTiny->new( url => "$url" );
 
   my $build = alienfile filename => 'corpus/blank/alienfile';
@@ -120,9 +128,10 @@ subtest 'fetch' => sub {
     is(
       $res,
       hash {
-        field type    => 'html';
-        field base    => match qr!^http:/!;
-        field content => match qr!foo-1\.00\.tar\.gz!;
+        field type     => 'html';
+        field base     => match qr!^http:/!;
+        field content  => match qr!foo-1\.00\.tar\.gz!;
+        field protocol => $proto;
       },
     );
   };
@@ -140,6 +149,7 @@ subtest 'fetch' => sub {
         field type     => 'file';
         field filename => 'foo-1.00.tar.gz';
         field content  => $expected_content;
+        field protocol => $proto;
       },
     );
   };

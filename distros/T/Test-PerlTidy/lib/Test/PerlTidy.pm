@@ -1,5 +1,5 @@
 package Test::PerlTidy;
-$Test::PerlTidy::VERSION = '20210709';
+$Test::PerlTidy::VERSION = '20220902';
 use 5.014;
 use strict;
 use warnings;
@@ -10,13 +10,13 @@ use parent 'Exporter';
 use vars qw( @EXPORT );    ## no critic (Modules::ProhibitAutomaticExportation)
 @EXPORT = qw( run_tests );
 
-use Carp qw( croak );
+use Carp             qw( croak );
 use Path::Tiny 0.100 qw( path );
-use File::Spec ();
-use IO::File   ();
-use Perl::Tidy 20201001;
+use File::Spec       ();
+use IO::File         ();
+use Perl::Tidy 20220613;
 use Test::Builder ();
-use Text::Diff qw( diff );
+use Text::Diff    qw( diff );
 
 my $test = Test::Builder->new;
 
@@ -195,7 +195,7 @@ Test::PerlTidy - check that all your files are tidy.
 
 =head1 VERSION
 
-version 20210709
+version 20220902
 
 =head1 SYNOPSIS
 
@@ -473,7 +473,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Edmund von der Burg.
+This software is copyright (c) 2022 by Edmund von der Burg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

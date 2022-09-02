@@ -34,6 +34,8 @@
       },
       "test" : {
          "requires" : {
+            "Test::Builder::Tester" : "0",
+            "Test::Builder::Tester::Color" : "0",
             "Test::More" : "0.70"
          }
       }
@@ -52,7 +54,7 @@
          "web" : "https://github.com/ap/Test-File-Contents"
       }
    },
-   "version" : "0.241",
+   "version" : "0.242",
    "x_copyright" : {
       "holder" : "David E. Wheeler",
       "year" : 2016

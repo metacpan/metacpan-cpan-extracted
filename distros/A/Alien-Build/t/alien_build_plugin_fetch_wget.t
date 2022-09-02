@@ -22,6 +22,14 @@ subtest 'fetch from http' => sub {
 
   my $base = $config->{url};
 
+  my($proto) = $base =~ /^([a-z]+):/;
+  like $proto, qr/^https?$/, "protocol is either http or https (url = $base)";
+
+  # This test runs against a real http or ftp server, usually only in CI
+  # the server is running on localhost
+  local $ENV{ALIEN_DOWNLOAD_RULE} = $ENV{ALIEN_DOWNLOAD_RULE};
+  $ENV{ALIEN_DOWNLOAD_RULE} = 'warn' if $proto ne 'https';
+
   my $build = alienfile_ok qq{
     use alienfile;
 
@@ -43,9 +51,10 @@ subtest 'fetch from http' => sub {
     is(
       $list,
       hash {
-        field type    => 'html';
-        field base    => "$base/html_test.html";
-        field content => "<html><head><title>Hello World</title></head><body><p>Hello World</p></body></html>\n";
+        field type     => 'html';
+        field base     => "$base/html_test.html";
+        field content  => "<html><head><title>Hello World</title></head><body><p>Hello World</p></body></html>\n";
+        field protocol => $proto;
         end;
       },
       'list'
@@ -63,6 +72,7 @@ subtest 'fetch from http' => sub {
         field type     => 'file';
         field filename => 'foo-1.01.tar';
         field path     => T();
+        field protocol => $proto;
         end;
       },
       'file meta',
@@ -96,6 +106,15 @@ subtest 'headers' => sub {
   my $url = http_url;
   skip_all http_error unless $url;
 
+  require URI;
+  my $furl = URI->new_abs("test1/foo.txt", $url);
+  note "url = $furl";
+
+  # This test runs against a real http or ftp server, usually only in CI
+  # the server is running on localhost
+  local $ENV{ALIEN_DOWNLOAD_RULE} = $ENV{ALIEN_DOWNLOAD_RULE};
+  $ENV{ALIEN_DOWNLOAD_RULE} = 'warn' if $url ne 'https';
+
   my $build = do {
     my $plugin = Alien::Build::Plugin::Fetch::Wget->new;
     my $build = alienfile filename => 'corpus/blank/alienfile';
@@ -103,10 +122,6 @@ subtest 'headers' => sub {
     $plugin->init($meta);
     $build;
   };
-
-  require URI;
-  my $furl = URI->new_abs("test1/foo.txt", $url);
-  note "url = $furl";
 
   my $res = capture_note { $build->fetch("$furl", http_headers => [ Foo => 'Bar1', Foo => 'Bar2', Baz => 1 ]) };
 

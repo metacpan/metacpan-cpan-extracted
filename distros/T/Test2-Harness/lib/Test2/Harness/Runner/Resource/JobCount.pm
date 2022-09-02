@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Resource::JobCount;
 use strict;
 use warnings;
 
-our $VERSION = '1.000125';
+our $VERSION = '1.000127';
 
 use parent 'Test2::Harness::Runner::Resource';
 use Test2::Harness::Util::HashBase qw/<settings <job_count <used/;
@@ -54,6 +54,12 @@ sub record {
 sub release {
     my $self = shift;
     $self->{+USED}--;
+}
+
+sub status_lines {
+    my $self = shift;
+
+    return ("using $self->{+USED}/$self->{+JOB_COUNT} job slot(s).");
 }
 
 1;

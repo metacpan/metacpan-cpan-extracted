@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-use FindBin ();
-use Hash::Merge qw( merge );
-use JSON::PP ();
-use List::Util 1.49 qw( uniq );
-use Path::Tiny qw( path );
+use FindBin           ();
+use Hash::Merge       qw( merge );
+use JSON::PP          ();
+use List::Util 1.49   qw( uniq );
+use Path::Tiny        qw( path );
 use Test::Differences qw( eq_or_diff );
 use Test::Warnings;
 use Test::More import =>
@@ -126,7 +126,7 @@ foreach my $ua ( sort ( keys %{$all_tests} ) ) {
                     $detected->browser_properties()
             ],
             [ sort grep { $_ !~ m{\Arobot_id\z} } @{ $test->{match} } ],
-            "browser properties match"
+            'browser properties match'
         );
 
         # Test that $ua doesn't match a specific method

@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.35';
+our $VERSION = '3.36';
 
 # Operating Systems
 our @OS_TESTS = qw(
@@ -110,6 +110,7 @@ our @NETSCAPE_TESTS = qw(
 our @FIREFOX_TESTS = qw(
     firebird    iceweasel   phoenix
     namoroka
+    fxios
 );
 
 # Engine tests
@@ -697,7 +698,7 @@ sub _init_core {
     }
     elsif (
         $ua =~ m{
-                (firebird|iceweasel|phoenix|namoroka|firefox)
+                (firebird|iceweasel|phoenix|namoroka|firefox|fxios)
                 \/
                 ( [^.]* )           # Major version number is everything before first dot
                 \.                  # The first dot
@@ -709,7 +710,7 @@ sub _init_core {
         # Browser is Firefox, possibly under an alternate name
 
         $browser        = 'firefox';
-        $browser_string = ucfirst $1;
+        $browser_string = ucfirst( $1 eq 'fxios' ? $browser : $1 );
 
         $browser_tests->{$1} = 1;
         $browser_tests->{firefox} = 1;
@@ -1880,6 +1881,9 @@ sub _init_version {
             }
         }
     }
+    elsif ( $browser_tests->{fxios} ) {
+        ( $major, $minor ) = $ua =~ m{ \b fxios/ (\d+) [.] (\d+) }x;
+    }
     elsif ( $browser_tests->{ie} ) {
 
         # MSIE
@@ -2978,7 +2982,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.35
+version 3.36
 
 =head1 SYNOPSIS
 

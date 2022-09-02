@@ -7,6 +7,7 @@ use parent q(PLS::Server::Response);
 use feature 'state';
 
 use Pod::Functions;
+use List::Util;
 use Module::CoreList;
 use Module::Metadata;
 use ExtUtils::Installed;
@@ -34,62 +35,73 @@ sub new
     my $self = bless {id => $request->{id}, result => undef}, $class;
 
     my $document = PLS::Parser::Document->new(uri => $request->{params}{textDocument}{uri}, line => $request->{params}{position}{line});
-    return $self unless (ref $document eq 'PLS::Parser::Document');
+    return $self if (ref $document ne 'PLS::Parser::Document');
 
-    my @word_under_cursor_info = $document->find_word_under_cursor(@{$request->{params}{position}}{qw(line character)});
-    return $self unless (scalar @word_under_cursor_info);
-    my ($range, $arrow, $package, $filter) = @word_under_cursor_info;
+    my ($range, $arrow, $package, $filter) = $document->find_word_under_cursor(@{$request->{params}{position}}{qw(line character)});
 
-    if (ref $range eq 'HASH')
-    {
-        $range->{start}{line} = $request->{params}{position}{line};
-        $range->{end}{line}   = $request->{params}{position}{line};
-    }
+    return $self if (ref $range ne 'HASH');
 
-    return $self unless (ref $range eq 'HASH');
+    $range->{start}{line}    = $request->{params}{position}{line};
+    $range->{end}{line}      = $request->{params}{position}{line};
+    $range->{end}{character} = $request->{params}{position}{character};
+
     $package =~ s/::$// if (length $package);
 
     my @results;
+    my $full_text = $document->get_full_text();
 
-    if ($filter =~ /^[\$\%\@]/ and not $arrow)
+    my @futures;
+
+    if ($filter =~ /^[\$\@\%]/)
     {
-        my $full_text = $document->get_full_text();
         push @results, @{get_variables($document, $filter, $full_text)};
     }
     else
     {
-        my $functions = get_package_functions($package, $filter, $arrow);
-        push @results, @{$functions};
-
-        my $full_text;
-
-        unless (scalar @{$functions})
-        {
-            $full_text = $document->get_full_text();
-            push @results, @{get_subroutines($document, $filter, $full_text)};
-            push @results, @{get_keywords()} unless $arrow;
-        } ## end unless (scalar @{$functions...})
+        my @packages = @{get_packages($document, $full_text)};
 
         unless ($arrow)
         {
-            $full_text = $document->get_full_text() unless (ref $full_text eq 'SCALAR');
-            push @results, @{get_packages($document, $filter, $full_text)};
+            push @results, @packages;
+            push @results, @{get_keywords()};
         }
-    } ## end else [ if ($filter =~ /^[\$\%\@]/...)]
+
+        if ($package)
+        {
+            push @futures, get_package_functions($package, $filter, $arrow);
+        }
+
+        if ($filter)
+        {
+            push @results, @{get_constants($document, $filter, $full_text)};
+            push @futures, get_imported_package_functions($document, $full_text);
+            push @results, @{get_subroutines($document, $arrow, $full_text, $packages[0]{label})};
+        } ## end if ($filter)
+    } ## end else [ if ($filter =~ /^[\$\@\%]/...)]
+
+    push @results, @{Future->wait_all(@futures)->then(
+            sub {
+                [map { @{$_->result} } grep { $_->is_ready } @_]
+            }
+          )->get()
+    };
+
+    my %unique_by_detail;
 
     foreach my $result (@results)
     {
         my $new_text = $result->{label};
         $new_text = $result->{insertText} if (length $result->{insertText});
         delete $result->{insertText};
+        next if (exists $result->{detail} and length $result->{detail} and $unique_by_detail{$result->{detail}}++);
 
-        push @{$self->{result}},
-          {
-            %$result,
-            textEdit => {newText => $new_text, range => $range},
-            data     => $request->{params}{textDocument}{uri}
-          };
+        push @{$self->{result}}, {%$result, textEdit => {newText => $new_text, range => $range}};
     } ## end foreach my $result (@results...)
+
+    if (not $arrow and not $package and $filter !~ /^\%\@/)
+    {
+        push @{$self->{result}}, get_snippets();
+    }
 
     return $self;
 } ## end sub new
@@ -112,11 +124,13 @@ sub get_keywords
         } ## end foreach my $sub (@{$Pod::Functions::Kinds...})
     } ## end foreach my $family (keys %Pod::Functions::Kinds...)
 
-    foreach my $keyword (qw(cmp continue default do else elsif eq for foreach ge given gt if le lock lt ne not or package sub unless until when while x xor))
+    foreach my $keyword (
+        qw(cmp continue default do else elsif eq for foreach ge given gt if le lock lt ne not or package sub unless until when while x xor -r -w -x -o -R -W -X -O -e -z -s -f -d -l -p -S -b -c -t -u -g -k -T -B -M -A -C)
+      )
     {
         next if $seen_keywords{$keyword}++;
         push @keywords, {label => $keyword, kind => 14};
-    }
+    } ## end foreach my $keyword (...)
 
     return \@keywords;
 } ## end sub get_keywords
@@ -153,113 +167,162 @@ sub get_package_functions
 {
     my ($package, $filter, $arrow) = @_;
 
-    my $functions = PLS::Parser::PackageSymbols::get_package_functions($package, $PLS::Server::State::CONFIG);
-    return [] if (ref $functions ne 'HASH');
+    return Future->done([]) unless (length $package);
 
-    my $separator = $arrow ? '->' : '::';
-    my @functions;
+    return PLS::Parser::PackageSymbols::get_package_symbols($PLS::Server::State::CONFIG, $package)->then(
+        sub {
+            my ($functions) = @_;
 
-    foreach my $package_name (keys %{$functions})
-    {
-        foreach my $name (@{$functions->{$package_name}})
-        {
-            my $fully_qualified = join $separator, $package_name, $name;
+            return Future->done([]) if (ref $functions ne 'HASH');
 
-            my $result = {
-                          label    => $name,
-                          sortText => $fully_qualified,
-                          kind     => 3
-                         };
+            my $separator = $arrow ? '->' : '::';
+            my @functions;
 
-            if ($arrow)
+            foreach my $package_name (keys %{$functions})
             {
-                $result->{insertText} = $name;
-            }
-            else
-            {
-                $result->{insertText} = $fully_qualified;
-            }
-
-            if ($arrow)
-            {
-                if (length $filter)
+                foreach my $name (@{$functions->{$package_name}})
                 {
-                    $result->{filterText} = $name;
-                }
-                else
-                {
-                    $result->{filterText} = $fully_qualified;
-                }
-            } ## end if ($arrow)
-            else
-            {
-                $result->{filterText} = $fully_qualified;
-            }
+                    my $fully_qualified = join $separator, $package_name, $name;
 
-            push @functions, $result;
-        } ## end foreach my $name (@{$functions...})
-    } ## end foreach my $package_name (keys...)
+                    my $result = {
+                                  label    => $name,
+                                  sortText => $fully_qualified,
+                                  kind     => 3
+                                 };
 
-    return \@functions;
+                    if ($arrow)
+                    {
+                        $result->{insertText} = $name;
+                    }
+                    else
+                    {
+                        $result->{insertText} = $fully_qualified;
+                    }
+
+                    if ($arrow)
+                    {
+                        if (length $filter)
+                        {
+                            $result->{filterText} = $name;
+                        }
+                        else
+                        {
+                            $result->{filterText} = $fully_qualified;
+                        }
+                    } ## end if ($arrow)
+                    else
+                    {
+                        $result->{filterText} = $fully_qualified;
+                    }
+
+                    push @functions, $result;
+                } ## end foreach my $name (@{$functions...})
+            } ## end foreach my $package_name (keys...)
+
+            return Future->done(\@functions);
+        }
+    );
 } ## end sub get_package_functions
+
+sub get_imported_package_functions
+{
+    my ($document, $full_text) = @_;
+
+    my $imports = $document->get_imports($full_text);
+    return Future->done([]) if (ref $imports ne 'ARRAY' or not scalar @{$imports});
+
+    return PLS::Parser::PackageSymbols::get_imported_package_symbols($PLS::Server::State::CONFIG, @{$imports})->then(
+        sub {
+            my ($imported_functions) = @_;
+
+            my @results;
+            foreach my $package_name (keys %{$imported_functions})
+            {
+                foreach my $subroutine (@{$imported_functions->{$package_name}})
+                {
+                    my $result = {
+                                  kind   => 3,
+                                  label  => $subroutine,
+                                  data   => [$package_name],
+                                  detail => "${package_name}::${subroutine}",
+                                 };
+
+                    $result->{labelDetails} = {description => "${package_name}::${subroutine}"}
+                      if $PLS::Server::State::CLIENT_CAPABILITIES->{textDocument}{completion}{completionItem}{labelDetailsSupport};
+                    push @results, $result;
+                } ## end foreach my $subroutine (@{$imported_functions...})
+            } ## end foreach my $package_name (keys...)
+            return Future->done(\@results);
+        }
+    );
+} ## end sub get_imported_package_functions
 
 sub get_subroutines
 {
-    my ($document, $filter, $full_text) = @_;
+    my ($document, $arrow, $full_text, $this_document_package) = @_;
 
-    my %seen_subs;
-    my @subroutines;
+    my %subroutines;
 
     foreach my $sub (@{$document->get_subroutines_fast($full_text)})
     {
-        next if $seen_subs{$sub}++;
         next if ($sub =~ /\n/);
-        push @subroutines, {label => $sub, kind => 3};
+        $subroutines{$sub} = {label => $sub, kind => 3};
+        $subroutines{$sub}{data} = ["${this_document_package}::${sub}"] if (length $this_document_package);
     } ## end foreach my $sub (@{$document...})
 
-    if (ref $document->{index} eq 'PLS::Parser::Index')
+    # Add subroutines to the list, uniquifying and keeping track of the packages in which
+    # it is defined so that resolve can find the documentation.
+    foreach my $sub (keys %{$document->{index}->subs})
     {
-        my $subs = $document->{index}{subs_trie}->find($filter);
-        @{$subs} = map { {label => $_, kind => 3} } grep { not $seen_subs{$_}++ } @{$subs};
-        push @subroutines, @{$subs};
-    } ## end if (ref $document->{index...})
+        foreach my $data (@{$document->{index}->subs->{$sub}})
+        {
+            my $result = $subroutines{$sub} // {label => $sub, kind => $data->{kind}, data => []};
 
-    return \@subroutines;
+            if (length $data->{package})
+            {
+                push @{$result->{data}}, $data->{package};
+            }
+
+            $subroutines{$sub} = $result;
+        } ## end foreach my $data (@{$document...})
+    } ## end foreach my $sub (keys %{$document...})
+
+    # If the subroutine is only defined in one place, include the package name as the detail.
+    foreach my $sub (keys %subroutines)
+    {
+        if (exists $subroutines{$sub}{data} and ref $subroutines{$sub}{data} eq 'ARRAY' and scalar @{$subroutines{$sub}{data}} == 1)
+        {
+            $subroutines{$sub}{detail} = $subroutines{$sub}{data}[0] . "::${sub}";
+        }
+    } ## end foreach my $sub (keys %subroutines...)
+
+    return [values %subroutines];
 } ## end sub get_subroutines
 
 sub get_packages
 {
-    my ($document, $filter, $full_text) = @_;
+    my ($document, $full_text) = @_;
 
     my @packages;
-
-    my $curr_doc_packages = $document->get_packages_fast($full_text);
 
     # Can use state here, core modules unlikely to change.
     state $core_modules = [Module::CoreList->find_modules(qr//, $])];
     my $ext_modules = get_ext_modules();
 
-    my %seen_packages;
+    push @packages, @{$document->get_packages_fast($full_text)};
 
-    foreach my $pack (@{$curr_doc_packages}, @{$core_modules}, @{$ext_modules})
+    foreach my $pack (@{$core_modules}, @{$ext_modules})
     {
-        next if $seen_packages{$pack}++;
         next if ($pack =~ /\n/);
-        push @packages,
-          {
-            label => $pack,
-            kind  => 7
-          };
-    } ## end foreach my $pack (@{$curr_doc_packages...})
+        push @packages, $pack;
+    }
 
     if (ref $document->{index} eq 'PLS::Parser::Index')
     {
-        my $packages = $document->{index}{packages_trie}->find($filter);
-        @{$packages} = map { {label => $_, kind => 7} } grep { not $seen_packages{$_}++ } @{$packages};
-        push @packages, @{$packages};
-    } ## end if (ref $document->{index...})
+        push @packages, @{$document->{index}->get_all_packages()};
+    }
 
-    return \@packages;
+    return [map { {label => $_, kind => 7} } List::Util::uniq sort @packages];
 } ## end sub get_packages
 
 sub get_constants
@@ -281,12 +344,38 @@ sub get_constants
 
 sub get_variables
 {
-    my ($document, $filter, $full_text) = @_;
+    my ($document, $full_text) = @_;
 
     my @variables;
     my %seen_variables;
 
-    foreach my $variable (@{$document->get_variables_fast($full_text)})
+    state @builtin_variables;
+
+    unless (scalar @builtin_variables)
+    {
+        my $perldoc = PLS::Parser::Pod->get_perldoc_location();
+
+        if (open my $fh, '-|', $perldoc, '-Tu', 'perlvar')
+        {
+            while (my $line = <$fh>)
+            {
+                if ($line =~ /=item\s*(C<)?([\$\@\%]\S+)\s*/)
+                {
+                    # If variable started with pod sequence "C<" remove ">" from the end
+                    my $variable = $2;
+                    $variable = substr $variable, 0, -1 if (length $1);
+
+                    # Remove variables indicated by pod sequences
+                    next if ($variable =~ /^\$</ and $variable ne '$<');
+                    push @builtin_variables, $variable;
+                } ## end if ($line =~ /=item\s*(C<)?([\$\@\%]\S+)\s*/...)
+            } ## end while (my $line = <$fh>)
+
+            close $fh;
+        } ## end if (open my $fh, '-|',...)
+    } ## end unless (scalar @builtin_variables...)
+
+    foreach my $variable (@builtin_variables, @{$document->get_variables_fast($full_text)})
     {
         next if $seen_variables{$variable}++;
         next if ($variable =~ /\n/);
@@ -309,9 +398,140 @@ sub get_variables
                 kind       => 6
               };
         } ## end if ($variable =~ /^[\@\%]/...)
-    } ## end foreach my $variable (@{$document...})
+    } ## end foreach my $variable (@builtin_variables...)
 
     return \@variables;
 } ## end sub get_variables
+
+sub get_snippets
+{
+    state @snippets;
+
+    return @snippets if (scalar @snippets);
+
+    @snippets = (
+                 {
+                  label            => 'sub',
+                  detail           => 'Insert subroutine',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => "sub \$1\n{\n\t\$0\n}",
+                 },
+                 {
+                  label            => 'foreach',
+                  detail           => 'Insert foreach loop',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => "foreach my \$1 (\$2)\n{\n\t\$0\n}",
+                 },
+                 {
+                  label            => 'for',
+                  detail           => 'Insert C-style for loop',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => "for (\$1 ; \$2 ; \$3)\n{\n\t\$0\n}",
+                 },
+                 {
+                  label            => 'while',
+                  detail           => 'Insert while statement',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => "while (\$1)\n{\n\t\$0\n}",
+                 },
+                 {
+                  label            => 'if',
+                  detail           => 'Insert if statement',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => "if (\$1)\n{\n\t\$0\n}",
+                 },
+                 {
+                  label            => 'elsif',
+                  detail           => 'Insert elsif statement',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => "elsif (\$1)\n{\n\t\$0\n}",
+                 },
+                 {
+                  label            => 'else',
+                  detail           => 'Insert else statement',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => "else\n{\n\t\$0\n}",
+                 },
+                 {
+                  label            => 'package',
+                  detail           => 'Create a new package',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => "package \$1;\n\nuse strict;\nuse warnings;\n\n\$0\n\n1;",
+                 },
+                 {
+                  label            => 'open my $fh, ...',
+                  filterText       => 'open',
+                  sortText         => 'open',
+                  detail           => 'Insert an open statement',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => q[open $1, '${2|<,>,>>,+<,+>,\|-,-\|,>&,<&=,>>&=|}', $3],
+                 },
+                 {
+                  label            => 'do { local $/; <$fh> }',
+                  filterText       => 'do',
+                  sortText         => 'do1',
+                  detail           => 'Slurp an entire filehandle',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => 'do { local $/; <$1> }'
+                 },
+                 {
+                  label            => 'while (my $line = <$fh>) { ... }',
+                  filterText       => 'while',
+                  sortText         => 'while1',
+                  detail           => 'Iterate through a filehandle line-by-line',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => "while (my \$1 = <\$2>)\n{\n\t\$0\n}"
+                 },
+                 {
+                  label            => 'my ($param1, $param2, ...) = @_;',
+                  filterText       => 'my',
+                  sortText         => 'my1',
+                  detail           => 'Get subroutine parameters',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => "my (\$1) = \@_;\n\n"
+                 },
+                 {
+                  label            => '$? >> 8',
+                  filterText       => '$?',
+                  sortText         => '$?',
+                  detail           => 'Get exit code',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => '? >> 8'
+                 },
+                 {
+                  label            => 'sort { $a <=> $b } ...',
+                  filterText       => 'sort',
+                  sortText         => 'sort1',
+                  detail           => 'Sort numerically ascending',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => 'sort { \$a <=> \$b } $1'
+                 },
+                 {
+                  label            => 'reverse sort { $a <=> $b } ...',
+                  filterText       => 'sort',
+                  sortText         => 'sort2',
+                  detail           => 'Sort numerically descending',
+                  kind             => 15,
+                  insertTextFormat => 2,
+                  insertText       => 'reverse sort { \$a <=> \$b } $1'
+                 }
+                );
+
+    return @snippets;
+} ## end sub get_snippets
 
 1;

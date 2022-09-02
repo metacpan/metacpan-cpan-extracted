@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018,2021 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -14,8 +14,8 @@
 package Doit::File;
 
 use strict;
-use vars qw($VERSION);
-$VERSION = '0.021';
+use warnings;
+our $VERSION = '0.024';
 
 use Doit::Log;
 use Doit::Util qw(copy_stat new_scope_cleanup);
@@ -37,11 +37,24 @@ sub file_atomic_write {
 
     require File::Basename;
     require Cwd;
-    my $dest_dir = Cwd::realpath(File::Basename::dirname($file));
+    my $dest_dir = File::Basename::dirname($file);
+    eval { $dest_dir = Cwd::realpath($dest_dir) }; # may fail on some platforms (e.g. Windows) if $dest_dir does not exist
 
-    my $tmp_suffix = delete $opts{tmpsuffix} || '.tmp';
-    my $tmp_dir    = delete $opts{tmpdir}; if (!defined $tmp_dir) { $tmp_dir = $dest_dir }
-    my $mode       = delete $opts{mode};
+    my $tmp_suffix   = delete $opts{tmpsuffix} || '.tmp';
+    my $tmp_dir      = delete $opts{tmpdir};
+    if (!defined $tmp_dir) {
+	if (defined $dest_dir && -d $dest_dir) {
+	    $tmp_dir = $dest_dir;
+	} else {
+	    if (eval { require File::Spec; 1 }) {
+		$tmp_dir = File::Spec->tmpdir;
+	    } else {
+		$tmp_dir = '/tmp';
+	    }
+	}
+    }
+    my $mode         = delete $opts{mode};
+    my $check_change = delete $opts{check_change};
     error "Unhandled options: " . join(" ", %opts) if %opts;
 
     my($tmp_fh,$tmp_file);
@@ -65,20 +78,23 @@ sub file_atomic_write {
 	push @cleanup_files, $tmp_file;
 	push @cleanup_fhs, $tmp_fh;
 	if (defined $mode) {
-	    $doit->chmod($mode, $tmp_file);
+	    $doit->chmod({quiet => 1}, $mode, $tmp_file);
 	} else {
-	    $doit->chmod(0666 & ~umask, $tmp_file);
+	    $doit->chmod({quiet => 1}, 0666 & ~umask, $tmp_file);
 	}
 	if ($tmp_dir ne $dest_dir) {
 	    my @stat_destdir = stat $dest_dir;
-	    if ($^O =~ /bsd/ || $^O eq 'darwin' || ($stat_destdir[2] & 02000)) {
-		$doit->chown(undef, $stat_destdir[5], $tmp_file);
+	    if (@stat_destdir) { # may fail in dry-run mode if $dest_dir is missing
+		if ($^O =~ /bsd/ || $^O eq 'darwin' || ($stat_destdir[2] & 02000)) {
+		    $doit->chown({quiet => 1 }, undef, $stat_destdir[5], $tmp_file);
+		}
 	    }
 	}
     }
     my $same_fs = do {
 	my $tmp_dev  = (stat($tmp_file))[0];
 	my $dest_dev = (stat($dest_dir))[0];
+	no warnings 'uninitialized'; # $dest_dev may be undefined in dry-run mode
 	$tmp_dev == $dest_dev;
     };
 
@@ -102,6 +118,14 @@ sub file_atomic_write {
 	error "Error while closing temporary file $tmp_file: $!";
     }
 
+    if ($check_change) {
+	require File::Compare;
+	if (File::Compare::compare($tmp_file, $file) == 0) {
+	    # unchanged
+	    return 0;
+	}
+    }
+
     if ($same_fs) {
 	_make_writeable($doit, $file, 'rename');
 	$doit->rename($tmp_file, $file);
@@ -121,6 +145,8 @@ sub file_atomic_write {
 	    copy_stat [@dest_stat], $file, mode => 1;
 	}
     }
+
+    return 1;
 }
 
 sub _make_writeable {

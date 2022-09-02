@@ -1,5 +1,15 @@
 Release history for DBIx-Simple-Interpol
 
+1.007 Fri 02 Sep 2022
+	- No functional changes
+	- Copyright bump
+
+1.006 Thu 01 Sep 2022
+	- Switch from reimplementing SQL::Interpol::import to delegating to it
+	- Internal refactoring of the module
+	- No minimum Test::More version requirement
+	- Updated packaging and package metadata
+
 1.005 Sat 10 Jan 2015
 	- No functional changes
 	- No longer contains INSTALL file with install-as-root instructions

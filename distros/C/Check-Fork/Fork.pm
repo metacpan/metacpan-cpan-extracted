@@ -10,7 +10,7 @@ use Readonly;
 our $ERROR_MESSAGE;
 Readonly::Array our @EXPORT_OK => qw(check_fork $ERROR_MESSAGE);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub check_fork {
 	my ($config_hr, $os) = @_;
@@ -90,7 +90,7 @@ Returns 0/1.
                  $^O: No interpreter-based threading implementation.
                  $^O: No PERL_IMPLICIT_SYS ccflags set.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
 
 =for comment filename=check_fork.pl
 
@@ -116,6 +116,51 @@ Returns 0/1.
  # Output on Windows without $Config{'useithreads'} set:
  # We couldn't fork.
  # Error message: MSWin32: No interpreter-based threading implementation.
+
+=head1 EXAMPLE2
+
+=for comment filename=check_fork_and_socket.pl
+
+ use strict;
+ use warnings;
+
+ use Check::Fork qw(check_fork);
+ use Check::Socket qw(check_socket);
+
+ if (! check_fork()) {
+         print "We couldn't fork.\n";
+         print "Error message: $Check::Fork::ERROR_MESSAGE\n";
+ } elsif (! check_socket()) {
+         print "We couldn't use socket communication.\n";
+         print "Error message: $Check::Socket::ERROR_MESSAGE\n";
+ } else {
+         print "We could use fork and socket communication.\n";
+ }
+
+ # Output on Unix:
+ # We could use fork and socket communication.
+
+=head1 EXAMPLE3
+
+=for comment filename=test_fork_and_socket.pl
+
+ use strict;
+ use warnings;
+
+ use Check::Fork qw(check_fork);
+ use Check::Socket qw(check_socket);
+ use Test::More 'tests' => 1;
+
+ SKIP: {
+         skip $Check::Fork::ERROR_MESSAGE, 1 unless check_fork();
+         skip $Check::Socket::ERROR_MESSAGE, 1 unless check_socket();
+
+         ok(1, 'Fork and Socket test');
+ };
+
+ # Output on Unix:
+ # 1..1
+ # ok 1 - Fork and Socket test
 
 =head1 DEPENDENCIES
 
@@ -151,6 +196,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

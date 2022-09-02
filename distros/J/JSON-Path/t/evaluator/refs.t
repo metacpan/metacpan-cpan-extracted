@@ -1,11 +1,8 @@
-use Test::Most;
+use Test2::V0 '-target' => 'JSON::Path::Evaluator';
 use Carp;
-use JSON::Path::Evaluator;
 use JSON::MaybeXS qw/decode_json/;
 
-no warnings qw/uninitialized/;
-my @tests_to_run = split /,/, $ARGV[0];
-use warnings qw/uninitialized/;
+my @tests_to_run = split /,/, $ARGV[0] // '';
 
 subtest recursive => sub {
     plan skip_all => 'This test not requested' if @tests_to_run && !grep { lc($_) eq 'recursive' } @tests_to_run;
@@ -144,7 +141,7 @@ sub do_test {
 
     subtest $expression => sub {
         my @refs;
-        lives_ok { @refs = JSON::Path::Evaluator::evaluate_jsonpath( $obj, $expression, want_ref => 1 ) }
+        ok lives { @refs = JSON::Path::Evaluator::evaluate_jsonpath( $obj, $expression, want_ref => 1 ) },
         q{evaluate() did not die};
         $test->( \@refs, $obj );
     };
@@ -300,4 +297,3 @@ sub sample_json {
 END
     return $data;
 }
-

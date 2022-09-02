@@ -1,26 +1,24 @@
-use 5.006;
-use strict;
-no warnings;
+use 5.006; use strict; use warnings;
 
 package DBIx::Simple::Concrete;
-$DBIx::Simple::Concrete::VERSION = '1.001';
-# ABSTRACT: monkey-patch DBIx::Simple to use SQL::Concrete
 
-BEGIN {
-	require SQL::Concrete;
-	require DBIx::Simple;
-	require Import::Into;
-	die 'Too late to patch DBIx::Simple' if DBIx::Simple->can( 'cquery' );
-	*DBIx::Simple::cquery = sub {
-		use warnings; # limited scope to avoid "Subroutine redefined"
-		my $self = shift;
-		return $self->query( SQL::Concrete::Renderer->new->render( @_ ) );
-	};
+our $VERSION = '1.007';
+
+use DBIx::Simple ();
+use SQL::Concrete ();
+
+sub import {
+	shift;
+	my $prelude = sprintf qq'package %s;\n#line %d "%s"\n', ( caller )[0,2,1];
+	my $sub = eval qq{ sub { $prelude SQL::Concrete->import(\@_) } };
+	&$sub;
 }
 
-sub import { shift; SQL::Concrete->import::into( scalar caller, @_ ) }
+sub cquery { shift->query( SQL::Concrete::Renderer->new->render( @_ ) ) }
 
-1;
+die 'Too late to patch DBIx::Simple' if DBIx::Simple->can( 'cquery' );
+
+*DBIx::Simple::cquery = \&cquery;
 
 __END__
 
@@ -31,10 +29,6 @@ __END__
 =head1 NAME
 
 DBIx::Simple::Concrete - monkey-patch DBIx::Simple to use SQL::Concrete
-
-=head1 VERSION
-
-version 1.001
 
 =head1 SYNOPSIS
 
@@ -64,7 +58,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Aristotle Pagaltzis.
+This software is copyright (c) 2022 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

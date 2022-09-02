@@ -4,13 +4,13 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-Static-Minifier",
    "prereqs" : {
@@ -23,7 +23,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
@@ -41,7 +41,7 @@
    "provides" : {
       "Plack::Middleware::Static::Minifier" : {
          "file" : "lib/Plack/Middleware/Static/Minifier.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -53,5 +53,6 @@
          "url" : "git://github.com/bayashi/Plack-Middleware-Static-Minifier.git"
       }
    },
-   "version" : "0.08"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

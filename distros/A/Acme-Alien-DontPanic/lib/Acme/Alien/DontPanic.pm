@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Test Module for Alien::Base::ModuleBuild
-our $VERSION = '2.5900'; # VERSION
+our $VERSION = '2.6500'; # VERSION
 
 1;
 
@@ -21,7 +21,7 @@ Acme::Alien::DontPanic - Test Module for Alien::Base::ModuleBuild
 
 =head1 VERSION
 
-version 2.5900
+version 2.6500
 
 =head1 DESCRIPTION
 

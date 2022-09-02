@@ -134,7 +134,7 @@ class Regex {
       my $match_length = $self->match_length;
       
       $result_buffer->replace($match_start, $match_length, $replace_string);
-      
+
       $self->{replaced_count} = $match_count;
       
       unless ($global) {
@@ -143,7 +143,7 @@ class Regex {
       
       my $next_offset = $match_start + $replace_string_length;
       $offset = $next_offset;
-      $length -= $offset;
+      $length = $result_buffer->length - $offset;
     }
     
     $result = $result_buffer->to_string;

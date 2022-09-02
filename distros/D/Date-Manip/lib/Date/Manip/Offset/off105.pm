@@ -6,9 +6,9 @@ Date::Manip::Offset::off105;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  1 10:56:59 EDT 2022
-#    Data version: tzdata2022a
-#    Code version: tzcode2022a
+#    Generated on: Thu Sep  1 10:36:28 EDT 2022
+#    Data version: tzdata2022c
+#    Code version: tzcode2022c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.88';
+$VERSION='6.89';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -28,11 +28,53 @@ END {
    undef %Offset;
 }
 
-$Offset        = '+04:21:52';
+$Offset        = '+05:00:00';
 
 %Offset        = (
    0 => [
+      'asia/dushanbe',
+      'asia/tashkent',
+      'asia/aqtau',
+      'asia/aqtobe',
+      'asia/ashgabat',
+      'asia/atyrau',
+      'asia/oral',
       'asia/qyzylorda',
+      'asia/samarkand',
+      'asia/yekaterinburg',
+      'asia/karachi',
+      'indian/maldives',
+      'etc/gmt+5',
+      'r',
+      'antarctica/mawson',
+      'asia/bishkek',
+      'asia/qostanay',
+      'indian/chagos',
+      'asia/omsk',
+      'asia/almaty',
+      'antarctica/davis',
+      ],
+   1 => [
+      'asia/baku',
+      'asia/yerevan',
+      'europe/samara',
+      'indian/mauritius',
+      'asia/tbilisi',
+      'asia/oral',
+      'asia/aqtau',
+      'asia/atyrau',
+      'asia/aqtobe',
+      'asia/ashgabat',
+      'asia/qostanay',
+      'asia/qyzylorda',
+      'asia/yekaterinburg',
+      'europe/astrakhan',
+      'europe/kirov',
+      'europe/ulyanovsk',
+      'europe/saratov',
+      'europe/volgograd',
+      'asia/tehran',
+      'europe/moscow',
       ],
 );
 

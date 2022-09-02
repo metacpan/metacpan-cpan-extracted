@@ -2,7 +2,7 @@ use strict; use warnings;
 
 package Class::Observable;
 
-our $VERSION = '2.002';
+our $VERSION = '2.003';
 
 use Scalar::Util 'refaddr';
 use Class::ISA;
@@ -376,7 +376,7 @@ would return a three-item list, including the observer for that
 specific object (C<observer_c> coderef) as well as from its class
 (Baz) and the parent (Foo) of its class.
 
-=head2 Observers
+=head2 Types of Observers
 
 There are three types of observers: classes, objects, and
 subroutines. All three respond to events when C<notify_observers()> is

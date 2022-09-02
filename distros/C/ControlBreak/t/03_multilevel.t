@@ -15,7 +15,8 @@ use Data::Table;
 use Getopt::Long;
 
 my $verbose = 0;
-GetOptions( 'v' => \$verbose ) 
+
+GetOptions( 'v' => \$verbose ) # uncoverable branch true
     or die "*E* unrecognized command line arguments";
 
 
@@ -29,10 +30,11 @@ my @colnames = $dt->header();
 # the list index corresponds to ControlBreak's one-based level numbers
 my @cbnames = ('', reverse @colnames[0,1]);
 
+# uncoverable branch true
 if ($verbose > 0) {
-    say sprintf '%s %-7s %-9s %-12s %10s', ' ' x 25, 
+    say sprintf '%s %-7s %-9s %-12s %10s', ' ' x 25,
         $colnames[0], $colnames[1], $colnames[2], $colnames[3];
-    say sprintf '%s %-7s %-9s %-12s %10s', ' ' x 25, 
+    say sprintf '%s %-7s %-9s %-12s %10s', ' ' x 25,
         '=' x 7, '=' x 9, '=' x 12, '=' x 10;
 }
 
@@ -55,16 +57,17 @@ while (my $row = $next->()) {
     $cb->test( reverse $row->{Country}, $row->{State} );
     my $level = $cb->levelnum;
 
+    # uncoverable branch true
     if ($verbose > 0) {
         # say "\n----- break $level -------" if $level;
-        say sprintf '%s %-7s %-9s %-12s %10s', ' ' x 25, 
+        say sprintf '%s %-7s %-9s %-12s %10s', ' ' x 25,
             $row->{Country}, $row->{State}, $row->{City}, $row->{Population};
     }
 
     my $expected = shift @expected;
     my $col = $cbnames[$level];
     ok $cb->levelnum == $expected, $expected ? "break on $col" : "no break";
-    
+
     $cb->continue;
 }
 

@@ -15,6 +15,9 @@ use JSON::PP qw( decode_json );
 
 $Alien::Build::Plugin::Fetch::CurlCommand::VERSION = '1.19';
 
+# This test makes real http request against localhost only
+$ENV{ALIEN_DOWNLOAD_RULE} = 'warn';
+
 subtest 'fetch from http' => sub {
 
   my $config = test_config 'httpd';
@@ -44,9 +47,10 @@ subtest 'fetch from http' => sub {
     is(
       $list,
       hash {
-        field type    => 'html';
-        field base    => "$base/html_test.html";
-        field content => "<html><head><title>Hello World</title></head><body><p>Hello World</p></body></html>\n";
+        field type     => 'html';
+        field base     => "$base/html_test.html";
+        field content  => "<html><head><title>Hello World</title></head><body><p>Hello World</p></body></html>\n";
+        field protocol => 'http';
         end;
       },
       'list'
@@ -64,6 +68,7 @@ subtest 'fetch from http' => sub {
         field type     => 'file';
         field filename => 'foo-1.01.tar';
         field path     => T();
+        field protocol => 'http';
         end;
       },
       'file meta',
@@ -221,23 +226,11 @@ subtest 'fetch from http' => sub {
 subtest 'live test' => sub {
   skip_all 'set ALIEN_BUILD_LIVE_TEST=1 to enable test' unless $ENV{ALIEN_BUILD_LIVE_TEST};
 
-  if(defined $ENV{CIPDIST} && $ENV{CIPDIST} eq 'centos6')
-  {
-    my $curl = which('curl');
-    is $curl, T();
-    note "curl = $curl";
-    my $pok = Alien::Build::Plugin::Fetch::CurlCommand->protocol_ok('https');
-    is $pok, F();
-    return;
-  }
-  else
-  {
-    my $curl = which('curl');
-    is $curl, T();
-    note "curl = $curl";
-    my $pok = Alien::Build::Plugin::Fetch::CurlCommand->protocol_ok('https');
-    is $pok, T();
-  }
+  my $curl = which('curl');
+  is $curl, T();
+  note "curl = $curl";
+  my $pok = Alien::Build::Plugin::Fetch::CurlCommand->protocol_ok('https');
+  is $pok, T();
 
   require Alien::Build::Plugin::Download::Negotiate;
   my $mock = mock 'Alien::Build::Plugin::Download::Negotiate' => (

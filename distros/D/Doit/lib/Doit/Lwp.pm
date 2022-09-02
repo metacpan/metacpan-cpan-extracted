@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -15,9 +15,7 @@ package Doit::Lwp; # Convention: all commands here should be prefixed with 'lwp_
 
 use strict;
 use warnings;
-
-use vars qw($VERSION);
-$VERSION = '0.01';
+our $VERSION = '0.012';
 
 use Doit::Log;
 
@@ -62,7 +60,11 @@ sub lwp_mirror {
 		info "Response: " . Data::Dumper->new([$resp],[qw()])->Indent(1)->Useqq(1)->Sortkeys(1)->Terse(1)->Dump;
 	    }
 	    if (!$resp->{success}) {
-		error "mirroring failed: $resp->{status} $resp->{reason}";
+		my $msg = "mirroring failed: $resp->{status} $resp->{reason}";
+		if ($resp->{status} == 599) {
+		    $msg .= ": $resp->{content}";
+		}
+		error $msg;
 	    } elsif ($resp->{status} == 304) {
 		return 0;
 	    } else {

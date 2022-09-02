@@ -3,7 +3,7 @@ Locale::Codes::LangExt_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Wed Jun  1 10:46:06 EDT 2022
+#    Generated on: Thu Sep  1 10:00:57 EDT 2022
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.71';
+$VERSION='3.72';
 
 $Locale::Codes::Data{'langext'}{'id'} = '0249';
 
@@ -419,7 +419,7 @@ $Locale::Codes::Data{'langext'}{'id2names'} = {
       ],
    q(0131) => [
       q(Albarradas Sign Language),
-      q(Lengua de seÃ±as Albarradas),
+      q(Lengua de senas Albarradas),
       ],
    q(0132) => [
       q(Latvian Sign Language),
@@ -1303,6 +1303,10 @@ $Locale::Codes::Data{'langext'}{'alias2id'} = {
       q(0132),
       q(0),
       ],
+   q(lengua de senas albarradas) => [
+      q(0131),
+      q(1),
+      ],
    q(lengua de senas catalana) => [
       q(0055),
       q(1),
@@ -1313,10 +1317,6 @@ $Locale::Codes::Data{'langext'}{'alias2id'} = {
       ],
    q(lengua de senas panamenas) => [
       q(0135),
-      q(1),
-      ],
-   q(lengua de seÃ±as albarradas) => [
-      q(0131),
       q(1),
       ],
    q(libyan arabic) => [

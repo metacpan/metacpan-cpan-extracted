@@ -1,5 +1,9 @@
 Release history for PostScript-DecodeGlyphName
 
+0.002 Fri 02 Sep 2022
+	- No functional changes
+	- Updated packaging and package metadata
+
 0.001 Sat 10 Jan 2015
 	- Initial release
 	  (for nostalgia -- <http://perlmonks.org/?node_id=284750>)

@@ -41,7 +41,7 @@ App::InvestSim::run($res_dir);
 
 =head1 Investment Simulator
 
-See the main L<README|https://metacpan.org/dist/App-InvestSim/source/README.pod>
+See the main L<README|https://metacpan.org/dist/App-InvestSim/view/README.pod>
 file of this distribution for more details on how to install and use this tool.
 
 =cut

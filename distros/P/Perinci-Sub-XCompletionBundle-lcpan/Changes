@@ -1,3 +1,9 @@
+0.003   2022-09-02  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Provide summaries for the completion entries (e.g. for CPAN
+          author id: full names).
+
+
 0.002   2021-01-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Add XCompletion: lcpan_distname, lcpan_modname.

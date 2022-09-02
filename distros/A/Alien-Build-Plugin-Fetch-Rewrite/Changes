@@ -1,5 +1,8 @@
 Revision history for Alien-Build-Plugin-Fetch-Rewrite
 
+0.03      2022-08-29 13:36:09 -0600
+  - Handle ALIEN_DOWNLOAD_RULE overrides (gh#5)
+
 0.02      2017-08-12 09:17:46 -0400
   - Remove annoying init log
 

@@ -1,0 +1,49 @@
+---
+abstract: 'handle OPTIONS requests as HEAD'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  Module::Metadata: '0'
+  Plack::Builder: '0'
+  Plack::Middleware::ContentLength: '0'
+  Plack::Middleware::Static: '0'
+  Plack::Response: '0'
+  Plack::Test: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - PSGI
+  - Plack
+  - HTTP
+  - OPTIONS
+  - CORS
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-EmulateOPTIONS
+provides:
+  Plack::Middleware::EmulateOPTIONS:
+    file: lib/Plack/Middleware/EmulateOPTIONS.pm
+    version: v0.2.0
+requires:
+  HTTP::Status: '0'
+  Plack::Middleware: '0'
+  parent: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/robrwo/Plack-Middleware-EmulateOPTIONS/issues
+  repository: git://github.com/robrwo/Plack-Middleware-EmulateOPTIONS.git
+version: v0.2.0
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

@@ -5,3 +5,6 @@ set -ex
 cip sudo apt-get update
 cip sudo apt-get install -y git
 cip exec cpanm -n Sort::Versions
+
+cip exec mkdir -p /home/cip/tmp
+cip exec ./maint/cip-before-install-inside

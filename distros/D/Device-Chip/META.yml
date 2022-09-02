@@ -4,6 +4,7 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   Test::Builder::Tester: '0'
+  Test::Fatal: '0'
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
@@ -17,32 +18,32 @@ name: Device-Chip
 provides:
   Device::Chip:
     file: lib/Device/Chip.pm
-    version: '0.22'
+    version: '0.23'
   Device::Chip::Adapter:
     file: lib/Device/Chip/Adapter.pm
-    version: '0.22'
+    version: '0.23'
   Device::Chip::Base::RegisteredI2C:
     file: lib/Device/Chip/Base/RegisteredI2C.pm
-    version: '0.22'
+    version: '0.23'
   Device::Chip::ProtocolBase::SPI:
     file: lib/Device/Chip/ProtocolBase/SPI.pm
-    version: '0.22'
+    version: '0.23'
   Device::Chip::Sensor:
     file: lib/Device/Chip/Sensor.pm
-    version: '0.22'
+    version: '0.23'
   Test::Device::Chip::Adapter:
     file: lib/Test/Device/Chip/Adapter.pm
-    version: '0.22'
+    version: '0.23'
 requires:
   Future: '0.26'
   Future::AsyncAwait: '0.47'
   List::Util: '1.33'
-  Object::Pad: '0.63'
+  Object::Pad: '0.66'
   Struct::Dumb: '0'
   Test::Builder: '0'
   Test::ExpectAndCheck::Future: '0'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.22'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

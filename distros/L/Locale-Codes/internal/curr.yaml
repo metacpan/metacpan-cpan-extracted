@@ -226,7 +226,7 @@ country:
       tm: Turkmenistan
       tn: Tunisia
       to: Tonga
-      tr: Turkey
+      tr: Turkiye
       tt: Trinidad and Tobago
       tv: Tuvalu
       tw: Taiwan (Province of China)
@@ -933,9 +933,9 @@ country:
       tunisia: 
         - tn
         - Tunisia
-      turkey: 
+      turkiye: 
         - tr
-        - Turkey
+        - Turkiye
       turkmenistan: 
         - tm
         - Turkmenistan
@@ -1227,7 +1227,7 @@ country:
       ton: Tonga
       tto: Trinidad and Tobago
       tun: Tunisia
-      tur: Turkey
+      tur: Turkiye
       tuv: Tuvalu
       twn: Taiwan (Province of China)
       tza: Tanzania, the United Republic of
@@ -1932,9 +1932,9 @@ country:
       tunisia: 
         - tun
         - Tunisia
-      turkey: 
+      turkiye: 
         - tur
-        - Turkey
+        - Turkiye
       turkmenistan: 
         - tkm
         - Turkmenistan
@@ -2224,7 +2224,7 @@ country:
       tm: Turkmenistan
       tn: Tunisia
       to: Tonga
-      tr: Turkey
+      tr: Turkiye
       tt: Trinidad and Tobago
       tv: Tuvalu
       tw: Taiwan (Province of China)
@@ -2931,9 +2931,9 @@ country:
       tunisia: 
         - tn
         - Tunisia
-      turkey: 
+      turkiye: 
         - tr
-        - Turkey
+        - Turkiye
       turkmenistan: 
         - tm
         - Turkmenistan
@@ -3230,7 +3230,7 @@ country:
       TM: Turkmenistan
       TN: Tunisia
       TO: Tonga
-      TR: Turkey
+      TR: TURKEY
       TT: Trinidad and Tobago
       TV: Tuvalu
       TW: Taiwan (Province of China)
@@ -4026,7 +4026,7 @@ country:
         - Tunisia
       turkey: 
         - TR
-        - Turkey
+        - TURKEY
       turkmenistan: 
         - TM
         - Turkmenistan
@@ -4325,7 +4325,7 @@ country:
       TON: Tonga
       TTO: Trinidad and Tobago
       TUN: Tunisia
-      TUR: Turkey
+      TUR: TURKEY
       TUV: Tuvalu
       TWN: Taiwan (Province of China)
       TZA: Tanzania
@@ -5125,7 +5125,7 @@ country:
         - Tunisia
       turkey: 
         - TUR
-        - Turkey
+        - TURKEY
       turkmenistan: 
         - TKM
         - Turkmenistan
@@ -5419,7 +5419,7 @@ country:
       780: Trinidad and Tobago
       784: United Arab Emirates
       788: Tunisia
-      792: Turkey
+      792: TURKEY
       795: Turkmenistan
       796: Turks and Caicos Islands
       798: Tuvalu
@@ -6224,7 +6224,7 @@ country:
         - Tunisia
       turkey: 
         - 792
-        - Turkey
+        - TURKEY
       turkmenistan: 
         - 795
         - Turkmenistan
@@ -6522,7 +6522,7 @@ country:
       780: Trinidad and Tobago
       784: United Arab Emirates
       788: Tunisia
-      792: Turkey
+      792: Turkiye
       795: Turkmenistan
       796: Turks and Caicos Islands
       798: Tuvalu
@@ -7227,9 +7227,9 @@ country:
       tunisia: 
         - 788
         - Tunisia
-      turkey: 
+      turkiye: 
         - 792
-        - Turkey
+        - Turkiye
       turkmenistan: 
         - 795
         - Turkmenistan
@@ -7521,7 +7521,7 @@ country:
       TON: Tonga
       TTO: Trinidad and Tobago
       TUN: Tunisia
-      TUR: Turkey
+      TUR: T&#252;rkiye
       TUV: Tuvalu
       TZA: United Republic of Tanzania
       UGA: Uganda
@@ -8195,6 +8195,9 @@ country:
       syrian arab republic: 
         - SYR
         - Syrian Arab Republic
+      t&#252;rkiye: 
+        - TUR
+        - T&#252;rkiye
       tajikistan: 
         - TJK
         - Tajikistan
@@ -8219,9 +8222,6 @@ country:
       tunisia: 
         - TUN
         - Tunisia
-      turkey: 
-        - TUR
-        - Turkey
       turkmenistan: 
         - TKM
         - Turkmenistan
@@ -8516,7 +8516,7 @@ country:
       780: Trinidad and Tobago
       784: United Arab Emirates
       788: Tunisia
-      792: Turkey
+      792: T&#252;rkiye
       795: Turkmenistan
       796: Turks and Caicos Islands
       798: Tuvalu
@@ -9194,6 +9194,9 @@ country:
       syrian arab republic: 
         - 760
         - Syrian Arab Republic
+      t&#252;rkiye: 
+        - 792
+        - T&#252;rkiye
       tajikistan: 
         - 762
         - Tajikistan
@@ -9218,9 +9221,6 @@ country:
       tunisia: 
         - 788
         - Tunisia
-      turkey: 
-        - 792
-        - Turkey
       turkmenistan: 
         - 795
         - Turkmenistan
@@ -46551,6 +46551,8 @@ langvar:
       lemosin: Limousin
       lengadoc: Languedocien
       lipaw: The Lipovaz dialect of Resian
+      ltg1929: The Latgalian language orthography codified in 1929
+      ltg2007: The Latgalian language orthography codified in the language law in 2007
       luna1918: Post-1917 Russian orthography
       metelko: Slovene in Metelko alphabet
       monoton: Monotonic Greek
@@ -46849,6 +46851,12 @@ langvar:
       the kociewie dialect of polish: 
         - kociewie
         - The Kociewie dialect of Polish
+      the latgalian language orthography codified in 1929: 
+        - ltg1929
+        - The Latgalian language orthography codified in 1929
+      the latgalian language orthography codified in the language law in 2007: 
+        - ltg2007
+        - The Latgalian language orthography codified in the language law in 2007
       the lipovaz dialect of resian: 
         - lipaw
         - The Lipovaz dialect of Resian

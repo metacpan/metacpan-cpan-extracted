@@ -7,18 +7,24 @@ use Capture::Tiny qw( capture_merged );
 
 $ENV{ALIEN_BUILD_POSTLOAD} = 'Fetch::Rewrite';
 
+# This plugin doesn't make any real internet
+# connections, and uses a fake protocol for
+# testing that isn't recognized by AB as
+# being safe.
+$ENV{ALIEN_DOWNLOAD_RULE} = 'warn';
+
 my $build = alienfile_ok q{
   use alienfile;
 
   log 'setting start_url';
   meta->prop->{start_url} = 'bogus://bogus1';
-  
+
   probe sub { 'share' };
-  
+
   share {
-  
+
     fetch sub { die 'oh noes!' }
-  
+
   };
 };
 
@@ -29,7 +35,7 @@ subtest 'failure' => sub {
   eval { $build->fetch };
   my $error = $@;
 
-  isnt $error, '';  
+  isnt $error, '';
   note "error = $error";
 
 };
@@ -53,7 +59,7 @@ subtest 'basic good' => sub {
     $url->host('localhost');
     $url->path($exp);
   });
-  
+
   subtest 'with start_url' => sub {
 
     my $ret; eval {
@@ -61,9 +67,9 @@ subtest 'basic good' => sub {
         $ret = $build->fetch
       };
     };
-    
+
     is $@, '';
-  
+
     is(
       $orig,
       object {
@@ -76,16 +82,16 @@ subtest 'basic good' => sub {
     is res2content($ret), $exp->slurp_raw;
 
   };
-  
+
   subtest 'with another url' => sub{
-  
+
     my $ret;
     note scalar capture_merged {
       $ret = $build->fetch('http://bogus1/bogus2');
     };
-    
+
     is $@, '';
-  
+
     is(
       $orig,
       object {
@@ -95,7 +101,7 @@ subtest 'basic good' => sub {
         call path   => '/bogus2';
       },
     );
-  
+
     is $ret->{filename}, 'foo-1.00.tar';
     is res2content($ret), $exp->slurp_raw;
 

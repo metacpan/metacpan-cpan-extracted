@@ -1,3 +1,167 @@
+0.9650 2022-09-02
+  [Incompatible Changes]
+    * Rename the following methods in Time::Info
+      [Before]
+      native method sec : int ();
+      native method min : int ();
+      native method hour : int ();
+      native method mday : int ();
+      native method mon : int ();
+      native method year : int ();
+      native method wday : int ();
+      native method yday : int ();
+      native method hour : int ();
+      native method mday : int ();
+      native method mon : int ();
+      native method year : int ();
+      native method wday : int ();
+      native method yday : int ();
+      native method isdst : int ();
+      native method set_sec : int ($sec : int);
+      native method set_min : int ($min : int);
+      native method set_hour : int ($hour : int);
+      native method set_mday : int ($mday : int);
+      native method set_mon : int ($mon : int);
+      native method set_year : int ($year : int);
+      native method set_wday : int ($wday : int);
+      native method set_yday : int ($yday : int);
+      native method set_isdst : int ($isdst : int);
+
+      [After]
+      native method tm_sec : int ();
+      native method tm_min : int ();
+      native method tm_hour : int ();
+      native method tm_mday : int ();
+      native method tm_mon : int ();
+      native method tm_year : int ();
+      native method tm_wday : int ();
+      native method tm_yday : int ();
+      native method tm_isdst : int ();
+      native method set_tm_sec : int ($sec : int);
+      native method set_tm_min : int ($min : int);
+      native method set_tm_hour : int ($hour : int);
+      native method set_tm_mday : int ($mday : int);
+      native method set_tm_mon : int ($mon : int);
+      native method set_tm_year : int ($year : int);
+      native method set_tm_wday : int ($wday : int);
+      native method set_tm_yday : int ($yday : int);
+      native method set_tm_isdst : int ($isdst : int);
+    * Remove the following deprecated methods.
+      Point->new_xy
+      Point3D->new_xyz
+      Array->copy_range_byte
+      Array->copy_range_double
+      Array->copy_range_float
+      Array->copy_range_int
+      Array->copy_range_long
+      Array->copy_range_object
+      Array->copy_range_object_address
+      Array->copy_range_short
+      Array->copy_range_string
+      Array->copy_range_string_address
+      Array->copy_range_object
+      Array->copy_range_object_address
+      Array->copy_range_short
+      Array->copy_range_string
+      Array->copy_range_string_address
+      Array->memcpy_object
+      Array->memcpy_string
+      Array->memmove_object
+      Array->memmove_string
+      Fn->get_next_code_point
+      Fn->look_next_code_point
+      Fn->index_len
+      Fn->rindex_len
+      Fn->split_limit
+      Fn->trim_ascii_space
+      Fn->index_len
+      Fn->rindex_len
+      Fn->split_limit
+      Fn->trim_ascii_space
+
+  [Compilation Error Message Improvement]
+    * The following compilation error message is changed.
+      [Before]The narrowing type conversion can't be performed in %s at %s line %d
+      [After]The implicite narrowing conversion from \"%s\" to \"%s\" in %s is not allowed at %s line %d
+
+  [Incompatible Document Changes]
+    * Rename the heading.
+      [Before]String Type
+      [After]string Type
+
+      [Before]Integer Promotional Type Conversion
+      [After]Integer Promotional Conversion
+
+      [Before]Numeric Widening Type Conversion
+      [After]Numeric Widening Conversion
+
+      [Before]Numeric Narrowing Type Conversion
+      [After]Numeric Narrowing Conversion
+
+      [Before]Binary Numeric Type Conversion
+      [After]Binary Numeric Conversion
+
+      [Before]Numeric-to-String Type Conversion
+      [After]Numeric-to-String Conversion
+
+      [Before]String-to-byte[] Type Conversion
+      [After]String-to-byte[] Conversion
+
+      [Before]byte[]-to-String Type Conversion
+      [After]byte[]-to-string Conversion
+
+      [Before]Boxing Type Conversion
+      [After]Boxing Conversion
+
+      [Before]Unboxing Type Conversion
+      [After]Unboxing Conversion
+
+      [Before]Conditional Type Conversion
+      [After]Bool Conversion
+
+0.9649 2022-08-31
+  [Bug Fix]
+    * Fix the bug that the destcutor changes the original return vlaue.
+  [Document Improvement]
+    * Improve the doc of the unary plus operator.
+    * Improve the doc of the unary minus operator.
+    * Improve many parts. The numeric widening type conversion is replaced with the integer promotional type conversion.
+    * Improve the doc of the switch statement.
+    * Improve the doc of "Loop Syntax".
+    * Improve the doc of "return Statemenet".
+    * Improve the doc of "Empty Statemenet".
+    * Improve the doc of "Operator Statemenet".
+  [Document Fix]
+    * Fix the type of the heading "Character Literal".
+
+0.9648 2022-08-30
+  [New Features]
+    * Add Pointable module.
+    * Add Pointable interface to Point class.
+    * Add the following method to Point class.
+      
+      required method pointable : int ();
+    
+  [Incompatible Changes]
+    * All method call that is called from the class is resolved in compilation time.
+      [Before]
+      # (0, 0, 0)
+      my $point3d = Point3D->new(1, 2, 3);
+      my $point = (Point)$point3d;
+      $point->clear;
+      [After]
+      # (0, 0, 3) because $point is Point class.
+      my $point3d = Point3D->new(1, 2, 3);
+      my $point = (Point)$point3d;
+      $point->clear;
+      
+      Please rewrite to
+      
+      # (0, 0, 0).
+      my $point3d = Point3D->new(1, 2, 3);
+      my $point = (Point)$point3d;
+      $point->(Pointable)->clear;
+    
 0.9647 2022-08-29
   [New Features]
     * Add "protected" attribute.
@@ -5,6 +169,8 @@
     * Implement the compilation error check of "protected" method.
     * Implement the compilation error check of "protected" class variable.
     * Implement the compilation error check of "protected" field.
+  [Bug Fix]
+    * Fix the bug that private field is searched.
   [Imcompative Changes]
     * SUPER:: qualifier calls the method of the super class of the current class, instead of the instance.
     * The field searching of the field access is used for the class and the super classes.

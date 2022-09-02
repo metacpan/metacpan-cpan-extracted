@@ -82,7 +82,7 @@ CONSTRUCTING
     Net::Netmask objects are created with an IP address and optionally a
     mask. There are many forms that are recognized:
 
-    '216.240.32.0/24'               The preferred IPv6 form.
+    '216.240.32.0/24'               The preferred IPv4 form.
 
     '216.240.32.0:255.255.255.0'
     '216.240.32.0-255.255.255.0'
@@ -115,7 +115,7 @@ CONSTRUCTING
     $Net::Netmask::error.
 
     IMPORTANT: You want to use "safe_new" or "new2" ("new2" is a synonym for
-    "new") in new code!
+    "safe_new") in new code!
 
     As of version 2.000, the following abbreviated IPv4 netblocks are not
     accepted by default, but can be accepted with options.
@@ -360,7 +360,7 @@ METHODS
 
                                Net::Netmask->safe_new( '10.0.0.0/24' )->split(2)
 
-                             is equivilent to
+                             is equivalent to
 
                                ( Net::Netmask( '10.0.0.0/25'), Net::Netmask( '10.0.0.128/25' ) )
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Find 0.47;
+package Devel::MAT::Tool::Find 0.48;
 
 use v5.14;
 use warnings;
@@ -333,6 +333,52 @@ sub build
       return unless $pv =~ $pattern;
 
       return Devel::MAT::Cmd->format_value( $pv, pv => 1 );
+   };
+}
+
+package # hide
+   Devel::MAT::Tool::Find::filter::cv;
+use base qw( Devel::MAT::Tool::Find::filter );
+
+use constant FILTER_DESC => "Code CVs";
+
+use constant FILTER_OPTS => (
+   xsub    => { help => "Is an XSUB" },
+   package => { help => "In the given package",
+                type => "s",
+                alias => "p" },
+   file    => { help => "Location is the given file",
+                type => "s",
+                alias => "f" },
+);
+
+sub build
+{
+   my $self = shift;
+   my $inv = shift;
+   my %opts = %{ +shift };
+
+   return sub {
+      my ( $sv ) = @_;
+      return unless $sv->type eq "CODE";
+      if( $opts{xsub} ) {
+         return if !$sv->is_xsub;
+      }
+      if( $opts{package} ) {
+         my $stash = $sv->glob ? $sv->glob->stash : return;
+         return if $stash->stashname ne $opts{package};
+      }
+      if( $opts{file} ) {
+         return if $sv->file ne $opts{file};
+      }
+
+      # Selected
+      if( my $symname = $sv->symname ) {
+         return Devel::MAT::Cmd->format_symbol( $symname );
+      }
+      else {
+         return "__ANON__";
+      }
    };
 }
 

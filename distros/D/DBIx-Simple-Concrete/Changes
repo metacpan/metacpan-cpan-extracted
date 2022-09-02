@@ -1,5 +1,15 @@
 Release history for DBIx-Simple-Concrete
 
+1.007 Fri 02 Sep 2022
+	- No functional changes
+	- Copyright bump
+
+1.006 Thu 01 Sep 2022
+	- No more dependency on Import::Into
+	- Internal refactoring of the module
+	- No minimum Test::More version requirement
+	- Updated packaging and package metadata
+
 1.001 Sat 10 Jan 2015
 	- No functional changes
 	- Correct SYNOPSIS

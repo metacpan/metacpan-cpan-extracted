@@ -1,9 +1,9 @@
 Class::Observable
 
 If you have ever used Java, you may have run across the
-"java.util.Observable" class and the "java.util.Observer" interface. With
-them you can decouple an object from the one or more objects that wish to
-be notified whenever particular events occur.
+"java.util.Observable" class and the "java.util.Observer" interface.
+With them you can decouple an object from the one or more objects that
+wish to be notified whenever particular events occur.
 
 These events occur based on a contract with the observed item. They may
 occur at the beginning, in the middle or end of a method. In addition,
@@ -18,15 +18,16 @@ handling there. So be careful.
 
 INSTALLATION
 
-This is a Perl module distribution. It should be installed with whichever
-tool you use to manage your installation of Perl, e.g. any of
+This is a Perl module distribution. It should be installed with
+whichever tool you use to manage your installation of Perl, e.g. any of
 
   cpanm .
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
-Should you wish to install this module manually, the procedure is
+Consult http://www.cpan.org/modules/INSTALL.html for further
+instruction. Should you wish to install this module manually, the
+procedure is
 
   perl Makefile.PL
   make
@@ -39,5 +40,5 @@ This documentation is copyright (c) 2002-2004 Chris Winters.
 
 This software is copyright (c) 2021 by Aristotle Pagaltzis.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

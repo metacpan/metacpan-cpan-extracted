@@ -35,6 +35,8 @@ C<Point> class has the following interfaces.
 
 =item * L<Cloneable|SPVM::Cloneable>
 
+=item * L<Cloneable|SPVM::Pointable>
+
 =back
 
 =head1 Fields
@@ -59,17 +61,13 @@ C<y>.
 
 Create a new C<Point> object with L</"x"> and L</"y">.
 
-=head2 new_xy
-
-  method new_xy : Point ($x : int, $y : int)
-
-The alias for the following code using L</"new">
-
-  my $point = Point->new($x, $y);
-
-This method is deprecated and will be removed after 2022-09-03.
-
 =head1 Instance Methods
+
+=head2 pointable
+
+  required method pointable : int ();
+
+Return C<1>.
 
 =head2 clear
 

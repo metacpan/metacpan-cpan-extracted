@@ -9,7 +9,7 @@ use File::Temp ();
 use Path::Tiny qw( path );
 
 # ABSTRACT: Plugin for fetching files using Net::FTP
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 has '+url' => '';
@@ -81,6 +81,7 @@ sub init
           type     => 'file',
           filename => $filename,
           path     => $path,
+          protocol => 'ftp',
         };
       }
 
@@ -111,8 +112,9 @@ sub init
     $path .= '/' unless $path =~ /\/$/;
 
     return {
-      type => 'list',
-      list => [
+      type     => 'list',
+      protocol => 'ftp',
+      list     => [
         map {
           my $filename = $_;
           my $furl = $url->clone;
@@ -161,7 +163,7 @@ Alien::Build::Plugin::Fetch::NetFTP - Plugin for fetching files using Net::FTP
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,8 @@
+0.03 2022-08-31T20:12:19+02:00
+ - Add example to doc for test of fork and socket functionality.
+ - Add example to doc for example test which use fork and socket
+   functionality.
+
 0.02 2022-08-26T11:52:58+02:00
  - Add Check::Fork::HardcodedUsage doc.
  - Add test for failing NetWare in fake test.

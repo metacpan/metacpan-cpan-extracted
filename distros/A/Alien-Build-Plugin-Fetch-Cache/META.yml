@@ -6,7 +6,7 @@ build_requires:
   Capture::Tiny: '0'
   File::chdir: '0'
   Test2::Plugin::FauxHomeDir: '0'
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   Test::Alien::Build: '0'
   Test::Script: '0'
   perl: '5.010001'
@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,8 +30,11 @@ requires:
   perl: '5.010001'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/plicease/Alien-Build-Plugin-Fetch-Cache/issues
+  bugtracker: https://github.com/PerlAlien/Alien-Build-Plugin-Fetch-Cache/issues
   homepage: https://metacpan.org/pod/Alien::Build::Plugin::Fetch::Cache
-  repository: git://github.com/plicease/Alien-Build-Plugin-Fetch-Cache.git
-version: '0.04'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  repository: git://github.com/PerlAlien/Alien-Build-Plugin-Fetch-Cache.git
+version: '0.05'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

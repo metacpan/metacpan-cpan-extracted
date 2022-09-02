@@ -4,8 +4,11 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Fatal;
 
 use Future::AsyncAwait;
+
+my $HEIGHT = 1.234;
 
 {
    use Object::Pad 0.57;
@@ -17,9 +20,10 @@ use Future::AsyncAwait;
 
    declare_sensor height =>
       units     => "metres",
-      precision => 2;
+      precision => 2,
+      sanity_bounds => [ 0, 3 ];
 
-   async method read_height () { return 1.234; }
+   async method read_height () { return $HEIGHT; }
 
    declare_sensor width =>
       method    => "measure_width",
@@ -74,6 +78,19 @@ is( scalar @sensors, 4, '$chip->list_sensors yields 3 sensors' );
    my $sensor = $sensors[3];
 
    is( $sensor->type, "counter", '$sensor->type counter' );
+}
+
+# insane value
+{
+   my $sensor = $sensors[0];
+
+   $HEIGHT = -1;
+   like( exception { $sensor->read->get }, qr/^Reading -1.00 is out of range/,
+      '$sensor->read fails when below lbounds' );
+
+   $HEIGHT = 17;
+   like( exception { $sensor->read->get }, qr/^Reading 17.00 is out of range/,
+      '$sensor->read fails when above ubounds' );
 }
 
 done_testing;

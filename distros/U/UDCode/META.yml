@@ -1,10 +1,24 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         UDCode
-version:      1.03
-version_from: lib/UDCode.pm
-installdirs:  site
+---
+abstract: 'Does a set of code words form a uniquely decodable code?'
+author:
+  - 'Mark Jason Dominus'
+build_requires:
+  Test::More: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: UDCode
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30_01
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=UDCode
+  repository: https://github.com/ap/UDCode.git
+version: '1.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

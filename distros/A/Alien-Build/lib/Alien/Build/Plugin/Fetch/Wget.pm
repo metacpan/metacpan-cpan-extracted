@@ -12,7 +12,7 @@ use File::chdir;
 use List::Util qw( pairmap );
 
 # ABSTRACT: Plugin for fetching files using wget
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 sub _wget
@@ -89,9 +89,10 @@ sub init
         if($type eq 'text/html')
         {
           return {
-            type    => 'html',
-            base    => $url,
-            content => scalar $path->slurp,
+            type     => 'html',
+            base     => $url,
+            content  => scalar $path->slurp,
+            protocol => $scheme,
           };
         }
         else
@@ -100,6 +101,7 @@ sub init
             type     => 'file',
             filename => $path->basename,
             path     => $path->absolute->stringify,
+            protocol => $scheme,
           };
         }
       }
@@ -142,7 +144,7 @@ Alien::Build::Plugin::Fetch::Wget - Plugin for fetching files using wget
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 

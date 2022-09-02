@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+use strict;
+
+# This helper script simulates the behavior of
+# solaris diff: missing newlines are reported
+# to stderr, not part as the diff output. See
+# also http://www.cpantesters.org/cpan/report/12606728-23fa-11ed-bd7d-5be2279bd446
+
+# assume last two arguments are possibly the diffed files
+# (assumption may be wrong) (does not work for stdin (-))
+my @files = grep { defined $_ && -f $_ } (@ARGV[-2 .. -1]);
+for my $file (@files) {
+    if (open my $fh, '<', $file) {
+	seek $fh, 2, 0;
+	read $fh, my $buf, 1;
+	if ($buf ne "\n") {
+	    warn "Warning: missing newline at end of file $file\n";
+	}
+    }
+}
+
+exec("/usr/bin/diff", @ARGV);

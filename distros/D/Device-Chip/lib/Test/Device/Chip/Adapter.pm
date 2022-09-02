@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;  # :does
+use Object::Pad 0.66;  # field
 
-package Test::Device::Chip::Adapter 0.22;
+package Test::Device::Chip::Adapter 0.23;
 class Test::Device::Chip::Adapter
    :does(Device::Chip::Adapter);
 
@@ -59,11 +59,11 @@ This ensures that unit tests correctly perform the required asynchronisation.
 
 =cut
 
-has $_protocol;
+field $_protocol;
 
-has $_controller;
-has $_obj;
-has $_txn_helper;
+field $_controller;
+field $_obj;
+field $_txn_helper;
 
 ADJUST
 {
@@ -164,7 +164,7 @@ BEGIN {
    my $meta = Object::Pad::MOP::Class->for_caller;
 
    foreach my $method ( keys %METHODS ) {
-      my ( $canonicalise, $allowed_protos ) = @{ $METHODS{$method} };
+      my ( $canonicalise, $allowed_protos ) = $METHODS{$method}->@*;
 
       $meta->add_method(
          "expect_$method" => method {
@@ -189,7 +189,7 @@ BEGIN {
    }
 
    class Test::Device::Chip::Adapter::_TxnHelper {
-      has $_adapter :param;
+      field $_adapter :param;
 
       async method write { await $_adapter->write( @_ ) }
       async method read  { return await $_adapter->read( @_ ) }

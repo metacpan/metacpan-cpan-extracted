@@ -1,13 +1,12 @@
 package JSON::Path::Tokenizer;
-$JSON::Path::Tokenizer::VERSION = '0.431';
+$JSON::Path::Tokenizer::VERSION = '1.0.1';
 use strict;
 use warnings;
-use 5.008;
 
 use Carp;
 use Readonly;
 use JSON::Path::Constants qw(:symbols :operators);
-use Exporter::Easy ( OK => ['tokenize'] );
+use Exporter::Shiny 'tokenize';
 
 Readonly my $ESCAPE_CHAR      => qq{\\};
 Readonly my %OPERATORS => (
@@ -125,7 +124,7 @@ JSON::Path::Tokenizer - Helper class for JSON::Path::Evaluator. Do not call dire
 
 =head1 VERSION
 
-version 0.431
+version 1.0.1
 
 =head1 AUTHOR
 
@@ -133,7 +132,7 @@ Kit Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Kit Peters.
+This software is copyright (c) 2022 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Revision history for Business-GoCardless
 
+0.36     2022-09-01
+        - Add consent_parameters to Mandate object
+
 0.35     2020-01-08
         - Remove references to Basic API along with the modules
           relating to it and the upgrade guide

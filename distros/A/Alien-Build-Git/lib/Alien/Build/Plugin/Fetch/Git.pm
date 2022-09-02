@@ -14,7 +14,7 @@ use File::chdir;
 use Capture::Tiny qw( capture_merged capture_stdout );
 
 # ABSTRACT: Alien::Build plugin to fetch from git
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub init
@@ -92,6 +92,7 @@ sub init
           type     => 'file',
           filename => $dir->basename,
           path     => $dir->stringify,
+          protocol => $url->scheme,
         };
       }
       else
@@ -127,6 +128,7 @@ sub init
               \%h;
             } @tags
           ],
+          protocol => $url->scheme,
         };
       }
     },
@@ -185,7 +187,7 @@ Alien::Build::Plugin::Fetch::Git - Alien::Build plugin to fetch from git
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -219,7 +221,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017,2018,2019,2022 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

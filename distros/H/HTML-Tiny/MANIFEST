@@ -2,17 +2,16 @@ Changes
 examples/js.pl
 examples/simple.pl
 examples/table.pl
+inc/boilerplate.pl
 lib/HTML/Tiny.pm
 Makefile.PL
 MANIFEST
-META.yml
-README
-t/000-load.t
 t/010-simple.t
 t/020-coverage.t
 t/030-tags.t
 t/040-lazy.t
 t/050-validate_tag.t
-xt/author/pod-coverage.t
-xt/author/pod.t
-SIGNATURE                                Public-key signature (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

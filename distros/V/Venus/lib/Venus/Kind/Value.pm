@@ -47,13 +47,19 @@ sub cast {
 sub defined {
   my ($self) = @_;
 
-  return int(CORE::defined($self->get));
+  return CORE::defined($self->get) ? true : false;
 }
 
 sub explain {
   my ($self) = @_;
 
   return $self->get;
+}
+
+sub mutate {
+  my ($self, $code, @args) = @_;
+
+  return $self->set($self->assert($self->coerce($self->$code(@args))));
 }
 
 sub TO_JSON {
@@ -86,9 +92,13 @@ Value Base Class for Perl 5
 
   base 'Venus::Kind::Value';
 
+  sub test {
+    $_[0]->get + 1
+  }
+
   package main;
 
-  my $example = Example->new;
+  my $example = Example->new(1);
 
   # $example->defined;
 
@@ -120,6 +130,8 @@ L<Venus::Role::Buildable>
 L<Venus::Role::Explainable>
 
 L<Venus::Role::Pluggable>
+
+L<Venus::Role::Proxyable>
 
 L<Venus::Role::Valuable>
 
@@ -248,6 +260,34 @@ I<Since C<0.01>>
   my $explain = $example->explain;
 
   # "hello, there"
+
+=back
+
+=cut
+
+=head2 mutate
+
+  mutate(Str | CodeRef $code, Any @args) (Object)
+
+The mutate method dispatches the method call or executes the callback and
+returns the result, which if is of the same type as the invocant's underlying
+data type will update the object's internal state or will throw an exception.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item mutate example 1
+
+  # given: synopsis
+
+  package main;
+
+  $example->mutate('test');
+
+  $example;
+
+  # bless({value => 2}, "Example")
 
 =back
 

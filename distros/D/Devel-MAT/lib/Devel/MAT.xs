@@ -8,6 +8,10 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef av_count
+#  define av_count(av)  (AvFILL(av) + 1)
+#endif
+
 struct pmat_sv
 {
   SV  *df;
@@ -93,6 +97,13 @@ struct pmat_sv_struct
     int   type;
     long  val;
   }             *fields;
+};
+
+struct pmat_sv_object
+{
+  struct pmat_sv _parent;
+  long           n_fields;
+  long          *fields_at;
 };
 
 #if (PERL_REVISION == 5) && (PERL_VERSION < 14)
@@ -188,11 +199,14 @@ CODE:
         Newx(ptr, 1, struct pmat_sv_ref); break;
       case 4: /* PMAT_SVtARRAY */
         Newx(ptr, 1, struct pmat_sv_array); break;
-      case 5: /* PMAT_SVtHASH  fallthrough */
+      case 5: /* PMAT_SVtHASH */
       case 6: /* PMAT_SVtSTASH */
+      case 17: /* PMAT_SVtCLASS */
         Newx(ptr, 1, struct pmat_sv_hash); break;
       case 7: /* PMAT_SVtCODE */
         Newx(ptr, 1, struct pmat_sv_code); break;
+      case 16: /* PMAT_SVtOBJECT */
+        Newx(ptr, 1, struct pmat_sv_object); break;
       case 0x7F: /* PMAT_SVtSTRUCT */
         Newx(ptr, 1, struct pmat_sv_struct); break;
       default:
@@ -572,7 +586,7 @@ CODE:
     av->is_backrefs = 0;
     av->padcv_at    = 0;
 
-    n = AvMAX(elems_at) + 1;
+    n = av_count(elems_at);
     av->n_elems = n;
 
     Newx(av->elems_at, n, long);
@@ -927,6 +941,61 @@ CODE:
         case 0: RETVAL = cv->file; break;
         case 1: RETVAL = cv->name; break;
       }
+  }
+OUTPUT:
+  RETVAL
+
+MODULE = Devel::MAT                PACKAGE = Devel::MAT::SV::OBJECT
+
+void
+_set_object_fields(self, fields_at)
+  HV *self
+  AV *fields_at
+CODE:
+  {
+    struct pmat_sv_object *obj = (struct pmat_sv_object *)get_pmat_sv(self);
+    long n, i;
+
+    n = av_count(fields_at);
+    obj->n_fields = n;
+
+    Newx(obj->fields_at, n, long);
+    for(i = 0; i < n; i++)
+      obj->fields_at[i] = SvUV(AvARRAY(fields_at)[i]);
+  }
+
+void DESTROY(self)
+  HV *self
+CODE:
+  {
+    struct pmat_sv_object *obj = (struct pmat_sv_object *)get_pmat_sv(self);
+
+    Safefree(obj->fields_at);
+
+    free_pmat_sv((struct pmat_sv *)obj);
+  }
+
+long
+n_fields(self)
+  HV   *self
+CODE:
+  {
+    struct pmat_sv_object *obj = (struct pmat_sv_object *)get_pmat_sv(self);
+    if(obj)
+      RETVAL = obj->n_fields;
+  }
+OUTPUT:
+  RETVAL
+
+long
+field_at(self, i)
+  HV            *self
+  unsigned long  i
+CODE:
+  {
+    struct pmat_sv_object *obj = (struct pmat_sv_object *)get_pmat_sv(self);
+    if(obj && i < obj->n_fields)
+      RETVAL = obj->fields_at[i];
   }
 OUTPUT:
   RETVAL

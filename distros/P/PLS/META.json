@@ -35,7 +35,7 @@
             "Future" : "0.47",
             "Future::Queue" : "0.47",
             "Future::Utils" : "0.47",
-            "IO::Async" : "0.78",
+            "IO::Async" : "0.79",
             "PPI" : "1.264",
             "PPR" : "0.000028",
             "Path::Tiny" : "0.114",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/FractalBoy/perl-language-server"
       }
    },
-   "version" : "0.899",
+   "version" : "0.902",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

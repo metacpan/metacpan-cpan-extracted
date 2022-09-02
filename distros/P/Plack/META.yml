@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Milla version v1.0.21, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/plack/Plack/issues
   homepage: https://github.com/plack/Plack
   repository: https://github.com/plack/Plack.git
-version: '1.0048'
+version: '1.0049'
 x_authority: cpan:MIYAGAWA
 x_contributors:
   - 'Aaron Trevena <aaron.trevena@gmail.com>'
@@ -77,6 +77,7 @@ x_contributors:
   - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
   - 'Daisuke Maki <lestrrat+github@gmail.com>'
   - 'Daisuke Murase <typester@cpan.org>'
+  - 'Daniel Mita <966706+m-dango@users.noreply.github.com>'
   - 'Dave Marr <dave.marr@gmail.com>'
   - 'Dave Rolsky <autarch@urth.org>'
   - 'David E. Wheeler <david@justatheory.com>'
@@ -130,6 +131,7 @@ x_contributors:
   - 'Masahiro Chiba <chiba@everqueue.com>'
   - 'Masahiro Nagano <kazeburo@gmail.com>'
   - 'Michael G. Schwern <schwern@pobox.com>'
+  - 'Michael R. Davis <mrdvt92@users.noreply.github.com>'
   - 'Michal Josef Špaček <michal.josef.spacek@gmail.com>'
   - 'mickey <mickey75@gmail.com>'
   - 'Narsimham Chelluri <nchelluri@maxmind.com>'
@@ -166,6 +168,7 @@ x_contributors:
   - 'smcmurray <smcmurray@localhost.localdomain>'
   - 'Stephen Clouse <stephenclouse@gmail.com>'
   - 'Stevan Little <stevan.little@iinteractive.com>'
+  - 'Stig Palmquist <git@stig.io>'
   - 'Stuart A Johnston <saj_git@thecommune.net>'
   - 'Takeshi OKURA <okura3@gmail.com>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
@@ -184,6 +187,7 @@ x_contributors:
   - 'Yury Zavarin <yury.zavarin@gmail.com>'
   - 'Yuval Kogman <nothingmuch@woobling.org>'
   - '唐鳳 <audreyt@audreyt.org>'
-x_generated_by_perl: v5.20.1
+x_generated_by_perl: v5.34.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

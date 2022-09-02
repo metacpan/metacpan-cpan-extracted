@@ -31,9 +31,10 @@ name: Alien-Brotli
 provides:
   Alien::Brotli:
     file: lib/Alien/Brotli.pm
-    version: v0.2.0
+    version: v0.2.1
 requires:
   Alien::Base: '0'
+  Alien::Build::Plugin::Probe::CommandLine: '0'
   Alien::cmake3: '0'
   Path::Tiny: '0'
   base: '0'
@@ -44,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Alien-Brotli/issues
   repository: git://github.com/robrwo/perl-Alien-Brotli.git
-version: v0.2.0
+version: v0.2.1
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
@@ -64,6 +65,8 @@ x_alienfile:
       URI::Escape: '0'
     system: {}
 x_authority: cpan:RRWO
+x_contributors:
+  - 'Michal Josef Špaček <mspacek@redhat.com>'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

@@ -8,7 +8,7 @@ use parent qw( FFI::Platypus::TypeParser );
 use constant _version => 1;
 
 # ABSTRACT: FFI Type Parser Version One
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 
 our @CARP_NOT = qw( FFI::Platypus FFI::Platypus::TypeParser );
@@ -300,7 +300,7 @@ FFI::Platypus::TypeParser::Version1 - FFI Type Parser Version One
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 SYNOPSIS
 

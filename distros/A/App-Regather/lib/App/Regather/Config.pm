@@ -9,6 +9,7 @@ use diagnostics;
 use parent 'Config::Parser::Ini';
 use Carp;
 use File::Basename;
+use Mail::RFC822::Address qw(valid validlist);
 
 use App::Regather::Plugin;
 
@@ -483,7 +484,7 @@ email address validation against regex
 sub chk_notify_email {
   my ($self, $valref, $prev_value, $locus) = @_;
 
-  if ( $$valref !~ /^[a-z0-9]([a-z0-9.]+[a-z0-9])?\@[a-z0-9.-]+$/ ) {
+  if ( ! valid($$valref) ) {
     $self->error('notify_email is not valid email address', locus => $locus);
     return 0;
   }

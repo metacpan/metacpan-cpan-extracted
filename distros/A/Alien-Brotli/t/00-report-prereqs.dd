@@ -34,6 +34,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Alien::Base' => '0',
+                                      'Alien::Build::Plugin::Probe::CommandLine' => '0',
                                       'Alien::cmake3' => '0',
                                       'Path::Tiny' => '0',
                                       'base' => '0',

@@ -47,7 +47,7 @@ foreach my $short (qw( code message content content_type content_length content_
 }
 
 # ABSTRACT: Test HTTP / PSGI
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 my $tx;
@@ -108,7 +108,7 @@ sub http_request
     if($delta)
     {
       $ok = 0;
-      push @diag, $delta->diag;
+      push @diag, $delta->diag->as_string;
     }
   }
 
@@ -611,7 +611,7 @@ Test2::Tools::HTTP - Test HTTP / PSGI
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

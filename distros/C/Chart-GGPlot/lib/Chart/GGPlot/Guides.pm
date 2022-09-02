@@ -5,7 +5,7 @@ package Chart::GGPlot::Guides;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.002000'; # VERSION
+our $VERSION = '0.002001'; # VERSION
 
 use List::AllUtils qw(uniq);
 use Module::Load;
@@ -125,7 +125,7 @@ Chart::GGPlot::Guides - The container of guides
 
 =head1 VERSION
 
-version 0.002000
+version 0.002001
 
 =head1 METHODS
 
@@ -137,7 +137,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2021 by Stephan Loyd.
+This software is copyright (c) 2019-2022 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

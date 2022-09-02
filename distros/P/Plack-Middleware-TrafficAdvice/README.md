@@ -4,7 +4,7 @@ Plack::Middleware::TrafficAdvice - handle requests for /.well-known/traffic-advi
 
 # VERSION
 
-version v0.2.1
+version v0.2.3
 
 # SYNOPSIS
 
@@ -78,7 +78,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Robert Rothenberg.
+This software is Copyright (c) 2021-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -1,0 +1,28 @@
+---
+abstract: 'analyse C<Future> logic'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Future: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-MAT-Tool-Future
+provides:
+  Devel::MAT::Tool::Future:
+    file: lib/Devel/MAT/Tool/Future.pm
+    version: '0.01'
+requires:
+  Devel::MAT::Tool: '0.48'
+  File::ShareDir: '1.00'
+  Syntax::Keyword::Match: '0'
+  perl: '5.014'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

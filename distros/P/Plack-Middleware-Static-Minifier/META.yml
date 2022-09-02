@@ -3,31 +3,32 @@ abstract: 'serves static files and minify CSS and JavaScript'
 author:
   - 'Dai Okabayashi <bayashi@cpan.org>'
 build_requires:
-  Cwd: 0
-  HTTP::Request::Common: 0
-  Test::More: 0.88
+  Cwd: '0'
+  HTTP::Request::Common: '0'
+  Test::More: '0.88'
 configure_requires:
-  Module::Build: 0.40
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Plack-Middleware-Static-Minifier
 provides:
   Plack::Middleware::Static::Minifier:
     file: lib/Plack/Middleware/Static/Minifier.pm
-    version: 0.08
+    version: '0.09'
 requires:
-  CSS::Minifier::XS: 0.09
-  Digest::MD5: 0
-  JavaScript::Minifier::XS: 0
-  Plack: 0.9958
-  Plack::Util::Accessor: 0
-  parent: 0
+  CSS::Minifier::XS: '0.09'
+  Digest::MD5: '0'
+  JavaScript::Minifier::XS: '0'
+  Plack: '0.9958'
+  Plack::Util::Accessor: '0'
+  parent: '0'
   perl: v5.8.7
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/bayashi/Plack-Middleware-Static-Minifier.git
-version: 0.08
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,12 +1,17 @@
 Release history for Test-File-Contents
 
+0.242 Thu 01 Sep 2022
+      - No functional changes
+      - Corrected test dependencies
+        (Test::Builder::Tester and Test::Builder::Tester::Color were missing)
+
 0.241 Wed 10 Aug 2022
       - No more subclassing of Exporter
       - Packaging fix to stop installing boilerplate.pl
-      - Updated package metadata
 
 0.240 Sun 17 Jul 2022
-      - Packaging improvements. No functional changes.
+      - No functional changes
+      - Packaging improvements
 
 0.23  Wed 16 Mar 2016
       - Fix encoding errors when reading in a file on Windows with `utf8`

@@ -1,9 +1,11 @@
+use strict; use warnings;
+
 package UDCode;
 
-$VERSION = "1.03";
+our $VERSION = '1.04';
 
-use base 'Exporter';
-@EXPORT = qw(is_udcode ud_pair);
+BEGIN { require Exporter; *import = \&Exporter::import }
+our @EXPORT = qw(is_udcode ud_pair);
 
 =head1 NAME
 
@@ -19,14 +21,21 @@ UDCode - Does a set of code words form a uniquely decodable code?
 
 =head1 DESCRIPTION
 
-A code is a set of strings, called the I<code words>.  A code is
-"uniquely decodable" if any string I<S> that is a concatenation of
+A I<code> is a set of strings, called the I<code words>. A code is
+I<uniquely decodable> if any string I<S> that is a concatenation of
 code words is so in I<exactly one way>.
 
-For example, the code C<"ab", "abba", "b"> is I<not> uniquely
-decodable, because C<"abba" . "b" eq "ab" . "b" . "ab">.  But the code
-C<"a", "ab", "abb"> I<is> uniquely decodable, because there is no such
+For example, the code C<('ab', 'abba', 'b')> is I<not> uniquely
+decodable, because C<'abba' . 'b' eq 'ab' . 'b' . 'ab'>. But the code
+C<('a', 'ab', 'abb')> I<is> uniquely decodable, because there is no such
 pair of sequences of code words.
+
+This module provides a pair of functions to tell whether a set of
+code words is a uniquely decodable code, and to find an example of
+sequences of code words whose concatenations are the same, if there is
+such a pair.
+
+=head1 INTERFACE
 
 =head2 C<is_udcode>
 
@@ -117,19 +126,14 @@ sub subtract {
 
 =head1 AUTHOR
 
-Mark Jason Dominus (C<mjd@plover.com>)
+Mark Jason Dominus
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is hereby released into the public domain.  You may use,
 modify, or distribute it for any purpose whatsoever without restriction.
 
 =cut
-
-unless (caller) {
-  my ($a, $b) = ud_pair("ab", "abba", "b");
-  print "@$a == @$b\n";
-}
 
 1;
 

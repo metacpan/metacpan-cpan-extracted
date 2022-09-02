@@ -3,7 +3,7 @@ Locale::Codes::Country_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Wed Jun  1 10:47:14 EDT 2022
+#    Generated on: Thu Sep  1 10:02:44 EDT 2022
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.71';
+$VERSION='3.72';
 
 $Locale::Codes::Retired{'country'}{'alpha-2'}{'code'} = {
    q(an) => q(Netherlands Antilles),
@@ -380,6 +380,7 @@ $Locale::Codes::Retired{'country'}{'alpha-2'}{'name'} = {
    q(swaziland) => [ q(sz), q(Swaziland) ],
    q(taiwan, province of china) => [ q(tw), q(Taiwan, Province of China) ],
    q(tanzania, united republic of) => [ q(tz), q(Tanzania, United Republic of) ],
+   q(turkey) => [ q(tr), q(Turkey) ],
    q(united kingdom) => [ q(gb), q(United Kingdom) ],
    q(united states) => [ q(us), q(United States) ],
    q(vatican city state (holy see)) => [ q(va), q(Vatican City State (Holy See)) ],
@@ -461,6 +462,7 @@ $Locale::Codes::Retired{'country'}{'alpha-3'}{'name'} = {
    q(taiwan, province of china) => [ q(twn), q(Taiwan, Province of China) ],
    q(tanzania, united republic of) => [ q(tza), q(Tanzania, United Republic of) ],
    q(the former yugoslav republic of macedonia) => [ q(mkd), q(The former Yugoslav Republic of Macedonia) ],
+   q(turkey) => [ q(tur), q(Turkey) ],
    q(united kingdom) => [ q(gbr), q(United Kingdom) ],
    q(united kingdom of great britain and northern ireland) => [ q(gbr), q(United Kingdom of Great Britain and Northern Ireland) ],
    q(united republic of tanzania) => [ q(tza), q(United Republic of Tanzania) ],
@@ -514,6 +516,7 @@ $Locale::Codes::Retired{'country'}{'dom'}{'name'} = {
    q(taiwan) => [ q(TW), q(Taiwan) ],
    q(taiwan, province of china) => [ q(tw), q(Taiwan, Province of China) ],
    q(tanzania, united republic of) => [ q(tz), q(Tanzania, United Republic of) ],
+   q(turkey) => [ q(tr), q(Turkey) ],
    q(united kingdom) => [ q(gb), q(United Kingdom) ],
    q(united states) => [ q(us), q(United States) ],
    q(ussr) => [ q(su), q(USSR) ],
@@ -612,6 +615,7 @@ $Locale::Codes::Retired{'country'}{'numeric'}{'name'} = {
    q(taiwan, province of china) => [ q(158), q(Taiwan, Province of China) ],
    q(tanzania, united republic of) => [ q(834), q(Tanzania, United Republic of) ],
    q(the former yugoslav republic of macedonia) => [ q(807), q(The former Yugoslav Republic of Macedonia) ],
+   q(turkey) => [ q(792), q(Turkey) ],
    q(united kingdom) => [ q(826), q(United Kingdom) ],
    q(united kingdom of great britain and northern ireland) => [ q(826), q(United Kingdom of Great Britain and Northern Ireland) ],
    q(united republic of tanzania) => [ q(834), q(United Republic of Tanzania) ],
@@ -637,6 +641,7 @@ $Locale::Codes::Retired{'country'}{'un-alpha-3'}{'name'} = {
    q(macedonia, the former yugoslav republic of) => [ q(MKD), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(SWZ), q(Swaziland) ],
    q(tanzania, united republic of) => [ q(TZA), q(Tanzania, United Republic of) ],
+   q(turkey) => [ q(TUR), q(Turkey) ],
 };
 
 $Locale::Codes::Retired{'country'}{'un-numeric'}{'name'} = {
@@ -646,6 +651,7 @@ $Locale::Codes::Retired{'country'}{'un-numeric'}{'name'} = {
    q(macedonia, the former yugoslav republic of) => [ q(807), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(748), q(Swaziland) ],
    q(tanzania, united republic of) => [ q(834), q(Tanzania, United Republic of) ],
+   q(turkey) => [ q(792), q(Turkey) ],
 };
 
 

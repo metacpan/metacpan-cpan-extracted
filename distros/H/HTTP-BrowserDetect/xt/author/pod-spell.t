@@ -34,6 +34,7 @@ Deltac
 Douglas
 Doye
 Elep
+Feraru
 Findlay
 Firebird
 Florian
@@ -61,6 +62,7 @@ Lee
 MFONTANI
 Mahdi
 Marco
+Marius
 Maros
 McGregor
 Mohammad
@@ -111,6 +113,7 @@ adm
 ahrefs
 alexchorny
 altavista
+altblue
 andrew
 aol
 apache

@@ -1,5 +1,8 @@
 Revision history for Alien-Role-Dino
 
+0.08      2022-08-30 01:11:24 -0600
+  - Compatability with ALIEN_DOWNLOAD_RULE overrides (gh#10)
+
 0.07      2022-02-27 16:35:13 -0700
   - Make Alien::cmake3 and Alien::Autotools test prereqs optional (gh#8)
 

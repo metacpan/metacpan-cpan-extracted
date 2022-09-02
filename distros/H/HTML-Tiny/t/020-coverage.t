@@ -1,4 +1,4 @@
-use strict;
+use strict; use warnings;
 use Test::More;
 use HTML::Tiny;
 
@@ -251,10 +251,10 @@ BEGIN {
     },
     {
       "expect_list" =>
-       [ "<iframe>one</iframe>", "<iframe>two</iframe>" ],
+       [ "<mark>one</mark>", "<mark>two</mark>" ],
       "args" => [ "one", "two" ],
-      "expect_scalar" => "<iframe>one</iframe><iframe>two</iframe>",
-      "method"        => "iframe"
+      "expect_scalar" => "<mark>one</mark><mark>two</mark>",
+      "method"        => "mark"
     },
     {
       "expect_list" => [ "<ins>one</ins>", "<ins>two</ins>" ],
@@ -561,6 +561,11 @@ BEGIN {
     },
     {
       "args"          => [],
+      "expect_scalar" => "<iframe />",
+      "method"        => "iframe"
+    },
+    {
+      "args"          => [],
       "expect_scalar" => "<hr />",
       "method"        => "hr"
     },
@@ -626,6 +631,11 @@ BEGIN {
       "args"          => [],
       "expect_scalar" => "<frame>",
       "method"        => "frame"
+    },
+    {
+      "args"          => [],
+      "expect_scalar" => "<iframe>",
+      "method"        => "iframe"
     },
     {
       "args"          => [],

@@ -1,6 +1,15 @@
 Revision history for DBIx::Class::InflateColumn::TimePiece
 ==========================================================
 
+0.03    2022-09-01  10:00:00
+
+  * switched to Dist::Zilla bundle "PERLSRVDE"
+  * updated documentation (thanks to Håkon Hægland)
+
+0.02    2018-12-11  20:30:00
+
+  * set time zone in tests to have defined behaviour
+
 0.01    2018-12-11  19:30:00
 
   * initial release

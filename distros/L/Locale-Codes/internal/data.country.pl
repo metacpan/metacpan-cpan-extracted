@@ -186,6 +186,7 @@ $Data{'country'}{'iso'}{'orig'}{'name'} = {
    "Réunion"                                 => "Reunion",
    "Saint Barthélemy"                        => "Saint Barthelemy",
    "Western Sahara*"                         => "Western Sahara",
+   "Türkiye"                                => "Turkiye",
 };
 
 $Data{'country'}{'iso'}{'ignore'} = {

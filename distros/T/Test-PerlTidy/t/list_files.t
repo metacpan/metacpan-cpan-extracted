@@ -11,6 +11,7 @@ my @wanted_files = sort qw(
   Build.PL
   Makefile.PL
   lib/Test/PerlTidy.pm
+  scripts/tag-release.pl
   t/00-compile.t
   t/exclude_files.t
   t/exclude_perltidy.t

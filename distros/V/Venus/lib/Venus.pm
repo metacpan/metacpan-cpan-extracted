@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '1.23';
+our $VERSION = '1.30';
 
 # AUTHORITY
 
@@ -21,6 +21,16 @@ sub import {
   my $target = caller;
 
   no strict 'refs';
+
+  my %exports = (
+    catch => 1,
+    error => 1,
+    false => 1,
+    raise => 1,
+    true => 1,
+  );
+
+  @args = grep defined && !ref && /^[A-Za-z]/ && $exports{$_}, @args;
 
   my %seen;
   for my $name (grep !$seen{$_}++, @args, 'true', 'false') {
@@ -56,9 +66,9 @@ sub error (;$) {
 }
 
 sub false () {
-  require Venus::Boolean;
+  require Venus::False;
 
-  return Venus::Boolean::FALSE();
+  return Venus::False->value;
 }
 
 sub raise ($;$) {
@@ -77,9 +87,9 @@ sub raise ($;$) {
 }
 
 sub true () {
-  require Venus::Boolean;
+  require Venus::True;
 
-  return Venus::Boolean::TRUE();
+  return Venus::True->value;
 }
 
 1;
@@ -99,7 +109,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-1.23
+1.30
 
 =cut
 
@@ -914,5 +924,12 @@ B<example 1>
 =head1 AUTHORS
 
 Awncorp, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
 
 =cut

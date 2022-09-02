@@ -1,0 +1,31 @@
+<h3>CMS {% ifequal lang ".en" %}Sales Enquiries{% endifequal %}{% ifequal lang ".es" %}Consultas de ventas{% endifequal %}{% ifequal lang ".de" %}Verkaufsanfragen{% endifequal %}{% ifequal lang ".fr" %}Demandes de ventes{% endifequal %}</h3>
+<form method="POST" action="/cgi-bin/enquiry.pl" class="form">
+    <label for="name">{% ifequal lang ".en" %}Your Name{% endifequal %}{% ifequal lang ".es" %}Tu nombre{% endifequal %}{% ifequal lang ".de" %}Dein Name{% endifequal %}{% ifequal lang ".fr" %}Votre Nom{% endifequal %}</label>
+	<input name="name" class="form-control" required />
+
+	<label for="email">{% ifequal lang ".en" %}Your Email Address{% endifequal %}{% ifequal lang ".es" %}Tu correo electrónico{% endifequal %}{% ifequal lang ".de" %}Deine Emailadresse{% endifequal %}{% ifequal lang ".fr" %}Votre adresse email{% endifequal %}</label>
+	<input type="email" name="email" class="form-control" required />
+
+    <label for="site">{% ifequal lang ".en"%}Your Target Website{% endifequal %}{% ifequal lang ".es" %}Su sitio web objetivo{% endifequal %}{% ifequal lang ".de" %}Ihre Zielwebsite{% endifequal %}{% ifequal lang ".fr" %}Votre site Web cible{% endifequal %}</label>
+	<input name="site" type="url" class="form-control" required />
+
+	<label for="hosting">Subversion {% ifequal lang ".en" %}Hosting Plan{% endifequal %}{% ifequal lang ".es" %}Plan de Alojamiento{% endifequal %}{% ifequal lang ".de" %}Hosting-Plan{% endifequal %}{% ifequal lang ".fr" %}Plan d'hébergement{% endifequal %}</label>
+	<input type="radio" name="hosting" value="public" checked /> &nbsp; SunStar Systems Professional / Business {% ifequal lang ".en" %}Public Repository{% endifequal %}{% ifequal lang ".es" %}Repositorio Público{% endifequal %}{% ifequal lang ".de" %}Öffentliches Repository{% endifequal %}{% ifequal lang ".fr" %}Dépôt public{% endifequal %}
+	<input type="radio" name="hosting" value="private" /> &nbsp; SunStar Systems Business {%ifequal lang ".en" %}Private Repository{% endifequal %}{% ifequal lang ".es" %}Repositorio Privado{% endifequal %}{% ifequal lang ".de" %}Privater Bereich{% endifequal %}{% ifequal lang ".fr" %}Dépôt privé{% endifequal %}
+	<input type="radio" name="hosting" value="private" /> &nbsp; SunStar Systems {%ifequal lang ".en" %}Enterprise Repository{% endifequal %}{% ifequal lang ".es" %}Repositorio empresarial{% endifequal %}{% ifequal lang ".de" %}Enterprise Repository{% endifequal %}{% ifequal lang ".fr" %}Référentiel d'entreprise{% endifequal %}
+
+	<label for="plang">{% ifequal lang ".en" %}Preferred Build System Programming Language{% endifequal %}{% ifequal lang ".es" %}Lenguaje de programación del sistema de compilación preferido{% endifequal %}{% ifequal lang ".de" %}Bevorzugte Programmiersprache für Build-Systeme{% endifequal %}{% ifequal lang ".fr" %}Langage de programmation Preferred Build System{% endifequal %}</label>
+	<input type="radio" name="plang" value="perl" checked /> &nbsp; Perl 7
+	<input type="radio" name="plang" value="python" /> &nbsp; Python 3
+	<input type="radio" name="plang" value="typescript" /> &nbsp; TypeScript
+	<input type="radio" name="plang" value="golang" /> &nbsp; GoLang
+
+	<label for="subject">{% ifequal lang ".en" %}Subject{% endifequal %}{% ifequal lang ".es" %}Sujeto{% endifequal %}{% ifequal lang ".de" %}Gegenstand{% endifequal %}{% ifequal lang ".fr" %}Matière{% endifequal %}</label>
+	<input name="subject" class="form-control" value="CMS " pattern="CMS.*" required />
+
+	<label for="content">{% ifequal lang ".en" %}Message for Sales{% endifequal %}{% ifequal lang ".es" %}Mensaje para el departamento de ventas{% endifequal %}{% ifequal lang ".de" %}Nachricht für die Verkaufsabteilung{% endifequal %}{% ifequal lang ".fr" %}Message pour le service commercial{% endifequal %}</label>
+	<textarea name="content" class="form-control" rows=10></textarea>
+
+	<input type="hidden" name="lang" value="{{ lang }}" />
+	<button name="submit" class="btn btn-outline-success" value=1 >{% ifequal lang ".en" %}Submit{% endifequal %}{% ifequal lang ".es" %}Enviar{% endifequal %}{% ifequal lang ".de" %}Einreichen{% endifequal %}{% ifequal lang ".fr" %}Soumettre{% endifequal %}</button>
+</form>

@@ -1,5 +1,8 @@
 Revision history for Alien-Build-Git
 
+0.10      2022-08-30 03:12:22 -0600
+  - Compatability with ALIEN_DOWNLOAD_RULE overrides (gh#11)
+
 0.09      2022-03-16 05:08:43 -0600
   - Fetch::Git plugin will now download just the tag/branch needed
     if git version 1.8.3.5 is installed (gh#1, gh#8)

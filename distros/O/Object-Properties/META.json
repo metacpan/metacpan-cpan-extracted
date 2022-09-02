@@ -4,52 +4,56 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Object-Properties",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "NEXT" : "0",
             "Sentinel" : "0",
-            "perl" : "5.008008",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.008008"
          }
       },
       "test" : {
          "requires" : {
-            "Carp" : "0",
-            "Test::Fatal" : "0",
             "Test::Lives" : "0",
-            "Test::More" : "0.88",
-            "lib" : "0",
-            "parent" : "0"
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/ap/Object-Properties/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Properties"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Object-Properties",
-         "web" : "http://github.com/ap/Object-Properties"
+         "url" : "https://github.com/ap/Object-Properties.git",
+         "web" : "https://github.com/ap/Object-Properties"
       }
    },
-   "version" : "1.002"
+   "version" : "1.003",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2016
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }
-

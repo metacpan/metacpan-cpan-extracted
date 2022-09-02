@@ -6,9 +6,9 @@ Date::Manip::Offset::off161;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  1 10:56:59 EDT 2022
-#    Data version: tzdata2022a
-#    Code version: tzcode2022a
+#    Generated on: Thu Sep  1 10:36:29 EDT 2022
+#    Data version: tzdata2022c
+#    Code version: tzcode2022c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.88';
+$VERSION='6.89';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -28,45 +28,11 @@ END {
    undef %Offset;
 }
 
-$Offset        = '+08:00:00';
+$Offset        = '+09:14:20';
 
 %Offset        = (
    0 => [
-      'asia/taipei',
-      'australia/perth',
-      'asia/manila',
-      'asia/shanghai',
-      'asia/hong_kong',
-      'asia/macau',
-      'asia/irkutsk',
-      'asia/brunei',
-      'asia/kuching',
-      'asia/makassar',
-      'asia/choibalsan',
-      'asia/ulaanbaatar',
-      'asia/kuala_lumpur',
-      'asia/singapore',
-      'etc/gmt+8',
-      'u',
-      'asia/chita',
-      'asia/krasnoyarsk',
-      'asia/dili',
-      'asia/khandyga',
-      'asia/yakutsk',
-      'asia/pontianak',
-      'asia/ho_chi_minh',
-      'asia/jakarta',
-      'asia/ust-nera',
-      'antarctica/casey',
-      ],
-   1 => [
-      'asia/hovd',
-      'asia/krasnoyarsk',
-      'asia/novokuznetsk',
-      'asia/tomsk',
-      'asia/barnaul',
-      'asia/novosibirsk',
-      'asia/irkutsk',
+      'australia/adelaide',
       ],
 );
 

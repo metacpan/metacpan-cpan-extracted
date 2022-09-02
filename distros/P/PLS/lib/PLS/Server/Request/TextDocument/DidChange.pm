@@ -11,6 +11,7 @@ use IO::Async::Loop;
 use IO::Async::Timer::Countdown;
 
 use PLS::Parser::Document;
+use PLS::Parser::Index;
 use PLS::Server::Request::TextDocument::PublishDiagnostics;
 
 =head1 NAME
@@ -29,7 +30,11 @@ sub service
     my ($self, $server) = @_;
 
     return unless (ref $self->{params}{contentChanges} eq 'ARRAY');
-    PLS::Parser::Document->update_file(uri => $self->{params}{textDocument}{uri}, changes => $self->{params}{contentChanges});
+    PLS::Parser::Document->update_file(
+                                       uri     => $self->{params}{textDocument}{uri},
+                                       changes => $self->{params}{contentChanges},
+                                       version => $self->{params}{textDocument}{version}
+                                      );
 
     state %timers;
 
@@ -40,14 +45,16 @@ sub service
         # If we get another change before the timer goes off, reset the timer.
         # This will allow us to limit the diagnostics to a time one second after the user stopped typing.
         $timers{$uri}->reset();
-    }
+    } ## end if (ref $timers{$uri} ...)
     else
     {
         $timers{$uri} = IO::Async::Timer::Countdown->new(
-            delay => 2,
+            delay     => 2,
             on_expire => sub {
-                my $text = PLS::Parser::Document::text_from_uri($uri);
-                $server->send_server_request(PLS::Server::Request::TextDocument::PublishDiagnostics->new(uri => $uri, unsaved => 1));
+                my $index = PLS::Parser::Index->new();
+                $index->index_files($uri)->then(sub { Future->wait_all(@_) })->retain();
+
+                $server->send_server_request(PLS::Server::Request::TextDocument::PublishDiagnostics->new(uri => $uri));
                 delete $timers{$uri};
             },
             remove_on_expire => 1
@@ -56,9 +63,9 @@ sub service
         my $loop = IO::Async::Loop->new();
         $loop->add($timers{$uri});
         $timers{$uri}->start();
-    }
+    } ## end else [ if (ref $timers{$uri} ...)]
 
     return;
-}
+} ## end sub service
 
 1;

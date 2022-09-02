@@ -75,7 +75,7 @@ voltage-sweep.pl - Sweep a Yokogawa GS200 voltage source
 
 =head1 VERSION
 
-version 3.822
+version 3.823
 
 =head1 COPYRIGHT AND LICENSE
 

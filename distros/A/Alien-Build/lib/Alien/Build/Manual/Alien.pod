@@ -14,7 +14,7 @@ Alien::Build::Manual::Alien - General alien author documentation
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,16 @@ L<Alien::Build::Manual::FAQ>
 =item Contributing
 
 L<Alien::Build::Manual::Contributing>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Alien::Build::Manual>
+
+Other L<Alien::Build> manuals.
 
 =back
 

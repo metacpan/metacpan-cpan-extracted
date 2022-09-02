@@ -10,7 +10,6 @@ use Venus::Class 'base';
 base 'Venus::Kind::Value';
 
 use overload (
-  '.' => sub{$_[0]->value . "$_[1]"},
   'eq' => sub{$_[0]->value eq "$_[1]"},
   'ne' => sub{$_[0]->value ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->value)]}/},
@@ -31,6 +30,21 @@ sub append_with {
   my $data = $self->get;
 
   return CORE::join($delimiter // '', $data, @args);
+}
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('boolean', true);
+  $assert->constraint('float', true);
+  $assert->constraint('number', true);
+  $assert->constraint('string', true);
+
+  return $assert;
 }
 
 sub camelcase {
@@ -95,7 +109,7 @@ sub contains {
 
   return CORE::index($data, $pattern) < 0 ? 0 : 1 if !$regexp;
 
-  return ($data =~ $pattern) ? 1 : 0;
+  return ($data =~ $pattern) ? true : false;
 }
 
 sub default {
@@ -441,7 +455,8 @@ I<Since C<0.01>>
 
   append_with(Str $delimiter, Str @parts) (Str)
 
-The append_with method appends arugments to the string using the delimiter provided.
+The append_with method appends arugments to the string using the delimiter
+provided.
 
 I<Since C<0.01>>
 
@@ -1716,7 +1731,7 @@ I<Since C<0.01>>
 
 =head2 index
 
-  index(Str $substr, Int $start) (Str)
+  index(Str $substr, Int $start) (Num)
 
 The index method searches for the argument within the string and returns the
 position of the first occurrence of the argument.
@@ -3323,17 +3338,25 @@ This package overloads the following operators:
 
 =over 4
 
-=item operation: C<(.)>
+=item operation: C<("")>
 
-This package overloads the C<.> operator.
+This package overloads the C<""> operator.
 
 B<example 1>
 
   # given: synopsis;
 
-  my $text = $string . ', welcome';
+  my $result = "$string";
 
-  # "hello world, welcome"
+  # "hello world"
+
+B<example 2>
+
+  # given: synopsis;
+
+  my $result = "$string, $string";
+
+  # "hello world, hello world"
 
 =back
 

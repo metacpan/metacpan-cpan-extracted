@@ -39,6 +39,18 @@ sub build_self {
 
 # METHODS
 
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('string', true);
+
+  return $assert;
+}
+
 sub error {
   my ($self, $data) = @_;
 
@@ -195,9 +207,6 @@ This package provides the following methods:
   error(HashRef $data) (Error)
 
 The error method throws the prepared error object.
-
-
-
 
 I<Since C<0.01>>
 

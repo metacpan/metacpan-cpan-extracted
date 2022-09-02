@@ -7,7 +7,7 @@ use Alien::Build;
 use base qw( Module::Build );
 
 # ABSTRACT: Alien::Build installer class for Module::Build
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 sub new
@@ -223,7 +223,7 @@ Alien::Build::MB - Alien::Build installer class for Module::Build
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

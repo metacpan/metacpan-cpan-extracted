@@ -11,7 +11,7 @@ use Time::HiRes qw(alarm time);
 use Carp qw(croak);
 use HTTP::Status qw(HTTP_GATEWAY_TIMEOUT);
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 sub prepare_app {
     my $self = shift;
@@ -69,21 +69,27 @@ sub call {
         return $self->app->($env);
 
     } or do {
-        my $request        = Plack::Request->new($env);
+        my $error = $@;
+        if ( $error =~ /Plack::Middleware::Timeout/ ) {
 
-        my $response = Plack::Response->new(HTTP_GATEWAY_TIMEOUT);
-        if ( my $build_response_coderef = $self->response ) {
-            $build_response_coderef->($response);
-        }
-        else {
-            # warn by default, so there's a trace of the timeout left somewhere
-            warn sprintf
-              "Terminated request for uri '%s' due to timeout (%ds)",
-              $request->uri,
-              $self->timeout;
-        }
+            my $request = Plack::Request->new($env);
+            my $response = Plack::Response->new(HTTP_GATEWAY_TIMEOUT);
+            if ( my $build_response_coderef = $self->response ) {
+                $build_response_coderef->($response);
+            }
+            else {
+                # warn by default, so there's a trace of the timeout left somewhere
+                warn sprintf
+                  "Terminated request for uri '%s' due to timeout (%ds)",
+                  $request->uri,
+                  $self->timeout;
+            }
 
-        return $response->finalize;
+            return $response->finalize;
+        } else {
+            # something else blew up, so rethrow it
+            die $@;
+        }
     };
 }
 
@@ -99,7 +105,7 @@ Plack::Middleware::Timeout
 
     my $app = sub { ... };
 
-    Plack::Middleeare::Timeout->wrap(
+    Plack::Middleware::Timeout->wrap(
         $app,
         timeout  => 120,
         # optional callback to set the custom response 
@@ -156,9 +162,13 @@ optional coderef that'll get executed when we established, that time required to
 
 =back
 
+=head1 KNOWN LIMITATIONS
+
+The module won't correctly handle the IO operations in progress - where the signals aren't delivered until after the read/write ends.
+
 =head1 AUTHOR
 
-Tomasz Czepiel <tjmc@cpan.org>
+Tomasz Czepiel <tjczepiel@gmail.com>
 
 =head1 LICENCE 
 

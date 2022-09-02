@@ -3,18 +3,20 @@ abstract: 'Type constraints for numbers'
 author:
   - 'Grant Street Group <developers@grantstreet.com>'
 build_requires:
+  Exporter: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::CheckDeps: '0'
   Test::Exception: '0'
   Test::More: '0'
   Test::TypeTiny: '0'
+  base: '0'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,22 +25,29 @@ name: Types-Numbers
 provides:
   Types::Numbers:
     file: lib/Types/Numbers.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Data::Float: '0'
   Data::Integer: '0'
   Error::TypeTiny: '0'
+  Math::BigFloat: '0'
+  Math::BigInt: '> 1.999719'
+  POSIX: '0'
   Scalar::Util: '1.20'
   Type::Library: '0'
-  Type::Tiny: '0'
+  Type::Tiny::Intersection: '0'
+  Type::Tiny::Union: '0'
   Types::Standard: '0'
+  constant: '0'
   perl: v5.8.8
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/SineSwiper/Types-Numbers/issues
   homepage: http://metacpan.org/release/Types-Numbers/
   repository: git://github.com/SineSwiper/Types-Numbers.git
-version: v1.0.0
-x_generated_by_perl: v5.18.2
+version: v1.0.1
+x_generated_by_perl: v5.24.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0
 x_static_install: 1

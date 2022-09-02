@@ -1,23 +1,20 @@
 use 5.006; use strict; use warnings;
 
 package Test::Lives;
-$Test::Lives::VERSION = '1.002';
-# ABSTRACT: decorate tests with a no-exceptions assertion
 
+our $VERSION = '1.003';
+
+use Carp ();
 use Test::Builder ();
 
 my $Tester = Test::Builder->new;
-*Level = \$Test::Builder::Level;
 
 sub lives_and (&;$) {
 	my ( $code, $name ) = @_;
 
-	local our $Level = $Level + 1; # this function
-
 	my $ok;
 
 	eval {
-		local $Level = $Level + 2; # eval block + callback
 		local $Carp::Internal{(__PACKAGE__)} = 1;
 		$ok = $code->() for $name;
 		1;
@@ -48,10 +45,6 @@ __END__
 =head1 NAME
 
 Test::Lives - decorate tests with a no-exceptions assertion
-
-=head1 VERSION
-
-version 1.002
 
 =head1 SYNOPSIS
 
@@ -85,7 +78,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Aristotle Pagaltzis.
+This software is copyright (c) 2022 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

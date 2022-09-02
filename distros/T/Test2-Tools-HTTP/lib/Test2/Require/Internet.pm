@@ -6,7 +6,7 @@ use IO::Socket::INET;
 use parent qw( Test2::Require );
 
 # ABSTRACT: Skip tests if there is no internet access
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 sub skip
@@ -48,7 +48,7 @@ Test2::Require::Internet - Skip tests if there is no internet access
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

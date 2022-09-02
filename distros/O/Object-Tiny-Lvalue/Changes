@@ -1,5 +1,10 @@
 Release history for Object-Tiny-Lvalue
 
+1.084 Fri 02 Sep 2022
+	- No functional changes
+	- Reduced test dependencies
+	- Updated packaging and package metadata
+
 1.083 Thu 19 Mar 2015
 	- No functional changes
 	- Further test suite cleanup

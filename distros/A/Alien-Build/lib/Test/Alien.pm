@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is interpolate_run_ok plugin_ok );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 our @aliens;
@@ -835,7 +835,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 
@@ -1164,7 +1164,7 @@ Tests that the given helper has been defined.
  plugin_ok $plugin_name, $message;
  plugin_ok [$plugin_name, @args], $message;
 
-This applies an L<Alien::Build::Plugin> to the interpolator used by L</helper_ok>, L<interpolate_template_is>
+This applies an L<Alien::Build::Plugin> to the interpolator used by L</helper_ok>, L</interpolate_template_is>
 and L</interpolate_run_ok> so that you can test with any helpers that plugin provides.  Useful,
 for example for getting C<%{configure}> from L<Alien::Build::Plugin::Build::Autoconf>.
 

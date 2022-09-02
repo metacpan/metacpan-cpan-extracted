@@ -6,15 +6,16 @@ use Path::Tiny qw( path );
 
 my $alien_file = q|
     use alienfile;
-    use Path::Tiny qw( path );
+
+    plugin 'Test::Mock',
+      probe    => 'share',
+      download => 1,
+      extract  => 1;
 
     share {
       #start_url 'file://TARFILE';
       #plugin 'Download';
       #plugin Extract => 'tar';
-
-      download sub { path('file1')->touch }; 
-      extract sub { path('file2')->touch }; 
 
       plugin 'Cleanse::BuildDir';
       

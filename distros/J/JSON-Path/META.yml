@@ -3,71 +3,42 @@ abstract: 'search nested hashref/arrayref structures using JSONPath'
 author:
   - 'Kit Peters <popefelix@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
-  JSON: '0'
-  JSON::Parse: '0'
   Test2::V0: '0'
-  Test::Deep: '0'
-  Test::More: '0'
-  Test::Most: '0'
-  Tie::IxHash: '0'
-  perl: '5.016'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: JSON-Path
-no_index:
-  directory:
-    - eg
-    - examples
-    - inc
-    - share
-    - t
-    - xt
 provides:
   JSON::Path:
     file: lib/JSON/Path.pm
-    version: '0.431'
+    version: v1.0.1
   JSON::Path::Constants:
     file: lib/JSON/Path/Constants.pm
-    version: '0.431'
+    version: v1.0.1
   JSON::Path::Evaluator:
     file: lib/JSON/Path/Evaluator.pm
-    version: '0.431'
+    version: v1.0.1
   JSON::Path::Tokenizer:
     file: lib/JSON/Path/Tokenizer.pm
-    version: '0.431'
+    version: v1.0.1
 requires:
-  Carp: '0'
   Carp::Assert: '0'
-  Exporter: '0'
-  Exporter::Easy: '0'
   Exporter::Tiny: '0'
   JSON::MaybeXS: '0'
   LV: '0'
-  List::Util: '1.48'
+  List::Util: '1.45'
   Readonly: '0'
-  Safe: '0'
-  Scalar::Util: '0'
-  Storable: '0'
-  Sys::Hostname: '0'
   Try::Tiny: '0'
-  base: '0'
-  overload: '0'
-  perl: '5.016'
-  strict: '0'
-  warnings: '0'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/popefelix/p5-json-path/issues
   homepage: https://github.com/popefelix/p5-json-path
   repository: https://github.com/popefelix/p5-json-path.git
-version: '0.431'
-x_generated_by_perl: v5.26.1
+version: 1.0.1
+x_generated_by_perl: v5.30.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

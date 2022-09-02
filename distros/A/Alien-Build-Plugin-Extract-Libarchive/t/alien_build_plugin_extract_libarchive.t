@@ -11,6 +11,8 @@ alienfile_ok q{
   use alienfile;
   probe sub { 'share' };
   share {
+    digest SHA256 => '2d792655e3384ca921bb0a2ed64237fdeccfb6b9a9436ba3e99e4985c3d3d73e'
+      if __PACKAGE__->can('digest');
     start_url $main::tarball;
     plugin 'Fetch::Local';
     plugin 'Extract::Libarchive';

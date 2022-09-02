@@ -31,6 +31,18 @@ sub build_self {
 
 # METHODS
 
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('number', true);
+
+  return $assert;
+}
+
 sub bit {
   my ($self) = @_;
 
@@ -46,7 +58,7 @@ sub boolean {
 sub byte {
   my ($self) = @_;
 
-  return chr(int($self->make * 256));
+  return chr(int($self->pick * 256));
 }
 
 sub character {
@@ -66,7 +78,7 @@ sub collect {
 sub digit {
   my ($self) = @_;
 
-  return int($self->make(10));
+  return int($self->pick(10));
 }
 
 sub float {
@@ -96,7 +108,7 @@ sub lowercased {
   return lc(chr($self->range(97, 122)));
 }
 
-sub make {
+sub pick {
   my ($self, $data) = @_;
 
   return $data ? rand($data) : rand;
@@ -123,7 +135,7 @@ sub number {
 
   return $self->range($from, $upto) if $upto;
 
-  return int($self->make(10 ** ($from > 9 ? 9 : $from) -1));
+  return int($self->pick(10 ** ($from > 9 ? 9 : $from) -1));
 }
 
 sub range {
@@ -139,7 +151,7 @@ sub range {
   $from = 0 if !$from || $from > $ceil;
   $upto = $ceil if !$upto || $upto > $ceil;
 
-  return $from + int($self->make(($upto-$from) + 1));
+  return $from + int($self->pick(($upto-$from) + 1));
 }
 
 sub repeat {
@@ -651,76 +663,6 @@ I<Since C<1.11>>
 
 =cut
 
-=head2 make
-
-  make(Num $data) (Num)
-
-The make method is the random number generator and returns a random number. By
-default, calling this method is equivalent to call L<perlfunc/rand>. This
-method can be overridden in a subclass to provide a custom generator, e.g. a
-more cyptographically secure generator.
-
-I<Since C<1.11>>
-
-=over 4
-
-=item make example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $make = $random->make;
-
-  # 0.744525000061007
-
-  # $make = $random->make;
-
-  # 0.342701478718908
-
-=back
-
-=over 4
-
-=item make example 2
-
-  # given: synopsis
-
-  package main;
-
-  my $make = $random->make(100);
-
-  # 74.4525000061007
-
-  # $make = $random->make(100);
-
-  # 34.2701478718908
-
-=back
-
-=over 4
-
-=item make example 3
-
-  # given: synopsis
-
-  package main;
-
-  my $make = $random->make(2);
-
-  # 1.48905000012201
-
-  # $make = $random->make(2);
-
-  # 0.685402957437816
-
-
-
-
-=back
-
-=cut
-
 =head2 nonzero
 
   nonzero(Str|CodeRef $code, Any @args) (Int|Str)
@@ -757,11 +699,11 @@ I<Since C<1.11>>
 
   package main;
 
-  my $nonzero = $random->nonzero("make");
+  my $nonzero = $random->nonzero("pick");
 
   # 1.74452500006101
 
-  # $nonzero = $random->nonzero("make");
+  # $nonzero = $random->nonzero("pick");
 
   # 1.34270147871891
 
@@ -884,6 +826,73 @@ I<Since C<1.11>>
   # $number = $random->number(5);
 
   # 34269
+
+=back
+
+=cut
+
+=head2 pick
+
+  pick(Num $data) (Num)
+
+The pick method is the random number generator and returns a random number. By
+default, calling this method is equivalent to call L<perlfunc/rand>. This
+method can be overridden in a subclass to provide a custom generator, e.g. a
+more cyptographically secure generator.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item pick example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $pick = $random->pick;
+
+  # 0.744525000061007
+
+  # $pick = $random->pick;
+
+  # 0.342701478718908
+
+=back
+
+=over 4
+
+=item pick example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $pick = $random->pick(100);
+
+  # 74.4525000061007
+
+  # $pick = $random->pick(100);
+
+  # 34.2701478718908
+
+=back
+
+=over 4
+
+=item pick example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $pick = $random->pick(2);
+
+  # 1.48905000012201
+
+  # $pick = $random->pick(2);
+
+  # 0.685402957437816
 
 =back
 

@@ -5,8 +5,7 @@ use warnings;
 
 use parent q(PLS::Server::Response);
 
-use JSON::PP;
-
+use PLS::JSON;
 use PLS::Server::State;
 
 =head1 NAME
@@ -30,29 +29,36 @@ sub new
                 id     => $request->{id},
                 result => {
                            capabilities => {
-                                            definitionProvider     => JSON::PP::true,
-                                            documentSymbolProvider => JSON::PP::true,
-                                            hoverProvider          => JSON::PP::true,
+                                            completionItem => {
+                                                               labelDetailsSupport => PLS::JSON::true
+                                                              },
+                                            definitionProvider     => PLS::JSON::true,
+                                            documentSymbolProvider => PLS::JSON::true,
+                                            hoverProvider          => PLS::JSON::true,
                                             signatureHelpProvider  => {
                                                                       triggerCharacters => ['(', ',']
                                                                      },
                                             textDocumentSync => {
-                                                                 openClose => JSON::PP::true,
+                                                                 openClose => PLS::JSON::true,
                                                                  change    => 2,
-                                                                 save => JSON::PP::true,
+                                                                 save      => PLS::JSON::true,
                                                                 },
-                                            documentFormattingProvider      => JSON::PP::true,
-                                            documentRangeFormattingProvider => JSON::PP::true,
+                                            documentFormattingProvider      => PLS::JSON::true,
+                                            documentRangeFormattingProvider => PLS::JSON::true,
                                             completionProvider              => {
-                                                                   triggerCharacters => ['>', ':', '$', '@', '%'],
-                                                                   resolveProvider   => JSON::PP::true,
+                                                                   triggerCharacters => ['>', ':', '$', '@', '%', ' ', '-'],
+                                                                   resolveProvider   => PLS::JSON::true,
                                                                   },
                                             executeCommandProvider => {
-                                                commands => [
-                                                    'perl.sortImports'
-                                                ]
-                                            },
-                                            workspaceSymbolProvider => JSON::PP::true
+                                                                       commands => ['pls.sortImports']
+                                                                      },
+                                            workspaceSymbolProvider => PLS::JSON::true,
+                                            workspace               => {
+                                                          workspaceFolders => {
+                                                                               supported           => PLS::JSON::true,
+                                                                               changeNotifications => PLS::JSON::true
+                                                                              }
+                                                         }
                                            }
                           }
                );
@@ -66,6 +72,6 @@ sub serialize
 
     $PLS::Server::State::INITIALIZED = 1;
     return $self->SUPER::serialize();
-}
+} ## end sub serialize
 
 1;

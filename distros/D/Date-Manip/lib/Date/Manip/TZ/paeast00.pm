@@ -6,9 +6,9 @@ Date::Manip::TZ::paeast00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  1 10:55:29 EDT 2022
-#    Data version: tzdata2022a
-#    Code version: tzcode2022a
+#    Generated on: Thu Sep  1 10:29:10 EDT 2022
+#    Data version: tzdata2022c
+#    Code version: tzcode2022c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.88';
+$VERSION='6.89';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -524,11 +524,11 @@ END { undef $VERSION; }
    2022 =>
      [
         [ [2022,4,3,3,0,0],[2022,4,2,21,0,0],'-06:00:00',[-6,0,0],
-          '-06',0,[2022,9,4,3,59,59],[2022,9,3,21,59,59],
-          '2022040303:00:00','2022040221:00:00','2022090403:59:59','2022090321:59:59' ],
-        [ [2022,9,4,4,0,0],[2022,9,3,23,0,0],'-05:00:00',[-5,0,0],
+          '-06',0,[2022,9,11,3,59,59],[2022,9,10,21,59,59],
+          '2022040303:00:00','2022040221:00:00','2022091103:59:59','2022091021:59:59' ],
+        [ [2022,9,11,4,0,0],[2022,9,10,23,0,0],'-05:00:00',[-5,0,0],
           '-05',1,[2023,4,2,2,59,59],[2023,4,1,21,59,59],
-          '2022090404:00:00','2022090323:00:00','2023040202:59:59','2023040121:59:59' ],
+          '2022091104:00:00','2022091023:00:00','2023040202:59:59','2023040121:59:59' ],
      ],
    2023 =>
      [

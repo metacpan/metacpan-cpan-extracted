@@ -26,6 +26,7 @@ lib/App/Yath/Command/projects.pm
 lib/App/Yath/Command/ps.pm
 lib/App/Yath/Command/reload.pm
 lib/App/Yath/Command/replay.pm
+lib/App/Yath/Command/resources.pm
 lib/App/Yath/Command/run.pm
 lib/App/Yath/Command/runner.pm
 lib/App/Yath/Command/spawn.pm

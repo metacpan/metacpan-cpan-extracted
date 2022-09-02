@@ -12,7 +12,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -34,6 +34,9 @@ sub new
     pkg_config_path => [],
     aclocal_path => [],
   }, $class;
+
+  # force computing this as soon as possible
+  $self->download_rule;
 
   $self->meta->filename(
     $args{filename} || do {
@@ -252,6 +255,24 @@ sub install_type
 {
   my($self) = @_;
   $self->{runtime_prop}->{install_type} ||= $self->probe;
+}
+
+
+sub download_rule
+{
+  my($self) = @_;
+
+  $self->install_prop->{download_rule} ||= do {
+    my $dr = $ENV{ALIEN_DOWNLOAD_RULE};
+    $dr = 'warn' unless defined $dr;
+    $dr = 'warn' if $dr eq 'default';
+    unless($dr =~ /^(warn|digest|encrypt|digest_or_encrypt|digest_and_encrypt)$/)
+    {
+      $self->log("unknown ALIEN_DOWNLOAD_RULE \"$dr\", using \"warn\" instead");
+      $dr = 'warn';
+    }
+    $dr;
+  };
 }
 
 
@@ -589,7 +610,51 @@ sub download
 sub fetch
 {
   my $self = shift;
-  $self->_call_hook( 'fetch' => @_ );
+  my $url = $_[0] || $self->meta_prop->{start_url};
+
+  my $secure = 0;
+
+  $DB::single = 1;
+  if(defined $url && ($url =~ /^(https|file):/ || $url !~ /:/))
+  {
+    # considered secure when either https or a local file
+    $secure = 1;
+  }
+  elsif(!defined $url)
+  {
+    $self->log("warning: undefined url in fetch");
+  }
+  else
+  {
+    $self->log("warning: attempting to fetch a non-TLS or bundled URL: @{[ $url ]}");
+  }
+
+  die "insecure fetch is not allowed" if $self->download_rule =~ /^(encrypt|digest_and_encrypt)$/ && !$secure;
+
+  my $file = $self->_call_hook( 'fetch' => @_ );
+
+  $secure = 0;
+
+  if(ref($file) ne 'HASH')
+  {
+    $self->log("warning: fetch returned non-hash reference");
+  }
+  elsif(!defined $file->{protocol})
+  {
+    $self->log("warning: fetch did not return a protocol");
+  }
+  elsif($file->{protocol} !~ /^(https|file)$/)
+  {
+    $self->log("warning: fetch did not use a secure protocol: @{[ $file->{protocol} ]}");
+  }
+  else
+  {
+    $secure = 1;
+  }
+
+  die "insecure fetch is not allowed" if $self->download_rule =~ /^(encrypt|digest_and_encrypt)$/ && !$secure;
+
+  $file;
 }
 
 
@@ -610,11 +675,12 @@ sub check_digest
     };
   }
 
-  if(defined $file->{path})
+  my $path = $file->{path};
+  if(defined $path)
   {
     # there is technically a race condition here
-    die "Missing file in digest check: @{[ $file->{filename} ]}" unless -f $file->{path};
-    die "Unreadable file in digest check: @{[ $file->{filename} ]}" unless -r $file->{path};
+    die "Missing file in digest check: @{[ $file->{filename} ]}" unless -f $path;
+    die "Unreadable file in digest check: @{[ $file->{filename} ]}" unless -r $path;
   }
   else
   {
@@ -632,7 +698,9 @@ sub check_digest
 
   if($self->meta->call_hook( check_digest => $self, $file, $algo, $expected ))
   {
-    return 1;
+    # record the verification here so that we can check in the extract step that the signature
+    # was checked.
+    $self->install_prop->{download_detail}->{$path}->{digest} = [$algo, $expected] if defined $path; return 1;
   }
   else
   {
@@ -644,14 +712,22 @@ sub check_digest
 sub decode
 {
   my($self, $res) = @_;
-  $self->_call_hook( decode => $res );
+  my $res2 = $self->_call_hook( decode => $res );
+  $res2->{protocol} = $res->{protocol}
+    if !defined $res2->{protocol}
+    &&  defined $res->{protocol};
+  return $res2;
 }
 
 
 sub prefer
 {
   my($self, $res) = @_;
-  $self->_call_hook( prefer => $res );
+  my $res2 = $self->_call_hook( prefer => $res );
+  $res2->{protocol} = $res->{protocol}
+    if !defined $res2->{protocol}
+    &&  defined $res->{protocol};
+  return $res2;
 }
 
 
@@ -664,6 +740,75 @@ sub extract
   unless(defined $archive)
   {
     die "tried to call extract before download";
+  }
+
+  {
+    my $checked_digest  = 0;
+    my $encrypted_fetch = 0;
+    my $detail = $self->install_prop->{download_detail}->{$archive};
+    if(defined $detail)
+    {
+      if(defined $detail->{digest})
+      {
+        my($algo, $expected) = @{ $detail->{digest} };
+        my $file = {
+          type     => 'file',
+          filename => Path::Tiny->new($archive)->basename,
+          path     => $archive,
+          tmp      => 0,
+        };
+        $checked_digest = $self->meta->call_hook( check_digest => $self, $file, $algo, $expected )
+      }
+      if(!defined $detail->{protocol})
+      {
+        $self->log("warning: extract did not receive protocol details for $archive") unless $checked_digest;
+      }
+      elsif($detail->{protocol} !~ /^(https|file)$/)
+      {
+        $self->log("warning: extracting from a file that was fetched via insecure protocol @{[ $detail->{protocol} ]}") unless $checked_digest ;
+      }
+      else
+      {
+        $encrypted_fetch = 1;
+      }
+    }
+    else
+    {
+      $self->log("warning: extract received no download details for $archive");
+    }
+
+    if($self->download_rule eq 'digest')
+    {
+      die "required digest missing for $archive" unless $checked_digest;
+    }
+    elsif($self->download_rule eq 'encrypt')
+    {
+      die "file was fetched insecurely for $archive" unless $encrypted_fetch;
+    }
+    elsif($self->download_rule eq 'digest_or_encrypt')
+    {
+      die "file was fetched insecurely and required digest missing for $archive" unless $checked_digest || $encrypted_fetch;
+    }
+    elsif($self->download_rule eq 'digest_and_encrypt')
+    {
+      die "file was fetched insecurely and required digest missing for $archive" unless $checked_digest || $encrypted_fetch;
+      die "required digest missing for $archive" unless $checked_digest;
+      die "file was fetched insecurely for $archive" unless $encrypted_fetch;
+    }
+    elsif($self->download_rule eq 'warn')
+    {
+      unless($checked_digest || $encrypted_fetch)
+      {
+        $self->log("!!! NOTICE OF FUTURE CHANGE IN BEHAVIOR !!!");
+        $self->log("a future version of Alien::Build will die here by default with this exception: file was fetched insecurely and required digest missing for $archive");
+        $self->log("!!! NOTICE OF FUTURE CHANGE IN BEHAVIOR !!!");
+      }
+    }
+    else
+    {
+      die "internal error, unknown download rule: @{[ $self->download_rule ]}";
+    }
+
   }
 
   my $nick_name = 'build';
@@ -1256,7 +1401,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 
@@ -1305,6 +1450,13 @@ If you have a common question that has already been answered, like
 
 This is for the brave souls who want to write plugins that will work with
 L<Alien::Build> + L<alienfile>.
+
+=item L<Alien::Build::Manual::Security>
+
+If you are concerned that L<Alien>s might be downloading tarballs off
+the internet, then this is the place for you.  This will discuss some
+of the risks of downloading (really any) software off the internet
+and will give you some tools to remediate these risks.
 
 =back
 
@@ -1411,6 +1563,12 @@ that the library or tool contains architecture dependent files and so should
 be stored in an architecture dependent location.  If not specified by your
 L<alienfile> then it will be set to true.
 
+=item check_digest
+
+True if cryptographic digest should be checked when files are fetched
+or downloaded.  This is set by
+L<Digest negotiator plugin|Alien::Build::Plugin::Digest::Negotiate>.
+
 =item destdir
 
 Some plugins (L<Alien::Build::Plugin::Build::Autoconf> for example) support
@@ -1430,6 +1588,30 @@ into the stage directory.  If not defined, then all files will be copied.
 =item destdir_ffi_filter
 
 Same as C<destdir_filter> except applies to C<build_ffi> instead of C<build>.
+
+=item digest
+
+This properties contains the cryptographic digests (if any) that should
+be used when verifying any fetched and downloaded files.  It is a hash
+reference where the key is the filename and the value is an array
+reference containing a pair of values, the first being the algorithm
+('SHA256' is recommended) and the second is the actual digest.  The
+special filename C<*> may be specified to indicate that any downloaded
+file should match that digest.  If there are both real filenames and
+the C<*> placeholder, the real filenames will be used for filenames
+that match and any other files will use the placeholder.  Example:
+
+ $build->meta_prop->{digest} = {
+   'foo-1.00.tar.gz' => [ SHA256 => '9feac593aa49a44eb837de52513a57736457f1ea70078346c60f0bfc5f24f2c1' ],
+   'foo-1.01.tar.gz' => [ SHA256 => '6bbde6a7f10ae5924cf74afc26ff5b7bc4b4f9dfd85c6b534c51bd254697b9e7' ],
+   '*'               => [ SHA256 => '33a20aae3df6ecfbe812b48082926d55391be4a57d858d35753ab1334b9fddb3' ],
+ };
+
+Cryptographic signatures will only be checked
+if the L<check_digest meta property|/check_digest> is set and if the
+L<Digest negotiator plugin|Alien::Build::Plugin::Digest::Negotiate> is loaded.
+(The Digest negotiator can be used directly, but is also loaded automatically
+if you use the L<digest directive|alienfile/digest> is used by the L<alienfile>).
 
 =item env
 
@@ -1542,13 +1724,38 @@ based module.
 The prefix as understood by autoconf.  This is only different on Windows
 Where MSYS is used and paths like C<C:/foo> are  represented as C</C/foo>
 which are understood by the MSYS tools, but not by Perl.  You should
-only use this if you are using L<Alien::Build::Plugin::Autoconf> in
-your L<alienfile>.  This is set during before the build hook is run.
+only use this if you are using L<Alien::Build::Plugin::Build::Autoconf> in
+your L<alienfile>.  This is set during before the
+L<build hook|Alien::Build::Manual::PluginAuthor/"build hook"> is run.
 
 =item download
 
 The location of the downloaded archive (tar.gz, or similar) or directory.
 This will be undefined until the archive is actually downloaded.
+
+=item download_detail
+
+This property contains optional details about a downloaded file.  This
+property is populated by L<Alien::Build> core.  This property is a
+hash reference.  The key is the path to the file that has been downloaded
+and the value is a hash reference with additional detail.  All fields
+are optional.
+
+=over 4
+
+=item digest
+
+This, if available, with the cryptographic signature that was successfully
+matched against the downloaded file.  It is an array reference with a
+pair of values, the algorithm (typically something like C<SHA256>) and
+the digest.
+
+=item protocol
+
+This, if available, will be the URL protocol used to fetch the downloaded
+file.
+
+=back
 
 =item env
 
@@ -1728,7 +1935,8 @@ included.  See L<Inline::C/auto_include> for details.
 
 =item install_type
 
-The install type.  This is set by AB core after the probe hook is
+The install type.  This is set by AB core after the
+L<probe hook|Alien::Build::Manual::PluginAuthor/"probe hook"> is
 executed.  Is one of:
 
 =over 4
@@ -1841,6 +2049,46 @@ This will return the install type.  (See the like named install property
 above for details).  This method will call C<probe> if it has not already
 been called.
 
+=head2 download_rule
+
+ my $rule = $build->download_rule;
+
+This returns install rule as a string.  This is determined by the environment
+and should be one of:
+
+=over 4
+
+=item C<warn>
+
+Warn only if fetching via non secure source (secure sources include C<https>,
+and bundled files, may include other encrypted protocols in the future).
+
+=item C<digest>
+
+Require that any downloaded source package have a cryptographic signature in
+the L<alienfile> and that signature matches what was downloaded.
+
+=item C<encrypt>
+
+Require that any downloaded source package is fetched via secure source.
+
+=item C<digest_or_encrypt>
+
+Require that any downloaded source package is B<either> fetched via a secure source
+B<or> has a cryptographic signature in the L<alienfile> and that signature matches
+what was downloaded.
+
+=item C<digest_and_encrypt>
+
+Require that any downloaded source package is B<both> fetched via a secure source
+B<and> has a cryptographic signature in the L<alienfile> and that signature matches
+what was downloaded.
+
+=back
+
+The current default is C<warn>, but in the near future this will be upgraded to
+C<digest_or_encrypt>.
+
 =head2 set_prefix
 
  $build->set_prefix($prefix);
@@ -1918,7 +2166,8 @@ Under a C<system> install this does not do anything.
  my $res = $build->fetch($url, %options);
 
 Fetch a resource using the fetch hook.  Returns the same hash structure
-described below in the hook documentation.
+described below in the
+L<fetch hook|Alien::Build::Manual::PluginAuthor/"fetch hook"> documentation.
 
 [version 2.39]
 
@@ -1959,7 +2208,7 @@ Containing the path to the file to be checked.
 =item C<HASH>
 
 A Hash reference containing information about a file.  See
-L<the fetch hook|Alien::Build::Manual::PluginAuthor/"fech hook"> for details
+the L<fetch hook|Alien::Build::Manual::PluginAuthor/"fetch hook"> for details
 on the format.
 
 =back
@@ -1974,7 +2223,8 @@ signature.
  my $decoded_res = $build->decode($res);
 
 Decode the HTML or file listing returned by C<fetch>.  Returns the same
-hash structure described below in the hook documentation.
+hash structure described below in the
+L<decode hook|Alien::Build::Manual::PluginAuthor/"decode hook"> documentation.
 
 =head2 prefer
 
@@ -1982,7 +2232,8 @@ hash structure described below in the hook documentation.
 
 Filter and sort candidates.  The preferred candidate will be returned first in the list.
 The worst candidate will be returned last.  Returns the same hash structure described
-below in the hook documentation.
+below in the
+L<prefer hook|Alien::Build::Manual::PluginAuthor/"prefer hook"> documentation.
 
 =head2 extract
 
@@ -2009,7 +2260,9 @@ recipe.  If there is a C<gather_share> that will be executed last.
 
 =item system
 
-The C<gather_system> hook will be executed.
+The
+L<gather_system hook|Alien::Build::Manual::PluginAuthor/"gather_system hook">
+will be executed.
 
 =back
 
@@ -2169,6 +2422,36 @@ L<Alien::Build> responds to these environment variables:
 
 =over 4
 
+=item ALIEN_BUILD_LOG
+
+The default log class used.  See L<Alien::Build::Log> and L<Alien::Build::Log::Default>.
+
+=item ALIEN_BUILD_PKG_CONFIG
+
+Override the logic in L<Alien::Build::Plugin::PkgConfig::Negotiate> which
+chooses the best C<pkg-config> plugin.
+
+=item ALIEN_BUILD_POSTLOAD
+
+semicolon separated list of plugins to automatically load after parsing
+your L<alienfile>.
+
+=item ALIEN_BUILD_PRELOAD
+
+semicolon separated list of plugins to automatically load before parsing
+your L<alienfile>.
+
+=item ALIEN_BUILD_RC
+
+Perl source file which can override some global defaults for L<Alien::Build>,
+by, for example, setting preload and postload plugins.
+
+=item ALIEN_DOWNLOAD_RULE
+
+This value determines the rules by which types of downloads are allowed.  The legal
+values listed under L</download_rule>, plus C<default> which will be the default for
+the current version of L<Alien::Build>.  For this version that default is C<warn>.
+
 =item ALIEN_INSTALL_NETWORK
 
 If set to true (the default), then network fetch will be allowed.  If set to
@@ -2198,30 +2481,6 @@ user is aware that L<Alien> modules may be installed and have indicated consent.
 The actual implementation of this, by its nature would have to be in the consuming
 CPAN module.
 
-=item ALIEN_BUILD_LOG
-
-The default log class used.  See L<Alien::Build::Log> and L<Alien::Build::Log::Default>.
-
-=item ALIEN_BUILD_RC
-
-Perl source file which can override some global defaults for L<Alien::Build>,
-by, for example, setting preload and postload plugins.
-
-=item ALIEN_BUILD_PKG_CONFIG
-
-Override the logic in L<Alien::Build::Plugin::PkgConfig::Negotiate> which
-chooses the best C<pkg-config> plugin.
-
-=item ALIEN_BUILD_PRELOAD
-
-semicolon separated list of plugins to automatically load before parsing
-your L<alienfile>.
-
-=item ALIEN_BUILD_POSTLOAD
-
-semicolon separated list of plugins to automatically load after parsing
-your L<alienfile>.
-
 =item DESTDIR
 
 This environment variable will be manipulated during a destdir install.
@@ -2234,7 +2493,7 @@ when using the command line plugin: L<Alien::Build::Plugin::PkgConfig::CommandLi
 =item ftp_proxy, all_proxy
 
 If these environment variables are set, it may influence the Download negotiation
-plugin L<Alien::Build::Plugin::Downaload::Negotiate>.  Other proxy variables may
+plugin L<Alien::Build::Plugin::Download::Negotiate>.  Other proxy variables may
 be used by some Fetch plugins, if they support it.
 
 =back

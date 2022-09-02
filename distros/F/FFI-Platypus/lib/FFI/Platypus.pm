@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -597,7 +597,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 SYNOPSIS
 
@@ -2181,7 +2181,8 @@ Like OpenVMS
 
 =item Languages that do not support using dynamic libraries from other languages
 
-Like older versions of Google's Go. This is a problem for C / XS code as well.
+This used to be the case with Google's Go, but is no longer the case.  This is
+a problem for C / XS code as well.
 
 =item Languages that do not compile to machine code
 
@@ -2344,7 +2345,7 @@ making significant changes to the Platypus Core.  For that I use
 
 =over 4
 
-=item L<https://github.com/PerlFFI/FFI-Performance>
+=item L<https://github.com/Perl5-FFI/FFI-Performance>
 
 =back
 
@@ -2485,12 +2486,6 @@ Promising interface to Platypus inspired by Raku.
 =item L<Win32::API>
 
 Microsoft Windows specific FFI style interface.
-
-=item L<Ctypes|https://gitorious.org/perl-ctypes>
-
-Ctypes was intended as a FFI style interface for Perl, but was never
-part of CPAN, and at least the last time I tried it did not work with
-recent versions of Perl.
 
 =item L<FFI>
 

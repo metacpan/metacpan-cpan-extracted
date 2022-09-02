@@ -1,6 +1,14 @@
 Changelog for Types-Numbers
 
-v1.0.0 2021-06-10T19:13:01
+v1.0.1 2022-09-02T18:29:34
+ - Bump copyright dates and version in README/LICENSE (Andrew Hewus Fresh)
+ - Pull in new Makefile from PluginBundle (Andrew Hewus Fresh)
+ - Pull request #2: SM-3754 - Avoid bad Math BigInt (Andrew Fresh)
+ - Require newer version of Math::BigInt (Andrew Hewus Fresh)
+ - Exclude "bad" versions of Math::BigInt (Andrew Hewus Fresh)
+ - Add core dependencies to cpanfile (Andrew Hewus Fresh)
+
+v1.0.0 2021-06-10T19:12:43
  - Update README / LICENSE (Brendan Byrd)
  - Pull request #1: SM-3106 (Brendan Byrd)
  - Add a small POD correction (Brendan Byrd)

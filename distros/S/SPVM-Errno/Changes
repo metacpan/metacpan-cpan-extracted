@@ -1,3 +1,17 @@
+0.05 2022-08-31
+  [Incompativle Changes]
+    * All constant methods set the class id of Error::NotSupported to the error if the constant is not supported on the system.
+  [Requirement Changes]
+    * SPVM 0.9648 is required.
+  [Bug Fix]
+    * Fux the bug that native file name is wrong. This is changed from "Sys/Stat.c" to "Sys/Errno.c".
+  [Exception Message Improvement]
+    * Exception messages are improved
+      [Before]
+      X is not defined in this system
+      [After]
+      X is not defined on this system
+    
 0.04 2022-07-12
   [Fix Testing Bugs]
     * Fix the testing bug that when a errno doesn't eixsts in the system, the test fails.

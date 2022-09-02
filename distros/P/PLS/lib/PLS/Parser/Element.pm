@@ -65,8 +65,10 @@ sub lsp_line_number
 {
     my ($self) = @_;
 
-    return $self->ppi_line_number - 1;
-}
+    my $line_number = $self->ppi_line_number;
+    return 0 unless $line_number;
+    return $line_number - 1;
+} ## end sub lsp_line_number
 
 =head2 lsp_column_number
 
@@ -78,8 +80,10 @@ sub lsp_column_number
 {
     my ($self) = @_;
 
-    return $self->ppi_column_number - 1;
-}
+    my $column_number = $self->ppi_column_number;
+    return 0 unless $column_number;
+    return $column_number - 1;
+} ## end sub lsp_column_number
 
 =head2 location_info
 
@@ -204,7 +208,7 @@ sub method_name
           or not $element->sprevious_sibling->isa('PPI::Token::Operator')
           or $element->sprevious_sibling ne '->');
 
-    return $element->content;
+    return $element->content =~ s/^SUPER:://r;
 } ## end sub method_name
 
 =head2 class_method_package_and_name
@@ -244,18 +248,37 @@ sub subroutine_package_and_name
 
     my $element = $self->element;
 
-    return if (not blessed($element) or not $element->isa('PPI::Token::Word'));
+    return unless blessed($element);
 
-    if ($element->content =~ /::/)
+    my $content = '';
+
+    return if (    blessed($element->sprevious_sibling)
+               and $element->sprevious_sibling->isa('PPI::Token::Operator')
+               and $element->sprevious_sibling eq '->');
+
+    if ($element->isa('PPI::Token::Symbol') and $element->content =~ /^&/)
     {
-        my @parts      = split /::/, $element->content;
+        $content = $element->content =~ s/^&//r;
+    }
+    elsif ($element->isa('PPI::Token::Word'))
+    {
+        $content = $element->content;
+    }
+    else
+    {
+        return;
+    }
+
+    if ($content =~ /::/)
+    {
+        my @parts      = split /::/, $content;
         my $subroutine = pop @parts;
         my $package    = join '::', @parts;
         return $package, $subroutine;
-    } ## end if ($element->content ...)
+    } ## end if ($content =~ /::/)
     else
     {
-        return '', $element->content;
+        return '', $content;
     }
 
     return;

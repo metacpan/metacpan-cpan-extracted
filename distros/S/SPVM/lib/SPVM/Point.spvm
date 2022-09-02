@@ -2,6 +2,7 @@ class Point {
   # Interfaces
   interface Stringable;
   interface Cloneable;
+  interface Pointable;
   
   # Fields
   has x : rw protected int;
@@ -17,12 +18,9 @@ class Point {
     return $self;
   }
   
-  static method new_xy : Point ($x : int, $y : int) {
-    warn "Point->new_xy(\$x, \$y) is deprecated. Use Point->new(\$x, \$y) instead. This method will be removed after 2022-09-03";
-    return &new($x, $y);
-  }
-  
   # Instance methods
+  method pointable : int () { return 1; }
+
   method clear : void () {
     $self->{x} = 0;
     $self->{y} = 0;

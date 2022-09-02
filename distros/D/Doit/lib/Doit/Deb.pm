@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018,2020 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -14,9 +14,10 @@
 package Doit::Deb; # Convention: all commands here should be prefixed with 'deb_'
 
 use strict;
-use vars qw($VERSION);
-$VERSION = '0.02';
+use warnings;
+our $VERSION = '0.024';
 
+use Doit::Log;
 use Doit::Util 'get_sudo_cmd';
 
 sub new { bless {}, shift }
@@ -54,7 +55,7 @@ sub deb_missing_packages {
 	my $err = Symbol::gensym();
 	my $fh;
 	my $pid = IPC::Open3::open3(undef, $fh, $err, @cmd)
-	    or die "Error running '@cmd': $!";
+	    or error "Error running '@cmd': $!";
 	while(<$fh>) {
 	    chomp;
 	    if (m{^([^\t]+)\t([^\t]+)\t([^\t]*)$}) {
@@ -66,7 +67,7 @@ sub deb_missing_packages {
 		}
 		$seen_packages{$1} = 1;
 	    } else {
-		warn "ERROR: cannot parse $_, ignore line...\n";
+		warning "cannot parse '$_', ignore line...";
 	    }
 	}
 	waitpid $pid, 0;
@@ -84,18 +85,18 @@ sub deb_install_key {
     my $url       = delete $opts{url};
     my $keyserver = delete $opts{keyserver};
     my $key       = delete $opts{key};
-    die "Unhandled options: " . join(" ", %opts) if %opts;
+    error "Unhandled options: " . join(" ", %opts) if %opts;
 
     if (!$url) {
 	if (!$keyserver) {
-	    die "keyserver is missing";
+	    error "keyserver is missing";
 	}
 	if (!$key) {
-	    die "key is missing";
+	    error "key is missing";
 	}
     } else {
 	if ($keyserver) {
-	    die "Don't define both url and keyserver";
+	    error "Don't define both url and keyserver";
 	}
     }
 
@@ -111,16 +112,27 @@ sub deb_install_key {
 	#   local $ENV{HOME} = (getpwuid($<))[7];
 	# Probably better would be to work with privilege escalation and run
 	# this command as normal user (to be implemented).
-	open my $fh, '-|', 'gpg', '--keyring', '/etc/apt/trusted.gpg', '--list-keys', '--fingerprint', '--with-colons'
-	    or die "Running gpg failed: $!";
-	while(<$fh>) {
-	    if (m{^fpr:::::::::\Q$key\E:$}) {
-		$found_key = 1;
-		last;
+	#
+	# Older Debian (jessie and older?) have only /etc/apt/trusted.gpg,
+	# newer ones (stretch and newer?) have /etc/apt/trusted.gpg.d/*.gpg
+    SEARCH_FOR_KEY: {
+	    require File::Glob;
+	    for my $keyfile ('/etc/apt/trusted.gpg', File::Glob::bsd_glob('/etc/apt/trusted.gpg.d/*.gpg')) {
+		if (-r $keyfile) {
+		    my @cmd = ('gpg', '--keyring', $keyfile, '--list-keys', '--fingerprint', '--with-colons');
+		    open my $fh, '-|', @cmd
+			or error "Running '@cmd' failed: $!";
+		    while(<$fh>) {
+			if (m{^fpr:::::::::\Q$key\E:$}) {
+			    $found_key = 1;
+			    last SEARCH_FOR_KEY;
+			}
+		    }
+		    close $fh
+			or error "Running '@cmd' failed: $!";
+		}
 	    }
 	}
-	close $fh
-	    or die "Running gpg failed: $!";
     }
 
     my $changed = 0;
@@ -128,9 +140,31 @@ sub deb_install_key {
 	if ($keyserver) {
 	    $self->system(get_sudo_cmd(), 'apt-key', 'adv', '--keyserver', $keyserver, '--recv-keys', $key);
 	} elsif ($url) {
-	    $self->run(['curl', '-fsSL', $url], '|', [get_sudo_cmd(), 'apt-key', 'add', '-']);
+	    my @fetch_cmd;
+	    if ($self->which('curl')) {
+		@fetch_cmd = ('curl', '-fsSL', $url);
+	    } else {
+		@fetch_cmd = ('wget', '-O-', $url); # other alternative would be lwp-request
+	    }
+	    my @add_cmd   = (get_sudo_cmd(), 'apt-key', 'add', '-');
+	    if ($self->is_dry_run) {
+		info "Fetch key using '@fetch_cmd' and add using '@add_cmd' (dry-run)";
+	    } else {
+		open my $ifh, '-|', @fetch_cmd
+		    or error "Failed to start '@fetch_cmd': $!";
+		open my $ofh, '|-', @add_cmd
+		    or error "Failed to start '@add_cmd': $!";
+		local $/ = \1024;
+		while(<$ifh>) {
+		    print $ofh $_;
+		}
+		close $ofh
+		    or error "Running '@add_cmd' failed: $!";
+		close $ifh
+		    or error "Running '@fetch_cmd' failed: $!";
+	    }
 	} else {
-	    die "Shouldn't happen";
+	    error "Shouldn't happen (either url or keyserver has to be specified)";
 	}
 	$changed = 1;
     }

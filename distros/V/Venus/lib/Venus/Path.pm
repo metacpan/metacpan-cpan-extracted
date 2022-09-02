@@ -16,7 +16,6 @@ with 'Venus::Role::Explainable';
 
 use overload (
   '""' => 'explain',
-  '.' => sub{$_[0]->value . "$_[1]"},
   'eq' => sub{$_[0]->value eq "$_[1]"},
   'ne' => sub{$_[0]->value ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->value)]}/},
@@ -25,6 +24,18 @@ use overload (
 );
 
 # METHODS
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('string', true);
+
+  return $assert;
+}
 
 sub absolute {
   my ($self) = @_;
@@ -176,6 +187,14 @@ sub is_relative {
   my ($self) = @_;
 
   return int!$self->is_absolute;
+}
+
+sub lines {
+  my ($self, $separator, $binmode) = @_;
+
+  $separator //= "\n";
+
+  return [split /$separator/, $binmode ? $self->read($binmode) : $self->read];
 }
 
 sub lineage {
@@ -691,6 +710,7 @@ I<Since C<0.01>>
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -874,6 +894,7 @@ I<Since C<0.01>>
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -912,6 +933,7 @@ I<Since C<0.01>>
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -980,6 +1002,7 @@ I<Since C<0.01>>
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -1100,6 +1123,41 @@ I<Since C<0.01>>
   #   bless({ value => "t/data" }, "Venus::Path"),
   #   bless({ value => "t" }, "Venus::Path"),
   # ]
+
+=back
+
+=cut
+
+=head2 lines
+
+  lines(Str|Regexp $separator, Str $binmode) (ArrayRef[Str])
+
+The lines method returns the list of lines from the underlying file. By default
+the file contents are separated by newline.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item lines example 1
+
+  # given: synopsis;
+
+  my $lines = $path->child('mercury')->lines;
+
+  # ['mercury']
+
+=back
+
+=over 4
+
+=item lines example 2
+
+  # given: synopsis;
+
+  my $lines = $path->child('planet9')->lines($^O =~ /win32/i ? "\n" : "\r\n");
+
+  # ['planet', 'nine']
 
 =back
 
@@ -1918,6 +1976,16 @@ B<example 1>
   my $result = "$path";
 
   # "t/data/planets"
+
+B<example 2>
+
+  # given: synopsis;
+
+  my $mercury = $path->child('mercury');
+
+  my $result = "$path, $path";
+
+  # "t/data/planets, t/data/planets"
 
 =back
 

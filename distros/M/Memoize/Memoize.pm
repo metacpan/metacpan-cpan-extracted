@@ -10,7 +10,7 @@
 use strict; use warnings;
 
 package Memoize;
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Carp;
 use Config;                     # Dammit.

@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.6.1    2022-09-02 16:05:17+01:00 Europe/London
+  [Other]
+  - Signed distribution.
+
 v0.6.0    2022-07-26 16:50:26+01:00 Europe/London
   [Incompatable Changes]
   - Minimum Perl version is v5.14.

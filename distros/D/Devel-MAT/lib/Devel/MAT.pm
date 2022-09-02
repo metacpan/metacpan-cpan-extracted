@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT 0.47;
+package Devel::MAT 0.48;
 
 use v5.14;
 use warnings;
@@ -11,6 +11,8 @@ use warnings;
 use Carp;
 use List::Util qw( first pairs );
 use List::UtilsBy qw( sort_by );
+
+use Syntax::Keyword::Match;
 
 use Devel::MAT::Dumpfile;
 use Devel::MAT::Graph;
@@ -168,6 +170,22 @@ sub load_tool_for_command
 
       $self->load_tool( $name, %args );
    };
+}
+
+=head2 has_tool
+
+   $bool = $pmat->has_tool( $name )
+
+Returns true if the named tool is already loaded.
+
+=cut
+
+sub has_tool
+{
+   my $self = shift;
+   my ( $name ) = @_;
+
+   return defined $self->{tools}{$name};
 }
 
 =head2 run_command
@@ -625,30 +643,58 @@ sub format_sv_with_value
 
    my $repr = $self->format_sv( $sv );
 
-   if( $sv->type eq "SCALAR" ) {
-      my @reprs;
+   match( $sv->type : eq ) {
+      case( "SCALAR" ) {
+         my @reprs;
 
-      my $num;
-      defined( $num = $sv->nv // $sv->uv ) and
-         push @reprs, $self->format_value( $num, nv => 1 );
+         my $num;
+         defined( $num = $sv->nv // $sv->uv ) and
+            push @reprs, $self->format_value( $num, nv => 1 );
 
-      defined $sv->pv and
-         push @reprs, $self->format_value( $sv->pv, pv => 1 );
+         defined $sv->pv and
+            push @reprs, $self->format_value( $sv->pv, pv => 1 );
 
-      # Dualvars
-      return "$repr = $reprs[0] / $reprs[1]" if @reprs > 1;
+         # Dualvars
+         return "$repr = $reprs[0] / $reprs[1]" if @reprs > 1;
 
-      return "$repr = $reprs[0]" if @reprs;
-   }
-   elsif( $sv->type eq "BOOL" ) {
-      return "$repr = " . $self->format_value( $sv->uv ? "true" : "false" );
-   }
-   elsif( $sv->type eq "REF" ) {
-      #return "REF => NULL" if !$sv->rv;
-      return "$repr => " . $self->format_sv_with_value( $sv->rv ) if $sv->rv;
-   }
-   elsif( $sv->type eq "STASH" ) {
-      return "$repr is " . $self->format_symbol( $sv->stashname, $sv );
+         return "$repr = $reprs[0]" if @reprs;
+      }
+      case( "BOOL" ) {
+         return "$repr = " . $self->format_value( $sv->uv ? "true" : "false" );
+      }
+      case( "REF" ) {
+         #return "REF => NULL" if !$sv->rv;
+         return "$repr => " . $self->format_sv_with_value( $sv->rv ) if $sv->rv;
+      }
+      case( "ARRAY" ) {
+         return $repr if $sv->blessed;
+
+         my $n_elems = $sv->elems;
+         return "$repr = []" if !$n_elems;
+
+         my $elem = $self->format_sv( $sv->elem( 0 ) );
+         $elem .= ", ..." if $n_elems > 1;
+
+         return "$repr = [$elem]";
+      }
+      case( "HASH" ) {
+         return $repr if $sv->blessed;
+
+         my $n_values = $sv->values;
+         return "$repr = {}" if !$n_values;
+
+         my $key = ( $sv->keys )[0]; # pick one at random
+         my $value = $self->format_value( $key, key => 1 ) . " => " . $self->format_sv( $sv->value( $key ) );
+         $value .= ", ..." if $n_values > 1;
+
+         return "$repr = {$value}";
+      }
+      case( "GLOB" ) {
+         return "$repr is " . $self->format_symbol( "*" . $sv->stashname, $sv );
+      }
+      case( "STASH" ) {
+         return "$repr is " . $self->format_symbol( $sv->stashname, $sv );
+      }
    }
 
    return $repr;

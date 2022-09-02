@@ -6,9 +6,9 @@ Date::Manip::Offset::off144;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  1 10:56:59 EDT 2022
-#    Data version: tzdata2022a
-#    Code version: tzcode2022a
+#    Generated on: Thu Sep  1 10:36:28 EDT 2022
+#    Data version: tzdata2022c
+#    Code version: tzcode2022c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.88';
+$VERSION='6.89';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -28,43 +28,43 @@ END {
    undef %Offset;
 }
 
-$Offset        = '+07:00:00';
+$Offset        = '+08:00:00';
 
 %Offset        = (
    0 => [
-      'indian/christmas',
-      'asia/ho_chi_minh',
-      'asia/bangkok',
-      'asia/barnaul',
-      'asia/krasnoyarsk',
-      'asia/novokuznetsk',
-      'asia/novosibirsk',
-      'asia/tomsk',
-      'asia/jakarta',
-      'asia/hovd',
-      'asia/pontianak',
-      'etc/gmt+7',
-      't',
-      'antarctica/davis',
-      'asia/omsk',
+      'asia/taipei',
+      'australia/perth',
+      'asia/manila',
+      'asia/shanghai',
+      'asia/hong_kong',
+      'asia/macau',
       'asia/irkutsk',
+      'asia/kuching',
+      'asia/makassar',
       'asia/choibalsan',
       'asia/ulaanbaatar',
-      'asia/kuala_lumpur',
       'asia/singapore',
+      'etc/gmt+8',
+      'u',
+      'asia/chita',
+      'asia/krasnoyarsk',
+      'asia/dili',
+      'asia/khandyga',
+      'asia/yakutsk',
+      'asia/pontianak',
+      'asia/ho_chi_minh',
+      'asia/jakarta',
+      'asia/ust-nera',
+      'antarctica/casey',
       ],
    1 => [
-      'asia/omsk',
-      'asia/barnaul',
-      'asia/novokuznetsk',
-      'asia/novosibirsk',
-      'asia/tomsk',
-      'asia/dhaka',
-      'asia/almaty',
+      'asia/hovd',
       'asia/krasnoyarsk',
-      'asia/bishkek',
-      'asia/dushanbe',
-      'asia/tashkent',
+      'asia/novokuznetsk',
+      'asia/tomsk',
+      'asia/barnaul',
+      'asia/novosibirsk',
+      'asia/irkutsk',
       ],
 );
 

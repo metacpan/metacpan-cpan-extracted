@@ -1,16 +1,17 @@
 package DBIx::Class::InflateColumn::TimePiece;
 
-# ABSTRACT: Auto-create Time::Piece objects from integer columns
+# ABSTRACT: Auto-create Time::Piece objects from integer (number of seconds since epoch) columns
+
 use v5.10;
 
 use strict;
 use warnings;
 
+our $VERSION = '0.03'; # VERSION
+
 use parent 'DBIx::Class';
 
 use Time::Piece;
-
-our $VERSION = '0.02';
 
 sub register_column {
     my ($self, $column, $info, @rest) = @_;
@@ -45,11 +46,11 @@ __END__
 
 =head1 NAME
 
-DBIx::Class::InflateColumn::TimePiece - Auto-create Time::Piece objects from integer columns
+DBIx::Class::InflateColumn::TimePiece - Auto-create Time::Piece objects from integer (number of seconds since epoch) columns
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -72,9 +73,22 @@ version 0.02
 
     1;
 
-=head1 METHODS
+In the above example, a L<DBIx::Class> named C<Event> is created, then L<this|DBIx::Class::InflateColumn::TimePiece>
+DBIx::Class L<Component|DBIx::Class::Manual::Component> is loaded and two columns are added to the C<my_events> table.
 
-=head2 register_column
+A column with C<data_type> equal to C<integer> or C<int> and with property C<inflate_time_piece> set to true, will be
+L<inflated|DBIx::Class::InflateColumn> using C<localtime> in L<Time::Piece> and L<deflated|DBIx::Class::InflateColumn>
+using the L<epoch|Time::Piece> method.
+
+=for Pod::Coverage register_column
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<DBIx::Class::InflateColumn::DateTime>
+
+=back
 
 =head1 AUTHOR
 

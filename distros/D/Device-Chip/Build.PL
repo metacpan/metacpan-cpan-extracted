@@ -8,7 +8,7 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026', # signatures in Object::Pad
       'Future::AsyncAwait' => '0.47', # toplevel await
-      'Object::Pad' => '0.63',
+      'Object::Pad' => '0.66',
 
       'Future' => '0.26',
       'List::Util' => '1.33',
@@ -17,6 +17,7 @@ my $build = Module::Build->new(
       'Test::ExpectAndCheck::Future' => 0,
    },
    test_requires => {
+      'Test::Fatal' => 0,
       'Test::More' => '0.88', # done_testing
       'Test::Builder::Tester' => 0,
    },

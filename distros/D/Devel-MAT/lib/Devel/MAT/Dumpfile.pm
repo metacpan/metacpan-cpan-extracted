@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile 0.47;
+package Devel::MAT::Dumpfile 0.48;
 
 use v5.14;
 use warnings;
@@ -185,8 +185,10 @@ sub load
 
    $self->_read_u8 == 0 or die "Cannot read $path - format version major unrecognised";
 
-   ( $self->{format_minor} = $self->_read_u8 ) <= 4 or
+   # minor version 5 is the still-experimental support for feature-class
+   ( $self->{format_minor} = $self->_read_u8 ) <= 5 or
       die "Cannot read $path - format version minor unrecognised ($self->{format_minor})";
+   warnings::warnif experimental => "Support for PMAT file format v0.5 is experimental" if $self->{format_minor} == 5;
 
    if( $self->{format_minor} < 1 ) {
       warn "Loading an earlier format of dumpfile - SV MAGIC annotations may be incorrect\n";

@@ -1,0 +1,80 @@
+NAME
+
+    Devel::MAT::Tool::Future - analyse Future logic
+
+DESCRIPTION
+
+    This Devel::MAT tool performs analysis of objects and code logic built
+    using the Future module.
+
+    This version supports analysing code based on Future version 0.24.
+
+METHODS
+
+ $ok = $tool->class_is_future( $pkg )
+
+    Returns true if the given package is a Future class. $pkg may be either
+    a Devel::MAT::SV instance referring to a stash, or a plain string.
+
+SV METHODS
+
+    This tool adds the following SV methods.
+
+ is_future (SV)
+
+       $ok = $sv->is_future
+
+    Returns true if the Devel::MAT::SV instance represents a Future
+    instance.
+
+ future_state (SV)
+
+       $state = $sv->future_state
+
+    Returns a string describing the state of the given Future instance; one
+    of pending, done, failed or cancelled.
+
+ future_result
+
+       @result = $sv->future_result
+
+    Returns a list of SVs containing the result of a successful Future.
+
+ future_failure
+
+       @failure = $sv->future_failure
+
+    Returns a list of SVs containing the failure of a failed Future.
+
+EXTENSIONS TO FIND
+
+ find future
+
+       pmat> find future -f
+       HASH(2)=Future at 0x55d43c854660: Future(failed) - SCALAR(PV) at 0x55d43c8546f0 = "It failed"
+
+    Lists SVs that are Future instances, optionally matching only futures
+    in a given state.
+
+    Takes the following named options
+
+    --pending, -p
+
+      Lists only Futures in the pending state
+
+    --done, -d
+
+      Lists only Futures in the done state
+
+    --failed, -f
+
+      Lists only Futures in the failed state
+
+    --cancelled, -c
+
+      Lists only Futures in the cancelled state
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -14,8 +14,8 @@
 package Doit::Docker;
 
 use strict;
-use vars qw($VERSION);
-$VERSION = '0.01';
+use warnings;
+our $VERSION = '0.012';
 
 sub new { bless {}, shift }
 sub functions { qw(docker_connect) }
@@ -29,7 +29,7 @@ sub docker_connect {
 {
     package Doit::Docker::RPC;
 
-    use vars '@ISA'; @ISA = ('Doit::_AnyRPCImpl');
+    our @ISA = ('Doit::_AnyRPCImpl');
 
     use Doit::Log;
 
@@ -113,7 +113,7 @@ sub docker_connect {
 
 	# On linux use Linux Abstract Namespace Sockets ---
 	# invisible and automatically cleaned up. See man 7 unix.
-	my $LANS_PREFIX = $^O eq 'linux' ? '\0' : '';
+	my $LANS_PREFIX = $class->_can_LANS;
 
 	# Run the server
 	my @cmd_worker =

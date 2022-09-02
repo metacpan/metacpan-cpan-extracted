@@ -272,6 +272,7 @@ lib/Lab/XPRESS/Utilities/Utilities.pm
 lib/Lab/XPRESS/hub.pm
 perltidyrc
 rpm/MakeRPM
+rpm/perl-Lab-Measurement.spec
 t/00-load.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t

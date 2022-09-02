@@ -9,7 +9,7 @@ use Alien::Build::Util qw( _ssl_reqs );
 use Carp ();
 
 # ABSTRACT: Plugin for fetching files using HTTP::Tiny
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 has '+url' => '';
@@ -24,8 +24,9 @@ sub init
 {
   my($self, $meta) = @_;
 
-  $meta->add_requires('share' => 'HTTP::Tiny' => '0.044' );
-  $meta->add_requires('share' => 'URI' => 0 );
+  $meta->add_requires('share' => 'HTTP::Tiny'  => '0.044' );
+  $meta->add_requires('share' => 'URI'         => '0'     );
+  $meta->add_requires('share' => 'Mozilla::CA' => '0'     );
 
   $meta->prop->{start_url} ||= $self->url;
   $self->url($meta->prop->{start_url});
@@ -43,6 +44,8 @@ sub init
   $meta->register_hook( fetch => sub {
     my($build, $url, %options) = @_;
     $url ||= $self->url;
+
+    $url = URI->new($url) unless ref($url) && $url->isa('URI');
 
     my %headers;
     if(my $headers = $options{http_headers})
@@ -68,7 +71,10 @@ sub init
       }
     }
 
-    my $ua = HTTP::Tiny->new( agent => "Alien-Build/@{[ $Alien::Build::VERSION || 'dev' ]} " );
+    my $ua = HTTP::Tiny->new(
+      agent      => "Alien-Build/@{[ $Alien::Build::VERSION || 'dev' ]} ",
+      verify_SSL => $build->download_rule =~ /encrypt/ ? 1 : 0,
+    );
     my $res = $ua->get($url, { headers => \%headers });
 
     unless($res->{success})
@@ -119,9 +125,10 @@ sub init
     if($type eq 'text/html')
     {
       return {
-        type    => 'html',
-        base    => $base->as_string,
-        content => $res->{content},
+        type     => 'html',
+        base     => $base->as_string,
+        content  => $res->{content},
+        protocol => $url->scheme,
       };
     }
     else
@@ -130,6 +137,7 @@ sub init
         type     => 'file',
         filename => $filename || 'downloadedfile',
         content  => $res->{content},
+        protocol => $url->scheme,
       };
     }
 
@@ -152,7 +160,7 @@ Alien::Build::Plugin::Fetch::HTTPTiny - Plugin for fetching files using HTTP::Ti
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 

@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.63;  # :experimental
+use Object::Pad 0.66 ':experimental(init_expr)';
 
-package Device::Chip::Sensor 0.22;
+package Device::Chip::Sensor 0.23;
 
 use strict;
 use warnings;
@@ -120,6 +120,15 @@ Optional string or code reference giving the method on the main chip object to
 call to obtain a new reading of this sensor's current value. If not provided a
 default will be created by prefixing C<"read_"> onto the sensor name.
 
+=item sanity_bounds => ARRAY[ 2 * NUM ]
+
+Optional bounding values to sanity-test reported readings. If a reading is
+obtained that is lower than the first value or higher than the second, it is
+declared to be out of bounds by the L</read> method. Either bound may be set
+to C<undef> to ignore that setting. For example, setting just a lower bound of
+zero ensures that any negative values that are obtained are considered out of
+the valid range.
+
 =back
 
 =head2 declare_sensor_counter
@@ -197,14 +206,17 @@ my %TYPES = (
    counter => 1,
 );
 
-has $_type      :reader :param = "gauge";
-has $_name      :reader :param;
-has $_units     :reader :param = undef;
-has $_precision :reader :param = 0;
+field $_type      :reader :param { "gauge" };
+field $_name      :reader :param;
+field $_units     :reader :param { undef };
+field $_precision :reader :param { 0 };
 
-has $_method :param = undef;
+field $_lbound;
+field $_ubound;
 
-has $_chip :reader :param = undef;
+field $_method :param { undef };
+
+field $_chip :reader :param { undef };
 
 ADJUST
 {
@@ -212,6 +224,11 @@ ADJUST
       croak "Unrecognised sensor type '$_type'";
 
    $_method //= "read_$_name";
+}
+
+ADJUSTPARAMS ( $params )
+{
+   ( $_lbound, $_ubound ) = ( delete $params->{sanity_bounds} // [] )->@*;
 }
 
 method bind ( $chip )
@@ -224,6 +241,7 @@ method bind ( $chip )
       units     => $_units,
       precision => $_precision,
       method    => $_method,
+      sanity_bounds => [ $_lbound, $_ubound ],
    );
 }
 
@@ -237,11 +255,22 @@ measured value.
 This method always returns a single scalar value, even if the underlying
 method on the sensor chip returned more than one.
 
+If the value obtained from the sensor is outside of the sanity-check bounds
+then an exception is thrown instead.
+
 =cut
 
 async method read ()
 {
-   return scalar await $_chip->$_method();
+   defined( my $value = scalar await $_chip->$_method() )
+      or return undef;
+
+   if( defined $_lbound and $value < $_lbound or
+      defined $_ubound and $value > $_ubound ) {
+      die sprintf "Reading %s is out of range\n", $self->format( $value );
+   }
+
+   return $value;
 }
 
 =head2 format

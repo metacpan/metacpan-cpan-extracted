@@ -1,0 +1,21 @@
+Release history for UDCode
+
+1.04  Tue 30 Aug 2022
+	- No functional changes
+	- Perl 5.6 minimum requirement
+	- Improved test suite
+	- Updated packaging and package metadata
+
+1.03  Tue 26 Feb 2008
+	- No functional changes
+	- POD tweaks
+
+1.02  Tue 26 Feb 2008
+	- Minor optimization
+
+1.01  Tue 26 Feb 2008
+	- No functional changes
+	- README
+
+1.00  Tue 26 Feb 2008
+	- Initial release

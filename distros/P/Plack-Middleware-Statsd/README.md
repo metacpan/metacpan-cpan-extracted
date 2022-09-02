@@ -4,7 +4,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.6.0
+version v0.6.1
 
 # SYNOPSIS
 

@@ -1,3 +1,9 @@
+0.017   2022-09-02  Released-By: PERLANCAR; Urgency: medium
+
+        - Add filtering options: --include-dist, --include-dist-re,
+          --include-author, --include-author-re.
+
+
 0.016   2021-08-10  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Add options --today, --this-week, --this-month.

@@ -1757,7 +1757,7 @@ string czech_lemma_addinfo::format(const unsigned char* addinfo, int addinfo_len
     res.reserve(addinfo_len + 4);
     if (addinfo[0] != 255) {
       char num[5];
-      sprintf(num, "-%u", addinfo[0]);
+      snprintf(num, sizeof(num), "-%u", addinfo[0]);
       res += num;
     }
     for (int i = 1; i < addinfo_len; i++)
@@ -1784,9 +1784,13 @@ int czech_lemma_addinfo::parse(string_piece lemma, bool die_on_failure) {
     const char* lemma_additional_info = lemma_info;
 
     if (*lemma_info == '-') {
-      lemma_num = strtol(lemma_info + 1, (char**) &lemma_additional_info, 10);
+      lemma_num = 0;
+      for (lemma_additional_info = lemma_info + 1;
+           lemma_additional_info < lemma.str + lemma.len && (*lemma_additional_info >= '0' && *lemma_additional_info <= '9');
+           lemma_additional_info++)
+        lemma_num = 10 * lemma_num + (*lemma_additional_info - '0');
 
-      if (lemma_additional_info == lemma_info + 1 || (*lemma_additional_info != '\0' && *lemma_additional_info != '`' && *lemma_additional_info != '_') || lemma_num < 0 || lemma_num >= 255) {
+      if (lemma_additional_info == lemma_info + 1 || (lemma_additional_info < lemma.str + lemma.len && *lemma_additional_info != '`' && *lemma_additional_info != '_') || lemma_num >= 255) {
         if (die_on_failure)
           runtime_failure("Lemma number " << lemma_num << " in lemma " << lemma << " out of range!");
         else
@@ -1854,9 +1858,12 @@ inline bool tag_filter::matches(const char* tag) const {
 
   int tag_pos = 0;
   for (auto&& filter : filters) {
+    // Skip until next filter position. If the tag ends prematurely, accept.
     while (tag_pos < filter.pos)
       if (!tag[tag_pos++])
         return true;
+    if (!tag[tag_pos])
+      return true;
 
     // We assume filter.chars_len >= 1.
     bool matched = (wildcard[filter.chars_offset] == tag[tag_pos]) ^ filter.negate;
@@ -2578,7 +2585,7 @@ void czech_morpho::analyze_special(string_piece form, vector<tagged_lemma>& lemm
   }
 
   if (any_digit && !form.len && (!codepoint || codepoint == '.')) {
-    lemmas.emplace_back(string(form_ori.str, form_ori.len - (codepoint == '.')), number_tag);
+    lemmas.emplace_back(string(form_ori.str, form_ori.len), number_tag);
   } else if ((first < sizeof(punctuation_additional) && punctuation_additional[first]) ||
              ((unicode::category(first) & unicode::P) && (first >= sizeof(punctuation_exceptions) || !punctuation_exceptions[first])))
     lemmas.emplace_back(string(form_ori.str, form_ori.len), punctuation_tag);
@@ -2914,10 +2921,10 @@ void english_morpho::analyze_special(string_piece form, vector<tagged_lemma>& le
     while (unicode::category(codepoint) & unicode::N) any_digit = true, codepoint = utf8::decode(number.str, number.len);
   }
   if (any_digit && !number.len && (!codepoint || codepoint == '.')) {
-    lemmas.emplace_back(string(form.str, form.len - (codepoint == '.')), number_tag);
-    lemmas.emplace_back(string(form.str, form.len - (codepoint == '.')), nnp_tag);
+    lemmas.emplace_back(string(form.str, form.len), number_tag);
+    lemmas.emplace_back(string(form.str, form.len), nnp_tag);
     if (form.len == 1 + (codepoint == '.') && *form.str >= '1' && *form.str <= '9')
-      lemmas.emplace_back(string(form.str, form.len - (codepoint == '.')), ls_tag);
+      lemmas.emplace_back(string(form.str, form.len), ls_tag);
     return;
   }
 
@@ -5713,7 +5720,7 @@ void generic_morpho::analyze_special(string_piece form, vector<tagged_lemma>& le
   }
 
   if (any_digit && !number.len && (!codepoint || codepoint == '.')) {
-    lemmas.emplace_back(string(form.str, form.len - (codepoint == '.')), number_tag);
+    lemmas.emplace_back(string(form.str, form.len), number_tag);
     return;
   }
 
@@ -5792,6 +5799,104 @@ unique_ptr<T> new_unique_ptr(Args&&... args) {
 } // namespace utils
 
 /////////
+// File: utils/path_from_utf8.h
+/////////
+
+// This file is part of UFAL C++ Utils <http://github.com/ufal/cpp_utils/>.
+//
+// Copyright 2022 Institute of Formal and Applied Linguistics, Faculty of
+// Mathematics and Physics, Charles University in Prague, Czech Republic.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+namespace utils {
+
+//
+// Declarations
+//
+
+#ifdef _WIN32
+inline wstring path_from_utf8(const char* str);
+inline wstring path_from_utf8(const string& str);
+#else
+inline string path_from_utf8(const char* str);
+inline const string& path_from_utf8(const string& str);
+#endif
+
+//
+// Definitions
+//
+
+#ifdef _WIN32
+
+inline wstring path_from_utf8(const char* str) {
+  // We could implement this using codecvt_utf8_utf16, but it is not available
+  // in GCC 4.9, which we still use. We could also use MultiByteToWideChar,
+  // but using it would require changing our build infrastructure -- hence
+  // we implement the conversion manually.
+  wstring wstr;
+  while (*str) {
+    char32_t chr;
+    if (((unsigned char)*str) < 0x80) chr = (unsigned char)*str++;
+    else if (((unsigned char)*str) < 0xC0) chr = '?', ++str;
+    else if (((unsigned char)*str) < 0xE0) {
+      chr = (((unsigned char)*str++) & 0x1F) << 6;
+      if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) chr = '?';
+      else chr += ((unsigned char)*str++) & 0x3F;
+    } else if (((unsigned char)*str) < 0xF0) {
+      chr = (((unsigned char)*str++) & 0x0F) << 12;
+      if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) chr = '?';
+      else {
+        chr += (((unsigned char)*str++) & 0x3F) << 6;
+        if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) chr = '?';
+        else chr += ((unsigned char)*str++) & 0x3F;
+      }
+    } else if (((unsigned char)*str) < 0xF8) {
+      chr = (((unsigned char)*str++) & 0x07) << 18;
+      if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) chr = '?';
+      else {
+        chr += (((unsigned char)*str++) & 0x3F) << 12;
+        if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) chr = '?';
+        else {
+          chr += (((unsigned char)*str++) & 0x3F) << 6;
+          if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) chr = '?';
+          else chr += ((unsigned char)*str++) & 0x3F;
+        }
+      }
+    } else chr = '?', ++str;
+
+    if (chr <= 0xFFFF) wstr.push_back(chr);
+    else if (chr <= 0x10FFFF) {
+      wstr.push_back(0xD800 + ((chr - 0x10000) >> 10));
+      wstr.push_back(0xDC00 + ((chr - 0x10000) & 0x3FF));
+    } else {
+      wstr.push_back('?');
+    }
+  }
+  return wstr;
+}
+
+inline wstring path_from_utf8(const string& str) {
+  return path_from_utf8(str.c_str());
+}
+
+#else
+
+inline string path_from_utf8(const char* str) {
+  return str;
+}
+
+inline const string& path_from_utf8(const string& str) {
+  return str;
+}
+
+#endif
+
+} // namespace utils
+
+/////////
 // File: morpho/morpho.cpp
 /////////
 
@@ -5858,7 +5963,7 @@ morpho* morpho::load(istream& is) {
 }
 
 morpho* morpho::load(const char* fname) {
-  ifstream f(fname, ifstream::binary);
+  ifstream f(path_from_utf8(fname).c_str(), ifstream::binary);
   if (!f) return nullptr;
 
   return load(f);
@@ -7369,7 +7474,7 @@ tagger* tagger::load(istream& is) {
 }
 
 tagger* tagger::load(const char* fname) {
-  ifstream f(fname, ifstream::binary);
+  ifstream f(path_from_utf8(fname).c_str(), ifstream::binary);
   if (!f) return nullptr;
 
   return load(f);
@@ -7889,8 +7994,8 @@ static const int czech_tokenizer_start = 7;
 // Note: because of VS, we cannot list the abbreviations directly in UTF-8,
 // because the compilation of utf-8 encoded sources fail on some locales
 // (e.g., Japanese).
-// perl -CSD -ple 'use Encode;s/([^[:ascii:]])/join("", map {sprintf "\\%o", ord($_)} split(m@@, encode("utf-8", $1)))/ge'
-// perl -CSD -ple 'use Encode;s/\\([0-7]{3})\\([0-7]{3})/decode("utf-8", chr(oct($1)).chr(oct($2)))/ge'
+// perl -CS -ple 'use Encode;s/([^[:ascii:]])/join("", map {sprintf "\\%o", ord($_)} split(m@@, encode("utf-8", $1)))/ge'
+// perl -CS -ple 'use Encode;s/\\([0-7]{3})\\([0-7]{3})/decode("utf-8", chr(oct($1)).chr(oct($2)))/ge'
 const unordered_set<string> czech_tokenizer::abbreviations_czech = {
   // Titles
   "prof", "csc", "drsc", "doc", "phd", "ph", "d",
@@ -11670,7 +11775,7 @@ class version {
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 version version::current() {
-  return {1, 10, 1, ""};
+  return {1, 11, 0, ""};
 }
 
 // Returns multi-line formated version and copyright string.

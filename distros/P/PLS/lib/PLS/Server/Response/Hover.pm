@@ -28,21 +28,13 @@ sub new
                      }, $class;
 
     my $document = PLS::Parser::Document->new(uri => $request->{params}{textDocument}{uri});
-    my ($ok, $pod) = $document->find_pod(@{$request->{params}{position}}{qw(line character)});
+    return $self if (ref $document ne 'PLS::Parser::Document');
+    my ($ok, $pod) = $document->find_pod($request->{params}{textDocument}{uri}, @{$request->{params}{position}}{qw(line character)});
     return $self unless $ok;
 
     $self->{result} = {
                        contents => {kind => 'markdown', value => ${$pod->{markdown}}},
-                       range    => {
-                                 start => {
-                                           line      => $pod->line_number,
-                                           character => $pod->column_number,
-                                          },
-                                 end => {
-                                         line      => $pod->line_number,
-                                         character => $pod->column_number + length $pod->{element}->content,
-                                        }
-                                }
+                       range    => $pod->{element}->range()
                       };
 
     return $self;

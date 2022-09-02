@@ -26,9 +26,11 @@ extends 'Business::GoCardless::Resource';
     fx
     id
     links
+    metadata
     payout_type
     reference
     status
+    tax_currency
 
 =cut
 
@@ -49,9 +51,11 @@ has [ qw/
     fx
     id
     links
+    metadata
     payout_type
     reference
     status
+    tax_currency
 / ] => (
     is => 'rw',
 );

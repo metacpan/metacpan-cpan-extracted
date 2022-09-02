@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88; # for done_testing
+use Test::More tests => 36;
 use Object::Properties ();
 
 my @order;
@@ -43,5 +43,3 @@ permute {
 		is "@order", $declared, "@_ => $declared";
 	} sort @_;
 } sort keys %field;
-
-done_testing;

@@ -27,6 +27,7 @@ can_ok(
     $Mandate,
     qw/
 		created_at
+        consent_parameters
 		id
 		links
 		metadata
@@ -48,6 +49,7 @@ ok( $Mandate->active,'active' );
 ok( ! $Mandate->failed,'failed' );
 ok( ! $Mandate->cancelled,'cancelled' );
 ok( ! $Mandate->expired,'expired' );
+ok( ! $Mandate->consent_parameters,'consent_parameters' );
 
 $Mandate->id( 123 );
 is( $Mandate->uri,'https://api.gocardless.com/mandates/123','->uri' );

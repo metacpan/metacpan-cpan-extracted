@@ -1,5 +1,4 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
 use Test::More;
 use PostScript::DecodeGlyphName 'decode_glyph';

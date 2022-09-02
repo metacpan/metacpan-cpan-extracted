@@ -6,7 +6,6 @@
 #
 
 use Doit;
-use Doit::Extcmd;
 use Doit::Util 'new_scope_cleanup';
 use File::Glob 'bsd_glob';
 use File::Temp 'tempdir';
@@ -78,11 +77,11 @@ $doit->mkdir("$tempdir/another_tmp");
 {   # This should be the first test case creating the new file
     $doit->create_file_if_nonexisting("$tempdir/stat_reference");
 
-    $doit->file_atomic_write("$tempdir/1st", sub {
-				 my $fh = shift;
-				 binmode $fh, ':encoding(utf-8)';
-				 print $fh "\x{20ac}uro\n";
-			     });
+    is $doit->file_atomic_write("$tempdir/1st", sub {
+				    my $fh = shift;
+				    binmode $fh, ':encoding(utf-8)';
+				    print $fh "\x{20ac}uro\n";
+				}), 1;
 
     ok -s "$tempdir/1st", 'Created file exists and is non-empty';
     is slurp_utf8("$tempdir/1st"), "\x{20ac}uro\n", 'expected content';
@@ -111,10 +110,10 @@ SKIP: {   # Test with setgid bit
 
     $doit->create_file_if_nonexisting("$tempdir/setgid/stat_reference");
 
-    $doit->file_atomic_write("$tempdir/setgid/file", sub {
-				 my $fh = shift;
-				 print $fh "test setgid\n";
-			     }, tmpdir => $tempdir); # use a non-setgid directory for tmpfile
+    is $doit->file_atomic_write("$tempdir/setgid/file", sub {
+				    my $fh = shift;
+				    print $fh "test setgid\n";
+				}, tmpdir => $tempdir), 1; # use a non-setgid directory for tmpfile
 
     ok -s "$tempdir/setgid/file", 'Created file exists and is non-empty';
     is slurp("$tempdir/setgid/file"), "test setgid\n", 'expected content';
@@ -131,10 +130,10 @@ SKIP: {   # Test with setgid bit
 {
     my @stat;
 
-    $doit->file_atomic_write("$tempdir/my_mode", sub {
-				 my $fh = shift;
-				 print $fh "my special mode\n";
-			     }, mode => 0400);
+    is $doit->file_atomic_write("$tempdir/my_mode", sub {
+				    my $fh = shift;
+				    print $fh "my special mode\n";
+				}, mode => 0400), 1;
 
     ok -s "$tempdir/my_mode", 'Created file exists and is non-empty';
     is slurp("$tempdir/my_mode"), "my special mode\n", 'expected content';
@@ -142,10 +141,10 @@ SKIP: {   # Test with setgid bit
     @stat = stat("$tempdir/my_mode");
     is(($stat[2] & 07777), ($^O eq 'MSWin32' ? 0444 : 0400), 'mode option on newly created file');
 
-    $doit->file_atomic_write("$tempdir/my_mode", sub {
-				 my $fh = shift;
-				 print $fh "changing my mode\n";
-			     }, mode => 0600);
+    is $doit->file_atomic_write("$tempdir/my_mode", sub {
+				    my $fh = shift;
+				    print $fh "changing my mode\n";
+				}, mode => 0600), 1;
 
     is slurp("$tempdir/my_mode"), "changing my mode\n", 'content was changed';
 
@@ -159,10 +158,10 @@ SKIP: {   # Test with setgid bit
     $doit->chmod(0600, "$tempdir/1st");
     my $mode_before = (stat("$tempdir/1st"))[2];
 
-    $doit->file_atomic_write("$tempdir/1st", sub {
-				 my $fh = shift;
-				 print $fh "changed content\n";
-			     });
+    is $doit->file_atomic_write("$tempdir/1st", sub {
+				    my $fh = shift;
+				    print $fh "changed content\n";
+				}), 1;
     is slurp("$tempdir/1st"), "changed content\n", 'content of existent file changed';
     my $mode_after = (stat("$tempdir/1st"))[2];
     is $mode_after, $mode_before, 'mode was preserved';
@@ -170,10 +169,10 @@ SKIP: {   # Test with setgid bit
 }
 
 {
-    $doit->file_atomic_write("$tempdir/1st", sub {
-				 my($fh, $filename) = @_;
-				 $doit->system($^X, '-e', 'open my $ofh, ">", shift or die $!; print $ofh "external program writing the contents\n"; close $ofh or die $!', $filename);
-			     });
+    is $doit->file_atomic_write("$tempdir/1st", sub {
+				    my($fh, $filename) = @_;
+				    $doit->system($^X, '-e', 'open my $ofh, ">", shift or die $!; print $ofh "external program writing the contents\n"; close $ofh or die $!', $filename);
+				}), 1;
     is slurp("$tempdir/1st"), "external program writing the contents\n", 'filename parameter was used';
     no_leftover_tmp $tempdir;
 }
@@ -183,11 +182,11 @@ for my $opt_def (
 		 [tmpdir => "$tempdir/another_tmp"],
 		) {
     my $opt_spec = "@$opt_def";
-    $doit->file_atomic_write("$tempdir/1st",
-			     sub {
-				 my $fh = shift;
-				 print $fh $opt_spec;
-			     }, @$opt_def);
+    is $doit->file_atomic_write("$tempdir/1st",
+				sub {
+				    my $fh = shift;
+				    print $fh $opt_spec;
+				}, @$opt_def), 1;
     is slurp("$tempdir/1st"), $opt_spec, "atomic write with opts: $opt_spec";
     if ($opt_def->[0] eq 'tmpsuffix') {
 	no_leftover_tmp $tempdir, $opt_def->[1];
@@ -196,14 +195,51 @@ for my $opt_def (
     }
 }
 
+{ # check change
+    is $doit->file_atomic_write("$tempdir/checked",
+				sub {
+				    my $fh = shift;
+				    print $fh "checked change\n";
+				}, check_change => 1), 1, "checked change (non-existing file before)";
+
+    is $doit->file_atomic_write("$tempdir/checked",
+				sub {
+				    my $fh = shift;
+				    print $fh "checked change\n";
+				}, check_change => 1), 0, 'no change detected';
+
+    is slurp("$tempdir/checked"), "checked change\n";
+
+    is $doit->file_atomic_write("$tempdir/checked",
+				sub {
+				    my $fh = shift;
+				    print $fh "now there's a change\n";
+				}, check_change => 1), 1, 'change on existing file';
+
+    is slurp("$tempdir/checked"), "now there's a change\n";
+
+    no_leftover_tmp $tempdir;
+}
+
 { # dry-run check
     my $old_content = slurp("$tempdir/1st");
-    $doit_dryrun->file_atomic_write("$tempdir/1st", sub {
-					my $fh = shift;
-					print $fh "this is dry run mode\n";
-				    });
+    is $doit_dryrun->file_atomic_write("$tempdir/1st", sub {
+					   my $fh = shift;
+					   print $fh "this is dry run mode\n";
+				       }), 1;
     is slurp("$tempdir/1st"), $old_content, 'nothing changed in dry run mode';
     no_leftover_tmp $tempdir;
+}
+
+{ # dry-run with non-existing file
+    for my $testfile ("$tempdir/non-existing", "$tempdir/non-existting-dir/non-existing") {
+	is $doit_dryrun->file_atomic_write($testfile, sub {
+					       my $fh = shift;
+					       print $fh "this is dry run mode\n";
+					   }), 1;
+	ok !-e $testfile, 'file still non-existing after dry-run';
+	no_leftover_tmp $tempdir;
+    }
 }
 
 SKIP: {
@@ -264,41 +300,41 @@ SKIP: {
     $doit->utime(0,0,"$tempdir/1st");
     my $mode_before = (stat("$tempdir/1st"))[2];
     my $time = time;
-    $doit->file_atomic_write("$tempdir/1st",
-			     sub {
-				 my $fh = shift;
-				 print $fh "File::Copy::move testing\n";
-			     }, tmpdir => $other_fs_dir);
+    is $doit->file_atomic_write("$tempdir/1st",
+				sub {
+				    my $fh = shift;
+				    print $fh "File::Copy::move testing\n";
+				}, tmpdir => $other_fs_dir), 1;
     is slurp("$tempdir/1st"), "File::Copy::move testing\n", "content OK after using cross-mount move";
     my $mode_after = (stat("$tempdir/1st"))[2];
     is $mode_after, $mode_before, 'mode was preserved';
     my $mtime_after = (stat("$tempdir/1st"))[9];
     cmp_ok $mtime_after, ">=", $time, 'current mtime';
 
-    $doit->file_atomic_write("$tempdir/fresh",
-			     sub {
-				 my $fh = shift;
-				 print $fh "fresh file with File::Copy::move\n";
-			     }, tmpdir => $other_fs_dir);
+    is $doit->file_atomic_write("$tempdir/fresh",
+				sub {
+				    my $fh = shift;
+				    print $fh "fresh file with File::Copy::move\n";
+				}, tmpdir => $other_fs_dir), 1;
     is slurp("$tempdir/fresh"), "fresh file with File::Copy::move\n", "cross-mount move with fresh file";
 
     {
 	my @stat;
 
-	$doit->file_atomic_write("$tempdir/my_fresh_mode",
-				 sub {
-				     my $fh = shift;
-				     print $fh "using mode and File::Copy::move (fresh)\n";
-				 }, tmpdir => $other_fs_dir, mode => 0400);
+	is $doit->file_atomic_write("$tempdir/my_fresh_mode",
+				    sub {
+					my $fh = shift;
+					print $fh "using mode and File::Copy::move (fresh)\n";
+				    }, tmpdir => $other_fs_dir, mode => 0400), 1;
 	is slurp("$tempdir/my_fresh_mode"), "using mode and File::Copy::move (fresh)\n", "cross-mount move with fresh file";
 	@stat = stat("$tempdir/my_fresh_mode");
 	is(($stat[2] & 07777), ($^O eq 'MSWin32' ? 0444 : 0400), 'mode option on newly created file');
 
-	$doit->file_atomic_write("$tempdir/my_fresh_mode",
-				 sub {
-				     my $fh = shift;
-				     print $fh "using mode and File::Copy::move (existing)\n";
-				 }, tmpdir => $other_fs_dir, mode => 0600);
+	is $doit->file_atomic_write("$tempdir/my_fresh_mode",
+				    sub {
+					my $fh = shift;
+					print $fh "using mode and File::Copy::move (existing)\n";
+				    }, tmpdir => $other_fs_dir, mode => 0600), 1;
 	is slurp("$tempdir/my_fresh_mode"), "using mode and File::Copy::move (existing)\n", "cross-mount move with existing file";
 	@stat = stat("$tempdir/my_fresh_mode");
 	is(($stat[2] & 07777), ($^O eq 'MSWin32' ? 0666 : 0600), 'mode option on existing file');
@@ -306,10 +342,10 @@ SKIP: {
 
     { # dry-run check
 	my $old_content = slurp("$tempdir/1st");
-	$doit_dryrun->file_atomic_write("$tempdir/1st", sub {
-					    my $fh = shift;
-					    print $fh "this is dry run mode\n";
-					}, tmpdir => $other_fs_dir);
+	is $doit_dryrun->file_atomic_write("$tempdir/1st", sub {
+					       my $fh = shift;
+					       print $fh "this is dry run mode\n";
+					   }, tmpdir => $other_fs_dir), 1;
 	is slurp("$tempdir/1st"), $old_content, 'nothing changed in dry run mode';
 	no_leftover_tmp $other_fs_dir, '';
     }
@@ -335,7 +371,7 @@ sub get_another_filesystem {
     return { skip => "Hangs on travis-ci" } if $ENV{TRAVIS}; # reason unknown
     return { skip => "Mounting fs only implemented for linux" } if $^O ne 'linux';
     return { skip => "Cannot mount in linux containers" } if TestUtil::in_linux_container($doit);
-    return { skip => "dd not available" } if !Doit::Extcmd::is_in_path("dd");
+    return { skip => "dd not available" } if !$doit->which("dd");
     return { skip => "mkfs not available" } if !-x "/sbin/mkfs";
     my $sudo = TestUtil::get_sudo($doit, info => \my %info);
     return { skip => $info{error} } if !$sudo;

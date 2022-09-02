@@ -6,7 +6,7 @@ use 5.010;
 use base qw( Alien::Build::Plugin::Fetch::Prompt );
 
 # ABSTRACT: Backwards compatible plugin name
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 
 1;
@@ -23,7 +23,7 @@ Alien::Build::Plugin::Fetch::PromptBeforeDownload - Backwards compatible plugin 
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -58,7 +58,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

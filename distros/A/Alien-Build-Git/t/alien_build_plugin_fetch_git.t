@@ -38,6 +38,8 @@ subtest 'fetch with tag' => sub {
       field filename => 'example1';
       field path     => match(qr/example1/);
       field type     => 'file';
+      field protocol => 'file';
+      end;
     },
   );
 
@@ -99,6 +101,8 @@ subtest 'fetch without tag' => sub {
         };
         end;
       };
+      field protocol => 'file';
+      end;
     },
   ) || do {
     require Data::Dumper;

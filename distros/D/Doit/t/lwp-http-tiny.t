@@ -33,15 +33,35 @@ $doit->add_component('lwp');
 
 my $tmpdir = tempdir("doit-lwp-XXXXXXXX", CLEANUP => 1, TMPDIR => 1);
 
-in_directory {
+sub lwp_mirror_wrapper {
+    my($url, $text, @more_ua_opts) = @_;
     my @ua_opts = (ua => $ua);
+    my $res = eval { $doit->lwp_mirror($url, $text, @ua_opts, @more_ua_opts) };
+    if ($@ && (
+	       $@ =~ /503 Service Unavailable: Back-end server is at capacity/ ||
+	       $@ =~ /599 Internal Exception: Timed out while waiting for socket to become ready for reading/
+	      )) {
+	skip "Unrecoverable backend error ($@), skipping remaining tests", 1;
+    }
+    ($res, $@);
+}
 
-    is $doit->lwp_mirror("$httpbin_url/get",   "mirrored.txt", @ua_opts), 1, 'mirror was done';
-    is $doit->lwp_mirror("$httpbin_url/cache", "mirrored.txt", @ua_opts), 0, 'no change';
+in_directory {
 
-    eval { $doit->lwp_mirror("$httpbin_url/status/500", "mirrored.txt", @ua_opts, debug => 1) };
-    like $@, qr{ERROR.*mirroring failed: 500 };
+ SKIP: {
+	my($res, $err);
 
+	($res, $err) = lwp_mirror_wrapper("$httpbin_url/get",   "mirrored.txt");
+	is $res, 1, 'mirror was done';
+	($res, $err) = lwp_mirror_wrapper("$httpbin_url/cache", "mirrored.txt");
+	is $res, 0, 'no change';
+
+	($res, $err) = lwp_mirror_wrapper("$httpbin_url/status/500", "mirrored.txt", debug => 1);
+	like $err, qr{ERROR.*mirroring failed: 500 }, 'got status 500';
+
+	($res, $err) = lwp_mirror_wrapper("unknown_scheme://localhost/foobar", "mirrored.txt", debug => 1);
+	like $err, qr{ERROR.*mirroring failed: 599 Internal Exception: Unsupported URL scheme 'unknown_scheme}, 'got internal exception with extra information';
+    }
 } $tmpdir;
 
 __END__

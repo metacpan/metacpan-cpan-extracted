@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -ex
+
+cd $(mktemp -d)
+curl -L https://github.com/PerlAlien/Alien-Build/tarball/main | tar zxf -
+cd $(ls -1)
+dzil-dzil authordeps --missing | dzil-cpanm -n
+dzil-dzil build
+dzil-cpanm -n *.tar.gz
+cpanm -n *.tar.gz
+

@@ -43,6 +43,6 @@
          "type" : "git"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

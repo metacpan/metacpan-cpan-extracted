@@ -8,7 +8,7 @@ use App::InvestSim::GUI;
 use App::InvestSim::Values;
 use Tkx;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 sub run($) {
   my ($res_dir) = @_;
@@ -27,7 +27,7 @@ sub run($) {
 
 This package is not meant to be used directly, it only serves to provide the
 features of the L<investment_simulator> app. See the main
-L<README|https://metacpan.org/dist/App-InvestSim/source/README.pod> file of
+L<README|https://metacpan.org/dist/App-InvestSim/view/README.pod> file of
 this distribution for more details.
 
 =cut

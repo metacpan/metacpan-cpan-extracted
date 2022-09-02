@@ -9,10 +9,11 @@ use Future::Utils;
 use IO::Async::Loop;
 use IO::Async::Signal;
 use IO::Async::Stream;
+use IO::Async::Timer::Periodic;
 use IO::Handle;
-use JSON::PP;
 use Scalar::Util qw(blessed);
 
+use PLS::JSON;
 use PLS::Server::Request::Factory;
 use PLS::Server::Response;
 use PLS::Server::Response::Cancelled;
@@ -108,10 +109,8 @@ sub run
     } ## end Future::Utils::repeat
     while => sub { 1 };
 
-    STDOUT->blocking(0);
-
     $self->{stream} = IO::Async::Stream->new_for_stdio(
-        autoflush => 1,
+        autoflush => 0,
         on_read   => sub {
             my $size = 0;
 
@@ -135,7 +134,7 @@ sub run
                 my $json = substr $$buffref, 0, $size, '';
                 $size = 0;
 
-                my $content = JSON::PP->new->utf8->decode($json);
+                my $content = decode_json $json;
 
                 $self->handle_client_message($content);
                 return 1;
@@ -145,10 +144,8 @@ sub run
 
     $self->{loop}->add($self->{stream});
     $self->{loop}->add(
-                       IO::Async::Signal->new(
-                                              name       => 'TERM',
-                                              on_receipt => sub { $self->stop(0) }
-                                             )
+                       IO::Async::Signal->new(name       => 'TERM',
+                                              on_receipt => sub { $self->stop(0) })
                       )
       if ($^O ne 'MSWin32');
 
@@ -219,8 +216,8 @@ sub send_message
 
     return if (not blessed($message) or not $message->isa('PLS::Server::Message'));
     my $json   = $message->serialize();
-    my $length = length $json;
-    $self->{stream}->write("Content-Length: $length\r\n\r\n$json")->await;
+    my $length = length $$json;
+    $self->{stream}->write("Content-Length: $length\r\n\r\n$$json")->retain();
 
     return;
 } ## end sub send_message
@@ -297,6 +294,24 @@ sub handle_server_response
     $self->send_message($response);
     return;
 } ## end sub handle_server_response
+
+sub monitor_client_process
+{
+    my ($self, $pid) = @_;
+
+    my $timer = IO::Async::Timer::Periodic->new(
+        interval => 30,
+        on_tick  => sub {
+            return if (kill 'ZERO', $pid);
+            $self->stop(1);
+        }
+    );
+    $self->{loop}->add($timer);
+
+    $timer->start();
+
+    return;
+} ## end sub monitor_client_process
 
 sub stop
 {

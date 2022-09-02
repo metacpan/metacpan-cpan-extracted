@@ -62,6 +62,12 @@ METHODS
 
     Loads the named Devel::MAT::Tool class.
 
+ has_tool
+
+       $bool = $pmat->has_tool( $name )
+
+    Returns true if the named tool is already loaded.
+
  run_command
 
        $pmat->run_command( $inv )

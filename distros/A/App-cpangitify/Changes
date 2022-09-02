@@ -1,5 +1,8 @@
 Revision history for App-cpangitify
 
+0.20      2022-09-01 19:15:57 -0600
+  - Validate SSL with (gh#19)
+
 0.19      2022-08-23 19:28:42 -0600
   - Use Archive::Libarchive::Extract instead of Archive::Extract (gh#17)
   - Drop support for Perls older than 5.20 (gh#17)

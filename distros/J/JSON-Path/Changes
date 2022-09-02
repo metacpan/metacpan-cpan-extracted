@@ -1,6 +1,45 @@
-0.431     2021-01-28 17:04:25-06:00 America/Chicago
+1.0.1     2022-08-30 21:58:38-05:00 America/Chicago
+
+1.0.0     2022-08-30 21:56:52-05:00 America/Chicago
+
+    [ Bug Fixes ]
+    - Fix filtering when there are nested structures.
+    Fixes issue #35
+    David Escribano García++
+
+    [ Bug Fixes ]
+    - Fix filtering using unary operators.
+    Fixes issue #34
+    David Escribano García++
+
     [ Other ]
-    - Fix the local/ directory being included in the distro
+    - No functional changes since 0.51, switch to semantic versioning.
+
+0.51      2022-03-03 18:25:11-06:00 America/Chicago
+
+    [ Other ]
+    - Remove JSON, use JSON::MaybeXS throughout.
+      Fixes issue #22
+      James Rapass++
+
+    - Remove Exporter and Exporter::Easy, use Exporter::Shiny throughout.
+      Fixes issue #23
+      James Raspass++
+
+    - Remove unused Sys::Hostname dependency.
+      Fixes issue #24
+      James Raspass++
+
+    - Remove Test::Deep, Test::More, and Test::Most, use Test2::V0 throughout.
+      Fixes issue #25
+      James Raspass++
+
+0.5       2021-07-07 10:52:00-05:00 America/Chicago
+
+    [ Bug Fixes ]
+    - basic support for AND and OR operators
+      Fixes issue #21
+      David Escribano García ++
 
 0.430     2021-01-27 23:34:50-06:00 America/Chicago
 

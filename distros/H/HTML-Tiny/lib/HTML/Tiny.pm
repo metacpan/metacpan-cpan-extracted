@@ -1,33 +1,44 @@
+use strict; use warnings;
+
 package HTML::Tiny;
 
-use strict;
 use Carp;
 
 =head1 NAME
 
 HTML::Tiny - Lightweight, dependency free HTML/XML generation
 
-=head1 VERSION
-
-This document describes HTML::Tiny version 1.05
-
 =cut
 
-use vars qw/$VERSION/;
-$VERSION = '1.05';
+our $VERSION = '1.07';
 
 BEGIN {
 
-  # http://www.w3schools.com/tags/default.asp
-  for my $tag (
-    qw( a abbr acronym address area b base bdo big blockquote body br
-    button caption cite code col colgroup dd del div dfn dl dt em
-    fieldset form frame frameset h1 h2 h3 h4 h5 h6 head hr html i
-    iframe img input ins kbd label legend li link map meta noframes
-    noscript object ol optgroup option p param pre q samp script select
-    small span strong style sub sup table tbody td textarea tfoot th
-    thead title tr tt ul var )
-   ) {
+  # https://developer.mozilla.org/en-US/docs/Web/HTML/Element
+  for my $tag ( qw(
+    a abbr acronym address applet area article aside audio
+    b base bdi bdo big blink blockquote body br button
+    canvas caption center cite code col colgroup
+    data datalist dd del details dfn dialog dir div dl dt
+    em embed
+    fieldset figcaption figure font footer form frame frameset
+    h1 h2 h3 h4 h5 h6 head header hgroup hr html
+    i iframe img input ins
+    kbd keygen
+    label legend li link
+    main map mark marquee menu menuitem meta meter
+    nav nobr noframes noscript
+    object ol optgroup option output
+    p param picture portal pre progress
+    q
+    rb rp rt rtc ruby
+    s samp script section select slot small source spacer span strike strong style sub summary sup
+    table tbody td template textarea tfoot th thead time title tr track tt
+    u ul
+    var video
+    wbr
+    xmp
+  ) ) {
     no strict 'refs';
     *$tag = sub { shift->auto_tag( $tag, @_ ) };
   }
@@ -35,7 +46,8 @@ BEGIN {
 
 # Tags that are closed (<br /> versus <br></br>)
 my @DEFAULT_CLOSED
- = qw( area base br col frame hr img input link meta param );
+  # https://developer.mozilla.org/en-US/docs/Glossary/Empty_element
+  = qw( area base br col embed frame hr iframe img input keygen link meta param source track wbr );
 
 # Tags that get a trailing newline
 my @DEFAULT_NEWLINE = qw( html head body div p tr table );
@@ -492,17 +504,21 @@ sub stringify {
 In addition to the methods described above C<< HTML::Tiny >> provides
 all of the following HTML generation methods:
 
-  a abbr acronym address area b base bdo big blockquote body br
-  button caption cite code col colgroup dd del div dfn dl dt em
-  fieldset form frame frameset h1 h2 h3 h4 h5 h6 head hr html i
-  iframe img input ins kbd label legend li link map meta noframes
-  noscript object ol optgroup option p param pre q samp script select
-  small span strong style sub sup table tbody td textarea tfoot th
-  thead title tr tt ul var
+  a abbr acronym address applet area article aside audio b base bdi bdo big
+  blink blockquote body br button canvas caption center cite code col colgroup
+  data datalist dd del details dfn dialog dir div dl dt em embed fieldset
+  figcaption figure font footer form frame frameset h1 h2 h3 h4 h5 h6 head
+  header hgroup hr html i iframe img input ins kbd keygen label legend li link
+  main map mark marquee menu menuitem meta meter nav nobr noframes noscript
+  object ol optgroup option output p param picture portal pre progress q rb rp
+  rt rtc ruby s samp script section select slot small source spacer span strike
+  strong style sub summary sup table tbody td template textarea tfoot th thead
+  time title tr track tt u ul var video wbr xmp
 
 The following methods generate closed XHTML (<br />) tags by default:
 
-  area base br col frame hr img input meta param
+  area base br col embed frame hr iframe img input keygen link meta param
+  source track wbr
 
 So:
 
@@ -755,7 +771,12 @@ blessed object that does not implement C<TO_JSON> will fail.
 sub json_encode { shift->_json_encode( {}, @_ ) }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =back
 
@@ -772,61 +793,17 @@ attempt is made to generate an invalid tag.
 
 =back
 
-=head1 CONFIGURATION AND ENVIRONMENT
-
-HTML::Tiny requires no configuration files or environment variables.
-
-=head1 DEPENDENCIES
-
-By design HTML::Tiny has no non-core dependencies.
-
-To run the tests you will require Test::More.
-
-=head1 INCOMPATIBILITIES
-
-None reported.
-
-=head1 BUGS AND LIMITATIONS
-
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-C<bug-html-tiny@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
-
 =head1 AUTHOR
 
-Andy Armstrong  C<< <andy@hexten.net> >>
+Andy Armstrong <andy@hexten.net>
 
-Aristotle Pagaltzis C<< <pagaltzis@gmx.de> >>
+Aristotle Pagaltzis <pagaltzis@gmx.de>
 
-=head1 LICENCE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2008, Andy Armstrong C<< <andy@hexten.net> >>. All
-rights reserved.
+This software is copyright (c) 2008 by Andy Armstrong.
 
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-=head1 DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
-OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
-THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES.
+=cut

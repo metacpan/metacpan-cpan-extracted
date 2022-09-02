@@ -103,8 +103,7 @@ someone else to fix bugs, I will apply it, provided it applies
 cleanly, and the resulting code continues to pass all tests.  I will
 not apply patches to add features.
 
-I will continue to distribute version 5 for several years.  I do not
-have a date in mind where version 5 will be removed.
+I intend to remove this in version 7.00.
 
 =item B<Limited Time Zone Support>
 

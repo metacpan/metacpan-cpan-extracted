@@ -1,9 +1,13 @@
 Revision history for Alien-Build-Plugin-Cleanse-BuildDir
 
+0.06      2022-08-30
+  - Update for forthcoming Alien::Build download rule approach
+    @plicease ++
+
 0.05      2018-08-01
   - Clean up the manifest (thanks MANWAR)
   - Remove redundant directories.
-
+  
 0.04      2018-07-30
   - Simplify the test dependencies (thanks to PLICEASE) 
   - Clean up some duplicated POD

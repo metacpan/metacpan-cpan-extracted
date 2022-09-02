@@ -98,6 +98,7 @@ t/openapiv2-discriminator.t
 t/openapiv2-file.t
 t/openapiv2-headers.t
 t/openapiv2-readonly.t
+t/openapiv2-routes.t
 t/openapiv3-basic.t
 t/openapiv3-coerce-array.t
 t/openapiv3-default-values.t

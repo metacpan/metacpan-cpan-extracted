@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 use Carp;
 use Net::DNS;

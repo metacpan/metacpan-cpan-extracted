@@ -25,17 +25,15 @@ my $tests="
 
 # +06:30:00;
 #    0 => [
-#         indian/cocos,
-#         asia/colombo,
-#         asia/dhaka,
-#         asia/kolkata,
-#         asia/rangoon,
-#         ],
-#      1 => [
-#         asia/colombo,
-#         asia/kolkata,
-#         asia/karachi,
-#         ],
+#          Asia/Yangon
+#          Asia/Colombo
+#          Asia/Dhaka
+#         ]
+#    1 => [
+#          Asia/Kolkata
+#          Asia/Colombo
+#          Asia/Karachi
+#         ]
 
 +06:30:01 std Asia/Colombo Indian/Cocos     => 1 __undef__
 
@@ -49,7 +47,7 @@ my $tests="
 
 +06:30:00 stdonly Asia/Colombo Asia/Karachi => 5 Asia/Karachi
 
-+06:30:00 dstonly Asia/Colombo Indian/Cocos => 5 Indian/Cocos
++06:30:00 dstonly Asia/Colombo Indian/Cocos => 3 Indian/Cocos
 
 +06:30:00:50 std Asia/Colombo               => 9 __undef__
 

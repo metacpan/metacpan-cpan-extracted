@@ -17,7 +17,7 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Object::Pad' => '0.66',
-                                      'perl' => 'v5.18.0',
+                                      'perl' => 'v5.26.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

@@ -1,13 +1,11 @@
-use 5.008;
+package JSON::Path;
+$JSON::Path::VERSION = '1.0.1';
 use strict;
 use warnings;
 
-package JSON::Path;
-$JSON::Path::VERSION = '0.431';
 # VERSION
 
-use Exporter::Tiny ();
-our @ISA       = qw/ Exporter::Tiny /;
+use Exporter::Shiny qw/ jpath jpath1 jpath_map /;
 our $AUTHORITY = 'cpan:POPEFELIX';
 our $Safe      = 1;
 
@@ -16,8 +14,6 @@ use JSON::MaybeXS qw/decode_json/;
 use JSON::Path::Evaluator;
 use Scalar::Util qw[blessed];
 use LV ();
-
-our @EXPORT_OK = qw/ jpath jpath1 jpath_map /;
 
 use overload '""' => \&to_string;
 
@@ -138,7 +134,7 @@ JSON::Path
 
 =head1 VERSION
 
-version 0.431
+version 1.0.1
 
 =head1 SYNOPSIS
 
@@ -388,6 +384,8 @@ Heiko Jansen E<lt>hjansen@cpan.orgE<gt>.
 
 Mitsuhiro Nakamura E<lt>m.nacamura@gmail.comE<gt>
 
+David Escribano García https://github.com/DavidEGx
+
 =head1 COPYRIGHT AND LICENCE
 
 Copyright 2007 Stefan Goessner.
@@ -424,7 +422,7 @@ Kit Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Kit Peters.
+This software is copyright (c) 2022 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -21,10 +21,10 @@ use CPAN::ReleaseHistory;
 use HTTP::Tiny;
 
 # ABSTRACT: Convert cpan distribution from BackPAN to a git repository
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 
-our $ua  = HTTP::Tiny->new;
+our $ua  = HTTP::Tiny->new( verify_SSL => 1 );
 our $opt_metacpan_url;
 
 sub _rm_rf ($file)
@@ -279,7 +279,7 @@ App::cpangitify - Convert cpan distribution from BackPAN to a git repository
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 DESCRIPTION
 

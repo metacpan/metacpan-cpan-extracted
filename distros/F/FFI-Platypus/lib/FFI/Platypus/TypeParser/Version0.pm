@@ -7,7 +7,7 @@ use Carp qw( croak );
 use parent qw( FFI::Platypus::TypeParser );
 
 # ABSTRACT: FFI Type Parser Version Zero
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 
 our @CARP_NOT = qw( FFI::Platypus FFI::Platypus::TypeParser );
@@ -165,7 +165,7 @@ FFI::Platypus::TypeParser::Version0 - FFI Type Parser Version Zero
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 SYNOPSIS
 

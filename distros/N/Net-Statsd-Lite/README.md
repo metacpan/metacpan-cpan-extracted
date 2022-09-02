@@ -4,7 +4,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 # VERSION
 
-version v0.6.2
+version v0.6.3
 
 # SYNOPSIS
 
@@ -103,7 +103,7 @@ be added. `$rate` must be between 0 and 1.
 ## `update`
 
 This is an alias for ["counter"](#counter), for compatability with
-[Etsy::StatsD](https://metacpan.org/pod/Etsy::StatsD) or [Net::Statsd::Client](https://metacpan.org/pod/Net::Statsd::Client).
+[Etsy::StatsD](https://metacpan.org/pod/Etsy%3A%3AStatsD) or [Net::Statsd::Client](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3AClient).
 
 ## `increment`
 
@@ -178,7 +178,7 @@ rates for timings may not be supported by all statsd servers.
 ## `timing_ms`
 
 This is an alias for ["timing"](#timing), for compatability with
-[Net::Statsd::Client](https://metacpan.org/pod/Net::Statsd::Client).
+[Net::Statsd::Client](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3AClient).
 
 ## `histogram`
 
@@ -225,7 +225,7 @@ is any data in the buffer.
 If this module is first loaded in `STRICT` mode, then the values and
 rate arguments will be checked that they are the correct type.
 
-See [Devel::StrictMode](https://metacpan.org/pod/Devel::StrictMode) for more information.
+See [Devel::StrictMode](https://metacpan.org/pod/Devel%3A%3AStrictMode) for more information.
 
 # TAGGING EXTENSIONS
 
@@ -251,7 +251,7 @@ around record_metric => sub {
 
 # SEE ALSO
 
-This module was forked from [Net::Statsd::Tiny](https://metacpan.org/pod/Net::Statsd::Tiny).
+This module was forked from [Net::Statsd::Tiny](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3ATiny).
 
 [https://github.com/statsd/statsd/blob/master/docs/metric\_types.md](https://github.com/statsd/statsd/blob/master/docs/metric_types.md)
 
@@ -285,7 +285,7 @@ Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

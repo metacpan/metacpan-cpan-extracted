@@ -12,9 +12,9 @@ use Exporter 'import';
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-28'; # DATE
+our $DATE = '2022-09-02'; # DATE
 our $DIST = 'Perinci-Sub-Complete'; # DIST
-our $VERSION = '0.945'; # VERSION
+our $VERSION = '0.946'; # VERSION
 
 our @EXPORT_OK = qw(
                        complete_from_schema
@@ -1085,7 +1085,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.945 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2022-08-28.
+This document describes version 0.946 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2022-09-02.
 
 =head1 SYNOPSIS
 
@@ -1612,7 +1612,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,9 +6,9 @@ Date::Manip::Offset::off235;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  1 10:56:59 EDT 2022
-#    Data version: tzdata2022a
-#    Code version: tzcode2022a
+#    Generated on: Thu Sep  1 10:36:29 EDT 2022
+#    Data version: tzdata2022c
+#    Code version: tzcode2022c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.88';
+$VERSION='6.89';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -28,16 +28,11 @@ END {
    undef %Offset;
 }
 
-$Offset        = '+14:00:00';
+$Offset        = '-01:27:52';
 
 %Offset        = (
    0 => [
-      'pacific/kiritimati',
-      ],
-   1 => [
-      'pacific/apia',
-      'pacific/tongatapu',
-      'asia/anadyr',
+      'america/scoresbysund',
       ],
 );
 

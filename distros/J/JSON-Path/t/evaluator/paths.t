@@ -1,5 +1,4 @@
-use Test::Most;
-use Test::Deep;
+use Test2::V0;
 use JSON::MaybeXS qw/encode_json decode_json/;
 use JSON::Path::Evaluator;
 use Storable qw(dclone);
@@ -77,13 +76,14 @@ sub do_test {
     my @expressions = @_;
     while ( my $expression = shift @expressions ) {
         my $expected = shift @expressions;
-        my @got;
-        lives_and {
-            @got = JSON::Path::Evaluator::evaluate_jsonpath( $json, $expression );
-            cmp_bag( \@got, $expected );
-        }
-        qq{"$expression" evaluated correctly};
+        subtest $expression => sub {
+            my @got;
+            ok lives {
+                @got = JSON::Path::Evaluator::evaluate_jsonpath( $json, $expression );
+            }, 'lives';
 
+            is \@got, bag { item $_ for @$expected; end }, 'evaluated correctly';
+        };
     }
 }
 

@@ -14,18 +14,18 @@ use File::Temp qw(tempdir);
 use Test::More;
 
 use Doit;
-use Doit::Extcmd qw(is_in_path);
 use Doit::Util qw(in_directory);
 
 use TestUtil qw(is_dir_eq);
 
-if (!is_in_path('git')) {
+my $d = Doit->init;
+
+if (!$d->which('git')) {
     plan skip_all => 'git not in PATH';
 }
 
 plan 'no_plan';
 
-my $d = Doit->init;
 $d->add_component('git');
 
 my $git_less_directory;
@@ -56,17 +56,19 @@ for my $git_key (sort keys %ENV) {
     $d->unsetenv($git_key);
 }
 
-# realpath() needed on darwin
+# realpath() needed on darwin (/private/tmp vs. /tmp)
 my $dir = realpath(tempdir('doit-git-XXXXXXXX', CLEANUP => 1, TMPDIR => 1));
 
-# A private git-short-status script; should behave the same.
+# A private git-short-status script; should behave the same as the git_short_status command.
 my $my_git_short_status;
 if ($ENV{HOME} && -x "$ENV{HOME}/bin/sh/git-short-status") {
     $my_git_short_status = "$ENV{HOME}/bin/sh/git-short-status";
 }
 
+######################################################################
 # Tests with the Doit repository (if checked out)
 SKIP: {
+#    skip "git_short_status does not work as expected (TODO)" if $ENV{GITHUB_ACTIONS}; # this does not seem to work if git-lfs is in use, which is the default with actions/checkout@v1 and may be configured with actions/checkout@v2, but is not currently
     my $self_git = eval { $d->git_root };
     skip "Not a git checkout", 1 if !$self_git;
     skip "Current git checkout is not the Doit git checkout", 1 # ... but probably a git directory in an upper directory
@@ -78,6 +80,7 @@ SKIP: {
     run_tests($self_git, $workdir);
 }
 
+######################################################################
 # Error cases
 for my $meth (qw(git_repo_update git_short_status git_root git_get_commit_hash git_get_commit_files git_get_changed_files git_is_shallow git_current_branch git_config)) {
     eval { $d->$meth('unhandled-option' => 1) };
@@ -111,6 +114,7 @@ SKIP: {
     }
 }
 
+######################################################################
 # Tests with a freshly created git repository
 {
     my $workdir = "$dir/newworkdir";
@@ -122,6 +126,7 @@ SKIP: {
     is_dir_eq $d->git_root, $workdir, 'git_root in root directory';
     is_dir_eq $d->git_root(directory => getcwd), $workdir, 'git_root with directory option';
     is_deeply [$d->git_get_changed_files], [], 'no changed files in fresh empty directory';
+    is_deeply [$d->git_get_changed_files(ignore_untracked => 1)], [], 'no changed files in fresh empty directory, also with ignore_untracked';
     git_short_status_check(                         $d, '', 'empty directory, not dirty');
     git_short_status_check({untracked_files=>'no'}, $d, '', 'empty directory, not dirty');
     is $d->git_current_branch, 'master';
@@ -131,6 +136,7 @@ SKIP: {
     # dirty
     $d->touch('testfile');
     is_deeply [$d->git_get_changed_files], ['testfile'], 'new file detected';
+    is_deeply [$d->git_get_changed_files(ignore_untracked => 1)], [], 'untracked file ignored';
     git_short_status_check(                         $d, '*', 'untracked file detected');
     git_short_status_check({untracked_files=>'no'}, $d, '',  'no detection of untracked files');
 
@@ -142,6 +148,7 @@ SKIP: {
 
     is $d->git_short_status, '<<', 'git_short_status without directory';
 
+    # untracked file
     $d->touch('untracked-file');
     ok((grep { $_ eq 'testfile'       } $d->git_get_changed_files), 'added, but not committed file detected');
     ok((grep { $_ eq 'untracked-file' } $d->git_get_changed_files), 'untracked file detected');
@@ -163,6 +170,7 @@ SKIP: {
     _git_commit_with_author('two files in commit');
     is_deeply [$d->git_get_commit_files], [qw(multiple-files-1 multiple-files-2)], 'git_get_commit_files with multiple files';
 
+    # changed file
     $d->change_file('testfile', {add_if_missing => 'some content'});
     git_short_status_check(                         $d, '<<', 'dirty after change');
     git_short_status_check({untracked_files=>'no'}, $d, '<<', 'dirty after change');
@@ -185,6 +193,7 @@ SKIP: {
 	is_dir_eq $d->git_root, $workdir, 'in_directory call without prototype';
     }, 'subdir');
 
+    # git_config
     eval {
 	$d->git_config(key => "test.key", val => "test.val", unset => 1);
     };
@@ -213,12 +222,39 @@ SKIP: {
     is $d->git_config(key => "test.with.newlines", val => "line1\nline2\line3\another line\n"), 1, 'newline key was changed';
     is $d->git_config(key => "test.with.newlines"),       "line1\nline2\line3\another line\n", 'last change was successful';
 
+    # various clone tests
     is $d->git_repo_update(
 			   repository => "$workdir/.git",
 			   repository_aliases => [$workdir],
 			   directory => $workdir2,
 			  ), 0, "handling repository_aliases";
     ok !$d->git_is_shallow(directory => $workdir2), 'cloned directory is not shallow';
+
+    for my $default_branch_method_def (
+	[[qw(symbolic-ref remote)]],
+	['symbolic-ref',   'may-fail'],
+	['remote'],
+	[],
+	['does-not-exist', 'expect-fail'],
+    ) {
+	my($default_branch_method, $possible_fail) = @$default_branch_method_def;
+	my @args = (
+	    directory => $workdir2,
+	    method    => $default_branch_method,
+	);
+	if ($possible_fail) {
+	    my $res = eval { $d->git_get_default_branch(@args) };
+	    if ($possible_fail eq 'may-fail') {
+		if (!$@) {
+		    like $res, qr{^(master|main)$};
+		}
+	    } else {
+		like $@, qr{Unhandled git_get_default_branch method 'does-not-exist'}, 'got error for unhandled method';
+	    }
+	} else {
+	    like $d->git_get_default_branch(@args), qr{^(master|main)$}, "git_get_default_branch with method " . (!defined $default_branch_method ? "undef" : ref $default_branch_method eq 'ARRAY' ? join(", ", @$default_branch_method) : $default_branch_method);
+	}
+    }
 
     is $d->git_repo_update(
 			   repository => $workdir,
@@ -369,6 +405,161 @@ SKIP: {
 	ok -e "$repo2/new-file", 'refresh=>always';
     }
 
+    { # Test branch option
+	my $repo1 = "$dir/newworkdir9";
+	my $repo2 = "$dir/newworkdir10";
+	my $repo3 = "$dir/newworkdir10b";
+
+	is $d->git_repo_update(repository => $workdir, directory => $repo1), 1, 'clone without --branch';
+	in_directory {
+	    $d->system(qw(git checkout -b branch_test));
+	    is $d->git_current_branch, 'branch_test';
+	    is $d->git_repo_update(repository => $workdir, directory => $repo1, branch => 'branch_test'), 0, 'no change with branch';
+	    is $d->git_repo_update(repository => $workdir, directory => $repo1), 0, 'no change without branch option';
+	    is $d->git_repo_update(repository => $workdir, directory => $repo1, branch => 'master'), 1, 'branch changed';
+	    is $d->git_current_branch, 'master';
+	} $repo1;
+
+	is $d->git_repo_update(repository => $repo1, directory => $repo2, branch => 'branch_test'), 1, 'clone with --branch';
+	in_directory {
+	    my %info;
+	    is $d->git_current_branch(info_ref => \%info), 'branch_test', 'clone into non-master branch';
+	    ok !$info{fallback}, 'no git-status fallback was used';
+	    $d->system("git", "checkout", "master");
+	    is $d->git_current_branch, 'master', 'changed back to master';
+	} $repo2;
+
+	is $d->git_repo_update(repository => $repo1, directory => $repo3, branch => 'refs/remotes/origin/branch_test'), 1, 'clone and switch to branch, use refs/remotes/... syntax';
+	in_directory {
+	    my %info;
+	    is $d->git_current_branch(info_ref => \%info), 'branch_test', 'clone into non-master branch';
+	    ok !$info{fallback}, 'no git-status fallback was used';
+	    $d->system("git", "checkout", "master");
+	    is $d->git_current_branch, 'master', 'changed back to master';
+	} $repo3;
+
+	in_directory {
+	    $d->system("git", "checkout", "branch_test");
+	    $d->create_file_if_nonexisting('new_file_for_detached_branch_test');
+	    $d->system(qw(git add new_file_for_detached_branch_test));
+	    _git_commit_with_author('msg for detached branch test');
+	} $repo1;
+
+	is $d->git_repo_update(repository => $repo1, directory => $repo2, branch => 'origin/branch_test'), 1, 'switch + update with detached branch';
+	in_directory {
+	    my %info;
+	    is $d->git_current_branch(info_ref => \%info), 'origin/branch_test', 'detached branch'
+		or diag `git status`;
+	    ok $info{detached}, 'git_current_branch knows that the branch is detached';
+	    like $info{fallback}, qr{^(git-status|git-show-ref)$}, 'a fallback was used';
+	    ok -f 'new_file_for_detached_branch_test', 'freshly created file exists';
+	} $repo2;
+
+	in_directory {
+	    $d->create_file_if_nonexisting('new_file_2_for_detached_branch_test');
+	    $d->system(qw(git add new_file_2_for_detached_branch_test));
+	    _git_commit_with_author('msg 2 for detached branch test');
+	} $repo1;
+
+	is $d->git_repo_update(repository => $repo1, directory => $repo2, branch => 'origin/branch_test'), 1, 'update with detached branch, but without switch';
+	in_directory {
+	    my %info;
+	    is $d->git_current_branch(info_ref => \%info), 'origin/branch_test', 'still in detached branch'
+		or diag `git status`;
+	    ok $info{detached}, 'git_current_branch knows that the branch is detached';
+	    like $info{fallback}, qr{^(git-status|git-show-ref)$}, 'a fallback was used';
+	    ok -f 'new_file_2_for_detached_branch_test', 'freshly created file exists';
+	} $repo2;
+
+	$d->git_repo_update(repository => $repo1, directory => $repo2, branch => 'origin/master');
+	is $d->git_repo_update(repository => $repo1, directory => $repo2, branch => 'refs/remotes/origin/branch_test'), 1, 'use refs/remotes/... syntax';
+	in_directory {
+	    my %info;
+	    is $d->git_current_branch(info_ref => \%info), 'origin/branch_test', 'still in detached branch'
+		or diag `git status`;
+	    ok $info{detached}, 'git_current_branch knows that the branch is detached';
+	    like $info{fallback}, qr{^(git-status|git-show-ref)$}, 'a fallback was used';
+	    ok -f 'new_file_2_for_detached_branch_test', 'freshly created file exists';
+	} $repo2;
+    }
+
+    { # branch option on a branch not yet in the fetched remote
+	my $repo1 = "$dir/newworkdir11";
+	my $repo2 = "$dir/newworkdir12";
+
+	is $d->git_repo_update(repository => $workdir, directory => $repo1), 1;
+	is $d->git_repo_update(repository => $repo1,   directory => $repo2), 1;
+	in_directory {
+	    $d->system(qw(git checkout -b new_branch));
+	} $repo1;
+	is $d->git_repo_update(repository => $repo1,   directory => $repo2, branch => 'new_branch'), 1;
+	is $d->git_current_branch(directory => $repo2), 'new_branch';
+	is $d->git_repo_update(repository => $repo1,   directory => $repo2, branch => 'new_branch'), 0;
+	is $d->git_current_branch(directory => $repo2), 'new_branch';
+
+	# go even further: checkout a detached branch
+	is $d->git_repo_update(repository => $repo1,   directory => $repo2, origin => 'some_remote', branch => 'some_remote/new_branch'), 1;
+	my $git_with_show_ref_fallback;
+	{
+	    my %info;
+	    my $current_branch = $d->git_current_branch(directory => $repo2, info_ref => \%info);
+	    $git_with_show_ref_fallback = ($info{fallback}||'') eq 'git-show-ref';
+	SKIP: {
+		skip "cannot distinguish between origin/master and some_remote/new_branch with git-show-ref fallback", 5
+		    if $git_with_show_ref_fallback;
+
+		is $current_branch, 'some_remote/new_branch';
+		ok $info{detached};
+
+		# update again to the same branch (should be a no-op)
+		is $d->git_repo_update(repository => $repo1,   directory => $repo2, origin => 'some_remote', branch => 'some_remote/new_branch'), 0;
+		
+		%info = ();
+		$current_branch = $d->git_current_branch(directory => $repo2, info_ref => \%info);
+		is $current_branch, 'some_remote/new_branch';
+		ok $info{detached};
+	    }
+	}
+    }
+
+    { # branch option on a branch not yet in the working directory, but exists in two remotes
+      # a mere "git checkout branch" fails in this situation --- one has to explicitly
+      # specify the remote here: "git checkout -b branch --track remote/branch"
+
+	# create two remotes
+	for my $remote (qw(one two)) {
+	    my $workdir = "$dir/newworkdir13_$remote";
+	    $d->mkdir($workdir);
+	    in_directory {
+		$d->system(qw(git init));
+		$d->touch(qw(testfile));
+		$d->system(qw(git add testfile));
+		_git_commit_with_author('test');
+		$d->system(qw(git checkout -b testbranch));
+		$d->write_binary('testfile', "some content\n");
+		$d->system(qw(git add testfile));
+		_git_commit_with_author('a change');
+		$d->system(qw(git checkout master));
+	    } $workdir;
+	}
+	# create working directory, using the first remote
+	my $workdir = "$dir/newworkdir13_work";
+	$d->git_repo_update(repository => "$dir/newworkdir13_one",
+			    directory => $workdir);
+	in_directory {
+	    # add the 2nd remote
+	    $d->system(qw(git remote add another_remote), "$dir/newworkdir13_two");
+	    $d->system(qw(git fetch another_remote));
+	    # now switch to the (ambigous) not-yet checked out branch
+	    # This will also fail for git < 1.5.1, but hopefully
+	    # such old gits do not exist anymore.
+	    $d->git_repo_update(repository => "$dir/newworkdir13_one",
+				directory => $workdir,
+				branch => "testbranch",
+			       );
+	    is $d->git_current_branch, 'testbranch';
+	} $workdir;
+    }
 }
 
 chdir "/"; # for File::Temp cleanup
@@ -381,6 +572,11 @@ sub run_tests {
     git_short_status_check({untracked_files=>'no', directory => $directory}, $d, '', 'not dirty after clone');
     my $commit_hash = $d->git_get_commit_hash(directory => $directory);
     like $commit_hash, qr{^[0-9a-f]{40}$}, 'a sha1';
+    my $current_branch = $d->git_current_branch(directory => $directory);
+    my $commit_hash_with_branch = $d->git_get_commit_hash(directory => $directory, commit => $current_branch);
+    is $commit_hash_with_branch, $commit_hash, 'git_get_commit_hash with commit option';
+    my $commit_hash_with_abbrev_sha1 = $d->git_get_commit_hash(directory => $directory, commit => substr($commit_hash, 0, 7));
+    is $commit_hash_with_abbrev_sha1, $commit_hash, 'git_get_commit_hash with abbreviated sha1';
     ok -d $directory;
     ok -d "$directory/.git";
     is $d->git_repo_update(repository => $repository, directory => $directory), 0, 'second call does nothing';
@@ -430,6 +626,11 @@ sub run_tests {
 
 	$d->system(qw(git checkout -b new_branch));
 	is $d->git_current_branch, 'new_branch';
+	my $commit_hash_branch = $d->git_get_commit_hash;
+	like $commit_hash_branch, qr{^[0-9a-f]{40}$}, 'a sha1';
+	my $commit_hash_branch_with_branch = $d->git_get_commit_hash(directory => $directory, commit => 'new_branch');
+	is $commit_hash_branch_with_branch, $commit_hash_branch, 'git_get_commit_hash with commit option';
+
     } $directory;
 
     $d->mkdir("$dir/exists");

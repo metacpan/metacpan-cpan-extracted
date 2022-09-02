@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 20;
 use FindBin;
 use File::Basename;
 use File::Path;
@@ -14,7 +14,8 @@ use PLS::Server::State;
 
 my $text = do { local $/; <DATA> };
 
-local $PLS::Server::State::ROOT_PATH = $FindBin::RealBin;
+# Cache workspace folders
+PLS::Parser::Index->new(workspace_folders => [$FindBin::RealBin]);
 
 my $uri = URI::file->new(File::Spec->catfile($FindBin::RealBin, File::Basename::basename($0)));
 PLS::Parser::Document->open_file(uri => $uri->as_string, text => $text, languageId => 'perl');
@@ -226,11 +227,69 @@ subtest 'class method arrow with start of method name inside method parentheses'
     is($filter,  'c',          'filter correct');
 };
 
-END
-{
-    # Clean up index created by server
-    eval { File::Path::rmtree("$FindBin::RealBin/.pls_cache") };
-}
+subtest 'variable typed before another variable' => sub {
+    plan tests => 4;
+
+    my $doc = PLS::Parser::Document->new(uri => $uri->as_string, line => 24);
+    my ($range, $arrow, $package, $filter) = $doc->find_word_under_cursor(1, 2);
+    is_deeply($range, {start => {line => 0, character => 0}, end => {line => 0, character => 2}}, 'correct range');
+    ok(!$arrow,           'no arrow');
+    ok(!length($package), 'no package');
+    is($filter, '$x', 'filter correct');
+};
+
+subtest 'only sigil before arrow' => sub {
+    plan tests => 5;
+
+    my $doc = PLS::Parser::Document->new(uri => $uri->as_string, line => 25);
+    isa_ok($doc, 'PLS::Parser::Document');
+
+    my ($range, $arrow, $package, $filter) = $doc->find_word_under_cursor(1, 1);
+    is_deeply($range, {start => {line => 0, character => 0}, end => {line => 0, character => 1}}, 'correct range');
+    ok(!$arrow,           'no arrow');
+    ok(!length($package), 'no package');
+    is($filter, '$', 'filter correct');
+
+};
+
+subtest 'only sigil before close paren' => sub {
+    plan tests => 5;
+
+    my $doc = PLS::Parser::Document->new(uri => $uri->as_string, line => 26);
+    isa_ok($doc, 'PLS::Parser::Document');
+
+    my ($range, $arrow, $package, $filter) = $doc->find_word_under_cursor(1, 2);
+    is_deeply($range, {start => {line => 0, character => 1}, end => {line => 0, character => 2}}, 'correct range');
+    ok(!$arrow,           'no arrow');
+    ok(!length($package), 'no package');
+    is($filter, '$', 'filter correct');
+};
+
+subtest 'only sigil before close curly brace' => sub {
+    plan tests => 5;
+
+    my $doc = PLS::Parser::Document->new(uri => $uri->as_string, line => 27);
+    isa_ok($doc, 'PLS::Parser::Document');
+
+    my ($range, $arrow, $package, $filter) = $doc->find_word_under_cursor(1, 2);
+    is_deeply($range, {start => {line => 0, character => 1}, end => {line => 0, character => 2}}, 'correct range');
+    ok(!$arrow,           'no arrow');
+    ok(!length($package), 'no package');
+    is($filter, '$', 'filter correct');
+};
+
+subtest 'only sigil before comma' => sub {
+    plan tests => 5;
+
+    my $doc = PLS::Parser::Document->new(uri => $uri->as_string, line => 28);
+    isa_ok($doc, 'PLS::Parser::Document');
+
+    my ($range, $arrow, $package, $filter) = $doc->find_word_under_cursor(1, 2);
+    is_deeply($range, {start => {line => 0, character => 1}, end => {line => 0, character => 2}}, 'correct range');
+    ok(!$arrow,           'no arrow');
+    ok(!length($package), 'no package');
+    is($filter, '$', 'filter correct');
+};
 
 __END__
 $
@@ -257,3 +316,8 @@ func(File::)
 $obj->method(File::)
 $obj->method(File::Spec->)
 $obj->method(File::Spec->c)
+$x$obj
+$->method
+($)
+{$}
+($,$y)

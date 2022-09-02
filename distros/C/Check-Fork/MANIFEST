@@ -1,5 +1,7 @@
 Changes
 examples/check_fork.pl
+examples/check_fork_and_socket.pl
+examples/test_fork_and_socket.pl
 Fork.pm
 Fork/HardcodedUsage.pod
 inc/Module/Install.pm

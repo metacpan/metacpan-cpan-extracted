@@ -1,5 +1,11 @@
 Revision history for Device-Chip
 
+0.23    2022-09-01
+        [CHANGES]
+         * Define the concept of sanity-check bounds on sensor values, to
+           discard obviously-bad readings
+         * Use the new `field` from Object::Pad 0.66
+
 0.22    2022-04-20
         [CHANGES]
          * General improvements to documentation, especially Authoring guide

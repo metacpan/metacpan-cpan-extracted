@@ -1,13 +1,15 @@
 #!perl
 
-our $DATE = '2021-07-29'; # DATE
-our $VERSION = '0.479'; # VERSION
-
 use 5.010;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-07-16'; # DATE
+our $DIST = 'App-SahUtils'; # DIST
+our $VERSION = '0.480'; # VERSION
 
 our %SPEC;
 
@@ -318,14 +320,14 @@ sub validate_with_sah {
             } elsif ($type eq 'perl') {
                 require File::Slurper;
                 my $ct = File::Slurper::read_text($path);
-                $schema = eval $ct;
+                $schema = eval $ct; ## no critic: BuiltinFunctions::ProhibitStringyEval
                 die if $@;
             } else {
                 $res = [400, "Unknown schema file type '$type', please specify json/yaml"];
                 last GET_RESULT;
             }
         } elsif (defined $args{schema_module}) {
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             my $mod = "Sah::Schema::$args{schema_module}";
             (my $mod_pm = "$mod.pm") =~ s!::!/!g;
             require $mod_pm;
@@ -345,7 +347,7 @@ sub validate_with_sah {
         my $func;
         my $obj;
         {
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             my $c = $args{compiler};
             if ($c eq 'perl') {
                 require Data::Sah;
@@ -430,7 +432,7 @@ sub validate_with_sah {
             } elsif ($type eq 'perl') {
                 require File::Slurper;
                 my $ct = File::Slurper::read_text($path);
-                $data = eval $ct;
+                $data = eval $ct; ## no critic: BuiltinFunctions::ProhibitStringyEval
                 die if $@;
             } else {
                 $res = [400, "Unknown data file type '$type', please specify json/yaml"];
@@ -496,156 +498,15 @@ validate-with-sah - Validate data with Sah schema
 
 =head1 VERSION
 
-This document describes version 0.479 of validate-with-sah (from Perl distribution App-SahUtils), released on 2021-07-29.
+This document describes version 0.480 of validate-with-sah (from Perl distribution App-SahUtils), released on 2022-07-16.
 
 =head1 SYNOPSIS
 
-Usage:
+% B<validate-with-sah> [B<--compiler>=I<str>|B<-C>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--core>] [B<--core-or-pp>] [B<--data-file-type>=I<str>] [B<--data-file>=I<str>] [B<--data-with-result>|B<-d>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-file>=I<str>] [B<--multiple-data>=I<any>|B<--multiple-data-json>=I<json>] [B<--(no)naked-res>] [B<--no-env>] [B<--no-modules>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pp>] [B<--return-type>=I<str>|B<--bool>|B<--bool-val>|B<--full>|B<-r>=I<str>|B<--str-val>] [B<--schema-file-type>=I<str>|B<-t>=I<str>] [B<--schema-file>=I<str>|B<-f>=I<str>] [B<--schema-module>=I<str>|B<-m>=I<str>] [B<--show-code>|B<-c>] [B<--show-raw-compile>|B<-R>] [B<--show-schema>|B<-s>] [B<--with-debug>] -- [I<schema>] [I<data>]
 
-% B<validate-with-sah> [B<--compiler>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--core>] [B<--core-or-pp>] [B<--data-file-type>=I<str>] [B<--data-file>=I<str>] [B<--data-with-result>|B<-d>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-file>=I<str>] [B<--multiple-data>=I<any>] [B<--(no)naked-res>] [B<--no-env>] [B<--no-modules>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pp>] [B<--return-type>=I<str>] [B<--schema-file-type>=I<str>] [B<--schema-file>=I<str>] [B<--schema-module>=I<str>] [B<--show-code>|B<-c>] [B<--show-raw-compile>|B<-R>] [B<--show-schema>|B<-s>] [B<--with-debug>] [B<--multiple-data-json>=I<json>] [B<-C>=I<str>] [B<--bool>|B<--bool-val>|B<--full>|B<-r>=I<str>|B<--str-val>] [B<-f>=I<str>] [B<-m>=I<str>] [B<-t>=I<str>] -- [I<schema>] [I<data>]
 
-Examples:
 
-Should succeed and return empty string:
-
- % validate-with-sah '"int*"' 42
- 
-Should show an error message because "x" is not int:
-
- % validate-with-sah '"int*"' '"x"'
- Not of type integer
-
-Validate multiple data, should return "", 1, "":
-
- % validate-with-sah '["int","min",1,"max",10]' --multiple-data-json '[-4,7,15]' --return-type bool
- ["", 1, ""]
-
-Show data alongside with result, in a table:
-
- % validate-with-sah '["int","min",1,"max",10]' --multiple-data-json '[-4,7,15]' -d
- [
-   { data => -4, result => "Must be at least 1" },
-   { data => 7, result => "" },
-   { data => 15, result => "Must be at most 10" },
- ]
-
-Show validator Perl code only, with line number:
-
- % validate-with-sah '["int","min",1,"max",10]' -c -l
-    1|do {
-    2|    no warnings ('void');
-    3|    require Scalar::Util::Numeric;
-    4|    sub {
-    5|        my ($data) = @_;
-    6|        my $err_data;
-    7|        my $_sahv_res = 
-     |        
-    9|            # skip if undef
-   10|            (!defined($data) ? 1 : 
-     |            
-   12|            (# check type 'int'
-   13|            ((Scalar::Util::Numeric::isint($data)) ? 1 : (($err_data //= "Not of type integer"),0))
-     |            
-   15|            &&
-     |            
-   17|            (# clause: min
-   18|            (($data >= 1) ? 1 : (($err_data //= "Must be at least 1"),0)))
-     |            
-   20|            &&
-     |            
-   22|            (# clause: max
-   23|            (($data <= 10) ? 1 : (($err_data //= "Must be at most 10"),0)))));
-     |        
-   25|        ($err_data //= "");
-     |        
-   27|        return($err_data);
-   28|    }}
-
-Show validator JavaScript code:
-
- % validate-with-sah '["int","min",1,"max",10]' -c -C js
- function(data) {
-     var err_data = null;
-     var tmp_data = [];
-     var _sahv_res = 
-     
-         // skip if undef
-         (!!(data === undefined || data === null) ? true : 
-         
-         (// check type 'int'
-         ((typeof(data)=='number' && Math.round(data)==data || parseInt(data)==data) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Not of type integer",0))
-         
-         &&
-         
-         // set temporary data term
-         ((tmp_data[0] = typeof(data)=='number' ? data : parseFloat(data)), true)
-         
-         &&
-         
-         (// clause: min
-         ((tmp_data[0] >= 1) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at least 1",0)))
-         
-         &&
-         
-         (// clause: max
-         ((tmp_data[0] <= 10) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at most 10",0)))
-         
-         &&
-         
-         // restore original data term
-         ((tmp_data).pop(), true)));
-     
-     err_data = !(err_data === undefined || err_data === null) ? err_data : "";
-     
-     return(err_data);
- }
-
-Show validator JS code only, with line number:
-
- % validate-with-sah '["int","min",1,"max",10]' -C js -c -l
-    1|function(data) {
-    2|    var err_data = null;
-    3|    var tmp_data = [];
-    4|    var _sahv_res = 
-     |    
-    6|        // skip if undef
-    7|        (!!(data === undefined || data === null) ? true : 
-     |        
-    9|        (// check type 'int'
-   10|        ((typeof(data)=='number' && Math.round(data)==data || parseInt(data)==data) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Not of type integer",0))
-     |        
-   12|        &&
-     |        
-   14|        // set temporary data term
-   15|        ((tmp_data[0] = typeof(data)=='number' ? data : parseFloat(data)), true)
-     |        
-   17|        &&
-     |        
-   19|        (// clause: min
-   20|        ((tmp_data[0] >= 1) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at least 1",0)))
-     |        
-   22|        &&
-     |        
-   24|        (// clause: max
-   25|        ((tmp_data[0] <= 10) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at most 10",0)))
-     |        
-   27|        &&
-     |        
-   29|        // restore original data term
-   30|        ((tmp_data).pop(), true)));
-     |    
-   32|    err_data = !(err_data === undefined || err_data === null) ? err_data : "";
-     |    
-   34|    return(err_data);
-   35|}
-
-Load schema from file:
-
- % validate-with-sah -f schema1.json '["data"]'
-
-Load schema and data from file:
-
- % validate-with-sah -f schema1.json --multiple-data-file datafile --data-file-type json
+See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
@@ -685,15 +546,39 @@ Don't validate data, show normalized schema only.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 Can be specified multiple times.
 
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
 =item B<--no-config>
 
 Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
 
 =back
 
@@ -731,7 +616,7 @@ Can also be specified as the 2nd command-line argument.
 
 Retrieve multiple data from file.
 
-This is like `data_file` except that for multiple data. Data must be an array.
+This is like C<data_file> except that for multiple data. Data must be an array.
 
 
 =item B<--multiple-data-json>=I<s>
@@ -754,6 +639,10 @@ Validate multiple data (array of data) against schema.
 
 Do not read environment for default options.
 
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
 =back
 
 =head2 Logging options
@@ -767,6 +656,17 @@ Shortcut for --log-level=debug.
 =item B<--log-level>=I<s>
 
 Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<fatal>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--quiet>
 
@@ -801,6 +701,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -815,24 +721,33 @@ When outputing as JSON, add result envelope.
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -1004,7 +919,7 @@ naked for simpler output.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/validate-with-sah.conf>, F<~/validate-with-sah.conf>, or F</etc/validate-with-sah.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/validate-with-sah.conf>, F</home/u1/validate-with-sah.conf>, or F</etc/validate-with-sah.conf>.
 
 All found files will be read and merged.
 
@@ -1060,17 +975,160 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 VALIDATE_WITH_SAH_OPT => str
+=head2 VALIDATE_WITH_SAH_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/validate-with-sah.conf>
+=head2 /home/u1/.config/validate-with-sah.conf
 
-F<~/validate-with-sah.conf>
+=head2 /home/u1/validate-with-sah.conf
 
-F</etc/validate-with-sah.conf>
+=head2 /etc/validate-with-sah.conf
+
+=head1 EXAMPLES
+
+=head2 Should succeed and return empty string
+
+ % validate-with-sah '"int*"' 42
+ 
+=head2 Should show an error message because "x" is not int
+
+ % validate-with-sah '"int*"' '"x"'
+ Not of type integer
+
+=head2 Validate multiple data, should return "", 1, ""
+
+ % validate-with-sah '["int","min",1,"max",10]' --multiple-data-json '[-4,7,15]' --return-type bool
+ ["", 1, ""]
+
+=head2 Show data alongside with result, in a table
+
+ % validate-with-sah '["int","min",1,"max",10]' --multiple-data-json '[-4,7,15]' -d
+ [
+   { data => -4, result => "Must be at least 1" },
+   { data => 7, result => "" },
+   { data => 15, result => "Must be at most 10" },
+ ]
+
+=head2 Show validator Perl code only, with line number
+
+ % validate-with-sah '["int","min",1,"max",10]' -c -l
+    1|do {
+    2|    no warnings ('void');
+    3|    require Scalar::Util::Numeric;
+    4|    sub {
+    5|        my ($data) = @_;
+    6|        my $err_data;
+    7|        my $_sahv_res = 
+     |        
+    9|            # skip if undef
+   10|            (!defined($data) ? 1 : 
+     |            
+   12|            (# check type 'int'
+   13|            ((Scalar::Util::Numeric::isint($data)) ? 1 : (($err_data //= "Not of type integer"),0))
+     |            
+   15|            &&
+     |            
+   17|            (# clause: min
+   18|            (($data >= 1) ? 1 : (($err_data //= "Must be at least 1"),0)))
+     |            
+   20|            &&
+     |            
+   22|            (# clause: max
+   23|            (($data <= 10) ? 1 : (($err_data //= "Must be at most 10"),0)))));
+     |        
+   25|        ($err_data //= "");
+     |        
+   27|        return($err_data);
+   28|    }}
+
+=head2 Show validator JavaScript code
+
+ % validate-with-sah '["int","min",1,"max",10]' -c -C js
+ function(data) {
+     var err_data = null;
+     var tmp_data = [];
+     var _sahv_res = 
+     
+         // skip if undef
+         (!!(data === undefined || data === null) ? true : 
+         
+         (// check type 'int'
+         ((typeof(data)=='number' && Math.round(data)==data || parseInt(data)==data) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Not of type integer",0))
+         
+         &&
+         
+         // set temporary data term
+         ((tmp_data[0] = typeof(data)=='number' ? data : parseFloat(data)), true)
+         
+         &&
+         
+         (// clause: min
+         ((tmp_data[0] >= 1) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at least 1",0)))
+         
+         &&
+         
+         (// clause: max
+         ((tmp_data[0] <= 10) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at most 10",0)))
+         
+         &&
+         
+         // restore original data term
+         ((tmp_data).pop(), true)));
+     
+     err_data = !(err_data === undefined || err_data === null) ? err_data : "";
+     
+     return(err_data);
+ }
+
+=head2 Show validator JS code only, with line number
+
+ % validate-with-sah '["int","min",1,"max",10]' -C js -c -l
+    1|function(data) {
+    2|    var err_data = null;
+    3|    var tmp_data = [];
+    4|    var _sahv_res = 
+     |    
+    6|        // skip if undef
+    7|        (!!(data === undefined || data === null) ? true : 
+     |        
+    9|        (// check type 'int'
+   10|        ((typeof(data)=='number' && Math.round(data)==data || parseInt(data)==data) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Not of type integer",0))
+     |        
+   12|        &&
+     |        
+   14|        // set temporary data term
+   15|        ((tmp_data[0] = typeof(data)=='number' ? data : parseFloat(data)), true)
+     |        
+   17|        &&
+     |        
+   19|        (// clause: min
+   20|        ((tmp_data[0] >= 1) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at least 1",0)))
+     |        
+   22|        &&
+     |        
+   24|        (// clause: max
+   25|        ((tmp_data[0] <= 10) ? true : (err_data = !(err_data === undefined || err_data === null) ? err_data : "Must be at most 10",0)))
+     |        
+   27|        &&
+     |        
+   29|        // restore original data term
+   30|        ((tmp_data).pop(), true)));
+     |    
+   32|    err_data = !(err_data === undefined || err_data === null) ? err_data : "";
+     |    
+   34|    return(err_data);
+   35|}
+
+=head2 Load schema from file
+
+ % validate-with-sah -f schema1.json '["data"]'
+
+=head2 Load schema and data from file
+
+ % validate-with-sah -f schema1.json --multiple-data-file datafile --data-file-type json
 
 =head1 HOMEPAGE
 
@@ -1080,14 +1138,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-SahUti
 
 Source repository is at L<https://github.com/perlancar/perl-App-SahUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 To normalize a schema, you can also use L<normalize-sah-schema>.
@@ -1096,11 +1146,36 @@ To normalize a schema, you can also use L<normalize-sah-schema>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

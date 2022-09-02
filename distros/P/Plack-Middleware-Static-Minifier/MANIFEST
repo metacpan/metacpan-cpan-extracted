@@ -3,6 +3,7 @@ Changes
 lib/Plack/Middleware/Static/Minifier.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json
 META.yml
 README.pod
 share/face.jpg
@@ -12,6 +13,5 @@ share/try.js
 t/00_compile.t
 t/01_basic.t
 xt/01_perlcritic.t
-xt/02_pod.t
 xt/02_pod-coverage.t
-META.json
+xt/02_pod.t

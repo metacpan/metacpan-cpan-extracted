@@ -6,8 +6,8 @@ my $bt = q<https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Observable>;
 my %META = (
 	name        => 'Class-Observable',
 	author      => [ 'Aristotle Pagaltzis <pagaltzis@gmx.de>', 'Chris Winters' ],
-	license     => 'perl_5',
 	x_copyright => { holder => 'Aristotle Pagaltzis', year => 2021 },
+	license     => 'perl_5',
 	resources   => {
 		license    => [ 'http://dev.perl.org/licenses/' ],
 		repository => { type => 'git', url => "$sc.git", web => $sc },
@@ -51,7 +51,7 @@ my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;
 my $mymeta        = $eumm_version >= 6.57_02;
 my $mymeta_broken = $mymeta && $eumm_version < 6.57_07;
 
-(my $basepath = (-d 'lib' && 'lib/') . $META{name}) =~ s{-}{/}g;
+(my $basepath = (-d 'lib' ? 'lib/' : '') . $META{name}) =~ s{-}{/}g;
 
 ($MM_ARGS{NAME} = $META{name}) =~ s/-/::/g;
 $MM_ARGS{VERSION_FROM} = "$basepath.pm";

@@ -10,7 +10,7 @@ use Alien::Build::Plugin::Fetch::LWP;
 use Alien::Build::Plugin::Decode::HTML;
 
 # ABSTRACT: Alien::Build plugin to rewrite network requests to local resources
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub init
@@ -43,7 +43,7 @@ sub init
         $url = "$copy";
       }
     }
-    
+
     return $f->($build, $url);
   });
 }
@@ -62,7 +62,7 @@ Alien::Build::Plugin::Fetch::Rewrite - Alien::Build plugin to rewrite network re
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -72,10 +72,10 @@ In your ~/.alienbuild/rc.pl:
  
  sub rewrite {
    my($build, $uri) = @_;
-   
+ 
    # $build isa Alien::Build
    # $uri isa URI
-   
+ 
    if($uri->host eq 'ftp.gnu.org')
    {
      # if we see a request to ftp.gnu.org (either ftp or http)
@@ -119,7 +119,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

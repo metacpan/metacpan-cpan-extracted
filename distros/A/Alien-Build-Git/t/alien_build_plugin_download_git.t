@@ -9,6 +9,17 @@ use Repo;
 skip_all 'Test requires Sort::Versions'
   unless eval { require Sort::Versions; 1 };
 
+# This module is not compatible with check_digest.  It does not connect to the internet
+# in testing, only using file URLs
+if(defined $ENV{ALIEN_DOWNLOAD_RULE} && $ENV{ALIEN_DOWNLOAD_RULE} eq 'digest_and_encrypt')
+{
+  $ENV{ALIEN_DOWNLOAD_RULE} = 'digest_or_encrypt';
+}
+elsif(defined $ENV{ALIEN_DOWNLOAD_RULE} && $ENV{ALIEN_DOWNLOAD_RULE} eq 'digest')
+{
+  $ENV{ALIEN_DOWNLOAD_RULE} = 'warn';
+}
+
 my $build = alienfile_ok q{
   use alienfile;
 

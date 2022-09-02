@@ -3,13 +3,15 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::SV 0.47;
+package Devel::MAT::SV 0.48;
 
 use v5.14;
 use warnings;
 
 use Carp;
 use Scalar::Util qw( weaken );
+
+use Syntax::Keyword::Match;
 
 # Load XS code
 require Devel::MAT;
@@ -92,7 +94,7 @@ C<Devel::MAT::SV::> prefix.
 
 Returns the inner perl API type of the SV. This is one of
 
-   SV AV HV CV GV LV PVIO PVFM REGEXP INVLIST
+   SV AV HV CV GV LV PVIO PVFM REGEXP INVLIST OBJ
 
 =head2 desc
 
@@ -461,7 +463,7 @@ boolean true and false. They are
 
 =cut
 
-package Devel::MAT::SV::Immortal 0.47;
+package Devel::MAT::SV::Immortal 0.48;
 use base qw( Devel::MAT::SV );
 use constant immortal => 1;
 use constant basetype => "SV";
@@ -474,12 +476,12 @@ sub new {
 }
 sub _outrefs { () }
 
-package Devel::MAT::SV::UNDEF 0.47;
+package Devel::MAT::SV::UNDEF 0.48;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc { "UNDEF" }
 sub type { "UNDEF" }
 
-package Devel::MAT::SV::YES 0.47;
+package Devel::MAT::SV::YES 0.48;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc { "YES" }
 sub type { "SCALAR" }
@@ -492,7 +494,7 @@ sub pv { "1" }
 sub rv { undef }
 sub is_weak { '' }
 
-package Devel::MAT::SV::NO 0.47;
+package Devel::MAT::SV::NO 0.48;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc { "NO" }
 sub type { "SCALAR" }
@@ -505,7 +507,7 @@ sub pv { "0" }
 sub rv { undef }
 sub is_weak { '' }
 
-package Devel::MAT::SV::Unknown 0.47;
+package Devel::MAT::SV::Unknown 0.48;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 0xff );
 
@@ -513,7 +515,7 @@ sub desc { "UNKNOWN" }
 
 sub _outrefs {}
 
-package Devel::MAT::SV::GLOB 0.47;
+package Devel::MAT::SV::GLOB 0.48;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 1 );
 use constant $CONSTANTS;
@@ -699,7 +701,7 @@ sub _more_saved
    push @{ $self->{saved} }, [ $slot => $addr ];
 }
 
-package Devel::MAT::SV::SCALAR 0.47;
+package Devel::MAT::SV::SCALAR 0.48;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 2 );
 use constant $CONSTANTS;
@@ -860,7 +862,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::REF 0.47;
+package Devel::MAT::SV::REF 0.48;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 3 );
 use constant $CONSTANTS;
@@ -951,7 +953,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::BOOL 0.47;
+package Devel::MAT::SV::BOOL 0.48;
 use base qw( Devel::MAT::SV::SCALAR );
 
 sub type { return "BOOL" }
@@ -963,7 +965,7 @@ sub desc
    return "BOOL(NO)";
 }
 
-package Devel::MAT::SV::ARRAY 0.47;
+package Devel::MAT::SV::ARRAY 0.48;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 4 );
 use constant $CONSTANTS;
@@ -1119,7 +1121,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::PADLIST 0.47;
+package Devel::MAT::SV::PADLIST 0.48;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PADLIST";
@@ -1167,7 +1169,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::PADNAMES 0.47;
+package Devel::MAT::SV::PADNAMES 0.48;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PADNAMES";
@@ -1250,7 +1252,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::PAD 0.47;
+package Devel::MAT::SV::PAD 0.48;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PAD";
@@ -1360,7 +1362,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::HASH 0.47;
+package Devel::MAT::SV::HASH 0.48;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 5 );
 use constant $CONSTANTS;
@@ -1541,7 +1543,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::STASH 0.47;
+package Devel::MAT::SV::STASH 0.48;
 use base qw( Devel::MAT::SV::HASH );
 __PACKAGE__->register_type( 6 );
 use constant $CONSTANTS;
@@ -1680,7 +1682,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::CODE 0.47;
+package Devel::MAT::SV::CODE 0.48;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 7 );
 use constant $CONSTANTS;
@@ -1691,7 +1693,7 @@ use Carp;
 use List::Util 1.44 qw( uniq );
 
 use Struct::Dumb 0.07 qw( struct );
-struct Padname => [qw( name ourstash flags )];
+struct Padname => [qw( name ourstash flags fieldix fieldstash_at )];
 {
    no strict 'refs';
    *{__PACKAGE__."::Padname::is_outer"}  = sub { shift->flags & 0x01 };
@@ -1699,6 +1701,9 @@ struct Padname => [qw( name ourstash flags )];
    *{__PACKAGE__."::Padname::is_lvalue"} = sub { shift->flags & 0x04 };
    *{__PACKAGE__."::Padname::is_typed"}  = sub { shift->flags & 0x08 };
    *{__PACKAGE__."::Padname::is_our"}    = sub { shift->flags & 0x10 };
+
+   # Internal flags, not appearing in the file itself
+   *{__PACKAGE__."::Padname::is_field"}  = sub { shift->flags & 0x100 };
 }
 
 =head1 Devel::MAT::SV::CODE
@@ -1728,21 +1733,27 @@ sub load
    $self->{padnames} = [] if $df->{perlver} > ( ( 5 << 24 ) | ( 20 << 16 ) | 0xffff );
 
    while( my $type = $df->_read_u8 ) {
-      if   ( $type == 1 ) { push @{ $self->{consts_at} }, $df->_read_ptr }
-      elsif( $type == 2 ) { push @{ $self->{constix} }, $df->_read_uint }
-      elsif( $type == 3 ) { push @{ $self->{gvs_at} }, $df->_read_ptr }
-      elsif( $type == 4 ) { push @{ $self->{gvix} }, $df->_read_uint }
-      elsif( $type == 5 ) { my $padix = $df->_read_uint;
-                            $self->{padnames}[$padix] = _load_padname( $df ); }
-      elsif( $type == 6 ) { # ignore - used to be padsvs_at
-                            $df->_read_uint; $df->_read_uint; $df->_read_ptr; }
-      elsif( $type == 7 ) { $self->_set_padnames_at( $df->_read_ptr ); }
-      elsif( $type == 8 ) { my $depth = $df->_read_uint;
-                            $self->{pads_at}[$depth] = $df->_read_ptr; }
-      elsif( $type == 9 ) { my $padix = $df->_read_uint;
-                            $self->{padnames}[$padix]->flags = $df->_read_u8; }
-      else {
-         die "TODO: unhandled CODEx type $type";
+      match( $type : == ) {
+         case( 1 ) { push @{ $self->{consts_at} }, $df->_read_ptr }
+         case( 2 ) { push @{ $self->{constix} }, $df->_read_uint }
+         case( 3 ) { push @{ $self->{gvs_at} }, $df->_read_ptr }
+         case( 4 ) { push @{ $self->{gvix} }, $df->_read_uint }
+         case( 5 ) { my $padix = $df->_read_uint;
+                     $self->{padnames}[$padix] = _load_padname( $df ); }
+         case( 6 ) { # ignore - used to be padsvs_at
+                     $df->_read_uint; $df->_read_uint; $df->_read_ptr; }
+         case( 7 ) { $self->_set_padnames_at( $df->_read_ptr ); }
+         case( 8 ) { my $depth = $df->_read_uint;
+                     $self->{pads_at}[$depth] = $df->_read_ptr; }
+         case( 9 )  { my $padname = $self->{padnames}[ $df->_read_uint ];
+                      $padname->flags = $df->_read_u8; }
+         case( 10 ) { my $padname = $self->{padnames}[ $df->_read_uint ];
+                      $padname->flags |= 0x100;
+                      $padname->fieldix = $df->_read_uint;
+                      $padname->fieldstash_at = $df->_read_ptr; }
+         default {
+            die "TODO: unhandled CODEx type $type";
+         }
       }
    }
 }
@@ -1751,7 +1762,7 @@ sub _load_padname
 {
    my ( $df ) = @_;
 
-   return Padname( $df->_read_str, $df->_read_ptr, 0 );
+   return Padname( $df->_read_str, $df->_read_ptr, 0, 0, 0 );
 }
 
 sub _fixup
@@ -1793,7 +1804,7 @@ sub _fixup
          my $padnamesv = $padnames->elem( $padix ) or next;
          $padnamesv->immortal and next; # UNDEF
 
-         $padnames[$padix] = Padname( $padnamesv->pv, $padnamesv->ourstash, 0 );
+         $padnames[$padix] = Padname( $padnamesv->pv, $padnamesv->ourstash, 0, 0, 0 );
       }
    }
 
@@ -2002,6 +2013,7 @@ The returned padname is a structure of the following fields:
  $bool = $padname->is_lvalue
  $bool = $padname->is_typed
  $bool = $padname->is_our
+ $bool = $padname->is_field
 
 =cut
 
@@ -2235,7 +2247,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::IO 0.47;
+package Devel::MAT::SV::IO 0.48;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 8 );
 use constant $CONSTANTS;
@@ -2309,7 +2321,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::LVALUE 0.47;
+package Devel::MAT::SV::LVALUE 0.48;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 9 );
 use constant $CONSTANTS;
@@ -2350,7 +2362,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::REGEXP 0.47;
+package Devel::MAT::SV::REGEXP 0.48;
 use base qw( Devel::MAT::SV );
 use constant basetype => "REGEXP";
 __PACKAGE__->register_type( 10 );
@@ -2361,7 +2373,7 @@ sub desc { "REGEXP()" }
 
 sub _outrefs { () }
 
-package Devel::MAT::SV::FORMAT 0.47;
+package Devel::MAT::SV::FORMAT 0.48;
 use base qw( Devel::MAT::SV );
 use constant basetype => "PVFM";
 __PACKAGE__->register_type( 11 );
@@ -2372,7 +2384,7 @@ sub desc { "FORMAT()" }
 
 sub _outrefs { () }
 
-package Devel::MAT::SV::INVLIST 0.47;
+package Devel::MAT::SV::INVLIST 0.48;
 use base qw( Devel::MAT::SV );
 use constant basetype => "INVLIST";
 __PACKAGE__->register_type( 12 );
@@ -2384,7 +2396,7 @@ sub desc { "INVLIST()" }
 sub _outrefs { () }
 
 # A hack to compress files
-package Devel::MAT::SV::_UNDEFSV 0.47;
+package Devel::MAT::SV::_UNDEFSV 0.48;
 use base qw( Devel::MAT::SV::SCALAR );
 __PACKAGE__->register_type( 13 );
 
@@ -2400,7 +2412,7 @@ sub load
    );
 }
 
-package Devel::MAT::SV::_YESSV 0.47;
+package Devel::MAT::SV::_YESSV 0.48;
 use base qw( Devel::MAT::SV::BOOL );
 __PACKAGE__->register_type( 14 );
 
@@ -2416,7 +2428,7 @@ sub load
    );
 }
 
-package Devel::MAT::SV::_NOSV 0.47;
+package Devel::MAT::SV::_NOSV 0.48;
 use base qw( Devel::MAT::SV::BOOL );
 __PACKAGE__->register_type( 15 );
 
@@ -2432,9 +2444,221 @@ sub load
    );
 }
 
+package Devel::MAT::SV::OBJECT 0.48;
+use base qw( Devel::MAT::SV );
+__PACKAGE__->register_type( 16 );
+use constant $CONSTANTS;
+use constant basetype => "OBJ";
+
+=head1 Devel::MAT::SV::OBJECT
+
+Represents an object instance; an SV of type C<SVt_PVOBJ>. These are only
+present in files from perls with C<feature 'class'>.
+
+=cut
+
+sub load
+{
+   my $self = shift;
+   my ( $header, $ptrs, $strs ) = @_;
+   my $df = $self->df;
+
+   my ( $n ) =
+      unpack "$df->{uint_fmt} a*", $header;
+
+   my @fields_at = $n ? $df->_read_ptrs( $n ) : ();
+   $self->_set_object_fields( \@fields_at );
+}
+
+=head2 fields
+
+   @svs = $obj->fields
+
+Returns all the values of all the fields in a list.
+
+Note that to find the names of the fields you'll have to enquire with the
+class
+
+=cut
+
+sub fields
+{
+   my $self = shift;
+
+   my $n = $self->n_fields;
+   return $n unless wantarray;
+
+   my $df = $self->df;
+   return map { $df->sv_at( $self->field_at( $_ ) ) } 0 .. $n-1;
+}
+
+=head2 field
+
+   $sv = $obj->field( $name_or_fieldix )
+
+Returns the value of the given field; which may be specified by name or
+index directly.
+
+=cut
+
+sub field
+{
+   my $self = shift;
+   my ( $name_or_fieldix ) = @_;
+
+   my $fieldix;
+   if( $name_or_fieldix =~ m/^\d+$/ ) {
+      $fieldix = $name_or_fieldix;
+   }
+   else {
+      $fieldix = $self->blessed->field( $name_or_fieldix )->fieldix;
+   }
+
+   return $self->df->sv_at( $self->field_at( $fieldix ) );
+}
+
+sub desc
+{
+   my $self = shift;
+
+   return "OBJ()";
+}
+
+sub _outrefs
+{
+   my $self = shift;
+   my ( $match, $no_desc ) = @_;
+
+   my $n = $self->n_fields;
+
+   my @outrefs;
+
+   foreach my $field ( $self->blessed->fields ) {
+      my $sv = $self->field( $field->fieldix ) or next;
+
+      my $name = $no_desc ? undef :
+         "the " . Devel::MAT::Cmd->format_note( $field->name, 1 ) . " field";
+      if( $match & STRENGTH_STRONG ) {
+         push @outrefs, $no_desc ? ( strong => $sv ) :
+            Devel::MAT::SV::Reference( $name, strong => $sv );
+      }
+      if( $match & STRENGTH_INDIRECT and $sv->type eq "REF" and !$sv->{magic} and my $rv = $sv->rv ) {
+         push @outrefs, $no_desc ? ( indirect => $rv ) :
+            Devel::MAT::SV::Reference( $name . " via RV", indirect => $rv );
+      }
+   }
+
+   return @outrefs;
+}
+
+package Devel::MAT::SV::CLASS 0.48;
+use base qw( Devel::MAT::SV::STASH );
+__PACKAGE__->register_type( 17 );
+use constant $CONSTANTS;
+
+use Struct::Dumb 0.07 qw( readonly_struct );
+readonly_struct Field => [qw( fieldix name )];
+
+use List::Util qw( first );
+
+=head1 Devel::MAT::SV::CLASS
+
+Represents a class; a sub-type of stash for implementing object classes. These
+are only present in files from perls with C<feature 'class'>.
+
+=cut
+
+sub load
+{
+   my $self = shift;
+   my ( $header, $ptrs, $strs ) = @_;
+   my $df = $self->df;
+
+   my ( $stash_bytes, $stash_ptrs, $stash_strs ) = @{ $df->{sv_sizes}[6] };
+
+   $self->SUPER::load(
+      substr( $header, 0, $stash_bytes, "" ),
+      [ splice @$ptrs, 0, $stash_ptrs ],
+      [ splice @$strs, 0, $stash_strs ],
+   );
+
+   @{$self}{qw( adjust_blocks_at )} =
+      @$ptrs;
+
+   while( my $type = $df->_read_u8 ) {
+      match( $type : == ) {
+         case( 1 ) { push @{ $self->{fields} }, [ $df->_read_uint, $df->_read_str ] }
+         default {
+            die "TODO: unhandled CLASSx type $type";
+         }
+      }
+   }
+}
+
+sub adjust_blocks { my $self = shift; return $self->df->sv_at( $self->{adjust_blocks_at} ) }
+
+=head2 fields
+
+   @fields = $class->fields
+
+Returns a list of the field definitions of the class, in declaration order.
+Each is a structure whose form is given below.
+
+=cut
+
+sub fields
+{
+   my $self = shift;
+   return map { Field( @$_ ) } @{ $self->{fields} };
+}
+
+=head2 field
+
+   $field = $class->field( $name_or_fieldix )
+
+Returns the field definition of the given field; which may be specified by
+name or index directly.
+
+The returned field is a structure of the following fields:
+
+   $fieldix = $field->fieldix
+   $name    = $field->name
+
+=cut
+
+sub field
+{
+   my $self = shift;
+   my ( $name_or_fieldix ) = @_;
+
+   if( $name_or_fieldix =~ m/^\d+$/ ) {
+      return first { $_->fieldix == $name_or_fieldix } $self->fields;
+   }
+   else {
+      return first { $_->name eq $name_or_fieldix } $self->fields
+   }
+}
+
+sub _outrefs
+{
+   my $self = shift;
+   my ( $match, $no_desc ) = @_;
+
+   my @outrefs = $self->SUPER::_outrefs( @_ );
+
+   if( $match & STRENGTH_STRONG ) {
+      if( my $sv = $self->adjust_blocks ) {
+         push @outrefs, $no_desc ? ( strong => $sv ) :
+            Devel::MAT::SV::Reference( "the ADJUST blocks AV", strong => $sv );
+      }
+   }
+
+   return @outrefs;
+}
+
 # A "SV" type that isn't really an SV, but has many of the same methods. These
 # aren't created by core perl, but are used by XS extensions
-package Devel::MAT::SV::C_STRUCT 0.47;
+package Devel::MAT::SV::C_STRUCT 0.48;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 0x7F );
 use constant $CONSTANTS;

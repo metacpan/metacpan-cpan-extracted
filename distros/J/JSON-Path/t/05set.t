@@ -21,13 +21,11 @@ terms as Perl itself.
 
 =cut
 
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
 use JSON::Path -all;
 
-use JSON;
-my $object = from_json(<<'JSON');
+use JSON::MaybeXS;
+my $object = decode_json(<<'JSON');
 {
 	"store": {
 		"book": [
@@ -69,12 +67,12 @@ JSON
 my $titles = '$.store.book[*].title';
 my $jpath  = JSON::Path->new($titles);
 
-is_deeply( [ $jpath->values($object) ],
+is( [ $jpath->values($object) ],
     [ "Sayings of the Century", "Sword of Honour", "Moby Dick", "The Lord of the Rings", ] );
 
 is( $jpath->set( $object => 'TBD', 2 ), 2, );
 
-is_deeply( [ $jpath->values($object) ], [ "TBD", "TBD", "Moby Dick", "The Lord of the Rings", ], );
+is( [ $jpath->values($object) ], [ "TBD", "TBD", "Moby Dick", "The Lord of the Rings", ], );
 
 my $author = '$.store.book[2].author';
 $jpath = JSON::Path->new($author);

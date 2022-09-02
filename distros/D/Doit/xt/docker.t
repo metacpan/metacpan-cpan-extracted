@@ -32,12 +32,10 @@ require FindBin;
 { no warnings 'once'; push @INC, "$FindBin::RealBin/../t"; }
 require TestUtil;
 
-require Doit::Extcmd;
+my $doit = Doit->init;
 
 plan skip_all => 'docker not in PATH'
-    if !Doit::Extcmd::is_in_path('docker');
-
-my $doit = Doit->init;
+    if !$doit->which('docker');
 
 my $name = 'doit-docker-component-test';
 eval {

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::NanonisTramea;
-$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.822';
+$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.823';
 #ABSTRACT: Nanonis Tramea
 
 use v5.20;
@@ -334,6 +334,8 @@ sub oneDSwp_Open {
 
 
 sub threeDSwp_AcqChsSet {
+  #Some issues with this function, calling Start too soon after it breakes software
+  #not sure whats happening, I am waiting for response :/
   my $self = shift;
   my $Number_of_Channels= shift;
   my $command_name = "3dswp.acqchsset";
@@ -345,6 +347,9 @@ sub threeDSwp_AcqChsSet {
   }
   $self->write(command=>$header.$body);
   $self->_end_of_com();
+  #This sleep here solves "some issue" with threeDSwp_AcqChsSet, 
+  #even if it sends a response baclo, software bhaves wierdly if another command is sent too soon
+  sleep(0.1);
 
 }
 
@@ -628,10 +633,11 @@ sub threeDSwp_StpCh1LimitsSet {
   my ($Start,$Stop)= @_;
   my $command_name= "3dswp.stpch1limitsset";
   my $bodysize = 8;
-  my $head= $self->nt_header($command_name,$bodysize,0);
+  my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_float32($Start);
   $body=$body.nt_float32($Stop);
   $self->write(command=>$head.$body);
+  $self->_end_of_com();
 }
 
 sub threeDSwp_StpCh1LimitsGet {
@@ -653,12 +659,13 @@ sub threeDSwp_StpCh1PropsSet {
   my ($Number_of_points,$Backward_sweep,$End_of_sweep_action,$End_of_sweep_arbitrary_value)= @_;
   my $command_name= "3dswp.stpch1propsset";
   my $bodysize = 16;
-  my $head= $self->nt_header($command_name,$bodysize,0);
+  my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Number_of_points);
   $body=$body.nt_int($Backward_sweep);
   $body=$body.nt_int($End_of_sweep_action);
   $body=$body.nt_float32($End_of_sweep_arbitrary_value);
   $self->write(command=>$head.$body);
+  $self->_end_of_com();
 }
 
 sub threeDSwp_StpCh1PropsGet {
@@ -719,6 +726,7 @@ sub threeDSwp_StpCh2SignalSet {
   $self->_end_of_com();
 }
 
+
 sub threeDSwp_StpCh2SignalGet {
   my $self = shift;
   my $command_name = "3dswp.stpch2signalget";
@@ -733,10 +741,11 @@ sub threeDSwp_StpCh2LimitsSet {
   my ($Start,$Stop)= @_;
   my $command_name= "3dswp.stpch2limitsset";
   my $bodysize = 8;
-  my $head= $self->nt_header($command_name,$bodysize,0);
+  my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_float32($Start);
   $body=$body.nt_float32($Stop);
   $self->write(command=>$head.$body);
+  $self->_end_of_com();
 }
 
 sub threeDSwp_StpCh2LimitsGet {
@@ -758,12 +767,13 @@ sub threeDSwp_StpCh2PropsSet {
   my ($Number_of_points,$Backward_sweep,$End_of_sweep_action,$End_of_sweep_arbitrary_value)= @_;
   my $command_name= "3dswp.stpch2propsset";
   my $bodysize = 16;
-  my $head= $self->nt_header($command_name,$bodysize,0);
+  my $head= $self->nt_header($command_name,$bodysize,1);
   my $body=nt_int($Number_of_points);
   $body=$body.nt_int($Backward_sweep);
   $body=$body.nt_int($End_of_sweep_action);
   $body=$body.nt_float32($End_of_sweep_arbitrary_value);
   $self->write(command=>$head.$body);
+  $self->_end_of_com();
 }
 
 sub threeDSwp_StpCh2PropsGet {
@@ -1548,13 +1558,6 @@ has _Session_Path => (
     default => ''
 );
 
-has _Host_Data_Path => (
-    is => 'rw',
-    isa => 'Str',
-    reader => 'Host_Data_Path',
-    writer =>  '_Host_Data_Path'
-);
-
 has sweep_prop_configuration => (
     is=>'rw',
     isa => 'HashRef',
@@ -1572,6 +1575,65 @@ sub _build_sweep_prop_configuration {
   $hash{at_end}=-1;
   $hash{at_end_val}=0;
   $hash{save_all}=-1;
+  return \%hash;
+}
+#This is needed due to the contraint on Stp Channel2
+
+has signals => (
+    is=>'ro',
+    isa => 'HashRef',
+    reader => "signals",
+    builder => '_signals_builder',
+);
+
+sub _signals_builder {
+  my $self = shift;
+  my %hash;
+  $hash{0}="Plunger Gate (V)";
+  $hash{1}="Source-Drain (V)";
+  $hash{2}="Left Gate (V)";
+  $hash{3}="Right Gate (V)";
+  $hash{4}="Output 5 (V)";
+  $hash{5}="Output 6 (V)";
+  $hash{6}="Output 7 (V)";
+  $hash{7}="Output 8 (V)";
+  return \%hash;
+
+}
+
+has step1_prop_configuration => (
+    is=>'rw',
+    isa => 'HashRef',
+    reader => 'step1_prop_configuration',
+    writer => '_step1_prop_configuration',
+    builder => '_build_step1_prop_configuration',
+);
+
+sub _build_step1_prop_configuration {
+  my $self = shift;
+  my %hash;
+  $hash{point_number}=0;
+  $hash{backwards}=-1;
+  $hash{at_end}=-1;
+  $hash{at_end_val}=0;
+  return \%hash;
+}
+
+has step2_prop_configuration => (
+    is=>'rw',
+    isa => 'HashRef',
+    reader => 'step2_prop_configuration',
+    writer => '_step2_prop_configuration',
+    builder => '_build_step2_prop_configuration',
+);
+
+sub _build_step2_prop_configuration {
+  my $self = shift;
+  my %hash;
+  $hash{point_number}=0;
+  $hash{backwards}=-1;
+  $hash{at_end}=-1;
+  $hash{at_end_val}=0;
   return \%hash;
 }
 
@@ -1740,6 +1802,89 @@ sub sweep_prop_configure {
                                  $params{save_all});  
 }
 
+sub step1_prop_configure {
+  my $self= shift;
+  my %params =  validated_hash(
+  \@_,
+  point_number =>{isa=>"Int", optional=>1},
+  backwards =>{isa=>"Int", optional =>1},
+  at_end=> {isa => "Int", optional =>1}, 
+  at_end_val =>{isa =>"Num", optional =>1}
+  );
+
+  if(!exists($params{point_number})){
+    $params{point_number}=$self->step1_prop_configuration()->{point_number};
+  }
+  if(!exists($params{backwards})){
+    $params{backwards}=$self->step1_prop_configuration()->{backwards};
+  }
+  if(!exists($params{at_end})){
+    $params{at_end}=$self->step1_prop_configuration()->{at_end};
+  }
+  if(!exists($params{at_end_val})){
+    $params{at_end_val}=$self->step1_prop_configuration()->{at_end_val};
+  }
+
+  if($params{point_number}<0){
+    die "Invalid point_number value in step1_prop_configure: value must be greater or equal to 0!";
+  }
+  if($params{backwards}!=-1 && $params{backwards}!=0 && $params{backwards}!=1){
+    die "Invalid backwards value in step1_prop_configure: value -1,0 or 1";
+  }
+  if($params{at_end}!=-1 && $params{at_end}!=0 && $params{at_end}!=1 && $params{at_end}!=2){
+    die "Invalid backwards value in step1_prop_configure: value -1,0,1 or 2";
+  }
+
+  $self->_step1_prop_configuration(\%params);
+  $self->threeDSwp_StpCh1PropsSet($params{point_number},
+                                  $params{backwards},
+                                  $params{at_end},
+                                  $params{at_end_val});  
+}
+
+sub step2_prop_configure {
+  my $self= shift;
+  my %params =  validated_hash(
+  \@_,
+  point_number =>{isa=>"Int", optional=>1},
+  backwards =>{isa=>"Int", optional =>1},
+  at_end=> {isa => "Int", optional =>1}, 
+  at_end_val =>{isa =>"Num", optional =>1}
+  );
+
+  if(!exists($params{point_number})){
+    $params{point_number}=$self->step1_prop_configuration()->{point_number};
+  }
+  if(!exists($params{backwards})){
+    $params{backwards}=$self->step1_prop_configuration()->{backwards};
+  }
+  if(!exists($params{at_end})){
+    $params{at_end}=$self->step2_prop_configuration()->{at_end};
+  }
+  if(!exists($params{at_end_val})){
+    $params{at_end_val}=$self->step2_prop_configuration()->{at_end_val};
+  }
+
+  if($params{point_number}<0){
+    die "Invalid point_number value in step2_prop_configure: value must be greater or equal to 0!";
+  }
+
+  if($params{backwards}!=-1 && $params{backwards}!=0 && $params{backwards}!=1){
+    die "Invalid backwards value in step2_prop_configure: value -1,0 or 1";
+  }
+
+  if($params{at_end}!=-1 && $params{at_end}!=0 && $params{at_end}!=1 && $params{at_end}!=2){
+    die "Invalid backwards value in step2_prop_configure: value -1,0,1 or 2";
+  }
+
+  $self->_step2_prop_configuration(\%params);
+  $self->threeDSwp_StpCh2PropsSet($params{point_number},
+                                  $params{backwards},
+                                  $params{at_end},
+                                  $params{at_end_val});  
+}
+
+# Deprecate after expanding to 3D
 sub sweep1D {
   my ($self, %params) = validated_hash(
     \@_,
@@ -1774,6 +1919,133 @@ sub sweep1D {
   while($self->threeDSwp_StatusGet()!=0 && $self->threeDSwp_StatusGet()!=2)
   {
     sleep(0.5);
+  }
+  #Note: Delay Between response and successfull file creation,may be due to VM setup
+}
+
+sub sweep {
+  my ($self, %params) = validated_hash(
+    \@_,
+    sweep_channel => {isa => "Int"},
+    step1_channel => {isa => "Int", optional=>1},
+    step2_channel => {isa => "Int", optional=>1},
+    aquisition_channels => {isa=>"ArrayRef[Int]"},
+    lower_limit_sweep =>{isa=>"Num"},
+    upper_limit_sweep =>{isa=>"Num"},
+    lower_limit_step1 =>{isa=>"Num",optional=>1},
+    upper_limit_step1 =>{isa=>"Num",optional=>1},
+    lower_limit_step2 =>{isa=>"Num",optional=>1},
+    upper_limit_step2 =>{isa=>"Num",optional=>1},
+    point_number_sweep =>{isa=>"Int", optional=>1},
+    point_number_step1 =>{isa=>"Int", optional=>1},
+    point_number_step2 =>{isa=>"Int", optional=>1},
+    series_name => {isa=> "Str", optional=>1},
+    comment => {isa=>"Str", optional =>1}
+  );
+
+  # PARAMETER CONTROLL FOR Sweep Channel, Need to check for maximum channel?
+
+  if(exists($params{point_number_sweep}) && $params{point_number_sweep}!= $self->sweep_prop_configuration()->{point_number}){
+    #$self->sweep_prop_configure(point_number=>$params{point_number_sweep});
+  }
+  
+  #$self->threeDSwp_SwpChSignalSet($params{sweep_channel});
+  
+  # PARAMETER CONTROLL FOR Step channel 1
+  if(exists($params{step1_channel}))
+  {
+    if($params{step1_channel}>=0)
+     {
+       if(exists($params{point_number_step1}) && $params{point_number_step1}!= $self->step1_prop_configuration()->{point_number})
+       {
+          $self->step1_prop_configure(point_number=>$params{point_number_step1});
+       }
+
+       if(exists($params{lower_limit_step1}))
+       {
+
+        if(exists($params{upper_limit_step1}))
+        {
+          $self->threeDSwp_StpCh1SignalSet($params{step1_channel});
+          $self->threeDSwp_StpCh1LimitsSet($params{lower_limit_step1},$params{upper_limit_step1})
+        }
+        else
+        {
+          die "No upper limit supplied to Step Channel 1, upper_limit_step1";  
+        }
+
+       }
+       else
+       {
+        die "No lower limit supplied to Step Channel 1, lower_limit_step1";
+       }
+     }
+    else
+    {
+      die "Invalid value for step1_channel, value must be greter or equal  to 0!"
+    }     
+  }
+  else
+  {
+    $self->threeDSwp_StpCh1SignalSet(-1);
+  }
+  # PARAMETER CONTROLL FOR Step channel 2
+   if(exists($params{step2_channel}))
+  { 
+    if($params{step2_channel}>=0)
+     { 
+       if(exists($params{point_number_step2}) && $params{point_number_step2}!= $self->step2_prop_configuration()->{point_number})
+       {
+          #$self->step2_prop_configure(point_number=>$params{point_number_step2});
+       }
+
+       if(exists($params{lower_limit_step2}))
+       {
+
+        if(exists($params{upper_limit_step2}))
+        { 
+
+          $self->threeDSwp_StpCh2SignalSet($self->signals->{$params{step2_channel}});
+          $self->threeDSwp_StpCh2LimitsSet($params{lower_limit_step2},$params{upper_limit_step2})
+        }
+        else
+        {
+          die "No upper limit supplied to Step Channel 2, upper_limit_step2";  
+        }
+
+       }
+       else
+       {
+        die "No lower limit supplied to Step Channel 2, lower_limit_step2";
+       }
+     }
+    else
+    {
+      die "Invalid value for step2_channel, value must be greter or equal  to 0!"
+    }     
+  }
+  else
+  {
+    $self->threeDSwp_StpCh2SignalSet("");
+  }
+
+
+  # Needs a better solution here to not call Sweep Save configure twice
+  if(exists($params{series_name})&& $params{series_name} ne $self->sweep_save_configuration()->{series_name}){
+    $self->sweep_save_configure(series_name=>$params{series_name});
+  }
+
+  if(exists($params{comment})&& ($params{comment} ne $self->sweep_save_configuration()->{comment})){
+    $self->sweep_save_configure(comment=>$params{comment});
+  }
+  $self->threeDSwp_AcqChsSet(scalar(@{$params{aquisition_channels}}),@{$params{aquisition_channels}});
+  $self->threeDSwp_SwpChLimitsSet($params{lower_limit_sweep},$params{upper_limit_sweep});
+  $self->threeDSwp_Start();
+
+  #Not sure whats the best approach here.
+  while($self->threeDSwp_StatusGet()!=0 && $self->threeDSwp_StatusGet()!=2)
+  {
+    sleep(0.1);
   }
   #Note: Delay Between response and successfull file creation,may be due to VM setup
 }
@@ -1861,7 +2133,7 @@ Lab::Moose::Instrument::NanonisTramea - Nanonis Tramea
 
 =head1 VERSION
 
-version 3.822
+version 3.823
 
 =head1 SYNOPSIS
 

@@ -7,6 +7,17 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.016010	2022-08-31
+
+ [ Bug Fixes ]
+ - Fix an uninitialized warning when calling compile_named_oo outside a
+   sub.
+   Diab Jerius++
+
+ [ Documentation ]
+ - List which versions of Perl Type::Tiny requires in
+   Type::Tiny::Manual::Policies.
+
 1.016009	2022-08-27
 
  [ Bug Fixes ]

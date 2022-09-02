@@ -30,6 +30,7 @@ extends 'Business::GoCardless::Resource';
     links
     metadata
     reference
+    retry_if_possible
     status
 
 =cut
@@ -46,6 +47,7 @@ has [ qw/
     links
     metadata
     reference
+    retry_if_possible
     status
 / ] => (
     is => 'rw',

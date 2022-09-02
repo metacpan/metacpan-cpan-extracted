@@ -1,0 +1,77 @@
+=head1 NAME
+
+Doit::Util - utility functions for Doit
+
+=head1 SYNOPSIS
+
+    use Doit::Util;
+    use Doit::Util qw(in_directory new_scope_cleanup copy_stat get_sudo_cmd);
+
+=head1 DESCRIPTION
+
+=head2 FUNCTIONS
+
+=head3 in_directory
+
+    in_directory {
+       ... code ...
+    } $directory;
+
+Temporary change to the specified I<$directory> and execute the code
+in the enclosed block. After execution, the previous directory is
+restored. Dies if the specified I<$directory> does not exist.
+
+Note: commands like C<last> or C<return> apply to the enclosed block,
+not to the outer function. As this is confusing and the behavior may
+change it's best to avoid them.
+
+=head3 new_scope_cleanup
+
+    {
+        my $scope_cleanup = new_scope_cleanup(sub { say "This is printed when leaving the current block" });
+        ... code ...
+    }
+    # at this point the cleanups are executed
+
+Register a callback which is executed when leaving the current block
+E<0x2014> either at the end of the block, or when using C<return>, C<goto>
+or similar commands. Note that the return value of the
+C<new_scope_cleanup> needs to be assigned to a lexical variable E<0x2014> if
+this lexical variable goes out of scope, then the callback will be executed.
+
+=head3 copy_stat
+
+    copy_stat($source_file, $dest_file);
+    copy_stat($source_file, $dest_file, { ownership => 1, mode => 1, time => 1 });
+
+Copy file properties from I<$source_file> to I<$dest_file>. By
+default, all possible properties (ownership: owner and group; mode;
+time: atime and mtime) are copied, but this can be limitted by
+specifying a third parameter as shown above.
+
+If some of the properties cannot be copied, then just warnings will be
+issued.
+
+=head3 get_sudo_cmd
+
+Return an empty list if using C<sudo> is not required (i.e. the
+current user is the root user), otherwise returns a list with C<sudo>.
+Handy for writing commands like:
+
+    $doit->system(get_sudo_cmd(), 'apt-get', '-y', 'install', @missing_packages);
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2022 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Doit>, L<perlfunc/stat EXPR>, L<sudo(8)>.
+
+=cut

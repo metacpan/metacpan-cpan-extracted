@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Data-Sah-Filter-perl-Str-replace_dashes_with_underscores'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub meta {
     +{
@@ -57,7 +57,7 @@ Data::Sah::Filter::perl::Str::replace_dashes_with_underscores - Replace dashes i
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Sah::Filter::perl::Str::replace_dashes_with_underscores (from Perl distribution Data-Sah-Filter-perl-Str-replace_dashes_with_underscores), released on 2022-07-16.
+This document describes version 0.003 of Data::Sah::Filter::perl::Str::replace_dashes_with_underscores (from Perl distribution Data-Sah-Filter-perl-Str-replace_dashes_with_underscores), released on 2022-07-17.
 
 =head1 SYNOPSIS
 
@@ -89,9 +89,10 @@ This document describes version 0.002 of Data::Sah::Filter::perl::Str::replace_d
 
 =head1 DESCRIPTION
 
-Can be useful in schemas like Perl module name where you can type dasah (which
-does not require pressing the Shiff key in most keyboards) and later have the
-dash canonicalized to undersore.
+Can be useful in schemas like Perl module name (or any other identifier kind of
+schema which only allowes alphanumeric characters which include underscore but
+not dash) where you can type dasah (which does not require pressing the Shiff
+key in most keyboards) and later have the dash canonicalized to undersore.
 
 =head1 HOMEPAGE
 

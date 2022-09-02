@@ -1,5 +1,14 @@
 Revision history for Net-Statsd-Lite
 
+v0.6.3    2022-09-02 14:31:47+01:00 Europe/London
+  [Documentation]
+  - Bumped copyright year.
+
+  - Fixed encoding of links in the README.
+
+  [Other]
+  - Signed distribution.
+
 v0.6.2    2021-05-21 17:00:32+01:00 Europe/London
   [Documentation]
   - Fixed POD markup.

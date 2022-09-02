@@ -2,13 +2,13 @@ package Plack::Middleware::Static::Minifier;
 use strict;
 use warnings;
 use Plack::Util;
-use Plack::Util::Accessor qw/cache/;
+use Plack::Util::Accessor qw/cache no_minify/;
 use parent 'Plack::Middleware::Static';
 use CSS::Minifier::XS qw//;
 use JavaScript::Minifier::XS qw//;
 use Digest::MD5 qw/md5_hex/;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub call {
     my $self = shift;
@@ -27,7 +27,7 @@ sub call {
             if ($self->cache) {
                 my $key = md5_hex($env->{PATH_INFO});
                 unless ( my $cache = $self->cache->get($key) ) {
-                    $minified_body = _minify($ct, \$body);
+                    $minified_body = $self->_minify($ct, \$body);
                     $self->cache->set($key, @{$minified_body}[0]);
                 }
                 else {
@@ -35,7 +35,7 @@ sub call {
                 }
             }
             else {
-                $minified_body = _minify($ct, \$body);
+                $minified_body = $self->_minify($ct, \$body);
             }
             $res->[2] = $minified_body;
             $h->set('Content-Length', length $res->[2][0]);
@@ -50,10 +50,16 @@ sub call {
 }
 
 sub _minify {
-    my ($ct, $body_ref) = @_;
-    return ($ct =~ m!^css!)
-            ? [CSS::Minifier::XS::minify($$body_ref)]
-            : [JavaScript::Minifier::XS::minify($$body_ref)];
+    my ($self, $ct, $body_ref) = @_;
+
+    if ($self->no_minify) {
+        return [$$body_ref];
+    }
+    else {
+        return ($ct =~ m!^css!)
+                ? [CSS::Minifier::XS::minify($$body_ref)]
+                : [JavaScript::Minifier::XS::minify($$body_ref)];
+    }
 }
 
 1;
@@ -91,6 +97,18 @@ or you can cache minified content
             path  => qr{^/(js|css|images)/},
             root  => './htdocs/',
             cache => $cache;
+        $app;
+    };
+
+Also you can stop minifying by no_minify option
+
+    use Plack::Builder;
+
+    builder {
+        enable "Plack::Middleware::Static::Minifier",
+            path  => qr{^/(js|css|images)/},
+            root  => './htdocs/',
+            no_minify => $env_is_dev;
         $app;
     };
 

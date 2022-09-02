@@ -16,9 +16,9 @@ BEGIN {
 plan 'no_plan';
 
 use Doit;
-use Doit::Extcmd qw(is_in_path);
 
 sub slurp ($) { open my $fh, shift or die $!; local $/; <$fh> }
+sub _diff_available () { no warnings 'once'; defined $Doit::diff_cmd[0] }
 
 my $d = Doit->init;
 
@@ -61,7 +61,7 @@ my $dir = tempdir(CLEANUP => 1);
 	is $d->write_binary("$dir/test", "new testcontent\n"), 1, 'a change, changed content';
     };
     is $stdout, '';
-    if (is_in_path 'diff') {
+    if (_diff_available) {
 	like colorstrip($stderr), qr{^INFO: Replace existing file .*test with diff}, 'replace + diff';
     } else {
 	# On Windows, something like
@@ -77,7 +77,7 @@ my $dir = tempdir(CLEANUP => 1);
 	is $d->write_binary("$dir/test", "testcontent new\n"), 1, 'different content, same file size';
     };
     is $stdout, '';
-    if (is_in_path 'diff') {
+    if (_diff_available) {
 	like colorstrip($stderr), qr{^INFO: Replace existing file .*test with diff}, 'replace + diff';
     } else {
 	like colorstrip($stderr), qr{INFO:.*diff not available};

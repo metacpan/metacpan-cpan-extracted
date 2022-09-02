@@ -4,3 +4,6 @@ set -ex
 
 cip sudo apt-get update
 cip sudo apt-get -y install liblzo2-dev nettle-dev libarchive-dev libffi-dev
+
+cip exec mkdir -p /home/cip/tmp
+cip exec ./maint/cip-before-install-inside

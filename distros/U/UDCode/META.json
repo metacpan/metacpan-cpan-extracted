@@ -1,0 +1,52 @@
+{
+   "abstract" : "Does a set of code words form a uniquely decodable code?",
+   "author" : [
+      "Mark Jason Dominus"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "UDCode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Differences" : "0"
+         },
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=UDCode"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ap/UDCode.git",
+         "web" : "https://github.com/ap/UDCode"
+      }
+   },
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

@@ -14,7 +14,7 @@ use Number::Bytes::Human qw( format_bytes );
 
 # ABSTRACT: Command line interface to Alien::Build::Plugin::Fetch::Cache
 # PODNAME: abcache
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 my $opt_list;
@@ -61,7 +61,7 @@ if($opt_list)
 {
   recurse(sub {
     my($uri, $meta, $metafile) = @_;
-    
+
     my $size = 0;
     my $age  = 0;
     if($meta->{path})
@@ -74,7 +74,7 @@ if($opt_list)
       $size = do { use bytes; length $meta->{content} };
       $age  = -A $metafile;
     }
-    
+
     printf "%5s %5s %s\n", format_bytes($size), int($age), $uri;
   });
 }
@@ -92,16 +92,16 @@ elsif($opt_clear)
     my($uri, $meta, $metafile) = @_;
 
     my $dir = $metafile->parent;
-    
+
     if($meta->{path})
     {
       $rm->($meta->{path});
     }
-    
+
     $rm->($metafile);
-    
+
     $rmdir->($dir);
-    
+
   });
 }
 else
@@ -121,7 +121,7 @@ abcache - Command line interface to Alien::Build::Plugin::Fetch::Cache
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -161,7 +161,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

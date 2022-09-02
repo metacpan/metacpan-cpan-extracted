@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::InternalTools 0.47;
+package Devel::MAT::InternalTools 0.48;
 
 use v5.14;
 use warnings;
@@ -113,6 +113,7 @@ sub help_cmd
 
             if( my $type = $opt->{type} ) {
                $synopsis .= " INT" if $type eq "i";
+               $synopsis .= " STR" if $type eq "s";
             }
 
             [ $synopsis, $opt->{help} ],

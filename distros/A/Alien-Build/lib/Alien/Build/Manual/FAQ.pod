@@ -14,7 +14,7 @@ Alien::Build::Manual::FAQ - Frequently Asked Questions about Alien::Build
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 
@@ -527,7 +527,13 @@ L<https://github.com/PerlAlien/Alien-Build/issues>
 
 =head1 SEE ALSO
 
-L<Alien::Build>, L<Alien::Build::MM>, L<Alien::Build::Plugin>, L<alienfile>
+=over 4
+
+=item L<Alien::Build::Manual>
+
+Other L<Alien::Build> manuals.
+
+=back
 
 =head1 AUTHOR
 

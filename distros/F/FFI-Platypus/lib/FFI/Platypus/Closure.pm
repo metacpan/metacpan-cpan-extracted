@@ -12,7 +12,7 @@ use overload '&{}' => sub {
 }, bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Platypus closure object
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 
 sub new
@@ -67,7 +67,7 @@ sub unstick
 
 package FFI::Platypus::ClosureData;
 
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 1;
 
@@ -83,7 +83,7 @@ FFI::Platypus::Closure - Platypus closure object
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 SYNOPSIS
 

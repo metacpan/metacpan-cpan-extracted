@@ -1,74 +1,87 @@
-Revision history for HTML-Tiny
+Release history for HTML-Tiny
 
-0.1     2007-05-30
-        Initial release.
-    
-0.2     2007-05-30
-        More examples.
-        More documentation.
-        json_encode now uses Scalar::Util::looks_like_number to test for
-        numberness rather than the crappy re-based match.
-    
-0.3     2007-05-31
-        Added empty array ref => empty attribute functionality.
-    
-0.4     2007-05-31
-        Renamed to HTML::Tiny to avoid name clash with TOMC's module
-    
-0.5     2007-05-31
-        Made empty tags generate at least one tag pair.
-    
-0.6     2007-06-01
-        Added validate_tag subclassing hook.
-        Made it possible to specify the open/closed behaviour of tags.
-        Added auto-newline functionality, prefix/suffix specification.
-    
-0.7     2007-06-03
-        Removed non-core dependencies. Oops.
-    
-0.8     2007-06-03
-        Speeded up _str.
+1.07  Thu 01 Sep 2022
+	- No functional changes
+	- POD error fix
 
-0.9     2007-06-08
-        Made everything work with Perl 5.0.4.
+1.06  Wed 31 Aug 2022
+	- Updated packaging and package metadata
+	- Minimum Perl version requirement raised to 5.6
+	- New shortcut methods for HTML5 tags as well as previously missing tags:
+	  applet article aside audio bdi blink canvas center data datalist details
+	  dialog dir embed figcaption figure font footer header hgroup keygen main
+	  mark marquee menu menuitem meter nav nobr output picture portal progress
+	  rb rp rt rtc ruby s section slot source strike summary template time
+	  track u video wbr xmp
 
-0.10    2007-06-09
-        Reinstated Test::More based tests.
+1.05  Sun 08 Mar 2009
+	- Add support for TO_JSON in json_encode
 
-0.11    2007-07-17
-        Simplicate and add lightness. Removed a load of cruft that nobody will
-        ever use. The various set_ accessors are gone.
+1.04  Sat 07 Mar 2009
+	- Make link default to being closed [RT #40990]
 
-0.901
-        Really must work out what to do with version numbers.
+1.03  Thu 07 Aug 2008
+	- Forgot the Changelog for 1.02. Oops
 
-0.902   2007-09-25
-        Added recursion blocker to json_encode. Thanks to Yuval Kogman
-        for the suggestion.
+1.02  Thu 07 Aug 2008
+	- Added support for strict HTML output [RT #34378].
+	  Thanks JUERD and SIGZERO for the report and VRK for the patch
 
-0.903   2007-09-26
-        Added new deferred method call syntax.
+1.01  Tue 18 Dec 2007
+	- url_decode now handles uppercase hex correctly
 
-0.904   2007-10-23
-        Minor documentation fixes.
-        Fixed (invisible) bug in _set_auto arg handling.
+1.00  Tue 11 Dec 2007
+	- url_encode now encodes '~' as '~'
 
-1.00    2007-12-11
-        url_encode now encodes '~' as '~'.
+0.904 Tue 23 Oct 2007
+	- Minor documentation fixes
+	- Fixed (invisible) bug in _set_auto arg handling
 
-1.01    2007-12-18
-        url_decode now handles uppercase hex correctly.
+0.903 Wed 26 Sep 2007
+	- Added new deferred method call syntax
 
-1.02    2008-08-07
-        Added support for strict HTML output. Fixes #34378. Thanks JUERD
-        and SIGZERO for the report and VRK for the patch that fixes it.
+0.902 Tue 25 Sep 2007
+	- Added recursion blocker to json_encode.
+	  Thanks to Yuval Kogman for the suggestion
 
-1.03    2008-08-07
-        Forgot the Changelog for 1.02. Oops.
+0.901 Tue 17 Jul 2007
+	- Really must work out what to do with version numbers
 
-1.04    2009-03-07
-        Make link default to being closed. See #40990.
+0.11  Tue 17 Jul 2007
+	- Simplicate and add lightness. Removed a load of cruft that nobody will
+	  ever use. The various set_ accessors are gone
 
-1.05    2009-03-08
-        Add support for TO_JSON in json_encode.
+0.10  Sat 09 Jun 2007
+	- Reinstated Test::More based tests
 
+0.9  Fri 08 Jun 2007
+	- Perl 5.0.4 support
+
+0.8  Sun 03 Jun 2007
+	- Faster _str
+
+0.7  Sun 03 Jun 2007
+	- Removed non-core dependencies. Oops.
+
+0.6  Fri 01 Jun 2007
+	- Added validate_tag subclassing hook
+	- Made it possible to specify the open/closed behaviour of tags
+	- Added auto-newline functionality, prefix/suffix specification
+
+0.5  Thu 31 May 2007
+	- Made empty tags generate at least one tag pair
+
+0.4  Thu 31 May 2007
+	- Renamed to HTML::Tiny to avoid name clash with TOMC's module
+
+0.3  Thu 31 May 2007
+	- Added empty array ref => empty attribute functionality
+
+0.2  Wed 30 May 2007
+	- More examples
+	- More documentation
+	- json_encode now uses Scalar::Util::looks_like_number to test for
+	  numberness rather than the crappy RE-based match
+
+0.1  Wed 30 May 2007
+	- Initial release

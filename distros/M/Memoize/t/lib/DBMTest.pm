@@ -46,7 +46,7 @@ sub test_dbm { SKIP: {
 
 	untie %cache;
 
-	tie my %cache, $module, @_ or die $!;
+	tie %cache, $module, @_ or die $!;
 
 	# Now something tricky---we'll memoize c23 with the wrong table that
 	# has the 5 already cached.

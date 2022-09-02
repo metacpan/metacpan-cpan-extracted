@@ -14,7 +14,7 @@ Alien::Build::Plugin::Prefer - Prefer Alien::Build plugins
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,17 @@ plugin which will automatically load the appropriate Prefer plugins.
 
 =over 4
 
+=item L<Alien::Build::Plugin::Prefer::BadVersion>
+
+Filter out known bad versions from a candidate list.
+
+=item L<Alien::Build::Plugin::Prefer::GoodVersion>
+
+Require specific known good versions from a candidate list.
+
 =item L<Alien::Build::Plugin::Prefer::SortVersions>
+
+Sort candidates by version.
 
 =back
 

@@ -3,12 +3,6 @@
 
 This is Perl module B<Plack::Middleware::Static::Minifier>.
 
-=begin html
-
-<a href="http://travis-ci.org/bayashi/Plack-Middleware-Static-Minifier"><img src="https://secure.travis-ci.org/bayashi/Plack-Middleware-Static-Minifier.png"/></a>
-
-=end html
-
 
 =head1 INSTALLATION
 

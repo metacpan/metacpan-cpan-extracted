@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 
-use Test::More tests => 69;
+use Test::More tests => 71;
 
 use_ok('PLS');
+use_ok('PLS::JSON');
 use_ok('PLS::Server');
 
 use_ok('PLS::Server::Method::CompletionItem');
@@ -33,8 +34,11 @@ use_ok('PLS::Server::Request::Workspace::ApplyEdit');
 use_ok('PLS::Server::Request::Workspace::Configuration');
 use_ok('PLS::Server::Request::Workspace::DidChangeConfiguration');
 use_ok('PLS::Server::Request::Workspace::DidChangeWatchedFiles');
+use_ok('PLS::Server::Request::Workspace::DidChangeWorkspaceFolders');
 use_ok('PLS::Server::Request::Workspace::ExecuteCommand');
 use_ok('PLS::Server::Request::Workspace::Symbol');
+
+use_ok('PLS::Server::Request::Window::WorkDoneProgress::Create');
 
 use_ok('PLS::Server::Request::CancelRequest');
 use_ok('PLS::Server::Request::Factory');
@@ -42,6 +46,7 @@ use_ok('PLS::Server::Request::Initialize');
 use_ok('PLS::Server::Request::Initialized');
 use_ok('PLS::Server::Request::Shutdown');
 use_ok('PLS::Server::Request::Exit');
+use_ok('PLS::Server::Request::Progress');
 
 use_ok('PLS::Server::Response::Cancelled');
 use_ok('PLS::Server::Response::Completion');
@@ -62,9 +67,6 @@ use_ok('PLS::Server::Message');
 use_ok('PLS::Server::Request');
 use_ok('PLS::Server::Response');
 use_ok('PLS::Server::State');
-
-use_ok('PLS::Trie');
-use_ok('PLS::Trie::Node');
 
 use_ok('PLS::Parser::Document');
 use_ok('PLS::Parser::DocumentSymbols');

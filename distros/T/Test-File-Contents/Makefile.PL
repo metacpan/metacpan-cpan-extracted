@@ -27,6 +27,8 @@ my %META = (
 		test => {
 			requires => {qw(
 				Test::More 0.70
+				Test::Builder::Tester 0
+				Test::Builder::Tester::Color 0
 			)},
 		},
 	},

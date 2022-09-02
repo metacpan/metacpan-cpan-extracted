@@ -22,7 +22,7 @@ use Plack::Util::Accessor
 use Ref::Util qw/ is_coderef /;
 use Time::HiRes;
 
-our $VERSION = 'v0.6.0';
+our $VERSION = 'v0.6.1';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -211,7 +211,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.6.0
+version v0.6.1
 
 =head1 SYNOPSIS
 

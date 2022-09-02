@@ -8,7 +8,7 @@ use Path::Tiny ();
 use Alien::Build::Util qw( _mirror );
 
 # ABSTRACT: Core download plugin
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 sub _hook
@@ -84,6 +84,7 @@ sub _hook
       $path->spew_raw($res->{content});
       $build->install_prop->{download} = $path->stringify;
       $build->install_prop->{complete}->{download} = 1;
+      $build->install_prop->{download_detail}->{"$path"}->{protocol} = $res->{protocol} if defined $res->{protocol};
       return $build;
     }
     elsif($res->{path})
@@ -94,6 +95,7 @@ sub _hook
         {
           $build->install_prop->{download} = $res->{path};
           $build->install_prop->{complete}->{download} = 1;
+          $build->install_prop->{download_detail}->{$res->{path}}->{protocol} = $res->{protocol} if defined $res->{protocol};
         }
         else
         {
@@ -122,6 +124,7 @@ sub _hook
         }
         $build->install_prop->{download} = $to->stringify;
         $build->install_prop->{complete}->{download} = 1;
+        $build->install_prop->{download_detail}->{"$to"}->{protocol} = $res->{protocol} if defined $res->{protocol};
       }
       return $build;
     }
@@ -151,7 +154,7 @@ Alien::Build::Plugin::Core::Download - Core download plugin
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 

@@ -11,7 +11,7 @@ use Digest::MD5;
 use File::Glob qw( bsd_glob );
 
 # ABSTRACT: Alien::Build plugin to cache files downloaded from the internet
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 sub _local_file
@@ -29,14 +29,14 @@ sub _local_file
 sub init
 {
   my($self, $meta) = @_;
-  
+
   $meta->around_hook(
     fetch => sub {
       my($orig, $build, $url) = @_;
       my $local_file;
-      
-      my $cache_url = $url // $build->meta_prop->{plugin_download_negotiate_default_url};
-      
+
+      my $cache_url = $url // $build->meta_prop->{start_url};
+
       if($cache_url && $cache_url !~ m!^/!  && $cache_url !~ m!^file:!)
       {
         my $uri = URI->new($cache_url);
@@ -48,14 +48,14 @@ sub init
         }
       }
       my $res = $orig->($build, $url);
-      
+
       if(defined $local_file)
       {
         $local_file->parent->mkpath;
         if($res->{type} eq 'file')
         {
           my $md5 = Digest::MD5->new;
-          
+
           if($res->{content})
           {
             $md5->add($res->{content});
@@ -66,7 +66,7 @@ sub init
             $md5->addfile($fh);
             close $fh;
           }
-          
+
           my $data = Path::Tiny->new(bsd_glob '~/.alienbuild/plugin_fetch_cache/payload')
                      ->child($md5->hexdigest)
                      ->child($res->{filename});
@@ -76,6 +76,7 @@ sub init
             type     => 'file',
             filename => $res->{filename},
             path     => $data->stringify,
+            protocol => $res->{protocol},
           };
           if($res->{content})
           {
@@ -96,7 +97,7 @@ sub init
           $local_file->spew_raw( encode_sereal $res );
         }
       }
-      
+
       $res;
     }
   );
@@ -107,7 +108,7 @@ sub init
       prefer => sub {
         my($orig, $build, @rest) = @_;
         my $ret = $orig->($build, @rest);
-      
+
         if($ret->{type} eq 'list')
         {
           foreach my $file (@{ $ret->{list} })
@@ -143,7 +144,7 @@ Alien::Build::Plugin::Fetch::Cache - Alien::Build plugin to cache files download
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -187,7 +188,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

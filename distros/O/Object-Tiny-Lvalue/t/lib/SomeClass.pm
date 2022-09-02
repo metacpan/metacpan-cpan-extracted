@@ -1,5 +1,4 @@
-package # hide from PAUSE
-	SomeClass;
+package SomeClass;
 
 use Object::Tiny::Lvalue qw( foo bar );
 

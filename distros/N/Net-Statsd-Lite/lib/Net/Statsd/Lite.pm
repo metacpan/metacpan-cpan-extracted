@@ -22,7 +22,7 @@ use namespace::autoclean;
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.6.2';
+our $VERSION = 'v0.6.3';
 
 
 has host => (
@@ -227,7 +227,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.6.2
+version v0.6.3
 
 =head1 SYNOPSIS
 
@@ -505,7 +505,7 @@ Toby Inkster <tobyink@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

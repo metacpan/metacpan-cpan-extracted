@@ -1,6 +1,6 @@
 package CatalystX::RequestModel;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Class::Method::Modifiers;
 use Scalar::Util;
@@ -89,7 +89,12 @@ sub import {
 
     my $predicate;
     unless($opts{required}) {
-      $predicate = $opts{predicate} = "has_${attr}" unless exists($opts{predicate});
+      if(exists $opts{predicate}) {
+        $predicate = $opts{predicate};
+      } else {
+        $predicate = "__cx_req_model_has_${attr}";
+        $opts{predicate} = $predicate;
+      }
     }
 
     if(my $info = delete $opts{property}) {

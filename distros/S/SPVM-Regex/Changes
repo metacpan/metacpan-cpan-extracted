@@ -1,3 +1,7 @@
+0.13 2022-09-01
+  [Bug Fix]
+    * Fix the bug that replace_common don't work well in global replacement.
+  
 0.12 2022-08-18
   [New Features]
     * The match method of the Regex class can receive the offset and the length.

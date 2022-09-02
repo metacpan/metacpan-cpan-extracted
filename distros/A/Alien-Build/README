@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.59
+    version 2.66
 
 SYNOPSIS
 
@@ -54,6 +54,13 @@ DESCRIPTION
 
       This is for the brave souls who want to write plugins that will work
       with Alien::Build + alienfile.
+
+    Alien::Build::Manual::Security
+
+      If you are concerned that Aliens might be downloading tarballs off
+      the internet, then this is the place for you. This will discuss some
+      of the risks of downloading (really any) software off the internet
+      and will give you some tools to remediate these risks.
 
     Note that you will not usually create a Alien::Build instance directly,
     but rather be using a thin installer layer, such as Alien::Build::MM
@@ -157,6 +164,11 @@ PROPERTIES
       location. If not specified by your alienfile then it will be set to
       true.
 
+    check_digest
+
+      True if cryptographic digest should be checked when files are fetched
+      or downloaded. This is set by Digest negotiator plugin.
+
     destdir
 
       Some plugins (Alien::Build::Plugin::Build::Autoconf for example)
@@ -177,6 +189,31 @@ PROPERTIES
     destdir_ffi_filter
 
       Same as destdir_filter except applies to build_ffi instead of build.
+
+    digest
+
+      This properties contains the cryptographic digests (if any) that
+      should be used when verifying any fetched and downloaded files. It is
+      a hash reference where the key is the filename and the value is an
+      array reference containing a pair of values, the first being the
+      algorithm ('SHA256' is recommended) and the second is the actual
+      digest. The special filename * may be specified to indicate that any
+      downloaded file should match that digest. If there are both real
+      filenames and the * placeholder, the real filenames will be used for
+      filenames that match and any other files will use the placeholder.
+      Example:
+
+       $build->meta_prop->{digest} = {
+         'foo-1.00.tar.gz' => [ SHA256 => '9feac593aa49a44eb837de52513a57736457f1ea70078346c60f0bfc5f24f2c1' ],
+         'foo-1.01.tar.gz' => [ SHA256 => '6bbde6a7f10ae5924cf74afc26ff5b7bc4b4f9dfd85c6b534c51bd254697b9e7' ],
+         '*'               => [ SHA256 => '33a20aae3df6ecfbe812b48082926d55391be4a57d858d35753ab1334b9fddb3' ],
+       };
+
+      Cryptographic signatures will only be checked if the check_digest
+      meta property is set and if the Digest negotiator plugin is loaded.
+      (The Digest negotiator can be used directly, but is also loaded
+      automatically if you use the digest directive is used by the
+      alienfile).
 
     env
 
@@ -276,14 +313,35 @@ PROPERTIES
       The prefix as understood by autoconf. This is only different on
       Windows Where MSYS is used and paths like C:/foo are represented as
       /C/foo which are understood by the MSYS tools, but not by Perl. You
-      should only use this if you are using Alien::Build::Plugin::Autoconf
-      in your alienfile. This is set during before the build hook is run.
+      should only use this if you are using
+      Alien::Build::Plugin::Build::Autoconf in your alienfile. This is set
+      during before the build hook is run.
 
     download
 
       The location of the downloaded archive (tar.gz, or similar) or
       directory. This will be undefined until the archive is actually
       downloaded.
+
+    download_detail
+
+      This property contains optional details about a downloaded file. This
+      property is populated by Alien::Build core. This property is a hash
+      reference. The key is the path to the file that has been downloaded
+      and the value is a hash reference with additional detail. All fields
+      are optional.
+
+      digest
+
+	This, if available, with the cryptographic signature that was
+	successfully matched against the downloaded file. It is an array
+	reference with a pair of values, the algorithm (typically something
+	like SHA256) and the digest.
+
+      protocol
+
+	This, if available, will be the URL protocol used to fetch the
+	downloaded file.
 
     env
 
@@ -552,6 +610,45 @@ METHODS
     above for details). This method will call probe if it has not already
     been called.
 
+ download_rule
+
+     my $rule = $build->download_rule;
+
+    This returns install rule as a string. This is determined by the
+    environment and should be one of:
+
+    warn
+
+      Warn only if fetching via non secure source (secure sources include
+      https, and bundled files, may include other encrypted protocols in
+      the future).
+
+    digest
+
+      Require that any downloaded source package have a cryptographic
+      signature in the alienfile and that signature matches what was
+      downloaded.
+
+    encrypt
+
+      Require that any downloaded source package is fetched via secure
+      source.
+
+    digest_or_encrypt
+
+      Require that any downloaded source package is either fetched via a
+      secure source or has a cryptographic signature in the alienfile and
+      that signature matches what was downloaded.
+
+    digest_and_encrypt
+
+      Require that any downloaded source package is both fetched via a
+      secure source and has a cryptographic signature in the alienfile and
+      that signature matches what was downloaded.
+
+    The current default is warn, but in the near future this will be
+    upgraded to digest_or_encrypt.
+
  set_prefix
 
      $build->set_prefix($prefix);
@@ -627,7 +724,7 @@ METHODS
      my $res = $build->fetch($url, %options);
 
     Fetch a resource using the fetch hook. Returns the same hash structure
-    described below in the hook documentation.
+    described below in the fetch hook documentation.
 
     [version 2.39]
 
@@ -674,7 +771,7 @@ METHODS
      my $decoded_res = $build->decode($res);
 
     Decode the HTML or file listing returned by fetch. Returns the same
-    hash structure described below in the hook documentation.
+    hash structure described below in the decode hook documentation.
 
  prefer
 
@@ -682,7 +779,8 @@ METHODS
 
     Filter and sort candidates. The preferred candidate will be returned
     first in the list. The worst candidate will be returned last. Returns
-    the same hash structure described below in the hook documentation.
+    the same hash structure described below in the prefer hook
+    documentation.
 
  extract
 
@@ -862,6 +960,38 @@ ENVIRONMENT
 
     Alien::Build responds to these environment variables:
 
+    ALIEN_BUILD_LOG
+
+      The default log class used. See Alien::Build::Log and
+      Alien::Build::Log::Default.
+
+    ALIEN_BUILD_PKG_CONFIG
+
+      Override the logic in Alien::Build::Plugin::PkgConfig::Negotiate
+      which chooses the best pkg-config plugin.
+
+    ALIEN_BUILD_POSTLOAD
+
+      semicolon separated list of plugins to automatically load after
+      parsing your alienfile.
+
+    ALIEN_BUILD_PRELOAD
+
+      semicolon separated list of plugins to automatically load before
+      parsing your alienfile.
+
+    ALIEN_BUILD_RC
+
+      Perl source file which can override some global defaults for
+      Alien::Build, by, for example, setting preload and postload plugins.
+
+    ALIEN_DOWNLOAD_RULE
+
+      This value determines the rules by which types of downloads are
+      allowed. The legal values listed under "download_rule", plus default
+      which will be the default for the current version of Alien::Build.
+      For this version that default is warn.
+
     ALIEN_INSTALL_NETWORK
 
       If set to true (the default), then network fetch will be allowed. If
@@ -894,31 +1024,6 @@ ENVIRONMENT
       implementation of this, by its nature would have to be in the
       consuming CPAN module.
 
-    ALIEN_BUILD_LOG
-
-      The default log class used. See Alien::Build::Log and
-      Alien::Build::Log::Default.
-
-    ALIEN_BUILD_RC
-
-      Perl source file which can override some global defaults for
-      Alien::Build, by, for example, setting preload and postload plugins.
-
-    ALIEN_BUILD_PKG_CONFIG
-
-      Override the logic in Alien::Build::Plugin::PkgConfig::Negotiate
-      which chooses the best pkg-config plugin.
-
-    ALIEN_BUILD_PRELOAD
-
-      semicolon separated list of plugins to automatically load before
-      parsing your alienfile.
-
-    ALIEN_BUILD_POSTLOAD
-
-      semicolon separated list of plugins to automatically load after
-      parsing your alienfile.
-
     DESTDIR
 
       This environment variable will be manipulated during a destdir
@@ -933,7 +1038,7 @@ ENVIRONMENT
     ftp_proxy, all_proxy
 
       If these environment variables are set, it may influence the Download
-      negotiation plugin Alien::Build::Plugin::Downaload::Negotiate. Other
+      negotiation plugin Alien::Build::Plugin::Download::Negotiate. Other
       proxy variables may be used by some Fetch plugins, if they support
       it.
 

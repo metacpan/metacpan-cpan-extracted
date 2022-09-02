@@ -1,29 +1,25 @@
 package JSON::Path::Evaluator;
-$JSON::Path::Evaluator::VERSION = '0.431';
+$JSON::Path::Evaluator::VERSION = '1.0.1';
 use strict;
 use warnings;
-use 5.008;
 
 # ABSTRACT: A module that recursively evaluates JSONPath expressions with native support for Javascript-style filters
 
 use Carp;
 use Carp::Assert qw(assert);
-use Exporter::Tiny ();
 use JSON::MaybeXS;
 use JSON::Path::Constants qw(:operators :symbols);
 use JSON::Path::Tokenizer qw(tokenize);
-use List::Util qw/pairs/;
+use List::Util qw/pairs uniq/;
 use Readonly;
 use Safe;
 use Scalar::Util qw/looks_like_number blessed refaddr/;
 use Storable qw/dclone/;
-use Sys::Hostname qw/hostname/;
 use Try::Tiny;
 
 # VERSION
-use base q(Exporter);
+use Exporter::Shiny qw/evaluate_jsonpath/;
 our $AUTHORITY = 'cpan:POPEFELIX';
-our @EXPORT_OK = qw/ evaluate_jsonpath /;
 
 Readonly my $OPERATOR_IS_TRUE         => 'IS_TRUE';
 Readonly my $OPERATOR_TYPE_PATH       => 1;
@@ -126,8 +122,8 @@ sub evaluate {
 sub _reftable_walker {
     my ( $self, $json_object, $base_path ) = @_;
 
-    $base_path   = defined $base_path   ? $base_path   : '$';
-    $json_object = defined $json_object ? $json_object : $self->root;
+    $base_path   //= '$';
+    $json_object //= $self->root;
 
     my @entries = ( refaddr $json_object => $base_path );
 
@@ -161,7 +157,7 @@ sub _evaluate {    # This assumes that the token stream is syntactically valid
 
     return unless ref $obj;
 
-    $token_stream = defined $token_stream ? $token_stream : [];
+    $token_stream //= [];
 
     while ( defined( my $token = shift @{$token_stream} ) ) {
         next if $token eq $TOKEN_CURRENT;
@@ -477,33 +473,45 @@ sub _filter_recursive {
 }
 
 sub _process_pseudo_js {
-    my ( $self, $object, $expression ) = @_;
+    my ( $self, $object, $expressions ) = @_;
 
-    my ( $lhs, $operator, $rhs ) = _parse_psuedojs_expression($expression);
+    my @expressions_or = split /\Q||\E/, $expressions;
+    my @matching_or;
 
-    my (@token_stream) = tokenize($lhs);
+    foreach my $expression (@expressions_or) {
+        my @expressions_and = split /\Q&&\E/, $expression;
+        my %matching_and;
 
-    my $index;
+        foreach my $expression (@expressions_and) {
 
-    my @lhs;
-    if ( _hashlike($object) ) {
-        @lhs = map { $self->_evaluate( $_, [@token_stream] ) } values %{$object};
-    }
-    elsif ( _arraylike($object) ) {
-        for my $value ( @{$object} ) {
-            my ($got) = $self->_evaluate( $value, [@token_stream] );
-            push @lhs, $got;
+            my ( $lhs, $operator, $rhs ) = _parse_psuedojs_expression($expression);
+            $lhs =~ s/^\s+|\s+$//g;
+
+            my (@token_stream) = tokenize($lhs);
+
+            if ( _hashlike($object) ) {
+                while (my ($k, $v) = each(%$object)) {
+                  my @got = $self->_evaluate( $v, [@token_stream] );
+                  foreach my $got (@got) {
+                      $matching_and{$k}++ if _compare( $operator, $got, $rhs );
+                  }
+                }
+            }
+            elsif ( _arraylike($object) ) {
+                my $idx = 0;
+                for my $value ( @{$object} ) {
+                    my ($got) = $self->_evaluate( $value, [@token_stream] );
+                    $matching_and{$idx}++ if _compare( $operator, $got, $rhs );
+                    $idx++;
+                }
+            }
+        }
+        while (my ($idx, $val) = each(%matching_and)) {
+            push @matching_or, $idx if ($val == @expressions_and);
         }
     }
 
-    # get indexes that pass compare()
-    my @matching;
-    for ( 0 .. $#lhs ) {
-        my $val = $lhs[$_];
-        push @matching, $_ if _compare( $operator, $val, $rhs );
-    }
-
-    return @matching;
+    return sort(uniq(@matching_or));
 }
 
 sub _parse_psuedojs_expression {
@@ -646,7 +654,7 @@ JSON::Path::Evaluator - A module that recursively evaluates JSONPath expressions
 
 =head1 VERSION
 
-version 0.431
+version 1.0.1
 
 =head1 SYNOPSIS
 
@@ -832,7 +840,7 @@ child operator
 
 recursive descent. JSONPath borrows this syntax from E4X.
 
-=item '*' (literal asterisk)
+=item *
 
 wildcard. All objects/elements regardless their names.
 
@@ -914,7 +922,7 @@ Kit Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Kit Peters.
+This software is copyright (c) 2022 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

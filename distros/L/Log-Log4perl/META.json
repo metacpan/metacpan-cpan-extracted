@@ -59,10 +59,10 @@
       },
       "repository" : {
          "type" : "git",
-         "web" : "https://github.com/github.com/mschilli/log4perl"
+         "web" : "https://github.com/mschilli/log4perl"
       },
       "x_MailingList" : "mailto:log4perl-devel@lists.sourceforge.net"
    },
-   "version" : "1.55",
+   "version" : "1.56",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

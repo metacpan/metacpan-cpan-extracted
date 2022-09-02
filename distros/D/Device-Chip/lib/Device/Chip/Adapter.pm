@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.35;
 
-package Device::Chip::Adapter 0.22;
+package Device::Chip::Adapter 0.23;
 role Device::Chip::Adapter :repr(HASH) :compat(invokable);
 
 use utf8;
@@ -71,7 +71,7 @@ splits the options into an even-sized name/value list. It loads the class
 implied by the base name and invokes a method called C<new_from_description>
 on it. This is passed the even-sized name/value list obtained by splitting
 the option string. Any option named without a value will be passed having the
-value C<1>, as a convenience for options that are simple boolean flags.
+value true, as a convenience for options that are simple boolean flags.
 
 If the class does not provide the C<new_from_description> method (and of
 course, simply inheriting the base class one from here does not count), then

@@ -1,27 +1,34 @@
 {
-   "abstract" : "Auto-create Time::Piece objects from integer columns",
+   "abstract" : "Auto-create Time::Piece objects from integer (number of seconds since epoch) columns",
    "author" : [
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBIx-Class-InflateColumn-TimePiece",
    "prereqs" : {
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::BOM" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
          }
@@ -47,25 +54,27 @@
    "provides" : {
       "DBIx::Class::InflateColumn::TimePiece" : {
          "file" : "lib/DBIx/Class/InflateColumn/TimePiece.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece/issues"
+         "web" : "https://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece/issues"
       },
-      "homepage" : "http://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece",
+      "homepage" : "https://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece.git",
-         "web" : "http://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece"
+         "web" : "https://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
+      "H\u00e5kon H\u00e6gland <hakon.hagland@gmail.com>",
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

@@ -1,11 +1,18 @@
 # ControlBreak.pm - Compare values during iteration to detect changes
 
 # Done:
-# - switch from using say join to using printf in the Synopsis example
+# - change to use v5.26 to align with Object::Pad 0.66 requirements and avoid test failures
 
 # To Do:
 # - provide an accumulate method that counts and sums an arbitrary number of named variables
 
+
+########################################################################
+# perlcritic rules
+########################################################################
+
+## no critic [ProhibitVersionStrings]
+## no critic [RequirePodAtEnd]
 
 =head1 NAME
 
@@ -101,37 +108,27 @@ are no further calls to B<test()> as the loop ends.  It may be necessary,
 therefore, to do additional processing after the loop in order to
 handle the very last data group; e.g. to print a final set of subtotals.
 
-To simplify this situation, method B<test_and_do())> can be used in
+To simplify this situation, method B<test_and_do()> can be used in
 place of B<test()> and B<continue()>.
 
 =cut
-
-########################################################################
-# perlcritic rules
-########################################################################
-
-## no critic [ProhibitSubroutinePrototypes]
-
-# due to use of postfix dereferencing, we have to disable these warnings
-## no critic [References::ProhibitDoubleSigils]
-
-# perlcritic wants POD sections like VERSION, DIAGNOSTICS, CONFIGURATION AND ENVIRONMENT,
-# and INCOMPATIBILITIES.  But so far these are unneeded so we'll disable these warnings
-# here so that perlcritic gives the module a clean bill of health.
-
-## no critic (Documentation::RequirePodSections)
 
 ########################################################################
 # Libraries and Features
 ########################################################################
 use strict;
 use warnings;
-use v5.18;
+use v5.26;      # minimum perl necessary for Object::Pad 0.66
 
 use Object::Pad 0.66 qw( :experimental(init_expr) );
 
 package ControlBreak;
-class   ControlBreak 1.00;
+class   ControlBreak;
+
+# althouth Object::Pad allows a version argument on the class statement
+# we can't use it because we want Dist::Zilla to set it from the dist.ini
+# version -- and that requires it to be an 'our' statement.
+our $VERSION = 'v0.22.244';
 
 use Carp            qw(croak);
 
@@ -162,15 +159,15 @@ iteration loop has ended.  In the event that the data stream is empty
 and there were no iterations, then you can condition your final
 processing on iteration > 0.
 
-Note that B<interation> is incremented by B<test> (or <test_and_do>).
-Therefore, when called wihtin a loop it is effectively zero-based if
-referenced within the iteration block before B<test> is invoked, and
-then one-based after B<test>.
+Note that the B<interation> field is incremented by B<test()> (or
+B<test_and_do()>). Therefore, when called within a loop it is
+effectively zero-based if referenced within the iteration block
+before B<test()> is invoked, and then one-based after B<test()>.
 
 =head2 level_names
 
 A readonly field that provides a list of the level names that were
-provided as arguments to new().
+provided as arguments to B<new()>.
 
 =cut
 
@@ -180,7 +177,7 @@ provided as arguments to new().
 
 =head1 METHODS
 
-=head2 new ( <level_name> [, <level_name> ]... )
+=head2 new ( $level_name> [, $level_name> ]... )
 
 Create a new ControlBreak object.
 
@@ -192,14 +189,14 @@ numbers or underscores.
 A level name can also begin with a '+', which denotes that a numeric
 comparison will be used for the values processed at this level.
 
-The number of arguments to new() determines the number of control levels
-that will be monitored.  The variables provided to method test() must
-match in number and datatype to these operators.
+The number of arguments to B<new()> determines the number of control
+levels that will be monitored.  The variables provided to method
+test() must match in number and datatype to these operators.
 
-The order of the arguments corresponds to a hierachical level of
+The order of the arguments corresponds to a hierarchical level of
 control, from lowest to highest; i.e. the first argument corresponds
-to level 1, the second to level 2, etc.  This also corresponds
-to sort order, from minor to major, when iterating through a data stream.
+to level 1, the second to level 2, etc.  This also corresponds to
+sort order, from minor to major, when iterating through a data stream.
 
 =cut
 
@@ -241,10 +238,10 @@ BUILD {
 # Public methods
 ######################################################################
 
-=head2 break ( [ <level_name> ] )
+=head2 break ( [ $level_name ] )
 
-The B<break> method provides a convenient way to check whether the last
-invocation of the test method resulted in a control break, or a
+The B<break()> method provides a convenient way to check whether the
+last invocation of the test method resulted in a control break, or a
 control break greater than or equal to the <level_name> optionally
 provided as an argument.
 
@@ -253,12 +250,13 @@ there's a control break on level 1 (City), then invoking B<break()>
 will return 1 and therefore be treated as true within a condition.
 If there was no control break, then 0 (false) is returned.
 
-When invoked with a level name argument, B<break> will map the level name
-to a level number and compare it to the control break level determined
-by the last invocation of test().  If the tested control break level
-number is equal or higher than the argument level, then that level
-number is returned and, since it will be non-zero, treated as a true
-value within a condition.  Otherwise, zero (false) is returned.
+When invoked with a level name argument, B<break()> will map the
+level name to a level number and compare it to the control break
+level determined by the last invocation of test().  If the tested
+control break level number is equal or higher than the argument
+level, then that level number is returned and, since it will be
+non-zero, treated as a true value within a condition.  Otherwise,
+zero (false) is returned.
 
 Ultimately the point of this is that you can use it to write a series
 of actions, like printing subtotals and clearing subtotal variables,
@@ -302,20 +300,20 @@ method break ( $level_name=undef ) {
 
 =head2 comparison ( level_name => [ 'eq' | '==' | sub ] ... )
 
-The B<comparison> method accepts a hash which sets the comparison
+The B<comparison()> method accepts a hash which sets the comparison
 operations for the designated levels.  Keywords must match the level
-names provide in new().  Values can be '==' for numeric comparison,
+names provide in B<new()>.  Values can be '==' for numeric comparison,
 'eq' for alpha comparison, or anonymous subroutines.
 
 Anonymous subroutines must take two arguments, compare them in some
 fashion, and return a boolean. The first argument to the comparison
-routine will be the value passed to the test() method.  The second
+routine will be the value passed to the B<test()> method.  The second
 argument will be the corresponding value from the last iteration.
 
-All levels are provided with default comparison functions as determined
-by new().  This method is provided so you can change one or more of
-those defaults.  Any level name not referenced by keys in the
-argument list will be left unchanged.
+All levels are provided with default comparison functions as
+determined by B<new()>.  This method is provided so you can change
+one or more of those defaults.  Any level name not referenced by keys
+in the argument list will be left unchanged.
 
 Some handy comparison functions are:
 
@@ -339,19 +337,19 @@ method comparison (%h) {
     }
 }
 
-=head2 continue ()
+=head2 continue
 
-Saves the values most recently provided to the test() method so they
-can be compared to new values on the next iteration.
+Saves the values most recently provided to the B<test()> method so
+they can be compared to new values on the next iteration.
 
-On the next iteration these values will be accessible via the last()
-method.
+On the next iteration these values will be accessible via the
+B<last()> method.
 
-B<continue> is best invoked within the continue block of a loop, to
+B<continue()> is best invoked within the continue block of a loop, to
 make sure it isn't missed.
 
-B<continue> cannot be used in conjunction with B<test_and_do>, which
-internally calls B<test> and B<continue> for you.
+B<continue()> cannot be used in conjunction with B<test_and_do()>,
+which internally calls B<test> and B<continue()> for you.
 
 =cut
 
@@ -360,9 +358,9 @@ method continue () {
     $_continue_count++;
 }
 
-=head2 last ($level)
+=head2 last ( $level_name_or_number> )
 
-Returns the value (of the corresponding level) that was given to the
+For the corresponding level, returns the value that was given to the
 B<test()> method called prior to the most recent one.
 
 The argument can be a level name or a level number.
@@ -381,19 +379,20 @@ iterating through data and invoking test($x, $y) at each iteration,
 then invoking $cb->last('Y') on iteration 9 will returns the value of
 $y on iteration 8.
 
-Note that B<continue()> should not be invoked before last() within the
-scope of an iteration loop; i.e. continue() should be the last thing
-done before the next turn of the loop.
+Note that B<continue()> should not be invoked before B<last()> within
+the scope of an iteration loop; i.e. B<continue()> should be the last
+thing done before the next turn of the loop.
 
 =cut
 
-method last ($arg) {
+method last ($arg) {    ## no critic [ProhibitParensWithBuiltins]
     my $retval;
 
-    if ( $arg =~ m{ \A \d+ \Z }xms ) {
+    if ( $arg =~ m{ \A [1-9]\d* \Z }xms ) {
+        my $levidx = $arg - 1;
         croak '*E* invalid level number: ' . $arg
-            unless exists $_levname{$arg};
-        $retval = $_last_values[$arg];
+            unless exists $_levname{$levidx};
+    $retval = $_last_values[$levidx];
     } else {
         croak '*E* invalid level name: ' . $arg
             unless exists $_levidx{$arg};
@@ -405,7 +404,7 @@ method last ($arg) {
 
 =head2 levelname
 
-Return the level name for the most recent invocation of the B<test>
+Return the level name for the most recent invocation of the B<test()>
 method.
 
 =cut
@@ -416,8 +415,8 @@ method levelname () {
 
 =head2 levelnum
 
-Return the level number for the most recent invocation of the B<test>
-method.
+Return the level number for the most recent invocation of the
+B<test()> method.
 
 =cut
 
@@ -469,12 +468,12 @@ method level_numbers () {
 
 Resets the state of the object so it can be used again for another
 set of iterations using the same number and type of controls
-establish when the object was instantiated with new().  Any
+establish when the object was instantiated with B<new()>.  Any
 comparisons that were subsequently modified are retained.
 
 =cut
 
-method reset () {
+method reset () {   ## no critic [ProhibitParensWithBuiltins]
     $iteration          = 0;
     $_continue_count    = 0;
     $_test_levelnum     = 0;
@@ -492,20 +491,22 @@ Testing is done in reverse order, from highest to lowest (major to
 minor) and stops once a change is detected. Where it stops determines
 the control break level.  For example, if $var2 changed, method
 levelnum will return 2.  If $var2 did not change, but $var1 did, then
-method B<levelnum> will return 1.  If nothing changes, then
-B<levelnum> will return 0.
+method B<levelnum()> will return 1.  If nothing changes, then
+B<levelnum()> will return 0.
 
 Note that the level numbers set by B<test(...)> are true if there was
 a level change, and false if there wasn't.  So, they can be used as a
 simple boolean test of whether there was a change.  Or you can use
-the B<break> method to determine whether any control break has occured.
+the B<break()> method to determine whether any control break has
+occurred.
 
-Because level numbers correspond to the hierachy of data order, they
-can be use to trigger multiple actions; e.g. B<levelnum> >= 1 could be
-used to print subtotals for levels 1 whenever a control break occured
-for level 1, 2 or 3.  It is usually the case that higher control
-breaks are meant to cascade to lower control levels and this can be
-achieved in this fashion.  The B<break> method simplifies this.
+Because level numbers correspond to the hierarchical data order, they
+can be use to trigger multiple actions; e.g. B<levelnum()> >= 1 could
+be used to print subtotals for levels 1 whenever a control break
+occurred for level 1, 2 or 3.  It is usually the case that higher
+control breaks are meant to cascade to lower control levels and this
+can be achieved in this fashion.  The B<break()> method simplifies
+this.
 
 Note that method B<continue()> must be called at the end of each
 iteration in order to save the values of the iteration for the next
@@ -534,7 +535,8 @@ method test (@args) {
 
         # on the first iteration, make the last values match the current
         # ones so we don't detect any control break
-        $_last_values[$jj] //= $arg
+
+        $_last_values[$jj] //= $arg # uncoverable condition left
             if $iteration == 1;
 
         my $level_name = $_levname{$jj};
@@ -572,11 +574,11 @@ there is a control break, calls the anonymous subroutine provided in
 the last argument.  Typically, that code will perform work related to
 subtotals or other actions necessary when a control break occurs.
 
-But B<test_and_do> does one other thing.  It expects the last control
-variable ($var_end) to be an end of data indicator, such as the perl
-builtin operator B<eof>.  This indicator should return false on each
-iteration over the data until the very last iteration -- when it
-should change to true, thereby triggering a major control break.
+But B<test_and_do()> does one other thing.  It expects the last
+control variable ($var_end) to be an end of data indicator, such as
+the perl builtin operator B<eof>.  This indicator should return false
+on each iteration over the data until the very last iteration -- when
+it should change to true, thereby triggering a major control break.
 
 What test_and_do does then is to add an extra loop.  This simulates
 a final record and will trigger B<test()> to signal control breaks
@@ -585,13 +587,13 @@ every change of data AND after all data has been iterated over.
 
 This avoids the necessity of repeating the control break actions
 you've put inside the data loop immediately after the loop's closing
-bracket.  When you just use B<test> and B<continue>, an end-of-data
-control break won't occur and the simplist workaround is to just
+bracket.  When you just use B<test> and B<continue()>, an end-of-data
+control break won't occur and the simplest workaround is to just
 duplicate your control break code after the loops closing bracket.
 
 Here's a typical use case involving end of file processing.  Note the
 extra control level, named 'EOF', and the use of the B<eof> builtin
-function as the second last argument of B<test_and_do>:
+function as the second last argument of B<test_and_do()>:
 
     my $cb = ControlBreak->new( qw( L1 L2 EOF ) );
 
@@ -671,10 +673,14 @@ method test_and_do (@args) {
         unless @args == $_num_levels + 1;
 
     my $coderef = pop @args;
-    my $eod = 0 + $args[-1];
 
-    croak '*E* last argument of test_and_do must be a code reference'
+    croak '*E* test_and_do last argument must be a code reference'
         unless ref $coderef eq 'CODE';
+
+    my $eod = $args[-1];
+
+    croak '*E* test_and_do invalid boolean value in 2nd-last argument: ' . $eod
+        if $eod and $eod !~ m{ \A [01] \Z }xms;
 
     for my $ii (0..$eod) {
         $args[-1] = $ii;
@@ -683,6 +689,7 @@ method test_and_do (@args) {
         $self->continue;
     }
 
+    return $self->break;
 }
 
 ######################################################################
@@ -691,6 +698,8 @@ method test_and_do (@args) {
 sub _op_to_func ($op) {
 
     my $fcompare;
+
+    no warnings 'uninitialized';
 
     if ($op eq '==') {
         $fcompare = sub { $_[0] == $_[1] };
@@ -702,7 +711,7 @@ sub _op_to_func ($op) {
         $fcompare = $op;
     }
     else {
-        croak '*F* invalid comparison operator: ' . $op;
+        croak '*E* invalid comparison operator: ' . $op;
     }
 
     return $fcompare;

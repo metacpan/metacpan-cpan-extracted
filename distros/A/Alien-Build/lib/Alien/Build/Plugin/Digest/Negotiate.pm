@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin negotiator for cryptographic signatures
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 has '+sig' => sub { {} };
@@ -54,7 +54,6 @@ sub init
     fetch => sub {
       my($orig, $build, @rest) = @_;
       my $res = $orig->($build, @rest);
-      $DB::single = 1;
       if($res->{type} eq 'file')
       {
         $build->check_digest($res);
@@ -93,7 +92,7 @@ Alien::Build::Plugin::Digest::Negotiate - Plugin negotiator for cryptographic si
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 

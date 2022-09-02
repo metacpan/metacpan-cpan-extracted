@@ -1,0 +1,48 @@
+#!/usr/bin/env perl
+
+# download the HTML pages with something like this:
+# % for class in `seq 1 45`;do wget https://skm.dgip.go.id/index.php/skm/detailkelas/$class; done
+#
+# then run this script to produce the CSV's
+
+use 5.010001;
+use strict;
+use warnings;
+#use FindBin '$Bin';
+use Log::ger;
+BEGIN { our $Default_Log_Level = 'info' }
+use Log::ger::Screen;
+
+use File::Slurper qw/write_text read_text/;
+use Text::CSV;
+
+my $csv = Text::CSV->new ({ binary => 1, auto_diag => 1 });
+
+my %class_descriptions; # key=number, value=description
+
+for my $class (1..45) {
+    log_info "Processing class $class ...";
+    my $content = read_text($class);
+
+    $content =~ m!<a href="#" class="list-group-item active">(.+)</a></p>!
+        or die "Class $class: can't get description";
+    $class_descriptions{$class} = $1;
+
+    open my $fh, ">", "class$class.csv" or die "Can't open class$class.csv for writing: $!";
+    print $fh "name_id,name_en\n";
+    while ($content =~ m!<tr class="even gradeA">\s*<td>(.+?)</td>\s*<td>(.+?)</td>!gs) {
+        $csv->combine($1, $2) or die;
+        print $fh $csv->string;
+        print $fh "\n";
+    }
+    close $fh;
+}
+
+open my $fh, ">", "class.csv" or die "Can't open class.csv for writing: $!";
+print $fh "class,description\n";
+for my $class (sort {$a<=>$b} keys %class_descriptions) {
+    $csv->combine($class, $class_descriptions{$class}) or die;
+    print $fh $csv->string;
+    print $fh "\n";
+}
+close $fh;

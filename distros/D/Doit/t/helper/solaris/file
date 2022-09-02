@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+use strict;
+
+# This helper script simulates the behavior of
+# solaris file: manpages are reported differently
+# then on linux systems. See
+# also http://www.cpantesters.org/cpan/report/12606728-23fa-11ed-bd7d-5be2279bd446
+
+my $file = $ARGV[0];
+if ($file =~ m{\.[1-9]$}) {
+    print "[nt]roff, tbl, or eqn input text";
+    exit 0;
+}
+exec("/usr/bin/file", @ARGV);

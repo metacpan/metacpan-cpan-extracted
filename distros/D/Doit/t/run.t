@@ -6,12 +6,19 @@
 #
 
 use strict;
+use FindBin;
+use lib $FindBin::RealBin;
+
 use Test::More;
 
 plan skip_all => "no IPC::Run installed (highly recommended, but optional)" if !eval { require IPC::Run; 1 };
 plan 'no_plan';
 
 use Doit;
+
+use TestUtil qw(signal_kill_num);
+my $KILL = signal_kill_num;
+my $KILLrx = qr{$KILL};
 
 my $r = Doit->init;
 
@@ -34,10 +41,10 @@ eval { $r->run([$^X, '-e', 'kill KILL => $$']) };
 if ($^O eq 'MSWin32') {
     # There does not seem to be any signal handling on Windows
     # --- exit(9) and kill KILL is indistinguishable here.
-    like $@, qr{^Command exited with exit code 9};
+    like $@, qr{^Command exited with exit code $KILLrx};
 } else {
-    like $@, qr{^Command died with signal 9, without coredump};
-    is $@->{signalnum}, 9;
+    like $@, qr{^Command died with signal $KILLrx, without coredump};
+    is $@->{signalnum}, $KILL;
     is $@->{coredump}, 'without';
 }
 

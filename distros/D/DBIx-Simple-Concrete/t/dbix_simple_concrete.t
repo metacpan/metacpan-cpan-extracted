@@ -1,7 +1,6 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
-use Test::More 0.88; # for done_testing
+use Test::More tests => 5;
 use lib 't/lib';
 
 local $@;
@@ -21,5 +20,3 @@ ok not( __PACKAGE__->can( 'sql_render' ) ),
 DBIx::Simple::Concrete->import( ':core' );
 is __PACKAGE__->can( 'sql_render' ), \&SQL::Concrete::sql_render,
 	'... but does just that when asked';
-
-done_testing;

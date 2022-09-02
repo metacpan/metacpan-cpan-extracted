@@ -25,8 +25,7 @@ after having been formatted.
 # Set up formatting as a function because it can be slow
 my $loop = IO::Async::Loop->new();
 my $function = IO::Async::Function->new(
-    max_workers => 1,
-    code        => sub {
+    code => sub {
         my ($self, $request, $text, $perltidyrc) = @_;
 
         my ($ok, $formatted) = PLS::Parser::Document->format(text => $text, formatting_options => $request->{params}{options}, perltidyrc => $perltidyrc);
@@ -40,9 +39,9 @@ sub new
     my ($class, $request) = @_;
 
     my $self = bless {id => $request->{id}}, $class;
-    my $text = PLS::Parser::Document::text_from_uri($request->{params}{textDocument}{uri});
+    my $text = PLS::Parser::Document->text_from_uri($request->{params}{textDocument}{uri});
 
-    return $function->call(args => [$self, $request, $text, $PLS::Server::State::CONFIG->{perltidyrc}])->then(
+    return $function->call(args => [$self, $request, $text, $PLS::Server::State::CONFIG->{perltidy}{perltidyrc}])->then(
         sub {
             my ($ok, $formatted) = @_;
 

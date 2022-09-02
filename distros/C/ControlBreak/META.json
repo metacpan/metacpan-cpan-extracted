@@ -42,7 +42,7 @@
          "requires" : {
             "Carp" : "0",
             "Object::Pad" : "0.66",
-            "perl" : "v5.18.0",
+            "perl" : "v5.26.0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -67,7 +67,7 @@
    "provides" : {
       "ControlBreak" : {
          "file" : "lib/ControlBreak.pm",
-         "version" : "1.00"
+         "version" : "v0.22.244"
       }
    },
    "release_status" : "stable",
@@ -76,13 +76,14 @@
          "mailto" : "bug-ControlBreak@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=ControlBreak"
       },
+      "homepage" : "https://github.com/jgpuckering/ControlBreak/wiki",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/jgpuckering/ControlBreak.git",
          "web" : "https://github.com/jgpuckering/ControlBreak.git"
       }
    },
-   "version" : "1.00",
+   "version" : "v0.22.244",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

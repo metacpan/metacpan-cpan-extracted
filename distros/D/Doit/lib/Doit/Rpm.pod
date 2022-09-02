@@ -40,6 +40,17 @@ packages in scalar context).
 Return the packages out of I<@packages> which are not yet installed.
 This is an "informational" command and runs even in dry-run mode.
 
+=head3 rpm_enable_repo
+
+    my $changed = $doit->rpm_enable_repo($repo_name, %options);
+
+Enable a repository I<$repo_name> using C<yum config-manager
+--set-enabled>. Return true if a change was actually done.
+
+If the named option C<update> is set to a false value, then no C<yum
+update> is done after a change was done. The default is to do the
+update.
+
 =head1 AUTHOR
 
 Slaven Rezic <srezic@cpan.org>

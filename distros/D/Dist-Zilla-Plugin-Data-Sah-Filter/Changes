@@ -1,3 +1,8 @@
+0.002   2022-07-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Add xt/release/sah-filter.t file to build distribution.
+
+
 0.001   2020-02-10  Released-By: PERLANCAR
 
         - First release.

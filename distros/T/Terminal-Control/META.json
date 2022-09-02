@@ -31,10 +31,13 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Time::HiRes" : "1.9764",
+            "Try::Catch" : "v1.1.0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.11"
 }

@@ -19,11 +19,10 @@ terms as Perl itself.
 
 =cut
 
-use Test::More;
-BEGIN { use_ok('JSON::Path') }
+use Test2::V0 '-target' => 'JSON::Path';
 
-use JSON;
-my $object = from_json(<<'JSON');
+use JSON::MaybeXS;
+my $object = decode_json(<<'JSON');
 {
 	"store": {
 		"book": [

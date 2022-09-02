@@ -1,9 +1,17 @@
 Revision history for Perl extension Plack::Middleware::Timeout.
 
+0.11 2022-08-31
+    - fix a bug whereby an exception raised early by an application
+      would be falsely reported as a timeout. Thanks to Damian Nowak (https://github.com/Nowaker)
+      for report and initial PR with a fix.
+
+0.10 2022-08-31
+    - fix errors in documentation - thanks to Clive Holloway for reporting.
+
 0.09 2017-09-02
-	- corrected the documentation
-	- using a better default response code 504 Gateway Timeout, 408 Request Timeout
-	  was misleading, as it's definition is explicitly indicating a client error.
+    - corrected the documentation
+    - using a better default response code 504 Gateway Timeout, 408 Request Timeout
+      was misleading, as it's definition is explicitly indicating a client error.
 
 0.08 2015-12-10
     - updated documentation
@@ -35,4 +43,4 @@ Revision history for Perl extension Plack::Middleware::Timeout.
     - added more options for defining custom responses
 
 0.01  2015-04-02
-	- original version
+    - original version

@@ -1,12 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ListNewCPANDists/list_new_cpan_dists
-# and generated automatically using Perinci::CmdLine::Gen version 0.499
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-20'; # DATE
-our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.016'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
@@ -14,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-02'; # DATE
+our $DIST = 'App-ListNewCPANDists'; # DIST
+our $VERSION = '0.017'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ListNewCPANDists/list_new_cpan_dists",
@@ -40,19 +40,15 @@ list-new-cpan-dists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.016 of list-new-cpan-dists (from Perl distribution App-ListNewCPANDists), released on 2021-08-20.
+This document describes version 0.017 of list-new-cpan-dists (from Perl distribution App-ListNewCPANDists), released on 2022-09-02.
 
 =head1 SYNOPSIS
 
-Usage:
+B<list-new-cpan-dists> [B<--cpan>=I<dirname>] [B<--db-name>=I<filename>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--exclude-author-re>=I<re>] [(B<--exclude-author>=I<cpan::pause_id>)+|B<--exclude-authors-json>=I<json>] [B<--exclude-dist-re>=I<re>] [(B<--exclude-dist>=I<perl::distname>)+|B<--exclude-dists-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--include-author-re>=I<re>] [(B<--include-author>=I<cpan::pause_id>)+|B<--include-authors-json>=I<json>] [B<--include-dist-re>=I<re>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--this-month>] [B<--this-week>] [B<--today>] [B<--include-dists-json>=I<json>] -- [I<from_time>] [I<to_time>]
 
-% B<list-new-cpan-dists> [B<--cpan>=I<dirname>] [B<--db-name>=I<filename>] [B<--debug>] [B<--exclude-author-re>=I<re>] [(B<--exclude-author>=I<cpan::pause_id>)+|B<--exclude-authors-json>=I<json>] [B<--exclude-dist-re>=I<re>] [(B<--exclude-dist>=I<perl::distname>)+|B<--exclude-dists-json>=I<json>] [B<--format>=I<name>] [B<--json>] [B<--log-level>=I<level>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]] [B<--quiet>] [B<--this-month>] [B<--this-week>] [B<--today>] [B<--trace>] [B<--verbose>] [B<--view-result>[=I<program>]] -- [I<from_time>] [I<to_time>]
 
-Examples:
 
-Show new distributions from Jan 1, 2019 to the present:
-
- % list-new-cpan-dists 2019-01-01
+See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
@@ -122,6 +118,20 @@ Can be specified multiple times.
 
 See C<--exclude-dist>.
 
+=item B<--include-author-re>=I<s>
+
+=item B<--include-author>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--include-authors-json>=I<s>
+
+See C<--include-author>.
+
+=item B<--include-dist-re>=I<s>
+
+=item B<--include-dists-json>=I<s>
+
 =back
 
 =head2 Logging options
@@ -135,6 +145,17 @@ Shortcut for --log-level=debug.
 =item B<--log-level>=I<s>
 
 Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--quiet>
 
@@ -162,6 +183,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -176,24 +203,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -205,10 +241,10 @@ View output using a viewer.
 
 Location of your local CPAN mirror, e.g. /path/to/cpan.
 
-Defaults to `~/cpan`. This actually does not need to be a real CPAN local
+Defaults to C<~/cpan>. This actually does not need to be a real CPAN local
 mirror, but can be just an empty directory. If you use happen to use
-<pm:App::lcpan>, you can use the local CPAN mirror generated by <prog:lcpan>
-(which also defaults to `~/cpan`) to store the database.
+L<App::lcpan>, you can use the local CPAN mirror generated by L<lcpan>
+(which also defaults to C<~/cpan>) to store the database.
 
 
 =item B<--help>, B<-h>, B<-?>
@@ -255,6 +291,12 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+=head2 Show new distributions from Jan 1, 2019 to the present
+
+ % list-new-cpan-dists 2019-01-01
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-ListNewCPANDists>.
@@ -262,14 +304,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ListNe
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-ListNewCPANDists>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 AUTHOR
 
@@ -288,15 +322,24 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

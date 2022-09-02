@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.47';
+$VERSION = '0.48';
 $VERSION = $VERSION;
 
 # internal use
@@ -5378,9 +5378,10 @@ These encodings are still used today in most areas except the world wide web.
 Even if you are an avid Unicode proponent, you cannot change this fact.
 
 In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, CP932) have any DAMEMOJI who have metacharacters at second octet.
-Which characters are DAMEMOJI is depends on whether the enclosing delimiter is single quote or double quote.
+And in Big5, Big5-HKSCS, GB18030, GBK, Sjis, CP932 and UHC have many CHANTOSHITAMOJI who have alphabets at second octet.
 
-This software escapes DAMEMOJI in your script, generate a new script and run it.
+mb.pm modulino makes new script then run it.
+mb.pm modulino escapes DAMEMOJI and keeps CHANTOSHITAMOJI in your scripts to make new scripts.
 
 This software has the following features
 
@@ -5444,6 +5445,8 @@ The necessary terms are listed below. Maybe world wide web will help you.
 
 =item * encoding
 
+=item * encode
+
 =item * decode
 
 =item * character
@@ -5452,15 +5455,25 @@ The necessary terms are listed below. Maybe world wide web will help you.
 
 =item * grapheme
 
-=item * SBCS(Single Byte Character Set)
+=item * SBCS(Single Byte Character Set, Single Byte Code Set)
 
-=item * DBCS(Double Byte Character Set)
+=item * DBCS(Double Byte Character Set, Double Byte Code Set)
 
-=item * MBCS(Multibyte Character Set)
+=item * MBCS(Multibyte Character Set, Multibyte Code Set)
 
 =item * multibyte anchoring
 
 =item * character class
+
+=item * HIRAGANA
+
+=item * KATAKANA
+
+=item * KANJI
+
+=item * GAIJI
+
+=item * GETA, GETA-MOJI, GETA-MARK
 
 =item * MOJIBAKE
 
@@ -5468,9 +5481,9 @@ The necessary terms are listed below. Maybe world wide web will help you.
 
 =item * CHANTOSHITAMOJI
 
-=item * GAIJI
+=item * ZENKAKU(fullwidth)
 
-=item * GETA, GETA-MOJI, GETA-MARK
+=item * HANKAKU(halfwidth)
 
 =back
 
@@ -5862,7 +5875,7 @@ Single quotes are follows
   qr''
   ------------------------------------------------------------------
  
-In single quote, DAMEMOJI are double-byte characters that include the following metacharacters
+In single quote, DAMEMOJI are double-byte characters that include the following metacharacters at second octet
 
   ------------------------------------------------------------------
   hex   character as US-ASCII
@@ -5884,14 +5897,14 @@ Double quotes are follows
   <<`END`
   //
   m//
-  ??
   s///
   split(//)
   split(m//)
   qr//
+  <fileglob>
   ------------------------------------------------------------------
 
-In double quote, DAMEMOJI are double-byte characters that include the following metacharacters
+In double quote, DAMEMOJI are double-byte characters that include the following metacharacters at second octet
 
   ------------------------------------------------------------------
   hex   character as US-ASCII
@@ -6107,10 +6120,8 @@ in perl interpreter memory,
 
 =head1 What are CHANTOSHITAMOJI?
 
-CHANTOSHITAMOJI is CHANTO-SHITA-MOJI.
-It means qr/[A-Za-z]/, "NOT DAMEMOJI".
-
-CHANTOSHITAMOJI are follows
+CHANTOSHITAMOJI are contained in Big5, Big5-HKSCS, GB18030, GBK, Shift_JIS(also CP932), UHC.
+CHANTOSHITAMOJI are double-byte characters that include the following alphabets at second octet.
 
   ------------------------------------------------------------------
   hex   character as US-ASCII
@@ -6169,9 +6180,12 @@ CHANTOSHITAMOJI are follows
   7A    [z]    US-ASCII z
   ------------------------------------------------------------------
 
-=head1 MBCS character casing
+Embeded functions "lc()", "lcfirst()", "uc()", and "ucfirst()", and escapes "\L...\E", "\l...", "\U...\E", and "\u..." of bare Perl cannot handle CHANTOSHITAMOJI correctly.
+mb.pm modulino solves this problem by replacing "lc()" in your scripts with "mb::lc()".
 
-mb.pm modulino solves the CHANTOSHITAMOJI problem.
+=head1 MBCS character casing (solves CHANTOSHITAMOJI problem)
+
+mb.pm modulino solves CHANTOSHITAMOJI problem.
 
 (The automatic translation of this part may be not correct.
 Please refer to the original text.)
@@ -6181,9 +6195,8 @@ For easy to use like JPerl, "lc()" and "uc()" do not work for MBCS encoding that
 
 "DBCS," "ZENKAKU(fullwidth) characters," and "KANJI" are often intentionally misused as having the same meaning.
 In other words, fullwidth alphabetic characters are treated as KANJI.
-In that case, it is desirable that those characters are not converted by lc() and uc().
-
-UHC is very excellent encoding since not containing DAMEMOJI, but on the other hand it contains a lot of CHANTOSHITAMOJI.
+In that case, it is desirable that those characters are not converted by "lc()" and "uc()".
+You may feel it a little strange, but this is normal in the JPerl world.
 
     ----------------------------------------------------------------------------------------------
                                                bare Perl4, bare Perl5     mb.pm modulino

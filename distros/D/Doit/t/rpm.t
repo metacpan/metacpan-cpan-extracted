@@ -9,22 +9,23 @@ use FindBin;
 use lib $FindBin::RealBin;
 
 use Doit;
-use Doit::Extcmd qw(is_in_path);
 use Test::More;
 
 use TestUtil qw(get_sudo);
 
 return 1 if caller;
 
+my $doit = Doit->init;
+
 plan skip_all => "This test script requires Linux"
     if $^O ne 'linux';
 plan skip_all => "This test script requires yum"
-    if !is_in_path('yum');
+    if !$doit->which('yum');
 plan skip_all => "This test script requires rpm"
-    if !is_in_path('rpm');
+    if !$doit->which('rpm');
+
 plan 'no_plan';
 
-my $doit = Doit->init;
 $doit->add_component('rpm');
 
 my @missing_packages = $doit->rpm_missing_packages('perl', 'yum', 'this-package-does-not-exist');

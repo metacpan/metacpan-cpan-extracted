@@ -10,6 +10,7 @@ use Pod::Markdown;
 use Pod::Simple::Search;
 use Symbol qw(gensym);
 
+use PLS::Parser::Index;
 use PLS::Server::State;
 
 =head1 NAME
@@ -23,7 +24,8 @@ for sending to the Language Server Protocol.
 
 =cut
 
-my $PERL_EXE = $^X;
+my $PERL_EXE  = $^X;
+my $PERL_ARGS = [];
 
 sub new
 {
@@ -38,45 +40,6 @@ sub new
 
     return bless \%self, $class;
 } ## end sub new
-
-=head2 line_number
-
-The line number of the element
-
-=cut
-
-sub line_number
-{
-    my ($self) = @_;
-
-    return $self->{element}->lsp_line_number;
-}
-
-=head2 column_number
-
-The column number of the element
-
-=cut
-
-sub column_number
-{
-    my ($self) = @_;
-
-    return $self->{element}->lsp_column_number;
-}
-
-=head2 name
-
-The name of the element.
-
-=cut
-
-sub name
-{
-    my ($self) = @_;
-
-    return '';
-}
 
 =head2 set_perl_exe
 
@@ -102,6 +65,30 @@ Get the perl executable path.
 sub get_perl_exe
 {
     return $PERL_EXE;
+}
+
+=head2 set_perl_args
+
+Set the arguments to be used when using the perl binary.
+
+=cut
+
+sub set_perl_args
+{
+    my (undef, $args) = @_;
+
+    $PERL_ARGS = $args;
+}
+
+=head2 get_perl_args
+
+Get the arguments to be used when using the perl binary.
+
+=cut
+
+sub get_perl_args
+{
+    return $PERL_ARGS;
 }
 
 =head2 get_perldoc_location
@@ -211,6 +198,62 @@ sub get_markdown_from_text
     return $ok, \$markdown;
 } ## end sub get_markdown_from_text
 
+sub find_pod_in_file
+{
+    my ($self, $path, $name) = @_;
+
+    open my $fh, '<', $path or return 0;
+
+    my @lines;
+    my $start = '';
+
+    while (my $line = <$fh>)
+    {
+        if ($line =~ /^=(head\d|item).*\b\Q$name\E\b.*$/)
+        {
+            $start = $1;
+            push @lines, $line;
+            next;
+        } ## end if ($line =~ /^=(head\d|item).*\b\Q$name\E\b.*$/...)
+
+        if (length $start)
+        {
+            push @lines, $line;
+
+            if (   $start eq 'item' and $line =~ /^=item/
+                or $start =~ /head/ and $line =~ /^=$start/
+                or $line =~ /^=cut/)
+            {
+                last;
+            } ## end if ($start eq 'item' and...)
+        } ## end if (length $start)
+    } ## end while (my $line = <$fh>)
+
+    close $fh;
+
+    # we don't want the last line - it's a start of a new section.
+    pop @lines;
+
+    my $markdown = '';
+
+    if (scalar @lines)
+    {
+        my $parser = Pod::Markdown->new();
+
+        $parser->output_string(\$markdown);
+        $parser->no_whining(1);
+        $parser->parse_lines(@lines, undef);
+
+        # remove first extra space to avoid markdown from being displayed inappropriately as code
+        $markdown =~ s/\n\n/\n/;
+        my $ok = $parser->content_seen;
+        return 0 unless $ok;
+        return $ok, \$markdown;
+    } ## end if (scalar @lines)
+
+    return 0;
+} ## end sub find_pod_in_file
+
 =head2 clean_markdown
 
 This fixes markdown so that documentation isn't incorrectly displayed as code.
@@ -265,8 +308,10 @@ sub get_clean_inc
         waitpid $pid, 0;
     } ## end if (my $pid = open my ...)
 
-    unshift @include, @{$PLS::Server::State::CONFIG->{inc}} if (ref $PLS::Server::State::CONFIG->{inc} eq 'ARRAY');
-    unshift @include, $PLS::Server::State::ROOT_PATH        if (length $PLS::Server::State::ROOT_PATH);
+    push @include, @{$PLS::Server::State::CONFIG->{inc}} if (ref $PLS::Server::State::CONFIG->{inc} eq 'ARRAY');
+    my $index = PLS::Parser::Index->new();
+    push @include, @{PLS::Parser::Index->new->workspace_folders};
+
     return \@include;
 } ## end sub get_clean_inc
 

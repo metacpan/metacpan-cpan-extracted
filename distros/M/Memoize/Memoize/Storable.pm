@@ -1,7 +1,7 @@
 use strict; use warnings;
 
 package Memoize::Storable;
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Storable 1.002 (); # for lock_* function variants
 

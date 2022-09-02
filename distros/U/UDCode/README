@@ -1,19 +1,38 @@
-UDCode - Does a set of code words form a uniquely decodable code?
+UDCode
 
-A code is a set of strings, called the _code words_.  A code is
-"uniquely decodable" if any string S that is a concatenation of
-code words is so in _exactly one way_.
+A *code* is a set of strings, called the *code words*. A code is
+*uniquely decodable* if any string *S* that is a concatenation of code
+words is so in *exactly one way*.
 
-For example, the code ("ab", "abba", "b") is _not_ uniquely
-decodable, because "abba" . "b" eq "ab" . "b" . "ab".  But the code
-("a", "ab", "abb") _is_ uniquely decodable, because there is no such
-pair of sequences of code words.
+For example, the code "('ab', 'abba', 'b')" is *not* uniquely decodable,
+because 'abba' . 'b' eq 'ab' . 'b' . 'ab'. But the code "('a', 'ab',
+'abb')" *is* uniquely decodable, because there is no such pair of
+sequences of code words.
 
-UDcode contains a function "is_udcode" that tells whether a set of
-code words is a uniquely decodable code, and a function "ud_pair" that
-returns two sequences of code words whose concatenations are the same,
-if there is such a pair.
+This module provides a pair of functions to tell whether a set of code
+words is a uniquely decodable code, and to find an example of sequences
+of code words whose concatenations are the same, if there is such a
+pair.
 
-Author: Mark Jason Dominus (mjd@plover.com)
+INSTALLATION
 
-License: Public domain
+This is a Perl module distribution. It should be installed with
+whichever tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further
+instruction. Should you wish to install this module manually, the
+procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is hereby released into the public domain. You may use,
+modify, or distribute it for any purpose whatsoever without restriction.

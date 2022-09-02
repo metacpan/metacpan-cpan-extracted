@@ -6,9 +6,9 @@ Date::Manip::TZ::ampunt00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  1 10:55:31 EDT 2022
-#    Data version: tzdata2022a
-#    Code version: tzcode2022a
+#    Generated on: Thu Sep  1 10:29:10 EDT 2022
+#    Data version: tzdata2022c
+#    Code version: tzcode2022c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.88';
+$VERSION='6.89';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -122,8 +122,14 @@ END { undef $VERSION; }
           '-05',0,[1942,8,1,4,59,59],[1942,7,31,23,59,59],
           '1942060104:00:00','1942053123:00:00','1942080104:59:59','1942073123:59:59' ],
         [ [1942,8,1,5,0,0],[1942,8,1,1,0,0],'-04:00:00',[-4,0,0],
-          '-04',0,[1947,4,1,3,59,59],[1947,3,31,23,59,59],
-          '1942080105:00:00','1942080101:00:00','1947040103:59:59','1947033123:59:59' ],
+          '-04',0,[1946,8,29,3,59,59],[1946,8,28,23,59,59],
+          '1942080105:00:00','1942080101:00:00','1946082903:59:59','1946082823:59:59' ],
+     ],
+   1946 =>
+     [
+        [ [1946,8,29,4,0,0],[1946,8,29,0,0,0],'-04:00:00',[-4,0,0],
+          '-04',1,[1947,4,1,3,59,59],[1947,3,31,23,59,59],
+          '1946082904:00:00','1946082900:00:00','1947040103:59:59','1947033123:59:59' ],
      ],
    1947 =>
      [

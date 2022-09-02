@@ -4,6 +4,8 @@ author:
   - 'Kirrily Robert'
   - 'David E. Wheeler'
 build_requires:
+  Test::Builder::Tester: '0'
+  Test::Builder::Tester::Color: '0'
   Test::More: '0.70'
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
@@ -26,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-File-Contents
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ap/Test-File-Contents.git
-version: '0.241'
+version: '0.242'
 x_copyright:
   holder: 'David E. Wheeler'
   year: 2016

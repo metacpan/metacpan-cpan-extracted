@@ -32,7 +32,7 @@ use PLS::Parser::Pod::Subroutine;
 use PLS::Parser::Pod::Variable;
 
 my %FILES;
-my $INDEX;
+my %VERSIONS;
 
 =head1 NAME
 
@@ -82,43 +82,13 @@ sub new
                       uri  => $uri
                      }, $class;
 
-    $self->{index} = $self->get_index();
+    $self->{index} = PLS::Parser::Index->new();
     my $document = $self->_get_ppi_document(%args);
     return unless (ref $document eq 'PPI::Document');
     $self->{document} = $document;
 
     return $self;
 } ## end sub new
-
-=head2 set_index
-
-This sets the L<PLS::Parser::Index> object to be used by all L<PLS::Parser::Document>
-objects.
-
-=cut
-
-sub set_index
-{
-    my ($class, $index) = @_;
-
-    $INDEX = $index;
-}
-
-=head2 get_index
-
-This gets the L<PLS::Parser::Index> object to use.
-It will set it for other objects to use if it does not already exist.
-
-=cut
-
-sub get_index
-{
-    my ($class) = @_;
-
-    return                                                                   unless (length $PLS::Server::State::ROOT_PATH);
-    $INDEX = PLS::Parser::Index->new(root => $PLS::Server::State::ROOT_PATH) unless (ref $INDEX eq 'PLS::Parser::Index');
-    return $INDEX;
-} ## end sub get_index
 
 =head2 go_to_definition
 
@@ -150,15 +120,10 @@ sub find_current_list
     my $find     = PPI::Find->new(sub { $_[0]->isa('PPI::Structure::List') });
 
     # Find the nearest list structure that completely surrounds the column.
-    return first
-    {
-        $_->lsp_column_number < $column_number
-          and $column_number < $_->lsp_column_number +
-          length($_->content)
-    }
-    sort  { abs($column_number - $a->lsp_column_number) - abs($column_number - $b->lsp_column_number) }
-      map { PLS::Parser::Element->new(element => $_, document => $self->{document}, file => $self->{path}) }
-      map { $find->in($_->element) } @elements;
+    return first { $_->lsp_column_number < $column_number and $column_number < $_->lsp_column_number + length($_->content) }
+      sort { abs($column_number - $a->lsp_column_number) - abs($column_number - $b->lsp_column_number) }
+      map  { PLS::Parser::Element->new(element => $_, document => $self->{document}, file => $self->{path}) }
+      map  { $find->in($_->element) } @elements;
 } ## end sub find_current_list
 
 =head2 go_to_definition_of_closest_subroutine
@@ -182,7 +147,9 @@ sub go_to_definition_of_closest_subroutine
     }
 
     return if (not blessed($word) or not $word->isa('PLS::Parser::Element') or not $word->element->isa('PPI::Token::Word'));
-    return $self->search_elements_for_definition($line_number, $column_number, $word);
+    my $definitions = $self->search_elements_for_definition($line_number, $column_number, $word);
+    return $definitions, $word if wantarray;
+    return $definitions;
 } ## end sub go_to_definition_of_closest_subroutine
 
 =head2 search_elements_for_definition
@@ -274,8 +241,6 @@ sub search_elements_for_definition
         } ## end if (my ($class, $method...))
         if (my $method = $match->method_name())
         {
-            $method =~ s/SUPER:://;
-
             if (ref $self->{index} eq 'PLS::Parser::Index')
             {
                 return $self->{index}->find_subroutine($method);
@@ -394,7 +359,7 @@ sub pod_link
                 )?
                 > # final closing >
             }gx
-              )
+          )
         {
             my $start = $-[1];
             my $end   = $+[1];
@@ -422,7 +387,7 @@ This attempts to find POD for the symbol at the given location.
 
 sub find_pod
 {
-    my ($self, $line_number, $column_number) = @_;
+    my ($self, $uri, $line_number, $column_number) = @_;
 
     my @elements = $self->find_elements_at_location($line_number, $column_number);
 
@@ -445,8 +410,10 @@ sub find_pod
                 else
                 {
                     $args{subroutine} = $import;
+                    $args{packages}   = [$package];
+                    delete $args{package};
                     $class_name = 'PLS::Parser::Pod::Subroutine';
-                }
+                } ## end else [ if ($import =~ /^[\$\@\%]/...)]
             } ## end if (length $import)
 
             my $pod = $class_name->new(%args);
@@ -459,7 +426,7 @@ sub find_pod
               PLS::Parser::Pod::ClassMethod->new(
                                                  index      => $self->{index},
                                                  element    => $element,
-                                                 package    => $package,
+                                                 packages   => [$package],
                                                  subroutine => $subroutine
                                                 );
             my $ok = $pod->find();
@@ -478,11 +445,14 @@ sub find_pod
         } ## end if ($subroutine = $element...)
         if (($package, $subroutine) = $element->subroutine_package_and_name())
         {
+            my @packages = length $package ? ($package) : ();
+
             my $pod =
               PLS::Parser::Pod::Subroutine->new(
+                                                uri              => $uri,
                                                 index            => $self->{index},
                                                 element          => $element,
-                                                package          => $package,
+                                                packages         => \@packages,
                                                 subroutine       => $subroutine,
                                                 include_builtins => 1
                                                );
@@ -500,6 +470,17 @@ sub find_pod
             my $ok = $pod->find();
             return (1, $pod) if $ok;
         } ## end if ($variable = $element...)
+        if ($element->type eq 'PPI::Token::Operator' and $element->content =~ /^-[rwxoRWXOezsfdlpSbctugkTBMAC]$/)
+        {
+            my $pod = PLS::Parser::Pod::Subroutine->new(
+                                                        index            => $self->{index},
+                                                        element          => $element,
+                                                        subroutine       => '-X',
+                                                        include_builtins => 1
+                                                       );
+            my $ok = $pod->find();
+            return (1, $pod) if $ok;
+        } ## end if ($element->type eq ...)
     } ## end foreach my $element (@elements...)
 
     return 0;
@@ -543,10 +524,10 @@ sub find_external_subroutine
 
     my $include = PLS::Parser::Pod->get_clean_inc();
     my $package = Module::Metadata->new_from_module($package_name, inc => $include);
-    return unless (ref $package eq 'Module::Metadata');
+    return if (ref $package ne 'Module::Metadata');
 
     my $doc = PLS::Parser::Document->new(path => $package->filename);
-    return unless (ref $doc eq 'PLS::Parser::Document');
+    return if (ref $doc ne 'PLS::Parser::Document');
 
     foreach my $subroutine (@{$doc->get_subroutines()})
     {
@@ -577,10 +558,10 @@ sub find_external_package
     my $include  = PLS::Parser::Pod->get_clean_inc();
     my $metadata = Module::Metadata->new_from_module($package_name, inc => $include);
 
-    return unless (ref $metadata eq 'Module::Metadata');
+    return if (ref $metadata ne 'Module::Metadata');
 
     my $document = PLS::Parser::Document->new(path => $metadata->filename);
-    return unless (ref $document eq 'PLS::Parser::Document');
+    return if (ref $document ne 'PLS::Parser::Document');
 
     foreach my $package (@{$document->get_packages()})
     {
@@ -613,6 +594,7 @@ sub go_to_variable_definition
     my $document = $cursor->top;
 
     my $declaration;
+    state $var_rx = qr/((?&PerlVariable))$PPR::GRAMMAR/;
 
   OUTER: while (1)
     {
@@ -635,13 +617,12 @@ sub go_to_variable_definition
                 }
                 if ($child->isa('PPI::Statement::Include') and $child->type eq 'use' and $child->pragma eq 'vars')
                 {
-                    my @variables = grep { defined } $child =~ /((?&PerlVariable))$PPR::GRAMMAR/gx;
-
-                    if (any { $_ eq $variable } @variables)
+                    while ($child =~ /$var_rx/g)
                     {
+                        next if ($1 ne $variable);
                         $declaration = $child;
                         last OUTER;
-                    }
+                    } ## end while ($child =~ /$var_rx/g...)
                 } ## end if ($child->isa('PPI::Statement::Include'...))
             } ## end foreach my $child ($cursor->...)
         } ## end if ($cursor->isa('PPI::Structure::Block'...))
@@ -658,9 +639,10 @@ sub go_to_variable_definition
                     {
                         if (blessed($child->snext_sibling) and $child->snext_sibling->isa('PPI::Token::Symbol') and $child->snext_sibling->symbol eq $variable)
                         {
+                            #$declaration = $child->snext_sibling;
                             $declaration = $cursor;
                             last OUTER;
-                        }
+                        } ## end if (blessed($child->snext_sibling...))
                     } ## end if ($child->isa('PPI::Token::Word'...))
                 } ## end foreach my $child ($cursor->...)
             } ## end if ($cursor->type eq 'foreach'...)
@@ -674,7 +656,7 @@ sub go_to_variable_definition
                     last CHILDREN if $child == $prev_cursor;
                     next unless blessed($child);
 
-                    if ($child->isa('PPI::Statement::Variable'))
+                    if ($child->isa('PPI::Statement::Variable') and any { $_ eq $variable } $child->variables)
                     {
                         $declaration = $child;
                         last OUTER;
@@ -710,7 +692,8 @@ sub open_file
 
     return unless $args{languageId} eq 'perl';
 
-    $FILES{$args{uri}} = {text => $args{text}};
+    $FILES{$args{uri}}    = \($args{text});
+    $VERSIONS{$args{uri}} = $args{version};
 
     return;
 } ## end sub open_file
@@ -740,21 +723,43 @@ sub update_file
     my %args = @args;
 
     my $file = $FILES{$args{uri}};
-    return unless (ref $file eq 'HASH');
+    return if (ref $file ne 'SCALAR');
+
+    $VERSIONS{$args{uri}} = $args{version};
 
     foreach my $change (@{$args{changes}})
     {
         if (ref $change->{range} eq 'HASH')
         {
-            my @lines       = _split_lines($file->{text});
+            my @lines       = _split_lines($$file);
             my @replacement = _split_lines($change->{text});
 
             my ($starting_text, $ending_text);
 
             # get the text that we're not replacing at the start and end of each selection
-            $starting_text = substr $lines[$change->{range}{start}{line}], 0, $change->{range}{start}{character}
-              if ($#lines >= $change->{range}{start}{line});
-            $ending_text = substr $lines[$change->{range}{end}{line}], $change->{range}{end}{character} if ($#lines >= $change->{range}{end}{line});
+            # this needs to be done in UTF-16 according to the LSP specification.
+            # the byte order doesn't matter because we're decoding immediately,
+            # so we are using little endian.
+
+            if ($#lines >= $change->{range}{start}{line})
+            {
+                my $first_line = Encode::encode('UTF-16LE', $lines[$change->{range}{start}{line}]);
+
+                # each code unit is two bytes long
+                my $starting_code_unit = $change->{range}{start}{character} * 2;
+                $starting_text = substr $first_line, 0, $starting_code_unit;
+                $starting_text = Encode::decode('UTF-16LE', $starting_text);
+            } ## end if ($#lines >= $change...)
+
+            if ($#lines >= $change->{range}{end}{line})
+            {
+                my $last_line = Encode::encode('UTF-16LE', $lines[$change->{range}{end}{line}]);
+
+                # each code unit is two bytes long
+                my $ending_code_unit = $change->{range}{end}{character} * 2;
+                $ending_text = substr $last_line, $ending_code_unit;
+                $ending_text = Encode::decode('UTF-16LE', $ending_text);
+            } ## end if ($#lines >= $change...)
 
             # append the existing text to the replacement
             if (length $starting_text)
@@ -777,12 +782,12 @@ sub update_file
             # with the replacement, including the existing text that is not changing, that we appended above
             my $lines_replacing = $change->{range}{end}{line} - $change->{range}{start}{line} + 1;
             splice @lines, $change->{range}{start}{line}, $lines_replacing, @replacement;
-            $file->{text} = join '', @lines;
+            $$file = join '', @lines;
         } ## end if (ref $change->{range...})
         else
         {
             # no range means we're updating the entire document
-            $file->{text} = $change->{text};
+            $$file = $change->{text};
         }
     } ## end foreach my $change (@{$args...})
 
@@ -802,6 +807,9 @@ sub close_file
     my %args = @args;
 
     delete $FILES{$args{uri}};
+    delete $VERSIONS{$args{uri}};
+
+    return;
 } ## end sub close_file
 
 =head2 get_subroutines
@@ -926,7 +934,7 @@ sub get_full_text
 {
     my ($self) = @_;
 
-    return text_from_uri($self->{uri});
+    return $self->text_from_uri($self->{uri});
 }
 
 =head2 get_variables_fast
@@ -940,19 +948,32 @@ sub get_variables_fast
 {
     my ($self, $text) = @_;
 
-    $text = $self->get_full_text() unless (ref $text eq 'SCALAR');
-    return []                      unless (ref $text eq 'SCALAR');
+    $text = $self->get_full_text() if (ref $text ne 'SCALAR');
+    return []                      if (ref $text ne 'SCALAR');
 
-    my @variable_declarations = $$text =~ /((?&PerlVariableDeclaration))$PPR::GRAMMAR/gx;
-    @variable_declarations = grep { defined } @variable_declarations;
+    state $variable_decl_rx = qr/((?&PerlVariableDeclaration))$PPR::GRAMMAR/;
+    state $lvalue_rx        = qr/((?&PerlLvalue))$PPR::GRAMMAR/;
+    state $variable_rx      = qr/((?&PerlVariable))$PPR::GRAMMAR/;
+    my @variables;
 
-    # Precompile regex used multiple times
-    my $re = qr/((?&PerlVariable))$PPR::GRAMMAR/x;
+    while ($$text =~ /$variable_rx/g)
+    {
+        my $declaration = $1;
+        my ($lvalue) = $declaration =~ /$lvalue_rx/;
 
-    return [
-            map { s/^\s+|\s+$//r }
-            grep { defined } map { /$re/g } @variable_declarations
-           ];
+        next unless (length $lvalue);
+
+        while ($lvalue =~ /$variable_rx/g)
+        {
+            my $variable = $1;
+            next unless (length $variable);
+            $variable =~ s/^\s+|\s+$//g;
+
+            push @variables, $variable;
+        } ## end while ($lvalue =~ /$variable_rx/g...)
+    } ## end while ($$text =~ /$variable_rx/g...)
+
+    return \@variables;
 } ## end sub get_variables_fast
 
 =head2 get_packages_fast
@@ -966,19 +987,21 @@ sub get_packages_fast
 {
     my ($self, $text) = @_;
 
-    $text = $self->get_full_text() unless (ref $text eq 'SCALAR');
-    return []                      unless (ref $text eq 'SCALAR');
+    $text = $self->get_full_text() if (ref $text ne 'SCALAR');
+    return []                      if (ref $text ne 'SCALAR');
 
-    my @package_declarations = $$text =~ /((?&PerlPackageDeclaration))$PPR::GRAMMAR/gx;
-    @package_declarations = grep { defined } @package_declarations;
+    state $package_rx = qr/((?&PerlPackageDeclaration))$PPR::GRAMMAR/;
+    my @packages;
 
-    # Precompile regex used multiple times
-    my $re = qr/((?&PerlQualifiedIdentifier))$PPR::GRAMMAR/x;
+    while ($$text =~ /$package_rx/g)
+    {
+        my ($package) = $1 =~ /^package\s+(\S+)\s*;\s*$/;
+        next unless (length $package);
 
-    return [
-            map { s/^\s+|\s+$//r }
-            grep { defined } map { /$re/g } @package_declarations
-           ];
+        push @packages, $package;
+    } ## end while ($$text =~ /$package_rx/g...)
+
+    return \@packages;
 } ## end sub get_packages_fast
 
 =head2 get_subroutines_fast
@@ -992,10 +1015,16 @@ sub get_subroutines_fast
 {
     my ($self, $text) = @_;
 
-    $text = $self->get_full_text() unless (ref $text eq 'SCALAR');
-    return []                      unless (ref $text eq 'SCALAR');
+    $text = $self->get_full_text() if (ref $text ne 'SCALAR');
+    return []                      if (ref $text ne 'SCALAR');
 
-    my @subroutine_declarations = $$text =~ /sub\b(?&PerlOWS)((?&PerlOldQualifiedIdentifier))$PPR::GRAMMAR/gx;
+    state $sub_rx = qr/sub\b(?&PerlOWS)((?&PerlOldQualifiedIdentifier))$PPR::GRAMMAR/;
+    my @subroutine_declarations;
+
+    while ($$text =~ /$sub_rx/g)
+    {
+        push @subroutine_declarations, $1;
+    }
 
     return [
             map  { s/^\s+|\s+$//r }
@@ -1016,22 +1045,70 @@ sub get_constants_fast
 {
     my ($self, $text) = @_;
 
-    $text = $self->get_full_text() unless (ref $text eq 'SCALAR');
-    return []                      unless (ref $text eq 'SCALAR');
+    $text = $self->get_full_text() if (ref $text ne 'SCALAR');
+    return []                      if (ref $text ne 'SCALAR');
 
-    my @use_statements = $$text =~ /((?&PerlUseStatement)) $PPR::GRAMMAR/gx;
-    @use_statements = grep { defined } @use_statements;
+    state $block_rx        = qr/use\h+constant(?&PerlOWS)((?&PerlBlock))$PPR::GRAMMAR/;
+    state $bareword_rx     = qr/((?&PerlBareword))(?&PerlOWS)(?&PerlComma)$PPR::GRAMMAR/;
+    state $one_constant_rx = qr/use\h+constant\h+((?&PerlBareword))(?&PerlOWS)(?&PerlComma)$PPR::GRAMMAR/;
+    my @constants;
 
-    # Precompile regex used multiple times
-    my $block_re    = qr/constant (?&PerlOWS) ((?&PerlBlock)) $PPR::GRAMMAR/x;
-    my $bareword_re = qr/((?&PerlBareword)) (?&PerlOWS) (?&PerlComma) $PPR::GRAMMAR/x;
+    while ($$text =~ /$block_rx/g)
+    {
+        my $block = $1;
 
-    return [
-            map  { s/^\s+|\s+$//r }
-            grep { defined } map { /$bareword_re/g }
-            grep { defined } map { /$block_re/g } @use_statements
-           ];
+        while ($block =~ /$bareword_rx/g)
+        {
+            my $constant = $1;
+
+            next unless (length $constant);
+            $constant =~ s/^\s+|\s+$//g;
+
+            push @constants, $constant;
+        } ## end while ($block =~ /$bareword_rx/g...)
+    } ## end while ($$text =~ /$block_rx/g...)
+
+    while ($$text =~ /$one_constant_rx/g)
+    {
+        my $constant = $1;
+        next unless (length $constant);
+        $constant =~ s/^\s+|\s+$//g;
+
+        push @constants, $constant;
+    } ## end while ($$text =~ /$one_constant_rx/g...)
+
+    return \@constants;
 } ## end sub get_constants_fast
+
+sub get_imports
+{
+    my ($self, $text) = @_;
+
+    $text = $self->get_full_text() if (ref $text ne 'SCALAR');
+    return []                      if (ref $text ne 'SCALAR');
+
+    state $use_rx        = qr/((?&PerlUseStatement))$PPR::GRAMMAR/;
+    state $identifier_rx = qr/use\h+((?&PerlQualifiedIdentifier))(?&PerlOWS)(?&PerlList)?$PPR::GRAMMAR/;
+
+    my @imports;
+
+    while ($$text =~ /$use_rx/g)
+    {
+        my $use = $1;
+
+        if ($use =~ /$identifier_rx/)
+        {
+            my $module = $1;
+
+            # Assume lowercase modules are pragmas.
+            next if (lc $module eq $module);
+
+            push @imports, {use => $use, module => $module};
+        } ## end if ($use =~ /$identifier_rx/...)
+    } ## end while ($$text =~ /$use_rx/g...)
+
+    return \@imports;
+} ## end sub get_imports
 
 =head2 format_range
 
@@ -1173,11 +1250,11 @@ This returns a SCALAR reference to the text of a particular URI.
 
 sub text_from_uri
 {
-    my ($uri) = @_;
+    my (undef, $uri) = @_;
 
-    if (ref $FILES{$uri} eq 'HASH')
+    if (ref $FILES{$uri} eq 'SCALAR')
     {
-        return \($FILES{$uri}{text});
+        return $FILES{$uri};
     }
     else
     {
@@ -1187,6 +1264,13 @@ sub text_from_uri
         return \$text;
     } ## end else [ if (ref $FILES{$uri} eq...)]
 } ## end sub text_from_uri
+
+sub uri_version
+{
+    my ($uri) = @_;
+
+    return $VERSIONS{$uri};
+}
 
 =head2 _get_ppi_document
 
@@ -1200,23 +1284,22 @@ sub _get_ppi_document
     my ($self, %args) = @_;
 
     my $file;
-    my $sha = Digest::SHA->new(256);
 
-    if (length $args{uri})
+    if ($args{text})
     {
-        if (ref $FILES{$args{uri}} eq 'HASH')
+        $file = $args{text};
+    }
+    elsif (length $args{uri})
+    {
+        if (ref $FILES{$args{uri}} eq 'SCALAR')
         {
-            $file = \($FILES{$args{uri}}{text});
+            $file = $FILES{$args{uri}};
         }
         else
         {
             $file = URI->new($args{uri})->file;
         }
-    } ## end if (length $args{uri})
-    elsif ($args{text})
-    {
-        $file = $args{text};
-    }
+    } ## end elsif (length $args{uri})
 
     if (length $args{line})
     {
@@ -1246,35 +1329,10 @@ sub _get_ppi_document
         } ## end elsif (open $fh, '<', $file...)
     } ## end if (length $args{line}...)
 
-    state %documents;
-
-    if (ref $file eq 'SCALAR')
-    {
-        $sha->add(Encode::encode_utf8($$file));
-    }
-    else
-    {
-        return if (not -f $file or not -r $file);
-        $sha->addfile($file);
-    }
-
-    my $digest = $sha->hexdigest();
-
-    if (exists $documents{$digest} and blessed($documents{$digest}{document}) and $documents{$digest}{document}->isa('PPI::Document') and not $args{no_cache})
-    {
-        return $documents{$digest}{document};
-    }
-
     my $document = PPI::Document->new($file, readonly => 1);
     return if (not blessed($document) or not $document->isa('PPI::Document'));
-    $document->index_locations();
-    $documents{$digest} = {document => $document, time => time} if (length $digest and not $args{no_cache});
 
-    # Clear cache after one minute
-    foreach my $digest (keys %documents)
-    {
-        delete $documents{$digest} if (time - $documents{$digest}{time} >= Time::Seconds::ONE_MINUTE);
-    }
+    $document->index_locations();
 
     return $document;
 } ## end sub _get_ppi_document
@@ -1321,9 +1379,88 @@ sub find_word_under_cursor
     @elements = map { $_->tokens } @elements;
     @elements =
       sort { (abs $character - $a->lsp_column_number) <=> (abs $character - $b->lsp_column_number) } @elements;
-    my @in_range         = grep { $_->lsp_column_number <= $character and $_->lsp_column_number + length($_->content) >= $character } @elements;
-    my $element          = first { $_->type eq 'PPI::Token::Word' or $_->type eq 'PPI::Token::Label' or $_->type eq 'PPI::Token::Symbol' } @in_range;
+    my @in_range = grep { $_->lsp_column_number <= $character and $_->lsp_column_number + length($_->content) >= $character } @elements;
+    my $element  = first
+    {
+             $_->type eq 'PPI::Token::Word'
+          or $_->type eq 'PPI::Token::Label'
+          or $_->type eq 'PPI::Token::Symbol'
+          or $_->type eq 'PPI::Token::Magic'
+          or $_->type eq 'PPI::Token::Operator'
+          or $_->type eq 'PPI::Token::Quote::Double'
+          or $_->type eq 'PPI::Token::Quote::Interpolate'
+          or $_->type eq 'PPI::Token::QuoteLike::Regexp'
+          or $_->type eq 'PPI::Token::QuoteLike::Command'
+          or $_->element->isa('PPI::Token::Regexp')
+    } @in_range;
     my $closest_operator = first { $_->type eq 'PPI::Token::Operator' } @elements;
+
+    if (blessed($element) and $element->isa('PLS::Parser::Element') and $element->type eq 'PPI::Token::Operator')
+    {
+        return $element->range(), 0, '', '-' if ((not blessed($element->element->previous_sibling) or $element->element->previous_sibling->isa('PPI::Token::Whitespace')) and $element->content eq '-');
+        undef $element;
+    }
+
+    if (
+            blessed($element)
+        and $element->isa('PLS::Parser::Element')
+        and (   $element->type eq 'PPI::Token::Quote::Double'
+             or $element->type eq 'PPI::Token::Quote::Interpolate'
+             or $element->type eq 'PPI::Token::QuoteLike::Regexp'
+             or $element->type eq 'PPI::Token::QuoteLike::Command'
+             or $element->element->isa('PPI::Token::Regexp'))
+       )
+    {
+        my $string_start = $character - $element->range->{start}{character};
+        my $string_end   = $character - $element->range->{end}{character};
+
+        return if ($string_start <= 0);
+
+        my $string = $element->name;
+
+        if ($string =~ /^"/)
+        {
+            $string = substr $string, 1, -1;
+        }
+        elsif ($string =~ /^(q[qrx]|[ysm]|tr)(\S)/ or $string =~ m{^()(/)})
+        {
+            my $operator      = $1 // '';
+            my $delimiter     = $2;
+            my $end_delimiter = $delimiter;
+            $end_delimiter = '}' if ($delimiter eq '{');
+            $end_delimiter = ')' if ($delimiter eq '(');
+            $end_delimiter = '>' if ($delimiter eq '>');
+            $end_delimiter = ']' if ($delimiter eq ']');
+
+            if ($string =~ /\Q$end_delimiter\E$/)
+            {
+                $string = substr $string, length($operator) + 1, -1;
+            }
+            else
+            {
+                $string = substr $string, length($operator) + 1;
+            }
+        } ## end elsif ($string =~ /^(q[qrx]|[ysm]|tr)(\S)/...)
+
+        state $var_rx = qr/((?&PerlVariable)|[\$\@\%])$PPR::GRAMMAR$/;
+
+        if ($string =~ /$var_rx/)
+        {
+            return {
+                    start => {
+                              line      => $line,
+                              character => $character - length $1
+                             },
+                    end => {
+                            line      => $line,
+                            character => $character
+                           }
+                   },
+              0, '', $1;
+        } ## end if ($string =~ /$var_rx/...)
+
+        undef $element;
+    } ## end if (blessed($element) ...)
 
     if (not blessed($element) or not $element->isa('PLS::Parser::Element'))
     {
@@ -1418,6 +1555,19 @@ sub find_word_under_cursor
 
     return if (not blessed($element) or not $element->isa('PLS::Parser::Element'));
 
+    if ($element->type eq 'PPI::Token::Magic')
+    {
+        my $range = $element->range;
+        $range->{end}{character}--;
+        return $range, 0, '', '$';
+    } ## end if ($element->type eq ...)
+
+    # If we're typing right before a sigil, return the previous element.
+    if ($element->type eq 'PPI::Token::Symbol' and $element->lsp_column_number == $character and blessed($element->previous_sibling) and $element->previous_sibling->isa('PLS::Parser::Element'))
+    {
+        $element = $element->previous_sibling;
+    }
+
     # Short-circuit if this is a HASH reference subscript.
     my $parent = $element->parent;
     $parent = $parent->parent if (blessed($parent) and ref $parent eq 'PLS::Parser::Element');
@@ -1481,7 +1631,12 @@ sub find_word_under_cursor
 
     # This handles the case for when there is an arrow after a variable name
     # but the user has not yet started typing the method name.
-    if (blessed($closest_operator) and $closest_operator->isa('PLS::Parser::Element') and $closest_operator->name eq '->' and $closest_operator->previous_sibling->element == $element->element)
+    if (    blessed($closest_operator)
+        and $closest_operator->isa('PLS::Parser::Element')
+        and $closest_operator->name eq '->'
+        and blessed($closest_operator->previous_sibling)
+        and $closest_operator->previous_sibling->isa('PLS::Parser::Element')
+        and $closest_operator->previous_sibling->element == $element->element)
     {
         my $arrow_range = $closest_operator->range;
         my $range = {

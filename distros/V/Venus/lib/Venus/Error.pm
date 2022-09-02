@@ -14,7 +14,6 @@ with 'Venus::Role::Stashable';
 
 use overload (
   '""' => 'explain',
-  '.' => sub{$_[0]->message . "$_[1]"},
   'eq' => sub{$_[0]->message eq "$_[1]"},
   'ne' => sub{$_[0]->message ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->message)]}/},
@@ -52,6 +51,18 @@ sub build_self {
 }
 
 # METHODS
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('string', true);
+
+  return $assert;
+}
 
 sub id {
   my ($self, $name) = @_;
@@ -162,10 +173,10 @@ sub is {
   my $method = "is_${name}";
 
   if ($self->name && !$self->can($method)) {
-    return $self->name eq $name ? 1 : 0;
+    return $self->name eq $name ? true : false;
   }
 
-  return (ref $self ? $self: $self->new)->$method ? 1 : 0;
+  return (ref $self ? $self: $self->new)->$method ? true : false;
 }
 
 sub name {
@@ -182,13 +193,13 @@ sub of {
   my $method = "of_${name}";
 
   if ($self->name && !$self->can($method)) {
-    return $self->name =~ /$name/ ? 1 : 0;
+    return $self->name =~ /$name/ ? true : false;
   }
 
-  return (ref $self ? $self: $self->new)->$method ? 1 : 0;
+  return (ref $self ? $self: $self->new)->$method ? true : false;
 }
 
-sub origin {
+sub frame {
   my ($self, $index) = @_;
 
   my $frames = $self->frames;
@@ -493,6 +504,66 @@ I<Since C<0.01>>
   my $explain = $error->explain;
 
   # "Exception! in ...
+
+=back
+
+=cut
+
+=head2 frame
+
+  frame(Int $index) (HashRef)
+
+The frame method returns the data from C<caller> on the frames captured, and
+returns a hashref where the keys map to the keys described by
+L<perlfunc/caller>.
+
+I<Since C<1.11>>
+
+=over 4
+
+=item frame example 1
+
+  # given: synopsis;
+
+  my $frame = $error->frame;
+
+  # {
+  #   'bitmask' => '...',
+  #   'evaltext' => '...',
+  #   'filename' => '...',
+  #   'hasargs' => '...',
+  #   'hinthash' => '...',
+  #   'hints' => '...',
+  #   'is_require' => '...',
+  #   'line' => '...',
+  #   'package' => '...',
+  #   'subroutine' => '...',
+  #   'wantarray' => '...',
+  # }
+
+=back
+
+=over 4
+
+=item frame example 2
+
+  # given: synopsis;
+
+  my $frame = $error->frame(1);
+
+  # {
+  #   'bitmask' => '...',
+  #   'evaltext' => '...',
+  #   'filename' => '...',
+  #   'hasargs' => '...',
+  #   'hinthash' => '...',
+  #   'hints' => '...',
+  #   'is_require' => '...',
+  #   'line' => '...',
+  #   'package' => '...',
+  #   'subroutine' => '...',
+  #   'wantarray' => '...',
+  # }
 
 =back
 
@@ -952,22 +1023,6 @@ I<Since C<0.01>>
 This package overloads the following operators:
 
 =cut
-
-=over 4
-
-=item operation: C<(.)>
-
-This package overloads the C<.> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $string = $error . ' Unknown';
-
-  # "Exception! Unknown"
-
-=back
 
 =over 4
 

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.00
+    version 2.01
 
 SYNOPSIS
 
@@ -1560,8 +1560,8 @@ CAVEATS
     Languages that do not support using dynamic libraries from other
     languages
 
-      Like older versions of Google's Go. This is a problem for C / XS code
-      as well.
+      This used to be the case with Google's Go, but is no longer the case.
+      This is a problem for C / XS code as well.
 
     Languages that do not compile to machine code
 
@@ -1706,7 +1706,7 @@ CONTRIBUTING
     making significant changes to the Platypus Core. For that I use
     `FFI-Performance`, which can be found in my GitHub repository here:
 
-    https://github.com/PerlFFI/FFI-Performance
+    https://github.com/Perl5-FFI/FFI-Performance
 
  System integrators
 
@@ -1830,12 +1830,6 @@ SEE ALSO
     Win32::API
 
       Microsoft Windows specific FFI style interface.
-
-    Ctypes <https://gitorious.org/perl-ctypes>
-
-      Ctypes was intended as a FFI style interface for Perl, but was never
-      part of CPAN, and at least the last time I tried it did not work with
-      recent versions of Perl.
 
     FFI
 

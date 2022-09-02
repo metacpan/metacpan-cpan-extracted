@@ -1,5 +1,131 @@
 Revision history for Doit.
 
+0.026	 2022-09-01
+	- stable release, no changes since 0.025_59
+
+0.025_59 2022-08-31
+	- tests
+	  - fix diff-related tests on windows
+
+0.025_58 2022-08-30
+	- internal
+	  - _diff_files may fallback to "fc" instead of "diff" on Windows
+
+0.025_57 2022-08-29
+	- features
+	  - new informational command which
+	  - can_openssl available as informational command from the ssl component
+	- fixes and improvements
+	  - minor changes in new ini component (ini_change return value, use binmode)
+	- documentation
+	  - add documentation for Doit::Ini
+	  - add documentation for Doit::Util
+	  - examples for do_ssh_connect with master_opts
+	- build
+	  - make docker-testing ubuntu:precise possible
+	- tests
+	  - github: test windows
+	  - github: more tests with optional dependencies
+	  - add some test helpers mimic some solaris specialities
+	  - ini.t: test for line endings
+	  - ini.t: fix for Windows
+	  - man.t: fix for Solaris
+	- internal
+	  - new _open2 and _open3 functions usable within Doit
+	  - new _diff_files function usable within Doit
+	  - move Doit::Extcmd::is_in_path implementation to Doit::Util
+
+0.025_56 2022-08-23
+	- features
+	  - new components
+	    - Doit::Ini
+	    - Doit::Pip
+	  - Doit::Deb: deb_install_key may use also wget
+	  - Doit::Git: new function git_get_default_branch
+	- fixes
+	  - Doit::File works now better in dry-run mode
+	  - git_repo_update: handle some edge cases
+	- build improvements
+	  - test_in_docker works for alpine
+	  - test_standard: more configurations
+	  - docker builds: configure safe git directories
+	- tests
+	  - github: new tests using special perl containers
+	  - github: test ubuntu-20.04 and 22.04
+	  - travis-ci: new configuration using arm64
+	  - new test file t/deb.t for Doit::Deb
+	  - various test improvements
+
+0.025_55 2020-01-26
+	- features
+	  - ability to bootstrap perl
+	  - new function rpm_enable_repo
+	  - git_get_commit_hash with new optional parameter 'commit'
+	  - no log coloring for dumb/empty TERM
+	  - regain debian:wheezy support
+	- fixes
+	  - use correct locations for vendor/site packlists
+	  - another Doit::Git corner case regarding checkout branches
+	  - debian_package_with_docker may run on docker-machine systems
+	  - fix handling if old-fashioned Build.PL options
+	  - rework cover handling
+	- tests
+	  - new test file for Doit's own version
+	  - do not hardcode man3 extension
+	  - lwp-http-tiny.t: skip on fatal backend errors
+	  - implement ci testing on github
+	  - travis-ci: adapt for the travis-ci switch to xenial
+	  - test_standard: more distributions to test
+	  - test_standard: two passes now, one with "more testing"
+
+0.025_54 2019-04-28
+	- features
+	  - do_ssh_connect can take a Net::OpenSSH object (GH #3)
+	  - new umask option for do_ssh_connect
+	  - git_get_changed_files: new option ignore_untracked
+	  - new quiet option for chmod and chown commands (used in Doit::File)
+	  - Doit::File: new option check_change
+	- fixes
+	  - Doit::Git: handle more edge cases wrt detached branches
+	  - open3: fill errref before analyzing $?
+	- tests
+	  - new TestUtil helper signal_kill_num
+	  - skip some problematic tests on haiku (atime, root user)
+	  - new build action test_standard
+	  - ci improvements (for appveyor)
+
+0.025_53 2018-03-02
+	- use _pipe_open in all places in Doit::Git
+	- try harder to find "prove"
+	- typo fix in Doit::Git doc
+
+0.025_52 2018-02-24
+	- ssh: explicitely disconnect in DESTROY
+	- workaround: localize $? in ssh DESTROY
+	- new experimental Doit::XTermRPC module
+	- new command info_system
+	- git_repo_update: new option branch
+	- Doit::Lwp: more information in case of 599
+	- Build.PL: new manifypods action
+	- use warnings everywhere
+	- convert "use vars" to our
+	- minimum perl version is now 5.006
+
+0.025_51 2017-12-31
+	- use ExtUtils::Install::install's dry_run mode
+	- skip another test on cygwin
+
+0.025_50 2017-12-23
+	- experimental: do_ssh_connect works from Unix to Windows systems
+	  (using new Doit::WinRPC module and named pipes)
+	- deb_install_key: trusted keys may be in a .d directory (seen
+	  on stretch)
+	- workaround for pure perl getcwd returning "", not undef
+	  (see also perl RT #132648)
+	- check harder if Linux Abstract Namespace Sockes may be used
+	- tests: run with Test::Harness instead with prove
+	- skip some tests on cygwin
+
 0.025	 2017-12-16
 	- stable release, no changes since 0.024_51
 

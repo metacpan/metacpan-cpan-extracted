@@ -1,0 +1,149 @@
+NAME
+    App::FontUtils - Command-line utilities related fonts and font files
+
+VERSION
+    This document describes version 0.001 of App::FontUtils (from Perl
+    distribution App-FontUtils), released on 2022-08-30.
+
+SYNOPSIS
+    This distribution provides tha following command-line utilities related
+    to fonts and font files:
+
+    *   otf2ttf
+
+    *   ttf2otf
+
+FUNCTIONS
+  otf2ttf
+    Usage:
+
+     otf2ttf(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert OTF to TTF.
+
+    This program is a shortcut wrapper for fontforge. This command:
+
+     % otf2ttf foo.otf
+
+    is equivalent to:
+
+     % fontforge -lang=ff -c 'Open($1); Generate($2); Close();' foo.otf foo.ttf
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   otf_file* => *filename*
+
+    *   overwrite => *bool*
+
+    *   ttf_file => *filename*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  ttf2otf
+    Usage:
+
+     ttf2otf(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert TTF to OTF.
+
+    This program is a shortcut wrapper for fontforge. This command:
+
+     % ttf2otf foo.ttf
+
+    is equivalent to:
+
+     % fontforge -lang=ff -c 'Open($1); Generate($2); Close();' foo.ttf foo.otf
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   otf_file => *filename*
+
+    *   overwrite => *bool*
+
+    *   ttf_file* => *filename*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+TODO
+    "list-fonts" to list installed fonts on the system (in a cross-platform
+    way). Tab completion. Filtering OTF/TTF, etc.
+
+    "show-fonts <font names> [text]" to show how fonts look. Allow
+    specifying wildcards. Allow specifying filename for source of text. Tab
+    completion.
+
+    "install-font <font files>" and "uninstall-font <font names>" to install
+    and uninstall fonts (in a cross-platform way). Allow specifying
+    regex/wildcard in uninstall. Tab completion.
+
+    "<search-font">
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-FontUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-FontUtils>.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-FontUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

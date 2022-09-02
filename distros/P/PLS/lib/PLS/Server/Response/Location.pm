@@ -30,8 +30,7 @@ sub new
     bless $self, $class;
 
     my $document = PLS::Parser::Document->new(uri => $request->{params}{textDocument}{uri});
-
-    return $self unless (ref $document eq 'PLS::Parser::Document');
+    return $self if (ref $document ne 'PLS::Parser::Document');
 
     my $results = $document->go_to_definition(@{$request->{params}{position}}{qw(line character)});
 
@@ -39,7 +38,7 @@ sub new
     {
         foreach my $result (@$results)
         {
-            delete $result->{signature};
+            delete @{$result}{qw(package signature kind)};
         }
     } ## end if (ref $results eq 'ARRAY'...)
 

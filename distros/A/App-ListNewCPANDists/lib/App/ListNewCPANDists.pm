@@ -1,14 +1,14 @@
 package App::ListNewCPANDists;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-20'; # DATE
-our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.016'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-02'; # DATE
+our $DIST = 'App-ListNewCPANDists'; # DIST
+our $VERSION = '0.017'; # VERSION
 
 our %SPEC;
 
@@ -81,6 +81,16 @@ our %args_filter = (
         schema => 're*',
         tags => ['category:filtering'],
     },
+    include_dists => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'exclude_dist',
+        schema => ['array*', of=>'perl::distname*'],
+        tags => ['category:filtering'],
+    },
+    include_dist_re => {
+        schema => 're*',
+        tags => ['category:filtering'],
+    },
     exclude_authors => {
         'x.name.is_plural' => 1,
         'x.name.singular' => 'exclude_author',
@@ -88,6 +98,16 @@ our %args_filter = (
         tags => ['category:filtering'],
     },
     exclude_author_re => {
+        schema => 're*',
+        tags => ['category:filtering'],
+    },
+    include_authors => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'include_author',
+        schema => ['array*', of=>'cpan::pause_id*'],
+        tags => ['category:filtering'],
+    },
+    include_author_re => {
         schema => 're*',
         tags => ['category:filtering'],
     },
@@ -408,13 +428,31 @@ sub list_new_cpan_dists {
                 log_info "Distribution %s matches exclude_dist_re, skipped", $dist;
                 next HIT;
             }
+            if ($args{include_dists} && @{ $args{include_dists} } &&
+                    !(grep {$dist eq $_} @{ $args{include_dists} })) {
+                log_info "Distribution %s is not in include_dists, skipped", $dist;
+                next HIT;
+            }
+            if ($args{include_dist_re} && $dist !~ /$args{include_dist_re}/) {
+                log_info "Distribution %s does not match include_dist_re, skipped", $dist;
+                next HIT;
+            }
             if ($args{exclude_authors} && @{ $args{exclude_authors} } &&
                     (grep {$row->{author} eq $_} @{ $args{exclude_authors} })) {
                 log_info "Author %s is in exclude_authors, skipped", $row->{author};
                 next HIT;
             }
             if ($args{exclude_author_re} && $hit->{fields}{author} =~ /$args{exclude_author_re}/) {
-                log_info "Author %s matches exclude_dist_re, skipped", $row->{author};
+                log_info "Author %s matches exclude_author_re, skipped", $row->{author};
+                next HIT;
+            }
+            if ($args{include_authors} && @{ $args{include_authors} } &&
+                    !(grep {$row->{author} eq $_} @{ $args{include_authors} })) {
+                log_info "Author %s is not in include_authors, skipped", $row->{author};
+                next HIT;
+            }
+            if ($args{include_author_re} && $hit->{fields}{author} !~ /$args{include_author_re}/) {
+                log_info "Author %s does not match include_author_re, skipped", $row->{author};
                 next HIT;
             }
         }
@@ -603,7 +641,7 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.016 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2021-08-20.
+This document describes version 0.017 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2022-09-02.
 
 =head1 FUNCTIONS
 
@@ -663,6 +701,14 @@ Arguments ('*' denotes required arguments):
 
 =item * B<exclude_dists> => I<array[perl::distname]>
 
+=item * B<include_author_re> => I<re>
+
+=item * B<include_authors> => I<array[cpan::pause_id]>
+
+=item * B<include_dist_re> => I<re>
+
+=item * B<include_dists> => I<array[perl::distname]>
+
 =item * B<month>* => I<int>
 
 =item * B<year>* => I<int>
@@ -707,6 +753,14 @@ Arguments ('*' denotes required arguments):
 =item * B<exclude_dist_re> => I<re>
 
 =item * B<exclude_dists> => I<array[perl::distname]>
+
+=item * B<include_author_re> => I<re>
+
+=item * B<include_authors> => I<array[cpan::pause_id]>
+
+=item * B<include_dist_re> => I<re>
+
+=item * B<include_dists> => I<array[perl::distname]>
 
 =item * B<month>* => I<int>
 
@@ -782,6 +836,14 @@ Filename of database.
 
 =item * B<from_time> => I<date>
 
+=item * B<include_author_re> => I<re>
+
+=item * B<include_authors> => I<array[cpan::pause_id]>
+
+=item * B<include_dist_re> => I<re>
+
+=item * B<include_dists> => I<array[perl::distname]>
+
 =item * B<this_month> => I<true>
 
 =item * B<this_week> => I<true>
@@ -814,14 +876,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ListNe
 
 Source repository is at L<https://github.com/perlancar/perl-App-ListNewCPANDists>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
@@ -839,15 +893,24 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

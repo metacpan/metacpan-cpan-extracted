@@ -17,7 +17,7 @@ use HTTP::Date;
 use HTTP::Status qw/ :constants /;
 use JSON::MaybeXS 1.004000;
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.3';
 
 
 sub prepare_app {
@@ -113,7 +113,7 @@ Plack::Middleware::TrafficAdvice - handle requests for /.well-known/traffic-advi
 
 =head1 VERSION
 
-version v0.2.1
+version v0.2.3
 
 =head1 SYNOPSIS
 
@@ -187,7 +187,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Robert Rothenberg.
+This software is Copyright (c) 2021-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

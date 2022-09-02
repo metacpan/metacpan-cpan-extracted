@@ -1,5 +1,9 @@
 Release history for Test-Lives
 
+1.003 Fri 02 Sep 2022
+	- Superfluous code removal
+	- Update packaging and package metadata
+
 1.002 Wed 04 Oct 2017
 	- No non-core dependencies
 

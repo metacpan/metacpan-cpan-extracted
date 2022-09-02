@@ -22,17 +22,20 @@ sub init
   my($self, $meta) = @_;
 
   my $list = {
-    type => 'list',
-    list => [
+    type     => 'list',
+    protocol => 'https',
+    list     => [
       map {
         my %h = (
           filename => $_,
-          url      => "http://test1.test/foo/bar/baz/$_",
+          url      => "https://test1.test/foo/bar/baz/$_",
         );
         \%h;
       } ((map { $_->basename } grep { -f $_ } _path('corpus/dist')->children), map { sprintf "foo-0.%02d.tar.gz", $_ } 0..99),
     ],
   };
+
+  $meta->prop->{start_url} = 'https://test1.test/foo/bar/baz/';
 
   $meta->register_hook(
     fetch => sub {
@@ -40,7 +43,7 @@ sub init
 
       $url ||= $self->url;
 
-      if($url =~ qr!^http://test1\.test/foo/bar/baz/?$!)
+      if($url =~ qr!^https://test1\.test/foo/bar/baz/?$!)
       {
         if($self->return_listing_as eq 'list')
         {
@@ -49,9 +52,10 @@ sub init
         elsif($self->return_listing_as =~ /^(?:html|dir_listing)$/)
         {
           return {
-            type    => $self->return_listing_as,
-            base    => 'http://test1.test/foo/bar/baz/',
-            content => 'test content',
+            type     => $self->return_listing_as,
+            base     => 'https://test1.test/foo/bar/baz/',
+            content  => 'test content',
+            protocol => 'https',
           };
         }
         else
@@ -59,7 +63,7 @@ sub init
           die "todo: @{[ $self->return_listing_as ]}";
         }
       }
-      elsif($url =~ qr!^http://test1\.test/foo/bar/baz/(.*)$!)
+      elsif($url =~ qr!^https://test1\.test/foo/bar/baz/(.*)$!)
       {
         my $path = _path "corpus/dist/$1";
         if(-f $path)
@@ -76,6 +80,7 @@ sub init
           {
             $hash{path} = $path->stringify;
           }
+          $hash{protocol} = 'https';
           return \%hash;
         }
         else
@@ -113,4 +118,3 @@ sub init
 }
 
 1;
-

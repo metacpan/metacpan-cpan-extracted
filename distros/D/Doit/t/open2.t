@@ -6,11 +6,18 @@
 #
 
 use strict;
+use FindBin;
+use lib $FindBin::RealBin;
+
 use Test::More;
 
 plan 'no_plan';
 
 use Doit;
+
+use TestUtil qw(signal_kill_num);
+my $KILL = signal_kill_num;
+my $KILLrx = qr{$KILL};
 
 TODO: {
     todo_skip "Hangs on Windows, need to check why", 1 if $^O eq 'MSWin32';
@@ -30,8 +37,8 @@ TODO: {
     is $@->{coredump}, 'without';
 
     eval { $r->open2($^X, '-e', 'kill KILL => $$') };
-    like $@, qr{^Command died with signal 9, without coredump};
-    is $@->{signalnum}, 9;
+    like $@, qr{^Command died with signal $KILLrx, without coredump};
+    is $@->{signalnum}, $KILL;
     is $@->{coredump}, 'without';
 
     is $r->open2({quiet=>1}, $^X, '-e', '#nothing'), '', 'nothing returned; command is also quiet';

@@ -91,6 +91,7 @@ bingos
 book
 brainbuz
 canonpath
+chainable
 codepoints
 cwd
 dagolden

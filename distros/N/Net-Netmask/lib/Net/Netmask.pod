@@ -91,7 +91,7 @@ a mask.  There are many forms that are recognized:
 
 =item '216.240.32.0/24'
 
-The preferred IPv6 form.
+The preferred IPv4 form.
 
 =item '216.240.32.0:255.255.255.0'
 
@@ -140,7 +140,7 @@ With C<new>, the error string can be found as $block->{'ERROR'}.  With
 C<safe_new> the error can be found as Net::Netmask::errstr or $Net::Netmask::error.
 
 IMPORTANT: You want to use C<safe_new> or C<new2> (C<new2> is a synonym
-for C<new>) in new code!
+for C<safe_new>) in new code!
 
 As of version 2.000, the following abbreviated IPv4 netblocks are not accepted
 by default, but can be accepted with options.
@@ -405,7 +405,7 @@ For instance,
 
   Net::Netmask->safe_new( '10.0.0.0/24' )->split(2)
 
-is equivilent to
+is equivalent to
 
   ( Net::Netmask( '10.0.0.0/25'), Net::Netmask( '10.0.0.128/25' ) )
 

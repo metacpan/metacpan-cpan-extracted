@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Show 0.47;
+package Devel::MAT::Tool::Show 0.48;
 
 use v5.14;
 use warnings;
@@ -50,6 +50,14 @@ Prints information about the given SV.
 =cut
 
 use constant CMD_ARGS_SV => 1;
+
+my @SHOW_EXTRA;
+sub register_extra
+{
+   shift;
+   my ( $code ) = @_;
+   push @SHOW_EXTRA, $code;
+}
 
 sub run
 {
@@ -114,6 +122,10 @@ sub run
       my $file = $sv->debug_file;
       Devel::MAT::Cmd->printf( "  created at %s:%d\n", $file, $sv->debug_line )
          if defined $file;
+   }
+
+   foreach my $extra ( @SHOW_EXTRA ) {
+      $extra->( $sv ); # TODO: consider opts?
    }
 
    my $type = $sv->type;
@@ -306,6 +318,7 @@ sub show_PAD_contents
       $padname ? _join( " ",
          ( $padname->is_state ? Devel::MAT::Cmd->format_note( "state" ) : () ),
          ( $padname->is_our   ? Devel::MAT::Cmd->format_note( "our" )   : () ),
+         ( $padname->is_field ? Devel::MAT::Cmd->format_note( "field" ) : () ),
          Devel::MAT::Cmd->format_note( $padname->name, 1 ),
          ( $is_just_outer     ? Devel::MAT::Cmd->format_note( "*OUTER", 2 ) : () ),
          # is_typed and is_lvalue not indicated
@@ -341,7 +354,7 @@ sub show_PAD_contents
          Devel::MAT::Cmd->printf( "  [%*d %-*s]=%s\n",
             $idxlen, $padix,
             $namelen, $padtype{$padix} // "",
-            ( $sv ? Devel::MAT::Cmd->format_sv( $sv ) : "NULL" ),
+            ( $sv ? Devel::MAT::Cmd->format_sv_with_value( $sv ) : "NULL" ),
          );
       }
    }
@@ -375,6 +388,36 @@ sub show_IO
 
    Devel::MAT::Cmd->printf( "  ifileno=%d\n", $io->ifileno ) if defined $io->ifileno;
    Devel::MAT::Cmd->printf( "  ofileno=%d\n", $io->ofileno ) if defined $io->ofileno;
+}
+
+sub show_OBJECT
+{
+   my $self = shift;
+   my ( $obj ) = @_;
+
+   my @fields = $obj->fields;
+
+   foreach my $field ( $obj->blessed->fields ) {
+      my $val = $obj->field( $field->fieldix );
+
+      Devel::MAT::Cmd->printf( "  %s=%s\n",
+         Devel::MAT::Cmd->format_note( $field->name, 1 ),
+         Devel::MAT::Cmd->format_sv_with_value( $val )
+      );
+   }
+}
+
+sub show_CLASS
+{
+   my $self = shift;
+   my ( $cls ) = @_;
+
+   Devel::MAT::Cmd->printf( "  is CLASS\n" );
+
+   $cls->adjust_blocks ? say_with_sv( "  adjust_blocks=", $cls->adjust_blocks )
+                       : ();
+
+   $self->show_STASH( $cls );
 }
 
 sub show_C_STRUCT

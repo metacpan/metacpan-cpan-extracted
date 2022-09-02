@@ -163,7 +163,7 @@ subtest gradient_n_pal => sub {
     # colors for now. Probably Perl Math::Gradient::multi_gradient is
     # different from R's algorithm..
     diag( sprintf( q{gradient_n_pal($colors, $values) : %s}, $colors ) );
-    ok( $colors->at(0) eq '#ff0000' and $colors->at(2) eq '#0000ff',
+    ok( ($colors->at(0) eq '#ff0000' and $colors->at(2) eq '#0000ff'),
         'gradient_n_pal($colors, $values)' );
 };
 

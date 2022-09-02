@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Common;
-$Lab::Moose::Instrument::OI_Common::VERSION = '3.822';
+$Lab::Moose::Instrument::OI_Common::VERSION = '3.823';
 #ABSTRACT: Role for handling Oxfords Instruments pseudo-SCPI commands
 
 use v5.20;
@@ -99,7 +99,7 @@ Lab::Moose::Instrument::OI_Common - Role for handling Oxfords Instruments pseudo
 
 =head1 VERSION
 
-version 3.822
+version 3.823
 
 =head1 DESCRIPTION
 

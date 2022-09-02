@@ -22,13 +22,26 @@ sub BUILD {
 # METHODS
 
 sub default {
+
   return;
+}
+
+sub get {
+  my ($self) = @_;
+
+  return $self->value;
+}
+
+sub set {
+  my ($self, $value) = @_;
+
+  return $self->value($value);
 }
 
 # EXPORTS
 
 sub EXPORT {
-  ['value', 'default']
+  ['default', 'get', 'set', 'value']
 }
 
 1;
@@ -66,7 +79,8 @@ Valuable Role for Perl 5
 =head1 DESCRIPTION
 
 This package modifies the consuming package and provides a C<value> attribute
-which defaults to what's returned by the C<default> method.
+which defaults to what's returned by the C<default> method, as well as C<get>
+and C<set> methods for modifying the value.
 
 =cut
 
@@ -109,6 +123,54 @@ I<Since C<0.01>>
   my $default = $example->default;
 
   # undef
+
+=back
+
+=cut
+
+=head2 get
+
+  get() (Any)
+
+The get method gets and returns the value.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item get example 1
+
+  package main;
+
+  my $example = Example->new(value => 'hey, there');
+
+  my $get = $example->get;
+
+  # "hey, there"
+
+=back
+
+=cut
+
+=head2 set
+
+  set(Any $value) (Any)
+
+The set method set the value and returns the value set.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item set example 1
+
+  package main;
+
+  my $example = Example->new(value => 'hey, there');
+
+  my $set = $example->set('hi, there');
+
+  # "hi, there"
 
 =back
 

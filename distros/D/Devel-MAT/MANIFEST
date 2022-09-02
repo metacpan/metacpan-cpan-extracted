@@ -32,6 +32,7 @@ lib/Devel/MAT/Tool/Sizes.pm
 lib/Devel/MAT/Tool/Stack.pm
 lib/Devel/MAT/Tool/Summary.pm
 lib/Devel/MAT/Tool/Symbols.pm
+lib/Devel/MAT/Tool/Tools.pm
 lib/Devel/MAT/ToolBase/GraphWalker.pm
 lib/Devel/MAT/UI.pod
 lib/Devel/MAT/UserGuide.pod

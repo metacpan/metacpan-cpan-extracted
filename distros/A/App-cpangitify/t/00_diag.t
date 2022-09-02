@@ -21,6 +21,7 @@ $modules{$_} = $_ for qw(
   HTTP::Tiny
   IPC::System::Simple
   JSON::PP
+  Mozilla::CA
   Path::Class
   PerlX::Maybe
   PerlX::Maybe::XS

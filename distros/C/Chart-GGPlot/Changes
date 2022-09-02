@@ -1,5 +1,9 @@
 Revision history for Chart::GGPlot
 
+0.002001    2022-09-02
+  - Adapt to changes in PDL to avoid exception computing date time scales.
+    (Thanks pablrod !)
+
 0.002000    2022-01-04
   - Require Data::Frame 0.006002.
   - PDL-compatibility fixes.

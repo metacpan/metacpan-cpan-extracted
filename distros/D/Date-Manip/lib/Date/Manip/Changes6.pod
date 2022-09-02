@@ -27,11 +27,37 @@ For the most part, Date::Manip has remained backward compatible at
 every release, but occasionally, a change is made which is backward
 incompatible. These are marked with an exclamation mark (!).
 
-#=head1 VERSION 6.90 (expected 2022-12-01)
+#=head1 VERSION 7.00 (expected 2024-12-01)
+#    Remove DM5
+#=head1 VERSION 6.99 (expected )
+#=head1 VERSION 6.98 (expected 2024-09-01)
+#=head1 VERSION 6.97 (expected 2024-06-01)
+#=head1 VERSION 6.96 (expected 2024-03-01)
+#=head1 VERSION 6.95 (expected 2023-12-01)
+#=head1 VERSION 6.94 (expected 2023-09-01)
+#=head1 VERSION 6.93 (expected 2023-06-01)
+#=head1 VERSION 6.92 (expected 2023-03-01)
+#=head1 VERSION 6.91 (expected 2022-12-01)
 
-#=head1 VERSION 6.89 (expected 2022-09-01)
+=head1 VERSION 6.90 (2022-09-01)
 
-=head1 VERSION 6.89 (2022-09-02)
+=over 5
+
+=item (!) Date::Manip 5.xx interface to be removed
+
+The old version of Date::Manip (version 5.xx) has been distributed as part
+of the package in order to support versions of perl older than 5.10 .  I see
+no valid reason to continue to support that, so as of version 7.00, Date::Manip
+will only include the newer interfaces (which require perl 5.10 or newer).
+There are no plans to deprecate the functional interface.
+
+=item Time zone fixes
+
+Newest zoneinfo data (tzdata 2022c).
+
+=back
+
+=head1 VERSION 6.89 (2022-06-02)
 
 =over 5
 

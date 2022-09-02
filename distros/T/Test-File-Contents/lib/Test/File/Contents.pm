@@ -12,7 +12,7 @@ Test::File::Contents - Test routines for examining the contents of files
 
 =cut
 
-our $VERSION = '0.241';
+our $VERSION = '0.242';
 
 use Test::Builder;
 use Digest::MD5;

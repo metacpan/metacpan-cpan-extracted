@@ -63,7 +63,7 @@ while( defined( my $line = $rl->readline(
 
    next unless defined $inv->peek_token; # blank line
 
-   last if $inv->peek_token eq "exit";
+   last if $inv->peek_token eq "exit" or $inv->peek_token eq "quit";
 
    try {
       # We just have to hope nobody catches this one.

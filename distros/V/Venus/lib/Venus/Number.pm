@@ -16,7 +16,6 @@ use overload (
   '*' => sub{$_[0]->get * ($_[1] + 0)},
   '+' => sub{$_[0]->get + ($_[1] + 0)},
   '-' => sub{$_[0]->get - ($_[1] + 0)},
-  '.' => sub{$_[0]->get . ($_[1] + 0)},
   '/' => sub{$_[0]->get / ($_[1] + 0)},
   '0+' => sub{$_[0]->get + 0},
   '<' => sub{$_[0]->get < ($_[1] + 0)},
@@ -42,6 +41,41 @@ sub abs {
   return CORE::abs($data);
 }
 
+sub add {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data + ($arg + 0);
+}
+
+sub append {
+  my ($self, @args) = @_;
+
+  return $self->append_with(undef, @args);
+}
+
+sub append_with {
+  my ($self, $delimiter, @args) = @_;
+
+  my $data = $self->get;
+
+  return CORE::join($delimiter // '', $data, @args);
+}
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('number', true);
+  $assert->constraint('float', true);
+
+  return $assert;
+}
+
 sub atan2 {
   my ($self, $arg) = @_;
 
@@ -54,6 +88,28 @@ sub comparer {
   my ($self) = @_;
 
   return 'numified';
+}
+
+sub concat {
+  my ($self, @args) = @_;
+
+  my $data = $self->get;
+
+  return CORE::join('', $data, @args);
+}
+
+sub contains {
+  my ($self, $pattern) = @_;
+
+  my $data = $self->get;
+
+  return 0 unless CORE::defined($pattern);
+
+  my $regexp = UNIVERSAL::isa($pattern, 'Regexp');
+
+  return CORE::index($data, $pattern) < 0 ? 0 : 1 if !$regexp;
+
+  return ($data =~ $pattern) ? true : false;
 }
 
 sub cos {
@@ -73,7 +129,16 @@ sub decr {
 }
 
 sub default {
+
   return 0;
+}
+
+sub div {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data / ($arg + 0);
 }
 
 sub exp {
@@ -100,12 +165,29 @@ sub incr {
   return $data + (($arg || 1) + 0);
 }
 
+sub index {
+  my ($self, $substr, $start) = @_;
+
+  my $data = $self->get;
+
+  return CORE::index($data, $substr) if not(CORE::defined($start));
+  return CORE::index($data, $substr, $start);
+}
+
 sub int {
   my ($self) = @_;
 
   my $data = $self->get;
 
   return CORE::int($data);
+}
+
+sub length {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return CORE::length($data);
 }
 
 sub log {
@@ -116,12 +198,28 @@ sub log {
   return CORE::log($data);
 }
 
+sub lshift {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data << ($arg + 0);
+}
+
 sub mod {
   my ($self, $arg) = @_;
 
   my $data = $self->get;
 
   return $data % ($arg + 0);
+}
+
+sub multi {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data * ($arg + 0);
 }
 
 sub neg {
@@ -148,6 +246,20 @@ sub pow {
   return $data ** ($arg + 0);
 }
 
+sub prepend {
+  my ($self, @args) = @_;
+
+  return $self->prepend_with(undef, @args);
+}
+
+sub prepend_with {
+  my ($self, $delimiter, @args) = @_;
+
+  my $data = $self->get;
+
+  return CORE::join($delimiter // '', @args, $data);
+}
+
 sub range {
   my ($self, $arg) = @_;
 
@@ -156,6 +268,22 @@ sub range {
   return [
     ($data > ($arg + 0)) ? CORE::reverse(($arg + 0)..$data) : ($data..($arg + 0))
   ];
+}
+
+sub repeat {
+  my ($self, $count, $delimiter) = @_;
+
+  my $data = $self->get;
+
+  return CORE::join($delimiter // '', CORE::map $data, 1..($count || 1));
+}
+
+sub rshift {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data >> ($arg + 0);
 }
 
 sub sin {
@@ -172,6 +300,29 @@ sub sqrt {
   my $data = $self->get;
 
   return CORE::sqrt($data);
+}
+
+sub sub {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data - ($arg + 0);
+}
+
+sub substr {
+  my ($self, $offset, $length, $replace) = @_;
+
+  my $data = $self->get;
+
+  if (CORE::defined($replace)) {
+    my $result = CORE::substr($data, $offset // 0, $length // 0, $replace);
+    return wantarray ? ($result, $data) : $data;
+  }
+  else {
+    my $result = CORE::substr($data, $offset // 0, $length // 0);
+    return wantarray ? ($result, $data) : $result;
+  }
 }
 
 1;
@@ -271,6 +422,74 @@ I<Since C<0.01>>
   my $abs = $number->abs;
 
   # 12
+
+=back
+
+=cut
+
+=head2 add
+
+  add(Num $value) (Num)
+
+The add method returns the result of addition performed on the argument
+provided.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item add example 1
+
+  # given: synopsis;
+
+  my $add = $number->add(1_000);
+
+  # 2000
+
+=back
+
+=cut
+
+=head2 append
+
+  append(Str @parts) (Str)
+
+The append method appends arugments to the number.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item append example 1
+
+  # given: synopsis;
+
+  my $append = $number->append(0);
+
+  # 10_000
+
+=back
+
+=cut
+
+=head2 append_with
+
+  append_with(Str $delimiter, Str @parts) (Str)
+
+The append_with method appends arugments to the number using the delimiter
+provided.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item append_with example 1
+
+  # given: synopsis;
+
+  my $append = $number->append_with('.', 0);
+
+  # "1000.0"
 
 =back
 
@@ -474,6 +693,91 @@ I<Since C<0.08>>
 
 =cut
 
+=head2 concat
+
+  concat(Str @parts) (Str)
+
+The concat method returns the number with the argument list appended to it.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item concat example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_000);
+
+  my $concat = $number->concat('.', '0001');
+
+  # "1000.0001"
+
+=back
+
+=cut
+
+=head2 contains
+
+  contains(Str $expr) (Bool)
+
+The contains method searches the number for a substring or expression returns
+true or false if found.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item contains example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $contains = $number->contains(10);
+
+  # 1
+
+=back
+
+=over 4
+
+=item contains example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $contains = $number->contains(2);
+
+  # 0
+
+=back
+
+=over 4
+
+=item contains example 3
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $contains = $number->contains(qr/01$/);
+
+  # 1
+
+=back
+
+=cut
+
 =head2 cos
 
   cos() (Num)
@@ -544,7 +848,7 @@ I<Since C<0.01>>
 
 =head2 default
 
-  default() (Int)
+  default() (Num)
 
 The default method returns the default value, i.e. C<0>.
 
@@ -559,6 +863,29 @@ I<Since C<0.01>>
   my $default = $number->default;
 
   # 0
+
+=back
+
+=cut
+
+=head2 div
+
+  div(Num $value) (Num)
+
+The div method returns the result of division performed on the argument
+provided.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item div example 1
+
+  # given: synopsis;
+
+  my $div = $number->div(2);
+
+  # 500
 
 =back
 
@@ -1549,9 +1876,68 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 index
+
+  index(Str $substr, Int $start) (Num)
+
+The index method searches for the argument within the number and returns the
+position of the first occurrence of the argument.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item index example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $index = $number->index(0);
+
+  # 1
+
+=back
+
+=over 4
+
+=item index example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $index = $number->index(1, 1);
+
+  # 4
+
+=back
+
+=over 4
+
+=item index example 3
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $index = $number->index(2);
+
+  # -1
+
+=back
+
+=cut
+
 =head2 int
 
-  int() (Int)
+  int() (Num)
 
 The int method returns the integer portion of the number. Do not use this
 method for rounding.
@@ -1748,6 +2134,28 @@ I<Since C<0.08>>
 
 =cut
 
+=head2 length
+
+  length() (Num)
+
+The length method returns the number of characters within the number.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item length example 1
+
+  # given: synopsis;
+
+  my $length = $number->length;
+
+  # 4
+
+=back
+
+=cut
+
 =head2 log
 
   log() (Num)
@@ -1769,6 +2177,29 @@ I<Since C<0.01>>
   my $log = $number->log;
 
   # 9.42100640177928
+
+=back
+
+=cut
+
+=head2 lshift
+
+  lshift(Num $value) (Num)
+
+The lshift method returns the result of a left shift performed on the argument
+provided.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item lshift example 1
+
+  # given: synopsis;
+
+  my $lshift = $number->lshift(2);
+
+  # 4000
 
 =back
 
@@ -1947,7 +2378,7 @@ I<Since C<0.08>>
 
 =head2 mod
 
-  mod() (Int)
+  mod() (Num)
 
 The mod method returns the division remainder of the number divided by the
 argment.
@@ -1999,6 +2430,29 @@ I<Since C<0.01>>
   my $mod = $number->mod(5);
 
   # 2
+
+=back
+
+=cut
+
+=head2 multi
+
+  multi(Num $value) (Num)
+
+The multi method returns the result multiplication performed on the argument
+provided.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item multi example 1
+
+  # given: synopsis;
+
+  my $multi = $number->multi(2);
+
+  # 2000
 
 =back
 
@@ -2203,7 +2657,7 @@ I<Since C<0.01>>
 
 =head2 numified
 
-  numified() (Int)
+  numified() (Num)
 
 The numified method returns the numerical representation of the object. For
 number objects this method returns the object's underlying value.
@@ -2283,6 +2737,51 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 prepend
+
+  prepend(Str @parts) (Str)
+
+The prepend method prepends arugments to the number.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item prepend example 1
+
+  # given: synopsis;
+
+  my $prepend = $number->prepend(1);
+
+  # 11_000
+
+=back
+
+=cut
+
+=head2 prepend_with
+
+  prepend_with(Str $delimiter, Str @parts) (Str)
+
+The prepend_with method prepends arugments to the number using the delimiter
+provided.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item prepend_with example 1
+
+  # given: synopsis;
+
+  my $prepend = $number->prepend_with('.', '11');
+
+  # "11.1000"
+
+=back
+
+=cut
+
 =head2 range
 
   range() (ArrayRef)
@@ -2321,6 +2820,73 @@ I<Since C<0.01>>
   my $range = $number->range(1);
 
   # [5, 4, 3, 2, 1]
+
+=back
+
+=cut
+
+=head2 repeat
+
+  repeat(Num $number, Str $delimiter) (Str)
+
+The repeat method repeats the number value N times based on the argument provided
+and returns a new concatenated number. Optionally, a delimiter can be provided
+and be place between the occurences.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item repeat example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new('999');
+
+  my $repeat = $number->repeat(2);
+
+  # 999999
+
+=back
+
+=over 4
+
+=item repeat example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new('999');
+
+  my $repeat = $number->repeat(2, '.');
+
+  # 999.999
+
+=back
+
+=cut
+
+=head2 rshift
+
+  rshift(num $value) (Num)
+
+The rshift method returns the result a right shift performed on the argument
+provided.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item rshift example 1
+
+  # given: synopsis;
+
+  my $rshift = $number->rshift(2);
+
+  # 250
 
 =back
 
@@ -2373,6 +2939,104 @@ I<Since C<0.01>>
   my $sqrt = $number->sqrt;
 
   # 111.108055513541
+
+=back
+
+=cut
+
+=head2 sub
+
+  sub(Num $value) (Num)
+
+The sub method returns the result subtraction performed on the argument
+provided.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item sub example 1
+
+  # given: synopsis;
+
+  my $sub = $number->sub(500);
+
+  # 500
+
+=back
+
+=cut
+
+=head2 substr
+
+  substr(Num $offset, Num $length, Str $replace) (Str)
+
+The substr method calls the core L</substr> function with the object's number
+value. In list context returns the result and the subject.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item substr example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1234567890);
+
+  my $substr = $number->substr(0, 5);
+
+  # 12345
+
+=back
+
+=over 4
+
+=item substr example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1234567890);
+
+  my $substr = $number->substr(6, 5);
+
+  # 7890
+
+=back
+
+=over 4
+
+=item substr example 3
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1234567890);
+
+  my $substr = $number->substr(6, 5, '0000');
+
+  # "1234560000"
+
+=back
+
+=over 4
+
+=item substr example 4
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1234567890);
+
+  my ($result, $subject) = $number->substr(6, 5, '0000');
+
+  # ("789", "1234560000")
 
 =back
 

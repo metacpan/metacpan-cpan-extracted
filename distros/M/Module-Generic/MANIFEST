@@ -45,6 +45,7 @@ README
 README.md
 SIGNATURE			Public-key signature (added by MakeMaker)
 t/00.load.t
+t/01.core_methods.t
 t/01.pod.t
 t/02.num.t
 t/03.hash.t
@@ -65,6 +66,7 @@ t/17.serialise_storable.t
 t/18.serialise_sereal.t
 t/19.serialise_cbor.t
 t/20.mmap.t
+t/21.serialise_cbor_free.t
 t/90.coverage.t
 t/91.signature.t
 t/99.kwalitee.t

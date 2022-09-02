@@ -1,5 +1,9 @@
 CHANGES
 
+20220902        2022-09-02
+
+            * Fix the tests with latest Perl::Tidy
+
 20210709        2021-07-09
 
             * Fix the tests when TEST_AUTHOR=1

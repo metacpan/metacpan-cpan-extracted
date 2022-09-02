@@ -708,8 +708,8 @@ MAIN: {
     $block77->storeNetblock();
     is( findNetblock( "10.2.1.0", $table77 ), undef );
 
-    my $table77 = {};
-    my $block77 = Net::Netmask->safe_new("10.1.2.0/24");
+    $table77 = {};
+    $block77 = Net::Netmask->safe_new("10.1.2.0/24");
     $block77->storeNetblock();
     is( findNetblock( "10.2.1.0", $table77 ), undef );
 

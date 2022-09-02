@@ -3,28 +3,28 @@ abstract: 'monkey-patch DBIx::Simple to use SQL::Concrete'
 author:
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
 build_requires:
-  File::Find: 0
-  File::Temp: 0
-  Test::More: 0.88
-  lib: 0
-configure_requires:
-  ExtUtils::MakeMaker: 0
+  Test::More: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-Simple-Concrete
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  DBIx::Simple: 0
-  Import::Into: 0
-  SQL::Concrete: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  DBIx::Simple: '0'
+  SQL::Concrete: '0'
+  perl: '5.006'
 resources:
-  bugtracker: http://github.com/ap/DBIx-Simple-Concrete/issues
-  homepage: http://github.com/ap/DBIx-Simple-Concrete
-  repository: git://github.com/ap/DBIx-Simple-Concrete
-version: 1.001
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Simple-Concrete
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/DBIx-Simple-Concrete.git
+version: '1.007'
+x_copyright:
+  holder: 'Aristotle Pagaltzis'
+  year: 2022
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

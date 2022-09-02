@@ -9,6 +9,10 @@ plugin 'PkgConfig' => (
     pkg_name        => [qw/ libbrotlicommon libbrotlienc libbrotlidec /],
     minimum_version => MINIMUM_VERSION,
 );
+plugin 'Probe::CommandLine' => (
+    command => 'brotli',
+    secondary => 1,
+);
 
 share {
 

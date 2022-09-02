@@ -17,11 +17,11 @@ terms as Perl itself.
 
 =cut
 
-use Test::More;
+use Test2::V0;
 use JSON::Path -all;
 
-use JSON;
-my $object = from_json(<<'JSON');
+use JSON::MaybeXS;
+my $object = decode_json(<<'JSON');
 {
 	"store": {
 		"book": [
@@ -62,9 +62,9 @@ JSON
 
 my $path1 = '$.store.book[*].title';
 
-is_deeply( [ jpath1( $object, $path1 ) ], ['Sayings of the Century'], );
+is( [ jpath1( $object, $path1 ) ], ['Sayings of the Century'], );
 
-is_deeply(
+is(
     [ jpath( $object, $path1 ) ],
     [ 'Sayings of the Century', 'Sword of Honour', 'Moby Dick', 'The Lord of the Rings' ],
 );

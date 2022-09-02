@@ -45,6 +45,7 @@ my %WriteMakefileArgs = (
     "HTTP::Tiny"                   => 0,
     "IPC::System::Simple"          => 0,
     "JSON::PP"                     => 0,
+    "Mozilla::CA"                  => 0,
     "Path::Class"                  => "0.26",
     "PerlX::Maybe"                 => "0.003",
     "Test2::API"                   => "1.302086",
@@ -59,7 +60,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"                  => "0.000121",
     "URI::file"                  => 0
   },
-  "VERSION" => "0.19",
+  "VERSION" => "0.20",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -76,6 +77,7 @@ my %FallbackPrereqs = (
   "HTTP::Tiny"                   => 0,
   "IPC::System::Simple"          => 0,
   "JSON::PP"                     => 0,
+  "Mozilla::CA"                  => 0,
   "Path::Class"                  => "0.26",
   "PerlX::Maybe"                 => "0.003",
   "Test2::API"                   => "1.302086",

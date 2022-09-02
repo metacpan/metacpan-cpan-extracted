@@ -1,5 +1,4 @@
-package # hide from PAUSE
-	PlainClass;
+package PlainClass;
 
 sub new { my $class = shift; bless { @_ }, $class }
 

@@ -12,7 +12,7 @@ _init();
 our @EXPORT = grep /^FFI_PL/, keys %FFI::Platypus::Internal::;
 
 # ABSTRACT: For internal use only
-our $VERSION = '2.00'; # VERSION
+our $VERSION = '2.01'; # VERSION
 
 
 1;
@@ -29,7 +29,7 @@ FFI::Platypus::Internal - For internal use only
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 SYNOPSIS
 

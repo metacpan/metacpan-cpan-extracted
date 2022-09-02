@@ -2,7 +2,7 @@ NAME
     Path::Tiny - File path utility
 
 VERSION
-    version 0.122
+    version 0.124
 
 SYNOPSIS
       use Path::Tiny;
@@ -186,7 +186,7 @@ CONSTRUCTORS
         my $target_dir = path('/to/destination');
         my $tempfile = $target_dir->tempfile('foobarXXXXXX');
         $tempfile->spew('A lot of data...');  # not atomic
-        $tempfile->rename($target_dir->child('foobar')); # hopefully atomic
+        $tempfile->move($target_dir->child('foobar')); # hopefully atomic
 
     In this case, any value set for option "DIR" is ignored.
 
@@ -583,6 +583,9 @@ METHODS
     passed through to "make_path". Errors will be trapped and an exception
     thrown. Returns the list of directories created or an empty list if the
     directories already exist, just like "make_path".
+
+    See also "touchpath" as a chainable alternative to create a writeable
+    file path (though without options).
 
     Current API available since 0.001.
 

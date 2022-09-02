@@ -10,7 +10,7 @@ use Cwd qw /getcwd/;
 use Path::Tiny qw /path/;
 
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub init {

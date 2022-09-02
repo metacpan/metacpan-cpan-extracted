@@ -1,8 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.88; # for done_testing
-use Test::Fatal 'exception';
+use Test::More tests => 37;
 use Test::Lives;
 use Object::Properties ();
 
@@ -27,22 +26,25 @@ for my $obj ( SomeClass->new( rw => 1, ro => 2, xx => 3 ) ) {
 
 	lives_and { is $obj->rw, 1, $_ } 'Accessors exist and give the expected answers';
 	lives_and { is $obj->ro, 2, $_ } '... for declared fields';
-	like exception { $obj->xx }, qr/locate object method/, '... but not for other keys';
+	lives_and { eval { $obj->xx; 1 } ? die : like $@, qr/locate object method/, $_ } '... but not for other keys';
 
 	lives_and { $obj->rw = 42; is $obj->rw, 42, $_ } 'Read-write accessors can be written to';
-	like exception { $obj->ro = 42 }, qr/non-lvalue/, '... but not read-only ones';
+	lives_and { eval { $obj->ro = 42; 1 } ? die : like $@, qr/non-lvalue/, $_ } '... but not read-only ones';
 }
 
-like exception { package Foo; Object::Properties->import( 'bad identifier' ) },
-	qr/Invalid accessor name/, 'Bad identifiers are rejected';
+lives_and {
+	eval { package Foo; Object::Properties->import( 'bad identifier' ); 1 } && die;
+	like $@, qr/Invalid accessor name/, $_;
+}
+	'Bad identifiers are rejected';
 
-like exception { SomeClass->new->rw_die = 'hello!' }, qr/hello!/,
+lives_and { eval { SomeClass->new->rw_die = 'hello!'; 1 } ? die : like $@, qr/hello!/, $_ }
 	'Checks are called on write ...';
 
-like exception { SomeClass->new( rw_die => 'hello!' ) }, qr/hello!/,
+lives_and { eval { SomeClass->new( rw_die => 'hello!' ); 1 } ? die : like $@, qr/hello!/, $_ }
 	'... and during instantiation';
 
-like exception { SomeClass->new( ro_die => 'hello!' ) }, qr/hello!/,
+lives_and { eval { SomeClass->new( ro_die => 'hello!' ); 1 } ? die : like $@, qr/hello!/, $_ }
 	'... even on read-only fields';
 
 for my $obj ( SomeClass->new( ro_munged => 'AAA', rw_munged => 'AAA', bitbucket => 'AAA' ) ) {
@@ -68,7 +70,5 @@ for my $obj ( SubClass->new( foo => 1, bar => 2, baz => 3 ) ) {
 	is $obj->{'baz'}, 3, '... and "baz"';
 	lives_and { is $obj->foo, 1, $_ } 'Accessors exist and give the expected answers';
 	lives_and { is $obj->bar, 2, $_ } '... for declared fields';
-	like exception { $obj->baz }, qr/locate object method/, '... but not for other keys';
+	lives_and { eval { $obj->baz; 1 } ? die : like $@, qr/locate object method/, $_ } '... but not for other keys';
 }
-
-done_testing;

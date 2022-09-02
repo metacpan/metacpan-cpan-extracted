@@ -4,6 +4,7 @@ use File::Temp qw( tempdir );
 use Path::Tiny qw( path );
 use File::chdir;
 use lib 'corpus/lib';
+use Data::Dumper;
 use Capture::Tiny qw( capture_merged );
 
 delete $ENV{$_} for qw( ALIEN_BUILD_PRELOAD ALIEN_BUILD_POSTLOAD ALIEN_INSTALL_TYPE );
@@ -28,17 +29,31 @@ subtest 'share' => sub {
     use alienfile;
     use Path::Tiny qw( path );
 
+    plugin 'Test::Mock',
+      probe    => 'share',
+      download => {
+        'foo-1.00.tar.gz' => 'testdata',
+      },
+      extract  => 1;
+
     configure { requires 'Foo' => '2.01' };
     probe sub { 'share' };
     share {
       requires 'Bar' => '0.01';
-      download sub {
-        path('foo-1.00.tar.gz')->spew('testdata');
+
+      # TODO: remove this when newer version of AB is required
+      # workaround so this works in old and new
+      # versions of AB
+      after download => sub {
+        my($build) = @_;
+        my $tarball = Path::Tiny->new('foo-1.00.tar.gz')->absolute->stringify;
+        $build->install_prop->{download_detail}->{$tarball}->{digest} ||= [ FAKE => 'deadbeaf' ];
+        $build->install_prop->{download_detail}->{$tarball}->{protocol} ||= 'file';
       };
-      extract sub {
-        path('file1')->touch;
-        path('file2')->touch;
-      };
+
+      # TODO: remove this when newer version of AB is required
+      meta->register_hook(check_digest => sub { 1 });
+
       build sub {
         my($build) = @_;
         $build->install_prop->{did_the_install} = 1;
@@ -121,7 +136,16 @@ subtest 'share' => sub {
   };
 
   subtest 'build' => sub {
-    note scalar capture_merged { $abmb->ACTION_alien_build };
+    my($out, $error) = capture_merged {
+      eval { $abmb->ACTION_alien_build };
+      $@;
+    };
+
+    is($error, '', 'build did not error ') || do {
+      diag Dumper($abmb->alien_build);
+      return;
+    };
+
     my $build = $abmb->alien_build(1);
     is $build->install_prop->{did_the_install}, T();
     ok -f "blib/lib/Alien/Foo/Install/Files.pm", "created Alien::Foo::Install::Files";

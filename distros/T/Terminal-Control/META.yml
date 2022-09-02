@@ -17,6 +17,8 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '0.04'
+requires:
+  Time::HiRes: '1.9764'
+  Try::Catch: v1.1.0
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

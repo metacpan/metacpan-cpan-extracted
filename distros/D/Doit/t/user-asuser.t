@@ -53,6 +53,7 @@ unshift @INC, $FindBin::RealBin;
 require TestUtil;
 
 plan skip_all => 'Does not work on Windows' if $^O eq 'MSWin32'; # too many unix-isms used
+plan skip_all => 'cygwin does not have a root user' if $^O eq 'cygwin';
 plan 'no_plan';
 
 my $doit = Doit->init;
@@ -95,7 +96,9 @@ for my $cache (undef, 1, 1, 0) {
 
 ######################################################################
 # as_user root
-{
+SKIP: {
+    skip "haiku does not have a root user", 2 if $^O eq 'haiku';
+
     my $as_user_body_called;
     eval {
 	as_user {

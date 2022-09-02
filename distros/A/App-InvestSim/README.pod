@@ -6,19 +6,27 @@ A Perl/Tk application to simulate the return of a rental property investment.
 This is tuned for French taxes and benefits and, given that, the application is
 entirely localized in French.
 
+=head2 PRE-BUILT BINARIES
+
+You can download a pre-built Windows binary from the
+L<GitHub release page of the project|https://github.com/mkende/investment_simulator/releases>.
+That binary is a self-installing archive. On the first run it will unzip
+itself in a temporary folder, so that first run is quite slow. Subsequent
+runs are faster to launch.
+
+=head2 AUTOMATED INSTALLATION FROM CPAN
+
 Install with:
 
     sudo apt-get install perl make tcl tk tcllib tklib
     cpan App::InvestSim
 
-And then run it with:
+If this is the first time you run `cpan`, just select `auto` for the configuration
+and select `sudo` as the installation mode if you want to install for all users.
+
+And then run the program with:
 
     investment_simulator
-
-Alternatively, you can download a pre-built Windows binary from the GitHub release
-page of the project. That binary is a self-installing archive. On the first run it
-will unzip itself in a temporary folder, so that first run is quite slow. Subsequent
-runs are faster to launch.
 
 =head2 MANUAL INSTALLATION FROM SOURCE
 
@@ -33,6 +41,9 @@ runs are faster to launch.
     # These Perl modules are needed too, but they are installed
     # automatically if you install the program with cpan:
     cpan Tkx CLDR::Number File::HomeDir File::ShareDir File::ShareDir::Install
+
+If this is the first time you run `cpan`, just select `auto` for the configuration
+and select `sudo` as the installation mode if you want to install for all users.
 
 =head3 INSTALLATION
 
@@ -52,10 +63,7 @@ commands to install the program:
 If you have a working Windows Perl and TCL/Tk installation, you can create a
 self installing binary using the C<Par-Packer> module:
 
-    pp -o investment_simulator.exe -c -x -A pp_includes.txt -I lib \
-        --link=C:\TclTk\8.6.9\bin\zlib1.dll script\investment_simulator \
-        --gui -M CLDR::Number::Role::Format -cd par.cache \
-        -a res\icon.ico;res\icon.ico
+    pp -o investment_simulator.exe -c -x -A pp_includes.txt -I lib --link=C:\TclTk\8.6.9\bin\zlib1.dll script\investment_simulator --gui -M CLDR::Number::Role::Format -cd par.cache -a res\icon.ico;res\icon.ico
 
 The C<pp_includes.txt> file should contain the following content (of course,
 the path should be fixed for the version of TCL, Tk, and tklib that you

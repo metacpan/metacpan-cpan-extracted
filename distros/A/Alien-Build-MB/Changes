@@ -1,5 +1,9 @@
 Revision history for Alien-Build-MB
 
+0.09      2022-08-29 11:48:55 -0600
+  - Tests are now passable with ALIEN_DOWNLOAD_RULE
+    overrides (gh#16)
+
 0.08      2022-03-23 12:29:50 -0600
   - Generated ::Install::Files POD missing pod coverage
     exception (gh#7, gh#14)

@@ -93,7 +93,6 @@ corpus/lib/pkgconfig/xor-chillout.pc
 corpus/lib/pkgconfig/xor.pc
 corpus/pkgconfig/libbar1.pc
 corpus/pkgconfig/libfoo1.pc
-corpus/rc/basic.pl
 corpus/vcpkg/r1/.vcpkg-root
 corpus/vcpkg/r1/installed/x64-windows/debug/lib/foo.lib
 corpus/vcpkg/r1/installed/x64-windows/include/foo.h
@@ -189,12 +188,14 @@ lib/Alien/Build/Log.pm
 lib/Alien/Build/Log/Abbreviate.pm
 lib/Alien/Build/Log/Default.pm
 lib/Alien/Build/MM.pm
+lib/Alien/Build/Manual.pod
 lib/Alien/Build/Manual/Alien.pod
 lib/Alien/Build/Manual/AlienAuthor.pod
 lib/Alien/Build/Manual/AlienUser.pod
 lib/Alien/Build/Manual/Contributing.pod
 lib/Alien/Build/Manual/FAQ.pod
 lib/Alien/Build/Manual/PluginAuthor.pod
+lib/Alien/Build/Manual/Security.pod
 lib/Alien/Build/Manual/image/PluginAuthor-flowchart.png
 lib/Alien/Build/Manual/image/PluginAuthor-flowchart.svg
 lib/Alien/Build/Plugin.pm
@@ -239,7 +240,9 @@ lib/Alien/Build/Plugin/Fetch/Local.pm
 lib/Alien/Build/Plugin/Fetch/LocalDir.pm
 lib/Alien/Build/Plugin/Fetch/NetFTP.pm
 lib/Alien/Build/Plugin/Fetch/Wget.pm
+lib/Alien/Build/Plugin/Gather.pod
 lib/Alien/Build/Plugin/Gather/IsolateDynamic.pm
+lib/Alien/Build/Plugin/PkgConfig.pod
 lib/Alien/Build/Plugin/PkgConfig/CommandLine.pm
 lib/Alien/Build/Plugin/PkgConfig/LibPkgConf.pm
 lib/Alien/Build/Plugin/PkgConfig/MakeStatic.pm
@@ -253,6 +256,7 @@ lib/Alien/Build/Plugin/Probe.pod
 lib/Alien/Build/Plugin/Probe/CBuilder.pm
 lib/Alien/Build/Plugin/Probe/CommandLine.pm
 lib/Alien/Build/Plugin/Probe/Vcpkg.pm
+lib/Alien/Build/Plugin/Test.pod
 lib/Alien/Build/Plugin/Test/Mock.pm
 lib/Alien/Build/Temp.pm
 lib/Alien/Build/Util.pm
@@ -284,6 +288,7 @@ t/alien_base__system_installed.t
 t/alien_base_pkgconfig.t
 t/alien_base_wrapper.t
 t/alien_build.t
+t/alien_build__download_rule.t
 t/alien_build_commandsequence.t
 t/alien_build_commandsequence__cd.t
 t/alien_build_interpolate.t
@@ -346,6 +351,8 @@ t/alien_build_plugin_probe_commandline.t
 t/alien_build_plugin_probe_vcpkg.t
 t/alien_build_plugin_test_mock.t
 t/alien_build_rc.t
+t/alien_build_rc__prepostload.t
+t/alien_build_rc__prepostload_plugin.t
 t/alien_build_temp.t
 t/alien_build_tempdir.t
 t/alien_build_util.t
@@ -376,6 +383,7 @@ xt/author/filename.t
 xt/author/no_tabs.t
 xt/author/pod.t
 xt/author/pod_coverage.t
+xt/author/pod_link.t
 xt/author/pod_spelling_system.t
 xt/author/version.t
 xt/release/changes.t

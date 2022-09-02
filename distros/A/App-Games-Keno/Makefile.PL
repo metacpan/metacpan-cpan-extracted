@@ -16,11 +16,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "App::Games::Keno",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "List::Compare" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "List::Util" => 0,
+    "Moose" => 0,
+    "Types::Standard" => 0
   },
-  "VERSION" => "1.222380",
+  "VERSION" => "1.222450",
   "test" => {
     "TESTS" => ""
   }
@@ -28,9 +30,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "List::Compare" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "List::Util" => 0,
+  "Moose" => 0,
+  "Types::Standard" => 0
 );
 
 

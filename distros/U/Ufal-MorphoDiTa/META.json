@@ -4,13 +4,13 @@
       "Milan Straka <straka@ufal.mff.cuni.cz>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "open_source"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Ufal-MorphoDiTa",
    "prereqs" : {
@@ -29,99 +29,94 @@
    "provides" : {
       "Ufal::MorphoDiTa" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::Analyses" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::DerivatedLemma" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::DerivatedLemmas" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::DerivationFormatter" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::Derivator" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::Forms" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::Indices" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::Morpho" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::TaggedForm" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::TaggedForms" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::TaggedLemma" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::TaggedLemmaForms" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::TaggedLemmas" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::TaggedLemmasForms" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::Tagger" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::TagsetConverter" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::TokenRange" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::TokenRanges" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::Tokenizer" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTa::Version" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       },
       "Ufal::MorphoDiTac" : {
          "file" : "lib/Ufal/MorphoDiTa.pm",
-         "version" : "v1.10.1.1"
+         "version" : "v1.11.0.1"
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "license" : [
-         "http://www.mozilla.org/MPL/2.0/index.txt"
-      ]
-   },
-   "version" : "v1.10.1.1",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v1.11.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

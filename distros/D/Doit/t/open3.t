@@ -6,13 +6,18 @@
 #
 
 use strict;
+use FindBin;
+use lib $FindBin::RealBin;
+
 use Test::More;
 
 plan 'no_plan';
 
 use Doit;
 
-use Errno qw(ENOENT);
+use TestUtil qw(signal_kill_num);
+my $KILL = signal_kill_num;
+my $KILLrx = qr{$KILL};
 
 TODO: {
     todo_skip "Hangs on Windows, need to check why", 1 if $^O eq 'MSWin32';
@@ -41,12 +46,21 @@ TODO: {
 	my %status;
 	is $r->open3({errref => \my $stderr, statusref => \%status}, $^X, '-e', 'print STDERR "a warning"; exit 0'), '';
 	is $status{exitcode}, 0, 'status reference filled, exit code as expected (success)';
+	is $stderr, 'a warning', 'got stderr';
     }
 
     {
 	my %status;
 	is $r->open3({errref => \my $stderr, statusref => \%status}, $^X, '-e', 'print STDERR "a warning"; exit 1'), '';
 	is $status{exitcode}, 1, 'status reference filled, exit code as expected (fail)';
+	is $stderr, 'a warning', 'got stderr';
+    }
+
+    {
+	my $stderr;
+	eval { $r->open3({errref => \$stderr}, $^X, '-e', 'print STDERR "a warning"; exit 1') };
+	like "$@", qr{^Command exited with exit code 1};
+	is $stderr, 'a warning', 'got stderr, even with non-zero exit code';
     }
 
  TODO: {
@@ -64,8 +78,8 @@ TODO: {
     is $@->{coredump}, 'without';
 
     eval { $r->open3($^X, '-e', 'kill KILL => $$') };
-    like $@, qr{^Command died with signal 9, without coredump};
-    is $@->{signalnum}, 9;
+    like $@, qr{^Command died with signal $KILLrx, without coredump};
+    is $@->{signalnum}, $KILL;
     is $@->{coredump}, 'without';
 
     is $r->open3({quiet=>1}, $^X, '-e', '#nothing'), '', 'nothing returned; command is also quiet';

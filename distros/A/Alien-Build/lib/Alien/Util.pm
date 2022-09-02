@@ -5,7 +5,7 @@ use warnings;
 use Exporter qw( import );
 
 # ABSTRACT: Alien Utilities used at build and runtime
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 our @EXPORT_OK = qw( version_cmp );
@@ -54,7 +54,7 @@ Alien::Util - Alien Utilities used at build and runtime
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 
@@ -69,8 +69,8 @@ run-time for Alien.
 
   $cmp = version_cmp($x, $y)
 
-Comparison method used by L<atleast_version>, L<exact_version> and
-L<max_version>. May be useful to implement custom comparisons, or for
+Comparison method used by L<Alien::Base/atleast_version>, L<Alien::Base/exact_version> and
+L<Alien::Base/max_version>. May be useful to implement custom comparisons, or for
 subclasses to overload to get different version comparison semantics than the
 default rules, for packages that have some other rules than the F<pkg-config>
 behaviour.

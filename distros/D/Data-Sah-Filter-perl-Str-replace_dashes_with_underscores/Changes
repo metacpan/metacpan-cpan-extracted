@@ -1,3 +1,9 @@
+0.003   2022-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - Remove manual test script because we are now using
+          Test::Sah::Filter.
+
+
 0.002   2022-07-16  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

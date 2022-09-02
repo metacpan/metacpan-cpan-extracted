@@ -71,8 +71,8 @@ METHODS
     A variant of "mount" that parses its options from the given string.
     This string should be a comma-separated list of parameters, where each
     is given as a name and value separated by equals sign. If there is no
-    equals sign, the value is implied as 1, as a convenience for parameters
-    that are simple boolean flags.
+    equals sign, the value is implied as true, as a convenience for
+    parameters that are simple boolean flags.
 
 AUTHOR
 

@@ -1,38 +1,37 @@
+package JSON::Path::Constants;
+$JSON::Path::Constants::VERSION = '1.0.1';
 use strict;
 use warnings;
-use 5.008;
 
-package JSON::Path::Constants;
-$JSON::Path::Constants::VERSION = '0.431';
 # ABSTRACT: Constants used in the JSON::Path distribution
 
 # VERSION
 
 use Readonly;
 
-use Exporter::Easy (
-    TAGS => [
-        symbols => [
-            '$DOLLAR_SIGN',          '$COMMERCIAL_AT',     '$FULL_STOP',      '$LEFT_SQUARE_BRACKET',
-            '$RIGHT_SQUARE_BRACKET', '$ASTERISK',          '$COLON',          '$LEFT_PARENTHESIS',
-            '$RIGHT_PARENTHESIS',    '$COMMA',             '$QUESTION_MARK',  '$EQUAL_SIGN',
-            '$EXCLAMATION_MARK',     '$GREATER_THAN_SIGN', '$LESS_THAN_SIGN', '$QUOTATION_MARK',
-            '$APOSTROPHE'
-        ],
-        operators => [
-            '$TOKEN_ROOT',           '$TOKEN_CURRENT',
-            '$TOKEN_CHILD',          '$TOKEN_RECURSIVE',
-            '$TOKEN_ALL',            '$TOKEN_FILTER_OPEN',
-            '$TOKEN_SCRIPT_OPEN',    '$TOKEN_FILTER_SCRIPT_CLOSE',
-            '$TOKEN_SUBSCRIPT_OPEN', '$TOKEN_SUBSCRIPT_CLOSE',
-            '$TOKEN_UNION',          '$TOKEN_ARRAY_SLICE',
-            '$TOKEN_SINGLE_EQUAL',   '$TOKEN_DOUBLE_EQUAL',
-            '$TOKEN_TRIPLE_EQUAL',   '$TOKEN_GREATER_THAN',
-            '$TOKEN_LESS_THAN',      '$TOKEN_NOT_EQUAL',
-            '$TOKEN_GREATER_EQUAL',  '$TOKEN_LESS_EQUAL',
-        ],
-    ]
+use Exporter::Shiny;
+our %EXPORT_TAGS = (
+    symbols => [
+        '$DOLLAR_SIGN',          '$COMMERCIAL_AT',     '$FULL_STOP',      '$LEFT_SQUARE_BRACKET',
+        '$RIGHT_SQUARE_BRACKET', '$ASTERISK',          '$COLON',          '$LEFT_PARENTHESIS',
+        '$RIGHT_PARENTHESIS',    '$COMMA',             '$QUESTION_MARK',  '$EQUAL_SIGN',
+        '$EXCLAMATION_MARK',     '$GREATER_THAN_SIGN', '$LESS_THAN_SIGN', '$QUOTATION_MARK',
+        '$APOSTROPHE'
+    ],
+    operators => [
+        '$TOKEN_ROOT',           '$TOKEN_CURRENT',
+        '$TOKEN_CHILD',          '$TOKEN_RECURSIVE',
+        '$TOKEN_ALL',            '$TOKEN_FILTER_OPEN',
+        '$TOKEN_SCRIPT_OPEN',    '$TOKEN_FILTER_SCRIPT_CLOSE',
+        '$TOKEN_SUBSCRIPT_OPEN', '$TOKEN_SUBSCRIPT_CLOSE',
+        '$TOKEN_UNION',          '$TOKEN_ARRAY_SLICE',
+        '$TOKEN_SINGLE_EQUAL',   '$TOKEN_DOUBLE_EQUAL',
+        '$TOKEN_TRIPLE_EQUAL',   '$TOKEN_GREATER_THAN',
+        '$TOKEN_LESS_THAN',      '$TOKEN_NOT_EQUAL',
+        '$TOKEN_GREATER_EQUAL',  '$TOKEN_LESS_EQUAL',
+    ],
 );
+our @EXPORT_OK = map @$_, values %EXPORT_TAGS;
 
 Readonly our $QUOTATION_MARK       => q{"};
 Readonly our $APOSTROPHE           => q{'};
@@ -87,7 +86,7 @@ JSON::Path::Constants - Constants used in the JSON::Path distribution
 
 =head1 VERSION
 
-version 0.431
+version 1.0.1
 
 =head1 AUTHOR
 
@@ -95,7 +94,7 @@ Kit Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Kit Peters.
+This software is copyright (c) 2022 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

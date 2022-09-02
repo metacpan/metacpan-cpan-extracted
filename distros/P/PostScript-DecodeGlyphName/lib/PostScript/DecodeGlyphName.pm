@@ -1,10 +1,8 @@
-use 5.008001;
-use strict;
-use warnings;
+use 5.008001; use strict; use warnings;
 
 package PostScript::DecodeGlyphName;
-$PostScript::DecodeGlyphName::VERSION = '0.001';
-# ABSTRACT: PostScript glyph name to Unicode conversion
+
+our $VERSION = '0.002';
 
 use Exporter::Tidy all => [qw( decode_glyph parse_adobeglyphlist )];
 
@@ -98,10 +96,6 @@ __END__
 =head1 NAME
 
 PostScript::DecodeGlyphName - PostScript glyph name to Unicode conversion
-
-=head1 VERSION
-
-version 0.001
 
 =head1 SYNOPSIS
 

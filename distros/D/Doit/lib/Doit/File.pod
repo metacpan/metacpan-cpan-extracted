@@ -40,8 +40,13 @@ perl-level exceptions when running the code reference, and no system
 errors like "no space left on device"), then the temporary file is
 renamed atomically to the final destination.
 
-The code reference takes two parameters: a filehandle and the filename
-of a temporary file.
+The code reference takes two parameters: a filehandle to write to and
+the filename of a temporary file. Don't close the filehandle;
+C<file_atomic_write> takes care of closing it (and fails if something
+goes wrong).
+
+The command always returns true, as the file is normally always
+written, but see the L</check_change> option below.
 
 Options are specified as named parameters. Possible options are:
 
@@ -79,6 +84,21 @@ L<perlfunc/chmod> syntax.
 If not used, then the permissions would be as creating a normal
 non-executable file, which usually takes L<perlfunc/umask> into
 account.
+
+=item C<< check_change => I<bool> >>
+
+If set to a true value, then two things are done:
+
+=over
+
+=item * a comparison between the old file and the newly created
+temporary is done, and if there's no difference, then the old file
+will be left untouched
+
+=item * if the old file was not changed, then the command returns a
+false value
+
+=back
 
 =back
 
@@ -163,7 +183,7 @@ Slaven Rezic <srezic@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2017 Slaven Rezic. All rights reserved.
+Copyright (c) 2017,2018 Slaven Rezic. All rights reserved.
 This module is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

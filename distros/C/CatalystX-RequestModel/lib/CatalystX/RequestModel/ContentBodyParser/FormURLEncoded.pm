@@ -11,13 +11,13 @@ sub default_attr_rules {
   return +{ flatten=>1, %$attr_rules };
 }
 
-sub expand_cgi {
+sub expand_cgi { 
   my ($self) = shift;
   my $params = (($self->{ctx}->req->method eq 'GET') || ($self->{request_model}->get_content_in eq 'query')) ?
     $self->{ctx}->req->query_parameters :
       $self->{ctx}->req->body_parameters;
 
-  my $data;
+  my $data = +{};
   foreach my $param (keys %$params) {
     my (@segments) = split /\./, $param;
     my $data_ref = \$data;

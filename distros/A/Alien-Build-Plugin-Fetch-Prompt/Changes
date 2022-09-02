@@ -1,5 +1,8 @@
 Revision history for Alien-Build-Plugin-Fetch-Prompt
 
+0.61      2022-08-29 13:34:30 -0600
+  - Add compatability with ALIEN_DOWNLOAD_RULE override (gh#4)
+
 0.60      2021-03-27 11:21:05 -0600
   - Migrate test dep from Test::Exit to Test2::Tools::Process (gh#1)
   - Drop support for Perls prior to 5.10

@@ -16,6 +16,6 @@ WriteMakefile(
         'Test::More'    => 0,
     },
     ABSTRACT => 'Timeout long running requests',
-    AUTHOR   => 'Tomasz Czepiel <tjmc@cpan.org>',
+    AUTHOR   => 'Tomasz Czepiel <tjczepiel@gmail.com>',
     LICENSE  => 'perl',
 );

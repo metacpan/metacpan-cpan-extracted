@@ -12,18 +12,19 @@ delete $ENV{ALIEN_DOWNLOAD};
 my $build = alienfile_ok q{
   use alienfile;
 
-  meta->prop->{plugin_download_negotiate_default_url} = "http://alienfile.org/foo/bar/baz";
-
   share {
+
+    start_url 'https://alienfile.org/foo/bar/baz';
   
     fetch sub {
       my($build, $url) = @_;
       
       return {
-        type    => 'html',
-        charset => 'utf-8',
-        base    => $url,
-        content => '<html/>',
+        type     => 'html',
+        charset  => 'utf-8',
+        base     => $url,
+        content  => '<html/>',
+        protocol => 'https',
       };
     };
   
@@ -46,7 +47,7 @@ subtest 'user says yes' => sub {
       $build->fetch;
     }, U();
     
-    like $msg, qr{http://alienfile.org/foo/bar/baz};
+    like $msg, qr{https://alienfile.org/foo/bar/baz};
     note "msg = $msg";
     
     is $def, 'yes';
@@ -56,10 +57,10 @@ subtest 'user says yes' => sub {
   subtest 'non-default url' => sub {
   
     is intercept_exit {
-      $build->fetch('http://alienfile.org/bar/baz/foo');
+      $build->fetch('https://alienfile.org/bar/baz/foo');
     }, U();
     
-    link $msg, qr{http://alienfile.org/bar/baz/foo};
+    link $msg, qr{https://alienfile.org/bar/baz/foo};
     note "msg = $msg";
     
     is $def, 'yes';
@@ -71,7 +72,7 @@ subtest 'user says yes' => sub {
     local $ENV{ALIEN_DOWNLOAD} = 'no';
   
     is intercept_exit {
-      $build->fetch('http://alienfile.org/bar/baz/foo');
+      $build->fetch('https://alienfile.org/bar/baz/foo');
     }, U();
     
     is $def, 'no';

@@ -7,7 +7,7 @@ use File::Spec ();
 use Test2::Tools::HTTP::Apps;
 
 # ABSTRACT: User agent wrapper for Test2::Tools::HTTP
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 sub _init
@@ -136,7 +136,7 @@ Test2::Tools::HTTP::UA - User agent wrapper for Test2::Tools::HTTP
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

@@ -19,5 +19,5 @@ no_index:
     - inc
 requires: {}
 resources: {}
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

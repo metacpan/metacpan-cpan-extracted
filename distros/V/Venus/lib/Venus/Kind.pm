@@ -16,15 +16,23 @@ with 'Venus::Role::Digestable';
 with 'Venus::Role::Doable';
 with 'Venus::Role::Matchable';
 with 'Venus::Role::Printable';
+with 'Venus::Role::Reflectable';
 with 'Venus::Role::Testable';
 with 'Venus::Role::Throwable';
+with 'Venus::Role::Assertable';
 
 # METHODS
 
-sub class {
+sub assertion {
   my ($self) = @_;
 
-  return ref($self) || $self;
+  require Venus::Assert;
+
+  my $assert = Venus::Assert->new(ref $self || $self);
+
+  $assert->constraints->when(sub{true})->then(true);
+
+  return $assert;
 }
 
 sub checksum {
@@ -56,6 +64,18 @@ sub numified {
   return CORE::length($self->stringified);
 }
 
+sub renew {
+  my ($self, @args) = @_;
+
+  my $data = $self->ARGS(@args);
+
+  for my $attr (@{$self->meta->attrs}) {
+    $data->{$attr} = $self->$attr if exists $self->{$attr} && !exists $data->{$attr};
+  }
+
+  return $self->class->new($data);
+}
+
 sub safe {
   my ($self, $method, @args) = @_;
 
@@ -64,12 +84,10 @@ sub safe {
   return(wantarray ? (@$result) : $result->[0]);
 }
 
-sub space {
+sub self {
   my ($self) = @_;
 
-  require Venus::Space;
-
-  return Venus::Space->new($self->class);
+  return $self;
 }
 
 sub stringified {
@@ -106,17 +124,6 @@ sub trap {
   return(wantarray ? (@$result) : $result->[0]);
 }
 
-sub type {
-  my ($self, $method, @args) = @_;
-
-  require Venus::Type;
-
-  my $value = $method
-    ? $self->$method(@args) : $self->can('value') ? $self->value : $self;
-
-  return Venus::Type->new(value => $value);
-}
-
 1;
 
 
@@ -145,6 +152,8 @@ Kind Base Class for Perl 5
 
   my $example = Example->new;
 
+  # bless({}, "Example")
+
 =cut
 
 =head1 DESCRIPTION
@@ -156,6 +165,8 @@ This package provides identity and methods common across all L<Venus> classes.
 =head1 INTEGRATES
 
 This package integrates behaviors from:
+
+L<Venus::Role::Assertable>
 
 L<Venus::Role::Boxable>
 
@@ -173,15 +184,43 @@ L<Venus::Role::Matchable>
 
 L<Venus::Role::Printable>
 
+L<Venus::Role::Reflectable>
+
 L<Venus::Role::Testable>
 
 L<Venus::Role::Throwable>
+
+L<Venus::Role::Tryable>
 
 =cut
 
 =head1 METHODS
 
 This package provides the following methods:
+
+=cut
+
+=head2 assertion
+
+  assertion() (Assert)
+
+The assertion method returns a L<Venus::Assert> object based on the invocant.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item assertion example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $assertion = $example->assertion;
+
+  # bless({name => "Example"}, "Venus::Assert")
+
+=back
 
 =cut
 
@@ -230,28 +269,6 @@ I<Since C<0.08>>
 
 =cut
 
-=head2 class
-
-  class() (Str)
-
-The class method returns the class name for the given class or object.
-
-I<Since C<0.01>>
-
-=over 4
-
-=item class example 1
-
-  # given: synopsis;
-
-  my $class = $example->class;
-
-  # "Example"
-
-=back
-
-=cut
-
 =head2 numified
 
   numified() (Int)
@@ -292,6 +309,78 @@ I<Since C<0.08>>
   my $numified = $example->numified;
 
   # 7
+
+=back
+
+=cut
+
+=head2 renew
+
+  renew(Any @args) (Object)
+
+The renew method returns a new instance of the invocant by instantiating the
+underlying class passing all recognized class attributes to the constructor.
+B<Note:> This method is not analogous to C<clone>, i.e. attributes which are
+references will be passed to the new object as references.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item renew example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $renew = $example->renew;
+
+  # bless({}, "Example")
+
+=back
+
+=over 4
+
+=item renew example 2
+
+  package Example;
+
+  use Venus::Class;
+
+  base 'Venus::Kind';
+
+  attr 'values';
+
+  package main;
+
+  my $example = Example->new(values => [1,2]);
+
+  my $renew = $example->renew;
+
+  # bless({values => [1,2]}, "Example")
+
+=back
+
+=over 4
+
+=item renew example 3
+
+  package Example;
+
+  use Venus::Class;
+
+  base 'Venus::Kind';
+
+  attr 'keys';
+  attr 'values';
+
+  package main;
+
+  my $example = Example->new(values => [1,2]);
+
+  my $renew = $example->renew(keys => ['a','b']);
+
+  # bless({keys => ["a","b"], values => [1,2]}, "Example")
 
 =back
 
@@ -350,23 +439,25 @@ I<Since C<0.08>>
 
 =cut
 
-=head2 space
+=head2 self
 
-  space() (Space)
+  self() (Any)
 
-The space method returns a L<Venus::Space> object for the given object.
+The self method returns the invocant.
 
-I<Since C<0.01>>
+I<Since C<1.23>>
 
 =over 4
 
-=item space example 1
+=item self example 1
 
-  # given: synopsis;
+  # given: synopsis
 
-  my $space = $example->space;
+  package main;
 
-  # bless({ value => "Example" }, "Venus::Space")
+  my $self = $example->self;
+
+  # bless({}, "Example")
 
 =back
 
@@ -510,28 +601,6 @@ I<Since C<0.08>>
   });
 
   # ([], [], ["Died..."])
-
-=back
-
-=cut
-
-=head2 type
-
-  type() (Type)
-
-The type method returns a L<Venus::Type> object for the given object.
-
-I<Since C<0.01>>
-
-=over 4
-
-=item type example 1
-
-  # given: synopsis;
-
-  my $type = $example->type;
-
-  # bless({ value => bless({}, "Example") }, "Venus::Type")
 
 =back
 

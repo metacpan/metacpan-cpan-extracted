@@ -1,8 +1,6 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
-use Test::More 0.88; # for done_testing
-use Test::Fatal;
+use Test::More tests => 26;
 use Test::Lives;
 
 use lib 't/lib';
@@ -25,13 +23,16 @@ for my $obj ( SomeClass->new( foo => 1, bar => 2, baz => 3 ) ) {
 
 	lives_and { is $obj->foo, 1, $_ } 'Accessors exist and give the expected answers';
 	lives_and { is $obj->bar, 2, $_ } '... for declared fields';
-	like exception { $obj->baz }, qr/locate object method/, '... but not for other keys';
+	lives_and { eval { $obj->baz; 1 } ? die : like $@, qr/locate object method/, $_ } '... but not for other keys';
 
 	lives_and { $obj->foo = 42; is $obj->foo, 42, $_ } 'Read-write accessors can be written to';
 }
 
-like exception { package Foo; Object::Tiny::Lvalue->import( 'bad identifier' ) },
-	qr/Invalid accessor name/, 'Bad identifiers are rejected';
+lives_and {
+	eval { package Foo; Object::Tiny::Lvalue->import( 'bad identifier' ); 1 } && die;
+	like $@, qr/Invalid accessor name/, $_;
+}
+	'Bad identifiers are rejected';
 
 require_ok 'SubClass';
 
@@ -45,7 +46,5 @@ for my $obj ( SubClass->new( foo => 1, bar => 2, baz => 3 ) ) {
 	is $obj->{'baz'}, 3, '... and "baz"';
 	lives_and { is $obj->foo, 1, $_ } 'Accessors exist and give the expected answers';
 	lives_and { is $obj->bar, 2, $_ } '... for declared fields';
-	like exception { $obj->baz }, qr/locate object method/, '... but not for other keys';
+	lives_and { eval { $obj->baz; 1 } ? die : like $@, qr/locate object method/, $_ } '... but not for other keys';
 }
-
-done_testing;

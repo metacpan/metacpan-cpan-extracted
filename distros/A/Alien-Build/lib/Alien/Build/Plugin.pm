@@ -10,7 +10,7 @@ use Digest::SHA ();
 our @CARP_NOT = qw( alienfile Alien::Build Alien::Build::Meta );
 
 # ABSTRACT: Plugin base class for Alien::Build
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 sub new
@@ -133,7 +133,7 @@ Alien::Build::Plugin - Plugin base class for Alien::Build
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 
@@ -186,17 +186,17 @@ Tools for building.
 
 Tools already included.
 
-=item L<Alien::Build::Plugin::Download>
-
-Methods for retrieving from the internet.
-
 =item L<Alien::Build::Plugin::Decode>
 
 Normally use Download plugins which will pick the correct Decode plugins.
 
 =item L<Alien::Build::Plugin::Digest>
 
-Check cryptographic signatures on downloaded files.
+Tools for checking cryptographic signatures during a C<share> install.
+
+=item L<Alien::Build::Plugin::Download>
+
+Methods for retrieving from the internet.
 
 =item L<Alien::Build::Plugin::Extract>
 
@@ -206,6 +206,15 @@ Extract from archives that have been downloaded.
 
 Normally use Download plugins which will pick the correct Fetch plugins.
 
+=item L<Alien::Build::Plugin::Gather>
+
+Plugins that modify or enhance the gather step.
+
+=item L<Alien::Build::Plugin::PkgConfig>
+
+Plugins that work with C<pkg-config> or libraries that provide the same
+functionality.
+
 =item L<Alien::Build::Plugin::Prefer>
 
 Normally use Download plugins which will pick the correct Prefer plugins.
@@ -213,6 +222,10 @@ Normally use Download plugins which will pick the correct Prefer plugins.
 =item L<Alien::Build::Plugin::Probe>
 
 Look for packages already installed on the system.
+
+=item L<Alien::Build::Plugin::Probe>
+
+Plugins useful for unit testing L<Alien::Build> itself, or plugins for it.
 
 =back
 

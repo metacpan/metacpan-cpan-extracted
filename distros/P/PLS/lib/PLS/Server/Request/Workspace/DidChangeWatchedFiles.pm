@@ -8,7 +8,7 @@ use parent 'PLS::Server::Request';
 use List::Util qw(any uniq);
 use Path::Tiny;
 
-use PLS::Parser::Document;
+use PLS::Parser::Index;
 use PLS::Server::Request::TextDocument::PublishDiagnostics;
 
 =head1 NAME
@@ -30,34 +30,31 @@ sub service
 
     return if (ref $self->{params}{changes} ne 'ARRAY');
 
-    my $index = PLS::Parser::Document->get_index();
-    return if (ref $index ne 'PLS::Parser::Index');
+    my $index = PLS::Parser::Index->new();
 
     my @changed_files;
-    my $any_deletes;
 
     foreach my $change (@{$self->{params}{changes}})
     {
         my $file = URI->new($change->{uri});
-
-        next unless (ref $file eq 'URI::file');
+        next if (ref $file ne 'URI::file');
 
         if ($change->{type} == 3)
         {
-            $any_deletes = 1;
+            $index->cleanup_file($file->file);
             next;
         }
+
+        next if ($file->file =~ /\/\.pls-tmp-[^\/]*$/);
 
         next unless $index->is_perl_file($file->file);
         next if $index->is_ignored($file->file);
 
-        push @changed_files, $file->file;
+        push @changed_files, $change->{uri};
     } ## end foreach my $change (@{$self...})
 
-    $index->cleanup_old_files() if $any_deletes;
-
     @changed_files = uniq @changed_files;
-    $index->index_files(@changed_files) if (scalar @changed_files);
+    $index->index_files(@changed_files)->then(sub { Future->wait_all(@_) })->retain() if (scalar @changed_files);
 
     return;
 } ## end sub service

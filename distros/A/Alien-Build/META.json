@@ -46,7 +46,7 @@
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::PruneFiles" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
-            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.69",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.71",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
@@ -104,6 +104,7 @@
          "requires" : {
             "FindBin" : "0",
             "Perl::Critic" : "0",
+            "Test2::Require::EnvVar" : "0.000121",
             "Test2::Require::Module" : "0.000121",
             "Test2::Tools::PerlCritic" : "0",
             "Test2::V0" : "0.000121",
@@ -114,6 +115,7 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
+            "Test::Pod::LinkCheck::Lite" : "0",
             "Test::Spelling" : "0"
          }
       },
@@ -163,7 +165,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.59",
+   "version" : "2.66",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -195,7 +197,7 @@
       "H\u00e5kon H\u00e6gland (hakonhagland, HAKONH)",
       "nick nauwelaerts (INPHOBIA)"
    ],
-   "x_generated_by_perl" : "v5.36.0",
+   "x_generated_by_perl" : "v5.35.10",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

@@ -4,10 +4,8 @@ INSTALL
 lib/Alien/Build/Plugin/Cleanse/BuildDir.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
-META.json
-META.yml
 README.md
 t/00_diag.t
 t/01_use.t
@@ -22,3 +20,5 @@ xt/author/strict.t
 xt/author/version.t
 xt/release/changes.t
 xt/release/fixme.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

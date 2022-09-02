@@ -6,7 +6,7 @@ use Chart::GGPlot::Class;
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.002000'; # VERSION
+our $VERSION = '0.002001'; # VERSION
 
 use Module::Load;
 use Types::Standard qw(ConsumerOf InstanceOf);
@@ -51,7 +51,7 @@ Chart::GGPlot::Global - Various global variables and settings
 
 =head1 VERSION
 
-version 0.002000
+version 0.002001
 
 =head1 SYNOPSIS
 
@@ -83,7 +83,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2021 by Stephan Loyd.
+This software is copyright (c) 2019-2022 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

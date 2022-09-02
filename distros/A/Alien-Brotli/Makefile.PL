@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Alien::Brotli",
   "PREREQ_PM" => {
     "Alien::Base" => 0,
+    "Alien::Build::Plugin::Probe::CommandLine" => 0,
     "Alien::cmake3" => 0,
     "Path::Tiny" => 0,
     "base" => 0,
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.2.0",
+  "VERSION" => "v0.2.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +54,7 @@ my %FallbackPrereqs = (
   "Alien::Base" => 0,
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
+  "Alien::Build::Plugin::Probe::CommandLine" => 0,
   "Alien::cmake3" => 0,
   "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,

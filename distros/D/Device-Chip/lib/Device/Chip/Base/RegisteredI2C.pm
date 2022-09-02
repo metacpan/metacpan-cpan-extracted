@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;  # :isa
+use Object::Pad 0.66;  # field
 
-package Device::Chip::Base::RegisteredI2C 0.22;
+package Device::Chip::Base::RegisteredI2C 0.23;
 class Device::Chip::Base::RegisteredI2C :isa(Device::Chip);
 
 use utf8;
@@ -51,13 +51,13 @@ of the C<$len> parameter to the register reading and writing methods.
 
 =cut
 
-method REG_DATA_BYTES
+method REG_DATA_BYTES ()
 {
    my $bytes = int( ( $self->REG_DATA_SIZE + 7 ) / 8 );
 
    # cache it for next time
    my $pkg = ref $self || $self;
-   { no strict 'refs'; *{"${pkg}::REG_DATA_BYTES"} = sub { $bytes }; }
+   { no strict 'refs'; *{"${pkg}::REG_DATA_BYTES"} = method () { $bytes }; }
 
    return $bytes;
 }
@@ -69,7 +69,7 @@ instances.
 
 =cut
 
-has @_regcache;
+field @_regcache;
 
 =head2 read_reg
 

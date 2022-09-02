@@ -1,0 +1,115 @@
+=head1 NAME
+
+Doit::Ini - commands for changing ini files
+
+=head1 SYNOPSIS
+
+    use Doit;
+    my $doit = Doit->init;
+    $doit->add_component('ini'); # requires Config::IOD::INI or Config::IniFiles to be installed
+
+    my $changed = $doit->ini_change('/path/to/file.ini', 'section1.key1' => 'newval1', 'section2.key2' => 'newval2', ...);
+
+    $doit->ini_set_implementation('Config::IniFiles');
+    $doit->ini_change('/path/to/file.ini', sub {
+        my $self = shift;
+        $self->confobj->setval('section', 'key', 'newval');
+    });
+
+=head1 DESCRIPTION
+
+B<Doit::Ini> is a L<Doit> component providing methods for changing
+ini files. It has to be added to a script using L<Doit's add_component|Doit/add_component>:
+
+    $doit->add_component('ini');
+
+Note that a 3rd party CPAN module is required to do the actual ini
+file handling. Currently supported are:
+
+=over
+
+=item * L<Config::IOD::INI>
+
+=item * L<Config::IniFiles>
+
+This module is also available as a Debian or Ubuntu package:
+C<libconfig-inifiles-perl>.
+
+=back
+
+=head2 DOIT COMMANDS
+
+The following commands are added to the Doit runner object:
+
+=head3 ini_change
+
+Change an existing ini file. Return 1 if a change was actually done,
+otherwise 0. There is a simple mode with key-value arguments, and a
+mode where an anonymous subroutine may be provided.
+
+    $doit->ini_change("/path/to/file.ini", "section.key" => "newval", ...)
+
+Set the existing I<key> in I<section> to the value I<newval>. It's
+possible to specify multiple key-value pairs. Note that it's only
+possible to change existing keys (this may change in a future
+implementation).
+
+    $doit->ini_change("/path/to/file.ini", sub {
+        my($self) = @_;
+        $self->confobj->setval('section','key','newval'); # if Config::IniFiles is used
+        $self->confobj->set_value('section','key','newval'); # if Config::IOD::INI is used
+    });
+
+The anonymous subroutine is called with the adapter object. Use C<<
+$self->confobj >> to get to the underlying implementation object where
+the native methods like C<setval> (in the case of C<Config::IniFiles>)
+respective C<set_value> (in the case of C<Config::IOD::INI>) may be
+used. It's also possible to use other methods e.g. to insert new keys
+or delete existing ones. To make sure that a specific ini
+implementation module is used, call L</ini_set_implementation> with a
+single module.
+
+=head3 ini_set_implementation
+
+    $doit->ini_set_implementation(qw(Config::IOD::INI Config::IniFiles));
+
+Define which ini modules are used. The specified modules are checked
+for availability, and the first available one is used. The default
+order is as shown in the sample above.
+
+=head3 ini_adapter_class
+
+    my $adapter_class = $doit->ini_adapter_class;
+
+Return which adapter class is available and will be used for ini file
+operations. If no suitable implementation is available, then C<undef>
+is returned. Note that the adapter class has C<Doit::Ini::> prepended
+--- so if C<Config::IniFiles> is chosen, then
+C<Doit::Ini::Config::IniFiles> is returned.
+
+=head1 BUGS
+
+C<ini_change> tries to do minimal changes, preserving whitespace,
+comments and order of sections andkeys. However, it seems that some
+whitespace may be lost when using C<Config::IniFiles>.
+
+Currently Unix newlines are used when writing files, even on Windows
+systems. This may change in future (i.e. preserving original line
+endings).
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2022 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Doit>, L<Config::IOD::INI>, L<Config::IniFiles>.
+
+=cut
+

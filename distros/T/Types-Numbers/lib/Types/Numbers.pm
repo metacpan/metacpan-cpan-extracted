@@ -3,7 +3,7 @@ package Types::Numbers;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Type constraints for numbers
 use version;
-our $VERSION = 'v1.0.0'; # VERSION
+our $VERSION = 'v1.0.1'; # VERSION
 
 #############################################################################
 # Modules
@@ -1268,7 +1268,7 @@ Types::Numbers - Type constraints for numbers
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 DESCRIPTION
 
@@ -1598,7 +1598,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2021 by Grant Street Group.
+This software is Copyright (c) 2013 - 2022 by Grant Street Group.
 
 This is free software, licensed under:
 

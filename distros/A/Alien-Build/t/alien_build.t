@@ -520,7 +520,7 @@ subtest 'download' => sub {
       subtest "single download with file as $file_as" => sub {
 
         my($build, $meta) = $build->(
-          url            => 'http://test1.test/foo/bar/baz/foo-1.00.tar.gz',
+          url            => 'https://test1.test/foo/bar/baz/foo-1.00.tar.gz',
           return_file_as => $file_as,
         );
 
@@ -535,7 +535,7 @@ subtest 'download' => sub {
       subtest "listing download with listing as $listing_as" => sub {
 
         my($build, $meta) = $build->(
-          url               => 'http://test1.test/foo/bar/baz/',
+          url               => 'https://test1.test/foo/bar/baz/',
           return_listing_as => $listing_as,
         );
 
@@ -549,6 +549,9 @@ subtest 'download' => sub {
 
   subtest 'command single' => sub {
 
+    # This test uses a fake wget, and doesn't connect to the internet
+    local $ENV{ALIEN_DOWNLOAD_RULE} = 'warn';
+
     my $guard = system_fake
       wget => sub {
         my($url) = @_;
@@ -556,7 +559,7 @@ subtest 'download' => sub {
         # just pretend that we have some hidden files
         path('.foo')->touch;
 
-        if($url eq 'http://test1.test/foo/bar/baz/foo-1.00.tar.gz')
+        if($url eq 'https://test1.test/foo/bar/baz/foo-1.00.tar.gz')
         {
           print "200 found $url!\n";
           path('foo-1.00.tar.gz')->spew_raw($tarpath->slurp_raw);
@@ -573,7 +576,7 @@ subtest 'download' => sub {
     my $meta = $build->meta;
 
     $meta->register_hook(
-      download => [ "wget http://test1.test/foo/bar/baz/foo-1.00.tar.gz" ],
+      download => [ "wget https://test1.test/foo/bar/baz/foo-1.00.tar.gz" ],
     );
 
     $check->($build);
@@ -651,6 +654,8 @@ alien_subtest 'extract' => sub {
 
   my $build = alienfile_ok q{
     use alienfile;
+    plugin 'Test::Mock',
+      check_digest => 1;
   };
   my $meta = $build->meta;
 
@@ -658,7 +663,11 @@ alien_subtest 'extract' => sub {
     extract => [ [ $tar_cmd, "xf", "%{alien.install.download}"] ],
   );
 
-  $build->install_prop->{download} = path("corpus/dist/foo-1.00.tar")->absolute->stringify;
+  my $archive = $build->install_prop->{download} = path("corpus/dist/foo-1.00.tar")->absolute->stringify;
+  $build->install_prop->{download_detail}->{$archive} = {
+    protocol => 'file',
+    digest => [ FAKE => 'deadbeaf' ],
+  };
 
   my($out, $dir, $error) = capture_merged { (eval { $build->extract }, $@) };
 
@@ -686,19 +695,21 @@ alien_subtest 'extract' => sub {
 subtest 'build' => sub {
 
   subtest 'plain' => sub {
-    my $build = alienfile filename => 'corpus/blank/alienfile';
+
+    my $build = alienfile_ok q{
+      use alienfile;
+      plugin 'Test::Mock',
+        probe        => 'share',
+        check_digest => 1;
+      meta->prop->{env}->{FOO1} = 'bar1';
+    };
     my $meta = $build->meta;
 
     my @data;
 
-    $meta->prop->{env}->{FOO1} = 'bar1';
     $build->install_prop->{env}->{FOO3} = 'bar3';
 
     local $ENV{FOO2} = 'bar2';
-
-    $meta->register_hook(
-      probe => sub { 'share' },
-    );
 
     $meta->register_hook(
       extract => sub {
@@ -726,7 +737,11 @@ subtest 'build' => sub {
 
     my $tmp = Path::Tiny->tempdir;
     my $share = $tmp->child('blib/lib/auto/share/Alien-Foo/');
-    $build->install_prop->{download} = path("corpus/dist/foo-1.00.tar")->absolute->stringify;
+    my $archive = $build->install_prop->{download} = path("corpus/dist/foo-1.00.tar")->absolute->stringify;
+    $build->install_prop->{download_detail}->{$archive} = {
+      protocol => 'file',
+      digest   => [ FAKE => 'deadbeaf' ],
+    };
     $build->set_stage($share->stringify);
 
     note capture_merged {
@@ -748,12 +763,13 @@ subtest 'build' => sub {
 
   subtest 'destdir' => sub {
 
-    my $build = alienfile filename => 'corpus/blank/alienfile';
+    my $build = alienfile_ok q{
+      use alienfile;
+      plugin 'Test::Mock',
+        probe        => 'share',
+        check_digest => 1;
+    };
     my $meta = $build->meta;
-
-    $meta->register_hook(
-      probe => sub { 'share' },
-    );
 
     $meta->register_hook(
       extract => sub {
@@ -792,8 +808,12 @@ subtest 'build' => sub {
 
     my $share = $tmp->child('blib/lib/auto/share/Alien-Foo/');
 
-    $build->meta_prop->{destdir}       = 1;
-    $build->install_prop->{download}   = path("corpus/dist/foo-1.00.tar")->absolute->stringify;
+    $build->meta_prop->{destdir} = 1;
+    my $archive = $build->install_prop->{download} = path("corpus/dist/foo-1.00.tar")->absolute->stringify;
+    $build->install_prop->{download_detail}->{$archive} = {
+      protocol => 'file',
+      digest   => [ FAKE => 'deadbeaf' ],
+    };
     $build->set_prefix($tmp->child('usr/local')->stringify);
     $build->set_stage($share->stringify);
 
@@ -847,98 +867,69 @@ subtest 'patch' => sub {
 
   subtest 'single' => sub {
 
-    my $build = alienfile filename => 'corpus/blank/alienfile';
-    my $meta = $build->meta;
-
-    my $tmp = Path::Tiny->tempdir;
-    my $share = $tmp->child('blib/lib/auto/share/Alien-Foo/');
-    $build->install_prop->{download} = path("corpus/dist/foo-1.00.tar")->absolute->stringify;
-    $build->install_prop->{stage}    = $share->stringify;
-
-    $meta->register_hook(
-      probe => sub { 'share' },
-    );
-
-    $meta->register_hook(
-      extract => sub {
-        path('file1')->spew('The quick brown dog jumps over the lazy dog');
-        path('file2')->spew('text2');
-      },
-    );
-
-    $meta->register_hook(
-      patch => sub {
-        # fix the saying.
-        path('file1')->edit(sub { s/dog/fox/ });
-      },
-    );
-
-    $meta->register_hook(
-      build => sub {
-        my($build) = @_;
-        path('file1')->copy(path($build->install_prop->{stage})->child('file3'));
-      },
-    );
-
-    note capture_merged {
-      $build->build;
-      ();
+    my $build = alienfile_ok q{
+      use alienfile;
+      plugin 'Test::Mock',
+        probe => 'share',
+        download => 1,
+        extract  => {
+          file1 => 'The quick brown dog jumps over the lazy dog',
+          file2 => 'text2',
+        };
+      share {
+        patch sub {
+          Path::Tiny->new('file1')->edit(sub { s/dog/fox/ });
+        };
+        build sub {
+          my($build) = @_;
+          Path::Tiny->new('file1')->copy(Path::Tiny->new($build->install_prop->{stage})->child('file3'));
+        };
+      };
     };
 
-    my $file3 = path($build->install_prop->{stage})->child('file3');
+    alien_install_type_is 'share';
+    alien_download_ok;
+    alien_extract_ok;
+    alien_build_ok;
+
     is(
-      $file3->slurp,
+      path($build->install_prop->{stage})->child('file3')->slurp,
       'The quick brown fox jumps over the lazy dog',
     );
   };
 
   subtest 'double' => sub {
 
-    my $build = alienfile filename => 'corpus/blank/alienfile';
-    my $meta = $build->meta;
-
-    my $tmp = Path::Tiny->tempdir;
-    my $share = $tmp->child('blib/lib/auto/share/Alien-Foo/');
-    $build->install_prop->{download} = path("corpus/dist/foo-1.00.tar")->absolute->stringify;
-    $build->install_prop->{stage}    = $share->stringify;
-
-    $meta->register_hook(
-      probe => sub { 'share' },
-    );
-
-    $meta->register_hook(
-      extract => sub {
-        path('file1')->spew('The quick brown dog jumps over the lazy dog');
-        path('file2')->spew('The quick brown fox jumps over the lazy fox');
-      },
-    );
-
-    $meta->register_hook(
-      patch => sub {
-        # fix the saying.
-        path('file1')->edit(sub { s/dog/fox/ });
-      },
-    );
-
-    $meta->register_hook(
-      patch => sub {
-        # fix the saying.
-        path('file2')->edit(sub { s/fox$/dog/ });
-      },
-    );
-
-    $meta->register_hook(
-      build => sub {
-        my($build) = @_;
-        path('file1')->copy(path($build->install_prop->{stage})->child('file3'));
-        path('file2')->copy(path($build->install_prop->{stage})->child('file4'));
-      },
-    );
-
-    note capture_merged {
-      $build->build;
-      ();
+    my $build = alienfile_ok q{
+      use alienfile;
+      plugin 'Test::Mock',
+        probe    => 'share',
+        download => 1,
+        extract  => {
+          file1  => 'The quick brown dog jumps over the lazy dog',
+          file2  => 'The quick brown fox jumps over the lazy fox',
+        };
+      share {
+        patch sub {
+          # fix the saying in file1
+          Path::Tiny->new('file1')->edit(sub { s/dog/fox/ });
+        };
+        patch sub {
+          # fix the saying in file 2
+          Path::Tiny->new('file2')->edit(sub { s/fox$/dog/ });
+        };
+        build sub {
+          my($build) = @_;
+          Path::Tiny->new('file1')->copy(Path::Tiny->new($build->install_prop->{stage})->child('file3'));
+          Path::Tiny->new('file2')->copy(Path::Tiny->new($build->install_prop->{stage})->child('file4'));
+        };
+      };
     };
+
+    alien_install_type_is 'share';
+    alien_download_ok;
+    alien_extract_ok;
+    alien_build_ok;
 
     my $file3 = path($build->install_prop->{stage})->child('file3');
     is(
@@ -1208,7 +1199,11 @@ subtest 'out-of-source build' => sub {
 
   alien_subtest 'from bundled source' => sub {
 
-    local $Alien::Build::Plugin::Fetch::LocalDir::VERSION = '1.07';
+    local $Alien::Build::Plugin::Fetch::LocalDir::VERSION = $Alien::Build::Plugin::Fetch::LocalDir::VERSION || '1.07';
+
+    # this test extracts a local directory, which is not supported
+    # by check_digest and does not connect to the internet
+    local $ENV{ALIEN_DOWNLOAD_RULE} = 'warn';
 
     my $build = alienfile_ok q{
       use alienfile;
@@ -1244,28 +1239,29 @@ subtest 'out-of-source build' => sub {
 
 subtest 'test' => sub {
 
-  local $Alien::Build::VERSION = $Alien::Build::VERSION;
-  $Alien::Build::VERSION ||= '1.14';
-
+  local $Alien::Build::VERSION = $Alien::Build::VERSION || '1.14';
 
   alien_subtest 'good' => sub {
 
     alienfile_ok q{
       use alienfile;
-      use Path::Tiny qw( path );
 
-      probe sub { 'share' };
+      plugin 'Test::Mock',
+        probe    => 'share',
+        download => 1,
+        extract  => {
+          file2 => '',
+          file3 => '',
+        };
 
       share {
-        download sub { path('file1')->touch };
-        extract sub { path($_)->touch for qw( file2 file3 ) };
         build sub {
           log("the build");
-          path('file4')->spew('content of file4')
+          Path::Tiny->new('file4')->spew('content of file4')
         };
         test sub {
           log("the test");
-          my $x = path('file4')->slurp;
+          my $x = Path::Tiny->new('file4')->slurp;
           die "hrm" unless $x eq 'content of file4';
         };
       };
@@ -1293,14 +1289,14 @@ subtest 'test' => sub {
 
     alienfile_ok q{
       use alienfile;
-      use Path::Tiny qw( path );
 
-      probe sub { 'share' };
+      plugin 'Test::Mock',
+        probe => 'share',
+        download => 1,
+        extract  => 1,
+        build    => 1;
 
       share {
-        download sub { path('file1')->touch };
-        extract sub { path($_)->touch for qw( file2 file3 ) };
-        build sub { };
         test sub {
           log("the test");
           die "bogus!";
@@ -1332,11 +1328,15 @@ subtest 'test' => sub {
       use alienfile;
       use Path::Tiny qw( path );
 
-      probe sub { 'share' };
+      plugin 'Test::Mock',
+        probe    => 'share',
+        download => 1,
+        extract  => {
+          file2 => '',
+          file3 => '',
+        };
 
       share {
-        download sub { path('file1')->touch };
-        extract sub { path($_)->touch for qw( file2 file3 ) };
         build sub {
           log("the build");
           path('file4')->spew('content of file4')
@@ -1382,11 +1382,12 @@ subtest 'test' => sub {
       use alienfile;
       use Path::Tiny qw( path );
 
-      probe sub { 'share' };
+      plugin 'Test::Mock',
+        probe    => 'share',
+        download => 1,
+        extract  => 1;
 
       share {
-        download sub { path('file1')->touch };
-        extract sub { path($_)->touch for qw( file2 file3 ) };
         build sub {
           log("the build");
           path('file4')->spew('content of file4')
@@ -1499,13 +1500,14 @@ alien_subtest 'pkg-config path during build' => sub {
     use Path::Tiny qw( path );
     use Env qw( @PKG_CONFIG_PATH );
 
-    probe sub { 'share' };
+    plugin 'Test::Mock',
+      probe    => 'share',
+      download => 1,
+      extract  => 1;
 
     share {
 
       requires 'Alien::libfoo2';
-      download sub { path('file1')->touch };
-      extract sub { path('file2')->touch };
       build sub {
         my($build) = @_;
         $build->runtime_prop->{my_pkg_config_path} = [@PKG_CONFIG_PATH];
@@ -1953,10 +1955,29 @@ subtest 'check_digest' => sub {
           'foo.txt.gz' => [ SHA256 => $good ],
         };
 
+        delete $build->install_prop->{download_detail};
+
         is
           $build->check_digest($file),
           1,
           'good signature with filename';
+
+        if(ref($file) eq 'HASH' && defined $file->{path})
+        {
+          is
+            $build->install_prop,
+            hash {
+              field download_detail => hash {
+                field $file->{path} => hash {
+                  field digest => [ SHA256 => $good ];
+                  etc;
+                };
+                etc;
+              };
+              etc;
+            },
+            '.install.download_detail.$download.digest is populated and matches';
+        }
 
         $build->meta_prop->{digest} = {
           'foo.txt.gz' => [ SHA256 => $bad ],
@@ -2067,6 +2088,194 @@ subtest 'check_digest' => sub {
 
 };
 
+subtest 'prefer' => sub {
+
+  local $Alien::Build::VERSION = $Alien::Build::VERSION || 2.60;
+
+  my $build = alienfile_ok q{
+    use alienfile;
+    probe sub { 'share' };
+    share {
+      start_url './corpus/dist';
+      plugin 'Download';
+
+      prefer sub {
+        my($build, $res) = @_;
+
+        return {
+          type => 'list',
+          list => [
+            sort { $b->{filename} cmp $a->{filename} } @{ $res->{list} },
+          ],
+        };
+      };
+
+    };
+  };
+
+  alienfile_skip_if_missing_prereqs;
+  alien_install_type_is 'share';
+
+  is
+    $build->prefer($build->fetch),
+    hash {
+      field type     => 'list';
+      field protocol => 'file';
+      field list     => array {
+        item hash {
+          field filename => 'foo-1.00.zip';
+          field url      => T();
+        };
+        etc;
+      };
+      end;
+    },
+    'expected result';
+
+};
+
+subtest 'decode' => sub {
+
+  my $build = alienfile_ok q{
+    use alienfile;
+    probe sub { 'share' };
+    share {
+
+      decode sub {
+        my($build, $res) = @_;
+
+        if($res->{type} eq 'html')
+        {
+          die "did not get expected content" unless $res->{content} =~ /FAUX HTML/;
+        }
+        elsif($res->{type} eq 'dir_listing')
+        {
+          die "did not get expected content" unless $res->{content} =~ /FAUX DIR LISTING/;
+        }
+        else
+        {
+          die "test does not handle @{[ $res->{type} ]}";
+        }
+
+        return {
+          type => 'list',
+          list => [
+            { filename => 'foo1.txt', url => "@{[ $res->{base} ]}/foo1.txt" },
+            { filename => 'foo2.txt', url => "@{[ $res->{base} ]}/foo2.txt" },
+          ],
+        };
+
+      };
+
+    };
+  };
+
+  alienfile_skip_if_missing_prereqs;
+  alien_install_type_is 'share';
+
+  is
+    $build->decode({
+      type     => 'html',
+      base     => 'http://foo.com',
+      content  => 'my FAUX HTML content',
+      protocol => 'http',
+    }),
+    hash {
+      field type     => 'list';
+      field protocol => 'http';
+      field list => [
+        { filename => 'foo1.txt', url => 'http://foo.com/foo1.txt' },
+        { filename => 'foo2.txt', url => 'http://foo.com/foo2.txt' },
+      ];
+      end;
+    },
+    'decoded html';
+
+  is
+    $build->decode({
+      type     => 'dir_listing',
+      base     => 'ftp://foo.com',
+      content  => 'my FAUX DIR LISTING content',
+      protocol => 'ftp',
+    }),
+    hash {
+      field type     => 'list';
+      field protocol => 'ftp';
+      field list => [
+        { filename => 'foo1.txt', url => 'ftp://foo.com/foo1.txt' },
+        { filename => 'foo2.txt', url => 'ftp://foo.com/foo2.txt' },
+      ];
+      end;
+    },
+    'decoded dir listing';
+
+};
+
+subtest 'alien_download_rule' => sub {
+
+  local $ENV{ALIEN_DOWNLOAD_RULE};
+  delete $ENV{ALIEN_DOWNLOAD_RULE};
+
+  is(
+    Alien::Build->new,
+    object {
+      call download_rule => 'warn';
+    },
+    'implicit default');
+
+  is(
+    do { $ENV{ALIEN_DOWNLOAD_RULE} = 'default'; Alien::Build->new },
+    object {
+      call download_rule => 'warn';
+    },
+    'explicit default');
+
+  foreach my $value ( qw( warn digest encrypt digest_or_encrypt digest_and_encrypt ) )
+  {
+
+    local $ENV{ALIEN_DOWNLOAD_RULE} = $value;
+
+    is(
+      Alien::Build->new,
+      object {
+        call download_rule => $value;
+
+        # changing the enviroment after the first call should not do anything
+        call sub {
+          $ENV{ALIEN_DOWNLOAD_RULE} = $value eq 'warn' ? 'digest' : 'warn';
+          shift->download_rule;
+       } => $value;
+
+      },
+      "override $value");
+  }
+
+  $ENV{ALIEN_DOWNLOAD_RULE} = 'bogus';
+
+  my @w;
+
+  my $mock = mock 'Alien::Build' => (
+    override => [
+      log => sub {
+        my(undef, $msg) = @_;
+        push @w, $msg if $msg =~ /^unknown ALIEN_DOWNLOAD_RULE/;
+      },
+    ]
+  );
+
+  is(
+    Alien::Build->new,
+      object {
+        call download_rule => 'warn';
+      },
+      "got correct default for bogus rule");
+
+  is(
+    \@w,
+    [ 'unknown ALIEN_DOWNLOAD_RULE "bogus", using "warn" instead' ],
+    'got correct log for bogus rule');
+};
+
 done_testing;
 
 {
@@ -2078,4 +2287,3 @@ done_testing;
   package MyBuild2;
   use parent 'Alien::Build';
 }
-

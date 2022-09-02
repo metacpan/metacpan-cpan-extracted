@@ -125,6 +125,7 @@ ok !-f 'doit-test2', 'file was deleted';
 is $r->unlink('non-existing-directory/test'), 0; # not throwing exceptions, as a file check is done before
 SKIP: {
     skip "permissions probably work differently on Windows", 1 if $^O eq 'MSWin32';
+    skip "permissions probably work differently on cygwin", 1 if $^O eq 'cygwin';
     skip "non-writable directory not a problem for the superuser", 1 if $> == 0;
 
     $r->mkdir("non-writable-dir");
@@ -143,6 +144,8 @@ is $r->unlink('not-existing', 'doit-a', 'doit-b', 'doit-c'), 3, 'three of four f
 $r->create_file_if_nonexisting('doit-test2');
 is $r->chmod(0755, "doit-test", "doit-test2"), 2; # changes expected
 is $r->chmod(0644, "doit-test2"), 1; # one change expected
+is $r->chmod({quiet => 1}, 0755, "doit-test2"), 1;
+is $r->chmod({quiet => 1}, 0644, "doit-test2"), 1;
 {
     local $TODO = "No noop on Windows" if $^O eq 'MSWin32';
     is $r->chmod(0755, "doit-test"), 0; # noop
@@ -164,6 +167,7 @@ is $r->chown(-1, -1, "doit-test"), 0;
 is $r->chown($>, undef, "doit-test"), 0;
 is $r->chown($>, -1, "doit-test"), 0;
 is $r->chown($>, undef, "doit-test"), 0;
+is $r->chown({quiet => 1 }, $>, undef, "doit-test"), 0;
 SKIP: {
     my @groups = split / /, $);
     my $another_group = $groups[1];
@@ -278,6 +282,7 @@ eval { $r->write_binary("non-existing-dir/test", "egal\n") };
 like $@, qr{ERROR.*\Q$errno_string{ENOENT}};
 SKIP: {
     skip "permissions probably work differently on Windows", 1 if $^O eq 'MSWin32';
+    skip "permissions probably work differently on cygwin", 1 if $^O eq 'cygwin';
     skip "non-writable file not a problem for the superuser", 1 if $> == 0;
 
     $r->write_binary({quiet=>1}, "unwritable-file", "something\n");
@@ -304,6 +309,8 @@ SKIP: {
 is $r->mkdir("doit-test"), 1;
 ok -d "doit-test";
 is $r->mkdir("doit-test"), 0;
+ok -d "doit-test";
+is $r->mkdir("doit-test/"), 0, 'ignore trailing slash';
 ok -d "doit-test";
 {
     my $umask = umask 0;
@@ -464,6 +471,7 @@ sub with_unreadable_directory (&$) {
 
  SKIP: {
 	skip "unreadable directories behave differently on Windows", 1 if $^O eq 'MSWin32';
+	skip "unreadable directories behave differently on cygwin", 1 if $^O eq 'cygwin';
 	skip "unreadable directories not a problem for the superuser", 1 if $> == 0;
 
 	$r->mkdir($unreadable_dir);

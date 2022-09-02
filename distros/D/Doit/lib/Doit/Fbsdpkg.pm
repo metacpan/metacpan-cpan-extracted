@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -14,8 +14,8 @@
 package Doit::Fbsdpkg; # Convention: all commands here should be prefixed with 'fbsdpkg_'
 
 use strict;
-use vars qw($VERSION);
-$VERSION = '0.01';
+use warnings;
+our $VERSION = '0.011';
 
 sub new { bless {}, shift }
 sub functions { qw(fbsdpkg_install_packages fbsdpkg_missing_packages) }

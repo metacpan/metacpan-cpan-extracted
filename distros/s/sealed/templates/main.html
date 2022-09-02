@@ -1,0 +1,93 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="SunStar Systems">
+    <meta name="author" content="Joe Schaefer">
+    <meta name="keywords" content="{{ headers.keywords }},{{ conf.keywords }}">
+
+    <title>{% block title %}{{ conf.title }} - {{ headers.title }}{% endblock %}</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/css/code.css" rel="stylesheet" media="screen">
+    <link href="/css/local.css" rel="stylesheet" media="screen">
+	<link href="/css/katex.min.css" rel="stylesheet" media="screen">
+
+	<link href="/favicon.png" rel="icon">
+</head>
+ <body>
+    <div class="navbar navbar-expand-lg fixed-top bg-light navbar-light">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="navbar-brand"><img src="/images/sunstarlinear.png" /></div>
+        </div>
+        <div class="navbar-collapse collapse" id="navbarResponsive">
+          <ul class="navbar-nav">
+            <li class="nav-item{% ifequal path "/index.html"|append:lang %}
+                   active
+                   {% endifequal %}"><a class="nav-link text" href="/">{% ifequal lang ".en" %}Home{% endifequal %}{% ifequal lang ".es" %}Hogar{% endifequal %}{% ifequal lang ".de" %}Zuhause{% endifequal %}{% ifequal lang ".fr" %}Accueil{% endifequal %}</a></li>
+            <li class="nav-item{% ifequal path "/about.html"|append:lang %}
+                   active
+                   {% endifequal %}"><a class="nav-link text" href="/about">{% ifequal lang ".en" %}About{% endifequal %}{% ifequal lang ".es" %}Acerca de{% endifequal %}{% ifequal lang ".de" %}Über{% endifequal %}{% ifequal lang ".fr" %}À propos{% endifequal %}</a></li>
+            <li class="nav-item{% ifequal path "/contact.html"|append:lang %}
+				  active
+                   {% endifequal %}"><a class="nav-link" href="/contact">{% ifequal lang ".en" %}Contact{% endifequal %}{% ifequal lang ".es" %}Contacto{% endifequal %}{% ifequal lang ".de" %}Kontakt{% endifequal %}{% ifequal lang ".fr" %}Contact{% endifequal %}</a></li>
+ 			<li class="nav-item dropdown">
+              <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">{% ifequal lang ".en" %}Products{% endifequal %}{% ifequal lang ".es" %}Productos{% endifequal %}{% ifequal lang ".de" %}Produkte{% endifequal %}{% ifequal lang ".fr" %}Des produits{% endifequal %}... <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+				<li class="dropdown-item{% ifequal path "/CMS/index.html"|append:lang %}
+				  active
+                   {% endifequal %}"><a class="nav-link text-white" href="/CMS/index.html{{ lang }}">CMS</a></li>
+				<li class="dropdown-item{% ifequal path "/CMS/plans.html"|append:lang %}
+				  active
+                   {% endifequal %}"><a class="nav-link text-white" href="/CMS/plans.html{{ lang }}">{% ifequal lang ".en" %}CMS Plans{% endifequal %}{% ifequal lang ".es" %}Planes CMS{% endifequal %}{% ifequal lang ".de" %}CMS-Pläne{% endifequal %}{% ifequal lang ".fr" %}Plans CMS{% endifequal %}</a></li>
+              </ul>
+			</li>
+            <li class="nav-item{% ifequal path "/open-source.html"|append:lang %}
+                   active
+                   {% endifequal %}"><a class="nav-link" href="/open-source">{% ifequal lang ".en" %}Open Source{% endifequal %}{% ifequal lang ".es" %}Fuente abierta{% endifequal %}{% ifequal lang ".de" %}Open Source{% endifequal %}{% ifequal lang ".fr" %}Open source{% endifequal %}</a></li>
+            <li class="nav-item dropdown">
+              <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">{% ifequal lang ".en" %}More{% endifequal %}{% ifequal lang ".es" %}Más{% endifequal %}{% ifequal lang ".de" %}Mehr{% endifequal %}{% ifequal lang ".fr" %}Plus{% endifequal %}... <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+				<li class="dropdown-item">
+					<a class="nav-link text-white" href="https://vcs.sunstarsys.com/viewvc/public/cms-sites/www.sunstarsys.com/trunk/">{% ifequal lang ".en" %}Site Source{% endifequal %}{% ifequal lang ".es" %}Fuente del sitio{% endifequal %}{% ifequal lang ".de" %}Site-Quelle{% endifequal %}{% ifequal lang ".fr" %}Source du site{% endifequal %}</a>
+				  </li>
+                <li class="dropdown-item divider"></li>
+                <li class="dropdown-header text-white">{% ifequal lang ".en" %}Site Maps{% endifequal %}{% ifequal lang ".es" %}Mapas del sitio{% endifequal %}{% ifequal lang ".de" %}Site Maps{% endifequal %}{% ifequal lang ".fr" %}Cartes du site{% endifequal %}</li>
+				<li class="dropdown-item"><a class="nav-link text-white" href="/sitemap.html.en">{% ifequal lang ".en" %}English{% endifequal %}{% ifequal lang ".es" %}Inglés{% endifequal %}{% ifequal lang ".de" %}Englisch{% endifequal %}{% ifequal lang ".fr" %}Anglais{% endifequal %}</a></li>
+				<li class="dropdown-item"><a class="nav-link text-white" href="/sitemap.html.es">{% ifequal lang ".en" %}Spanish{% endifequal %}{% ifequal lang ".es" %}Español{% endifequal %}{% ifequal lang ".de" %}Spanisch{% endifequal %}{% ifequal lang ".fr" %}Espagnol{% endifequal %}</a></li>
+				<li class="dropdown-item"><a class="nav-link text-white" href="/sitemap.html.de">{% ifequal lang ".en" %}German{% endifequal %}{% ifequal lang ".es" %}Alemán{% endifequal %}{% ifequal lang ".de" %}Deutsche{% endifequal %}{% ifequal lang ".fr" %}Allemand{% endifequal %}</a></li>
+				<li class="dropdown-item"><a class="nav-link text-white" href="/sitemap.html.fr">{% ifequal lang ".en" %}French{% endifequal %}{% ifequal lang ".es" %}Francés{% endifequal %}{% ifequal lang ".de" %}Französisch{% endifequal %}{% ifequal lang ".fr" %}Français{% endifequal %}</a></li>
+                 <li class="dropdown-item divider"></li>
+                <li class="dropdown-header text-white">{% ifequal lang ".en" %}Engagements{% endifequal %}{% ifequal lang ".es" %}Compromisos{% endifequal %}{% ifequal lang ".de" %}Engagements{% endifequal %}{% ifequal lang ".fr" %}Engagements{% endifequal %}</li>
+                <li class="dropdown-item"><a class="nav-link text-white" href="/clients">{% ifequal lang ".en" %}Clients{% endifequal %}{% ifequal lang ".es" %}Clientes{% endifequal %}{% ifequal lang ".de" %}Kunden{% endifequal %}{% ifequal lang ".fr" %}Clients{% endifequal %}</a></li>
+                <li class="dropdown-item"><a class="nav-link text-white" href="/essays">{% ifequal lang ".en" %}Essays{% endifequal %}{% ifequal lang ".es" %}Ensayos{% endifequal %}{% ifequal lang ".de" %}Aufsätze{% endifequal %}{% ifequal lang ".fr" %}Essais{% endifequal %}</a></li>
+              </ul>
+            </li>
+            <li class="nav-item{% ifequal path "/powered-by.html"|append:lang %}
+                     active
+                     {% endifequal %}"><a class="nav-link" href="/powered-by">{% ifequal lang ".en" %}Powered by{% endifequal %}{% ifequal lang ".es" %}Energizado por{% endifequal %}{% ifequal lang ".de" %}Unterstützt von{% endifequal %}{% ifequal lang ".fr" %}Alimenté par{% endifequal %}...</a>
+            </li>
+          </ul>
+		</div>
+      </div>
+	</div>
+	<div class="container theme-showcase">
+     	{% block content %}
+		<div class="breadcrumbs">
+			{{ breadcrumbs|safe }}&nbsp;&nbsp;<a href="javascript:void(location.href='https://cms.sunstarsys.com/redirect?uri='+escape(location.href))">
+				<img src="/images/edit.png" />
+			</a>
+		</div>
+        <h1>{{ headers.title }}</h1>
+      	<div class="jumbotron">{{ content|markdown }}</div>
+      		{% endblock %}
+    		<script src="/js/jquery.min.js"></script>
+    		<script src="/js/bootstrap.bundle.min.js"></script>
+		</div>
+	</body>
+</html>

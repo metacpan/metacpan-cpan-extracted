@@ -6,9 +6,9 @@ Date::Manip::Offset::off000;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  1 10:56:59 EDT 2022
-#    Data version: tzdata2022a
-#    Code version: tzcode2022a
+#    Generated on: Thu Sep  1 10:36:28 EDT 2022
+#    Data version: tzdata2022c
+#    Code version: tzcode2022c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.88';
+$VERSION='6.89';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -40,7 +40,6 @@ $Offset        = '+00:00:00';
       'africa/sao_tome',
       'atlantic/canary',
       'atlantic/madeira',
-      'atlantic/reykjavik',
       'africa/monrovia',
       'africa/bissau',
       'america/danmarkshavn',
@@ -58,15 +57,12 @@ $Offset        = '+00:00:00';
       'america/rankin_inlet',
       'europe/gibraltar',
       'america/inuvik',
-      'indian/kerguelen',
       'america/resolute',
       'europe/andorra',
       'america/iqaluit',
       'europe/brussels',
       'europe/madrid',
-      'europe/monaco',
       'europe/paris',
-      'europe/luxembourg',
       'pacific/kanton',
       'america/yellowknife',
       'america/pangnirtung',
@@ -78,7 +74,6 @@ $Offset        = '+00:00:00';
       'antarctica/mawson',
       'antarctica/palmer',
       'antarctica/rothera',
-      'antarctica/vostok',
       ],
    1 => [
       'atlantic/azores',
@@ -86,7 +81,6 @@ $Offset        = '+00:00:00';
       'america/scoresbysund',
       'africa/casablanca',
       'africa/el_aaiun',
-      'atlantic/reykjavik',
       'atlantic/madeira',
       'europe/prague',
       ],

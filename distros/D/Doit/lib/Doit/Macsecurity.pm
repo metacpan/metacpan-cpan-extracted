@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -15,9 +15,7 @@ package Doit::Macsecurity;
 
 use strict;
 use warnings;
-
-use vars qw($VERSION);
-$VERSION = '0.01';
+our $VERSION = '0.011';
 
 use Doit::Log;
 

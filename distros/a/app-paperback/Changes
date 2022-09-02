@@ -1,5 +1,20 @@
 Revision history for Perl module and script App::paperback.
 
+1.14  Thu Sep 1 15:00:00 2022
+	- Faster exit with error when input file is not a PDF
+
+1.13  Thu Sep 1 10:00:00 2022
+	- Fix error messages
+
+1.12  Thu Sep 1 09:00:00 2022
+	- Fix handling of 'versioned' v1.4 PDF files
+
+1.11  Wed Aug 31 09:00:00 2022
+	- Change global var to state, rename functions and var
+
+1.10  Tue Aug 30 15:00:00 2022
+	- Rename and simplify extractXrefSection
+
 1.09  Mon Aug 29 09:00:00 2022
 	- Simplify syntax in several subroutines
 

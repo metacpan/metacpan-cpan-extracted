@@ -10,7 +10,6 @@ use Getopt::Long;
 use Test::More;
 
 use Doit;
-use Doit::Extcmd qw(is_in_path);
 
 sub get_id {
     my $d = shift;
@@ -40,10 +39,6 @@ require FindBin;
 { no warnings 'once'; push @INC, $FindBin::RealBin; }
 require TestUtil;
 
-if (!is_in_path('sudo')) {
-    plan skip_all => 'git not in PATH';
-}
-
 my $other_user;
 my $debug;
 GetOptions(
@@ -53,6 +48,11 @@ GetOptions(
     or die "usage: $0 [--other-user username] [--debug]\n";
 
 my $d = Doit->init;
+
+if (!$d->which('sudo')) {
+    plan skip_all => 'sudo not in PATH';
+}
+
 my %info;
 my $sudo = TestUtil::get_sudo($d, info => \%info);
 if (!$sudo) {

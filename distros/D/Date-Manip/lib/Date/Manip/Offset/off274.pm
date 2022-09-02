@@ -6,9 +6,9 @@ Date::Manip::Offset::off274;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  1 10:56:59 EDT 2022
-#    Data version: tzdata2022a
-#    Code version: tzcode2022a
+#    Generated on: Thu Sep  1 10:36:29 EDT 2022
+#    Data version: tzdata2022c
+#    Code version: tzcode2022c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.88';
+$VERSION='6.89';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -28,81 +28,88 @@ END {
    undef %Offset;
 }
 
-$Offset        = '-03:00:00';
+$Offset        = '-04:00:00';
 
 %Offset        = (
    0 => [
-      'america/sao_paulo',
-      'america/araguaina',
-      'america/bahia',
-      'america/belem',
-      'america/fortaleza',
-      'america/maceio',
-      'america/recife',
-      'america/nuuk',
-      'america/montevideo',
-      'america/cayenne',
-      'america/argentina/buenos_aires',
-      'america/argentina/catamarca',
-      'america/argentina/cordoba',
-      'america/argentina/jujuy',
-      'america/argentina/la_rioja',
-      'america/argentina/mendoza',
-      'america/argentina/rio_gallegos',
-      'america/argentina/salta',
-      'america/argentina/san_juan',
-      'america/argentina/san_luis',
-      'america/argentina/tucuman',
-      'america/argentina/ushuaia',
-      'america/miquelon',
-      'atlantic/stanley',
-      'america/paramaribo',
-      'america/santarem',
-      'america/punta_arenas',
-      'etc/gmt-3',
-      'c',
-      'antarctica/palmer',
-      'antarctica/rothera',
-      'america/danmarkshavn',
-      'america/guyana',
-      'america/asuncion',
-      ],
-   1 => [
-      'america/halifax',
+      'america/puerto_rico',
       'america/glace_bay',
+      'america/halifax',
       'america/moncton',
-      'atlantic/bermuda',
-      'america/santiago',
-      'america/goose_bay',
-      'america/asuncion',
-      'america/thule',
+      'america/barbados',
+      'america/guyana',
+      'america/martinique',
+      'america/boa_vista',
       'america/campo_grande',
       'america/cuiaba',
+      'america/manaus',
+      'america/porto_velho',
+      'america/thule',
+      'america/santiago',
+      'atlantic/bermuda',
+      'america/asuncion',
+      'america/la_paz',
+      'america/caracas',
+      'america/goose_bay',
+      'america/santo_domingo',
+      'etc/gmt-4',
+      'd',
+      'america/grand_turk',
       'america/punta_arenas',
+      'america/eirunepe',
+      'america/rio_branco',
       'atlantic/stanley',
       'america/argentina/san_luis',
-      'america/argentina/buenos_aires',
+      'america/santarem',
       'america/argentina/catamarca',
-      'america/argentina/cordoba',
-      'america/argentina/jujuy',
       'america/argentina/la_rioja',
       'america/argentina/mendoza',
       'america/argentina/rio_gallegos',
-      'america/argentina/salta',
       'america/argentina/san_juan',
       'america/argentina/tucuman',
       'america/argentina/ushuaia',
-      'america/boa_vista',
-      'america/manaus',
       'america/pangnirtung',
-      'america/porto_velho',
-      'america/santarem',
-      'america/barbados',
-      'america/martinique',
-      'america/iqaluit',
-      'america/puerto_rico',
+      'america/argentina/cordoba',
+      'america/argentina/jujuy',
+      'america/argentina/salta',
+      'america/miquelon',
+      'america/argentina/buenos_aires',
+      'america/cayenne',
       'america/montevideo',
       'antarctica/palmer',
+      ],
+   1 => [
+      'america/new_york',
+      'america/nipigon',
+      'america/toronto',
+      'america/havana',
+      'america/detroit',
+      'america/iqaluit',
+      'america/thunder_bay',
+      'america/kentucky/louisville',
+      'america/indiana/indianapolis',
+      'america/indiana/marengo',
+      'america/indiana/vevay',
+      'america/indiana/vincennes',
+      'america/indiana/winamac',
+      'america/grand_turk',
+      'america/port-au-prince',
+      'america/pangnirtung',
+      'america/kentucky/monticello',
+      'america/indiana/petersburg',
+      'america/cancun',
+      'america/eirunepe',
+      'america/lima',
+      'america/bogota',
+      'america/guayaquil',
+      'america/rio_branco',
+      'america/jamaica',
+      'america/indiana/tell_city',
+      'america/santo_domingo',
+      'america/rankin_inlet',
+      'america/resolute',
+      'america/punta_arenas',
+      'america/santiago',
       ],
 );
 

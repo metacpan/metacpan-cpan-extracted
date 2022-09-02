@@ -112,21 +112,24 @@ would be done, and in real mode it's the number of changes performed.
 =head3 chmod
 
     $doit->chmod($mode, $file ...);
+    $doit->chmod({quiet => $bool}, $mode, $file ...);
 
 Make sure that the permission of the listed files is set to I<$mode>
 (which is typically expressed as an octal number). Fails if not all
-files could be changed. See L<perlfunc/chmod> for more details.
+files could be changed. If C<quiet> is set to a true value, then no
+logging is done. See L<perlfunc/chmod> for more details.
 
 =head3 chown
 
     $doit->chown($user, $group, $file ...);
+    $doit->chown({quiet => $bool}, $user, $group, $file ...);
 
 Make sure that the owner (and group) of the listed files is set to the
 given values. The user and group may be specified as uid/gid or as
 username/groupname. A value of -1 or C<undef> for I<$user> and
 I<$group> is interpreted to leave that value unchanged. This command
-is not useful on Windows systems. See L<perlfunc/chown> for more
-details.
+is not useful on Windows systems. If C<quiet> is set to a true value,
+then no logging is done. See L<perlfunc/chown> for more details.
 
 =head3 create_file_if_nonexisting
 
@@ -363,9 +366,10 @@ details may be streamlined or even changed.
     $doit->write_binary($filename, $content);
     $doit->write_binary({quiet=>$level, atomic=>$bool}, $filename, $content);
 
-Make sure that the file I<$filename> has the content I<$content>. The
-given content should be unencoded (raw, binary, octets). If you need a
-specific encoding, then it has to be encoded before:
+Make sure that the file I<$filename> has the content I<$content>.
+Return 1 if a change was done, otherwise 0. The given content should
+be unencoded (raw, binary, octets). If you need a specific encoding,
+then it has to be encoded before:
 
     $doit->write_binary($filename, Encode::encode_utf8($character_content));
 
@@ -499,10 +503,12 @@ Always returns C<1> (unless there's an exception).
 =head3 system
 
     $doit->system("command", "arg" ...);
-    $doit->system({show_cwd => $bool}, "command", "arg" ...);
+    $doit->system({quiet => $bool, info => $bool, show_cwd => $bool}, "command", "arg" ...);
 
 Execute a command. If C<show_cwd> is set to a true value, then logging
-shows also the current working directory. See L<"system" in
+shows also the current working directory. If C<quiet> is set to a true
+value, then no logging is done. If C<info> is set to a true value,
+then command execution happens even in dry-run mode. See L<"system" in
 perlfunc|perlfunc/system LIST> for more details.
 
 Always returns C<1> (unless there's an exception).
@@ -538,6 +544,24 @@ Like L</open3>, but with the option C<< info=>1 >> set.
     my $stdout = $doit->info_qx({quiet => $bool, statusref => \%status}, "command", "arg" ...);
 
 Like L</qx>, but with the option C<< info=>1 >> set.
+
+=head3 info_system
+
+    $doit->info_system("command", "arg" ...);
+    $doit->info_system({quiet => $bool, show_cwd => $bool }, "command", "arg" ...);
+
+Like L</system>, but with the option C<< info=>1 >> set.
+
+=head2 MISC INFORMATIONAL COMMANDS
+
+Informational commands also run in dry-run mode.
+
+=head3 which
+
+    $doit->which($program)
+
+Return the path to the given I<$program>, or C<undef> if it cannot be
+found in user's PATH.
 
 =head2 REMOTE AND USER-SWITCHING FUNCTIONS
 
@@ -575,10 +599,16 @@ dry-run mode, if defined, is passed to the other system or user.
 
     my $ssh = $doit->do_ssh_connect('user@host', options ...);
 
+    my $net_openssh = Net::OpenSSH->new('user@host', options ...);
+    my $ssh = $doit->do_ssh_connect($net_openssh, options ...);
+
 Create a Doit runner-like object which runs commands over a ssh
 connection to I<user@host>. The connection and communication is
-created and done using L<Net::OpenSSH>. The following options are
-available:
+created and done using L<Net::OpenSSH>. It is also possible to pass a
+L<Net::OpenSSH> object instead of specifying user and host in the
+first argument.
+
+The following options are available:
 
 =over
 
@@ -599,7 +629,9 @@ Enable ssh agent forwardning if set to true.
 =item C<< tty => I<$bool> >>
 
 Allocate a pseudo terminal. May be useful if the script requires
-interactive input (e.g. password input).
+interactive input (e.g. password input or host key confirmation). Note
+that simultanously having multiple ssh connections with tty enabled is
+calling for trouble.
 
 =item C<< port => I<$port> >>
 
@@ -607,7 +639,17 @@ Use a different ssh port.
 
 =item C<< master_opts => [ ... ] >>
 
-Additional options to pass. See L<Net::OpenSSH/master_opts>.
+Additional options to pass to the underlying C<Net::OpenSSH> object.
+See L<Net::OpenSSH/master_opts>. Cannot be used if a C<Net::OpenSSH>
+object was passed in this method call.
+
+For example, to specify a connection timeout:
+
+    $doit->do_ssh_connect('user@host', master_opts => [-o => "ConnectTimeout=2"]);
+
+Or using another identity:
+
+    $doit->do_ssh_connect('user@host', master_opts => [-i => $bootstrap_privkey_file]);
 
 =item C<< put_to_remote => I<$method> >>
 
@@ -617,6 +659,12 @@ C<rsync_put> (default) and C<scp_put>.
 =item C<< perl => I<$path> >>
 
 Use a different perl for running the commands. Defaults to C<$^X>.
+
+=item C<< umask => I<$umask> >>
+
+Specify an explicit umask for the worker process. Default is unset,
+which means that the system's default umask is used, which may be 0022
+or 0077.
 
 =back
 
@@ -749,7 +797,7 @@ Slaven Rezic <srezic@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2017 Slaven Rezic. All rights reserved.
+Copyright (c) 2017,2018 Slaven Rezic. All rights reserved.
 This module is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

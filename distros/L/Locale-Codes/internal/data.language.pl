@@ -511,6 +511,8 @@ $Data{'language'}{'iana'}{'orig'}{'name'} = {
    "Gaɓogbo"                                       => "Gabogbo",
    "Guébie"                                        => "Guebie",
    "Juǀʼhoansi"                                    => "Ju|'hoansi",
+   "Meänkieli"                                      => "Meankieli",
+   "Lengua de señas Albarradas"                     => "Lengua de senas Albarradas",
 };
 
 $Data{'language'}{'iana'}{'ignore'} = {

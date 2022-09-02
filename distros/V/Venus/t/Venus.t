@@ -1284,6 +1284,13 @@ $test->for('example', 1, 'template-system', sub {
 
 Awncorp, C<awncorp@cpan.org>
 
++=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
+
 =cut
 
 # END

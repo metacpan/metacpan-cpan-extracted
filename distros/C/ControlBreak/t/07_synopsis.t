@@ -78,6 +78,7 @@ sub synopsis {
     }
 
     # simulate break at end of data, if we iterated at least once
+    # uncoverable branch false
     if ($cb->iteration > 0) {
         printf "%s,%s,%d%s\n", $cb->last('Country'), $cb->last('District'), $district_total, '*';
         printf "%s total,%s,%d%s\n", $cb->last('Country'), '', $country_total, '**';

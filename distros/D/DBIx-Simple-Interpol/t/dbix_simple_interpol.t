@@ -1,7 +1,6 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
-use Test::More 0.88; # for done_testing
+use Test::More tests => 5;
 use lib 't/lib';
 
 local $@;
@@ -22,5 +21,3 @@ DBIx::Simple::Interpol->import( ':all' );
 ok __PACKAGE__->can( 'sql_interp' ) == \&SQL::Interpol::sql_interp
 && __PACKAGE__->can( 'sql' ) == \&SQL::Interpol::sql,
 	'... but does just that when asked';
-
-done_testing;

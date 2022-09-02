@@ -41,6 +41,14 @@ sub coerce_args {
   return $data;
 }
 
+sub coerce_attr {
+  my ($self, $name, @args) = @_;
+
+  return $self->{$name} if !@args;
+
+  return $self->{$name} = $self->coercion({$name, $args[0]})->{$name};
+}
+
 sub coerce_into {
   my ($self, $class, $value) = @_;
 
@@ -90,6 +98,7 @@ sub EXPORT {
   [
     'coerce',
     'coerce_args',
+    'coerce_attr',
     'coerce_into',
     'coerce_onto',
     'coercion',
@@ -250,6 +259,53 @@ I<Since C<0.07>>
   # {
   #   father   => bless({...}, 'Person'),
   # }
+
+=back
+
+=cut
+
+=head2 coerce_attr
+
+  coerce_attr(Str $name, Any $value) (Any)
+
+The coerce_attr method is a surrogate accessor and gets and/or sets an instance
+attribute based on the coercion rules, returning the coerced value.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item coerce_attr example 1
+
+  # given: synopsis
+
+  package main;
+
+  $person = Person->new(
+    name => 'me',
+  );
+
+  my $coerce_name = $person->coerce_attr('name');
+
+  # bless({value => "me"}, "Venus::String")
+
+=back
+
+=over 4
+
+=item coerce_attr example 2
+
+  # given: synopsis
+
+  package main;
+
+  $person = Person->new(
+    name => 'me',
+  );
+
+  my $coerce_name = $person->coerce_attr('name', 'myself');
+
+  # bless({value => "myself"}, "Venus::String")
 
 =back
 

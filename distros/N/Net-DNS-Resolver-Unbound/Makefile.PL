@@ -64,13 +64,16 @@ if ( my $dir = $ENV{UNBOUND_PREFIX} ) {
 
 $inc = $ENV{UNBOUND_INCLUDE} if $ENV{UNBOUND_INCLUDE};
 $lib = $ENV{UNBOUND_LIB}     if $ENV{UNBOUND_LIB};
-chomp $_ for ( $inc, $lib );
+chomp $_ foreach ( $inc, $lib );
 
 
-if ( my $cpp = $Config{cpprun} ) {	## unbound-devel package installed?
-	my $header = 'unbound.h';
-	my @header = `$Config{echo} "#include <$header>" | $cpp $inc - 2>$nul`;
-	die "$header	file not found" unless grep {/$header/} @header;
+my @header = qw(unbound.h);					# library headers
+
+if ( my $cpp = $Config{cpprun} ) {
+	for my $header (@header) {
+		my @text = `$Config{echo} | $cpp $inc -include $header - 2>$nul`;
+		die "$header  file not found" unless grep {/$header/i} @text;
+	}
 }
 
 

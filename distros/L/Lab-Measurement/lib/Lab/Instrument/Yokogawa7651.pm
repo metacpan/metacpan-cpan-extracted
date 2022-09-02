@@ -1,6 +1,6 @@
 package Lab::Instrument::Yokogawa7651;
 #ABSTRACT: Yokogawa 7651 DC source
-$Lab::Instrument::Yokogawa7651::VERSION = '3.822';
+$Lab::Instrument::Yokogawa7651::VERSION = '3.823';
 use v5.20;
 
 use warnings;
@@ -787,7 +787,7 @@ Lab::Instrument::Yokogawa7651 - Yokogawa 7651 DC source
 
 =head1 VERSION
 
-version 3.822
+version 3.823
 
 =head1 SYNOPSIS
 

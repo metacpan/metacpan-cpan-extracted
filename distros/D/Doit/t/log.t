@@ -21,6 +21,8 @@ plan 'no_plan';
 SKIP: {
     skip "No log coloring on Windows", 1
 	if $^O eq 'MSWin32';
+    skip "No log coloring on dump terms", 1
+	if ($ENV{TERM}||'') =~ m{^(|dumb)$};
     is Doit::Log::_can_coloring(), 1; # as Term::ANSIColor is a prereq for this test, _can_coloring has to be true on non-Windows systems
 }
 

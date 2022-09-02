@@ -6,9 +6,9 @@ Date::Manip::Offset::off176;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed Jun  1 10:56:59 EDT 2022
-#    Data version: tzdata2022a
-#    Code version: tzcode2022a
+#    Generated on: Thu Sep  1 10:36:29 EDT 2022
+#    Data version: tzdata2022c
+#    Code version: tzcode2022c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.88';
+$VERSION='6.89';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -28,63 +28,11 @@ END {
    undef %Offset;
 }
 
-$Offset        = '+09:00:00';
+$Offset        = '+10:03:12';
 
 %Offset        = (
    0 => [
-      'asia/tokyo',
-      'pacific/palau',
-      'asia/pyongyang',
-      'asia/seoul',
-      'asia/chita',
-      'asia/khandyga',
-      'asia/yakutsk',
-      'asia/jayapura',
-      'asia/dili',
-      'etc/gmt+9',
-      'v',
-      'asia/irkutsk',
-      'asia/choibalsan',
-      'asia/vladivostok',
-      'asia/ust-nera',
-      'asia/sakhalin',
-      'pacific/chuuk',
-      'pacific/kosrae',
-      'pacific/pohnpei',
-      'asia/taipei',
-      'asia/hong_kong',
-      'asia/macau',
-      'asia/jakarta',
-      'asia/kuala_lumpur',
-      'asia/kuching',
-      'asia/makassar',
-      'asia/pontianak',
-      'asia/singapore',
-      'asia/yangon',
-      'pacific/bougainville',
-      'pacific/nauru',
-      'asia/ho_chi_minh',
-      'pacific/majuro',
-      'pacific/guam',
-      'pacific/kwajalein',
-      'asia/manila',
-      'australia/adelaide',
-      'australia/darwin',
-      'australia/broken_hill',
-      ],
-   1 => [
-      'asia/ulaanbaatar',
-      'asia/choibalsan',
-      'asia/irkutsk',
-      'australia/perth',
-      'asia/shanghai',
-      'asia/chita',
-      'asia/khandyga',
-      'asia/yakutsk',
-      'asia/hong_kong',
-      'asia/macau',
-      'asia/taipei',
-      'asia/manila',
+      'asia/magadan',
       ],
 );
 

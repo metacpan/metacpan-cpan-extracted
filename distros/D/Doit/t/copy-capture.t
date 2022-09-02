@@ -16,7 +16,6 @@ BEGIN {
 plan 'no_plan';
 
 use Doit;
-use Doit::Extcmd qw(is_in_path);
 
 sub slurp ($) { open my $fh, shift or die $!; local $/; <$fh> }
 
@@ -68,13 +67,31 @@ $doit->write_binary({quiet => 2}, "test-file", "changed content");
     };
     is $stdout, '';
     like colorstrip($stderr), qr{^\QINFO: copy test-file test-file-copied}, 'changed contents';
-    if (is_in_path 'diff') {
+    if ($Doit::diff_cmd[0] eq 'diff') {
 	like $stderr, qr{^\Q--- test-file-copied}sm, 'looks like a diff header';
 	like $stderr, qr{^\Q+++ test-file}sm, 'looks like a diff header';
 	like $stderr, qr{^\Q-content}sm, 'looks like diff body';
 	like $stderr, qr{^\Q+changed content}sm, 'looks like diff body';
+    } elsif ($Doit::diff_cmd[0] eq 'fc') {
+	#like $stderr, qr{^\QComparing files test-file-copied and TEST-FILE}sm, 'looks like a FC header'; # could be localized and there's no easy way to force/query a locale on Windows
+	like $stderr, qr{^\Q***** test-file-copied}smi, 'first file in FC output';
+	like $stderr, qr{^\Q***** TEST-FILE}smi, 'second file in FC output'; # case insensitive check, unclear if this may be lowercase sometimes
     }
     is slurp("test-file-copied"), "changed content";
+}
+
+# Force FC operation on MSWin32
+if ($^O eq 'MSWin32' && $Doit::diff_cmd[0] eq 'diff' && $doit->which('fc')) {
+    $doit->create_file_if_nonexisting("test-file-copied-fc");
+    local @Doit::diff_cmd = ('fc');
+    my($stdout, $stderr) = capture {
+	$doit->copy("test-file", "test-file-copied-fc");
+    };
+    is $stdout, '';
+    like colorstrip($stderr), qr{^\QINFO: copy test-file test-file-copied-fc}, 'changed contents';
+    #like $stderr, qr{^\QComparing files test-file-copied-fc and TEST-FILE}sm, 'looks like a FC header'; # see above
+    like $stderr, qr{^\Q***** test-file-copied-fc}smi, 'first file in FC output';
+    like $stderr, qr{^\Q***** TEST-FILE}smi, 'second file in FC output'; # case insensitive check, unclear if this may be lowercase sometimes
 }
 
 $doit->write_binary({quiet => 2}, "test-file", "again changed content");

@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Netmask
 
+2.0002 2022-08-31
+ - Documentation fixes (thanks, Breno G. de Oliveira!)
+
 2.0001 2021-03-29
  - BUGFIX: Return a netmask length of 0 whenever parsing an invalid
    digit.

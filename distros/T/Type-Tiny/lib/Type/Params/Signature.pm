@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::Signature::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Signature::VERSION    = '1.016009';
+	$Type::Params::Signature::VERSION    = '1.016010';
 }
 
 $Type::Params::Signature::VERSION =~ tr/_//d;
@@ -612,15 +612,16 @@ sub _coderef_extra_names {
 sub _coderef_end {
 	my ( $self, $coderef ) = ( shift, @_ );
 
-	if ( $self->bless and $self->oo_trace) {
+	if ( $self->bless and $self->oo_trace ) {
 		my $package = $self->package;
 		my $subname = $self->subname;
-
-		$coderef->add_line( sprintf(
-			'$out{"~~caller"} = %s;',
-			B::perlstring( "$package\::$subname" ),
-		) );
-		$coderef->add_gap;
+		if ( defined $package and defined $subname ) {
+			$coderef->add_line( sprintf(
+				'$out{"~~caller"} = %s;',
+				B::perlstring( "$package\::$subname" ),
+			) );
+			$coderef->add_gap;
+		}
 	}
 
 	$self->_coderef_end_extra( $coderef );

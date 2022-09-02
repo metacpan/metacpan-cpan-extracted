@@ -1,13 +1,15 @@
 #!perl
 
-our $DATE = '2021-07-29'; # DATE
-our $VERSION = '0.479'; # VERSION
-
 use 5.010;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-07-16'; # DATE
+our $DIST = 'App-SahUtils'; # DIST
+our $VERSION = '0.480'; # VERSION
 
 our %SPEC;
 
@@ -29,7 +31,7 @@ $SPEC{format_with_sah} = {
             tags => ['category:formatter-specification'],
             completion => sub {
                 my %args = @_;
-                my $cmdline = $args{cmdline} or return undef;
+                my $cmdline = $args{cmdline} or return;
                 my $r = $args{r};
 
                 $r->{read_config} = 1;
@@ -141,7 +143,7 @@ sub format_with_sah {
     {
         my $gen_res;
         {
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             my %gen_args = (
                 format => $args{format},
                 (formatter_args => $args{formatter_args}) x !!$args{formatter_args},
@@ -184,10 +186,10 @@ sub format_with_sah {
             $data = JSON::MaybeXS->new->allow_nonref->decode($args{multiple_data_as_json});
             $multiple = 1;
         } elsif (defined $args{data_as_perl}) {
-            $data = eval $args{data_as_perl};
+            $data = eval $args{data_as_perl}; ## no critic: BuiltinFunctions::ProhibitStringyEval
             die if $@;
         } elsif (defined $args{multiple_data_as_perl}) {
-            $data = eval $args{multiple_data_as_perl};
+            $data = eval $args{multiple_data_as_perl}; ## no critic: BuiltinFunctions::ProhibitStringyEval
             die if $@;
             $multiple = 1;
         } else {
@@ -249,18 +251,15 @@ format-with-sah - Format data
 
 =head1 VERSION
 
-This document describes version 0.479 of format-with-sah (from Perl distribution App-SahUtils), released on 2021-07-29.
+This document describes version 0.480 of format-with-sah (from Perl distribution App-SahUtils), released on 2022-07-16.
 
 =head1 SYNOPSIS
 
-Usage:
+% B<format-with-sah> [B<--compiler>=I<str>|B<-C>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--data-as-json>=I<str>] [B<--data-as-perl>=I<str>] [B<--data-with-result>|B<-d>] [B<--format>=I<name>|B<--json>] [B<--formatter-args>=I<s>|B<--formatter-args-json>=I<json>] [B<--linenum>|B<-l>] [B<--multiple-data-as-json>=I<str>] [B<--multiple-data-as-perl>=I<str>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--show-code>|B<-c>] -- E<lt>I<format>E<gt>
 
-% B<format-with-sah> [B<--compiler>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--data-as-json>=I<str>] [B<--data-as-perl>=I<str>] [B<--data-with-result>|B<-d>] [B<--format>=I<name>|B<--json>] [B<--formatter-args>=I<s>] [B<--linenum>|B<-l>] [B<--multiple-data-as-json>=I<str>] [B<--multiple-data-as-perl>=I<str>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--show-code>|B<-c>] [B<--formatter-args-json>=I<json>] [B<-C>=I<str>] -- E<lt>I<format>E<gt>
 
-Examples:
 
- % format-with-sah iso8601_date --data-as-perl '1466055012'
- 2016-06-16
+See examples in the L</EXAMPLES> section.
 
 =head1 OPTIONS
 
@@ -284,15 +283,39 @@ Don't format data, show generated formatter code only.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 Can be specified multiple times.
 
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
 =item B<--no-config>
 
 Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
 
 =back
 
@@ -325,6 +348,10 @@ Multiple data as Perl code, perl code should return arrayref.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
 
 =back
 
@@ -375,6 +402,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -389,24 +422,33 @@ When outputing as JSON, add result envelope.
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -469,7 +511,7 @@ naked for simpler output.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/format-with-sah.conf>, F<~/format-with-sah.conf>, or F</etc/format-with-sah.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/format-with-sah.conf>, F</home/u1/format-with-sah.conf>, or F</etc/format-with-sah.conf>.
 
 All found files will be read and merged.
 
@@ -512,17 +554,24 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 FORMAT_WITH_SAH_OPT => str
+=head2 FORMAT_WITH_SAH_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/format-with-sah.conf>
+=head2 /home/u1/.config/format-with-sah.conf
 
-F<~/format-with-sah.conf>
+=head2 /home/u1/format-with-sah.conf
 
-F</etc/format-with-sah.conf>
+=head2 /etc/format-with-sah.conf
+
+=head1 EXAMPLES
+
+=head2 Example #1
+
+ % format-with-sah iso8601_date --data-as-perl '1466055012'
+ 2016-06-16
 
 =head1 HOMEPAGE
 
@@ -532,6 +581,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-SahUti
 
 Source repository is at L<https://github.com/perlancar/perl-App-SahUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils>
@@ -539,16 +616,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

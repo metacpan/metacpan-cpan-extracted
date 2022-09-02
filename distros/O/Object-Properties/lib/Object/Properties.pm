@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 package Object::Properties;
-$Object::Properties::VERSION = '1.002';
-# ABSTRACT: minimal-ceremony class builder
+
+our $VERSION = '1.003';
 
 use Sentinel ();
 
@@ -86,7 +86,9 @@ sub import {
 }
 
 package Object::Properties::Base;
-$Object::Properties::Base::VERSION = '1.002';
+
+our $VERSION = '1.003';
+
 use NEXT ();
 
 sub new {
@@ -108,10 +110,6 @@ __END__
 =head1 NAME
 
 Object::Properties - minimal-ceremony class builder
-
-=head1 VERSION
-
-version 1.002
 
 =head1 SYNOPSIS
 

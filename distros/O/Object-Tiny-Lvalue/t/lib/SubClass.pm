@@ -1,7 +1,6 @@
-package # hide from PAUSE
-	SubClass;
+package SubClass;
 
-use parent 'PlainClass';
+BEGIN { require PlainClass; our @ISA = 'PlainClass' }
 use Object::Tiny::Lvalue qw( foo bar );
 
 1;

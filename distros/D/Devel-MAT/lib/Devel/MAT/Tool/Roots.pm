@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Roots 0.47;
+package Devel::MAT::Tool::Roots 0.48;
 
 use v5.14;
 use warnings;

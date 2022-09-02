@@ -1,5 +1,9 @@
 Release history for Class-Observable
 
+2.003 Thu 01 Sep 2022
+	- No functional changes
+	- Internal POD link fixes
+
 2.002 Tue 09 Aug 2022
 	- No functional changes
 	- Packaging fix to stop installing boilerplate.pl

@@ -6,7 +6,7 @@ use 5.010;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Alien::Build plugin to prompt a user before making external download
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 
 sub init
@@ -18,7 +18,7 @@ sub init
   $meta->before_hook(
     fetch => sub {
       my($build, $url) = @_;
-      $url ||= $build->meta_prop->{plugin_download_negotiate_default_url};
+      $url ||= $build->meta_prop->{start_url} || $build->meta_prop->{plugin_download_negotiate_default_url};
       my $value = ExtUtils::MakeMaker::prompt("Downloading $url, is that okay?", $ENV{ALIEN_DOWNLOAD} || 'yes');
       unless($value =~ /^(y|yes)$/i)
       {
@@ -44,7 +44,7 @@ Alien::Build::Plugin::Fetch::Prompt - Alien::Build plugin to prompt a user befor
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -91,7 +91,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

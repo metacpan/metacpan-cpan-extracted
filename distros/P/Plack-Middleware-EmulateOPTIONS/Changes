@@ -1,0 +1,15 @@
+Revision history for Plack-Middleware-EmulateOPTIONS:
+
+v0.2.0    2022-09-02 16:51:02+01:00 Europe/London
+  [Enhancements]
+  - Added callback option to modify the response based on the request.
+
+  [Other]
+  - Removed function from namespace.
+
+v0.1.1    2022-09-02 14:18:35+01:00 Europe/London
+  [Other]
+  - Signed distribution.
+
+v0.1.0    2022-09-02 13:24:12+01:00 Europe/London
+  - Initial version.

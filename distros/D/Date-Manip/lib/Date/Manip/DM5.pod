@@ -2208,7 +2208,7 @@ about it.
 
 =item B<Daylight Saving Times>
 
-Date::Manip does not handle daylight saving time, though it does handle
+Date::Manip 5.xx does not handle daylight saving time, though it does handle
 time zones to a certain extent.  Converting from EST to PST works fine.
 Going from EST to PDT is unreliable.
 

@@ -9,7 +9,7 @@ configure_requires:
   Exporter: '5.57'
   File::Path: '2'
 dynamic_config: 1
-generated_by: 'Doit version 0.025, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Doit version 0.026, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +21,8 @@ recommends:
 requires:
   Exporter: '5.57'
   File::Path: '2.07'
+  perl: '5.006'
 resources:
   repository: git://github.com/eserte/Doit
-version: '0.025'
+version: '0.026'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

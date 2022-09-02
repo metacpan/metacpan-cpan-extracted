@@ -3,10 +3,10 @@ NAME
     dashes in string with underscores
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Data::Sah::Filter::perl::Str::replace_dashes_with_underscores (from Perl
     distribution Data-Sah-Filter-perl-Str-replace_dashes_with_underscores),
-    released on 2022-07-16.
+    released on 2022-07-17.
 
 SYNOPSIS
   Using in Sah schema's "prefilters" (or "postfilters") clause
@@ -30,9 +30,11 @@ SYNOPSIS
      "foo-bar" # valid, becomes "foo_bar"
 
 DESCRIPTION
-    Can be useful in schemas like Perl module name where you can type dasah
-    (which does not require pressing the Shiff key in most keyboards) and
-    later have the dash canonicalized to undersore.
+    Can be useful in schemas like Perl module name (or any other identifier
+    kind of schema which only allowes alphanumeric characters which include
+    underscore but not dash) where you can type dasah (which does not
+    require pressing the Shiff key in most keyboards) and later have the
+    dash canonicalized to undersore.
 
 HOMEPAGE
     Please visit the project's homepage at

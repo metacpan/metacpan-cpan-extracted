@@ -1,5 +1,4 @@
-package # hide from PAUSE
-	SomeClass;
+package SomeClass;
 
 use Object::Properties qw( +rw ro ),
 	'+rw_die'    => \&_refuse,

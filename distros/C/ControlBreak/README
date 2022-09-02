@@ -88,8 +88,8 @@ DESCRIPTION
     therefore, to do additional processing after the loop in order to handle
     the very last data group; e.g. to print a final set of subtotals.
 
-    To simplify this situation, method test_and_do()) can be used in place
-    of test() and continue().
+    To simplify this situation, method test_and_do() can be used in place of
+    test() and continue().
 
 FIELDS
   iteration
@@ -100,17 +100,17 @@ FIELDS
     there were no iterations, then you can condition your final processing
     on iteration > 0.
 
-    Note that interation is incremented by test (or <test_and_do>).
-    Therefore, when called wihtin a loop it is effectively zero-based if
-    referenced within the iteration block before test is invoked, and then
-    one-based after test.
+    Note that the interation field is incremented by test() (or
+    test_and_do()). Therefore, when called within a loop it is effectively
+    zero-based if referenced within the iteration block before test() is
+    invoked, and then one-based after test().
 
   level_names
     A readonly field that provides a list of the level names that were
     provided as arguments to new().
 
 METHODS
-  new ( <level_name> [, <level_name> ]... )
+  new ( $level_name> [, $level_name> ]... )
     Create a new ControlBreak object.
 
     Arguments are user-defined names for each level, in minor to major
@@ -125,13 +125,13 @@ METHODS
     that will be monitored. The variables provided to method test() must
     match in number and datatype to these operators.
 
-    The order of the arguments corresponds to a hierachical level of
+    The order of the arguments corresponds to a hierarchical level of
     control, from lowest to highest; i.e. the first argument corresponds to
     level 1, the second to level 2, etc. This also corresponds to sort
     order, from minor to major, when iterating through a data stream.
 
-  break ( [ <level_name> ] )
-    The break method provides a convenient way to check whether the last
+  break ( [ $level_name ] )
+    The break() method provides a convenient way to check whether the last
     invocation of the test method resulted in a control break, or a control
     break greater than or equal to the <level_name> optionally provided as
     an argument.
@@ -141,7 +141,7 @@ METHODS
     return 1 and therefore be treated as true within a condition. If there
     was no control break, then 0 (false) is returned.
 
-    When invoked with a level name argument, break will map the level name
+    When invoked with a level name argument, break() will map the level name
     to a level number and compare it to the control break level determined
     by the last invocation of test(). If the tested control break level
     number is equal or higher than the argument level, then that level
@@ -176,7 +176,7 @@ METHODS
     State and City will print.
 
   comparison ( level_name => [ 'eq' | '==' | sub ] ... )
-    The comparison method accepts a hash which sets the comparison
+    The comparison() method accepts a hash which sets the comparison
     operations for the designated levels. Keywords must match the level
     names provide in new(). Values can be '==' for numeric comparison, 'eq'
     for alpha comparison, or anonymous subroutines.
@@ -202,21 +202,21 @@ METHODS
         # blank values treated as matched
         sub { $_[0] eq '' ? 1 : $_[0] eq $_[1] }
 
-  continue ()
+  continue
     Saves the values most recently provided to the test() method so they can
     be compared to new values on the next iteration.
 
     On the next iteration these values will be accessible via the last()
     method.
 
-    continue is best invoked within the continue block of a loop, to make
+    continue() is best invoked within the continue block of a loop, to make
     sure it isn't missed.
 
-    continue cannot be used in conjunction with test_and_do, which
-    internally calls test and continue for you.
+    continue() cannot be used in conjunction with test_and_do(), which
+    internally calls test and continue() for you.
 
-  last ($level)
-    Returns the value (of the corresponding level) that was given to the
+  last ( $level_name_or_number> )
+    For the corresponding level, returns the value that was given to the
     test() method called prior to the most recent one.
 
     The argument can be a level name or a level number.
@@ -240,10 +240,11 @@ METHODS
     done before the next turn of the loop.
 
   levelname
-    Return the level name for the most recent invocation of the test method.
+    Return the level name for the most recent invocation of the test()
+    method.
 
   levelnum
-    Return the level number for the most recent invocation of the test
+    Return the level number for the most recent invocation of the test()
     method.
 
   level_numbers
@@ -291,19 +292,20 @@ METHODS
     minor) and stops once a change is detected. Where it stops determines
     the control break level. For example, if $var2 changed, method levelnum
     will return 2. If $var2 did not change, but $var1 did, then method
-    levelnum will return 1. If nothing changes, then levelnum will return 0.
+    levelnum() will return 1. If nothing changes, then levelnum() will
+    return 0.
 
     Note that the level numbers set by test(...) are true if there was a
     level change, and false if there wasn't. So, they can be used as a
     simple boolean test of whether there was a change. Or you can use the
-    break method to determine whether any control break has occured.
+    break() method to determine whether any control break has occurred.
 
-    Because level numbers correspond to the hierachy of data order, they can
-    be use to trigger multiple actions; e.g. levelnum >= 1 could be used to
-    print subtotals for levels 1 whenever a control break occured for level
-    1, 2 or 3. It is usually the case that higher control breaks are meant
-    to cascade to lower control levels and this can be achieved in this
-    fashion. The break method simplifies this.
+    Because level numbers correspond to the hierarchical data order, they
+    can be use to trigger multiple actions; e.g. levelnum() >= 1 could be
+    used to print subtotals for levels 1 whenever a control break occurred
+    for level 1, 2 or 3. It is usually the case that higher control breaks
+    are meant to cascade to lower control levels and this can be achieved in
+    this fashion. The break() method simplifies this.
 
     Note that method continue() must be called at the end of each iteration
     in order to save the values of the iteration for the next iteration. If
@@ -317,7 +319,7 @@ METHODS
     argument. Typically, that code will perform work related to subtotals or
     other actions necessary when a control break occurs.
 
-    But test_and_do does one other thing. It expects the last control
+    But test_and_do() does one other thing. It expects the last control
     variable ($var_end) to be an end of data indicator, such as the perl
     builtin operator eof. This indicator should return false on each
     iteration over the data until the very last iteration -- when it should
@@ -330,13 +332,13 @@ METHODS
 
     This avoids the necessity of repeating the control break actions you've
     put inside the data loop immediately after the loop's closing bracket.
-    When you just use test and continue, an end-of-data control break won't
-    occur and the simplist workaround is to just duplicate your control
-    break code after the loops closing bracket.
+    When you just use test and continue(), an end-of-data control break
+    won't occur and the simplest workaround is to just duplicate your
+    control break code after the loops closing bracket.
 
     Here's a typical use case involving end of file processing. Note the
     extra control level, named 'EOF', and the use of the eof builtin
-    function as the second last argument of test_and_do:
+    function as the second last argument of test_and_do():
 
         my $cb = ControlBreak->new( qw( L1 L2 EOF ) );
 

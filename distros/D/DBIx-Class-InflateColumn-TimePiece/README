@@ -1,11 +1,11 @@
 NAME
 
     DBIx::Class::InflateColumn::TimePiece - Auto-create Time::Piece objects
-    from integer columns
+    from integer (number of seconds since epoch) columns
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
 
@@ -28,9 +28,17 @@ SYNOPSIS
     
         1;
 
-METHODS
+    In the above example, a DBIx::Class named Event is created, then this
+    DBIx::Class Component is loaded and two columns are added to the
+    my_events table.
 
- register_column
+    A column with data_type equal to integer or int and with property
+    inflate_time_piece set to true, will be inflated using localtime in
+    Time::Piece and deflated using the epoch method.
+
+SEE ALSO
+
+    DBIx::Class::InflateColumn::DateTime
 
 AUTHOR
 

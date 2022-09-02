@@ -68,13 +68,16 @@
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "v2.0.5"
+         "version" : "v2.0.8"
       },
       "Perlanet::Entry" : {
          "file" : "lib/Perlanet/Entry.pm"
       },
       "Perlanet::Feed" : {
          "file" : "lib/Perlanet/Feed.pm"
+      },
+      "Perlanet::Role::Config" : {
+         "file" : "lib/Perlanet/Role/Config.pm"
       },
       "Perlanet::Simple" : {
          "file" : "lib/Perlanet/Simple.pm"
@@ -119,6 +122,6 @@
          "web" : "https://github.com/davorg/perlanet"
       }
    },
-   "version" : "v2.0.5",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v2.0.8",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

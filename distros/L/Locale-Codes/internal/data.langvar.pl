@@ -35,6 +35,8 @@ $Data{'langvar'}{'iana'}{'orig'}{'name'} = {
    "Østgrønlands"                 =>"Ostgronlands",
    "Latvian orthography used before 1920s (\"vecā druka\")" =>
    "Latvian orthography used before 1920s (\"veca druka\")",
+   "Lengua de señas Albarradas"      => "Lengua de senas Albarradas",
+   "Østgrønlandsk"               => "Ostgronlandsk",
 };
 
 $Data{'langvar'}{'iana'}{'ignore'} = {

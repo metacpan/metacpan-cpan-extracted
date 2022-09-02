@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 28 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 30 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/SahUtils.pm'
@@ -30,6 +30,8 @@ my @scripts = (
     'script/list-sah-clauses',
     'script/list-sah-coerce-rule-modules',
     'script/list-sah-filter-rule-modules',
+    'script/list-sah-pschema-modules',
+    'script/list-sah-pschemas-modules',
     'script/list-sah-schema-modules',
     'script/list-sah-schemas-modules',
     'script/list-sah-type-modules',

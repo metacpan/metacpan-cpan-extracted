@@ -1,5 +1,9 @@
 Revision history for Alien-Brotli:
 
+v0.2.1    2022-08-31 13:39:02+01:00 Europe/London
+  [Bug Fixes]
+  - Fixed `exe` method for 'share' and 'system'  version of brotli command, GH#2 (mspacek).
+
 v0.2.0    2022-06-17 16:18:02+01:00 Europe/London
   [Bug Fixes]
   - Fixed usage with Alien::Base::Wrapper, GH#1.

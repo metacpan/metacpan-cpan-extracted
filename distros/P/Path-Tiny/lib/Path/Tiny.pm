@@ -5,7 +5,7 @@ use warnings;
 package Path::Tiny;
 # ABSTRACT: File path utility
 
-our $VERSION = '0.122';
+our $VERSION = '0.124';
 
 # Dependencies
 use Config;
@@ -361,7 +361,7 @@ sub rootdir { path( File::Spec->rootdir ) }
 #pod     my $target_dir = path('/to/destination');
 #pod     my $tempfile = $target_dir->tempfile('foobarXXXXXX');
 #pod     $tempfile->spew('A lot of data...');  # not atomic
-#pod     $tempfile->rename($target_dir->child('foobar')); # hopefully atomic
+#pod     $tempfile->move($target_dir->child('foobar')); # hopefully atomic
 #pod
 #pod In this case, any value set for option C<DIR> is ignored.
 #pod
@@ -1351,6 +1351,9 @@ sub lines_utf8 {
 #pod thrown.  Returns the list of directories created or an empty list if
 #pod the directories already exist, just like C<make_path>.
 #pod
+#pod See also L</touchpath> as a chainable alternative to create a writeable file path
+#pod (though without options).
+#pod
 #pod Current API available since 0.001.
 #pod
 #pod =cut
@@ -2245,7 +2248,7 @@ Path::Tiny - File path utility
 
 =head1 VERSION
 
-version 0.122
+version 0.124
 
 =head1 SYNOPSIS
 
@@ -2436,7 +2439,7 @@ temporary file/directory, setting the C<DIR> option in File::Temp.
     my $target_dir = path('/to/destination');
     my $tempfile = $target_dir->tempfile('foobarXXXXXX');
     $tempfile->spew('A lot of data...');  # not atomic
-    $tempfile->rename($target_dir->child('foobar')); # hopefully atomic
+    $tempfile->move($target_dir->child('foobar')); # hopefully atomic
 
 In this case, any value set for option C<DIR> is ignored.
 
@@ -2857,6 +2860,9 @@ Like calling C<make_path> from L<File::Path>.  An optional hash reference
 is passed through to C<make_path>.  Errors will be trapped and an exception
 thrown.  Returns the list of directories created or an empty list if
 the directories already exist, just like C<make_path>.
+
+See also L</touchpath> as a chainable alternative to create a writeable file path
+(though without options).
 
 Current API available since 0.001.
 

@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018,2019,2020,2022 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -17,7 +17,8 @@ use warnings;
 
 {
     package Doit;
-    our $VERSION = '0.025';
+    our $VERSION = '0.026';
+    $VERSION =~ s{_}{};
 
     use constant IS_WIN => $^O eq 'MSWin32';
 }
@@ -42,7 +43,7 @@ use warnings;
 	    # XXX Probably should also check if the terminal is ANSI-capable at all
 	    # XXX Probably should not use coloring on non-terminals (but
 	    #     there could be a --color option like in git to force it)
-	    $can_coloring = !Doit::IS_WIN && eval { require Term::ANSIColor; 1 } ? 1 : 0;
+	    $can_coloring = !Doit::IS_WIN && ($ENV{TERM}||'') !~ m{^(|dumb)$} && eval { require Term::ANSIColor; 1 } ? 1 : 0;
 	}
     }
 
@@ -162,7 +163,7 @@ use warnings;
 {
     package Doit::Util;
     use Exporter 'import';
-    our @EXPORT; BEGIN { @EXPORT = qw(in_directory new_scope_cleanup copy_stat get_sudo_cmd) }
+    our @EXPORT; BEGIN { @EXPORT = qw(in_directory new_scope_cleanup copy_stat get_sudo_cmd is_in_path) }
     $INC{'Doit/Util.pm'} = __FILE__; # XXX hack
     use Doit::Log;
 
@@ -179,7 +180,7 @@ use warnings;
 	if (defined $dir) {
 	    require Cwd;
 	    my $pwd = Cwd::getcwd();
-	    if (!defined $pwd) {
+	    if (!defined $pwd || $pwd eq '') { # XS variant returns undef, PP variant returns '' --- see https://rt.perl.org/Ticket/Display.html?id=132648
 		warning "No known current working directory";
 	    } else {
 		$scope_cleanup = new_scope_cleanup
@@ -233,6 +234,54 @@ use warnings;
 	return ('sudo');
     }
 
+    sub is_in_path {
+	my($prog) = @_;
+
+	if (!defined &_file_name_is_absolute) {
+	    if (eval { require File::Spec; defined &File::Spec::file_name_is_absolute }) {
+		*_file_name_is_absolute = \&File::Spec::file_name_is_absolute;
+	    } else {
+		*_file_name_is_absolute = sub {
+		    my $file = shift;
+		    my $r;
+		    if ($^O eq 'MSWin32') {
+			$r = ($file =~ m;^([a-z]:(/|\\)|\\\\|//);i);
+		    } else {
+			$r = ($file =~ m|^/|);
+		    }
+		    $r;
+		};
+	    }
+	}
+
+	if (_file_name_is_absolute($prog)) {
+	    if ($^O eq 'MSWin32') {
+		return $prog       if (-f $prog && -x $prog);
+		return "$prog.bat" if (-f "$prog.bat" && -x "$prog.bat");
+		return "$prog.com" if (-f "$prog.com" && -x "$prog.com");
+		return "$prog.exe" if (-f "$prog.exe" && -x "$prog.exe");
+		return "$prog.cmd" if (-f "$prog.cmd" && -x "$prog.cmd");
+	    } else {
+		return $prog if -f $prog and -x $prog;
+	    }
+	}
+	require Config;
+	%Config::Config = %Config::Config if 0; # cease -w
+	my $sep = $Config::Config{'path_sep'} || ':';
+	foreach (split(/$sep/o, $ENV{PATH})) {
+	    if ($^O eq 'MSWin32') {
+		# maybe use $ENV{PATHEXT} like maybe_command in ExtUtils/MM_Win32.pm?
+		return "$_\\$prog"     if (-f "$_\\$prog" && -x "$_\\$prog");
+		return "$_\\$prog.bat" if (-f "$_\\$prog.bat" && -x "$_\\$prog.bat");
+		return "$_\\$prog.com" if (-f "$_\\$prog.com" && -x "$_\\$prog.com");
+		return "$_\\$prog.exe" if (-f "$_\\$prog.exe" && -x "$_\\$prog.exe");
+		return "$_\\$prog.cmd" if (-f "$_\\$prog.cmd" && -x "$_\\$prog.cmd");
+	    } else {
+		return "$_/$prog" if (-x "$_/$prog" && !-d "$_/$prog");
+	    }
+	}
+	undef;
+    }
 }
 
 {
@@ -334,6 +383,7 @@ use warnings;
     use Doit::Log;
 
     my $diff_error_shown;
+    our @diff_cmd;
 
     sub _new {
 	my $class = shift;
@@ -390,7 +440,11 @@ use warnings;
     }
 
     sub cmd_chmod {
-	my($self, $mode, @files) = @_;
+	my($self, @args) = @_;
+	my %options; if (@args && ref $args[0] eq 'HASH') { %options = %{ shift @args } }
+	my $quiet = delete $options{quiet};
+	error "Unhandled options: " . join(" ", %options) if %options;
+	my($mode, @files) = @args;
 	my @files_to_change;
 	for my $file (@files) {
 	    my @s = stat($file);
@@ -416,7 +470,7 @@ use warnings;
 				     }
 				 }
 			     },
-			     msg  => sprintf("chmod 0%o %s", $mode, join(" ", @files_to_change)), # shellquote?
+			     ($quiet ? () : (msg => sprintf("chmod 0%o %s", $mode, join(" ", @files_to_change)))), # shellquote?
 			     rv   => scalar @files_to_change,
 			    };
 	    Doit::Commands->new(@commands);
@@ -426,7 +480,11 @@ use warnings;
     }
 
     sub cmd_chown {
-	my($self, $uid, $gid, @files) = @_;
+	my($self, @args) = @_;
+	my %options; if (@args && ref $args[0] eq 'HASH') { %options = %{ shift @args } }
+	my $quiet = delete $options{quiet};
+	error "Unhandled options: " . join(" ", %options) if %options;
+	my($uid, $gid, @files) = @args;
 
 	if (!defined $uid) {
 	    $uid = -1;
@@ -483,7 +541,7 @@ use warnings;
 				     }
 				 }
 			     },
-			     msg  => "chown $uid, $gid, @files_to_change", # shellquote?
+			     ($quiet ? () : (msg => "chown $uid, $gid, @files_to_change")), # shellquote?
 			     rv   => scalar @files_to_change,
 			    };
 	    Doit::Commands->new(@commands);
@@ -675,17 +733,7 @@ use warnings;
 				     if ($quiet) {
 					 "copy $from $real_to";
 				     } else {
-					 if (eval { require IPC::Run; 1 }) {
-					     my $diff;
-					     if (eval { IPC::Run::run(['diff', '-u', $real_to, $from], '>', \$diff); 1 }) {
-						 "copy $from $real_to\ndiff:\n$diff";
-					     } else {
-						 "copy $from $real_to\n(diff not available" . (!$diff_error_shown++ ? ", error: $@" : "") . ")";
-					     }
-					 } else {
-					     my $diffref = _qx('diff', '-u', $real_to, $from);
-					     "copy $from $real_to\ndiff:\n$$diffref";
-					 }
+					 "copy $from $real_to\ndiff:\n" . _diff_files($real_to, $from);
 				     }
 				 }
 			     },
@@ -758,6 +806,24 @@ use warnings;
 	}
     }
 
+    sub _open2 {
+	my($instr, @args) = @_;
+	@args = Doit::Win32Util::win32_quote_list(@args) if Doit::IS_WIN;
+
+	require IPC::Open2;
+
+	my($chld_out, $chld_in);
+	my $pid = IPC::Open2::open2($chld_out, $chld_in, @args);
+	print $chld_in $instr;
+	close $chld_in;
+	local $/;
+	my $buf = <$chld_out>;
+	close $chld_out;
+	waitpid $pid, 0;
+
+	$buf;
+    }
+
     sub cmd_open2 {
 	my($self, @args) = @_;
 	my %options; if (@args && ref $args[0] eq 'HASH') { %options = %{ shift @args } }
@@ -766,19 +832,8 @@ use warnings;
 	my $instr = delete $options{instr}; $instr = '' if !defined $instr;
 	error "Unhandled options: " . join(" ", %options) if %options;
 
-	@args = Doit::Win32Util::win32_quote_list(@args) if Doit::IS_WIN;
-
-	require IPC::Open2;
-
 	my $code = sub {
-	    my($chld_out, $chld_in);
-	    my $pid = IPC::Open2::open2($chld_out, $chld_in, @args);
-	    print $chld_in $instr;
-	    close $chld_in;
-	    local $/;
-	    my $buf = <$chld_out>;
-	    close $chld_out;
-	    waitpid $pid, 0;
+	    my $buf = _open2($instr, @args);
 	    $? == 0
 		or _handle_dollar_questionmark($quiet||$info ? (prefix_msg => "open2 command '@args' failed: ") : ());
 	    $buf;
@@ -799,6 +854,46 @@ use warnings;
 	$self->cmd_open2(\%options, @args);
     }
 
+    sub _open3 {
+	my($instr, @args) = @_;
+	@args = Doit::Win32Util::win32_quote_list(@args) if Doit::IS_WIN;
+
+	require IO::Select;
+	require IPC::Open3;
+	require Symbol;
+
+	my($chld_out, $chld_in, $chld_err);
+	$chld_err = Symbol::gensym();
+	my $pid = IPC::Open3::open3((defined $instr ? $chld_in : undef), $chld_out, $chld_err, @args);
+	if (defined $instr) {
+	    print $chld_in $instr;
+	    close $chld_in;
+	}
+
+	my $sel = IO::Select->new;
+	$sel->add($chld_out);
+	$sel->add($chld_err);
+
+	my %buf = ($chld_out => '', $chld_err => '');
+	while(my @ready_fhs = $sel->can_read()) {
+	    for my $ready_fh (@ready_fhs) {
+		my $buf = '';
+		while (sysread $ready_fh, $buf, 1024, length $buf) { }
+		if ($buf eq '') { # eof
+		    $sel->remove($ready_fh);
+		    $ready_fh->close;
+		    last if $sel->count == 0;
+		} else {
+		    $buf{$ready_fh} .= $buf;
+		}
+	    }
+	}
+
+	waitpid $pid, 0;
+
+	($buf{$chld_out}, $buf{$chld_err});
+    }
+
     sub cmd_open3 {
 	my($self, @args) = @_;
 	my %options; if (@args && ref $args[0] eq 'HASH') { %options = %{ shift @args } }
@@ -809,41 +904,13 @@ use warnings;
 	my $statusref = delete $options{statusref};
 	error "Unhandled options: " . join(" ", %options) if %options;
 
-	@args = Doit::Win32Util::win32_quote_list(@args) if Doit::IS_WIN;
-
-	require IO::Select;
-	require IPC::Open3;
-	require Symbol;
-
 	my $code = sub {
-	    my($chld_out, $chld_in, $chld_err);
-	    $chld_err = Symbol::gensym();
-	    my $pid = IPC::Open3::open3((defined $instr ? $chld_in : undef), $chld_out, $chld_err, @args);
-	    if (defined $instr) {
-		print $chld_in $instr;
-		close $chld_in;
+	    my($stdout, $stderr) = _open3($instr, @args);
+
+	    if ($errref) {
+		$$errref = $stderr;
 	    }
 
-	    my $sel = IO::Select->new;
-	    $sel->add($chld_out);
-	    $sel->add($chld_err);
-
-	    my %buf = ($chld_out => '', $chld_err => '');
-	    while(my @ready_fhs = $sel->can_read()) {
-		for my $ready_fh (@ready_fhs) {
-		    my $buf = '';
-		    while (sysread $ready_fh, $buf, 1024, length $buf) { }
-		    if ($buf eq '') { # eof
-			$sel->remove($ready_fh);
-			$ready_fh->close;
-			last if $sel->count == 0;
-		    } else {
-			$buf{$ready_fh} .= $buf;
-		    }
-		}
-	    }
-
-	    waitpid $pid, 0;
 	    if ($statusref) {
 		%$statusref = ( _analyze_dollar_questionmark );
 	    } else {
@@ -852,11 +919,7 @@ use warnings;
 		}
 	    }
 
-	    if ($errref) {
-		$$errref = $buf{$chld_err};
-	    }
-
-	    $buf{$chld_out};
+	    $stdout;
 	};
 
 	my @commands;
@@ -1004,21 +1067,42 @@ use warnings;
     sub cmd_system {
 	my($self, @args) = @_;
 	my %options; if (@args && ref $args[0] eq 'HASH') { %options = %{ shift @args } }
-	@args = Doit::Win32Util::win32_quote_list(@args) if Doit::IS_WIN;
+	my $quiet = delete $options{quiet};
+	my $info = delete $options{info};
 	my $show_cwd = delete $options{show_cwd};
 	error "Unhandled options: " . join(" ", %options) if %options;
+
+	@args = Doit::Win32Util::win32_quote_list(@args) if Doit::IS_WIN;
+
+	my $code = sub {
+	    system @args;
+	    if ($? != 0) {
+		_handle_dollar_questionmark;
+	    }
+	};
+
 	my @commands;
 	push @commands, {
-			 code => sub {
-			     system @args;
-			     if ($? != 0) {
-				 _handle_dollar_questionmark;
-			     }
-			 },
-			 msg  => "@args" . _show_cwd($show_cwd),
-			 rv   => 1,
+			 ($info
+			  ? (
+			     rv   => do { $code->(); 1 },
+			     code => sub {},
+			    )
+			  : (
+			     rv   => 1,
+			     code => $code,
+			    )
+			 ),
+			 ($quiet ? () : (msg  => "@args" . _show_cwd($show_cwd))),
 			};
 	Doit::Commands->new(@commands);
+    }
+
+    sub cmd_info_system {
+	my($self, @args) = @_;
+	my %options; if (@args && ref $args[0] eq 'HASH') { %options = %{ shift @args } }
+	$options{info} = 1;
+	$self->cmd_system(\%options, @args);
     }
 
     sub cmd_touch {
@@ -1141,6 +1225,15 @@ use warnings;
 	}
     }
 
+    sub cmd_which {
+	my($self, @args) = @_;
+	if (@args != 1) {
+	    error "Expecting exactly one argument: command";
+	}
+	my $path = Doit::Util::is_in_path($args[0]);
+	Doit::Commands->new({ rv => $path, code => sub {} });
+    }
+
     sub cmd_write_binary {
 	my($self, @args) = @_;
 	my %options; if (@args && ref $args[0] eq 'HASH') { %options = %{ shift @args } }
@@ -1204,35 +1297,7 @@ use warnings;
 					 }
 				     } else {
 					 if ($need_diff) {
-					     if (eval { require IPC::Run; 1 }) { # no temporary file required
-						 my $diff;
-						 if (eval { IPC::Run::run(['diff', '-u', $filename, '-'], '<', \$content, '>', \$diff); 1 }) {
-						     "Replace existing file $filename with diff:\n$diff";
-						 } else {
-						     "(diff not available" . (!$diff_error_shown++ ? ", error: $@" : "") . ")";
-						 }
-					     } else {
-						 my $diff;
-						 if (eval { require File::Temp; 1 }) {
-						     my($tempfh,$tempfile) = File::Temp::tempfile(UNLINK => 1);
-						     print $tempfh $content;
-						     if (close $tempfh) {
-							 my $diffref = _qx('diff', '-u', $filename, $tempfile);
-							 $diff = $$diffref;
-							 unlink $tempfile;
-							 if (length $diff) {
-							     $diff = "Replace existing file $filename with diff:\n$diff";
-							 } else {
-							     $diff = "(diff not available, probably no diff utility installed)";
-							 }
-						     } else {
-							 $diff = "(diff not available, error in tempfile creation ($!))";
-						     }
-						 } else {
-						     $diff = "(diff not available, neither IPC::Run nor File::Temp available)";
-						 }
-						 $diff;
-					     }
+					     "Replace existing file $filename with diff:\n" . _diff_files($filename, \$content);
 					 } else {
 					     "Create new file $filename with content:\n$content";
 					 }
@@ -1448,15 +1513,7 @@ use warnings;
 				     or error "Can't rename $tmpfile to $file: $!";
 			     },
 			     msg => do {
-				 my $diff;
-				 if (eval { require IPC::Run; 1 }) {
-				     if (!eval { IPC::Run::run(['diff', '-u', $file, $tmpfile], '>', \$diff); 1 }) {
-					 $diff = "(diff not available" . (!$diff_error_shown++ ? ", error: $@" : "") . ")";
-				     }
-				 } else {
-				     $diff = `diff -u '$file' '$tmpfile'`;
-				 }
-				 "Final changes as diff:\n$diff";
+				 "Final changes as diff:\n" . _diff_files($file, $tmpfile);
 			     },
 			     rv => $no_of_changes,
 			    };
@@ -1467,6 +1524,70 @@ use warnings;
 	} else {
 	    Doit::Commands->return_zero;
 	}
+    }
+
+    sub _diff_files {
+	my($file1, $file2) = @_;
+
+	my $stdin;
+	if (ref $file2) {
+	    $stdin = $$file2;
+	    $file2 = '-';
+	}
+
+	if (!@diff_cmd) {
+	    my @diff_candidates = (['diff', '-u']);
+	    if ($^O eq 'MSWin32') {
+		push @diff_candidates, ['fc'];
+	    }
+	    for my $diff_candidate (@diff_candidates) {
+		if (Doit::Util::is_in_path($diff_candidate->[0])) {
+		    @diff_cmd = @$diff_candidate;
+		    last;
+		}
+	    }
+	    return "(diff not available" . (!$diff_error_shown++ ? ", error: none of the candidates (" . join(", ", map { $_->[0] } @diff_candidates) . ") exist" : "") . ")"
+		if !@diff_cmd;
+	}
+
+	my $cannot_use_dash;
+	if ($^O eq 'MSWin32' && $diff_cmd[0] eq 'fc') { # FC cannot handle forward slashes
+	    s{/}{\\}g for ($file1, $file2);
+	    if ($file2 eq '-') {
+		$cannot_use_dash = 1;
+	    }
+	}
+
+	my($diff, $diff_stderr);
+	if (!$cannot_use_dash && eval { require IPC::Run; 1 }) {
+	    if (!eval {
+		IPC::Run::run([@diff_cmd, $file1, $file2], (defined $stdin ? ('<', \$stdin) : ()), '>', \$diff, '2>', \$diff_stderr); 1;
+	    }) {
+		$diff = "(diff not available" . (!$diff_error_shown++ ? ", error: $@" : "") . ")";
+		$diff_stderr = '';
+	    }
+	} else {
+	    if ($^O eq 'MSWin32' || $cannot_use_dash) { # list systems with unreliable IPC::Open3 here
+		my $tmp;
+		if ($file2 eq '-') {
+		    require File::Temp;
+		    $tmp = File::Temp->new;
+		    binmode($tmp); # XXX yes or no?
+		    $tmp->print($stdin);
+		    $tmp->close;
+		    $file2 = "$tmp";
+		}
+		my $diffref = _qx(@diff_cmd, $file1, $file2);
+		$diff = $$diffref;
+		$diff_stderr = '';
+	    } else {
+		($diff, $diff_stderr) = eval { _open3($stdin, @diff_cmd, $file1, $file2) };
+		if ($@) {
+		    $diff = "(diff not available" . (!$diff_error_shown++ ? ", error: $@" : "") . ")";
+		}
+	    }
+	}
+	"$diff$diff_stderr";
     }
 
 }
@@ -1602,16 +1723,18 @@ use warnings;
     }
 
     for my $cmd (
-		 qw(chmod chown mkdir rename rmdir symlink system unlink utime),
+		 qw(chmod chown mkdir rename rmdir symlink unlink utime),
 		 qw(make_path remove_tree), # File::Path
 		 qw(copy move), # File::Copy
 		 qw(run), # IPC::Run
 		 qw(qx info_qx), # qx// and variant which even runs in dry-run mode, both using list syntax
 		 qw(open2 info_open2), # IPC::Open2
 		 qw(open3 info_open3), # IPC::Open3
+		 qw(system info_system), # builtin system with variant
 		 qw(cond_run), # conditional run
 		 qw(touch), # like unix touch
 		 qw(ln_nsf), # like unix ln -nsf
+		 qw(which), # like unix which
 		 qw(create_file_if_nonexisting), # does the half of touch
 		 qw(write_binary), # like File::Slurper
 		 qw(change_file), # own invention
@@ -1710,7 +1833,19 @@ use warnings;
 		if ($self->{debug}) {
 		    info "Reaping process $pid...";
 		}
-		my $got_pid = waitpid $pid, &POSIX::WNOHANG;
+		my $start_time = time;
+		my $got_pid = Doit::RPC::gentle_retry(
+		    code => sub {
+			waitpid $pid, &POSIX::WNOHANG;
+		    },
+		    retry_msg_code => sub {
+			my($seconds) = @_;
+			if (time - $start_time >= 2) {
+			    info "can't reap process $pid, sleep for $seconds seconds";
+			}
+		    },
+		    fast_sleep => 0.01,
+		);
 		if (!$got_pid) {
 		    warning "Could not reap process $pid...";
 		}
@@ -1754,7 +1889,7 @@ use warnings;
 
 {
     package Doit::RPC::Client;
-    use vars '@ISA'; @ISA = ('Doit::RPC');
+    our @ISA = ('Doit::RPC');
 
     sub new {
 	my($class, $infh, $outfh, %options) = @_;
@@ -1794,7 +1929,7 @@ use warnings;
 
 {
     package Doit::RPC::Server;
-    use vars '@ISA'; @ISA = ('Doit::RPC');
+    our @ISA = ('Doit::RPC');
 
     sub new {
 	my($class, $runner, $sockpath, %options) = @_;
@@ -1872,7 +2007,7 @@ use warnings;
 
 {
     package Doit::RPC::SimpleServer;
-    use vars '@ISA'; @ISA = ('Doit::RPC');
+    our @ISA = ('Doit::RPC');
     
     sub new {
 	my($class, $runner, $infh, $outfh, %options) = @_;
@@ -1920,11 +2055,16 @@ use warnings;
 	$self->{rpc}->call_remote(@args);
     }
 
-    use vars '$AUTOLOAD';
+    our $AUTOLOAD;
     sub AUTOLOAD {
 	(my $method = $AUTOLOAD) =~ s{.*::}{};
 	my $self = shift;
 	$self->call_remote($method, @_); # XXX or use goto?
+    }
+
+    sub _can_LANS {
+	require POSIX;
+	$^O eq 'linux' && (POSIX::uname())[2] !~ m{^([01]\.|2\.[01]\.)} # osvers >= 2.2, earlier versions did not have LANS
     }
 
 }
@@ -1952,7 +2092,7 @@ use warnings;
 {
     package Doit::Sudo;
 
-    use vars '@ISA'; @ISA = ('Doit::_AnyRPCImpl');
+    our @ISA = ('Doit::_AnyRPCImpl');
 
     use Doit::Log;
 
@@ -1971,16 +2111,14 @@ use warnings;
 
 	require File::Basename;
 	require IPC::Open2;
+	require POSIX;
 	require Symbol;
 
 	# Socket pathname, make it possible to find out
 	# old outdated sockets easily by including a
 	# timestamp. Also need to maintain a $socket_count,
 	# if the same script opens multiple sockets quickly.
-	my $sock_path = do {
-	    require POSIX;
-	    "/tmp/." . join(".", "doit", "sudo", POSIX::strftime("%Y%m%d_%H%M%S", gmtime), $<, $$, (++$socket_count)) . ".sock";
-	};
+	my $sock_path = "/tmp/." . join(".", "doit", "sudo", POSIX::strftime("%Y%m%d_%H%M%S", gmtime), $<, $$, (++$socket_count)) . ".sock";
 
 	# Make sure password has to be entered only once (if at all)
 	# Using 'sudo --validate' would be more correct, however,
@@ -2002,7 +2140,7 @@ use warnings;
 
 	# On linux use Linux Abstract Namespace Sockets ---
 	# invisible and automatically cleaned up. See man 7 unix.
-	my $LASN_PREFIX = $^O eq 'linux' ? '\0' : '';
+	my $LANS_PREFIX = $class->_can_LANS ? '\0' : '';
 
 	# Run the server
 	my @cmd_worker =
@@ -2011,8 +2149,8 @@ use warnings;
 	     Doit::_ScriptTools::self_require() .
 	     q{my $d = Doit->init; } .
 	     Doit::_ScriptTools::add_components(@components) .
-	     q{Doit::RPC::Server->new($d, "} . $LASN_PREFIX . $sock_path . q{", excl => 1, debug => } . ($debug?1:0) . q{)->run();} .
-	     ($LASN_PREFIX ? '' : q<END { unlink "> . $sock_path . q<" }>), # cleanup socket file, except if Linux Abstract Namespace Sockets are used
+	     q{Doit::RPC::Server->new($d, "} . $LANS_PREFIX . $sock_path . q{", excl => 1, debug => } . ($debug?1:0) . q{)->run();} .
+	     ($LANS_PREFIX ? '' : q<END { unlink "> . $sock_path . q<" }>), # cleanup socket file, except if Linux Abstract Namespace Sockets are used
 	     "--", ($dry_run? "--dry-run" : ())
 	    );
 	my $worker_pid = fork;
@@ -2028,7 +2166,7 @@ use warnings;
 	# access.
 	my($in, $out);
 	my @cmd_comm = ('sudo', @sudo_opts, $perl, "-I".File::Basename::dirname(__FILE__), "-MDoit", "-e",
-			q{Doit::Comm->comm_to_sock("} . $LASN_PREFIX . $sock_path . q{", debug => shift)}, !!$debug);
+			q{Doit::Comm->comm_to_sock("} . $LANS_PREFIX . $sock_path . q{", debug => shift)}, !!$debug);
 	warn "comm perl cmd: @cmd_comm\n" if $debug;
 	my $comm_pid = IPC::Open2::open2($out, $in, @cmd_comm);
 	$self->{rpc} = Doit::RPC::Client->new($out, $in, label => "sudo:", debug => $debug);
@@ -2043,7 +2181,7 @@ use warnings;
 {
     package Doit::SSH;
 
-    use vars '@ISA'; @ISA = ('Doit::_AnyRPCImpl');
+    our @ISA = ('Doit::_AnyRPCImpl');
 
     use Doit::Log;
 
@@ -2051,7 +2189,7 @@ use warnings;
 	require File::Basename;
 	require Net::OpenSSH;
 	require FindBin;
-	my($class, $host, %opts) = @_;
+	my($class, $ssh_or_host, %opts) = @_;
 	my $dry_run = delete $opts{dry_run};
 	my @components = @{ delete $opts{components} || [] };
 	my $debug = delete $opts{debug};
@@ -2060,13 +2198,20 @@ use warnings;
 	my $tty = delete $opts{tty};
 	my $port = delete $opts{port};
 	my $master_opts = delete $opts{master_opts};
+	my $dest_os = delete $opts{dest_os};
+	$dest_os = 'unix' if !defined $dest_os;
 	my $put_to_remote = delete $opts{put_to_remote} || 'rsync_put'; # XXX ideally this should be determined automatically
 	$put_to_remote =~ m{^(rsync_put|scp_put)$}
 	    or error "Valid values for put_to_remote: rsync_put or scp_put";
 	my $perl = delete $opts{perl} || 'perl';
+	my $umask = delete $opts{umask};
+	if (defined $umask && $umask !~ m{^\d+$}) {
+	    error "The umask '$umask' does not look correct, it should be a (possibly octal) number";
+	}
+	my $bootstrap = delete $opts{bootstrap};
 	error "Unhandled options: " . join(" ", %opts) if %opts;
 
-	my $self = bless { host => $host, debug => $debug }, $class;
+	my $self = bless { debug => $debug }, $class;
 	my %ssh_run_opts = (
 	    ($forward_agent ? (forward_agent => $forward_agent) : ()),
 	    ($tty           ? (tty           => $tty)           : ()),
@@ -2075,12 +2220,31 @@ use warnings;
 	    ($forward_agent ? (forward_agent => $forward_agent) : ()),
 	    ($master_opts   ? (master_opts   => $master_opts)   : ()),
 	);
-	my $ssh = Net::OpenSSH->new($host, %ssh_new_opts);
-	$ssh->error
-	    and error "Connection error to $host: " . $ssh->error;
+
+	my($host, $ssh);
+	if (UNIVERSAL::isa($ssh_or_host, 'Net::OpenSSH')) {
+	    $ssh = $ssh_or_host;
+	    $host = $ssh->get_host; # XXX what about username/port/...?
+	} else {
+	    $host = $ssh_or_host;
+	    $ssh = Net::OpenSSH->new($host, %ssh_new_opts);
+	    $ssh->error
+		and error "Connection error to $host: " . $ssh->error;
+	}
 	$self->{ssh} = $ssh;
+
+	if (($bootstrap||'') eq 'perl') {
+	    require Doit::Bootstrap;
+	    Doit::Bootstrap::_bootstrap_perl($self, dry_run => $dry_run);
+	}
+
 	{
-	    my $remote_cmd = "[ ! -d .doit/lib ] && mkdir -p .doit/lib";
+	    my $remote_cmd;
+	    if ($dest_os eq 'MSWin32') {
+		$remote_cmd = 'if not exist .doit\lib\ mkdir .doit\lib';
+	    } else {
+		$remote_cmd = "[ ! -d .doit/lib ] && mkdir -p .doit/lib";
+	    }
 	    if ($debug) {
 		info "Running '$remote_cmd' on remote";
 	    }
@@ -2093,23 +2257,43 @@ use warnings;
 	$ssh->$put_to_remote({verbose => $debug}, __FILE__, ".doit/lib/");
 	{
 	    my %seen_dir;
-	    for my $component (@components) {
+	    for my $component (
+			       @components,
+			       ( # add additional RPC components
+				$dest_os ne 'MSWin32' ? () :
+				do {
+				    (my $srcpath = __FILE__) =~ s{\.pm}{/WinRPC.pm};
+				    {relpath => "Doit/WinRPC.pm", path => $srcpath},
+				}
+			       )
+			      ) {
 		my $from = $component->{path};
 		my $to = $component->{relpath};
 		my $full_target = ".doit/lib/$to";
 		my $target_dir = File::Basename::dirname($full_target);
 		if (!$seen_dir{$target_dir}) {
-		    $ssh->system(\%ssh_run_opts, "[ ! -d $target_dir ] && mkdir -p $target_dir");
+		    my $remote_cmd;
+		    if ($dest_os eq 'MSWin32') {
+			(my $win_target_dir = $target_dir) =~ s{/}{\\}g;
+			$remote_cmd = "if not exist $win_target_dir mkdir $win_target_dir"; # XXX is this equivalent to mkdir -p?
+		    } else {
+			$remote_cmd = "[ ! -d $target_dir ] && mkdir -p $target_dir";
+		    }
+		    $ssh->system(\%ssh_run_opts, $remote_cmd);
 		    $seen_dir{$target_dir} = 1;
 		}
 		$ssh->$put_to_remote({verbose => $debug}, $from, $full_target);
 	    }
 	}
 
-	my $sock_path = do {
-	    require POSIX;
-	    "/tmp/." . join(".", "doit", "ssh", POSIX::strftime("%Y%m%d_%H%M%S", gmtime), $<, $$, int(rand(99999999))) . ".sock";
-	};
+	my $sock_path = (
+			 $dest_os eq 'MSWin32'
+			 ? join("-", "doit", "ssh", POSIX::strftime("%Y%m%d_%H%M%S", gmtime), int(rand(99999999)))
+			 : do {
+			     require POSIX;
+			     "/tmp/." . join(".", "doit", "ssh", POSIX::strftime("%Y%m%d_%H%M%S", gmtime), $<, $$, int(rand(99999999))) . ".sock";
+			 }
+			);
 
 	my @cmd;
 	if (defined $as) {
@@ -2120,9 +2304,26 @@ use warnings;
 	    }
 	} # XXX add ssh option -t? for password input?
 
-	my @cmd_worker =
+	my @cmd_worker;
+	if ($dest_os eq 'MSWin32') {
+	    @cmd_worker =
+	    (
+	     # @cmd not used here (no sudo)
+	     $perl, "-I.doit", "-I.doit\\lib", "-e",
+	     Doit::_ScriptTools::self_require($FindBin::RealScript) .
+	     q{use Doit::WinRPC; } .
+	     q{my $d = Doit->init; } .
+	     Doit::_ScriptTools::add_components(@components) .
+	     # XXX server cleanup? on signals? on END?
+	     q{Doit::WinRPC::Server->new($d, "} . $sock_path . q{", debug => } . ($debug?1:0).q{)->run();},
+	     "--", ($dry_run? "--dry-run" : ())
+	    );
+	    @cmd_worker = Doit::Win32Util::win32_quote_list(@cmd_worker);
+	} else {
+	    @cmd_worker =
 	    (
 	     @cmd, $perl, "-I.doit", "-I.doit/lib", "-e",
+	     (defined $umask ? qq{umask $umask; } : q{}) .
 	     Doit::_ScriptTools::self_require($FindBin::RealScript) .
 	     q{my $d = Doit->init; } .
 	     Doit::_ScriptTools::add_components(@components) .
@@ -2132,16 +2333,27 @@ use warnings;
 	     q{Doit::RPC::Server->new($d, "} . $sock_path . q{", excl => 1, debug => } . ($debug?1:0).q{)->run();},
 	     "--", ($dry_run? "--dry-run" : ())
 	    );
+	}
 	warn "remote perl cmd: @cmd_worker\n" if $debug;
 	my $worker_pid = $ssh->spawn(\%ssh_run_opts, @cmd_worker); # XXX what to do with worker pid?
 	$self->{worker_pid} = $worker_pid;
 
-	my @cmd_comm =
+	my @cmd_comm;
+	if ($dest_os eq 'MSWin32') {
+	    @cmd_comm =
+	    ($perl, "-I.doit\\lib", "-MDoit", "-MDoit::WinRPC", "-e",
+	     q{Doit::WinRPC::Comm->new("} . $sock_path . q{", debug => shift)->run},
+	     !!$debug,
+	    );
+	    @cmd_comm = Doit::Win32Util::win32_quote_list(@cmd_comm);
+	} else {
+	    @cmd_comm =
 	    (
 	     @cmd, $perl, "-I.doit/lib", "-MDoit", "-e",
 	     q{Doit::Comm->comm_to_sock("} . $sock_path . q{", debug => shift);},
 	     !!$debug,
 	    );
+	}
 	warn "comm perl cmd: @cmd_comm\n" if $debug;
 	my($out, $in, $comm_pid) = $ssh->open2(@cmd_comm);
 	$self->{comm_pid} = $comm_pid;
@@ -2154,7 +2366,9 @@ use warnings;
 
     sub DESTROY {
 	my $self = shift;
+	local $?; # XXX Net::OpenSSH::_waitpid sets $?=0
 	if ($self->{ssh}) {
+	    $self->{ssh}->disconnect if $self->{ssh}->can('disconnect');
 	    delete $self->{ssh};
 	}
 	if ($self->{rpc}) {

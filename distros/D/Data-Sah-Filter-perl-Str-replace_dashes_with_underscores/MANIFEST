@@ -9,8 +9,8 @@ README
 dist.ini
 lib/Data/Sah/Filter/perl/Str/replace_dashes_with_underscores.pm
 t/00-compile.t
-t/01-basic.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/release-sah-filter.t
 weaver.ini

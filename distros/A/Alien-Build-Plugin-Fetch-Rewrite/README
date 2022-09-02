@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
 
@@ -15,10 +15,10 @@ SYNOPSIS
      
      sub rewrite {
        my($build, $uri) = @_;
-       
+     
        # $build isa Alien::Build
        # $uri isa URI
-       
+     
        if($uri->host eq 'ftp.gnu.org')
        {
          # if we see a request to ftp.gnu.org (either ftp or http)
@@ -59,7 +59,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Graham Ollis.
+    This software is copyright (c) 2017-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

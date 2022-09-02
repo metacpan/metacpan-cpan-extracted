@@ -14,11 +14,18 @@ do { my $x = {
                                       'Data::Float' => '0',
                                       'Data::Integer' => '0',
                                       'Error::TypeTiny' => '0',
+                                      'Math::BigFloat' => '0',
+                                      'Math::BigInt' => '> 1.999719',
+                                      'POSIX' => '0',
                                       'Scalar::Util' => '1.20',
                                       'Type::Library' => '0',
-                                      'Type::Tiny' => '0',
+                                      'Type::Tiny::Intersection' => '0',
+                                      'Type::Tiny::Union' => '0',
                                       'Types::Standard' => '0',
-                                      'perl' => 'v5.8.8'
+                                      'constant' => '0',
+                                      'perl' => 'v5.8.8',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -26,14 +33,16 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Exporter' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Test::CheckDeps' => '0',
                                    'Test::Exception' => '0',
                                    'Test::More' => '0',
-                                   'Test::TypeTiny' => '0'
+                                   'Test::TypeTiny' => '0',
+                                   'base' => '0',
+                                   'lib' => '0'
                                  }
                  }
      };

@@ -18,12 +18,13 @@ Doit::Git - commands for dealing with the git revision control system
         untracked_files => 'no',
     );
 
-    my $directory = $doit->get_root;
+    my $directory = $doit->git_root;
     my $sha1      = $doit->git_get_commit_hash;
     my @files     = $doit->git_get_commit_files;
     my @files     = $doit->git_get_changed_files;
     my $boolean   = $doit->git_is_shallow;
     my $branch    = $doit->git_current_branch;
+    my $dbranch   = $doit->git_get_default_branch;
 
     $self->git_config(
         key       => 'user.email',
@@ -55,6 +56,7 @@ The following commands are added to the Doit runner object:
         repository              => $git_url,
         directory               => $local_directory,
         repository_aliases      => [$git_url ...],
+        branch                  => $branch,
         allow_remote_url_change => $boolean,
         origin                  => $nickname,
         refresh                 => 'always', # or 'never'
@@ -76,6 +78,10 @@ this case the remote URL will be adapted.
 
 The default remote name C<origin> may be changed by using the
 C<origin> option.
+
+If the C<branch> option is given, then make sure that I<$branch> is
+checkout out. There's some heuristics to detect detached branches and
+do the right thing if updates are requested.
 
 If C<refresh> is set to C<never>, then only C<git-clone> will be done
 for non-existent local repositories. The default is C<always>, which
@@ -193,11 +199,16 @@ given.
 
     my $sha1 = $doit->git_get_commit_hash(
         directory => $directory,
+	commit    => $committish,
     );
 
 Return the SHA1 of the git checkout for the given directory
 I<$directory>, or the current working directory if C<directory> is not
 given.
+
+If the optional C<commit> is set, then return the SHA1 for the given
+commit --- usually a branch or tag, but may also be used to expand a
+abbreviated SHA1 to a full one.
 
 =head3 git_get_commit_files
 
@@ -214,11 +225,15 @@ current working directory if not specified).
 
     my @files = $doit->git_get_changed_files(
         directory => $directory,
+	ignore_untracked => $boolean,
     );
 
 Return the list of changed files (uncommitted or untracked) in the
 given directory I<$directory> (or the current working directory if not
 specified).
+
+If C<ignore_untracked> is set to a true value, then untracked files
+are ignored.
 
 =head3 git_is_shallow
 
@@ -239,8 +254,50 @@ checked.
         directory => $directory,
     );
 
+    my %info;
+    my @files = $doit->git_current_branch(
+        directory => $directory,
+        info_ref  => \%info,
+    );
+
 Return the current branch in the given directory I<$directory> (or the
 current working directory if not specified).
+
+If C<info_ref> is specified, then it should point to a hash reference,
+which is filled with the following keys:
+
+=over
+
+=item detached
+
+Set to a true value if the current branch is a detached one, otherwise
+it's set to a false value or is missing.
+
+=item fallback
+
+Set to C<git-status> if the function walked into fallback code using
+C<git status> and parsing its output. Otherwise it is missing. Mainly
+used for internal testing purposes.
+
+=back
+
+=head3 git_get_default_branch
+
+    my $dbranch = $doit->git_get_default_branch(
+        directory => $directory,
+        origin    => $nickname,
+        method    => $method, # "remote", "symbolic-ref", or an array ref with possible values
+    );
+
+Return the default branch in the given directory I<$directory> (or the
+current working directory if not specified).
+
+By default, the C<remote> method is used, which may access a remote
+system and thus be slow. Another possible method is C<symbolic-ref>,
+which uses locally available information and is thus faster, but may
+return a wrong or no result at all in some cases.
+
+May fail if the default branch cannot be determined.
 
 =head3 git_config (informational command)
 

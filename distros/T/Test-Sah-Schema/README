@@ -2,7 +2,7 @@ NAME
     Test::Sah::Schema - Test Sah::Schema::* modules in distribution
 
 VERSION
-    This document describes version 0.011 of Test::Sah::Schema (from Perl
+    This document describes version 0.012 of Test::Sah::Schema (from Perl
     distribution Test-Sah-Schema), released on 2022-07-17.
 
 SYNOPSIS

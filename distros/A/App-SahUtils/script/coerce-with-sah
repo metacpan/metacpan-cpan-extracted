@@ -1,10 +1,5 @@
 #!perl
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-29'; # DATE
-our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.479'; # VERSION
-
 use 5.010;
 use strict;
 use warnings;
@@ -13,6 +8,11 @@ use Perinci::CmdLine::Any;
 use Data::Sah::CoerceCommon;
 
 our %SPEC;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-07-16'; # DATE
+our $DIST = 'App-SahUtils'; # DIST
+our $VERSION = '0.480'; # VERSION
 
 $SPEC{coerce_with_sah} = {
     v => 1.1,
@@ -41,12 +41,12 @@ $SPEC{coerce_with_sah} = {
             tags => ['category:coercer-specification'],
             element_completion => sub {
                 my %args = @_;
-                my $cmdline = $args{cmdline} or return undef;
+                my $cmdline = $args{cmdline} or return;
                 my $r = $args{r};
 
                 $r->{read_config} = 1;
                 my $res = $cmdline->parse_argv($r);
-                my $type = $res->[2]{type} or return undef;
+                my $type = $res->[2]{type} or return;
                 my $compiler = $res->[2]{compiler} // 'perl';
 
                 require Complete::Module;
@@ -217,7 +217,7 @@ sub coerce_with_sah {
 
         my $gen_res;
         {
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             my %gen_args = (
                 type => $args{type},
                 return_type => $args{return_type},
@@ -262,10 +262,10 @@ sub coerce_with_sah {
             $data = JSON::MaybeXS->new->allow_nonref->decode($args{multiple_data_as_json});
             $multiple = 1;
         } elsif (defined $args{data_as_perl}) {
-            $data = eval $args{data_as_perl};
+            $data = eval $args{data_as_perl}; ## no critic: BuiltinFunctions::ProhibitStringyEval
             die if $@;
         } elsif (defined $args{multiple_data_as_perl}) {
-            $data = eval $args{multiple_data_as_perl};
+            $data = eval $args{multiple_data_as_perl}; ## no critic: BuiltinFunctions::ProhibitStringyEval
             die if $@;
             $multiple = 1;
         } else {
@@ -327,15 +327,346 @@ coerce-with-sah - Coerce data
 
 =head1 VERSION
 
-This document describes version 0.479 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2021-07-29.
+This document describes version 0.480 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2022-07-16.
 
 =head1 SYNOPSIS
 
-Usage:
+% B<coerce-with-sah> [(B<--coerce-rule>=I<str>)+|B<--coerce-rules-json>=I<json>] [B<--coerce-to>=I<str>] [B<--compiler>=I<str>|B<-C>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--data-as-json>=I<str>] [B<--data-as-perl>=I<str>] [B<--data-with-result>|B<-d>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-as-json>=I<str>] [B<--multiple-data-as-perl>=I<str>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--return-type>=I<str>|B<-r>=I<str>] [B<--show-code>|B<-c>] [B<--show-rules>] -- E<lt>I<type>E<gt>
 
-% B<coerce-with-sah> [(B<--coerce-rule>=I<str>)+] [B<--coerce-to>=I<str>] [B<--compiler>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--data-as-json>=I<str>] [B<--data-as-perl>=I<str>] [B<--data-with-result>|B<-d>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-as-json>=I<str>] [B<--multiple-data-as-perl>=I<str>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--return-type>=I<str>] [B<--show-code>|B<-c>] [B<--show-rules>] [B<--coerce-rules-json>=I<json>] [B<-C>=I<str>] [B<-r>=I<str>] -- E<lt>I<type>E<gt>
 
-Examples:
+
+See examples in the L</EXAMPLES> section.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Action selection options
+
+=over
+
+=item B<--show-code>, B<-c>
+
+Don't coerce data, show generated coercer code only.
+
+=item B<--show-rules>
+
+Don't coerce data, show coerce rules that will be used.
+
+=back
+
+=head2 Coercer specification options
+
+=over
+
+=item B<--coerce-rule>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--coerce-rules-json>=I<s>
+
+See C<--coerce-rule>.
+
+=item B<--coerce-to>=I<s>
+
+=item B<--compiler>=I<s>, B<-C>
+
+Select compiler.
+
+Default value:
+
+ "perl"
+
+Valid values:
+
+ ["perl","js"]
+
+=item B<--return-type>=I<s>, B<-r>
+
+Default value:
+
+ "val"
+
+Valid values:
+
+ ["val","bool_coerced+val","bool_coerced+str_errmsg+val"]
+
+=item B<--type>=I<s>*
+
+Can also be specified as the 1st command-line argument.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>
+
+Set path to configuration file.
+
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
+=back
+
+=head2 Data specification options
+
+=over
+
+=item B<--data-as-json>=I<s>
+
+Data as JSON.
+
+=item B<--data-as-perl>=I<s>
+
+Data as Perl code.
+
+=item B<--multiple-data-as-json>=I<s>
+
+Multiple data as JSON code, JSON data must be an array.
+
+=item B<--multiple-data-as-perl>=I<s>
+
+Multiple data as Perl code, perl code should return arrayref.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--data-with-result>, B<-d>
+
+Show data alongside with coerced result.
+
+The default is to show the coerced result only.
+
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--linenum>, B<-l>
+
+When showing source code, add line numbers.
+
+=item B<--no-naked-res>
+
+When outputing as JSON, add result envelope.
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C coerce-with-sah coerce-with-sah
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete coerce-with-sah 'p/*/`coerce-with-sah`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 FAQ
+
+=head2 When there is an error (e.g. in generating coercer code, in coercing) the program returns undef/null, how do I see the error message?
+
+Pass `--no-naked-res` to see the error code and error message. The default is
+naked for simpler output.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/coerce-with-sah.conf>, F</home/u1/coerce-with-sah.conf>, or F</etc/coerce-with-sah.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+ coerce_rules (see --coerce-rule)
+ coerce_to (see --coerce-to)
+ compiler (see --compiler)
+ data_as_json (see --data-as-json)
+ data_as_perl (see --data-as-perl)
+ data_with_result (see --data-with-result)
+ format (see --format)
+ linenum (see --linenum)
+ multiple_data_as_json (see --multiple-data-as-json)
+ multiple_data_as_perl (see --multiple-data-as-perl)
+ naked_res (see --naked-res)
+ return_type (see --return-type)
+ show_code (see --show-code)
+ show_rules (see --show-rules)
+ type (see --type)
+
+=head1 ENVIRONMENT
+
+=head2 COERCE_WITH_SAH_OPT
+
+String. Specify additional command-line options.
+
+=head1 FILES
+
+=head2 /home/u1/.config/coerce-with-sah.conf
+
+=head2 /home/u1/coerce-with-sah.conf
+
+=head2 /etc/coerce-with-sah.conf
+
+=head1 EXAMPLES
+
+=head2 Example #1
 
  % coerce-with-sah date --coerce-to DateTime --data-as-perl '"2016-05-22"'
  do {
@@ -368,20 +699,20 @@ Examples:
                                                                "Ed"                => "d E",
                                                                "Ehm"               => "E h:mm a",
                                                                "EHm"               => "E HH:mm",
-                                                               "Ehms"              => "E h:mm:ss a",
                                                                "EHms"              => "E HH:mm:ss",
+                                                               "Ehms"              => "E h:mm:ss a",
                                                                "Gy"                => "y G",
                                                                "GyMMM"             => "MMM y G",
                                                                "GyMMMd"            => "MMM d, y G",
                                                                "GyMMMEd"           => "E, MMM d, y G",
-                                                               "H"                 => "HH",
                                                                "h"                 => "h a",
+                                                               "H"                 => "HH",
                                                                "hm"                => "h:mm a",
                                                                "Hm"                => "HH:mm",
-                                                               "Hms"               => "HH:mm:ss",
                                                                "hms"               => "h:mm:ss a",
-                                                               "Hmsv"              => "HH:mm:ss v",
+                                                               "Hms"               => "HH:mm:ss",
                                                                "hmsv"              => "h:mm:ss a v",
+                                                               "Hmsv"              => "HH:mm:ss v",
                                                                "Hmv"               => "HH:mm v",
                                                                "hmv"               => "h:mm a v",
                                                                "M"                 => "L",
@@ -591,7 +922,7 @@ Examples:
                           max_year => 2031,
                           name => "Asia/Jakarta",
                           spans => [
-                            ["-Inf", 58904383968, "-Inf", 58904409600, 25632, 0, "LMT"],
+                            [-Inf, 58904383968, -Inf, 58904409600, 25632, 0, "LMT"],
                             [
                               58904383968,
                               60683964000,
@@ -655,7 +986,7 @@ Examples:
                               0,
                               "+0730",
                             ],
-                            [61946267400, "Inf", 61946292600, "Inf", 25200, 0, "WIB"],
+                            [61946267400, Inf, 61946292600, Inf, 25200, 0, "WIB"],
                           ],
                         }, "DateTime::TimeZone::Asia::Jakarta"),
      utc_rd_days     => 736105,
@@ -688,17 +1019,17 @@ Examples:
    $a;
  }
 
-Coerce multiple data:
+=head2 Coerce multiple data
 
  % coerce-with-sah date --coerce-to 'float(epoch)' --multiple-data-as-perl '["2016-05-15", "1463328281"]'
  [1463245200, 1463328281]
 
-Add one or more coerce rules:
+=head2 Add one or more coerce rules
 
  % coerce-with-sah duration --coerce-rule From_str::human --coerce-rule From_str::iso8601 --data-as-perl '"P1Y2M"'
  36817200
 
-Show source code:
+=head2 Show source code
 
  % coerce-with-sah duration --coerce-to 'float(secs)' -c
  require Scalar::Util;
@@ -711,7 +1042,7 @@ Show source code:
      (!ref($data) && $data =~ /\A[0-9]+(?:.[0-9]+)\z/) ? ($data) : (Scalar::Util::blessed($data) && $data->isa('DateTime::Duration')) ? (($data->years * 365.25*86400 + $data->months * 30.4375*86400 + $data->weeks * 7*86400 + $data->days * 86400 + $data->hours * 3600 + $data->minutes * 60 + $data->seconds + $data->nanoseconds * 1e-9)) : (!ref($data) && $data =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? ((($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))) : do { if (!ref($data) && $data =~ /\d.*[a-z]/) { my $res = do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($data) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }; $res->[0] ? undef : $res->[1] } else { $data } };
  }
 
-Show source code, with line number:
+=head2 Show source code, with line number
 
  % coerce-with-sah duration --coerce-to 'DateTime::Duration' -c -l
     1|require DateTime::Duration;
@@ -725,7 +1056,7 @@ Show source code, with line number:
     9|    (!ref($data) && $data =~ /\A[0-9]+(?:.[0-9]+)\z/) ? (DateTime::Duration->new(seconds => $data)) : (Scalar::Util::blessed($data) && $data->isa('DateTime::Duration')) ? ($data) : (!ref($data) && $data =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? (DateTime::Duration->new( (years=>$1) x !!defined($1), (months=>$2) x !!defined($2), (weeks=>$3) x !!defined($3), (days=>$4) x !!defined($4), (hours=>$5) x !!defined($5), (minutes=>$6) x !!defined($6), (seconds=>$7) x !!defined($7))) : do { if (!ref($data) && $data =~ /\d.*[a-z]/) { my $res = do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($data) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, DateTime::Duration->new( (years=>$p->{years}) x !!defined($p->{years}), (months=>$p->{months}) x !!defined($p->{months}), (weeks=>$p->{weeks}) x !!defined($p->{weeks}), (days=>$p->{days}) x !!defined($p->{days}), (hours=>$p->{hours}) x !!defined($p->{hours}), (minutes=>$p->{minutes}) x !!defined($p->{minutes}), (seconds=>$p->{seconds}) x !!defined($p->{seconds}))] } }; $res->[0] ? undef : $res->[1] } else { $data } };
    10|}
 
-Show source code (JavaScript):
+=head2 Show source code (JavaScript)
 
  % coerce-with-sah date -C js -c
  function (data) {
@@ -735,290 +1066,6 @@ Show source code (JavaScript):
      return ((typeof(data)=='number' && data >= 100000000 && data <= 2147483648) ? ((new Date(data * 1000))) : (function() { if ((data instanceof Date)) { var _tmp1 = isNaN(data) ? ['Invalid date', data] : [null, data]; if (_tmp1[0]) { return null } else { return _tmp1[1] } } else { return (function() { if (typeof(data)=='string') { var _tmp1 = (function (_m) { _m = new Date(data); if (isNaN(_m)) { return ['Invalid date', _m] } else { return [null, _m] } })(); if (_tmp1[0]) { return null } else { return _tmp1[1] } } else { return data } })() } })());
  }
 
-=head1 OPTIONS
-
-C<*> marks required options.
-
-=head2 Action selection options
-
-=over
-
-=item B<--show-code>, B<-c>
-
-Don't coerce data, show generated coercer code only.
-
-=item B<--show-rules>
-
-Don't coerce data, show coerce rules that will be used.
-
-=back
-
-=head2 Coercer specification options
-
-=over
-
-=item B<--coerce-rule>=I<s@>
-
-Can be specified multiple times.
-
-=item B<--coerce-rules-json>=I<s>
-
-See C<--coerce-rule>.
-
-=item B<--coerce-to>=I<s>
-
-=item B<--compiler>=I<s>, B<-C>
-
-Select compiler.
-
-Default value:
-
- "perl"
-
-Valid values:
-
- ["perl","js"]
-
-=item B<--return-type>=I<s>, B<-r>
-
-Default value:
-
- "val"
-
-Valid values:
-
- ["val","bool_coerced+val","bool_coerced+str_errmsg+val"]
-
-=item B<--type>=I<s>*
-
-Can also be specified as the 1st command-line argument.
-
-=back
-
-=head2 Configuration options
-
-=over
-
-=item B<--config-path>=I<s>
-
-Set path to configuration file.
-
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>, B<-P>
-
-Set configuration profile to use.
-
-=item B<--no-config>
-
-Do not use any configuration file.
-
-=back
-
-=head2 Data specification options
-
-=over
-
-=item B<--data-as-json>=I<s>
-
-Data as JSON.
-
-=item B<--data-as-perl>=I<s>
-
-Data as Perl code.
-
-=item B<--multiple-data-as-json>=I<s>
-
-Multiple data as JSON code, JSON data must be an array.
-
-=item B<--multiple-data-as-perl>=I<s>
-
-Multiple data as Perl code, perl code should return arrayref.
-
-=back
-
-=head2 Environment options
-
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
-
-=back
-
-=head2 Output options
-
-=over
-
-=item B<--data-with-result>, B<-d>
-
-Show data alongside with coerced result.
-
-The default is to show the coerced result only.
-
-
-=item B<--format>=I<s>
-
-Choose output format, e.g. json, text.
-
-Default value:
-
- undef
-
-=item B<--json>
-
-Set output format to json.
-
-=item B<--linenum>, B<-l>
-
-When showing source code, add line numbers.
-
-=item B<--no-naked-res>
-
-When outputing as JSON, add result envelope.
-
-By default, when outputing as JSON, the full enveloped result is returned, e.g.:
-
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
-
-The reason is so you can get the status (1st element), status message (2nd
-element) as well as result metadata/extra result (4th element) instead of just
-the result (3rd element). However, sometimes you want just the result, e.g. when
-you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
-
-    [1,2,3]
-
-
-=item B<--page-result>
-
-Filter output through a pager.
-
-=item B<--view-result>
-
-View output using a viewer.
-
-=back
-
-=head2 Other options
-
-=over
-
-=item B<--help>, B<-h>, B<-?>
-
-Display help message and exit.
-
-=item B<--version>, B<-v>
-
-Display program's version and exit.
-
-=back
-
-=head1 COMPLETION
-
-This script has shell tab completion capability with support for several
-shells.
-
-=head2 bash
-
-To activate bash completion for this script, put:
-
- complete -C coerce-with-sah coerce-with-sah
-
-in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
-recognize tab completion for the command. Or, you can also directly execute the
-line above in your shell to activate immediately.
-
-It is recommended, however, that you install modules using L<cpanm-shcompgen>
-which can activate shell completion for scripts immediately.
-
-=head2 tcsh
-
-To activate tcsh completion for this script, put:
-
- complete coerce-with-sah 'p/*/`coerce-with-sah`/'
-
-in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
-recognize tab completion for the command. Or, you can also directly execute the
-line above in your shell to activate immediately.
-
-It is also recommended to install L<shcompgen> (see above).
-
-=head2 other shells
-
-For fish and zsh, install L<shcompgen> as described above.
-
-=head1 FAQ
-
-=head2 When there is an error (e.g. in generating coercer code, in coercing) the program returns undef/null, how do I see the error message?
-
-Pass `--no-naked-res` to see the error code and error message. The default is
-naked for simpler output.
-
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/coerce-with-sah.conf>, F<~/coerce-with-sah.conf>, or F</etc/coerce-with-sah.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
-
- [plugin=DumpArgs]
- -event=before_validate_args
- -prio=99
- 
- [plugin=Foo]
- -event=after_validate_args
- arg1=val1
- arg2=val2
-
- 
-
-which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
-
-List of available configuration parameters:
-
- coerce_rules (see --coerce-rule)
- coerce_to (see --coerce-to)
- compiler (see --compiler)
- data_as_json (see --data-as-json)
- data_as_perl (see --data-as-perl)
- data_with_result (see --data-with-result)
- format (see --format)
- linenum (see --linenum)
- multiple_data_as_json (see --multiple-data-as-json)
- multiple_data_as_perl (see --multiple-data-as-perl)
- naked_res (see --naked-res)
- return_type (see --return-type)
- show_code (see --show-code)
- show_rules (see --show-rules)
- type (see --type)
-
-=head1 ENVIRONMENT
-
-=head2 COERCE_WITH_SAH_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/coerce-with-sah.conf>
-
-F<~/coerce-with-sah.conf>
-
-F</etc/coerce-with-sah.conf>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-SahUtils>.
@@ -1027,6 +1074,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-SahUti
 
 Source repository is at L<https://github.com/perlancar/perl-App-SahUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils>
@@ -1034,16 +1109,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

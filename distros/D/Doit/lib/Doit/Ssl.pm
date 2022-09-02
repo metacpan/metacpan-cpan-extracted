@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018,2022 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -14,20 +14,19 @@
 package Doit::Ssl; # Convention: all commands here should be prefixed with 'ssl_'
 
 use strict;
-use vars qw($VERSION);
-$VERSION = '0.01';
+use warnings;
+our $VERSION = '0.012';
 
 use File::Basename 'basename';
 
 use Doit::Log;
 
 sub new { bless {}, shift }
-sub functions { qw(ssl_install_ca_certificate) }
-sub add_component { qw(extcmd) }
+sub functions { qw(ssl_install_ca_certificate can_openssl) }
 
 sub can_openssl {
-    require Doit::Extcmd;
-    Doit::Extcmd::is_in_path('openssl') ? 1 : 0;
+    my($self) = @_;
+    $self->which('openssl') ? 1 : 0;
 }
 
 sub ssl_install_ca_certificate {
@@ -35,7 +34,7 @@ sub ssl_install_ca_certificate {
     my $ca_file = delete $args{ca_file} || error "Please specify ca_file";
     error "Unhandled options: " . join(" ", %args) if %args;
 
-    if (!can_openssl) {
+    if (!$self->can_openssl) {
 	error "openssl is not available";
     }
 

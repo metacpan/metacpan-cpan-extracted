@@ -93,7 +93,7 @@
 \.rej$
 \.tdy$
 \.tmp$
-^\w$
+# ^\w$
 \.ttc$
 \.pmc$
 
@@ -104,5 +104,6 @@ Plack-Middleware-TrafficAdvice-.*\.tar\.gz
 \.mailmap$
 perltidy\.(LOG|ERR)
 fatlib/
+^\.mite$
 cpanfile\.snapshot$
 local/

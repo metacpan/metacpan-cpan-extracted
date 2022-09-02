@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches-ignore:
+      - '*travis*'
+      - '*appveyor*'
+      - '*doozer*'
+  pull_request:
+
+jobs:
+  test:
+    name: Test on ${{ matrix.config_name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - config_name: ubuntu-20.04
+            os: ubuntu-20.04
+            install_optional_dependencies: false
+          - config_name: ubuntu-22.04
+            os: ubuntu-22.04
+            install_optional_dependencies: false
+          - config_name: ubuntu-22.04 with optional dependencies
+            os: ubuntu-22.04
+            install_optional_dependencies: true
+          - config_name: macos-latest
+            os: macos-latest
+            install_optional_dependencies: false
+          - config_name: windows-latest
+            os: windows-latest
+            install_optional_dependencies: true
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        clean: false
+    - run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y libipc-run-perl libnet-openssh-perl libbsd-resource-perl libdevel-hide-perl libconfig-inifiles-perl
+      if: ${{ matrix.install_optional_dependencies && startsWith(matrix.os, 'ubuntu-') }}
+    - run: |
+        cpanm --quiet --notest Devel::Hide Config::IniFiles Config::IOD::INI
+      if: ${{ matrix.install_optional_dependencies && startsWith(matrix.os, 'windows-') }}
+
+    - name: Build and test
+      run: |
+        perl Build.PL
+        ./Build
+        ./Build test
+      if: "!startsWith(matrix.os,'windows-')"
+    - name: Build and test on Windows
+      run: |
+        c:\strawberry\perl\bin\perl Build.PL
+        c:\strawberry\perl\bin\perl Build
+        c:\strawberry\perl\bin\perl Build test
+      if: "startsWith(matrix.os, 'windows-')"
+
+  test_in_container:
+    name: Test with perl ${{ matrix.perlimage }}
+    runs-on: ubuntu-latest
+    container: perl:${{ matrix.perlimage }}
+    strategy:
+      matrix:
+        include:
+          - perlimage: 5.8.9-threaded-stretch
+          - perlimage: 5.10.1-buster
+          - perlimage: 5.12.5-stretch
+          - perlimage: 5.14.4-stretch
+          - perlimage: 5.16.3-buster
+          - perlimage: 5.18.4-buster
+          - perlimage: 5.22.4-stretch
+          - perlimage: 5.36.0-slim-bullseye
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Preinstall, Configure, Build and Test
+      env:
+        HARNESS_TIMER:   1
+        HARNESS_OPTIONS: j8
+      run: |
+        cpanm --quiet --installdeps --notest . || ( cat /github/home/.cpanm/work/*/build.log; false )
+        perl Build.PL
+        ./Build
+        ./Build test
+
+  coverage:
+    name: Test coverage
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        clean: false
+    - name: install Devel::Cover::Report::Coveralls and optional Doit deps
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -q --no-install-recommends \
+            cpanminus \
+            libdevel-cover-perl \
+            libcapture-tiny-perl libipc-run-perl libwww-perl \
+            libdevel-hide-perl libconfig-inifiles-perl
+        sudo cpanm --quiet --notest Devel::Cover::Report::Coveralls Config::IOD::INI
+    - name: Build and test with coverage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DOIT_TEST_WITH_SUDO: 1
+      run: |
+        perl Build.PL
+        ./Build
+        cover -test -report coveralls

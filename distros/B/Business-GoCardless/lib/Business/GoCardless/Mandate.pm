@@ -19,6 +19,7 @@ extends 'Business::GoCardless::Resource';
 =head1 ATTRIBUTES
 
     created_at
+    consent_parameters
     id
     links
     metadata
@@ -32,6 +33,7 @@ extends 'Business::GoCardless::Resource';
 
 has [ qw/
     created_at
+    consent_parameters
     id
     links
     metadata

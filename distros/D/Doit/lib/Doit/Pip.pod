@@ -1,0 +1,75 @@
+=head1 NAME
+
+Doit::Pip - commands for dealing with pip packages
+
+=head1 SYNOPSIS
+
+    use Doit;
+    my $doit = Doit->init;
+    $doit->add_component('pip');
+
+    $doit->pip_install_packages(qw(zk-shell));
+
+    my @missing_packages = $doit->pip_missing_packages(qw(zk-shell));
+
+=head1 DESCRIPTION
+
+B<Doit::Pip> is a L<Doit> component providing commands for dealing
+with pip packages. It has to be added to a script using L<Doit's
+add_component|Doit/add_component>:
+
+    $doit->add_component('pip');
+
+Only support for pip3 is available.
+
+=head2 DOIT COMMANDS
+
+The following commands are added to the Doit runner object:
+
+=head3 pip_install_packages
+
+    my @installed_packages = $doit->pip_install_packages(@packages);
+
+Make sure that the listed pip packages are installed (using
+L<pip3(1)>). Return a list of the packages which were actually
+installed during the execution of this command (or the number of
+packages in scalar context).
+
+=head3 pip_missing_packages
+
+    my @missing_packages = $doit->pip_missing_packages(@packages);
+
+Return the packages out of I<@packages> which are not yet installed.
+This is an "informational" command and runs even in dry-run mode.
+
+=head3 can_pip
+
+    my $available = $doit->can_pip;
+
+Return a boolean value whether pip operation is possible (i.e. C<pip3>
+is installed).
+
+Note that this component does not make sure that C<pip3> is installed.
+You have to assure this by installing the package yourself, i.e.
+
+    $doit->deb_install_packages(qw(python3-pip));
+
+or
+
+    $doit->rpm_install_packages(qw(python3-pip));
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2020 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Doit>, L<pip3(1)>.
+
+=cut

@@ -3,11 +3,11 @@ package App::paperback;
 use v5.10;
 use strict;
 # use warnings;
-our $VERSION = "1.09";
+our $VERSION = "1.14";
 
 my ($GinFile, $GpageObjNr, $Groot, $Gpos, $GobjNr, $Gstream, $GoWid, $GoHei);
 my (@Gkids, @Gcounts, @GformBox, @Gobject, @Gparents, @Gto_be_created);
-my (%Gold, %GpageXObject, %GoldObject);
+my (%GpageXObject, %GObjects);
 
 # ISO 216 paper sizes in pt:
 my $AH = 841.8898; # [A] A4 ~ 297 mm (H)
@@ -178,8 +178,8 @@ main() if not caller();
 ##########################################################
 sub newPageInOutputFile {
 ##########################################################
-  die "[!] No output file, you must call openOutputFile first" if !$Gpos;
-  writePage() if defined $Gstream and length($Gstream) > 0;
+  die "[!] No output file, you must call openOutputFile first.\n" if !$Gpos;
+  writePage() if $Gstream;
 
   ++$GobjNr;
   $GpageObjNr = $GobjNr;
@@ -192,7 +192,7 @@ sub newPageInOutputFile {
 ##########################################################
 sub copyPageFromInputToOutput {
 ##########################################################
-  die "[!] No output file, you have to call openOutputFile first" if !$Gpos;
+  die "[!] No output file, you have to call openOutputFile first.\n" if !$Gpos;
   my $param      = $_[0];
   my $pagenumber = $param->{'page'}   or 1;
   my $x          = $param->{'x'}      or 0;
@@ -204,9 +204,9 @@ sub copyPageFromInputToOutput {
 
   my $name = "Fm${formNr}";
   my $refNr = getPage( $pagenumber );
-  die "[!] Page ${pagenumber} in ${GinFile} can't be used. Concatenate streams!" 
+  die "[!] Page ${pagenumber} in ${GinFile} can't be used. Concatenate streams!\n" 
     if !defined $refNr;
-  die "[!] Page ${pagenumber} doesn't exist in file ${GinFile}" if !$refNr;
+  die "[!] Page ${pagenumber} doesn't exist in file ${GinFile}.\n" if !$refNr;
 
   $Gstream .= "q\n" . calcRotateMatrix($x, $y, $rotate) ."\n/Gs0 gs\n/${name} Do\nQ\n";
   $GpageXObject{$name} = $refNr;
@@ -221,9 +221,8 @@ sub setInitGrState {
   ++$GobjNr;
 
   $Gobject[$GobjNr] = $Gpos;
-  my $out_line = "${GobjNr} 0 obj<</Type/ExtGState/SA false/SM 0.02/TR2 /Default"
-    . ">>endobj\n";
-  $Gpos += syswrite $OUT_FILE, $out_line;
+  $Gpos += syswrite $OUT_FILE,
+    "${GobjNr} 0 obj<</Type/ExtGState/SA false/SM 0.02/TR2 /Default>>endobj\n";
   return;
 }
 
@@ -237,7 +236,7 @@ sub createPageResourceDict {
     $resourceDict .= "/$_ $GpageXObject{$_} 0 R" for sort keys %GpageXObject;
     $resourceDict .= ">>";
   }
-  $resourceDict .= "/ExtGState<<\/Gs0 4 0 R>>";
+  $resourceDict .= "/ExtGState<</Gs0 4 0 R>>";
   return $resourceDict;
 }
 
@@ -396,8 +395,7 @@ sub writeEndNode {
   # Arrange and print the end node:
   $nodeObj  = "${endNode} 0 obj<</Type/Pages/Kids [";
   $nodeObj .= "${_} 0 R " for @{ $Gkids[$si] };
-  $nodeObj .= "]/Count ${Gcounts[$si]}/MediaBox \[0 0 ";
-  $nodeObj .= "${GoWid} ${GoHei}\]>>endobj\n";
+  $nodeObj .= "]/Count ${Gcounts[$si]}/MediaBox [0 0 ${GoWid} ${GoHei}]>>endobj\n";
   $Gobject[$endNode] = $Gpos;
   $Gpos += syswrite $OUT_FILE, $nodeObj;
   return $endNode;
@@ -408,7 +406,7 @@ sub writeEndNode {
 sub calcRotateMatrix {
 ##########################################################
   my $rotate = $_[2];
-  my $str = "1 0 0 1 $_[0] $_[1] cm\n";
+  my $str = "1 0 0 1 ${_[0]} ${_[1]} cm\n";
 
   if ($rotate) {
     my $upperX = 0; my $upperY = 0;
@@ -423,55 +421,75 @@ sub calcRotateMatrix {
 
 
 ##########################################################
-sub getRoot {
+sub getRootAndMapGobjects {
 ##########################################################
-  my ( $xref, $tempRoot, $buf );
+  my ( $xref, $tempRoot, $buf, $buf2 );
 
-  sysseek $IN_FILE, -50, 2;
-  sysread $IN_FILE, $buf, 100;
-  die "[!] File ${GinFile} is encrypted, cannot be used, aborting"
+  sysseek $IN_FILE, -150, 2;
+  sysread $IN_FILE, $buf, 200;
+  die "[!] File ${GinFile} is encrypted, cannot be used, aborting.\n"
     if $buf =~ m'Encrypt';
-  if ( $buf =~ m'\bstartxref\s+(\d+)' ) {
+
+  if ($buf =~ m'/Prev\s+\d') { # "Versioned" PDF file (several xref sections)
+    while ($buf =~ m'/Prev\s+(\d+)') {
+      $xref = $1;
+      sysseek $IN_FILE, $xref, 0;
+      sysread $IN_FILE, $buf, 200;
+      # Reading 200 bytes may NOT be enough. Read on till we find 1st %%EOF:
+      until ($buf =~ m'%%EOF') {
+        sysread $IN_FILE, $buf2, 200;
+        $buf .= $buf2;
+      }
+    }
+  } elsif ( $buf =~ m'\bstartxref\s+(\d+)' ) { # Non-versioned PDF file
     $xref = $1;
-    # stat[7] = filesize
-    die "[!] Invalid XREF, aborting" if $xref > (stat($GinFile))[7];
-    $tempRoot = getRootFromXrefSection( $xref );
+  } else {
+    return 0;
   }
+  # stat[7] = filesize
+  die "[!] Invalid XREF, aborting.\n" if $xref > (stat($GinFile))[7];
+  populateGobjects($xref);
+  $tempRoot = getRootFromXrefSection();
 
   return 0 unless $tempRoot; # No Root object in ${GinFile}, aborting
-  saveOldObjects();
+
   return $tempRoot;
+}
+
+
+##########################################################
+sub populateGobjects {
+##########################################################
+  my $xref = $_[0];
+  my ( $idx, $qty, $readBytes );
+
+  sysseek $IN_FILE, $xref += 5, 0;
+  ($qty, $idx) = extractXrefSection();
+
+  while ($qty) {
+    for (1..$qty) {
+      sysread $IN_FILE, $readBytes, 20;
+      $GObjects{$idx} = $1 if $readBytes =~ m'^\s?(\d{10}) \d{5} n';
+      ++$idx;
+    }
+    ($qty, $idx) = extractXrefSection();
+  }
+  addSizeToGObjects();
+  return;
 }
 
 
 ##########################################################
 sub getRootFromXrefSection {
 ##########################################################
-  my $xref = $_[0];
-  my ( $i, $rooty, $qty, $incoming_line, $buf );
-
-  sysseek $IN_FILE, $xref += 5, 0;
-  ($incoming_line, $qty, $i) = extractContent();
-
-  while ($qty) {
-    for (1..$qty) {
-      sysread $IN_FILE, $incoming_line, 20;
-      if ( $incoming_line =~ m'^\s?(\d+) \d+ (\w)\s*' ) {
-        $GoldObject{$i} = int($1) unless $2 ne "n" or exists $GoldObject{$i};
-      }
-      ++$i;
-    }
-    ($incoming_line, $qty, $i) = extractContent();
+  my $readBytes = " ";
+  my $buf;
+  while ($readBytes) {
+    sysread $IN_FILE, $readBytes, 200;
+    $buf .= $readBytes;
+    return $1 if $buf =~ m'\/Root\s+(\d+)\s+\d+\s+R's;
   }
-
-  while ($incoming_line) {
-    $buf .= $incoming_line;
-    $rooty = $1 if $buf =~ m'\/Root\s+(\d+)\s+\d+\s+R's;
-    last if $rooty;
-    sysread $IN_FILE, $incoming_line, 30;
-  }
-
-  return $rooty;
+  return;
 }
 
 
@@ -479,9 +497,10 @@ sub getRootFromXrefSection {
 sub getObject {
 ##########################################################
   my $index = $_[0];
-  return 0 if ! defined $GoldObject{$index};
+
+  return 0 if (! defined $GObjects{$index});   # A non-1.4 PDF
   my $buf;
-  my ( $offs, $size ) = @{ $GoldObject{$index} };
+  my ( $offs, $size ) = @{ $GObjects{$index} };
 
   sysseek $IN_FILE, $offs, 0;
   sysread $IN_FILE, $buf, $size;
@@ -502,12 +521,12 @@ sub writeToBeCreated {
     if ( $elObje =~ m'^(\d+ \d+ obj\s*<<)(.+)(>>\s*stream)'s ) {
       $part = $2;
       $strPos = length($1) + length($2) + length($3);
-      renew_ddR_and_populate_to_be_created($part);
+      update_references_and_populate_to_be_created($part);
       $out_line = "${new_one} 0 obj\n<<${part}>>stream";
       $out_line .= substr( $elObje, $strPos );
     } else {
       $elObje = substr( $elObje, length($1) ) if $elObje =~ m'^(\d+ \d+ obj\s*)'s;
-      renew_ddR_and_populate_to_be_created($elObje);
+      update_references_and_populate_to_be_created($elObje);
       $out_line = "${new_one} 0 obj ${elObje}";
     }
     $Gobject[$new_one] = $Gpos;
@@ -569,7 +588,7 @@ sub getPage {
   my $elObje = getObject($Groot);
 
   # Find pages:
-  die "[!] Didn't find Pages section in '${GinFile}' - aborting" 
+  die "[!] Didn't find Pages section in '${GinFile}', aborting.\n" 
     unless $elObje =~ m'/Pages\s+(\d+)\s+\d+\s+R's;
   $elObje = getObject($1);
 
@@ -594,11 +613,12 @@ sub writeRes {
   $elObje =~ m'^(\d+ \d+ obj\s*<<)(.+)(>>\s*stream)'s;
   my $strPos = length($1) + length($2) + length($3);
   my $newPart = "<</Type/XObject/Subtype/Form/FormType 1/Resources ${formRes}"
-    . "/BBox \[ $GformBox[0] $GformBox[1] $GformBox[2] $GformBox[3]\] ${2}";
+    . "/BBox [@{GformBox}] ${2}";
+
   ++$GobjNr;
   $Gobject[$GobjNr] = $Gpos;
   my $reference = $GobjNr;
-  renew_ddR_and_populate_to_be_created($newPart);
+  update_references_and_populate_to_be_created($newPart);
   $out_line = "${reference} 0 obj\n${newPart}>>\nstream";
   $out_line .= substr( $elObje, $strPos );
   $Gpos += syswrite $OUT_FILE, $out_line;
@@ -696,20 +716,25 @@ sub getResourcesFromObj {
 sub openInputFile {
 ##########################################################
   $GinFile = $_[0];
-  my ( $elObje, $inputPageSize );
+  my ( $elObje, $inputPageSize, $c );
 
   open( $IN_FILE, q{<}, $GinFile )
-    or die "[!] Couldn't open ${GinFile}";
+    or die "[!] Couldn't open '${GinFile}'.\n";
   binmode $IN_FILE;
 
+  sysread $IN_FILE, $c, 5;
+  return 0 if $c ne "%PDF-";
+
   # Find root
-  $Groot = getRoot();
+  $Groot = getRootAndMapGobjects();
+  return 0 unless $Groot > 0;
 
   # Find input page size:
   $inputPageSize = getInputPageDimensions();
 
   # Find pages
   return 0 unless eval { $elObje = getObject($Groot); 1; };
+
   if ( $elObje =~ m'/Pages\s+(\d+)\s+\d+\s+R's ) {
     $elObje = getObject($1);
     return ($1, $inputPageSize) if $elObje =~ m'/Count\s+(\d+)'s;
@@ -719,32 +744,34 @@ sub openInputFile {
 
 
 ##########################################################
-sub saveOldObjects {
+sub addSizeToGObjects {
 ##########################################################
-  my $bytes = (stat($GinFile))[7];  # stat[7] = filesize
+  my $size = (stat($GinFile))[7];  # stat[7] = filesize
   # Objects are sorted numerically (<=>) and in reverse order ($b $a)
   # according to their offset in the file: last first
-  my @offset = sort { $GoldObject{$b} <=> $GoldObject{$a} } keys %GoldObject;
+  my @offset = sort { $GObjects{$b} <=> $GObjects{$a} } keys %GObjects;
 
-  my $saved;
+  my $pos;
 
   for (@offset) {
-    $saved = $GoldObject{$_};
-    $bytes -= $saved;
-    $GoldObject{$_} = [ $saved, $bytes ] if ! m'^xref';
-    $bytes = $saved;
+    $pos = $GObjects{$_};
+    $size -= $pos;
+    $GObjects{$_} = [ $pos, $size ]; # if ! m'^xref';
+    $size = $pos;
   }
 }
 
 
 ##########################################################
-sub renew_ddR_and_populate_to_be_created {
+sub update_references_and_populate_to_be_created {
 ##########################################################
   # $xform translates an old object number to a new one
   # and populates a table with what must be created
-  my $xform = sub { return $Gold{$1} if exists $Gold{$1};
+  state %known;
+  my $xform = sub {
+    return $known{$1} if exists $known{$1};
     push @Gto_be_created, [ $1, ++$GobjNr ];
-    return $Gold{$1} = $GobjNr;
+    return $known{$1} = $GobjNr;
   };
   $_[0] =~ s/\b(\d+)\s+\d+\s+R\b/&$xform . ' 0 R'/eg;
   return;
@@ -752,22 +779,19 @@ sub renew_ddR_and_populate_to_be_created {
 
 
 ##########################################################
-sub extractContent {
+sub extractXrefSection {
 ##########################################################
-  my ($incoming_line, $qty, $i, $c);
+  my $readBytes = ""; my ($qty, $idx, $c);
 
   sysread $IN_FILE, $c, 1;
   sysread $IN_FILE, $c, 1 while $c =~ m'\s's;
-  while ( (defined $c) and ($c ne "\n") and ($c ne "\r") ) {
-    $incoming_line .= $c;
+  while ( $c =~ /[\d ]/ ) {
+    $readBytes .= $c;
     sysread $IN_FILE, $c, 1;
   }
-  if ( $incoming_line =~ m'^(\d+)\s+(\d+)' ) {
-    $i   = $1;
-    $qty = $2;
-  }
+  ($idx, $qty) = ($1, $2) if $readBytes =~ m'^(\d+)\s+(\d+)';
 
-  return ($incoming_line, $qty, $i);
+  return ($qty, $idx);
 }
 
 
@@ -780,7 +804,7 @@ sub openOutputFile {
   my $pdf_signature = "%PDF-1.4\n%\â\ã\Ï\Ó\n"; # Keep it far from file beginning!
 
   open( $OUT_FILE, q{>}, $outputfile )
-    or die "[!] Couldn't open file ${outputfile}";
+    or die "[!] Couldn't open file '${outputfile}'.\n";
   binmode $OUT_FILE;
   $Gpos = syswrite $OUT_FILE, $pdf_signature;
 

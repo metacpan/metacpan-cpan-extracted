@@ -42,5 +42,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/investment_simulator/issues
   repository: https://github.com/mkende/investment_simulator
-version: v1.0.0
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,7 +3,7 @@ Locale::Codes::Language_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Wed Jun  1 10:45:42 EDT 2022
+#    Generated on: Thu Sep  1 09:56:47 EDT 2022
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.71';
+$VERSION='3.72';
 
 $Locale::Codes::Data{'language'}{'id'} = '8020';
 
@@ -7264,7 +7264,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(2352) => [
       q(Tornedalen Finnish),
-      q(MeÃ¤nkieli),
+      q(Meankieli),
       ],
    q(2353) => [
       q(Fiwaga),
@@ -12483,7 +12483,7 @@ $Locale::Codes::Data{'language'}{'id2names'} = {
       ],
    q(4063) => [
       q(Albarradas Sign Language),
-      q(Lengua de seÃ±as Albarradas),
+      q(Lengua de senas Albarradas),
       ],
    q(4064) => [
       q(Lishana Deni),
@@ -40320,6 +40320,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(3874),
       q(0),
       ],
+   q(lengua de senas albarradas) => [
+      q(4063),
+      q(1),
+      ],
    q(lengua de senas catalana) => [
       q(1858),
       q(1),
@@ -40330,10 +40334,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       ],
    q(lengua de senas panamenas) => [
       q(4072),
-      q(1),
-      ],
-   q(lengua de seÃ±as albarradas) => [
-      q(4063),
       q(1),
       ],
    q(leningitij) => [
@@ -42940,6 +42940,10 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
       q(1730),
       q(2),
       ],
+   q(meankieli) => [
+      q(2352),
+      q(1),
+      ],
    q(medebur) => [
       q(4344),
       q(0),
@@ -43179,10 +43183,6 @@ $Locale::Codes::Data{'language'}{'alias2id'} = {
    q(mezquital otomi) => [
       q(5337),
       q(0),
-      ],
-   q(meÃ¤nkieli) => [
-      q(2352),
-      q(1),
       ],
    q(mfinu) => [
       q(7925),

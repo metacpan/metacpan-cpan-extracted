@@ -1,5 +1,10 @@
 Revision history for Perl extension Plack::Middleware::Static::Minifier
 
+0.09    Thu Sep  1 06:57:45 JST 2022
+        - Remove Travis-CI
+        - Improve files: .gitifnore, MANIFEST.SKIP
+        - Add `no_minify` option
+
 0.08    Sat Nov  2 15:08:50 JST 2013
     [INCOMPATIBLE CHANGES]
         - Minified CSS removes units on zero values ("0px" -> "0").

@@ -8,7 +8,7 @@ use File::Which ();
 use Env qw( @PATH );
 
 # ABSTRACT: MSYS plugin for Alien::Build
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 has msys_version   => '0.07';
@@ -81,7 +81,7 @@ Alien::Build::Plugin::Build::MSYS - MSYS plugin for Alien::Build
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ projects will not build with C<nmake> or C<dmake> typically used by Perl on Wind
 
 =head1 SEE ALSO
 
-L<Alien::Build::Plugin::Autoconf>, L<Alien::Build::Plugin>, L<Alien::Build>, L<Alien::Base>, L<Alien>
+L<Alien::Build::Plugin::Build::Autoconf>, L<Alien::Build::Plugin>, L<Alien::Build>, L<Alien::Base>, L<Alien>
 
 L<http://www.mingw.org/wiki/MSYS>
 

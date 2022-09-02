@@ -1,5 +1,11 @@
 Revision history for Acme-Ford-Prefect2
 
+2.6500    2022-08-30 11:24:28 -0600
+  - Require Acme::Alien::DontPanic2 2.6500 (Alien::Build 2.65)
+
+2.6400    2022-08-30 10:20:20 -0600
+  - Require Acme::Alien::DontPanic2 2.6400 (Alien::Build 2.64)
+
 2.5900    2022-08-16 09:52:32 -0600
   - Require Acme::Alien::DontPanic2 2.5900 (Alien::Build 2.59)
 

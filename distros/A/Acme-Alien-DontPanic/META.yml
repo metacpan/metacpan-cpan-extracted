@@ -17,7 +17,7 @@ build_requires:
   Test::Alien::Diag: '0'
   perl: '5.006'
 configure_requires:
-  Alien::Build: '2.59'
+  Alien::Build: '2.65'
   Alien::Build::MM: '0.40'
   Alien::Build::Plugin::Digest::Negotiate: '0'
   ExtUtils::MakeMaker: '6.52'
@@ -30,14 +30,14 @@ meta-spec:
   version: '1.4'
 name: Acme-Alien-DontPanic
 requires:
-  Alien::Base: '2.59'
+  Alien::Base: '2.65'
   perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/PerlAlien/Acme-Alien-DontPanic/issues
   homepage: https://metacpan.org/pod/Acme::Alien::DontPanic
   repository: git://github.com/PerlAlien/Acme-Alien-DontPanic.git
-version: '2.5900'
+version: '2.6500'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
@@ -53,7 +53,7 @@ x_alienfile:
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_generated_by_perl: v5.36.0
+x_generated_by_perl: v5.35.10
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

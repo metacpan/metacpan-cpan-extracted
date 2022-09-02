@@ -53,7 +53,7 @@ sub count_runs {
 
     while (my $line = <DATA>) {
         chomp $line;
-        
+
         my ($label, $v) = split ' ', $line;
 
         # test the values; make sure the variables are listed in the correct order
@@ -73,13 +73,14 @@ sub count_runs {
 
         # capture current value
         push @result, $v;
-    } 
+    }
     continue {
-        # this sets up the next iteration, by making the current values 
+        # this sets up the next iteration, by making the current values
         # (as received by ->test) into the last values
-        $cb->continue();   
+        $cb->continue();
     }
 
+    # uncoverable branch false
     if ($cb->iteration > 0) {
         say 'L1 ', $cb->last('Label'), ' -> ', $cb->last('IsExtreme'), ' x ', scalar @result;
         say 'L2 ========= ', $cb->last('Label');

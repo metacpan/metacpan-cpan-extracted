@@ -3,8 +3,8 @@ NAME
     period
 
 VERSION
-    This document describes version 0.016 of App::ListNewCPANDists (from
-    Perl distribution App-ListNewCPANDists), released on 2021-08-20.
+    This document describes version 0.017 of App::ListNewCPANDists (from
+    Perl distribution App-ListNewCPANDists), released on 2022-09-02.
 
 FUNCTIONS
   create_new_cpan_dists_stats
@@ -54,6 +54,14 @@ FUNCTIONS
 
     *   exclude_dists => *array[perl::distname]*
 
+    *   include_author_re => *re*
+
+    *   include_authors => *array[cpan::pause_id]*
+
+    *   include_dist_re => *re*
+
+    *   include_dists => *array[perl::distname]*
+
     *   month* => *int*
 
     *   year* => *int*
@@ -93,6 +101,14 @@ FUNCTIONS
     *   exclude_dist_re => *re*
 
     *   exclude_dists => *array[perl::distname]*
+
+    *   include_author_re => *re*
+
+    *   include_authors => *array[cpan::pause_id]*
+
+    *   include_dist_re => *re*
+
+    *   include_dists => *array[perl::distname]*
 
     *   month* => *int*
 
@@ -160,6 +176,14 @@ FUNCTIONS
 
     *   from_time => *date*
 
+    *   include_author_re => *re*
+
+    *   include_authors => *array[cpan::pause_id]*
+
+    *   include_dist_re => *re*
+
+    *   include_dists => *array[perl::distname]*
+
     *   this_month => *true*
 
     *   this_week => *true*
@@ -192,13 +216,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-ListNewCPANDists>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 
@@ -213,15 +230,22 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

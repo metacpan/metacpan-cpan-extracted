@@ -52,8 +52,12 @@ PARAMETERS
             'Soft timeout reached for uri '%s' (soft timeout: %ds) request
             took %ds'
 
+KNOWN LIMITATIONS
+
+The module won't correctly handle the IO operations in progress - where the signals aren't delivered until after the read/write ends.
+
 AUTHOR
-    Tomasz Czepiel <tjmc@cpan.org>
+    Tomasz Czepiel <tjczepiel@gmail.com>
 
 LICENCE
     This library is free software; you can redistribute it and/or modify it

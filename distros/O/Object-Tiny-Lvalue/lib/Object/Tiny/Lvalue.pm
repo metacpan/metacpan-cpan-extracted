@@ -1,10 +1,8 @@
-use 5.006;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package Object::Tiny::Lvalue;
-$Object::Tiny::Lvalue::VERSION = '1.083';
-# ABSTRACT: minimal class builder with lvalue accessors
+
+our $VERSION = '1.084';
 
 sub import {
 	return unless shift eq __PACKAGE__;
@@ -37,10 +35,6 @@ __END__
 =head1 NAME
 
 Object::Tiny::Lvalue - minimal class builder with lvalue accessors
-
-=head1 VERSION
-
-version 1.083
 
 =head1 SYNOPSIS
 

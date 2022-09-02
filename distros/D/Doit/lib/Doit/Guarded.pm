@@ -1,7 +1,21 @@
+# -*- perl -*-
+
+#
+# Author: Slaven Rezic
+#
+# Copyright (C) 2017,2018 Slaven Rezic. All rights reserved.
+# This package is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Mail: slaven@rezic.de
+# WWW:  http://www.rezic.de/eserte/
+#
+
 package Doit::Guarded;
 
 use strict;
 use warnings;
+our $VERSION = '0.011';
 
 use Exporter 'import';
 our @EXPORT = qw(ensure using);

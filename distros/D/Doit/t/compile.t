@@ -16,7 +16,11 @@ use Getopt::Long;
 my $lib = "$FindBin::RealBin/../lib";
 
 my @pms;
-find sub { push @pms, $File::Find::name if /\.pm$/ }, $lib;
+find sub {
+    push @pms, $File::Find::name
+	if /\.pm$/
+	&& !m{^\.#} # ignore emacs lock files
+    }, $lib;
 
 my $doit = Doit->init;
 

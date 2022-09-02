@@ -44,7 +44,6 @@ ywt =>
 #
 
 +06:30:00 stdonly =>
-   Indian/Cocos
    Asia/Yangon
    Asia/Colombo
    Asia/Dhaka
@@ -55,7 +54,6 @@ ywt =>
    Asia/Karachi
 
 +06:30:00 std =>
-   Indian/Cocos
    Asia/Yangon
    Asia/Colombo
    Asia/Dhaka
@@ -66,7 +64,6 @@ ywt =>
    Asia/Kolkata
    Asia/Colombo
    Asia/Karachi
-   Indian/Cocos
    Asia/Yangon
    Asia/Dhaka
 
@@ -141,7 +138,7 @@ stdonly
 
 [ 2001 01 01 00 00 00 ] -12:00:00 dstonly =>
 
-[ 1980 01 01 00 00 00 ] +07:30:00         => Asia/Kuala_Lumpur Asia/Singapore
+[ 1980 01 01 00 00 00 ] +07:30:00         => Asia/Singapore
 
 #
 # HPUX zones

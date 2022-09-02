@@ -4,10 +4,10 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME              => 'Terminal::Control',
-    ABSTRACT          => 'Module with methods for the control of the terminal window',
     VERSION_FROM      => 'lib/Terminal/Control.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
-    ABSTRACT_FROM     => 'lib/Terminal/Control.pm', # retrieve abstract from module
+    PREREQ_PM         => {'Time::HiRes' => '1.9764', 'Try::Catch' => '1.1.0'}, # e.g., Module::Name => 1.1
+    ABSTRACT          => 'Module with methods for the control of the terminal window',
+    #ABSTRACT_FROM     => 'lib/Terminal/Control.pm', # retrieve abstract from module
     AUTHOR            => 'Dr. Peter Netz <ztenretep@cpan.org>',
     LICENSE           => 'perl',
     #Value must be from legacy list of licenses here

@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018,2019,2020,2021,2022 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -17,10 +17,10 @@ use FindBin;
 use lib "$FindBin::RealBin/lib";
 
 use Config;
+use Cwd qw(realpath getcwd);
 use Digest::MD5 qw(md5_hex);
 use File::Basename;
 use Doit;
-use Doit::Extcmd qw(is_in_path);
 use Doit::Log;
 use Doit::Util qw(in_directory);
 
@@ -35,7 +35,7 @@ my $Build_PL_file_contents = do {
 my $Build_PL_md5hex = md5_hex $Build_PL_file_contents;
 
 for (@ARGV) {
-    if (/.*=.*/) { # looks like oldfashioned options (e.g. "installdirs=vendor")
+    if (/^[^-].*=.*/) { # looks like oldfashioned option without leading dash (e.g. "installdirs=vendor")
 	s/^/--/;
     }
 }
@@ -88,6 +88,9 @@ Getopt::Long::GetOptions(
     'verbose:1',
     'versionlib=s',
     'version=s',
+    # The following are just ignored, but currently set by cover
+    'extra_compiler_flags=s',
+    'extra_linker_flags=s',
 )
     or error "usage: $0 [options]";
 
@@ -102,6 +105,11 @@ if (@ARGV) {
 }
 
 sub build {
+    build_libs();
+    manifypods();
+}
+
+sub build_libs {
     $doit->make_path('blib/lib');
     $doit->make_path('blib/arch'); # not used, but keep ExtUtils::Install quiet
     require File::Find;
@@ -116,6 +124,42 @@ sub build {
     }
 }
 
+sub manifypods {
+    # Handles only Pods in .pod files (which is the case in the Doit distribution)
+    require File::Find;
+    require Pod::Man;
+    my $mansep = $^O =~ m{^(MSWin32|cygwin)$} ? '.' : '::';
+    File::Find::find
+	    ({
+	      wanted => sub {
+		  if (-f $_ && /\.pod$/) {
+		      no warnings 'once';
+		      my $pod = $File::Find::name;
+		      my $section = 3; # no scripts yet, so we can hardcode here
+		      my %options = (section => $section);
+		      (my $man = $pod) =~ s{^lib.}{};
+		      $man =~ s{/+}{$mansep}g;
+		      $man =~ s{\.pod$}{.$Config{"man${section}ext"}};
+		      $man = "blib/man$section/$man";
+		      if (!-e $man || -M $man > -M $pod || -M $man > -M "Build") {
+			  $doit->make_path(dirname($man));
+			  my $parser = Pod::Man->new(%options);
+			  if ($doit->is_dry_run) {
+			      info "$pod -> $man (dry-run)";
+			  } else {
+			      info "$pod -> $man";
+			      $parser->parse_from_file($pod, $man)
+				  or error "Could not install $man";
+			  }
+			  $doit->chmod(0644, $man); # XXX should this be changeable? like $PERM_RW in Makefile.PL?
+		      }
+		  }
+	      },
+	      no_chdir => 1,
+	     },
+	     "lib");
+}
+
 sub clean {
     $doit->remove_tree('blib');
 }
@@ -123,7 +167,11 @@ sub clean {
 sub realclean { &clean }
 
 sub test {
-    $doit->system(_prove_path(), '-b', 't'); # use right perl?
+    local $ENV{PERL_DL_NONLAZY} = 1;
+    require File::Glob;
+    require File::Spec;
+    $doit->system($^X, "-MExtUtils::Command::MM", "-MTest::Harness", "-e", 'undef *Test::Harness::Switches; test_harness(0, "blib/lib", "blib/arch")', File::Glob::bsd_glob(File::Spec->catfile("t", "*.t")));
+    # $doit->system(_prove_path(), '-b', 't'); # use right perl?
 }
 
 sub test_xt {
@@ -143,6 +191,7 @@ sub test_in_docker {
 	error "Please set DISTRO_SPEC environment variable to something like 'debian:jessie'";
     }
     my $more_testing = $ENV{XXX_MORE_TESTING}; # XXX this will be a proper option in future!
+    Doit::Log::set_label("[$distro_spec" . ($more_testing ? " (more)" : "") . "]");
     for my $tool (qw(docker)) {
 	$doit->qx('which', $tool); # existence check
     }
@@ -152,6 +201,11 @@ sub test_in_docker {
 FROM $distro_spec
 
 EOF
+    if ($ENV{XXX_INVALIDATE_CACHE}) { # XXX this will be a proper option in future!
+	_add_Dockerfile_invalidate_cmd(\$dockerfile);
+    }
+    my $add_opts = {};
+    $dockerfile .= _fix_Dockerfile_for_dist($distro_spec, $add_opts);
     if ($distro_spec =~ m{^centos:}) {
 	######################################################################
 	# CentOS
@@ -164,13 +218,15 @@ EOF
 	    $dockerfile .= <<"EOF";
 RUN yum -y install epel-release
 EOF
+	} elsif ($distro_spec =~ m{:8$}) {
+	    $dockerfile .= <<"EOF";
+RUN yum -y install epel-release
+EOF
 	} else {
 	    info "No EPEL support for $distro_spec";
 	}
 	$dockerfile .= <<"EOF";
 RUN yum -y install \\
-    "perl(IPC::Run)" \\
-    "perl(Net::OpenSSH)" \\
     sudo \\
     rsync \\
     "perl(ExtUtils::MakeMaker)" \\
@@ -180,6 +236,24 @@ RUN yum -y install \\
     git
 
 EOF
+	if ($distro_spec =~ m{:8$}) {
+	    # Requires also PowerTools repo additionally to EPEL
+	    $dockerfile .= <<"EOF";
+RUN dnf -y install 'dnf-command(config-manager)'
+RUN yum config-manager --set-enabled PowerTools
+EOF
+	}
+	$dockerfile .= <<"EOF";
+RUN yum -y install \\
+    "perl(IPC::Run)"
+EOF
+	if ($distro_spec !~ m{:8$}) {
+	    # Currently not available in CentOS8
+	    $dockerfile .= <<"EOF";
+RUN yum -y install \\
+    "perl(Net::OpenSSH)"
+EOF
+	}
 	if ($distro_spec =~ m{:6$}) {
 	    $dockerfile .= <<"EOF";
 RUN curl -L https://cpanmin.us | perl - App::cpanminus
@@ -199,7 +273,9 @@ RUN yum -y install \\
     "perl(Capture::Tiny)" \\
     "perl(Term::ANSIColor)" \\
     "perl(BSD::Resource)" \\
-    "perl(CPAN::Meta::Validator)"
+    "perl(CPAN::Meta::Validator)" \\
+    "perl(LWP::UserAgent)" \\
+    file
 
 ENV TRAVIS 1
 ENV DOIT_TEST_WITH_SUDO 1
@@ -210,31 +286,71 @@ EOF
 # Term::ANSIColor exists, but is too old (no colorstrip function)
 RUN cpanm --quiet --notest "Term::ANSIColor~>=2.01"
 
+RUN yum -y install python34-pip
+
+EOF
+	    } else {
+		$dockerfile .= <<"EOF";
+RUN yum -y install python3-pip
 EOF
 	    }
 	}
-    } else {
-	######################################################################
-	# Debian-like (Debian, Ubuntu, LinuxMint ...)
+    } elsif ($distro_spec =~ m{^alpine(:|$)}) {
 	$dockerfile .= <<"EOF";
-ENV DEBIAN_FRONTEND noninteractive 
-
-RUN apt-get update && apt-get install -y --no-install-recommends \\
-    libipc-run-perl \\
-    libnet-openssh-perl \\
-    sudo \\
-    rsync \\
-    git
-
+RUN apk update
+# perl-utils for prove
+# shadow for useradd
+RUN apk add sudo rsync git perl perl-utils make shadow
 EOF
 	if ($more_testing) {
 	    $dockerfile .= <<"EOF";
+RUN apk add py3-pip
+
+#ENV TRAVIS 1
+ENV DOIT_TEST_WITH_SUDO 1
+
+EOF
+	}
+
+    } else {
+	######################################################################
+	# Debian-like (Debian, Ubuntu, LinuxMint ...)
+	my @packages = (
+	    'libipc-run-perl',
+	    ($distro_spec eq 'ubuntu:precise' ? () : 'libnet-openssh-perl'),
+	    'sudo',
+	    'rsync',
+	    'git',
+	);
+	my $packages_spec = join(" \\\n", map { "    $_" } @packages);
+	if ($distro_spec =~ m{^(ubuntu:precise)$}) {
+	    # See https://gist.github.com/dergachev/f5da514802fcbbb441a1
+	    $dockerfile .= <<'EOF'
+RUN sed -i.bak -r 's/(archive|security).ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
+EOF
+	}
+	$dockerfile .= <<"EOF";
+ENV DEBIAN_FRONTEND noninteractive 
+
+RUN apt-get$add_opts->{apt_get_update_opts} update && apt-get install -y --no-install-recommends \\
+$packages_spec
+
+EOF
+	if ($more_testing) {
+	    my @more_packages = (
+		'libbsd-resource-perl',
+		'libcapture-tiny-perl',
+		'libcpan-meta-perl',
+		'libwww-perl',
+		'perl-modules',
+		'locales',
+		'file',
+		($distro_spec eq 'ubuntu:precise' ? () : 'python3-pip'),
+	    );
+	    my $more_packages_spec = join(" \\\n", map { "    $_" } @more_packages);
+	    $dockerfile .= <<"EOF";
 RUN apt-get install -y --no-install-recommends \\
-    libbsd-resource-perl \\
-    libcapture-tiny-perl \\
-    libcpan-meta-perl \\
-    perl-modules \\
-    locales
+$more_packages_spec
 
 ENV TRAVIS 1
 ENV DOIT_TEST_WITH_SUDO 1
@@ -242,6 +358,15 @@ ENV DOIT_TEST_WITH_SUDO 1
 EOF
 	}
     }
+
+    for my $env_key (qw(HARNESS_OPTIONS)) {
+	if (defined $ENV{$env_key}) {
+	    $dockerfile .= <<"EOF";
+ENV $env_key "$ENV{$env_key}"
+EOF
+	}
+    }
+
     $doit->write_binary("$dir/Dockerfile", $dockerfile);
     in_directory {
 	(my $tag = $distro_spec) =~ s{:}{-}g;
@@ -249,9 +374,30 @@ EOF
 	$doit->system(qw(docker build -t), $tag, qw(.));
 	$doit->system(
 		      qw(docker run), '-v', "$FindBin::RealBin:/data:ro", $tag,
-		      'sh', '-c', 'rsync -a --exclude=blib "--exclude=Doit-*.tar.gz" /data/ /tmp/Doit/ && cd /tmp/Doit && perl Build.PL && ./Build && ./Build generate_META_json && ./Build test && ./Build test_xt && ./Build dist_install_and_test'
+		      'sh', '-c', 'rsync -a --no-owner --no-group --exclude=blib "--exclude=Doit-*.tar.gz" /data/ /tmp/Doit/ && cd /tmp/Doit && perl Build.PL && ./Build && ./Build generate_META_json && ./Build test && ./Build test_xt && ./Build dist_install_and_test'
 		     );
     } $dir;
+
+    Doit::Log::set_label(undef);
+}
+
+# Run docker-based tests on a number of Linux distributions:
+# the stable ones of Debian, Ubuntu and CentOS, and some
+# older versions of these distributions.
+sub test_standard {
+    Doit::Log::set_label("[local]");
+    $doit->system($^X, 'Build.PL');
+    $doit->system('./Build');
+    $doit->system('./Build', 'test');
+    Doit::Log::set_label(undef);
+    for my $distro_spec ('ubuntu:jammy', 'debian:bullseye', 'ubuntu:focal', 'debian:buster', 'ubuntu:bionic', 'centos:7', 'debian:stretch', 'debian:jessie', 'ubuntu:xenial', 'ubuntu:precise', 'centos:6', 'alpine:latest') {
+	local $ENV{DISTRO_SPEC} = $distro_spec;
+	for my $more_testing (0, 1) {
+	    next if $more_testing && $distro_spec eq 'centos:6'; # centos:6 is unmaintained since Nov 2020, and some yum operations don't work anymore. See also https://support.plesk.com/hc/en-us/articles/360017922619-After-November-30th-2020-updating-system-packages-on-Plesk-server-with-CentOS-6-fails-Cannot-find-a-valid-baseurl-for-repo-base
+	    local $ENV{XXX_MORE_TESTING} = $more_testing;
+	    $doit->system('./Build', 'test_in_docker');
+	}
+    }
 }
 
 sub test_kwalitee (;$) {
@@ -286,7 +432,7 @@ sub test_pod (;$) {
 sub test_cpan_versions {
     my($distdir) = @_;
 
-    if (is_in_path "cpan_check_versions") {
+    if ($doit->which("cpan_check_versions")) {
 	in_directory {
 	    $doit->system('cpan_check_versions', '-remote');
 	} $distdir;
@@ -322,19 +468,18 @@ sub distdir {
     my $temporary = delete $options{temporary};
     error "Unhandled options: " . join(" ", %options) if %options;
 
-    require File::Basename;
     require File::Temp;
     my $tempdir = File::Temp::tempdir("Doit_distdir_XXXXXXXX", TMPDIR => 1, CLEANUP => $temporary);
     my $Doit_VERSION = _get_Doit_VERSION();
     my $distdir = "$tempdir/Doit-$Doit_VERSION";
     $doit->mkdir($distdir);
-    for my $line (split /\n/, $doit->info_qx({quiet=>1}, 'git', 'ls-files')) {
+    for my $line (split /\0/, $doit->info_qx({quiet=>1}, 'git', 'ls-files', '-z')) {
 	next if ($line =~ m{^(   \.travis\.yml
-			     |   appveyor\.yml
+			     |   \.?appveyor\.yml
 			     |   \.gitignore
 			     )$}x);
 	# XXX maybe implement also MANIFEST.SKIP?
-	my $dirname = File::Basename::dirname($line);
+	my $dirname = dirname $line;
 	if ($dirname ne '.') {
 	    $doit->make_path("$distdir/$dirname");
 	}
@@ -377,13 +522,12 @@ sub dist {
     # else because versions of all Doit modules are usually not
     # incremented in this phase
 
-    require File::Basename;
     in_directory {
 	# Note: tar cfvz C:/... ... does not seem to work on Windows
 	# (for all or some tar versions?). Error message is:
 	#     tar (child): Cannot connect to C: resolve failed
 	# So create in cwd first, and move to final location.
-	$doit->system('tar', 'cfvz', File::Basename::basename($tarfile), File::Basename::basename($distdir));
+	$doit->system('tar', 'cfvz', basename($tarfile), basename($distdir));
 	$doit->move(basename($tarfile), $tarfile);
     } "$distdir/..";
 }
@@ -394,14 +538,13 @@ sub dist_install_and_test {
     if (!-e $tarfile) {
 	dist();
     }
-    require File::Basename;
     require File::Temp;
     my $dir = File::Temp::tempdir("Doit_dist_install_and_test_XXXXXXXX", TMPDIR => 1, CLEANUP => 1);
     my $Doit_VERSION = _get_Doit_VERSION();
     in_directory {
 	# Note: see above for tar under Windows problems
-	$doit->move($tarfile, File::Basename::basename($tarfile));
-	$doit->system('tar', 'xfz', File::Basename::basename($tarfile));
+	$doit->move($tarfile, basename($tarfile));
+	$doit->system('tar', 'xfz', basename($tarfile));
 	in_directory {
 	    $doit->system($^X, 'Build.PL');
 	    my @Build = $^O eq 'MSWin32' ? ($^X, 'Build') : ('./Build');
@@ -433,18 +576,12 @@ sub look {
 }
 
 sub cover {
-    {
-	no warnings 'uninitialized';
-	local $ENV{PERL5LIB} .= ($ENV{PERL5LIB} ne '' ? ':' : '') . "$FindBin::RealBin/lib";
-	local $ENV{PERL5OPT} .= ($ENV{PERL5OPT} ne '' ? ' ' : '') . '-MDevel::Cover=-db,' . "$FindBin::RealBin/cover_db";
-	$doit->system(_prove_path(), '--exec', $^X, 't');
-    }
-    $doit->system(_cover_path());
+    $doit->system(_cover_path(), '--test');
 }
 
 sub show_cover {
     cover();
-    my $browser = $^O eq 'darwin' ? 'open' : is_in_path('xdg-open') ? 'xdg-open' : 'firefox';
+    my $browser = $^O eq 'darwin' ? 'open' : $doit->which('xdg-open') ? 'xdg-open' : 'firefox';
     $doit->system($browser, "$FindBin::RealBin/cover_db/coverage.html");
 }
 
@@ -518,7 +655,7 @@ sub install {
 		?
 		(
 		    read          => "$Config{vendorlib}/auto/$FULLEXT/.packlist",
-		    ($opt{create_packlist} ? (write => "$opt{destdir}$Config{installarchlib}/auto/$FULLEXT/.packlist") : ()),
+		    ($opt{create_packlist} ? (write => "$opt{destdir}$Config{installvendorarch}/auto/$FULLEXT/.packlist") : ()),
 		    $INST_LIB     => "$opt{destdir}$Config{installvendorlib}",
 		    $INST_ARCHLIB => "$opt{destdir}$Config{installvendorarch}",
 		    $INST_BIN     => "$opt{destdir}$Config{installvendorbin}",
@@ -529,7 +666,7 @@ sub install {
 		: # default is site
 		(
 		    read          => "$Config{sitearchexp}/auto/$FULLEXT/.packlist",
-		    ($opt{create_packlist} ? (write => "$opt{destdir}$Config{installarchlib}/auto/$FULLEXT/.packlist") : ()),
+		    ($opt{create_packlist} ? (write => "$opt{destdir}$Config{installsitearch}/auto/$FULLEXT/.packlist") : ()),
 		    $INST_LIB     => "$opt{destdir}$Config{installsitelib}",
 		    $INST_ARCHLIB => "$opt{destdir}$Config{installsitearch}",
 		    $INST_BIN     => "$opt{destdir}$Config{installsitebin}",
@@ -542,31 +679,55 @@ sub install {
 	verbose           => $opt{verbose},
 	uninstall_shadows => $opt{uninst},
 	dir_mode          => $PERM_DIR,
+	dry_run           => $doit->is_dry_run,
     );
     my $euii_args_dump = Data::Dumper->new([{ @euii_args }],[qw()])->Indent(1)->Useqq(1)->Sortkeys(1)->Terse(1)->Dump;
+    info "Run ExtUtils::Install::install with parameters\n" . $euii_args_dump;
+    ExtUtils::Install::install([@euii_args]);
     if ($doit->is_dry_run) {
-	info "Would run ExtUtils::Install::install with parameters\n" . $euii_args_dump;
-    } else {
-	info "Run ExtUtils::Install::install with parameters\n" . $euii_args_dump;
-	ExtUtils::Install::install([@euii_args]);
+	info "(this was dry-run mode)";
     }
 }
 
-sub _get_Doit_VERSION () {
-    my $Doit_VERSION = $Doit::VERSION;
-    if (!defined $Doit_VERSION) {
-	error 'Fatal: Doit.pm does not define a version';
+{
+    my $Doit_VERSION;
+
+    sub _get_Doit_VERSION () {
+	return $Doit_VERSION if defined $Doit_VERSION;
+
+	{
+	    my $Doit_pm = $INC{"Doit.pm"};
+	    open my $fh, $Doit_pm or die "Cannot open $Doit_pm: $!";
+	    while(<$fh>) {
+		if (/\$VERSION\s*=\s*'(.*)'/) {
+		    $Doit_VERSION = $1;
+		    last;
+		}
+	    }
+	    if (!defined $Doit_VERSION) {
+		error "Fatal: Cannot find \$VERSION in $Doit_pm";
+	    }
+	}
+	if ($Doit_VERSION !~ m{^\d+\.[\d_]+$}) {
+	    error "Doit.pm VERSION $Doit_VERSION does not look as expected";
+	}
+	# Check also for numerical value of version
+	if (!defined $Doit::VERSION) {
+	    error "Unexpected: cannot find \$VERSION in loaded Doit.pm";
+	}
+	{
+	    (my $Doit_numerical_version = $Doit_VERSION) =~ s{_}{}g;
+	    if ($Doit_numerical_version != $Doit::VERSION) {
+		error "Unexpected: parsed version $Doit_VERSION is not numerically equal to loaded version $Doit::VERSION";
+	    }
+	}
+	$Doit_VERSION;
     }
-    if ($Doit_VERSION !~ m{^\d+\.[\d_]+$}) {
-	error "Doit.pm VERSION $Doit_VERSION does not look like expected";
-    }
-    $Doit_VERSION;
 }
 
 sub _get_tarfilename () {
     my $Doit_VERSION = _get_Doit_VERSION();
-    require Cwd;
-    Cwd::getcwd() . "/Doit-" . $Doit_VERSION . ".tar.gz";
+    getcwd . "/Doit-" . $Doit_VERSION . ".tar.gz";
 }
 
 sub _generate_META ($;$) {
@@ -594,6 +755,7 @@ sub _generate_META ($;$) {
 		    'Net::OpenSSH' => 0,
 		},
 		requires => {
+		    'perl'        => 5.006,
 		    'Exporter'    => 5.57, # use Exporter "import"
 		    'File::Path'  => 2.07, # make_path
 		},
@@ -696,8 +858,21 @@ sub debian_package_with_docker {
     for my $tool (qw(docker)) {
 	$doit->qx('which', $tool); # existence check
     }
+
+    # Cannot access directories outside of /Users when working
+    # with docker-machine @ Mac, see for an explanation:
+    # https://stackoverflow.com/questions/37673140/docker-volume-located-in-tmp-on-osx-empty
+    my $limited_volume_availability = $^O eq 'darwin';
+
     require File::Temp;
-    my $dir = File::Temp::tempdir("Doit_debian_package_docker_XXXXXXXX", TMPDIR => 1, CLEANUP => 1);
+    my $dir = File::Temp::tempdir("Doit_debian_package_docker_XXXXXXXX", TMPDIR => !$limited_volume_availability, CLEANUP => 1);
+    $dir = realpath $dir; # docker volumes have to be specified with absolute paths
+
+    my $pkgdir = $limited_volume_availability ? "$FindBin::RealBin/pkg" : "/tmp";
+    if (!-d $pkgdir) {
+	$doit->mkdir($pkgdir);
+    }
+
     my $use_workdir = $ENV{USE_WORKDIR}; # XXX this should be a proper option
     if ($use_workdir) {
 	# no --cvs-exclude --- git-describe has to work
@@ -713,10 +888,14 @@ sub debian_package_with_docker {
     in_directory {
 	my $dockerfile = <<"EOF";
 FROM $distro_spec
+EOF
+	my $add_opts = {};
+	$dockerfile .= _fix_Dockerfile_for_dist($distro_spec, $add_opts);
+	$dockerfile .= <<"EOF";
 
 ENV DEBIAN_FRONTEND noninteractive 
 
-RUN apt-get update && apt-get install -y --no-install-recommends \\
+RUN apt-get$add_opts->{apt_get_update_opts} update && apt-get install -y --no-install-recommends \\
     dh-make-perl \\
     lsb-release \\
     git
@@ -740,10 +919,11 @@ EOF
 	$label = "doit-deb-$label";
 	$doit->system(qw(docker build -t), $label, qw(.));
 	$doit->system(
-		      qw(docker run), '-v', "$dir:/data", qw(-v /tmp:/pkg), $label,
-		      'sh', '-c', 'cd /data && perl Build.PL && ./Build debian_package && cp *.deb /pkg'
+		      qw(docker run), '-v', "$dir:/data", '-v', "$pkgdir:/pkg", $label,
+		      'sh', '-c', 'git config --global --add safe.directory /data && cd /data && perl Build.PL && ./Build debian_package && cp *.deb /pkg'
 		     );
     } $dir;
+    info "Package is available in $pkgdir";
 }
 
 sub release {
@@ -786,15 +966,21 @@ sub release {
 	error "exiting release process";
     }
 
-    require File::Basename;
-    $doit->system('cpan-upload', File::Basename::basename($tarfile));
+    $doit->system('cpan-upload', basename($tarfile));
 
     $doit->system('git', 'tag', '-a', '-m', "* $Doit_VERSION", $Doit_VERSION);
     $doit->system('git', 'push', 'origin', 'master', $Doit_VERSION);
 }
 
 sub _prove_path {
-    my @candidates = ("$Config{bin}/prove", "$Config{bin}/prove$Config{version}");
+    my @directory_candidates = ($Config{bin}, dirname(realpath $^X));
+    my @basename_candidates = ('prove', "prove$Config{version}");
+    my @candidates = map {
+	my $basename = $_;
+	map {
+	    "$_/$basename";
+	} @directory_candidates;
+    } @basename_candidates;
     if ($^O eq 'MSWin32') {
 	unshift @candidates, map { "$_.bat"} @candidates;
     }
@@ -835,6 +1021,35 @@ EOF
 	$doit->chmod(0755, 'Build');
     }
     exit;
+}
+
+# Return a string for adding to Dockerfile after the FROM line. Also
+# the 2nd parameter (which has to be an empty hashref) is filled with
+# further instructions to amend the Dockerfile (currently only
+# apt_get_update_opts).
+sub _fix_Dockerfile_for_dist {
+    my($distro_spec, $add_opts_ref) = @_;
+    if ($distro_spec =~ m{^debian:(wheezy|7)$}) {
+	# https://unix.stackexchange.com/questions/508724/failed-to-fetch-jessie-backports-repository
+	$add_opts_ref->{apt_get_update_opts} = ' -o Acquire::Check-Valid-Until=false'; # with leading space
+	<<EOF;
+RUN echo 'deb [check-valid-until=no] http://archive.debian.org/debian wheezy main'                   >  /etc/apt/sources.list
+RUN echo 'deb [check-valid-until=no] http://archive.debian.org/debian-security/ wheezy/updates main' >> /etc/apt/sources.list
+EOF
+    } else {
+	$add_opts_ref->{apt_get_update_opts} = '';
+	'';
+    }
+}
+
+sub _add_Dockerfile_invalidate_cmd {
+    my $dockerfile_ref = shift;
+    require POSIX;
+    $$dockerfile_ref .= <<"EOF";
+# Just a hack to make sure that the following lines
+# are executed at least once a day
+RUN echo @{[ POSIX::strftime("%F", localtime) ]}
+EOF
 }
 
 # REPO BEGIN

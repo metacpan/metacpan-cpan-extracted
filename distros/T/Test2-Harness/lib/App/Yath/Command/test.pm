@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000125';
+our $VERSION = '1.000127';
 
 use App::Yath::Options;
 
@@ -245,6 +245,15 @@ sub start {
     $self->ipc->start();
     $self->parse_args;
     $self->write_settings_to($self->workdir, 'settings.json');
+
+    unless ($ENV{TEST2_HARNESS_NO_WRITE_TEST_INFO}) {
+        Test2::Harness::Util::File::JSON->new(name => './.test_info.json')->write({
+            workdir   => $self->workdir,
+            job_count => $self->job_count,
+        });
+
+        $ENV{TEST2_HARNESS_NO_WRITE_TEST_INFO} = 1;
+    }
 
     my $pop = $self->populate_queue();
     $self->terminate_queue();

@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Plugin for fetching files using LWP
-our $VERSION = '2.59'; # VERSION
+our $VERSION = '2.66'; # VERSION
 
 
 has '+url' => '';
@@ -51,6 +51,8 @@ sub init
     $ua->env_proxy;
     my $res = $ua->get($url, @headers);
 
+    my($protocol) = $url =~ /^([a-z]+):/;
+
     die "error fetching $url: @{[ $res->status_line ]}"
       unless $res->is_success;
 
@@ -61,18 +63,20 @@ sub init
     if($type eq 'text/html')
     {
       return {
-        type    => 'html',
-        charset => $charset,
-        base    => "$base",
-        content => $res->decoded_content || $res->content,
+        type     => 'html',
+        charset  => $charset,
+        base     => "$base",
+        content  => $res->decoded_content || $res->content,
+        protocol => $protocol,
       };
     }
     elsif($type eq 'text/ftp-dir-listing')
     {
       return {
-        type => 'dir_listing',
-        base => "$base",
-        content => $res->decoded_content || $res->content,
+        type     => 'dir_listing',
+        base     => "$base",
+        content  => $res->decoded_content || $res->content,
+        protocol => $protocol,
       };
     }
     else
@@ -81,6 +85,7 @@ sub init
         type     => 'file',
         filename => $filename || 'downloadedfile',
         content  => $res->content,
+        protocol => $protocol,
       };
     }
 
@@ -103,7 +108,7 @@ Alien::Build::Plugin::Fetch::LWP - Plugin for fetching files using LWP
 
 =head1 VERSION
 
-version 2.59
+version 2.66
 
 =head1 SYNOPSIS
 

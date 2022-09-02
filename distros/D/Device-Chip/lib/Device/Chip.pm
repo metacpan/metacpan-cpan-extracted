@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.66;
 
-package Device::Chip 0.22;
+package Device::Chip 0.23;
 class Device::Chip :repr(HASH);
 
 use Carp;
@@ -77,14 +77,14 @@ for futures to provide more asynchronous use of the device.
 
 =cut
 
-has $_adapter;
+field $_adapter;
 method adapter
 {
    return $_adapter //
       croak "This chip has not yet been mounted on an adapter";
 }
 
-has $_protocol;
+field $_protocol;
 method protocol
 {
    return $_protocol //
@@ -121,9 +121,12 @@ async method mount ( $adapter, %params )
    return $self;
 }
 
+# Perl 5.36+ can distinguish this; but this still works fine on older perls
+use constant true => (1 == 1);
+
 sub _parse_options ( $, $str )
 {
-   return map { m/^([^=]+)=(.*)$/ ? ( $1 => $2 ) : ( $_ => 1 ) }
+   return map { m/^([^=]+)=(.*)$/ ? ( $1 => $2 ) : ( $_ => true ) }
           split m/,/, $str // "";
 
 }
@@ -135,7 +138,7 @@ sub _parse_options ( $, $str )
 A variant of L</mount> that parses its options from the given string. This
 string should be a comma-separated list of parameters, where each is given as
 a name and value separated by equals sign. If there is no equals sign, the
-value is implied as C<1>, as a convenience for parameters that are simple
+value is implied as true, as a convenience for parameters that are simple
 boolean flags.
 
 =cut

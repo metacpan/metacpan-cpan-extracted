@@ -17,9 +17,7 @@ terms as Perl itself.
 
 =cut
 
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
 
 use JSON::Path -all;
 
@@ -27,12 +25,12 @@ my $person = { name => "Robert", foo => { bar => [ 1, 2, 3 ] } };
 my $path = JSON::Path->new('$.name');
 $path->value($person) = "Bob";
 
-is_deeply( $person, { name => "Bob", foo => { bar => [ 1, 2, 3 ] } } , q{Setting 'name' changes only the 'name' key and nothing else});
+is( $person, { name => "Bob", foo => { bar => [ 1, 2, 3 ] } } , q{Setting 'name' changes only the 'name' key and nothing else});
 
 jpath1( $person, '$.name' )    = "Robbie";
 jpath1( $person, '$.foo.bar' ) = 12;
 
-is_deeply( $person, { name => "Robbie", foo => { bar => 12 } }, q{jpath1() works as lvalue});
+is( $person, { name => "Robbie", foo => { bar => 12 } }, q{jpath1() works as lvalue});
 $path->value($person) ||= 'Fred';
 is $person->{name}, 'Robbie', q{lvalue works with ||=};
 
@@ -45,4 +43,3 @@ $path->value($person) ||= 'beta';
 is $person->{quuy}, 'beta', q{lvalue and ||= will create keys not previously extant};
 
 done_testing;
-
