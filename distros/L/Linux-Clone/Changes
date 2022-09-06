@@ -1,7 +1,19 @@
 Revision history for Perl extension Linux::Clone
 
+TODO: clone3()
+
+1.3  Tue 06 Sep 2022 12:56:21 CEST
+	- add Linux::Clone::configure_loopback helper function.
+	- add CLONE_PIDFD, CLONE_NEWTIME, CSIGNAL, NS_GET_USERNS, NS_GET_PARENT,
+          NS_GET_NSTYPE and NS_OWNER_UID symbols.
+        - use "official" sched.h include.
+        - add KCMP_EPOLL_TFD enum, hardcoded to value 7, and require linux/kcmp.h
+          for the rest.
+        - changed the prototype of unshare from automatically-generated $ to @, to
+          avoid it acting as an operator.
+
 1.2  Tue Nov  7 19:15:11 CET 2017
-	- the CLONE constants wrongly acuqired a CLONE_ prefix, remove
+	- the CLONE constants wrongly acquired a CLONE_ prefix, remove
           it again (reported by Ryan Voots).
 	- use __has_include to check for existance of linux/kcmp.h, if the
           compiler defines it in case there is a kernel/libc mismatch.

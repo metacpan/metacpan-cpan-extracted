@@ -1,12 +1,10 @@
-use 5.008001;
-use strict;
-use warnings;
+use 5.008001; use strict; use warnings;
 
 package Plack::Middleware::NeverExpire;
-$Plack::Middleware::NeverExpire::VERSION = '1.006';
-# ABSTRACT: set expiration headers far in the future
 
-use parent 'Plack::Middleware';
+our $VERSION = '1.007';
+
+BEGIN { require Plack::Middleware; our @ISA = 'Plack::Middleware' }
 
 use Plack::Util ();
 use Time::Piece ();
@@ -19,7 +17,7 @@ sub call {
 		return if $res->[0] != 200;
 		my $date = Time::Piece->gmtime( time + Time::Seconds::ONE_YEAR );
 		Plack::Util::header_set( $res->[1], 'Expires', $date->strftime );
-		Plack::Util::header_push( $res->[1], 'Cache-Control', 'max-age=' . Time::Seconds::ONE_YEAR . ', public' );
+		push @{ $res->[1] }, 'Cache-Control', 'max-age=' . Time::Seconds::ONE_YEAR . ', public';
 		return;
 	} );
 }
@@ -35,10 +33,6 @@ __END__
 =head1 NAME
 
 Plack::Middleware::NeverExpire - set expiration headers far in the future
-
-=head1 VERSION
-
-version 1.006
 
 =head1 SYNOPSIS
 

@@ -110,9 +110,9 @@ subtest 'record requires transformation' => sub {
             field bool    => meta {
                 prop this => in_set(
                     meta { prop blessed => 'JSON::PP::Boolean'; },
-                    meta { prop blessed => 'Types::Serializer::Boolean'; },
+                    meta { prop blessed => 'Types::Serialiser::Boolean'; },
                 );
-                prop this => 1;
+                prop this => T();
             };
             end;
         },

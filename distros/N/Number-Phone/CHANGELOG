@@ -1,3 +1,10 @@
+3.8006    2022-09-03
+
+- Data updates
+
+- No longer auto-tested on 5.8 because a 'make dist'-time dependency (XML::XPath)
+  no longer supports that.
+
 3.8005    2022-06-01
 
 - Data updates only

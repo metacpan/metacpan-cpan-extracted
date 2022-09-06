@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220601185318;
+our $VERSION = 1.20220903144941;
 
 my $formatters = [
                 {
@@ -151,7 +151,7 @@ my $validators = {
                 88
               )|
               9(?:
-                0[013]|
+                0[0-3]|
                 [19]\\d|
                 21|
                 77|
@@ -186,68 +186,68 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{fa} = {"9851", "خراسان\ رضوی",
-"9825", "استان\ قم",
-"9854", "سیستان\ و\ بلوچستان",
-"9886", "مرکزی",
-"9883", "استان\ کرمانشاه",
-"9876", "هرمزگان",
-"9866", "لرستان",
-"9861", "خوزستان",
-"9835", "استان\ یزد",
-"9858", "خراسان\ شمالی",
-"9871", "فارس",
-"9841", "آذربایجان\ شرقی",
-"9874", "کهگیلویه\ و\ بویراحمد",
-"9844", "آذربایجان\ غربی",
-"9884", "استان\ ایلام",
-"9856", "خراسان\ جنوبی",
-"9881", "استان\ همدان",
-"9817", "گلستان",
-"9831", "استان\ اصفهان",
-"9828", "استان\ قزوین",
-"9845", "استان\ اردبیل",
-"9887", "کردستان",
+$areanames{fa} = {"9856", "خراسان\ جنوبی",
 "9834", "استان\ کرمان",
-"9811", "مازندران",
-"9823", "استان\ سمنان",
-"9826", "البرز",
-"9877", "استان\ بوشهر",
 "9838", "چهارمحال\ و\ بختیاری",
+"9877", "استان\ بوشهر",
+"9845", "استان\ اردبیل",
+"9811", "مازندران",
+"9841", "آذربایجان\ شرقی",
+"9884", "استان\ ایلام",
+"9876", "هرمزگان",
+"9886", "مرکزی",
+"9858", "خراسان\ شمالی",
+"9825", "استان\ قم",
+"9874", "کهگیلویه\ و\ بویراحمد",
+"9883", "استان\ کرمانشاه",
 "9821", "استان\ تهران",
+"9887", "کردستان",
+"9854", "سیستان\ و\ بلوچستان",
+"9866", "لرستان",
+"9813", "گیلان",
 "9824", "استان\ زنجان",
-"9813", "گیلان",};
-$areanames{en} = {"9876", "Hormozgan",
-"9866", "Lorestan",
-"9854", "Sistan\ and\ Baluchestan",
-"9886", "Markazi",
-"9883", "Kermanshah\ province",
+"9871", "فارس",
+"9817", "گلستان",
+"9851", "خراسان\ رضوی",
+"9828", "استان\ قزوین",
+"9831", "استان\ اصفهان",
+"9835", "استان\ یزد",
+"9861", "خوزستان",
+"9881", "استان\ همدان",
+"9844", "آذربایجان\ غربی",
+"9823", "استان\ سمنان",
+"9826", "البرز",};
+$areanames{en} = {"9828", "Qazvin\ province",
 "9851", "Razavi\ Khorasan",
-"9825", "Qom\ province",
-"9881", "Hamadan\ province",
 "9817", "Golestan",
-"9884", "Ilam\ province",
-"9856", "South\ Khorasan",
-"9874", "Kohgiluyeh\ and\ Boyer\-Ahmad",
-"9844", "West\ Azarbaijan",
-"9861", "Khuzestan",
-"9835", "Yazd\ province",
-"9858", "North\ Khorasan",
 "9871", "Fars",
-"9841", "East\ Azarbaijan",
-"9823", "Semnan\ province",
-"9826", "Alborz",
-"9877", "Bushehr\ province",
-"9887", "Kurdistan",
-"9834", "Kerman\ province",
-"9811", "Mazandaran",
-"9831", "Isfahan\ province",
-"9828", "Qazvin\ province",
-"9845", "Ardabil\ province",
 "9813", "Gilan",
 "9824", "Zanjan\ province",
+"9826", "Alborz",
+"9823", "Semnan\ province",
+"9844", "West\ Azarbaijan",
+"9881", "Hamadan\ province",
+"9861", "Khuzestan",
+"9835", "Yazd\ province",
+"9831", "Isfahan\ province",
+"9876", "Hormozgan",
+"9884", "Ilam\ province",
+"9841", "East\ Azarbaijan",
+"9877", "Bushehr\ province",
+"9811", "Mazandaran",
 "9838", "Chahar\-mahal\ and\ Bakhtiari",
-"9821", "Tehran\ province",};
+"9845", "Ardabil\ province",
+"9834", "Kerman\ province",
+"9856", "South\ Khorasan",
+"9866", "Lorestan",
+"9854", "Sistan\ and\ Baluchestan",
+"9887", "Kurdistan",
+"9821", "Tehran\ province",
+"9883", "Kermanshah\ province",
+"9874", "Kohgiluyeh\ and\ Boyer\-Ahmad",
+"9825", "Qom\ province",
+"9858", "North\ Khorasan",
+"9886", "Markazi",};
 
     sub new {
       my $class = shift;

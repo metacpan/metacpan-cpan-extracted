@@ -1,5 +1,10 @@
 Release history for SQL-Interpol
 
+1.104 Sat 03 Sep 2022
+	- No functional changes
+	- No minimum Test::More version requirement
+	- Updated packaging and package metadata
+
 1.103 Mon 12 Oct 2015
 	- Reinstated strictures (forgotten during Perl version drop)
 	- Fix for some perl 5.8.9/5.10.1 failures

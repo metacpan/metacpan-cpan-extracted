@@ -10,7 +10,7 @@ use lib 't/lib';
 use Catalyst::Test 'TestApp';
 
 my @Methods =
-  map { "is_" . $_ } qw/ get head post put delete connect options trace patch propfind /;
+  map { "is_" . $_ } qw/ get head post put delete connect options trace patch /;
 
 subtest 'HEAD' => sub {
 

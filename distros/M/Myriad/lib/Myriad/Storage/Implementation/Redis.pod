@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Myriad::Storage::Implementation::Redis
 at lib/Myriad/Storage/Implementation/Redis.pm
@@ -241,6 +240,104 @@ Takes the following parameters:
 Returns a L<Future> which will resolve to a list of key/value pairs,
 suitable for assigning to a hash.
 
+=head2 orderedset_add
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$s> - the scalar score to be attached to member
+
+=item * C<$m> - the scalar member value
+
+=back
+
+Note that references are B<not> supported - attempts to write an arrayref, hashref
+or object will fail.
+
+Redis sorted sets data structure family.
+add a scored member value to a storage key
+
+Returns a L<Future> which will resolve on completion.
+
+=head2 orderedset_remove_member
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$m> - the scalar member value
+
+=back
+
+Redis sorted sets data structure family.
+removes a specific member from ordered set in storage
+
+Returns a L<Future> which will resolve on completion.
+
+=head2 orderedset_remove_byscore
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$min> - the minimum score
+
+=item * C<$max> - the max score
+
+=back
+
+Redis sorted sets data structure family.
+removes all members with scores between minimum and maximum within an ordered set in storage
+
+Returns a L<Future> which will resolve on completion.
+
+=head2 orderedset_member_count
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$min> - the minimum score
+
+=item * C<$max> - the max score
+
+=back
+
+Redis sorted sets data structure family.
+gives the members count within the provided min and max scores in an ordered set.
+
+Returns a L<Future> which will resolve on completion.
+
+=head2 orderedset_members
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$min> - the minimum score
+
+=item * C<$max> - the max score
+
+=item * C<$with_score> - flag to return members with or without scores
+
+=back
+
+Redis sorted sets data structure family.
+gives list of members within the provided min and max scores in an ordered set.
+
+Returns a L<Future> which will resolve on completion.
+
 =head1 INHERITED METHODS
 
 =over 4
@@ -259,5 +356,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

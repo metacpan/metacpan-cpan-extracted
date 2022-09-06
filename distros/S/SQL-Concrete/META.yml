@@ -3,29 +3,30 @@ abstract: 'render SQL from fragments and placeholders from data structures'
 author:
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
 build_requires:
-  Data::Dumper: 0
-  File::Find: 0
-  File::Temp: 0
-  Test::Differences: 0
-  Test::More: 0.88
-configure_requires:
-  ExtUtils::MakeMaker: 0
+  Data::Dumper: '0'
+  Test::Differences: '0'
+  Test::More: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: SQL-Concrete
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Carp: 0
-  Exporter::Tidy: 0
-  Object::Tiny::Lvalue: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Exporter::Tidy: '0'
+  Object::Tiny::Lvalue: '0'
+  perl: '5.006'
 resources:
-  bugtracker: http://github.com/ap/SQL-Concrete/issues
-  homepage: http://github.com/ap/SQL-Concrete
-  repository: git://github.com/ap/SQL-Concrete
-version: 1.003
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Concrete
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ap/SQL-Concrete.git
+version: '1.004'
+x_copyright:
+  holder: 'Aristotle Pagaltzis'
+  year: 2015
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

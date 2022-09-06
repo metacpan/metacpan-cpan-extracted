@@ -11,6 +11,20 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
+#include <sched.h>
+
+#include <sys/ioctl.h>
+#include <net/if.h>
+
+#include <linux/nsfs.h>
+#include <linux/kcmp.h>
+
+/* kcmp.h does not define symbols, so there is no way to detect preesence of enum */
+/* members, so we just hardcode new symbols here. */
+#ifndef KCMP_EPOLL_TFD
+  #define KCMP_EPOLL_TFD 7
+#endif
+
 #ifdef __has_include
   #if !__has_include("linux/kcmp.h") // use "" as GCC wrongly expands macros
     #undef SYS_kcmp
@@ -78,6 +92,9 @@ BOOT:
   } *civ, const_iv[] = {
 #   define const_iv(name)       { # name, (IV)name },
 #   define const_iv_clone(name) { # name, (IV) CLONE_ ## name },
+#   ifdef CSIGNAL
+      const_iv (CSIGNAL)
+#   endif
 #   ifdef CLONE_FILES
       const_iv_clone (FILES)
 #   endif
@@ -107,6 +124,10 @@ BOOT:
 #   endif
 #   ifdef CLONE_NEWNET
       const_iv_clone (NEWNET)
+#   endif
+#   ifdef CLONE_NEWTIME
+      x
+      const_iv_clone (NEWTIME)
 #   endif
 #   ifdef CLONE_PTRACE
       const_iv_clone (PTRACE)
@@ -144,6 +165,9 @@ BOOT:
 #   ifdef CLONE_NEWCGROUP
       const_iv_clone (NEWCGROUP)
 #   endif
+#   ifdef CLONE_PIDFD
+      const_iv_clone (PIDFD)
+#   endif
 #   ifdef SYS_kcmp
       const_iv (KCMP_FILE)
       const_iv (KCMP_VM)
@@ -152,7 +176,19 @@ BOOT:
       const_iv (KCMP_SIGHAND)
       const_iv (KCMP_IO)
       const_iv (KCMP_SYSVSEM)
-      const_iv (KCMP_FILE)
+      const_iv (KCMP_EPOLL_TFD)
+#   endif
+#   ifdef NS_GET_USERNS
+      const_iv (NS_GET_USERNS)
+#   endif
+#   ifdef NS_GET_PARENT
+      const_iv (NS_GET_PARENT)
+#   endif
+#   ifdef NS_GET_NSTYPE
+      const_iv (NS_GET_NSTYPE)
+#   endif
+#   ifdef NS_OWNER_UID
+      const_iv (NS_OWNER_UID
 #   endif
   };
 
@@ -190,11 +226,11 @@ clone (SV *sub, IV stacksize, int flags, SV *ptid = 0, SV *tls = &PL_sv_undef)
               }
           }
 }
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 int
 unshare (int flags)
+	PROTOTYPE: @
 
 int
 setns (SV *fh_or_fd, int nstype = 0)
@@ -206,9 +242,23 @@ pivot_root (SV *new_root, SV *old_root)
         RETVAL = syscall (SYS_pivot_root,
                           (const char *)SvPVbyte_nolen (new_root),
                           (const char *)SvPVbyte_nolen (old_root));
-	OUTPUT:
-        RETVAL
+	OUTPUT: RETVAL
 
 int
 kcmp (IV pid1, IV pid2, IV type, UV idx1 = 0, UV idx2 = 0)
+
+int
+siocsifflags (char *ifname, U32 flags = IFF_UP)
+	CODE:
+{
+        int saved_errno;
+	struct ifreq ifr;
+	int fd = socket (AF_INET, SOCK_DGRAM, 0);
+        strncpy (ifr.ifr_name, ifname, sizeof (ifr.ifr_name));
+        RETVAL = ioctl (fd, SIOCSIFFLAGS, &ifr);
+        saved_errno = errno;
+        close (fd);
+        errno = saved_errno;
+}
+	OUTPUT: RETVAL
 

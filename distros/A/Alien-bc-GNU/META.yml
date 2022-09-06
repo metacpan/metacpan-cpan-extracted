@@ -1,0 +1,69 @@
+---
+abstract: 'Find or download and install GNU bc.'
+author:
+  - 'Michal Josef Špaček <skim@cpan.org>'
+build_requires:
+  Alien::Build::MM: '0.32'
+  Alien::Texinfo: '0'
+  Alien::ed::GNU: '0'
+  Archive::Tar: '0'
+  Config: '0'
+  ExtUtils::MakeMaker: '6.76'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
+  Mojo::DOM58: '1.00'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  Sort::Versions: '0'
+  Test::Alien: '0'
+  Test::Alien::Diag: '2.67'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  URI: '0'
+  URI::Escape: '0'
+configure_requires:
+  Alien::Build: '1.40'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.76'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-bc-GNU
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Base: '0'
+  Alien::Build: '0.25'
+  Path::Tiny: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/Alien-bc-GNU/issues
+  repository: https://github.com/michal-josef-spacek/Alien-bc-GNU
+version: '0.03'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.67'
+  requires:
+    share:
+      Alien::Texinfo: '0'
+      Alien::ed::GNU: '0'
+      Archive::Tar: '0'
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

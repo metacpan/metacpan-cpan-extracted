@@ -1,3 +1,7 @@
+0.42.3 2022-09-04 10:29:10 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - allow column type html
+
 0.42.2 2022-08-26 09:14:27 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - catch plugin instanciation error

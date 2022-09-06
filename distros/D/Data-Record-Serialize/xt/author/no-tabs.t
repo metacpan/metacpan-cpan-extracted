@@ -20,6 +20,7 @@ my @files = (
     'lib/Data/Record/Serialize/Role/Encode.pm',
     'lib/Data/Record/Serialize/Role/EncodeAndSink.pm',
     'lib/Data/Record/Serialize/Role/Sink.pm',
+    'lib/Data/Record/Serialize/Role/Sink/Stream.pm',
     'lib/Data/Record/Serialize/Sink/array.pm',
     'lib/Data/Record/Serialize/Sink/null.pm',
     'lib/Data/Record/Serialize/Sink/stream.pm',
@@ -49,6 +50,7 @@ my @files = (
     't/lib/My/Test/Util.pm',
     't/nullify.t',
     't/numify.t',
+    't/stream.t',
     't/stringify.t'
 );
 

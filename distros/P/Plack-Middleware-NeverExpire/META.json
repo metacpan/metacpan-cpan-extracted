@@ -4,21 +4,24 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-NeverExpire",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "Plack" : "0.9942",
@@ -26,16 +29,11 @@
             "Plack::Util" : "0",
             "Time::Piece" : "0",
             "Time::Seconds" : "0",
-            "parent" : "0",
-            "perl" : "5.008001",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
             "HTTP::Request::Common" : "0",
             "Plack::Builder" : "0",
             "Plack::Test" : "0",
@@ -46,14 +44,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/ap/Plack-Middleware-NeverExpire/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Plack-Middleware-NeverExpire"
       },
-      "homepage" : "http://github.com/ap/Plack-Middleware-NeverExpire",
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Plack-Middleware-NeverExpire"
+         "url" : "https://github.com/ap/Plack-Middleware-NeverExpire.git",
+         "web" : "https://github.com/ap/Plack-Middleware-NeverExpire"
       }
    },
-   "version" : "1.006"
+   "version" : "1.007",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2015
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }
-

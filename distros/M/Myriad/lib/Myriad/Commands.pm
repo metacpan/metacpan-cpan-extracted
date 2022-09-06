@@ -2,7 +2,7 @@ package Myriad::Commands;
 
 use Myriad::Class;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '1.000'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -60,17 +60,14 @@ async method service (@args) {
         }
     }
 
-    my $service_custom_name = $myriad->config->service_name->as_string;
-
-    die 'You cannot pass a service name and load multiple modules' if @modules > 1 and length $service_custom_name;
-
     # Load modules to compile
-
+    my @services_modules;
     for my $module (@modules) {
-        $log->debugf('Loading %s', $module);
         try {
             require_module($module);
+            next unless $module->isa('Myriad::Service');
             die 'loaded ' . $module . ' but it cannot ->new?' unless $module->can('new');
+            push @services_modules, $module;
         } catch ($e) {
             Future::Exception->throw(sprintf 'Service module %s not found', $module) if $e =~ /Can't locate.*(\Q$module\E)/;
             Future::Exception->throw(sprintf 'Failed to load module for service %s - %s', $module, $e);
@@ -81,31 +78,34 @@ async method service (@args) {
 
     await fmap0(async sub {
         my ($module) = @_;
-        $log->debugf('Preparing %s', $module);
         try {
-            if ($service_custom_name eq '') {
-                await $myriad->add_service($module, namespace => $namespace);
+            # No need to pass namespaces here
+            my $default_service_name = $myriad->registry->make_service_name($module,'');
+
+            # Check if we should override the servicename
+            if (my $service_name = $myriad->config->service_name($default_service_name)) {
+                await $myriad->add_service($module, namespace => $namespace, name => $service_name);
             } else {
-                await $myriad->add_service($module, name => $service_custom_name);
+                await $myriad->add_service($module, namespace => $namespace);
             }
         } catch ($e) {
             Future::Exception->throw(sprintf 'Failed to add service %s - %s', $module, $e);
         }
-    }, foreach => \@modules, concurrent => 4);
+    }, foreach => \@services_modules, concurrent => 4);
 
     $cmd = {
         code => async sub {
             try {
                 await fmap0 {
                     my $service = shift;
-                    $log->infof('Starting service [%s]', $service->service_name);
+                    $log->infof('Starting service %s', $service->service_name);
                     $service->start->transform(fail => sub {
                         return $service->service_name . ' : ' . shift;
                     });
                 } foreach => [values $myriad->services->%*], concurrent => 4;
 
             } catch($e) {
-                $log->warnf('Failed to start services - %s', $e);
+                $log->warnf('Failed to start services, error: %s', $e);
                 await $myriad->shutdown;
             }
         },
@@ -213,4 +213,4 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.

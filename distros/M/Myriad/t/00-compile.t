@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 51 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 54 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Myriad.pm',
@@ -15,6 +15,10 @@ my @module_files = (
     'Myriad/Class.pm',
     'Myriad/Commands.pm',
     'Myriad/Config.pm',
+    'Myriad/Example/Call.pm',
+    'Myriad/Example/Echo.pm',
+    'Myriad/Example/RPC.pm',
+    'Myriad/Example/Startup.pm',
     'Myriad/Exception.pm',
     'Myriad/Exception/Base.pm',
     'Myriad/Exception/Builder.pm',
@@ -48,7 +52,6 @@ my @module_files = (
     'Myriad/Subscription/Implementation/Redis.pm',
     'Myriad/Transport/HTTP.pm',
     'Myriad/Transport/Memory.pm',
-    'Myriad/Transport/PostgreSQL.pm',
     'Myriad/Transport/Redis.pm',
     'Myriad/UI/Readline.pm',
     'Myriad/Util/Defer.pm',

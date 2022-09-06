@@ -1,6 +1,6 @@
 package Media::Convert::Pipe;
 
-use Mojo::JSON qw(decode_json);
+use JSON::MaybeXS qw(decode_json);
 use Moose;
 use Carp;
 

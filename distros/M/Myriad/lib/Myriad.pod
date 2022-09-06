@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Myriad
 at lib/Myriad.pm
@@ -186,6 +185,20 @@ modules under that immediate namespace will be loaded
 =item * if it contains C<::>, it's treated as a comma-separated list of service module names to load
 
 =item * a C<-> prefix is a standard getopt parameter
+
+=back
+
+=head2 transport
+
+Returns the L<Myriad::Transport> instance according to the config value.
+
+it's designed to be used by tests, so be careful before using it in the framework code.
+
+it takes a single param
+
+=over 4
+
+=item * component - the RPC, Subscription or storage in lower case
 
 =back
 
@@ -431,5 +444,5 @@ L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

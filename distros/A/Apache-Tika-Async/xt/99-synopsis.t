@@ -47,5 +47,5 @@ sub synopsis_file_ok {
             skip "$file has no SYNOPSIS section", 1;
         };
     };
-    
+
 }

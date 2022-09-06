@@ -7,7 +7,9 @@ use_ok("Password::OWASP");
 use Password::OWASP::Argon2;
 use Authen::Passphrase::Argon2;
 
-my $pwo = Password::OWASP::Argon2->new();
+my $pwo = Password::OWASP::Argon2->new(
+    hashing => 'sha512',
+);
 
 isa_ok($pwo, 'Password::OWASP::Argon2');
 
@@ -21,6 +23,15 @@ ok(
 ok(
     !$pwo->check_password('Demo', $crypted),
     ".. and Demo isn't"
+);
+
+my $none = Password::OWASP::Argon2->new(
+    hashing => 'none',
+);
+
+ok(
+    $none->check_password('demo', $crypted),
+    "Default change to none supports old sha512 default"
 );
 
 my $ppr = Authen::Passphrase::Argon2->new(
@@ -52,6 +63,7 @@ ok(
 my $updated_password;
 
 $pwo = Password::OWASP::Argon2->new(
+    hashing => 'sha512',
     cost => 4,
     update_method => sub {
         my ($password) = shift;

@@ -5,14 +5,20 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 sub meta {
     +{
         v => 1,
         summary => 'Convert string to uppercase',
+        examples => [
+            {value=>'foo', filtered_value=>'FOO'},
+            {value=>'Foo', filtered_value=>'FOO'},
+            {value=>'fOO', filtered_value=>'FOO'},
+            {value=>'FOO'},
+        ],
     };
 }
 
@@ -45,7 +51,7 @@ Data::Sah::Filter::perl::Str::upcase - Convert string to uppercase
 
 =head1 VERSION
 
-This document describes version 0.011 of Data::Sah::Filter::perl::Str::upcase (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
+This document describes version 0.012 of Data::Sah::Filter::perl::Str::upcase (from Perl distribution Data-Sah-Filter), released on 2022-07-17.
 
 =head1 SYNOPSIS
 
@@ -67,6 +73,13 @@ This document describes version 0.011 of Data::Sah::Filter::perl::Str::upcase (f
 
  my $filter = gen_filter([["Str::upcase"]]);
  my $filtered_value = $filter->($some_data);
+
+=head2 Sample data and filtering results
+
+ "foo" # valid, becomes "FOO"
+ "Foo" # valid, becomes "FOO"
+ "fOO" # valid, becomes "FOO"
+ "FOO" # valid, unchanged
 
 =for Pod::Coverage ^(meta|filter)$
 

@@ -1,0 +1,35 @@
+Data::Record::Serialize::Encode::csv
+
+Data::Record::Serialize::Encode::csv encodes a record as CSV (well
+anything that Text::CSV can write).
+
+It performs the Data::Record::Serialize::Role::Encode role. If the data
+sink is a stream, try Data::Record::Serialize::Encode::csv_stream; it
+provides better performance using Text::CSV's native output to
+filehandles.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

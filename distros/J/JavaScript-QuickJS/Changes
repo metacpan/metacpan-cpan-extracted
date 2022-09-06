@@ -1,5 +1,8 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
+0.14 Sun 4 Sep 2022
+- Fix parallel build errors. (Thank you, CPAN Testers!)
+
 0.13 Thu 25 Aug 2022
 - Detect missing gmake up-front at build time.
 - Detect at build time when linking to libatomic is necessary, and only

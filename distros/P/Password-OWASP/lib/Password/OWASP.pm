@@ -2,7 +2,7 @@ package Password::OWASP;
 use warnings;
 use strict;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 # ABSTRACT: OWASP recommendations for password storage in perl
 
@@ -20,7 +20,7 @@ Password::OWASP - OWASP recommendations for password storage in perl
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ following:
 
 =item * Don't limit password length or characters
 
-=item * Hash the password before you crypt them
+=item * Hash the password before you crypt them (deprecated)
 
 =item * Use either Argon2, PBKDF2, Scrypt or Bcrypt
 
@@ -61,7 +61,11 @@ following:
 
 This module currently supports Argon2, Scrypt and Bcrypt. All implementations
 hash the password first with SHA-512. SHA-256 and SHA-1 are also supported.
-This allows for storing password which are longer that 72 characters.
+This allows for storing password which are longer that 72 characters. OWASP now
+recommends against this. This module will move away from prehashing.
+In order to allow for a transition the default will stay, but emit a
+deprecation warning. You can now set C<none> as a hashing option. This will
+become the new default.
 
 The check_password method allows for weaker schemes as the module also allows
 for inplace updates on these passwords. Please note that clear text passwords

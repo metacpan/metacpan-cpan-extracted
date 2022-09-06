@@ -4,49 +4,54 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Sub-ArgShortcut",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "Attribute::Handlers" : "0",
-            "Carp" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
-            "Test::More" : "0.88"
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/ap/Sub-ArgShortcut/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-ArgShortcut"
       },
-      "homepage" : "http://github.com/ap/Sub-ArgShortcut",
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Sub-ArgShortcut"
+         "url" : "https://github.com/ap/Sub-ArgShortcut.git",
+         "web" : "https://github.com/ap/Sub-ArgShortcut"
       }
    },
-   "version" : "1.021"
+   "version" : "1.022",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2015
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }
-

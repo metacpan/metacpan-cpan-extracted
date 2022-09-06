@@ -1,10 +1,67 @@
 ==================================================
-Changes from 2021-06-20 00:00:00 +0000 to present.
+Changes from 2021-09-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.020 at 2022-06-20 17:28:34 +0000
+version 0.021 at 2022-09-05 03:12:01 +0000
 ------------------------------------------
+
+  Change: 51e3babc58a65c4dc58b21fc28eaa118382e113c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-09-04 21:34:19 +0000
+
+    fix: wrong INI format 
+
+  Change: 35f13bba468cd8530d8e949068eb09d6b8d3dc22
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-07-11 01:05:19 +0000
+
+    doc: more references 
+
+  Change: d5ebf0abab28486505a8eefd67adb2c0c12c2076
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-07-04 23:57:57 +0000
+
+    chore: also blocks i386 
+
+  Change: 1e4bb661ba35827817b5eccca80ceeb97e4d415e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-07-04 00:09:55 +0000
+
+    feat: inotify support 
+
+  Change: 774b9613f14bffa398107cccd03110fa15de3d8f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-07-03 17:19:27 +0000
+
+    chore: clean up 
+
+  Change: aabc478c5ec0f94172050f039338a4ce13492e2d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-06-28 12:41:40 +0000
+
+    doc: optimizations 
+
+  Change: 3fa4a4b2e73b862536e2aacf21ba68eb9bd637a0
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-06-25 18:42:16 +0000
+
+    doc: required updates 
+
+  Change: ca693579d786d7c88020247ae64f53c4aa5c7c90
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-06-23 00:28:53 +0000
+
+    fix: correct permissions for Vim config 
+
+  Change: 71aa916566664b047fa0a58ca97defed2ad199d9
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-06-23 00:26:14 +0000
+
+    feat: custom comment into reports
+
+    To allow developers to know from where to reproduce tests results
+    and/or use for development and/or bug fixes. 
 
   Change: cc180b498dd4248ff4db4e78ac5f26a0e185b920
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

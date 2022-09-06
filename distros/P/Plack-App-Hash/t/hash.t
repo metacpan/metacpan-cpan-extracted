@@ -1,7 +1,6 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
-use Test::More 0.88; # for done_testing
+use Test::More tests => 18;
 use Plack::App::Hash;
 use Plack::Test;
 use HTTP::Request::Common;
@@ -92,5 +91,3 @@ test_psgi app => $app, client => sub {
 	$res = $cb->( GET '/index.html' );
 	is $res->code, 500, '... and in JSON too';
 };
-
-done_testing;

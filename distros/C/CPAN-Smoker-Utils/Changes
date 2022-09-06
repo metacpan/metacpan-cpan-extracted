@@ -1,0 +1,79 @@
+==================================================
+Changes from 2021-09-05 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v1.0.1 at 2022-09-05 04:22:31 +0000
+-------------------------------------------
+
+  Change: e98cb08f401006a4d5857bb0cfc57020fcfc9b0a
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-09-05 00:37:01 +0000
+
+    chore: version bump 
+
+  Change: 20c39b41fa3cbd9598005bf43bcd63bde24c9424
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-09-05 00:36:02 +0000
+
+    doc: license fix
+
+    Also fixed POD lines larger than 80 columns. 
+
+  Change: 3100a49a05b74274a3c2022e41e096f1f018df49
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-09-03 19:15:18 +0000
+
+    doc: typo 
+
+  Change: 2e5ad0d3cbc54a2de6e6a937e2cc8c3e9901a035
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-09-03 19:14:45 +0000
+
+    doc: CI badge 
+
+  Change: abf7ae83eb6c1fbec4e225271e07dbd2289127e5
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-09-03 19:09:59 +0000
+
+    fix: action bug fixes 
+
+  Change: 41cb39886a1e9d449f412a1de17a7b2c5af8cc22
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-08-24 21:21:52 +0000
+
+    fix: action config 
+
+  Change: 001dc3c8771295eb38e786374cd3de13cd0b4f89
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-08-24 21:08:52 +0000
+
+    feat: initial github action 
+
+  Change: ffb862cda1e3232e537d232f878729b72ee2ebd8
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-08-24 20:18:17 +0000
+
+    chore: required updates 
+
+  Change: 200c3da466b50f0bbfdcaf7811c3617c6e755fd0
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-08-24 19:19:36 +0000
+
+    chore: remaining distro files 
+
+  Change: dd098fb33d4cb9f727078a5b8b68f25fdf59236e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-08-24 19:04:04 +0000
+
+    chore: initial distro 
+
+  Change: 8680ffa066f2b174cd3e8e39e921139bce7523c5
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-08-24 18:12:13 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

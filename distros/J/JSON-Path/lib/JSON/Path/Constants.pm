@@ -1,5 +1,5 @@
 package JSON::Path::Constants;
-$JSON::Path::Constants::VERSION = '1.0.1';
+$JSON::Path::Constants::VERSION = '1.0.2';
 use strict;
 use warnings;
 
@@ -29,6 +29,7 @@ our %EXPORT_TAGS = (
         '$TOKEN_TRIPLE_EQUAL',   '$TOKEN_GREATER_THAN',
         '$TOKEN_LESS_THAN',      '$TOKEN_NOT_EQUAL',
         '$TOKEN_GREATER_EQUAL',  '$TOKEN_LESS_EQUAL',
+        '$TOKEN_QUOTE'
     ],
 );
 our @EXPORT_OK = map @$_, values %EXPORT_TAGS;
@@ -71,6 +72,7 @@ Readonly our $TOKEN_LESS_THAN           => $LESS_THAN_SIGN;
 Readonly our $TOKEN_NOT_EQUAL           => $EXCLAMATION_MARK . $EQUAL_SIGN;
 Readonly our $TOKEN_GREATER_EQUAL       => $GREATER_THAN_SIGN . $EQUAL_SIGN;
 Readonly our $TOKEN_LESS_EQUAL          => $LESS_THAN_SIGN . $EQUAL_SIGN;
+Readonly our $TOKEN_QUOTE               => $QUOTATION_MARK;
 
 1;
 
@@ -86,7 +88,7 @@ JSON::Path::Constants - Constants used in the JSON::Path distribution
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 AUTHOR
 

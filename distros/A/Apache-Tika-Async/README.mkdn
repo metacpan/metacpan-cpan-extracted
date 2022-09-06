@@ -25,7 +25,7 @@ Apache::Tika::Async - connect to Apache Tika
 # REPOSITORY
 
 The public repository of this module is
-[https://github.com/Corion/apache-tika](https://github.com/Corion/apache-tika).
+[https://github.com/Corion/Apache-Tika-Async](https://github.com/Corion/Apache-Tika-Async).
 
 # SUPPORT
 
@@ -36,7 +36,7 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=Apache-Tika-Async](https://rt.cpan.org/Public/Dist/Display.html?Name=Apache-Tika-Async)
-or via mail to [apache-tika-async-Bugs@rt.cpan.org](https://metacpan.org/pod/apache-tika-async-Bugs@rt.cpan.org).
+or via mail to [apache-tika-async-Bugs@rt.cpan.org](https://metacpan.org/pod/apache-tika-async-Bugs%40rt.cpan.org).
 
 # AUTHOR
 

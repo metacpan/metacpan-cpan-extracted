@@ -1,7 +1,7 @@
 Plack::Middleware::MockProxyFrontend
 
-This middleware implements the HTTP proxy protocol… without the proxy:
-it passes every request down to the wrapped PSGI application. Your
+This middleware implements the HTTP proxy protocol… without the proxy: it
+passes every request down to the wrapped PSGI application. Your
 application becomes the browser's entire internet: no matter which
 address you navigate to, the response comes from the wrapped PSGI
 application.
@@ -11,8 +11,8 @@ hosting, i.e. dispatching on hostname. Instead of testing your
 application by going to "http://localhost:5000/", you go to
 "https://example.com/" (or whatever your site is). Your application will
 see a request for "https://example.com/", not "http://localhost:5000/",
-e.g. when your framework generates absolute links. And then when the
-page loads, the browser will think it is showing you the real
+e.g. when your framework generates absolute links. And then when the page
+loads, the browser will think it is showing you the real
 "https://example.com/", e.g. in the address bar.
 
 The way this works is that instead of typing "http://localhost:5000/"
@@ -43,5 +43,5 @@ COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2015 by Aristotle Pagaltzis.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

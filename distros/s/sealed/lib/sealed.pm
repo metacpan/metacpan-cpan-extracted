@@ -14,9 +14,9 @@ use version;
 use B::Generate ();
 use B::Deparse  ();
 
-our $VERSION                    = qv(4.1.1);
+our $VERSION                    = qv(4.1.7);
 our $DEBUG;
-my $end;
+
 my %valid_attrs                 = (sealed => 1);
 my $p_obj                       = B::svref_2object(sub {&tweak});
 
@@ -87,6 +87,7 @@ sub tweak ($\@\@\@$) {
         ++$tweaked;
       }
     }
+
     continue {
       last unless $$op and ${$op->next};
       $op                       = $op->next;
@@ -122,7 +123,7 @@ sub MODIFY_CODE_ATTRIBUTES {
         warn __PACKAGE__ . ": tweak() aborted: $@" if $@;
       }
       elsif ($op->can("pmreplroot")) {
-        push @op_stack, $op->pmreplroot, $op->next;
+        push @op_stack, $op->pmreplroot, $op->pmreplstart, $op->next;
       }
       elsif ($op->can("first")) {
 	for (my $kid = $op->first; ref $kid and $$kid; $kid = $kid->sibling) {
@@ -131,7 +132,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 	unshift @op_stack, $op->next;
       }
       else {
-        unshift @op_stack, $op->next;
+        unshift @op_stack, $op->next, $op->parent;
       }
 
     }
@@ -154,13 +155,12 @@ sub import {
 
 __END__
 
-=head1 sealed
+=head1 NAME
 
-Subroutine attribute for compile-time method lookups on its typed lexicals.
+sealed - Subroutine attribute for compile-time method lookups on its typed lexicals.
 
-=over 4
 
-=item Sample Usage
+=head1 SYNOPSIS
 
     use Apache2::RequestRec;
     use base 'sealed';
@@ -170,7 +170,7 @@ Subroutine attribute for compile-time method lookups on its typed lexicals.
       $r->content_type("text/html"); # compile-time method lookup.
     ...
 
-=item C<import()> Options
+=head2 C<import()> Options
 
     use sealed 'debug';   # warns about 'method_named' op tweaks
     use sealed 'deparse'; # additionally warns with the B::Deparse output
@@ -178,7 +178,7 @@ Subroutine attribute for compile-time method lookups on its typed lexicals.
     use sealed 'disabled';# disables all CV tweaks
     use sealed;           # disables all warnings
 
-=item BUGS
+=head1 BUGS
 
 You may need to simplify your named method call argument stack,
 because this op-tree walker isn't as robust as it needs to be.
@@ -190,7 +190,7 @@ Reentry/recursion on :Sealed subs under ithreads (with multiple interpreters ava
 will occasionally segfault, but everything else seems fine in a mod_perl2 context.
 Stay tuned for v4.0.0 for the fix.
 
-=item Compiling perl v5.30+ for functional mod_perl2 w/ithreads and httpd 2.4.x w/event mpm
+=head2 Compiling perl v5.30+ for functional mod_perl2 w/ithreads and httpd 2.4.x w/event mpm
 
     % ./Configure -Uusemymalloc -Duseshrplib -Dusedtrace -Duseithreads -des && make -j$(nproc) && sudo make -j$(nproc) install
 
@@ -200,7 +200,7 @@ process is at its global exit point. For mod_perl, ensure you never reap new ith
 from the mod_perl portion of the tune, only from the mpm_event worker process tune or
 during httpd server (graceful) restart.
 
-=item CAVEATS
+=head1 CAVEATS
 
 Don't use typed lexicals under a :sealed sub for API method argument
 processing, if you are writing a reusable OO module (on CPAN, say). This
@@ -216,8 +216,10 @@ invoked method call. For nontrivial methods implemented entirely in Perl itself,
 the op-tree processing overhead involved during execution of those methods will
 drown out any performance gains this module would otherwise provide.
 
-=item See Also
+=head1 SEE ALSO
 
 L<https://www.sunstarsys.com/essays/perl7-sealed-lexicals>
 
-=back
+=head1 LICENSE
+
+Apache License 2.0

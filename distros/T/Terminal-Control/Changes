@@ -1,5 +1,14 @@
 Revision history for Perl extension Terminal::Control.
 
+0.12  2022-09-4
+        - Improvement in documentation. Bug fixing. 
+
+0.11  2022-09-4
+        - Bug fixing. 
+
+0.10  2022-09-4
+        - Major changes in documentation. Major changes in code. Inline C functions added. 
+
 0.09  2022-09-2
         - Changes in code. Changes in documentation. 
 
@@ -13,7 +22,7 @@ Revision history for Perl extension Terminal::Control.
         - Changes in documentation. Changes in code. 
 
 0.05  2022-08-31
-        - Major changes in code as well as documentation.
+        - Major changes in code as well as documentation. IOCTL call added.
 
 0.04  2022-08-28
         - Major changes in code. Minor Changes in documentation.

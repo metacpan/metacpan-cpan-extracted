@@ -7,13 +7,16 @@ use_ok("Password::OWASP");
 use Password::OWASP::Scrypt;
 use Authen::Passphrase::Scrypt;
 
-my $pwo = Password::OWASP::Scrypt->new();
+my $pwo = Password::OWASP::Scrypt->new(
+    hashing => 'sha512',
+);
 isa_ok($pwo, 'Password::OWASP::Scrypt');
 
 is($pwo->cost, 12, "Default cost factor of 12");
 
 $pwo = Password::OWASP::Scrypt->new(
-    cost => 4
+    cost => 4,
+    hashing => 'sha512',
 );
 isa_ok($pwo, 'Password::OWASP::Scrypt');
 is($pwo->cost, 4, "Changed the cost to 4");
@@ -28,6 +31,15 @@ ok(
 ok(
     !$pwo->check_password('Demo', $crypted),
     ".. and Demo isn't"
+);
+
+my $none = Password::OWASP::Scrypt->new(
+    hashing => 'none',
+);
+
+ok(
+    $none->check_password('demo', $crypted),
+    "sha512 to none migration [x]"
 );
 
 my $ppr = Authen::Passphrase::Scrypt->new(
@@ -59,6 +71,7 @@ ok(
 my $updated_password;
 
 $pwo = Password::OWASP::Scrypt->new(
+    hashing => 'sha512',
     update_method => sub {
         my ($password) = shift;
         $updated_password = $password;

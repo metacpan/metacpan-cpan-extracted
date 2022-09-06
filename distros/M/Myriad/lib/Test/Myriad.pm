@@ -3,13 +3,14 @@ package Test::Myriad;
 use strict;
 use warnings;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '1.000'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use IO::Async::Loop;
 use Future::Utils qw(fmap0);
 use Future::AsyncAwait;
 use Check::UnitCheck;
+use Object::Pad qw(:experimental);
 
 use Myriad;
 use Myriad::Service::Implementation;
@@ -76,7 +77,7 @@ sub add_service {
             no strict 'refs';
             push @{$pkg . '::ISA' }, 'Myriad::Service';
             $Myriad::Service::SLOT{$pkg} = {
-                map { $_ => $meta->add_slot('$' . $_) } qw(api)
+                map { $_ => $meta->add_field('$' . $_) } qw(api)
             };
         }
     }
@@ -97,6 +98,16 @@ at the moment it is just a shortcut for L<Myriad> run_future.
 
 sub ready {
     return $myriad->run_future;
+}
+
+=head2 instance
+
+Returns the L<Myriad> instance we are using
+
+=cut
+
+sub instance {
+    return $myriad;
 }
 
 sub import {

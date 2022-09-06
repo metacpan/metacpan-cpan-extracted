@@ -4,21 +4,24 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-Precompressed",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "Array::RefElem" : "0",
@@ -27,16 +30,11 @@
             "Plack::Middleware" : "0",
             "Plack::Util" : "0",
             "Plack::Util::Accessor" : "0",
-            "parent" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
             "HTTP::Request::Common" : "0",
             "Plack::Builder" : "0",
             "Plack::Test" : "0",
@@ -47,14 +45,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/ap/Plack-Middleware-Precompressed/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Plack-Middleware-Precompressed"
       },
-      "homepage" : "http://github.com/ap/Plack-Middleware-Precompressed",
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Plack-Middleware-Precompressed"
+         "url" : "https://github.com/ap/Plack-Middleware-Precompressed.git",
+         "web" : "https://github.com/ap/Plack-Middleware-Precompressed"
       }
    },
-   "version" : "1.103"
+   "version" : "1.104",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2022
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }
-

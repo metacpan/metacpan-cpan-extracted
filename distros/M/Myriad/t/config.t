@@ -14,38 +14,39 @@ BEGIN { *CORE::GLOBAL::exit = sub(;$) { pass("called exit"); } }
 use Myriad::Config;
 
 my %defaults = %Myriad::Config::DEFAULTS;
+my @regular_config = grep !ref $defaults{$_}, keys %defaults;
 my %shortcuts = %Myriad::Config::FULLNAME_FOR;
 
 subtest 'It should parse commandline args correctly' => sub {
-    my $configs = Myriad::Config->new();
+    my $config = Myriad::Config->new();
     my $args = ['--bad-key', 'value'];
 
     # Bad keys
-    exception { $configs->lookup_from_args($args) };
+    exception { $config->lookup_from_args($args) };
     $log->contains_ok(qr/don't know how to deal with.*bad-key/, 'bad-key was reported');
 
     # Parse full options
-    $args = [ map { "--" . $_ => 'test_value' } keys %defaults ];
-    $configs->lookup_from_args($args);
+    $args = [ map { "--" . $_ => 'test_value' } @regular_config ];
+    $config->lookup_from_args($args);
 
-    is($configs->key($_), 'test_value' , "config $_ has been set correctly") for keys %defaults;
+    is($config->key($_), 'test_value' , "config $_ has been set correctly") for @regular_config;
 
     # Parse short
     $args = [ map { "-" . $_ => 'test_value' } keys %shortcuts ];
-    $configs->lookup_from_args($args);
+    $config->lookup_from_args($args);
 
-    is($configs->key($_), 'test_value' , "config $_ has been set correctly from shortcut") for values %shortcuts;
+    is($config->key($_), 'test_value' , "config $_ has been set correctly from shortcut") for values %shortcuts;
 
     # key=value format should be accepted
     $args = ['--transport=anything'];
-    $configs->lookup_from_args($args);
+    $config->lookup_from_args($args);
 
-    is($configs->key('transport'), 'anything', 'key=value format is parsed correctly');
+    is($config->key('transport'), 'anything', 'key=value format is parsed correctly');
 
     # Stops at the correct place
     $args = ['--transport', 'memory', '-lib', '/code', 'service'];
 
-    $configs->lookup_from_args($args);
+    $config->lookup_from_args($args);
     cmp_deeply($args, ['service'], 'only args has been consumed');
 
     subtest 'It should parse service related config correctly' => sub {
@@ -53,147 +54,156 @@ subtest 'It should parse commandline args correctly' => sub {
         # We try to configure the same
         my $is_service_config_ok = sub {
             my $args = shift;
-            $configs->lookup_from_args($args);
-            my $service_configs = $configs->key('services');
-            ok($service_configs->{'fake.name'}, 'service name been captured correctly');
-            is($service_configs->{'fake.name'}->{configs}->{key}, 'value', 'service config been parsed correctly');
+            $config->lookup_from_args($args);
+            my $service_config = $config->key('services');
+            ok($service_config->{'fake.name'}, 'service name been captured correctly');
+            is($service_config->{'fake.name'}->{config}->{key}, 'value', 'service config been parsed correctly') or note explain $service_config;
         };
 
-        # Dynamically parsing services config using . format
-        $configs = Myriad::Config->new;
-        $args = ['--services.fake.name.configs.key', 'value'];
+        # Dynamically parsing service config using . format
+        $config = Myriad::Config->new;
+        $args = ['--service.fake.name.config.key', 'value'];
         $is_service_config_ok->($args);
 
-        # Dynamically parsing services config using _ format
-        $configs = Myriad::Config->new;
-        $args = ['--services_fake_name_configs_key', 'value'];
-        $is_service_config_ok->($args);
-
-        # We should be able to use service (single) and config (single)
-        $configs = Myriad::Config->new;
+        # Dynamically parsing service config using _ format
+        $config = Myriad::Config->new;
         $args = ['--service_fake_name_config_key', 'value'];
         $is_service_config_ok->($args);
 
         my $is_service_instance_ok = sub {
             my $args = shift;
-            $configs->lookup_from_args($args);
-            my $service_configs = $configs->key('services');
-            ok($service_configs->{'fake.name'}, 'service name been captured correctly');
-            my $instance_configs = $service_configs->{'fake.name'}->{instances};
+            $config->lookup_from_args($args);
+            my $service_config = $config->key('services');
+            ok($service_config->{'fake.name'}, 'service name been captured correctly');
+            my $instance_config = $service_config->{'fake.name'}->{instance};
 
-            ok($instance_configs->{demo}, 'instance name been captured correctly');
-            is($instance_configs->{demo}->{configs}->{new_key}, 'value', 'service config been parsed correctly');
+            ok($instance_config->{demo}, 'instance name been captured correctly');
+            is($instance_config->{demo}->{config}->{new_key}, 'value', 'service config been parsed correctly');
         };
 
         # Dynamically parse instance config using . format
-        $configs = Myriad::Config->new;
-        $args = ['--services.fake.name.instances.demo.configs.new_key', 'value'];
+        $config = Myriad::Config->new;
+        $args = ['--service.fake.name.instance.demo.config.new_key', 'value'];
         $is_service_instance_ok->($args);
 
         # Dynamically parsing instance config using _ format
-        $configs = Myriad::Config->new;
-        $args = ['--services_fake_name_instances_demo_configs_new_key', 'value'];
+        $config = Myriad::Config->new;
+        $args = ['--service_fake_name_instance_demo_config_new_key', 'value'];
         $is_service_instance_ok->($args);
 
         # We should be able to use service (single) and instnace (single)
-        $configs = Myriad::Config->new;
+        $config = Myriad::Config->new;
         $args = ['--service_fake_name_instance_demo_config_new_key', 'value'];
         $is_service_instance_ok->($args);
 
     };
+    done_testing;
 };
 
 subtest 'It should read config from ENV correctly' => sub {
-    my $configs = Myriad::Config->new;
-    $configs->clear_all;
+    my $config = Myriad::Config->new;
+    $config->clear_all;
 
     # To detect standard config from ENV
-    $ENV{"MYRIAD_$_"} = 'test_value' for map {uc($_)} keys %defaults;
-    $configs->lookup_from_env();
+    local %ENV = %ENV;
+    $ENV{"MYRIAD_$_"} = 'test_value' for map {uc($_)} @regular_config;
+    is(exception {
+        $config->lookup_from_env();
+    }, undef, 'handle global configuration from environment');
 
-    is($configs->key($_), 'test_value' , "config $_ has been set correctly") for keys %defaults;
+    is($config->key($_), 'test_value' , "config $_ has been set correctly") for @regular_config;
 
-    # To pass services' configs
-    $ENV{'MYRIAD_SERVICES_FAKE_NAME_CONFIGS_ENV_KEY'} = 'value from env';
-    $configs->lookup_from_env();
+    # To pass services' config
+    $ENV{'MYRIAD_SERVICE_FAKE_NAME_CONFIG_ENV_KEY'} = 'value from env';
+    is(exception {
+        $config->lookup_from_env();
+    }, undef, 'handle service configuration from environment');
 
-    my $services_config = $configs->key('services');
+    my $services_config = $config->key('services');
     ok($services_config->{'fake.name'}, 'service name parsed correctly');
-    is($services_config->{'fake.name'}->{configs}->{env_key}, 'value from env', 'service config has been parsed correctly');
+    is($services_config->{'fake.name'}->{config}->{env_key}, 'value from env', 'service config has been parsed correctly');
 
-    $configs->clear_all();
+    $config->clear_all();
 
-    # To parse instances config
-    $ENV{'MYRIAD_SERVICES_FAKE_NAME_INSTANCES_DEMO_CONFIGS_ENV_KEY'} = 'instance value from env';
-    $configs->lookup_from_env();
+    # To parse instance config
+    $ENV{'MYRIAD_SERVICE_FAKE_NAME_INSTANCE_DEMO_CONFIG_ENV_KEY'} = 'instance value from env';
+    $config->lookup_from_env();
 
-    $services_config = $configs->key('services');
+    $services_config = $config->key('services');
     ok($services_config->{'fake.name'}, 'service name parsed correctly');
-    ok(my $instance_configs = $services_config->{'fake.name'}->{instances}->{demo}, 'service instance has been parsed correctly');
-    is($instance_configs->{configs}->{env_key}, 'instance value from env', 'instance config has been parsed correctly');
+    ok(my $instance_config = $services_config->{'fake.name'}->{instance}->{demo}, 'service instance has been parsed correctly');
+    is($instance_config->{config}->{env_key}, 'instance value from env', 'instance config has been parsed correctly');
+    done_testing;
 };
 
 subtest 'It should read config from config file correctly' => sub {
-    my $configs = Myriad::Config->new;
+    my $config = Myriad::Config->new;
 
-    $configs->clear_key('transport');
-    $configs->clear_key('services');
-    $configs->lookup_from_file('t/config.yml');
+    $config->clear_key('transport');
+    $config->clear_key('services');
+    $config->lookup_from_file('t/config.yml');
 
-    is($configs->key('transport'), 'value_from_file', 'framework config has been passed correctly');
-    is($configs->key('services')->{'fake.name'}->{configs}->{key}, 'value from file', 'services config has been passed correctly');
-    is($configs->key('services')->{'fake.name'}->{instances}->{demo}->{configs}->{key}, 'instance value from file', 'instance config has been passed correctly');
+    is($config->key('transport'), 'value_from_file', 'framework config has been passed correctly');
+    is($config->key('services')->{'fake.name'}->{config}->{key}, 'value from file', 'services config has been passed correctly');
+    is($config->key('services')->{'fake.name'}->{instance}->{demo}->{config}->{key}, 'instance value from file', 'instance config has been passed correctly');
+    done_testing;
 };
 
-subtest 'It should keep configs source priority correct' => sub {
+subtest 'It should keep config source priority correct' => sub {
+    local %ENV = %ENV;
     # commandline args should take over ENV
     $ENV{MYRIAD_TRANSPORT} = 'env_prio';
     my $args = ['--transport', 'cmd_prio'];
 
-    my $configs = Myriad::Config->new(commandline => $args);
-    is($configs->key('transport'), 'cmd_prio', 'command line priority is more than the env variables');
+    my $config = Myriad::Config->new(commandline => $args);
+    is($config->key('transport'), 'cmd_prio', 'command line priority is more than the env variables');
 
     # Env should take over file
     $args = ['--config_path', 't/config.yml'];
     $ENV{MYRIAD_TRANSPORT} = 'env_prio';
 
-    $configs = Myriad::Config->new(commandline => $args);
-    is($configs->key('transport'), 'env_prio', 'env variables priority is more than the file data');
+    $config = Myriad::Config->new(commandline => $args);
+    is($config->key('transport'), 'env_prio', 'env variables priority is more than the file data');
 
     # File take over defaults
     $args = ['--config_path', 't/config.yml'];
     delete $ENV{MYRIAD_TRANSPORT};
 
-    $configs = Myriad::Config->new(commandline => $args);
-    is($configs->key('transport'), 'value_from_file', 'config file priority is more than the default values');
+    $config = Myriad::Config->new(commandline => $args);
+    is($config->key('transport'), 'value_from_file', 'config file priority is more than the default values');
 
     # Default by default
-    $configs = Myriad::Config->new();
-    is($configs->key('transport'), $defaults{'transport'}, 'default is correct');
+    $config = Myriad::Config->new();
+    is($config->key('transport'), $defaults{'transport'}, 'default is correct');
+    done_testing;
 };
 
 subtest 'Special config shortcuts' => sub {
     subtest 'framework config should be returend as Ryu::Obvervable' => sub {
-        my $configs = Myriad::Config->new();
-        isa_ok($configs->key('transport'), 'Ryu::Observable', 'correct config container');
+        my $config = Myriad::Config->new();
+        isa_ok($config->key('transport'), 'Ryu::Observable', 'correct config container');
+        done_testing;
     };
 
     subtest 'It should infer transport and address' => sub {
         my $args = ['--transport', 'redis://somehost:1111'];
-        my $configs = Myriad::Config->new(commandline => $args);
+        my $config = Myriad::Config->new(commandline => $args);
 
-        is($configs->key('transport'), 'redis', 'correct transport type');
-        is($configs->key('transport_redis'), 'redis://somehost:1111', 'correct uri for the correct transport');
+        is($config->key('transport'), 'redis', 'correct transport type');
+        is($config->key('transport_redis'), 'redis://somehost:1111', 'correct uri for the correct transport');
+        done_testing;
     };
 
     subtest 'It should configure all transport type implicitly' => sub {
         my $args = ['--transport', 'memory'];
-        my $configs = Myriad::Config->new(commandline => $args);
+        my $config = Myriad::Config->new(commandline => $args);
 
-        is($configs->key('rpc_transport'), 'memory', 'correct rpc transport');
-        is($configs->key('subscription_transport'), 'memory', 'correct subscription transport');
-        is($configs->key('storage_transport'), 'memory', 'correct storage transport');
+        is($config->key('rpc_transport'), 'memory', 'correct rpc transport');
+        is($config->key('subscription_transport'), 'memory', 'correct subscription transport');
+        is($config->key('storage_transport'), 'memory', 'correct storage transport');
+        done_testing;
     };
+    done_testing;
 };
 
 done_testing;

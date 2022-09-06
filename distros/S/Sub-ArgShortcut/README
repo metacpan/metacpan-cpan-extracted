@@ -3,8 +3,8 @@ Sub::ArgShortcut
 This module encapsulates the logic required for functions that assume $_
 as their argument when called with an empty argument list, and which
 modify their arguments in void context but return modified copies in any
-other context. You only need to write code which modifies the elements
-of @_ in-place.
+other context. You only need to write code which modifies the elements of
+@_ in-place.
 
 INSTALLATION
 
@@ -27,5 +27,5 @@ COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2015 by Aristotle Pagaltzis.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

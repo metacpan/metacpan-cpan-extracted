@@ -21,20 +21,6 @@
 #include <fcntl.h>
 #include <sched.h>
 
-/* the incompetent fool that created musl keeps __linux__, refuses
- * to implement any linux standard apis, and also has no way to test
- * for his broken iplementation. don't complain to me if this fails
- * for you.
- */
-#if __linux__ && (defined __GLIBC__ || defined __UCLIBC__)
-# include <linux/fs.h>
-# ifdef FS_IOC_FIEMAP
-#  include <linux/types.h>
-#  include <linux/fiemap.h>
-#  define HAVE_FIEMAP 1
-# endif
-#endif
-
 /* perl namespace pollution */
 #undef VERSION
 
@@ -124,6 +110,28 @@
 # include <sys/uio.h>
 #endif
 
+/* MUST be included before linux/fs.h, as the latter includes
+ * linux/mount.h, which is incompatible to sys/mount.h
+ */
+#if HAVE_SYS_MOUNT_H
+# include <sys/mount.h>
+#endif
+
+/* the incompetent fool that created musl keeps __linux__, refuses
+ * to implement any linux standard apis, and also has no way to test
+ * for his broken implementation. don't complain to me if this fails
+ * for you.
+ */
+#if __linux__ && (defined __GLIBC__ || defined __UCLIBC__)
+# include <linux/fs.h> /* MUST be included after sys/mount.h */
+# ifdef FS_IOC_FIEMAP
+#  include <linux/types.h>
+#  include <linux/fiemap.h>
+#  undef HAVE_FIEMAP
+#  define HAVE_FIEMAP 1
+# endif
+#endif
+
 #if HAVE_ST_XTIMENSEC
 # define ATIMENSEC PL_statcache.st_atimensec
 # define MTIMENSEC PL_statcache.st_mtimensec
@@ -171,6 +179,8 @@
 #endif
 
 typedef SV SV8; /* byte-sv, used for argument-checking */
+typedef char *octet_string;
+typedef char *octet_string_ornull;
 typedef int aio_rfd; /* read file desriptor */
 typedef int aio_wfd; /* write file descriptor */
 
@@ -1095,6 +1105,34 @@ ts_get (const struct timespec *ts)
 
 /*****************************************************************************/
 
+/* extract a ref-to-array of strings into a temporary c style string vector */
+static char **
+extract_stringvec (SV *sv, const char *croakmsg)
+{
+  if (!SvROK (sv) || SvTYPE (SvRV (sv)) != SVt_PVAV)
+    croak (croakmsg);
+
+  AV *av = (AV *)SvRV (sv);
+  int i, nelem = av_len (av) + 1;
+  char **vecp = (char **)SvPVX (sv_2mortal (newSV (sizeof (char *) * (nelem + 1))));
+
+  for (i = 0; i < nelem; ++i)
+    {
+      SV **e = av_fetch (av, i, 0);
+
+      if (e && *e)
+        vecp[i] = SvPVbyte_nolen (*e);
+      else
+        vecp[i] = "";
+    }
+
+  vecp[nelem] = 0;
+
+  return vecp;
+}
+
+/*****************************************************************************/
+
 XS(boot_IO__AIO) ecb_cold;
 
 MODULE = IO::AIO                PACKAGE = IO::AIO
@@ -1313,6 +1351,8 @@ BOOT:
     const_iv (MFD_CLOEXEC)
     const_iv (MFD_ALLOW_SEALING)
     const_iv (MFD_HUGETLB)
+    const_iv (MFD_HUGETLB_2MB)
+    const_iv (MFD_HUGETLB_1GB)
 
     const_iv (CLOCK_REALTIME)
     const_iv (CLOCK_MONOTONIC)
@@ -1400,6 +1440,58 @@ BOOT:
     const_iv (MOUNT_ATTR_NOATIME)
     const_iv (MOUNT_ATTR_STRICTATIME)
     const_iv (MOUNT_ATTR_NODIRATIME)
+
+    /* sys/mount.h */
+    const_iv (MS_RDONLY)
+    const_iv (MS_NOSUID)
+    const_iv (MS_NODEV)
+    const_iv (MS_NOEXEC)
+    const_iv (MS_SYNCHRONOUS)
+    const_iv (MS_REMOUNT)
+    const_iv (MS_MANDLOCK)
+    const_iv (MS_DIRSYNC)
+    const_iv (MS_NOATIME)
+    const_iv (MS_NODIRATIME)
+    const_iv (MS_BIND)
+    const_iv (MS_MOVE)
+    const_iv (MS_REC)
+    const_iv (MS_SILENT)
+    const_iv (MS_POSIXACL)
+    const_iv (MS_UNBINDABLE)
+    const_iv (MS_PRIVATE)
+    const_iv (MS_SLAVE)
+    const_iv (MS_SHARED)
+    const_iv (MS_RELATIME)
+    const_iv (MS_KERNMOUNT)
+    const_iv (MS_I_VERSION)
+    const_iv (MS_STRICTATIME)
+    const_iv (MS_LAZYTIME)
+    const_iv (MS_ACTIVE)
+    const_iv (MS_NOUSER)
+    const_iv (MS_RMT_MASK)
+    const_iv (MS_MGC_VAL)
+    const_iv (MS_MGC_MSK)
+
+    const_iv (MNT_FORCE)
+    const_iv (MNT_DETACH)
+    const_iv (MNT_EXPIRE)
+    const_iv (UMOUNT_NOFOLLOW)
+
+    const_iv (BLKROSET)
+    const_iv (BLKROGET)
+    const_iv (BLKRRPART)
+    const_iv (BLKGETSIZE)
+    const_iv (BLKFLSBUF)
+    const_iv (BLKRASET)
+    const_iv (BLKRAGET)
+    const_iv (BLKFRASET)
+    const_iv (BLKFRAGET)
+    const_iv (BLKSECTSET)
+    const_iv (BLKSECTGET)
+    const_iv (BLKSSZGET)
+    const_iv (BLKBSZGET)
+    const_iv (BLKBSZSET)
+    const_iv (BLKGETSIZE64)
 
     /* these are libeio constants, and are independent of gendef0 */
     const_eio (SEEK_SET)
@@ -2796,18 +2888,57 @@ timerfd_gettime (SV *fh)
 }
 
 void
-memfd_create (SV8 *pathname, int flags = 0)
+memfd_create (octet_string pathname, int flags = 0)
 	PPCODE:
 {
 	int fd;
 #if HAVE_MEMFD_CREATE
-        fd = memfd_create (SvPVbyte_nolen (pathname), flags);
+        fd = memfd_create (pathname, flags);
 #else
         fd = (errno = ENOSYS, -1);
 #endif
 	
         XPUSHs (newmortalFH (fd, O_RDWR));
 }
+
+int
+fexecve (SV *fh, SV *args, SV *envs = &PL_sv_undef)
+	CODE:
+{
+	int fd = PerlIO_fileno (IoIFP (sv_2io (fh)));
+        char **envp, **argv;
+        argv = extract_stringvec (args, "IO::AIO::fexecve: args must be an array of strings");
+        if (!SvOK (envs))
+          {
+            extern char **environ;
+            envp = environ;
+          }
+        else
+          envp = extract_stringvec (envs, "IO::AIO::fexecve: envs must be an array of strings");
+#if _POSIX_VERSION >= 200809L
+          RETVAL = fexecve (fd, argv, envp);
+#else
+          RETVAL = (errno = ENOSYS, -1);
+#endif
+}
+	OUTPUT: RETVAL
+
+int
+mount (octet_string special, octet_string path, octet_string fstype, UV flags = 0, octet_string_ornull data = 0)
+        OUTPUT: RETVAL
+
+int
+umount (octet_string path, int flags = 0)
+	CODE:
+        if (flags)
+#if HAVE_UMOUNT2
+          RETVAL = umount2 (path, flags);
+#else
+          RETVAL = (errno = ENOSYS, -1);
+#endif
+        else
+          RETVAL = umount (path);
+        OUTPUT: RETVAL
 
 UV
 get_fdlimit ()

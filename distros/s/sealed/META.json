@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Subroutine attribute for compile-time method lookups on its typed lexicals.",
    "author" : [
       "unknown"
    ],
@@ -32,12 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "APR::Request" : "0",
-            "B::Generate" : "0"
+            "B::Generate" : "0",
+            "perl" : "5.022000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v4.1.1",
+   "version" : "v4.1.7",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

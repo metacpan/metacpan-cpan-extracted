@@ -2,7 +2,7 @@ package App::Yath::Options;
 use strict;
 use warnings;
 
-our $VERSION = '1.000127';
+our $VERSION = '1.000128';
 
 use Carp qw/croak confess/;
 use Scalar::Util qw/blessed/;
@@ -776,7 +776,7 @@ common fields added automatically, this makes it easier to define multiple
 options that share common fields. Common fields can be overridden inside the
 option definition.
 
-These are both equivelent:
+These are both equivalent:
 
     # Using option group
     option_group { category => 'foo', prefix => 'foo' } => sub {

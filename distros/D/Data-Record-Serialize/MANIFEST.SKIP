@@ -1,0 +1,17 @@
+^Build$
+^Makefile$
+\.tar\.gz$
+\.tar$
+~$
+^[^/]*\.html$
+\.old$
+^blib/
+^pm_to_blib
+^.hg
+^MYMETA
+^cover_db/
+^cpanfile
+\.orig$
+local
+devel
+_build_params

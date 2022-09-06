@@ -228,7 +228,7 @@ es-copy-index.pl - Copy an index from one cluster to another
 
 =head1 VERSION
 
-version 8.3
+version 8.4
 
 =head1 SYNOPSIS
 
@@ -254,8 +254,12 @@ From App::ElasticSearch::Utilities:
     --port          HTTP port for your cluster
     --proto         Defaults to 'http', can also be 'https'
     --http-username HTTP Basic Auth username
-    --http-password HTTP Basic Auth password (if not specified, and --http-user is, you will be prompted)
     --password-exec Script to run to get the users password
+    --insecure      Don't verify TLS certificates
+    --cacert        Specify the TLS CA file
+    --capath        Specify the directory with TLS CAs
+    --cert          Specify the path to the client certificate
+    --key           Specify the path to the client private key file
     --noop          Any operations other than GET are disabled, can be negated with --no-noop
     --timeout       Timeout to ElasticSearch, default 10
     --keep-proxy    Do not remove any proxy settings from %ENV
@@ -549,6 +553,58 @@ Which would expand to:
 
 This option will iterate through the whole file and unique the elements of the list.  They will then be transformed into
 an appropriate L<terms query|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html>.
+
+=head3 Wildcards
+
+We can also have a group of wildcard or regexp in a file:
+
+    $ cat wildcards.dat
+    *@gmail.com
+    *@yahoo.com
+
+To enable wildcard parsing, prefix the filename with a C<*>.
+
+    es-search.pl to_address:*wildcards.dat
+
+Which expands the query to:
+
+    {
+      "bool": {
+        "minimum_should_match":1,
+        "should": [
+           {"wildcard":{"to_outbound":{"value":"*@gmail.com"}}},
+           {"wildcard":{"to_outbound":{"value":"*@yahoo.com"}}}
+        ]
+      }
+    }
+
+No attempt is made to verify or validate the wildcard patterns.
+
+=head3 Regular Expressions
+
+If you'd like to specify a file full of regexp, you can do that as well:
+
+    $ cat regexp.dat
+    .*google\.com$
+    .*yahoo\.com$
+
+To enable regexp parsing, prefix the filename with a C<~>.
+
+    es-search.pl to_address:~regexp.dat
+
+Which expands the query to:
+
+    {
+      "bool": {
+        "minimum_should_match":1,
+        "should": [
+          {"regexp":{"to_outbound":{"value":".*google\\.com$"}}},
+          {"regexp":{"to_outbound":{"value":".*yahoo\\.com$"}}}
+        ]
+      }
+    }
+
+No attempt is made to verify or validate the regexp expressions.
 
 =head2 App::ElasticSearch::Utilities::QueryString::Nested
 

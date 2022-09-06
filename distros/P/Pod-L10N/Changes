@@ -1,5 +1,10 @@
 Revision history for Perl module Pod::L10N
 
+1.06 2022-09-03T09:45:33Z
+
+	- separate Pod::L10N::Model to Pod-L10N-Model
+	- upgrade upstream to 5.28.1-based
+
 1.05 2021-07-21T14:23:56Z
 
 	- fix test failure on Pod::Simple older than 3.28

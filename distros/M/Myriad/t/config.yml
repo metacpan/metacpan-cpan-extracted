@@ -2,10 +2,10 @@ transport: value_from_file
 
 services:
     fake.name:
-        configs:
+        config:
             key: value from file
-        instances:
+        instance:
             demo:
-                configs:
+                config:
                     key: instance value from file
 

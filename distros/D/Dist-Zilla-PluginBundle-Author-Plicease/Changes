@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.72      2022-09-05 04:08:43 -0600
+  - Bump CI in generated dist to use Perl 5.36/5.37
+
 2.71      2022-08-13 14:33:06 -0600
   - Add [Author::Plicease::PkgVersionBlock]
 

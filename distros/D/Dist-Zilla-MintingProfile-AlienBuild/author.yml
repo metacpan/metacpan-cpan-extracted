@@ -8,6 +8,7 @@ pod_spelling_system:
   stopwords:
     - AlienBuild
     - alienfile
+    - libarchive
 
 pod_coverage:
   skip: 0

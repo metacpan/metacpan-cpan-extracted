@@ -1,8 +1,8 @@
 Plack::App::Hash
 
-This PSGI application responds to HTTP requests by looking up the
-request path in a hash and returning the value of that key (if found) as
-the response body.
+This PSGI application responds to HTTP requests by looking up the request
+path in a hash and returning the value of that key (if found) as the
+response body.
 
 This is useful for cases like inlining the content of a boilerplate
 static site into a single-page-application-in-a-module, or serving up a
@@ -29,7 +29,7 @@ Should you wish to install this module manually, the procedure is
 
 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Aristotle Pagaltzis.
+This software is copyright (c) 2022 by Aristotle Pagaltzis.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,22 @@
+Algorithm/LCS/XS
+================
+
+Algorithm::LCS::XS reimplements Algorithm::Diff's core loop in XS,
+and provides a simple OO interface to it.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Joe Schaefer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

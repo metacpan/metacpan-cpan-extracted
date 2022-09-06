@@ -1,0 +1,34 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Myriad::Example::Startup
+at lib/Myriad/Example/Startup.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Myriad::Service::Implementation>
+
+L<MODIFY_CODE_ATTRIBUTES|Myriad::Service::Implementation/MODIFY_CODE_ATTRIBUTES>, L<configure|Myriad::Service::Implementation/configure>, L<diagnostics|Myriad::Service::Implementation/diagnostics>, L<load|Myriad::Service::Implementation/load>, L<myriad|Myriad::Service::Implementation/myriad>, L<process_batch|Myriad::Service::Implementation/process_batch>, L<rpc|Myriad::Service::Implementation/rpc>, L<ryu|Myriad::Service::Implementation/ryu>, L<service_name|Myriad::Service::Implementation/service_name>, L<shutdown|Myriad::Service::Implementation/shutdown>, L<start|Myriad::Service::Implementation/start>, L<subscription|Myriad::Service::Implementation/subscription>
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=item L<Myriad::Service>
+
+L<import|Myriad::Service/import>
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+

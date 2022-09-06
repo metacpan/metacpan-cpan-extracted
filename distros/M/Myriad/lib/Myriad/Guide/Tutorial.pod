@@ -1,0 +1,110 @@
+=encoding utf8
+
+=head1 NAME
+
+Myriad::Guide::Tutorial - introduction and tutorial for the L<Myriad> framework
+
+=head1 TUTORIAL
+
+Most of the time, you would use the L<myriad.pl> script to run everything.
+
+The L<Myriad> framework handles loading, logging, configuration and other tasks: you provide
+services which implement functionality, and wire them together. Instead of implementing top-level code,
+those services can call each other or subscribe to data streams.
+
+Note that if you're on Windows, you may need to run the C<myriad.pl> commands under PowerShell or WSL
+terminal, due to the nested quotes.
+
+=head2 Run code on startup
+
+Each service has a C<startup> method - this is where you put code that should run once the service is
+loaded and ready.
+
+ package Myriad::Example::Startup;
+ # VERSION
+ # To try this out, run:
+ #  myriad.pl service Myriad::Example::Startup
+ use Myriad::Service ':v1';
+ async method startup (%args) {
+  $log->infof('This is our example service, running code in the startup method');
+ }
+ 1;
+
+There are 3 key lines here - firstly, we give our service a name:
+
+ package Myriad::Example::Startup
+
+Every service has a unique name, and we can have multiple instances of a given service (for example, connecting to different database shards or serving different domain names for a webhook).
+
+Next, we load the framework and indicate that this is a service:
+
+ use Myriad::Service ':v1';
+
+This line applies C<strict>, C<warnings>, and many other "standard" settings - see L<Myriad::Class> for more details.
+
+Next, we provide methods - in this case, a C<startup> method:
+
+ async method startup (%args) {
+
+We're using L<Object::Pad> for the C<method> keyword - every service is a Perl OO class, and L<Object::Pad> is the prototype for the planned Perl core OO implementation.
+The C<async> keyword comes from L<Future::AsyncAwait> - it allows us to use the C<await> keyword if there are any asynchronous operations that should complete before
+we return.
+
+=head2 An RPC call
+
+"Remote procedure calls", usually abbreviated RPC, are the basic building blocks for services. Creating a method marked as C<RPC> tells Myriad that this method should be available for other services to call.
+
+ package Myriad::Example::RPC;
+ # VERSION
+ # To try this out, run:
+ #  myriad.pl service Myriad::Example::RPC rpc myriad.example.rpc
+ use Myriad::Service ':v1';
+ async method message : RPC {
+  return 'Welcome to Myriad';
+ }
+ 1;
+
+We use L<subroutine attributes|perlsub/"Subroutine Attributes"> to mark a method as an RPC call.
+
+=head2 Simple RPC echo method
+
+This service takes parameters, in this case returning them as the result from the RPC call:
+
+ package Myriad::Example::Echo;
+ # VERSION
+ # To try this out, run:
+ #  myriad.pl service Myriad::Example::RPC rpc myriad.example.echo/message='{"message":"example message"}'
+ use Myriad::Service ':v1';
+ async method echo : RPC (%args) {
+  return $args{message};
+ }
+ 1;
+
+We're using Perl core signatures for the parameters, although you can use C<@_> as usual if you prefer:
+
+ async method echo : RPC {
+  my (%args) = @_;
+  return $args{message};
+ }
+
+=head2 Call another service
+
+This service takes parameters, in this case returning them as the result from the RPC call:
+
+ package Myriad::Example::Call;
+ # VERSION
+ # To try this out, run:
+ #  myriad.pl service Myriad::Example::Call rpc myriad.example.call/remote_call
+ use Myriad::Service ':v1';
+ async method remote_call : RPC (%args) {
+  my $srv = await $api->service_by_name('myriad.example.call');
+  return await $srv->target_method;
+ }
+ async method target_method : RPC {
+  return 'This is a method we call from within another service';
+ }
+ 1;
+
+The C<$api> variable is available within services for accessing the service API - see L<Myriad::API> for more details.
+
+=cut

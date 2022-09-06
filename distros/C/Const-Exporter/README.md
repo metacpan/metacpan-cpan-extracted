@@ -4,7 +4,7 @@ Const::Exporter - Declare constants for export.
 
 # VERSION
 
-version v1.2.1
+version v1.2.2
 
 # SYNOPSIS
 
@@ -110,7 +110,7 @@ are added to the `@EXPORTS` array).
 
 When a constant is already defined in a previous tag, then no value is
 specified for it. (For example, `bar` in `tab_b` above.)  If you do
-give a value, [Const::Exporter](https://metacpan.org/pod/Const::Exporter) will assume it's another symbol.
+give a value, [Const::Exporter](https://metacpan.org/pod/Const%3A%3AExporter) will assume it's another symbol.
 
 Your module can include multiple calls to `use Const::Exporter`, so
 that you can reference constants in other expressions, e.g.
@@ -248,11 +248,11 @@ Pull requests to support older versions of Perl are welcome. See
 
 ## Exporting Functions
 
-[Const::Exporter](https://metacpan.org/pod/Const::Exporter) is not intended for use with modules that also
+[Const::Exporter](https://metacpan.org/pod/Const%3A%3AExporter) is not intended for use with modules that also
 export functions.
 
 There are workarounds that you can use, such as getting
-[Const::Exporter](https://metacpan.org/pod/Const::Exporter) to export your functions, or munging `@EXPORT`
+[Const::Exporter](https://metacpan.org/pod/Const%3A%3AExporter) to export your functions, or munging `@EXPORT`
 etc. separately, but these are not supported and changes in the
 future my break our code.
 
@@ -302,23 +302,23 @@ See [Exporter](https://metacpan.org/pod/Exporter) for a discussion of export tag
 
 ## Similar Modules
 
-- [Exporter::Constants](https://metacpan.org/pod/Exporter::Constants)
+- [Exporter::Constants](https://metacpan.org/pod/Exporter%3A%3AConstants)
 
     This module only allows you to declare function symbol constants, akin
     to the [constant](https://metacpan.org/pod/constant) module, without tags.
 
-- [Constant::Exporter](https://metacpan.org/pod/Constant::Exporter)
+- [Constant::Exporter](https://metacpan.org/pod/Constant%3A%3AExporter)
 
     This module only allows you to declare function symbol constants, akin
     to the [constant](https://metacpan.org/pod/constant) module, although you can specify tags.
 
-- [Constant::Export::Lazy](https://metacpan.org/pod/Constant::Export::Lazy)
+- [Constant::Export::Lazy](https://metacpan.org/pod/Constant%3A%3AExport%3A%3ALazy)
 
     This module only allows you to declare function symbol constants, akin
     to the [constant](https://metacpan.org/pod/constant) module by defining functions that are only called
     as needed.  The interface is rather complex.
 
-- [Const::Fast::Exporter](https://metacpan.org/pod/Const::Fast::Exporter)
+- [Const::Fast::Exporter](https://metacpan.org/pod/Const%3A%3AFast%3A%3AExporter)
 
     This module will export all constants declared in the package's
     namespace.
@@ -348,7 +348,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2021 by Robert Rothenberg.
+This software is Copyright (c) 2014-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

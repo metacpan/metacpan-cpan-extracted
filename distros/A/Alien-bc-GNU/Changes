@@ -1,0 +1,14 @@
+0.03 2022-09-05T11:58:15+02:00
+ - Detect version of bc and GNU bc.
+ - Fix example in doc.
+ - Fix MANIFEST file.
+ - Fix missing texinfo command.
+ - Improve path to bc source tar.gz.
+
+0.02 2022-09-04T14:18:47+02:00
+ - Add alien_diag() to tests.
+ - Fix abstract.
+ - Fix missing ed command.
+
+0.01 2022-09-02T23:15:44+02:00
+ - First version.

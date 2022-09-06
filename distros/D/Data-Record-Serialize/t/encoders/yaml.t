@@ -108,8 +108,11 @@ subtest 'record requires transformation' => sub {
             field string1 => '99';
             field string2 => 'nyuck nyuck';
             field bool    => object {
-                prop blessed => 'JSON::PP::Boolean';
-                prop this => 1;
+                prop this => in_set(
+                    meta { prop blessed => 'JSON::PP::Boolean'; },
+                    meta { prop blessed => 'Types::Serialiser::Boolean'; },
+                );
+                prop this => T();
             };
             end;
         },

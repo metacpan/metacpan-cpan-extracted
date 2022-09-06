@@ -10,6 +10,8 @@ use Test::MockObject;
 use Future::AsyncAwait;
 use IO::Async::Test;
 
+use Object::Pad qw(:experimental);
+
 sub loop_notifiers {
     my $loop = shift;
 
@@ -29,14 +31,14 @@ my $loop = $myriad->loop;
 testing_loop($loop);
 
 subtest "class methods and proper initialization" => sub {
-    can_ok($myriad, qw(configure_from_argv loop registry redis rpc_client rpc http subscription storage add_service service_by_name ryu shutdown run));
+    can_ok($myriad, qw(configure_from_argv loop registry redis_transport memory_transport transport rpc_client rpc http subscription storage add_service service_by_name ryu shutdown run));
 
 
     my $command_param = 'Testing';
     wait_for_future($myriad->configure_from_argv('-l', 'debug', '--subscription_transport', 'memory', '--rpc_transport', 'memory', '--storage_transport', 'memory', $command, $command_param))->get;
 
     # Check configure_from_argv init objects
-    my $loop = $metaclass->get_slot('$loop')->value($myriad);
+    my $loop = $metaclass->get_field('$loop')->value($myriad);
     isa_ok($loop, 'IO::Async::Loop', 'Loop is set');
     isa_ok($myriad->config, 'Myriad::Config', 'Config is set');
 
@@ -45,8 +47,8 @@ subtest "class methods and proper initialization" => sub {
     isa_ok(@{$myriad->config->log_level->{subscriptions}}[0], 'CODE', 'Logging has been setup');
 
     # Tracing setup
-    isa_ok($metaclass->get_slot('$tracing')->value($myriad), 'Net::Async::OpenTracing', 'Tracing is set');
-    my $shutdown_tasks = $metaclass->get_slot('$shutdown_tasks')->value($myriad);
+    isa_ok($metaclass->get_field('$tracing')->value($myriad), 'Net::Async::OpenTracing', 'Tracing is set');
+    my $shutdown_tasks = $metaclass->get_field('$shutdown_tasks')->value($myriad);
     isa_ok($shutdown_tasks->[-1], 'CODE', 'Added to shutdown tasks');
     is(@$shutdown_tasks, 1, 'One added shutdown task');
 
@@ -57,7 +59,7 @@ subtest "class methods and proper initialization" => sub {
     # No Service, or plugin is setup.
 
     # Command
-    isa_ok($metaclass->get_slot('$commands')->value($myriad), 'Myriad::Commands', 'Command is set');
+    isa_ok($metaclass->get_field('$commands')->value($myriad), 'Myriad::Commands', 'Command is set');
     like($command_is_called, qr/$command_param/, 'Test Command has been found and called');
 
 };
@@ -66,10 +68,10 @@ subtest "Myriad attributes setting tests" => sub {
 
     # RPC
     my $rpc = $myriad->rpc;
-    isa_ok($metaclass->get_slot('$rpc')->value($myriad), 'Myriad::RPC::Implementation::Memory', 'Myriad RPC is set');
+    isa_ok($metaclass->get_field('$rpc')->value($myriad), 'Myriad::RPC::Implementation::Memory', 'Myriad RPC is set');
     my $current_notifiers = loop_notifiers($myriad->loop);
     ok($current_notifiers->{'Myriad::RPC::Implementation::Memory'}, 'RPC is added to loop');
-    my $shutdown_tasks = $metaclass->get_slot('$shutdown_tasks')->value($myriad);
+    my $shutdown_tasks = $metaclass->get_field('$shutdown_tasks')->value($myriad);
     isa_ok($shutdown_tasks->[-1], 'CODE', 'Added to shutdown tasks');
     is(@$shutdown_tasks, 2, 'Two added shutdown tasks');
 
@@ -81,24 +83,24 @@ subtest "Myriad attributes setting tests" => sub {
 
     # HTTP
     my $http = $myriad->http;
-    isa_ok($metaclass->get_slot('$http')->value($myriad), 'Myriad::Transport::HTTP', 'Myriad HTTP is set');
+    isa_ok($metaclass->get_field('$http')->value($myriad), 'Myriad::Transport::HTTP', 'Myriad HTTP is set');
     $current_notifiers = loop_notifiers($myriad->loop);
     ok($current_notifiers->{'Myriad::Transport::HTTP'}, 'HTTP is added to loop');
 
     # Subscription
     my $subscription = $myriad->subscription;
-    isa_ok($metaclass->get_slot('$subscription')->value($myriad), 'Myriad::Subscription::Implementation::Memory', 'Myriad Subscription is set');
+    isa_ok($metaclass->get_field('$subscription')->value($myriad), 'Myriad::Subscription::Implementation::Memory', 'Myriad Subscription is set');
     $current_notifiers = loop_notifiers($myriad->loop);
     ok($current_notifiers->{'Myriad::Subscription::Implementation::Memory'}, 'Subscription is added to loop');
 
     # Storage
     my $storage = $myriad->storage;
-    isa_ok($metaclass->get_slot('$storage')->value($myriad), 'Myriad::Storage::Implementation::Memory', 'Myriad Storage is set');
+    isa_ok($metaclass->get_field('$storage')->value($myriad), 'Myriad::Storage::Implementation::Memory', 'Myriad Storage is set');
 
     # Registry and ryu
     isa_ok($myriad->registry, 'Myriad::Registry', 'Myriad::Registry is set');
     my $ryu = $myriad->ryu;
-    isa_ok($metaclass->get_slot('$ryu')->value($myriad), 'Ryu::Async', 'Myriad Ryu is set');
+    isa_ok($metaclass->get_field('$ryu')->value($myriad), 'Ryu::Async', 'Myriad Ryu is set');
     $current_notifiers = loop_notifiers($myriad->loop);
     ok($current_notifiers->{'Ryu::Async'}, 'Ryu is added to loop');
 
@@ -115,8 +117,8 @@ subtest  "Run and shutdown behaviour" => sub {
     my $service_mock = Test::MockObject->new();
     $service_mock->mock( 'shutdown', $shutdown_test );
 
-    $metaclass->get_slot('$shutdown_tasks')->value($myriad) = [$shutdown_test];
-    $metaclass->get_slot('$services')->value($myriad) = { testing_service => $service_mock };
+    $metaclass->get_field('$shutdown_tasks')->value($myriad) = [$shutdown_test];
+    $metaclass->get_field('$services')->value($myriad) = { testing_service => $service_mock };
 
     wait_for_future(Future->needs_all(
         $loop->delay_future(after => 0)->on_ready(sub {

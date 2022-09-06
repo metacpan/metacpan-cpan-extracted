@@ -2,7 +2,7 @@
     # automatically generated file, don't edit
 
     package Number::Phone::Country::Data;
-    $VERSION = '2.20220601185227';
+    $VERSION = '2.20220902220705';
         %Number::Phone::Country::idd_codes = (
     20 => 'EG',
 211 => 'SS',
@@ -382,7 +382,7 @@
 'NZ' => ['64', '00', '0', qr/\A 0(?:0|161) /xms],
 'OM' => ['968', '00', undef, qr/\A 00 /xms],
 'PA' => ['507', '00', undef, qr/\A 00 /xms],
-'PE' => ['51', '191200', '0', qr/\A 19(?:1[124]|77|90)00 /xms],
+'PE' => ['51', '00', '0', qr/\A 00|19(?:1[124]|77|90)00 /xms],
 'PF' => ['689', '00', undef, qr/\A 00 /xms],
 'PG' => ['675', '00', undef, qr/\A 00|140[1-3] /xms],
 'PH' => ['63', '00', '0', qr/\A 00 /xms],
@@ -512,7 +512,9 @@ $Number::Phone::Country::idd_codes{447937} = 'JE';
 $Number::Phone::Country::idd_codes{4477003} = 'JE';
 $Number::Phone::Country::idd_codes{4477007} = 'JE';
 $Number::Phone::Country::idd_codes{4477008} = 'JE';
-$Number::Phone::Country::idd_codes{447797} = 'JE';
+$Number::Phone::Country::idd_codes{4477977} = 'JE';
+$Number::Phone::Country::idd_codes{4477978} = 'JE';
+$Number::Phone::Country::idd_codes{4477979} = 'JE';
 $Number::Phone::Country::idd_codes{5999} = 'CW';
 $Number::Phone::Country::idd_codes{6189162} = 'CC';
 $Number::Phone::Country::idd_codes{6189164} = 'CX';

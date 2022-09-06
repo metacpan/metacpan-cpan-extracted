@@ -1,7 +1,6 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
-use Test::More 0.88; # for done_testing
+use Test::More tests => 65;
 use Test::Differences;
 use Data::Dumper;
 use SQL::Interpol ':all';
@@ -155,5 +154,3 @@ sql_ok q[ 'FROM', [ { a => undef } ] ] =>
 	'FROM (SELECT ? AS a) AS tbl0', undef;
 
 sql_error_ok q[ { some_column => { '1 or 1', '1' } } ], qr/unrecognized HASH value in aggregate/;
-
-done_testing;

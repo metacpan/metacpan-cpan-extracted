@@ -1,37 +1,35 @@
-Router/Resource version 0.21
-============================
+Router::Resource
 
-This library's module, Router::Resource, provides an REST-friendly interface for
-creating routes.
+There are a bunch of path routers on CPAN, but they tend not to be very
+RESTy. A basic idea of a RESTful API is that URIs point to resources and
+the standard HTTP methods indicate the actions to be taken on those
+resources. So to encourage you to think about it that way,
+Router::Resource requires that you declare resources and then the HTTP
+methods that are implemented for those resources.
+
+The rules for matching paths are defined by Router::Simple's routing
+rules, which offer quite a lot of flexibility.
 
 INSTALLATION
 
-To install this module, type the following:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-    perl Build.PL
-    ./Build
-    ./Build test
-    ./Build install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-Or, if you don't have Module::Build installed, type the following:
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-Dependencies
-------------
+COPYRIGHT AND LICENSE
 
-Router::Resource requires the following modules:
+This software is copyright (c) 2011 by David E. Wheeler.
 
-* Test::Builder 0.17
-* XML::LibXML 1.69
-
-Copyright and Licence
----------------------
-
-Copyright (c) 2010-2011 David E. Wheeler. Some Rights Reserved.
-
-This module is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

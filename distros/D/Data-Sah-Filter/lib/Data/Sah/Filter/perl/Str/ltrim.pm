@@ -5,14 +5,18 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 sub meta {
     +{
         v => 1,
         summary => 'Trim whitespaces at the beginning of string',
+        examples => [
+            {value=>'foo'},
+            {value=>' foo ', filtered_value=>'foo '},
+        ],
     };
 }
 
@@ -45,7 +49,7 @@ Data::Sah::Filter::perl::Str::ltrim - Trim whitespaces at the beginning of strin
 
 =head1 VERSION
 
-This document describes version 0.011 of Data::Sah::Filter::perl::Str::ltrim (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
+This document describes version 0.012 of Data::Sah::Filter::perl::Str::ltrim (from Perl distribution Data-Sah-Filter), released on 2022-07-17.
 
 =head1 SYNOPSIS
 
@@ -67,6 +71,11 @@ This document describes version 0.011 of Data::Sah::Filter::perl::Str::ltrim (fr
 
  my $filter = gen_filter([["Str::ltrim"]]);
  my $filtered_value = $filter->($some_data);
+
+=head2 Sample data and filtering results
+
+ "foo" # valid, unchanged
+ " foo " # valid, becomes "foo "
 
 =for Pod::Coverage ^(meta|filter)$
 

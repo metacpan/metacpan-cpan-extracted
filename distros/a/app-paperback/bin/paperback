@@ -32,7 +32,7 @@ Options:
 
 =head1 VERSION
 
-Version 1.14
+Version 1.15
 
 =head1 DESCRIPTION
 
@@ -298,6 +298,8 @@ Half Legal and Quarter Legal. Other sizes give an error message.
 Only PDF v1.4 is supported as input, although many higher-labeled
 PDF files are correctly handled since they are essentially v1.4 PDF
 files stamped as something more modern.
+
+Work has started to add correct processing of v1.5+ PDF files.
 
 =head1 INSTALL
 

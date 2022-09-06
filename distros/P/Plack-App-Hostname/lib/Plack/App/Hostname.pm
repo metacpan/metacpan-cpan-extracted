@@ -1,12 +1,10 @@
-use 5.006;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package Plack::App::Hostname;
-$Plack::App::Hostname::VERSION = '1.001';
-# ABSTRACT: Run multiple apps dispatched by the request Host header
 
-use parent 'Plack::Component';
+our $VERSION = '1.002';
+
+BEGIN { require Plack::Component; our @ISA = 'Plack::Component' }
 use Plack::Util::Accessor qw( custom_matcher missing_header_app default_app );
 
 sub map_hosts_to {

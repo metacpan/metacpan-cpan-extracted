@@ -3,6 +3,9 @@ do { my $x = {
                     'requires' => {
                                     'Alien::Build' => '0.32',
                                     'Alien::Build::MM' => '0.32',
+                                    'Alien::Build::Plugin::Probe::CommandLine' => '0',
+                                    'Alien::bc::GNU' => '0',
+                                    'Alien::cmake3' => '0',
                                     'ExtUtils::MakeMaker' => '6.52'
                                   }
                   },
@@ -34,8 +37,6 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Alien::Base' => '0',
-                                      'Alien::Build::Plugin::Probe::CommandLine' => '0',
-                                      'Alien::cmake3' => '0',
                                       'Path::Tiny' => '0',
                                       'base' => '0',
                                       'namespace::autoclean' => '0',
@@ -53,6 +54,7 @@ do { my $x = {
                                    'Module::Metadata' => '0',
                                    'Test2::V0' => '0',
                                    'Test::Alien' => '0',
+                                   'Test::Alien::Diag' => '0',
                                    'Test::More' => '0'
                                  }
                  }

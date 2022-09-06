@@ -19,8 +19,9 @@ requires:
   perl: '5.006'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Try-Tiny-Tiny
+  license: https://dev.perl.org/licenses/
   repository: https://github.com/ap/Try-Tiny-Tiny.git
-version: '0.004'
+version: '0.005'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2017

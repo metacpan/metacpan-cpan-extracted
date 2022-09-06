@@ -6,7 +6,7 @@ use 5.008004;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Core FFI plugin
-our $VERSION = '2.66'; # VERSION
+our $VERSION = '2.68'; # VERSION
 
 
 sub init
@@ -35,7 +35,7 @@ Alien::Build::Plugin::Core::FFI - Core FFI plugin
 
 =head1 VERSION
 
-version 2.66
+version 2.68
 
 =head1 SYNOPSIS
 

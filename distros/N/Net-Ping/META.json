@@ -9,7 +9,7 @@
       "Mark Gardner <mjgardner@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -44,11 +44,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::CPAN::Meta" : "0.12",
-            "Test::Kwalitee" : "1.20",
             "Test::More" : "0",
-            "Test::Pod" : "1.22",
-            "Test::Pod::Coverage" : "1.04"
+            "Test::Pod" : "1.22"
          }
       }
    },
@@ -63,6 +60,6 @@
          "web" : "https://github.com/rurban/Net-Ping"
       }
    },
-   "version" : "2.74",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "2.75",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

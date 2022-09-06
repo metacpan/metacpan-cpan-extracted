@@ -7,6 +7,7 @@ use Test::Myriad;
 
 use Future;
 use Future::AsyncAwait;
+use Object::Pad qw(:experimental);
 
 my ($ping_service, $pong_service);
 

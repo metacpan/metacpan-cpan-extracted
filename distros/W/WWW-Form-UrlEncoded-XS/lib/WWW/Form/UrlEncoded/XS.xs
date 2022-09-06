@@ -197,8 +197,8 @@ parse_urlencoded(qs)
                 else {
                     f = 1;
                 }
-                mPUSHs(url_decode(aTHX_ src, prev_s, p - prev + prev_s ));
-                mPUSHs(url_decode(aTHX_ src, p - prev + prev_s + f, i ));
+                mXPUSHs(url_decode(aTHX_ src, prev_s, p - prev + prev_s ));
+                mXPUSHs(url_decode(aTHX_ src, p - prev + prev_s + f, i ));
                 prev = &src[i+1];
                 prev_s = i + 1;
             }
@@ -217,14 +217,14 @@ parse_urlencoded(qs)
             else {
                 f = 1;
             }
-            mPUSHs(url_decode(aTHX_ src, prev_s, p - prev + prev_s ));
-            mPUSHs(url_decode(aTHX_ src, p - prev + prev_s + f, i ));
+            mXPUSHs(url_decode(aTHX_ src, prev_s, p - prev + prev_s ));
+            mXPUSHs(url_decode(aTHX_ src, p - prev + prev_s + f, i ));
         }
 
         if ( src_len > 0 ) {
             if ( src[src_len-1] == '&' || src[src_len-1] == ';' ) {
-                mPUSHs(newSVpv("",0));
-                mPUSHs(newSVpv("",0));
+                mXPUSHs(newSVpv("",0));
+                mXPUSHs(newSVpv("",0));
             }
         }
 

@@ -4,7 +4,7 @@ Catalyst::TraitFor::Request::Methods - Add enumerated methods for HTTP requests
 
 # VERSION
 
-version v0.3.2
+version v0.4.0
 
 # SYNOPSIS
 
@@ -85,10 +85,6 @@ The request method is `TRACE`.
 ## is\_patch
 
 The request method is `PATCH`.
-
-## is\_propfind
-
-The request method is `PROPFIND`.
 
 ## is\_unrecognized\_method
 

@@ -2,7 +2,7 @@ package Myriad::Registry;
 
 use Myriad::Class extends => 'IO::Async::Notifier';
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '1.000'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -80,7 +80,7 @@ async method add_service (%args) {
     $batch{$pkg} ||= {};
     $emitter{$pkg} ||= {};
     $receiver{$pkg} ||= {};
-    $log->tracef('Going to load service %s', $service_name);
+    $log->debugf('Adding service %s package: %s', $service_name, $pkg);
     $self->loop->add(
         $srv
     );
@@ -231,7 +231,7 @@ it takes the following args:
 =cut
 
 method make_service_name ($name, $namespace = '') {
-    $name =~ s/^\Q$namespace// if $namespace;
+    $name =~ s/^\Q$namespace// if length $namespace;
     return lc($name) =~ s{::}{.}gr
 }
 
@@ -245,5 +245,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

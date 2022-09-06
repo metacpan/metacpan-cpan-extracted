@@ -29,7 +29,7 @@ do { my $x = {
                                         'Type::Tiny::XS' => '0'
                                       },
                       'requires' => {
-                                      'Exporter' => '0',
+                                      'Exporter' => '5.57',
                                       'PerlX::Maybe' => '0',
                                       'Ref::Util' => '0',
                                       'Safe::Isa' => '1.000008',

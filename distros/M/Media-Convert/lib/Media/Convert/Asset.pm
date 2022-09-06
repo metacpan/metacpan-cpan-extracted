@@ -70,7 +70,7 @@ attributes will be probed from ffprobe output unless noted otherwise.
 
 =cut
 
-use Mojo::JSON qw(decode_json);
+use JSON::MaybeXS qw(decode_json);
 use Media::Convert::CodecMap qw/detect_to_write/;
 
 use Moose;
@@ -299,7 +299,11 @@ sub _probe_videobitrate {
 	if($self->has_reference) {
 		return $self->reference->video_bitrate;
 	}
-	return $self->_get_videodata->{bit_rate};
+	my $bitrate = $self->_get_videodata->{bit_rate};
+	if(defined($bitrate) && (!($bitrate =~ /k/))) {
+		return $bitrate / 1000;
+	}
+	return $bitrate;
 }
 
 =head2 video_minrate
@@ -345,6 +349,27 @@ has 'video_maxrate' => (
 	builder => '_probe_videomaxrate',
 	lazy => 1,
 );
+
+=head2 video_preset
+
+The value for the -preset parameter. Used by some codecs, like av1 (and
+pretty critical there).
+
+=cut
+
+has 'video_preset' => (
+	is => 'rw',
+	builder => '_probe_video_preset',
+	lazy => 1,
+);
+
+sub _probe_video_preset {
+	my $self = shift;
+	if($self->has_reference) {
+		return $self->reference->video_preset;
+	}
+	return undef;
+}
 
 sub _probe_videomaxrate {
 	my $self = shift;
@@ -751,6 +776,9 @@ sub writeopts {
 		}
 		if(defined($self->speed)) {
 			push @opts, ('-speed', $self->speed);
+		}
+		if(defined($self->video_preset)) {
+			push @opts, ('-preset', $self->video_preset);
 		}
 		if($self->has_pass) {
 			push @opts, ('-pass', $self->pass, '-passlogfile', $self->url . '-multipass');

@@ -8,10 +8,10 @@ simple case but will accept a custom match callback to support complex
 scenarios.
 
 One likely "complex" scenario is deployment on a multiprocess forking
-server, where updates to the mapping only take effect per worker
-process. Arranging for all workers to update their mappings in lockstep
-is fiddly but a custom matcher doing lookups against some type of
-IPC-able table is not.
+server, where updates to the mapping only take effect per worker process.
+Arranging for all workers to update their mappings in lockstep is fiddly
+but a custom matcher doing lookups against some type of IPC-able table is
+not.
 
 Instances of this application can be introspected to ask whether a
 particular hostname can be dispatched. This makes it easy to make other
@@ -39,5 +39,5 @@ COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2016 by Aristotle Pagaltzis.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

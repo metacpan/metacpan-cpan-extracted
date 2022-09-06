@@ -4,7 +4,7 @@ Types::Const - Types that coerce references to read-only
 
 # VERSION
 
-version v0.4.1
+version v0.4.2
 
 # SYNOPSIS
 
@@ -46,15 +46,15 @@ This was added in v0.3.0.
 
 # SEE ALSO
 
-[Const::Fast](https://metacpan.org/pod/Const::Fast)
+[Const::Fast](https://metacpan.org/pod/Const%3A%3AFast)
 
-[Type::Tiny](https://metacpan.org/pod/Type::Tiny)
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny)
 
-[Types::Standard](https://metacpan.org/pod/Types::Standard)
+[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard)
 
-[Types::ReadOnly](https://metacpan.org/pod/Types::ReadOnly)
+[Types::ReadOnly](https://metacpan.org/pod/Types%3A%3AReadOnly)
 
-[MooX::Const](https://metacpan.org/pod/MooX::Const)
+[MooX::Const](https://metacpan.org/pod/MooX%3A%3AConst)
 
 # KNOWN ISSUES
 
@@ -73,7 +73,7 @@ The work around for this is to check that a key exists beforehand.
 
 Validating that a complex data-structure is read-only can affect
 performance.  If this is an issue, one workaround is to use
-[Devel::StrictMode](https://metacpan.org/pod/Devel::StrictMode) and only validate data structures during tests:
+[Devel::StrictMode](https://metacpan.org/pod/Devel%3A%3AStrictMode) and only validate data structures during tests:
 
 ```perl
 has bar => (
@@ -115,7 +115,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2020 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

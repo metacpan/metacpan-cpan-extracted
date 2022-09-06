@@ -1,0 +1,67 @@
+NAME
+    Alien::bc::GNU - Find or download and install GNU bc.
+
+SYNOPSIS
+     use Alien::bc::GNU;
+
+     my $atleast_version = Alien::bc::GNU->atleast_version($wanted_version);
+     my $bin_dir = Alien::bc::GNU->bin_dir;
+     my $dist_dir = Alien::bc::GNU->dist_dir;
+     my $exact_version = Alien::bc::GNU->exact_version($wanted_version);
+     my $install_type = Alien::bc::GNU->install_type;
+     my $max_version = Alien::bc::GNU->max_version($wanted_version);
+     my $version = Alien::bc::GNU->version;
+
+DESCRIPTION
+    Some packages insist on using GNU bc tool.
+
+    This package detect system GNU bc tool or install own.
+
+SUBROUTINES/METHODS
+    All methods are inherited from Alien::Base.
+
+CONFIGURATION AND ENVIRONMENT
+    Not yet.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Alien::bc::GNU;
+
+     print 'bin_dir: '.Alien::bc::GNU->bin_dir."\n"
+            if defined Alien::bc::GNU->bin_dir;
+     print 'dist_dir: '.Alien::bc::GNU->dist_dir."\n";
+     print 'install_type: '.Alien::bc::GNU->install_type."\n";
+     print 'version: '.Alien::bc::GNU->version."\n";
+
+     # Output like (share):
+     # bin_dir: ~home/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/auto/share/dist/Alien-bc-GNU/bin
+     # dist_dir: ~home/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/auto/share/dist/Alien-bc-GNU
+     # install_type: share
+     # version: 1.07.1
+
+     # Output like (system):
+     # dist_dir: ~home/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/auto/share/dist/Alien-bc-GNU
+     # install_type: system
+     # version: 1.07.1
+
+DEPENDENCIES
+    Alien::Base.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Alien-bc-GNU>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

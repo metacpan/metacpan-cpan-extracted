@@ -19,7 +19,7 @@ my $check = Media::Convert::Asset->new(url => $output->url);
 ok($check->video_size eq $input->video_size, "The video was generated with the correct output size");
 ok($check->video_codec eq $input->video_codec, "The video was copied correctly");
 ok($check->audio_codec eq $input->audio_codec, "The audio was copied correctly");
-ok(int($check->duration) == int($input->duration), "The output duration is about the same as that of the input");
+ok(int($check->duration) == int($input->duration), "The output duration is about the same as that of the input:" . $check->duration . " vs " . $input->duration);
 unlink($check->url);
 $avsync->audio_delay(1);
 $avsync->run;

@@ -1,5 +1,5 @@
 package JSON::Path;
-$JSON::Path::VERSION = '1.0.1';
+$JSON::Path::VERSION = '1.0.2';
 use strict;
 use warnings;
 
@@ -134,7 +134,7 @@ JSON::Path
 
 =head1 VERSION
 
-version 1.0.1
+version 1.0.2
 
 =head1 SYNOPSIS
 

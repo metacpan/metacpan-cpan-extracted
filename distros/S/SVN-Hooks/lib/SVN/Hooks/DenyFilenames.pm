@@ -1,6 +1,6 @@
 package SVN::Hooks::DenyFilenames;
 # ABSTRACT: Deny some file names.
-$SVN::Hooks::DenyFilenames::VERSION = '1.34';
+$SVN::Hooks::DenyFilenames::VERSION = '1.35';
 use strict;
 use warnings;
 
@@ -98,7 +98,7 @@ SVN::Hooks::DenyFilenames - Deny some file names.
 
 =head1 VERSION
 
-version 1.34
+version 1.35
 
 =head1 SYNOPSIS
 
@@ -172,7 +172,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2022 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

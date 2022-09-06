@@ -1,5 +1,11 @@
 Release history for Pod-Readme-Brief
 
+1.003 Sat 03 Sep 2022
+	- Output width is now overridable
+	- Source =encoding directive (if any) is copied
+	- POD errors are reported loudly on contemporary Pod::Text versions
+	- Updated packaging
+
 1.002 Wed 10 Aug 2022
 	- No functional changes
 	- Packaging fix to stop installing boilerplate.pl

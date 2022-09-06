@@ -4,10 +4,11 @@ package Data::Record::Serialize::Encode::ddump;
 
 use Moo::Role;
 
-our $VERSION = '0.34';
+our $VERSION = '1.04';
 
+use Scalar::Util;
 use Data::Dumper;
-
+use Data::Record::Serialize::Error { errors => ['::parameter'] }, -all;
 use namespace::clean;
 
 sub _needs_eol { 1 }
@@ -17,12 +18,73 @@ sub _needs_eol { 1 }
 
 
 
+
+
+has ddump => (
+    is      => 'lazy',
+    isa     => sub { Scalar::Util::blessed $_[0] && $_[0]->isa( 'Data::Dumper' ) },
+    builder => sub {
+        Data::Dumper->new( [] );
+    },
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+has dd_config => (
+    is  => 'ro',
+    isa => sub {
+        ref $_[0] eq 'HASH'
+          or error( '::parameter' => q{'config' parameter  must be a hashref'} );
+    },
+    default => sub { {} },
+);
+
+
+
+
+
+
 sub encode {
-    shift;
-    local $Data::Dumper::Terse = 1;
-    local $Data::Dumper::Trailingcomma = 1;
-    Data::Dumper::Dumper( @_ ) . ",\n";
+    my $self = shift;
+    $self->ddump->Values( \@_ )->Dump . ",";
 }
+
+around BUILD => sub {
+    my ( $orig, $self) = ( shift, shift );
+
+    $orig->( $self, @_);
+
+    my $ddump  = $self->ddump;
+    my %config = (
+        %{ $self->dd_config },
+        Terse         => 1,
+        Trailingcomma => 1
+    );
+
+    for my $mth ( keys  %config ) {
+        my $code = $ddump->can( $mth )
+          or error( '::parameter', "$mth is not a Data::Dumper configuration variable" );
+        $code->( $ddump, $config{$mth});
+    }
+    return;
+};
+
+
+
+
+
+
+
 
 with 'Data::Record::Serialize::Role::Encode';
 
@@ -42,7 +104,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory Trailingcomma
 
 =head1 NAME
 
@@ -50,7 +112,7 @@ Data::Record::Serialize::Encode::ddump - encoded a record using Data::Dumper
 
 =head1 VERSION
 
-version 0.34
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -69,12 +131,31 @@ L<Data::Dumper>.  The resultant encoding may be decoded via
 
 It performs the L<Data::Record::Serialize::Role::Encode> role.
 
+=head1 CLASS METHODS
+
+=head2 new
+
+This role adds two named arguments to the constructor, L</ddump> and
+L</config>, which mirror the added object attributes.
+
+=head1 ATTRIBUTES
+
+=head2 ddump
+
+The L<Data::Dumper> object. It will be constructed if not provided to
+the constructor.
+
+=head2 dd_config
+
+Configuration data for the L</ddump> L<Data::Dumper> object.  Hash
+keys are the names of L<Data::Dumper> configuration variables, without
+the preceding C<Data::Dumper::> prefix.  Be careful to ensure that the
+resultant output is a (comma separated) list of structures which can be
+C<eval>'ed.
+
+B<Terse> and B<Trailingcomma> are always set.
+
 =for Pod::Coverage encode
-
-=head1 INTERFACE
-
-There are no additional attributes which may be passed to
-L<< Data::Record::Serialize::new|Data::Record::Serialize/new >>.
 
 =head1 SUPPORT
 

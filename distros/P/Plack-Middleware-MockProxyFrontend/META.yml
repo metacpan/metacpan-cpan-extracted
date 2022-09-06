@@ -2,29 +2,32 @@
 abstract: 'virtualhost-aware PSGI app developer tool'
 author:
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
-build_requires:
-  Test::More: 0
-  strict: 0
-configure_requires:
-  ExtUtils::MakeMaker: 0
+build_requires: {}
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Plack-Middleware-MockProxyFrontend
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  HTTP::Server::PSGI: 0
-  IO::Socket::SSL: 0
-  Plack::Middleware: 0
-  Plack::Util: 0
-  Plack::Util::Accessor: 0
-  URI::Split: 0
-  parent: 0
-  perl: 5.014
-  warnings: 0
+  HTTP::Server::PSGI: '0'
+  IO::Socket::SSL: '0'
+  Plack::Middleware: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  URI::Split: '0'
+  perl: '5.014'
 resources:
-  bugtracker: https://github.com/ap/Plack-Middleware-MockProxyFrontend/issues
-  repository: git://github.com/ap/Plack-Middleware-MockProxyFrontend.git
-version: 0.003
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Plack-Middleware-MockProxyFrontend
+  license: https://dev.perl.org/licenses/
+  repository: https://github.com/ap/Plack-Middleware-MockProxyFrontend.git
+version: '0.005'
+x_copyright:
+  holder: 'Aristotle Pagaltzis'
+  year: 2015
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

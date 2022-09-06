@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 sub meta {
     +{
@@ -18,6 +18,12 @@ sub meta {
                 schema => 'ufloat*',
             },
         },
+        examples => [
+            {value=>1, filtered_value=>1},
+            {value=>-1.1, filtered_value=>-1},
+            {value=>1.1, filtered_value=>2},
+            {value=>1.1, filter_args=>{nearest=>0.5}, filtered_value=>1.5},
+        ],
     };
 }
 
@@ -54,7 +60,7 @@ Data::Sah::Filter::perl::Float::ceil - Round number to the nearest integer (or "
 
 =head1 VERSION
 
-This document describes version 0.011 of Data::Sah::Filter::perl::Float::ceil (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
+This document describes version 0.012 of Data::Sah::Filter::perl::Float::ceil (from Perl distribution Data-Sah-Filter), released on 2022-07-17.
 
 =head1 SYNOPSIS
 
@@ -76,6 +82,13 @@ This document describes version 0.011 of Data::Sah::Filter::perl::Float::ceil (f
 
  my $filter = gen_filter([["Float::ceil"]]);
  my $filtered_value = $filter->($some_data);
+
+=head2 Sample data and filtering results
+
+ 1 # valid, unchanged
+ -1.1 # valid, becomes -1
+ 1.1 # valid, becomes 2
+ 1.1 # filtered with args {nearest=>0.5}, valid, becomes 1.5
 
 =for Pod::Coverage ^(meta|filter)$
 

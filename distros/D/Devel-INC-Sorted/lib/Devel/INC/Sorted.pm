@@ -1,4 +1,4 @@
-package Devel::INC::Sorted; # git description: Devel-INC-Sorted-0.02-7-geee6b42
+package Devel::INC::Sorted; # git description: v0.03-5-g064f0d2
 # ABSTRACT: Keep your hooks in the beginning of @INC
 
 use base 'Tie::Array';
@@ -6,13 +6,11 @@ use base 'Tie::Array';
 use strict;
 use warnings;
 
-use sort 'stable';
-
 use Exporter;
 use Scalar::Util qw(blessed reftype);
 use Tie::RefHash;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @EXPORT_OK = qw(inc_add_floating inc_float_entry inc_unfloat_entry untie_inc);
 
@@ -169,7 +167,7 @@ Devel::INC::Sorted - Keep your hooks in the beginning of @INC
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -229,11 +227,21 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge
+=for stopwords Karen Etheridge José Joaquín Atria
+
+=over 4
+
+=item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+José Joaquín Atria <jjatria@gmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENCE
 

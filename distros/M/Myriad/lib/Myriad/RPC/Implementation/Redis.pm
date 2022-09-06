@@ -2,7 +2,7 @@ package Myriad::RPC::Implementation::Redis;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '1.000'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -46,6 +46,7 @@ has $rpc_list;
 method rpc_list { $rpc_list }
 
 has $running;
+has $processing;
 
 sub stream_name_from_service ($service, $method) {
     return RPC_PREFIX . ".$service.". RPC_SUFFIX . "/$method"
@@ -56,6 +57,7 @@ method configure (%args) {
     $whoami = hostname();
     $group_name = 'processors';
     $rpc_list //= [];
+    $processing //= {};
 
     $self->next::method(%args);
 }
@@ -83,13 +85,51 @@ async method stop () {
 
 async method create_group ($rpc) {
     unless ($rpc->{group}) {
+        await $self->check_pending($rpc);
         await $self->redis->create_group($rpc->{stream}, $self->group_name, '$', 1);
         $rpc->{group} = 1;
     }
 }
 
+async method check_pending ($rpc) {
+    my $done = 0;
+    while ( !$done && !$rpc->{group}) {
+        my @items = await $self->redis->pending(stream => $rpc->{stream}, group => $self->group_name, client => $self->whoami);
+        $done = 1 if @items < 1;
+        $log->tracef('Pending messages in stream: %s | Done: %s', \@items, $done);
+
+        await $self->stream_items_messages($rpc, @items);
+    }
+}
+
+async method stream_items_messages ($rpc, @items) {
+
+    for my $item (@items) {
+        next unless $item->{data}->@* || exists $processing->{$item->{id}};
+        push $item->{data}->@*, ('transport_id', $item->{id});
+        $processing->{$rpc->{stream}}->{$item->{id}} = $self->loop->new_future(label => "rpc::response::$rpc->{stream}::$item->{id}");
+        try {
+            my $message = Myriad::RPC::Message::from_hash($item->{data}->@*);
+            $log->tracef('Passing message: %s to: %s', $message, $rpc->{sink}->label);
+            if ($message->passed_deadline) {
+                $log->tracef('Skipping message %s because deadline is due - deadline: %s now: %s',
+                    $message->transport_id, $message->deadline, time);
+                await $self->drop($rpc->{stream}, $item->{id});
+                next;
+            }
+            $rpc->{sink}->emit($message);
+        } catch ($error) {
+            $log->tracef("error while parsing the incoming messages: %s", $error->message);
+            await $self->drop($rpc->{stream}, $item->{id});
+        }
+    }
+    await Future->needs_all(values $processing->{$rpc->{stream}}->%*);
+    $processing->{$rpc->{stream}} = {};
+}
+
 async method listen () {
     return $running //= (async sub {
+        $log->tracef('Start listening to (%d) RPC streams', scalar($self->rpc_list->@*));
         await &fmap_void($self->$curry::curry(async method ($rpc) {
             await $self->create_group($rpc);
 
@@ -99,17 +139,8 @@ async method listen () {
                     group => $self->group_name,
                     client => $self->whoami
                 );
+                await $self->stream_items_messages($rpc, @items);
 
-                for my $item (@items) {
-                    push $item->{data}->@*, ('transport_id', $item->{id});
-                    try {
-                        my $message = Myriad::RPC::Message::from_hash($item->{data}->@*);
-                        $rpc->{sink}->emit($message);
-                    } catch ($error) {
-                        $log->tracef("error while parsing the incoming messages: %s", $error->message);
-                        await $self->drop($rpc->{stream}, $_->{id});
-                    }
-                }
             }
         }), foreach => [$self->rpc_list->@*], concurrent => scalar $self->rpc_list->@*);
     })->();
@@ -120,6 +151,7 @@ async method reply ($service, $message) {
     try {
         await $self->redis->publish($message->who, $message->as_json);
         await $self->redis->ack($stream, $self->group_name, $message->transport_id);
+        $processing->{$stream}->{$message->transport_id}->done('published');
     } catch ($e) {
         $log->warnf("Failed to reply to client due: %s", $e);
         return;
@@ -137,8 +169,9 @@ async method reply_error ($service, $message, $error) {
 }
 
 async method drop ($stream, $id) {
-    $log->tracef("Going to drop message: %s", $id);
+    $log->tracef("Going to drop message ID: %s on stream: %s", $id, $stream);
     await $self->redis->ack($stream, $self->group_name, $id);
+    $processing->{$stream}->{$id}->done('published');
 }
 
 async method has_pending_requests ($service) {
@@ -163,5 +196,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

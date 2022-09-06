@@ -5,14 +5,12 @@ use Cwd;
 use File::Share;
 use Hash::Merge 'merge';
 use IO::All;
-use JSON;
 use Template::Toolkit::Simple;
 use Zilla::Dist;
 
-my ($template, $target, $json) = @ARGV;
+my ($template, $target) = @ARGV;
 
 $target ||= $template;
-$json ||= '{}';
 
 if (-e "pkg/$template") {
   my $text = io->file("pkg/$template")->all;

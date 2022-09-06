@@ -15,7 +15,8 @@ use Pod::Usage;
 use POSIX qw(strftime);
 use Ref::Util qw(is_ref is_arrayref is_hashref);
 use Time::HiRes qw(sleep time);
-use YAML;
+use YAML::XS;
+local $YAML::XS::Boolean = "JSON::PP";
 
 #------------------------------------------------------------------------#
 # Argument Parsing
@@ -650,8 +651,12 @@ sub display_aggregations {
                 }
                 if(exists $agg->{by} ) {
                     my $by = delete $agg->{by};
-                    if( exists $by->{value} ) {
-                        unshift @out, $by->{value};
+                    if( exists $by->{value_as_string} ) {
+                        unshift @out, $by->{value_as_string};
+                    }
+                    elsif( exists $by->{value} ) {
+                        my $v = $by->{value} =~ /^\d+\.\d+$/ ? sprintf($CONFIG{decimal_format}, $by->{value}) : $by->{value};
+                        unshift @out, $v;
                     }
                 }
                 # Handle the --with elements
@@ -677,8 +682,13 @@ sub display_aggregations {
                             $subaggs{$k} = \@sub if @sub;
                         }
                         # Simple Numeric Aggs
+                        elsif( exists $agg->{$k}{value_as_string} ) {
+                            $subaggs{$k} = [ [ $agg->{$k}{value_as_string} ] ];
+                        }
                         elsif( exists $agg->{$k}{value} ) {
-                            $subaggs{$k} = [ [ $agg->{$k}{value} ] ];
+                            my $v = $agg->{$k}{value} =~ /^\d+\.\d+$/ ? sprintf $CONFIG{decimal_format}, $agg->{$k}{value}
+                                                                      : $agg->{$k}{value};
+                            $subaggs{$k} = [ [ $v ] ];
                         }
                         # Percentiles
                         elsif( exists $agg->{$k}{values} ) {
@@ -688,8 +698,8 @@ sub display_aggregations {
                             }
                             $subaggs{$k} = [ \@pcts ];
                         }
-                        # Statistics
-                        elsif( exists $agg->{$k}{avg} ) {
+                        else {
+                            # Statistics
                             my @stats;
                             my %alias = qw( variance var std_deviation stdev );
                             foreach my $stat (qw(count min avg max sum variance std_deviation)) {
@@ -698,7 +708,7 @@ sub display_aggregations {
                                                                     : $agg->{$k}{$stat};
                                 push @stats, $alias{$stat} || $stat => $v;
                             }
-                            $subaggs{$k} = [ \@stats ];
+                            $subaggs{$k} = [ \@stats ] if @stats;
                         }
                     }
                 }
@@ -739,7 +749,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 8.3
+version 8.4
 
 =head1 SYNOPSIS
 
@@ -785,8 +795,12 @@ From App::ElasticSearch::Utilities:
     --port          HTTP port for your cluster
     --proto         Defaults to 'http', can also be 'https'
     --http-username HTTP Basic Auth username
-    --http-password HTTP Basic Auth password (if not specified, and --http-user is, you will be prompted)
     --password-exec Script to run to get the users password
+    --insecure      Don't verify TLS certificates
+    --cacert        Specify the TLS CA file
+    --capath        Specify the directory with TLS CAs
+    --cert          Specify the path to the client certificate
+    --key           Specify the path to the client private key file
     --noop          Any operations other than GET are disabled, can be negated with --no-noop
     --timeout       Timeout to ElasticSearch, default 10
     --keep-proxy    Do not remove any proxy settings from %ENV
@@ -1269,6 +1283,58 @@ Which would expand to:
 
 This option will iterate through the whole file and unique the elements of the list.  They will then be transformed into
 an appropriate L<terms query|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html>.
+
+=head3 Wildcards
+
+We can also have a group of wildcard or regexp in a file:
+
+    $ cat wildcards.dat
+    *@gmail.com
+    *@yahoo.com
+
+To enable wildcard parsing, prefix the filename with a C<*>.
+
+    es-search.pl to_address:*wildcards.dat
+
+Which expands the query to:
+
+    {
+      "bool": {
+        "minimum_should_match":1,
+        "should": [
+           {"wildcard":{"to_outbound":{"value":"*@gmail.com"}}},
+           {"wildcard":{"to_outbound":{"value":"*@yahoo.com"}}}
+        ]
+      }
+    }
+
+No attempt is made to verify or validate the wildcard patterns.
+
+=head3 Regular Expressions
+
+If you'd like to specify a file full of regexp, you can do that as well:
+
+    $ cat regexp.dat
+    .*google\.com$
+    .*yahoo\.com$
+
+To enable regexp parsing, prefix the filename with a C<~>.
+
+    es-search.pl to_address:~regexp.dat
+
+Which expands the query to:
+
+    {
+      "bool": {
+        "minimum_should_match":1,
+        "should": [
+          {"regexp":{"to_outbound":{"value":".*google\\.com$"}}},
+          {"regexp":{"to_outbound":{"value":".*yahoo\\.com$"}}}
+        ]
+      }
+    }
+
+No attempt is made to verify or validate the regexp expressions.
 
 =head2 App::ElasticSearch::Utilities::QueryString::Nested
 

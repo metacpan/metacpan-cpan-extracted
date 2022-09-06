@@ -8,8 +8,8 @@ Linux::Clone - an interface to the linux clone, unshare, setns, pivot_root and k
 
 =head1 DESCRIPTION
 
-This module exposes the linux clone(2), unshare(2) and related syscalls to
-Perl.
+This module exposes the linux clone(2), unshare(2) and some related
+syscalls to Perl.
 
 =over 4
 
@@ -32,13 +32,15 @@ for more info on what they do:
    Linux::Clone::NEWIPC
    Linux::Clone::NEWNET
    Linux::Clone::NEWCGROUP
+   Linux::Clone::NEWTIME
 
 Example: unshare the network namespace and prove that by calling ifconfig,
-showing only an unconfigured lo interface.
+showing only the unconfigured lo interface.
 
    Linux::Clone::unshare Linux::Clone::NEWNET
       and "unshare: $!";
-   system "ifconfig -a";
+   Linux::Clone::configure_loopback;
+   system "ifconfig";
 
 Example: unshare the network namespace, initialise the loopback interface,
 create a veth interface pair, put one interface into the parent processes
@@ -51,13 +53,11 @@ interface with 192.168.99.2 -> 192.168.99.1 and start a shell.
    Linux::Clone::unshare Linux::Clone::NEWNET
      and "unshare: $!";
 
+   Linux::Clone::configure_loopback;
+
    my $ppid = getppid;
 
    system "
-      # configure loopback interface
-      ip link set lo up
-      ip route add 127.0.0.0/8 dev lo
-
       # create veth pair
       ip link add name veth_master type veth peer name veth_slave
 
@@ -90,7 +90,7 @@ only visible to the current process.
    Linux::Clone::unshare Linux::Clone::NEWNS
       and die "unshare: $!";
 
-   # now bind-mount /lib over /etc and ls -l /etc - scary
+   # now bind-mount /lib over /etc and ls -l /etc - looks scary
    system "mount -n --bind /lib /etc";
    system "ls -l /etc";
 
@@ -125,9 +125,11 @@ to the clone(2) manual page.
    Linux::Clone::PARENT_SETTID  (not yet implemented)
    Linux::Clone::CHILD_SETTID   (not yet implemented)
    Linux::Clone::CHILD_CLEARTID (not yet implemented)
+   Linux::Clone::PIDFD          (not yet implemented)
    Linux::Clone::DETACHED
    Linux::Clone::UNTRACED
    Linux::Clone::IO
+   Linux::Clone::CSIGNAL exit signal mask
 
 Note that for practical reasons you basically must not use
 C<Linux::Clone::VM> or C<Linux::Clone::VFORK>, as perl is unlikely to cope
@@ -146,7 +148,7 @@ Calls setns(2) on the file descriptor (or file handle) C<$fh_or_fd>. If
 C<$nstype> is missing, then C<0> is used.
 
 The argument C<$nstype> can be C<0>, C<Linux::Clone::NEWIPC>,
-C<Linux::Clone::NEWNET>, C<Linux::Clone::NEUTS>, C<Linux::Clone::NEWCGROUP>,
+C<Linux::Clone::NEWNET>, C<Linux::Clone::NEWUTS>, C<Linux::Clone::NEWCGROUP>,
 C<Linux::Clone::NEWNS>, C<Linux::Clone::NEWPID> or C<Linux::Clone::NEWUSER>.
 
 =item Linux::Clone::pivot_root $new_root, $old_root
@@ -161,9 +163,25 @@ The following C<$type> constants are available if the kcmp syscall number
 was available during compilation:
 
 C<Linux::Clone::KCMP_FILE>, C<Linux::Clone::KCMP_VM>, C<Linux::Clone::KCMP_FILES>,
-C<Linux::Clone::KCMP_FS>, C<Linux::Clone::KCMP_SIGHAND>, C<Linux::Clone::KCMP_IO> and
-C<Linux::Clone::KCMP_SYSVSEM>.
+C<Linux::Clone::KCMP_FS>, C<Linux::Clone::KCMP_SIGHAND>, C<Linux::Clone::KCMP_IO>,
+C<Linux::Clone::KCMP_SYSVSEM> and C<Linux::Clone::KCMP_EPOLL_TFD>.
 
+=item Linux::Clone::configure_loopback
+
+Configures a working loopback interface (basically, does the equivalent of
+"ifconfig lo up" which automatically adds ipv4/ipv6 addresses and routes),
+which can be useful to get a network namespace going.
+
+Dies on error and returns nothing.
+
+=item C<ioctl> symbols
+
+The following ioctl symbols are also provided by this module (see L<ioctl_ns(8)>).
+
+   Linux::Clone::NS_GET_USERNS
+   Linux::Clone::NS_GET_PARENT
+   Linux::Clone::NS_GET_NSTYPE
+   Linux::Clone::NS_OWNER_UID
 
 =back
 
@@ -174,13 +192,27 @@ package Linux::Clone;
 # use common::sense;
 
 BEGIN {
-   our $VERSION = '1.2';
+   our $VERSION = '1.3';
 
    require XSLoader;
    XSLoader::load (__PACKAGE__, $VERSION);
 }
 
+sub configure_loopback() {
+   siocsifflags "lo"
+      and die "Linux::Clone::configure_looopback: unable to bring up loopback interface: $!\n";
+}
+
 1;
+
+=head1 SEE ALSO
+
+L<IO::AIO> has some related functions, such as C<pidfd_send_signal>, and
+some unrelated functions that might be useful.
+
+L<namspaces(7)>, L<cgroup_namespaces(7)>, L<pid_namespaces(7)>,
+L<user_namespaces(7)>, L<time_namespaces(7)>, L<ip-netns(8)>,
+L<switch_root(8)>, L<ioctl_ns(2)>, L<lsns(8)>Q
 
 =head1 AUTHOR
 

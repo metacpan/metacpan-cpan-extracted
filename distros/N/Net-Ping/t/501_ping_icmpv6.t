@@ -19,6 +19,7 @@ BEGIN {
 }
 
 my $is_devel = $ENV{PERL_CORE} || -d ".git" ? 1 : 0;
+$ENV{TEST_PING6_HOST} = "::1" if $ENV{NO_NETWORK_TESTING};
 if (!Net::Ping::_isroot()) {
     my $file = __FILE__;
     my $lib = $ENV{PERL_CORE} ? '-I../../lib' : '-Mblib';
@@ -59,7 +60,7 @@ SKIP: {
   my $rightip = "2001:4860:4860::8888"; # pingable ip of google's dnsserver
   # for a firewalled ipv6 network try an optional local ipv6 host
   $rightip = $ENV{TEST_PING6_HOST} if $ENV{TEST_PING6_HOST};
-  my $wrongip = "2001:4860:4860::1234"; # non existing ip
+  my $wrongip = "2001:db8::"; # non existing ip
   # diag "Pinging existing IPv6 ";
   my $result = $p->ping($rightip);
   if ($result == 1) {

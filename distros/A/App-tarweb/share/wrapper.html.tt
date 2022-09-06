@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>[% IF archive %][% archive.name %][% ELSE %][% title %][% END %]</title>
+    <style>
+      a {
+        text-decoration: none;
+        color: blue;
+      }
+      a:visited {
+        color: blue;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      body {
+        font-family: 'Droid Serif';
+        margin-top: 80px;
+        margin-left: 30px;
+        margin-right: 30px;
+        margin-bottom: 50px;
+      }
+      div.nx-header-title {
+        position: fixed;
+        top: 0px;
+        left: 20px;
+        width: 100%;
+        font-size: 50px;
+        text-align: left;
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      div.nx-header-flag-1 {
+        background-color: #000000;
+        background: -webkit-gradient(linear, left top, right top, color-stop(0%,#ffffff),
+                                                                  color-stop(100%,#005bbb) );
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        height: 30px;
+        width: 100%;
+        text-align: left;
+      }
+      div.nx-header-flag-2 {
+        background-color: #000000;
+        background: -webkit-gradient(linear, left top, right top, color-stop(0%,#ffffff),
+                                                                  color-stop(100%,#ffd500) );
+        position: fixed;
+        top: 29px;
+        left: 0px;
+        height: 30px;
+        width: 100%;
+        text-align: left;
+      }
+      div.nx-footer {
+        font-size: 10pt;
+        text-align: center;
+        position: fixed;
+        bottom: 0px;
+        left: 0px;
+        height: 40px;
+        width: 100%;
+        background: white;
+      }
+      div.nx-footer p {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        height: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="nx-header-flag-1"></div>
+    <div class="nx-header-flag-2"></div>
+    <div class="nx-header-title"><a href="/">🌻</a> [% IF archive %][% archive.name %][% ELSE %][% title %][% END %]</div>
+    [% content %]
+    <div class="nx-footer">
+      <p>Copyright &copy; 2022 Graham Ollis</p>
+    </div>
+  </body>
+</html>

@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-use HTTP::Request::Common;
+use HTTP::Request::Common 6.22;
 use HTTP::Status qw/ :constants status_message /;
 use Plack::Builder;
 use Plack::Response;

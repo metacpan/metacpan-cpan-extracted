@@ -1,0 +1,56 @@
+---
+abstract: 'Moose but with less typing'
+author:
+  - 'Christian Walde <walde.christian@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  if: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Muuse
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Muuse:
+    file: lib/Muuse.pm
+    version: '1.222490'
+  Muuse::Role:
+    file: lib/Muuse/Role.pm
+    version: '1.222490'
+requires:
+  Import::Into: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  MooseX::ShortHas: '0'
+  perl: '5.006'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/wchristian/Muuse/issues
+  homepage: https://github.com/wchristian/Muuse
+  repository: https://github.com/wchristian/Muuse.git
+version: '1.222490'
+x_contributors:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: CC0-1.0

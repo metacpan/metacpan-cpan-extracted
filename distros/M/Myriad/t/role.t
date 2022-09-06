@@ -12,12 +12,13 @@ BEGIN {
 use Test::More;
 use Test::Fatal;
 use Test::Deep;
+use Object::Pad qw(:experimental);
 
 is(exception {
     eval <<'EOS' or die $@;
     package Example::Role {
         use Myriad::Role;
-        requires example;
+        method example;
     }
 
     package Example::Class {
@@ -27,12 +28,9 @@ is(exception {
     }
     1
 EOS
-}, undef, 'can create a class');
+}, undef, 'can create a class') or die explain $@;
 my $obj = new_ok('Example::Class');
 is($obj->example, $obj, 'can call a method');
-TODO: {
-    local $TODO = 'https://rt.cpan.org/Ticket/Display.html?id=137952';
-    cmp_deeply([ map { $_->name } Object::Pad::MOP::Class->for_class('Example::Class')->roles ], bag('Example::Role'), 'have expected rôle');
-}
+cmp_deeply([ map { $_->name } Object::Pad::MOP::Class->for_class('Example::Class')->roles ], bag('Example::Role'), 'have expected rôle');
 done_testing;
 

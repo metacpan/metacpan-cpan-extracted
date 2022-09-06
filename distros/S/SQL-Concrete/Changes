@@ -1,5 +1,9 @@
 Release history for SQL-Concrete
 
+1.004 Sat 03 Sep 2022
+	- No functional changes
+	- Updated packaging and package metadata
+
 1.003 Sat 10 Jan 2015
 	- No functional changes
 	- No longer contains INSTALL file with install-as-root instructions

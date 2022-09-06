@@ -79,27 +79,23 @@
    "provides" : {
       "Password::OWASP" : {
          "file" : "lib/Password/OWASP.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Password::OWASP::AbstractBase" : {
          "file" : "lib/Password/OWASP/AbstractBase.pm",
-         "version" : "0.004"
-      },
-      "Password::OWASP::AbstractBaseX" : {
-         "file" : "lib/Password/OWASP/AbstractBaseX.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Password::OWASP::Argon2" : {
          "file" : "lib/Password/OWASP/Argon2.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Password::OWASP::Bcrypt" : {
          "file" : "lib/Password/OWASP/Bcrypt.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Password::OWASP::Scrypt" : {
          "file" : "lib/Password/OWASP/Scrypt.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -110,7 +106,7 @@
          "web" : "https://gitlab.com/waterkip/p5-password-owasp"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "BSD"

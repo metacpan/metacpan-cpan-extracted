@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
-    "HTTP::Request::Common" => 0,
+    "HTTP::Request::Common" => "6.22",
     "Module::Metadata" => 0,
     "Plack::Builder" => 0,
     "Plack::Middleware::ContentLength" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::Differences" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.2.0",
+  "VERSION" => "v0.2.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Spec" => 0,
-  "HTTP::Request::Common" => 0,
+  "HTTP::Request::Common" => "6.22",
   "HTTP::Status" => 0,
   "Module::Metadata" => 0,
   "Plack::Builder" => 0,

@@ -53,7 +53,7 @@
             "File::Spec" : "0",
             "Hash::Util" : "0",
             "Scalar::Util" : "0",
-            "Sereal::Decoder" : "4.002",
+            "Sereal::Decoder" : "5.000",
             "Test::Deep" : "0",
             "Test::Differences" : "0",
             "Test::LongString" : "0",
@@ -72,6 +72,6 @@
          "url" : "git://github.com/Sereal/Sereal.git"
       }
    },
-   "version" : "4.025",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "5.001",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

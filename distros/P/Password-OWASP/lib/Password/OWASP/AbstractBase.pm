@@ -1,5 +1,5 @@
 package Password::OWASP::AbstractBase;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -10,17 +10,113 @@ use Digest::SHA;
 use Moose::Util::TypeConstraints qw(enum);
 use Try::Tiny;
 
-with 'Password::OWASP::AbstractBaseX';
+requires qw(ppr);
+
+has cost => (
+    is      => 'ro',
+    isa     => 'Int',
+    default => 12,
+);
+
+has hashing => (
+    is      => 'ro',
+    isa     => enum([qw(sha1 sha256 sha512 none sha384 sha224)]),
+    lazy    => 1,
+    builder => '_build_hashing_default',
+);
+
+has update_method => (
+    is        => 'ro',
+    isa       => 'CodeRef',
+    predicate => 'has_update_method',
+);
+
+sub crypt_password {
+    my $self = shift;
+    my $pass = shift;
+    my $ppr = $self->ppr->new(
+        cost        => $self->cost,
+        salt_random => 1,
+        passphrase  => $self->prehash_password($pass),
+    );
+    return $ppr->as_rfc2307;
+}
 
 sub check_password {
-    my ($self, $given, $want) = @_;
+    my $self  = shift;
+    my $given = shift;
+    my $want  = shift;
+
     my $ok = try {
-        my $ppr = Authen::Passphrase->from_rfc2307($want);
-        return 1 if $ppr->match($self->hash_password($given));
-        return 0;
+        my $ppr = $self->ppr->from_rfc2307($want);
+        return 1 if $ppr->match($self->prehash_password($given));
     };
-    return 1 if $ok || $self->check_legacy_password($given, $want);
+    return 1 if $ok;
+    return 1 if $self->check_legacy_password($given, $want);
     return 0;
+}
+
+sub check_legacy_password {
+    my ($self, $given, $want) = @_;
+
+    my $ok = try {
+        my $ppr = $self->ppr->from_rfc2307($want);
+        return 1 if $ppr->match($self->_prehash_password($given));
+        return 1 if $ppr->match($given);
+    };
+    if ($ok) {
+        $self->update_password($given);
+        return 1;
+    }
+
+    $ok = try {
+        my $ppr = Authen::Passphrase->from_rfc2307($want);
+        return $ppr->match($given);
+    };
+    return 0 unless $ok;
+    $self->update_password($given);
+    return 1;
+}
+
+sub _build_hashing_default {
+    my $self = shift;
+    warn "DEPRECATION: Please supply a hashing default";
+    return 'sha512';
+}
+
+sub prehash_password {
+    my $self = shift;
+    my $pass = shift;
+
+    if ($self->hashing eq 'none') {
+        return $pass;
+    }
+
+    my $sha = Digest::SHA->new($self->hashing);
+    $sha->add($pass);
+    return $sha->b64digest;
+}
+
+sub _prehash_password {
+    my $self = shift;
+    my $pass = shift;
+
+    my $sha = Digest::SHA->new('sha512');
+    $sha->add($pass);
+    return $sha->b64digest;
+}
+
+sub hash_password {
+    my $self = shift;
+    warn "DEPRECATION: Please use prehash_password instead";
+    return $self->prehash_password(@_);
+}
+
+sub update_password {
+    my ($self, $given) = @_;
+    return 0 unless $self->has_update_method;
+    $self->update_method->($self->crypt_password($given));
+    return 1;
 }
 
 1;
@@ -37,7 +133,7 @@ Password::OWASP::AbstractBase - Abstract base class to implement OWASP password 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -46,10 +142,10 @@ version 0.004
 
     with 'Password::OWASP::AbstractBase';
 
+    use Authen::Passphrase::SomeThing
+
     # You need to implement this method
-    sub crypt_password {
-        ...;
-    }
+    sub ppr { 'Authen::Passphrase::SomeThing' }
 
 =head1 DESCRIPTION
 
@@ -64,8 +160,10 @@ This class implements the following methods and attributes.
 
 =item hashing
 
-An enumeration of C<sha1>, C<sha256>, C<sha512>. The latter is the default.
-This is used for the L<Password::OWASP::AbstractBase/hash_password> function.
+An enumeration of C<none>, C<sha1>, C<sha224>, C<sha256>, C<sha384>, C<sha512>.
+The latter is the default. This default will change in the future to C<none>,
+as the new OWASP policy states that prehashing is a security risk.  This is
+used for the L<Password::OWASP::AbstractBase/prehash_password> function.
 
 =item update_method
 
@@ -76,11 +174,6 @@ to update the password via L<Password::OWASP::AbstractBase/update_password>.
 =back
 
 =head1 METHODS
-
-=head2 check_password
-
-Check the user password, returns true or false depending on the correctness of
-the password. The password needs to be in a RFC2307 format.
 
 =head2 check_legacy_password
 
@@ -96,15 +189,29 @@ password is updated in place.
 Update the password if L<Password::OWASP::AbstractBase/update_method> was
 provided.
 
+=head2 prehash_password
+
+Hash the password with the given sha. When hashing is set to C<none>, no hashing
+wil be performed and the password is returned instead of the hash.
+
 =head2 hash_password
 
-Hash the password with the given sha.
+DEPRECATED: This method will be removed in a future release, please use
+L<Password::OWASP::AbstractBase/prehash_password> instead.
+
+=head2 check_password
+
+Check the password against the current password scheme
+
+=head2 crypt_password
+
+Crypt/hash the password for storage
 
 =head1 SEE ALSO
 
-=over
+=head2 OWASP
 
-=item * L<Password::OWASP::AbstractBaseX>
+=over
 
 =item * L<OWASP cheatsheet for password storage|https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Password_Storage_Cheat_Sheet.md>
 

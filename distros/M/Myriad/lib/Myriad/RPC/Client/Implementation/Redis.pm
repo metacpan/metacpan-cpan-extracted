@@ -2,7 +2,7 @@ package Myriad::RPC::Client::Implementation::Redis;
 
 use Myriad::Class extends => qw(IO::Async::Notifier);
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '1.000'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -64,6 +64,7 @@ async method start() {
     })->completed;
 
     $started->done('started');
+    $log->tracef('Started RPC client subscription on %s', $whoami);
 
     await $subscription;
 }
@@ -86,21 +87,20 @@ async method call_rpc($service, $method, %args) {
     try {
         await $self->is_started();
 
+        $log->tracef('Sending rpc::request::%s::%s : %s', $service, $method, $request->as_hash);
         my $stream_name = stream_name_from_service($service, $method);
         $pending_requests->{$message_id} = $pending;
         await $redis->xadd($stream_name => '*', $request->as_hash->%*);
-        $log->tracef('Sent RPC request %s', $request->as_hash);
 
         # The subscription loop will parse the message for us
         my $message = await Future->wait_any($self->loop->timeout_future(after => $timeout), $pending);
 
         return $message->response->{response};
     } catch ($e) {
-        $log->tracef('RPC request failed due: %s', $e);
         if ($e =~ /Timeout/) {
             $e  = Myriad::Exception::RPC::Timeout->new(reason => 'deadline is due');
         } else {
-            $e = Myriad::Exception::InternalError->new(reason => $e) unless blessed $e && $e->isa('Myriad::Exception');
+            $e = Myriad::Exception::InternalError->new(reason => $e) unless blessed $e && $e->does('Myriad::Exception');
         }
         $pending->fail($e);
         delete $pending_requests->{$message_id};
@@ -126,5 +126,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

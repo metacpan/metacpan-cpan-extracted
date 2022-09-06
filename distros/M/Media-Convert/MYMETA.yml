@@ -1,0 +1,29 @@
+---
+abstract: 'a Moose-based library to work with media assets'
+author:
+  - 'Wouter Verhelst <w@uter.be>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Media-Convert
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::ffmpeg: '0'
+  JSON::MaybeXS: '0'
+  Moose: '0'
+  MooseX::Singleton: '0'
+resources:
+  repository: https://salsa.debian.org/wouter/media-convert.git
+version: v1.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

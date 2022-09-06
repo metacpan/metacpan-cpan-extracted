@@ -2,7 +2,7 @@ use strict; use warnings;
 
 package Class::Observable;
 
-our $VERSION = '2.003';
+our $VERSION = '2.004';
 
 use Scalar::Util 'refaddr';
 use Class::ISA;
@@ -654,12 +654,12 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 Chris Winters
 
+Documentation by Chris Winters.
+
 =head1 COPYRIGHT AND LICENSE
 
-This documentation is copyright (c) 2002-2004 Chris Winters.
-
-
 This software is copyright (c) 2021 by Aristotle Pagaltzis.
+Its documentation is copyright (c) 2002–2004 Chris Winters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

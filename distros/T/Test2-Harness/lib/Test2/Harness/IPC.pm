@@ -2,7 +2,7 @@ package Test2::Harness::IPC;
 use strict;
 use warnings;
 
-our $VERSION = '1.000127';
+our $VERSION = '1.000128';
 
 use POSIX;
 
@@ -255,6 +255,15 @@ sub _wait_done {
     return 0 if $params->{cat};
 
     return 1;
+}
+
+sub watch_pid {
+    my $self = shift;
+    my ($pid) = @_;
+
+    my $proc = Test2::Harness::IPC::Process->new(pid => $pid);
+
+    return $self->watch($proc);
 }
 
 sub watch {

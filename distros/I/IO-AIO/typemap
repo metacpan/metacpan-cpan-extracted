@@ -10,6 +10,9 @@ off_t           T_VAL64
 aio_rfd		T_AIO_RFD
 aio_wfd		T_AIO_WFD
 
+octet_string		T_STR8
+octet_string_ornull	T_STR8_ORNULL
+
 INPUT
 
 T_AIO
@@ -33,6 +36,12 @@ T_AIO_RFD
 
 T_AIO_WFD
 	$var = s_fileno_croak ($arg, 1);
+
+T_STR8
+	$var = SvPVbyte_nolen ($arg);
+
+T_STR8_ORNULL
+	$var = SvOK ($arg) ? SvPVbyte_nolen ($arg) : 0;
 
 OUTPUT
 

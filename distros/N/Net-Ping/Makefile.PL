@@ -52,10 +52,7 @@ WriteMakefile(
     'Time::HiRes' => 0,
   },
   TEST_REQUIRES => {
-    'Test::CPAN::Meta'    => '0.12',
     'Test::Pod'           => '1.22',
-    'Test::Pod::Coverage' => '1.04',
-    'Test::Kwalitee'      => '1.20',
     'Test::More'          => 0,
   },
   INSTALLDIRS => ($ENV{PERL_CORE} ? 'perl' : 'site'),
@@ -76,4 +73,3 @@ release : dist
 	git push --tags
 "
 }
-

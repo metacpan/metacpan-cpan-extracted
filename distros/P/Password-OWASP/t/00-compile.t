@@ -6,12 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Password/OWASP.pm',
     'Password/OWASP/AbstractBase.pm',
-    'Password/OWASP/AbstractBaseX.pm',
     'Password/OWASP/Argon2.pm',
     'Password/OWASP/Bcrypt.pm',
     'Password/OWASP/Scrypt.pm'

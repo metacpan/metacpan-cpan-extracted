@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 sub meta {
     +{
@@ -21,6 +21,10 @@ _
         might_fail => 1,
         args => {
         },
+        examples => [
+            {value=>1, valid=>0},
+            {value=>-1.1, valid=>1},
+        ],
     };
 }
 
@@ -52,7 +56,7 @@ Data::Sah::Filter::perl::Float::check_has_fraction - Check that a floating point
 
 =head1 VERSION
 
-This document describes version 0.011 of Data::Sah::Filter::perl::Float::check_has_fraction (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
+This document describes version 0.012 of Data::Sah::Filter::perl::Float::check_has_fraction (from Perl distribution Data-Sah-Filter), released on 2022-07-17.
 
 =head1 SYNOPSIS
 
@@ -75,6 +79,11 @@ This document describes version 0.011 of Data::Sah::Filter::perl::Float::check_h
  my $filter = gen_filter([["Float::check_has_fraction"]]);
  # $errmsg will be empty/undef when filtering succeeds
  my ($errmsg, $filtered_value) = $filter->($some_data);
+
+=head2 Sample data and filtering results
+
+ 1 # INVALID (Number must have fraction), unchanged
+ -1.1 # valid, unchanged
 
 =head1 DESCRIPTION
 

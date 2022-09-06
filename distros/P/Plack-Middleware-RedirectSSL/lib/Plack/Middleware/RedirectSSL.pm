@@ -1,10 +1,10 @@
 use 5.006; use strict; use warnings;
 
 package Plack::Middleware::RedirectSSL;
-$Plack::Middleware::RedirectSSL::VERSION = '1.301';
-# ABSTRACT: force all requests to use in-/secure connections
 
-use parent 'Plack::Middleware';
+our $VERSION = '1.302';
+
+BEGIN { require Plack::Middleware; our @ISA = 'Plack::Middleware' }
 
 use Plack::Util ();
 use Plack::Util::Accessor qw( ssl hsts_header );
@@ -118,10 +118,6 @@ __END__
 =head1 NAME
 
 Plack::Middleware::RedirectSSL - force all requests to use in-/secure connections
-
-=head1 VERSION
-
-version 1.301
 
 =head1 SYNOPSIS
 

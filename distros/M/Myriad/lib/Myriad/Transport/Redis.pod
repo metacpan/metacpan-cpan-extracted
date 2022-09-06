@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Myriad::Transport::Redis
 at lib/Myriad/Transport/Redis.pm
@@ -86,7 +85,21 @@ Takes the following named parameters:
 
 =back
 
-Returns a L<Ryu::Source> for the pending items in this stream.
+Returns the pending items in this stream.
+
+=head2 create_stream
+
+Creates a Redis stream.
+Note that there is no straight way to do that in Redis
+without creating a group or adding an event.
+To overcome this it will create a group with MKSTREAM option
+Then destroy that init consumer group.
+
+=over 4
+
+=item * C<stream> - name of the stream we want to create.
+
+=back
 
 =head2 create_group
 
@@ -102,6 +115,18 @@ It'll also send the MKSTREAM option to create the stream if it doesn't exist.
 
 =item * C<start_from> - The id of the message that is going to be considered the start of the stream for this group's point of view
 by default it's C<$> which means the last message.
+
+=back
+
+=head2 remove_group
+
+Delete a Redis consumer group.
+
+=over 4
+
+=item * C<stream> - The name of the stream group belongs to.
+
+=item * C<group> - The consumer group name.
 
 =back
 
@@ -199,5 +224,5 @@ Deriv Group Services Ltd. C<DERIV@cpan.org>
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

@@ -1,3 +1,9 @@
+0.1.11 Sat Sep  3 10:33:43 AM PDT 2022
+ - Simpler way for shared Makefile to find its path
+
+0.1.10 Sat Sep  3 10:28:26 AM PDT 2022
+ - Applied https://github.com/ingydotnet/zilla-dist-pm/pull/59 perlpunk++
+
 0.1.9 Sun 24 Jul 2022 07:22:47 AM PDT
  - share/Makefile patches
 

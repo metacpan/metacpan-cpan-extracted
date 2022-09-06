@@ -143,8 +143,9 @@ sub render {
 	    }
 	}
 	else {
-	    printf("%.2f %.2f \"%s\" %s\n",
+	    printf("%.2f %.2f %.2f \"%s\" %s\n",
 		   $x, $y-$fragment->{base}-$bl,
+		   $font->width($fragment->{text}) * ($fragment->{size} || $self->{_currentsize}),
 		   $fragment->{text},
 		   join(" ", $fragment->{font}->{family},
 			$fragment->{font}->{style},
@@ -157,6 +158,13 @@ sub render {
 		  ) if 0;
 	    my $t = $fragment->{text};
 	    if ( $t ne "" ) {
+
+		# See ChordPro issue 240.
+		if ( $font->issymbol && $font->is_standard ) {
+		    # This enables byte access to these symbol fonts.
+		    utf8::downgrade( $t, 1 );
+		}
+
 		my $y = $y-$fragment->{base}-$bl;
 		my $sz = $fragment->{size} || $self->{_currentsize};
 		my $w = $font->width($t) * $sz;

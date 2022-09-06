@@ -20,11 +20,15 @@ my %WriteMakefileArgs = (
     "List::Compare" => 0,
     "List::Util" => 0,
     "Moose" => 0,
+    "Scalar::Util" => 0,
     "Types::Standard" => 0
   },
-  "VERSION" => "1.222450",
+  "TEST_REQUIRES" => {
+    "Test2::V0" => 0
+  },
+  "VERSION" => "1.222451",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
@@ -34,6 +38,8 @@ my %FallbackPrereqs = (
   "List::Compare" => 0,
   "List::Util" => 0,
   "Moose" => 0,
+  "Scalar::Util" => 0,
+  "Test2::V0" => 0,
   "Types::Standard" => 0
 );
 

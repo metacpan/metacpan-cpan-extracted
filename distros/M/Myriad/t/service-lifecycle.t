@@ -34,9 +34,9 @@ subtest 'It should throw if it failed to find required config' => sub {
     };
 
     my $myriad = get_myriad;
-    wait_for { $myriad->configure_from_argv(service => 'Should::Fail') };
+    $myriad->configure_from_argv(service => 'Should::Fail')->get();
     like( exception { $myriad->run->get },
-        qr/A required configueration key was not set/,
+        qr/A required configuration key was not set/,
         'exception has been thrown'
     );
 
@@ -54,7 +54,7 @@ subtest 'API should be available on startup' => sub {
     };
 
     my $myriad = get_myriad;
-    wait_for { $myriad->configure_from_argv(service => 'Dummy::Service') };
+    $myriad->configure_from_argv(service => 'Dummy::Service')->get;
     lives_ok { $myriad->run->get };
 };
 
@@ -76,7 +76,7 @@ subtest 'diagnostics should be called after startup' => sub {
     };
 
     my $myriad = get_myriad;
-    wait_for { $myriad->configure_from_argv(service => 'Diag::Test') };
+    $myriad->configure_from_argv(service => 'Diag::Test')->get;
     lives_ok { $myriad->run->get };
 };
 

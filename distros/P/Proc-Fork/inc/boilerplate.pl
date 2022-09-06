@@ -2,7 +2,7 @@ use strict; use warnings;
 
 use CPAN::Meta;
 use Software::LicenseUtils 0.103011;
-use Pod::Readme::Brief 1.001;
+use Pod::Readme::Brief 1.003;
 
 sub slurp { open my $fh, '<', $_[0] or die "Couldn't open $_[0] to read: $!\n"; local $/; readline $fh }
 sub trimnl { s/\A\s*\n//, s/\s*\z/\n/ for @_; wantarray ? @_ : $_[-1] }
@@ -24,18 +24,20 @@ my $license = do {
 	$class->new( $meta->custom( 'x_copyright' ) );
 };
 
-my $old_notice = "This documentation is copyright (c) 2002 by Eric J. Roode.\n";
+sub add_old_notice { my $old_notice = <<''; $_[0] =~ s/\n/\n$old_notice/; $_[0] }
+Its documentation is copyright (c) 2002 by Eric J. Roode.
 
-$file{'LICENSE'} = $old_notice . trimnl $license->fulltext;
+$file{'LICENSE'} = add_old_notice trimnl $license->fulltext;
 
 my ( $main_module ) = map { s!-!/!g; s!^!lib/! if -d 'lib'; -f "$_.pod" ? "$_.pod" : "$_.pm" } $meta->name;
 
 ( $file{ $main_module } = slurp $main_module ) =~ s{(^=cut\s*\z)}{ join "\n", (
 	"=head1 AUTHOR\n", trimnl( $meta->authors ), "Documentation by Eric J. Roode.\n",
-	"=head1 COPYRIGHT AND LICENSE\n\n$old_notice", trimnl( $license->notice ),
+	"=head1 COPYRIGHT AND LICENSE\n", add_old_notice( trimnl $license->notice ),
 	"=cut\n",
 ) }me;
 
+# slurp examples from eg/ into the POD
 $file{ $main_module } =~ s{^F<(\w+\.pl)>\n?}{
 	local $_ = slurp "eg/$1";
 	s[^(\t+)]{ ' ' x ( 4 * length $1 ) }meg; # expand
@@ -44,7 +46,7 @@ $file{ $main_module } =~ s{^F<(\w+\.pl)>\n?}{
 }meg;
 
 die unless -e 'Makefile.PL';
-$file{'README'} = Pod::Readme::Brief->new( $file{ $main_module } )->render( installer => 'eumm' );
+$file{'README'} = Pod::Readme::Brief->new( $file{ $main_module } )->render( installer => 'eumm', width => 72 );
 
 my @manifest = split /\n/, slurp 'MANIFEST';
 my %manifest = map /\A([^\s#]+)()/, @manifest;

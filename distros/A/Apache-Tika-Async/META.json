@@ -4,13 +4,13 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Apache-Tika-Async",
    "no_index" : {
@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
             "File::Find" : "0",
@@ -37,13 +38,12 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "5",
-            "Filter::signatures" : "0.15",
+            "Future" : "0",
             "JSON::XS" : "0",
             "LWP::UserAgent" : "6",
             "Moo" : "2",
-            "Promises" : "0",
             "Try::Tiny" : "0",
-            "perl" : "5.012"
+            "perl" : "5.020"
          }
       },
       "test" : {
@@ -55,13 +55,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/Corion/Apache-Tika-Async.git",
          "web" : "https://github.com/Corion/Apache-Tika-Async"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27203",
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

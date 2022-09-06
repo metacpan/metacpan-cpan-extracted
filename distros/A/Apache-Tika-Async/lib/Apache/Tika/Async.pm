@@ -2,8 +2,9 @@ package Apache::Tika::Async;
 use strict;
 use Moo 2;
 use JSON::XS qw(decode_json);
+use File::Temp 'tempfile';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -11,19 +12,19 @@ Apache::Tika::Async - connect to Apache Tika
 
 =head1 SYNOPSIS
 
-    use Apache::Tika::Async;
+  use Apache::Tika::Async;
 
-    my $tika= Apache::Tika::Async->new;
+  my $tika= Apache::Tika::Async->new;
 
-    my $fn= shift;
+  my $fn= shift;
 
-    use Data::Dumper;
-    my $info = $tika->get_all( $fn );
-    print Dumper $info->meta($fn);
-    print $info->content($fn);
-    # <html><body>...
-    print $info->meta->{"meta:language"};
-    # en
+  use Data::Dumper;
+  my $info = $tika->get_all( $fn );
+  print Dumper $info->meta($fn);
+  print $info->content($fn);
+  # <html><body>...
+  print $info->meta->{"meta:language"};
+  # en
 
 =cut
 
@@ -36,13 +37,13 @@ has java => (
 has 'jarfile' => (
     is => 'rw',
     #isa => 'Str',
-    #default => 'jar/tika-server-1.5-20130816.014724-18.jar',
+# tika-server-1.24.1.jar
+# tika-server-standard-2.3.0.jar
+
     default => sub {
-        # Do a natural sort on the dot-version
-        (sort { my $ad; $a =~ /server-1.(\d+)/ and $ad=$1;
-                my $bd; $b =~ /server-1.(\d+)/ and $bd=$1;
-                $bd <=> $ad
-              } glob 'jar/tika-server-*.jar')[0]
+        __PACKAGE__->best_jar_file(
+              glob 'jar/tika-server-*.jar'
+        );
     },
 );
 
@@ -61,12 +62,55 @@ has tika_args => (
     default => sub { [ ] },
 );
 
+sub _tika_config_xml {
+    my( $self, %entries ) = @_;
+    return join '',
+'<?xml version="1.0" encoding="UTF-8"?>',
+'<properties>',
+'<!-- <parsers etc.../> -->',
+'<server>',
+    '<params>',
+    (map { join '', "<$_>" => $entries{ $_ } => "</$_>" } sort keys %entries),
+    '</params>',
+'</server>',
+'</properties>',
+}
+
+sub tika_config {
+    my( $self, %entries ) = @_;
+    return $self->_tika_config_xml(
+        logLevel => $self->loglevel,
+        %entries
+    );
+}
+
+sub tika_config_temp_file {
+    my( $self, %entries ) = @_;
+
+    my( $fh, $name ) = tempfile();
+    binmode $fh;
+    print {$fh} $self->tika_config(%entries);
+    close $fh;
+
+    return $name;
+}
+
+sub best_jar_file {
+    my( $package, @files ) = @_;
+    # Do a natural sort on the dot-version
+    (sort { my $ad; $a =~ /\bserver-(?:standard-|)(\d+)\.(\d+)/ and $ad=sprintf '%02d.%04d', $1, $2;
+            my $bd; $b =~ /\bserver-(?:standard-|)(\d+)\.(\d+)/ and $bd=sprintf '%02d.%04d', $1, $2;
+                $bd <=> $ad
+          } @files)[0]
+}
+
 sub cmdline {
     my( $self )= @_;
     $self->java,
     @{$self->java_args},
     '-jar',
     $self->jarfile,
+    '--config', $self->tika_config_temp_file,
     @{$self->tika_args},
 };
 
@@ -76,9 +120,9 @@ sub fetch {
     push @cmd, $options{ type };
     push @cmd, $options{ filename };
     @cmd= map { qq{"$_"} } @cmd;
-    die "Fetching from local process is currently disabled";
+    #die "Fetching from local process is currently disabled";
     #warn "[@cmd]";
-    ''.`@cmd`
+    '' . readpipe(@cmd)
 }
 
 sub decode_csv {
@@ -90,37 +134,43 @@ sub get_meta {
     my( $self, $file )= @_;
     #return decode_json($self->fetch( filename => $file, type => 'meta' ));
     # Hacky CSV-to-hash decode :-/
-    return $self->fetch( filename => $file, type => 'meta' )->meta;
+    return $self->fetch( filename => $file, type => 'meta' )->meta->get;
 };
 
 sub get_text {
     my( $self, $file )= @_;
-    return $self->fetch( filename => $file, type => 'text' );
+    return $self->fetch( filename => $file, type => 'text' )->get;
 };
 
 sub get_test {
     my( $self, $file )= @_;
-    return $self->fetch( filename => $file, type => 'test' );
+    return $self->fetch( filename => $file, type => 'test' )->get;
 };
 
 sub get_all {
     my( $self, $file )= @_;
-    return $self->fetch( filename => $file, type => 'all' );
+    return $self->fetch( filename => $file, type => 'all' )->get;
 };
 
 sub get_language {
     my( $self, $file )= @_;
-    return $self->fetch( filename => $file, type => 'language' );
+    return $self->fetch( filename => $file, type => 'language' )->get;
 };
 
-__PACKAGE__->meta->make_immutable;
+# ->detect_stream wants not a file but the input bytes
+# sub detect_stream {
+#     my( $self, $file )= @_;
+#     return $self->fetch( filename => $file, type => 'all' )->get;
+# };
+
+# __PACKAGE__->meta->make_immutable;
 
 1;
 
 =head1 REPOSITORY
 
 The public repository of this module is
-L<https://github.com/Corion/apache-tika>.
+L<https://github.com/Corion/Apache-Tika-Async>.
 
 =head1 SUPPORT
 

@@ -1,0 +1,73 @@
+=head1 NAME
+
+Mojo::DOM::Role::Style - A Mojo::DOM role for managing inline CSS styles
+
+=head1 SYNOPSIS
+
+    use Mojo::DOM;
+
+    $\ = "\n"; $, = "\t";
+
+    my $dom = Mojo::DOM->new('<div style="color:red;background-color:grey;font-size:12pt">some string</div>')->with_roles('+Style');
+
+    print $dom->at('div')->style('color', 'black');
+
+    print $dom->at('div')->style('color', 'black')->attr('x');
+
+    print $dom->at('div')->style('color', 'black')->{color};
+
+    print $dom->at('div')->style({ 'color', 'black' })->{'background-color'};
+
+=head1 DESCRIPTION
+
+This module adds a convenience method for getting and setting a Mojo::DOM element's inline style
+
+=head2 Methods
+
+=over 12
+
+=item C<style>
+
+Gets or sets the element's style.
+
+    print $dom->at('div')->style  # returns a hashref
+
+When chained as an object returns the element itself:
+
+    print $dom->at('div')->style('font-family', 'serif')->attr('href');
+
+When deref'd as hash, returns the style attribute as a hash
+
+    print $dom->at('div')->style('font-family', 'serif')->{'font-family'}
+    # 'serif'
+
+If passed an even number of arguments it will overwrite the style:
+
+    print $dom->at('div')->style('font-family', 'serif')
+    # "font-family:serif"
+
+If passed a hash it will merge it into the style :
+
+    print $dom->at('div')->style('color' => 'blue')->style({ 'font-family' => 'serif' })
+    # "color:blue;font-family:serif"
+
+If passed ```undef``` it will remove the style altogether
+
+    print $dom->at('div')->style(undef)
+    # nothing
+    print $dom->at('div')
+    # <div>some stuff</div>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Simone Cesano.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+=head1 AUTHOR
+
+Simone Cesano
+
+=cut

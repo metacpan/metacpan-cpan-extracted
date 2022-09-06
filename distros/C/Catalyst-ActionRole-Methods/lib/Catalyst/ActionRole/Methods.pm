@@ -2,7 +2,7 @@ package Catalyst::ActionRole::Methods;
 
 use Moose::Role;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 around 'dispatch', sub {
     my $orig = shift;
@@ -96,7 +96,7 @@ sub _return_options {
     my @allowed = $self->get_allowed_methods($controller, $c, $method_name);
     $c->response->content_type('text/plain');
     $c->response->status(200);
-    $c->response->header( 'Allow' => \@allowed );
+    $c->response->header( 'Allow' => @allowed ? \@allowed : '' );
     $c->response->body(q{});
 }
  
@@ -106,7 +106,7 @@ sub _return_not_implemented {
     my @allowed = $self->get_allowed_methods($controller, $c, $method_name);
     $c->response->content_type('text/plain');
     $c->response->status(405);
-    $c->response->header( 'Allow' => \@allowed );
+    $c->response->header( 'Allow' => @allowed ? \@allowed : '' );
     $c->response->body( "Method "
           . $c->request->method
           . " not implemented for "

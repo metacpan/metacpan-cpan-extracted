@@ -3,7 +3,7 @@ package Myriad::Role;
 use strict;
 use warnings;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '1.000'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use utf8;
@@ -43,19 +43,9 @@ sub import {
 
     my $class = __PACKAGE__;
     my $pkg = delete($args{target}) // caller(0);
-    Myriad::Class->import(%args);
-    if(my $class = $args{class} || $pkg) {
-        # For history here, see this:
-        # https://rt.cpan.org/Ticket/Display.html?id=132337
-        # At the time of writing, ->begin_class is undocumented
-        # but can be seen in action in this test:
-        # https://metacpan.org/source/PEVANS/Object-Pad-0.21/t/70mop-create-class.t#L30
-        Object::Pad->import_into($pkg);
-        return Object::Pad::MOP::Class->begin_role(
-            $pkg
-        );
-    }
-    return $pkg;
+    $args{type} = 'role';
+    $args{target} //= $pkg;
+    return Myriad::Class->import(%args);
 }
 
 1;
@@ -70,5 +60,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

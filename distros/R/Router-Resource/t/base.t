@@ -1,10 +1,7 @@
-#!/usr/bin/env perl -w
+use strict; use warnings;
 
-use strict;
-use warnings;
 use Router::Resource;
 use Test::More tests => 72;
-#use Test::More 'no_plan';
 
 can_ok 'Router::Resource', qw(
     new

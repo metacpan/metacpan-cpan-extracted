@@ -1,12 +1,8 @@
-use 5.006;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package Sub::ArgShortcut;
-$Sub::ArgShortcut::VERSION = '1.021';
-# ABSTRACT: simplify writing functions that use default arguments
 
-sub croak { require Carp; goto &Carp::croak }
+our $VERSION = '1.022';
 
 sub argshortcut(&) {
 	my ( $code ) = @_;
@@ -40,10 +36,6 @@ __END__
 =head1 NAME
 
 Sub::ArgShortcut - simplify writing functions that use default arguments
-
-=head1 VERSION
-
-version 1.021
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,7 @@ use Text::Fold ();
 use constant DEBUG => $ENV{TLDR_DEBUG};
 use constant REPOSITORY => $ENV{TLDR_REPOSITORY};
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my $URL = "https://raw.githubusercontent.com/tldr-pages/tldr/main/pages%s/%s/%s.md";
 
@@ -123,7 +123,7 @@ sub _local_get {
 
 sub run {
     my $self = shift;
-    my $arg  = shift @{$self->{argv}} or $self->_help(1);
+    my $arg  = shift @{$self->{argv}} or die $self->_help(1);
     my $content;
     for my $platform (@{ $self->{platform} }) {
         ($content, my $err) = $self->_get($arg, $platform);

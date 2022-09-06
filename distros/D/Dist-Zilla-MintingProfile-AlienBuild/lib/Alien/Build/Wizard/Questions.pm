@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.022;
 
-package Alien::Build::Wizard::Questions 0.06 {
+package Alien::Build::Wizard::Questions 0.07 {
 
   use Exporter qw( import );
   use constant QUESTION_URL          => 'Enter the full URL to the latest tarball (or zip, etc.) of the project you want to alienize.';
@@ -41,7 +41,7 @@ Alien::Build::Wizard::Questions - List of questions
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Graham Ollis.
+This software is copyright (c) 2021-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

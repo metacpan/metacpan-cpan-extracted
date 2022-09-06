@@ -4,9 +4,11 @@ CONTRIBUTING.md
 Changes
 LICENSE
 MANIFEST
+MANIFEST.SKIP
 META.json
 META.yml
 README
+ddump.pl
 dist.ini
 lib/Data/Record/Serialize.pm
 lib/Data/Record/Serialize/Encode/dbi.pm
@@ -21,6 +23,7 @@ lib/Data/Record/Serialize/Role/Default.pm
 lib/Data/Record/Serialize/Role/Encode.pm
 lib/Data/Record/Serialize/Role/EncodeAndSink.pm
 lib/Data/Record/Serialize/Role/Sink.pm
+lib/Data/Record/Serialize/Role/Sink/Stream.pm
 lib/Data/Record/Serialize/Sink/array.pm
 lib/Data/Record/Serialize/Sink/null.pm
 lib/Data/Record/Serialize/Sink/stream.pm
@@ -53,6 +56,7 @@ t/lib/My/Test/Encode/types_ns.pm
 t/lib/My/Test/Util.pm
 t/nullify.t
 t/numify.t
+t/stream.t
 t/stringify.t
 templates/CONTRIBUTING.md
 tidyall.ini

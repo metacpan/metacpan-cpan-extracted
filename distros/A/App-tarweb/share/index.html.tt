@@ -1,0 +1,5 @@
+<ul>
+  [% FOREACH archive IN archives %]
+    <li><a href=[% archive | uri %]>[% archive | html %]</a></li>
+  [% END %]
+</ul>

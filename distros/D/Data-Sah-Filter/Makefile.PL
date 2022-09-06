@@ -31,11 +31,9 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::Exception" => 0,
-    "Test::More" => "0.98",
-    "Test::Needs" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,9 +51,7 @@ my %FallbackPrereqs = (
   "JSON" => 0,
   "Log::ger" => "0.038",
   "Nodejs::Util" => "0.007",
-  "Test::Exception" => 0,
-  "Test::More" => "0.98",
-  "Test::Needs" => 0,
+  "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0
 );

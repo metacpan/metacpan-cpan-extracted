@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Zilla::Dist version 0.1.9.
+    This document describes Zilla::Dist version 0.1.11.
 
 SYNOPSIS
 
@@ -136,8 +136,8 @@ USAGE
 
  Release in Depth
 
-    This section lists all the things that actually happen during the zild
-    release step.
+    This section lists all the things that actually happen during the
+    zildrelease step.
 
     …to be completed…
 

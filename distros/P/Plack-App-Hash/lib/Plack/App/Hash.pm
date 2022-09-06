@@ -1,13 +1,10 @@
-#!/usr/bin/perl
-use 5.006;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package Plack::App::Hash;
-$Plack::App::Hash::VERSION = '1.000';
-# ABSTRACT: Serve up the contents of a hash as a website
 
-use parent 'Plack::Component';
+our $VERSION = '1.001';
+
+BEGIN { require Plack::Component; our @ISA = 'Plack::Component' }
 
 use Plack::Util ();
 use Array::RefElem ();
@@ -16,11 +13,16 @@ use HTTP::Status ();
 
 use Plack::Util::Accessor qw( content headers auto_type default_type );
 
+sub prepare_app {
+	my $self = shift;
+	require Plack::MIME if $self->auto_type;
+}
+
 sub call {
 	my $self = shift;
 	my $env  = shift;
 
-	my $path = $env->{'PATH_INFO'} || '';
+	my $path = $env->{'PATH_INFO'};
 	$path =~ s!\A/!!;
 
 	my $content = $self->content;
@@ -44,12 +46,12 @@ sub call {
 		my $default = $self->default_type;
 		last unless $auto or $default;
 		last if Plack::Util::header_exists $headers, 'Content-Type';
-		$auto &&= do { require Plack::MIME; Plack::MIME->mime_type( $path ) };
-		Plack::Util::header_push $headers, 'Content-Type' => $_ for $auto || $default || ();
+		$auto &&= Plack::MIME->mime_type( $path );
+		push @$headers, 'Content-Type' => $_ for $auto || $default || ();
 	}
 
 	if ( not Plack::Util::header_exists $headers, 'Content-Length' ) {
-		Plack::Util::header_push $headers, 'Content-Length' => length $content->{ $path };
+		push @$headers, 'Content-Length' => length $content;
 	}
 
 	my @body;
@@ -79,10 +81,6 @@ __END__
 
 Plack::App::Hash - Serve up the contents of a hash as a website
 
-=head1 VERSION
-
-version 1.000
-
 =head1 SYNOPSIS
 
  use Plack::App::Hash;
@@ -108,8 +106,8 @@ E<ndash> in short, for one-off hacks and scaling down.
 =item C<content>
 
 The content of your site. Each key-value pair will be one resource in your URI
-space. The key is its URI path without leading slash, and the is the content of
-the resource. Values must not be references.
+space. The key is its URI path without leading slash, the value is the content
+of the resource. Values must not be references.
 
 =item C<headers> (optional)
 
@@ -136,7 +134,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Aristotle Pagaltzis.
+This software is copyright (c) 2022 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

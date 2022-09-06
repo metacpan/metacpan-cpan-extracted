@@ -9,7 +9,7 @@ configure_requires:
   File::ShareDir: '1.03'
   Path::Class: '0.013'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ requires:
 resources:
   homepage: https://github.com/Getty/p5-alien-ffmpeg
   repository: https://github.com/Getty/p5-alien-ffmpeg.git
-version: '0.104'
+version: '0.105'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -45,47 +45,47 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::GETTY/@Filter/MetaYAML'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::GETTY/@Filter/License'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Author::GETTY/@Filter/Readme'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::GETTY/@Filter/ExtraTests'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::GETTY/@Filter/ExecDir'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::GETTY/@Filter/ShareDir'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::GETTY/@Filter/Manifest'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::GETTY/@Filter/TestRelease'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::GETTY/@Filter/ConfirmRelease'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::GETTY/@Filter/UploadToCPAN'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -94,26 +94,26 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.37.2
           repo_root: .
       name: '@Author::GETTY/Git::NextVersion'
       version: '2.048'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Author::GETTY/PkgVersion'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::GETTY/MetaJSON'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::GETTY/PodSyntaxTests'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::GETTY/GithubMeta'
@@ -125,7 +125,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Alien
       name: '@Author::GETTY/Alien'
-      version: '0.023'
+      version: '0.024'
     -
       class: Dist::Zilla::Plugin::Run::Test
       config:
@@ -147,7 +147,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.37.2
           repo_root: .
       name: '@Author::GETTY/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -255,7 +255,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.37.2
           repo_root: .
       name: '@Author::GETTY/@Git/Check'
       version: '2.048'
@@ -273,7 +273,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.37.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -286,11 +286,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.104'
+          tag: '0.105'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.37.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -304,55 +304,55 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.34.1
+          git_version: 2.37.2
           repo_root: .
       name: '@Author::GETTY/@Git/Push'
       version: '2.048'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.024'
+      version: '6.025'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.024'
+    version: '6.025'
 x_authority: cpan:GETTY
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

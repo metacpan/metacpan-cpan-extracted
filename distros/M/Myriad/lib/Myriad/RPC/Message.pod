@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Myriad::RPC::Message
 at lib/Myriad/RPC/Message.pm
@@ -99,6 +98,10 @@ A helper method to enode the hash fields into JSON string.
 
 A helper sub to decode some field from JSON string into Perl hashes.
 
+=head2 passed_deadline
+
+Check if the message is stil relevent
+
 =head1 INHERITED METHODS
 
 =over 4
@@ -117,5 +120,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

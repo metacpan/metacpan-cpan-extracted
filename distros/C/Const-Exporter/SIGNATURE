@@ -1,0 +1,72 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 77d5ccf3e5f54b9bc3dc80ceda5e0d6cef22bc87ea812b354706db779d9f32f9 Changes
+SHA256 1970c94c068765d64621a6494f0cb66c434070941be5ba3420fe7fc5e2a60ea9 INSTALL
+SHA256 415e6b7a90160bfff98b0455337b7636540218b6048ecb08403c9de80fd33a3f LICENSE
+SHA256 f758be961a702a8f299b6e5320cf73a4e78aa88cb96d99bb5ed18ce953fde92d MANIFEST
+SHA256 a9d15a883db6cace5830c7789637f2c908bbe33b042b7e82b4f7d2b312bbaf91 MANIFEST.SKIP
+SHA256 6542bddfa83225e07817a97f8d07e19ad7807dc2f71e9def784da9db6392c694 META.json
+SHA256 8b15fc60c29b8679b41c4da3550f909f8960abbed7428a2a66c7f5e0a6b24d69 META.yml
+SHA256 070d4d232195f1f4e7758eb6c217af58fed1e4b8d2cb2acf0af3085db812f024 Makefile.PL
+SHA256 df40782b65d2fc3c1f617031a84d3f1a39d902c87bdd0be69c204bc43d298472 README.md
+SHA256 0ac0554d3e713031bb1ba892560b7dbee50d1556443366807a2a7d99014ae25c cpanfile
+SHA256 edec93c3c6684c912f2383ee1058696bb5e627594939cb0b9d8c035cb6632e59 dist.ini
+SHA256 da82ee83a5e6ec05a2b49c477c73e29966d57783bb3de0e8be3c48c4b30520dc lib/Const/Exporter.pm
+SHA256 1c61b537c02623611378ae055ef77ef173a4ec99c47a9e9ff199723324b1f23e t/00-report-prereqs.dd
+SHA256 66fb112d30424ac9787706db3791b750a2509ee554833eca0f06cd5e16673d85 t/00-report-prereqs.t
+SHA256 91c09178ebca4cd620b08d1016557b9c0ac5befc5b25292887d6c8cb0e969e6d t/10-basic.t
+SHA256 e131dbca1a2ada3c67a81ebae46f0c6c32e854e544b33d06ff4fe7e5adc7a9fb t/11-tags.t
+SHA256 be65f49f2a0856a6f6472b5aeb8d0a3e4aba4ae63b046b7b86d58381f612f1bb t/12-blessed.t
+SHA256 55223c2ae74bb73f360dfbfc8750be950e7e06cd17d0db88b066b0c2747daa17 t/13-is_const.t
+SHA256 4c9b687abf7c76b02ffc456b262ab72fa33a887ad24dd3e5ecae088ee814d8b2 t/20-example.t
+SHA256 001ee7d5fd222708edde6b5015c980da99f8556db2db93961d39e6760bdc98c5 t/21-example.t
+SHA256 e5bab84ea3bf87c793fd33295c79e6a96f9286dfb61e95658fc07f77323c6d11 t/author-critic.t
+SHA256 fbe6cdd54a8c2e95b5eb624cdc1799f9ea3d28e4fca551e23738cf9a0a829e32 t/author-eof.t
+SHA256 7c3f23c7e26ae5ba763acbfec942c42b595a531eb1d35d090599438e2bfc63c9 t/author-eol.t
+SHA256 914bde9f0ea3cadd6afb992b32d87f5027d1a0921b6b8fec75db045bac31956e t/author-minimum-version.t
+SHA256 ed2efb6ffb29a5db532625469aa515857500870340ef863c25ce6670d7cf912c t/author-no-tabs.t
+SHA256 1ee64d4f8248deb3541453ec521ac8057c9a4ba365946b6a02ee760ad28ce164 t/author-pod-coverage.t
+SHA256 8835ccb71da79a1b53a576dd349e188d444fce139e1f9f62976458c066b8edf9 t/author-pod-linkcheck.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 c1f29c0000903a78a9a6f6d4d84f375740d5bb333d532c0502bedbe613918127 t/author-portability.t
+SHA256 ee42d666152b803055b6b66ba57b56bec893bdb72bba767c6f9d5fa51dfe11db t/author-vars.t
+SHA256 7209d3d52198668e142c1f1fe337037357d4ad3ef689293e4490bf31113f67e7 t/empty-with-const.t
+SHA256 4a4a022fb17d4e4be4e40c9a8b19845fe49b187d65fa7f85043f9d932922f589 t/enums.t
+SHA256 c460e18d2ca79fb9daecfa401c50b33a59277aa6d353dfc80ba353e3f32728d0 t/etc/perlcritic.rc
+SHA256 8be0db701a3a58e7ad78f84c7d65551c7b1e79dc4fbbcec1b2cdf40d995d13c5 t/lib/Test/Const/Exporter/Empty.pm
+SHA256 831c3a900547386693ce3d2fce244c0c23f396d8df8fd65c3fee0348090633b4 t/lib/Test/Const/Exporter/Enums.pm
+SHA256 bc205b591f11168b309a7594381d0acc9902c0fc16d08cc934adc01257afc08f t/lib/Test/Const/Exporter/Strictures.pm
+SHA256 b5232d273bbe74d423210cfa2a2a12e583900fa420f1c093e1147e9625db790c t/release-check-manifest.t
+SHA256 6817b484798f726a44e9aee17da6e80979b4ace77349f0d0b4a13cd935172cba t/release-fixme.t
+SHA256 426c441a368792fa6be6a2e35ff0ac997faa48575d090646e9570e056109bb32 t/release-kwalitee.t
+SHA256 6157040bb26db4ca06dd9c19043099fe31004612d27961308558fa2e3e6a7bbe t/release-trailing-space.t
+SHA256 e5b019a7601021cec31d6c2b6b53892fab8eaf98d213ee2ef15095617df9e881 t/strictures.t
+SHA256 31b04c4b94fc05dbbe052789c2ce433e96e50ad34d3f66b97d53a576917da35b weaver.ini
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEEeIwq7Pfyfxtssr5nHmWrcYGDC6wFAmMTD/4ACgkQHmWrcYGD
+C6yIfAv+J7CGhjBhILmQZII3awQxdZbeTO2W97j9QtFnP1gJqNHEQTbduzcC6NrA
+hJnP/5wBIdrCl7DbJJrQtrsmxMZexxoXWkkmNJHvfboLy291JDgbHq/XCQ2CFOnH
+6akmebsZuqNUeZGL8SMCAkJ/GaeurqZZvoNgpW7DSE7n2VPTM+it5LWHC3yHmdFa
+W/fC+STJpjUzHvWgTRi3vOxHptFZTyzMlhxprATWCXbE2ZW4zdZMyGNo8HmKfFNt
+o3DcFpAN9f7tDvBjXRUTn99sobkejxo8iSFUNHN84DaLNhsU/2DlUs3MMmB+zyM9
+JSWO/Al/qlSl0TjVDPyVpKrtM7MrJ0zabBkDwhWtRdH6Kf0tSto6EZ+mjROs3nyx
++kpRtH6qzliA3CSPm0jjThyxYJ87eRmdhBDfSTdwWGYNty+U8avD+hh7XhievZNX
+GlY/2Pw2NsDg7H5AUYFqy1Eu7A+l72iBR13LJRAuTszVjv2DSTIGjleBoz3VLpWR
+bUQuyeyw
+=DD2Q
+-----END PGP SIGNATURE-----

@@ -1,0 +1,11 @@
+\.git
+^enquiry\.pl$
+lib/Dotiac
+\.tar\.gz
+^Makefile(?:\.old)?$
+^templates
+^blib\b
+^MANIFEST\.bak$
+^pm_to_blib$
+^sealed-
+^MYMETA\.

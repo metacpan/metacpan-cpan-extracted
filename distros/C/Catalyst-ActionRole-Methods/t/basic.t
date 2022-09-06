@@ -32,6 +32,8 @@ use Test::Most;
 
     sub next_action_in_chain :Chained(myaction) PathPart('') Args(0) { }
 
+    sub no_methods_implemented :Chained(/) Does('Methods') PathPart('fail') Args(0) { }
+
   $INC{'MyApp/Controller/Root.pm'} = __FILE__;
   MyApp::Controller::Root->config(namespace=>'');
 
@@ -62,6 +64,12 @@ use HTTP::Request::Common;
 {
   ok my $res = request(PUT '/22');
   is $res->content, '1na22';
+}
+
+{
+  ok my $res = request(GET '/fail');
+  is $res->code, 405;
+  is $res->header( 'Allow' ), '';
 }
 
 done_testing;

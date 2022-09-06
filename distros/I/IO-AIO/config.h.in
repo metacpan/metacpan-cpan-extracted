@@ -36,6 +36,9 @@
 /* Define to 1 if you have the <minix/config.h> header file. */
 #undef HAVE_MINIX_CONFIG_H
 
+/* mount/umount are available */
+#undef HAVE_MOUNT
+
 /* pipe2(2) is available */
 #undef HAVE_PIPE2
 
@@ -108,6 +111,9 @@
 /* Define to 1 if you have the <sys/mkdev.h> header file. */
 #undef HAVE_SYS_MKDEV_H
 
+/* Define to 1 if you have the <sys/mount.h> header file. */
+#undef HAVE_SYS_MOUNT_H
+
 /* Define to 1 if you have the <sys/prctl.h> header file. */
 #undef HAVE_SYS_PRCTL_H
 
@@ -131,6 +137,9 @@
 
 /* timerfd_*(2) are available */
 #undef HAVE_TIMERFD
+
+/* umount2 is available */
+#undef HAVE_UMOUNT2
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H

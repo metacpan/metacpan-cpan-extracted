@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 12;
 use Test::Differences qw/ eq_or_diff /;
-use Path::Tiny qw/ path tempdir tempfile cwd /;
+use Path::Tiny        qw/ path tempdir tempfile cwd /;
 
 use XML::LibXML  ();
 use XML::LibXSLT ();
@@ -27,7 +27,7 @@ my @tests = (
         quote-fort-sample-6-with-bold
         quote-fort-sample-7-with-italics
         quote-fort-sample-8-with-em-and-strong
-        )
+    )
 );
 
 my $parser = XML::LibXML->new();

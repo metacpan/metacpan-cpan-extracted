@@ -19,9 +19,6 @@ sub call {
     my $self = shift;
     my $env  = shift;
 
-    my $method = $env->{REQUEST_METHOD};
-    return $self->return_405 unless $method eq 'GET' || $method eq 'HEAD';
-
     my($file, $path_info) = $self->file || $self->locate_file($env);
     return $file if ref $file eq 'ARRAY';
 
@@ -115,11 +112,6 @@ sub serve_path {
     ];
 }
 
-sub return_405 {
-    my $self = shift;
-    return [405, ['Content-Type' => 'text/plain', 'Content-Length' => 18], ['Method Not Allowed']];
-}
-
 sub return_403 {
     my $self = shift;
     return [403, ['Content-Type' => 'text/plain', 'Content-Length' => 9], ['forbidden']];
@@ -157,7 +149,7 @@ Plack::App::File - Serve static files from root directory
 =head1 DESCRIPTION
 
 This is a static file server PSGI application, and internally used by
-L<Plack::Middleware::Static>. This application serves file from
+L<Plack::Middleware::Static>. This application serves files from the
 document root if the path matches with the local file. Use
 L<Plack::App::Directory> if you want to list files in the directory
 as well.
@@ -186,7 +178,7 @@ Set the file encoding for text files. Defaults to C<utf-8>.
 
 Set the file content type. If not set L<Plack::MIME> will try to detect it
 based on the file extension or fall back to C<text/plain>.
-Can be set to a callback which should work on $_[0] to check full path file 
+Can be set to a callback which should work on $_[0] to check full path file
 name.
 
 =back
@@ -200,5 +192,3 @@ Tatsuhiko Miyagawa
 L<Plack::Middleware::Static> L<Plack::App::Directory>
 
 =cut
-
-

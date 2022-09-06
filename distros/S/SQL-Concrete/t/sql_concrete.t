@@ -1,7 +1,6 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
-use Test::More 0.88; # for done_testing
+use Test::More tests => 60;
 use Test::Differences;
 use Data::Dumper;
 use SQL::Concrete qw( :all );
@@ -137,5 +136,3 @@ sql_ok q[ [ 1, 2, 3 ] ]
 	=> '$1, $2, $3', 1, 2, 3;
 sql_ok q[ { x => [ 1, sql([ 2 ]), 3 ], y => 4 } ]
 	=> '(x IN ($1, $2, $3) AND y=$4)', 1, 2, 3, 4;
-
-done_testing;

@@ -26,6 +26,7 @@ Role
 Serialize
 Sink
 Smithsonian
+Stream
 Types
 Util
 array
@@ -33,8 +34,8 @@ bitbucket
 d'etre
 dbi
 ddump
-deterministically
 djerius
+fh
 json
 lib
 msg

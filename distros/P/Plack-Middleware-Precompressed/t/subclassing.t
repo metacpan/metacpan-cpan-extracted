@@ -1,9 +1,8 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
+use Test::More tests => 2;
 use Plack::Test;
 use Plack::Builder;
-use Test::More;
 use HTTP::Request::Common;
 
 my @key = qw( HTTP_HOST REMOTE_ADDR );
@@ -23,12 +22,11 @@ test_psgi
 		is $got, $expected, '... and works exactly the same';
 	};
 
-done_testing;
-
 BEGIN {
-package # hide from PAUSE
-	Plack::Middleware::PrecompressedSubclass;
-use parent 'Plack::Middleware::Precompressed';
+package Plack::Middleware::PrecompressedSubclass;
+
+require Plack::Middleware::Precompressed;
+our @ISA = 'Plack::Middleware::Precompressed';
 
 sub env_keys { \@key }
 

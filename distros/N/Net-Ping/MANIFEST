@@ -1,5 +1,6 @@
 .appveyor.yml
 .cirrus.yml
+.github/workflows/testsuite.yml
 .travis.yml
 .whitesource
 Changes

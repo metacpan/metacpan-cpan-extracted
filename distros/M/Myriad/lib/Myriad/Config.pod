@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Myriad::Config
 at lib/Myriad/Config.pm
@@ -33,11 +32,12 @@ The C<%FULLNAME_FOR> hash maps commandline shortcuts for common parameters.
 
 =head2 SERVICES_CONFIG
 
-A registry of configs defined by the services using the C<config > helper.
+A registry of service configuration defined by the services using the C<config> helper.
 
 =head2 ACTIVE_SERVICES_CONFIG
 
-A collection of L<Ryu::Observable> to notify services about updates on the configs values
+A collection of L<Ryu::Observable> instances for notifying services about updates on their
+configuration.
 
 =head2 clear_key
 
@@ -53,27 +53,29 @@ the best use case for this sub is during tests.
 
 A helper to resolve the correct service config
 
-input is expected to look like <service_name>_[configs|instances].<key>
+input is expected to look like:
+
+ <service_name>_[config|instance].<key>
 
 and this sub will set the correct path to key with the provided value.
 
 Example:
 
-dummy_service.configs.password
+ dummy_service.config.password
 
 will end up in
 
-$config->{services}->{dummy_service}->{configs}->{password}
+ $config->{services}->{dummy_service}->{config}->{password}
 
-it takes:
+Takes the following parameters:
 
 =over 4
 
-=item * C<subarg> - the arguments as passed by the user.
+=item * C<$subarg> - the arguments as passed by the user.
 
-=item * C<root> - the level in which we should add the sub arg, we start from $config->{services}.
+=item * C<$root> - the level in which we should add the sub arg, we start from $config->{services}.
 
-=item * C<value> - the value that we should assign after resolving the config path.
+=item * C<$value> - the value that we should assign after resolving the config path.
 
 =back
 
@@ -82,18 +84,18 @@ it takes:
 Parse the arguments provided from the command line.
 
 There are many modules that can parse command lines arguments
-but in our case we have unknown arguments - the services configs - that
+but in our case we have unknown arguments - the services config - that
 might be passed by the user or might not and they are on top of that nested.
 
 This sub simply start looking for a match for the arg at hand in C<%DEFAULTS>
 then it searches in the shortcuts map and lastly it tries to parse it as a subarg.
 
-Currently this sub takes into account flags (0|1) configs and config written as:
+Currently this sub takes into account flags (0|1) config and config written as:
 config=value
 
 =head2 lookup_from_env
 
-Tries to find environments variables that start with MYRIAD_* and parse them.
+Try to find environment variables that start with C<MYRIAD_*> and parse them.
 
 =head2 lookup_from_file
 
@@ -119,9 +121,16 @@ it takes
 
 =item * C<pkg> - The package name of the service, will be used to lookup for generic config
 
-=item * C<service_name> - The current service name either from the registry or as it bassed by the user, useful for instances config
+=item * C<service_name> - The current service name either from the registry or as it bassed by the user, useful for instance config
 
 =back
+
+=head2 service_name
+
+Check if the developer configured a name for this service.
+This is different from service_config because we are going
+to check args and ENV only looking using the default
+L<Myriad::Registry> assigned name
 
 =head2 from_storage
 
@@ -157,5 +166,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

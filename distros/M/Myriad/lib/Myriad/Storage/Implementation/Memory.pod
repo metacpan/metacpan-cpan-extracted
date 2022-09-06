@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Myriad::Storage::Implementation::Memory
 at lib/Myriad/Storage/Implementation/Memory.pm
@@ -239,6 +238,87 @@ Takes the following parameters:
 Returns a L<Future> which will resolve to a list of key/value pairs,
 suitable for assigning to a hash.
 
+=head2 orderedset_add
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$s> - the scalar score value
+
+=item * C<$m> - the scalar member value
+
+=back
+
+Note that references are currently B<not> supported - attempts to write an arrayref, hashref
+or object will fail.
+
+Returns a L<Future> which will resolve on completion.
+
+=head2 orderedset_remove_member
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$m> - the scalar member value
+
+=back
+
+Returns a L<Future> which will resolve on completion.
+
+=head2 orderedset_remove_byscore
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$min> - the minimum score to remove
+
+=item * C<$max> - the maximum score to remove
+
+=back
+
+Returns a L<Future> which will resolve on completion.
+
+=head2 orderedset_member_count
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$min> - minimum score for selection
+
+=item * C<$max> - maximum score for selection
+
+=back
+
+Returns a L<Future> which will resolve on completion.
+
+=head2 orderedset_members
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$min> - minimum score for selection
+
+=item * C<$max> - maximum score for selection
+
+=back
+
+Returns a L<Future> which will resolve on completion.
+
 =head1 INHERITED METHODS
 
 =over 4
@@ -251,10 +331,6 @@ L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/a
 
 L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
 
-=item L<Myriad::Util::Defer>
-
-L<Defer|Myriad::Util::Defer/Defer>
-
 =back
 
 =head1 AUTHOR
@@ -265,5 +341,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

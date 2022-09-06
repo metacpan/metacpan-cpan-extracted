@@ -1,7 +1,7 @@
 use 5.006; use warnings; use strict;
 
 package Class::Closure;
-our $VERSION = '0.303';
+our $VERSION = '0.304';
 
 use Exporter ();
 use Carp ();
@@ -173,7 +173,7 @@ sub extends($) { &$EXTENDS }
 sub destroy(&) { _install DESTROY => \Class::Closure::DestroyDelegate->new( $_[0] ) }
 
 package Class::Closure::DestroyDelegate;
-our $VERSION = '0.303';
+our $VERSION = '0.304';
 
 sub new { bless $_[1] }
 sub DESTROY { goto &{$_[0]} }
@@ -432,9 +432,8 @@ Documentation by Luke Palmer.
 
 =head1 COPYRIGHT AND LICENSE
 
-This documentation is copyright (c) 2004 by Luke Palmer.
-
 This software is copyright (c) 2015 by Aristotle Pagaltzis.
+Its documentation is copyright (c) 2004 by Luke Palmer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

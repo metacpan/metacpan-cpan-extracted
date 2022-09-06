@@ -13,7 +13,7 @@ use Path::Tiny qw/ path /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.2';
 
 
 sub exe {
@@ -36,7 +36,7 @@ Alien::Brotli - Download and install Brotli compressor
 
 =head1 VERSION
 
-version v0.2.1
+version v0.2.2
 
 =head1 DESCRIPTION
 
@@ -81,7 +81,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =for stopwords Michal Josef Špaček
 
-Michal Josef Špaček <mspacek@redhat.com>
+Michal Josef Špaček <skim@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

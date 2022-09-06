@@ -1,5 +1,20 @@
 Revision history for Alien-Brotli:
 
+v0.2.2    2022-09-03 13:40:15+01:00 Europe/London
+  [Bug Fixes]
+  - Add missing bc to bootstrap, GH#5 (mspacek).
+
+  - Moved build prerequisites to build phase.
+
+  [Tests]
+  - Add diagnostics to tests (mpsacek).
+
+  [Toolchain]
+  - Added .mailmap to use CPAN email for contributors.
+
+  [Other]
+  - Sign the release.
+
 v0.2.1    2022-08-31 13:39:02+01:00 Europe/London
   [Bug Fixes]
   - Fixed `exe` method for 'share' and 'system'  version of brotli command, GH#2 (mspacek).

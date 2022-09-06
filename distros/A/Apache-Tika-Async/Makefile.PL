@@ -29,13 +29,15 @@ my %module = (
                 web => "https://github.com/Corion/$distlink",
                 url => "git://github.com/Corion/$distlink.git",
                 type => 'git',
-            }
+            },
+            bugtracker => "https://rt.cpan.org/Public/Dist/Display.html?Name=$distbase",
+            license    => "https://dev.perl.org/licenses/",
         },
         dynamic_config   => 0, # we promise to keep META.* up-to-date
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.012',
+    MIN_PERL_VERSION => '5.020', # signatures, syntax amenities
 
     'LICENSE'=> 'perl',
 
@@ -46,13 +48,14 @@ my %module = (
         'File::Copy' => 0,
         'File::Find' => 0,
         'File::Basename' => 0,
+        'ExtUtils::MakeMaker' => 0,
     },
 
     PREREQ_PM => {
         'Exporter'           => '5',    # we need the "import" facility
-        'Filter::signatures' => 0.15,
+        # 'Filter::signatures' => 0.15, # we require 5.020 anyway
         'Carp'           => 0,
-        'Promises'       => 0,
+        'Future'         => 0,
         'LWP::UserAgent' => 6,
         'Moo'            => 2,
         'Try::Tiny'      => 0,
@@ -130,7 +133,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL
@@ -186,9 +189,9 @@ sub pod_section {
         shift @section if $remove_heading;
 
         pop @section
-            while $section[-1] =~ /^\s*$/;
+            while @section and $section[-1] =~ /^\s*$/;
         shift @section
-            while $section[0] =~ /^\s*$/;
+            while @section and $section[0] =~ /^\s*$/;
     };
 
     @section = map { $_ =~ s!^=\w+\s+!!; $_ } @section;

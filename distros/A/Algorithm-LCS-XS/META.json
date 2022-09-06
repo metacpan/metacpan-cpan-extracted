@@ -1,0 +1,44 @@
+{
+   "abstract" : "Fast (XS) implementation of the                  Longest Common Subsequence (LCS) Algorithm",
+   "author" : [
+      "Joe Schaefer <joe+cpan@sunstarsys.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Algorithm-LCS-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Diff" : "0",
+            "LCS::BV" : "0",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

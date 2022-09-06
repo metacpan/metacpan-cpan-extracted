@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Myriad::Transport::Memory
 at lib/Myriad/Transport/Memory.pm
@@ -23,7 +22,7 @@ Myriad::Transport::Memory - In-Memory data layer that mimics Redis behaviour..
 
 =head1 DESCRIPTION
 
-=head2 Exceptions
+=head1 Exceptions
 
 =head2 StreamNotFound
 
@@ -43,6 +42,16 @@ exist but it's not.
 =head2 create_stream
 
 Creats an empty stream.
+
+=over 4
+
+=item * C<stream_name> - The name of the stream.
+
+=back
+
+=head2 stream_info
+
+Return stream details
 
 =over 4
 
@@ -119,11 +128,26 @@ This is not exaclty how Redis works but it covers our need at the moment.
 
 =back
 
-=head2 ack_message
+=head2 pending_stream_by_consumer
 
-Remove a message from the pending list.
+Read pending elements from the stream for the given group.
 
-It's safe to call this method multiple time even if the message doesn't exist.
+This operation will return messages consumed but not yet acknowledged only.
+It will return items regardless of their consumer.
+
+=over 4
+
+=item * C<stream_name> - The name of the stream should exist before calling this sub.
+
+=item * C<group_name> - The name of the group should exist before callingg this sub.
+
+=item * C<consumer_name> - The current consumer name, will be used to keep tracking of pendign messages.
+
+=item * C<offset> - If given the consumer can skip the given number of messages.
+
+=item * C<count> - The limit of messages to be received.
+
+=back
 
 =over 4
 
@@ -174,6 +198,14 @@ Subscribe to a channel by optaining a L<Ryu::Source> that'll receive events.
 =item * C<channel_name> - The name of the channel.
 
 =back
+
+=head2 stream_groups_info
+
+Get information about the stream's groups.
+
+=head2 exists
+
+Checks if a  given key exists or not.
 
 =head1 INHERITED METHODS
 

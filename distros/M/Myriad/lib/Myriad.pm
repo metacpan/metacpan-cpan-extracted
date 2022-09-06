@@ -3,7 +3,7 @@ package Myriad;
 
 use Myriad::Class;
 
-our $VERSION = '0.010';
+our $VERSION = '1.000';
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8
@@ -178,6 +178,11 @@ use Myriad::Transport::HTTP;
 use Myriad::Transport::Memory;
 use Myriad::Transport::Redis;
 
+use Future::IO;
+use Future::IO::Impl::IOAsync;
+
+use IO::Async::Loop;
+
 use Log::Any::Adapter;
 
 use Net::Async::OpenTracing;
@@ -297,7 +302,7 @@ async method configure_from_argv (@args) {
 
     $self->setup_logging;
     $self->setup_tracing;
-    $self->setup_metrics;
+    await $self->setup_metrics;
 
     $commands = Myriad::Commands->new(
         myriad => $self
@@ -326,13 +331,35 @@ async method configure_from_argv (@args) {
 
 method config () { $config }
 
+=head2 transport
+
+Returns the L<Myriad::Transport> instance according to the config value.
+
+it's designed to be used by tests, so be careful before using it in the framework code.
+
+it takes a single param
+
+=over 4
+
+=item * component - the RPC, Subscription or storage in lower case
+
+=back
+
+=cut
+
+method transport ($component) {
+    my $config_method = "${component}_transport";
+    my $myriad_method = $config->$config_method->as_string . '_transport';
+    $self->$myriad_method;
+}
+
 =head2 redis
 
 The L<Net::Async::Redis> (or compatible) instance used for service coördination.
 
 =cut
 
-method redis () {
+method redis_transport () {
     unless($redis) {
         $self->loop->add(
             $redis = Myriad::Transport::Redis->new(
@@ -340,12 +367,14 @@ method redis () {
                     redis_uri              => $config->transport_redis->as_string,
                     cluster                => ($config->transport_cluster->as_string ? 1 : 0),
                     client_side_cache_size => $config->transport_redis_cache->as_number,
+                    max_pool_count         => $config->transport_pool_count->as_number,
+                    wait_time              => $config->transport_wait_time->as_number,
                 ) : ()
             )
         );
 
         $self->on_start(async method {
-            await $self->redis->start;
+            await $self->redis_transport->start;
         });
     }
     $redis
@@ -637,16 +666,21 @@ Prepare for logging.
 
 =cut
 
-method setup_logging () {
-    my $level = $config->log_level;
-    STDERR->autoflush(1);
-    $level->subscribe(my $code = sub {
-        Log::Any::Adapter->import(
-            qw(Stderr),
-            log_level => $level->as_string,
-        );
-    });
-    $code->();
+method setup_logging ($code = undef) {
+    state $logging = do {
+        my $level = $config->log_level;
+        $code ||= sub {
+            state $flushed = do {
+                STDERR->autoflush(1);
+            };
+            Log::Any::Adapter->import(
+                qw(Stderr),
+                log_level => $level->as_string,
+            );
+        };
+        $level->subscribe($code);
+        $code->();
+    };
     return;
 }
 
@@ -676,10 +710,17 @@ Prepare L<Metrics::Any::Adapter> to collect metrics.
 
 =cut
 
-method setup_metrics () {
+async method setup_metrics () {
     my $adapter = $config->metrics_adapter;
     my $host = $config->metrics_host;
     my $port = $config->metrics_port;
+
+    try {
+        await $loop->resolver->getaddrinfo(host => $host->as_string, timeout => 10);
+    } catch ($e) {
+        $log->errorf('metrics: unable to resolve host %s - %s', $host->as_string, $e);
+        $host->set_string('127.0.0.1');
+    }
 
     # Metrics::Any::Adapter use a lexical variable to identify
     # the adapter instance that doesn't allow easy overrides.
@@ -687,6 +728,7 @@ method setup_metrics () {
     {
         no warnings 'redefine';
         *Metrics::Any::Adapter::adapter = sub {
+            return $metrics_adapter if ${^GLOBAL_PHASE} eq 'DESTRUCT';
             return $metrics_adapter //= Metrics::Any::Adapter->class_for_type(
                 $adapter->as_string,
             )->new(
@@ -695,8 +737,16 @@ method setup_metrics () {
         )   ;
         };
     }
+
     my $code = sub {
-        undef $metrics_adapter;
+        # Try to resolve the host first
+        $loop->resolver->getaddrinfo(host => $host->as_string, timeout => 10)
+        ->on_done(sub {
+            undef $metrics_adapter;
+        })->on_fail(sub {
+            $log->errorf('metrics: unable to resolve host %s - %s', $host->as_string, shift);
+            $host->set_string('127.0.0.1');
+        })->retain();
     };
 
     $adapter->subscribe($code);
@@ -888,4 +938,4 @@ Deriv Group Services Ltd. C<< DERIV@cpan.org >>
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.

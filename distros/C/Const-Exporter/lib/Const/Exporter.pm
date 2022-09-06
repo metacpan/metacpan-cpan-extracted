@@ -7,11 +7,11 @@ use v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.2.1';
+our $VERSION = 'v1.2.2';
 
 use Carp;
 use Const::Fast;
-use Exporter ();
+use Exporter 5.57 ();
 use List::Util '1.56' => qw/ pairs mesh /;
 use Package::Stash;
 use Ref::Util qw/ is_blessed_ref is_arrayref is_coderef is_hashref is_ref /;
@@ -243,7 +243,7 @@ Const::Exporter - Declare constants for export.
 
 =head1 VERSION
 
-version v1.2.1
+version v1.2.2
 
 =head1 SYNOPSIS
 
@@ -578,7 +578,7 @@ B. Estrade <estrabd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2021 by Robert Rothenberg.
+This software is Copyright (c) 2014-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -9,7 +9,6 @@ use Test::EOL;
 my @files = (
     'lib/Password/OWASP.pm',
     'lib/Password/OWASP/AbstractBase.pm',
-    'lib/Password/OWASP/AbstractBaseX.pm',
     'lib/Password/OWASP/Argon2.pm',
     'lib/Password/OWASP/Bcrypt.pm',
     'lib/Password/OWASP/Scrypt.pm',

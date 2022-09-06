@@ -7,9 +7,9 @@ use warnings;
 use Data::Dmp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 sub meta {
     +{
@@ -31,8 +31,15 @@ sub meta {
             },
         },
         examples => [
+            {value=>"12", filter_args=>{min_len=>3}, valid=>0},
+            {value=>"12345", filter_args=>{min_len=>3}, valid=>1},
+
             {value=>"123", filter_args=>{max_len=>3}, valid=>1},
             {value=>"12345", filter_args=>{max_len=>3}, valid=>0},
+
+            {value=>"123", filter_args=>{match=>'[abc]'}, valid=>0},
+            {value=>"a", filter_args=>{match=>'[abc]'}, valid=>1},
+
         ],
         description => <<'_',
 
@@ -98,7 +105,7 @@ Data::Sah::Filter::perl::Str::check - Perform some checks
 
 =head1 VERSION
 
-This document describes version 0.011 of Data::Sah::Filter::perl::Str::check (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
+This document describes version 0.012 of Data::Sah::Filter::perl::Str::check (from Perl distribution Data-Sah-Filter), released on 2022-07-17.
 
 =head1 SYNOPSIS
 
@@ -124,8 +131,12 @@ This document describes version 0.011 of Data::Sah::Filter::perl::Str::check (fr
 
 =head2 Sample data and filtering results
 
+ 12 # filtered with args {min_len=>3}, INVALID (Length of data must be at least 3), unchanged
+ 12345 # filtered with args {min_len=>3}, valid, unchanged
  123 # filtered with args {max_len=>3}, valid, unchanged
  12345 # filtered with args {max_len=>3}, INVALID (Length of data must be at most 3), unchanged
+ 123 # filtered with args {match=>"[abc]"}, INVALID (Data must match (?^:[abc])), unchanged
+ "a" # filtered with args {match=>"[abc]"}, valid, unchanged
 
 =for Pod::Coverage ^(meta|filter)$
 

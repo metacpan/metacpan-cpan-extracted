@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,29 +16,32 @@ name: JSON-Path
 provides:
   JSON::Path:
     file: lib/JSON/Path.pm
-    version: v1.0.1
+    version: v1.0.2
   JSON::Path::Constants:
     file: lib/JSON/Path/Constants.pm
-    version: v1.0.1
+    version: v1.0.2
   JSON::Path::Evaluator:
     file: lib/JSON/Path/Evaluator.pm
-    version: v1.0.1
+    version: v1.0.2
   JSON::Path::Tokenizer:
     file: lib/JSON/Path/Tokenizer.pm
-    version: v1.0.1
+    version: v1.0.2
 requires:
   Carp::Assert: '0'
   Exporter::Tiny: '0'
   JSON::MaybeXS: '0'
+  JSON::Parse: '0'
   LV: '0'
   List::Util: '1.45'
   Readonly: '0'
+  Tie::IxHash: '0'
   Try::Tiny: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/popefelix/p5-json-path/issues
   homepage: https://github.com/popefelix/p5-json-path
   repository: https://github.com/popefelix/p5-json-path.git
-version: 1.0.1
-x_generated_by_perl: v5.30.1
+version: 1.0.2
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

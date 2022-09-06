@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.71 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.72 {
 
   use 5.020;
   use Moose;
@@ -385,7 +385,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.71
+version 2.72
 
 =head1 DESCRIPTION
 
@@ -704,7 +704,8 @@ jobs:
       fail-fast: false
       matrix:
         cip_tag:
-          - "5.35"
+          - "5.37"
+          - "5.36"
           - "5.34"
           - "5.32"
           - "5.30"

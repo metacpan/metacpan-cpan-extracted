@@ -175,7 +175,7 @@ sub _tweak_for_os {
         }
     }
     else {
-        print "No tweaks for $^O are available. Hopefully none are needed!$/";
+        print "No tweaks for this OS ($^O) are available. Hopefully none are needed!$/";
     }
 }
 
@@ -324,23 +324,16 @@ package MY;
 use Config;
 
 sub postamble {
+
+    # QuickJS requires GNU make.
+    my $make = ($^O =~ m<bsd>i) ? $GMAKE_PATH : '$(MAKE)';
+
+    # The leading “+” is to ensure that parallel builds work properly.
     return <<"MAKE_FRAG"
 
-.PHONY:
-build-quickjs:
-\t$GMAKE_PATH -C quickjs -f '$PERL_QJS_MAKEFILE_PATH' libquickjs.a
+quickjs/libquickjs.a:
+\t+$make -C quickjs -f '$PERL_QJS_MAKEFILE_PATH' libquickjs.a
 MAKE_FRAG
 }
 
-my $orig_top_targets;
-BEGIN {
-$orig_top_targets = __PACKAGE__->can('top_targets');
-}
-
-sub top_targets {
-    my $out = $orig_top_targets->(@_);
-
-    $out =~ s<^(all\s*:+s*)><$1 build-quickjs >;
-
-    return $out;
-}
+1;

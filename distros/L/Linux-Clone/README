@@ -6,8 +6,8 @@ SYNOPSIS
      use Linux::Clone;
 
 DESCRIPTION
-    This module exposes the linux clone(2), unshare(2) and related syscalls
-    to Perl.
+    This module exposes the linux clone(2), unshare(2) and some related
+    syscalls to Perl.
 
     $retval = unshare $flags
         The following CLONE_ flag values (without CLONE_ prefix) are
@@ -27,13 +27,15 @@ DESCRIPTION
            Linux::Clone::NEWIPC
            Linux::Clone::NEWNET
            Linux::Clone::NEWCGROUP
+           Linux::Clone::NEWTIME
 
         Example: unshare the network namespace and prove that by calling
-        ifconfig, showing only an unconfigured lo interface.
+        ifconfig, showing only the unconfigured lo interface.
 
            Linux::Clone::unshare Linux::Clone::NEWNET
               and "unshare: $!";
-           system "ifconfig -a";
+           Linux::Clone::configure_loopback;
+           system "ifconfig";
 
         Example: unshare the network namespace, initialise the loopback
         interface, create a veth interface pair, put one interface into the
@@ -47,13 +49,11 @@ DESCRIPTION
            Linux::Clone::unshare Linux::Clone::NEWNET
              and "unshare: $!";
 
+           Linux::Clone::configure_loopback;
+
            my $ppid = getppid;
 
            system "
-              # configure loopback interface
-              ip link set lo up
-              ip route add 127.0.0.0/8 dev lo
-
               # create veth pair
               ip link add name veth_master type veth peer name veth_slave
 
@@ -86,7 +86,7 @@ DESCRIPTION
            Linux::Clone::unshare Linux::Clone::NEWNS
               and die "unshare: $!";
 
-           # now bind-mount /lib over /etc and ls -l /etc - scary
+           # now bind-mount /lib over /etc and ls -l /etc - looks scary
            system "mount -n --bind /lib /etc";
            system "ls -l /etc";
 
@@ -122,9 +122,11 @@ DESCRIPTION
            Linux::Clone::PARENT_SETTID  (not yet implemented)
            Linux::Clone::CHILD_SETTID   (not yet implemented)
            Linux::Clone::CHILD_CLEARTID (not yet implemented)
+           Linux::Clone::PIDFD          (not yet implemented)
            Linux::Clone::DETACHED
            Linux::Clone::UNTRACED
            Linux::Clone::IO
+           Linux::Clone::CSIGNAL exit signal mask
 
         Note that for practical reasons you basically must not use
         "Linux::Clone::VM" or "Linux::Clone::VFORK", as perl is unlikely to
@@ -142,7 +144,7 @@ DESCRIPTION
         $nstype is missing, then 0 is used.
 
         The argument $nstype can be 0, "Linux::Clone::NEWIPC",
-        "Linux::Clone::NEWNET", "Linux::Clone::NEUTS",
+        "Linux::Clone::NEWNET", "Linux::Clone::NEWUTS",
         "Linux::Clone::NEWCGROUP", "Linux::Clone::NEWNS",
         "Linux::Clone::NEWPID" or "Linux::Clone::NEWUSER".
 
@@ -157,8 +159,33 @@ DESCRIPTION
 
         "Linux::Clone::KCMP_FILE", "Linux::Clone::KCMP_VM",
         "Linux::Clone::KCMP_FILES", "Linux::Clone::KCMP_FS",
-        "Linux::Clone::KCMP_SIGHAND", "Linux::Clone::KCMP_IO" and
-        "Linux::Clone::KCMP_SYSVSEM".
+        "Linux::Clone::KCMP_SIGHAND", "Linux::Clone::KCMP_IO",
+        "Linux::Clone::KCMP_SYSVSEM" and "Linux::Clone::KCMP_EPOLL_TFD".
+
+    Linux::Clone::configure_loopback
+        Configures a working loopback interface (basically, does the
+        equivalent of "ifconfig lo up" which automatically adds ipv4/ipv6
+        addresses and routes), which can be useful to get a network
+        namespace going.
+
+        Dies on error and returns nothing.
+
+    "ioctl" symbols
+        The following ioctl symbols are also provided by this module (see
+        ioctl_ns(8)).
+
+           Linux::Clone::NS_GET_USERNS
+           Linux::Clone::NS_GET_PARENT
+           Linux::Clone::NS_GET_NSTYPE
+           Linux::Clone::NS_OWNER_UID
+
+SEE ALSO
+    IO::AIO has some related functions, such as "pidfd_send_signal", and
+    some unrelated functions that might be useful.
+
+    namspaces(7), cgroup_namespaces(7), pid_namespaces(7),
+    user_namespaces(7), time_namespaces(7), ip-netns(8), switch_root(8),
+    ioctl_ns(2), lsns(8)Q
 
 AUTHOR
      Marc Lehmann <schmorp@schmorp.de>

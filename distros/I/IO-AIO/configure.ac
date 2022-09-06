@@ -271,5 +271,28 @@ int main (void)
 ]])],ac_cv_accept4=yes,ac_cv_accept4=no)])
 test $ac_cv_accept4 = yes && AC_DEFINE(HAVE_ACCEPT4, 1, accept4(2) is available)
 
+AC_CHECK_HEADERS([sys/mount.h])
+AC_CACHE_CHECK(for mount/umount, ac_cv_mount, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <sys/mount.h>
+int main (void)
+{
+   int res;
+   res = mount ("path", "path", "fstype", MS_RDONLY, 0);
+   res = umount ("path");
+   return 0;
+}
+]])],ac_cv_mount=yes,ac_cv_mount=no)])
+test $ac_cv_mount = yes && AC_DEFINE(HAVE_MOUNT, 1, mount/umount are available)
+AC_CACHE_CHECK(for umount2, ac_cv_umount2, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <sys/mount.h>
+int main (void)
+{
+   int res;
+   res = umount2 ("path", MNT_FORCE|MNT_DETACH);
+   return 0;
+}
+]])],ac_cv_umount2=yes,ac_cv_umount2=no)])
+test $ac_cv_umount2 = yes && AC_DEFINE(HAVE_UMOUNT2, 1, umount2 is available)
+
 AC_OUTPUT
 

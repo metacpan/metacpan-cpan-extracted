@@ -1,5 +1,6 @@
 Changes
 Makefile.PL
+inc/WriteMakefile.pl
 inc/boilerplate.pl
 lib/Pod/Readme/Brief.pm
 t/roundtrip.t

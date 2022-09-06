@@ -1,5 +1,6 @@
 Changes
 Makefile.PL
+inc/WriteMakefile.pl
 inc/boilerplate.pl
 lib/Try/Tiny/Tiny.pm
 t/basic.t

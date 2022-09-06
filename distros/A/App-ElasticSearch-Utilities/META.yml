@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.013002'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -58,7 +58,7 @@ requires:
   Types::Standard: '0'
   URI: '0'
   URI::QueryParam: '0'
-  YAML: '0'
+  YAML::XS: '0'
   feature: '0'
   namespace::autoclean: '0'
   parent: '0'
@@ -69,7 +69,7 @@ requires:
 resources:
   bugtracker: https://github.com/reyjrar/es-utils/issues
   repository: git://github.com/reyjrar/es-utils.git
-version: '8.3'
+version: '8.4'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -77,22 +77,22 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: PruneCruft
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: MakeMaker
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: Manifest
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -190,7 +190,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::License
       name: License
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::InsertCopyright
       name: InsertCopyright
@@ -234,15 +234,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl
@@ -277,11 +277,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: Test::Perl::Critic
@@ -318,7 +318,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: CheckPrereqsIndexed
@@ -350,7 +350,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^release-(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.35.1
+          git_version: 2.37.2
           repo_root: .
       name: Git::NextVersion
       version: '2.048'
@@ -375,22 +375,22 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.35.1
+          git_version: 2.37.2
           repo_root: .
       name: Git::Check
       version: '2.048'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -405,7 +405,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.35.1
+          git_version: 2.37.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -418,11 +418,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release-8.3
+          tag: release-8.4
           tag_format: release-%v
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.35.1
+          git_version: 2.37.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -431,7 +431,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -446,7 +446,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.35.1
+          git_version: 2.37.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -460,55 +460,55 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.35.1
+          git_version: 2.37.2
           repo_root: .
       name: Git::Push
       version: '2.048'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.024'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.024'
+      version: '6.025'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.024'
+    version: '6.025'
 x_contributors:
   - 'Alexey Shatlovsky <alexey.shatlovsky@booking.com>'
   - 'Alexey Surikov <ksurent@gmail.com>'

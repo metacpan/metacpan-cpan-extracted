@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000127';
+our $VERSION = '1.000128';
 
 use App::Yath::Options;
 
@@ -790,6 +790,8 @@ sub start_auditor {
     close($self->auditor_writer());
 }
 
+sub collector_options { () }
+
 sub start_collector {
     my $self = shift;
 
@@ -806,6 +808,11 @@ sub start_collector {
         $options{show_runner_output}     = $settings->display->hide_runner_output ? 0 : 1;
         $options{truncate_runner_output} = $settings->display->truncate_runner_output;
     }
+
+    %options = (
+        %options,
+        $self->collector_options(),
+    );
 
     my $ipc = $self->ipc;
     $ipc->spawn(
@@ -1032,7 +1039,7 @@ Exit after showing a helpful usage message
 
 =item --no-no-scan-plugins
 
-Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that it loading other modules when it should not.
+Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that is loading other modules when it should not.
 
 
 =item --plugins PLUGIN

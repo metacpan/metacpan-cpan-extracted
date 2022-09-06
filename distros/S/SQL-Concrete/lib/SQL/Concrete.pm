@@ -1,10 +1,8 @@
-use 5.006;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package SQL::Concrete;
-$SQL::Concrete::VERSION = '1.003';
-# ABSTRACT: render SQL from fragments and placeholders from data structures
+
+our $VERSION = '1.004';
 
 use Exporter::Tidy
 	core    => [ qw( sql_render ) ],
@@ -22,7 +20,9 @@ sub sql_values { my @stuff = @_; bless sub { $_[0]->render_values( @stuff ) }, _
 sub sql_select { my @stuff = @_; bless sub { $_[0]->render_select( @stuff ) }, __PACKAGE__ }
 
 package SQL::Concrete::Renderer;
-$SQL::Concrete::Renderer::VERSION = '1.003';
+
+our $VERSION = '1.004';
+
 use Object::Tiny::Lvalue qw( alias_id prev_item bind );
 
 # our code references are blessed into this package
@@ -182,10 +182,6 @@ __END__
 
 SQL::Concrete - render SQL from fragments and placeholders from data structures
 
-=head1 VERSION
-
-version 1.003
-
 =head1 SYNOPSIS
 
  use SQL::Concrete ':all';
@@ -233,7 +229,7 @@ having to have specific support for almost any of them.
 
 =item SQL::Abstract, trying to express it all:
 
- { name => { like => '%son' }, age => [ -and => { '>=', 10 }, { '<=', 20 } ] }
+ { name => { like => '%son' }, age => { '>=', 10, '<=', 20 } }
 
 =item SQL::Concrete, lacking syntactic shortcuts for this task:
 
@@ -360,7 +356,7 @@ It optionally accepts a name for the table reference as its first argument:
  ()  SELECT nonsense => [1, 2, 3, 4]
  ->  '(SELECT ?, ?, ?, ?) AS nonsense', 1, 2, 3, 4
 
-You can pass an undefined value to ask it to autogenerate a name this will be
+You can pass an undefined value to ask it to autogenerate a name that will be
 unique to this query:
 
  ()  SELECT undef, [1, 2, 3, 4]

@@ -1,4 +1,5 @@
-use strict;
+use strict; use warnings;
+
 use XML::Builder;
 use Test::More tests => 6;
 

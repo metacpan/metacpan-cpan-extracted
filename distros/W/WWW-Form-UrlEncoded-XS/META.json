@@ -56,7 +56,7 @@
    "provides" : {
       "WWW::Form::UrlEncoded::XS" : {
          "file" : "lib/WWW/Form/UrlEncoded/XS.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
@@ -71,9 +71,10 @@
          "web" : "https://github.com/kazeburo/WWW-Form-UrlEncoded-XS"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_contributors" : [
       "Brian Fraser <brian.fraser@booking.com>",
+      "Leon Timmermans <fawaka@gmail.com>",
       "Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.04",

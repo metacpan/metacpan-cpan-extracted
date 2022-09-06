@@ -1,0 +1,7 @@
+#install_default
+.git.*
+Makefile$
+MANIFEST.bak
+Media-Convert-[\d.]+
+blib/.*
+pm_to_blib

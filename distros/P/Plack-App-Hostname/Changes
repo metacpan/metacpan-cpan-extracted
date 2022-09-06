@@ -1,5 +1,9 @@
 Release history for Plack-App-Hostname
 
+1.002 Tue 04 Sep 2022
+	- No functional changes
+	- Updated packaging and package metadata
+
 1.001 Tue 20 Sep 2016
 	- Packaging changes
 	- Small optimisation in hottest code path

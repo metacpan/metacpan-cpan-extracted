@@ -1,0 +1,89 @@
+NAME
+    CPAN::Smoker::Utils - Set of CLI's to manage a Perl CPAN smoker machine
+
+DESCRIPTION
+    This module exports some functions used to manage a smoker testing
+    machine based on CPAN::Reporter::Smoker.
+
+  Command Line Interfaces programs
+    The following programs are available under this distribution:
+
+    *   "dblock": blocks a distribution to be tested in the smoker.
+
+    *   "mirror_cleanup": further removes spurious files from a local CPAN
+        mirror.
+
+    *   "send_reports": send local stored tests results to a running
+        metabase::relayd.
+
+    You can check each program online documentation by using "perldoc
+    dblock", "perldoc mirror_cleanup" and "perldoc send_reports" after
+    installing the distribution.
+
+EXPORTS
+    Only the "sub" "is_distro_ok" is exported, if explicit requested.
+
+  is_distro_ok
+    Expects as parameter a string in the format "AUTHOR/DISTRIBUTION".
+
+    It executes some very basic testing against the string.
+
+    Returns true or false depending if the string passes the tests. It will
+    also "warn" if things are not OK.
+
+  block_distro
+    Blocks a distribution to be tested under the smoker by using a
+    distroprefs file.
+
+    Expects as parameters:
+
+    1.  a distribution name (for example, "JOHNDOE/Some-Distro-Name").
+
+    2.  The perl interpreter (which is in execution) configuration.
+
+    3.  An comment to include in the distroprefs file.
+
+    It returns a hash reference containing keys/values that could be
+    directly serialized to YAML (or other format) but the "full_path" key,
+    that contains a suggest complete path to the distroprefs file (based on
+    the CPAN "prefs_dir" configuration client.
+
+    If there is an already file created as defined in "full_path" key, it
+    will "warn" and return "undef".
+
+SEE ALSO
+    For more details about those programs interact with the smoker and
+    CPAN::Reporter, be sure to read the documentation about CPAN client,
+    specially the part about DistroPrefs.
+
+    You will also want to take a look at the following programs
+    documentation:
+
+    *   "perldoc send_reports"
+
+    *   "perldoc dblock"
+
+    *   "perldoc mirror_cleanup"
+
+AUTHOR
+    Alceu Rodrigues de Freitas Junior, <arfreitas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 of Alceu Rodrigues de Freitas
+    Junior, arfreitas@cpan.org
+
+    This file is part of CPAN Smoker Utils.
+
+    CPAN Smoker Utils is free software: you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or (at
+    your option) any later version.
+
+    CPAN Smoker Utils is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with CPAN Smoker Utils. If not, see <http://www.gnu.org/licenses/>.
+

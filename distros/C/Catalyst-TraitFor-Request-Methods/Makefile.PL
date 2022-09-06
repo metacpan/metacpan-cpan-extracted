@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Catalyst-TraitFor-Request-Methods",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Catalyst::TraitFor::Request::Methods",
   "PREREQ_PM" => {
     "Catalyst" => "5.90090",
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.3.2",
+  "VERSION" => "v0.4.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

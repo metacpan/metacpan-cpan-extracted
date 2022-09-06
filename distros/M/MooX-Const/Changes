@@ -1,5 +1,11 @@
 Revision history for MooX-Const:
 
+v0.5.4    2022-09-04 16:02:53+01:00 Europe/London
+  [Other]
+  - Sign distribution.
+
+  - Update MANIFEST.SKIP.
+
 v0.5.3    2022-04-03 17:42:59+01:00 Europe/London
   [Bug Fixes]
   - Writers will throw errors, unless it is a write-once attribute.

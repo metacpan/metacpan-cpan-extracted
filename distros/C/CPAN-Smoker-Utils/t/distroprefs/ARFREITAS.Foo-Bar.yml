@@ -1,0 +1,10 @@
+---
+comment: Tests hang smoker
+disabled: 1
+match:
+  distribution: ^ARFREITAS/Foo-Bar
+  perlconfig:
+    useithreads: '^$'
+    osname: openbsd
+    archname: Openbsd.amd64-openbsd
+

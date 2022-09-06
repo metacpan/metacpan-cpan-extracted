@@ -1,3 +1,57 @@
+1.04      2022-09-06 06:18:25-04:00 America/New_York
+
+    * No changes.  Promote to production.
+
+1.03      2022-09-04 10:59:51-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+    * require minimum version of Data::Dumper for Trailingcommas
+      option
+
+1.02      2022-09-03 18:19:28-04:00 America/New_York (TRIAL RELEASE)
+
+  [TESTS]
+
+    * stream tests which perform compares on dumps
+      need to perform CR/LF conversion on MS Windows systems.
+
+
+1.01      2022-09-03 09:30:13-04:00 America/New_York
+
+  [TESTS]
+
+    * don't check for actual value of round-tripped JSON and YAML
+      booleans, just if it's true/false.
+
+    * fix Americanized spelling of Types::Serialiser::Boolean
+
+1.00      2022-09-03 08:47:05-04:00 America/New_York
+
+  [API CHANGE]
+
+    * ::Sink:stream no longer takes an 'fh' parameter.  All output
+      streams (including file handles) are specified via the 'output'
+      parameter.
+
+  [BUG FIX]
+
+    * streams which write to a passed fh no longer close the fh
+
+  [ENHANCEMENT]
+
+    * Sink::stream functionality moved into Role::Sink::Stream so
+      can be reused
+
+    * streams now recognize more types of file handle objects
+
+    * Data::Dumper sink
+        * optimized to use a single DD object rather than creating one
+          for each send operation
+        * DD configuration variables can be specified
+        * can use an existing DD object
+
+
 0.34      2022-01-27 10:44:45-05:00 America/New_York
 
 

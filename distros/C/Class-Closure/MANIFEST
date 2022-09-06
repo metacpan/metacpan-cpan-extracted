@@ -2,6 +2,7 @@ Changes
 Makefile.PL
 TODO
 author/benchmark.pl
+inc/WriteMakefile.pl
 inc/boilerplate.pl
 lib/Class/Closure.pm
 t/basic.t

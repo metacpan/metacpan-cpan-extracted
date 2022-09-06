@@ -2,7 +2,7 @@ package Catalyst::TraitFor::Request::Methods;
 
 # ABSTRACT: Add enumerated methods for HTTP requests
 
-use v5.10.1;
+use v5.14;
 
 use Moose::Role;
 
@@ -12,19 +12,17 @@ use namespace::autoclean;
 
 requires 'method';
 
-our $VERSION = 'v0.3.2';
+our $VERSION = 'v0.4.0';
 
 
-my @METHODS = qw/ get head post put delete connect options trace patch propfind unrecognized_method /;
+my @METHODS = qw/ get head post put delete connect options trace patch unrecognized_method /;
 
 has _method_enum => (
     is => 'ro',
     lazy => 1,
     default => sub {
         state $enum = Data::Enum->new(@METHODS);
-        my $method = $_[0]->method;
-        $method =~ s/\W/_/g;
-        return eval { $enum->new(lc $method) } // $enum->new('unrecognized_method');
+        return eval { $enum->new(lc $_[0]->method =~ s/\W/_/gr) } // $enum->new('unrecognized_method');
     },
     handles => [ map { "is_" . $_ } @METHODS ],
 );
@@ -44,7 +42,7 @@ Catalyst::TraitFor::Request::Methods - Add enumerated methods for HTTP requests
 
 =head1 VERSION
 
-version v0.3.2
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -117,10 +115,6 @@ The request method is C<TRACE>.
 =head2 is_patch
 
 The request method is C<PATCH>.
-
-=head2 is_propfind
-
-The request method is C<PROPFIND>.
 
 =head2 is_unrecognized_method
 

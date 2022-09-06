@@ -173,7 +173,7 @@ use common::sense;
 use base 'Exporter';
 
 BEGIN {
-   our $VERSION = 4.76;
+   our $VERSION = 4.78;
 
    our @AIO_REQ = qw(aio_sendfile aio_seek aio_read aio_write aio_open aio_close
                      aio_stat aio_lstat aio_unlink aio_rmdir aio_readdir aio_readdirx
@@ -194,7 +194,12 @@ BEGIN {
                        nreqs nready npending nthreads
                        max_poll_time max_poll_reqs
                        sendfile fadvise madvise
-                       mmap munmap mremap munlock munlockall);
+                       mmap munmap mremap munlock munlockall
+
+                       accept4 tee splice pipe2 pipesize
+                       fexecve mount umount memfd_create eventfd
+                       timerfd_create timerfd_settime timerfd_gettime
+                       pidfd_open pidfd_send_signal pidfd_getfd);
 
    push @AIO_REQ, qw(aio_busy); # not exported
 
@@ -287,6 +292,7 @@ documentation.
 
    IO::AIO::sendfile $ofh, $ifh, $offset, $count
    IO::AIO::fadvise $fh, $offset, $len, $advice
+   IO::AIO::fexecve $fh, $argv, $envp
 
    IO::AIO::mmap $scalar, $length, $prot, $flags[, $fh[, $offset]]
    IO::AIO::munmap $scalar
@@ -308,13 +314,23 @@ documentation.
    IO::AIO::accept4 $r_fh, $sockaddr, $sockaddr_len, $flags
    IO::AIO::splice $r_fh, $r_off, $w_fh, $w_off, $length, $flags
    IO::AIO::tee $r_fh, $w_fh, $length, $flags
+
    $actual_size = IO::AIO::pipesize $r_fh[, $new_size]
    ($rfh, $wfh) = IO::AIO::pipe2 [$flags]
-   $fh = IO::AIO::memfd_create $pathname[, $flags]
+
    $fh = IO::AIO::eventfd [$initval, [$flags]]
+   $fh = IO::AIO::memfd_create $pathname[, $flags]
+
    $fh = IO::AIO::timerfd_create $clockid[, $flags]
    ($cur_interval, $cur_value) = IO::AIO::timerfd_settime $fh, $flags, $new_interval, $nbw_value
    ($cur_interval, $cur_value) = IO::AIO::timerfd_gettime $fh
+
+   $fh = IO::AIO::pidfd_open $pid[, $flags]
+   $status = IO::AIO::pidfd_send_signal $pidfh, $signal[, $siginfo[, $flags]]
+   $fh = IO::AIO::pidfd_getfd $pidfh, $targetfd[, $flags]
+
+   $retval = IO::AIO::mount $special, $path, $fstype, $flags = 0, $data = undef
+   $retval = IO::AIO::umount $path, $flags = 0
 
 =head2 API NOTES
 
@@ -1340,6 +1356,11 @@ C<FS_XFLAG_SYNC>, C<FS_XFLAG_NOATIME>, C<FS_XFLAG_NODUMP>, C<FS_XFLAG_RTINHERIT>
 C<FS_XFLAG_PROJINHERIT>, C<FS_XFLAG_NOSYMLINKS>, C<FS_XFLAG_EXTSIZE>, C<FS_XFLAG_EXTSZINHERIT>,
 C<FS_XFLAG_NODEFRAG>, C<FS_XFLAG_FILESTREAM>, C<FS_XFLAG_DAX>, C<FS_XFLAG_HASATTR>,
 
+C<BLKROSET>, C<BLKROGET>, C<BLKRRPART>, C<BLKGETSIZE>, C<BLKFLSBUF>, C<BLKRASET>,
+C<BLKRAGET>, C<BLKFRASET>, C<BLKFRAGET>, C<BLKSECTSET>, C<BLKSECTGET>, C<BLKSSZGET>,
+C<BLKBSZGET>, C<BLKBSZSET>, C<BLKGETSIZE64>,
+
+
 =item aio_sync $callback->($status)
 
 Asynchronously call sync and call the callback when finished.
@@ -2063,12 +2084,13 @@ longer exceeded.
 In other words, this setting does not enforce a queue limit, but can be
 used to make poll functions block if the limit is exceeded.
 
-This is a very bad function to use in interactive programs because it
-blocks, and a bad way to reduce concurrency because it is inexact: Better
-use an C<aio_group> together with a feed callback.
+This is a bad function to use in interactive programs because it blocks,
+and a bad way to reduce concurrency because it is inexact. If you need to
+issue many requests without being able to call a poll function on demand,
+it is better to use an C<aio_group> together with a feed callback.
 
-Its main use is in scripts without an event loop - when you want to stat
-a lot of files, you can write something like this:
+Its main use is in scripts without an event loop - when you want to stat a
+lot of files, you can write something like this:
 
    IO::AIO::max_outstanding 32;
 
@@ -2079,10 +2101,11 @@ a lot of files, you can write something like this:
 
    IO::AIO::flush;
 
-The call to C<poll_cb> inside the loop will normally return instantly, but
-as soon as more thna C<32> reqeusts are in-flight, it will block until
-some requests have been handled. This keeps the loop from pushing a large
-number of C<aio_stat> requests onto the queue.
+The call to C<poll_cb> inside the loop will normally return instantly,
+allowing the loop to progress, but as soon as more than C<32> requests
+are in-flight, it will block until some requests have been handled. This
+keeps the loop from pushing a large number of C<aio_stat> requests onto
+the queue (which, with many paths to stat, can use up a lot of memory).
 
 The default value for C<max_outstanding> is very large, so there is no
 practical limit on the number of outstanding requests.
@@ -2219,6 +2242,38 @@ some "Advanced I/O" function not available to in Perl, without going the
 counterpart.
 
 =over 4
+
+=item $retval = IO::AIO::fexecve $fh, $argv, $envp
+
+A more-or-less direct equivalent to the POSIX C<fexecve> functions, which
+allows you to specify the program to be executed via a file descriptor (or
+handle). Returns C<-1> and sets errno to C<ENOSYS> if not available.
+
+=item $retval = IO::AIO::mount $special, $path, $fstype, $flags = 0, $data = undef
+
+Calls the GNU/Linux mount syscall with the given arguments. All except
+C<$flags> are strings, and if C<$data> is C<undef>, a C<NULL> will be
+passed.
+
+The following values for C<$flags> are available:
+
+C<IO::AIO::MS_RDONLY>, C<IO::AIO::MS_NOSUID>, C<IO::AIO::MS_NODEV>, C<IO::AIO::MS_NOEXEC>, C<IO::AIO::MS_SYNCHRONOUS>,
+C<IO::AIO::MS_REMOUNT>, C<IO::AIO::MS_MANDLOCK>, C<IO::AIO::MS_DIRSYNC>, C<IO::AIO::MS_NOATIME>,
+C<IO::AIO::MS_NODIRATIME>, C<IO::AIO::MS_BIND>, C<IO::AIO::MS_MOVE>, C<IO::AIO::MS_REC>, C<IO::AIO::MS_SILENT>,
+C<IO::AIO::MS_POSIXACL>, C<IO::AIO::MS_UNBINDABLE>, C<IO::AIO::MS_PRIVATE>, C<IO::AIO::MS_SLAVE>, C<IO::AIO::MS_SHARED>,
+C<IO::AIO::MS_RELATIME>, C<IO::AIO::MS_KERNMOUNT>, C<IO::AIO::MS_I_VERSION>, C<IO::AIO::MS_STRICTATIME>,
+C<IO::AIO::MS_LAZYTIME>, C<IO::AIO::MS_ACTIVE>, C<IO::AIO::MS_NOUSER>, C<IO::AIO::MS_RMT_MASK>, C<IO::AIO::MS_MGC_VAL> and
+C<IO::AIO::MS_MGC_MSK>.
+
+=item $retval = IO::AIO::umount $path, $flags = 0
+
+Invokes the GNU/Linux C<umount> or C<umount2> syscalls. Always calls
+C<umount> if C<$flags> is C<0>, otherwqise always tries to call
+C<umount2>.
+
+The following C<$flags> are available:
+
+C<IO::AIO::MNT_FORCE>, C<IO::AIO::MNT_DETACH>, C<IO::AIO::MNT_EXPIRE> and C<IO::AIO::UMOUNT_NOFOLLOW>.
 
 =item $numfd = IO::AIO::get_fdlimit
 
@@ -2485,7 +2540,8 @@ C<undef>. If the memfd_create syscall is missing, fails with C<ENOSYS>.
 Please refer to L<memfd_create(2)> for more info on this call.
 
 The following C<$flags> values are available: C<IO::AIO::MFD_CLOEXEC>,
-C<IO::AIO::MFD_ALLOW_SEALING> and C<IO::AIO::MFD_HUGETLB>.
+C<IO::AIO::MFD_ALLOW_SEALING>, C<IO::AIO::MFD_HUGETLB>,
+C<IO::AIO::MFD_HUGETLB_2MB> and C<IO::AIO::MFD_HUGETLB_1GB>.
 
 Example: create a new memfd.
 

@@ -1,12 +1,9 @@
 package Myriad::Service::Attributes;
 
-use strict;
-use warnings;
+use Myriad::Class;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '1.000'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
-
-use utf8;
 
 =encoding utf8
 
@@ -31,9 +28,6 @@ which does all the real work.
 
 use Myriad::Registry;
 
-use Log::Any qw($log);
-use Exporter qw(import export_to_level);
-
 use Sub::Util ();
 
 our %KNOWN_ATTRIBUTES = (
@@ -43,7 +37,9 @@ our %KNOWN_ATTRIBUTES = (
     Receiver => 'receiver',
 );
 
-=head2 MODIFY_CODE_ATTRIBUTES
+=head1 METHODS
+
+=head2 apply_attributes
 
 Due to L<Attribute::Handlers> limitations at runtime, we need to pick
 up attributes ourselves.
@@ -60,7 +56,7 @@ sub apply_attributes {
         # an m//gc parser later with a restricted set of options.
         $args = eval "+{ $args }" // die 'invalid attribute parameters: ' . $@ if length $args;
 
-        $log->tracef('Attribute %s (%s) applying to %s', $type, $args, $pkg);
+        $log->tracef('Applying %s attribute to %s::%s with args (%s)', $type, $pkg, $method, $args);
         my $handler = $KNOWN_ATTRIBUTES{$type}
             or die 'unknown attribute ' . $type;
         $class->$handler(
@@ -87,6 +83,7 @@ This will cause the method to be registered in L<Myriad::Registry/add_rpc>.
 
 sub rpc {
     my ($class, $pkg, $method, $code, $args) = @_;
+    require Myriad;
     $Myriad::REGISTRY->add_rpc(
         $pkg,
         $method,
@@ -161,5 +158,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

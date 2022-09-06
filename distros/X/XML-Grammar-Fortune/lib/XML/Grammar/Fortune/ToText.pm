@@ -1,11 +1,11 @@
 package XML::Grammar::Fortune::ToText;
-$XML::Grammar::Fortune::ToText::VERSION = '0.0802';
+$XML::Grammar::Fortune::ToText::VERSION = '0.0900';
 use warnings;
 use strict;
 
-use XML::LibXML qw/ XML_CDATA_SECTION_NODE XML_ELEMENT_NODE XML_TEXT_NODE /;
+use XML::LibXML  qw/ XML_CDATA_SECTION_NODE XML_ELEMENT_NODE XML_TEXT_NODE /;
 use Text::Format ();
-use List::Util   (qw(max));
+use List::Util (qw(max));
 
 use Carp ();
 
@@ -27,7 +27,7 @@ has '_is_first_line' => ( isa => "Bool", is      => 'rw' );
 has '_input'         => ( is  => 'rw',  init_arg => 'input',  required => 1, );
 has '_output'        => ( is  => 'rw',  init_arg => 'output', required => 1, );
 has '_this_line'     => ( isa => 'Str', is       => 'rw',     default  => '', );
-has '_buf'           => (
+has '_buf' => (
     isa     => 'ScalarRef[Str]',
     is      => 'rw',
     default => sub { my $s = ''; return \$s; }
@@ -762,7 +762,7 @@ XML::Grammar::Fortune::ToText - convert the FortunesXML grammar to plaintext.
 
 =head1 VERSION
 
-version 0.0802
+version 0.0900
 
 =head1 SYNOPSIS
 

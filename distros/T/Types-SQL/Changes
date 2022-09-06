@@ -1,5 +1,13 @@
 Revision history for Types-SQL
 
+v0.6.1    2022-09-04 15:58:06+01:00 Europe/London
+  [Other]
+  - Specify minimum version of Exporter.
+
+  - Update MANIFEST.SKIP rules.
+
+  - Sign release.
+
 v0.6.0    2022-04-23 12:53:00+01:00 Europe/London
   [Enhancements]
   - Recognise some types from Types::DateTime.

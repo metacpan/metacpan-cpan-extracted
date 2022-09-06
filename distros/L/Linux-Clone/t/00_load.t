@@ -3,3 +3,5 @@ END {print "not ok 1\n" unless $loaded;}
 use Linux::Clone;
 $loaded = 1;
 print "ok 1\n";
+
+Linux::Clone::CSIGNAL();

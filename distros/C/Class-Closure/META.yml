@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Closure
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ap/Class-Closure.git
-version: '0.303'
+version: '0.304'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2015

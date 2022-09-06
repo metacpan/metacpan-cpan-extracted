@@ -5,14 +5,19 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 sub meta {
     +{
         v => 1,
         summary => 'Convert string to lowercase',
+        examples => [
+            {value=>'foo'},
+            {value=>'Foo', filtered_value=>'foo'},
+            {value=>'FOO', filtered_value=>'foo'},
+        ],
     };
 }
 
@@ -45,7 +50,7 @@ Data::Sah::Filter::perl::Str::lowercase - Convert string to lowercase
 
 =head1 VERSION
 
-This document describes version 0.011 of Data::Sah::Filter::perl::Str::lowercase (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
+This document describes version 0.012 of Data::Sah::Filter::perl::Str::lowercase (from Perl distribution Data-Sah-Filter), released on 2022-07-17.
 
 =head1 SYNOPSIS
 
@@ -67,6 +72,12 @@ This document describes version 0.011 of Data::Sah::Filter::perl::Str::lowercase
 
  my $filter = gen_filter([["Str::lowercase"]]);
  my $filtered_value = $filter->($some_data);
+
+=head2 Sample data and filtering results
+
+ "foo" # valid, unchanged
+ "Foo" # valid, becomes "foo"
+ "FOO" # valid, becomes "foo"
 
 =for Pod::Coverage ^(meta|filter)$
 

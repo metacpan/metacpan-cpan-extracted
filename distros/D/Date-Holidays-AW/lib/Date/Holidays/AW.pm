@@ -1,7 +1,5 @@
-use utf8;
-
 package Date::Holidays::AW;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -23,7 +21,7 @@ my %FIXED_DATES = (
     'newyears' => {
         m   => 1,
         d   => 1,
-        pap => 'Aña Nobo',
+        pap => "A\x{00F1}a Nobo",
         nl  => 'Nieuwjaarsdag',
         en  => 'New years day',
     },
@@ -37,7 +35,7 @@ my %FIXED_DATES = (
     'flagday' => {
         m   => 3,
         d   => 18,
-        pap => 'Na dia di Himno y Bandera',
+        pap => 'Dia di Himno y Bandera',
         nl  => 'Nationale vlag en volkslied',
         en  => 'Flag day',
     },
@@ -46,7 +44,7 @@ my %FIXED_DATES = (
         d      => 27,
         nl     => 'Koningsdag',
         en     => 'Kings day',
-        pap    => 'Dia di Reino',
+        pap    => 'Dia di Rei',
         # change day of week if it falls on a sunday
         dow    => { 7 => -1 },
         year_started => 2014,
@@ -105,6 +103,8 @@ my %FIXED_DATES = (
         pap => 'Dia di Labor/Dia di Obrero',
         nl  => 'Dag van de arbeid',
         en  => 'Labor day',
+        # change day of week if it falls on a sunday
+        dow          => { 7 => 1 },
     },
     'xmas' => {
         m   => 12,
@@ -285,19 +285,19 @@ Date::Holidays::AW - Aruba's official holidays
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
-    use Date::Holidays::NL;
+    use Date::Holidays::AW;
 
-    if (my $thing = is_holiday(2020, 5, 5, lang => 'en')) {
-        print "It is $thing!", $/; # prints liberation day
+    if (my $thing = is_holiday(2020, 3, 18, lang => 'en')) {
+        print "It is $thing!", $/; # prints 'It is Betico day!'
     }
 
 =head1 DESCRIPTION
 
-A L<Date::Holidays> family member from the Netherlands
+A L<Date::Holidays> family member from Aruba
 
 =head1 METHODS
 
@@ -307,22 +307,22 @@ L<Date::Holidays::Abstract>.
 =head2 is_holiday(yyyy, mm, dd, %additional)
 
     is_holiday(
-        '2022', '05', '05',
+        '2020', '3', '18',
         gov  => 1,      # Important for government institutions
-        lang => 'en'    # defaults to nl/nld, alternatively en/eng can be used.
+        lang => 'en'    # defaults to pap, alternatively nl/nld or en/eng can be used.
     );
 
 =head2 is_holiday_dt(dt, %additional)
 
-    is_holiday(
+    is_holiday_dt(
         DateTime->new(
-            year      => 2022,
-            month     => 5,
-            day       => 5,
-            time_zone => 'Europe/Amsterdam',
+            year      => 2020,
+            month     => 3,
+            day       => 18,
+            time_zone => 'America/Curacao',
         ),
         gov  => 1,      # Important for government institutions
-        lang => 'en'    # defaults to nl/nld, alternatively en/eng can be used.
+        lang => 'en'    # defaults to pap, alternatively nl/nld or en/eng can be used.
     );
 
 =head2 holidays(yyyy, gov => 1)
@@ -330,6 +330,11 @@ L<Date::Holidays::Abstract>.
     holidays('2022', gov  => 1);
 
 Similar API to the other functions, returns an hashref for the year.
+
+=head1 UTF-8
+
+Be aware that we return UTF-8 when Papiamento is chosen. So make sure you set
+your enconding to UTF-8, otherwise you may see weird things.
 
 =head1 AUTHOR
 

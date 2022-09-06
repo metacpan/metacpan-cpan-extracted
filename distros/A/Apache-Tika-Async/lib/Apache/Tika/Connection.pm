@@ -2,7 +2,7 @@ package Apache::Tika::Connection;
 use strict;
 use Moo::Role;
 use JSON::XS;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub decode_response {
     my( $self, $body ) = @_;

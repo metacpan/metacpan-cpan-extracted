@@ -1,3 +1,6 @@
+0.84 Sat 03 Sep 2022 09:20:20 PM CEST
+ - Add option ForbidDuplicateKeys (PR#105 tinita)
+
 0.83 Sat 08 May 2021 11:51:32 PM CEST
  - Recognize tied variables (PR#101 tinita)
  - Add license file from included libyaml code (PR#102 tinita)

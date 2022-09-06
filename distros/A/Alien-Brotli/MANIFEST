@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+SIGNATURE
 alienfile
 cpanfile
 dist.ini

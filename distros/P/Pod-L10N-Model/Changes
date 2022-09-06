@@ -1,0 +1,6 @@
+Revision history for Perl extension Pod-L10N-Model
+
+1.06 2022-09-03T06:55:10Z
+
+    - separate from Pod::HTML 1.05
+

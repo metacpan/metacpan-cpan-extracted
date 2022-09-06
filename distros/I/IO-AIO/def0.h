@@ -513,6 +513,12 @@
 #ifndef MFD_HUGETLB
 #define MFD_HUGETLB 0
 #endif
+#ifndef MFD_HUGETLB_2MB
+#define MFD_HUGETLB_2MB 0
+#endif
+#ifndef MFD_HUGETLB_1GB
+#define MFD_HUGETLB_1GB 0
+#endif
 #ifndef CLOCK_REALTIME
 #define CLOCK_REALTIME 0
 #endif
@@ -734,6 +740,150 @@
 #endif
 #ifndef MOUNT_ATTR_NODIRATIME
 #define MOUNT_ATTR_NODIRATIME 0
+#endif
+#ifndef MS_RDONLY
+#define MS_RDONLY 0
+#endif
+#ifndef MS_NOSUID
+#define MS_NOSUID 0
+#endif
+#ifndef MS_NODEV
+#define MS_NODEV 0
+#endif
+#ifndef MS_NOEXEC
+#define MS_NOEXEC 0
+#endif
+#ifndef MS_SYNCHRONOUS
+#define MS_SYNCHRONOUS 0
+#endif
+#ifndef MS_REMOUNT
+#define MS_REMOUNT 0
+#endif
+#ifndef MS_MANDLOCK
+#define MS_MANDLOCK 0
+#endif
+#ifndef MS_DIRSYNC
+#define MS_DIRSYNC 0
+#endif
+#ifndef MS_NOATIME
+#define MS_NOATIME 0
+#endif
+#ifndef MS_NODIRATIME
+#define MS_NODIRATIME 0
+#endif
+#ifndef MS_BIND
+#define MS_BIND 0
+#endif
+#ifndef MS_MOVE
+#define MS_MOVE 0
+#endif
+#ifndef MS_REC
+#define MS_REC 0
+#endif
+#ifndef MS_SILENT
+#define MS_SILENT 0
+#endif
+#ifndef MS_POSIXACL
+#define MS_POSIXACL 0
+#endif
+#ifndef MS_UNBINDABLE
+#define MS_UNBINDABLE 0
+#endif
+#ifndef MS_PRIVATE
+#define MS_PRIVATE 0
+#endif
+#ifndef MS_SLAVE
+#define MS_SLAVE 0
+#endif
+#ifndef MS_SHARED
+#define MS_SHARED 0
+#endif
+#ifndef MS_RELATIME
+#define MS_RELATIME 0
+#endif
+#ifndef MS_KERNMOUNT
+#define MS_KERNMOUNT 0
+#endif
+#ifndef MS_I_VERSION
+#define MS_I_VERSION 0
+#endif
+#ifndef MS_STRICTATIME
+#define MS_STRICTATIME 0
+#endif
+#ifndef MS_LAZYTIME
+#define MS_LAZYTIME 0
+#endif
+#ifndef MS_ACTIVE
+#define MS_ACTIVE 0
+#endif
+#ifndef MS_NOUSER
+#define MS_NOUSER 0
+#endif
+#ifndef MS_RMT_MASK
+#define MS_RMT_MASK 0
+#endif
+#ifndef MS_MGC_VAL
+#define MS_MGC_VAL 0
+#endif
+#ifndef MS_MGC_MSK
+#define MS_MGC_MSK 0
+#endif
+#ifndef MNT_FORCE
+#define MNT_FORCE 0
+#endif
+#ifndef MNT_DETACH
+#define MNT_DETACH 0
+#endif
+#ifndef MNT_EXPIRE
+#define MNT_EXPIRE 0
+#endif
+#ifndef UMOUNT_NOFOLLOW
+#define UMOUNT_NOFOLLOW 0
+#endif
+#ifndef BLKROSET
+#define BLKROSET 0
+#endif
+#ifndef BLKROGET
+#define BLKROGET 0
+#endif
+#ifndef BLKRRPART
+#define BLKRRPART 0
+#endif
+#ifndef BLKGETSIZE
+#define BLKGETSIZE 0
+#endif
+#ifndef BLKFLSBUF
+#define BLKFLSBUF 0
+#endif
+#ifndef BLKRASET
+#define BLKRASET 0
+#endif
+#ifndef BLKRAGET
+#define BLKRAGET 0
+#endif
+#ifndef BLKFRASET
+#define BLKFRASET 0
+#endif
+#ifndef BLKFRAGET
+#define BLKFRAGET 0
+#endif
+#ifndef BLKSECTSET
+#define BLKSECTSET 0
+#endif
+#ifndef BLKSECTGET
+#define BLKSECTGET 0
+#endif
+#ifndef BLKSSZGET
+#define BLKSSZGET 0
+#endif
+#ifndef BLKBSZGET
+#define BLKBSZGET 0
+#endif
+#ifndef BLKBSZSET
+#define BLKBSZSET 0
+#endif
+#ifndef BLKGETSIZE64
+#define BLKGETSIZE64 0
 #endif
 #if HAVE_SYSCALL
 # if __linux__ && !defined(SYS_pidfd_open)

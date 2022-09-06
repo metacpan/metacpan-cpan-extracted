@@ -5,7 +5,7 @@ package App::ElasticSearch::Utilities::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '8.3'; # VERSION
+our $VERSION = '8.4'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:output);
@@ -13,7 +13,7 @@ use JSON::MaybeXS;
 use LWP::UserAgent;
 use Module::Load;
 use Ref::Util qw(is_ref is_arrayref is_hashref);
-use Types::Standard qw( Enum InstanceOf Int Str );
+use Types::Standard qw( Enum HashRef InstanceOf Int Str );
 use URI;
 use URI::QueryParam;
 
@@ -34,7 +34,7 @@ has 'port' => (
 
 
 has 'proto' => (
-    is      => 'ro',
+    is      => 'rw',
     isa     => Enum[qw(http https)],
     default => sub { 'http' },
 );
@@ -47,23 +47,29 @@ has 'timeout' => (
 );
 
 
+has 'username' => (
+    is      => 'ro',
+    isa     => Str,
+    default => sub { $ENV{USER} },
+);
+
+
+has 'password' => (
+    is => 'ro',
+);
+
+
+has 'ssl_opts' => (
+    is      => 'ro',
+    isa     => HashRef,
+    default => sub { {} },
+);
+
+
 has 'ua' => (
     is  => 'lazy',
     isa => InstanceOf["LWP::UserAgent"],
 );
-
-
-# Monkey Patch LWP::UserAgent to use our credentials
-{
-    no warnings 'redefine';
-
-    sub LWP::UserAgent::get_basic_credentials {
-        my ($self,$realm,$url) = @_;
-        my $uri = URI->new( $url );
-        load "App::ElasticSearch::Utilities" => 'es_basic_auth';
-        return es_basic_auth( $uri->host );
-    }
-}
 
 sub _build_ua {
     my ($self) = @_;
@@ -77,8 +83,9 @@ sub _build_ua {
         agent             => sprintf("%s/%s (Perl %s)", __PACKAGE__, $local_version, $^V),
         protocols_allowed => [qw(http https)],
         timeout           => $self->timeout,
+        ssl_opts          => $self->ssl_opts,
     );
-    debug({color=>'cyan'}, sprintf "Initialized a UA: %s", $ua->agent);
+    debug({color=>'cyan'}, sprintf "Initialized a UA: %s%s", $ua->agent, $self->password ? ' (password provided)' : '');
 
     # Decode the JSON Automatically
     $ua->add_handler( response_done => sub {
@@ -116,6 +123,10 @@ sub _build_ua {
         }
         $_[0] = $response;
     });
+
+    # Warn About Basic Auth without TLS
+    warn "HTTP Basic Authorization configured and not using TLS, this is not supported"
+        if length $self->password && $self->proto ne 'https';
 
     return $ua;
 }
@@ -171,6 +182,11 @@ sub request {
 
     # Make the request
     my $req = App::ElasticSearch::Utilities::HTTPRequest->new( $method => $uri->as_string );
+
+    # Authentication
+    $req->authorization_basic( $self->username, $self->password )
+        if length $self->password and $self->proto eq 'https';
+
     $req->content($body) if defined $body;
 
     return $self->ua->request( $req );
@@ -226,7 +242,7 @@ App::ElasticSearch::Utilities::Connection - Abstract the connection element
 
 =head1 VERSION
 
-version 8.3
+version 8.4
 
 =head1 SYNOPSIS
 
@@ -275,6 +291,18 @@ basic authentication.
 =head2 timeout
 
 Connection and Read Timeout for the HTTP connection, defaults to B<10> seconds.
+
+=head2 username
+
+HTTP Basic Authorization username, defaults to C<$ENV{USER}>.
+
+=head2 password
+
+HTTP Basic Authorization password, if set, we'll try authentication.
+
+=head2 ssl_opts
+
+SSL Options for L<LWP::UserAgent/ssl_opts>.
 
 =head2 ua
 

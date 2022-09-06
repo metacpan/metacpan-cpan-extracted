@@ -1,5 +1,16 @@
 Version history for Catalyst-TraitFor-Request-Methods:
 
+v0.4.0    2022-09-04 16:11:27+01:00 Europe/London
+  [Incompatible Changes]
+  - This now requires Perl 5.14 or later.
+
+  - Removed is_propfind. A better way is needed for handling HTTP extension methods.
+
+  [Other]
+  - Internal code improvements.
+
+  - Sign release.
+
 v0.3.2    2022-07-29 16:46:23+01:00 Europe/London
   [Enhancements]
   - Add is_unrecognized_method method.

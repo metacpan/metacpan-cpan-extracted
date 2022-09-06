@@ -1,4 +1,8 @@
-Revision history for Plack-App-Hash
+Release history for Plack-App-Hash
+
+1.001 Sun 04 Sep 2022
+	- Small performance improvements
+	- Updated packaging and package metadata
 
 1.000 Mon 05 Jan 2015
 	- Now has actual docs

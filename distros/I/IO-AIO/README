@@ -230,6 +230,7 @@ FUNCTIONS
 
        IO::AIO::sendfile $ofh, $ifh, $offset, $count
        IO::AIO::fadvise $fh, $offset, $len, $advice
+       IO::AIO::fexecve $fh, $argv, $envp
 
        IO::AIO::mmap $scalar, $length, $prot, $flags[, $fh[, $offset]]
        IO::AIO::munmap $scalar
@@ -251,13 +252,23 @@ FUNCTIONS
        IO::AIO::accept4 $r_fh, $sockaddr, $sockaddr_len, $flags
        IO::AIO::splice $r_fh, $r_off, $w_fh, $w_off, $length, $flags
        IO::AIO::tee $r_fh, $w_fh, $length, $flags
+
        $actual_size = IO::AIO::pipesize $r_fh[, $new_size]
        ($rfh, $wfh) = IO::AIO::pipe2 [$flags]
-       $fh = IO::AIO::memfd_create $pathname[, $flags]
+
        $fh = IO::AIO::eventfd [$initval, [$flags]]
+       $fh = IO::AIO::memfd_create $pathname[, $flags]
+
        $fh = IO::AIO::timerfd_create $clockid[, $flags]
        ($cur_interval, $cur_value) = IO::AIO::timerfd_settime $fh, $flags, $new_interval, $nbw_value
        ($cur_interval, $cur_value) = IO::AIO::timerfd_gettime $fh
+
+       $fh = IO::AIO::pidfd_open $pid[, $flags]
+       $status = IO::AIO::pidfd_send_signal $pidfh, $signal[, $siginfo[, $flags]]
+       $fh = IO::AIO::pidfd_getfd $pidfh, $targetfd[, $flags]
+
+       $retval = IO::AIO::mount $special, $path, $fstype, $flags = 0, $data = undef
+       $retval = IO::AIO::umount $path, $flags = 0
 
   API NOTES
     All the "aio_*" calls are more or less thin wrappers around the syscall
@@ -945,6 +956,10 @@ FUNCTIONS
         "FS_XFLAG_NODEFRAG", "FS_XFLAG_FILESTREAM", "FS_XFLAG_DAX",
         "FS_XFLAG_HASATTR",
 
+        "BLKROSET", "BLKROGET", "BLKRRPART", "BLKGETSIZE", "BLKFLSBUF",
+        "BLKRASET", "BLKRAGET", "BLKFRASET", "BLKFRAGET", "BLKSECTSET",
+        "BLKSECTGET", "BLKSSZGET", "BLKBSZGET", "BLKBSZSET", "BLKGETSIZE64",
+
     aio_sync $callback->($status)
         Asynchronously call sync and call the callback when finished.
 
@@ -1593,9 +1608,11 @@ FUNCTIONS
         In other words, this setting does not enforce a queue limit, but can
         be used to make poll functions block if the limit is exceeded.
 
-        This is a very bad function to use in interactive programs because
-        it blocks, and a bad way to reduce concurrency because it is
-        inexact: Better use an "aio_group" together with a feed callback.
+        This is a bad function to use in interactive programs because it
+        blocks, and a bad way to reduce concurrency because it is inexact.
+        If you need to issue many requests without being able to call a poll
+        function on demand, it is better to use an "aio_group" together with
+        a feed callback.
 
         Its main use is in scripts without an event loop - when you want to
         stat a lot of files, you can write something like this:
@@ -1610,10 +1627,11 @@ FUNCTIONS
            IO::AIO::flush;
 
         The call to "poll_cb" inside the loop will normally return
-        instantly, but as soon as more thna 32 reqeusts are in-flight, it
-        will block until some requests have been handled. This keeps the
-        loop from pushing a large number of "aio_stat" requests onto the
-        queue.
+        instantly, allowing the loop to progress, but as soon as more than
+        32 requests are in-flight, it will block until some requests have
+        been handled. This keeps the loop from pushing a large number of
+        "aio_stat" requests onto the queue (which, with many paths to stat,
+        can use up a lot of memory).
 
         The default value for "max_outstanding" is very large, so there is
         no practical limit on the number of outstanding requests.
@@ -1727,6 +1745,42 @@ FUNCTIONS
     some "Advanced I/O" function not available to in Perl, without going the
     "Asynchronous I/O" route. Many of these have an asynchronous "aio_*"
     counterpart.
+
+    $retval = IO::AIO::fexecve $fh, $argv, $envp
+        A more-or-less direct equivalent to the POSIX "fexecve" functions,
+        which allows you to specify the program to be executed via a file
+        descriptor (or handle). Returns -1 and sets errno to "ENOSYS" if not
+        available.
+
+    $retval = IO::AIO::mount $special, $path, $fstype, $flags = 0, $data =
+    undef
+        Calls the GNU/Linux mount syscall with the given arguments. All
+        except $flags are strings, and if $data is "undef", a "NULL" will be
+        passed.
+
+        The following values for $flags are available:
+
+        "IO::AIO::MS_RDONLY", "IO::AIO::MS_NOSUID", "IO::AIO::MS_NODEV",
+        "IO::AIO::MS_NOEXEC", "IO::AIO::MS_SYNCHRONOUS",
+        "IO::AIO::MS_REMOUNT", "IO::AIO::MS_MANDLOCK",
+        "IO::AIO::MS_DIRSYNC", "IO::AIO::MS_NOATIME",
+        "IO::AIO::MS_NODIRATIME", "IO::AIO::MS_BIND", "IO::AIO::MS_MOVE",
+        "IO::AIO::MS_REC", "IO::AIO::MS_SILENT", "IO::AIO::MS_POSIXACL",
+        "IO::AIO::MS_UNBINDABLE", "IO::AIO::MS_PRIVATE",
+        "IO::AIO::MS_SLAVE", "IO::AIO::MS_SHARED", "IO::AIO::MS_RELATIME",
+        "IO::AIO::MS_KERNMOUNT", "IO::AIO::MS_I_VERSION",
+        "IO::AIO::MS_STRICTATIME", "IO::AIO::MS_LAZYTIME",
+        "IO::AIO::MS_ACTIVE", "IO::AIO::MS_NOUSER", "IO::AIO::MS_RMT_MASK",
+        "IO::AIO::MS_MGC_VAL" and "IO::AIO::MS_MGC_MSK".
+
+    $retval = IO::AIO::umount $path, $flags = 0
+        Invokes the GNU/Linux "umount" or "umount2" syscalls. Always calls
+        "umount" if $flags is 0, otherwqise always tries to call "umount2".
+
+        The following $flags are available:
+
+        "IO::AIO::MNT_FORCE", "IO::AIO::MNT_DETACH", "IO::AIO::MNT_EXPIRE"
+        and "IO::AIO::UMOUNT_NOFOLLOW".
 
     $numfd = IO::AIO::get_fdlimit
         Tries to find the current file descriptor limit and returns it, or
@@ -1974,7 +2028,8 @@ FUNCTIONS
         Please refer to memfd_create(2) for more info on this call.
 
         The following $flags values are available: "IO::AIO::MFD_CLOEXEC",
-        "IO::AIO::MFD_ALLOW_SEALING" and "IO::AIO::MFD_HUGETLB".
+        "IO::AIO::MFD_ALLOW_SEALING", "IO::AIO::MFD_HUGETLB",
+        "IO::AIO::MFD_HUGETLB_2MB" and "IO::AIO::MFD_HUGETLB_1GB".
 
         Example: create a new memfd.
 

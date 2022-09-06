@@ -22,6 +22,9 @@
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Probe::CommandLine" : "0",
+            "Alien::bc::GNU" : "0",
+            "Alien::cmake3" : "0",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -53,8 +56,6 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0",
-            "Alien::Build::Plugin::Probe::CommandLine" : "0",
-            "Alien::cmake3" : "0",
             "Path::Tiny" : "0",
             "base" : "0",
             "namespace::autoclean" : "0",
@@ -72,6 +73,7 @@
             "Module::Metadata" : "0",
             "Test2::V0" : "0",
             "Test::Alien" : "0",
+            "Test::Alien::Diag" : "0",
             "Test::More" : "0"
          }
       }
@@ -79,7 +81,7 @@
    "provides" : {
       "Alien::Brotli" : {
          "file" : "lib/Alien/Brotli.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
       }
    },
    "release_status" : "stable",
@@ -93,11 +95,12 @@
          "web" : "https://github.com/robrwo/perl-Alien-Brotli"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.2.2",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
+            "Alien::bc::GNU" : "0",
             "Alien::cmake3" : "0.02",
             "Archive::Tar" : "0",
             "Config" : "0",
@@ -107,6 +110,7 @@
             "IO::Zlib" : "0",
             "Mojo::DOM" : "0",
             "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
@@ -117,7 +121,7 @@
    },
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
-      "Michal Josef \u0160pa\u010dek <mspacek@redhat.com>"
+      "Michal Josef \u0160pa\u010dek <skim@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.31",

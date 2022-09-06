@@ -1,6 +1,24 @@
 
 Revision history for Myriad
 
+1.000     2022-09-05 10:25:25+08:00 Asia/Singapore
+    [API changes]
+    - The --service_name parameter has been dropped, since it makes no sense when
+    used with multiple services or instances
+
+    [New features]
+    - Thanks to Syntax::Keyword::Equ, match() now supports `equ` as an operator
+    - RPC on start handle existing pending messages in stream, if not expired.
+    - RPC overflow protection (will not connsume more than it can process).
+    - Transport Redis connection pool count and wait time can be controlled through config parameters.
+    - Add orderedset data structure to Myriad storage.
+
+    [Bugs fixed]
+    - Subscriptions to create streams from source without a published event.
+
+    [Dependencies]
+    - Object::Pad - updated to v0.55 for various bugfixes and improvements
+
 0.010     2021-07-22 07:14:15+00:00 UTC
     [New features]
     - Metrics adapter type is now configurable using --metrics_adapter.

@@ -43,7 +43,7 @@ es-open.pl - Open any closed indices matching your paramters.
 
 =head1 VERSION
 
-version 8.3
+version 8.4
 
 =head1 SYNOPSIS
 
@@ -61,8 +61,12 @@ From App::ElasticSearch::Utilities:
     --port          HTTP port for your cluster
     --proto         Defaults to 'http', can also be 'https'
     --http-username HTTP Basic Auth username
-    --http-password HTTP Basic Auth password (if not specified, and --http-user is, you will be prompted)
     --password-exec Script to run to get the users password
+    --insecure      Don't verify TLS certificates
+    --cacert        Specify the TLS CA file
+    --capath        Specify the directory with TLS CAs
+    --cert          Specify the path to the client certificate
+    --key           Specify the path to the client private key file
     --noop          Any operations other than GET are disabled, can be negated with --no-noop
     --timeout       Timeout to ElasticSearch, default 10
     --keep-proxy    Do not remove any proxy settings from %ENV

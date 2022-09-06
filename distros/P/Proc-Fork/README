@@ -46,9 +46,8 @@ procedure is
 
 COPYRIGHT AND LICENSE
 
-This documentation is copyright (c) 2002 by Eric J. Roode.
-
-This software is copyright (c) 2018 by Aristotle Pagaltzis.
+This software is copyright (c) 2018 by Aristotle Pagaltzis. Its
+documentation is copyright (c) 2002 by Eric J. Roode.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

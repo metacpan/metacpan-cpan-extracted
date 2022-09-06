@@ -1,0 +1,9 @@
+Revision history for Plack-App-Libarchive
+
+0.02      2022-09-04 15:23:17 -0600
+  - Fixed bug where index could be encoded wrong (gh#11)
+
+0.01      2022-09-04 10:34:54 -0600
+  - initial version
+
+

@@ -39,6 +39,6 @@ ok(is_holiday(1978, 5, 1),  ".. but before it was celebrated on labor day");
 ok(is_holiday(2014, 4, 26),  "Willem came early");
 
 is(is_holiday_dt(DateTime->new(year => 2020, month => 4, day => 27)),
-    "Dia di Reino", "Willem 2");
+    "Dia di Rei", "Willem 2");
 
 done_testing;

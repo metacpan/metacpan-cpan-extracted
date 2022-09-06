@@ -41,3 +41,12 @@ This module implements the `is_holiday` and `holiday` functions from
     holidays('2022', gov  => 1);
 
 Similar API to the other functions, returns an hashref for the year.
+
+# UTF-8
+
+Be aware that we return UTF-8 when Papiamento is chosen. So make sure you set
+your enconding to UTF-8, otherwise you may see weird things.
+
+# SEE ALSO
+
+- https://wetten.overheid.nl/BWBR0002448/2010-10-10

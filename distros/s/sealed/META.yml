@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'Subroutine attribute for compile-time method lookups on its typed lexicals.'
 author:
   - unknown
 build_requires:
@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  APR::Request: '0'
   B::Generate: '0'
-version: v4.1.1
+  perl: '5.022000'
+version: v4.1.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

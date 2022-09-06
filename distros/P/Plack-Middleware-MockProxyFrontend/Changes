@@ -1,5 +1,14 @@
 Release history for Plack-Middleware-MockProxyFrontend
 
+0.005 Mon 05 Sep 2022
+	- Replacement of the art of failing tests without tests by the
+	  art of passing tests without tests
+
+0.004 Sun 04 Sep 2022
+	- No functional changes
+	- No more Test::More or parent.pm dependencies
+	- Updated packaging and package metadata
+
 0.003 Fri 04 Sep 2020
 	- Correct handling of SSL handshake failures in CONNECT requests
 

@@ -55,6 +55,7 @@ t/data/basic.yml
 t/dump-heuristics.t
 t/dump-int.t
 t/dump.t
+t/duplicate-keys.t
 t/empty.t
 t/empty.yaml
 t/error.t

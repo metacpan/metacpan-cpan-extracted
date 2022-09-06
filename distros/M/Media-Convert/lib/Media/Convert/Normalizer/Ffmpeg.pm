@@ -4,7 +4,7 @@ use Moose;
 
 extends 'Media::Convert::Normalizer';
 
-use Mojo::JSON qw/decode_json/;
+use JSON::MaybeXS qw/decode_json/;
 use Symbol 'gensym';
 use IPC::Open3;
 use Media::Convert::CodecMap qw/detect_to_write/;

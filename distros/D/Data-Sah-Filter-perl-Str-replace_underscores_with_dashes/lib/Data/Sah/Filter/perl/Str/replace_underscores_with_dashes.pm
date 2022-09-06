@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Data-Sah-Filter-perl-Str-replace_underscores_with_dashes'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub meta {
     +{
@@ -56,7 +56,7 @@ Data::Sah::Filter::perl::Str::replace_underscores_with_dashes - Replace undersco
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Sah::Filter::perl::Str::replace_underscores_with_dashes (from Perl distribution Data-Sah-Filter-perl-Str-replace_underscores_with_dashes), released on 2022-07-16.
+This document describes version 0.003 of Data::Sah::Filter::perl::Str::replace_underscores_with_dashes (from Perl distribution Data-Sah-Filter-perl-Str-replace_underscores_with_dashes), released on 2022-07-17.
 
 =head1 SYNOPSIS
 
@@ -79,7 +79,18 @@ This document describes version 0.002 of Data::Sah::Filter::perl::Str::replace_u
  my $filter = gen_filter([["Str::replace_underscores_with_dashes"]]);
  my $filtered_value = $filter->($some_data);
 
+=head2 Sample data and filtering results
+
+ "foo" # valid, unchanged
+ "foo_bar" # valid, becomes "foo-bar"
+
 =for Pod::Coverage ^(meta|filter)$
+
+=head1 DESCRIPTION
+
+This is mostly created as a counterpart for the replace_dashes_with_underscores
+filter (L<Data::Sah::Filter::perl::Str::replace_dashes_with_underscores>). So
+far I haven't got a practical use for this.
 
 =head1 HOMEPAGE
 

@@ -21,8 +21,8 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Readme-Brief
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ap/Pod-Readme-Brief.git
-version: '1.002'
+version: '1.003'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
-  year: 2018
+  year: 2022
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

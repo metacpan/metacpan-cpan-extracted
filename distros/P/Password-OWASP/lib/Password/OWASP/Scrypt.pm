@@ -1,54 +1,13 @@
 package Password::OWASP::Scrypt;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moose;
 
 # ABSTRACT: An Scrypt implemenation of Password::OWASP
 
-with 'Password::OWASP::AbstractBaseX';
-
-use Try::Tiny;
+with 'Password::OWASP::AbstractBase';
 
 use Authen::Passphrase::Scrypt;
-
-sub crypt_password {
-    my ($self, $pass) = @_;
-
-    my $ppr = Authen::Passphrase::Scrypt->new(
-        cost        => $self->cost,
-        salt_random => 1,
-        passphrase  => $self->hash_password($pass),
-    );
-    return $ppr->as_rfc2307;
-}
-
-sub check_password {
-    my ($self, $given, $want) = @_;
-
-    my $ok = try {
-        my $ppr = Authen::Passphrase::Scrypt->from_rfc2307($want);
-        return 1 if $ppr->match($self->hash_password($given));
-        return 0;
-    };
-    return 1 if $ok;
-    return 1 if $self->check_legacy_password($given, $want);
-    return 0;
-};
-
-around check_legacy_password => sub {
-    my ($orig, $self, $given, $want) = @_;
-
-    my $ok = try {
-        my $ppr = Authen::Passphrase::Scrypt->from_rfc2307($want);
-        return $ppr->match($given);
-    };
-    if ($ok) {
-        $self->update_password($given) if $self->has_update_method;
-        return 1;
-    }
-
-    return $orig->($self, $given, $want);
-
-};
+sub ppr { 'Authen::Passphrase::Scrypt' }
 
 __PACKAGE__->meta->make_immutable;
 
@@ -64,7 +23,7 @@ Password::OWASP::Scrypt - An Scrypt implemenation of Password::OWASP
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

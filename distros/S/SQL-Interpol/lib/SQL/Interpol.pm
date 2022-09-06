@@ -1,10 +1,8 @@
-use 5.006;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package SQL::Interpol;
-$SQL::Interpol::VERSION = '1.103';
-# ABSTRACT: interpolate Perl variables into SQL statements
+
+our $VERSION = '1.104';
 
 use Exporter::Tidy all => [ qw( sql_interp sql ) ];
 
@@ -19,7 +17,9 @@ sub sql_interp {
 
 
 package SQL::Interpol::Parser;
-$SQL::Interpol::Parser::VERSION = '1.103';
+
+our $VERSION = '1.104';
+
 use Object::Tiny::Lvalue qw( alias_id bind );
 
 use Carp ();
@@ -176,10 +176,6 @@ __END__
 =head1 NAME
 
 SQL::Interpol - interpolate Perl variables into SQL statements
-
-=head1 VERSION
-
-version 1.103
 
 =head1 SYNOPSIS
 
@@ -439,12 +435,9 @@ Documentation by David Manura and Mark Stosberg.
 
 =head1 COPYRIGHT AND LICENSE
 
-This documentation is
-copyright (c) 2003E<ndash>2005 by David Manura
-and
-copyright (c) 2006E<ndash>2012 by Mark Stosberg.
-
 This software is copyright (c) 2014 by Aristotle Pagaltzis.
+Its documentation is copyright (c) 2003–2005 by David Manura
+and copyright (c) 2006–2012 by Mark Stosberg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

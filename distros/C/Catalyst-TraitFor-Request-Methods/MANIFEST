@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+SIGNATURE
 cpanfile
 dist.ini
 lib/Catalyst/TraitFor/Request/Methods.pm

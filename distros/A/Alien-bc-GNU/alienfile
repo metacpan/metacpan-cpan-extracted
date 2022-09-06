@@ -1,0 +1,36 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+	command => 'bc',
+	args => ['--version'],
+	match => qr/bc/,
+	version => qr/bc ([0-9\.]+)/,
+);
+
+share {
+	requires 'Alien::ed::GNU' => '0';
+	requires 'Alien::Texinfo' => '0';
+
+	start_url 'https://ftp.gnu.org/gnu/bc/';
+
+	plugin 'Download' => (
+		filter => qr/^bc-.*\.tar\.gz$/,
+		version => qr/([0-9\.]+)/,
+		prefer  => 1,
+	);
+
+	plugin 'Extract' => 'tar.gz';
+
+	plugin 'Build::Autoconf';
+
+	build [
+		'%{configure}',
+		'%{make}',
+		'%{make} install',
+	];
+
+	after 'gather' => sub {
+		my $build = shift;
+		$build->runtime_prop->{'command'} = 'bc';
+	};
+};

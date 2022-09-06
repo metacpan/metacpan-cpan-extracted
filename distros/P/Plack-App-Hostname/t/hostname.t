@@ -1,10 +1,10 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
-use Test::More 0.88; # for done_testing
 use Plack::App::Hostname;
 use Plack::Test;
 use HTTP::Request::Common;
+
+use Test::More tests => 24;
 
 my $yippie = 'we will serve one and all';
 my $yay_app = sub { [ 200, [], [ $yippie ] ] };
@@ -19,12 +19,12 @@ test_psgi app => $map, client => sub {
 
 	# this smelly goop is necessary because Plack::Test and HTTP::Message::PSGI
 	# both insist on helping us out by defaulting HTTP_HOST to localhost
-	no warnings 'redefine';
+	{ no warnings qw( once redefine );
 	*HTTP::Request::to_psgi = sub {
 		my $env = HTTP::Message::PSGI::req_to_psgi( @_ );
 		delete $env->{'HTTP_HOST'} if 'localhost' eq $env->{'HTTP_HOST'};
 		$env;
-	};
+	} }
 
 	my $res;
 
@@ -81,6 +81,9 @@ test_psgi app => $map, client => sub {
 	$res = $cb->( GET 'http://foo.bar.example.com/' );
 	is $res->content, '**.bar.example.com', '... and match in specificity order';
 
+	$res = $cb->( GET 'http://'.('foo.bar.baz.quux.qux.' x 3).'.boom.example.com/' );
+	is $res->code, 400, '... but the music stops at 16 zones deep';
+
 	####################################################################
 
 	$map->unmap_host( '**.example.com', '**.bar.example.com', 'edit.example.com' );
@@ -119,5 +122,3 @@ test_psgi app => $map, client => sub {
 	$res = $cb->( GET '/' );
 	is $res->code, 400, '... and the handling can be removed again';
 };
-
-done_testing;

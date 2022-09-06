@@ -1,6 +1,11 @@
 Release history for Catalyst-Plugin-Digress
 
-1.004 Sun 07 Aug 2022
+1.100 Tue 06 Sep 2022
+	- Support for action classes/roles that override execute()
+	  (such as Catalyst::ActionClass::RenderView).
+	  Thanks to Tomohiro Hosaka for pointing out the issue
+
+1.004 Tue 09 Aug 2022
 	- No functional changes
 	- Packaging fix to stop installing boilerplate.pl
 

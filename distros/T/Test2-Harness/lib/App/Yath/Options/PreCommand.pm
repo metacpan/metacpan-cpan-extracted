@@ -2,7 +2,7 @@ package App::Yath::Options::PreCommand;
 use strict;
 use warnings;
 
-our $VERSION = '1.000127';
+our $VERSION = '1.000128';
 
 use App::Yath::Util qw/find_pfile/;
 use Test2::Harness::Util qw/mod2file clean_path/;
@@ -27,7 +27,7 @@ option_group {prefix => 'harness', pre_command => 1} => sub {
         type => 'b',
 
         category => 'Plugins',
-        description => 'Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that it loading other modules when it should not.',
+        description => 'Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that is loading other modules when it should not.',
     );
 
     option project => (
@@ -218,7 +218,7 @@ This lets you provide a label for your current project/codebase. This is best us
 
 =item --no-no-scan-plugins
 
-Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that it loading other modules when it should not.
+Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that is loading other modules when it should not.
 
 
 =item --plugins PLUGIN

@@ -4,7 +4,7 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,12 +13,15 @@
       "version" : 2
    },
    "name" : "Plack-Middleware-Rewrite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "Plack" : "0.9942",
@@ -27,10 +30,7 @@
             "Plack::Util" : "0",
             "Plack::Util::Accessor" : "0",
             "overload" : "0",
-            "parent" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -45,14 +45,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ap/Plack-Middleware-Rewrite/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Plack-Middleware-Rewrite"
       },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Plack-Middleware-Rewrite.git",
+         "url" : "https://github.com/ap/Plack-Middleware-Rewrite.git",
          "web" : "https://github.com/ap/Plack-Middleware-Rewrite"
       }
    },
-   "version" : "2.101"
+   "version" : "2.102",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2022
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }
-

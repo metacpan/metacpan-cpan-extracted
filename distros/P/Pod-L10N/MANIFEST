@@ -8,10 +8,8 @@ cpanfile
 lib/Pod/L10N.pm
 lib/Pod/L10N/Format.pod
 lib/Pod/L10N/Html.pm
-lib/Pod/L10N/Model.pm
 minil.toml
 script/pod2htmll10n
-t/10-model.t
 t/cache.pod
 t/cache.t
 t/crossref.pod

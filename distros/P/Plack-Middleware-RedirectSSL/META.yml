@@ -3,30 +3,34 @@ abstract: 'force all requests to use in-/secure connections'
 author:
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
 build_requires:
-  HTTP::Request::Common: 0
-  Plack::Builder: 0
-  Plack::Test: 0
-  Test::More: 0
-configure_requires:
-  ExtUtils::MakeMaker: 0
+  HTTP::Request::Common: '0'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  Test::More: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Plack-Middleware-RedirectSSL
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Plack: 0.9942
-  Plack::Middleware: 0
-  Plack::Request: 0
-  Plack::Util: 0
-  Plack::Util::Accessor: 0
-  parent: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Plack: '0.9942'
+  Plack::Middleware: '0'
+  Plack::Request: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  perl: '5.006'
 resources:
-  bugtracker: https://github.com/ap/Plack-Middleware-RedirectSSL/issues
-  repository: git://github.com/ap/Plack-Middleware-RedirectSSL.git
-version: 1.301
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Plack-Middleware-RedirectSSL
+  license: https://dev.perl.org/licenses/
+  repository: https://github.com/ap/Plack-Middleware-RedirectSSL.git
+version: '1.302'
+x_copyright:
+  holder: 'Aristotle Pagaltzis'
+  year: 2018
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

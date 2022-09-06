@@ -12,7 +12,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '2.66'; # VERSION
+our $VERSION = '2.68'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1401,7 +1401,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 2.66
+version 2.68
 
 =head1 SYNOPSIS
 
@@ -1636,7 +1636,7 @@ Hash reference.  Contains information about the platform beyond just C<$^O>.
 
 =over 4
 
-=item compiler_type
+=item platform.compiler_type
 
 Refers to the type of flags that the compiler accepts.  May be expanded in the
 future, but for now, will be one of:
@@ -1656,7 +1656,7 @@ Virtually everything else, including gcc on windows.
 The main difference is that with Visual C++ C<-LIBPATH> should be used instead
 of C<-L>, and static libraries should have the C<.LIB> suffix instead of C<.a>.
 
-=item system_type
+=item platform.system_type
 
 C<$^O> is frequently good enough to make platform specific logic in your
 L<alienfile>, this handles the case when $^O can cover platforms that provide
@@ -1743,14 +1743,14 @@ are optional.
 
 =over 4
 
-=item digest
+=item download_detail.digest
 
 This, if available, with the cryptographic signature that was successfully
 matched against the downloaded file.  It is an array reference with a
 pair of values, the algorithm (typically something like C<SHA256>) and
 the digest.
 
-=item protocol
+=item download_detail.protocol
 
 This, if available, will be the URL protocol used to fetch the downloaded
 file.
@@ -1779,14 +1779,14 @@ reuse the previous install if it is still sufficient.
 
 =over 4
 
-=item prefix
+=item old.prefix
 
 [deprecated]
 
 The prefix for the previous install.  Versions prior to 1.42 unfortunately
 had this in typo form of C<preifx>.
 
-=item runtime
+=item old.runtime
 
 [deprecated]
 
@@ -1903,14 +1903,14 @@ This property contains two sub properties:
 
 =over 4
 
-=item share
+=item ffi_checklib.share
 
  $build->runtime_prop->{ffi_checklib}->{share} = [ ... ];
 
 Array of additional L<FFI::CheckLib> flags to pass in to C<find_lib>
 for a C<share> install.
 
-=item system
+=item ffi_checklib.system
 
 Array of additional L<FFI::CheckLib> flags to pass in to C<find_lib>
 for a C<system> install.

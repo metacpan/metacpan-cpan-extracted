@@ -3,7 +3,8 @@ use Moose;
 use Types::Standard qw(Int ArrayRef HashRef);
 use Carp            qw(croak);
 use List::Compare   qw (get_intersection);
-use List::Util      qw(all uniq);
+use List::Util      qw(any uniq);
+use Scalar::Util    qw(looks_like_number);
 
 # ABSTRACT: Plays Keno
 
@@ -29,37 +30,42 @@ Sample code to play 1000 draws with 5 spots.  The spots are chosen for you.
 This is how you choose your own spots.  
 
  my $second_game = App::Games::Keno->new(
- 	spots => [ 45, 33, 12, 20, 75 ],
- 	draws => 1000
+   spots => [ 45, 33, 12, 20, 75 ],
+   draws => 1000
  );
  $second_game->PlayKeno;
  say "You won \$"
    . $second_game->winnings . " on "
    . $second_game->draws
    . " draws.";
-   
+
 =cut
 
 sub BUILD {
 	my $self = shift;
 
+	croak "Didn't get the number of draws you want"
+	  if ( !defined $self->draws );
 	croak "Spots or Number of spots (not both)"
 	  if ( defined $self->spots && defined $self->num_spots );
 	croak "Need spots or number of spots"
 	  if ( !defined $self->spots && !defined $self->num_spots );
 
 	if ( defined $self->spots ) {
-		unless ( all { $_ >= 1 && $_ <= 80 } @{ $self->spots } ) {
+		if ( any { !looks_like_number($_) } @{ $self->spots } ) {
+			croak "One of the spots you chose doesn't look like a number.";
+		}			
+		if ( any { $_ < 1 || $_ > 80 } @{ $self->spots } ) {
 			croak "You chose a spot that is out of the 1 to 80 range";
 		}
 		if ( scalar @{ $self->spots } != uniq @{ $self->spots } ) {
 			croak "You appear to have chosen two or more of the same spots";
 		}
 		if ( scalar @{ $self->spots } < 1 ) {
-			croak "You must choose more than one spot";
+			croak "You must choose at least one spot";
 		}
-		if ( scalar @{ $self->spots } > 10 ) {
-			croak "You must choose between 1 and 10 spots"
+		if ( my $too_many_spots = scalar @{ $self->spots } > 10 ) {
+			croak "Too many spots.  You must choose between 1 and 10 spots";
 		}
 		$self->num_spots( scalar @{ $self->spots } );
 	}
@@ -69,9 +75,6 @@ sub BUILD {
 	else {
 		croak "You must ask for between 1 and 10 spots.";
 	}
-
-	croak "Didn't get the number of draws you want"
-	  if ( !defined $self->draws );
 
 	return;
 }
@@ -178,7 +181,7 @@ sub PlayKeno {
 		my $matches        = scalar @matchedNumbers;
 		my $this_payout    = $self->get_payout($matches);
 		my $winningsIn     = $self->winnings;
-		if ( $matches > 4 && $matches == $self->spots ) {
+		if ( $matches > 6 && $matches == $self->num_spots ) {
 			print
 "You matched all $matches spots and won \$$this_payout on draw $_\n";
 		}

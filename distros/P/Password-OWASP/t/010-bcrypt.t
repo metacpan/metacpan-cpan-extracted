@@ -9,11 +9,14 @@ use Authen::Passphrase::BlowfishCrypt;
 
 my $pwo = Password::OWASP::Bcrypt->new(
     cost => 4,
+    hashing => 'sha512',
 );
 isa_ok($pwo, 'Password::OWASP::Bcrypt');
 is($pwo->cost, 4, "Changed the cost to 4");
 
-$pwo = Password::OWASP::Bcrypt->new();
+$pwo = Password::OWASP::Bcrypt->new(
+    hashing => 'sha512',
+);
 is($pwo->cost, 12, "Default is 12");
 
 isa_ok($pwo, 'Password::OWASP::Bcrypt');
@@ -28,6 +31,15 @@ ok(
 ok(
     !$pwo->check_password('Demo', $crypted),
     ".. and Demo isn't"
+);
+
+my $none = Password::OWASP::Bcrypt->new(
+    hashing => 'none',
+);
+
+ok(
+    $none->check_password('demo', $crypted),
+    "none is ok too"
 );
 
 my $ppr = Authen::Passphrase::BlowfishCrypt->new(
@@ -64,6 +76,7 @@ ok(
 my $updated_password;
 
 $pwo = Password::OWASP::Bcrypt->new(
+    hashing => 'sha512',
     update_method => sub {
         my ($password) = shift;
         $updated_password = $password;

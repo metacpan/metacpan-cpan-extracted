@@ -6,9 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::Exception: '0'
-  Test::More: '0.98'
-  Test::Needs: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -21,121 +19,121 @@ name: Data-Sah-Filter
 provides:
   Data::Sah::Filter:
     file: lib/Data/Sah/Filter.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::js::Str::downcase:
     file: lib/Data/Sah/Filter/js/Str/downcase.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::js::Str::lc:
     file: lib/Data/Sah/Filter/js/Str/lc.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::js::Str::lcfirst:
     file: lib/Data/Sah/Filter/js/Str/lcfirst.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::js::Str::lowercase:
     file: lib/Data/Sah/Filter/js/Str/lowercase.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::js::Str::ltrim:
     file: lib/Data/Sah/Filter/js/Str/ltrim.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::js::Str::rtrim:
     file: lib/Data/Sah/Filter/js/Str/rtrim.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::js::Str::trim:
     file: lib/Data/Sah/Filter/js/Str/trim.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::js::Str::uc:
     file: lib/Data/Sah/Filter/js/Str/uc.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::js::Str::ucfirst:
     file: lib/Data/Sah/Filter/js/Str/ucfirst.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::js::Str::upcase:
     file: lib/Data/Sah/Filter/js/Str/upcase.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::js::Str::uppercase:
     file: lib/Data/Sah/Filter/js/Str/uppercase.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Array::remove_undef:
     file: lib/Data/Sah/Filter/perl/Array/remove_undef.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Array::uniq:
     file: lib/Data/Sah/Filter/perl/Array/uniq.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Array::uniqnum:
     file: lib/Data/Sah/Filter/perl/Array/uniqnum.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Float::ceil:
     file: lib/Data/Sah/Filter/perl/Float/ceil.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Float::check_has_fraction:
     file: lib/Data/Sah/Filter/perl/Float/check_has_fraction.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Float::check_int:
     file: lib/Data/Sah/Filter/perl/Float/check_int.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Float::floor:
     file: lib/Data/Sah/Filter/perl/Float/floor.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Float::round:
     file: lib/Data/Sah/Filter/perl/Float/round.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::check:
     file: lib/Data/Sah/Filter/perl/Str/check.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::downcase:
     file: lib/Data/Sah/Filter/perl/Str/downcase.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::lc:
     file: lib/Data/Sah/Filter/perl/Str/lc.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::lcfirst:
     file: lib/Data/Sah/Filter/perl/Str/lcfirst.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::lowercase:
     file: lib/Data/Sah/Filter/perl/Str/lowercase.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::ltrim:
     file: lib/Data/Sah/Filter/perl/Str/ltrim.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::oneline:
     file: lib/Data/Sah/Filter/perl/Str/oneline.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::remove_comment:
     file: lib/Data/Sah/Filter/perl/Str/remove_comment.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::remove_nondigit:
     file: lib/Data/Sah/Filter/perl/Str/remove_nondigit.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::replace_map:
     file: lib/Data/Sah/Filter/perl/Str/replace_map.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::rtrim:
     file: lib/Data/Sah/Filter/perl/Str/rtrim.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::trim:
     file: lib/Data/Sah/Filter/perl/Str/trim.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::uc:
     file: lib/Data/Sah/Filter/perl/Str/uc.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::ucfirst:
     file: lib/Data/Sah/Filter/perl/Str/ucfirst.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::upcase:
     file: lib/Data/Sah/Filter/perl/Str/upcase.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::uppercase:
     file: lib/Data/Sah/Filter/perl/Str/uppercase.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::Filter::perl::Str::wrap:
     file: lib/Data/Sah/Filter/perl/Str/wrap.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::FilterCommon:
     file: lib/Data/Sah/FilterCommon.pm
-    version: '0.011'
+    version: '0.012'
   Data::Sah::FilterJS:
     file: lib/Data/Sah/FilterJS.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   Data::Dmp: '0.241'
   Exporter: '5.57'
@@ -151,7 +149,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Filter
   homepage: https://metacpan.org/release/Data-Sah-Filter
   repository: git://github.com/perlancar/perl-Data-Sah-Filter.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -159,7 +157,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Data::Sah::Filter
       name: Data::Sah::Filter
-      version: '0.001'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'

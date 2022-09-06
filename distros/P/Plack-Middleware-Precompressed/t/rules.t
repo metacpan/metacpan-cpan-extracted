@@ -1,9 +1,8 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
+use Test::More tests => 3;
 use Plack::Test;
 use Plack::Builder;
-use Test::More;
 use HTTP::Request::Common;
 
 test_psgi
@@ -44,5 +43,3 @@ test_psgi
 		is $got, $expected, '... but no more and no less than the given env_keys';
 	};
 }
-
-done_testing;

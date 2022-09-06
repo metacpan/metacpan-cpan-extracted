@@ -1,7 +1,7 @@
 use strict; use warnings;
 
 package Try::Tiny::Tiny;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 my $effective;
 

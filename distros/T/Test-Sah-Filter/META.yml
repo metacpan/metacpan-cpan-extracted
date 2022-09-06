@@ -19,7 +19,7 @@ name: Test-Sah-Filter
 provides:
   Test::Sah::Filter:
     file: lib/Test/Sah/Filter.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Data::Cmp: '0.002'
   Data::Dump: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Sah-Filter
   homepage: https://metacpan.org/release/Test-Sah-Filter
   repository: git://github.com/perlancar/perl-Test-Sah-Filter.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

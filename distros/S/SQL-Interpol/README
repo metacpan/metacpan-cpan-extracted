@@ -3,8 +3,7 @@ SQL::Interpol
 This module converts SQL fragments interleaved with variable references
 into one regular SQL string along with a list of bind values, suitable
 for passing to DBI. This makes database code easier to read as well as
-easier to write, while easily providing ready access to all SQL
-features.
+easier to write, while easily providing ready access to all SQL features.
 
 SQL::Interpol is a drop-in replacement for most of SQL::Interp. (Some
 features have been removed; please refer to the changelog.)
@@ -28,10 +27,9 @@ Should you wish to install this module manually, the procedure is
 
 COPYRIGHT AND LICENSE
 
-This documentation is copyright (c) 2003–2005 by David Manura and
-copyright (c) 2006–2012 by Mark Stosberg.
+This software is copyright (c) 2014 by Aristotle Pagaltzis. Its
+documentation is copyright (c) 2003–2005 by David Manura and copyright
+(c) 2006–2012 by Mark Stosberg.
 
-This software is copyright (c) 2014 by Aristotle Pagaltzis.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

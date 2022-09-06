@@ -7,7 +7,7 @@ use CPAN::HandleConfig;
 
 our @EXPORT_OK = qw(is_distro_ok block_distro);
 
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 =pod
 
@@ -15,6 +15,13 @@ our $VERSION = '0.020'; # VERSION
 
 CPAN::Reporter::Smoker::OpenBSD - set of scripts to manage a
 L<CPAN::Reporter::Smoker> on OpenBSD
+
+=head1 DEPRECATION WARNING
+
+This distribution was replaced by L<CPAN::Smoker::Utils> distribution and this
+is the latest release that will be maintained at CPAN.
+
+You're advised to start using L<CPAN::Smoker::Utils> as soon as possible.
 
 =head1 DESCRIPTION
 

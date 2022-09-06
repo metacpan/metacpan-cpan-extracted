@@ -84,6 +84,9 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                     case 'boolean':
                         cr =  new qx.ui.table.cellrenderer.Boolean;
                         break;
+                    case 'html':
+                        cr =  new qx.ui.table.cellrenderer.Html;
+                        break;
                     case 'date':
                         cr =  new qx.ui.table.cellrenderer.Date;
                         if (col.format != null) {

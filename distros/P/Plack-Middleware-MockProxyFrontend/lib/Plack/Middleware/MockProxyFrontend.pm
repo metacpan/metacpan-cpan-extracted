@@ -1,9 +1,10 @@
 use 5.014; use warnings;
 
 package Plack::Middleware::MockProxyFrontend;
-$Plack::Middleware::MockProxyFrontend::VERSION = '0.003';
-# ABSTRACT: virtualhost-aware PSGI app developer tool
-use parent 'Plack::Middleware';
+
+our $VERSION = '0.005';
+
+BEGIN { require Plack::Middleware; our @ISA = 'Plack::Middleware' }
 use Plack::Util::Accessor qw( host_acceptor http_server _ssl_context );
 use URI::Split ();
 use Plack::Util ();
@@ -114,10 +115,6 @@ __END__
 =head1 NAME
 
 Plack::Middleware::MockProxyFrontend - virtualhost-aware PSGI app developer tool
-
-=head1 VERSION
-
-version 0.003
 
 =head1 SYNOPSIS
 

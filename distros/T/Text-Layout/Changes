@@ -1,5 +1,10 @@
 Revision history for Text::Layout
 
+0.030	2022-09-03
+
+	Enable xx-small, medium, large, x-large and xx-large.
+	Enable byte-access to built-in Symbol and ZapfDingbats fonts.
+
 0.029	2022-03-17
 
 	Fix issue #11 (PDF::Builder only).

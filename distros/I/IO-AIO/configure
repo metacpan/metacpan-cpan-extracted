@@ -5275,6 +5275,79 @@ test $ac_cv_accept4 = yes &&
 printf "%s\n" "#define HAVE_ACCEPT4 1" >>confdefs.h
 
 
+ac_fn_c_check_header_compile "$LINENO" "sys/mount.h" "ac_cv_header_sys_mount_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_mount_h" = xyes
+then :
+  printf "%s\n" "#define HAVE_SYS_MOUNT_H 1" >>confdefs.h
+
+fi
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for mount/umount" >&5
+printf %s "checking for mount/umount... " >&6; }
+if test ${ac_cv_mount+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <sys/mount.h>
+int main (void)
+{
+   int res;
+   res = mount ("path", "path", "fstype", MS_RDONLY, 0);
+   res = umount ("path");
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_mount=yes
+else $as_nop
+  ac_cv_mount=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_mount" >&5
+printf "%s\n" "$ac_cv_mount" >&6; }
+test $ac_cv_mount = yes &&
+printf "%s\n" "#define HAVE_MOUNT 1" >>confdefs.h
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for umount2" >&5
+printf %s "checking for umount2... " >&6; }
+if test ${ac_cv_umount2+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <sys/mount.h>
+int main (void)
+{
+   int res;
+   res = umount2 ("path", MNT_FORCE|MNT_DETACH);
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_umount2=yes
+else $as_nop
+  ac_cv_umount2=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_umount2" >&5
+printf "%s\n" "$ac_cv_umount2" >&6; }
+test $ac_cv_umount2 = yes &&
+printf "%s\n" "#define HAVE_UMOUNT2 1" >>confdefs.h
+
+
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure

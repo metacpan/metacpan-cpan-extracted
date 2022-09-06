@@ -3,11 +3,13 @@ package App::paperback;
 use v5.10;
 use strict;
 # use warnings;
-our $VERSION = "1.14";
+our $VERSION = "1.15";
 
 my ($GinFile, $GpageObjNr, $Groot, $Gpos, $GobjNr, $Gstream, $GoWid, $GoHei);
 my (@Gkids, @Gcounts, @GformBox, @Gobject, @Gparents, @Gto_be_created);
 my (%GpageXObject, %GObjects);
+
+my $cr = '\s*(?:\015|\012|(?:\015\012))';
 
 # ISO 216 paper sizes in pt:
 my $AH = 841.8898; # [A] A4 ~ 297 mm (H)
@@ -446,13 +448,12 @@ sub getRootAndMapGobjects {
   } else {
     return 0;
   }
+  
   # stat[7] = filesize
   die "[!] Invalid XREF, aborting.\n" if $xref > (stat($GinFile))[7];
   populateGobjects($xref);
   $tempRoot = getRootFromXrefSection();
-
   return 0 unless $tempRoot; # No Root object in ${GinFile}, aborting
-
   return $tempRoot;
 }
 
@@ -463,7 +464,16 @@ sub populateGobjects {
   my $xref = $_[0];
   my ( $idx, $qty, $readBytes );
 
-  sysseek $IN_FILE, $xref += 5, 0;
+  sysseek $IN_FILE, $xref, 0;
+  sysread $IN_FILE, $readBytes, 22;
+
+	die "[!] File '${GinFile}' uses xref streams (not a v1.4 PDF file).\n"
+    if $readBytes =~ m/^\d+\s+\d+\s+obj/i; # Road to manage v1.5+ PDF files!
+  die "[!] File '${GinFile}' has a malformed xref table.\n"
+    unless $readBytes =~ m/^(xref$cr)/i;
+  my $extra = length($1);
+
+  sysseek $IN_FILE, $xref += $extra, 0;
   ($qty, $idx) = extractXrefSection();
 
   while ($qty) {
@@ -474,6 +484,7 @@ sub populateGobjects {
     }
     ($qty, $idx) = extractXrefSection();
   }
+
   addSizeToGObjects();
   return;
 }
@@ -790,7 +801,6 @@ sub extractXrefSection {
     sysread $IN_FILE, $c, 1;
   }
   ($idx, $qty) = ($1, $2) if $readBytes =~ m'^(\d+)\s+(\d+)';
-
   return ($qty, $idx);
 }
 

@@ -1,10 +1,8 @@
-use 5.006;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package SQL::Concrete::Dollars;
-$SQL::Concrete::Dollars::VERSION = '1.003';
-# ABSTRACT: use SQL::Concrete with dollar placeholders
+
+our $VERSION = '1.004';
 
 use SQL::Concrete ':noncore';
 BEGIN { our @ISA = 'SQL::Concrete' } # inherit import()
@@ -12,7 +10,9 @@ BEGIN { our @ISA = 'SQL::Concrete' } # inherit import()
 sub sql_render { SQL::Concrete::Renderer::Dollars->new->render( @_ ) }
 
 package SQL::Concrete::Renderer::Dollars;
-$SQL::Concrete::Renderer::Dollars::VERSION = '1.003';
+
+our $VERSION = '1.004';
+
 BEGIN { our @ISA = 'SQL::Concrete::Renderer' }
 
 sub render {
@@ -39,10 +39,6 @@ __END__
 
 SQL::Concrete::Dollars - use SQL::Concrete with dollar placeholders
 
-=head1 VERSION
-
-version 1.003
-
 =head1 SYNOPSIS
 
  use SQL::Concrete::Dollars ':all';
@@ -63,16 +59,5 @@ a per-query basis, you can export C<sql_render> from this module with a prefix:
  # depending on the form of placeholders you want
 
 For all further details, please refer to the L<SQL::Concrete> documentation.
-
-=head1 AUTHOR
-
-Aristotle Pagaltzis <pagaltzis@gmx.de>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by Aristotle Pagaltzis.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

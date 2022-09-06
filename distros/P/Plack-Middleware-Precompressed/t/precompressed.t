@@ -1,9 +1,8 @@
-use strict;
-use warnings;
+use strict; use warnings;
 
+use Test::More tests => 18;
 use Plack::Test;
 use Plack::Builder;
-use Test::More;
 use HTTP::Request::Common;
 
 our $key = 'PATH_INFO';
@@ -66,5 +65,3 @@ test_psgi app => $app, client => sub {
 	ok !$res->header( 'Content-Encoding' ), '... with no encoding header';
 	ok !$res->header( 'Vary' ), '... and no Vary header';
 };
-
-done_testing;

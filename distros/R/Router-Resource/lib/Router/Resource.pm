@@ -1,14 +1,14 @@
+use 5.008001; use strict; use warnings;
+
 package Router::Resource;
 
-use strict;
-use 5.8.1;
+our $VERSION = '0.22';
+
 use Router::Simple::Route;
 use Sub::Exporter -setup => {
     exports => [ qw(router resource missing GET POST PUT DELETE HEAD OPTIONS TRACE CONNECT PATCH)],
     groups  => { default => [ qw(resource router missing GET POST PUT DELETE HEAD OPTIONS TRACE CONNECT PATCH) ] }
 };
-
-our $VERSION = '0.21';
 
 sub new {
     my $class = shift;
@@ -85,13 +85,18 @@ sub match {
 }
 
 1;
+
 __END__
 
-=head1 Name
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
 
 Router::Resource - Build REST-inspired routing tables
 
-=head1 Synopsis
+=head1 SYNOPSIS
 
   use Router::Resource;
   use Plack::Builder;
@@ -116,7 +121,7 @@ Router::Resource - Build REST-inspired routing tables
       };
   }
 
-=head1 Description
+=head1 DESCRIPTION
 
 There are a bunch of path routers on CPAN, but they tend not to be very RESTy.
 A basic idea of a RESTful API is that URIs point to resources and the standard
@@ -129,7 +134,7 @@ The rules for matching paths are defined by
 L<Router::Simple's routing rules|Router::Simple/HOW TO WRITE A ROUTING RULE>,
 which offer quite a lot of flexibility.
 
-=head2 Interface
+=head1 INTERFACE
 
 You create a router in a C<router> block. Within that block, define resources
 understood by the router with the C<resource> keyword, which takes a resource
@@ -314,7 +319,7 @@ majority of needs.
 
 =end private
 
-=head1 See Also
+=head1 SEE ALSO
 
 =over
 
@@ -340,46 +345,36 @@ Plack-aware.
 
 =back
 
-=head1 Support
+=head1 ACKNOWLEDGEMENTS
 
-This module is stored in an open L<GitHub
-repository|http://github.com/theory/router-resource/>. Feel free to fork and
-contribute!
-
-Please file bug reports via L<GitHub
-Issues|http://github.com/theory/router-resource/issues/> or by sending mail to
-L<bug-Router-Resource@rt.cpan.org|mailto:bug-Router-Resource@rt.cpan.org>.
-
-=head1 Author
-
-David E. Wheeler <david@kineticode.com>
-
-=head1 Acknowledgements
-
-My thanks to the denizens of #plack for their feedback and advice on this module,
+Thanks to the denizens of #plack for their feedback and advice on this module,
 including:
 
 =over
 
-=item * L<Hans Dieter Pearcey (confound)|http://search.cpan.org/~hdp/>
+=item * Hans Dieter Pearcey (confound)
 
-=item * L<Florian Ragwitz (rafl)|http://search.cpan.org/~flora/>
+=item * Florian Ragwitz (rafl)
 
-=item * L<Paul Evans (LeoNerd)|http://search.cpan.org/~pevans/>
+=item * Paul Evans (LeoNerd)
 
-=item * L<Matt S Trout (mst)|http://search.cpan.org/~mstrout/>
+=item * Matt S Trout (mst)
 
-=item * L<Tatsuhiko Miyagawa (miyagawa)|http://search.cpan.org/~miyagawa/>
+=item * Tatsuhiko Miyagawa (miyagawa)
 
-=item * L<Pedro Melo (melo)|http://search.cpan.org/~melo/>
+=item * Pedro Melo (melo)
 
 =back
 
-=head1 Copyright and License
+=head1 AUTHOR
 
-Copyright (c) 2010-2011 David E. Wheeler. Some Rights Reserved.
+David E. Wheeler <david@kineticode.com>
 
-This module is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by David E. Wheeler.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

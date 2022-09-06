@@ -1,7 +1,8 @@
 use strict; use warnings;
 
 package Pod::Readme::Brief;
-our $VERSION = '1.002';
+
+our $VERSION = '1.003';
 
 use Pod::Text;
 
@@ -25,8 +26,15 @@ sub render {
 	s/\A\s+//, s/\s+\z// for $name;
 	die "Bad module name $name\n" unless $name =~ /\A\w+(?:::\w+)*\z/;
 
-	my @pod = $self->find_pod_section( DESCRIPTION => 0 );
-	$pod[0] =~ s/\s.*/ $name/;
+	my @pod = "=pod\n\n";
+
+	if ( my @encoding = grep /^=encoding\s/, @$self ) {
+		die "More than one =encoding directive found\n" if @encoding > 1;
+		push @pod, @encoding, "\n";
+	}
+
+	my ( undef, @description ) = $self->find_pod_section( DESCRIPTION => 0 );
+	push @pod, "=head1 $name\n", @description;
 
 	( push @pod, $_ ), $pod[-1] =~ s!^\t!!mg for <<'__HERE__';
 	=head1 INSTALLATION
@@ -59,11 +67,18 @@ __HERE__
 
 	push @pod, $self->find_pod_section( LICENSE => 1 );
 
-	my ( $pod, $text ) = join '', "=pod\n\n", @pod;
+	my $pod = join '', @pod;
+	my $text;
 
 	open my $in,  '<', \$pod  or die $!;
 	open my $out, '>', \$text or die $!;
-	my $parser = Pod::Text->new( loose => 1, width => 73, indent => 0 );
+	my $parser = Pod::Text->new(
+		errors => 'die',
+		stderr => 1,
+		loose  => 1,
+		indent => 0,
+		width  => $arg{'width'} || 73,
+	);
 	$parser->parse_from_filehandle( $in, $out );
 	$text =~ s{\n+\z}{\n};
 
@@ -152,6 +167,12 @@ C<eumm> (for a distribution using C<Makefile.PL>),
 C<mb> (for a distribution using C<Build.PL>),
 or a false value (to omit manual installation instructions).
 
+=item C<width>
+
+The number of columns to which output will be reflowed by L<Pod::Text>.
+
+Defaults to 73.
+
 =back
 
 =head1 SEE ALSO
@@ -164,7 +185,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Aristotle Pagaltzis.
+This software is copyright (c) 2022 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

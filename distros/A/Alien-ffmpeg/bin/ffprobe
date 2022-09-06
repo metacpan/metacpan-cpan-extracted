@@ -8,8 +8,14 @@ use strict;
 use warnings;
 use File::ShareDir ':ALL';
 use Path::Class;
+use Alien::ffmpeg;
 
-my $abs = file(dist_dir('Alien-ffmpeg'),'bin','ffprobe')->cleanup->absolute;
+my $abs;
+if(Alien::ffmpeg->install_type ne 'system') {
+	$abs = file(dist_dir('Alien-ffmpeg'),'bin','ffprobe')->cleanup->absolute;
+} else {
+	die "Alien::ffmpeg reinstalled as non-share install. Please remove wrapper at $0";
+}
 
 exec($abs, @ARGV) or print STDERR "couldn't exec ffprobe: $!";
 
@@ -23,7 +29,7 @@ ffprobe - Command ffprobe of Alien-ffmpeg
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 AUTHOR
 

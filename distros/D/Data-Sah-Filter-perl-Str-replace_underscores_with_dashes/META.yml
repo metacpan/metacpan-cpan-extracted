@@ -3,11 +3,10 @@ abstract: 'Replace underscores in string with dashes'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Sah::Filter: '0.006'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0.98'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -20,7 +19,7 @@ name: Data-Sah-Filter-perl-Str-replace_underscores_with_dashes
 provides:
   Data::Sah::Filter::perl::Str::replace_underscores_with_dashes:
     file: lib/Data/Sah/Filter/perl/Str/replace_underscores_with_dashes.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   perl: '5.010001'
   strict: '0'
@@ -29,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Filter-perl-Str-replace_underscores_with_dashes
   homepage: https://metacpan.org/release/Data-Sah-Filter-perl-Str-replace_underscores_with_dashes
   repository: git://github.com/perlancar/perl-Data-Sah-Filter-perl-Str-replace_underscores_with_dashes.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -37,7 +36,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Data::Sah::Filter
       name: Data::Sah::Filter
-      version: '0.001'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -339,7 +338,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Data::Sah::Filter
               name: -Data::Sah::Filter
-              version: '0.002'
+              version: '0.006'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

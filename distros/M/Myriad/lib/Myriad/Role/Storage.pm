@@ -1,12 +1,9 @@
 package Myriad::Role::Storage;
 
-use strict;
-use warnings;
+use Myriad::Class type => 'role';
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '1.000'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
-
-use utf8;
 
 =encoding utf8
 
@@ -44,30 +41,11 @@ a concrete implementation - instead, see classes such as:
 
 =cut
 
-no indirect qw(fatal);
-use Future::AsyncAwait;
+=head1 METHODS - Write
 
-use experimental qw(signatures);
+=cut
 
-use Role::Tiny;
-
-our @WRITE_METHODS = qw(set getset incr push unshift pop shift hash_set hash_add);
-our @READ_METHODS = qw(get observe watch_keyspace hash_get hash_keys hash_values hash_exists hash_count hash_as_list);
-
-requires $_ for @WRITE_METHODS;
-requires $_ for @READ_METHODS;
-
-=head2 get
-
-Takes the following parameters:
-
-=over 4
-
-=item * C<< $k >> - the relative key in storage
-
-=back
-
-Returns a L<Future> which will resolve to the corresponding value, or C<undef> if none.
+our @WRITE_METHODS = qw(set getset incr push unshift pop shift hash_set hash_add orderedset_add orderedset_remove_member orderedset_remove_byscore );
 
 =head2 set
 
@@ -85,6 +63,10 @@ Note that references are currently B<not> supported - attempts to write an array
 or object will fail.
 
 Returns a L<Future> which will resolve on completion.
+
+=cut
+
+method set;
 
 =head2 getset
 
@@ -105,11 +87,9 @@ or object will fail.
 
 Returns a L<Future> which will resolve on completion to the original value, or C<undef> if none.
 
-=head2 observe
+=cut
 
-Observe a specific key.
-
-Returns a L<Ryu::Observable> which will emit the current and all subsequent values.
+method getset;
 
 =head2 push
 
@@ -125,6 +105,10 @@ Takes the following parameters:
 
 Returns a L<Future>.
 
+=cut
+
+method push;
+
 =head2 unshift
 
 Takes the following parameters:
@@ -137,15 +121,27 @@ Takes the following parameters:
 
 Returns a L<Future>.
 
+=cut
+
+method unshift;
+
 =head2 pop
 
 Returns a L<Future> which will resolve to the item removed from the list,
 or C<undef> if none available.
 
+=cut
+
+method pop;
+
 =head2 shift
 
 Returns a L<Future> which will resolve to the item removed from the list,
 or C<undef> if none available.
+
+=cut
+
+method shift;
 
 =head2 hash_set
 
@@ -159,17 +155,9 @@ Takes the following parameters:
 
 Returns a L<Future> which will resolve to .
 
-=head2 hash_get
+=cut
 
-Takes the following parameters:
-
-=over 4
-
-=item *
-
-=back
-
-Returns a L<Future> which will resolve to the scalar value for this key.
+method hash_set;
 
 =head2 hash_add
 
@@ -183,6 +171,119 @@ Takes the following parameters:
 
 Returns a L<Future> indicating success or failure.
 
+=cut
+
+method hash_add;
+
+=head2 orderedset_add
+
+Adds a member to an orderedset structure
+Takes the following parameters:
+
+=over 4
+
+=item * C<< $k >> - the relative key in storage
+
+=item * C<< $s >> - the scalar value of the score attached to member
+
+=item * C<< $m >> - the scalar value of member
+
+=back
+
+Returns a L<Future>.
+
+=cut
+
+method orderedset_add;
+
+=head2 orderedset_remove_memeber
+
+Removes a member from an orderedset structure
+Takes the following parameters:
+
+=over 4
+
+=item * C<< $k >> - the relative key in storage
+
+=item * C<< $m >> - the scalar value of member
+
+=back
+
+Returns a L<Future>.
+
+=cut
+
+method orderedset_remove_member;
+
+=head2 orderedset_remove_byscore
+
+Removes members that have scores within the range passed from an orderedset structure
+Takes the following parameters:
+
+=over 4
+
+=item * C<< $k >> - the relative key in storage
+
+=item * C<< $min >> - the value of minimum score
+
+=item * C<< $max >> - the value of maximum score
+
+=back
+
+Returns a L<Future>.
+
+=cut
+
+method orderedset_remove_byscore;
+
+=head1 METHODS - Read
+
+=cut
+
+our @READ_METHODS = qw(get observe watch_keyspace hash_get hash_keys hash_values hash_exists hash_count hash_as_list orderedset_member_count orderedset_members);
+
+=head2 get
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<< $k >> - the relative key in storage
+
+=back
+
+Returns a L<Future> which will resolve to the corresponding value, or C<undef> if none.
+
+=cut
+
+method get;
+
+=head2 observe
+
+Observe a specific key.
+
+Returns a L<Ryu::Observable> which will emit the current and all subsequent values.
+
+=cut
+
+method observe;
+
+=head2 hash_get
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to the scalar value for this key.
+
+=cut
+
+method hash_get;
+
 =head2 hash_keys
 
 Takes the following parameters:
@@ -194,6 +295,10 @@ Takes the following parameters:
 =back
 
 Returns a L<Future> which will resolve to a list of the keys in no defined order.
+
+=cut
+
+method hash_keys;
 
 =head2 hash_values
 
@@ -207,6 +312,10 @@ Takes the following parameters:
 
 Returns a L<Future> which will resolve to a list of the values in no defined order.
 
+=cut
+
+method hash_values;
+
 =head2 hash_exists
 
 Takes the following parameters:
@@ -219,6 +328,10 @@ Takes the following parameters:
 
 Returns a L<Future> which will resolve to true if the key exists in this hash.
 
+=cut
+
+method hash_exists;
+
 =head2 hash_count
 
 Takes the following parameters:
@@ -230,6 +343,10 @@ Takes the following parameters:
 =back
 
 Returns a L<Future> which will resolve to the count of the keys in this hash.
+
+=cut
+
+method hash_count;
 
 =head2 hash_as_list
 
@@ -246,6 +363,50 @@ suitable for assigning to a hash.
 
 =cut
 
+method hash_as_list;
+
+=head2 orderedset_member_count
+
+Returns the count of members that have scores within the range passed from an orderedset structure
+Takes the following parameters:
+
+=over 4
+
+=item * C<< $k >> - the relative key in storage
+
+=item * C<< $min >> - the value of minimum score
+
+=item * C<< $max >> - the value of maximum score
+
+=back
+
+Returns a L<Future>.
+
+=cut
+
+method orderedset_member_count;
+
+=head2 orderedset_members
+
+Returns the members that have scores within the range passed from an orderedset structure
+Takes the following parameters:
+
+=over 4
+
+=item * C<< $k >> - the relative key in storage
+
+=item * C<< $min >> - the value of minimum score
+
+=item * C<< $max >> - the value of maximum score
+
+=back
+
+Returns a L<Future>.
+
+=cut
+
+method orderedset_members;
+
 1;
 
 =head1 AUTHOR
@@ -256,5 +417,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

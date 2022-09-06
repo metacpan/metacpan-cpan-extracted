@@ -1,12 +1,9 @@
 package Myriad::Service;
 
-use strict;
-use warnings;
+use Myriad::Class;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '1.000'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
-
-use utf8;
 
 =encoding utf8
 
@@ -73,17 +70,6 @@ any changes to syntax or other features.
 
 =cut
 
-no indirect qw(fatal);
-no multidimensional;
-no bareword::filehandles;
-use mro;
-use experimental qw(signatures);
-use Future::AsyncAwait;
-use Syntax::Keyword::Try;
-use Syntax::Keyword::Dynamically;
-use Object::Pad;
-use Scalar::Util;
-
 use Heap;
 use IO::Async::Notifier;
 use IO::Async::SSL;
@@ -91,9 +77,6 @@ use Net::Async::HTTP;
 
 use Myriad::Service::Implementation;
 use Myriad::Config;
-
-use Log::Any qw($log);
-use OpenTracing::Any qw($tracer);
 
 use Myriad::Exception::Builder category => 'service';
 
@@ -128,7 +111,7 @@ sub import ($called_on, @args) {
     # Currently we have `$api`, but might be helpful to provide `$storage`
     # and others directly here.
     $SLOT{$pkg} = {
-        map { $_ => $meta->add_slot('$' . $_) } qw(
+        map { $_ => $meta->add_field('$' . $_) } qw(
             api
         )
     };
@@ -163,5 +146,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

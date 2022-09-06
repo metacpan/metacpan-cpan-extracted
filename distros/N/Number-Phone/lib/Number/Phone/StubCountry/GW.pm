@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220601185318;
+our $VERSION = 1.20220903144940;
 
 my $formatters = [
                 {
@@ -54,45 +54,45 @@ my $validators = {
                 'voip' => '40\\d{5}'
               };
 my %areanames = ();
-$areanames{pt} = {"245334", "Mansaba",
-"245391", "Canchungo",
-"245354", "Pitche",
-"245320", "Bissau",
-"245392", "Cacheu",
-"245353", "Pirada",
-"245393", "S\.\ Domingos",
+$areanames{pt} = {"245392", "Cacheu",
+"245331", "Mansôa",
 "245322", "Sta\.\ Luzia",
+"245393", "S\.\ Domingos",
+"245391", "Canchungo",
 "245332", "Bigene\/Bissorã",
-"245342", "Bambadinca",
-"245352", "Sonaco",
-"245370", "Buba",
-"245394", "Bula",
 "245396", "Ingoré",
+"245354", "Pitche",
+"245370", "Buba",
+"245321", "Bissau",
+"245394", "Bula",
+"245320", "Bissau",
+"245341", "Bafatá",
 "245351", "Gabú",
 "245325", "Brá",
 "245335", "Farim",
-"245321", "Bissau",
-"245341", "Bafatá",
-"245331", "Mansôa",};
-$areanames{en} = {"24544396", "Ingoré",
-"24544352", "Sonaco",
-"24544320", "Bissau",
-"24544392", "Cacheu",
-"24544322", "St\.\ Luzia",
-"24544370", "Buba",
-"24544332", "Bissora",
+"245334", "Mansaba",
+"245353", "Pirada",
+"245342", "Bambadinca",
+"245352", "Sonaco",};
+$areanames{en} = {"24544332", "Bissora",
 "24544341", "Bafatá",
-"24544335", "Farim",
+"24544322", "St\.\ Luzia",
+"24544334", "Mansaba",
+"24544321", "Bissau",
 "24544325", "Brá",
 "24544342", "Bambadinca",
-"24544321", "Bissau",
-"24544394", "Bula",
-"24544353", "Pirada",
+"24544396", "Ingoré",
 "24544331", "Mansôa",
-"24544391", "Canchungo",
-"24544334", "Mansaba",
-"24544351", "Gabu",
+"24544335", "Farim",
+"24544392", "Cacheu",
+"24544370", "Buba",
 "24544397", "Bigene",
+"24544353", "Pirada",
+"24544394", "Bula",
+"24544391", "Canchungo",
+"24544320", "Bissau",
+"24544352", "Sonaco",
+"24544351", "Gabu",
 "24544393", "S\.\ Domingos",
 "24544354", "Pitche",};
 

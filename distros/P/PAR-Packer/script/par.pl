@@ -154,8 +154,39 @@ followed by a 8-bytes magic string: "C<\012PAR.pm\012>".
 
 =cut
 
+my ($PAR_MAGIC, $FILE_offset_size, $CACHE_marker, $cache_name_size);
+# NOTE: must initialize them in BEGIN as they are used in BEGIN below
+BEGIN {
+    $PAR_MAGIC = "\nPAR.pm\n";
+    $FILE_offset_size = 4;   # pack("N")
+    $cache_marker = "\0CACHE";
+    $cache_name_size = 40;
+}
 
-my ($PAR_MAGIC, $par_temp, $progname, @tmpfile, %ModuleCache);
+
+# Search $fh for the "\nPAR.pm\n signature backward from the end of the file
+sub find_par_magic
+{
+    my ($fh) = @_;
+
+    my $chunk_size = 64 * 1024;
+    my $buf;
+    my $size = -s $fh;
+
+    my $pos = $size - $size % $chunk_size;      # NOTE: $pos is a multiple of $chunk_size
+    while ($pos >= 0) {
+        seek $fh, $pos, 0;
+        read $fh, $buf, $chunk_size + length($PAR_MAGIC);
+        if ((my $i = rindex($buf, $PAR_MAGIC)) >= 0) {
+            $pos += $i;
+            return $pos;
+        }
+        $pos -= $chunk_size;
+    }
+    return -1;
+}
+
+my ($par_temp, $progname, @tmpfile, %ModuleCache);
 END { if ($ENV{PAR_CLEAN}) {
     require File::Temp;
     require File::Basename;
@@ -204,9 +235,8 @@ rm '$filename'
     }
 } }
 
-BEGIN {
-    $PAR_MAGIC = "\nPAR.pm\n";
 
+BEGIN {
     Internals::PAR::BOOT() if defined &Internals::PAR::BOOT;
 
     eval {
@@ -240,20 +270,7 @@ MAGIC: {
     }
 
     # Search for the "\nPAR.pm\n signature backward from the end of the file
-    my $chunk_size = 64 * 1024;
-    my $buf;
-    my $size = -s _FH;
-
-    my $magic_pos = $size - $size % $chunk_size; # NOTE: $magic_pos is a multiple of $chunk_size
-    while ($magic_pos >= 0) {
-        seek _FH, $magic_pos, 0;
-        read _FH, $buf, $chunk_size + length($PAR_MAGIC);
-        if ((my $i = rindex($buf, $PAR_MAGIC)) >= 0) {
-            $magic_pos += $i;
-            last;
-        }
-        $magic_pos -= $chunk_size;
-    }
+    my $magic_pos = find_par_magic(*_FH);
     if ($magic_pos < 0) {
         outs(qq[Can't find magic string "$PAR_MAGIC" in file "$progname"]);
         last MAGIC;
@@ -262,11 +279,11 @@ MAGIC: {
 
     # Seek 4 bytes backward from the signature to get the offset of the
     # first embedded FILE, then seek to it
-    seek _FH, $magic_pos - 4, 0;
-    read _FH, $buf, 4;
+    seek _FH, $magic_pos - $FILE_offset_size, 0;
+    read _FH, $buf, $FILE_offset_size;
     my $offset = unpack("N", $buf);
     outs("Offset from start of FILEs is $offset");
-    seek _FH, $magic_pos - 4 - $offset, 0;
+    seek _FH, $magic_pos - $FILE_offset_size - $offset, 0;
     $data_pos = tell _FH;
 
     # }}}
@@ -382,7 +399,6 @@ my ($out, $bundle, $logfh, $cache_name);
 
 delete $ENV{PAR_APP_REUSE}; # sanitize (REUSE may be a security problem)
 
-$quiet = 0 unless $ENV{PAR_DEBUG};
 # Don't swallow arguments for compiled executables without --par-options
 if (!$start_pos or ($ARGV[0] eq '--par-options' && shift)) {
     my %dist_cmd = qw(
@@ -477,6 +493,15 @@ if ($out) {
     }
 
 
+    # Extract the "par" dictionary from META.yml in $zip
+    my %meta_par = do {
+        if ($zip and my $meta = $zip->contents('META.yml')) {
+            $meta =~ s/.*^par:$//ms;
+            $meta =~ s/^\S.*//ms;
+            $meta =~ /^  ([^:]+): (.+)$/mg;
+        }
+    };
+
     # Open input and output files {{{
 
     if (defined $par) {
@@ -509,6 +534,18 @@ if ($out) {
     if (!$ENV{PAR_VERBATIM} and $loader =~ /^(?:#!|\@rem)/) {
         require PAR::Filter::PodStrip;
         PAR::Filter::PodStrip->apply(\$loader, $0);
+    }
+
+    # Patch a certain string in $loader
+    if ($meta_par{clean}) {
+        my $par_clean = "=1";
+        my $pass_par_clean = uc "__pass_par_clean__";
+        # NOTE: we avoid to mention the contents of pass_par_clean so that
+        # this file doesn't contain it **at all**
+
+        $loader =~ s{(?<=${pass_par_clean})( +)}
+                    {$par_clean . (" " x (length($1) - length($par_clean)))}eg;
+                    # NOTE: the replacement must be the same number of bytes as the match
     }
 
     $fh->print($loader)
@@ -611,7 +648,7 @@ if ($out) {
             or die qq[Error writing zip part of "$out"];
     }
 
-    $cache_name = substr $cache_name, 0, 40;
+    $cache_name = substr $cache_name, 0, $cache_name_size;
     if (!$cache_name and my $mtime = (stat($out))[9]) {
         my $ctx = Digest::SHA->new(1);
         open my $th, "<:raw", $out;
@@ -620,8 +657,8 @@ if ($out) {
 
         $cache_name = $ctx->hexdigest;
     }
-    $cache_name .= "\0" x (40 - length $cache_name);
-    $cache_name .= "\0CACHE";
+    $cache_name .= "\0" x ($cache_name_size - length $cache_name);
+    $cache_name .= $cache_marker;
     # compute the offset from the end of $loader to end of "...\0CACHE"
     my $offset = $fh->tell + length($cache_name) - length($loader);
     $fh->print($cache_name, 
@@ -663,19 +700,6 @@ if ($out) {
     ($zip->readFromFileHandle($fh, $progname) == Archive::Zip::AZ_OK())
         or die qq[Error reading zip archive "$progname"];
     Archive::Zip::setChunkSize(64 * 1024);
-
-    $quiet = !$ENV{PAR_DEBUG};
-
-    outs("Reading META.yml...");
-    if (my $meta = $zip->contents('META.yml')) {
-        # check par.clean
-        $meta =~ s/.*^par:\s*$//ms;
-        $meta =~ s/^\S.*//ms;
-        if (my ($clean) = $meta =~ /^\s+clean: (.*)$/m) {
-            $clean =~ /^\s*|\s*$/g;
-            $ENV{PAR_CLEAN} = 1 if $clean;
-        }
-    }
 
     push @PAR::LibCache, $zip;
     $PAR::LibCache{$progname} = $zip;
@@ -796,43 +820,42 @@ sub _set_par_temp {
         else {
             $username = $ENV{USERNAME} || $ENV{USER} || 'SYSTEM';
         }
-        $username =~ s/\W/_/g;
 
         my $stmpdir = "$path$sys{_delim}par-".unpack("H*", $username);
         mkdir $stmpdir, 0755;
-        if (!$ENV{PAR_CLEAN} and my $mtime = (stat($progname))[9]) {
-            open my $fh, "<:raw", $progname or die qq[Can't read "$progname": $!];
-            seek $fh, -18, 2;
-            my $buf;
-            read $fh, $buf, 6;
-            if ($buf eq "\0CACHE") {
-                seek $fh, -58, 2;
-                read $fh, $buf, 41;
-                $buf =~ s/\0//g;
-                $stmpdir .= "$sys{_delim}cache-$buf";
-            }
-            else {
-                my $digest = eval
-                {
-                    require Digest::SHA;
-                    my $ctx = Digest::SHA->new(1);
-                    open my $fh, "<:raw", $progname or die qq[Can't read "$progname": $!];
-                    $ctx->addfile($fh);
-                    close($fh);
-                    $ctx->hexdigest;
-                } || $mtime;
 
-                $stmpdir .= "$sys{_delim}cache-$digest";
-            }
-            close($fh);
+        my $cache_dir;
+        if ($ENV{PAR_CLEAN}) {
+            $cache_dir = "temp-$$";
         }
         else {
-            $ENV{PAR_CLEAN} = 1;
-            $stmpdir .= "$sys{_delim}temp-$$";
+            open my $fh, "<:raw", $progname or die qq[Can't read "$progname": $!];
+            if ((my $magic_pos = find_par_magic($fh)) >= 0) {
+                seek $fh, $magic_pos 
+                          - $FILE_offset_size 
+                          - length($cache_marker), 0;
+                my $buf;
+                read $fh, $buf, length($cache_marker);
+                if ($buf eq $cache_marker) {
+                    seek $fh, $magic_pos 
+                              - $FILE_offset_size 
+                              - length($cache_marker) 
+                              - $cache_name_size, 0;
+                    read $fh, $buf, $cache_name_size;
+                    $buf =~ s/\0//g;
+                    $cache_dir = "cache-$buf";
+                }
+            }
+            close $fh;
         }
+        if (!$cache_dir) {
+            $cache_dir = "temp-$$";
+            $ENV{PAR_CLEAN} = 1;
+        }
+        $stmpdir .= "$sys{_delim}$cache_dir";
 
-        $ENV{PAR_TEMP} = $stmpdir;
         mkdir $stmpdir, 0755;
+        $ENV{PAR_TEMP} = $stmpdir;
         last;
     }
 

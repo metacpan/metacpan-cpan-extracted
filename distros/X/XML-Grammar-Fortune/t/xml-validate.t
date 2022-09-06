@@ -27,7 +27,7 @@ my @inputs = (
         quote-fort-sample-8-with-em-and-strong
         quote-fort-sample-9-with-blockquote
         quote-fort-sample-10-with-hyperlink
-        )
+    )
 );
 
 my $rngschema =

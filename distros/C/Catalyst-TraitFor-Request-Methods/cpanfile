@@ -5,7 +5,7 @@ requires "Catalyst" => "5.90090";
 requires "Data::Enum" => "0";
 requires "Moose::Role" => "0";
 requires "namespace::autoclean" => "0";
-requires "perl" => "v5.10.1";
+requires "perl" => "v5.14.0";
 
 on 'test' => sub {
   requires "Catalyst" => "5.90090";

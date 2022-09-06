@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.029";
+our $VERSION = "0.030";
 
 use Text::Layout::FontDescriptor;
 
@@ -87,13 +87,14 @@ If true, a predefined set of font names (the PDF corefonts) is registered.
 
 sub new {
     my ( $pkg, %atts ) = @_;
-    my $self = bless \my $i => $pkg;
+    my $self = bless {} => $pkg;
     if ( $atts{corefonts} ) {
 	$self->register_corefonts;
     }
     if ( $atts{loader} ) {
 	$loader = $atts{loader};
     }
+    $debug = $self->{debug} = $atts{debug};
     return $self;
 }
 
@@ -102,6 +103,8 @@ sub reset {
     %fonts = ();
     @dirs = ();
 }
+
+sub debug { shift->{debug} }
 
 =over
 
@@ -344,6 +347,7 @@ sub find_font {
     my $atts;
     $atts = pop(@_) if UNIVERSAL::isa( $_[-1], 'HASH' );
     my ( $family, $style, $weight ) = @_;
+    warn("find_font( $family, $style, $weight )\n") if $debug;
 
     my $try = sub {
 	if ( $fonts{$family}
@@ -375,6 +379,10 @@ sub find_font {
 		$i{$_} = $ff->{$_};
 	    }
 
+	    if ( $debug ) {
+		warn("found( $i{family}, $i{style}, $i{weight} ) -> ",
+		     $i{loader_data}, "\n");
+	    }
 	    return Text::Layout::FontDescriptor->new(%i);
 	}
     };
@@ -567,6 +575,7 @@ sub _fallback {
     return unless $fallback;
 
     my ( $family, $style, $weight ) = @_;
+    warn("fallback( $family, $style, $weight )\n") if $debug;
 
     my $pattern = $family;
     $pattern .= ":$style" if $style;

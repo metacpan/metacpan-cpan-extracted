@@ -70,6 +70,6 @@
          "url" : "git://github.com/Sereal/Sereal.git"
       }
    },
-   "version" : "4.025",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "5.001",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

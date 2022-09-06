@@ -28,7 +28,7 @@ do { my $x = {
                                       'Data::Enum' => '0',
                                       'Moose::Role' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.1'
+                                      'perl' => 'v5.14.0'
                                     }
                     },
        'test' => {

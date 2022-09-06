@@ -3,10 +3,10 @@ NAME
     underscores in string with dashes
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Data::Sah::Filter::perl::Str::replace_underscores_with_dashes (from Perl
     distribution Data-Sah-Filter-perl-Str-replace_underscores_with_dashes),
-    released on 2022-07-16.
+    released on 2022-07-17.
 
 SYNOPSIS
   Using in Sah schema's "prefilters" (or "postfilters") clause
@@ -24,6 +24,16 @@ SYNOPSIS
 
      my $filter = gen_filter([["Str::replace_underscores_with_dashes"]]);
      my $filtered_value = $filter->($some_data);
+
+  Sample data and filtering results
+     "foo" # valid, unchanged
+     "foo_bar" # valid, becomes "foo-bar"
+
+DESCRIPTION
+    This is mostly created as a counterpart for the
+    replace_dashes_with_underscores filter
+    (Data::Sah::Filter::perl::Str::replace_dashes_with_underscores). So far
+    I haven't got a practical use for this.
 
 HOMEPAGE
     Please visit the project's homepage at

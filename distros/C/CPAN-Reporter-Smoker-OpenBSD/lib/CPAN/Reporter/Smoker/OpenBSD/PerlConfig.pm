@@ -5,7 +5,7 @@ use warnings;
 use Config;
 use Hash::Util qw(lock_hash);
 
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 =pod
 

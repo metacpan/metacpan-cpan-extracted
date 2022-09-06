@@ -1,5 +1,8 @@
 Revision history for App-tldr
 
+0.13  2022-09-05 21:32:15 JST
+    - Fix argument validation (zhumengu #8)
+
 0.12  2022-05-22 02:39:11 JST
     - Add language option (zhumengu #7)
 

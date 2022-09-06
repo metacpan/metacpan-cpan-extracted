@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -ex
+
+cip exec ./maint/cip-before-install-inside

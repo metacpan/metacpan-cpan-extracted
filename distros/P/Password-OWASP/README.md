@@ -5,12 +5,16 @@ recommendations for safe storage in Perl. In short OWASP recommends the
 following:
 
 - Don't limit password length or characters
-- Hash the password before you crypt them
+- Hash the password before you crypt them (deprecated)
 - Use either Argon2, PBKDF2, Scrypt or Bcrypt
 
 This module currently supports Argon2, Scrypt and Bcrypt. All implementations
 hash the password first with SHA-512. SHA-256 and SHA-1 are also supported.
-This allows for storing password which are longer that 72 characters.
+This allows for storing password which are longer that 72 characters. OWASP now
+recommends against this. This module will move away from prehashing.
+In order to allow for a transition the default will stay, but emit a
+deprecation warning. You can now set `none` as a hashing option. This will
+become the new default.
 
 The check\_password method allows for weaker schemes as the module also allows
 for inplace updates on these passwords. Please note that clear text passwords

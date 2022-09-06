@@ -1,0 +1,13 @@
+Revision history for Data-Record-Serialize-Encode-csv
+
+0.02      2022-09-03 10:45:25-04:00 America/New_York
+
+  [DOC FIX]
+
+    * csv & csv_stream constructor parameter docs were out-of-date as
+      the copied text from the roles which provided the parameters,
+      rather than simply linking to the roles' docs.
+
+0.01      2022-09-03 10:32:19-04:00 America/New_York
+
+    * First release upon an unsuspecting world.

@@ -1,13 +1,11 @@
-use 5.008001;
-use strict;
-use warnings;
+use 5.008001; use strict; use warnings;
 
 use Scalar::Util ();
 use Encode ();
 
 package XML::Builder;
-$XML::Builder::VERSION = '0.906';
-# ABSTRACT: programmatic XML generation, conveniently
+
+our $VERSION = '0.907';
 
 use Object::Tiny::Lvalue qw( nsmap default_ns encoding );
 
@@ -195,7 +193,9 @@ sub stringify {
 #######################################################################
 
 package XML::Builder::NS;
-$XML::Builder::NS::VERSION = '0.906';
+
+our $VERSION = '0.907';
+
 use Object::Tiny::Lvalue qw( builder uri prefix qname_for_localname );
 use overload '""' => 'uri', fallback => 1;
 
@@ -232,7 +232,9 @@ sub factory { bless \shift, 'XML::Builder::NS::QNameFactory' }
 #######################################################################
 
 package XML::Builder::NS::QNameFactory;
-$XML::Builder::NS::QNameFactory::VERSION = '0.906';
+
+our $VERSION = '0.907';
+
 sub AUTOLOAD { my $self = shift; $$self->qname( ( our $AUTOLOAD =~ /.*::(.*)/ ), @_ ) }
 sub _qname   { my $self = shift; $$self->qname(                                  @_ ) }
 sub DESTROY  {}
@@ -240,14 +242,18 @@ sub DESTROY  {}
 #######################################################################
 
 package XML::Builder::Fragment::Role;
-$XML::Builder::Fragment::Role::VERSION = '0.906';
+
+our $VERSION = '0.907';
+
 sub depends_ns_scope { 1 }
 
 #######################################################################
 
 package XML::Builder::Fragment;
-$XML::Builder::Fragment::VERSION = '0.906';
-use parent -norequire => 'XML::Builder::Fragment::Role';
+
+our $VERSION = '0.907';
+
+our @ISA = 'XML::Builder::Fragment::Role';
 
 use Object::Tiny::Lvalue qw( builder content );
 
@@ -315,8 +321,10 @@ sub flatten {
 #######################################################################
 
 package XML::Builder::Fragment::Unsafe;
-$XML::Builder::Fragment::Unsafe::VERSION = '0.906';
-use parent -norequire => 'XML::Builder::Fragment';
+
+our $VERSION = '0.907';
+
+our @ISA = 'XML::Builder::Fragment';
 
 sub depends_ns_scope { 0 }
 
@@ -337,10 +345,12 @@ sub flatten { shift }
 #######################################################################
 
 package XML::Builder::Fragment::QName;
-$XML::Builder::Fragment::QName::VERSION = '0.906';
+
+our $VERSION = '0.907';
+
 use Object::Tiny::Lvalue qw( builder ns name as_qname as_attr_qname as_clarkname as_string );
 
-use parent -norequire => 'XML::Builder::Fragment';
+our @ISA = 'XML::Builder::Fragment';
 use overload '""' => 'as_clarkname', fallback => 1;
 
 sub new {
@@ -414,8 +424,10 @@ sub foreach {
 #######################################################################
 
 package XML::Builder::Fragment::Tag;
-$XML::Builder::Fragment::Tag::VERSION = '0.906';
-use parent -norequire => 'XML::Builder::Fragment';
+
+our $VERSION = '0.907';
+
+our @ISA = 'XML::Builder::Fragment';
 use Object::Tiny::Lvalue qw( qname attr );
 
 sub depends_ns_scope { 1 }
@@ -452,8 +464,10 @@ sub flatten { shift }
 #######################################################################
 
 package XML::Builder::Fragment::Root;
-$XML::Builder::Fragment::Root::VERSION = '0.906';
-use parent -norequire => 'XML::Builder::Fragment::Tag';
+
+our $VERSION = '0.907';
+
+our @ISA = 'XML::Builder::Fragment::Tag';
 use overload '""' => 'as_string', fallback => 1;
 
 sub depends_ns_scope { 0 }
@@ -476,8 +490,10 @@ sub as_string {
 #######################################################################
 
 package XML::Builder::Fragment::Document;
-$XML::Builder::Fragment::Document::VERSION = '0.906';
-use parent -norequire => 'XML::Builder::Fragment';
+
+our $VERSION = '0.907';
+
+our @ISA = 'XML::Builder::Fragment';
 use overload '""' => 'as_string', fallback => 1;
 
 sub new {
@@ -517,7 +533,9 @@ sub as_string {
 
 BEGIN {
 package XML::Builder::Util;
-$XML::Builder::Util::VERSION = '0.906';
+
+our $VERSION = '0.907';
+
 use Carp::Clan '^XML::Builder(?:\z|::)';
 
 sub merge_param_hash {
@@ -554,10 +572,6 @@ __END__
 =head1 NAME
 
 XML::Builder - programmatic XML generation, conveniently
-
-=head1 VERSION
-
-version 0.906
 
 =head1 DESCRIPTION
 

@@ -15,6 +15,7 @@ lib/OrePAN2/Injector.pm
 lib/OrePAN2/Repository.pm
 lib/OrePAN2/Repository/Cache.pm
 minil.toml
+perlimports.toml
 script/orepan2-audit
 script/orepan2-gc
 script/orepan2-indexer

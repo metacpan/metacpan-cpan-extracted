@@ -2,6 +2,21 @@ Revision history for Password-OWASP
 
 TODO: Look into PBKDF2
 
+0.005     2022-09-02 23:39:42Z
+
+    * Deprecate hash_password and use prehash_password. This will be
+      changed in a future release. The idea is that crypt_password will
+      become hash_password. This is because crypt_password sounds like
+      it is a two-way function and we can decrypt it. Which we can't.
+
+    * Prehashing can be disabled by setting hashing to "none". This
+      could become the new default. OWASP now recommends against
+      prehashing because of hash shucking. The idea behind hash shucking
+      is that if you have a compromised site that uses unsalted shaXXX
+      hashing you only need to crack the shaXXX hash to get to the
+      original password. The default will change to 'none' in the future
+      and is planned for Jan 2023.
+
 0.004     2022-08-16 13:42:59Z
 
     * Bump version of Authen::Passphrase::Scrypt (CPANTesters)

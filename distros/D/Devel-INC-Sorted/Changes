@@ -1,5 +1,9 @@
 Revision history for Devel-INC-Sorted
 
+0.04      2022-09-03 17:33:13Z
+          - drop discouraged (and no-op) sort pragma - thanks José Joaquín
+            Atria! (PR #1)
+
 0.03      2016-09-08 03:04:35Z
               - fix use of Exporter that breaks with newer Test::More in tests
                 (RT#117544)

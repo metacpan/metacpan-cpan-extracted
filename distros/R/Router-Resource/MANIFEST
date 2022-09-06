@@ -1,9 +1,11 @@
-Build.PL
 Changes
-lib/Router/Resource.pm
 Makefile.PL
-MANIFEST			This list of files
-META.json
-META.yml
-README
+inc/WriteMakefile.pl
+inc/boilerplate.pl
+lib/Router/Resource.pm
 t/base.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

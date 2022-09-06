@@ -4,6 +4,7 @@ eg/daemon.pl
 eg/multichild.pl
 eg/server.pl
 eg/simple.pl
+inc/WriteMakefile.pl
 inc/boilerplate.pl
 lib/Proc/Fork.pm
 t/mock.t

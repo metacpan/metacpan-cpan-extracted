@@ -1,0 +1,33 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+	command => 'ed',
+	args => ['--version'],
+	match => qr/GNU ed/,
+	version => qr/GNU ed ([0-9\.]+)/,
+);
+
+share {
+	start_url 'https://ftp.gnu.org/gnu/ed/';
+
+	plugin 'Download' => (
+		filter => qr/^ed-.*\.tar\.lz$/,
+		version => qr/([0-9\.]+)/,
+		prefer  => 1,
+	);
+
+	plugin 'Extract::Libarchive';
+
+	plugin 'Build::Autoconf';
+
+	build [
+		'%{configure}',
+		'%{make}',
+		'%{make} install',
+	];
+
+	after 'gather' => sub {
+		my $build = shift;
+		$build->runtime_prop->{'command'} = 'ed';
+	};
+};

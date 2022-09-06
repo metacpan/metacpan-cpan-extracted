@@ -1,0 +1,136 @@
+{
+   "abstract" : "Framework for implementing Subversion hooks",
+   "author" : [
+      "Gustavo L. de M. Chaves <gnustavo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SVN-Hooks",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Data::Util" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "JIRA::REST" : "0",
+            "SVN::Look" : "0",
+            "SVN::Notify" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "File::Compare" : "0",
+            "File::Copy" : "0",
+            "Test::More" : "0",
+            "URI::file" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "SVN::Hooks" : {
+         "file" : "lib/SVN/Hooks.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::AllowLogChange" : {
+         "file" : "lib/SVN/Hooks/AllowLogChange.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::AllowPropChange" : {
+         "file" : "lib/SVN/Hooks/AllowPropChange.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::CheckCapability" : {
+         "file" : "lib/SVN/Hooks/CheckCapability.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::CheckJira" : {
+         "file" : "lib/SVN/Hooks/CheckJira.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::CheckLog" : {
+         "file" : "lib/SVN/Hooks/CheckLog.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::CheckMimeTypes" : {
+         "file" : "lib/SVN/Hooks/CheckMimeTypes.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::CheckProperty" : {
+         "file" : "lib/SVN/Hooks/CheckProperty.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::CheckStructure" : {
+         "file" : "lib/SVN/Hooks/CheckStructure.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::DenyChanges" : {
+         "file" : "lib/SVN/Hooks/DenyChanges.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::DenyFilenames" : {
+         "file" : "lib/SVN/Hooks/DenyFilenames.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::Generic" : {
+         "file" : "lib/SVN/Hooks/Generic.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::Mailer" : {
+         "file" : "lib/SVN/Hooks/Mailer.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::Notify" : {
+         "file" : "lib/SVN/Hooks/Notify.pm",
+         "version" : "1.35"
+      },
+      "SVN::Hooks::UpdateConfFile" : {
+         "file" : "lib/SVN/Hooks/UpdateConfFile.pm",
+         "version" : "1.35"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gnustavo/SVN-Hooks/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/SVN-Hooks/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gnustavo/SVN-Hooks.git",
+         "web" : "https://github.com/gnustavo/SVN-Hooks"
+      }
+   },
+   "version" : "1.35",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+}
+

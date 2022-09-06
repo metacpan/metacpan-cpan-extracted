@@ -1,0 +1,23 @@
+Changes with 1.07
+
+- test suite w/ crude benchmarks
+
+1.04  Mon Aug 11 07:33:00 EDT 2003
+        - simplify core loop (faster & more memory-efficient)
+
+1.03  Sun Aug 10 22:40:00 EDT 2003
+        - fix link walk/allocation bug in core loop (can't escape O(N*M)
+          allocation algorithm after all).
+
+1.02  Sun Aug 10 10:45:00 EDT 2003
+        - fix typo in LCS.xs: s/XS_RETURN_IV/XSRETURN_IV/
+
+1.01  Sun Aug 10 10:11:00 EDT 2003
+        - fix offset bug in LCS()
+
+1.00  Sat Aug 9 17:32:28 EDT 2003
+        - roll CPAN release
+
+0.01  Thu Aug  7 03:40:54 2003
+	- original version; created by h2xs 1.22 with options
+		-Afn Algorithm::LCS

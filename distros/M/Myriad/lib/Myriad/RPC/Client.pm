@@ -3,7 +3,7 @@ package Myriad::RPC::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '1.000'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use utf8;
@@ -59,7 +59,7 @@ sub new {
     if ($transport eq 'redis') {
         require Myriad::RPC::Client::Implementation::Redis;
         return Myriad::RPC::Client::Implementation::Redis->new(
-            redis   => $myriad->redis,
+            redis   => $myriad->redis_transport,
         );
     } elsif ($transport eq 'memory' or $transport eq 'perl') {
         require Myriad::RPC::Client::Implementation::Memory;
@@ -81,5 +81,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

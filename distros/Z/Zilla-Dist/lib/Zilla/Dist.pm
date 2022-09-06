@@ -1,6 +1,6 @@
 use strict; use warnings;
 package Zilla::Dist;
-our $VERSION = '0.1.9';
+our $VERSION = '0.1.11';
 
 use version;
 use File::Share;

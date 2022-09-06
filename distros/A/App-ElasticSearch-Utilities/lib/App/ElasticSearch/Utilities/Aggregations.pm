@@ -164,7 +164,10 @@ sub es_flatten_aggregations {
     my $extract = sub {
         my ($key, $hash) = @_;
 
-        if( $hash->{value} ) {
+        if( $hash->{value_as_string} ) {
+            push @{ $row }, $key, $hash->{value_as_string};
+        }
+        elsif( $hash->{value} ) {
             push @{ $row }, $key, $hash->{value};
         }
         elsif( $hash->{values} ) {
@@ -251,7 +254,7 @@ App::ElasticSearch::Utilities::Aggregations - Code to simplify creating and work
 
 =head1 VERSION
 
-version 8.3
+version 8.4
 
 =head1 FUNCTIONS
 

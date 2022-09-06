@@ -1,7 +1,7 @@
 use 5.006; use strict; use warnings;
 
 package Proc::Fork;
-our $VERSION = '0.807';
+our $VERSION = '0.808';
 
 use Exporter::Tidy (
 	default => [ ':all' ],
@@ -270,9 +270,8 @@ Documentation by Eric J. Roode.
 
 =head1 COPYRIGHT AND LICENSE
 
-This documentation is copyright (c) 2002 by Eric J. Roode.
-
 This software is copyright (c) 2018 by Aristotle Pagaltzis.
+Its documentation is copyright (c) 2002 by Eric J. Roode.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

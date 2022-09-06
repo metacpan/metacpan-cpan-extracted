@@ -21,7 +21,7 @@ name: Date-Holidays-AW
 provides:
   Date::Holidays::AW:
     file: lib/Date/Holidays/AW.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Date::Holidays::Abstract: '0'
   DateTime: '0'
@@ -29,7 +29,7 @@ requires:
   perl: '5.010'
 resources:
   repository: git://gitlab.com/waterkip/p5-date-holiday-aw.git
-version: '0.004'
+version: '0.005'
 x_contributors:
   - 'Wesley Schwengle <wesley@opndev.io>'
 x_generated_by_perl: v5.34.0

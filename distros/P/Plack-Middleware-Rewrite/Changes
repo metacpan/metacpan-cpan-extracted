@@ -1,4 +1,9 @@
-Revision history for Plack-Middleware-Rewrite
+Release history for Plack-Middleware-Rewrite
+
+2.102 Sun 04 Sep 2022
+	- Proper support of 304 responses: they are no longer treated as redirects
+	- No more parent.pm dependency
+	- Updated packaging and package metadata
 
 2.101 Mon 26 Feb 2018
 	- Minor documentation copyedit and packaging fix

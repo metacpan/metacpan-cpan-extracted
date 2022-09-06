@@ -2,7 +2,7 @@ package App::Yath::Command::runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000127';
+our $VERSION = '1.000128';
 
 use Config qw/%Config/;
 use File::Spec;
@@ -621,7 +621,7 @@ Exit after showing a helpful usage message
 
 =item --no-no-scan-plugins
 
-Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that it loading other modules when it should not.
+Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that is loading other modules when it should not.
 
 
 =item --plugins PLUGIN

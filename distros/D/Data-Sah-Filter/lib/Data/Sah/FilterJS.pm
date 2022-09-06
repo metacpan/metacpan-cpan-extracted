@@ -6,15 +6,14 @@ use warnings;
 use Log::ger;
 
 use Data::Sah::FilterCommon;
+use Exporter qw(import);
 use IPC::System::Options;
 use Nodejs::Util qw(get_nodejs_path);
 
-use Exporter qw(import);
-
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our @EXPORT_OK = qw(gen_filter);
 
@@ -32,14 +31,14 @@ This is mostly for testing. Normally the filter rules will be used from
 
 _
     args => {
-        filter_names => {
-            schema => ['array*', of=>'str*'],
-        },
+        %Data::Sah::FilterCommon::gen_filter_args,
     },
     result_naked => 1,
 };
 sub gen_filter {
     my %args = @_;
+
+    my $rt = $args{return_type} // 'val';
 
     my $rules = Data::Sah::FilterCommon::get_filter_rules(
         %args,
@@ -55,7 +54,24 @@ sub gen_filter {
             "    if (data === undefined || data === null) {\n",
             "        return null;\n",
             "    }\n",
-            (map { "    data = $_->{expr_filter};\n" } @$rules),
+        );
+        for my $rule (@$rules) {
+            if ($rule->{meta}{might_fail}) {
+                if ($rt eq 'val') {
+                    $code .= "    tmp = $rule->{expr_filter}; if (tmp[0]) { return null; } data = tmp[1]\n";
+                } else {
+                    $code .= "    tmp = $rule->{expr_filter}; if (tmp[0]) { return tmp; }  data = tmp[1]\n";
+                }
+            } else {
+                if ($rt eq 'val') {
+                    $code .= "    data = $rule->{expr_filter}\n";
+                } else {
+                    $code .= "    data = [false, $rule->{expr_filter}]\n";
+                }
+            }
+        }
+        $code .= join(
+            '',
             "    return data;\n",
             "}",
         );
@@ -110,7 +126,7 @@ Data::Sah::FilterJS - Generate filter code
 
 =head1 VERSION
 
-This document describes version 0.011 of Data::Sah::FilterJS (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
+This document describes version 0.012 of Data::Sah::FilterJS (from Perl distribution Data-Sah-Filter), released on 2022-07-17.
 
 =head1 SYNOPSIS
 

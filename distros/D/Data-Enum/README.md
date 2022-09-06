@@ -4,7 +4,7 @@ Data::Enum - fast, immutable enumeration classes
 
 # VERSION
 
-version v0.2.2
+version v0.2.3
 
 # SYNOPSIS
 
@@ -118,15 +118,15 @@ This was added in v0.2.1.
 
 # SEE ALSO
 
-[Class::Enum](https://metacpan.org/pod/Class::Enum)
+[Class::Enum](https://metacpan.org/pod/Class%3A%3AEnum)
 
-[Object::Enum](https://metacpan.org/pod/Object::Enum)
+[Object::Enum](https://metacpan.org/pod/Object%3A%3AEnum)
 
-[MooX::Enumeration](https://metacpan.org/pod/MooX::Enumeration)
+[MooX::Enumeration](https://metacpan.org/pod/MooX%3A%3AEnumeration)
 
-[MooseX::Enumeration](https://metacpan.org/pod/MooseX::Enumeration)
+[MooseX::Enumeration](https://metacpan.org/pod/MooseX%3A%3AEnumeration)
 
-[Type::Tiny::Enum](https://metacpan.org/pod/Type::Tiny::Enum)
+[Type::Tiny::Enum](https://metacpan.org/pod/Type%3A%3ATiny%3A%3AEnum)
 
 # SOURCE
 
@@ -148,7 +148,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Robert Rothenberg.
+This software is Copyright (c) 2021-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

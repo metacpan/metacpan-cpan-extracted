@@ -1,4 +1,8 @@
-Revision history for Plack-Middleware-RedirectSSL
+Release history for Plack-Middleware-RedirectSSL
+
+1.302 Sun 04 Sep 2022
+	- No more parent.pm dependency
+	- Updated packaging and package metadata
 
 1.301 Tue 10 Apr 2018
 	- No functional changes

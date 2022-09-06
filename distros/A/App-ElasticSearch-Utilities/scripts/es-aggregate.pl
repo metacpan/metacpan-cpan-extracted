@@ -15,7 +15,7 @@ use Getopt::Long::Descriptive;
 use JSON::MaybeXS;
 use Pod::Usage;
 use Storable qw(dclone);
-use YAML ();
+use YAML::XS ();
 
 # Grab a copy of the args
 my @args = @ARGV;
@@ -61,12 +61,12 @@ foreach my $token ( reverse @args ) {
     }
 }
 
-output({color=>'yellow'}, YAML::Dump($q->aggregations)) if $opt->show_aggs;
+output({color=>'yellow'}, YAML::XS::Dump($q->aggregations)) if $opt->show_aggs;
 
 my $result = $q->execute();
 my $aggs   = $result->{aggregations};
 
-output({color=>'cyan'}, YAML::Dump($aggs)) if $opt->show_raw;
+output({color=>'cyan'}, YAML::XS::Dump($aggs)) if $opt->show_raw;
 
 my $flat = es_flatten_aggs($aggs);
 foreach my $row ( @{ $flat } ) {
@@ -88,7 +88,7 @@ es-aggregate.pl - Multi-level aggregations in Elasticsearch
 
 =head1 VERSION
 
-version 8.3
+version 8.4
 
 =head1 SYNOPSIS
 
@@ -110,8 +110,12 @@ From App::ElasticSearch::Utilities:
     --port          HTTP port for your cluster
     --proto         Defaults to 'http', can also be 'https'
     --http-username HTTP Basic Auth username
-    --http-password HTTP Basic Auth password (if not specified, and --http-user is, you will be prompted)
     --password-exec Script to run to get the users password
+    --insecure      Don't verify TLS certificates
+    --cacert        Specify the TLS CA file
+    --capath        Specify the directory with TLS CAs
+    --cert          Specify the path to the client certificate
+    --key           Specify the path to the client private key file
     --noop          Any operations other than GET are disabled, can be negated with --no-noop
     --timeout       Timeout to ElasticSearch, default 10
     --keep-proxy    Do not remove any proxy settings from %ENV

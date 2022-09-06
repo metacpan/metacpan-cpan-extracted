@@ -1,5 +1,10 @@
 # This file documents the revision history for Perl extension Catalyst::ActionRole::Methods.
 
+0.003 - 2022-09-05
+  - Fixed bug where empty allows would return a useless
+    error (https://github.com/jjn1056/Catalyst-ActionRole-Methods/pull/1)
+    ap++ for the patch, sorry it took 5 years for me to see it.
+
 0.002 - 2015-11-11
   - Fixed mission version information
 

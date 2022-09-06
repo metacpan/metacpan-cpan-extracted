@@ -5,9 +5,9 @@ use strict 'subs', 'vars';
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our %SPEC;
 
@@ -21,7 +21,7 @@ our %common_args = (
 our %gen_filter_args = (
     %common_args,
     return_type => {
-        schema => ['str*', in=>['val', 'errstr+val']],
+        schema => ['str*', in=>['val', 'str_errmsg+val']],
         default => 'val',
     },
 );
@@ -90,7 +90,7 @@ Data::Sah::FilterCommon - Common stuffs for Data::Sah::Filter and Data::Sah::Fil
 
 =head1 VERSION
 
-This document describes version 0.011 of Data::Sah::FilterCommon (from Perl distribution Data-Sah-Filter), released on 2022-07-16.
+This document describes version 0.012 of Data::Sah::FilterCommon (from Perl distribution Data-Sah-Filter), released on 2022-07-17.
 
 =head1 FUNCTIONS
 

@@ -1,0 +1,43 @@
+---
+abstract: 'Open an archive file in your web browser!'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  HTTP::Request::Common: '0'
+  Mojo::DOM58: '0'
+  Test2::Tools::DOM: '0'
+  Test2::Tools::HTTP: '0'
+  Test2::V0: '0.000121'
+  Test::Script: '0'
+  perl: '5.034'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-tarweb
+requires:
+  Browser::Start: '0'
+  File::ShareDir::Dist: '0'
+  Path::Tiny: '0'
+  Plack::App::File: '0'
+  Plack::App::Libarchive: '0.02'
+  Plack::Builder: '0'
+  Plack::Runner: '0'
+  URI: '0'
+  perl: '5.034'
+resources:
+  bugtracker: https://github.com/uperl/App-tarweb/issues
+  homepage: https://metacpan.org/pod/App::tarweb
+  repository: git://github.com/uperl/App-tarweb.git
+version: '0.01'
+x_generated_by_perl: v5.35.10
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

@@ -1,0 +1,5 @@
+<ul>
+  [% WHILE (entry = archive.get_next_entry) %]
+    <li><a href="[% entry.pathname | uri %]">[% entry.pathname | html %]</a></li>
+  [% END %]
+</ul>

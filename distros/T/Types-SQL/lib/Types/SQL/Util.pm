@@ -3,12 +3,12 @@ package Types::SQL::Util;
 use strict;
 use warnings;
 
-use Exporter qw/ import /;
+use Exporter 5.57 qw/ import /;
 
 use PerlX::Maybe qw/ maybe /;
 use Safe::Isa 1.000008 qw/ $_isa $_call_if_can /;
 
-our $VERSION = 'v0.6.0';
+our $VERSION = 'v0.6.1';
 
 # RECOMMEND PREREQ: PerlX::Maybe::XS
 
@@ -258,7 +258,7 @@ Types::SQL::Util - extract DBIx::Class column_info from types
 
 =head1 VERSION
 
-version v0.6.0
+version v0.6.1
 
 =head1 SYNOPSIS
 

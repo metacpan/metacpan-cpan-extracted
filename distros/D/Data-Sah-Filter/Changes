@@ -1,3 +1,9 @@
+0.012   2022-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - Move tests to filter examples because we are now using
+          Test::Sah::Filter.
+
+
 0.011   2022-07-16  Released-By: PERLANCAR; Urgency: medium
 
         - Add perl filters: Array::{remove_undef,uniq,uniqnum}.

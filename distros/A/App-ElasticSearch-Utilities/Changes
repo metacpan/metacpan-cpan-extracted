@@ -1,9 +1,75 @@
 ==================================================
-Changes from 2020-03-23 00:00:00 +0000 to present.
+Changes from 2020-09-02 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 8.3 at 2022-03-23 00:17:37 +0000
+version 8.4 at 2022-09-02 19:54:37 +0000
+----------------------------------------
+
+  Change: b6112b07c154fe669e7ab9407b3b20f6f845e7bc
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-09-02 12:51:04 +0000
+
+    Convert to YAML::XS
+
+    * `YAML::XS` is more compatible with other YAML parsers * Enable boolean
+    detection for `es-search.pl` 
+
+  Change: 400b50196d211697fe4d40cca9b587b72d981e48
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-06-01 17:59:00 +0000
+
+    Fix display of statistics so they all follow --precision 
+
+  Change: c6c0e96db37f637bc62492acda8072700244d342
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-06-01 04:20:05 +0000
+
+    Add client certificate authentication to the tooling 
+
+  Change: ee969f539f64bd15bd3c3e30cd85cf273b728a1c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-06-01 03:56:41 +0000
+
+    Correct version check for TLS and Auth
+
+    * Use `App::ElasticSearch::Utilities::HTTPRequest` for checking the
+
+    version string. * Add a check for `PASSEXEC` to `_get_es_version()` so we
+    can use the
+
+    provided credentials * Correct `::Connection->request()` to set
+    `authorization_basic()` when
+
+    the `->password` has a length greater than 0. 
+
+  Change: e978a9b33eecd59191cfbf88ffc4f7b54d698c74
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-05-31 19:02:24 +0000
+
+    More fixes for HTTP Authentication
+
+    * Remove `--http-password` and parsing `~/.es-utils.yaml` for the
+
+    password. This is not a secure default. * Do not allow HTTP Basic Auth over
+    HTTP as it leaks credentials * Check for `value_as_string` in
+    `es_flatten_aggregations` 
+
+  Change: e49f4394b7a35b3f0539debec53f693f36d43da7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-05-31 03:41:01 +0000
+
+    Support HTTPS and Basic Authorization
+
+    * Adds support for HTTP Basic Authorization username/password to the
+
+    libraries * Add TLS support to `App::ElasticSearch::Utilities::Connection`
+    and
+
+    `es_connect()` 
+
+----------------------------------------
+version 8.3 at 2022-03-23 00:15:12 +0000
 ----------------------------------------
 
   Change: 823b184da9c4238d91fc2455922510aa937491c4
@@ -381,70 +447,6 @@ version 7.8 at 2020-09-16 18:12:23 +0000
     In the previous release, I added a check for the HOME environment variable,
     but I neglected to remove the originals from the search path. 
 
-----------------------------------------
-version 7.7 at 2020-06-08 15:34:40 +0000
-----------------------------------------
-
-  Change: 5cbe34afdc85b490d2938aa9e37a39f9b34ae6d6
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2020-06-08 08:34:40 +0000
-
-    Bugfix release
-
-    * Sending "0" value query parameters did not work previously * Only add the
-    ~/.es-utils.* to the config search path if HOME is set * Fix typo in the
-    documentation 
-
-----------------------------------------
-version 7.6 at 2020-03-27 22:43:58 +0000
-----------------------------------------
-
-  Change: 6cb7406e8cf4b112efe4fffd0a0138089d841597
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2020-03-27 15:43:58 +0000
-
-    Release Version 7.6
-
-    * In `::Query`, the `fields` element was deprecated a long time ago, so
-
-    overload it as a source filter. * `es-search.pl`
-
-    * Ensure `--missing` and `--exists` can be specified more than once
-
-    * Enable source filtering when the user specifies `--show`
-
-    * Honor `--max-batch-size` when `--all` is specified 
-
-  Change: 8ef098984362da46348bec5bbb66de15f57c07a7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2020-03-09 17:20:26 +0000
-
-    Added es-index-blocks.pl to manage index blocks 
-
-  Change: 7804940e5562e5edc9e4472c7e9dcb3c9eeeb97e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-12-31 11:05:36 +0000
-
-    Ensure error message isn't blank 
-
-  Change: 6743298fac9c15c55ea719e61eb63d5397e2f60e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-12-31 11:00:24 +0000
-
-    Change aggregation ID and make debug output more useful.
-
-    The debug output is now in a better format to paste to a Kibana instance
-    for debugging. 
-
-  Change: cc0f7b846e85d6a8397dea24ff4102083990cd3e
-  Author: Vitaly Shupak <vitaly.shupak@deshaw.com>
-  Date : 2019-12-09 18:03:10 +0000
-
-    use LWP::UserAgent request instead of simple_request
-
-    simple_request does not handle authentication responses, which breaks in
-    environments where ElasticSearch requires Kerberos authentication. 
-
 =================================================
-Plus 82 releases after 2020-03-23 00:00:00 +0000.
+Plus 84 releases after 2020-09-02 00:00:00 +0000.
 =================================================

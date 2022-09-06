@@ -32,7 +32,7 @@ my @tests = (
         quote-fort-sample-7-with-italics
         quote-fort-sample-8-with-em-and-strong
         quote-fort-sample-10-with-hyperlink
-        )
+    )
 );
 
 my @common = ( validation => 0, load_ext_dtd => 0, no_network => 1 );

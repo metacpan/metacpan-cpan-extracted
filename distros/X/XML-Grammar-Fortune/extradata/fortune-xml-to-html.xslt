@@ -226,7 +226,6 @@ namespace-->
 <xsl:template match="*" name="raw_info_subs" mode="raw_info_subs">
     <tr class="{name(.)}">
         <td class="field">
-            <b>
                 <xsl:choose>
                     <xsl:when test="name(.) = 'author'">
                         <xsl:text>Author</xsl:text>
@@ -248,7 +247,6 @@ namespace-->
                         <xsl:value-of select="name(.)" />
                     </xsl:otherwise>
                 </xsl:choose>
-            </b>
         </td>
         <td class="value">
             <xsl:choose>

@@ -1,9 +1,1 @@
-use strict;
-use warnings;
-
-use Test::More tests => 1;
-
-TODO: {
-	local $TODO = 'hell if I know how to test this';
-	fail 'actual tests written';
-}
+print "1..1\n", "not ok 1 # TODO hell if I know how to test this\n";

@@ -1,6 +1,6 @@
 package SVN::Hooks::UpdateConfFile;
 # ABSTRACT: Maintain the repository configuration versioned.
-$SVN::Hooks::UpdateConfFile::VERSION = '1.34';
+$SVN::Hooks::UpdateConfFile::VERSION = '1.35';
 use strict;
 use warnings;
 
@@ -37,7 +37,6 @@ sub UPDATE_CONF_FILE {
 	    } elsif (is_array_ref($what)) {
 		# This should point to list of command arguments
 		@$what > 0    or croak "$HOOK: $function argument must have at least one element.\n";
-		-x $what->[0] or croak "$HOOK: $function argument is not a valid command ($what->[0]).\n";
 		$confs{$function} = _functor($what);
 	    } else {
 		croak "$HOOK: $function argument must be a CODE-ref or an ARRAY-ref.\n";
@@ -274,7 +273,7 @@ SVN::Hooks::UpdateConfFile - Maintain the repository configuration versioned.
 
 =head1 VERSION
 
-version 1.34
+version 1.35
 
 =head1 SYNOPSIS
 
@@ -382,7 +381,7 @@ command above.
 
 =item rotate => NUMBER
 
-By default, after each successful commit the TO file is overwriten by
+By default, after each successful commit the TO file is overwritten by
 the new contents of FROM. With this option, the last NUMBER versions
 of TO are kept on disk with numeric suffixes ranging from C<.0> to
 C<.NUMBER-1>. This can be useful, for instance, in case you manage to
@@ -428,7 +427,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2022 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

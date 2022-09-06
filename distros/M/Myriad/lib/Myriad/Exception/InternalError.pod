@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Myriad::Exception::InternalError
 at lib/Myriad/Exception/InternalError.pm
@@ -25,7 +24,11 @@ See L<Myriad::Exception> for the rôle that defines the exception API.
 
 =item L<Myriad::Exception::Base>
 
-L<< I<< E<34>E<34> overloading >>|Myriad::Exception::Base/I<< E<34>E<34> overloading >> >>, L<< I<< E<98>E<111>E<111>E<108> overloading >>|Myriad::Exception::Base/I<< E<98>E<111>E<111>E<108> overloading >> >>, L<as_string|Myriad::Exception::Base/as_string>, L<new|Myriad::Exception::Base/new>, L<reason|Myriad::Exception::Base/reason>
+L<< I<< E<34>E<34> overloading >>|Myriad::Exception::Base/I<< E<34>E<34> overloading >> >>, L<< I<< E<98>E<111>E<111>E<108> overloading >>|Myriad::Exception::Base/I<< E<98>E<111>E<111>E<108> overloading >> >>, L<as_string|Myriad::Exception::Base/as_string>, L<reason|Myriad::Exception::Base/reason>
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
 
 =back
 
@@ -37,5 +40,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

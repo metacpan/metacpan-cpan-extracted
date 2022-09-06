@@ -20,5 +20,5 @@ no_index:
 requires:
   Time::HiRes: '1.9764'
   Try::Catch: v1.1.0
-version: '0.09'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

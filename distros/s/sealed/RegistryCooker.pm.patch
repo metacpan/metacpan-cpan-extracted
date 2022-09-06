@@ -1,0 +1,12 @@
+--- RegistryCooker.pm~  2022-08-30 11:10:19.790171019 -0400
++++ RegistryCooker.pm   2022-08-30 11:12:34.319572045 -0400
+@@ -399,7 +399,8 @@
+     my $eval = join '',
+                     'package ',
+                     $self->{PACKAGE}, ";",
+-                    "sub handler {",
++                    "use base 'sealed';",
++                    "sub handler :Sealed {",
+                     "local \$0 = '$script_name';",
+                     $nph,
+                     $shebang,

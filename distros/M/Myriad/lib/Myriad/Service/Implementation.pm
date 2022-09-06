@@ -1,18 +1,15 @@
 package Myriad::Service::Implementation;
 
-use strict;
-use warnings;
+use Myriad::Class extends => 'IO::Async::Notifier';
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '1.000'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
-
-use utf8;
 
 =encoding utf8
 
 =head1 NAME
 
-Myriad::Service - microservice coördination
+Myriad::Service::Implementation - microservice coördination
 
 =head1 SYNOPSIS
 
@@ -20,22 +17,9 @@ Myriad::Service - microservice coördination
 
 =cut
 
-use Object::Pad;
-use Future;
-use Future::AsyncAwait;
-use Syntax::Keyword::Try;
-
 use Myriad::Storage::Implementation::Redis;
 use Myriad::Subscription;
 
-use Myriad::Exception;
-
-class Myriad::Service::Implementation extends IO::Async::Notifier;
-
-use Log::Any qw($log);
-use Metrics::Any qw($metrics);
-use List::Util qw(min);
-use Scalar::Util qw(blessed);
 use Myriad::Service::Attributes;
 
 # Only defer up to this many seconds between batch iterations
@@ -145,9 +129,9 @@ A counter for the events emitted by emitters tagged by service and method name
 =cut
 
 $metrics->make_counter( emitters_count =>
-    name => [qw(myriad service emitter)],
+    name        => [qw(myriad service emitter)],
     description => "Counter for the events emitted by the emitters",
-    labels => [qw(method service)],
+    labels      => [qw(method service)],
 );
 
 =head1 METHODS
@@ -160,7 +144,7 @@ Populate internal configuration.
 
 method configure (%args) {
     $service_name //= (delete $args{name} || die 'need a service name');
-    Scalar::Util::weaken($myriad = delete $args{myriad}) if exists $args{myriad};
+    weaken($myriad = delete $args{myriad}) if exists $args{myriad};
     $self->next::method(%args);
 }
 
@@ -197,7 +181,6 @@ method _add_to_loop($loop) {
 
 async method process_batch($k, $code, $src) {
     my $backoff;
-    $log->tracef('Start batch processing for %s', $k);
     while (1) {
         await $src->unblocked;
         my $data = [];
@@ -213,7 +196,7 @@ async method process_batch($k, $code, $src) {
                 );
             });
         } catch ($e) {
-            $log->warnf("Batch iteration for %s failed - %s", $k, $e);
+            $log->warnf('Batch iteration for %s failed - %s', $k, $e);
         }
 
         die 'Batch should return an arrayref' unless ref $data eq 'ARRAY';
@@ -245,7 +228,7 @@ async method load () {
 
     if(my $emitters = $registry->emitters_for(ref($self))) {
         for my $method (sort keys $emitters->%*) {
-            $log->tracef('Found emitter %s as %s', $method, $emitters->{$method});
+            $log->tracef('Adding Emitter %s as %s for %s', $method, $emitters->{$method}, $service_name);
             my $spec = $emitters->{$method};
             my $chan = $spec->{args}{channel} // die 'expected a channel, but there was none to be found';
             my $sink = $spec->{sink} = $ryu->sink(
@@ -273,18 +256,16 @@ async method load () {
     if(my $receivers = $registry->receivers_for(ref($self))) {
         for my $method (sort keys $receivers->%*) {
             try {
-                $log->tracef('Found receiver %s as %s', $method, $receivers->{$method});
+                $log->tracef('Adding Receiver %s as %s for %s', $method, $receivers->{$method}, $service_name);
                 my $spec = $receivers->{$method};
                 my $chan = $spec->{args}{channel} // die 'expected a channel, but there was none to be found';
                 my $sink = $spec->{sink} = $ryu->sink(
                     label => "receiver:$chan",
                 );
                 $sink->pause;
-                $log->tracef('Creating receiver from sink');
                 await $self->subscription->create_from_sink(
                     sink    => $sink,
                     channel => $chan,
-                    client  => $service_name . '/' . $method,
                     from    => $spec->{args}{service},
                     service => $service_name,
                 );
@@ -296,7 +277,7 @@ async method load () {
 
     if (my $batches = $registry->batches_for(ref($self))) {
         for my $method (sort keys $batches->%*) {
-            $log->tracef('Starting batch process %s for %s', $method, ref($self));
+            $log->tracef('Adding Batch %s for %s', $method, $service_name);
             my $sink = $batches->{$method}{sink} = $ryu->sink(label => 'batch:' . $method);
             $sink->pause;
             await $self->subscription->create_from_source(
@@ -309,6 +290,7 @@ async method load () {
 
     if (my $rpc_calls = $registry->rpc_for(ref($self))) {
         for my $method (sort keys $rpc_calls->%*) {
+            $log->tracef('Adding RPC %s for %s', $method, $service_name);
             my $spec = $rpc_calls->{$method};
             my $sink = $spec->{sink} = $ryu->sink(label => "rpc:$service_name:$method");
             $sink->pause;
@@ -335,9 +317,7 @@ async method load () {
                     });
                     await $self->rpc->reply_success($service_name, $message, $response);
                 } catch ($e) {
-                    unless (blessed $e and $e->isa('Myriad::Error')) {
-                        $e = Myriad::Exception::InternalError->new(reason => $e);
-                    }
+                    $e = Myriad::Exception::InternalError->new(reason => $e) unless (blessed $e and $e->does('Myriad::Exception'));
                     await $self->rpc->reply_error($service_name, $message, $e);
                 }
             }))->resolve->completed;
@@ -363,7 +343,7 @@ async method start {
     my $registry = $Myriad::REGISTRY;
     if(my $emitters = $registry->emitters_for(ref($self))) {
         for my $method (sort keys $emitters->%*) {
-            $log->tracef('Starting emitter %s as %s', $method, $emitters->{$method}->{channel});
+            $log->tracef('Starting Emitter %s as %s for %s', $method, $emitters->{$method}{args}{channel}, $service_name);
             my $spec = $emitters->{$method};
             my $code = delete $spec->{code};
             $spec->{current} = $self->$code(
@@ -378,13 +358,12 @@ async method start {
     if(my $receivers = $registry->receivers_for(ref($self))) {
         for my $method (sort keys $receivers->%*) {
             try {
-                $log->tracef('Starting receiver %s as %s', $method, $receivers->{$method}->{channel});
+                $log->tracef('Starting Receiver %s as %s for %s', $method, $receivers->{$method}{args}{channel}, $service_name);
                 my $spec = $receivers->{$method};
                 my $code = delete $spec->{code};
                 my $current = await $self->$code(
                     $spec->{sink}->source
                 );
-                $log->tracef('Completed setup for receiver');
 
                 die "Receivers method: $method should return a Ryu::Source"
                     unless blessed $current && $current->isa('Ryu::Source');
@@ -402,7 +381,7 @@ async method start {
                     return $f;
                 })->resolve->completed->on_fail(sub {
                     my $error = shift;
-                    $log->errorf("Receiver %s failed while processing messages - %s", $method, $error);
+                    $log->errorf('Receiver %s failed while processing messages - %s', $method, $error);
                     my $sink = $sink_copy or return;
                     my $src = $sink->source;
                     $src->fail($error) unless $src->completed->is_ready;
@@ -416,7 +395,7 @@ async method start {
 
     if (my $batches = $registry->batches_for(ref($self))) {
         for my $method (sort keys $batches->%*) {
-            $log->tracef('Starting batch process %s for %s', $method, ref($self));
+            $log->tracef('Starting Batch %s for %s', $method, $service_name);
             my $code = delete $batches->{$method}{code};
 
             $active_batch{$method} = [
@@ -433,10 +412,13 @@ async method start {
     }
 
     if (my $rpc_calls = $registry->rpc_for(ref($self))) {
-        $rpc_calls->{$_}->{sink}->resume for keys $rpc_calls->%*;
+        for my $method ( sort keys $rpc_calls->%* ) {
+            $log->tracef('Starting RPC %s for %s', $method, $service_name);
+            $rpc_calls->{$method}->{sink}->resume;
+        }
     }
 
-    $log->infof('Done');
+    $log->infof('Service [%s] started', $service_name);
 
 };
 
@@ -492,5 +474,5 @@ See L<Myriad/CONTRIBUTORS> for full details.
 
 =head1 LICENSE
 
-Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+Copyright Deriv Group Services Ltd 2020-2022. Licensed under the same terms as Perl itself.
 

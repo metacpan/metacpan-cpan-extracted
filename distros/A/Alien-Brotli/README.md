@@ -4,7 +4,7 @@ Alien::Brotli - Download and install Brotli compressor
 
 # VERSION
 
-version v0.2.1
+version v0.2.2
 
 # DESCRIPTION
 
@@ -47,7 +47,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # CONTRIBUTOR
 
-Michal Josef Špaček <mspacek@redhat.com>
+Michal Josef Špaček <skim@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

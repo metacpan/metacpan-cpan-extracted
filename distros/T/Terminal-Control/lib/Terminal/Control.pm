@@ -1,7 +1,4 @@
 package Terminal::Control;
-# This package provides the basis for improving and studying Terminal Window
-# control. Essentially, the Perl header 'sys/ioctl.ph', the SHELL command stty
-# and ANSI escape sequences are used.
 
 # Load the basic Perl pragmas.
 use 5.030000;
@@ -16,7 +13,7 @@ use bytes;
 use Try::Catch;
 
 # Set the package version. 
-our $VERSION = '0.09';
+our $VERSION = '0.12';
 
 # Base class of this module.
 our @ISA = qw(Exporter);
@@ -44,6 +41,9 @@ our @EXPORT = qw(
     window_size_chars
     window_size_pixels
     ctlseqs_request
+    on_echo
+    off_echo
+    winsize_ic
 );
 
 # Set the global variables.
@@ -54,18 +54,39 @@ $ESC = "\033";  # Escape
 $CSI = "\033["; # Control Sequence Introducer
 $OSC = "\033]"; # Operating System Command
 
-# Declare global variable
-my $is_eval;
+# Declare the global variables.
+my $is_sysph;
+my $is_alarm;
+my $mod_alarm;
+my $timeout;
 
 # BEGIN block.
 BEGIN {
+    # Try to use Inline C program code.
+    eval {use Inline 'C'; 1};
     # Try to load Time::HiRes
-    eval {require Time::HiRes}
-    or die "Could not load module Time::HiRes\n";
-    eval {import Time::HiRes qw(ualarm)};
+    eval {require Time::HiRes;
+         Time::HiRes->import ( qw(ualarm) );
+         1;
+    };
+    if ($@) {
+        # On error use alarm.
+        $mod_alarm = 'alarm';
+        # Timeout is in seconds.
+        $timeout = 1;
+        # Set flag.
+        $is_alarm = 1;
+    } else {
+        # On success use ualarm.
+        $mod_alarm = 'ualarm';
+        # Timeout is in microseconds.
+        $timeout = 1000000;
+        # Set flag.
+        $is_alarm = 0; 
+    };
     # Try to load sys/ioctl.ph.
-    $is_eval = ((eval "require 'sys/ioctl.ph'") ? 1 : 0);
-    if ($is_eval ne 1) {
+    $is_sysph = ((eval "require 'sys/ioctl.ph'") ? 1 : 0);
+    if ($is_sysph ne 1) {
         # Print message into the terminal window.
         print "sys/ioctl.ph is missing\n";
         # Assign winsize to winsize_stty.
@@ -92,7 +113,6 @@ sub clear_screen {
     my $clear = "2J";
     my $home = "1;1H";
     # Clear screen.
-    #my $escseq = "${CSI}2J${CSI}1;1H";
     my $escseq = "${CSI}${clear}${CSI}${home}";
     # Get length of the escape sequence.
     my $buflen = length($escseq);
@@ -123,10 +143,10 @@ sub reset_screen {
 # stty for reading from tty and writing to tty. Redirect stderr to stdout.     #
 #------------------------------------------------------------------------------# 
 sub cursor_on {
-    # Set the sequence.
-    my $seq = "?25h";
+    # Set the control sequence.
+    my $ctl_seq = "?25h";
     # Show the cursor. Send command to the terminal.
-    print "${CSI}${seq}";
+    print "${CSI}${ctl_seq}";
 };
 
 #------------------------------------------------------------------------------# 
@@ -137,10 +157,10 @@ sub cursor_on {
 # stty for reading from tty and writing to tty. Redirect stderr to stdout.     #
 #------------------------------------------------------------------------------# 
 sub cursor_off {
-    # Set the sequence.
-    my $seq = "?25l";
+    # Set the control sequence.
+    my $ctl_seq = "?25l";
     # Hide the cursor. Send command to the terminal.
-    print "${CSI}${seq}";
+    print "${CSI}${ctl_seq}";
 };
 
 #------------------------------------------------------------------------------# 
@@ -216,42 +236,66 @@ sub set_cursor_position {
 sub ctlseqs_request {
     # Assign the subroutine arguments to the local variables.
     my ($Ps, $user_timeout) = @_;
-    # Define the signal handler.
-    local $SIG{ALRM} = sub {die "timeout"};
+    # Get id from request.
+    my $id = substr($Ps, 1);
+    # Change the timeout if neccessary.
+    $timeout = (defined $user_timeout) ? $user_timeout : $timeout;
+    if ($is_alarm eq 1) {
+        $timeout = int($timeout / 1000000);
+    };
+    $timeout = ($timeout <= 0) ? 1 : $timeout; 
     # Initialise the local variables.
     my ($width, $height) = undef;
     my $buf = '';
     my $chr = '';
-    my $timeout = 1_000_000;
-    # Change the timeout.
-    $timeout = (defined $user_timeout) ? $user_timeout : $timeout;
     # Change the settings of the terminal window.
-    system "stty cbreak -echo </dev/tty >/dev/tty 2>&1";
-    # Print the escape sequence.
+    system "stty cbreak -echo -echonl -echoke -echoe -isig </dev/tty >/dev/tty 2>&1";
+    # Print the escape sequence to STDOUT.
     print STDOUT "${CSI}${Ps}t";
     # Non blocking reading from STDIN.
+    my $match;
+    my @nums;
     eval {
-        # Invoke an alarm.
-        ualarm $timeout;
-        # Read chars from STDIN. 
-        while (($chr = getc(STDIN)) ne "") {
+        # Define the alarm handler.
+        local $SIG{ALRM} = sub {die "timeout"};
+        # Start the alarm.
+        eval "$mod_alarm $timeout";
+        while (($chr = getc(STDIN)) ne "t") {
             $buf .= $chr;
         };
         # Stop the alarm.
-        ualarm 0;
+        eval "$mod_alarm 0";
     };
-    if ($buf eq '') {
-        # Set width and height.
-        ($width, $height) = (-1, -1);
+    if ($@) {
+         # print "timedout\n";
+         try {
+             die;
+         } catch {
+             system "stty -cbreak echo echonl echoke echoe isig </dev/tty >/dev/tty 2>&1";
+             return (-3, -3);
+         };
     } else {
-        # Get width and height.
-        my $re = qr/\d+;(\d+)\;(\d+)/;
-        ($width, $height) = ($buf =~ $re) ? ($buf =~ $re) : (-2, -2);
+        if ($buf eq '') {
+            # Set width and height.
+            ($width, $height) = (-1, -1);
+        } else {
+            my $re = qr/^.*(\d+\;\d+\;\d+).*$/;
+            if ($buf =~ $re) {
+                $match = $1;
+                @nums = split(";", $match);
+            };
+            # Get width and height.
+            if ($id eq $nums[0]) { 
+                ($height, $width) = ($nums[1], $nums[2]);
+            } else {
+                ($height, $width) = (-2, -2);
+            };
     };
     # Restore the settings of the terminal window.
-    system "stty -cbreak echo </dev/tty >/dev/tty 2>&1";
+    system "stty -cbreak echo echonl echoke echoe isig </dev/tty >/dev/tty 2>&1";
     # Return width and height.
-    return ($width, $height);
+    return ($height, $width);
+    };
 };
 
 #------------------------------------------------------------------------------# 
@@ -365,11 +409,8 @@ sub winsize_ioctl {
     # Try to get the winsize.
     try {
         # Check the ioctl call of TIOCGWINSZ.
-        ($rows, $cols, $xpix, $ypix) = (
-            (ioctl(STDOUT, TIOCGWINSZ(), $winsize)) ?
-            (unpack 'S4', $winsize) :
-            (map {$_ * 0} (1..4))
-            );
+        ($rows, $cols, $xpix, $ypix) = ((ioctl(STDOUT, TIOCGWINSZ(), $winsize)) 
+            ? (unpack 'S4', $winsize) : (map {$_ * 0} (1..4)));
     } catch {
         ($rows, $cols, $xpix, $ypix) = (-1, -1, -1, -1);
     };
@@ -431,6 +472,136 @@ sub pixels {
 
 1;
 
+__DATA__
+
+__C__
+#include <sys/ioctl.h>
+#include <stdio.h>
+#include <termios.h>
+
+/* Ref.: termios(3) — Linux manual page
+ *
+ * struct termios {
+ *       tcflag_t c_iflag;     => input modes
+ *       tcflag_t c_oflag;     => output modes
+ *       tcflag_t c_cflag;     => control modes
+ *       tcflag_t c_lflag;     => local modes
+ *       cc_t     c_cc[NCCS];  => special characters
+ * }
+*/
+
+/* Pointer to the termios structure. */
+struct termios term;
+
+/*
+ * Function: on_echo()
+ * -------------------
+ */
+int on_echo() {
+    /* Read attributes, modify attributes and write attributes back. */
+    tcgetattr(fileno(stdin), &term);
+    term.c_lflag |= ECHO;
+    tcsetattr(fileno(stdin), 0, &term);
+    /* Return 1. */
+    return 1;
+};
+
+/*
+ * Function: off_echo()
+ * --------------------
+ */
+int off_echo() {
+    /* Read attributes, modify attributes and write attributes back. */
+    tcgetattr(fileno(stdin), &term);
+    term.c_lflag &= ~ECHO;
+    tcsetattr(fileno(stdin), 0, &term);
+    /* Return 1. */
+    return 1;
+};
+
+/* Define the function io_on(). */
+/* 
+ * Function: io_on()
+ * -----------------
+ */
+int io_on() {
+    /* Read attributes, modify attributes and write attributes back. */
+    tcgetattr(fileno(stdin), &term);
+    term.c_lflag |= (ECHO | ICANON);
+    tcsetattr(fileno(stdin), 0, &term);
+    /* Return 1. */
+    return 1;
+}
+
+/* 
+ * Function: io_off()
+ * ------------------
+ */
+int io_off() {
+    /* Read attributes, modify attributes and write attributes back. */
+    tcgetattr(fileno(stdin), &term);
+    term.c_lflag &= ~(ECHO | ICANON);
+    tcsetattr(fileno(stdin), 0, &term);
+    /* Return 1. */
+    return 1;
+};
+
+/* 
+ * Function: int_str()
+ * -------------------
+ *
+ * Cast short integer variables to string variables of type char.
+ *
+ * Args:
+ *     len    int       Length of value
+ *     value  uint16_t  Short integer number
+ *
+ * Returns:  
+ *     str    char*     Integer as string
+ */
+char* int_str(int len, uint16_t value) {
+    /* Allocate memory for the string variable. */   
+    char* str = malloc(len + 1);
+    snprintf(str, len + 1, "%d", value);
+    return str;
+};
+
+/* 
+ * Function: winsize()
+ * -------------------
+ * 
+ * Get the window size of a terminal window.  
+ *
+ * Ref.: ioctl_tty(2) — Linux manual page
+ * struct winsize {
+ *     unsigned short (uint16_t) ws_row;
+ *     unsigned short (uint16_t) ws_col;
+ *     unsigned short (uint16_t) ws_xpixel; 
+ *     unsigned short (uint16_t) ws_ypixel;
+ * };
+ */
+int winsize_ic(SV* var1, SV* var2, SV* var3, SV* var4) {
+    /* Assign struct to ws. */
+    struct winsize ws;
+    ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
+    /* Cast short integers to strings. */ 
+    int len1 = snprintf(NULL, 0, "%d", ws.ws_row);
+    char* str1 = int_str(len1, ws.ws_row);
+    int len2 = snprintf(NULL, 0, "%d", ws.ws_col);
+    char* str2 = int_str(len2, ws.ws_col);
+    int len3 = snprintf(NULL, 0, "%d", ws.ws_xpixel);
+    char* str3 = int_str(len3, ws.ws_xpixel);
+    int len4 = snprintf(NULL, 0, "%d", ws.ws_ypixel);
+    char* str4 = snprintf(NULL, 0, "%d", ws.ws_ypixel);
+    /* Set var1 to var4. */
+    sv_setpvn(var1, str1, len1);
+    sv_setpvn(var2, str2, len2);
+    sv_setpvn(var3, str3, len3);
+    sv_setpvn(var4, str4, len4);
+    /* Return 1. */
+    return 1;
+};
+
 __END__
 # Below is the package documentation.
 
@@ -438,21 +609,175 @@ __END__
 
 Terminal::Control - Perl extension with methods for the control of the terminal window
 
-=head1 ABSTRACT
-
-The module is intended for B<Linux> as well as B<Unix> or B<Unix-like>
-operating systems in general. These operating systems meet the requirements
-for using the module and its methods. The module contains, among others, two
-methods for clearing and resetting the terminal window. This is a standard
-task when scripts has to be executed in the terminal window. The related Shell
-commands are slow in comparison to the implemented methods in this module. This
-is achieved by using ANSI escape sequences. In addition XTERM control sequences
-can be used to query screen and window size. The terminal or window size is in
-general available via the system call ioctl.
-
 =head1 SYNOPSIS
 
   use Terminal::Control;
+
+  clear_screen();
+  reset_screen();
+
+  ($rows, $cols, $xpix, $ypix) = winsize();
+  ($rows, $cols) = chars();
+  ($xpix, $ypix) = pixels();
+
+  ($row, $col) = get_cursor_position();
+  set_cursor_position($row, $col);
+
+  echo_on();
+  echo_off();
+  
+  cursor_on();
+  cursor_off();   
+
+  ($rows, $cols) = window_size_chars([$timeout]);  
+  ($xpix, $ypix) = windows_size_pixels([$timeout]);
+  ($rows, $cols) = screen_size_chars([$timeout]); 
+  ($xpix, $ypix) = screen_size_pixels([$timeout]);
+
+Variables in square brackets in the method call are optional. They are in the
+related method predefined.
+
+=head1 DESCRIPTION
+
+=head2 Module description
+
+The module contains a collection of methods to control a terminal window. The
+basic methods are used to delete and reset a terminal window and to query the
+current window size.
+
+=head2 Implemented methods
+
+The following methods have been implemented so far within the module.
+The methods below are sorted according to their logical relationship.
+
+=over 4 
+
+=item * clear_screen()
+
+=item * reset_screen()
+
+=back
+
+=over 4 
+
+=item * get_cursor_position()
+
+=item * set_cursor_position($rows, $cols)
+
+=back
+
+=over 4 
+
+=item * winsize()
+
+=item * chars()
+
+=item * pixels()
+
+=back
+
+=over 4 
+
+=item * echo_on()
+
+=item * echo_off()
+
+=back
+
+=over 4 
+
+=item * cursor_on()
+
+=item * cursor_off()
+
+=back
+
+=over 4 
+
+=item * screen_size_chars($timeout) 
+
+=item * screen_size_pixels($timeout)
+
+=item * window_size_chars($timeout)
+
+=item * windows_size_pixels($timeout)
+
+=back
+
+=over 4 
+
+=item * ctlseqs_request($parameter, $timeout)
+
+=back
+
+=head1 METHODS
+
+B<clear_screen()>
+
+Clear the terminal window. The method is using Perls C<syswrite> for printing
+ANSI escape sequences to STDOUT. The standard terminal window is STDOUT for
+the output of Perl. This command has the same effect like calling the Perl
+command C<system("clear")>.
+
+B<reset_screen()> 
+
+Reset the terminal window. The method is using Perls C<syswrite> for printing
+ANSI escape sequences to STDOUT. The standard terminal window is STDOUT for
+the output of Perl. This command has the same effect like calling the Perl 
+command C<system("reset")>.
+
+B<echo_on>
+
+Turn the echo on. The method uses for the moment the Shell command C<stty> for 
+turning the echo of (user) input on. 
+
+B<echo_off>
+
+Turn the echo off. The method uses for the moment the Shell command C<stty> for 
+turning the echo of (user) input off. 
+
+Turn the echo off.
+
+B<cursor_on>
+
+Turn the cursor on. The cursor is enabled by using ANSI escape sequences
+in the method.
+
+B<cursor_off>
+
+Turn the cursor off. The cursor is disabled by using ANSI escape sequences
+in the method.
+
+B<get_cursor_position()
+
+Get the cursor position. The method gets the current cursor position in the
+terminal window.
+
+B<set_cursor_position($row, $col)> 
+
+Set the cursor position. The method gets the current cursor position in the 
+terminal window.
+
+B<window_size_chars([$timeout]);>  
+
+B<windows_size_pixels([$timeout]);>
+
+B<screen_size_chars([$timeout]);> 
+
+B<screen_size_pixels([$timeout]);>
+
+B<winsize()> 
+
+Get the window size. The method gets the dimensions in x-direction and y-direction
+of the terminal. The methods chars and pixels extract chars (rows and cols)
+and pixels (xpix and ypix) from the winsize data. The method is using the C-header
+for the system call C<ioctl> and the call or command C<TIOCGWINSZ>. The call
+returns the winsize in rows and cols and xpix and ypix.
+
+Variables in square brackets in the method call are optional. They are in the
+related method predefined.
+
+=head1 EXAMPLES
 
   # Clear the terminal window using ANSI escape sequences.
   clear_screen();
@@ -519,7 +844,9 @@ corresponding to window height.
 The predefined value of $timeout is 1000000 microseconds (1 second). The
 value of the parameter $timeout has to be given in microseconds.  
 
-=head1 DEVELOPMENT MOTIVATION
+=head1 NOTES
+
+=head2 Development
 
 The idea for the necessity of the module arises from the fact that especially 
 the call of the Perl command system C<system("reset")> of the Shell command
@@ -534,7 +861,7 @@ A single method is the best way to realise this for the terminal reset and
 several other commands. There is no need to implement a class with a bunch of
 methods to achive this.  
 
-=head1 PROVE OF CONCEPT
+=head2 Prove of concept
 
 Exemplary comparison of time of execution:
 
@@ -545,6 +872,15 @@ Exemplary comparison of time of execution:
 Using C<reset> on the command line and the Perl command C<system("reset")> have nearly
 the same result in time of execution. Detailed comparison is outstanding. This one example
 already shows a significant advantage of the new routine.
+
+=head2 Non-blocking behaviour  
+
+Reading from STDIN is blocking w.r.t. to the request of escape sequences, if no
+data are available. To overcome the problem of waiting endless for user input a
+timeout is programmed. Unfortunately, the programming implementation also slows
+down the processing when data is available in STDIN. If the standard value is not
+applicable, reduce the timeout step by step. If the timeout is to short the method
+is not able to catch the input from STDIN. A error code -1 is returned.
 
 =head1 SYSTEM COMPATIBILITY
 
@@ -559,7 +895,7 @@ module. The restriction under Perl is explained further below.
 
 The above requirements are fulfilled in principle by all Unix or Unix-like systems. 
 
-=head1 FULL FUNCTIONALITY REQUIREMENT
+=head1 FUNCTIONALITY REQUIREMENT
 
 The Perl header C<sys/ioctl.ph> is required for the C<ioctl> call of the
 function C<TIOCGWINSZ> to get the window size. The equivalent C/C++ header
@@ -572,10 +908,15 @@ to create a C<sys/ioctl.ph>. This is necessary manually via the C<h2ph> command.
 To prevent tests within CPAN from failing due to a missing C<sys/ioctl.ph>, a
 fallback solution based on the Shell command C<stty> is implemented.   
 
-=head1 ANSI ESCAPE SEQUENCES VERSUS XTERM CONTROL SEQUENCES
+=head1 PORTABILITY
 
-ANSI escape sequences are widely known. Less well known are the so-called XTERM
-control sequences.
+The module should work on B<Linux> as well as B<Unix> or B<Unix-like>
+operating systems in general.
+
+=head1 CONTROL SEQUENCES
+
+I<ANSI escape sequences> are widely known. Less well known are the so-called I<XTERM
+control sequences>.
 
 =head2 ANSI escape sequences
 
@@ -597,82 +938,7 @@ Escape sequences used by the module:
   CSI 1 8 t  =>  report window size in chars
   CSI 1 9 t  =>  report screen size in chars
 
-=head1 DESCRIPTION
-
-=head2 Implemented Methods
-
-The methods below are sorted according to their logical relationship.
-
-The following methods have been implemented so far within the module:
-
-=over 4 
-
-=item * clear_screen()
-
-=item * reset_screen()
-
-=back
-
-=over 4 
-
-=item * get_cursor_position()
-
-=item * set_cursor_position($rows, $cols)
-
-=back
-
-=over 4 
-
-=item * winsize()
-
-=item * chars()
-
-=item * pixels()
-
-=back
-
-=over 4 
-
-=item * echo_on()
-
-=item * echo_off()
-
-=back
-
-=over 4 
-
-=item * cursor_on()
-
-=item * cursor_off()
-
-=back
-
-=over 4 
-
-=item * screen_size_chars($timeout) 
-
-=item * screen_size_pixels($timeout)
-
-=item * window_size_chars($timeout)
-
-=item * windows_size_pixels($timeout)
-
-=back
-
-=over 4 
-
-=item * ctlseqs_request($parameter, $timeout)
-
-=back
-
-Reading from STDIN is blocking, if no data are available. To overcome the
-problem of waiting endless for user input a timeout is programmed. Unfortunately,
-the programming implementation also slows down the processing when data is available
-in STDIN. If the standard value is not applicable, reduce the timeout step by step.
-If the timeout is to short the method is not able to catch the input from STDIN. A
-error code -1 is returned.
-
-=head1 ALIASES
+=head1 METHOD ALIASES
 
 clear_screen and reset_screen can also be used with this aliases:
 
@@ -681,32 +947,24 @@ clear_screen and reset_screen can also be used with this aliases:
   reset           <=  reset_screen
   clear           <=  clear_screen
 
-=head2 METHOD DESCRIPTION
+=head1 KNOWN BUGS
 
-The method C<clear_screen> is clearing the terminal. This is similar to the
-Perl system command call C<system("clear")>. The method C<reset_screen> is
-reseting the terminal. This is similar to the Perl system command call
-C<system("reset")>.
+It happens that in rare cases the CPAN test of the module gives several errors
+during compilation. The first error issued is actually an error. This error
+then obviously causes subsequent errors that are not actually errors. It is
+still unclear how the first real error can be permanently eliminated. 
 
-The method C<winsize()> gets the dimensions in x-direction and y-direction
-of the terminal. The methods chars and pixels extract chars (rows and cols)
-and pixels (xpix and ypix.)
+=head1 ABSTRACT
 
-The method C<get_cursor_position()> gets the current cursor position in
-the terminal window. The method C<set_cursor_position()> sets the cursor
-position in the terminal window.
- 
-C<echo_on()> and C<echo_off()> turnes echo of commands on or off.C<cursor_on()> and
-C<cursor_off> shows or hides the cursor.
-
-=head1 PROGRAMMABLE BACKGROUND
-
-The methods C<clear_screen()> and C<reset_screen()> are using ANSI escape sequences.
-Doing this no other Perl commands are needed to clear and reset a screen. 
-
-The method C<winsize()> is using the C/C++ header for the system call C<ioctl> and the
-call or command C<TIOCGWINSZ>. The call returns the winsize in rows and cols and xpix
-and ypix.
+The module is intended for B<Linux> as well as B<Unix> or B<Unix-like>
+operating systems in general. These operating systems meet the requirements
+for using the module and its methods. The module contains, among others, two
+methods for clearing and resetting the terminal window. This is a standard
+task when scripts has to be executed in the terminal window. The related Shell
+commands are slow in comparison to the implemented methods in this module. This
+is achieved by using ANSI escape sequences. In addition XTERM control sequences
+can be used to query screen and window size. The terminal or window size is in
+general available via the system call ioctl.
 
 =head1 SEE ALSO
 
@@ -715,6 +973,10 @@ ANSI escape sequences
 XTERM control sequences
 
 stty(1) - Linux manual page 
+
+termios(3) — Linux manual page
+
+ioctl_tty(2) — Linux manual page
 
 =head1 AUTHOR
 

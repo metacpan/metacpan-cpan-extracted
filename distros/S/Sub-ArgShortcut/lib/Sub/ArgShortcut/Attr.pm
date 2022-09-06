@@ -1,9 +1,9 @@
-use 5.006;
-use strict;
-use warnings;
+use 5.006; use strict; use warnings;
 
 package Sub::ArgShortcut::Attr;
-$Sub::ArgShortcut::Attr::VERSION = '1.021';
+
+our $VERSION = '1.022';
+
 use Sub::ArgShortcut;
 use Attribute::Handlers;
 

@@ -36,18 +36,17 @@
       },
       "test" : {
          "requires" : {
-            "Data::Sah::Filter" : "0.006",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.98"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Data::Sah::Filter::perl::Str::replace_underscores_with_dashes" : {
          "file" : "lib/Data/Sah/Filter/perl/Str/replace_underscores_with_dashes.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -62,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah-Filter-perl-Str-replace_underscores_with_dashes"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -71,7 +70,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Data::Sah::Filter",
             "name" : "Data::Sah::Filter",
-            "version" : "0.001"
+            "version" : "0.002"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
@@ -454,7 +453,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Data::Sah::Filter",
                         "name" : "-Data::Sah::Filter",
-                        "version" : "0.002"
+                        "version" : "0.006"
                      }
                   ]
                }

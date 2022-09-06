@@ -15,9 +15,10 @@
 .PHONY: cpan test
 
 SHELL := bash
-ROOT := $(shell dirname $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
+MAKE_FILE := $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+ROOT := $(shell dirname $(dir $(MAKE_FILE)))
 BASE := $(shell pwd)
-MAKE := make -f $(ROOT)/share/Makefile
+MAKE := make -f $(MAKE_FILE)
 PERL ?= $(shell which perl)
 ZILD := $(PERL) -S zild
 LOG := $(PERL_ZILLA_DIST_RELEASE_LOG)

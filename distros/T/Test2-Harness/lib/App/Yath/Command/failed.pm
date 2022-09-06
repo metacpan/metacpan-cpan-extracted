@@ -2,7 +2,7 @@ package App::Yath::Command::failed;
 use strict;
 use warnings;
 
-our $VERSION = '1.000127';
+our $VERSION = '1.000128';
 
 use Test2::Util::Table qw/table/;
 use Test2::Harness::Util::File::JSONL;
@@ -15,10 +15,10 @@ use App::Yath::Options;
 option brief => (
     prefix => 'display',
     category => 'Display Options',
-    description => 'Show only files that failed, newline separated, no other output. If a file dailed once but passed on a retry it will NOT be shown.',
+    description => 'Show only the files that failed, newline separated, no other output. If a file failed once but passed on a retry it will NOT be shown.',
 );
 
-sub summary { "Replay a test run from an event log" }
+sub summary { "Show the failed tests from an event log" }
 
 sub group { 'log' }
 
@@ -26,10 +26,10 @@ sub cli_args { "[--] event_log.jsonl[.gz|.bz2] [job1, job2, ...]" }
 
 sub description {
     return <<"    EOT";
-This yath command will re-run the harness against an event log produced by a
-previous test run. The only required argument is the path to the log file,
-which maybe compressed. Any extra arguments are assumed to be job id's. If you
-list any jobs, only listed jobs will be processed.
+This yath command will list the test scripts from an event log that have failed.
+The only required argument is the path to the log file, which may be compressed.
+Any extra arguments are assumed to be job id's. If you list any jobs,
+only the listed jobs will be processed.
 
 This command accepts all the same renderer/formatter options that the 'test'
 command accepts.
@@ -149,14 +149,14 @@ __END__
 
 =head1 NAME
 
-App::Yath::Command::failed - Replay a test run from an event log
+App::Yath::Command::failed - Show the failed tests from an event log
 
 =head1 DESCRIPTION
 
-This yath command will re-run the harness against an event log produced by a
-previous test run. The only required argument is the path to the log file,
-which maybe compressed. Any extra arguments are assumed to be job id's. If you
-list any jobs, only listed jobs will be processed.
+This yath command will list the test scripts from an event log that have failed.
+The only required argument is the path to the log file, which may be compressed.
+Any extra arguments are assumed to be job id's. If you list any jobs,
+only the listed jobs will be processed.
 
 This command accepts all the same renderer/formatter options that the 'test'
 command accepts.
@@ -262,7 +262,7 @@ Exit after showing a helpful usage message
 
 =item --no-no-scan-plugins
 
-Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that it loading other modules when it should not.
+Normally yath scans for and loads all App::Yath::Plugin::* modules in order to bring in command-line options they may provide. This flag will disable that. This is useful if you have a naughty plugin that is loading other modules when it should not.
 
 
 =item --plugins PLUGIN
@@ -443,7 +443,7 @@ Create a json or jsonl file of all coverage data seen during the run (This impli
 
 =item --no-brief
 
-Show only files that failed, newline separated, no other output. If a file dailed once but passed on a retry it will NOT be shown.
+Show only the files that failed, newline separated, no other output. If a file failed once but passed on a retry it will NOT be shown.
 
 
 =back

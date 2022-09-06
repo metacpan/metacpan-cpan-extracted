@@ -5,8 +5,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '8.3'; # VERSION
+our $VERSION = '8.4'; # VERSION
 
+use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:all);
 use Getopt::Long qw(GetOptionsFromArray :config pass_through no_auto_abbrev);
 use Hash::Flatten qw(flatten);
@@ -19,7 +20,7 @@ use Ref::Util qw(is_ref is_arrayref is_hashref);
 use Time::Local;
 use URI;
 use URI::QueryParam;
-use YAML;
+use YAML::XS;
 
 # Control loading ARGV
 my $ARGV_AT_INIT    = 1;
@@ -28,9 +29,9 @@ our $_init_complete = 0;
 
 use Sub::Exporter -setup => {
     collectors => [
-        copy_argv => \'_copy_argv',
+        copy_argv       => \'_copy_argv',
         preprocess_argv => \'_preprocess_argv',
-        delay_argv => \'_delay_argv',
+        delay_argv      => \'_delay_argv',
     ],
     exports => [ qw(
         es_utils_initialize
@@ -118,9 +119,13 @@ my $PATTERN;
             datesep|date-separator=s
             proto=s
             http-username=s
-            http-password=s
             password-exec=s
             master-only|M
+            insecure
+            capath=s
+            cacert=s
+            cert=s
+            key=s
         );
 
         my $argv;
@@ -171,7 +176,7 @@ sub es_utils_initialize {
         next unless -f $config_file;
         debug("Loading options from $config_file");
         eval {
-            my $ref = YAML::LoadFile($config_file);
+            my $ref = YAML::XS::LoadFile($config_file);
             push @ConfigData, $ref;
             debug_var($ref);
             1;
@@ -204,16 +209,6 @@ sub es_utils_initialize {
                      : exists $_GLOBALS{'keep-proxy'} ? $_GLOBALS{'keep-proxy'}
                      : 1,
         MASTERONLY  => exists $opts->{'master-only'} ? $opts->{'master-only'} : 0,
-        # HTTP Basic Authentication
-        USERNAME    => exists $opts->{'http-username'}    ? $opts->{'http-username'}
-                     : exists $_GLOBALS{'http-username'}  ? $_GLOBALS{'http-username'}
-                     : undef,
-        PASSWORD    => exists $opts->{'http-password'}   ? $opts->{'http-password'}
-                     : exists $_GLOBALS{'http-password'} ? $_GLOBALS{'http-password'}
-                     : undef,
-        PASSEXEC    => exists $opts->{'password-exec'}   ? $opts->{'password-exec'}
-                     : exists $_GLOBALS{'password-exec'} ? $_GLOBALS{'password-exec'}
-                     : undef,
         # Index selection opts->ions
         INDEX       => exists $opts->{index}  ? $opts->{index} : undef,
         BASE        => exists $opts->{base}   ? lc $opts->{base}
@@ -226,6 +221,29 @@ sub es_utils_initialize {
                      : exists $_GLOBALS{datesep}          ? $_GLOBALS{datesep}
                      : exists $_GLOBALS{"date-separator"} ? $_GLOBALS{"date-separator"}
                      : '.',
+        # HTTP Basic Authentication
+        USERNAME    => exists $opts->{'http-username'}    ? $opts->{'http-username'}
+                     : exists $_GLOBALS{'http-username'}  ? $_GLOBALS{'http-username'}
+                     : $ENV{USER},
+        PASSEXEC    => exists $opts->{'password-exec'}   ? $opts->{'password-exec'}
+                     : exists $_GLOBALS{'password-exec'} ? $_GLOBALS{'password-exec'}
+                     : undef,
+        # TLS Options
+        INSECURE    => exists $opts->{insecure} ? 1
+                    :  exists $_GLOBALS{insecure} ? $_GLOBALS{insecure}
+                    :  0,
+        CACERT      => exists $opts->{cacert} ? 1
+                    :  exists $_GLOBALS{cacert} ? $_GLOBALS{cacert}
+                    :  undef,
+        CAPATH      => exists $opts->{capath} ? 1
+                    :  exists $_GLOBALS{capath} ? $_GLOBALS{capath}
+                    :  undef,
+        CERT        => exists $opts->{cert} ? 1
+                    :  exists $_GLOBALS{cert} ? $_GLOBALS{cert}
+                    :  undef,
+        KEY         => exists $opts->{key} ? 1
+                    :  exists $_GLOBALS{key} ? $_GLOBALS{key}
+                    :  undef,
     );
     CLI::Helpers::override(verbose => 1) if $DEF{NOOP};
 
@@ -288,7 +306,7 @@ sub es_basic_auth {
     # Lookup the details netrc
     my $netrc = Net::Netrc->lookup($host);
     if( $DEF{HOST} eq $host ) {
-        %auth = map { lc($_) => $DEF{$_} } qw(USERNAME PASSWORD);
+        %auth = map { lc($_) => $DEF{$_} } qw(USERNAME);
     }
     my %meta = ();
     foreach my $k (qw( http-username password-exec )) {
@@ -305,9 +323,7 @@ sub es_basic_auth {
     $auth{username} ||= $meta{'http-username'} ? $meta{'http-username'}
                       : defined $DEF{USERNAME} ? $DEF{USERNAME}
                       : defined $netrc         ? $netrc->login
-                      : prompt("Username for '$host': ",
-                            defined $DEF{USERNAME} ? (default => $DEF{USERNAME}) : ()
-                        );
+                      : $ENV{USER};
 
     # Prompt for the password
     $auth{password} ||= defined $netrc ? $netrc->password
@@ -328,7 +344,7 @@ sub es_pass_exec {
 
     # Simplest case we can't run
     $exec ||= $DEF{PASSEXEC};
-    return unless -x $exec;
+    return unless length $exec && -x $exec;
 
     my(@out,@err);
     # Run the password command captue out, error and RC
@@ -347,8 +363,6 @@ sub es_pass_exec {
     # Format and return the result
     my $passwd = $out[-1];
     chomp($passwd);
-
-    return unless defined $passwd and length $passwd;
     return $passwd;
 }
 
@@ -362,32 +376,77 @@ sub es_pattern {
     };
 }
 
+sub _get_ssl_opts {
+    es_utils_initialize() unless keys %DEF;
+    my %opts = ();
+    $opts{verify_hostname} = 0            if $DEF{INSECURE};
+    $opts{SSL_ca_file}     = $DEF{CACERT} if $DEF{CACERT};
+    $opts{SSL_ca_path}     = $DEF{CAPATH} if $DEF{CAPATH};
+    $opts{SSL_cert_file}   = $DEF{CERT}   if $DEF{CERT};
+    $opts{SSL_key_file}    = $DEF{KEY}    if $DEF{KEY};
+    return \%opts;
+}
+
 sub _get_es_version {
     return $CURRENT_VERSION if defined $CURRENT_VERSION;
     my $conn = es_connect();
-    my $resp = $conn->ua->get( sprintf "%s://%s:%d", $conn->proto, $conn->host, $conn->port );
-    if( $resp->is_success ) {
-        my $ver;
-        eval {
-            $ver = $resp->content->{version};
-        };
-        if( $ver ) {
-            if( $ver->{distribution} and $ver->{distribution} eq 'opensearch' ) {
-                $CURRENT_VERSION = '7.10';
-            }
-            else {
-                $CURRENT_VERSION = join('.', (split /\./,$ver->{number})[0,1]);
+    # Build the request
+    my $req  = App::ElasticSearch::Utilities::HTTPRequest->new(
+        GET => sprintf "%s://%s:%d",
+                    $conn->proto, $conn->host, $conn->port
+    );
+    # Check if we're doing auth
+    my @auth = $DEF{PASSEXEC} ? es_basic_auth($conn->host) : ();
+    # Add authentication if we get a password
+    $req->authorization_basic( @auth ) if @auth;
+
+    # Retry with TLS and/or Auth
+    my %try = map { $_ => 1 } qw( tls auth );
+    my $resp;
+    while( not defined $CURRENT_VERSION ) {
+        $resp = $conn->ua->request($req);
+        if( $resp->is_success ) {
+            my $ver;
+            eval {
+                $ver = $resp->content->{version};
+            };
+            if( $ver ) {
+                if( $ver->{distribution} and $ver->{distribution} eq 'opensearch' ) {
+                    $CURRENT_VERSION = '7.10';
+                }
+                else {
+                    $CURRENT_VERSION = join('.', (split /\./,$ver->{number})[0,1]);
+                }
             }
         }
-    };
-    if( !defined $CURRENT_VERSION || $CURRENT_VERSION <= 0 ) {
+        elsif( $resp->code == 500 && $resp->message eq "Server closed connection without sending any data back" ) {
+            # Try TLS
+            last unless $try{tls};
+            delete $try{tls};
+            $conn->proto('https');
+            warn "Attempting promotion to HTTPS, try setting 'proto: https' in ~/.es-utils.yaml";
+        }
+        elsif( $resp->code == 401 ) {
+            # Retry with credentials
+            last unless $try{auth};
+            delete $try{auth};
+            warn "Authorization required, try setting 'password-exec: /home/user/bin/get-password.sh` in ~/.es-utils.yaml'"
+                unless $DEF{PASSEXEC};
+            $req->authorization_basic( es_basic_auth($conn->host) );
+        }
+        else {
+            warn "Failed getting version";
+            last;
+        }
+    }
+    if( !defined $CURRENT_VERSION || $CURRENT_VERSION <= 2 ) {
         output({color=>'red',stderr=>1}, sprintf "[%d] Unable to determine Elasticsearch version, something has gone terribly wrong: aborting.", $resp->code);
-        output({color=>'red',stderr=>1}, ref $resp->content ? YAML::Dump($resp->content) : $resp->content) if $resp->content;
+        output({color=>'red',stderr=>1}, ref $resp->content ? YAML::XS::Dump($resp->content) : $resp->content) if $resp->content;
         exit 1;
     }
     debug({color=>'magenta'}, "FOUND VERISON '$CURRENT_VERSION'");
     return $CURRENT_VERSION;
-};
+}
 
 
 my $ES = undef;
@@ -398,20 +457,26 @@ sub es_connect {
     es_utils_initialize() unless keys %DEF;
 
     my %conn = (
-        host    => $DEF{HOST},
-        port    => $DEF{PORT},
-        proto   => $DEF{PROTO},
-        timeout => $DEF{TIMEOUT},
+        host     => $DEF{HOST},
+        port     => $DEF{PORT},
+        proto    => $DEF{PROTO},
+        timeout  => $DEF{TIMEOUT},
+        ssl_opts => _get_ssl_opts,
     );
+    # Only authenticate over TLS
+    if( $DEF{PROTO} eq 'https' ) {
+        $conn{username} = $DEF{USERNAME};
+        $conn{password} = es_pass_exec(@DEF{qw(HOST USERNAME)}) if $DEF{PASSEXEC};
+    }
 
     # If we're overriding, return a unique handle
     if(defined $override_servers) {
-        my @overrides =  is_arrayref($override_servers) ? @$override_servers : $override_servers;
+        my @overrides = is_arrayref($override_servers) ? @$override_servers : $override_servers;
         my @servers;
         foreach my $entry ( @overrides ) {
             my ($s,$p) = split /\:/, $entry;
             $p ||= $conn{port};
-            push @servers, { host => $s, port => $p };
+            push @servers, { %conn, host => $s, port => $p };
         }
 
         if( @servers > 0 ) {
@@ -1020,7 +1085,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 8.3
+version 8.4
 
 =head1 SYNOPSIS
 
@@ -1278,8 +1343,12 @@ From App::ElasticSearch::Utilities:
     --port          HTTP port for your cluster
     --proto         Defaults to 'http', can also be 'https'
     --http-username HTTP Basic Auth username
-    --http-password HTTP Basic Auth password (if not specified, and --http-user is, you will be prompted)
     --password-exec Script to run to get the users password
+    --insecure      Don't verify TLS certificates
+    --cacert        Specify the TLS CA file
+    --capath        Specify the directory with TLS CAs
+    --cert          Specify the path to the client certificate
+    --key           Specify the path to the client private key file
     --noop          Any operations other than GET are disabled, can be negated with --no-noop
     --timeout       Timeout to ElasticSearch, default 10
     --keep-proxy    Do not remove any proxy settings from %ENV
@@ -1336,11 +1405,6 @@ If HTTP Basic Authentication is required, use this username.
 
 See also the L<HTTP Basic Authentication> section for more details
 
-=item B<http-password>
-
-If HTTP Basic Authentication is required, use this password, B<**INSECURE**>, set
-in globals, netrc, or use the B<password-exec> option below.
-
 =item B<password-exec>
 
 If HTTP Basic Authentication is required, run this command, passing the arguments:
@@ -1362,6 +1426,26 @@ Timeout for connections and requests, defaults to 10.
 
 By default, HTTP proxy environment variables are stripped. Use this option to keep your proxy environment variables
 in tact.
+
+=item B<insecure>
+
+Don't verify TLS certificates
+
+=item B<cacert>
+
+Specify a file with the TLS CA certificates.
+
+=item B<capath>
+
+Specify a directory containing the TLS CA certificates.
+
+=item B<cert>
+
+Specify the path to the TLS client certificate file..
+
+=item B<key>
+
+Specify the path to the TLS client private key file.
 
 =back
 
@@ -1415,10 +1499,8 @@ The indexes are compared against this pattern.
 
 =head1 HTTP Basic Authentication
 
-The implementation for HTTP Basic Authentication leverages the LWP::UserAgent's underlying HTTP 401
-detection and is automatic.  There is no way to force basic authentication, it has to be requested
-by the server.  If the server does request it, here's what you need to know about how usernames and
-passwords are resolved.
+HTTP Basic Authorization is only supported when the C<proto> is set to B<https>
+as not to leak credentials all over.
 
 The username is selected by going through these mechanisms until one is found:
 
@@ -1429,8 +1511,6 @@ The username is selected by going through these mechanisms until one is found:
 
 Once the username has been resolved, the following mechanisms are tried in order:
 
-    --http-password
-    'http-password' in /etc/es-utils.yml or ~/.es-utils.yml
     Netrc element matching the hostname of the request
     Password executable defined by --password-exec
     'password-exec' in /etc/es-utils.yml, ~/.es-utils.yml

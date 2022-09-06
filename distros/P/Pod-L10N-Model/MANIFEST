@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Pod/L10N/Model.pm
+minil.toml
+t/00_compile.t
+t/10_model.t
+META.yml
+MANIFEST

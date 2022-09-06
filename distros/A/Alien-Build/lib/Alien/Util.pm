@@ -5,7 +5,7 @@ use warnings;
 use Exporter qw( import );
 
 # ABSTRACT: Alien Utilities used at build and runtime
-our $VERSION = '2.66'; # VERSION
+our $VERSION = '2.68'; # VERSION
 
 
 our @EXPORT_OK = qw( version_cmp );
@@ -54,7 +54,7 @@ Alien::Util - Alien Utilities used at build and runtime
 
 =head1 VERSION
 
-version 2.66
+version 2.68
 
 =head1 SYNOPSIS
 

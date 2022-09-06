@@ -9,7 +9,7 @@ use Data::Record::Serialize::Error { errors => [ 'json_backend' ] }, -all;
 
 use Moo::Role;
 
-our $VERSION = '0.34';
+our $VERSION = '1.04';
 
 
 BEGIN {
@@ -84,7 +84,7 @@ Data::Record::Serialize::Encode::json - encoded a record as JSON
 
 =head1 VERSION
 
-version 0.34
+version 1.04
 
 =head1 SYNOPSIS
 

@@ -42,6 +42,19 @@ is(exception {
     $message->as_hash();
 }, undef, '->as_* should succeed');
 
+# Deadline check
+
+$message_args->{deadline} = time + 30;
+my $valid_message = Myriad::RPC::Message::from_hash($message_args->%*);
+
+cmp_ok($valid_message->passed_deadline, '==', 0, 'Message did not pass deadline');
+
+$message_args->{deadline} = time - 1;
+my $invalid_message = Myriad::RPC::Message::from_hash($message_args->%*);
+
+cmp_ok($invalid_message->passed_deadline, '==', 1, 'Message passed the deadline');
+
+
 no_growth {
     my $message = Myriad::RPC::Message::from_hash(%$message_args);
 } 'no memory leak detected';

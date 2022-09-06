@@ -2,7 +2,7 @@ package Test2::Formatter::Test2;
 use strict;
 use warnings;
 
-our $VERSION = '1.000127';
+our $VERSION = '1.000128';
 
 use Test2::Util::Term qw/term_size/;
 use Test2::Harness::Util qw/hub_truth apply_encoding/;
@@ -177,7 +177,7 @@ sub init {
     my $use_color = ref($self->{+COLOR}) ? 1 : delete($self->{+COLOR});
     $use_color = $self->{+TTY} unless defined $use_color;
 
-    if ($self->{+TTY} && USE_ANSI_COLOR) {
+    if ($use_color && USE_ANSI_COLOR) {
         $self->{+SHOW_BUFFER} = 1 unless defined $self->{+SHOW_BUFFER};
 
         if ($use_color) {

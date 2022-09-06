@@ -1,0 +1,105 @@
+NAME
+
+    Plack::App::Libarchive - Serve an archive via libarchive as a PSGI web
+    app
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+     use Plack::App::Libarchive;
+     my $app = Plack::App::Libarchive->new( archive => 'foo.tar.tz' )->to_app;
+
+DESCRIPTION
+
+    This PSGI application serves the content of an archive (any format
+    supported by libarchive via Archive::Libarchive). A request to the root
+    for the app will return an index of the files contained within the
+    archive.
+
+    The index is generated using Template. There is a bundled template that
+    will list the entry files and link to their content. If you want to
+    customize the index you can provide your own template. Here are the
+    template variables that are available from within the template:
+
+    archive
+
+      A hash reference containing information about the archive
+
+    archive.name
+
+      The basename of the archive filename. For example: foo.tar.gz.
+
+    archive.get_next_entry
+
+      Get the next Archive::Libarchive::Entry object from the archive.
+
+    Here is the default wrapper.html.tt:
+
+     <!doctype html>
+     <html>
+       <head>
+         <meta charset="utf-8" />
+         <title>[% archive.name %]</title>
+       </head>
+       <body>
+         [% content %]
+       </body>
+     </html>
+
+    and the default archive_index.html.tt
+
+     <ul>
+       [% WHILE (entry = archive.get_next_entry) %]
+         <li><a href="[% entry.pathname | uri %]">[% entry.pathname | html %]</a></li>
+       [% END %]
+     </ul>
+
+CONFIGURATION
+
+    archive
+
+      The relative or absolute path to the archive.
+
+    tt
+
+      Instance of Template that will be used to generate the html index.
+      The default is:
+
+       Template->new(
+         WRAPPER            => 'wrapper.html.tt',
+         INCLUDE_PATH       => File::ShareDir::Dist::dist_share('Plack-App-Libarchive'),
+         DELIMITER          => ':',
+         render_die         => 1,
+         TEMPLATE_EXTENSION => '.tt',
+         ENCODING           => 'utf8',
+       )
+
+      On MSWin32 a delimiter of ; is used instead.
+
+    tt_include_path
+
+      Array reference of additional Template INCLUDE_PATH directories. This
+      id useful for writing your own custom template.
+
+SEE ALSO
+
+    Archive::Libarchive
+
+    Plack
+
+    PSGI
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2022 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

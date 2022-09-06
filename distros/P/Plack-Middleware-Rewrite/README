@@ -1,7 +1,7 @@
 Plack::Middleware::Rewrite
 
-This middleware provides a convenient way to modify requests in flight
-in Plack apps. Rewrite rules are simply written in Perl, which means
+This middleware provides a convenient way to modify requests in flight in
+Plack apps. Rewrite rules are simply written in Perl, which means
 everything that can be done with mod_rewrite can be done with this
 middleware much more intuitively (if in syntactically wordier ways). Its
 primary purpose is rewriting paths, but almost anything is possible very
@@ -26,7 +26,7 @@ Should you wish to install this module manually, the procedure is
 
 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Aristotle Pagaltzis.
+This software is copyright (c) 2022 by Aristotle Pagaltzis.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

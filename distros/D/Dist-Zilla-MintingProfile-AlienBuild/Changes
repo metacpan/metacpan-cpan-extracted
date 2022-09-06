@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-MintingProfile-AlienBuild,
 
+0.07      2022-09-06 06:48:33 -0600
+  - Documentation improvements (gh#22)
+
 0.06      2021-11-28 05:22:11 -0700
   - Remove erroneous extra } from Changes template (gh#20)
 

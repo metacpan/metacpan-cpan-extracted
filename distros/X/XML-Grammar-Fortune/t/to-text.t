@@ -33,7 +33,7 @@ my @tests = (
         screenplay-fort-sample-2-with-italics
         screenplay-fort-sample-2-long-line
         screenplay-fort-sample-3-with-inlinedesc
-        )
+    )
 );
 
 foreach my $fn_base (@tests)

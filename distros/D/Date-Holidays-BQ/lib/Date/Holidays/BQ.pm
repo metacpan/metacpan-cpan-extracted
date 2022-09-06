@@ -1,7 +1,5 @@
-use utf8;
-
 package Date::Holidays::BQ;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -23,7 +21,7 @@ my %FIXED_DATES = (
     newyears => {
         m   => 1,
         d   => 1,
-        pap => 'Aña Nobo',
+        pap => "A\x{00f1}a Nobo",
         nl  => 'Nieuwjaarsdag',
         en  => 'New years day',
     },
@@ -48,22 +46,12 @@ my %FIXED_DATES = (
         nl  => 'Bonairedag',
         en  => 'Bonaire Flag day',
     },
-    emancipation => {
-        m   => 7,
-        d   => 1,
-        pap => 'Dia di Lucha pa Libertat',
-        nl  => 'Keto Koti',
-
-        # Abolish slavery day would have been more appropiate as emancipation
-        # is very neutral
-        en => 'Emancipation day',
-    },
     wimlex => {
         m   => 4,
         d   => 27,
         nl  => 'Koningsdag',
         en  => 'Kings day',
-        pap => 'Dia di Reino',
+        pap => 'Dia di Rei',
 
         # change day of week if it falls on a sunday
         dow          => { 7 => -1 },
@@ -117,6 +105,16 @@ my %FIXED_DATES = (
         year_started => 1980,
         year_ended   => 2013,
     },
+    # https://wetten.overheid.nl/BWBR0002448/2010-10-10
+    # This is a gov-only day
+    liberation => {
+        m   => 5,
+        d   => 5,
+        pap => 'Dia di liberation',
+        nl  => 'Bevrijdingsdag',
+        en  => 'Liberation day',
+        gov => 1,
+    },
     labor => {
         m   => 5,
         d   => 1,
@@ -141,6 +139,12 @@ my %FIXED_DATES = (
 );
 
 my %EASTER_BASED = (
+    'carnaval' => {
+        d   => -31 - 16 - 2, # 49
+        pap => 'Prome dia di Carnaval',
+        nl  => 'Eerste carnavalsdag',
+        en  => 'First day of carnaval',
+    },
     goodfri => {
         d   => -2,
         pap => 'Bierna Santo',
@@ -149,27 +153,34 @@ my %EASTER_BASED = (
     },
     easter => {
         d   => 0,
-        pap => 'Pasco Grandi',
+        pap => 'Pasku Grandi',
         nl  => 'Pasen',
         en  => 'Easter',
     },
     easter2 => {
         d   => 1,
-        pap => 'Pasco Grandi',
+        pap => 'Pasku Grandi',
         nl  => 'Tweede paasdag',
         en  => 'Second day of easter',
     },
     ascension => {
         d   => 40,
-        pap => 'Dia di Asuncion',
+        pap => 'Dia di asuncion',
         nl  => 'Hemelvaartsdag',
         en  => 'Ascension day',
     },
     pentecost => {
         d   => 49,
-        pap => 'Dia di Asuncion',
+        pap => "Pentek\x{00f2}ste",
         nl  => 'Pinksteren',
         en  => 'Pentecost',
+    },
+    pentecost2 => {
+        d   => 50,
+        pap => "Dia dos di Pentek\x{00f2}ste",
+        nl  => 'Tweede pinksterdag',
+        en  => 'pentecost',
+        gov => 1,
     },
 );
 
@@ -192,22 +203,21 @@ sub holidays {
     foreach (keys %FIXED_DATES) {
         my $holiday = $FIXED_DATES{$_};
 
-        if (my $int = $holiday->{interval}) {
-            if ($args{gov} && $holiday->{gov}) {
-
-                # We should have this
-            }
-            else {
-                next if $year % $int != 0;
-            }
+        if (my $end = $holiday->{year_ended}) {
+            next if $year > $end;
         }
-
         if (my $start = $holiday->{year_started}) {
             next if $year < $start;
         }
 
-        if (my $end = $holiday->{year_ended}) {
-            next if $year > $end;
+        if (my $int = $holiday->{interval}) {
+            next if !$args{gov} && $year % $int != 0;
+        }
+        # Skip government only holidays
+        # This is due to "Algemene termijnwet" which is also valid on the BES
+        # islands: https://wetten.overheid.nl/BWBR0002448/2010-10-10
+        elsif (!$args{gov} && $holiday->{gov}) {
+            next;
         }
 
         my $dt = _to_date($holiday->{d}, $holiday->{m}, $year);
@@ -227,6 +237,8 @@ sub holidays {
     my $dt = _to_date(1, 1, $year);
     foreach (keys %EASTER_BASED) {
         my $holiday = $EASTER_BASED{$_};
+        next if !$args{gov} && $holiday->{gov};
+
         my $easter  = DateTime::Event::Easter->new(
             easter => 'western',
             day    => $holiday->{d}
@@ -291,7 +303,7 @@ sub is_holiday_dt {
     return;
 }
 
-'Aruba dushi terra';
+"Diver's paradise";
 
 __END__
 
@@ -305,7 +317,7 @@ Date::Holidays::BQ - Bonaire's official holidays
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -350,6 +362,19 @@ L<Date::Holidays::Abstract>.
     holidays('2022', gov  => 1);
 
 Similar API to the other functions, returns an hashref for the year.
+
+=head1 UTF-8
+
+Be aware that we return UTF-8 when Papiamento is chosen. So make sure you set
+your enconding to UTF-8, otherwise you may see weird things.
+
+=head1 SEE ALSO
+
+=over
+
+=item https://wetten.overheid.nl/BWBR0002448/2010-10-10
+
+=back
 
 =head1 AUTHOR
 

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+bsdtar cvf foo.tar foo.html foo.txt shot.png
+bsdtar cvf fav.tar favicon.ico

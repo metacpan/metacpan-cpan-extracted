@@ -1,0 +1,40 @@
+---
+abstract: 'Model for Pod::L10N'
+author:
+  - 'SHIRAKATA Kentaro <argrath@ub32.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-L10N-Model
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Pod::L10N::Model:
+    file: lib/Pod/L10N/Model.pm
+    version: '1.06'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/argrath/Pod-L10N-Model/issues
+  homepage: https://github.com/argrath/Pod-L10N-Model
+  repository: git://github.com/argrath/Pod-L10N-Model.git
+version: '1.06'
+x_authority: cpan:ARGRATH
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

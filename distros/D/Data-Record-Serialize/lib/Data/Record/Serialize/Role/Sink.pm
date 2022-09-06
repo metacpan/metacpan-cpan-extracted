@@ -6,7 +6,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.34';
+our $VERSION = '1.04';
 
 requires 'print';
 requires 'say';
@@ -51,7 +51,7 @@ Data::Record::Serialize::Role::Sink - Sink Role
 
 =head1 VERSION
 
-version 0.34
+version 1.04
 
 =head1 DESCRIPTION
 

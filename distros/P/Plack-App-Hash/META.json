@@ -4,21 +4,24 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-App-Hash",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "Array::RefElem" : "0",
@@ -28,33 +31,35 @@
             "Plack::MIME" : "0",
             "Plack::Util" : "0",
             "Plack::Util::Accessor" : "0",
-            "parent" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
             "HTTP::Request::Common" : "0",
             "Plack::Test" : "0",
-            "Test::More" : "0.88"
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/ap/Plack-App-Hash/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Plack-App-Hash"
       },
-      "homepage" : "http://github.com/ap/Plack-App-Hash",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Plack-App-Hash"
+         "url" : "https://github.com/ap/Plack-App-Hash.git",
+         "web" : "https://github.com/ap/Plack-App-Hash"
       }
    },
-   "version" : "1.000"
+   "version" : "1.001",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2022
+   },
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }
-

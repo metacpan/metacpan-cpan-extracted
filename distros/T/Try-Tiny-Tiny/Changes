@@ -1,8 +1,13 @@
 Release history for Try-Tiny-Tiny
 
+0.005 Sun 04 Sep 2022
+	- No functional changes
+	- Updated packaging and package metadata
+
 0.004 Wed 10 Aug 2022
 	- No functional changes
 	- Packaging fix to stop installing boilerplate.pl
+	- Updated package metadata
 
 0.003 Wed 22 Jun 2022
 	- No functional changes

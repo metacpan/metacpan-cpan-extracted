@@ -1,5 +1,9 @@
 Release history for Class-Closure
 
+0.304 Sep 03 Aug 2022
+	- No functional changes
+	- Updated packaging
+
 0.303 Tue 09 Aug 2022
 	- No more inheriting from Exporter
 	- Test::More no longer required to be 0.88 or newer

@@ -1,5 +1,11 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.35      2022-09-03 22:00:58-03:00 America/Sao_Paulo
+
+  [Fix]
+
+  - Fix a filetest check on SVN::Hooks::UpdateConfFile.
+
 1.34      2016-11-10 14:16:13-02:00 America/Sao_Paulo
 
   [Fix]

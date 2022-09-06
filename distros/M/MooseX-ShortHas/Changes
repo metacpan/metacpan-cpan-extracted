@@ -1,0 +1,7 @@
+Revision history for MooseX-ShortHas
+
+1.222491  2022-09-06 12:08:06+02:00 Europe/Berlin
+    - add MooseX::MungeHas in See Also
+
+1.222490  2022-09-06 11:30:14+02:00 Europe/Berlin
+    - first release
