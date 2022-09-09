@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Exporter-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-exporter-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.004001	2022-09-09
+
+ [ Bug Fixes ]
+ - Fix handling of non-hashref references in import list.
+
 1.004000	2022-08-26
 
  [ Documentation ]

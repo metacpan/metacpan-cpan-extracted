@@ -3,7 +3,7 @@ package Database::Async::Engine::PostgreSQL::DDL;
 use strict;
 use warnings;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '1.000'; # VERSION
 
 =head1 NAME
 

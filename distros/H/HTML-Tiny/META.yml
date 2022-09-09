@@ -20,9 +20,9 @@ requires:
   perl: '5.006'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Tiny
-  license: http://dev.perl.org/licenses/
+  license: https://dev.perl.org/licenses/
   repository: https://github.com/ap/HTML-Tiny.git
-version: '1.07'
+version: '1.08'
 x_copyright:
   holder: 'Andy Armstrong'
   year: 2008

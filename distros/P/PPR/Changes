@@ -330,3 +330,20 @@ Revision history for PPR
 
     * Fixed edge case of 'state' variable declarations
       (Thanks, Zaki!)
+
+
+0.001005  Tue Sep  6 22:54:34 2022
+
+    * Fixed erroneous non-interpolation of q'...'
+      (Thanks, Zaki!)
+
+
+
+0.001006  Thu Sep  8 03:50:55 2022
+
+    * Worked around bugs in regex engine that made it impossible
+      to interpolate PPR grammars into other regexes in some cases.
+      Note that such interpolations still don't work under Perl 5.18
+      to 5.28, as the bug was only fixed in 5.30.
+      (Thanks, Zaki!)
+

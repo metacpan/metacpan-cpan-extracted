@@ -1,5 +1,11 @@
 Revision history for Protocol-Database-PostgreSQL
 
+2.000     2022-09-07 04:59:16+08:00 Asia/Singapore
+    New features:
+
+    - support for SCRAM-SHA256 (see Database::Async::Engine::PostgreSQL for the other half
+    of the implementation)
+
 1.005     2019-06-30 01:46:24+08:00 Asia/Kuala_Lumpur
     No new features.
 

@@ -1,4 +1,4 @@
-package CTK::Skel::Extra; # $Id: Extra.pm 264 2019-05-17 21:17:51Z minus $
+package CTK::Skel::Extra;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Skel::Extra - Extra project skeleton for CTK::Helper
 
 =head1 VIRSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -32,11 +32,11 @@ L<CTK::Skel>, L<CTK::Helper>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -50,7 +50,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 use constant SIGNATURE => "extra";
 
 use vars qw($VERSION);
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub build {
     my $self = shift;
@@ -249,7 +249,7 @@ Name: PostConf.pm
 File: inc/PostConf.pm
 Mode: 644
 
-package PostConf; # %DOLLAR%Id%DOLLAR%
+package PostConf;
 use strict;
 use utf8;
 

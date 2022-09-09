@@ -56,19 +56,24 @@ Files: t/11noncode.t
 Copyright: This software is copyright (c) 2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/14lexical.t
+ t/15nonhashvalue.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: README
  lib/Exporter/Tiny.pm
 Copyright: This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: dist.ini
- examples/Example/Exporter.pm
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: inc/archaic/Test/More.pm
  inc/archaic/Test/Simple.pm
 Copyright: Copyright 2001-2008 by Michael G Schwern <schwern@pobox.com>.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+ examples/Example/Exporter.pm
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/archaic/Test/Builder.pm
@@ -78,10 +83,6 @@ License: GPL-1.0+ or Artistic-1.0
 Files: SIGNATURE
 Copyright: None
 License: public-domain
-
-Files: t/14lexical.t
-Copyright: This software is copyright (c) 2022 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/archaic/Test/Builder/IO/Scalar.pm
 Copyright: Copyright (c) 1996 by Eryq.  All rights reserved.

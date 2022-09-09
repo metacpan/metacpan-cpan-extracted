@@ -1,4 +1,4 @@
-package CTK::Digest::FNV32a; # $Id: FNV32a.pm 294 2020-09-02 06:36:52Z minus $
+package CTK::Digest::FNV32a;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Digest::FNV32a - FNV32a Digest calculation for short strings
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -56,11 +56,11 @@ L<http://isthe.com/chongo/tech/comp/fnv/>, L<Digest::FNV::PurePerl>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2020 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -72,12 +72,14 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = 1.01;
+$VERSION = 1.02;
 
 use parent qw/CTK::Digest/;
 
 sub digest {
     my $self = shift;
+    my $data = shift;
+    $self->{data} = $data if defined $data;
     my $string = $self->{data};
     my $hval = 0x811c9dc5;
 

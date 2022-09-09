@@ -2,7 +2,7 @@ package App::Yath::Command::abort;
 use strict;
 use warnings;
 
-our $VERSION = '1.000128';
+our $VERSION = '1.000133';
 
 use Time::HiRes qw/sleep/;
 use Term::Table;
@@ -40,7 +40,6 @@ sub run {
     $self->pfile_data();
 
     my $state = Test2::Harness::Runner::State->new(
-        job_count    => 1,
         workdir      => $self->workdir,
     );
 
@@ -1465,6 +1464,15 @@ DBI Driver to use
 =item --no-yathui-db-dsn
 
 DSN to use when connecting to the db
+
+
+=item --yathui-db-duration-limit ARG
+
+=item --yathui-db-duration-limit=ARG
+
+=item --no-yathui-db-duration-limit
+
+Limit the number of runs to look at for durations data (default: 10)
 
 
 =item --yathui-db-durations

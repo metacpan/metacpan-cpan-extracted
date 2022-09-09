@@ -1,6 +1,10 @@
 Revision history for Perl extension Business::OnlinePayment::IPPay.
 
-0.11  Fri Apr 09 07:35:21 AM PDT 2021  
+0.12  Thu 08 Sep 2022 12:41:25 PM PDT
+        - Default name to first_name + last_name when it is empty
+        - Same for ship_name
+
+0.11  Fri Apr 09 07:35:21 AM PDT 2021
         - ACH SEC code: Allow setting, default to CCD for business accounts,
           PPD otherwise (was: always PPD)
         - doc: Update copyright and maintainer information

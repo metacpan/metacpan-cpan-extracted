@@ -80,40 +80,6 @@ Hash map representing the criteria to limit the results of the list operation.  
 
 =over 4
 
-=item C<filter>
-
-Allows for ascending or descending sorting of the list.
-
-
-
-=item C<max>
-
-Allows up to a max of 50 list items to return. [min value: 0, max value: 50, default: 20]
-
-
-
-=item C<offset>
-
-Filters to apply to the list. [min value: 0, default: 0]
-
-
-
-=item C<sorting>
-
-Used in paging of the list.  This is the start offset of the page.
-The value maps properties to the sort direction (either C<asc> for ascending or C<desc> for descending).  Sortable properties are:
-
-=over 4
-
-=item C<dateCreated>
-
-=item C<status>
-
-
-=back
-
-
-
 
 =back
 
@@ -149,11 +115,6 @@ The properties that can be updated are:
 =over 4
 
 
-
-=item C<status>
-
-Status of the transaction review. 
-
 Authentication is done using the same credentials used when the AccessToken was created.
 
 =back
@@ -172,11 +133,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 

@@ -10,7 +10,7 @@ HTML::Tiny - Lightweight, dependency free HTML/XML generation
 
 =cut
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 BEGIN {
 
@@ -47,7 +47,7 @@ BEGIN {
 # Tags that are closed (<br /> versus <br></br>)
 my @DEFAULT_CLOSED
   # https://developer.mozilla.org/en-US/docs/Glossary/Empty_element
-  = qw( area base br col embed frame hr iframe img input keygen link meta param source track wbr );
+  = qw( area base br col embed hr img input keygen link meta param source track wbr );
 
 # Tags that get a trailing newline
 my @DEFAULT_NEWLINE = qw( html head body div p tr table );

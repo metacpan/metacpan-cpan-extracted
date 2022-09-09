@@ -1,4 +1,4 @@
-package CTK::CLI; # $Id: CLI.pm 253 2019-05-09 19:32:24Z minus $
+package CTK::CLI;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::CLI - Command line interface
 
 =head1 VERSION
 
-Version 1.72
+Version 1.73
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ L<ExtUtils::MakeMaker>
     use Term::ReadLine ();
     use Text::ParseWords qw(shellwords);
 
-    my $term = new Term::ReadLine 'T01';
+    my $term = Term::ReadLine->new('T01');
     my $prompt = "T> ";
     my $OUT = $term->OUT || \*STDOUT;
     while ( defined ($_ = $term->readline($prompt)) ) {
@@ -87,11 +87,11 @@ L<ExtUtils::MakeMaker>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -103,7 +103,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/$VERSION @EXPORT_OK/;
-$VERSION = '1.72';
+$VERSION = '1.73';
 
 use base qw/Exporter/;
 

@@ -1,13 +1,11 @@
 #########################################################################
 #
-# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
+# Serż Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 15-flags.t 234 2019-05-05 19:11:34Z minus $
 #
 #########################################################################
 use strict;

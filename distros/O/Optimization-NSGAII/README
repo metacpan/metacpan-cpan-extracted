@@ -3,7 +3,7 @@ Optimization-NSGAII version 0.01
 
 DESCRIPTION
 
-	NSGAII - non dominant sorting genetic algorithm for multi-objective optimization
+	NSGAII - non dominant sorting genetic algorithm for multi-objective optimization (also known as NSGA2)
 
 	NSGAII.pm apply (with some variations) the NSGA-II algorithm described in the paper: 
 
@@ -16,11 +16,7 @@ DESCRIPTION
 
 INSTALLATION
 
-	To install this module type the following:
-	
-       cpan Optimization::NSGAII
-		
-	or, after decompressing the archive tar.gz, type the following:	
+	After decompressing the archive tar.gz, type the following:	
 
 	   perl Makefile.PL
 	   make

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use strict; # $Id: ctklib 262 2019-05-17 15:22:41Z minus $
+use strict;
 use utf8;
 
 =encoding utf8
@@ -82,11 +82,11 @@ L<CTK>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -130,7 +130,7 @@ my $command = @ARGV ? shift @ARGV : CMDDEFAULT;
 $command = "version" if $options{version};
 my @arguments = @ARGV ? @ARGV : ();
 
-my $app = new CTK::Helper(
+my $app = CTK::Helper->new(
         debug   => $options{debug},
         verbose => $options{verbose},
         datadir => $options{dir},

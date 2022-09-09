@@ -42,7 +42,7 @@ use App::Regather::Plugin;
 use constant SYNST => [ qw( LDAP_SYNC_PRESENT LDAP_SYNC_ADD LDAP_SYNC_MODIFY LDAP_SYNC_DELETE ) ];
 
 # my @DAEMONARGS = ($0, @ARGV);
-our $VERSION   = '0.84.00';
+our $VERSION   = '0.85.00';
 
 sub new {
   my $class = shift;
@@ -87,6 +87,13 @@ sub new {
     exit 0;
   }
 
+  if ( ! -e $self->{_opt}{config} || -z $self->{_opt}{config} ) {
+    $self->{_opt}{l}->cc(          pr => 'err', fm => "config file does not exist or is empty" );
+    $self->{_opt}{l}->cc( fg => 1, pr => 'err', fm => "config file does not exist or is empty" );
+    pod2usage(-exitval => 2, -sections => [ qw(USAGE) ]);
+    exit 1;
+  }
+
   $self->{_opt}{cf} = new
     App::Regather::Config ( filename => $self->{_opt}{config},
 			    logger   => $self->{_opt}{l},
@@ -101,7 +108,8 @@ sub new {
     $fm_msg = 'group';
   }
   if ( defined $fm_msg ) {
-    $self->{_opt}{l}->cc( pr => 'err', fm => 'config file is accessible by ' . $fm_msg);
+    $self->{_opt}{l}->cc(          pr => 'err', fm => 'config file is accessible by ' . $fm_msg);
+    $self->{_opt}{l}->cc( fg => 1, pr => 'err', fm => 'config file is accessible by ' . $fm_msg);
     pod2usage(-exitval => 2, -sections => [ qw(USAGE) ]);
     exit 1;
   }
@@ -110,7 +118,8 @@ sub new {
 
   # !!! TO CORRECT
   if ( ! defined $self->{_opt}{cf} ) {
-    $self->l->cc( pr => 'err', fm => "do fix config file ..." );
+    $self->l->cc(          pr => 'err', fm => "do fix config file ..." );
+    $self->l->cc( fg => 1, pr => 'err', fm => "do fix config file ..." );
     pod2usage(-exitval => 2, -sections => [ qw(USAGE) ]);
     exit 1;
   }

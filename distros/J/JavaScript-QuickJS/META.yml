@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Deep: '0'
   Test::FailWarnings: '0'
+  Test::Fatal: '0'
   Types::Serialiser: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
@@ -25,5 +26,5 @@ no_index:
 resources:
   bugtracker: https://github.com/FGasper/p5-JavaScript-QuickJS/issues
   repository: git://github.com/FGasper/p5-JavaScript-QuickJS.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

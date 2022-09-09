@@ -1,0 +1,99 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Schema::Data;
+
+our $VERSION = 0.02;
+
+# Run.
+exit App::Schema::Data->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+schema-data - Script to manipulation with data for Schema.
+
+=head1 SYNOPSIS
+
+ schema-data [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_data_module var_key=var_value ..
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-p password>
+
+Database password.
+
+=item * C<-u user>
+
+Database user.
+
+=item * C<-v schema_version>
+
+Schema version.
+
+Default value is last version.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<dsn>
+
+Database DSN.
+e.g. dbi:SQLite:dbname=ex1.db
+
+=item * C<schema_data_module>
+
+Name of Schema data module. Must be a 'Schema::Data' instance.
+
+=item * C<var_key=var_value>
+
+Variable keys with values for insert.
+
+=back
+
+=head1 EXAMPLE
+
+ schema-deploy dbi:SQLite:dbname=commons.vote.db Schema::Commons::Vote
+ schema-data dbi:SQLite:dbname=commons.vote.db Schema::Data::Commons::Vote
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-Schema-Data>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2022 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

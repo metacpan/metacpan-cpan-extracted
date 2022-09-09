@@ -1,4 +1,4 @@
-package CTK::Util; # $Id: Util.pm 287 2020-08-29 19:38:34Z minus $
+package CTK::Util;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Util - CTK Utilities
 
 =head1 VERSION
 
-Version 2.82
+Version 2.83
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ Files located under /var/cache may be expired in an application specific manner,
 or both. The application must always be able to recover from manual deletion of these files (generally because of
 a disk space shortage). No other requirements are made on the data format of the cache directories.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"cachedir">
+See L<Sys::Path/"cachedir">
 
 Tags: CORE, BASE, FILE
 
@@ -546,7 +546,7 @@ more difficult and is likely to create a naming conflict. Instead, link /var to 
 Applications must generally not add directories to the top level of /var. Such directories should only be added if
 they have some system-wide implication, and in consultation with the FHS mailing list.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"localstatedir">
+See L<Sys::Path/"localstatedir">
 
 Tags: CORE, BASE, FILE
 
@@ -583,7 +583,7 @@ to store the process identifier (PID) as a ten byte ASCII decimal number, with a
 process 1230 holds a lock file, it would contain the eleven characters: space, space, space, space, space, space,
 one, two, three, zero, and newline.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"lockdir">
+See L<Sys::Path/"lockdir">
 
 Tags: CORE, BASE, FILE
 
@@ -612,7 +612,7 @@ host-specific or varies with time is stored elsewhere.
 
 Large software packages must not use a direct subdirectory under the /usr hierarchy.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"prefix">
+See L<Sys::Path/"prefix">
 
 Tags: CORE, BASE, FILE
 
@@ -691,7 +691,7 @@ Process identifier (PID) files, which were originally placed in /etc, must be pl
 convention for PID files is <program-name>.pid. For example, the crond PID file is named
 /var/run/crond.pid.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"rundir">
+See L<Sys::Path/"rundir">
 
 Tags: CORE, BASE, FILE
 
@@ -781,7 +781,7 @@ in /usr/share (or /usr/local/share, if installed locally). It is recommended tha
 Game data stored in /usr/share/games must be purely static data. Any modifiable files, such as score files,
 game play logs, and so forth, should be placed in /var/games.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"datadir">
+See L<Sys::Path/"datadir">
 
 Tags: CORE, BASE, FILE
 
@@ -806,7 +806,7 @@ the other subdirectories should only be present if the application in question i
 /var/lib/<name> is the location that must be used for all distribution packaging support. Different
 distributions may use different names, of course.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"sharedstatedir">
+See L<Sys::Path/"sharedstatedir">
 
 Tags: CORE, BASE, FILE
 
@@ -841,7 +841,7 @@ For example value can be set as: /var/spool
 work to be done in the future (by a program, user, or administrator); often data is deleted after it has been
 processed.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"spooldir">
+See L<Sys::Path/"spooldir">
 
 Tags: CORE, BASE, FILE
 
@@ -853,7 +853,7 @@ For example value can be set as: /srv
 
 /srv contains site-specific data which is served by this system.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"srvdir">
+See L<Sys::Path/"srvdir">
 
 Tags: CORE, BASE, FILE
 
@@ -866,7 +866,7 @@ For example value can be set as: /etc
 The /etc hierarchy contains configuration files. A "configuration file" is a local file used to control the operation
 of a program; it must be static and cannot be an executable binary.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"sysconfdir">
+See L<Sys::Path/"sysconfdir">
 
 Tags: CORE, BASE, FILE
 
@@ -879,7 +879,7 @@ For example value can be set as: /var/log
 This directory contains miscellaneous log files. Most logs must be written to this directory or an appropriate
 subdirectory.
 
-See L<http://www.pathname.com/fhs/pub/> and L<Sys::Path/"logdir">
+See L<Sys::Path/"logdir">
 
 Tags: CORE, BASE, FILE
 
@@ -1205,11 +1205,11 @@ L<CGI::Util>, L<IPC::Open3>, L<List::Util>, L<MIME::Lite>, L<Net::FTP>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2020 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -1238,7 +1238,7 @@ use constant {
 };
 
 use vars qw/$VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS/;
-$VERSION = '2.82';
+$VERSION = '2.83';
 
 use Encode;
 use Time::Local;
@@ -1974,7 +1974,7 @@ sub send_mail { # MIME::Lite interface only
         $message = to_utf8($message, $charset);
     }
 
-    # Формирую объект
+    # Object
     my $msg = MIME::Lite->new(
         From     => $from,
         To       => $to,

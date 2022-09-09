@@ -20,6 +20,7 @@ no_index:
 requires:
   Algorithm::Diff: '0'
   LCS::BV: '0'
+  LCS::XS: '0'
   perl: '5.008000'
-version: '1.08'
+version: v2.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

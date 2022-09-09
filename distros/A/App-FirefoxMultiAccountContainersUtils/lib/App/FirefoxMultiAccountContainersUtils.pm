@@ -8,9 +8,9 @@ use Log::ger;
 use Sort::Sub ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-21'; # DATE
+our $DATE = '2022-09-08'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 $Sort::Sub::argsopt_sortsub{sort_sub}{cmdline_aliases} = {S=>{}};
 $Sort::Sub::argsopt_sortsub{sort_args}{cmdline_aliases} = {A=>{}};
@@ -297,7 +297,7 @@ sub firefox_mua_sort_containers {
     [200];
 }
 
-$SPEC{firefox_container} = {
+$SPEC{open_firefox_container} = {
     v => 1.1,
     summary => "CLI to open URL in a new Firefox tab, in a specific multi-account container",
     description => <<'_',
@@ -353,7 +353,7 @@ _
         {url=>'prog:open-browser'},
     ],
 };
-sub firefox_container {
+sub open_firefox_container {
     require URI::Escape;
 
     my %args = @_;
@@ -388,7 +388,7 @@ App::FirefoxMultiAccountContainersUtils - Utilities related to Firefox Multi-Acc
 
 =head1 VERSION
 
-This document describes version 0.012 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-01-21.
+This document describes version 0.013 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-09-08.
 
 =head1 SYNOPSIS
 
@@ -407,79 +407,14 @@ containers addon:
 
 =item * L<firefox-mua-sort-containers>
 
+=item * L<open-firefox-container>
+
 =back
 
 
 About the add-on: L<https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/>.
 
 =head1 FUNCTIONS
-
-
-=head2 firefox_container
-
-Usage:
-
- firefox_container(%args) -> [$status_code, $reason, $payload, \%result_meta]
-
-CLI to open URL in a new Firefox tab, in a specific multi-account container.
-
-Examples:
-
-=over
-
-=item * Open two URLs in a container called "mycontainer":
-
- firefox_container(
-     container => "mycontainer",
-   urls => ["www.example.com", "www.example.com/url2"]
- );
-
-=item * If URL is not specified, will open a blank tab:
-
- firefox_container(container => "mycontainer");
-
-=back
-
-This utility opens a new firefox tab in a specific multi-account container. This
-requires the Firefox Multi-Account Containers add-on, as well as another add-on
-called "Open external links in a container",
-L<https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/>.
-
-The way it works, because add-ons currently do not have hooks to the CLI, is via
-a custom protocol handler. For example, if you want to open
-L<http://www.example.com/> in a container called C<mycontainer>, you ask Firefox
-to open this URL:
-
- ext+container:name=mycontainer&url=http://www.example.com/
-
-Ref: L<https://github.com/mozilla/multi-account-containers/issues/365>
-
-This function is not exported.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<container>* => I<str>
-
-=item * B<profile> => I<firefox::local_profile_name>
-
-=item * B<urls> => I<array[str]>
-
-
-=back
-
-Returns an enveloped result (an array).
-
-First element ($status_code) is an integer containing HTTP-like status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or something like "OK" if status is
-200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
-element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information, much like how HTTP response headers provide additional metadata.
-
-Return value:  (any)
-
 
 
 =head2 firefox_mua_list_containers
@@ -656,6 +591,73 @@ that contains extra information, much like how HTTP response headers provide add
 
 Return value:  (any)
 
+
+
+=head2 open_firefox_container
+
+Usage:
+
+ open_firefox_container(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+CLI to open URL in a new Firefox tab, in a specific multi-account container.
+
+Examples:
+
+=over
+
+=item * Open two URLs in a container called "mycontainer":
+
+ open_firefox_container(
+     container => "mycontainer",
+   urls => ["www.example.com", "www.example.com/url2"]
+ );
+
+=item * If URL is not specified, will open a blank tab:
+
+ open_firefox_container(container => "mycontainer");
+
+=back
+
+This utility opens a new firefox tab in a specific multi-account container. This
+requires the Firefox Multi-Account Containers add-on, as well as another add-on
+called "Open external links in a container",
+L<https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/>.
+
+The way it works, because add-ons currently do not have hooks to the CLI, is via
+a custom protocol handler. For example, if you want to open
+L<http://www.example.com/> in a container called C<mycontainer>, you ask Firefox
+to open this URL:
+
+ ext+container:name=mycontainer&url=http://www.example.com/
+
+Ref: L<https://github.com/mozilla/multi-account-containers/issues/365>
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<container>* => I<str>
+
+=item * B<profile> => I<firefox::local_profile_name>
+
+=item * B<urls> => I<array[str]>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-FirefoxMultiAccountContainersUtils>.
@@ -694,9 +696,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

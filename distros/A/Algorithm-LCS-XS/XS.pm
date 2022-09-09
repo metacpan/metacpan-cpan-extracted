@@ -4,8 +4,9 @@ use 5.008;
 use strict;
 use warnings;
 use version;
-our $VERSION = "1.08";
-
+our $VERSION = qv(2.0.1);
+use base 'Exporter';
+our @EXPORT_OK = qw/&ADLCS &LCSidx/;
 require XSLoader;
 XSLoader::load('Algorithm::LCS::XS', $VERSION);
 
@@ -53,6 +54,28 @@ sub LCS {
             map([$_ => ++$bmax], ($amax+1) .. $#$a);
 }
 
+
+my $alg;
+
+sub LCSidx {
+    $alg //= Algorithm::LCS::XS->new;
+    my (@l, @r);
+    for my $arr ($alg->LCS(@_)) {
+       push @l, $$arr[0];
+       push @r, $$arr[1];
+    }
+    return \@l, \@r;
+}
+
+sub ADLCS {
+    $alg //= Algorithm::LCS::XS->new;
+    my @rv;
+    for my $arr ($alg->LCS(@_)) {
+      $rv[$$arr[0]] = $_[0][$$arr[0]];
+    }
+    return wantarray ? @rv : \@rv;
+}
+
 1;
 
 __END__
@@ -64,7 +87,7 @@ Algorithm::LCS::XS - Fast (XS) implementation of the
 
 =head1 SYNOPSIS
 
-  use Algorithm::LCS::XS;
+  use Algorithm::LCS::XS qw/ADLCS LCSidx/;
 
   $alg = Algorithm::LCS::XS->new;
   @lcs = $alg->LCS(\@a,\@b);
@@ -126,7 +149,7 @@ L<Algorithm::Diff> manpage for more details.
 
 =head2 EXPORT
 
-None by design.
+ADLCS() and LCSidx().  See Algorithm::Diff for the APIs.
 
 =head1 SEE ALSO
 

@@ -1,10 +1,10 @@
 NAME
 
-    CTK - Command-line ToolKit library (CTKlib)
+    CTK - CTK ToolKit library (CTKlib)
 
 VERSION
 
-    Version 2.06
+    Version 2.08
 
 NOTE
 
@@ -15,8 +15,8 @@ SYNOPSIS
 
         use CTK;
     
-        my $ctk = new CTK;
-        my $ctk = new CTK (
+        my $ctk = CTK->new;
+        my $ctk = CTK->new (
             project => 'MyApp',
             configfile  => '/path/to/conf/file.conf',
             logfile     => '/path/to/log/file.log',
@@ -31,11 +31,11 @@ DESCRIPTION
 
  new
 
-        my $ctk = new CTK;
-        my $ctk = new CTK (
-            project => 'MyApp',
-            configfile  => '/path/to/conf/file.conf',
-            logfile     => '/path/to/log/file.log',
+        my $ctk = CTK->new;
+        my $ctk = CTK->new (
+            project    => 'MyApp',
+            configfile => '/path/to/conf/file.conf',
+            logfile    => '/path/to/log/file.log',
         );
 
     Main constructor. All the params are optional
@@ -191,7 +191,7 @@ DESCRIPTION
 
  again
 
-    For internal use only (plugins). Please not call this function
+    For internal use only (plugins). Please not call this method
 
  configfile
 
@@ -301,7 +301,7 @@ DESCRIPTION
 
         my $revision = $ctk->revision;
 
-    Returns revision value
+    Returns SVN revision number. Please not use it for your projects
 
  root
 
@@ -430,12 +430,9 @@ HISTORY
 
 DEPENDENCIES
 
-    Class::C3::Adopt::NEXT, Config::General, DBI, ExtUtils::MakeMaker,
-    File::Copy, File::Path, File::Pid, File::Spec, File::Temp, IO,
-    IO::String, IPC::Open3, JSON, List::Util, MIME::Base64, MIME::Lite,
-    MRO::Compat, Net::FTP, Perl::OSType, Sys::SigAction, Sys::Syslog
-    Term::ANSIColor, Test::Simple, Text::SimpleTable, Time::HiRes,
-    Time::Local, Try::Tiny, URI, XML::Simple, YAML::XS
+    Config::General, JSON, JSON::XS, List::Util, MIME::Lite, Perl::OSType,
+    Sys::Syslog, Term::ANSIColor, Text::SimpleTable, Time::Local,
+    Try::Tiny, URI, XML::Simple, YAML, YAML::XS
 
 TO DO
 
@@ -451,11 +448,11 @@ SEE ALSO
 
 AUTHOR
 
-    Serż Minus (Sergey Lepenkov) http://www.serzik.com <abalama@cpan.org>
+    Serż Minus (Sergey Lepenkov) https://www.serzik.com <abalama@cpan.org>
 
 COPYRIGHT
 
-    Copyright (C) 1998-2020 D&D Corporation. All Rights Reserved
+    Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 LICENSE
 

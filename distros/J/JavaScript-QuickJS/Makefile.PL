@@ -185,10 +185,9 @@ my $_cached_need_librt;
 sub _need_librt {
     return $_cached_need_librt if defined $_cached_need_librt;
 
-    my $dir = File::Temp::tempdir( CLEANUP => 1 );
-    open my $fh, '>', "$dir/test.c";
-    syswrite $fh, join(
-        "\n",
+    print "Checking whether this system needs to link to librt …\n";
+
+    my $ok = _does_this_compile(
         '#include <stdlib.h>',
         '#ifdef __GLIBC__',
         '#  if __GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 17)',
@@ -198,13 +197,24 @@ sub _need_librt {
         'int main() { return 0; }',
     );
 
-    print "Checking whether this system needs to link to librt …\n";
+    print "\t… " . ($ok ? 'Guess not.' : 'Looks like it.') . "\n";
 
-    my $ok = !!system $Config{'cc'}, "$dir/test.c";
+    return $_cached_need_librt = !$ok;
+}
 
-    print "\t… " . ($ok ? 'Looks like it.' : 'Guess not.') . "\n";
+sub _does_this_compile {
+    my (@lines_of_c) = @_;
 
-    return $_cached_need_librt = $ok;
+    my $dir = File::Temp::tempdir( CLEANUP => 1 );
+
+    my $path = File::Spec->catfile( $dir, 'test.c' );
+
+    {
+        open my $fh, '>', $path or die "open($dir/test.c): $!";
+        syswrite $fh, join("\n", @lines_of_c, q<>);
+    }
+
+    return 0 == system $Config{'cc'}, $path;
 }
 
 sub _should_link_libatomic {
@@ -308,9 +318,13 @@ sub make_libquickjs_makefile {
     # assume we need these other omissions as well:
     #
     if (_need_librt()) {
-        $make =~ s<^(.*no-format-truncation)><#$1 -- J::QJS>m;
-        $make =~ s<^(CONFIG_BIGNUM)><#$1 -- J::QJS>m;
-        $make =~ s<^(CONFIG_LTO)><#$1 -- J::QJS>m;
+        $make =~ s<^(.*no-format-truncation)><#$1 -- J::QJS>m or do {
+            warn "No no-format-truncation to hide?\n";
+        };
+
+        $make =~ s<^(CONFIG_LTO)><#$1 -- J::QJS>m or do {
+            warn "No CONFIG_LTO to hide?\n";
+        };
     }
 
     open my $fh, '>', $PERL_QJS_MAKEFILE_PATH or die "open($PERL_QJS_MAKEFILE_PATH): $!";

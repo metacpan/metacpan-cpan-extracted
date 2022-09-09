@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Terminal::Control',
     VERSION_FROM      => 'lib/Terminal/Control.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => {'Time::HiRes' => '1.9764', 'Try::Catch' => '1.1.0'}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {'Inline::C' => '0.82', 'Time::HiRes' => '1.9764', 'Try::Catch' => '1.1.0'}, # e.g., Module::Name => 1.1
     ABSTRACT          => 'Module with methods for the control of the terminal window',
     #ABSTRACT_FROM     => 'lib/Terminal/Control.pm', # retrieve abstract from module
     AUTHOR            => 'Dr. Peter Netz <ztenretep@cpan.org>',

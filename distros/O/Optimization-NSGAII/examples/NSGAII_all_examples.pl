@@ -6,7 +6,7 @@ use List::Util qw/max min/;
 
 use Optimization::NSGAII qw/ f_Optim_NSGAII /;
 
-# decomment only one case and execute
+# decomment only one case and then execute
 
 my $case = 'CONSTR';
 #my $case = 'FON';
@@ -20,7 +20,7 @@ my $case = 'CONSTR';
 #my $case = 'ZDT6';
 #my $case = 'mono-objective';
 
-# set work directory 'filesDir
+# set work directory 'filesDir'
 # 'filesDir' work directory can also be defined in ram by giving for example 'sudo mount -o size=1% -t tmpfs none /mnt/tmpfs' and then using /mnt/tmpfs
 my $workdir = '/tmp';
 

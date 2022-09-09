@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.20";
+our $VERSION = "1.21";
 
 use v5.14;
 use warnings;
@@ -21,9 +21,9 @@ use Text::ANSI::Printf qw(ansi_printf ansi_sprintf);
 use App::ansicolumn::Util;
 use App::ansicolumn::Border;
 
-use Getopt::EX::Hashed; {
+use Getopt::EX::Hashed 1.05; {
 
-    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'lv' ] );
+    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
     has debug               => '         ' ;
     has help                => '    h    ' ;
@@ -72,7 +72,7 @@ use Getopt::EX::Hashed; {
     has '+ambiguous' => any => [ qw(wide narrow) ] ;
 
     # --2up .. --9up
-    my $nup = sub { $_[0] =~ /^(\d+)/ and $_->{up} = $1 } ;
+    my $nup = sub { $_[0] =~ /^(\d+)/ and $_->up = $1 } ;
     for my $n (2..9) {
 	has "${n}up" => '', action => $nup;
     }

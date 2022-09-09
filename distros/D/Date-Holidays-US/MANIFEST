@@ -3,6 +3,7 @@ MANIFEST
 Changes
 README.md
 LICENSE
+CONTRIBUTING.md
 lib/Date/Holidays/US.pm
 perl-Date-Holidays-US.spec
 t/001_load.t

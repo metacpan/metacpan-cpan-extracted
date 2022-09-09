@@ -1,4 +1,4 @@
-package CTK::Configuration; # $Id: Configuration.pm 230 2019-05-03 17:27:05Z minus $
+package CTK::Configuration;
 use strict;
 use utf8;
 
@@ -10,13 +10,13 @@ CTK::Configuration - Configuration of CTK
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
     use CTK::Configuration;
 
-    my $config = new CTK::Configuration(
+    my $config = CTK::Configuration->new(
             config  => "foo.conf",
             confdir => "conf",
             options => {... Config::General options ...},
@@ -28,7 +28,7 @@ The module works with the configuration
 
 =head2 new
 
-    my $config = new CTK::Configuration(
+    my $config = CTK::Configuration->new(
             config  => "/path/to/config/file.conf",
             confdir => "/path/to/config/directory",
             options => {... Config::General options ...},
@@ -53,13 +53,25 @@ Example of the "conf" structure of $config object:
 
 =item B<config>
 
+    config => "/etc/myapp/myapp.conf"
+
 Specifies absolute or relative path to config-file.
 
 =item B<confdir, dir>
 
+    confdir => "/etc"
+
 Specifies absolute or relative path to config-dir.
 
+=item B<no_autoload>
+
+    no_autoload => 1
+
+Disables auto loading configuration files. Default: false (loading is enabled)
+
 =item B<options>
+
+    options => { ... }
 
 Options of L<Config::General>
 
@@ -96,6 +108,18 @@ Gets value from config structure by key
     my $config_hash = $config->getall;
 
 Returns config hash structure
+
+=item B<load>
+
+    my $config = $config->load;
+
+Loading config files
+
+=item B<reload>
+
+    my $config = $config->reload;
+
+Reloading config files. All the previous config options will be flushes
 
 =item B<set>
 
@@ -141,11 +165,11 @@ L<Config::General>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -157,7 +181,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw($VERSION);
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use Carp;
 use Config::General;
@@ -176,14 +200,17 @@ sub new {
     my %args = @_;
 
     # Create object
+    my $myhitime = gettimeofday() * 1;
     my $self = bless {
         status  => 0,
         dirs    => [],
         error   => "",
         files   => [],
         created => time(),
+        orig    => {},
+        myhitime=> $myhitime,
         conf    => {
-            hitime      => gettimeofday() * 1,
+            hitime      => $myhitime,
             loadstatus  => 0, # == $self->{status}
         },
     }, $class;
@@ -220,7 +247,7 @@ sub new {
         return $self;
     }
 
-    # Loading
+    # Options
     my $tmpopts = $args{options} || {};
     my %options = %$tmpopts;
     $options{"-ConfigFile"}         = $fileconf;
@@ -228,13 +255,26 @@ sub new {
     $options{"-ApacheCompatible"}   = 1 unless exists $options{"-ApacheCompatible"};
     $options{"-LowerCaseNames"}     = 1 unless exists $options{"-LowerCaseNames"};
     $options{"-AutoTrue"}           = 1 unless exists $options{"-AutoTrue"};
+    $self->{orig} = {%options};
+
+    return $self if $args{no_autoload};
+    return $self->load;
+}
+sub load {
+    my $self = shift;
+    my $orig = $self->{orig} || {};
+    $self->{error} = "";
+
+    # Loading
     my $cfg;
     try {
-        $cfg = new Config::General( %options );
+        $cfg = Config::General->new( %$orig );
     } catch {
-        $self->{error} = $_;
-        return $self;
+        $self->{error} = $_ // '';
     };
+    return $self if length($self->{error});
+
+    # Ok
     my %newconfig = $cfg->getall if $cfg && $cfg->can('getall');
     $self->{files} = [$cfg->files] if $cfg && $cfg->can('files');
 
@@ -242,11 +282,23 @@ sub new {
     my %lkeys = ();
     foreach my $k (@{(LOCKED_KEYS)}) { $lkeys{$k} = 1 }
     foreach my $k (keys(%newconfig)) { $self->{conf}->{$k} = $newconfig{$k} if $k && !$lkeys{$k} }
+
+    # Set statuses
     $self->{status} = 1;
-    $self->{error} = "";
     $self->{conf}->{loadstatus} = 1;
 
     return $self;
+}
+sub reload {
+    my $self = shift;
+
+    # Flush settings
+    $self->{conf} = {
+        hitime      => $self->{myhitime},
+        loadstatus  => 0,
+    };
+
+    return $self->load;
 }
 sub error {
     my $self = shift;

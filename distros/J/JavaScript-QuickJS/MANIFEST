@@ -17,6 +17,7 @@ easyxs/easyxs_structref.h
 easyxs/init.h
 easyxs/ppport.h
 lib/JavaScript/QuickJS.pm
+lib/JavaScript/QuickJS/Date.pm
 lib/JavaScript/QuickJS/Function.pm
 lib/JavaScript/QuickJS/RegExp.pm
 quickjs/Changelog
@@ -85,10 +86,13 @@ t/await.t
 t/basic.t
 t/callback_err.t
 t/callback_invalid_sv.t
+t/date.t
 t/export_ref.t
+t/import_std.t
 t/js2perl.t
 t/js_func_to_perl.t
 t/jsfunc_memory_handling.t
+t/memory.t
 t/module.t
 t/regexp.t
 t/set_globals.t

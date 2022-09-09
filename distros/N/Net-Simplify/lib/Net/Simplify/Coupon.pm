@@ -51,7 +51,7 @@ Hash map containing initial values for the object.  Valid keys are:
 
 =item amountOff
 
-Amount off of the price of the product in the smallest units of the currency of the merchant. While this field is optional, you must provide either amountOff or percentOff for a coupon. Example: 100 = $1.00USD [min value: 1] 
+Amount off of the price of the product in the smallest units of the currency of the merchant. While this field is optional, you must provide either amountOff or percentOff for a coupon. Example: 100 = $1.00 [min value: 1] 
 
 =item couponCode
 
@@ -118,7 +118,7 @@ Hash map representing the criteria to limit the results of the list operation.  
 
 =item C<filter>
 
-Filters to apply to the list.
+<table class="filter_list"><tr><td>filter.id</td><td>Filter by the coupon Id</td></tr><tr><td>filter.text</td><td>Filter by the coupon code</td></tr><tr><td>filter.dateCreatedMin<sup>*</sup></td><td>Filter by the minimum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.dateCreatedMax<sup>*</sup></td><td>Filter by the maximum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.startDateMin</td><td>Filter by the minimum coupon start date you are searching for - Date in UTC millis</td></tr><tr><td>filter.startDateMax</td><td>Filter by the maximum coupon start date you are searching for - Date in UTC millis</td></tr><tr><td>filter.endDateMin</td><td>Filter by the minimum coupon end date you are searching for - Date in UTC millis</td></tr><tr><td>filter.endDateMax</td><td>Filter by the maximum coupon end date you are searching for - Date in UTC millis</td></tr></table><br><sup>*</sup>Use dateCreatedMin with dateCreatedMax in the same filter if you want to search between two created dates
 
 
 
@@ -230,11 +230,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 

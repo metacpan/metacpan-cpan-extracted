@@ -32,6 +32,6 @@ UV _easyxs_SvUV (pTHX_ SV* sv) {
     croak("`%" SVf "` given where unsigned integer expected!", sv);
 }
 
-#define exs_SvUV(sv) _easyxs_SvUV(aTHX_ sv);
+#define exs_SvUV(sv) _easyxs_SvUV(aTHX_ sv)
 
 #endif

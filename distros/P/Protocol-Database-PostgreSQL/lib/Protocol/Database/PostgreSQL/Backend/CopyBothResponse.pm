@@ -3,7 +3,7 @@ package Protocol::Database::PostgreSQL::Backend::CopyBothResponse;
 use strict;
 use warnings;
 
-our $VERSION = '1.005'; # VERSION
+our $VERSION = '2.000'; # VERSION
 
 use parent qw(Protocol::Database::PostgreSQL::Backend);
 

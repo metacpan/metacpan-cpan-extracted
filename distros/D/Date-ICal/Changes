@@ -1,3 +1,8 @@
+2022-09-07  skim
+
+    * RT#124548: Fix year in timegm(), four digit number now.
+    * Fix doc in add() method.
+
 2011-05-10
 
     * Applies patch from Mark Alway for situation where min, hour, and

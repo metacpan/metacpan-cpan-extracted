@@ -1,6 +1,6 @@
 ---
 name: Data-Generate
-version: 0.02
+version: 1.24
 author:
   - 'Davide Conti <daconti.mail@gmail.com>'
 abstract: Generate data arrays by parsing user statements
@@ -12,11 +12,11 @@ requires:
   Date::Parse: 0
   Parse::RecDescent: 1.94
   Test::More: 0.47
-  perl: 0.005
+  perl: 5.30.0
 provides:
   Data::Generate:
     file: lib/Data/Generate.pm
-    version: 0.02
+    version: 1.24
 generated_by: Module::Build version 0.2807
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

@@ -7,9 +7,9 @@ use warnings;
 use Scalar::Util qw(blessed);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-24'; # DATE
+our $DATE = '2022-09-09'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.106'; # VERSION
+our $VERSION = '0.110'; # VERSION
 
 our %SPEC;
 
@@ -96,9 +96,22 @@ _
             schema => 'str*',
         },
         limit => {
-            summary => 'Only generate a certain amount of numbers',
+            summary => 'Only generate a certain amount of dates',
             schema => ['posint*'],
             cmdline_aliases => {n=>{}},
+        },
+        random => {
+            summary => 'Instead of incrementing/decrementing monotonically, generate random date between --to and --from',
+            schema => ['true*'],
+            description => <<'_',
+
+If you specify this, you have to specify `--to` *and* `--from`.
+
+Also, currently, if you also specify `--limit-yearly` or `--limit-monthly`, the
+script may hang because it runs out of dates, so be careful when specifying
+these options combined.
+
+_
         },
         limit_yearly => {
             summary => 'Only output at most this number of dates for each year',
@@ -312,6 +325,12 @@ _
             src_plang => 'bash',
             'x.doc.show_result' => 0,
         },
+        {
+            summary => 'Generate 100 random dates between a certain range',
+            src => q{[[prog]] --random --from "1 year ago" --to "1 year from now" --limit 100},
+            src_plang => 'bash',
+            'x.doc.max_result_lines' => 5,
+        },
     ],
     links => [
         {url=>'prog:durseq', summary=>'Produce sequence of date durations'},
@@ -329,6 +348,10 @@ sub dateseq {
     $args{from} //= DateTime->today;
     $args{increment} //= DateTime::Duration->new(days=>1);
     my $reverse = $args{reverse};
+
+    my $random = $args{random};
+    return [412, "If you specify --random, you must also specify --from *and* --to"]
+        if $random && !$args{to};
 
     my $formatter;
     if (my $cl = $args{format_class}) {
@@ -361,6 +384,7 @@ sub dateseq {
 
     my %seen_years;  # key=year (e.g. 2021), val=int
     my %seen_months; # key=year-mon (e.g. 2021-01), val=int
+    my $num_dates = 0;
     my $code_filter = sub {
         my $dt = shift;
         if (defined $args{business}) {
@@ -434,45 +458,54 @@ sub dateseq {
         }
     };
 
-    if (defined $args{to} || defined $args{limit}) {
+    my $num_secs;
+    if ($random) {
+        my $epoch_from = $args{from}->epoch;
+        my $epoch_to   = $args{to}->epoch;
+        $num_secs = $epoch_to-$epoch_from;
+    }
+
+    if ((defined $args{to} || defined $args{limit}) && !$random) {
         my @res;
-        push @res, $args{header} if $args{header};
+        push @res, $args{header} if defined $args{header};
         my $dt = $args{from}->clone;
         while (1) {
+            last if defined($args{limit}) && $num_dates >= $args{limit};
             #say "D:$dt vs $args{to}? ", DateTime->compare($dt, $args{to});
             if (defined $args{to}) {
                 last if !$reverse && DateTime->compare($dt, $args{to}) > 0;
                 last if  $reverse && DateTime->compare($dt, $args{to}) < 0;
             }
-            push @res, $_format->($dt) if $code_filter->($dt);
-            last if defined($args{limit}) && @res >= $args{limit};
+            if ($code_filter->($dt)) {
+                push @res, $_format->($dt);
+                $num_dates++;
+            }
             $dt = $reverse ? $dt - $args{increment} : $dt + $args{increment};
         }
         return [200, "OK", \@res];
     } else {
         # stream
+        # --random always goes here
         my $dt = $args{from}->clone;
-        my $j  = $args{header} ? -1 : 0;
-        my $next_dt;
-        #my $finish;
-        my $func0 = sub {
-            #return undef if $finish;
-            $dt = $next_dt if $j++ > 0;
-            return $args{header} if $j == 0 && $args{header};
-            $next_dt = $reverse ?
-                $dt - $args{increment} : $dt + $args{increment};
-            #$finish = 1 if ...
-            return $dt;
-        };
-        my $filtered_func = sub {
-            while (1) {
-                my $dt = $func0->();
-                return undef unless defined $dt; ## no critic: Subroutines::ProhibitExplicitReturnUndef
-                last if $code_filter->($dt);
+        my $has_printed_header;
+        my $func = sub {
+            return $args{header} if defined $args{header} && !$has_printed_header++;
+            return if defined $args{limit} && $num_dates++ >= $args{limit};
+          REPEAT:
+            if ($random) {
+                $dt = $args{from}->clone->add(seconds => $num_secs * rand());
             }
-            $_format->($dt);
+            goto REPEAT unless $code_filter->($dt);
+            my $res = $_format->($dt);
+
+            if ($random) {
+            } else {
+                $dt = $reverse ?
+                    $dt - $args{increment} : $dt + $args{increment};
+            }
+            $res;
         };
-        return [200, "OK", $filtered_func, {schema=>'str*', stream=>1}];
+        return [200, "OK", $func, {schema=>'str*', stream=>1}];
     }
 }
 
@@ -491,7 +524,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.106 of App::dateseq (from Perl distribution App-dateseq), released on 2021-09-24.
+This document describes version 0.110 of App::dateseq (from Perl distribution App-dateseq), released on 2022-09-09.
 
 =head1 FUNCTIONS
 
@@ -567,7 +600,7 @@ Only show dates with these month numbers.
 
 =item * B<limit> => I<posint>
 
-Only generate a certain amount of numbers.
+Only generate a certain amount of dates.
 
 =item * B<limit_monthly> => I<posint>
 
@@ -576,6 +609,16 @@ Only output at most this number of dates for each month.
 =item * B<limit_yearly> => I<posint>
 
 Only output at most this number of dates for each year.
+
+=item * B<random> => I<true>
+
+Instead of incrementingE<sol>decrementing monotonically, generate random date between --to and --from.
+
+If you specify this, you have to specify C<--to> I<and> C<--from>.
+
+Also, currently, if you also specify C<--limit-yearly> or C<--limit-monthly>, the
+script may hang because it runs out of dates, so be careful when specifying
+these options combined.
 
 =item * B<reverse> => I<true>
 
@@ -646,13 +689,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

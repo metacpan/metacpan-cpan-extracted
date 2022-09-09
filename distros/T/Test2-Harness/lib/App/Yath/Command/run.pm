@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000128';
+our $VERSION = '1.000133';
 
 use App::Yath::Options;
 
@@ -79,11 +79,14 @@ sub run {
     return $self->SUPER::run(@_);
 }
 
+sub write_test_info {
+    $ENV{TEST2_HARNESS_NO_WRITE_TEST_INFO} //= 1;
+}
+
 sub check_reload_state {
     my $self = shift;
 
     my $state = Test2::Harness::Runner::State->new(
-        job_count    => 1,
         workdir      => $self->workdir,
     );
 
@@ -1624,6 +1627,15 @@ DBI Driver to use
 =item --no-yathui-db-dsn
 
 DSN to use when connecting to the db
+
+
+=item --yathui-db-duration-limit ARG
+
+=item --yathui-db-duration-limit=ARG
+
+=item --no-yathui-db-duration-limit
+
+Limit the number of runs to look at for durations data (default: 10)
 
 
 =item --yathui-db-durations

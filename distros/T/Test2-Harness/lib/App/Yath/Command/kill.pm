@@ -2,7 +2,7 @@ package App::Yath::Command::kill;
 use strict;
 use warnings;
 
-our $VERSION = '1.000128';
+our $VERSION = '1.000133';
 
 use Time::HiRes qw/sleep/;
 use App::Yath::Util qw/find_pfile/;
@@ -1450,6 +1450,15 @@ DBI Driver to use
 =item --no-yathui-db-dsn
 
 DSN to use when connecting to the db
+
+
+=item --yathui-db-duration-limit ARG
+
+=item --yathui-db-duration-limit=ARG
+
+=item --no-yathui-db-duration-limit
+
+Limit the number of runs to look at for durations data (default: 10)
 
 
 =item --yathui-db-durations

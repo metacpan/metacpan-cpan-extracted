@@ -1,5 +1,14 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
+0.15 Thu 8 Sep 2022
+- Add Date compatibility.
+- QuickJS memory-management parameters are now configurable.
+- BigInt et al. on 64-bit no longer requires a compiler that implements
+  int128. (e.g., CloudLinux 6 can now have BigInt)
+- QuickJS runtime info is now set to the module name. (Debugging aid.)
+- Docs improvement for memory-leak notifications. (Thank you, perlancar!)
+- Docs now demonstrate use of `std` module, and a test is added.
+
 0.14 Sun 4 Sep 2022
 - Fix parallel build errors. (Thank you, CPAN Testers!)
 

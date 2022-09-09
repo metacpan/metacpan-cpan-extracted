@@ -44,3 +44,4 @@ t/11noncode.t
 t/12noncodegenerators.t
 t/13doesntexist.t
 t/14lexical.t
+t/15nonhashvalue.t

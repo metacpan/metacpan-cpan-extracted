@@ -1,4 +1,4 @@
-package CTK; # $Id: CTK.pm 294 2020-09-02 06:36:52Z minus $
+package CTK;
 use strict;
 use utf8;
 
@@ -6,11 +6,11 @@ use utf8;
 
 =head1 NAME
 
-CTK - Command-line ToolKit library (CTKlib)
+CTK - CTK ToolKit library (CTKlib)
 
 =head1 VERSION
 
-Version 2.06
+Version 2.08
 
 =head1 NOTE
 
@@ -20,8 +20,8 @@ The 2.00+ versions of this library is not compatible with earlier versions
 
     use CTK;
 
-    my $ctk = new CTK;
-    my $ctk = new CTK (
+    my $ctk = CTK->new;
+    my $ctk = CTK->new (
         project => 'MyApp',
         configfile  => '/path/to/conf/file.conf',
         logfile     => '/path/to/log/file.log',
@@ -35,11 +35,11 @@ To work with CTKlib, you just need to start using it!
 
 =head2 new
 
-    my $ctk = new CTK;
-    my $ctk = new CTK (
-        project => 'MyApp',
-        configfile  => '/path/to/conf/file.conf',
-        logfile     => '/path/to/log/file.log',
+    my $ctk = CTK->new;
+    my $ctk = CTK->new (
+        project    => 'MyApp',
+        configfile => '/path/to/conf/file.conf',
+        logfile    => '/path/to/log/file.log',
     );
 
 Main constructor. All the params are optional
@@ -86,7 +86,7 @@ Default: ""
     log => 'on'
     log => 'yes'
 
-Log mode
+Log mode. For debug and error methods only!!
 
 Default: 0
 
@@ -199,7 +199,7 @@ Default: 0
 
 =head2 again
 
-For internal use only (plugins). Please not call this function
+For internal use only (plugins). Please not call this method
 
 =head2 configfile
 
@@ -309,7 +309,7 @@ Returns project, prefix and suffix values
 
     my $revision = $ctk->revision;
 
-Returns revision value
+Returns SVN revision number. Please not use it for your projects
 
 =head2 root
 
@@ -449,36 +449,19 @@ See C<Changes> file
 
 =head1 DEPENDENCIES
 
-L<Class::C3::Adopt::NEXT>,
 L<Config::General>,
-L<DBI>,
-L<ExtUtils::MakeMaker>,
-L<File::Copy>,
-L<File::Path>,
-L<File::Pid>,
-L<File::Spec>,
-L<File::Temp>,
-L<IO>,
-L<IO::String>,
-L<IPC::Open3>,
-L<JSON>,
+L<JSON>, L<JSON::XS>,
 L<List::Util>,
-L<MIME::Base64>,
 L<MIME::Lite>,
-L<MRO::Compat>,
-L<Net::FTP>,
 L<Perl::OSType>,
-L<Sys::SigAction>,
-L<Sys::Syslog>
+L<Sys::Syslog>,
 L<Term::ANSIColor>,
-L<Test::Simple>,
 L<Text::SimpleTable>,
-L<Time::HiRes>,
 L<Time::Local>,
 L<Try::Tiny>,
 L<URI>,
 L<XML::Simple>,
-L<YAML::XS>
+L<YAML>, L<YAML::XS>
 
 =head1 TO DO
 
@@ -494,11 +477,11 @@ C<perl>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2020 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -510,7 +493,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/ $VERSION %PLUGIN_ALIAS_MAP %EXPORT_TAGS @EXPORT_OK /;
-$VERSION = '2.06';
+$VERSION = '2.08';
 
 use base qw/Exporter/;
 
@@ -580,7 +563,7 @@ sub new {
         origin      => {%args},
         created     => time(),
         hitime      => gettimeofday() * 1,
-        revision    => q/$Revision: 294 $/,
+        revision    => q/$Revision: 310 $/,
         options     => $options,
         plugins     => {},
 

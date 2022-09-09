@@ -5,32 +5,29 @@ package Catalyst::Plugin::Digress;
 use Scalar::Util ();
 use Carp ();
 
-our $VERSION = '1.100';
+our $VERSION = '1.101';
 
 sub digress {
 	my $c = shift;
+	my $action = shift;
 
-	my ( $action, $path );
-	if ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Catalyst::Action' ) ) {
-		$action = shift;
-	}
-	else {
-		$path   = shift;
-		$path   = $c->stack->[-1]->namespace . '/' . $path if $path !~ m!/!;
-		$action = $c->dispatcher->get_action_by_path( $path )
-			or Carp::croak "Cannot digress to nonexistant action '$path'";
+	unless ( Scalar::Util::blessed( $action ) && $action->isa( 'Catalyst::Action' ) ) {
+		$action = $c->stack->[-1]->namespace . '/' . $action if $action !~ m!/!;
+		$action = $c->dispatcher->get_action_by_path( $action )
+			|| Carp::croak "Cannot digress to nonexistant action '$action'";
 	}
 
 	my $scope_guard = bless [ $c ], 'Catalyst::Plugin::Digress::_ScopeGuard';
 	if ( $c->use_stats ) { # basically Catalyst::_stats_start_execute with less nonsense
+		my $counter = $c->counter;
 		my $action_name = $action->reverse;
-		my $uid = $action_name . ++$c->counter->{ $action_name };
+		my $uid = $action_name . ++$counter->{ $action_name };
 		my $stats_info = '-> ' . ( $action_name =~ /->/ ? '' : '/' ) . $action_name;
-		my ( $parent ) = grep exists $c->counter->{ $_ }, $c->stack->[-1] || ();
+		my $p = $c->stack->[-1];
 		$c->stats->profile(
-			begin => $stats_info,
-			uid   => $uid,
-			$parent ? ( parent => $parent . $c->counter->{ $parent } ) : (),
+			begin  => $stats_info,
+			uid    => $uid,
+			parent => ( $p && exists $counter->{ $p = $p->reverse } ? $p . $counter->{ $p } : undef ),
 		);
 		push @$scope_guard, $stats_info;
 	}
@@ -132,7 +129,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Aristotle Pagaltzis.
+This software is copyright (c) 2022 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

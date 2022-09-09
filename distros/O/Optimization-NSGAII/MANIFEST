@@ -5,6 +5,7 @@ README
 t/test.t
 lib/Optimization/NSGAII.pm
 examples/NSGAII_all_examples.pl
+examples/NSGAII_startPop_example.pl
 NSGAII_documentation.html
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

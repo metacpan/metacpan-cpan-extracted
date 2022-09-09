@@ -1,5 +1,10 @@
 Revision history for Database-Async-Engine-PostgreSQL
 
+1.000     2022-09-07 05:02:18+08:00 Asia/Singapore
+    [New features]
+
+    - support for SCRAM-SHA256 authentication (required for recent PostgreSQL versions)
+
 0.012     2021-09-13 00:42:06+08:00 Asia/Kuala_Lumpur
     [New features]
 

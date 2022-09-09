@@ -10,7 +10,7 @@ use Test::Sah::Filter;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Test-Sah-Filter'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my %opts = (
     exclude_modules => [],
@@ -50,7 +50,7 @@ test-sah-filter-modules - Test all Data::Sah::Filter::* modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.002 of test-sah-filter-modules (from Perl distribution Test-Sah-Filter), released on 2022-07-17.
+This document describes version 0.003 of test-sah-filter-modules (from Perl distribution Test-Sah-Filter), released on 2022-07-17.
 
 =head1 SYNOPSIS
 
@@ -89,15 +89,16 @@ Exclude a module. Can be specified multiple times.
 
 =item * -E
 
-This sets C<test_examples> to 0.
-
-=item * --no-test-perl-filters
-
-This sets C<test_perl_filters> to 0.
+This sets C<test_examples> to 0 to skip testing examples in filter modules.
 
 =item * --no-test-js-filters
 
-This sets C<test_perl_filters> to 0.
+This sets C<test_js_filters> to 0 to skip C<Data::Sah::Filter::js::*> modules.
+
+=item * --no-test-perl-filters
+
+This sets C<test_perl_filters> to 0 to skip C<Data::Sah::Filter::perl::*>
+modules.
 
 =back
 

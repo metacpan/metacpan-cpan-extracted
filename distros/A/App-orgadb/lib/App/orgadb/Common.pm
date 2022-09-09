@@ -6,9 +6,189 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-08'; # DATE
+our $DATE = '2022-09-09'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
+
+sub _heading_from_line {
+    my $heading = shift;
+
+    # string tags
+    $heading =~ s/(.+?)\s+:(?:\w+:)+\z/$1/;
+    # XXX strip radio target, todo keywords, count cookies
+
+    $heading;
+}
+
+sub _complete_category {
+    my %args = @_;
+
+    my $word = $args{word} // '';
+
+    # only run under pericmd
+    my $cmdline = $args{cmdline} or return;
+    my $r = $args{r};
+
+    # force read config file, because by default it is turned off when in
+    # completion
+    $r->{read_config} = 1;
+    my $parse_res = $cmdline->parse_argv($r);
+    my $cli_args = $parse_res->[2];
+
+    # read all heading lines from all files
+    my @l1_headings;
+    {
+        last unless $cli_args->{files} && @{ $cli_args->{files} };
+        for my $file (@{ $cli_args->{files} }) {
+            open my $fh, "<", $file or do {
+                log_trace "Addressbook file %s cannot be opened, skipped", $file;
+                next;
+            };
+            while (my $line = <$fh>) {
+                next unless $line =~ /^\* (.+)/;
+                chomp(my $heading = $1);
+                push @l1_headings, _heading_from_line($heading);
+            }
+        }
+    }
+
+    require Complete::Util;
+    Complete::Util::complete_array_elem(
+        array => \@l1_headings,
+        word  => $word,
+    );
+}
+
+sub _complete_entry {
+    my %args = @_;
+
+    my $word = $args{word} // '';
+
+    # only run under pericmd
+    my $cmdline = $args{cmdline} or return;
+    my $r = $args{r};
+
+    # force read config file, because by default it is turned off when in
+    # completion
+    $r->{read_config} = 1;
+    my $parse_res = $cmdline->parse_argv($r);
+    my $cli_args = $parse_res->[2];
+
+    require Regexp::From::String;
+
+    # read all heading lines from all files
+    my @l2_headings;
+    {
+        last unless $cli_args->{files} && @{ $cli_args->{files} };
+        for my $file (@{ $cli_args->{files} }) {
+            open my $fh, "<", $file or do {
+                log_trace "Addressbook file %s cannot be opened, skipped", $file;
+                next;
+            };
+            my $cur_l1_heading = '';
+            my $category_re;
+            while (my $line = <$fh>) {
+                if ($line =~ /^\* (.+)/) {
+                    chomp($cur_l1_heading = _heading_from_line($1));
+                    next;
+                } elsif ($line =~ /^\*\* (.+)/) {
+                    # if user has specified category, only consider entries that
+                    # match the category
+                    if (defined $cli_args->{category}) {
+                        unless (defined $category_re) {
+                            $category_re = Regexp::From::String::str_to_re({case_insensitive=>1}, $cli_args->{category});
+                        }
+                        next unless $cur_l1_heading =~ $category_re;
+                    }
+
+                    chomp(my $heading = $1);
+                    push @l2_headings, _heading_from_line($heading);
+                }
+            }
+        }
+    }
+
+    require Complete::Util;
+    Complete::Util::complete_array_elem(
+        array => \@l2_headings,
+        word  => $word,
+    );
+}
+
+sub _complete_field {
+    my %args = @_;
+
+    my $word = $args{word} // '';
+
+    # only run under pericmd
+    my $cmdline = $args{cmdline} or return;
+    my $r = $args{r};
+
+    # force read config file, because by default it is turned off when in
+    # completion
+    $r->{read_config} = 1;
+    my $parse_res = $cmdline->parse_argv($r);
+    my $cli_args = $parse_res->[2];
+
+    unless (defined $cli_args->{entry}) {
+        return {message=>"Please specify entry first", static=>1};
+    }
+
+    require Regexp::From::String;
+
+    # read all heading lines from all files
+    my @fields;
+    {
+        last unless $cli_args->{files} && @{ $cli_args->{files} };
+        for my $file (@{ $cli_args->{files} }) {
+            open my $fh, "<", $file or do {
+                log_trace "Addressbook file %s cannot be opened, skipped", $file;
+                next;
+            };
+            my $cur_l1_heading = '';
+            my $cur_l2_heading = '';
+            my $category_re;
+            my $entry_re = Regexp::From::String::str_to_re({case_insensitive=>1}, $cli_args->{entry});
+            while (my $line = <$fh>) {
+                if ($line =~ /^\* (.+)/) {
+                    chomp($cur_l1_heading = $1);
+                    # XXX strip radio target, tags, todo keywords, count cookies
+                    next;
+                } elsif ($line =~ /^\*\* (.+)/) {
+                    # if user has specified category, only consider entries that
+                    # match the category
+                    if (defined $cli_args->{category}) {
+                        unless (defined $category_re) {
+                            $category_re = Regexp::From::String::str_to_re({case_insensitive=>1}, $cli_args->{category});
+                        }
+                        next unless $cur_l1_heading =~ $category_re;
+                    }
+
+                    chomp($cur_l2_heading = $1);
+                    # XXX strip radio target, tags, todo keywords, count cookies
+                    next;
+                } elsif ($line =~ /^\s*[+*-]\s+(.+?)\s+::/) {
+                    my $field = $1;
+
+                    # only consider field under the matching category & entry
+                    if (defined $category_re) {
+                        next unless $cur_l1_heading =~ $category_re;
+                    }
+                    next unless defined $entry_re;
+                    next unless $cur_l2_heading =~ $entry_re;
+
+                    push @fields, $field;
+                }
+            }
+        }
+    }
+
+    require Complete::Util;
+    Complete::Util::complete_array_elem(
+        array => \@fields,
+        word  => $word,
+    );
+}
 
 our %argspecs_common = (
     files => {
@@ -17,6 +197,7 @@ our %argspecs_common = (
         'x.name.is_plural' => 1,
         'x.name.singular' => 'file',
         schema => ['array*', of=>'filename*', min_len=>1],
+        'x.element_completion' => ['filename', {file_ext_filter=>[qw/org ORG/]}],
         cmdline_aliases=>{f=>{}},
         tags => ['category:input'],
     },
@@ -49,6 +230,7 @@ our %argspecopt_category = (
         summary => 'Find entry by string or regex search against the category title',
         schema => 'str_or_re*',
         cmdline_aliases=>{c=>{}},
+        completion => \&_complete_category,
         tags => ['category:filter'],
     },
 );
@@ -58,6 +240,7 @@ our %argspecopt0_entry = (
         summary => 'Find entry by string or regex search against its title',
         schema => 'str_or_re*',
         pos => 0,
+        completion => \&_complete_entry,
         tags => ['category:entry-selection'],
     },
 );
@@ -96,6 +279,7 @@ our %argspecopt1_field = (
         schema => ['array*', of=>'str_or_re*'],
         pos => 1,
         slurpy => 1,
+        element_completion => \&_complete_field,
         tags => ['category:field-selection'],
     },
 );
@@ -186,7 +370,7 @@ App::orgadb::Common
 
 =head1 VERSION
 
-This document describes version 0.005 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2022-08-08.
+This document describes version 0.006 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2022-09-09.
 
 =head1 HOMEPAGE
 

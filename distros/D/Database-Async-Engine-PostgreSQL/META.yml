@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,20 +33,23 @@ no_index:
 provides:
   Database::Async::Engine::PostgreSQL:
     file: lib/Database/Async/Engine/PostgreSQL.pm
-    version: '0.012'
+    version: '1.000'
   Database::Async::Engine::PostgreSQL::DDL:
     file: lib/Database/Async/Engine/PostgreSQL/DDL.pm
-    version: '0.012'
+    version: '1.000'
 requires:
+  Bytes::Random::Secure: '0'
   Config::Tiny: '0'
+  CryptX: '0'
   Database::Async: '0.016'
   Encode: '0'
   File::HomeDir: '0'
   Future: '0.46'
   Future::AsyncAwait: '0.28'
   Log::Any: '1.050'
+  MIME::Base64: '0'
   Path::Tiny: '0'
-  Protocol::Database::PostgreSQL: '1.005'
+  Protocol::Database::PostgreSQL: '2.000'
   Ryu::Async: '0.017'
   Syntax::Keyword::Try: '0.25'
   Template: '2.28'
@@ -60,7 +63,7 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL/issues
   homepage: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL
   repository: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL.git
-version: '0.012'
+version: '1.000'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Arash <arashThr@outlook.com>'

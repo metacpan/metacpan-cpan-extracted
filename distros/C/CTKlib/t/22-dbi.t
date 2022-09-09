@@ -1,13 +1,11 @@
 #########################################################################
 #
-# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
+# Serż Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 22-dbi.t 272 2019-09-26 08:45:46Z minus $
 #
 #########################################################################
 use strict;
@@ -40,7 +38,7 @@ use constant SELECT_INCORRECT_FIELD => <<SQL;
 SQL
 
 # Connect
-my $mso = new CTK::DBI(
+my $mso = CTK::DBI->new(
         -dsn        => DB_DSN,
         #-user       => 'login',
         #-pass       => 'password',
@@ -50,7 +48,7 @@ my $mso = new CTK::DBI(
                 PrintError => 0,
                 RaiseError => 0,
             },
-        #-debug     => 1,
+        -debug     => 0,
         -prepare_attr => {
                 rows => [
                     [1, 'foo', 1],

@@ -32,7 +32,7 @@ Options:
 
 =head1 VERSION
 
-Version 1.15
+Version 1.23
 
 =head1 DESCRIPTION
 
@@ -51,11 +51,13 @@ ISO 216 normalised (international) page sizes:
 
 =over 4
 
-Input page sizes A6 (105 x 148 mm) and A5 (148 x 210 mm) produce
-an output page size of A4 (210 x 297 mm). Four A6 pages will be put
-on each A4 page, or two A5 pages will be put on each A4 page. 
-Before that, input pages will be reordered and reoriented so as to
-produce a final PDF fit for duplex 'long-edge-flip' printing.
+Input page sizes A6 (105 x 148 mm) and A5 (148 x 210 mm) produce an
+output page size of A4 (210 x 297 mm). Input page size A4 (210 x 297 mm)
+produces an output page size of A3 (297 x 420 mm). Four A6 pages will
+be put on each A4 page, two A5 pages will be put on each A4 page, or
+two A4 pages will be put on each A3 page. Before that, input pages will
+be reordered and reoriented so as to produce a final PDF fit for duplex
+'long-edge-flip' printing.
 
 =back
 
@@ -64,14 +66,16 @@ ANSI normalised (US) page sizes:
 =over 4
 
 Input page sizes Quarter Letter (4.25 x 5.5 in) and Half Letter (5.5
-x 8,5 in) produce a Letter output page size (8.5 x 11 in). Input
-page sizes Quarter Legal (4.25 x 7 in) and Half Legal (7 x 8,5 in)
-produce a Legal output page size (8.5 x 14 in). Four Quarter-Letter
-pages will be put on each Letter page, two Half-Letter pages will be
-put on each Letter page, four Quarter-Legal pages will be put on each
-Legal page, or two Half-Legal pages will be put on each Legal page.
-Before that, input pages will be reordered and reoriented so as to 
-produce a final PDF fit for duplex 'long-edge-flip' printing.
+x 8.5 in) produce a Letter output page size (8.5 x 11 in). Input
+page sizes Quarter Legal (4.25 x 7 in) and Half Legal (7 x 8.5 in)
+produce a Legal output page size (8.5 x 14 in). Input page size Letter
+(8.5 x 11 in) produces a Tabloid output page size (11 x 17 in). Four
+Quarter-Letter pages will be put on each Letter page, two Half-Letter
+pages will be put on each Letter page, four Quarter-Legal pages will be
+put on each Legal page, two Half-Legal pages will be put on each Legal page,
+or two Letter pages will be put on each Tabloid page. Before that, input 
+pages will be reordered and reoriented so as to produce a final PDF fit for
+duplex 'long-edge-flip' printing.
 
 =back
 
@@ -80,14 +84,16 @@ produce a final PDF fit for duplex 'long-edge-flip' printing.
 1. Which schema series (4up or 2up) is used depends on input PDF page
 size. For page sizes A6 (105 x 148 mm), Quarter Letter (4.25 x 5.5 in)
 and Quarter Legal (4.25 x 7 in), a 4up schema is used. For page sizes A5
-(148 x 210 mm), Half Letter (5.5 x 8.5 in) and Half Legal (7 x 8.5 in in),
-a 2up schema is used.
+(148 x 210 mm), Half Letter (5.5 x 8.5 in), Half Legal (7 x 8.5 in),
+Letter (8.5 x 11 in), and A4 (210 x 297 mm), a 2up schema is used.
 
 2. What page size is used for the output PDF depends on input size page.
-For input size pages A6 or A5, the output PDF pages are A4 (210 x 297 mm);
-for input size pages Quarter Letter or Half Letter, the output PDF pages
-are Letter (8.5 x 11 in); for input size pages Quarter Legal or Half Legal,
-the output PDF pages are Legal (8.5 x 14 in).
+For input pages of size A6 or A5, the output PDF pages are A4 (210 x 297 mm);
+for input pages of size Quarter Letter or Half Letter, the output PDF pages
+are Letter (8.5 x 11 in); for input pages of size Quarter Legal or Half Legal,
+the output PDF pages are Legal (8.5 x 14 in); for input pages of size Letter,
+the output PDF pages are Tabloid (11 x 17 in); for input pages of size A4,
+the output PDF pages are A3 (297 x 420 mm).
 
 3. How many signatures are produced depends on the amount of input pages
 to be processed. Recto-verso (or duplex) printing is always assumed. Maximum
@@ -292,8 +298,8 @@ this same way (these page numbers + 16, these page numbers + 32, etc).
 
 =head1 LIMITATIONS
 
-Input page sizes allowed are A5, A6, Half Letter, Quarter Letter,
-Half Legal and Quarter Legal. Other sizes give an error message.
+Input page sizes allowed are A4, A5, A6, Letter, Half Letter, Quarter
+Letter, Half Legal and Quarter Legal. Other sizes give an error message.
 
 Only PDF v1.4 is supported as input, although many higher-labeled
 PDF files are correctly handled since they are essentially v1.4 PDF

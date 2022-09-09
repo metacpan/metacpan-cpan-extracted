@@ -1,4 +1,4 @@
-package CTK::TFVals; # $Id: TFVals.pm 222 2019-05-01 14:44:03Z minus $
+package CTK::TFVals;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::TFVals - True & False values conversions
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -281,11 +281,11 @@ See C<TODO> file
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -297,7 +297,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 use base qw /Exporter/;
 

@@ -11,7 +11,7 @@ use Business::OnlinePayment::HTTPS;
 use vars qw($VERSION $DEBUG @ISA $me);
 
 @ISA = qw(Business::OnlinePayment::HTTPS);
-$VERSION = '0.11';
+$VERSION = '0.12';
 $VERSION = eval $VERSION; # modperlstyle: convert the string into a number
 
 $DEBUG = 0;
@@ -254,6 +254,10 @@ sub submit {
     $amount =~ s/\.//;
   }
 
+  my $name = length($content{name})
+               ? $content{name}
+               : $content{first_name}. ' '. $content{last_name};
+
   my $check_number = $content{check_number} || "100"  # make one up
     if($content{account_number});
 
@@ -269,6 +273,13 @@ sub submit {
   $country = $content{country}
     unless $country;
   $country = uc($country) if $country;
+
+  my $ship_name =
+    length($content{ship_name})
+      ? $content{ship_name}
+      : (length($content{ship_first_name}) || length($content{ship_last_name}))
+        ? $content{ship_first_name}. ' '. $content{ship_last_name}
+        : '';
 
   my $ship_country =
     country2code( $content{ship_country}, LOCALE_CODE_ALPHA_3 );
@@ -321,7 +332,7 @@ sub submit {
     $self->revmap_fields(
                           CustomerPO          => 'CustomerPO',
                           ShippingMethod      => 'ShippingMethod',
-                          ShippingName        => 'ship_name',
+                          ShippingName        => \$ship_name,
                           ShippingAddr        => \%shippingaddr,
                         );
 
@@ -348,7 +359,7 @@ sub submit {
                           Track1              => 'track1',
                           Track2              => 'track2',
                           ACH                 => \%ach,
-                          CardName            => 'name',
+                          CardName            => \$name,
                           DispositionType     => 'DispositionType',
                           TotalAmount         => \$amount,
                           FeeAmount           => 'FeeAmount',
@@ -608,13 +619,14 @@ from content(%content):
           Country             => 'ship_country',  # forced to ISO-3166-alpha-3
           Phone               => 'ship_phone',
 
+=head1 NOTE
+
 =head1 COMPATIBILITY
 
 Version 0.07 changes the server name and path for IPPay's late 2012 update.
 
-Business::OnlinePayment::IPPay implemented the IPPay XML Product Specifications
-Revision 1.1.2 (historically), updated in 2021 using revision 1-1-9.1
-(September 2018).
+Business::OnlinePayment::IPPay uses IPPay XML Product Specifications version
+1.1.2.
 
 See http://www.ippay.com/ for more information.
 
@@ -630,7 +642,7 @@ Reverse Authorization patch from dougforpres
 
 Copyright (c) 1999 Jason Kohles
 Copyright (c) 2002-2003 Ivan Kohler
-Copyright (c) 2008-2021 Freeside Internet Services, Inc.
+Copyright (c) 2008-2022 Freeside Internet Services, Inc.
 
 All rights reserved. This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

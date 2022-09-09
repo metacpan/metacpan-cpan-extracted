@@ -22,7 +22,7 @@ typedef enum exs_sv_type_e exs_sv_type_e;
 #define SvIsBOOL(sv) FALSE
 #endif
 
-#define exs_sv_type(sv) (           \
+#define exs_sv_type(sv) (               \
     !SvOK(sv) ? EXS_SVTYPE_UNDEF        \
     : SvROK(sv) ? EXS_SVTYPE_REFERENCE  \
     : SvIsBOOL(sv) ? EXS_SVTYPE_BOOLEAN \

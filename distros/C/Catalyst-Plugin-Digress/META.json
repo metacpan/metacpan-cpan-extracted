@@ -51,10 +51,10 @@
          "web" : "https://github.com/ap/Catalyst-Plugin-Digress"
       }
    },
-   "version" : "1.100",
+   "version" : "1.101",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
-      "year" : 2021
+      "year" : 2022
    },
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

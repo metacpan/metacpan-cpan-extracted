@@ -1,5 +1,8 @@
 Revision history for Perl extension Date::Holidays::US.
 
+0.03 2022-09-06
+  - Updated holidays function to dynamically calculate dates in the year as we expand is_holiday logic
+
 0.02 2022-08-20
   - Updated Observance logic based on executive orders
   - Added GitHub meta links

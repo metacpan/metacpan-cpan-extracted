@@ -17,7 +17,7 @@ meta-spec:
   version: '1.4'
 name: Alien-Build-Plugin-Fetch-HostBlockList
 requires:
-  Alien::Build::Plugin: '0'
+  Alien::Build::Plugin: '2.64'
   URI: '0'
   perl: '5.008004'
 resources:
@@ -25,8 +25,8 @@ resources:
   bugtracker: https://github.com/PerlAlien/Alien-Build-Plugin-Fetch-HostBlockList/issues
   homepage: https://metacpan.org/pod/Alien::Build::Plugin::Fetch::HostBlockList
   repository: git://github.com/PerlAlien/Alien-Build-Plugin-Fetch-HostBlockList.git
-version: '0.01'
-x_generated_by_perl: v5.37.2
+version: '0.02'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

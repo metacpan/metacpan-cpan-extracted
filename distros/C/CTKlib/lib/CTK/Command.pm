@@ -1,4 +1,4 @@
-package CTK::Command; # $Id: Command.pm 267 2019-05-21 08:23:33Z minus $
+package CTK::Command;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Command - Utilities to extend common UNIX commands
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 SYNOPSIS
 
@@ -128,11 +128,11 @@ L<CTK>, L<CTK::Plugin::File>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -144,7 +144,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw($VERSION @EXPORT);
-$VERSION = 1.03;
+$VERSION = 1.04;
 
 use base qw /Exporter/;
 @EXPORT = qw(
@@ -170,7 +170,7 @@ sub fsplit {
     return 0 unless length($file);
     return 0 unless length($dst);
 
-    my $ctk = new CTK(plugins => "file");
+    my $ctk = CTK->new(plugins => "file");
     unless ($ctk->status) {
         die $ctk->error;
     }
@@ -192,7 +192,7 @@ sub fjoin {
     my $dst     = shift(@ARGV) // "";
     my $file    = shift(@ARGV) // "";
     return 0 unless length($src) && -e $src;
-    my $ctk = new CTK(plugins => "file");
+    my $ctk = CTK->new(plugins => "file");
     unless ($ctk->status) {
         die $ctk->error;
     }

@@ -18,6 +18,18 @@ Quick and dirty …
         [ "The", "last", "value", "is", "returned." ];
     > );
 
+… or, something a bit fancier:
+
+    my $js = JavaScript::QuickJS->new()->std()->helpers();
+
+    $js->eval_module( q/
+        import * as std from 'std';
+
+        for (const [key, value] of Object.entries(std.getenviron())) {
+            console.log(key, value);
+        }
+    / );
+
 =head1 DESCRIPTION
 
 This library embeds Fabrice Bellard’s L<QuickJS|https://bellard.org/quickjs>
@@ -35,7 +47,7 @@ your system.
 
 use XSLoader;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -43,9 +55,54 @@ XSLoader::load( __PACKAGE__, $VERSION );
 
 =head1 METHODS
 
-=head2 $obj = I<CLASS>->new()
+=head2 $obj = I<CLASS>->new( %CONFIG_OPTS )
 
-Instantiates I<CLASS>.
+Instantiates I<CLASS>. %CONFIG_OPTS have the same effect as in
+C<configure()> below.
+
+=cut
+
+sub new {
+    my ($class, %opts) = @_;
+
+    my $self = $class->_new();
+
+    return %opts ? $self->configure(%opts) : $self;
+}
+
+=head2 $obj = I<OBJ>->configure( %OPTS )
+
+Tunes the QuickJS interpreter. Returns I<OBJ>.
+
+%OPTS are any of:
+
+=over
+
+=item * C<max_stack_size>
+
+=item * C<memory_limit>
+
+=item * C<gc_threshold>
+
+=back
+
+For more information on these, see QuickJS itself.
+
+=cut
+
+sub configure {
+    my ($self, %opts) = @_;
+
+    my ($stack, $memlimit, $gc_threshold) = delete @opts{'max_stack_size', 'memory_limit', 'gc_threshold'};
+
+    if (my @extra = sort keys %opts) {
+        Carp::croak("Unknown: @extra");
+    }
+
+    return $self->_configure($stack, $memlimit, $gc_threshold);
+}
+
+#----------------------------------------------------------------------
 
 =head2 $obj = I<OBJ>->set_globals( NAME1 => VALUE1, .. )
 
@@ -63,6 +120,7 @@ Returns I<OBJ>.
 =head2 $obj = I<OBJ>->std()
 
 Enables (but does I<not> import) QuickJS’s C<std> module.
+See L</SYNOPSIS> above for example usage.
 
 Returns I<OBJ>.
 
@@ -132,9 +190,9 @@ This module converts returned values from JavaScript thus:
 
 =item * “Plain” objects become Perl hash references.
 
-=item * Function objects become Perl L<JavaScript::QuickJS::Function> objects.
-
-=item * RegExp objects become Perl L<JavaScript::QuickJS::RegExp> objects.
+=item * Function, RegExp, and Date objects become Perl
+L<JavaScript::QuickJS::Function>, L<JavaScript::QuickJS::RegExp>,
+and L<JavaScript::QuickJS::Date> objects, respectively.
 
 =item * Behaviour is B<UNDEFINED> for other object types.
 
@@ -179,7 +237,8 @@ JavaScript C<RegExp> objects.
 
 If any instance of a class of this distribution is DESTROY()ed at Perl’s
 global destruction, we assume that this is a memory leak, and a warning is
-thrown. To prevent this, avoid circular references.
+thrown. To prevent this, avoid circular references, and clean up all global
+instances.
 
 Callbacks make that tricky. When you give a JavaScript function to Perl,
 that Perl object holds a reference to the QuickJS context. Only once that
@@ -316,5 +375,19 @@ QuickJS is copyright Fabrice Bellard and Charlie Gordon. It is released
 under the L<MIT license|https://opensource.org/licenses/MIT>.
 
 =cut
+
+#----------------------------------------------------------------------
+
+package JavaScript::QuickJS::JSObject;
+
+package JavaScript::QuickJS::RegExp;
+
+our @ISA;
+BEGIN { @ISA = 'JavaScript::QuickJS::JSObject' };
+
+package JavaScript::QuickJS::Function;
+
+our @ISA;
+BEGIN { @ISA = 'JavaScript::QuickJS::JSObject' };
 
 1;

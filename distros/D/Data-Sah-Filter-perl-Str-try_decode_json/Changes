@@ -1,3 +1,8 @@
+0.002   2022-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - Move test to examples since we are now using Test::Sah::Filter.
+
+
 0.001   2020-02-11  Released-By: PERLANCAR
 
         - First release. Currently unusable in Perinci::CmdLine-based

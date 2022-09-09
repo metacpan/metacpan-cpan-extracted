@@ -24,7 +24,7 @@ ansicolumn \[options\] \[file ...\]
     -W                   widen to terminal width
     -p                   paragraph mode
 
-    -B, --border[=#]     print border with optiona style
+    -B, --border[=#]     print border with optional style
     -F, --fillup[=#]     fill-up unit (pane|page|none)
 
     --height=#           page height
@@ -47,7 +47,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.20
+Version 1.21
 
 # DESCRIPTION
 

@@ -56,6 +56,6 @@
          "web" : "https://github.com/z-eos/regather.git"
       }
    },
-   "version" : "v0.84.00",
+   "version" : "v0.85.00",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

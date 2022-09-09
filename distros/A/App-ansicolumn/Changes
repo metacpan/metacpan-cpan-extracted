@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ansicolumn
 
+1.21 2022-09-07T09:40:42Z
+
+    - use Getopt::EX::Hashed 1.05;
+
 1.20 2022-08-21T23:58:50Z
 
     - Use new assignable accessor interface introduced in Getopt::EX::Hashed.

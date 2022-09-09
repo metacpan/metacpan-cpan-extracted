@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.20';
+$VERSION = '0.21';
 $VERSION = $VERSION;
 
 use strict;
@@ -90,7 +90,7 @@ my $x =
     $utf8_codepoint{'RFC3629'};
 
 # supports [\b] \d \h \s \v \w
-my $bare_b = '\x08';
+my $bare_backspace = '\x08';
 my $bare_d = '0123456789';
 my $bare_h = '\x09\x20';
 my $bare_s = '\t\n\f\r\x20';
@@ -193,6 +193,16 @@ END
 }
 
 #---------------------------------------------------------------------
+# mb::dosglob() like glob(), mb.pm compatible
+sub UTF8::R2::dosglob (;$) {
+    my $expr = @_ ? $_[0] : $_;
+
+    # returns globbing result
+    my %glob = map { $_ => 1 } CORE::glob($expr);
+    return sort { (UTF8::R2::uc($a) cmp UTF8::R2::uc($b)) || ($a cmp $b) } keys %glob;
+}
+
+#---------------------------------------------------------------------
 # mb::eval() like eval(), mb.pm compatible
 sub UTF8::R2::eval (;$) {
     local $_ = @_ ? $_[0] : $_;
@@ -210,7 +220,9 @@ END
 sub UTF8::R2::getc (;*) {
     my $fh = @_ ? Symbol::qualify_to_ref($_[0],caller()) : \*STDIN;
     my $getc = CORE::getc $fh;
-    if ($getc =~ /\A [\xC2-\xDF] \z/xms) {
+    if ($getc =~ /\A [\x00-\x7F\x80-\xC1\xF5-\xFF] \z/xms) {
+    }
+    elsif ($getc =~ /\A [\xC2-\xDF] \z/xms) {
         $getc .= CORE::getc $fh;
     }
     elsif ($getc =~ /\A [\xE0-\xEF] \z/xms) {
@@ -473,7 +485,7 @@ sub UTF8::R2::qr ($) {
                     elsif ($classmate eq '\S'         ) { push @xbcs, "(?:(?![$bare_s])$x)"  }
                     elsif ($classmate eq '\V'         ) { push @xbcs, "(?:(?![$bare_v])$x)"  }
                     elsif ($classmate eq '\W'         ) { push @xbcs, "(?:(?![$bare_w])$x)"  }
-                    elsif ($classmate eq '\b'         ) { push @sbcs, $bare_b                }
+                    elsif ($classmate eq '\b'         ) { push @sbcs, $bare_backspace        }
                     elsif ($classmate eq '\d'         ) { push @sbcs, $bare_d                }
                     elsif ($classmate eq '\h'         ) { push @sbcs, $bare_h                }
                     elsif ($classmate eq '\s'         ) { push @sbcs, $bare_s                }
@@ -835,7 +847,7 @@ sub list_all_ASCII_by_hyphen {
 #---------------------------------------------------------------------
 # tr/// for UTF-8 codepoint string
 sub UTF8::R2::tr ($$$;$) {
-    my @x           = $_[0] =~ /\G$x/g;
+    my @x           = $_[0] =~ /\G($x)/xmsg;
     my @search      = list_all_ASCII_by_hyphen($_[1] =~ /\G(\\-|$x)/xmsg);
     my @replacement = list_all_ASCII_by_hyphen($_[2] =~ /\G(\\-|$x)/xmsg);
     my %modifier    = (defined $_[3]) ? (map { $_ => 1 } CORE::split //, $_[3]) : ();
@@ -1166,6 +1178,7 @@ The following subroutines exist for compatibility with the mb.pm module.
   mb.pm Modulino            Compatible Routines, and Variables
   -------------------------------------------------------------------
   mb::do                    UTF8::R2::do($_)
+  mb::dosglob($_)           UTF8::R2::dosglob($_)
   mb::eval                  UTF8::R2::eval($_)
   mb::index_byte            UTF8::R2::index_byte($_, 'ABC', 5)
   mb::require               UTF8::R2::require($_)

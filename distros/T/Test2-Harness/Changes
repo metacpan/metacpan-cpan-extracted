@@ -1,3 +1,25 @@
+1.000133  2022-09-07 13:44:03-07:00 America/Los_Angeles
+
+    - Order tests with conflicts earlier than others
+
+1.000132  2022-09-07 09:42:06-07:00 America/Los_Angeles
+
+    - Further improve resource command and file
+
+1.000131  2022-09-06 15:53:55-07:00 America/Los_Angeles
+
+    - Use relative file paths for job slot display
+
+1.000130  2022-09-06 14:39:43-07:00 America/Los_Angeles
+
+    - Better resource display
+    - Fix #255 (.test_info.json being left behind)
+    - Fix issue where not all resources will be loaded by resource command
+
+1.000129  2022-09-06 11:20:38-07:00 America/Los_Angeles
+
+    - Fix issue with job slots sometimes being doubled when tests are skipped
+
 1.000128  2022-09-02 13:01:09-07:00 America/Los_Angeles
 
     - Fix issue where yath might exit before all output is rendered

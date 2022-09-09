@@ -1,4 +1,4 @@
-package CTKx; # $Id: CTKx.pm 217 2019-04-30 09:15:34Z minus $
+package CTKx;
 use strict;
 use utf8;
 
@@ -6,11 +6,11 @@ use utf8;
 
 =head1 NAME
 
-CTKx - User extension CTK
+CTKx - Singleton CTK extension
 
 =head1 VERSION
 
-Version 2.00
+Version 2.01
 
 =head1 SYNOPSIS
 
@@ -71,11 +71,11 @@ C<perl>, L<Class::Singleton>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -88,7 +88,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 use base qw/Class::Singleton/;
 use vars qw/$VERSION/;
-$VERSION = '2.00';
+$VERSION = '2.01';
 
 sub c { shift->{ctk} }
 sub ctk { shift->{ctk} }

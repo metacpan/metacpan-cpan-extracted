@@ -1,4 +1,4 @@
-package CTK::App; # $Id: App.pm 278 2020-03-24 07:24:38Z minus $
+package CTK::App;
 use strict;
 use utf8;
 
@@ -10,20 +10,19 @@ CTK::App - Application interface
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
     use CTK::App;
 
-    my $ctk = new CTK::App;
-    my $ctk = new CTK::App (
+    my $ctk = CTK::App->new;
+    my $ctk = CTK::App->new(
         project => 'MyApp',
         ident => "myapp",
         root => ".",
         confopts    => {... Config::General options ...},
         configfile  => '/path/to/conf/file.conf',
-        log => 1,
         logfile     => '/path/to/log/file.log',
     );
 
@@ -80,11 +79,7 @@ See L<CTK/"root">
 
 =head2 LOGGER
 
-For enabling logger specify the follow arguments in constructor:
-
-    log => 1,
-
-And include follow config-section:
+For logger enable include follow config-section:
 
     #
     # Logging
@@ -249,7 +244,7 @@ Method for register new cli handler
 
 =head2 run, run_handler
 
-    my $app = new CTK::MyApp;
+    my $app = CTK::MyApp->new;
     my $result = $app->run("foo",
         foo => "one",
         bar => 1
@@ -303,11 +298,11 @@ L<CTK>, L<CTK::Helper>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2020 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -319,11 +314,12 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw($VERSION);
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 use base qw/ CTK /;
 
 use Carp;
+use CTK::ConfGenUtil qw/lvalue/;
 
 use constant {
         APP_PLUGINS => [qw/
@@ -340,19 +336,19 @@ sub again {
     $self->{status} = 0 unless $status;
     my $config = $self->configobj;
 
-    # Autoloading logger (data from config)
-    my $log_on = $config->get("logenable") || $config->get("logenabled") || 0;
-    if ($self->logmode && (!$args->{no_logger_init}) && $log_on) {
+    # Autoloading logger (settings data from config only, no use logmode!!)
+    my $log_on = lvalue($config->get("logenable")) || lvalue($config->get("logenabled")) || 0;
+    if ($log_on && !$args->{no_logger_init}) {
         my $logopts = $args->{logopts} || {};
-        my $logfile = defined($args->{logfile}) ? $self->logfile : $config->get("logfile"); # From args or config
+        my $logfile = defined($args->{logfile}) ? $self->logfile : lvalue($config->get("logfile")); # From args or config
         $logopts->{facility} = $args->{logfacility} if defined($args->{logfacility});  # From args only!
         $logopts->{file} = $logfile if defined($logfile) && length($logfile);
         $logopts->{ident} = defined($args->{ident})
             ? $args->{ident}
-            : ($config->get("logident") // $self->project); # From args or config
+            : (lvalue($config->get("logident")) // $self->project); # From args or config
         $logopts->{level} = defined($args->{loglevel})
             ? $args->{loglevel}
-            : ($config->get("loglevel")); # From args or config
+            : lvalue($config->get("loglevel")); # From args or config
         $self->logger_init(%$logopts) or do {
             $self->error("Can't initialize logger");
             $self->{status} = 0;
@@ -440,6 +436,7 @@ sub run_handler {
         $self->error(sprintf("Handler lookup failed: %s", $name));
         return 0;
     };
+    return 0 unless $self->status; # Error occured on constructor or the again() method
     return $self->handle($handler, @params);
 }
 sub run { goto &run_handler }

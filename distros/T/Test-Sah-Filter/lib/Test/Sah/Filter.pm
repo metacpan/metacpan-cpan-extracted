@@ -15,7 +15,7 @@ use Test::More ();
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-07-17'; # DATE
 our $DIST = 'Test-Sah-Filter'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $Test = Test::Builder->new;
 
@@ -324,7 +324,7 @@ Test::Sah::Filter - Test Data::Sah::Filter::* modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.002 of Test::Sah::Filter (from Perl distribution Test-Sah-Filter), released on 2022-07-17.
+This document describes version 0.003 of Test::Sah::Filter (from Perl distribution Test-Sah-Filter), released on 2022-07-17.
 
 =head1 SYNOPSIS
 

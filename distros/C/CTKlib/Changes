@@ -174,3 +174,15 @@
 
 2.06 Wed  2 Sep 09:13:22 MSK 2020
     * Bug fixed - now added supporting 32 bit platforms for FNV digest function
+
+2.07 Mon 23 Nov 20:41:07 MSK 2020
+    * Added File::Pid implementation (RT#19)
+
+2.08 Tue 06 Sep 2022 19:41:34 MSK
+    * Added CTK::Timeout and removed Sys::SigAction dependency
+    * CTK::DBI: Has removed the Sys::SigAction dependency
+    * Removed Class::C3::Adopt::NEXT and MRO::Compat dependencies
+    * CTK::ConfGenUtil: added lvalue function
+    * CTK::Log: Added log_critical method
+    * CTK::Configuration: added the load and reload methods
+    * CTK::Daemon: added the cleanup and reload methods

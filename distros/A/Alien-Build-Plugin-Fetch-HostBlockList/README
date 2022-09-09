@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.02
 
 SYNOPSIS
 
@@ -16,10 +16,7 @@ SYNOPSIS
 
     Using from ~/.alienbuild/rc.pl:
 
-     preload sub {
-       my($meta) = @_;
-       $meta->apply_plugin('Fetch::HostBlockList', block_hosts => [qw( badsite1.com badsite2.org )])
-     };
+     preload_preload 'Fetch::HostBlockList', block_hosts => [qw( badsite1.com badsite2.org )];
 
 DESCRIPTION
 

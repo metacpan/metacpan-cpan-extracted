@@ -1,5 +1,30 @@
 Revision history for Perl module and script App::paperback.
 
+1.23  Fri Sep 9 10:00:00 2022
+	- Fix bug in 'state %known' (v1.22) that made PDF bigger than needed
+
+1.22  Fri Sep 9 09:00:00 2022
+	- Add test and early die in case a nonexistant page is requested
+
+1.21  Thu Sep 8 21:00:00 2022
+	- Correct output paper size for QuarterLegal input
+	- Made test in for loop both simpler and warning-free
+
+1.20  Thu Sep 8 15:00:00 2022
+	- Add processing for input page sizes Letter and A4
+
+1.19  Thu Sep 8 09:00:00 2022
+	- Fix bug in output paper size determination
+
+1.18  Wed Sep 7 21:00:00 2022
+	- Replace paper size constants by calculations and a hash
+
+1.17  Wed Sep 7 15:00:00 2022
+	- Improve page size recognition on modern PDF files
+
+1.16  Wed Sep 7 09:00:00 2022
+	- Clearer variable and sub names
+
 1.15  Sat Sep 3 09:00:00 2022
 	- Begin road to managing PDFs with xref streams by recognising them 
 

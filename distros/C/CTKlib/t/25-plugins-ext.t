@@ -1,19 +1,18 @@
 #########################################################################
 #
-# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
+# Serż Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 25-plugins-ext.t 289 2020-08-31 16:09:21Z minus $
 #
 #########################################################################
 use strict;
 use warnings;
 use Test::More;
 plan skip_all => "Currently a developer-only test" unless -d '.svn' || -d ".git";
+plan skip_all => "TEST_NET environment variable required" unless $ENV{TEST_NET};
 plan tests => 23;
 
 use File::Spec;
@@ -27,7 +26,7 @@ use constant {
         TESTURL_SFTP=> 'sftp://guest@192.168.123.8/home/guest/Public?timeout=10',
     };
 
-my $ctk = new CTK(
+my $ctk = CTK->new(
         plugins     => [qw/log file archive ftp sftp/],
         #verbose     => 1,
         #debug       => 1,

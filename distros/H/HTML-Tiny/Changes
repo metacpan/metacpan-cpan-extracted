@@ -1,5 +1,10 @@
 Release history for HTML-Tiny
 
+1.08  Wed 07 Sep 2022
+	- <frame> and <iframe> are no longer on the list of self-closing tags.
+	  Thanks to Graham Knop for catching this
+	- Updated packaging
+
 1.07  Thu 01 Sep 2022
 	- No functional changes
 	- POD error fix

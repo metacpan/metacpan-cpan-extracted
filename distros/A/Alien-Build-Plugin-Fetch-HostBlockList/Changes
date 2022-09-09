@@ -1,5 +1,8 @@
 Revision history for Alien-Build-Plugin-Fetch-HostBlockList
 
+0.02      2022-09-08 02:57:06 -0600
+  - Documentaton improvements (gh#3)
+
 0.01      2022-08-28 12:36:50 -0600
   - initial version
 

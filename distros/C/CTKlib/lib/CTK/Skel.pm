@@ -1,4 +1,4 @@
-package CTK::Skel; # $Id: Skel.pm 250 2019-05-09 12:09:57Z minus $
+package CTK::Skel;
 use strict;
 use utf8;
 
@@ -10,17 +10,17 @@ CTK::Skel - Helper for building project's skeletons
 
 =head1 VIRSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
     use CTK::Skel;
 
-    my $skel = new CTK::Skel (
+    my $skel = CTK::Skel->new(
         -dir    => "/destination/directory/for/project",
     );
 
-    my $skel = new CTK::Skel (
+    my $skel = CTK::Skel->new(
         -name   => "ProjectName",
         -root   => "/path/to/project/dir",
         -skels  => {
@@ -46,7 +46,7 @@ Helper for building project's skeletons
 
 =head2 new
 
-    my $skel = new CTK::Skel (
+    my $skel = CTK::Skel->new(
         -name   => "ProjectName",
         -root   => "/path/to/project/dir",
         -skels  => {
@@ -101,11 +101,11 @@ L<CTK>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -117,12 +117,11 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use Carp;
 use File::Spec;
 use File::Temp qw();
-use Class::C3::Adopt::NEXT; #use MRO::Compat;
 use MIME::Base64 qw/decode_base64/;
 use Term::ANSIColor qw/colored/;
 use CTK::Util qw/ :BASE /;
@@ -130,6 +129,8 @@ use CTK::ConfGenUtil;
 use CTK::TFVals qw/ :ALL /;
 
 use Cwd qw/getcwd/;
+
+use mro; # See also Class::C3::Adopt::NEXT and MRO::Compat
 
 use constant {
     PROJECT     => "Foo",
@@ -344,13 +345,13 @@ sub _debug {
 
 # Functions
 sub _yep {
-    return(colored(['green on_black'], '[  OK  ]'), ' ', sprintf(shift, @_));
+    return(colored(['green'], '[  OK  ]'), ' ', sprintf(shift, @_));
 }
 sub _nope {
-    return(colored(['red on_black'], '[ FAIL ]'), ' ', sprintf(shift, @_));
+    return(colored(['red'], '[ FAIL ]'), ' ', sprintf(shift, @_));
 }
 sub _skip {
-    return(colored(['yellow on_black'], '[ SKIP ]'), ' ', sprintf(shift, @_));
+    return(colored(['yellow'], '[ SKIP ]'), ' ', sprintf(shift, @_));
 }
 sub _bcut {
     my $s = shift;

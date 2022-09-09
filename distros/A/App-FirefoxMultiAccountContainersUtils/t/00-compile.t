@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FirefoxMultiAccountContainersUtils.pm'
@@ -16,7 +16,8 @@ my @scripts = (
     'script/firefox-container',
     'script/firefox-mua-list-containers',
     'script/firefox-mua-modify-containers',
-    'script/firefox-mua-sort-containers'
+    'script/firefox-mua-sort-containers',
+    'script/open-firefox-container'
 );
 
 # no fake home requested

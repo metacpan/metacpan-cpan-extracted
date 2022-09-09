@@ -1,4 +1,4 @@
-package CTK::ConfGenUtil; # $Id: ConfGenUtil.pm 222 2019-05-01 14:44:03Z minus $
+package CTK::ConfGenUtil;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::ConfGenUtil - Config::General structure utility functions
 
 =head1 VERSION
 
-Version 2.68
+Version 2.69
 
 =head1 SYNOPSIS
 
@@ -90,9 +90,15 @@ This method returns the found node of a given key.
 
 =item B<value>
 
-This method returns the scalar value of a given key.
+This method returns the scalar value (first) of a given key.
 
     my $baz = value( $config, 'foo/bar/baz' );
+
+=item B<lvalue>
+
+This method returns the scalar value (last) of a given key.
+
+    my $baz = lvalue( $config, 'foo/bar/baz' );
 
 =item B<array>
 
@@ -152,11 +158,11 @@ L<Config::General::Extended>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -168,10 +174,14 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '2.68';
+$VERSION = '2.69';
 
 use base qw/Exporter/;
-our @EXPORT = qw/ node value array hash is_value is_scalar is_array is_hash /;
+
+# Default export (all):
+our @EXPORT = qw/ node value lvalue array hash is_value is_scalar is_array is_hash /;
+# Required only:
+our @EXPORT_OK = qw/ node value lvalue array hash is_value is_scalar is_array is_hash /;
 
 sub node {
     #
@@ -227,6 +237,17 @@ sub value {
     $node = node($node, @_) if defined($_[0]);
     if ($node && ref($node) eq 'ARRAY') {
         return exists($node->[0]) ? $node->[0] : undef;
+    } elsif (defined($node) && !ref($node)) {
+        return $node
+    } else {
+        return undef
+    }
+}
+sub lvalue {
+    my $node = shift;
+    $node = node($node, @_) if defined($_[0]);
+    if ($node && ref($node) eq 'ARRAY') {
+        return exists($node->[0]) ? $node->[-1] : undef;
     } elsif (defined($node) && !ref($node)) {
         return $node
     } else {

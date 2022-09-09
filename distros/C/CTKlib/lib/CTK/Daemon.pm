@@ -1,4 +1,4 @@
-package CTK::Daemon; # $Id: Daemon.pm 277 2020-03-22 18:09:31Z minus $
+package CTK::Daemon;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Daemon - Abstract class to implement Daemons
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ Run as different user using setuid/setgid
 
 =item new
 
-    my $daemon = new CTK::Daemon('testdaemon', (
+    my $daemon = CTK::Daemon->new('testdaemon', (
         ctk         => CTK::App->new(...), # Or create CTKx instance first
         debug       => 1, # Default: 0
         loglevel    => "debug", # Default: undef
@@ -134,15 +134,19 @@ Destroy logger
 
 Exit with status code
 
-=item init, down, run
+=item init, down, run, reload, cleanup
 
 Base methods for overwriting in your class.
 
 The init() method is called at startup - before forking
 
-The run() method is called  at inside process and describes body of the your code
+The run() method is called at inside process and describes body of the your code. This code is called at startup of each forks
 
-The down () method is called at cleanup - after processing
+The down() method is called at cleanup - after processing each forks
+
+The reload() method is called at received HUP signal, this code is called at before running of each forks
+
+The cleanup() method is called at before exit from main fork
 
 =item start, stop, restart, status and hup
 
@@ -238,8 +242,8 @@ Classic example:
 
     package My::App;
 
-    my $ctk = new CTK::App;
-    my $daemon = new My::Class('testdaemon', (
+    my $ctk = CTK::App->new;
+    my $daemon = My::Class->new('testdaemon', (
         ctk         => $ctk,
         debug       => 1,
         loglevel    => "debug",
@@ -359,11 +363,11 @@ L<CTK>, L<POSIX>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 Based on PVE::Daemon ideology
 
@@ -377,7 +381,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/$VERSION @EXPORT $DEV_DEBUG/;
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 use Carp;
 use File::Spec;
@@ -431,30 +435,34 @@ sub new {
     my %params = @_;
 
     # Check instance
-    die "Can't create more that one Daemon\n" if $daemon_initialized;
+    croak "Can't create more that one Daemon\n" if $daemon_initialized;
     $daemon_initialized = 1;
 
     # Check name
-    die "Can't create unnamed daemon\n" unless $name;
-    die "Incorrect daemon name: \"$name\"\n" unless $name =~ /[a-z0-9\-_.]+/i;
+    croak "Can't create unnamed daemon\n" unless $name;
+    croak "Incorrect daemon name: \"$name\"\n" unless $name =~ /[a-z0-9\-_.]+/i;
 
     # Check root permissions
     die "Please run as root\n" if $> != 0;
 
     my $ctk = $params{ctk} || CTKx->instance->ctk;
-    die "CTK object required\n" unless $ctk && ref($ctk);
+    croak "CTK object required\n" unless $ctk && ref($ctk);
 
     my $forkers = $params{forks} || FORKS;
        $forkers = MAX_FORKS if $forkers > MAX_FORKS;
        $forkers = MIN_FORKS if $forkers < MIN_FORKS;
     my $pidfile = File::Spec->catfile(rundir(), sprintf("%s.pid", $name));
-    my $pidf    = new CTK::FilePid({ file => $pidfile });
+    my $pidf    = CTK::FilePid->new({ file => $pidfile });
     my $pidstat = $pidf->running || 0;
     my $sigs    = SIGS_DEF;
        %LOCAL_SIG = %$sigs;
     my $loglevel = $params{loglevel};
     unless (defined($loglevel)) {
-        $loglevel = $ctk->conf("loglevel") if $ctk->can("conf");
+        if ($ctk->can("conf")) {
+            $loglevel = lvalue($ctk->conf("loglevel"));
+            $loglevel = 'except'
+                unless lvalue($ctk->conf("logenable")) || lvalue($ctk->conf("logenabled"));
+        }
     }
     my $debug = $params{debug} // $ctk->debugmode;
     my $logger;
@@ -463,12 +471,12 @@ sub new {
     my $lsbstop = sub {
         if ($pidstat) {
             foreach my $sg (qw(TERM TERM INT KILL)) {
-                $logger->log_debug("Sending $sg signal to pid $pidstat..." ) if $logger;
+                $logger->log_debug("Sending $sg signal to pid $pidstat..." ) if $debug && $logger;
                 kill $sg => $pidstat;
                 for (1..KILL_TIMEOUT)
                 {
                     # abort early if the process is now stopped
-                    $logger->log_debug("Checking if pid $pidstat is still running...") if $logger;
+                    $logger->log_debug("Checking if pid $pidstat is still running...") if $debug && $logger;
                     last unless $pidf->running;
                     sleep 1;
                 }
@@ -482,10 +490,10 @@ sub new {
             my $tpid = $pidf->_get_pid_from_file;
             unlink($pidfile) if $tpid && (-e $pidfile) && $pidstat == $tpid;
             print("Stopped\n");
-            $logger->log_info("Stopped") if $logger;
+            $logger->log_debug("Stopped") if $logger;
         } else {
             print("Not Running\n");
-            $logger->log_info("Not Running") if $logger;
+            $logger->log_debug("Not Running") if $logger;
         }
         $pidstat = 0;
         return 0;
@@ -496,10 +504,10 @@ sub new {
         if ($pidstat) {
             kill "HUP" => $pidstat;
             print("Reloaded\n");
-            $logger->log_info("Reloaded") if $logger;
+            $logger->log_debug("Reloaded") if $logger;
         } else {
             print("Not Running\n");
-            $logger->log_info("Not Running") if $logger;
+            $logger->log_debug("Not Running") if $logger;
         }
         return 0;
     };
@@ -508,10 +516,10 @@ sub new {
     my $lsbstatus = sub {
         if ($pidstat) {
             print("Running\n");
-            $logger->log_info("Running") if $logger;
+            $logger->log_debug("Running") if $logger;
         } else {
             print("Not Running\n");
-            $logger->log_info("Not Running") if $logger;
+            $logger->log_debug("Not Running") if $logger;
         }
         return 0;
     };
@@ -543,13 +551,14 @@ sub new {
         lsbstatus   => $lsbstatus,
 
         # General properties
+        reloaded    => 0, # Reload counter
         interrupt   => 0, # For common interruption only
         exception   => 0, # For exceptions
         hangup      => 0, # For reloading
         skip        => 0, # For skipping of subprocesses
     }, $class;
 
-    $logger = $self->logger();
+    $logger = $self->logger(); # For init logger
 
     return $self;
 }
@@ -578,10 +587,11 @@ sub worker {
     local $SIG{KILL} = $anon;
     local $SIG{HUP} = sub {$self->{hangup}++};
 
-    $logger->log_info("Start worker #%d pid=%d", $j, $$) if $logger;
+    $logger->log_debug("Start worker #%d pid=%d", $j, $$) if $self->{debug} && $logger;
     RELOAD: if ($self->hangup) {
         $self->reinit_worker();
-        $self->hangup(0);
+        $self->{reloaded}++;
+        $self->reload(); # User defined method
     }
 
     my $status;
@@ -592,28 +602,28 @@ sub worker {
         mysleep(STEP); # avoid fast restarts
     }
     if (!$status) { # Abort
-        $logger->log_info("Abort worker #%d pid=%d (finished with negative status)", $j, $$) if $logger;
+        $logger->log_debug("Abort worker #%d pid=%d (finished with negative status)", $j, $$) if $self->{debug} && $logger;
         return 1; # For exit!
     } elsif ($self->exception) { # Exceptions
         if ($logger) {
-            $logger->log_crit("Exception #%d pid=%d", $j, $$);
+            $logger->log_crit("Exception #%d pid=%d", $j, $$) if $self->{debug};
         } else {
             printf STDERR "Exception #%d pid=%d\n", $j, $$;
         }
         return 1; # For exit!
     } elsif ($self->interrupt) { # Interruption
         if ($logger) {
-            $logger->log_error("Interrupt worker #%d pid=%d", $j, $$);
+            $logger->log_error("Interrupt worker #%d pid=%d", $j, $$) if $self->{debug};
         } else {
             printf STDERR "Interrupt worker #%d pid=%d\n", $j, $$;
         }
         return 1; # For exit!
     } elsif ($self->hangup) { # Reloading
-        $logger->log_info("Reload worker #%d pid=%d", $j, $$) if $logger;
+        $logger->log_debug("Reload worker #%d pid=%d", $j, $$) if $self->{debug} && $logger;
         goto RELOAD;
     }
 
-    $logger->log_info("Finish worker #%d pid=%d", $j, $$) if $logger;
+    $logger->log_debug("Finish worker #%d pid=%d", $j, $$) if $self->{debug} && $logger;
     return 0; # For exit!
 }
 
@@ -665,13 +675,26 @@ sub init {
     return 1;
 }
 # Please overwrite in subclass
-#  this is called at cleanup - after processing
+#  this is called at cleanup - after processing each forks
 sub down {
     my $self = shift;
     return 1;
 }
 # Please overwrite in subclass
+#  this is called at startup of each forks
 sub run {
+    my $self = shift;
+    return 1;
+}
+# Please overwrite in subclass
+#  this is called at before running of each forks
+sub reload {
+    my $self = shift;
+    return 1;
+}
+# Please overwrite in subclass
+#  this is called at before exit from main fork
+sub cleanup {
     my $self = shift;
     return 1;
 }
@@ -718,14 +741,18 @@ sub start {
     #say "INITPID> ".$self->{initpid};
     my $pidf = $self->{initpidf};
 
-    $self->init();
+    # Run init handler
+    $self->init() or return 1; # error level (exit code)
 
     # Start master process
     my $pid = myfork();
-    print("Started\n") if $pid;
-    if ($pid && $self->{debug}) {
-        #printf("Master process (pid=%d) successfully started\n", $pid);
-        $logger->log_debug("Master process (pid=%d) successfully started", $pid) if $logger;
+    if ($pid) {
+        print("Started\n");
+        if ($self->{debug}) {
+            $logger->log_debug("Master process (pid=%d) successfully started", $pid) if $logger;
+        } else {
+            $logger->log_debug("Started") if $logger;
+        }
     }
     $self->logger_close;
 
@@ -791,10 +818,11 @@ sub start {
         }
         #print("Terminated!\n");
 
-
+        # Cleanup
+        $self->cleanup();
         if ($self->{debug}) {
             #printf("Master process (pid=%d) successfully finished\n", $$);
-            $self->logger->log_info("Master process (pid=%d) successfully finished", $$) if $self->logger;
+            $self->logger->log_debug("Master process (pid=%d) successfully finished", $$) if $self->logger;
         }
         $pidf->remove;
         POSIX::_exit(0);
@@ -811,7 +839,7 @@ sub restart {
     my $self = shift;
     $self->stop();
 
-    my $pidf = new CTK::FilePid({ file => $self->{pidfile} });
+    my $pidf = CTK::FilePid->new({ file => $self->{pidfile} });
     $self->{initpid} = $$;
     $self->{initpidf} = $pidf;
     $self->{initpidstat} = $pidf->running || 0;
@@ -826,7 +854,7 @@ sub status {
 sub hup {
     my $self = shift;
     my $lsbreload = $self->{lsbreload};
-    $self->logger->log_info("Received signal HUP (reload)") if $self->logger;
+    $self->logger->log_debug("Received signal HUP (reload)") if $self->{debug} && $self->logger;
     return &$lsbreload();
 }
 
@@ -839,7 +867,7 @@ sub logger {
     return $self->{logger} if $self->{logger};
     my $ctk = $self->{ctk};
     return $ctk->logger if $ctk && $ctk->can("logger") && $ctk->logger;
-    my $logger = new CTK::Log(
+    my $logger = CTK::Log->new(
         level => $self->{loglevel},
         ident => $self->{name},
         facility => Sys::Syslog::LOG_DAEMON,

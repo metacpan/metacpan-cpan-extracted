@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/dateseq/dateseq
-# and generated automatically using Perinci::CmdLine::Gen version 0.500
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-24'; # DATE
+our $DATE = '2022-09-09'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.106'; # VERSION
+our $VERSION = '0.110'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/dateseq/dateseq",
@@ -38,13 +38,15 @@ dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.106 of dateseq (from Perl distribution App-dateseq), released on 2021-09-24.
+This document describes version 0.110 of dateseq (from Perl distribution App-dateseq), released on 2022-09-09.
 
 =head1 SYNOPSIS
 
-Usage:
+B<dateseq> [B<--business>|B<--no-business>|B<--nobusiness>] [B<--business6>|B<--no-business6>|B<--nobusiness6>] [B<--eval>=I<str>|B<-e>=I<str>] [(B<--exclude-dow>=I<date::dow_nums>)+|B<--exclude-dow-json>=I<json>] [(B<--exclude-month>=I<date::month_nums>)+|B<--exclude-month-json>=I<json>] [B<--format-class-attrs>=I<s>|B<--format-class-attrs-json>=I<json>] [B<--format-class>=I<perl::modname>] [B<--format>=I<name>|B<--json>] [B<--header>=I<str>] [(B<--include-dow>=I<date::dow_nums>)+|B<--include-dow-json>=I<json>] [(B<--include-month>=I<date::month_nums>)+|B<--include-month-json>=I<json>] [B<--limit-monthly>=I<posint>] [B<--limit-yearly>=I<posint>] [B<--limit>=I<posint>|B<-n>=I<posint>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--random>] [B<--reverse>|B<-r>] [B<--strftime>=I<str>|B<-f>=I<str>] -- [I<from>] [I<to>] [I<increment>]
 
-% B<dateseq> [B<--business>|B<--no-business>|B<--nobusiness>] [B<--business6>|B<--no-business6>|B<--nobusiness6>] [B<--eval>=I<str>] [(B<--exclude-dow>=I<date::dow_nums>)+] [(B<--exclude-month>=I<date::month_nums>)+] [B<--format-class-attrs>=I<s>] [B<--format-class>=I<perl::modname>] [B<--format>=I<name>|B<--json>] [B<--header>=I<str>] [(B<--include-dow>=I<date::dow_nums>)+] [(B<--include-month>=I<date::month_nums>)+] [B<--limit-monthly>=I<posint>] [B<--limit-yearly>=I<posint>] [B<--limit>=I<posint>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--reverse>|B<-r>] [B<--strftime>=I<str>] [B<--exclude-dow-json>=I<json>] [B<--exclude-month-json>=I<json>] [B<--format-class-attrs-json>=I<json>] [B<--include-dow-json>=I<json>] [B<--include-month-json>=I<json>] [B<-e>=I<str>] [B<-f>=I<str>] [B<-n>=I<posint>] -- [I<from>] [I<to>] [I<increment>]
+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
@@ -83,7 +85,18 @@ Only output at most this number of dates for each year.
 
 =item B<--limit>=I<s>, B<-n>
 
-Only generate a certain amount of numbers.
+Only generate a certain amount of dates.
+
+=item B<--random>
+
+Instead of incrementing/decrementing monotonically, generate random date between --to and --from.
+
+If you specify this, you have to specify C<--to> I<and> C<--from>.
+
+Also, currently, if you also specify C<--limit-yearly> or C<--limit-monthly>, the
+script may hang because it runs out of dates, so be careful when specifying
+these options combined.
+
 
 =item B<--reverse>, B<-r>
 
@@ -177,7 +190,7 @@ Arguments to pass to constructor of DateTime::Format::* class.
 
 Use a DateTime::Format::* class for formatting.
 
-By default, <pm:DateTime::Format::Strptime> is used with pattern set from the
+By default, L<DateTime::Format::Strptime> is used with pattern set from the
 <strftime> option.
 
 
@@ -185,23 +198,23 @@ By default, <pm:DateTime::Format::Strptime> is used with pattern set from the
 
 strftime() format for each date.
 
-Default is `%Y-%m-%d`, unless when hour/minute/second is specified, then it is
-`%Y-%m-%dT%H:%M:%S`.
+Default is C<%Y-%m-%d>, unless when hour/minute/second is specified, then it is
+C<%Y-%m-%dT%H:%M:%S>.
 
-`dateseq` actually uses <pm:DateTimeX::strftimeq>, so you can embed Perl code
+C<dateseq> actually uses L<DateTimeX::strftimeq>, so you can embed Perl code
 for flexibility. For example:
 
-    % dateseq 2019-11-19 2019-11-25 -f '%Y-%m-%d%( $_->day_of_week == 7 ? "su" : "" )q'
+ % dateseq 2019-11-19 2019-11-25 -f '%Y-%m-%d%( $_->day_of_week == 7 ? "su" : "" )q'
 
 will print something like:
 
-    2019-11-19
-    2019-11-20
-    2019-11-21
-    2019-11-22
-    2019-11-23
-    2019-11-24su
-    2019-11-25
+ 2019-11-19
+ 2019-11-20
+ 2019-11-21
+ 2019-11-22
+ 2019-11-23
+ 2019-11-24su
+ 2019-11-25
 
 
 =back
@@ -214,7 +227,7 @@ will print something like:
 
 Run perl code for each date.
 
-Specified perl code will receive the date as DateTime object in `$_`and expected
+Specified perl code will receive the date as DateTime object in C<$_>and expected
 to return result to print.
 
 
@@ -225,6 +238,12 @@ Choose output format, e.g. json, text.
 Default value:
 
  undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
 
 =item B<--json>
 
@@ -240,24 +259,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -311,11 +339,11 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
-Generate "infinite" dates from today:
+=head2 Generate "infinite" dates from today
 
  % dateseq
 
-Generate dates from 2015-01-01 to 2015-01-31:
+=head2 Generate dates from 2015-01-01 to 2015-01-31
 
  % dateseq 2015-01-01 2015-01-31
  2015-01-01
@@ -324,16 +352,16 @@ Generate dates from 2015-01-01 to 2015-01-31:
  2015-01-30
  2015-01-31
 
-Generate dates from yesterday to 2 weeks from now:
+=head2 Generate dates from yesterday to 2 weeks from now
 
  % dateseq yesterday "2 weeks from now"
- 2021-09-23T00:00:00
- 2021-09-24T00:00:00
+ 2022-09-08T00:00:00
+ 2022-09-09T00:00:00
  ... 12 more lines ...
- 2021-10-07T00:00:00
- 2021-10-08T00:00:00
+ 2022-09-22T00:00:00
+ 2022-09-23T00:00:00
 
-Generate dates from 2015-01-31 to 2015-01-01 (reverse):
+=head2 Generate dates from 2015-01-31 to 2015-01-01 (reverse)
 
  % dateseq 2015-01-31 2015-01-01 -r
  2015-01-31
@@ -342,11 +370,11 @@ Generate dates from 2015-01-31 to 2015-01-01 (reverse):
  2015-01-02
  2015-01-01
 
-Generate "infinite" dates from 2015-01-01 (reverse):
+=head2 Generate "infinite" dates from 2015-01-01 (reverse)
 
  % dateseq 2015-01-01 -r
 
-Generate 10 dates from 2015-01-01:
+=head2 Generate 10 dates from 2015-01-01
 
  % dateseq 2015-01-01 -n 10
  2015-01-01
@@ -355,7 +383,7 @@ Generate 10 dates from 2015-01-01:
  2015-01-09
  2015-01-10
 
-Generate dates with increment of 3 days:
+=head2 Generate dates with increment of 3 days
 
  % dateseq 2015-01-01 2015-01-31 -i P3D
  2015-01-01
@@ -364,7 +392,7 @@ Generate dates with increment of 3 days:
  2015-01-28
  2015-01-31
 
-Generate first 20 business days (Mon-Fri) after 2015-01-01:
+=head2 Generate first 20 business days (Mon-Fri) after 2015-01-01
 
  % dateseq 2015-01-01 --business -n 20 -f "%Y-%m-%d(%a)"
  2015-01-01(Thu)
@@ -378,7 +406,7 @@ Generate first 20 business days (Mon-Fri) after 2015-01-01:
  2015-01-27(Tue)
  2015-01-28(Wed)
 
-Generate first 5 non-business days (Sat-Sun) after 2015-01-01:
+=head2 Generate first 5 non-business days (Sat-Sun) after 2015-01-01
 
  % dateseq 2015-01-01 --no-business -n 5
  2015-01-03
@@ -387,7 +415,7 @@ Generate first 5 non-business days (Sat-Sun) after 2015-01-01:
  2015-01-11
  2015-01-17
 
-Show the first business day (Mon-Fri) of each month in 2021:
+=head2 Show the first business day (Mon-Fri) of each month in 2021
 
  % dateseq 2021-01-01 2021-12-13 --business --limit-monthly 1 -f "%Y-%m-%d(%a)"
  2021-01-01(Fri)
@@ -401,7 +429,7 @@ Show the first business day (Mon-Fri) of each month in 2021:
  2021-11-01(Mon)
  2021-12-01(Wed)
 
-Show the last business day (Mon-Fri) of each month in 2021:
+=head2 Show the last business day (Mon-Fri) of each month in 2021
 
  % dateseq 2021-12-31 2021-01-01 -r --business --limit-monthly 1 -f "%Y-%m-%d(%a)"
  2021-12-31(Fri)
@@ -415,15 +443,15 @@ Show the last business day (Mon-Fri) of each month in 2021:
  2021-02-26(Fri)
  2021-01-29(Fri)
 
-Show Mondays, Wednesdays, and Fridays between 2015-01-01 and 2015-02-28:
+=head2 Show Mondays, Wednesdays, and Fridays between 2015-01-01 and 2015-02-28
 
  % dateseq 2015-01-01 2015-02-28 --include-dow Mo,We,Fr -f "%Y-%m-%d(%a)"
 
-Show dates (except Mondays) after 2015-01-01 and 2015-02-28:
+=head2 Show dates (except Mondays) after 2015-01-01 and 2015-02-28
 
  % dateseq 2015-01-01 2015-02-28 --exclude-dow Mo -f "%Y-%m-%d(%a)"
 
-Generate a CSV data:
+=head2 Generate a CSV data
 
  % dateseq 2010-01-01 2015-01-31 -f "%Y,%m,%d" --header "year,month,day"
  year,month,day
@@ -432,7 +460,7 @@ Generate a CSV data:
  2015,01,30
  2015,01,31
 
-Generate periods (YYYY-MM):
+=head2 Generate periods (YYYY-MM)
 
  % dateseq 2010-01-01 2015-12-31 -i P1M -f "%Y-%m"
  2010-01
@@ -441,7 +469,7 @@ Generate periods (YYYY-MM):
  2015-11
  2015-12
 
-List non-holidays in 2015 (using Indonesian holidays):
+=head2 List non-holidays in 2015 (using Indonesian holidays)
 
  % setop --diff <(dateseq 2015-01-01 2015-12-31) <(list-idn-holidays --year 2015)
  2015-01-02
@@ -455,7 +483,10 @@ List non-holidays in 2015 (using Indonesian holidays):
  2015-12-30
  2015-12-31
 
-List non-holidays business days in 2015 (using Indonesian holidays):
+See also L<dateseq-id> as alternative.
+
+
+=head2 List non-holidays business days in 2015 (using Indonesian holidays)
 
  % setop --diff <(dateseq 2015-01-01 2015-12-31 --business) <(list-idn-holidays --year 2015)
  2015-01-02
@@ -469,11 +500,14 @@ List non-holidays business days in 2015 (using Indonesian holidays):
  2015-12-30
  2015-12-31
 
-Use with fsql:
+See also L<dateseq-id> as alternative.
+
+
+=head2 Use with fsql
 
  % dateseq 2010-01-01 2015-12-01 -f "%Y,%m" -i P1M --header "year,month" | fsql --add-csv - --add-csv data.csv -F YEAR -F MONTH 'SELECT year, month, data1 FROM stdin WHERE YEAR(data.date)=year AND MONTH(data.date)=month'
 
-Use %q (see DateTimeX::strftimeq):
+=head2 Use %q (see DateTimeX::strftimeq)
 
  % dateseq 2020-12-24 2021-01-15 -f '%Y-%m-%d%( $_->day_of_week == 7 ? "su" : "" )q'
  2020-12-24
@@ -487,7 +521,7 @@ Use %q (see DateTimeX::strftimeq):
  2021-01-14
  2021-01-15
 
-Print first and last days of each month of 2021:
+=head2 Print first and last days of each month of 2021
 
  % dateseq 2021-01-01 2021-12-01 --increment '1 month' -e 'my $dt2 = $_->clone; $dt2->add(months=>1); $dt2->add(days => -1); $_->ymd . " " . $dt2->ymd'
  2021-01-01 2021-01-31
@@ -501,9 +535,18 @@ Print first and last days of each month of 2021:
  2021-11-01 2021-11-30
  2021-12-01 2021-12-31
 
-Retrieve MetaCPAN releases data for 2020, saved in monthly JSON files:
+=head2 Retrieve MetaCPAN releases data for 2020, saved in monthly JSON files
 
  % dateseq 2020-01-01 2020-12-01 --increment '1 month' -e 'my $dt2 = $_->clone; $dt2->add(months=>1); $dt2->add(days => -1); sprintf "list-metacpan-releases --from-date %sT00:00:00 --to-date %sT23:59:59 --json > %04d%02d.json", $_->ymd, $dt2->ymd, $_->year, $_->month' | bash
+
+=head2 Generate 100 random dates between a certain range
+
+ % dateseq --random --from "1 year ago" --to "1 year from now" --limit 100
+ 2022-11-11T23:08:56
+ 2022-05-08T17:02:55
+ ... 96 more lines ...
+ 2021-10-21T19:09:29
+ 2023-08-28T14:07:55
 
 =head1 HOMEPAGE
 
@@ -540,13 +583,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

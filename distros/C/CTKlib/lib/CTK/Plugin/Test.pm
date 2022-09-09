@@ -10,12 +10,12 @@ CTK::Plugin::Test - Test plugin as example for Your plugins
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
     use CTK;
-    my $ctk = new CTK(
+    my $ctk = CTK->new(
             plugins => "test",
         );
     print $ctk->foo;
@@ -62,11 +62,11 @@ L<CTK>, L<CTK::Plugin>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -78,7 +78,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use base qw/CTK::Plugin/;
 

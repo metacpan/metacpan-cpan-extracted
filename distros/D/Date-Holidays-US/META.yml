@@ -24,4 +24,4 @@ resources:
   bugtracker: https://github.com/mrdvt92/perl-Date-Holidays-US/issues
   homepage: https://github.com/mrdvt92/perl-Date-Holidays-US
   repository: https://github.com/mrdvt92/perl-Date-Holidays-US.git
-version: '0.02'
+version: '0.03'

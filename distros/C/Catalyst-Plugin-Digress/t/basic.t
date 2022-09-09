@@ -1,4 +1,4 @@
-use Test::More tests => 4;
+use Test::More tests => 6;
 
 {
 	package Catalyst::Action::Null;
@@ -46,6 +46,11 @@ use Test::More tests => 4;
 		$c->digress( '/entry/null' );
 	}
 
+	sub err : Local {
+		my ( $self, $c ) = ( shift, @_ );
+		$c->digress( '/entry/err' );
+	}
+
 	package MyApp;
 	use Catalyst 'Digress';
 
@@ -71,4 +76,10 @@ use Catalyst::Test 'MyApp';
 	my $res = request '/null';
 	is $res->code, 200, 'Exception averted via ActionClass';
 	is $res->content, 'Carpe diem', 'Response received via ActionClass';
+}
+
+{
+	my $res = request '/err';
+	is $res->code, 500, 'Nonexistent action fails';
+	like $res->content, qr!Cannot digress to nonexistant action '/entry/err'!, '... with the expected error';
 }

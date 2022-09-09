@@ -69,7 +69,7 @@ Address of the cardholder if needed. (B<required>)
 
 =item card.addressState
 
-State of residence of the cardholder. For the US, this is a 2-digit USPS code. (B<required>) 
+State of residence of the cardholder. State abbreviations should be used. (B<required>) 
 
 =item card.addressZip
 
@@ -105,7 +105,7 @@ Email address of the customer (B<required>)
 
 =item name
 
-Customer name [min length: 2] (B<required>) 
+Customer name [max length: 50, min length: 2] (B<required>) 
 
 =item reference
 
@@ -115,7 +115,7 @@ Reference field for external applications use.
 
 =item subscriptions.amount
 
-Amount of payment in the smallest unit of your currency. Example: 100 = $1.00USD 
+Amount of payment in the smallest unit of your currency. Example: 100 = $1.00 
 
 =item subscriptions.billingCycle
 
@@ -131,7 +131,15 @@ Coupon associated with the subscription for the customer.
 
 =item subscriptions.currency
 
-Currency code (ISO-4217). Must match the currency associated with your account. [default: USD] 
+Currency code (ISO-4217). Must match the currency associated with your account. 
+
+=item subscriptions.currentPeriodEnd
+
+End date of subscription's current period 
+
+=item subscriptions.currentPeriodStart
+
+Start date of subscription's current period 
 
 =item subscriptions.customer
 
@@ -147,7 +155,7 @@ Period of frequency of payment for the plan. Example: if the frequency is weekly
 
 =item subscriptions.name
 
-Name describing subscription 
+Name describing subscription [max length: 50] 
 
 =item subscriptions.plan
 
@@ -160,6 +168,10 @@ Quantity of the plan for the subscription. [min value: 1]
 =item subscriptions.renewalReminderLeadDays
 
 If set, how many days before the next billing cycle that a renewal reminder is sent to the customer. If null, then no emails are sent. Minimum value is 7 if set. 
+
+=item subscriptions.source
+
+Source of where subscription was created 
 
 =item token
 
@@ -198,7 +210,7 @@ Hash map representing the criteria to limit the results of the list operation.  
 
 =item C<filter>
 
-Filters to apply to the list.
+<table class="filter_list"><tr><td>filter.id</td><td>Filter by the customer Id</td></tr><tr><td>filter.text</td><td>Can use this to filter by the name, email or reference for the customer</td></tr><tr><td>filter.dateCreatedMin<sup>*</sup></td><td>Filter by the minimum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.dateCreatedMax<sup>*</sup></td><td>Filter by the maximum created date you are searching for - Date in UTC millis</td></tr></table><br><sup>*</sup>Use dateCreatedMin with dateCreatedMax in the same filter if you want to search between two created dates
 
 
 
@@ -289,7 +301,7 @@ Address of the cardholder if needed. (B<required>)
 
 =item C<card.addressState>
 
-State of residence of the cardholder. For the US, this is a 2-digit USPS code. (B<required>) 
+State of residence of the cardholder. State abbreviations should be used. (B<required>) 
 
 =item C<card.addressZip>
 
@@ -326,7 +338,7 @@ Email address of the customer (B<required>)
 
 =item C<name>
 
-Customer name [min length: 2] (B<required>) 
+Customer name [max length: 50, min length: 2] (B<required>) 
 
 =item C<reference>
 
@@ -354,11 +366,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 

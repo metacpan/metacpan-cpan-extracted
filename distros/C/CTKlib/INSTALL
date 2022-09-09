@@ -6,41 +6,53 @@ INSTALLATION INSTRUCTIONS
     make install
     make clean
 
-INSTALLATION ON UBUNTU 16.04 AND ABOVE
+INSTALLATION ON RHEL 7 (CENTOS 7.x)
 
-    apt update
-    apt upgrade
-    apt-get install gcc
-    apt-get install libclass-c3-adopt-next-perl libconfig-general-perl libdbi-perl \
+1. Install the epel and abalama repositories
+
+    sudo yum install epel-release
+    sudo rpm -Uvh https://dist.suffit.org/repo/rhel7/abalama-release-1.00-1.el7.noarch.rpm
+    sudo yum clean all
+    sudo yum update
+
+2. Install CTKlib project
+
+    sudo yum install perl-CTKlib
+
+# Requirements (for manual installation):
+
+    sudo yum install epel-release perl-CPAN perl-Config-General perl-Encode perl-DBI \
+      perl-ExtUtils-MakeMaker perl-File-Copy-Recursive perl-File-Temp \
+      perl-JSON-XS perl-PathTools perl-Perl-OSType perl-Test-Simple \
+      perl-Time-HiRes perl-Try-Tiny perl-YAML
+    sudo cpan install CTK
+
+INSTALLATION ON RHEL 8 (ROCKY LINUX 8.x)
+
+1. Install the epel and abalama repository
+
+    sudo dnf install epel-release
+    sudo rpm -Uvh https://dist.suffit.org/repo/rhel8/abalama-release-1.00-1.el8.noarch.rpm
+    sudo dnf clean all
+    sudo yum update
+
+2. Install CTKlib project
+
+    sudo yum install perl-CTKlib
+
+INSTALLATION ON UBUNTU 20.x
+
+    sudo add-apt-repository ppa:abalama/v1.00
+    sudo apt update
+    sudo apt install libctk-perl
+
+# Requirements (for manual installation):
+
+    sudo apt install gcc libconfig-general-perl libdbi-perl \
       libfile-copy-recursive-perl libio-all-perl libjson-perl libjson-xs-perl \
       libscalar-list-utils-perl libemail-mime-encodings-perl libmime-lite-perl \
       libmro-compat-perl libtext-simpletable-perl libtry-tiny-perl liburi-perl \
       libxml-simple-perl libyaml-perl libyaml-libyaml-perl libsys-sigaction-perl \
-      libtest-simple-perl
-    cpan install CTK
-
-INSTALLATION ON CENTOS LINUX 7.5 AND ABOVE
-
-    yum update
-    yum install epel-release
-    yum install perl-CPAN perl-Config-General perl-Encode perl-DBI \
-      perl-ExtUtils-MakeMaker perl-File-Copy-Recursive perl-File-Temp \
-      perl-JSON-XS perl-MRO-Compat perl-PathTools perl-Perl-OSType perl-Test-Simple \
-      perl-Time-HiRes perl-Try-Tiny perl-YAML
-    cpan install CTK
-
-    .. or via abalama.repo:
-
-    Install abalama repository on your platform:
-        sudo rpm -Uvh https://dist.suffit.org/repo/rhel7/abalama-release-1.00-1.el7.noarch.rpm
-        sudo yum clean all
-        sudo yum update
-        sudo yum install perl-CTKlib
-
-    See also: openfusion repo (http://repo.openfusion.net/)
-
-CREATE NEW VERSION (FOR DEVELOPER ONLY)
-
-    * README         -- pod2readme lib/CTK.pm
-    * Changes        -- Result of command: gmtime | gclip
-    * lib/CTK.pm     -- In documentation (VERSION) & in code $VERSION
+      libtest-simple-perl libclass-singleton-perl libfile-pid-perl libio-string-perl \
+      ibnet-sftp-foreign-perl
+    sudo cpan install CTK

@@ -1,13 +1,11 @@
 #########################################################################
 #
-# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
+# Serż Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 05-helper.t 244 2019-05-08 20:27:23Z minus $
 #
 #########################################################################
 use strict;
@@ -51,7 +49,7 @@ ok($app->run("foo", (foo => "one", bar => 1)), "Run foo handler");
 #note(explain($handler));
 
 #my $ctkx = CTKx->instance(c => $c);
-#my $h = new CTK::Helper ( -t => 'regular' );
+#my $h = CTK::Helper->new( -t => 'regular' );
 #is($h->{class}, 'CTK::Helper::SkelRegular', 'Class for "regular" type');
 
 1;

@@ -21,3 +21,4 @@ t/09greg.t
 t/10subtract.t
 t/11duration.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

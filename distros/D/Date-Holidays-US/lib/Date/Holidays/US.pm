@@ -6,7 +6,7 @@ use POSIX; #strftime to calculate wday
 
 our @EXPORT_OK = qw(is_holiday holidays is_us_holiday us_holidays);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -43,6 +43,8 @@ sub is_holiday {
   my $month = shift;
   my $day   = shift;
   my $wday  = POSIX::strftime(qq{%w}, 0, 0, 0, $day, $month-1, $year-1900); #12:00 am
+
+  #Ref: https://sgp.fas.org/crs/misc/R41990.pdf
 
   #5 U.S. Code § 6103 - Holidays
   #The history of federal holidays in the United States dates back to June 28, 1870
@@ -143,7 +145,7 @@ sub is_holiday {
     return 'Christmas Day Observed';                                  #Friday before December 25
   } elsif ($year >= 1870 and $month == 12 and $day == 25) {
     return 'Christmas Day';                                           #December 25
-  } elsif ($year >= 1909 and $month == 12 and $day == 26 and $wday == 1) { #Executive Order 9636 (October 3, 1945)
+  } elsif ($year >= 1909 and $month == 12 and $day == 26 and $wday == 1) { #Executive Order 1076 (May 22, 1909)
     return 'Christmas Day Observed';                                  #Monday afer December 25
 
   } elsif ($year >= 1971 and $month == 12 and $day == 31 and $wday == 5) { #Executive Order 11582 (Feb. 11, 1971)
@@ -164,7 +166,7 @@ sub is_us_holiday {return is_holiday(@_)};
 
 =head2 holidays
 
-Returns a hash reference containing all of the holidays in specied year.  The keys for the returned hash reference are the dates where 2-digit month and 2-digit day are concatenated.
+Returns a hash reference containing all of the holidays in the specified year.  The keys for the returned hash reference are the dates where 2-digit month and 2-digit day are concatenated.
 
   use Date::Holidays::US qw{holidays};
   my $year          = 2022;
@@ -180,27 +182,14 @@ Returns a hash reference containing all of the holidays in specied year.  The ke
 sub holidays {
   my $year     = shift;
   my %holidays = ();
-  #All possible dates that could be a holiday
-  my @dates    = qw{
-                    0101 0102
-                    0115 0116 0117 0118 0119 0120 0121
-                    0222
-                    0215 0216 0217 0218 0219 0220 0221
-                    0525 0526 0527 0528 0529 0530 0531
-                    0618 0619 0620
-                    0703 0704 0705
-                    0901 0902 0903 0904 0905 0906
-                    1007 1008 1009 1010 1011 1012 1013
-                    1110 1111 1112
-                    1022 1023 1024 1025 1026 1027 1028
-                    1122 1123 1124 1125 1126 1127 1128
-                    1224 1225 1226
-                    1231
-                 };
-  foreach my $date (@dates) {
-    my ($month, $day) = $date =~ m/\A(..)(..)\Z/;
+  my $time     = POSIX::mktime(0, 0, 0, 1, 0, $year-1900); #Jan 1st
+  while (1) {
+    my ($year_calculated, $month, $day) = split /-/, POSIX::strftime("%Y-%m-%d", POSIX::gmtime($time));
+    last if $year_calculated > $year;
+    my $date          = $month . $day;
     my $name          = is_holiday($year, $month, $day);
     $holidays{$date}  = $name if defined($name);
+    $time            += 86400; #Note: Not all US days have 24 hours but we are using UTC for the date component
   }
   return \%holidays;
 }

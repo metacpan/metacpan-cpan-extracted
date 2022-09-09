@@ -1,4 +1,4 @@
-package CTK::Log; # $Id: Log.pm 276 2020-03-22 16:53:04Z minus $
+package CTK::Log;
 use strict;
 use utf8;
 
@@ -10,14 +10,14 @@ CTK::Log - CTK Logging
 
 =head1 VERSION
 
-Version 2.63
+Version 2.64
 
 =head1 SYNOPSIS
 
     use CTK::Log;
     use CTK::Log qw/:constants/;
 
-    my $logger = new CTK::Logger (
+    my $logger = CTK::Logger->new (
             file        => "logs/foo.log",
             level       => CTK::Log::LOG_INFO,
             ident       => "ident string",
@@ -25,26 +25,42 @@ Version 2.63
 
     $logger->log( CTK::Log::LOG_INFO, " ... Blah-Blah-Blah ... " );
 
-    $logger->log_except( "log message" );  # 9 exception
-    $logger->log_fatal( "log message" );   # 8 fatal
-    $logger->log_emerg( "log message" );   # 7 system is unusable
-    $logger->log_alert( "log message" );   # 6 action must be taken immediately
-    $logger->log_crit( "log message" );    # 5 critical conditions
-    $logger->log_error( "log message" );   # 4 error conditions
-    $logger->log_warning( "log message" ); # 3 warning conditions
-    $logger->log_notice( "log message" );  # 2 normal but significant condition
-    $logger->log_info( "log message" );    # 1 informational
-    $logger->log_debug( "log message" );   # 0 debug-level messages (default)
+    $logger->log_except( "..." );  # 9 exception, aborts program!
+    $logger->log_fatal( "..." );   # 8 system unusable, aborts program!
+    $logger->log_emerg( "..." );   # 7 system is unusable
+    $logger->log_alert( "..." );   # 6 failure in primary system
+    $logger->log_crit( "..." );    # 5 failure in backup system
+    $logger->log_error( "..." );   # 4 non-urgent program errors, a bug
+    $logger->log_warning( "..." ); # 3 possible problem, not necessarily error
+    $logger->log_notice( "..." );  # 2 unusual conditions
+    $logger->log_info( "..." );    # 1 normal messages, no action required
+    $logger->log_debug( "..." );   # 0 debugging messages (default)
 
 =head1 DESCRIPTION
 
 Logger class
 
+Log level overview:
+
+   LVL SLL NAME      ALIAS    NOTE
+    0   7  debug              debugging messages, copious tracing output
+    1   6  info               normal messages, no action required
+    2   5  notice    note     unusual conditions
+    3   4  warning   warn     possible problem, not necessarily error
+    4   3  error     err      non-urgent program errors, a bug
+    5   2  critical  crit     failure in backup system
+    6   1  alert              failure in primary system
+    7   0  emergency emerg    system unusable
+    8   0  fatal              system unusable, aborts program!
+    9   0  exception except   exception, aborts program!
+
+* SLL -- SysLog Level
+
 =head1 METHODS
 
 =head2 new
 
-    my $logger = new CTK::Log (
+    my $logger = CTK::Log->new(
             file        => "logs/foo.log",
             level       => "info", # or CTK::Log::LOG_INFO
             ident       => "ident string",
@@ -52,7 +68,7 @@ Logger class
 
 Returns logger object for logging to file
 
-    my $logger = new CTK::Log (
+    my $logger = CTK::Log->new(
             level       => "info", # or CTK::Log::LOG_INFO
             ident       => "ident string",
         );
@@ -212,70 +228,71 @@ Logging with info level (1). Same as log_info( "Message: %s", "Blah-Blah-Blah" )
 =head2 log_debug
 
     $logger->log_debug( <FORMAT>, <VALUE>, ... );
-    $logger->log_debug( "Blah-Blah-Blah" );
+    $logger->log_debug( "the function returned 3" );
+    $logger->log_debug( "going to call function abc" );
 
 Level 0: debug-level messages (default)
 
 =head2 log_info
 
     $logger->log_info( <FORMAT>, <VALUE>, ... );
-    $logger->log_info( "Blah-Blah-Blah" );
+    $logger->log_info( "File soandso successfully deleted." );
 
 Level 1: informational
 
 =head2 log_notice, log_note
 
     $logger->log_notice( <FORMAT>, <VALUE>, ... );
-    $logger->log_notice( "Blah-Blah-Blah" );
+    $logger->log_notice( "Attempted to create config, but config already exists." );
 
 Level 2: normal but significant condition
 
 =head2 log_warning, log_warn
 
     $logger->log_warning( <FORMAT>, <VALUE>, ... );
-    $logger->log_warning( "Blah-Blah-Blah" );
+    $logger->log_warning( "Couldn't delete the file." );
 
 Level 3: warning conditions
 
 =head2 log_error, log_err
 
     $logger->log_error( <FORMAT>, <VALUE>, ... );
-    $logger->log_error( "Blah-Blah-Blah" );
+    $logger->log_error( "Division by zero attempted." );
 
 Level 4: error conditions
 
-=head2 log_crit
+=head2 log_crit, log_critical
 
     $logger->log_crit( <FORMAT>, <VALUE>, ... );
-    $logger->log_crit( "Blah-Blah-Blah" );
+    $logger->log_crit( "The battery is too hot!" );
 
 Level 5: critical conditions
 
 =head2 log_alert
 
     $logger->log_alert( <FORMAT>, <VALUE>, ... );
-    $logger->log_alert( "Blah-Blah-Blah" );
+    $logger->log_alert( "The battery died!" );
 
 Level 6: action must be taken immediately
 
 =head2 log_emerg, log_emergency
 
     $logger->log_emerg( <FORMAT>, <VALUE>, ... );
-    $logger->log_emerg( "Blah-Blah-Blah" );
+    $logger->log_emerg( "No config found, cannot continue!" );
 
 Level 7: system is unusable
 
 =head2 log_fatal
 
     $logger->log_fatal( <FORMAT>, <VALUE>, ... );
-    $logger->log_fatal( "Blah-Blah-Blah" );
+    $logger->log_fatal( "No free memory" );
 
 Level 8: fatal
 
-=head2 log_except,log_exception
+=head2 log_except, log_exception
 
     $logger->log_except( <FORMAT>, <VALUE>, ... );
-    $logger->log_except( "Blah-Blah-Blah" );
+    $logger->log_except( "Segmentation violation" );
 
 Level 9: exception
 
@@ -301,11 +318,11 @@ L<Sys::Syslog>, L<IO::File>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -318,7 +335,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 
 use vars qw/$VERSION %EXPORT_TAGS @EXPORT_OK/;
-$VERSION = '2.63';
+$VERSION = '2.64';
 
 use base qw/Exporter/;
 
@@ -350,7 +367,7 @@ use constant {
         'notice'    => 2, 'note' => -2,
         'warning'   => 3, 'warn' => -3,
         'error'     => 4, 'err' => -4,
-        'crit'      => 5,
+        'crit'      => 5, 'critical' => -5,
         'alert'     => 6,
         'emerg'     => 7, 'emergency' => -7,
         'fatal'     => 8,
@@ -428,18 +445,18 @@ sub new {
         try { # ignore errors
             Sys::Syslog::openlog($ident, $syslogopts, $facility);
         } catch {
-            $self->{error} = $_;
-            return $self;
+            $self->{error} = $_ // '';
         };
+        return $self if length($self->{error});
         $self->{status} = 1;
     } else {
         my $fh;
         try {
-            $fh = new IO::File($file, "a");
+            $fh = IO::File->new($file, "a");
         } catch {
             $self->{error} = sprintf("Can't open log file %s: %s", $file, $_);
-            return $self;
         };
+        return $self if length($self->{error});
         unless (defined($fh)) {
             $self->{error} = sprintf("Can't open log file %s", $file);
             return $self;
@@ -491,7 +508,8 @@ sub log_warning { shift->log(LOG_WARNING, @_) };
 sub log_warn { goto &log_warning };
 sub log_error { shift->log(LOG_ERROR, @_) };
 sub log_err { goto &log_error };
-sub log_crit { shift->log(LOG_CRIT, @_) };
+sub log_critical { shift->log(LOG_CRIT, @_) };
+sub log_crit { goto &log_critical };
 sub log_alert { shift->log(LOG_ALERT, @_) };
 sub log_emerg { shift->log(LOG_EMERG, @_) };
 sub log_emergency { goto &log_emerg };
@@ -527,9 +545,9 @@ sub _flush_to_file {
             $fh->printf($format, @message);
             $fh->print("\n");
         } catch {
-            $self->{error} = $_;
-            return 0;
+            $self->{error} = $_ // '';
         };
+        return 0 if length($self->{error});
     } else {
         $self->{status} = 0;
         return 0;
@@ -547,9 +565,9 @@ sub _flush_to_syslog {
     try { # ignore errors
         Sys::Syslog::syslog($sl, $format, @message);
     } catch {
-        $self->{error} = $_;
-        return 0;
+        $self->{error} = $_ // '';
     };
+    return 0 if length($self->{error});
     return 1;
 }
 

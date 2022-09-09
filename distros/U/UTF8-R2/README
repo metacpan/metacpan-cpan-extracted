@@ -122,6 +122,7 @@ SUBROUTINES
 
   mb.pm MODULINO COMPATIBLE ROUTINES, VARIABLES
     UTF8::R2::do($_)
+    UTF8::R2::dosglob($_)
     UTF8::R2::eval($_)
     UTF8::R2::index_byte($_, 'ABC', 5)
     UTF8::R2::require($_)

@@ -1,0 +1,61 @@
+NAME
+    schema-data - Script to manipulation with data for Schema.
+
+SYNOPSIS
+     schema-data [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_data_module var_key=var_value ..
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "-p password"
+
+            Database password.
+
+    *       "-u user"
+
+            Database user.
+
+    *       "-v schema_version"
+
+            Schema version.
+
+            Default value is last version.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "dsn"
+
+            Database DSN. e.g. dbi:SQLite:dbname=ex1.db
+
+    *       "schema_data_module"
+
+            Name of Schema data module. Must be a 'Schema::Data' instance.
+
+    *       "var_key=var_value"
+
+            Variable keys with values for insert.
+
+EXAMPLE
+     schema-deploy dbi:SQLite:dbname=commons.vote.db Schema::Commons::Vote
+     schema-data dbi:SQLite:dbname=commons.vote.db Schema::Data::Commons::Vote
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Schema-Data>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

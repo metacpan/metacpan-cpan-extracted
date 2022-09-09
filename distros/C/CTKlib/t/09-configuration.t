@@ -1,13 +1,11 @@
 #########################################################################
 #
-# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
+# Serż Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 09-configuration.t 215 2019-04-29 17:46:56Z minus $
 #
 #########################################################################
 use strict;
@@ -36,7 +34,12 @@ BEGIN { use_ok('CTK::Configuration') };
     ok($config->set("test", 123), "Setter");
     is($config->get("test"), 123, "Getter");
     is(ref($config->getall), "HASH", "Get all as hash");
+    #note(explain($config));
+    #sleep 5;
+    #note(explain($config->reload));
 }
+
+
 
 1;
 

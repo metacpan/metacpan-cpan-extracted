@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-08'; # DATE
+our $DATE = '2022-09-09'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -35,7 +35,7 @@ orgadb-sel - Select entries and fields from Org addressbook
 
 =head1 VERSION
 
-This document describes version 0.005 of orgadb-sel (from Perl distribution App-orgadb), released on 2022-08-08.
+This document describes version 0.006 of orgadb-sel (from Perl distribution App-orgadb), released on 2022-09-09.
 
 =head1 SYNOPSIS
 
@@ -528,7 +528,7 @@ importance, from least important to most): C<trace>, C<debug>, C<info>,
 C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
 C<warn>, which means that log statements with level C<info> and less important
 levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
-C<fatal>.
+C<trace>.
 
 For more details on log level and logging, as well as how new logging levels can
 be defined or existing ones modified, see L<Log::ger>.
@@ -794,23 +794,32 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 BI1ITQYCX1_OPT => str
+=head2 ORGADB_SEL_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
+
+=head2 ORGADB_COLOR_THEME
+
+perl::colortheme::modname_with_optional_args. Set default color theme.
+
+Color theme is Perl module name under the C<ColorTheme::Search::> namespace,
+without the namespace prefix. The default is C<Light>. You can set color theme
+using the C<--color-theme> command-line option as well as this environment
+variable.
 
 =head1 FILES
 
-F</home/s1/.config/orgadb.conf>
+=head2 /home/s1/.config/orgadb.conf
 
-F</home/s1/.config/orgadb-sel.conf>
+=head2 /home/s1/.config/orgadb-sel.conf
 
-F</home/s1/orgadb.conf>
+=head2 /home/s1/orgadb.conf
 
-F</home/s1/orgadb-sel.conf>
+=head2 /home/s1/orgadb-sel.conf
 
-F</etc/orgadb.conf>
+=head2 /etc/orgadb.conf
 
-F</etc/orgadb-sel.conf>
+=head2 /etc/orgadb-sel.conf
 
 =head2 ~/.orgadb_sel_history
 

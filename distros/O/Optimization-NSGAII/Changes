@@ -4,3 +4,5 @@ Revision history for Perl extension Optimization::NSGAII.
 	- original version; created by h2xs 1.23 with options
 		-AX --skip-exporter --use-new-tests -n Optimization::NSGAII
 
+0.02  Thu Sep 8 16:33 2022
+	- added keywords 'startPop', to define the starting pupulation

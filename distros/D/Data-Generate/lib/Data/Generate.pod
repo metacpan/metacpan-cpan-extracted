@@ -8,7 +8,7 @@ Data::Generate - Create various types of synthetic data by parsing
 
 =head1 VERSION
 
-Version 0.02
+Version 1.24
 
 =head1 SYNOPSIS
 
@@ -795,6 +795,8 @@ When this happens the program generates a warning.
 =item - 0.01 Initial version
 
 =item - 0.02 Correct bug in calculation of degrees of freedom 
+
+=item - 1.24 Review library
 
 =back
 

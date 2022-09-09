@@ -1,4 +1,4 @@
-package CTK::Helper; # $Id: Helper.pm 264 2019-05-17 21:17:51Z minus $
+package CTK::Helper;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Helper - Helper for building CTK scripts. CLI user interface
 
 =head1 VIRSION
 
-Version 2.70
+Version 2.71
 
 =head1 SYNOPSIS
 
@@ -32,10 +32,6 @@ See C<README>
 
 See C<Changes> file
 
-=head1 DEPENDENCIES
-
-L<CTK>
-
 =head1 TO DO
 
 See C<TODO> file
@@ -50,11 +46,11 @@ L<CTK>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -66,10 +62,9 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '2.70';
+$VERSION = '2.71';
 
 use feature qw/say/;
-#use autouse 'Data::Dumper' => qw(Dumper); #$Data::Dumper::Deparse = 1;
 
 use base qw/ CTK::App /;
 
@@ -132,7 +127,7 @@ __PACKAGE__->register_handler(
     code => sub {
 ### CODE:
     my ($self, $meta, @params) = @_;
-    say sprintf("CTK Version: %s.%s", CTK->VERSION, $self->revision);
+    say sprintf("CTKlib/%s", CTK->VERSION);
     return 1;
 });
 
@@ -153,14 +148,6 @@ __PACKAGE__->register_handler(
         $summary = nope("Can't get CTK version");
     }
 
-    # CTK version
-    my $rev = $self->revision;
-    if ($rev) {
-        yep("CTK revision: %s", $rev);
-    } else {
-        $summary = nope("Can't get CTK revision");
-    }
-
     # Handlers list
     my @handlers = $self->list_handlers;
     if (@handlers) {
@@ -170,7 +157,7 @@ __PACKAGE__->register_handler(
     }
 
     # Allowed skels
-    my $skel = new CTK::Skel ( -skels => PROJECT_SKELS );
+    my $skel = CTK::Skel->new( -skels => PROJECT_SKELS );
     if (my @skels = $skel->skels) {
         yep("Allowed skeletons: %s", join(", ", @skels));
     } else {
@@ -262,7 +249,7 @@ __PACKAGE__->register_handler(
         $tbl->row( $_, $vars{$_} ) for @{(PROJECT_VARS)};
         $tbl->hr;
         $tbl->row( "DIRECTORY", $dir );
-        print("\n",colored(['cyan on_black'], "SUMMARY TABLE:"),"\n", colored(['cyan on_black'], $tbl->draw), "\n");
+        print("\n",colored(['cyan'], "SUMMARY TABLE:"),"\n", colored(['cyan'], $tbl->draw), "\n");
         return skip('Operation aborted') if !$yes
             && $self->cli_prompt('All right?:','yes') !~ /^\s*y/i;
     }
@@ -271,7 +258,7 @@ __PACKAGE__->register_handler(
     {
         my $tmpdirobj = File::Temp->newdir(TEMPLATE => lc($projectname).'XXXXX', TMPDIR => 1);
         my $tmpdir = $tmpdirobj->dirname;
-        my $skel = new CTK::Skel (
+        my $skel = CTK::Skel->new(
                 -name   => $projectname,
                 -root   => $tmpdir,
                 -skels  => PROJECT_SKELS,
@@ -311,15 +298,15 @@ __PACKAGE__->register_handler(
 
 # Colored print
 sub yep {
-    print(colored(['green on_black'], '[  OK  ]'), ' ', sprintf(shift, @_), "\n");
+    print(colored(['green'], '[  OK  ]'), ' ', sprintf(shift, @_), "\n");
     return 1;
 }
 sub nope {
-    print(colored(['red on_black'], '[ FAIL ]'), ' ', sprintf(shift, @_), "\n");
+    print(colored(['red'], '[ FAIL ]'), ' ', sprintf(shift, @_), "\n");
     return 0;
 }
 sub skip {
-    print(colored(['yellow on_black'], '[ SKIP ]'), ' ', sprintf(shift, @_), "\n");
+    print(colored(['yellow'], '[ SKIP ]'), ' ', sprintf(shift, @_), "\n");
     return 1;
 }
 

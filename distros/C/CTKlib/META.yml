@@ -1,5 +1,5 @@
 ---
-abstract: 'Command-line ToolKit library (CTKlib)'
+abstract: 'CTK ToolKit library (CTKlib)'
 author:
   - 'Serz Minus (Sergey Lepenkov) <abalama@cpan.org>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,6 @@ no_index:
 recommends:
   Data::Dumper: '0'
 requires:
-  Class::C3::Adopt::NEXT: '0.13'
   Class::Singleton: '1.4'
   Config::General: '2'
   DBI: '1.63'
@@ -29,7 +28,6 @@ requires:
   File::Copy::Recursive: '0.38'
   File::Find: '0'
   File::Path: '2'
-  File::Pid: '1'
   File::Spec: '0.82'
   File::Temp: '0'
   IO: '0'
@@ -39,11 +37,9 @@ requires:
   List::Util: '1.45'
   MIME::Base64: '3'
   MIME::Lite: '3'
-  MRO::Compat: '0.12'
   Net::FTP: '2.6'
   Perl::OSType: '1'
   Symbol: '1.05'
-  Sys::SigAction: '0.2'
   Sys::Syslog: '0'
   Term::ANSIColor: '4.03'
   Text::SimpleTable: '2'
@@ -57,7 +53,8 @@ requires:
   YAML::XS: '0.4'
   perl: '5.016001'
 resources:
-  homepage: http://www.serzik.com
+  homepage: https://www.serzik.com
   license: https://dev.perl.org/licenses
-  repository: http://svn.serzik.com/CTKlib/trunk
-version: '2.06'
+  repository: https://abalama@git.code.sf.net/p/ctklib/code
+version: '2.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

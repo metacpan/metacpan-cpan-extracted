@@ -1,3 +1,22 @@
+0.110   2022-09-09  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix a couple of bug fixes.
+
+
+0.109   2022-09-09  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] --random didn't observe --limit
+
+        - [ux] Give example for --random.
+
+        - [dist] Remove Changes entry for non-existent release 0.107.
+
+
+0.108   2022-09-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option: --random.
+
+
 0.106   2021-09-24  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

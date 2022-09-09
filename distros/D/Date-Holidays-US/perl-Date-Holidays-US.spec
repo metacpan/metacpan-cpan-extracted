@@ -1,7 +1,7 @@
 Name:           perl-Date-Holidays-US
-Version:        0.02
+Version:        0.03
 Release:        1%{?dist}
-Summary:        Perl extension for blah blah blah
+Summary:        Date::Holidays Adapter for US Federal holidays
 License:        mit
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Date-Holidays-US/

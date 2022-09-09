@@ -32,7 +32,7 @@ Wrapper around is\_holiday function per the API specification. See ["is\_holiday
 
 ## holidays
 
-Returns a hash reference containing all of the holidays in specied year.  The keys for the returned hash reference are the dates where 2-digit month and 2-digit day are concatenated.
+Returns a hash reference containing all of the holidays in the specified year.  The keys for the returned hash reference are the dates where 2-digit month and 2-digit day are concatenated.
 
     use Date::Holidays::US qw{holidays};
     my $year          = 2022;

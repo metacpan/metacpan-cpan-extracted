@@ -8,7 +8,7 @@ BEGIN{
         if $] > 5.020 && $] < 5.022;
 }
 
-plan tests => 5;
+plan tests => 8;
 
 use PPR::X;
 use re 'eval';
@@ -31,11 +31,30 @@ my $METAREGEX = qr{
     $PPR::X::GRAMMAR
 }xms;
 
-ok q{ qr'^([$@%*])(.+)$'               } =~ $METAREGEX;
-ok q{  m'^([$@%*])(.+)$'               } =~ $METAREGEX;
-ok q{  s'^([$@%*])(.+)$' $_ 'e         } =~ $METAREGEX;
-ok q{ qq' quote $@  $_  $etc  unquote' } =~ $METAREGEX;
-ok q{ qx' cmd   $-  $[  $etc  uncmd '  } =~ $METAREGEX;
+ok q{ qr'^([$@%*])(.+)$'               } =~ $METAREGEX  => 'qr';
+ok q{  m'^([$@%*])(.+)$'               } =~ $METAREGEX  => 'm';
+ok q{  s'^([$@%*])(.+)$' $_ 'e         } =~ $METAREGEX  => 's';
+ok q{ qx' cmd   $-  $[  $etc  uncmd '  } =~ $METAREGEX  => 'qx';
+
+$METAREGEX = qr{
+    \A \s* (?&PerlQuotelike) \s* \Z
+
+    (?(DEFINE)
+        (?<PerlScalarAccessNoSpace>
+            ((?&PerlStdScalarAccessNoSpace))
+            (?{ pass "$^N should match a (?&PerlScalarAccessNoSpace)" })
+        )
+
+        (?<PerlArrayAccessNoSpace>
+            ((?&PerlStdArrayAccessNoSpace))
+            (?{ pass "$^N should match a (?&PerlArrayAccessNoSpace)" })
+        )
+    )
+
+    $PPR::X::GRAMMAR
+}xms;
+
+ok q{ qq' quote $@  $_  $etc  unquote' } =~ $METAREGEX  => 'qq';
 
 done_testing();
 

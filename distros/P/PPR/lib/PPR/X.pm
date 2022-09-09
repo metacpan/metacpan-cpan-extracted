@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.001003';
+our $VERSION = '0.001005';
 use utf8;
 use List::Util qw<min max>;
 
@@ -1077,13 +1077,13 @@ our $GRAMMAR = qr{
             |
                 '  [^'\\]*+  (?: \\. [^'\\]*+ )*+ '
             |
-                (?: q \b | qq (?= (?>(?&PerlOWS)) ' ) )
+                q \b
                 (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
                 (?&PPR_X_quotelike_body)
             |
                 qq \b
                 (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-                (?&PPR_X_quotelike_body_interpolated)
+                (?&PPR_X_quotelike_body_always_interpolated)
             |
                 (?&PerlHeredoc)
             |
@@ -1204,7 +1204,7 @@ our $GRAMMAR = qr{
             |
                 \b qq \b
                 (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-                (?&PPR_X_quotelike_body_interpolated)
+                (?&PPR_X_quotelike_body_always_interpolated)
             )
     )) # End of rule
 
@@ -1624,7 +1624,7 @@ our $GRAMMAR = qr{
         ) # End of rule (?<PPR_X_balanced_angles>)
 
         (?<PPR_X_balanced_unicode_delims>
-            (??{$PPR::X::_qld_not_special})*+
+            (??{$PPR::X::_qld_not_special})
             (?:
                 (?>
                     \\.
@@ -1635,7 +1635,7 @@ our $GRAMMAR = qr{
                 |
                     (?&PPR_X_newline_and_heredoc)
                 )
-                (??{$PPR::X::_qld_not_special})*+
+                (??{$PPR::X::_qld_not_special})
             )*+
         ) # End of rule (?<PPR_X_balanced_unicode_delims>)
 
@@ -1669,9 +1669,9 @@ our $GRAMMAR = qr{
                     (?{ local $PPR::X::_qld_open  = $^N;
                         local $PPR::X::_qld_close = $PPR::X::_QLD_CLOSE_FOR{$PPR::X::_qld_open};
                         local $PPR::X::_qld_not_special
-                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]";
+                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]*+";
                         local $PPR::X::_qld_not_special_or_sigil
-                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]";
+                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]*+";
                         local $PPR::X::_qld_not_special_in_regex_var
                             = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\s(|)]";
                     })
@@ -1731,9 +1731,9 @@ our $GRAMMAR = qr{
                     (?{ local $PPR::X::_qld_open  = $^N;
                         local $PPR::X::_qld_close = $PPR::X::_QLD_CLOSE_FOR{$PPR::X::_qld_open};
                         local $PPR::X::_qld_not_special
-                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]";
+                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]*+";
                         local $PPR::X::_qld_not_special_or_sigil
-                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]";
+                            = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]*+";
                         local $PPR::X::_qld_not_special_in_regex_var
                             = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\s(|)]";
                     })
@@ -1768,6 +1768,11 @@ our $GRAMMAR = qr{
                 )
             )
         ) # End of rule (?<PPR_X_quotelike_body_unclosed>)
+
+        (?<PPR_X_quotelike_body_always_interpolated>
+            (?>(?&PPR_X_quotelike_body_always_interpolated_unclosed))
+            \S   # (Note: Don't have to test that this matches; the preceding subrule already did that)
+        ) # End of rule (?<PPR_X_quotelike_body_always_interpolated>)
 
         (?<PPR_X_quotelike_body_interpolated>
             (?>(?&PPR_X_quotelike_body_interpolated_unclosed))
@@ -1861,7 +1866,7 @@ our $GRAMMAR = qr{
 
 
         (?<PPR_X_balanced_unicode_delims_regex_interpolated>
-            (??{$PPR::X::_qld_not_special_or_sigil})*+
+            (??{$PPR::X::_qld_not_special_or_sigil})
             (?:
                 (?>
                     \\.
@@ -1880,7 +1885,7 @@ our $GRAMMAR = qr{
                 |
                     [\$\@]
                 )
-                (??{$PPR::X::_qld_not_special_or_sigil})*+
+                (??{$PPR::X::_qld_not_special_or_sigil})
             )*+
         ) # End of rule (?<PPR_X_balanced_unicode_delims_regex_interpolated>)
 
@@ -1946,7 +1951,7 @@ our $GRAMMAR = qr{
         ) # End of rule (?<PPR_X_balanced_squares_interpolated>)
 
         (?<PPR_X_balanced_unicode_delims_interpolated>
-            (??{$PPR::X::_qld_not_special_or_sigil})*+
+            (??{$PPR::X::_qld_not_special_or_sigil})
             (?:
                 (?>
                     \\.
@@ -1963,7 +1968,7 @@ our $GRAMMAR = qr{
                 |
                     [\$\@]
                 )
-                (??{$PPR::X::_qld_not_special_or_sigil})*+
+                (??{$PPR::X::_qld_not_special_or_sigil})
             )*+
         ) # End of rule (?<PPR_X_balanced_unicode_delims_interpolated>)
 
@@ -2023,9 +2028,9 @@ our $GRAMMAR = qr{
                         (?{ local $PPR::X::_qld_open  = $^N;
                             local $PPR::X::_qld_close = $PPR::X::_QLD_CLOSE_FOR{$PPR::X::_qld_open};
                             local $PPR::X::_qld_not_special
-                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]";
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]*+";
                             local $PPR::X::_qld_not_special_or_sigil
-                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]";
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]*+";
                             local $PPR::X::_qld_not_special_in_regex_var
                                 = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\s(|)]";
                         })
@@ -2113,6 +2118,124 @@ our $GRAMMAR = qr{
             (?&PPR_X_regex_body_unclosed)
         ) # End of rule (?<PPR_X_regex_body_interpolated_unclosed>)
 
+        (?<PPR_X_quotelike_body_always_interpolated_unclosed>
+            # Start by working out where it actually ends (ignoring interpolations)...
+            (?=
+                (?>
+                    [#]
+                    [^#\\\n\$\@]*+
+                    (?:
+                        (?>
+                            \\.
+                        |
+                            (?&PPR_X_newline_and_heredoc)
+                        |
+                            (?= \$ (?! [\s#] ) )  (?&PerlScalarAccessNoSpace)
+                        |
+                            (?= \@ (?! [\s#] ) )  (?&PerlArrayAccessNoSpace)
+                        |
+                            [\$\@]
+                        )
+                        [^#\\\n\$\@]*+
+                    )*+
+                    (?= [#] )
+                |
+                    (?>(?&PerlOWS))
+                    (?>
+                        \{  (?>(?&PPR_X_balanced_curlies_interpolated))    (?= \} )
+                    |
+                        \[  (?>(?&PPR_X_balanced_squares_interpolated))    (?= \] )
+                    |
+                        \(  (?>(?&PPR_X_balanced_parens_interpolated))     (?= \) )
+                    |
+                        <   (?>(?&PPR_X_balanced_angles_interpolated))     (?=  > )
+                    |
+                        (\X) (??{ exists $PPR::X::_QLD_CLOSE_FOR{$^N} ? '' : '(?!)' })
+                        (?{ local $PPR::X::_qld_open  = $^N;
+                            local $PPR::X::_qld_close = $PPR::X::_QLD_CLOSE_FOR{$PPR::X::_qld_open};
+                            local $PPR::X::_qld_not_special
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]*+";
+                            local $PPR::X::_qld_not_special_or_sigil
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]*+";
+                            local $PPR::X::_qld_not_special_in_regex_var
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\s(|)]";
+                        })
+                        (?>(?&PPR_X_balanced_unicode_delims_interpolated))
+                        (?=  (??{$PPR::X::_qld_close}) )
+                    |
+                        \\
+                            [^\\\n\$\@]*+
+                            (?:
+                                (?>
+                                    (?&PPR_X_newline_and_heredoc)
+                                |
+                                    (?= \$ (?! [\s\\] ) )  (?&PerlScalarAccessNoSpace)
+                                |
+                                    (?= \@ (?! [\s\\] ) )  (?&PerlArrayAccessNoSpace)
+                                |
+                                    [\$\@]
+                                )
+                                [^\\\n\$\@]*+
+                            )*+
+                        (?= \\ )
+                    |
+                        /
+                            [^\\/\n\$\@]*+
+                            (?:
+                                (?>
+                                    \\.
+                                |
+                                    (?&PPR_X_newline_and_heredoc)
+                                |
+                                    (?= \$ (?! [\s/] ) )  (?&PerlScalarAccessNoSpace)
+                                |
+                                    (?= \@ (?! [\s/] ) )  (?&PerlArrayAccessNoSpace)
+                                |
+                                    [\$\@]
+                                )
+                                [^\\/\n\$\@]*+
+                            )*+
+                        (?= / )
+                    |
+                        -
+                            (?:
+                                \\.
+                            |
+                                (?&PPR_X_newline_and_heredoc)
+                            |
+                                (?:
+                                    (?= \$ (?! [\s-] ) )  (?&PerlScalarAccessNoSpaceNoArrow)
+                                |
+                                    (?= \@ (?! [\s-] ) )  (?&PerlArrayAccessNoSpaceNoArrow)
+                                |
+                                    [^-]
+                                )
+                            )*+
+                        (?= - )
+                    |
+                        (?<PPR_X_qldel> \S )
+                            (?:
+                                \\.
+                            |
+                                (?&PPR_X_newline_and_heredoc)
+                            |
+                                (?! \g{PPR_X_qldel} )
+                                (?:
+                                    (?= \$ (?! \g{PPR_X_qldel} | \s ) )  (?&PerlScalarAccessNoSpace)
+                                |
+                                    (?= \@ (?! \g{PPR_X_qldel} | \s ) )  (?&PerlArrayAccessNoSpace)
+                                |
+                                    .
+                                )
+                            )*+
+                        (?= \g{PPR_X_qldel} )
+                    )
+                )
+            )
+
+            (?&PPR_X_quotelike_body_unclosed)
+        ) # End of rule (?<PPR_X_quotelike_body_always_interpolated_unclosed>)
+
         (?<PPR_X_quotelike_body_interpolated_unclosed>
             # Start by working out where it actually ends (ignoring interpolations)...
             (?=
@@ -2149,9 +2272,9 @@ our $GRAMMAR = qr{
                         (?{ local $PPR::X::_qld_open  = $^N;
                             local $PPR::X::_qld_close = $PPR::X::_QLD_CLOSE_FOR{$PPR::X::_qld_open};
                             local $PPR::X::_qld_not_special
-                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]";
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n]*+";
                             local $PPR::X::_qld_not_special_or_sigil
-                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]";
+                                = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\\\\\n\\\$\\\@]*+";
                             local $PPR::X::_qld_not_special_in_regex_var
                                 = "[^$PPR::X::_qld_open$PPR::X::_qld_close\\s(|)]";
                         })
@@ -2740,7 +2863,7 @@ PPR::X - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR::X version 0.001003
+This document describes PPR::X version 0.001005
 
 
 =head1 SYNOPSIS
@@ -2958,6 +3081,7 @@ A typical use might therefore be:
         die "Invalid Perl block: " . $PPR::X::ERROR->source . "\n",
             $PPR::X::ERROR->origin($linenum, $filename)->diagnostic . "\n";
     }
+
 
 =head2 Decommenting code with C<PPR_X::decomment()>
 
@@ -4151,6 +4275,14 @@ re-entrancy and safe lexical scoping).
 
 The C<decomment()> subroutine trips a separate regex engine bug in Perl
 5.14 only and will not run under that version.
+
+There was a lingering bug in regex re-interpolation between Perl 5.18 and 5.28,
+which means that interpolating a PPR::X grammar (or any other precompiled regex
+that uses the C<(??{...})> construct) into another regex sometimes does not work.
+In these cases, the spurious error message generated is usually:
+S<I<Sequence (?_...) not recognized>>. This problem is unlikely ever to be
+resolved, as those versions of Perl are no longer being maintained. The
+only known workaround is to upgrade to Perl 5.30 or later.
 
 There are also constructs in Perl 5 which cannot be parsed without
 actually executing some code...which the regex does not attempt to

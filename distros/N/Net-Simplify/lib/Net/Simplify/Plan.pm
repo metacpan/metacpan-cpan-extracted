@@ -51,7 +51,7 @@ Hash map containing initial values for the object.  Valid keys are:
 
 =item amount
 
-Amount of payment for the plan in the smallest unit of your currency. Example: 100 = $1.00USD (B<required>) 
+Amount of payment for the plan in the smallest unit of your currency. Example: 100 = $1.00 (B<required>) 
 
 =item billingCycle
 
@@ -122,7 +122,7 @@ Hash map representing the criteria to limit the results of the list operation.  
 
 =item C<filter>
 
-Filters to apply to the list.
+<table class="filter_list"><tr><td>filter.id</td><td>Filter by the plan Id</td></tr><tr><td>filter.text</td><td>Filter by the name of the plan</td></tr><tr><td>filter.frequency</td><td>Filter by the frequency of the plan</td></tr><tr><td>filter.amountMin & filter.amountMax</td><td>The filter amountMin must be used with amountMax to find plans with plan values between the min and max figures</td></tr><tr><td>filter.dateCreatedMin<sup>*</sup></td><td>Filter by the minimum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.dateCreatedMax<sup>*</sup></td><td>Filter by the maximum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.q</td><td>You can use this to filter by the Id, the name or the amount of the plan</td></tr></table><br><sup>*</sup>Use dateCreatedMin with dateCreatedMax in the same filter if you want to search between two created dates
 
 
 
@@ -218,11 +218,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 

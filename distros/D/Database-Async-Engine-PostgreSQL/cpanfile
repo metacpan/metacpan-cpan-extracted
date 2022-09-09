@@ -15,8 +15,11 @@ requires 'Path::Tiny';
 requires 'Config::Tiny';
 requires 'Encode';
 requires 'Unicode::UTF8';
+requires 'Bytes::Random::Secure';
+requires 'MIME::Base64';
+requires 'CryptX';
 
-requires 'Protocol::Database::PostgreSQL', '>= 1.005';
+requires 'Protocol::Database::PostgreSQL', '>= 2.000';
 
 on 'test' => sub {
     requires 'Test::More', '>= 0.98';

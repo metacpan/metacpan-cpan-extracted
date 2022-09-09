@@ -47,7 +47,7 @@ Hash map containing initial values for the object.  Valid keys are:
 
 =item amount
 
-Amount of the payment (in the smallest unit of your currency). Example: 100 = $1.00USD 
+Amount of the payment (in the smallest unit of your currency). Example: 100 = $1.00 
 
 =item authorization
 
@@ -73,11 +73,11 @@ Address of the cardholder if needed. [max length: 255]
 
 =item card.addressState
 
-State of residence of the cardholder. For the US, this is a 2-digit USPS code. [max length: 255] 
+State of residence of the cardholder. State abbreviations should be used. [max length: 255] 
 
 =item card.addressZip
 
-Postal code of the cardholder. The postal code size is between 5 and 9 in length and only contain numbers or letters. [max length: 9, min length: 3] 
+Postal code of the cardholder. The postal code size is between 5 and 9 in length and only contain numbers or letters. [max length: 32] 
 
 =item card.cvc
 
@@ -85,11 +85,11 @@ CVC security code of the card. This is the code on the back of the card. Example
 
 =item card.expMonth
 
-Expiration month of the card. Format is MM. Example: January = 01 [min value: 1, max value: 12] (B<required>) 
+Expiration month of the card. Format is MM. Example: January = 01 [min value: 1, max value: 12] 
 
 =item card.expYear
 
-Expiration year of the card. Format is YY. Example: 2013 = 13 [min value: 0, max value: 99] (B<required>) 
+Expiration year of the card. Format is YY. Example: 2013 = 13 [min value: 0, max value: 99] 
 
 =item card.name
 
@@ -97,7 +97,7 @@ Name as it appears on the card. [max length: 50, min length: 2]
 
 =item card.number
 
-Card number as it appears on the card. [max length: 19, min length: 13] (B<required>) 
+Card number as it appears on the card. [max length: 19, min length: 13] 
 
 =item currency
 
@@ -308,7 +308,7 @@ Hash map representing the criteria to limit the results of the list operation.  
 
 =item C<filter>
 
-Filters to apply to the list.
+<table class="filter_list"><tr><td>filter.id</td><td>Filter by the payment Id</td></tr><tr><td>filter.replayId</td><td>Filter by the compoundReplayId</td></tr><tr><td>filter.last4</td><td>Filter by the card number (last 4 digits)</td></tr><tr><td>filter.amount</td><td>Filter by the payment amount (in the smallest unit of your currency)</td></tr><tr><td>filter.text</td><td>Filter by the description of the payment</td></tr><tr><td>filter.amountMin & filter.amountMax</td><td>The filter amountMin must be used with amountMax to find payments with payments amounts between the min and max figures</td></tr><tr><td>filter.dateCreatedMin<sup>*</sup></td><td>Filter by the minimum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.dateCreatedMax<sup>*</sup></td><td>Filter by the maximum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.deposit</td><td>Filter by the deposit id connected to the payment</td></tr><tr><td>filter.customer</td><td>Filter using the Id of the customer to find the payments for that customer</td></tr><tr><td>filter.status</td><td>Filter by the payment status text</td></tr><tr><td>filter.reference</td><td>Filter by the payment reference text</td></tr><tr><td>filter.authCode</td><td>Filter by the payment authorization code (Not the authorization ID)</td></tr><tr><td>filter.q</td><td>You can use this to filter by the Id, the authCode or the amount of the payment</td></tr></table><br><sup>*</sup>Use dateCreatedMin with dateCreatedMax in the same filter if you want to search between two created dates
 
 
 
@@ -402,11 +402,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 

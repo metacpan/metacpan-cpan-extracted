@@ -1,32 +1,24 @@
 #!perl
 
-# Note: This script is a CLI for Riap function /App/FirefoxMultiAccountContainersUtils/firefox_container
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
-use Perinci::CmdLine::Any;
+use App::FirefoxMultiAccountContainersUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-21'; # DATE
+our $DATE = '2022-09-08'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
-my $cmdline = Perinci::CmdLine::Any->new(
-    url => "/App/FirefoxMultiAccountContainersUtils/firefox_container",
-    program_name => "firefox-container",
-    log => 1,
-    log_level => "info",
-    read_config => 0,
-    read_env => 0,
-);
+if (defined $ENV{FIREFOX_CONTAINER}) {
+    exec "open-firefox-container", $ENV{FIREFOX_CONTAINER}, @ARGV;
+} else {
+    exec "firefox", @ARGV;
+}
 
-$cmdline->run;
-
-# ABSTRACT: CLI to open URL in a new Firefox tab, in a specific multi-account container
+# ABSTRACT: Firefox wrapper to open URL's in a specific container
 # PODNAME: firefox-container
 
 __END__
@@ -37,192 +29,42 @@ __END__
 
 =head1 NAME
 
-firefox-container - CLI to open URL in a new Firefox tab, in a specific multi-account container
+firefox-container - Firefox wrapper to open URL's in a specific container
 
 =head1 VERSION
 
-This document describes version 0.012 of firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-01-21.
+This document describes version 0.013 of firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-09-08.
 
 =head1 SYNOPSIS
 
-Usage:
+Use like you would use L<firefox> command:
 
-% B<firefox-container> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--profile>=I<firefox::local_profile_name>] [(B<--url>=I<str>)+] [B<--urls-json>=I<json>] -- E<lt>I<container>E<gt> [I<url>] ...
+ % FIREFOX_CONTAINER=mycontainer firefox-container [options] <URL>...
+
+Or set it as your BROWSER:
+
+ % export BROWSER=firefox-container
+
+then use it with commands that open URL's in browser, e.g.
+L<this-repo-on-github>:
+
+ % FIREFOX_CONTAINER=mycontainer this-repo-on-github
 
 =head1 DESCRIPTION
 
-This utility opens a new firefox tab in a specific multi-account container. This
-requires the Firefox Multi-Account Containers add-on, as well as another add-on
-called "Open external links in a container",
-L<https://addons.mozilla.org/en-US/firefox/addon/open-url-in-container/>.
-
-The way it works, because add-ons currently do not have hooks to the CLI, is via
-a custom protocol handler. For example, if you want to open
-L<http://www.example.com/> in a container called C<mycontainer>, you ask Firefox
-to open this URL:
-
- ext+container:name=mycontainer&url=http://www.example.com/
-
-Ref: L<https://github.com/mozilla/multi-account-containers/issues/365>
+This is a simple wrapper for B<firefox>. If the environment variable
+L</FIREFOX_CONTAINER> is defined, will open using L<open-firefox-container>.
+Otherwise, will simply exec C<firefox>.
 
 =head1 OPTIONS
 
-C<*> marks required options.
+No other options are parsed by this wrapper. All will be passed to C<firefox>.
 
-=head2 Main options
+=head1 ENVIRONMENT
 
-=over
+=head2 FIREFOX_CONTAINER
 
-=item B<--container>=I<s>*
-
-Can also be specified as the 1st command-line argument.
-
-=item B<--profile>=I<s>
-
-=item B<--url>=I<s@>
-
-Can also be specified as the 2nd command-line argument and onwards.
-
-Can be specified multiple times.
-
-=item B<--urls-json>=I<s>
-
-See C<--url>.
-
-Can also be specified as the 2nd command-line argument and onwards.
-
-=back
-
-=head2 Logging options
-
-=over
-
-=item B<--debug>
-
-Shortcut for --log-level=debug.
-
-=item B<--log-level>=I<s>
-
-Set log level.
-
-=item B<--quiet>
-
-Shortcut for --log-level=error.
-
-=item B<--trace>
-
-Shortcut for --log-level=trace.
-
-=item B<--verbose>
-
-Shortcut for --log-level=info.
-
-=back
-
-=head2 Output options
-
-=over
-
-=item B<--format>=I<s>
-
-Choose output format, e.g. json, text.
-
-Default value:
-
- undef
-
-=item B<--json>
-
-Set output format to json.
-
-=item B<--naked-res>
-
-When outputing as JSON, strip result envelope.
-
-Default value:
-
- 0
-
-By default, when outputing as JSON, the full enveloped result is returned, e.g.:
-
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
-
-The reason is so you can get the status (1st element), status message (2nd
-element) as well as result metadata/extra result (4th element) instead of just
-the result (3rd element). However, sometimes you want just the result, e.g. when
-you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
-
-    [1,2,3]
-
-
-=item B<--page-result>
-
-Filter output through a pager.
-
-=item B<--view-result>
-
-View output using a viewer.
-
-=back
-
-=head2 Other options
-
-=over
-
-=item B<--help>, B<-h>, B<-?>
-
-Display help message and exit.
-
-=item B<--version>, B<-v>
-
-Display program's version and exit.
-
-=back
-
-=head1 COMPLETION
-
-This script has shell tab completion capability with support for several
-shells.
-
-=head2 bash
-
-To activate bash completion for this script, put:
-
- complete -C firefox-container firefox-container
-
-in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
-recognize tab completion for the command. Or, you can also directly execute the
-line above in your shell to activate immediately.
-
-It is recommended, however, that you install modules using L<cpanm-shcompgen>
-which can activate shell completion for scripts immediately.
-
-=head2 tcsh
-
-To activate tcsh completion for this script, put:
-
- complete firefox-container 'p/*/`firefox-container`/'
-
-in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
-recognize tab completion for the command. Or, you can also directly execute the
-line above in your shell to activate immediately.
-
-It is also recommended to install L<shcompgen> (see above).
-
-=head2 other shells
-
-For fish and zsh, install L<shcompgen> as described above.
-
-=head1 EXAMPLES
-
-Open two URLs in a container called "mycontainer":
-
- % firefox-container mycontainer www.example.com www.example.com/url2
-
-If URL is not specified, will open a blank tab:
-
- % firefox-container mycontainer
+Set the name of container to open URL's in.
 
 =head1 HOMEPAGE
 
@@ -234,7 +76,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-FirefoxMultiAcco
 
 =head1 SEE ALSO
 
-L<open-browser>.
+L<open-firefox-container>
 
 =head1 AUTHOR
 
@@ -253,9 +95,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'non dominant sorting genetic algorithm for multi-objective optimization'
+abstract: 'non dominant sorting genetic algorithm for multi-objective optimization (also known as NSGA2)'
 author:
   - 'dario <darvitdarvit@cpan.org>'
 build_requires:
@@ -18,5 +18,5 @@ no_index:
     - t
     - inc
 requires: {}
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,4 @@
-package CTK::Crypt::GPG; # $Id: GPG.pm 250 2019-05-09 12:09:57Z minus $
+package CTK::Crypt::GPG;
 use strict;
 use utf8;
 
@@ -10,13 +10,13 @@ CTK::Crypt - GPG Crypt backend
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
     use CTK::Crypt::GPG;
 
-    my $gpg = new CTK::Crypt::GPG(
+    my $gpg = CTK::Crypt::GPG->new(
         -gpgbin     => "/usr/bin/gpg",
         -gpghome    => "/gpg/homedir",
         -gpgconf    => "/gpg/homedir/gpg.conf",
@@ -68,7 +68,7 @@ For export keys run:
 
 =head2 new
 
-    my $gpg = new CTK::Crypt::GPG(
+    my $gpg = CTK::Crypt::GPG->new(
         -gpgbin     => "/usr/bin/gpg",
         -gpghome    => "/gpg/homedir",
         -gpgconf    => "/gpg/homedir/gpg.conf",
@@ -218,11 +218,11 @@ L<CTK::Util>, L<http://www.gnupg.org>, L<GPG4Win|http://gpg4win.org>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -234,7 +234,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use Carp;
 use CTK::Util qw(:API :FORMAT :UTIL :FILE );

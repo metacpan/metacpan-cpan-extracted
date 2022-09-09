@@ -1,5 +1,14 @@
 Revision history for Perl module DBIx::DBSchema
 
+0.47 Wed 07 Sep 2022 04:33:20 PM PDT
+    - Fix Pg reverse-engineering of default values in Pg v12+
+
+0.46 unreleased (2016)
+    - Add IF EXISTS to DROP INDEX (except under MySQL)
+    - Fix table fetching for Sybase and SQLite drivers; refactor table fetching
+      into a driver-overridable DBIx::DBSchema::DBD->tables method, patches
+      from Nathan Anderson <http://1id.com/=nathan.anderson>
+
 0.45 Wed May  6 22:17:33 PDT 2015
     - MySQL does not support DEFAULT for TEXT/BLOB columns, closes: CPAN#58505
     - doc: Add repository information

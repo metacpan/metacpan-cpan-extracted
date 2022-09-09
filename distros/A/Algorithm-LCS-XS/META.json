@@ -34,11 +34,12 @@
          "requires" : {
             "Algorithm::Diff" : "0",
             "LCS::BV" : "0",
+            "LCS::XS" : "0",
             "perl" : "5.008000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.08",
+   "version" : "v2.0.1",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

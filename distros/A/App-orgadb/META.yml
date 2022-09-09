@@ -19,16 +19,16 @@ name: App-orgadb
 provides:
   App::orgadb:
     file: lib/App/orgadb.pm
-    version: '0.005'
+    version: '0.006'
   App::orgadb::Common:
     file: lib/App/orgadb/Common.pm
-    version: '0.005'
+    version: '0.006'
   App::orgadb::Select::Shell:
     file: lib/App/orgadb/Select/Shell.pm
-    version: '0.005'
+    version: '0.006'
   App::orgadb::Select::Shell::Commands:
     file: lib/App/orgadb/Select/Shell/Commands.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Carp: '1.12'
   ColorThemeUtil::ANSI: '0'
@@ -36,7 +36,7 @@ requires:
   Complete::Util: '0.608'
   Config::IOD::Reader: '0.344'
   Data::CSel: '0.128'
-  Data::Dmp: '0.241'
+  Data::Dmp: '0.242'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname: '0'
   Data::Sah::Compiler::perl::TH::any: '0.911'
   Data::Sah::Compiler::perl::TH::array: '0.911'
@@ -60,9 +60,10 @@ requires:
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Help: '0.172'
   Perinci::Result::Format::Lite: '0.286'
-  Perinci::Sub::Complete: '0.935'
+  Perinci::Sub::Complete: '0.944'
   Perinci::Sub::GetArgs::Argv: '0.846'
   Perinci::Sub::ValidateArgs: '0.012'
+  Perinci::Sub::XCompletion::filename: '0'
   Regexp::From::String: '0.003'
   Sah::Schema::array_from_json: '0'
   Sah::Schema::filename: '0'
@@ -81,7 +82,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-orgadb
   homepage: https://metacpan.org/release/App-orgadb
   repository: git://github.com/perlancar/perl-App-orgadb.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -367,7 +368,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.781'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -544,8 +545,6 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.023'
 x_authority: cpan:PERLANCAR
-x_contributors:
-  - 'perlancar (on netbook-dell-xps13) <perlancar@gmail.com>'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

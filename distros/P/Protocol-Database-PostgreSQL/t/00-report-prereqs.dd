@@ -15,10 +15,9 @@ do { my $x = {
                                       'Test::EOL' => '0',
                                       'Test::MinimumVersion' => '0',
                                       'Test::Mojibake' => '0',
-                                      'Test::More' => '0.96',
+                                      'Test::More' => '0.88',
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
-                                      'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
                                       'Test::Version' => '1'
                                     }
@@ -28,22 +27,17 @@ do { my $x = {
                                       'Adapter::Async' => '0',
                                       'Check::UnitCheck' => '0',
                                       'Digest::MD5' => '0',
-                                      'Exporter' => '0',
                                       'Future' => '0.39',
-                                      'List::Util' => '0',
                                       'Log::Any' => '1.050',
+                                      'MIME::Base64' => '0',
                                       'POSIX' => '0',
                                       'Ryu' => '1.001',
-                                      'Ryu::Exception' => '0',
                                       'Sub::Identify' => '0',
                                       'Time::HiRes' => '0',
                                       'Unicode::UTF8' => '0',
-                                      'constant' => '0',
                                       'indirect' => '0',
                                       'parent' => '0',
-                                      'perl' => '5.024',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'perl' => '5.024'
                                     }
                     },
        'test' => {
@@ -60,8 +54,7 @@ do { my $x = {
                                    'Test::Fatal' => '0.010',
                                    'Test::HexString' => '0.03',
                                    'Test::More' => '0.98',
-                                   'Test::Refcount' => '0.07',
-                                   'perl' => '5.024'
+                                   'Test::Refcount' => '0.07'
                                  }
                  }
      };

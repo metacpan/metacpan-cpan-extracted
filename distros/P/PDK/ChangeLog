@@ -1,0 +1,5 @@
+0.003 2022-09-09 WENWU YAN <968826@gmail.com>
+ [DOCUMENTATION]
+ - Add PDK::Device component
+ - Clarify documentation of PDK::Device modules
+ - Clarify PDK::Device module tests script

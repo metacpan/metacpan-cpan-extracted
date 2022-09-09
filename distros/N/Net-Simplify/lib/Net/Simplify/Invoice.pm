@@ -111,7 +111,7 @@ Address zip of the business that is sending the invoice. [max length: 32]
 
 =item currency
 
-Currency code (ISO-4217). Must match the currency associated with your account. [max length: 3, min length: 3, default: USD] 
+Currency code (ISO-4217). Must match the currency associated with your account. [max length: 3, min length: 3] 
 
 =item customer
 
@@ -137,6 +137,10 @@ The email of the customer we are invoicing.  This is optional if customer or inv
 
 User defined invoice id. If not provided the system will generate a numeric id. [max length: 255] 
 
+=item invoiceLanguage
+
+The language in which invoice will be displayed. [max length: 5, min length: 5] 
+
 =item invoiceToCopy
 
 The id of an existing invoice to be copied.  This is optional if customer or a name and email are provided 
@@ -145,7 +149,7 @@ The id of an existing invoice to be copied.  This is optional if customer or a n
 
 =item items.amount
 
-Amount of the invoice item (the smallest unit of your currency). Example: 100 = $1.00USD (B<required>) 
+Amount of the invoice item (the smallest unit of your currency). Example: 100 = $1.00 (B<required>) 
 
 =item items.description
 
@@ -173,7 +177,7 @@ The tax ID of the tax charge in the invoice item.
 
 =item lateFee
 
-The late fee amount that will be added to the invoice total is the due date is past due.  Value provided must be in the smallest unit of your currency. Example: 100 = $1.00USD 
+The late fee amount that will be added to the invoice total is the due date is past due.  Value provided must be in the smallest unit of your currency. Example: 100 = $1.00 
 
 =item memo
 
@@ -266,7 +270,7 @@ Hash map representing the criteria to limit the results of the list operation.  
 
 =item C<filter>
 
-Filters to apply to the list.
+<table class="filter_list"><tr><td>filter.id</td><td>Filter by the invoice Id</td></tr><tr><td>filter.amount</td><td>Filter by the invoice amount (in the smallest unit of your currency)</td></tr><tr><td>filter.text</td><td>Filter by the name of the invoice</td></tr><tr><td>filter.dateCreatedMin<sup>*</sup></td><td>Filter by the minimum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.dateCreatedMax<sup>*</sup></td><td>Filter by the maximum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.datePaidMin<sup>*</sup></td><td>Filter by the minimum invoice paid date you are searching for - Date in UTC millis</td></tr><tr><td>filter.datePaidMax<sup>*</sup></td><td>Filter by the maximum invoice paid date you are searching for - Date in UTC millis</td></tr><tr><td>filter.status</td><td>Filter by the status of the invoice</td></tr><tr><td>filter.statuses</td><td>Filter by multiple statuses of different invoices</td></tr><tr><td>filter.customer</td><td>Filter using the Id of the customer linked to the invoice</td></tr><tr><td>filter.type</td><td>Filter by the invoice type</td></tr><tr><td>filter.types</td><td>Filter by multiple invoice types</td></tr><tr><td>filter.invoiceId</td><td>Filter by the user defined invoice id</td></tr><tr><td>filter.reference</td><td>Filter by the invoice reference text</td></tr></table><br><sup>*</sup>The filters datePaidMin and datePaidMax can be used in the same filter if you want to search between the two dates. The same is for dateCreatedMin/dateCreatedMax.
 
 
 
@@ -428,9 +432,13 @@ The email of the customer we are invoicing.  This is optional if customer or inv
 
 User defined invoice id. If not provided the system will generate a numeric id. [max length: 255] 
 
+=item C<invoiceLanguage>
+
+The language in which invoice will be displayed. [max length: 5, min length: 5] 
+
 =item C<items.amount>
 
-Amount of the invoice item in the smallest unit of your currency. Example: 100 = $1.00USD (B<required>) 
+Amount of the invoice item in the smallest unit of your currency. Example: 100 = $1.00 (B<required>) 
 
 =item C<items.description>
 
@@ -458,7 +466,7 @@ The tax ID of the tax charge in the invoice item.
 
 =item C<lateFee>
 
-The late fee amount that will be added to the invoice total is the due date is past due.  Value provided must be in the smallest unit of your currency. Example: 100 = $1.00USD 
+The late fee amount that will be added to the invoice total is the due date is past due.  Value provided must be in the smallest unit of your currency. Example: 100 = $1.00 
 
 =item C<memo>
 
@@ -479,6 +487,10 @@ The ID of the payment.  Use this ID to query the /payment API. [max length: 255]
 =item C<reference>
 
 User defined reference field. [max length: 255] 
+
+=item C<sendMail>
+
+Boolean flag.  If true the invoice will be sent to the customer if the invoice is in an OPEN state. [default: false] (B<required>) 
 
 =item C<shippingAddress.city>
 
@@ -538,11 +550,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 

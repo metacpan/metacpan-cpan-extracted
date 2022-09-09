@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.02
 
 SYNOPSIS
 
@@ -16,10 +16,7 @@ SYNOPSIS
 
     Using from ~/.alienbuild/rc.pl:
 
-     preload sub {
-       my($meta) = @_;
-       $meta->apply_plugin('Fetch::HostAllowList', allow_hosts => [qw( github.com ftp.gnu.org )])
-     };
+     preload_plugin 'Fetch::HostAllowList', allow_hosts => [qw( github.com ftp.gnu.org )];
 
 DESCRIPTION
 
@@ -37,7 +34,7 @@ PROPERTIES
 
  allow_hosts
 
-     plugin 'Fetch::HostALlowList', allow_hosts => \@hosts;
+     plugin 'Fetch::HostAllowList', allow_hosts => \@hosts;
 
     The list of domains that are allowed. Should be provided as an array
     reference. If not provided, then ALIEN_BUILD_HOST_ALLOW will be used
@@ -49,6 +46,16 @@ ENVIRONMENT
 
       Comma separated list of hosts to allow. If not specified when the
       plugin is applied then this list will be used.
+
+SEE ALSO
+
+    Alien::Build::Plugin::Fetch::HostBlockList
+
+    Alien::Build
+
+    alienfile
+
+    LAlien::Build::rc>
 
 AUTHOR
 

@@ -22,7 +22,7 @@ like(exception { $pg->build_message(type => 1) }, qr/No data provided/, 'check f
 
 subtest 'message type mapping' => sub {
     { my %uniq; $uniq{$_}++ for values %Protocol::Database::PostgreSQL::MESSAGE_TYPE_BACKEND; is($uniq{$_}, 1, "$_ is unique in backend message codes") for sort keys %uniq; }
-    { my %uniq; $uniq{$_}++ for values %Protocol::Database::PostgreSQL::MESSAGE_TYPE_FRONTEND; is($uniq{$_}, 1, "$_ is unique in frontend message codes") for sort keys %uniq; }
+    { my %uniq; $uniq{$_}++ for values %Protocol::Database::PostgreSQL::MESSAGE_TYPE_FRONTEND; is($uniq{$_}, 1, "$_ is unique in frontend message codes") for grep { $_ ne 'p' } sort keys %uniq; }
     done_testing;
 };
 

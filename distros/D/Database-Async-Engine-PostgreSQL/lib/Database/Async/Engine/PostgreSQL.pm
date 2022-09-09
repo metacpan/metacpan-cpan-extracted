@@ -6,7 +6,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.012';
+our $VERSION = '1.000';
 
 use parent qw(Database::Async::Engine);
 
@@ -62,9 +62,13 @@ use Database::Async::Query;
 use File::HomeDir;
 use Config::Tiny;
 use Encode ();
+use MIME::Base64 ();
+use Bytes::Random::Secure ();
 use Unicode::UTF8;
+use Crypt::Digest::SHA256 ();
+use Crypt::Mac::HMAC ();
 
-use Protocol::Database::PostgreSQL::Client qw(0.008);
+use Protocol::Database::PostgreSQL::Client qw(2.000);
 use Protocol::Database::PostgreSQL::Constants qw(:v1);
 
 use Log::Any qw($log);
@@ -594,6 +598,72 @@ our %AUTH_HANDLER = (
     AuthenticationGSSContinue => sub {
         my ($self, $msg) = @_;
         die "Not yet implemented";
+    },
+    AuthenticationSASL => sub {
+        my ($self, $msg) = @_;
+        $log->tracef('SASL starts');
+        my $nonce = MIME::Base64::encode_base64(Bytes::Random::Secure::random_string_from(join('', ('a'..'z'), ('A'..'Z'), ('0'..'9')), 18), '');
+        $self->{client_first_message} = 'n,,n=,r=' . $nonce;
+        $self->protocol->send_message(
+            'SASLInitialResponse',
+            mechanism        => 'SCRAM-SHA-256',
+            nonce            => $nonce,
+        );
+    },
+    AuthenticationSASLContinue => sub {
+        my ($self, $msg) = @_;
+        $log->tracef('Have msg %s', $msg);
+
+        my $rounds = $msg->password_rounds or die 'need iteration count';
+
+        my $server_first_message = $msg->server_first_message;
+        my $pass = Unicode::UTF8::encode_utf8($self->database_password);
+        my $salted_password = do {
+            my $hash = Crypt::Mac::HMAC::hmac('SHA256', $pass, MIME::Base64::decode_base64($msg->password_salt), pack('N1', 1));
+            my $out = $hash;
+            # Skip the first round - that's our original $hash value - and recursively re-hash
+            # for the remainder, incrementally building our bitwise XOR result
+            for my $idx (1..$rounds-1) {
+                $hash = Crypt::Mac::HMAC::hmac('SHA256', $pass, $hash);
+                $out = "$out" ^ "$hash";
+            }
+            $out
+        };
+        # The client key uses the literal string 'Client Key' as the base - for the server, it'd be 'Server Key'
+        my $client_key = Crypt::Mac::HMAC::hmac('SHA256', $salted_password, "Client Key");
+        my $server_key = Crypt::Mac::HMAC::hmac('SHA256', $salted_password, "Server Key");
+        # Then we hash this to get the stored key, which will be used for the signature
+        my $stored_key = Crypt::Digest::SHA256::sha256($client_key);
+
+        my $client_first_message = $self->{client_first_message};
+        # Strip out the channel-binding GS2 header
+        my $header = 'n,,';
+        $client_first_message =~ s{^\Q$header}{};
+        # ... but we _do_ want the header in the final-message c= GS2 component
+        my $client_final_message = 'c=' . MIME::Base64::encode_base64($header, '') . ',r=' . $msg->password_nonce;
+
+        # this is what we want to sign!
+        my $auth_message = join ',', $client_first_message, $server_first_message, $client_final_message;
+        $log->tracef('Auth message = %s', $auth_message);
+
+        my $client_signature = Crypt::Mac::HMAC::hmac('SHA256', $stored_key, $auth_message);
+        my $client_proof = "$client_key" ^ "$client_signature";
+        $log->tracef('Client proof is %s', $client_proof);
+        my $server_signature = Crypt::Mac::HMAC::hmac('SHA256', $server_key, $auth_message);
+        $self->{expected_server_signature} = $server_signature;
+        $self->protocol->send_message(
+            'SASLResponse',
+            header => $header,
+            nonce  => $msg->password_nonce,
+            proof  => $client_proof,
+        );
+    },
+    AuthenticationSASLFinal => sub {
+        my ($self, $msg) = @_;
+        my $expected = MIME::Base64::encode_base64($self->{expected_server_signature}, '');
+        die 'invalid server signature ' . $msg->server_signature . ', expected ' . $expected unless $msg->server_signature eq $expected;
+        $log->tracef('Server signature seems fine, continue with auth');
+        # No further action required, we'll get an AuthenticationOk immediately after this
     }
 );
 

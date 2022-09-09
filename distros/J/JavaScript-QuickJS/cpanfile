@@ -5,3 +5,4 @@ configure_requires 'File::Which';
 test_requires 'Types::Serialiser';
 test_requires 'Test::FailWarnings';
 test_requires 'Test::Deep';
+test_requires 'Test::Fatal';

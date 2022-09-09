@@ -2,10 +2,11 @@ package Test2::Harness::Runner::Resource::JobCount;
 use strict;
 use warnings;
 
-our $VERSION = '1.000128';
+our $VERSION = '1.000133';
 
 use parent 'Test2::Harness::Runner::Resource';
-use Test2::Harness::Util::HashBase qw/<settings <job_count <used/;
+use Test2::Harness::Util::HashBase qw/<settings <job_count <used <free/;
+use Time::HiRes qw/time/;
 
 sub job_limiter { 1 }
 
@@ -20,7 +21,8 @@ sub init {
     my $self = shift;
     my $settings = $self->{+SETTINGS};
     $self->{+JOB_COUNT} //= $settings ? $settings->runner->job_count // 1 : 1;
-    $self->{+USED} //= 0;
+    $self->{+USED} //= {};
+    $self->{+FREE} //= [1 .. $self->{+JOB_COUNT}];
 }
 
 sub job_limiter_max {
@@ -30,36 +32,61 @@ sub job_limiter_max {
 
 sub job_limiter_at_max {
     my $self = shift;
-    return 1 if $self->{+USED} >= $self->{+JOB_COUNT};
-    return 0;
+    return 0 if @{$self->{+FREE}};
+    return 1;
 }
 
 sub available {
     my $self = shift;
-    return 0 if $self->{+USED} >= $self->{+JOB_COUNT};
-    return 1;
+    return 1 if @{$self->{+FREE}};
+    return 0;
 }
 
 sub assign {
     my $self = shift;
     my ($task, $state) = @_;
-    $state->{record} = 1;
+    $state->{record} = {
+        slot => $self->{+FREE}->[0],
+        file => $task->{rel_file},
+        stamp => time,
+    };
 }
 
 sub record {
     my $self = shift;
-    $self->{+USED}++;
+    my ($job_id, $info) = @_;
+
+    my $slot = $info->{slot};
+    my $check = shift @{$self->{+FREE}};
+    die "$0 - check and slot mismatch! ($check vs $slot)" unless $check == $slot;
+
+    $self->{+USED}->{$job_id} = $info;
 }
 
 sub release {
     my $self = shift;
-    $self->{+USED}--;
+    my ($job_id) = @_;
+
+    # Could be a free with no used slot.
+    my $info = delete $self->{+USED}->{$job_id} or return;
+    my $slot = $info->{slot};
+    push @{$self->{+FREE}} => $slot;
 }
 
 sub status_lines {
     my $self = shift;
 
-    return ("using $self->{+USED}/$self->{+JOB_COUNT} job slot(s).");
+    my $out = "  Job Slots:\n";
+
+    for my $info (sort { $a->{stamp} <=> $b->{stamp} } values %{$self->{+USED}}) {
+        $out .= sprintf("%6d: %8.2fs | %s\n", $info->{slot}, time - $info->{stamp}, $info->{file});
+    }
+
+    for my $slot (sort { $a <=> $b } @{$self->{+FREE}}) {
+        $out .= sprintf("%6d: FREE\n", $slot);
+    }
+
+    return $out;
 }
 
 1;

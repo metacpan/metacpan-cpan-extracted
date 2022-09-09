@@ -1,4 +1,4 @@
-package CTK::Crypt; # $Id: Crypt.pm 250 2019-05-09 12:09:57Z minus $
+package CTK::Crypt;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Crypt - Cryptography frontend module
 
 =head1 VERSION
 
-Version 1.72
+Version 1.73
 
 =head1 SYNOPSIS
 
@@ -150,11 +150,11 @@ L<CTK::Crypt::GPG>, L<CTK::Crypt::TCD04>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -166,7 +166,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION @EXPORT_OK %EXPORT_TAGS $ERROR/;
-$VERSION = '1.72';
+$VERSION = '1.73';
 
 use base qw/Exporter/;
 
@@ -234,7 +234,7 @@ sub tcd_encrypt {
         return 0;
     };
 
-    my $tcd = new CTK::Crypt::TCD04;
+    my $tcd = CTK::Crypt::TCD04->new;
     my $buf;
     while ( $infh->read ( $buf, BUFFER_SIZE/2 ) ) {
         $outfh->write($tcd->encrypt($buf), BUFFER_SIZE) or do {
@@ -283,7 +283,7 @@ sub tcd_decrypt {
         return 0;
     };
 
-    my $tcd = new CTK::Crypt::TCD04;
+    my $tcd = CTK::Crypt::TCD04->new;
     my $buf;
     while ( $infh->read ( $buf, BUFFER_SIZE ) ) {
         $outfh->write($tcd->decrypt($buf), BUFFER_SIZE/2) or do {

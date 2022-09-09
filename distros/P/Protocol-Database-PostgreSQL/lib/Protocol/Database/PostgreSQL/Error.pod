@@ -1,3 +1,5 @@
+=encoding utf8
+
 =for comment POD_DERIVED_INDEX_GENERATED
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Protocol::Database::PostgreSQL::Error
@@ -59,7 +61,7 @@ Returns a string corresponding to the error code, or C<unknown> if it's not in t
 
 =item L<Ryu::Exception>
 
-L<as_future|Ryu::Exception/as_future>, L<details|Ryu::Exception/details>, L<fail|Ryu::Exception/fail>, L<from_future|Ryu::Exception/from_future>, L<future|Ryu::Exception/future>, L<new|Ryu::Exception/new>, L<throw|Ryu::Exception/throw>
+L<as_future|Ryu::Exception/as_future>, L<details|Ryu::Exception/details>, L<fail|Ryu::Exception/fail>, L<from_future|Ryu::Exception/from_future>, L<new|Ryu::Exception/new>, L<throw|Ryu::Exception/throw>
 
 =back
 

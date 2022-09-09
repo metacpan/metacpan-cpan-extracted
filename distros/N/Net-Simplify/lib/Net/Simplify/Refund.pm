@@ -42,7 +42,7 @@ Hash map containing initial values for the object.  Valid keys are:
 
 =item amount
 
-Amount of the refund in the smallest unit of your currency. Example: 100 = $1.00USD (B<required>) 
+Amount of the refund in the smallest unit of your currency. Example: 100 = $1.00 (B<required>) 
 
 =item payment
 
@@ -97,7 +97,7 @@ Hash map representing the criteria to limit the results of the list operation.  
 
 =item C<filter>
 
-Filters to apply to the list.
+<table class="filter_list"><tr><td>filter.id</td><td>Filter by the refund Id</td></tr><tr><td>filter.text</td><td>Filter by the refund description text</td></tr><tr><td>filter.replayId</td><td>Filter by the compoundReplayId</td></tr><tr><td>filter.authCode</td><td>Filter by the authorization code (Not authorization ID)</td></tr><tr><td>filter.amount</td><td>Filter by the refund amount (in the smallest unit of your currency)</td></tr><tr><td>filter.dateCreatedMin<sup>*</sup></td><td>Filter by the minimum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.dateCreatedMax<sup>*</sup></td><td>Filter by the maximum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.deposit</td><td>Filter by the deposit id</td></tr><tr><td>filter.q</td><td>You can use this to filter by the Id, the authCode or the amount of the refund</td></tr></table><br><sup>*</sup>Use dateCreatedMin with dateCreatedMax in the same filter if you want to search between two created dates
 
 
 
@@ -174,11 +174,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 

@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000128';
+our $VERSION = '1.000133';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -104,6 +104,8 @@ file over and over again.
 
 sub run {
     my $self = shift;
+
+    $ENV{TEST2_HARNESS_NO_WRITE_TEST_INFO} //= 1;
 
     my $settings = $self->settings;
     my $dir      = $settings->workspace->workdir;
@@ -1069,6 +1071,15 @@ DBI Driver to use
 =item --no-yathui-db-dsn
 
 DSN to use when connecting to the db
+
+
+=item --yathui-db-duration-limit ARG
+
+=item --yathui-db-duration-limit=ARG
+
+=item --no-yathui-db-duration-limit
+
+Limit the number of runs to look at for durations data (default: 10)
 
 
 =item --yathui-db-durations

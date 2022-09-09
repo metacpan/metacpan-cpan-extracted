@@ -11,6 +11,18 @@ Quick and dirty …
         [ "The", "last", "value", "is", "returned." ];
     > );
 
+… or, something a bit fancier:
+
+    my $js = JavaScript::QuickJS->new()->std()->helpers();
+
+    $js->eval_module( q/
+        import * as std from 'std';
+
+        for (const [key, value] of Object.entries(std.getenviron())) {
+            console.log(key, value);
+        }
+    / );
+
 # DESCRIPTION
 
 This library embeds Fabrice Bellard’s [QuickJS](https://bellard.org/quickjs)
@@ -24,9 +36,22 @@ your system.
 
 # METHODS
 
-## $obj = _CLASS_->new()
+## $obj = _CLASS_->new( %CONFIG\_OPTS )
 
-Instantiates _CLASS_.
+Instantiates _CLASS_. %CONFIG\_OPTS have the same effect as in
+`configure()` below.
+
+## $obj = _OBJ_->configure( %OPTS )
+
+Tunes the QuickJS interpreter. Returns _OBJ_.
+
+%OPTS are any of:
+
+- `max_stack_size`
+- `memory_limit`
+- `gc_threshold`
+
+For more information on these, see QuickJS itself.
 
 ## $obj = _OBJ_->set\_globals( NAME1 => VALUE1, .. )
 
@@ -44,6 +69,7 @@ Returns _OBJ_.
 ## $obj = _OBJ_->std()
 
 Enables (but does _not_ import) QuickJS’s `std` module.
+See ["SYNOPSIS"](#synopsis) above for example usage.
 
 Returns _OBJ_.
 
@@ -99,8 +125,9 @@ This module converts returned values from JavaScript thus:
 - JS objects …
     - Arrays become Perl array references.
     - “Plain” objects become Perl hash references.
-    - Function objects become Perl [JavaScript::QuickJS::Function](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3AFunction) objects.
-    - RegExp objects become Perl [JavaScript::QuickJS::RegExp](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3ARegExp) objects.
+    - Function, RegExp, and Date objects become Perl
+    [JavaScript::QuickJS::Function](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3AFunction), [JavaScript::QuickJS::RegExp](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3ARegExp),
+    and [JavaScript::QuickJS::Date](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3ADate) objects, respectively.
     - Behaviour is **UNDEFINED** for other object types.
 
 # TYPE CONVERSION: PERL → JAVASCRIPT
@@ -130,7 +157,8 @@ JavaScript `RegExp` objects.
 
 If any instance of a class of this distribution is DESTROY()ed at Perl’s
 global destruction, we assume that this is a memory leak, and a warning is
-thrown. To prevent this, avoid circular references.
+thrown. To prevent this, avoid circular references, and clean up all global
+instances.
 
 Callbacks make that tricky. When you give a JavaScript function to Perl,
 that Perl object holds a reference to the QuickJS context. Only once that

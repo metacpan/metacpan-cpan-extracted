@@ -1,3 +1,8 @@
+0.009   2022-09-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Spreadsheet-Read's CLI is now xlsx2csv.
+
+
 0.008   2021-07-12  Released-By: PERLANCAR; Urgency: low
 
 	- Also observe DIFF_CMD.

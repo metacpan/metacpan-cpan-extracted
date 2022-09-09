@@ -1,4 +1,4 @@
-package CTK::Skel::Common; # $Id: Common.pm 265 2019-05-17 21:35:29Z minus $
+package CTK::Skel::Common;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Skel::Common - Common skeleton for CTK::Helper
 
 =head1 VIRSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -32,11 +32,11 @@ L<CTK::Skel>, L<CTK::Helper>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -50,7 +50,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 use constant SIGNATURE => "common";
 
 use vars qw($VERSION);
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub build {
     my $self = shift;
@@ -92,7 +92,6 @@ File: Changes
 Mode: 644
 
 # Version/Revision history for %PROJECT_NAME%.
-# %DOLLAR%Id%DOLLAR%
 
 %PROJECT_VERSION% %GMT%
    * Initial release
@@ -760,7 +759,6 @@ File: TODO
 Mode: 644
 
 # %TODO% %GMT%
-# %DOLLAR%Id%DOLLAR%
 
 # GENERAL
 
@@ -801,8 +799,6 @@ Mode: 644
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# %DOLLAR%Id%DOLLAR%
 #
 #########################################################################
 use Test::More tests => 2;

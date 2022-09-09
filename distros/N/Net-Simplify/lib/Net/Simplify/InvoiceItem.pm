@@ -45,7 +45,7 @@ Hash map containing initial values for the object.  Valid keys are:
 
 =item amount
 
-Amount of the invoice item in the smallest unit of your currency. Example: 100 = $1.00USD (B<required>) 
+Amount of the invoice item in the smallest unit of your currency. Example: 100 = $1.00 (B<required>) 
 
 =item description
 
@@ -119,7 +119,7 @@ The properties that can be updated are:
 
 =item C<amount>
 
-Amount of the invoice item in the smallest unit of your currency. Example: 100 = $1.00USD [min value: 1] 
+Amount of the invoice item in the smallest unit of your currency. Example: 100 = $1.00 [min value: 1] 
 
 =item C<description>
 
@@ -156,11 +156,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 

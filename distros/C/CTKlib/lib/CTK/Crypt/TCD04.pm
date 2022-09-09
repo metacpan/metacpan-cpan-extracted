@@ -1,4 +1,4 @@
-package CTK::Crypt::TCD04; # $Id: TCD04.pm 250 2019-05-09 12:09:57Z minus $
+package CTK::Crypt::TCD04;
 use strict;
 use utf8;
 
@@ -10,13 +10,13 @@ CTK::Crypt::TCD04 - TCD04 Crypt backend
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
     use CTK::Crypt::TCD04;
 
-    my $tcd04 = new CTK::Crypt::TCD04;
+    my $tcd04 = CTK::Crypt::TCD04->new;
 
     my $code   = $tcd04->tcd04c('u');   # 1 char
     my $decode = $tcd04->tcd04d($code); # 1 word
@@ -33,7 +33,7 @@ TCD04 Crypt backend. Simple cryptografy's algorythm of D&D Corporation
 
 =item B<new>
 
-    my $tcd04 = new CTK::Crypt::TCD04;
+    my $tcd04 = CTK::Crypt::TCD04->new;
 
 =item B<decrypt>
 
@@ -83,11 +83,11 @@ L<CTK>, L<CTK::Crypt>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -99,7 +99,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = 1.01;
+$VERSION = 1.02;
 
 sub new {
     my $class = shift;

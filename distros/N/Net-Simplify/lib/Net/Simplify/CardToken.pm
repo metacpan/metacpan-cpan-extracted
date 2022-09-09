@@ -18,6 +18,11 @@ Net::Simplify::CardToken - A Simplify Commerce CardToken object
   # Retrieve a CardToken given its ID.
   my $card_token = Net::Simplify::CardToken->find('a7e41');
 
+  # Update existing CardToken.
+  my $card_token = Net::Simplify::CardToken->find('a7e41');
+  $card_token->{PROPERTY} = "NEW VALUE";
+  $card_token->update();
+
 =head1 DESCRIPTION
 
 =head2 METHODS
@@ -33,6 +38,10 @@ Creates a C<Net::Simplify::CardToken> object.  The parameters are:
 Hash map containing initial values for the object.  Valid keys are:
 
 =over 4
+
+=item authenticatePayer
+
+Set as true to create CardToken for EMV 3DS transaction. [default: false] 
 
 =item callback
 
@@ -58,11 +67,11 @@ Address of the cardholder if needed. [max length: 255]
 
 =item card.addressState
 
-State of residence of the cardholder. For the US, this is a 2-digit USPS code. [max length: 255] 
+State of residence of the cardholder. State abbreviations should be used. [max length: 255] 
 
 =item card.addressZip
 
-Postal code of the cardholder. The postal code size is between 5 and 9 in length and only contain numbers or letters. [max length: 9, min length: 3] 
+Postal code of the cardholder. The postal code size is between 5 and 9 in length and only contain numbers or letters. [max length: 32] 
 
 =item card.cvc
 
@@ -70,11 +79,11 @@ CVC security code of the card. This is the code on the back of the card. Example
 
 =item card.expMonth
 
-Expiration month of the card. Format is MM. Example: January = 01 [min value: 1, max value: 12] (B<required>) 
+Expiration month of the card. Format is MM. Example: January = 01 [min value: 1, max value: 12] 
 
 =item card.expYear
 
-Expiration year of the card. Format is YY. Example: 2013 = 13 [min value: 0, max value: 99] (B<required>) 
+Expiration year of the card. Format is YY. Example: 2013 = 13 [min value: 0, max value: 99] 
 
 =item card.name
 
@@ -82,11 +91,37 @@ Name as appears on the card. [max length: 50, min length: 2]
 
 =item card.number
 
-Card number as it appears on the card. [max length: 19, min length: 13] (B<required>) 
+Card number as it appears on the card. [max length: 19, min length: 13] 
 
 =item key
 
 Key used to create the card token. 
+
+
+
+=item secure3DRequestData.amount
+
+Amount of the subsequent transaction in the smallest unit of your currency. Example: 100 = $1.00 (B<required>) 
+
+=item secure3DRequestData.authOnly
+
+Specifies if the subsequent transaction is going to be a Payment or an Authorization (to be Captured later). If false or not specified, it refers to a Payment, otherwise it refers to an Authorization. 
+
+=item secure3DRequestData.currency
+
+Currency code (ISO-4217). Must match the currency associated with your account. (B<required>) 
+
+=item secure3DRequestData.description
+
+A description of the transaction. [max length: 256] 
+
+=item secure3DRequestData.id
+
+3D Secure data ID. 
+
+=item source
+
+Card Token Source [default: API] 
 
 
 =back
@@ -120,6 +155,49 @@ C<$Net::Simplify::public_key> and C<$Net::Simplify::private_key> are used.
 
 
 
+=head3 update()
+
+Update C<Net::Simplify::CardToken> object.
+The properties that can be updated are:
+
+=over 4
+
+
+=item C<device.browser>
+
+The User-Agent header of the browser the customer used to place the order (B<required>) 
+
+=item C<device.ipAddress>
+
+The IP address of the device used by the payer, in nnn.nnn.nnn.nnn format. (B<required>) 
+
+=item C<device.language>
+
+The language supported for the payer's browser as defined in IETF BCP47. 
+
+=item C<device.screenHeight>
+
+The total height of the payer's browser screen in pixels. 
+
+=item C<device.screenWidth>
+
+The total width of the payer's browser screen in pixels. 
+
+=item C<device.timeZone>
+
+The timezone of the device used by the payer, in Zone ID format. Example: "Europe/Dublin" (B<required>) 
+
+
+=item C<key>
+
+The public key of the merchant to be used for the token 
+
+Authentication is done using the same credentials used when the AccessToken was created.
+
+=back
+
+
+
 
 =head1 SEE ALSO
 
@@ -132,11 +210,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 
@@ -191,6 +269,17 @@ sub find {
     my $result = Net::Simplify::SimplifyApi->send_api_request("cardToken", 'find', { id => $id }, $auth);
 
     $class->SUPER::new($result, $auth);
+}
+
+sub update {
+
+    my ($self) = @_;
+
+    my $auth = Net::Simplify::SimplifyApi->get_authentication($self->{_authentication});
+    my $params = { %$self };
+    delete $params->{_authentication};
+
+    $self->merge(Net::Simplify::SimplifyApi->send_api_request("cardToken", 'update', $params, $auth));
 }
 
 

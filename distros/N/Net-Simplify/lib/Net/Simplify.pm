@@ -82,11 +82,9 @@ L<Net::Simplify::AuthenticationException>,
 L<Net::Simplify::Authorization>,
 L<Net::Simplify::BadRequestException>,
 L<Net::Simplify::CardToken>,
-L<Net::Simplify::Chargeback>,
 L<Net::Simplify::Constants>,
 L<Net::Simplify::Coupon>,
 L<Net::Simplify::Customer>,
-L<Net::Simplify::Deposit>,
 L<Net::Simplify::Event>,
 L<Net::Simplify::Event>,
 L<Net::Simplify::FieldError>,
@@ -108,11 +106,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 
@@ -167,12 +165,9 @@ use Net::Simplify::Event;
 
 use Net::Simplify::Authorization;
 use Net::Simplify::CardToken;
-use Net::Simplify::Chargeback;
 use Net::Simplify::Constants;
 use Net::Simplify::Coupon;
 use Net::Simplify::Customer;
-use Net::Simplify::DataToken;
-use Net::Simplify::Deposit;
 use Net::Simplify::FraudCheck;
 use Net::Simplify::Invoice;
 use Net::Simplify::InvoiceItem;

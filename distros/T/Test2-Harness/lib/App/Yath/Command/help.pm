@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::Util qw/pkg_to_file/;
 
-our $VERSION = '1.000128';
+our $VERSION = '1.000133';
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase qw/<_command_info_hash/;
@@ -637,6 +637,15 @@ DBI Driver to use
 =item --no-yathui-db-dsn
 
 DSN to use when connecting to the db
+
+
+=item --yathui-db-duration-limit ARG
+
+=item --yathui-db-duration-limit=ARG
+
+=item --no-yathui-db-duration-limit
+
+Limit the number of runs to look at for durations data (default: 10)
 
 
 =item --yathui-db-durations

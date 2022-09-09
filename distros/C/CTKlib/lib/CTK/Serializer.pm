@@ -1,4 +1,4 @@
-package CTK::Serializer; # $Id: Serializer.pm 212 2019-04-27 18:42:35Z minus $
+package CTK::Serializer;
 use strict;
 use utf8;
 
@@ -10,13 +10,13 @@ CTK::Serializer - Base class for serialization perl structures
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
     use CTK::Serializer;
 
-    my $sr = new CTK::Serializer( DEFAULT_FORMAT,
+    my $sr = CTK::Serializer->new( DEFAULT_FORMAT,
             attrs => {
                 xml => [
                         { # For serialize
@@ -68,11 +68,11 @@ XML, YAML, JSON and "none" for automatic format detecting
 
 =head2 new
 
-    my $sr = new CTK::Serializer( $format );
+    my $sr = CTK::Serializer->new( $format );
 
 If specified $format in constructor call then this format sets as default
 
-    my $sr = new CTK::Serializer( $format,
+    my $sr = CTK::Serializer->new( $format,
             attrs => {
                 format => [
                     {...serialize attr...}, # for serialize
@@ -223,11 +223,11 @@ L<CTK>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -239,7 +239,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use constant {
         DEFAULT_FORMAT      => "none",

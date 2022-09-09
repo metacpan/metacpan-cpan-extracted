@@ -5,7 +5,7 @@ use strict;
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.004000';
+our $VERSION   = '1.004001';
 our @EXPORT_OK = qw< mkopt mkopt_hash _croak _carp >;
 
 sub _croak ($;@) { require Carp; my $fmt = shift; @_ = sprintf($fmt, @_); goto \&Carp::croak }
@@ -258,6 +258,7 @@ sub _exporter_install_sub
 {
 	my $class = shift;
 	my ($name, $value, $globals, $sym) = @_;
+	my $value_hash = ( ref($value) eq 'HASH' ) ? $value : {};
 	
 	my $into      = $globals->{into};
 	my $installer = $globals->{installer} || $globals->{exporter};
@@ -273,9 +274,9 @@ sub _exporter_install_sub
 	}
 
 	$name =
-		ref    $globals->{as} ? $globals->{as}->($name) :
-		ref    $value->{-as}  ? $value->{-as}->($name) :
-		exists $value->{-as}  ? $value->{-as} :
+		ref    $globals->{as}      ? $globals->{as}->($name) :
+		ref    $value_hash->{-as}  ? $value_hash->{-as}->($name) :
+		exists $value_hash->{-as}  ? $value_hash->{-as} :
 		$name;
 	
 	return unless defined $name;
@@ -289,8 +290,8 @@ sub _exporter_install_sub
 				_croak("Cannot export symbols with a * sigil");
 			}
 		}
-		my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, q();
-		my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, q();
+		my ($prefix) = grep defined, $value_hash->{-prefix}, $globals->{prefix}, q();
+		my ($suffix) = grep defined, $value_hash->{-suffix}, $globals->{suffix}, q();
 		$name = "$prefix$name$suffix";
 	}
 	
@@ -310,7 +311,7 @@ sub _exporter_install_sub
 	
 	if (ref($sym) eq 'CODE' and exists &{"$into\::$name"} and \&{"$into\::$name"} != $sym)
 	{
-		my ($level) = grep defined, $value->{-replace}, $globals->{replace}, q(0);
+		my ($level) = grep defined, $value_hash->{-replace}, $globals->{replace}, q(0);
 		my $action = {
 			carp     => \&_carp,
 			0        => \&_carp,

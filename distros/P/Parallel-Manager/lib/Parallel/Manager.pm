@@ -17,8 +17,14 @@ has workers => (is => 'ro', isa => 'ArrayRef', required => 1,);
 
 has thread => (is => 'rw', isa => 'Int', default => 5,);
 
+# 等待子进程以及进入下一个子进程的周期
+has poll_interval => (is => 'rw', isa => 'Num', default => 0.5,);
+
+# 进入下一个队列的周期
+has wait_interval => (is => 'rw', isa => 'Num', default => 0.5,);
+
 #------------------------------------------------------------------------------
-# 并发执行脚本 - 入参为设备清单，为每台设备调度配置备份任务
+# 开启并发调度任务
 #------------------------------------------------------------------------------
 sub run {
   my $self = shift;
@@ -26,12 +32,17 @@ sub run {
   # 根据负载量自动设定线程数
   @{$self->workers} > $self->thread ? $self->thread : $self->thread(scalar @{$self->workers});
 
-  # 按照线程数塞进负载任务
+  # 按照线程数塞进负载任务，拆分成 $self->thread 个子队列
   my $i = 0;
   my @threads;
   for my $job (@{$self->workers}) {
     push(@{$threads[$i % $self->thread]}, $job);
     $i++;
+  }
+
+  # 切入运行前钩子函数
+  if ($self->{before_run_code}) {
+    $self->{before_run_code}->($self->{before_run_vars});
   }
 
   # fork 线程并发调度任务
@@ -42,12 +53,18 @@ sub run {
     }
     else {
       for my $work (@{$threads[$j]}) {
-        eval { $self->handler()->($work) } or die "Can't handle $work: $@\n";
-        sleep 0.5;
+        if ($self->{before_job_run_code}) {
+          $self->{before_job_run_code}->($self->{before_job_run_vars});
+        }
+        eval { $self->handler->($work) } or die "Can't handle $work: $@\n";
+        if ($self->{after_job_run_code}) {
+          $self->{after_job_run_code}->($self->{after_job_run_vars});
+        }
+        sleep $self->poll_interval;
       }
       exit;
     }
-    sleep 1;
+    sleep $self->wait_interval;
   }
 
   # 异步非阻塞等待并发任务运行结束
@@ -55,11 +72,78 @@ sub run {
   while (keys(%childPids)) {
     while (($exitPid = waitpid(-1, WNOHANG)) > 0) {
       delete($childPids{$exitPid});
-      sleep 0.5;
+      sleep $self->wait_interval;
     }
   }
 
+  # 运行结束后钩子函数
+  if ($self->{after_run_code}) {
+    $self->{after_run_code}->($self->{after_run_vars});
+  }
+
   return 1;
+}
+
+#------------------------------------------------------------------------------
+# 获取当前调用的函数名称
+#------------------------------------------------------------------------------
+sub called_subroutine {
+  '[split(/::/, (caller(0))[3])]->[-1];';
+}
+
+#------------------------------------------------------------------------------
+# 设定回调函数
+#------------------------------------------------------------------------------
+sub set_callback_name {
+  my ($self, $name, $code, $vars) = @_;
+  if (ref $code eq 'CODE') {
+    $self->{$name . '_code'} = $code;
+    $self->{$name . '_vars'} = $vars;
+  }
+  else {
+    die "Must set callback code";
+  }
+}
+
+#------------------------------------------------------------------------------
+# RUN 函数运行前钩子函数
+#------------------------------------------------------------------------------
+sub before_run {
+  my ($self, $code, $vars) = @_;
+  $self->set_callback_name("before_run", $code, $vars);
+}
+
+#------------------------------------------------------------------------------
+# RUN 函数运行后钩子函数
+#------------------------------------------------------------------------------
+sub after_run {
+  my ($self, $code, $vars) = @_;
+  $self->set_callback_name("after_run", $code, $vars);
+}
+
+#------------------------------------------------------------------------------
+# 子任务运行前钩子函数
+#------------------------------------------------------------------------------
+sub before_job_run {
+  my ($self, $code, $vars) = @_;
+  $self->set_callback_name("before_job_run", $code, $vars);
+}
+
+#------------------------------------------------------------------------------
+# 子任务运行后钩子函数
+#------------------------------------------------------------------------------
+sub after_job_run {
+  my ($self, $code, $vars) = @_;
+  $self->set_callback_name("after_job_run", $code, $vars);
+}
+
+#------------------------------------------------------------------------------
+# 支持哈希或标量实例化对象
+#------------------------------------------------------------------------------
+sub BUILDARGS {
+  my $self  = shift;
+  my %param = (@_ > 0 and ref $_[0] eq 'HASH') ? %{$_[0]} : @_;
+  return \%param;
 }
 
 1;
@@ -81,6 +165,7 @@ version 0.02
 =head1 SYNOPSIS
 
   use 5.018;
+  use Data::Printer;
   use Parallel::Manager;
 
   sub callback {
@@ -88,8 +173,20 @@ version 0.02
     say qq{callback $name #times};
   }
 
-  my $p = Parallel::Manager->new(handler => \&callback, workers => [1 .. 100]);
-  # will callback 100 times async
+  # handler and workers must defined, other attributes have default value;
+  my $pm = Parallel::Manager->new(handler => \&callback, workers => [1 .. 100], thread => 10, poll_interval => 0.2, wait_interval => 0.5);
+
+  # you can define some callback when $pm->run
+
+  $p->before_run(\&callback, "python");
+  $p->after_run(\&callback, "perl");
+  $p->before_job_run(\&callback, "php");
+  $p->after_job_run(\&callback, "ruby");
+
+  $pm->run;  # will callback 100 times async
+
+  # use DDP to see more info
+  p $pm;
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

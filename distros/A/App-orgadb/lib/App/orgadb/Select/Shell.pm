@@ -10,9 +10,9 @@ use parent qw(Term::Shell);
 use Time::HiRes qw(time);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-08'; # DATE
+our $DATE = '2022-09-09'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 sub new {
     my ($class, %args) = @_;
@@ -493,7 +493,7 @@ App::orgadb::Select::Shell - Shell object for orgadb-sel
 
 =head1 VERSION
 
-This document describes version 0.005 of App::orgadb::Select::Shell (from Perl distribution App-orgadb), released on 2022-08-08.
+This document describes version 0.006 of App::orgadb::Select::Shell (from Perl distribution App-orgadb), released on 2022-09-09.
 
 =head1 SYNOPSIS
 

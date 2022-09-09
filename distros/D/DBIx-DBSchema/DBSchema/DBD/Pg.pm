@@ -4,7 +4,7 @@ use base qw(DBIx::DBSchema::DBD);
 use strict;
 use DBD::Pg 1.41;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 our %typemap = (
   'BLOB'           => 'BYTEA',
@@ -62,7 +62,7 @@ END
     if ( $_->{atthasdef} ) {
       my $attnum = $_->{attnum};
       my $d_sth = $dbh->prepare(<<END) or die $dbh->errstr;
-        SELECT substring(d.adsrc for 128) FROM pg_attrdef d, pg_class c
+        SELECT pg_get_expr(d.adbin, d.adrelid) FROM pg_attrdef d, pg_class c
         WHERE c.relname = '$table' AND c.oid = d.adrelid AND d.adnum = $attnum
 END
       $d_sth->execute or die $d_sth->errstr;

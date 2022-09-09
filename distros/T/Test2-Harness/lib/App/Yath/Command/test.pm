@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000128';
+our $VERSION = '1.000133';
 
 use App::Yath::Options;
 
@@ -48,6 +48,8 @@ use Test2::Harness::Util::HashBase qw/
     +run_queue
     +tasks_queue
     +state
+
+    <cleanup_subs
 
     <final_data
 /;
@@ -119,6 +121,8 @@ sub init {
 
     $self->{+TESTS_SEEN}   //= 0;
     $self->{+ASSERTS_SEEN} //= 0;
+
+    $self->{+CLEANUP_SUBS} = [];
 }
 
 sub _resize_pipe {
@@ -236,7 +240,41 @@ sub run {
     }
 
     $self->stop();
+
     return 1;
+}
+
+sub DESTROY {
+    my $self = shift;
+
+    local ($?, $!, $@, $_);
+
+    my $cleanup = delete $self->{+CLEANUP_SUBS} or return;
+    for my $sub (@$cleanup) {
+        eval { $sub->(); 1 } or warn $@;
+    }
+}
+
+sub write_test_info {
+    my $self = shift;
+
+    return if $ENV{TEST2_HARNESS_NO_WRITE_TEST_INFO};
+
+    my $info_file = "./.test_info.$$.json";
+
+    my $workdir = $self->workdir;
+    Test2::Harness::Util::File::JSON->new(name => $info_file)->write({
+        workdir   => $self->workdir,
+        job_count => $self->job_count,
+    });
+
+    push @{$self->{+CLEANUP_SUBS}} => sub {
+        return unless -e $info_file;
+        return unless Test2::Harness::Util::File::JSON->new(name => $info_file)->read->{workdir} eq $workdir;
+        unlink($info_file) or die "Could not unlink info file: $!";
+    };
+
+    $ENV{TEST2_HARNESS_NO_WRITE_TEST_INFO} = 1;
 }
 
 sub start {
@@ -246,15 +284,7 @@ sub start {
     $self->parse_args;
     $self->write_settings_to($self->workdir, 'settings.json');
 
-    unless ($ENV{TEST2_HARNESS_NO_WRITE_TEST_INFO}) {
-        Test2::Harness::Util::File::JSON->new(name => './.test_info.json')->write({
-            workdir   => $self->workdir,
-            job_count => $self->job_count,
-        });
-
-        $ENV{TEST2_HARNESS_NO_WRITE_TEST_INFO} = 1;
-    }
-
+    $self->write_test_info();
     my $pop = $self->populate_queue();
     $self->terminate_queue();
 
@@ -2586,6 +2616,15 @@ DBI Driver to use
 =item --no-yathui-db-dsn
 
 DSN to use when connecting to the db
+
+
+=item --yathui-db-duration-limit ARG
+
+=item --yathui-db-duration-limit=ARG
+
+=item --no-yathui-db-duration-limit
+
+Limit the number of runs to look at for durations data (default: 10)
 
 
 =item --yathui-db-durations

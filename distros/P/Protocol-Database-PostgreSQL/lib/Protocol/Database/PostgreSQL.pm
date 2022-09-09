@@ -3,7 +3,7 @@ package Protocol::Database::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '1.005';
+our $VERSION = '2.000';
 
 =head1 NAME
 
@@ -204,6 +204,7 @@ use Ryu;
 use Future;
 use Sub::Identify;
 use Unicode::UTF8;
+use MIME::Base64;
 
 use Protocol::Database::PostgreSQL::Backend::AuthenticationRequest;
 use Protocol::Database::PostgreSQL::Backend::BackendKeyData;
@@ -242,6 +243,9 @@ our %AUTH_TYPE = (
     7   => 'AuthenticationGSS',
     8   => 'AuthenticationGSSContinue',
     9   => 'AuthenticationSSPI',
+    10  => 'AuthenticationSASL',
+    11  => 'AuthenticationSASLContinue',
+    12  => 'AuthenticationSASLFinal',
 );
 
 # The terms "backend" and "frontend" used in the documentation here reflect
@@ -319,6 +323,8 @@ our %MESSAGE_TYPE_FRONTEND = (
     FunctionCall    => 'F',
     Parse           => 'P',
     PasswordMessage => 'p',
+    SASLInitialResponse => 'p',
+    SASLResponse    => 'p',
     Query           => 'Q',
 # Both of these are handled separately, and for legacy reasons they don't
 # have a byte prefix for the message code
@@ -806,6 +812,41 @@ sub frontend_password_message {
     );
 }
 
+=head2 frontend_sasl_initial
+
+Initial client response for SASL authentication
+
+=cut
+
+sub frontend_sasl_initial_response {
+    my ($self, %args) = @_;
+
+    my $nonce = $args{nonce} // die 'no nonce provided';
+    my $mech  = $args{mechanism} // die 'no SASL mechanism provided';
+
+    my $data = 'n,,n=,r=' . $nonce;
+    return $self->build_message(
+        type    => 'SASLInitialResponse',
+        data    => pack('Z*N/a*', $mech, $data)
+    );
+}
+
+sub frontend_sasl_response {
+    my ($self, %args) = @_;
+
+    my $nonce = $args{nonce} // die 'no nonce provided';
+    my $proof = $args{proof} // die 'no proof provided';
+    my $header = $args{header} // die 'no header provided';
+
+    $header = MIME::Base64::encode_base64($header, '');
+    $proof = MIME::Base64::encode_base64($proof, '');
+    my $data = "c=$header,r=$nonce,p=$proof";
+    return $self->build_message(
+        type    => 'SASLResponse',
+        data    => pack('A*', $data)
+    );
+}
+
 =head2 frontend_query
 
 Simple query
@@ -936,7 +977,11 @@ Returns the method name for the given frontend type.
 sub method_for_frontend_type {
     my ($self, $type) = @_;
     my $method = 'frontend' . $type;
-    $method =~ s/([A-Z])/'_' . lc $1/ge;
+    for ($method) {
+        s{([A-Z0-9]+)([A-Z])}{"_" . lc($1) . "_" . lc($2)}ge;
+        s{([A-Z]+)}{"_" . lc($1)}ge;
+    }
+    # $method =~ s/([A-Z])/'_' . lc $1/ge;
     $method
 }
 
@@ -1154,7 +1199,7 @@ sub build_message {
 
     # Length includes the 4-byte length field, but not the type byte
     my $length = length($args{data}) + 4;
-    return (defined($args{type}) ? $MESSAGE_TYPE_FRONTEND{$args{type}} : '') . pack('N1', $length) . $args{data};
+    return (defined($args{type}) ? ($MESSAGE_TYPE_FRONTEND{$args{type}} // die 'unknown message ' . $args{type})  : '') . pack('N1', $length) . $args{data};
 }
 
 sub state { $_[0]->{state} = $_[1] }

@@ -259,6 +259,21 @@ sub column_value_needs_quoting {
 
 }
 
+sub tables {
+  my ($proto, $dbh, $sth) = @_;
+
+  my $db_catalog = $proto->default_db_catalog;
+  my $db_schema  = $proto->default_db_schema;
+
+  $sth ||= $dbh->table_info($db_catalog, $db_schema, '', 'TABLE')
+    or die $dbh->errstr;
+
+  #map { $_->{TABLE_NAME} } grep { $_->{TABLE_TYPE} eq 'TABLE' }
+  #  @{ $sth->fetchall_arrayref({ TABLE_NAME=>1, TABLE_TYPE=>1}) };
+  map { $_->[0] } grep { $_->[1] =~ /^TABLE$/i }
+    @{ $sth->fetchall_arrayref([2,3]) };
+}
+
 =back
 
 =head1 TYPE MAPPING
@@ -286,7 +301,7 @@ Ivan Kohler <ivan-dbix-dbschema@420.am>
 =head1 COPYRIGHT
 
 Copyright (c) 2000-2005 Ivan Kohler
-Copyright (c) 2007-2013 Freeside Internet Services, Inc.
+Copyright (c) 2007-2017 Freeside Internet Services, Inc.
 All rights reserved.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

@@ -1,4 +1,4 @@
-package CTK::Skel::Tiny; # $Id: Tiny.pm 262 2019-05-17 15:22:41Z minus $
+package CTK::Skel::Tiny;
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ CTK::Skel::Tiny - Tiny project skeleton for CTK::Helper
 
 =head1 VIRSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -32,11 +32,11 @@ L<CTK::Skel>, L<CTK::Helper>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -50,7 +50,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 use constant SIGNATURE => "tiny";
 
 use vars qw($VERSION);
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub pool {
     my $self = shift;
@@ -72,7 +72,7 @@ File: %PROJECT_NAMEL%
 Mode: 711
 
 #!/usr/bin/perl -w
-use strict; # %DOLLAR%Id%DOLLAR%
+use strict;
 
 %PODSIG%head1 NAME
 
@@ -214,7 +214,7 @@ my $command = shift(@ARGV);
 my @arguments = @ARGV ? @ARGV : ();
 
 # CTK Singleton instance
-my $app = new CTK::App(
+my $app = CTK::App->new(
         project => '%PROJECT_NAME%',
         #ident   => '%PROJECT_NAMEL%',
         options => {%options},

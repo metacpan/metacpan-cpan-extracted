@@ -4,7 +4,7 @@ use base qw( DBIx::DBSchema::DBD );
 use strict;
 use vars qw($VERSION %typemap);
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 %typemap = (
   'SERIAL' => 'INTEGER PRIMARY KEY AUTOINCREMENT',
@@ -26,9 +26,11 @@ $schema = new_native DBIx::DBSchema $dbh;
 
 This module implements a SQLite-native driver for DBIx::DBSchema.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Jesse Vincent <jesse@bestpractical.com>
+
+Nathan Anderson <http://1id.com/=nathan.anderson>
 
 =cut 
 
@@ -48,27 +50,27 @@ driver-specific use (which for sqlite is whether this col is a primary key)
 =cut
 
 sub columns {
-    my ( $proto, $dbh, $table ) = @_;
-    my $sth  = $dbh->prepare("PRAGMA table_info($table)");
-        $sth->execute();
-    my $rows = [];
+  my ( $proto, $dbh, $table ) = @_;
+  my $sth  = $dbh->prepare("PRAGMA table_info($table)");
+  $sth->execute();
+  my $rows = [];
 
-    while ( my $row = $sth->fetchrow_hashref ) {
+  while ( my $row = $sth->fetchrow_hashref ) {
 
-        #  notnull #  pk #  name #  type #  cid #  dflt_value
-        push @$rows,
-            [
-            $row->{'name'},    
-            $row->{'type'},
-            ( $row->{'notnull'} ? 0 : 1 ), 
-            undef,
-            $row->{'dflt_value'}, 
-            $row->{'pk'}
-            ];
+    #  notnull #  pk #  name #  type #  cid #  dflt_value
+    push @$rows,
+      [
+        $row->{'name'},    
+        $row->{'type'},
+        ( $row->{'notnull'} ? 0 : 1 ), 
+        undef,
+        $row->{'dflt_value'}, 
+        $row->{'pk'}
+      ];
 
-    }
+  }
 
-    return $rows;
+  return $rows;
 }
 
 
@@ -82,12 +84,12 @@ table.
 sub primary_key {
   my ($proto, $dbh, $table) = @_;
 
-        my $cols = $proto->columns($dbh,$table);
-        foreach my $col (@$cols) {
-                return ($col->[1]) if ($col->[5]);
-        }
-        
-        return undef;
+  my $cols = $proto->columns($dbh,$table);
+  foreach my $col (@$cols) {
+    return ($col->[1]) if ($col->[5]);
+  }
+  
+  return undef;
 }
 
 
@@ -104,16 +106,16 @@ L<DBIx::DBSchema::ColGroup>.
 sub unique {
   my ($proto, $dbh, $table) = @_;
   my @names;
-        my $indexes = $proto->_index_info($dbh, $table);
-   foreach my $row (@$indexes) {
-        push @names, $row->{'name'} if ($row->{'unique'});
+  my $indexes = $proto->_index_info($dbh, $table);
+  foreach my $row (@$indexes) {
+    push @names, $row->{'name'} if ($row->{'unique'});
 
-    }
-    my $info  = {};
-        foreach my $name (@names) {
-                $info->{'name'} = $proto->_index_cols($dbh, $name);
-        }
-    return $info;
+  }
+  my $info  = {};
+  foreach my $name (@names) {
+    $info->{'name'} = $proto->_index_cols($dbh, $name);
+  }
+  return $info;
 }
 
 
@@ -129,15 +131,15 @@ L<DBIx::DBSchema::ColGroup>.
 sub index {
   my ($proto, $dbh, $table) = @_;
   my @names;
-        my $indexes = $proto->_index_info($dbh, $table);
-   foreach my $row (@$indexes) {
-        push @names, $row->{'name'} if not ($row->{'unique'});
+  my $indexes = $proto->_index_info($dbh, $table);
+  foreach my $row (@$indexes) {
+    push @names, $row->{'name'} if not ($row->{'unique'});
 
-    }
-    my $info  = {};
-        foreach my $name (@names) {
-                $info->{'name'} = $proto->_index_cols($dbh, $name);
-        }
+  }
+  my $info  = {};
+  foreach my $name (@names) {
+    $info->{'name'} = $proto->_index_cols($dbh, $name);
+  }
 
   return $info;
 }
@@ -145,45 +147,57 @@ sub index {
 
 
 sub _index_list {
+  my $proto = shift;
+  my $dbh = shift;
+  my $table = shift;
 
-        my $proto = shift;
-        my $dbh = shift;
-        my $table = shift;
+  my $sth  = $dbh->prepare('PRAGMA index_list($table)');
+  $sth->execute();
+  my $rows = [];
 
-my $sth  = $dbh->prepare('PRAGMA index_list($table)');
-$sth->execute();
-my $rows = [];
-
-while ( my $row = $sth->fetchrow_hashref ) {
+  while ( my $row = $sth->fetchrow_hashref ) {
     # Keys are "name" and "unique"
     push @$rows, $row;
 
-}
+  }
 
-return $rows;
+  return $rows;
 }
 
 
 
 sub _index_cols {
-        my $proto  = shift;
-        my $dbh = shift;
-        my $index = shift;
+  my $proto  = shift;
+  my $dbh = shift;
+  my $index = shift;
         
-        my $sth  = $dbh->prepare('PRAGMA index_info($index)');
-        $sth->execute();
-        my $data = {}; 
-while ( my $row = $sth->fetchrow_hashref ) {
+  my $sth  = $dbh->prepare('PRAGMA index_info($index)');
+  $sth->execute();
+  my $data = {}; 
+  while ( my $row = $sth->fetchrow_hashref ) {
     # Keys are "name" and "seqno"
-        $data->{$row->{'seqno'}} = $data->{'name'};
+    $data->{$row->{'seqno'}} = $data->{'name'};
+  }
+  my @results; 
+  foreach my $key (sort keys %$data) {
+    push @results, $data->{$key}; 
+  }
+
+  return \@results;
+
 }
-        my @results; 
-        foreach my $key (sort keys %$data) {
-              push @results, $data->{$key}; 
-        }
 
-        return \@results;
+sub default_db_schema  { '%'; }
 
+sub tables {
+  my($proto, $dbh) = @_;
+  my $db_catalog = $proto->default_db_catalog;
+  my $db_schema  = $proto->default_db_schema;
+
+  my $sth = $dbh->table_info($db_catalog, $db_schema, '%', 'TABLE')
+    or die $dbh->errstr;
+
+  $proto->SUPER::tables($dbh, $sth);
 }
 
 =pod

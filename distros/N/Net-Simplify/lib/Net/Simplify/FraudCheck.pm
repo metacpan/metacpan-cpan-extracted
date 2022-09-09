@@ -47,7 +47,7 @@ Hash map containing initial values for the object.  Valid keys are:
 
 =item amount
 
-Amount of the transaction to be checked for fraud (in the smallest unit of your currency). Example: 100 = $1.00USD. This field is required if using “full” or “advanced” mode. 
+Amount of the transaction to be checked for fraud (in the smallest unit of your currency). Example: 100 = $1.00. This field is required if using “full” or “advanced” mode. 
 
 
 
@@ -69,11 +69,11 @@ Address of the cardholder if needed. [max length: 255]
 
 =item card.addressState
 
-State of residence of the cardholder. For the US, this is a 2-digit USPS code. [max length: 255] 
+State of residence of the cardholder. State abbreviations should be used. [max length: 255] 
 
 =item card.addressZip
 
-Postal code of the cardholder. The postal code size is between 5 and 9 characters in length and only contains numbers or letters. [max length: 9, min length: 3] 
+Postal code of the cardholder. The postal code size is between 5 and 9 characters in length and only contains numbers or letters. [max length: 32] 
 
 =item card.cvc
 
@@ -81,11 +81,11 @@ CVC security code of the card. This is the code on the back of the card. Example
 
 =item card.expMonth
 
-Expiration month of the card. Format is MM. Example: January = 01 [min value: 1, max value: 12] (B<required>) 
+Expiration month of the card. Format is MM. Example: January = 01 [min value: 1, max value: 12] 
 
 =item card.expYear
 
-Expiration year of the card. Format is YY. Example: 2013 = 13 [min value: 0, max value: 99] (B<required>) 
+Expiration year of the card. Format is YY. Example: 2013 = 13 [min value: 0, max value: 99] 
 
 =item card.name
 
@@ -93,7 +93,7 @@ Name as it appears on the card. [max length: 50, min length: 2]
 
 =item card.number
 
-Card number as it appears on the card. [max length: 19, min length: 13] (B<required>) 
+Card number as it appears on the card. [max length: 19, min length: 13] 
 
 =item currency
 
@@ -109,7 +109,7 @@ IP Address of the customer for which the fraud check is to be done. [max length:
 
 =item mode
 
-Fraud check mode.  “simple” only does an AVS and CVC check; “advanced” does a complete fraud check, running the input against the set up rules. [valid values: simple, advanced, full] (B<required>) 
+Fraud check mode.  “simple” only does an AVS and CVC check; “advanced” does a complete fraud check, running the input against the set up rules. [valid values: simple, advanced, full, SIMPLE, ADVANCED, FULL] (B<required>) 
 
 =item sessionId
 
@@ -117,7 +117,7 @@ Session ID used during data collection. [max length: 255]
 
 =item token
 
-Card token token representing card details for the card to be checked. [max length: 255] 
+Card token representing card details for the card to be checked. [max length: 255] 
 
 
 =back
@@ -146,7 +146,7 @@ Hash map representing the criteria to limit the results of the list operation.  
 
 =item C<filter>
 
-Allows for ascending or descending sorting of the list.
+Filters to apply to the list.
 
 
 
@@ -164,7 +164,7 @@ Used in paging of the list.  This is the start offset of the page. [min value: 0
 
 =item C<sorting>
 
-Used in paging of the list.  This is the start offset of the page.
+Allows for ascending or descending sorting of the list.
 The value maps properties to the sort direction (either C<asc> for ascending or C<desc> for descending).  Sortable properties are:
 
 =over 4
@@ -220,15 +220,15 @@ The properties that can be updated are:
 
 Authorization code for the transaction. [max length: 255] 
 
-=item C<integratorAvsAddress>
+=item C<integratorAvsAddressResponse>
 
 AVS address response. [max length: 255] 
 
-=item C<integratorAvsZip>
+=item C<integratorAvsZipResponse>
 
 AVS zip response. [max length: 255] 
 
-=item C<integratorCvc>
+=item C<integratorCvcResponse>
 
 CVC response. [max length: 255] 
 
@@ -262,11 +262,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 

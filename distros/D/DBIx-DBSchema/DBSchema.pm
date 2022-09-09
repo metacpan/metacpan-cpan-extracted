@@ -3,12 +3,12 @@ package DBIx::DBSchema;
 use strict;
 use Storable;
 use DBIx::DBSchema::_util qw(_load_driver _dbh _parse_opt);
-use DBIx::DBSchema::Table 0.08;
+use DBIx::DBSchema::Table 0.12;
 use DBIx::DBSchema::Index;
 use DBIx::DBSchema::Column;
 use DBIx::DBSchema::ForeignKey;
 
-our $VERSION = '0.45';
+our $VERSION = '0.47';
 $VERSION = eval $VERSION; # modperlstyle: convert the string into a number
 
 our $DEBUG = 0;
@@ -498,16 +498,8 @@ sub pretty_read {
 sub _tables_from_dbh {
   my($dbh) = @_;
   my $driver = _load_driver($dbh);
-  my $db_catalog =
-    scalar(eval "DBIx::DBSchema::DBD::$driver->default_db_catalog");
-  my $db_schema  =
-    scalar(eval "DBIx::DBSchema::DBD::$driver->default_db_schema");
-  my $sth = $dbh->table_info($db_catalog, $db_schema, '', 'TABLE')
-    or die $dbh->errstr;
-  #map { $_->{TABLE_NAME} } grep { $_->{TABLE_TYPE} eq 'TABLE' }
-  #  @{ $sth->fetchall_arrayref({ TABLE_NAME=>1, TABLE_TYPE=>1}) };
-  map { $_->[0] } grep { $_->[1] =~ /^TABLE$/i }
-    @{ $sth->fetchall_arrayref([2,3]) };
+  my $driver_class = "DBIx::DBSchema::DBD::$driver";
+  $driver_class->tables($dbh);
 }
 
 =back
@@ -526,6 +518,9 @@ internal usage of the old API.
 
 Slaven Rezic <srezic@cpan.org> contributed column and table dropping, Pg
 bugfixes and more.
+
+Nathan Anderson <http://1id.com/=nathan.anderson> contribued updates to the
+SQLite and Sybase drivers.
 
 =head1 CONTRIBUTIONS
 
@@ -548,7 +543,7 @@ Or on the web:
 
 Copyright (c) 2000-2007 Ivan Kohler
 Copyright (c) 2000 Mail Abuse Prevention System LLC
-Copyright (c) 2007-2015 Freeside Internet Services, Inc.
+Copyright (c) 2007-2017 Freeside Internet Services, Inc.
 All rights reserved.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

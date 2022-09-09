@@ -11,6 +11,7 @@ requires 'Future', '>= 0.39';
 requires 'Sub::Identify';
 requires 'Adapter::Async', 0;
 requires 'Unicode::UTF8', 0;
+requires 'MIME::Base64', 0;
 
 on 'test' => sub {
 	test_requires 'Test::More', '>= 0.98';

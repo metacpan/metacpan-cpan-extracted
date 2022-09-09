@@ -7,7 +7,7 @@ use DBIx::DBSchema::Column 0.14;
 use DBIx::DBSchema::Index;
 use DBIx::DBSchema::ForeignKey 0.13;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $DEBUG = 0;
 
 =head1 NAME
@@ -631,8 +631,8 @@ sub sql_alter_table {
     warn "removing obsolete index $table.$old ON ( ".
          $old_indices{$old}->columns_sql. " )\n"
       if $DEBUG > 1;
-    push @r, "DROP INDEX $old".
-             ( $driver eq 'mysql' ? " ON $table" : '');
+    push @r, 'DROP INDEX '.  ( $driver ne 'mysql' ? ' IF EXISTS ' : '').
+             " $old ".       ( $driver eq 'mysql' ? " ON $table " : '');
   }
 
   foreach my $new ( keys %new_indices ) {

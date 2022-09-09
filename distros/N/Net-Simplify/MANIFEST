@@ -12,12 +12,9 @@ lib/Net/Simplify/AuthenticationException.pm
 lib/Net/Simplify/Authorization.pm
 lib/Net/Simplify/BadRequestException.pm
 lib/Net/Simplify/CardToken.pm
-lib/Net/Simplify/Chargeback.pm
 lib/Net/Simplify/Constants.pm
 lib/Net/Simplify/Coupon.pm
 lib/Net/Simplify/Customer.pm
-lib/Net/Simplify/DataToken.pm
-lib/Net/Simplify/Deposit.pm
 lib/Net/Simplify/Domain.pm
 lib/Net/Simplify/DomainList.pm
 lib/Net/Simplify/Event.pm

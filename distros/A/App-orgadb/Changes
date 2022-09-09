@@ -1,3 +1,8 @@
+0.006   2022-09-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add completion for --category, --entry, --field.
+
+
 0.005   2022-08-08  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - [incompatible change] Rename CLI orgadb to orgadb-sel.

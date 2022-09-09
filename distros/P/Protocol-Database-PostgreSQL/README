@@ -219,6 +219,10 @@ METHODS
     Password data, possibly encrypted depending on what the server
     specified.
 
+ frontend_sasl_initial
+
+    Initial client response for SASL authentication
+
  frontend_query
 
     Simple query

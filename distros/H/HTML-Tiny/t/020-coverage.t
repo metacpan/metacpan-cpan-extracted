@@ -556,12 +556,12 @@ BEGIN {
     },
     {
       "args"          => [],
-      "expect_scalar" => "<frame />",
+      "expect_scalar" => "<frame></frame>",
       "method"        => "frame"
     },
     {
       "args"          => [],
-      "expect_scalar" => "<iframe />",
+      "expect_scalar" => "<iframe></iframe>",
       "method"        => "iframe"
     },
     {
@@ -629,12 +629,12 @@ BEGIN {
     },
     {
       "args"          => [],
-      "expect_scalar" => "<frame>",
+      "expect_scalar" => "<frame></frame>",
       "method"        => "frame"
     },
     {
       "args"          => [],
-      "expect_scalar" => "<iframe>",
+      "expect_scalar" => "<iframe></iframe>",
       "method"        => "iframe"
     },
     {

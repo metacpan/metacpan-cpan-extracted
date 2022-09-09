@@ -67,6 +67,11 @@ The result is returned.
 Like `exs_call_sv_scalar()` but traps exceptions. If one happens,
 NULL is returned, and `*error_svp` will contain the error SV.
 
+### `void exs_call_sv_void_trapped(SV* callback, SV** args, SV** error_svp)`
+
+Like `exs_call_sv_scalar_trapped()` but calls the Perl callback in void
+context and doesn’t return anything.
+
 ### `void exs_call_method_void(SV* object, const char* methname, SV** args)`
 
 Like `exs_call_sv_void()` but for calling object methods. See
@@ -76,6 +81,20 @@ the Perl API’s `call_method()` for more details.
 
 Like `exs_call_method_void()` but calls the method in scalar context.
 The result is returned.
+
+### `SV** exs_call_sv_list(SV* callback, SV** args)`
+
+Like `exs_call_sv_scalar` but calls the callback in list context.
+
+The return is a pointer to a NUL-terminated array of `SV*`s. The pointer will
+be freed automatically, but the SVs are non-mortals with reference count 1,
+so you’ll need to dispose of those however is best for you.
+
+### `SV** exs_call_sv_list_trapped(SV* callback, SV** args, SV** error_svp)`
+
+Like both `exs_call_sv_list` and `exs_call_sv_scalar_trapped`. If the
+callback throws, this behaves as `exs_call_sv_scalar_trapped` does;
+otherwise, this behaves as `exs_call_sv_list` does.
 
 ## SV “Typing”
 

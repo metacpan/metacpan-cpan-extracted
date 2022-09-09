@@ -3,11 +3,11 @@ package Alien::Build::Plugin::Fetch::HostAllowList;
 use strict;
 use warnings;
 use 5.008004;
-use Alien::Build::Plugin;
+use Alien::Build::Plugin 2.64;
 use URI;
 
 # ABSTRACT: Require that Alien::Build based aliens only fetch from an allow list of hosts
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 has '+allow_hosts' => sub { [
@@ -59,7 +59,7 @@ Alien::Build::Plugin::Fetch::HostAllowList - Require that Alien::Build based ali
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -70,10 +70,7 @@ Using with environment variables only:
 
 Using from C<~/.alienbuild/rc.pl>:
 
- preload sub {
-   my($meta) = @_;
-   $meta->apply_plugin('Fetch::HostAllowList', allow_hosts => [qw( github.com ftp.gnu.org )])
- };
+ preload_plugin 'Fetch::HostAllowList', allow_hosts => [qw( github.com ftp.gnu.org )];
 
 =head1 DESCRIPTION
 
@@ -91,7 +88,7 @@ see below) then no remote hosts will be allowed.
 
 =head2 allow_hosts
 
- plugin 'Fetch::HostALlowList', allow_hosts => \@hosts;
+ plugin 'Fetch::HostAllowList', allow_hosts => \@hosts;
 
 The list of domains that are allowed.  Should be provided as an array reference.
 If not provided, then C<ALIEN_BUILD_HOST_ALLOW> will be used (see below).
@@ -104,6 +101,20 @@ If not provided, then C<ALIEN_BUILD_HOST_ALLOW> will be used (see below).
 
 Comma separated list of hosts to allow.  If not specified when the
 plugin is applied then this list will be used.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Alien::Build::Plugin::Fetch::HostBlockList>
+
+=item L<Alien::Build>
+
+=item L<alienfile>
+
+=item LAlien::Build::rc>
 
 =back
 

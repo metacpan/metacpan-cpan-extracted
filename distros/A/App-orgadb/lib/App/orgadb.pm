@@ -8,9 +8,9 @@ use Log::ger;
 use App::orgadb::Common;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-08'; # DATE
+our $DATE = '2022-09-09'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -337,7 +337,7 @@ App::orgadb - An opinionated Org addressbook toolset
 
 =head1 VERSION
 
-This document describes version 0.005 of App::orgadb (from Perl distribution App-orgadb), released on 2022-08-08.
+This document describes version 0.006 of App::orgadb (from Perl distribution App-orgadb), released on 2022-09-09.
 
 =head1 SYNOPSIS
 
@@ -470,12 +470,6 @@ Source repository is at L<https://github.com/perlancar/perl-App-orgadb>.
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
-
-=head1 CONTRIBUTOR
-
-=for stopwords perlancar (on netbook-dell-xps13)
-
-perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 =head1 CONTRIBUTING
 

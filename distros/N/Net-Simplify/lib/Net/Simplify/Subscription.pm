@@ -51,7 +51,7 @@ Hash map containing initial values for the object.  Valid keys are:
 
 =item amount
 
-Amount of the payment in the smallest unit of your currency. Example: 100 = $1.00USD 
+Amount of the payment in the smallest unit of your currency. Example: 100 = $1.00 
 
 =item billingCycle
 
@@ -67,7 +67,15 @@ Coupon ID associated with the subscription
 
 =item currency
 
-Currency code (ISO-4217). Must match the currency associated with your account. [default: USD] 
+Currency code (ISO-4217). Must match the currency associated with your account. 
+
+=item currentPeriodEnd
+
+End date of subscription's current period 
+
+=item currentPeriodStart
+
+Start date of subscription's current period 
 
 =item customer
 
@@ -83,7 +91,7 @@ Period of frequency of payment for the plan. Example: if the frequency is weekly
 
 =item name
 
-Name describing subscription 
+Name describing subscription [max length: 50] 
 
 =item plan
 
@@ -96,6 +104,10 @@ Quantity of the plan for the subscription. [min value: 1]
 =item renewalReminderLeadDays
 
 If set, how many days before the next billing cycle that a renewal reminder is sent to the customer. If null, then no emails are sent. Minimum value is 7 if set. 
+
+=item source
+
+Source of where subscription was created 
 
 
 =back
@@ -130,7 +142,7 @@ Hash map representing the criteria to limit the results of the list operation.  
 
 =item C<filter>
 
-Filters to apply to the list.
+<table class="filter_list"><tr><td>filter.customer</td><td>Filter by the Id of the customer with the subscription</td></tr><tr><td>filter.plan</td><td>Filter by the Id of the plan linked to the subscription</td></tr><tr><td>filter.dateCreatedMin<sup>*</sup></td><td>Filter by the minimum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.dateCreatedMax<sup>*</sup></td><td>Filter by the maximum created date you are searching for - Date in UTC millis</td></tr><tr><td>filter.q</td><td>You can use this to filter by the Id, the name or the amount of the subscription</td></tr></table><br><sup>*</sup>Use dateCreatedMin with dateCreatedMax in the same filter if you want to search between two created dates
 
 
 
@@ -152,6 +164,8 @@ Allows for ascending or descending sorting of the list.
 The value maps properties to the sort direction (either C<asc> for ascending or C<desc> for descending).  Sortable properties are:
 
 =over 4
+
+=item C<dateCreated>
 
 =item C<id>
 
@@ -199,7 +213,7 @@ The properties that can be updated are:
 
 =item C<amount>
 
-Amount of the payment in the smallest unit of your currency. Example: 100 = $1.00USD 
+Amount of the payment in the smallest unit of your currency. Example: 100 = $1.00 
 
 =item C<billingCycle>
 
@@ -215,7 +229,15 @@ Coupon being assigned to this subscription
 
 =item C<currency>
 
-Currency code (ISO-4217). Must match the currency associated with your account. [default: USD] 
+Currency code (ISO-4217). Must match the currency associated with your account. 
+
+=item C<currentPeriodEnd>
+
+End date of subscription's current period 
+
+=item C<currentPeriodStart>
+
+Start date of subscription's current period 
 
 =item C<frequency>
 
@@ -264,11 +286,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 

@@ -11,11 +11,11 @@ L<http://www.simplify.com>
 
 =head1 VERSION
 
-1.5.0
+1.6.0
 
 =head1 LICENSE
 
-Copyright (c) 2013 - 2016 MasterCard International Incorporated
+Copyright (c) 2013 - 2022 MasterCard International Incorporated
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 
@@ -46,7 +46,7 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = "1.5.0";
+our $VERSION = "1.6.0";
 
 our $API_BASE_LIVE_URL = "https://api.simplify.com/v1/api";
 

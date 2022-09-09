@@ -15,15 +15,15 @@ use Carp;
  
 =head1 NAME
 
-Optimization::NSGAII - non dominant sorting genetic algorithm for multi-objective optimization
+Optimization::NSGAII - non dominant sorting genetic algorithm for multi-objective optimization (also known as NSGA2)
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 =head1 SYNOPSIS
 
@@ -110,6 +110,11 @@ our $VERSION = "0.01";
 	        'percentMut'    => 5,               # percentage of individual that are randomly perturbated (in all their genes)
 	                                            # and also percentage of input parameters (genes) that are randomly mutated in each individual
 	                                              # default: 5%
+	        'startPop'      => [[0.3,0.18,-0.1],# initial population
+	                            [-0.38,0.5,0.1],  # default: random population satisfying the bounds
+	                             ...,
+	                             ]
+
 	    },
 
 	                                            # the following is the optional set of parameters for 'Pareto front' 2D live plot
@@ -202,7 +207,7 @@ The number of B<parallel evaluation> of C<f_to_optimize>, and so the value of C<
 
 =item * run on your pc if you run the computation locally (e.g. 4)
 
-=item * run on a remote server if you run (inside the C<f_to_optimize>) the computation there (e.g. 256)
+=item * run on a remote server if you run (inside the C<f_to_optimize>) the computation there (e.g. 32)
 
 =back
 
@@ -216,13 +221,27 @@ Each time a new generation finish, all information of the population are written
 
 =over
 
-=item * VPt_genXXXXX.txt: input (parameters values)
+=item * F<VPt_genXXXXX.txt>: input (parameters values)
 
-=item * Pt_genXXXXX.txt: output (corresponding functions values)
+=item * F<Pt_genXXXXX.txt>: output (corresponding functions values)
 
 =back
 
+The algorithm can start by default with a random initial population (satisfying the bounds) or the B<start population> can be assigned by assigning it to the C<startPop> option.
 
+Assigning the population at the start can be useful for example if:
+
+=over
+
+=item * there was an unexpected termination of the program during the optimization, so that one can restart by using the content of one of the last saved F<VPt_genXXXXX.txt>
+
+=item * there is the interest in continuing the optimization with different parameters
+
+=item * there is already an idea of some input parameters which could give a good output
+
+=back
+
+For an example of use see F<NSGAII_startPop_example.pl>.
 
 =head2 Mutation
 
@@ -380,11 +399,7 @@ g|  1
 
 =head1 INSTALLATION
 
-execute:
-
-C<cpan Optimization::NSGAII>
-
-or (following the instruction in perlmodinstall)
+Following the instruction in perlmodinstall:
 
 =over
 
@@ -890,8 +905,10 @@ sub f_Optim_NSGAII {
 	my $scaleDistrib = $par{'scaleDistrib'} // 0;       # for mutation, default = 0, no perturbation
 	my $percentMut = $par{'percentMut'} // 5;           # for mutation, default = 5%
 	
+    my $startPop = $par{'startPop'} //  'nostartPop';
+
 	# control for no wrong use of keys
-	my @keys_ok = ('nPop','nGen','bounds','function','nProc','filesDir','verboseFinal','f_ineq','distrib','scaleDistrib','percentMut');
+	my @keys_ok = ('nPop','nGen','bounds','function','nProc','filesDir','verboseFinal','f_ineq','distrib','scaleDistrib','percentMut','startPop');
 	for my $key(keys %par){
 		unless ( grep( /^$key$/, @keys_ok ) ) {
 		  die 'E R R O R : the use of "'.$key.'" in the function to optimize is not defined! Compare with documentation.';
@@ -902,14 +919,21 @@ sub f_Optim_NSGAII {
 	my $VQt;
 
 
-	for my $gen(0..$nGen){
-		if ($gen == 0){
-			# input
-			for (0..$nPop-1){
-					$VPt->[$_]=[map { rand(1) * ($bounds->[$_-1][1] - $bounds->[$_-1][0]) + $bounds->[$_-1][0] } 1..$n];
-					$VQt->[$_]=[map { rand(1) * ($bounds->[$_-1][1] - $bounds->[$_-1][0]) + $bounds->[$_-1][0] } 1..$n];
-				}
-		}
+    for my $gen(0..$nGen){
+	    if ($gen == 0){
+		    # input
+		    for (0..$nPop-1){
+                    if ($startPop eq 'nostartPop'){
+    				    $VPt->[$_]=[map { rand(1) * ($bounds->[$_-1][1] - $bounds->[$_-1][0]) + $bounds->[$_-1][0] } 1..$n];
+                    }
+                    else {
+                        $VPt = $startPop;
+                    }
+				    $VQt->[$_]=[map { rand(1) * ($bounds->[$_-1][1] - $bounds->[$_-1][0]) + $bounds->[$_-1][0] } 1..$n];
+			    }
+	    }
+
+
 
 
 

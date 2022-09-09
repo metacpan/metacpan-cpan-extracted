@@ -37,11 +37,11 @@
 
 <h1 id="NAME">NAME</h1>
 
-<p>Optimization::NSGAII - non dominant sorting genetic algorithm for multi-objective optimization</p>
+<p>Optimization::NSGAII - non dominant sorting genetic algorithm for multi-objective optimization (also known as NSGA2)</p>
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>Version 0.01</p>
+<p>Version 0.02</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -128,6 +128,11 @@
                 &#39;percentMut&#39;    =&gt; 5,               # percentage of individual that are randomly perturbated (in all their genes)
                                                     # and also percentage of input parameters (genes) that are randomly mutated in each individual
                                                       # default: 5%
+                &#39;startPop&#39;      =&gt; [[0.3,0.18,-0.1],# initial population
+                                    [-0.38,0.5,0.1],  # default: random population satisfying the bounds
+                                     ...,
+                                     ]
+
             },
 
                                                     # the following is the optional set of parameters for &#39;Pareto front&#39; 2D live plot
@@ -214,7 +219,7 @@
 <li><p>run on your pc if you run the computation locally (e.g. 4)</p>
 
 </li>
-<li><p>run on a remote server if you run (inside the <code>f_to_optimize</code>) the computation there (e.g. 256)</p>
+<li><p>run on a remote server if you run (inside the <code>f_to_optimize</code>) the computation there (e.g. 32)</p>
 
 </li>
 </ul>
@@ -229,13 +234,32 @@
 
 <ul>
 
-<li><p>VPt_genXXXXX.txt: input (parameters values)</p>
+<li><p><i>VPt_genXXXXX.txt</i>: input (parameters values)</p>
 
 </li>
-<li><p>Pt_genXXXXX.txt: output (corresponding functions values)</p>
+<li><p><i>Pt_genXXXXX.txt</i>: output (corresponding functions values)</p>
 
 </li>
 </ul>
+
+<p>The algorithm can start by default with a random initial population (satisfying the bounds) or the <b>start population</b> can be assigned by assigning it to the <code>startPop</code> option.</p>
+
+<p>Assigning the population at the start can be useful for example if:</p>
+
+<ul>
+
+<li><p>there was an unexpected termination of the program during the optimization, so that one can restart by using the content of one of the last saved <i>VPt_genXXXXX.txt</i></p>
+
+</li>
+<li><p>there is the interest in continuing the optimization with different parameters</p>
+
+</li>
+<li><p>there is already an idea of some input parameters which could give a good output</p>
+
+</li>
+</ul>
+
+<p>For an example of use see <i>NSGAII_startPop_example.pl</i>.</p>
 
 <h2 id="Mutation">Mutation</h2>
 
@@ -391,11 +415,7 @@ g|  1
 
 <h1 id="INSTALLATION">INSTALLATION</h1>
 
-<p>execute:</p>
-
-<p><code>cpan Optimization::NSGAII</code></p>
-
-<p>or (following the instruction in perlmodinstall)</p>
+<p>Following the instruction in perlmodinstall:</p>
 
 <ul>
 

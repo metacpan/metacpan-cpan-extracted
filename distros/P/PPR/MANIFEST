@@ -85,5 +85,6 @@ t/trycatch.t
 t/trytiny.t
 t/postfix_deref_qq.t
 t/scalar_attributes.t
+t/qr_combine.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

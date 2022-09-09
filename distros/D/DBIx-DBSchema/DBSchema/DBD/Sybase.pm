@@ -4,7 +4,7 @@ use strict;
 use vars qw($VERSION @ISA %typemap);
 use DBIx::DBSchema::DBD;
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 @ISA = qw(DBIx::DBSchema::DBD);
 
 %typemap = (
@@ -108,6 +108,16 @@ sub _is_unique {
   return $isunique;
 }
 
+sub tables {
+  my($proto, $dbh) = @_;
+
+  my $sth = $dbh->prepare("sp_tables NULL, NULL, NULL, \"'TABLE'\"");
+  $sth->execute
+    or die $dbh->errstr;
+
+  $proto->SUPER::tables($dbh, $sth);
+}
+
 =head1 AUTHOR
 
 Charles Shapiro <charles.shapiro@numethods.com>
@@ -116,6 +126,8 @@ Charles Shapiro <charles.shapiro@numethods.com>
 Mitchell Friedman <mitchell.friedman@numethods.com>
 
 Bernd Dulfer <bernd@widd.de>
+
+Nathan Anderson <http://1id.com/=nathan.anderson>
 
 =head1 COPYRIGHT
 

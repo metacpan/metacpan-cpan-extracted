@@ -2,7 +2,7 @@ package Test2::Harness::Runner::State;
 use strict;
 use warnings;
 
-our $VERSION = '1.000128';
+our $VERSION = '1.000133';
 
 use Carp qw/croak/;
 
@@ -10,6 +10,9 @@ use File::Spec;
 use Time::HiRes qw/time/;
 use List::Util qw/first/;
 
+use Test2::Harness::Util qw/mod2file/;
+
+use Test2::Harness::Settings;
 use Test2::Harness::Runner::Constants;
 
 use Test2::Harness::Runner::Run;
@@ -26,6 +29,7 @@ use Test2::Harness::Util::HashBase(
         <no_poll
         <resources
         job_count
+        +settings
     },
 
     qw{
@@ -58,10 +62,20 @@ sub init {
     croak "You must specify a workdir"
         unless defined $self->{+WORKDIR};
 
-    $self->{+JOB_COUNT} //= 1;
+    $self->{+JOB_COUNT} //= $self->settings->runner->job_count // 1;
+
+    if (!$self->{+RESOURCES} || !@{$self->{+RESOURCES}}) {
+        my $settings = $self->settings;
+        my $resources = $self->{+RESOURCES} //= [];
+        for my $res (@{$self->settings->runner->resources}) {
+            require(mod2file($res));
+            push @$resources => $res->new(settings => $self->settings);
+        }
+    }
+
     unless (grep { $_->job_limiter } @{$self->{+RESOURCES}}) {
         require Test2::Harness::Runner::Resource::JobCount;
-        unshift @{$self->{+RESOURCES}} => Test2::Harness::Runner::Resource::JobCount->new(job_count => $self->{+JOB_COUNT});
+        unshift @{$self->{+RESOURCES}} => Test2::Harness::Runner::Resource::JobCount->new(job_count => $self->{+JOB_COUNT}, settings => $self->settings);
     }
 
     $self->{+DISPATCH_FILE} = Test2::Harness::Util::Queue->new(file => File::Spec->catfile($self->{+WORKDIR}, 'dispatch.jsonl'));
@@ -69,6 +83,11 @@ sub init {
     $self->{+RELOAD_STATE} //= {};
 
     $self->poll;
+}
+
+sub settings {
+    my $self = shift;
+    return $self->{+SETTINGS} //= Test2::Harness::Settings->new(File::Spec->catfile($self->{+WORKDIR}, 'settings.json'));
 }
 
 sub run {
@@ -696,6 +715,7 @@ sub _stage_order {
     return \@stages;
 }
 
+my %SORTED;
 sub _next {
     my $self = shift;
 
@@ -726,6 +746,11 @@ sub _next {
                 for my $ldur (@$dur_order) {
                     my $search = $search->{$ldur} or next;
 
+                    # Make sure anything with conflicts runs early.
+                    unless ($SORTED{$search}++) {
+                        @$search = sort { scalar(@{$b->{conflicts}}) <=> scalar(@{$a->{conflicts}}) } @$search;
+                    }
+
                     for my $task (@$search) {
                         # If the job has a listed conflict and an existing job is running with that conflict, then pick another job.
                         next if first { $conflicts->{$_} } @{$task->{conflicts}};
@@ -753,17 +778,21 @@ sub _next {
 
                         my @out = ($run_by_stage => $task, $outres);
 
+                        my @record = @$resources;
+
                         if (@resource_skip) {
                             push @out => (resource_skip => \@resource_skip);
+
+                            # Only the job limiter resources need to be recorded.
+                            @record = grep { $_->job_limiter } @record;
                         }
-                        else {
-                            for my $resource (@$resources) {
-                                my $res = {args => [], env_vars => {}};
-                                $resource->assign($task, $res);
-                                push @{$outres->{args}} => @{$res->{args}};
-                                $outres->{env_vars}->{$_} = $res->{env_vars}->{$_} for keys %{$res->{env_vars}};
-                                $outres->{record}->{ref($resource)} = $res->{record};
-                            }
+
+                        for my $resource (@record) {
+                            my $res = {args => [], env_vars => {}};
+                            $resource->assign($task, $res);
+                            push @{$outres->{args}} => @{$res->{args}};
+                            $outres->{env_vars}->{$_} = $res->{env_vars}->{$_} for keys %{$res->{env_vars}};
+                            $outres->{record}->{ref($resource)} = $res->{record};
                         }
 
                         return @out;
