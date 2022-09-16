@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 # PROPERTIES
 
@@ -38,21 +38,21 @@ sub newLdap {
     my $self = $_[0];
     my $ldap;
 
-    # Build object and test LDAP connexion
-    unless (
+    # Build object and test LDAP connection
+    $self->logger->debug( "Try to build new LDAP connection with: $self->{conf}->{ldapServer}" );
+
+    return undef
+      unless (
         $ldap = Lemonldap::NG::Portal::Lib::Net::LDAP->new(
             { p => $self->{p}, conf => $self->{conf} }
         )
-      )
-    {
-        return undef;
-    }
+      );
 
     # Test connection
     my $msg = $ldap->bind;
-    if ( $msg->code ) {
-        $self->logger->error( 'LDAP test has failed: ' . $msg->error );
-    }
+    $self->logger->error( 'LDAP test has failed: ' . $msg->error )
+      if $msg->code;
+
     return $ldap;
 }
 
@@ -127,8 +127,7 @@ sub getUser {
 
     $self->validateLdap;
     return PE_LDAPCONNECTFAILED unless $self->ldap;
-
-    return PE_LDAPERROR unless $self->bind();
+    return PE_LDAPERROR         unless $self->bind();
 
     my $mesg = $self->ldap->search(
         base   => $self->conf->{ldapBase},

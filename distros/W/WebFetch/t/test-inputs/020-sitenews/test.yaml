@@ -1,0 +1,63 @@
+---
+testing_faketime: 2022-08-30T21:28:00
+files:
+  00-basic-sitenews.webfetch:
+    - {name: "empty test"}
+    - {op: autofail, skip: "intentional skip", name: "skip test"}
+    - {op: value, path: [webfetch, datetime_settings, time_zone], expected: "US/Pacific"}
+    - {op: value, path: [webfetch, datetime_settings, locale], expected: "en-US"}
+    - {op: record_count, count: 26, name: "%{file}"}
+    - {op: output_cmp, file: 00-basic-sitenews-short.out}
+    - {op: output_cmp, file: 00-basic-sitenews-long.out}
+    - {op: value, path: [webfetch, dest], expected: "capture"}
+    - {op: value, path: [webfetch, dest_format], expected: "capture"}
+    - {op: value, path: [webfetch, num_links], expected: 5}
+    - {op: value, path: [webfetch, long_path], expected: "00-basic-sitenews-long.out"}
+    - {op: value, path: [webfetch, short_path], expected: "00-basic-sitenews-short.out"}
+    - {op: value, path: [webfetch, source], expected: "t/test-inputs/020-sitenews/00-basic-sitenews.webfetch"}
+    - {op: value, path: [webfetch, source_format], expected: "sitenews"}
+    - {op: value, path: [webfetch, testing_faketime], expected: "2022-08-30T21:28:00"}
+    - {op: value, path: [webfetch, url_prefix], expected: "https://example.net/webfetch-news/"}
+    - {op: value, path: [webfetch, data, fields, 0], expected: 'date'}
+    - {op: value, path: [webfetch, data, fields, 1], expected: 'title'}
+    - {op: value, path: [webfetch, data, fields, 2], expected: 'priority'}
+    - {op: value, path: [webfetch, data, fields, 3], expected: 'expired'}
+    - {op: value, path: [webfetch, data, fields, 4], expected: 'position'}
+    - {op: value, path: [webfetch, data, fields, 5], expected: 'label'}
+    - {op: value, path: [webfetch, data, fields, 6], expected: 'url'}
+    - {op: value, path: [webfetch, data, fields, 7], expected: 'category'}
+    - {op: value, path: [webfetch, data, fields, 8], expected: 'text'}
+    - {op: value, path: [webfetch, data, wkindex, date], expected: 0}
+    - {op: value, path: [webfetch, data, wkindex, title], expected: 1}
+    - {op: value, path: [webfetch, data, wkindex, url], expected: 6}
+    - {op: value, path: [webfetch, data, wkindex, category], expected: 7}
+    - {op: value, path: [webfetch, data, wkindex, summary], expected: 8}
+  01-webfetch-releases.webfetch:
+    - {op: value, path: [webfetch, datetime_settings, time_zone], expected: "America/Los Angeles"}
+    - {op: value, path: [webfetch, datetime_settings, locale], expected: "en-US"}
+    - {op: record_count, count: 7, name: "%{file}"}
+    - {op: output_cmp, file: 01-webfetch-releases-short.out}
+    - {op: output_cmp, file: 01-webfetch-releases-long.out}
+    - {op: value, path: [webfetch, dest], expected: "capture"}
+    - {op: value, path: [webfetch, dest_format], expected: "capture"}
+    - {op: value, path: [webfetch, num_links], expected: 5}
+    - {op: value, path: [webfetch, long_path], expected: "01-webfetch-releases-long.out", path: [webfetch, long_path]}
+    - {op: value, path: [webfetch, short_path], expected: "01-webfetch-releases-short.out"}
+    - {op: value, path: [webfetch, source], expected: "t/test-inputs/020-sitenews/01-webfetch-releases.webfetch"}
+    - {op: value, path: [webfetch, source_format], expected: "sitenews"}
+    - {op: value, path: [webfetch, testing_faketime], expected: "2022-08-30T21:28:00"}
+    - {op: value, path: [webfetch, url_prefix], expected: "https://example.net/webfetch-releases/"}
+    - {op: value, path: [webfetch, data, fields, 0], expected: 'date'}
+    - {op: value, path: [webfetch, data, fields, 1], expected: 'title'}
+    - {op: value, path: [webfetch, data, fields, 2], expected: 'priority'}
+    - {op: value, path: [webfetch, data, fields, 3], expected: 'expired'}
+    - {op: value, path: [webfetch, data, fields, 4], expected: 'position'}
+    - {op: value, path: [webfetch, data, fields, 5], expected: 'label'}
+    - {op: value, path: [webfetch, data, fields, 6], expected: 'url'}
+    - {op: value, path: [webfetch, data, fields, 7], expected: 'category'}
+    - {op: value, path: [webfetch, data, fields, 8], expected: 'text'}
+    - {op: value, path: [webfetch, data, wkindex, date], expected: 0}
+    - {op: value, path: [webfetch, data, wkindex, title], expected: 1}
+    - {op: value, path: [webfetch, data, wkindex, url], expected: 6}
+    - {op: value, path: [webfetch, data, wkindex, category], expected: 7}
+    - {op: value, path: [webfetch, data, wkindex, summary], expected: 8}

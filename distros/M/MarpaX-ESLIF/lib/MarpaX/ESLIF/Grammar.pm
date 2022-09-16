@@ -8,7 +8,7 @@ use parent qw/MarpaX::ESLIF::Base/;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.25'; # VERSION
+our $VERSION = '6.0.26'; # VERSION
 
 #
 # Base required class methods
@@ -22,7 +22,7 @@ sub _EQ {
 
         my $definedData = defined($data);
         my $_definedData = defined($args_ref->[1]);
-    
+
         return
             ($eslif == $args_ref->[0])
             &&
@@ -45,7 +45,7 @@ MarpaX::ESLIF::Grammar - MarpaX::ESLIF's grammar
 
 =head1 VERSION
 
-version 6.0.25
+version 6.0.26
 
 =head1 SYNOPSIS
 

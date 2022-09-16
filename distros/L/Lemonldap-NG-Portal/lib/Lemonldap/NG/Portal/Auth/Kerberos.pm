@@ -20,7 +20,7 @@ has allowedDomains => ( is => 'rw', isa => 'ArrayRef' );
 has keytab         => ( is => 'rw' );
 has AjaxInitScript => ( is => 'rw', default => '' );
 has Name           => ( is => 'ro', default => 'Kerberos' );
-has InitCmd        => (
+has InitCmd => (
     is      => 'ro',
     default => q@$self->p->setHiddenFormValue( $req, kerberos => 0, '', 0 )@
 );

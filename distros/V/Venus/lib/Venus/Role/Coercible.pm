@@ -26,7 +26,14 @@ sub BUILD {
 sub coerce {
   my ($self) = @_;
 
+  # deprecate coerce
   return {};
+}
+
+sub coercers {
+  my ($self) = @_;
+
+  return $self->can('coerce') ? $self->coerce : {};
 }
 
 sub coerce_args {
@@ -55,8 +62,13 @@ sub coerce_into {
   require Scalar::Util;
   require Venus::Space;
 
-  $class = Venus::Space->new($class)->load;
+  $class = (my $space = Venus::Space->new($class))->load;
 
+  my $name = lc $space->label;
+
+  if (my $method = $self->can("coerce_into_${name}")) {
+    return $self->$method($class, $value);
+  }
   if (Scalar::Util::blessed($value) && $value->isa($class)) {
     return $value;
   }
@@ -85,7 +97,7 @@ sub coerce_onto {
 sub coercion {
   my ($self, $data) = @_;
 
-  my $spec = $self->coerce;
+  my $spec = $self->coercers;
 
   return $data if !%$spec;
 
@@ -96,11 +108,11 @@ sub coercion {
 
 sub EXPORT {
   [
-    'coerce',
     'coerce_args',
     'coerce_attr',
     'coerce_into',
     'coerce_onto',
+    'coercers',
     'coercion',
   ]
 }
@@ -134,7 +146,7 @@ Coercible Role for Perl 5
   attr 'mother';
   attr 'siblings';
 
-  sub coerce {
+  sub coercers {
     {
       father => 'Person',
       mother => 'Person',
@@ -191,40 +203,6 @@ into object construction and coercing arguments into objects and values.
 =head1 METHODS
 
 This package provides the following methods:
-
-=cut
-
-=head2 coerce
-
-  coerce() (HashRef)
-
-The coerce method, if defined, is called during object construction, or by the
-L</coercion> method, and returns key/value pairs where the keys map to class
-attributes (or input parameters) and the values are L<Venus::Space> compatible
-package names.
-
-I<Since C<0.02>>
-
-=over 4
-
-=item coerce example 1
-
-  package main;
-
-  my $person = Person->new(
-    name => 'me',
-  );
-
-  my $coerce = $person->coerce;
-
-  # {
-  #   father   => "Person",
-  #   mother   => "Person",
-  #   name     => "Venus/String",
-  #   siblings => "Person",
-  # }
-
-=back
 
 =cut
 
@@ -368,6 +346,95 @@ I<Since C<0.07>>
   #
   # {
   #   friend => bless({...}, 'Person'),
+  # }
+
+=back
+
+=over 4
+
+=item coerce_onto example 2
+
+  package Player;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Coercible';
+
+  attr 'name';
+  attr 'teammates';
+
+  sub coercers {
+    {
+      teammates => 'Person',
+    }
+  }
+
+  sub coerce_into_person {
+    my ($self, $class, $value) = @_;
+
+    return $class->new($value);
+  }
+
+  sub coerce_into_venus_string {
+    my ($self, $class, $value) = @_;
+
+    return $class->new($value);
+  }
+
+  sub coerce_teammates {
+    my ($self, $code, $class, $value) = @_;
+
+    return [map $self->$code($class, $_), @$value];
+  }
+
+  package main;
+
+  my $player = Player->new;
+
+  my $data = { teammates => [{ name => 'player2' }, { name => 'player3' }] };
+
+  my $teammates = $player->coerce_onto($data, 'teammates', 'Person');
+
+  # [bless({...}, 'Person'), bless({...}, 'Person')]
+
+  # $data was updated
+  #
+  # {
+  #   teammates => [bless({...}, 'Person'), bless({...}, 'Person')],
+  # }
+
+=back
+
+=cut
+
+=head2 coercers
+
+  coercers() (HashRef)
+
+The coercers method, if defined, is called during object construction, or by the
+L</coercion> method, and returns key/value pairs where the keys map to class
+attributes (or input parameters) and the values are L<Venus::Space> compatible
+package names.
+
+I<Since C<0.02>>
+
+=over 4
+
+=item coercers example 1
+
+  package main;
+
+  my $person = Person->new(
+    name => 'me',
+  );
+
+  my $coercers = $person->coercers;
+
+  # {
+  #   father   => "Person",
+  #   mother   => "Person",
+  #   name     => "Venus/String",
+  #   siblings => "Person",
   # }
 
 =back

@@ -20,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use String::Random qw/random_string/;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Issuer
@@ -950,12 +950,52 @@ sub run {
 
             my $post_logout_redirect_uri =
               $oidc_request->{'post_logout_redirect_uri'};
-            my $state = $oidc_request->{'state'};
+            my $id_token_hint = $oidc_request->{'id_token_hint'};
+            my $state         = $oidc_request->{'state'};
+            my $bypassConfirm = 0;
+
+            # Check if we can bypass confirm using token_hint
+            if ($id_token_hint) {
+
+                $self->logger->debug("Check sub of ID Token $id_token_hint");
+
+                # TODO: we should check JWT signature here to avoid DoS by
+                # logging the user out, however, as long as there is no logout
+                # confirmation when accessing ?logout=1, such a protection is
+                # trivial to bypass
+                my $payload = getJWTPayload($id_token_hint);
+                my $azp     = $payload->{azp};
+
+                # Check bypassConfirm parameter for rp using audience
+                foreach ( keys %{ $self->conf->{oidcRPMetaDataOptions} } ) {
+                    my $logout_rp = $_;
+                    my $rpid =
+                      $self->conf->{oidcRPMetaDataOptions}->{$logout_rp}
+                      ->{oidcRPMetaDataOptionsClientID};
+
+                    # this works because _generateIDToken always sets azp
+                    if ( $azp and $rpid eq $azp ) {
+                        $bypassConfirm =
+                          $self->conf->{oidcRPMetaDataOptions}->{$logout_rp}
+                          ->{oidcRPMetaDataOptionsLogoutBypassConfirm};
+                        $self->logger->debug(
+                            "Bypass logout confirm for RP $logout_rp")
+                          if $bypassConfirm;
+                        last;
+                    }
+                }
+            }
 
             # Ask consent for logout
-            if ( $req->param('confirm') ) {
+            if ( $req->param('confirm') or $bypassConfirm ) {
                 my $err;
-                if ( $req->param('confirm') == 1 ) {
+                if ( (
+                        defined( $req->param('confirm') )
+                        and $req->param('confirm') eq '1'
+                    )
+                    or $bypassConfirm
+                  )
+                {
                     $req->steps( [
                             @{ $self->p->beforeLogout }, 'authLogout',
                             'deleteSession'
@@ -982,7 +1022,6 @@ sub run {
                             $self->conf->{oidcRPMetaDataOptions}->{$logout_rp}
                             ->{oidcRPMetaDataOptionsPostLogoutRedirectUris} )
                         {
-
                             foreach ( split( /\s+/, $redirect_uris ) ) {
                                 if ( $post_logout_redirect_uri eq $_ ) {
                                     $self->logger->debug(
@@ -1389,8 +1428,7 @@ sub _handleAuthorizationCodeGrant {
 
     # Get user identifier
     my $apacheSession =
-      $self->p->getApacheSession( $codeSession->data->{user_session_id},
-        noInfo => 1 );
+      $self->p->getApacheSession( $codeSession->data->{user_session_id} );
 
     unless ($apacheSession) {
         $self->userLogger->error("Unable to find user session");
@@ -1407,7 +1445,7 @@ sub _handleAuthorizationCodeGrant {
     # Generate access_token
     my $access_token = $self->newAccessToken(
         $req, $rp, $scope,
-        $codeSession->data->{user_session_id},
+        $apacheSession->data,
         {
             grant_type      => "authorizationcode",
             user_session_id => $apacheSession->id,
@@ -1580,11 +1618,17 @@ sub _handleRefreshTokenGrant {
             return $self->sendOIDCError( $req, 'invalid_grant', 400 );
         }
 
+        my $h = $self->p->processHook( $req, 'oidcGotOnlineRefresh', $rp,
+            $refreshSession->data, $session->data );
+        if ( $h != PE_OK ) {
+            return $self->sendOIDCError( $req, 'server_error', 500 );
+        }
+
         # Generate access_token
         $access_token = $self->newAccessToken(
             $req, $rp,
             $refreshSession->data->{scope},
-            $user_session_id,
+            $session->data,
             {
                 user_session_id => $user_session_id,
                 grant_type      => $refreshSession->data->{grant_type},
@@ -1637,6 +1681,12 @@ sub _handleRefreshTokenGrant {
         $session = $refreshSession;
         for ( keys %{ $req->sessionInfo } ) {
             $refreshSession->data->{$_} = $req->sessionInfo->{$_};
+        }
+
+        my $h = $self->p->processHook( $req, 'oidcGotOfflineRefresh', $rp,
+            $refreshSession->data );
+        if ( $h != PE_OK ) {
+            return $self->sendOIDCError( $req, 'server_error', 500 );
         }
 
         # Generate access_token
@@ -1701,13 +1751,6 @@ sub _handleRefreshTokenGrant {
         expires_in   => $expires_in + 0,
         ( $id_token ? ( id_token => "$id_token" ) : () ),
     };
-
-    # TODO
-    #my $cRP = $apacheSession->data->{_oidcConnectedRP} || '';
-    #unless ( $cRP =~ /\b$rp\b/ ) {
-    #    $self->p->updateSession( $req, { _oidcConnectedRP => "$rp,$cRP" },
-    #        $apacheSession->id );
-    #}
 
     $self->logger->debug("Send token response");
 
@@ -1962,7 +2005,7 @@ sub registration {
           $self->conf->{oidcServiceDynamicRegistrationExtraClaims};
     }
 
-    if ( $self->confAcc->saveConf($conf) ) {
+    if ( $self->confAcc->saveConf($conf) > 0 ) {
 
         # Reload RP list
         $self->loadRPs();
@@ -2380,9 +2423,9 @@ sub _generateIDToken {
         exp       => $id_token_exp,                      # expiration
         iat       => time,                               # Issued time
         auth_time => $sessionInfo->{_lastAuthnUTime},    # Authentication time
-        acr       => $id_token_acr,    # Authentication Context Class Reference
-        azp       => $client_id,       # Authorized party
-                                       # TODO amr
+        acr       => $id_token_acr,  # Authentication Context Class Reference
+        azp       => $client_id,     # Authorized party, this is used for logout
+                                     # TODO amr
     };
 
     for ( keys %{$extra_claims} ) {

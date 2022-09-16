@@ -33,3 +33,14 @@ sub transform_to_plain {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Babble::Plugin::SKT - Plugin to convert Syntax::Keyword::Try to eval
+
+=head1 SEE ALSO
+
+L<Syntax::Keyword::Try>
+
+=cut

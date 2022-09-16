@@ -14,6 +14,15 @@ BEGIN {
    Test::MemoryGrowth->import;
 }
 
+# Just to keep the in-dist unit tests happy; when loaded via Future.pm the
+# one provided there takes precedence
+sub Future::XS::wrap_cb
+{
+   my $self = shift;
+   my ( $name, $cb ) = @_;
+   return $cb;
+}
+
 no_growth {
    my $f = Future::XS->new;
    $f->done( 123 );

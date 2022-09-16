@@ -1,0 +1,51 @@
+NAME
+    angle2zodiac - Script to convert angle to zodiac string.
+
+SYNOPSIS
+     angle2zodiac [-a] [-h] [--version] angle
+
+ARGUMENTS
+    *       "-a"
+
+             Output will be in ascii form (e.g. 2 sc 31'28.9560'')
+
+    *       "-h"
+
+             Print help.
+
+    *       "--version"
+
+             Print version of script.
+
+    *       "angle"
+
+            Angle in numeric. (e.g. 212.5247100).
+
+EXAMPLE1
+     angle2zodiac 212.5247100
+
+     # Output:
+     # 2°♏31′28.9560′′
+
+EXAMPLE2
+     angle2zodiac -a 212.5247100
+
+     # Output:
+     # 2 sc 31'28.9560''
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Angle2Zodiac>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2020-2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

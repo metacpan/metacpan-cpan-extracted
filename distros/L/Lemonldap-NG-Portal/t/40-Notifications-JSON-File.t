@@ -1,10 +1,12 @@
 use Test::More;
 use strict;
 use IO::String;
+use JSON;
 
 require 't/test-lib.pm';
 
 my $res;
+my $json;
 my $file = "$main::tmpDir/20160530_dwho_dGVzdHJlZg==.json";
 
 open F, "> $file" or die($!);
@@ -33,9 +35,39 @@ my $client = LLNG::Manager::Test->new( {
         }
     }
 );
+use Lemonldap::NG::Portal::Main::Constants 'PE_NOTIFICATION';
 
 # Try to authenticate
 # -------------------
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new(
+            'user=dwho&password=dwho&url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw=='),
+        length => 64,
+    ),
+    'Auth query (JSON required)'
+);
+ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
+  or print STDERR "$@\n" . Dumper($res);
+ok( $json->{result} == 0, ' Good result' )
+  or explain( $json, 'result => 0' );
+ok( $json->{error} == PE_NOTIFICATION, ' Notificationtion is pending' )
+  or explain( $json, 'error => 36' );
+my $id = $json->{ciphered_id};
+
+# Verify that cookie can be deciphered (ciphered_id is valid)
+ok(
+    $res = $client->_get(
+        '/notifback',
+        accept => 'text/html',
+        cookie => "lemonldap=$id"
+    ),
+    'Test received Id'
+);
+count(5);
+expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
+
 ok(
     $res = $client->_post(
         '/',
@@ -48,7 +80,7 @@ ok(
 );
 count(1);
 expectOK($res);
-my $id = expectCookie($res);
+$id = expectCookie($res);
 expectForm( $res, undef, '/notifback', 'reference1x1', 'url' );
 
 # Verify that cookie is ciphered (session invalid)
@@ -58,7 +90,7 @@ ok(
         query  => 'url=aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==',
         cookie => "lemonldap=$id",
     ),
-    'Test cookie received'
+    'Test received cookie'
 );
 count(1);
 expectReject($res);

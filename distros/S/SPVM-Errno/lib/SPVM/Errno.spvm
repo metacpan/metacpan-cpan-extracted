@@ -122,4 +122,104 @@ class Errno {
   native static method EWOULDBLOCK : int ();
   native static method EXDEV : int ();
   native static method EXFULL : int ();
-}
+
+  native static method WSAEACCES : int ();
+
+  native static method WSAEADDRINUSE : int ();
+
+  native static method WSAEADDRNOTAVAIL : int ();
+
+  native static method WSAEAFNOSUPPORT : int ();
+
+  native static method WSAEALREADY : int ();
+
+  native static method WSAEBADF : int ();
+
+  native static method WSAECANCELLED : int ();
+
+  native static method WSAECONNABORTED : int ();
+
+  native static method WSAECONNREFUSED : int ();
+
+  native static method WSAECONNRESET : int ();
+
+  native static method WSAEDESTADDRREQ : int ();
+
+  native static method WSAEDISCON : int ();
+
+  native static method WSAEDQUOT : int ();
+
+  native static method WSAEFAULT : int ();
+
+  native static method WSAEHOSTDOWN : int ();
+
+  native static method WSAEHOSTUNREACH : int ();
+
+  native static method WSAEINPROGRESS : int ();
+
+  native static method WSAEINTR : int ();
+
+  native static method WSAEINVAL : int ();
+
+  native static method WSAEINVALIDPROCTABLE : int ();
+
+  native static method WSAEINVALIDPROVIDER : int ();
+
+  native static method WSAEISCONN : int ();
+
+  native static method WSAELOOP : int ();
+
+  native static method WSAEMFILE : int ();
+
+  native static method WSAEMSGSIZE : int ();
+
+  native static method WSAENAMETOOLONG : int ();
+
+  native static method WSAENETDOWN : int ();
+
+  native static method WSAENETRESET : int ();
+
+  native static method WSAENETUNREACH : int ();
+
+  native static method WSAENOBUFS : int ();
+
+  native static method WSAENOMORE : int ();
+
+  native static method WSAENOPROTOOPT : int ();
+
+  native static method WSAENOTCONN : int ();
+
+  native static method WSAENOTEMPTY : int ();
+
+  native static method WSAENOTSOCK : int ();
+
+  native static method WSAEOPNOTSUPP : int ();
+
+  native static method WSAEPFNOSUPPORT : int ();
+
+  native static method WSAEPROCLIM : int ();
+
+  native static method WSAEPROTONOSUPPORT : int ();
+
+  native static method WSAEPROTOTYPE : int ();
+
+  native static method WSAEPROVIDERFAILEDINIT : int ();
+
+  native static method WSAEREFUSED : int ();
+
+  native static method WSAEREMOTE : int ();
+
+  native static method WSAESHUTDOWN : int ();
+
+  native static method WSAESOCKTNOSUPPORT : int ();
+
+  native static method WSAESTALE : int ();
+
+  native static method WSAETIMEDOUT : int ();
+
+  native static method WSAETOOMANYREFS : int ();
+
+  native static method WSAEUSERS : int ();
+
+  native static method WSAEWOULDBLOCK : int ();
+  }

@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 BEGIN { use_ok('Date::Holidays::EnglandWales') };
 
 #########################
@@ -47,5 +47,5 @@ ok(is_uk_holiday("2022-06-02"),
     "2022-06-02 is a holiday (Spring Bank Holiday)");
 ok(is_uk_holiday("2022-06-03"),
     "2022-06-03 is a holiday (Queen's Platinum Jubilee)");
-
+ok(is_uk_holiday("2022-09-19"), "2022-09-19 is a public holiday (State Funeral of Queen Elizabeth II)");
 

@@ -24,6 +24,7 @@ use Scalar::Util ();
 
 has commands         => sub { Mojolicious::Commands->new(app => shift) };
 has controller_class => 'Mojolicious::Controller';
+has exception_format => 'html';
 has home             => sub { Mojo::Home->new->detect(ref shift) };
 has log              => sub {
   my $self = shift;
@@ -56,7 +57,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Waffle';
-our $VERSION  = '9.25';
+our $VERSION  = '9.27';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -105,12 +106,14 @@ sub dispatch {
 
   my $plugins = $self->plugins->emit_hook(before_dispatch => $c);
 
+  my $stash = $c->stash;
+  return if $stash->{'mojo.rendered'};
+
   # Try to find a static file
   my $tx = $c->tx;
   $self->static->dispatch($c) and $plugins->emit_hook(after_static => $c) unless $tx->res->code;
 
   # Start timer (ignore static files)
-  my $stash = $c->stash;
   $c->helpers->log->trace(sub {
     my $req    = $c->req;
     my $method = $req->method;
@@ -121,8 +124,7 @@ sub dispatch {
 
   # Routes
   $plugins->emit_hook(before_routes => $c);
-  $c->helpers->reply->not_found
-    unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code || $stash->{'mojo.rendered'};
+  $c->helpers->reply->not_found unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code;
 }
 
 sub handler {
@@ -378,6 +380,13 @@ Command line interface for your application, defaults to a L<Mojolicious::Comman
 
 Class to be used for the default controller, defaults to L<Mojolicious::Controller>. Note that this class needs to have
 already been loaded before the first request arrives.
+
+=head2 exception_format
+
+  my $format = $app->exception_format;
+  $app       = $app->exception_format('txt');
+
+Format for HTTP exceptions (C<html>, C<json>, or C<txt>), defaults to C<html>.
 
 =head2 home
 

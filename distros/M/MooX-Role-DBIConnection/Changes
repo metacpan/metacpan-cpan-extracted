@@ -1,0 +1,9 @@
+0.04 2022-09-14
+    * Fix package syntax to be compatible with 5.012
+      Reported by BINGOS, thanks
+
+0.03 2022-09-13
+    * Add 'eager' option to immediately connect to the database
+
+0.02 2022-09-12
+    * Spun out of Weather::MOSMIX

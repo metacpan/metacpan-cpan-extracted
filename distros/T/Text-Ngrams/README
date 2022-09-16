@@ -1,10 +1,5 @@
-<? read_starfish_conf(); $t= "Text::Ngrams version $ModuleVersion";
-echo "$t\n".'='x length($t); !>
-#+
-Text::Ngrams version 2.005
+Text::Ngrams version 2.007
 ==========================
-#-
-
 
 This is a module for flexible N-gram analysis of a text.  It supports
 character n-grams, word n-grams, and more.  Documentation is a part of
@@ -29,7 +24,7 @@ something important to add.
 
 COPYRIGHT AND LICENCE
 
-Copyright    2003-2017 Vlado Keselj web.cs.dal.ca/~vlado
+Copyright    2003-2020 Vlado Keselj web.cs.dal.ca/~vlado
 and contributors: 2005 Chris Jordan (contributed get_ngrams)
       2012 Magdalena Jankowska (utf8_character ngrams type)
 

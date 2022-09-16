@@ -20,8 +20,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -29,6 +29,8 @@ PDF::Builder::Basic::PDF::String - PDF String type objects and superclass
 for simple objects that are basically stringlike (Number, Name, etc.)
 
 =head1 METHODS
+
+=over
 
 =cut
 
@@ -54,7 +56,7 @@ our %out_trans = (
     ')' => ')',
 );
 
-=head2 PDF::Builder::Basic::PDF::String->from_pdf($string)
+=item PDF::Builder::Basic::PDF::String->from_pdf($string)
 
 Creates a new string object (not a full object yet) from a given
 string.  The string is parsed according to input criteria with
@@ -72,7 +74,7 @@ sub from_pdf {
     return $self;
 }
 
-=head2 PDF::Builder::Basic::PDF::String->new($string)
+=item PDF::Builder::Basic::PDF::String->new($string)
 
 Creates a new string object (not a full object yet) from a given
 string. The string is parsed according to input criteria with
@@ -90,7 +92,7 @@ sub new {
     return $self;
 }
 
-=head2 $s->convert($str)
+=item $s->convert($str)
 
 Returns $str converted as per criteria for input from PDF file
 
@@ -169,7 +171,7 @@ sub convert {
     return $output;
 }
 
-=head2 $s->val()
+=item $s->val()
 
 Returns the value of this string (the string itself).
 
@@ -179,7 +181,7 @@ sub val {
     return $_[0]->{'val'};
 }
 
-=head2 $s->as_pdf()
+=item $s->as_pdf()
 
 Returns the string formatted for output as PDF for PDF File object $pdf.
 
@@ -208,7 +210,7 @@ sub as_pdf {
     }
 }
 
-=head2 $s->outobjdeep($fh, $pdf)
+=item $s->outobjdeep($fh, $pdf)
 
 Outputs the string in PDF format, complete with necessary conversions.
 
@@ -220,5 +222,9 @@ sub outobjdeep {
     $fh->print($self->as_pdf($pdf));
     return;
 }
+
+=back
+
+=cut
 
 1;

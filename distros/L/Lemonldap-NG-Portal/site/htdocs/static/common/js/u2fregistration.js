@@ -69,6 +69,11 @@ LemonLDAP::NG U2F registration script
                     return setMsg('u2fFailed', 'danger');
                   }
                 } else if (resp.result) {
+                  $(document).trigger("mfaAdded", [
+                    {
+                      "type": "u"
+                    }
+                  ]);
                   return setMsg('yourKeyIsRegistered', 'positive');
                 }
               },

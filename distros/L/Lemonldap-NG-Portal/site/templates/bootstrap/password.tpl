@@ -35,8 +35,18 @@
           </div>
           <TMPL_IF NAME="DONT_STORE_PASSWORD">
             <input id="oldpassword" name="oldpassword" type="text" value="<TMPL_VAR NAME=OLDPASSWORD>" class="form-control" trplaceholder="currentPwd" autocomplete="off" required aria-required="true">
+            <TMPL_IF NAME="ENABLE_PASSWORD_DISPLAY">
+              <div class="input-group-append">
+                <span class="input-group-text"><i id="toggle_oldpassword" class="fa fa-eye-slash toggle-password"></i></span>
+              </div>
+            </TMPL_IF>
           <TMPL_ELSE>
             <input id="oldpassword" name="oldpassword" type="password" value="<TMPL_VAR NAME=OLDPASSWORD>" class="form-control" trplaceholder="currentPwd" required aria-required="true">
+            <TMPL_IF NAME="ENABLE_PASSWORD_DISPLAY">
+              <div class="input-group-append">
+                <span class="input-group-text"><i id="toggle_oldpassword" class="fa fa-eye-slash toggle-password"></i></span>
+              </div>
+            </TMPL_IF>
           </TMPL_IF>
         </div>
       </TMPL_IF>
@@ -50,8 +60,18 @@
       </div>
       <TMPL_IF NAME="DONT_STORE_PASSWORD">
         <input id="newpassword" name="newpassword" type="text" class="form-control" trplaceholder="newPassword" autocomplete="off" required aria-required="true"/>
+        <TMPL_IF NAME="ENABLE_PASSWORD_DISPLAY">
+          <div class="input-group-append">
+            <span class="input-group-text"><i id="toggle_newpassword" class="fa fa-eye-slash toggle-password"></i></span>
+          </div>
+        </TMPL_IF>
       <TMPL_ELSE>
         <input id="newpassword" name="newpassword" type="password" class="form-control" trplaceholder="newPassword" required aria-required="true"/>
+        <TMPL_IF NAME="ENABLE_PASSWORD_DISPLAY">
+          <div class="input-group-append">
+            <span class="input-group-text"><i id="toggle_newpassword" class="fa fa-eye-slash toggle-password"></i></span>
+          </div>
+        </TMPL_IF>
       </TMPL_IF>
     </div>
     <div class="form-group input-group">
@@ -60,8 +80,18 @@
       </div>
       <TMPL_IF NAME="DONT_STORE_PASSWORD">
         <input id="confirmpassword" name="confirmpassword" type="text" class="form-control" trplaceholder="confirmPwd" autocomplete="off" required aria-required="true"/>
+        <TMPL_IF NAME="ENABLE_PASSWORD_DISPLAY">
+          <div class="input-group-append">
+            <span class="input-group-text"><i id="toggle_confirmpassword" class="fa fa-eye-slash toggle-password"></i></span>
+          </div>
+        </TMPL_IF>
       <TMPL_ELSE>
         <input id="confirmpassword" name="confirmpassword" type="password" class="form-control" trplaceholder="confirmPwd" required aria-required="true"/>
+        <TMPL_IF NAME="ENABLE_PASSWORD_DISPLAY">
+          <div class="input-group-append">
+            <span class="input-group-text"><i id="toggle_confirmpassword" class="fa fa-eye-slash toggle-password"></i></span>
+          </div>
+        </TMPL_IF>
       </TMPL_IF>
     </div>
     <div class="buttons">
@@ -69,10 +99,6 @@
         <span class="fa fa-check-circle"></span>
         <span trspan="submit">Submit</span>
       </button>
-      <span id="show-hide-button" class="btn btn-info" role="button">
-        <span id='show-hide-icon-button' class="fa fa-eye"></span>
-        <span trspan="showhidePasswords">Show/Hide passwords</span>
-      </span>
     </div>
   </div>
   </form>

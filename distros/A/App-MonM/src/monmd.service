@@ -1,0 +1,17 @@
+[Unit]
+Description=MonM Daemon
+After=network.target network-online.target remote-fs.target
+Documentation=man:monmd(1)
+
+[Service]
+Type=forking
+PIDFile=/var/run/monmd.pid
+EnvironmentFile=/etc/sysconfig/monmd
+
+ExecStart=/usr/bin/monmd $MONMD_OPTS -k start
+ExecReload=/usr/bin/monmd $MONMD_OPTS -k reload
+ExecStop=/usr/bin/monmd $MONMD_OPTS -k stop
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

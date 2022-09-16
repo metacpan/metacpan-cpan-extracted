@@ -20,8 +20,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -30,12 +30,14 @@ PDF::Builder::Basic::PDF::Objind and cannot be subclassed.
 
 =head1 METHODS
 
+=over
+
 =cut
 
 # There is only one null object  (section 3.2.8).
 my $null_obj = bless {}, 'PDF::Builder::Basic::PDF::Null';
 
-=head2 PDF::Builder::Basic::PDF::Null->new()
+=item PDF::Builder::Basic::PDF::Null->new()
 
 Returns the null object. There is only one null object.
 
@@ -45,7 +47,7 @@ sub new {
     return $null_obj;
 }
 
-=head2 $s->realise()
+=item $s->realise()
 
 Pretends to finish reading the object.
 
@@ -55,7 +57,7 @@ sub realise {
     return $null_obj;
 }
 
-=head2 $s->outobjdeep()
+=item $s->outobjdeep()
 
 Output the object in PDF format.
 
@@ -68,7 +70,7 @@ sub outobjdeep {
     return;
 }
 
-=head2 $s->is_obj()
+=item $s->is_obj()
 
 Returns false because null is not a full object.
 
@@ -78,7 +80,7 @@ sub is_obj {
     return 0;
 }
 
-=head2 $s->copy()
+=item $s->copy()
 
 Another no-op.
 
@@ -88,7 +90,7 @@ sub copy {
     return $null_obj;
 }
 
-=head2 $s->val()
+=item $s->val()
 
 Return undef.
 
@@ -97,5 +99,9 @@ Return undef.
 sub val {
     return undef; ## no critic (undef is intentional)
 }
+
+=back
+
+=cut
 
 1;

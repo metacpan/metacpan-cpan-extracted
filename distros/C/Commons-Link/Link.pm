@@ -16,7 +16,7 @@ Readonly::Scalar our $COMMONS_URI => q{https://commons.wikimedia.org};
 Readonly::Array our @UPLOAD_SEGS => qw(wikipedia commons);
 Readonly::Array our @COMMONS_SEGS => qw(wiki);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 sub new {
 	my ($class, @params) = @_;
@@ -230,6 +230,8 @@ Returns string with URL.
 
 =head1 EXAMPLE1
 
+=for comment filename=link_to_commons_file1.pl
+
  use strict;
  use warnings;
 
@@ -254,6 +256,8 @@ Returns string with URL.
 
 =head1 EXAMPLE2
 
+=for comment filename=link_to_commons_file2.pl
+
  use strict;
  use warnings;
 
@@ -277,6 +281,8 @@ Returns string with URL.
  # Output link: http://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg
 
 =head1 EXAMPLE3
+
+=for comment filename=link_to_commons_thumb_file.pl
 
  use strict;
  use warnings;
@@ -320,12 +326,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2022
+© 2021-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

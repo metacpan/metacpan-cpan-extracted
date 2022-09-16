@@ -21,7 +21,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SLO_ERROR
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 # PROPERTIES
 
@@ -824,9 +824,16 @@ sub getOrganizationName {
     return unless $node;
 
     # Extract organization name
-    my $xs   = XML::Simple->new();
-    my $data = $xs->XMLin($node);
-    return $data->{OrganizationName}->{content};
+    my $org_name;
+    eval {
+        my $xs   = XML::Simple->new();
+        my $data = $xs->XMLin( $node, ForceContent => 1 );
+        $org_name = $data->{OrganizationName}->{content};
+    };
+    if ($@) {
+        $self->logger->warn("Could not parse organization name for $idp: $@");
+    }
+    return $org_name;
 }
 
 ## @method string getNextProviderId(Lasso::Logout logout)
@@ -1023,6 +1030,11 @@ sub createAuthnRequest {
             return;
         }
     }
+
+    # Call samlGenerateAuthnRequest hook
+    my $h =
+      $self->p->processHook( $req, 'samlGenerateAuthnRequest', $idp, $login );
+    return if ( $h != PE_OK );
 
     # Build authentication request
     unless ( $self->buildAuthnRequestMsg($login) ) {
@@ -1606,7 +1618,7 @@ sub buildLogoutRequestMsg {
 sub setSessionFromDump {
     my ( $self, $profile, $dump ) = @_;
 
-    $self->logger->debug("Loading Session dump: $dump");
+    $self->logger->debug("Loading Session dump: $dump") if $dump;
 
     eval { Lasso::Profile::set_session_from_dump( $profile, $dump ); };
 
@@ -2646,6 +2658,13 @@ sub sendLogoutRequestToProvider {
             return ( 0, $method, undef );
         }
         $self->logger->debug('Relay state set');
+    }
+
+    # Skip SLO if no method found (#2746)
+    unless ( defined $method and $method != -1 ) {
+        $self->logger->debug(
+            "No HTTP SLO method found for $providerID");
+        return ( 0, $method, undef );
     }
 
     # Initiate the logout request

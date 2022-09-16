@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed);
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 has base_url => sub {
   my $self      = shift;
@@ -192,7 +192,7 @@ sub _build_tx {
 
 sub _coerce_collection_format {
   my ($value, $param) = @_;
-  my $format = $param->{collectionFormat} || ($param->{type} eq 'array' ? 'csv' : '');
+  my $format = $param->{collectionFormat} || (+($param->{type} // '') eq 'array' ? 'csv' : '');
   return $value if !$format or $format eq 'multi';
   return join "|",  @$value if $format eq 'pipes';
   return join " ",  @$value if $format eq 'ssv';
@@ -438,8 +438,31 @@ the terms of the Artistic License version 2.0.
 
 =head1 AUTHORS
 
+=head2 Project Founder
+
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
-Ed J - C<etj@cpan.org>
+=head2 Contributors
+
+=over 2
+
+
+=item * Clive Holloway <clhollow@estee.com>
+
+=item * Ed J <mohawk2@users.noreply.github.com>
+
+=item * Jan Henning Thorsen <jan.henning@thorsen.pm>
+
+=item * Jan Henning Thorsen <jhthorsen@cpan.org>
+
+=item * Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item * Reneeb <info@perl-services.de>
+
+=item * Roy Storey <kiwiroy@users.noreply.github.com>
+
+=item * Veesh Goldman <rabbiveesh@gmail.com>
+
+=back
 
 =cut

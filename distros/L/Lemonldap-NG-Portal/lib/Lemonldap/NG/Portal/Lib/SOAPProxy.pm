@@ -16,7 +16,7 @@ our $VERSION = '2.0.14';
 
 has cookieName     => ( is => 'rw' );
 has sessionService => ( is => 'rw' );
-has urn            => (
+has urn => (
     is      => 'rw',
     lazy    => 1,
     default => sub {

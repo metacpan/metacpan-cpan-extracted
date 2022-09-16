@@ -8,7 +8,7 @@ use PDF::Builder;
 
 # Filename
 
-my $pdf = PDF::Builder->new('-compress' => 'none');
+my $pdf = PDF::Builder->new('compress' => 'none');
 
 my $gif = $pdf->image_gif('t/resources/1x1.gif');
 isa_ok($gif, 'PDF::Builder::Resource::XObject::Image::GIF',
@@ -17,9 +17,9 @@ isa_ok($gif, 'PDF::Builder::Resource::XObject::Image::GIF',
 is($gif->width(), 1,
    q{Image from filename has a width});
 
-my $gfx = $pdf->page->gfx();
+my $gfx = $pdf->page()->gfx();
 $gfx->image($gif, 72, 144, 216, 288);
-like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
+like($pdf->to_string(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
      q{Add GIF to PDF});
 
 # Filehandle
@@ -27,9 +27,9 @@ like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
 $pdf = PDF::Builder->new();
 open my $fh, '<', 't/resources/1x1.gif' or 
     die "Can't open file t/resources/1x1.gif";
-$gif = $pdf->image_gif($fh);
+$gif = $pdf->image($fh); # use convenience function
 isa_ok($gif, 'PDF::Builder::Resource::XObject::Image::GIF',
-       q{$pdf->image_gif(filehandle)});
+       q{$pdf->image(filehandle)});
 
 is($gif->width(), 1,
    q{Image from filehandle has a width});

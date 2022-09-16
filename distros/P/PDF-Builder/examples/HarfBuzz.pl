@@ -1,7 +1,5 @@
 #!/usr/bin/perl
 ##########################
-# NOTE: appears to bring in the entire Ming font (Chinese), rather than a
-#       subset. sorry about that! ref RT 130041
 # Note to maintainer: don't forget to refresh HarfBuzz_example.pdf
 ##########################
 # demonstrate some usage of HarfBuzz::Shaper and related text calls
@@ -11,7 +9,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
+our $VERSION = '3.024'; # VERSION
 our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 my $PDFname = $0;
@@ -52,8 +50,8 @@ my $ligFont =     # for full ligature list, Shaper ignores
   # '/Users/Phil/AppData/Local/Microsoft/Windows/Fonts/NimbusRoman-Regular.otf';
   # '/WINDOWS/Fonts/verdana.ttf';
   # '/WINDOWS/Fonts/arial.ttf';
-    '/WINDOWS/Fonts/times.ttf';
-my $arabicFont = '/Program Files (x86)/Adobe/Acrobat Reader DC/Resource/Font/AdobeArabic-Regular.otf';
+    '/WINDOWS/Fonts/times.ttf';  # missing fj, ij, and et
+my $arabicFont = '/Program Files/Adobe/Acrobat DC/Resource/Font/AdobeArabic-Regular.otf';
 # You will certainly have to modify the font file locations and names
 # per your local installation and operating system, here and below in %samples.
 # Some .ttf fonts may be usable by HarfBuzz for shaping, but others don't seem
@@ -106,8 +104,8 @@ my %samples = (
 		  'dir' => 'L',
 		  'script' => 'Latn',
 		  'specials' => 1, # -liga plus call Builder filter
-		  # ss/eszett sz/eszett 'n/'n, ff fi fl ffi oo
-	          'text' => ["strasse strasze R 'n R staff fish flow good"] },
+		  # ss/eszett sz/eszett 'n/'n, ff fi fl fj oo
+	          'text' => ["strasse strasze R 'n R staff fish flow fjord good"] },
    'LatinL3' => { 'title' => "LatinL3",
 	          'fontFile' => $ligFont,
 		  'dir' => 'L',
@@ -120,9 +118,9 @@ my %samples = (
 		  'dir' => 'L',
 		  'script' => 'Latn',
 		  'specials' => 1, # -liga plus call Builder filter
-		  # tz TZ ue vy ffi ffl
+		  # tz TZ ue vy ffi ffl ij
 		  # TBD see if setting language to German will do ss, tz, TZ
-	          'text' => ["Tirpitz TIRPITZ blue heavy suffice waffle"] },
+	          'text' => ["Tirpitz TIRPITZ blue heavy suffice waffle pij"] },
 
    # Demonstrate kerning (closing up overlapping characters) in a Latin script.
    # You should see AVA and AWAY are closed up, due to letter shapes. This can
@@ -154,7 +152,7 @@ my %samples = (
    # and removal, all taken care of by HarfBuzz.
    'Devan' => { 'title' => "Devanagari", # see PP_Advanced pg 26 & 27
 	                                 # and PP_Avanced_typography_in_PDF.pdf
-	        'fontFile' => '/Program Files (x86)/Adobe/Acrobat Reader DC/Resource/Font/AdobeDevanagari-Regular.otf',
+	        'fontFile' => '/Program Files/Adobe/Acrobat DC/Resource/Font/AdobeDevanagari-Regular.otf',
 		'dir' => 'L',
 		'script' => 'Deva',
 	        'text' => ["\x{091A}\x{093F}\x{0928}\x{094D}\x{0939}\x{0947}", " PDF::Builder ", "\x{0905}\x{0932}\x{093f}\x{091c}\x{093f}\x{0939}\x{094d}\x{0935}\x{0940}\x{092f}"] },
@@ -388,12 +386,15 @@ $y = 750;
    # some random Chinese characters. most interested in what direction is
    # the default, and what is settable
    'TTBChinese' => { 'title' => 'TTBChinese',
-#   	        'fontFile' => '/Program Files (x86)/Adobe/Acrobat Reader DC/Resource/CIDFont/AdobeMingStd-Light.otf',
-   	        'fontFile' => '/Program Files (x86)/Adobe/Acrobat Reader DC/Resource/CIDFont/AdobeGothicStd-Light.otf',
+#   	        'fontFile' => '/Program Files/Adobe/Acrobat DC/Resource/CIDFont/AdobeMingStd-Light.otf',
+   	        'fontFile' => '/Program Files/Adobe/Acrobat DC/Resource/CIDFont/AdobeGothicStd-Light.otf',
  	  	'dir' => 'T',  
  	  	'script' => 'Chin',
 # 	  	'text' => ["\x{5A40}\x{5A41}\x{5A42}\x{5A43}", " PDF::Builder ", "\x{5A44}\x{5A45}"] },
- 	  	'text' => ["\x{58D8}\x{5A41}\x{5C62}\x{6A13}", " PDF::Builder ", "\x{6DDA}\x{6F0F}"] },
+# 	  	'text' => ["\x{58D8}\x{5A41}\x{5C62}\x{6A13}", " PDF::Builder ", "\x{6DDA}\x{6F0F}"] },
+# want to show some punctuation that gets rotated around in TTB mode. text is Google Translate-produced "use this (whiter teeth)"
+##              'text' => ["使用這個（更白的牙齒）。"] },
+                'text' => ["\x{4F7F}\x{7528}\x{9019}\x{500B}\x{FF08}\x{66F4}\x{767D}\x{7684}\x{7259}\x{9F52}\x{FF09}\x{3002}"] },
 
    # Languages which are normally RTL don't seem to behave with TTB.
    # I would expect them to be reversed, but they aren't. Maybe the direction

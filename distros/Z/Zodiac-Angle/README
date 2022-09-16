@@ -176,6 +176,12 @@ DEPENDENCIES
     Class::Utils, Error::Pure, List::MoreUtils, Readonly, Unicode::UTF8.
 
 SEE ALSO
+    angle2zodiac
+        Script to convert angle to zodiac string.
+
+    App::Angle2Zodiac
+        Base class for angle2zodiac script.
+
     Zodiac::Angle::SwissEph
         Class for zodiac_angle manipulation based on SwissEph.
 
@@ -188,10 +194,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2020
+    © 2020-2022 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

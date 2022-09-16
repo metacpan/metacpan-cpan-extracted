@@ -1,4 +1,4 @@
-package App::MonM::Checkit::DBI; # $Id: DBI.pm 78 2019-07-07 19:48:16Z abalama $
+package App::MonM::Checkit::DBI; # $Id: DBI.pm 116 2022-08-27 08:57:12Z abalama $
 use strict;
 use utf8;
 
@@ -10,19 +10,20 @@ App::MonM::Checkit::DBI - Checkit DBI subclass
 
 =head1 VIRSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
     <Checkit "foo">
+
         Enable  yes
         Type    dbi
-        DSN         DBI:mysql:database=DBNAME;host=127.0.0.1
-        SQL         "SELECT 'OK' AS OK FROM DUAL" # By default
-        User        USER
-        Password    PASSWORD
-        Timeout     15 # Connect and request timeout, secs
-        Set RaiseError     0
+        DSN     DBI:mysql:database=DBNAME;host=127.0.0.1
+        SQL     "SELECT 'OK' AS OK FROM DUAL"
+        User    USER
+        Password PASSWORD
+        Timeout 15s
+        Set RaiseError  0
         Set PrintError     0
         Set mysql_enable_utf8   0
 
@@ -65,6 +66,62 @@ DSN of DBI connection
 
 =back
 
+=head1 CONFIGURATION DIRECTIVES
+
+The basic Checkit configuration options (directives) detailed describes in L<App::MonM::Checkit/CONFIGURATION DIRECTIVES>
+
+=over 4
+
+=item B<Content>, B<SQL>
+
+    SQL "SELECT 'OK' AS OK FROM DUAL"
+
+Specifies the SQL query string (as content)
+
+Default: "SELECT 'OK' AS OK FROM DUAL"
+
+=item B<DSN>
+
+    DSN     DBI:mysql:database=DATABASE;host=HOSTNAME
+
+Sets Database DSN string
+
+Default: dbi:Sponge:
+
+=item B<Set>
+
+    Set RaiseError     0
+    Set PrintError     0
+
+Defines DBI Attributes. This directive allows you set case sensitive DBI Attributes.
+There can be several such directives.
+
+Examples:
+
+    Set sqlite_unicode      1
+    Set mysql_enable_utf8   0
+
+Default: no specified
+
+=item B<Timeout>
+
+    Timeout    1m
+
+Defines the timeout of DBI requests
+
+Default: off
+
+=item B<Username>, B<Password>
+
+    User        USER
+    Password    PASSWORD
+
+Defines database credential: username and password
+
+Default: no specified
+
+=back
+
 =head1 HISTORY
 
 See C<Changes> file
@@ -83,11 +140,11 @@ L<App::MonM>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -99,11 +156,11 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use CTK::DBI;
 use CTK::ConfGenUtil;
-use App::MonM::Util qw/set2attr/;
+use App::MonM::Util qw/set2attr getTimeOffset/;
 
 use constant {
         DEFAULT_DSN     => "dbi:Sponge:",
@@ -114,19 +171,19 @@ use constant {
 sub check {
     my $self = shift;
     my $type = $self->type;
-    return $self->maybe::next::method() unless $type && $type eq 'dbi';
+    return $self->maybe::next::method() unless $type && ($type eq 'dbi' or $type eq 'db');
 
     # Init
-    my $dsn = value($self->config, 'dsn') || DEFAULT_DSN;
+    my $dsn = lvalue($self->config, 'dsn') || DEFAULT_DSN;
        $self->source($dsn);
-    my $timeout = value($self->config, 'timeout') || DEFAULT_TIMEOUT;
+    my $timeout = getTimeOffset(lvalue($self->config, 'timeout') || DEFAULT_TIMEOUT);
     my $attr = set2attr($self->config);
-    my $sql = value($self->config, 'sql') // value($self->config, 'content') // DEFAULT_SQL;
-    my $user = value($self->config, 'user');
-    my $password = value($self->config, 'password');
+    my $sql = lvalue($self->config, 'sql') // lvalue($self->config, 'content') // DEFAULT_SQL;
+    my $user = lvalue($self->config, 'user');
+    my $password = lvalue($self->config, 'password');
 
     # DB
-    my $db = new CTK::DBI(
+    my $db = CTK::DBI->new(
         -dsn    => $dsn,
         -debug  => 0,
         -username => $user,

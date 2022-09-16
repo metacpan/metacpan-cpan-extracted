@@ -1,6 +1,6 @@
 Button.pm
 Changes
-examples/ex1.pl
+examples/button_html_css.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

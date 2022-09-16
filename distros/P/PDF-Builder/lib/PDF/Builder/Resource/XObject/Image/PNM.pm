@@ -6,15 +6,17 @@ use base 'PDF::Builder::Resource::XObject::Image';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use IO::File;
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
 use Scalar::Util qw(weaken);
+
+# massively rewritten recently, so assuming nothing in PDF::API2 rewrite (2021)
+# should make any functional difference
 
 =head1 NAME
 
@@ -24,7 +26,25 @@ PDF::Builder::Resource::XObject::Image::PNM - support routines for PNM (Portable
 
 =over
 
-=new($pdf, $file, $name)
+=item $res = PDF::Builder::Resource::XObject::Image::PNM->new($pdf, $file, %opts)
+
+Options:
+
+=over
+
+=item 'name' => 'string'
+
+This is the name you can give for the PNM image object. The default is Nxnnnn.
+
+=item 'compress' => 1
+
+This is the compression you can give for the PNM image object. Any value will
+cause the use of I<Flate> compression, otherwise (C<compress> not given),
+I<ASCIIHexDecode> is used.
+
+=back
+
+=back
 
 Returns an image in the PDF. PNM types 1 (ASCII/plain bi-level/PBM), 
 2 (ASCII/plain grayscale/PGM), 3 (ASCII/plain RGB/PPM), 
@@ -39,17 +59,22 @@ color) may be anything from 1 to 65535 (the same maximum for all three colors),
 with 0 being full black. If the maximum sample value is 255 or smaller, three
 bytes of raw binary data per pixel, otherwise six bytes.
 
-=back
-
 =cut
 
 # -------------------------------------------------------------------
 sub new {
-    my ($class, $pdf, $file, $name) = @_;
+    my ($class, $pdf, $file, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-name'} && !defined $opts{'name'}) { $opts{'name'} = delete($opts{'-name'}); }
+    if (defined $opts{'-compress'} && !defined $opts{'compress'}) { $opts{'compress'} = delete($opts{'-compress'}); }
+
+    my ($name, $compress);
+    if (exists $opts{'name'}) { $name = $opts{'name'}; }
+    if (exists $opts{'compress'}) { $compress = $opts{'compress'}; }
 
     my $self;
 
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
 
     $self = $class->SUPER::new($pdf, $name || 'Nx'.pdfkey());
     $pdf->new_obj($self) unless $self->is_obj($pdf);
@@ -58,6 +83,12 @@ sub new {
     weaken $self->{' apipdf'};
 
     $self->read_pnm($pdf, $file);
+
+    if (defined $compress) {
+	$self->filters('FlateDecode');
+    } else {
+	$self->filters('ASCIIHexDecode');
+    }
 
     return $self;
 }
@@ -69,6 +100,7 @@ sub new {
 # extensively modified by Phil M Perry, copyright 2020
 #
 sub readppmheader {
+    # renamed to _read_header() in PDF::API2
     my ($gr, $buffer) = @_; # already-opened input file's filehandle
     my %info;
     $info{'error'} = undef;

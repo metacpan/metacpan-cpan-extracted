@@ -16,6 +16,7 @@ Diab
 Jerius
 MooX
 Observatory
+Propagate
 Role
 Smithsonian
 TaggedAttributes

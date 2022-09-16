@@ -10,27 +10,41 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.15';
 
 extends qw(
-  Lemonldap::NG::Portal::Main::SecondFactor
+  Lemonldap::NG::Portal::Lib::Code2F
   Lemonldap::NG::Portal::Lib::REST
 );
 
 # INITIALIZATION
 
-has prefix    => ( is => 'rw', default => 'rest' );
+# Prefix can overriden by sfExtra and is used for routes
+has prefix => ( is => 'rw', default => 'rest' );
+
+# Type is used to lookup config
+has type => ( is => 'ro', default => 'rest' );
+
+has legend    => ( is => 'rw', default => 'enterRest2fCode' );
 has initAttrs => ( is => 'rw', default => sub { {} } );
 has vrfyAttrs => ( is => 'rw', default => sub { {} } );
 
 sub init {
     my ($self) = @_;
-    unless ( $self->conf->{rest2fVerifyUrl} ) {
-        $self->logger->error('Missing REST verification URL');
-        return 0;
+
+    if ( $self->code_activation ) {
+        unless ( $self->conf->{rest2fInitUrl} ) {
+            $self->logger->error('Missing REST intialization URL');
+            return 0;
+        }
     }
-    $self->prefix( $self->conf->{sfPrefix} )
-      if ( $self->conf->{sfPrefix} );
+    else {
+        unless ( $self->conf->{rest2fVerifyUrl} ) {
+            $self->logger->error('Missing REST verification URL');
+            return 0;
+        }
+    }
+
     foreach my $k ( keys %{ $self->conf->{rest2fInitArgs} } ) {
         my $attr = $self->conf->{rest2fInitArgs}->{$k};
         $attr =~ s/^$//;
@@ -51,24 +65,23 @@ sub init {
         }
         $self->vrfyAttrs->{$k} = $attr;
     }
+
+    $self->prefix( $self->conf->{sfPrefix} ) if ( $self->conf->{sfPrefix} );
     return $self->SUPER::init();
 }
 
-sub run {
-    my ( $self, $req, $token ) = @_;
-
-    my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug("REST2F: checkLogins set") if $checkLogins;
-
-    my $stayconnected = $req->param('stayconnected');
-    $self->logger->debug("REST2F: stayconnected set") if $stayconnected;
+sub sendCode {
+    my ( $self, $req, $sessionInfo, $code ) = @_;
 
     if ( $self->conf->{rest2fInitUrl} ) {
 
         # Prepare args
-        my $args = {};
+        my $args = {
+            user => $sessionInfo->{ $self->conf->{whatToTrace} },
+            ( $code ? ( code => $code ) : () ),
+        };
         foreach my $k ( keys %{ $self->{initAttrs} } ) {
-            $args->{$k} = $req->sessionInfo->{ $self->{initAttrs}->{$k} };
+            $args->{$k} = $sessionInfo->{ $self->{initAttrs}->{$k} };
         }
 
         # Launch REST request
@@ -88,41 +101,23 @@ sub run {
         $self->logger->debug('No init URL, skipping initialization');
     }
 
-    # Prepare form
-    my $tmp = $self->p->sendHtml(
-        $req,
-        'ext2fcheck',
-        params => {
-            MAIN_LOGO => $self->conf->{portalMainLogo},
-            SKIN      => $self->p->getSkin($req),
-            TOKEN     => $token,
-            PREFIX    => $self->prefix,
-            TARGET    => '/'
-              . $self->prefix
-              . '2fcheck?skin='
-              . $self->p->getSkin($req),
-            LEGEND        => 'enterRest2fCode',
-            CHECKLOGINS   => $checkLogins,
-            STAYCONNECTED => $stayconnected
-        }
-    );
-    $self->logger->debug("Prepare external REST verification");
-
-    $req->response($tmp);
-    return PE_SENDRESPONSE;
+    return 1;
 }
 
-sub verify {
-    my ( $self, $req, $session ) = @_;
-    my $code;
-    unless ( $code = $req->param('code') ) {
-        $self->userLogger->error('External REST 2F: no code');
-        return PE_FORMEMPTY;
-    }
+sub verify_external {
+    my ( $self, $req, $session, $code ) = @_;
 
     # Prepare args
-    my $args = {};
+    my $args = {
+        user => $session->{ $self->conf->{whatToTrace} },
+        code => $code,
+    };
+
     foreach my $k ( keys %{ $self->{vrfyAttrs} } ) {
+
+        # in older versions, code was not automatically defined
+        # if admins defined it explicitely, do not treat it as a session
+        # attribute
         $args->{$k} = (
               $k eq 'code'
             ? $code

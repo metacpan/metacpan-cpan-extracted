@@ -3,7 +3,7 @@ package Data::Gimei;
 use warnings;
 use v5.22;
 
-use version; our $VERSION = version->declare("v0.2.0");
+use version; our $VERSION = version->declare("v0.3.0");
 
 use Data::Gimei::Name;
 use Data::Gimei::Address;
@@ -19,7 +19,7 @@ sub set_random_seed {
 
 sub sample {
     my $array = shift;
-    return $r->next_sample($array);
+    return $r->sample($array);
 }
 1;
 

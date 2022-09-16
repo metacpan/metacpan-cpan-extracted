@@ -5,11 +5,12 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
+use Carp;
 use POSIX qw(floor);
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(looks_like_number weaken);
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Content;
@@ -20,6 +21,38 @@ use PDF::Builder::Util;
 
 PDF::Builder::Page - Methods to interact with individual pages
 
+=head1 SYNOPSIS
+
+    my $pdf = PDF::Builder->new();
+
+    # Add a page to a new or existing PDF
+    my $page = $pdf->page();
+
+    # Set the physical (media) page size
+    # Set prepress page boundaries, a convenience function for those times when
+    # it is not necessary to set other prepress (print-related) page boundaries
+    $page->size('letter'); # by common size name
+   #$page->size([0, 0, 612, 792]); # by points LLx,LLy, URx,URy
+
+    # alternately, can set (or get) prepress page boundaries
+    $page->boundaries('media' => '12x18', 'trim' => 0.5 * 72);
+
+    # Add an image
+    my $image = $pdf->image('/path/to/file.jpg');
+    $page->object($image, $x,$y, $w,$h);
+
+    # Create a content object for text
+    my $text = $page->text();
+
+    # Create a content object for drawing shapes
+    my $canvas = $page->graphics();  # or gfx()
+
+    # Now to draw graphics (using $canvas object) and text (using $text object).
+    # NOTE that everything in the graphics (canvas) object will be laid down on
+    #   the page BEFORE anything in the text object is laid down. That is,
+    #   text will cover graphics, but not vice-versa. This is simply due to
+    #   the order in which the objects were defined.
+    
 =head1 METHODS
 
 =over
@@ -85,13 +118,26 @@ sub coerce {
 #=cut
 
 # appears to be internal routine
+# replace any use by call to out_obj: $self->{' apipdf'}->out_obj($self);
+
+# PDF::API2 2.042: DEPRECATED
+# Marking the page as dirty should only be needed in rare cases
+# when the page hash is being edited directly rather than through the API. In
+# that case, the out_obj call can be made manually. There's no reason (that I
+# can think of) to have a specific call just (and only) for Page objects.
 
 sub update {
-    my ($self) = @_;
+    my $self = shift;
 
     $self->{' apipdf'}->out_obj($self);
     return $self;
 }
+
+=back
+
+=head2 Page Size Methods
+
+=over
 
 =item $page->userunit($value)
 
@@ -110,7 +156,7 @@ sub userunit {
 
     # assume that even if $value is 1.0, it's being called for some reason
     # (perhaps overriding non-1.0 global setting)
-    PDF::Builder->verCheckOutput(1.6, "set User Unit");
+    $PDF::Builder::global_pdf->verCheckOutput(1.6, "set User Unit");
     $self->{' userUnit'} = float($value);  # this is local (page) UU
     $self->{'UserUnit'} = PDFNum(float($value));
 
@@ -155,18 +201,21 @@ sub _bbox {
 	}
 	
     } elsif (scalar @corners == 3) {
-	# have a name and one option (-orient)
+	# have a name and one option (orient)
 	my ($name, %opts) = @corners;
+	# copy dashed option names to preferred undashed names
+	if (defined $opts{'-orient'} && !defined $opts{'orient'}) { $opts{'orient'} = delete($opts{'-orient'}); }
+
         @corners = page_size(($name)); # now 4 numeric values
-	if (defined $opts{'-orient'}) {
-	    if ($opts{'-orient'} =~ m/^l/i) { # 'landscape' or just 'l'
+	if (defined $opts{'orient'}) {
+	    if ($opts{'orient'} =~ m/^l/i) { # 'landscape' or just 'l'
                 # 0 0 W H -> 0 0 H W
 		my $temp;
 		$temp = $corners[2]; $corners[2] = $corners[3]; $corners[3] = $temp;
 	    }
 	}
     } else {
-	# name without [-orient] option, or numeric coordinates given
+	# name without [orient] option, or numeric coordinates given
         @corners = page_size(@corners);
     }
 
@@ -188,7 +237,7 @@ sub _bbox {
 
 =item $page->mediabox($alias)
 
-=item $page->mediabox($alias, -orient => 'orientation')
+=item $page->mediabox($alias, 'orient' => 'orientation')
 
 =item $page->mediabox($w,$h)
 
@@ -224,7 +273,7 @@ sub get_mediabox {
 
 =item $page->cropbox($alias)
 
-=item $page->cropbox($alias, -orient => 'orientation')
+=item $page->cropbox($alias, 'orient' => 'orientation')
 
 =item $page->cropbox($w,$h)
 
@@ -259,7 +308,7 @@ sub get_cropbox {
 
 =item $page->bleedbox($alias)
 
-=item $page->bleedbox($alias, -orient => 'orientation')
+=item $page->bleedbox($alias, 'orient' => 'orientation')
 
 =item $page->bleedbox($w,$h)
 
@@ -294,7 +343,7 @@ sub get_bleedbox {
 
 =item $page->trimbox($alias)
 
-=item $page->trimbox($alias, -orient => 'orientation')
+=item $page->trimbox($alias, 'orient' => 'orientation')
 
 =item $page->trimbox($w,$h)
 
@@ -329,7 +378,7 @@ sub get_trimbox {
 
 =item $page->artbox($alias)
 
-=item $page->artbox($alias, -orient => 'orientation')
+=item $page->artbox($alias, 'orient' => 'orientation')
 
 =item $page->artbox($w,$h)
 
@@ -367,31 +416,349 @@ sub get_artbox {
 Rotates the page by the given degrees, which must be a multiple of 90.
 An angle that is not a multiple of 90 will be rounded to the nearest 90 
 degrees, with a message.
+
 Note that the rotation angle is I<clockwise> for a positive amount!
 E.g., a rotation of +90 (or -270) will have the bottom edge of the paper at
 the left of the screen.
+After rotating the page 180 degrees, C<[0, 0]> (originally lower left corner)
+will be be in the top right corner of the page, rather than the bottom left.
+X will increase to the right, and Y will increase downward.
 
-(This allows you to auto-rotate to landscape without changing the mediabox!)
+(This allows you to auto-rotate to landscape without changing the mediabox!
+There are other ways to accomplish this end, such as using the C<size()>
+method, which will not change the coordinate system (move the origin).)
 
 Do not confuse this C<rotate()> call with the I<graphics context> rotation 
 (Content.pm) C<rotate()>, which permits any angle, is of opposite direction, 
 and does not shift the origin!
 
+B<Alternate name:> C<rotation>
+
+This has been added for PDF::API2 compatibility.
+
 =cut
+
+sub rotation { return rotate(@_); } ## no critic
 
 sub rotate {
     my ($self, $degrees) = @_;
 
+    $degrees //= 0;
     # Ignore rotation of 360 or more (in either direction)
     $degrees = $degrees % 360; # range [0, 360)
+
     if ($degrees % 90) {
       my $deg = int(($degrees + 45)/90)*90;
-      warn "page rotate($degrees) invalid, not multiple of 90 degrees.\nChanged to $deg";
+      carp "page rotate($degrees) invalid, not multiple of 90 degrees.\nChanged to $deg";
       $degrees = $deg;
     }
 
     $self->{'Rotate'} = PDFNum($degrees);
 
+    return $self;
+}
+
+=item $page->size($size)  # Set
+
+=item @rectangle = $page->size()  # Get
+
+Set the physical page size or return the coordinates of the rectangle enclosing
+the physical page size.
+This is an alternate method provided for compatibility with PDF::API2.
+
+    # Set the physical page (media) size using a common size name
+    $page->size('letter');
+
+    # Set the page size using coordinates in points (X1, Y1, X2, Y2)
+    $page->size([0, 0, 612, 792]);
+
+    # Get the page coordinates in points
+    my @rectangle = $page->size();
+
+See Page Sizes below for possible values.
+The size method is a convenient shortcut for setting the PDF's media box when
+other prepress (print-related) page boundaries aren't required. It's equivalent 
+to the following:
+
+    # Set
+    $page = $page->boundaries('media' => $size);
+
+    # Get
+    @rectangle = $page->boundaries()->{'media'}->@*;
+
+=cut
+   
+sub size {
+    my $self = shift;
+
+    if (@_) { # Set (also returns object, for easy chaining)
+	return $self->boundaries('media' => @_); 
+    } else { # Get
+	my %boundaries = $self->boundaries();
+	return @{ $boundaries{'media'} };
+    }
+}
+
+=item $page = $page->boundaries(%boundaries)
+
+=item \%boundaries = $page->boundaries()
+
+Set prepress page boundaries to facilitate printing. Returns the current page 
+boundaries if called without arguments.
+This is an alternate method provided for compatibility with PDF::API2.
+
+    # Set
+    $page->boundaries(
+        # 13x19 inch physical sheet size
+        'media' => '13x19',
+        # sheet content is 11x17 with 0.25" bleed
+        'bleed' => [0.75 * 72, 0.75 * 72, 12.25 * 72, 18.25 * 72],
+        # 11x17 final trimmed size
+        'trim'  => 0.25 * 72,
+    );
+
+    # Get
+    %boundaries = $page->boundaries();
+    ($x1,$y1, $x2,$y2) = $page->boundaries('trim');
+
+The C<%boundaries> hash contains one or more page boundary keys (see Page
+Boundaries) to set or replace, each with a corresponding size (see Page Sizes). 
+
+If called without arguments, the returned hashref will contain (Get) all five 
+boundaries. If called with one string argument, it returns the coordinates for 
+the specified page boundary. If more than one boundary type is given, only the 
+first is processed, and a warning is given that the remainder are ignored.
+
+=back
+
+=head3 Page Boundaries
+
+PDF defines five page boundaries.  When creating PDFs for print shops, you'll
+most commonly use just the media box and trim box.  Traditional print shops may
+also use the bleed box when adding printer's marks and other information.
+
+=over
+
+=item media
+
+The media box defines the boundaries of the physical medium on which the page is
+to be printed.  It may include any extended area surrounding the finished page
+for bleed, printing marks, or other such purposes. The default value is as
+defined for PDF, a US letter page (8.5" x 11").
+
+=item crop
+
+The crop box defines the region to which the contents of the page shall be
+clipped (cropped) when displayed or printed.  The default value is the page's
+media box.
+This is a historical page boundary. You'll likely want to set the bleed and/or
+trim boxes instead.
+
+=item bleed
+
+The bleed box defines the region to which the contents of the page shall be
+clipped when output in a production environment. This may include any extra
+bleed area needed to accommodate the physical limitations of cutting, folding,
+and trimming equipment. The actual printed page (media box) may include
+printing marks that fall outside the bleed box. The default value is the page's
+crop box.
+
+=item trim
+
+The trim box defines the intended dimensions of the finished page after
+trimming. It may be smaller than the media box to allow for production-related
+content, such as printing instructions, cut marks, or color bars. The default
+value is the page's crop box.
+
+=item art
+
+The art box defines the extent of the page's meaningful content (including
+potential white space) as intended by the page's creator. The default value is
+the page's crop box.
+
+=back
+
+=head3 Page Sizes
+
+PDF page sizes are stored as rectangular coordinates. For convenience, 
+PDF::Builder also supports a number of aliases and shortcuts that are more 
+human-friendly. The following formats are available:
+
+=over
+
+=item a standard paper size
+
+    $page->boundaries('media' => 'A4');
+
+Aliases for the most common paper sizes are built in (case-insensitive).
+US: Letter, Legal, Ledger, Tabloid (and others)
+Metric: 4A0, 2A0, A0 - A6, 4B0, 2B0, and B0 - B6 (and others)
+
+=item a "WxH" string in inches
+
+    $page->boundaries('media' => '8.5x11');
+
+Many US paper sizes are commonly identified by their size in inches rather than
+by a particular name. These can be passed as strings with the width and height
+separated by an C<x>.
+Examples: C<4x6>, C<12x18>, C<8.5x11>
+
+=item a number representing a reduction (in points) from the next-larger box
+
+For example, a 12" x 18" physical sheet to be trimmed down to an 11" x 17" sheet
+can be specified as follows:
+
+    # Note: There are 72 points per inch
+    $page->boundaries('media' => '12x18', 'trim' => 0.5 * 72);
+
+    # Equivalent
+    $page->boundaries('media' => [0,        0,        12   * 72, 18   * 72],
+                      'trim'  => [0.5 * 72, 0.5 * 72, 11.5 * 72, 17.5 * 72]);
+
+This example shows a 12" x 18" physical sheet that will be reduced to a final
+size of 11" x 17" by trimming 0.5" from each edge. The smaller page boundary is
+assumed to be centered within the larger one.
+
+The "next-larger box" follows this order, stopping at the first defined value:
+
+    art -> trim -> bleed -> media
+    crop -> media
+
+This option isn't available for the media box, since it is by definition, the
+largest boundary.
+
+=item [$width, $height] in points
+
+    $page->boundaries('media' => [8.5 * 72, 11 * 7.2]);
+
+For other page or boundary sizes, the width and height (in points) can be given 
+directly as an array.
+
+=item [$x1, $y1, $x2, $y2] in points
+
+    $page->boundaries('media' => [0, 0, 8.5 * 72, 11 * 72]);
+
+Finally, the absolute (raw) coordinates of the bottom-left and top-right corners
+of a rectangle can be specified.
+
+=cut
+
+sub _to_rectangle {
+    my $value = shift();
+
+    # An array of two or four numbers in points
+    if (ref($value) eq 'ARRAY') {
+        if      (@$value == 2) {
+            return (0, 0, @$value);
+        } elsif (@$value == 4) {
+            return @$value;
+        }
+        croak "Page boundary array must contain two or four numbers";
+    }
+
+    # WxH in inches
+    if ($value =~ /^([0-9.]+)\s*x\s*([0-9.]+)$/) {
+        my ($w, $h) = ($1, $2);
+        if (looks_like_number($w) and looks_like_number($h)) {
+            return (0, 0, $w * 72, $h * 72);
+        }
+    }
+
+    # Common names for page sizes
+    my %page_sizes = PDF::Builder::Resource::PaperSizes::get_paper_sizes();
+
+    if ($page_sizes{lc $value}) {
+        return (0, 0, @{$page_sizes{lc $value}});
+    }
+
+    if (ref($value)) {
+        croak "Unrecognized page size";
+    } else {
+        croak "Unrecognized page size: $value";
+    }
+}
+
+sub boundaries {
+    my $self = shift();
+
+    # Get
+    if      (@_ == 0) {  # empty list -- do all boxes
+        my %boundaries;
+        foreach my $box (qw(Media Crop Bleed Trim Art)) {
+            $boundaries{lc($box)} = [$self->_bounding_box($box . 'Box')];
+        }
+        return %boundaries;
+    } elsif (@_ == 1) {  # request one specific box
+        my $box = shift();
+       # apparently it is normal to have an array of boxes, and use only first
+       #if (@_) { # more than one box in arg list?
+       #    carp "More than one box requested for boundaries(). Using only first ($box)";
+       #}
+        my @coordinates = $self->_bounding_box(ucfirst($box) . 'Box');
+        return @coordinates;
+    }
+
+    # Set
+    my %boxes = @_;
+    foreach my $box (qw(media crop bleed trim art)) {
+        next unless exists $boxes{$box};
+
+        # Special case: A single number as the value for anything other than
+        # MediaBox means to take the next larger size and reduce it by this
+        # amount in points on all four sides, provided the larger size was also
+        # included.
+        my $value = $boxes{$box};
+        my @rectangle;
+        if ($box ne 'media' and not ref($value) and looks_like_number($value)) {
+            my $parent = ($box eq 'crop'  ? 'media' :
+                          $box eq 'bleed' ? 'media' :
+                          $box eq 'trim'  ? 'bleed' : 'trim');
+            $parent = 'bleed' if $parent eq 'trim'  and not $boxes{'trim'};
+            $parent = 'media' if $parent eq 'bleed' and not $boxes{'bleed'};
+            $parent = 'media' if $parent eq 'bleed' and not $boxes{'bleed'};
+            unless ($boxes{$parent}) {
+                croak "Single-number argument for $box requires $parent";
+            }
+
+            @rectangle = @{$boxes{$parent}};
+            $rectangle[0] += $value;
+            $rectangle[1] += $value;
+            $rectangle[2] -= $value;
+            $rectangle[3] -= $value;
+        }
+        else {
+            @rectangle = _to_rectangle($value);
+        }
+
+        my $box_name = ucfirst($box) . 'Box';
+        $self->_bounding_box($box_name, @rectangle);
+        $boxes{$box} = [@rectangle];
+    }
+
+    return $self;
+}
+
+sub _bounding_box {
+    my $self = shift();
+    my $type = shift();
+
+    # Get
+    unless (scalar @_) {
+        my $box = $self->find_prop($type);
+        unless ($box) {
+            # Default to letter (for historical PDF::API2 reasons, not per the
+            # PDF specification)
+            return (0, 0, 612, 792) if $type eq 'MediaBox';
+
+            # Use defaults per PDF 1.7 section 14.11.2 Page Boundaries
+            return $self->_bounding_box('MediaBox') if $type eq 'CropBox';
+            return $self->_bounding_box('CropBox');
+        }
+        return map { $_->val() } $box->elements();
+    }
+
+    # Set
+    $self->{$type} = PDFArray(map { PDFNum(float($_)) } page_size(@_));
     return $self;
 }
 
@@ -444,16 +811,44 @@ sub precontent {
     return;
 }
 
+=item $gfx = $page->gfx(%opts)
+
 =item $gfx = $page->gfx($prepend)
 
 =item $gfx = $page->gfx()
 
-Returns a graphics content object. 
-If $prepend is I<true>, the content will be prepended to the page description.
+Returns a graphics content object, for drawing paths and shapes. 
+
+You may specify the "prepend" flag in the old or new way. The old way is to
+give a single boolean value (0 false, non-zero true). The new way is to give
+a hash element named 'prepend', with the same values.
+
+=over
+
+=item gfx(boolean_value $prepend)
+
+=item gfx('prepend' => boolean_value)
+
+=back
+
+If $prepend is I<true>, or the option 'prepend' is given with a I<true> value, 
+the content will be prepended to the page description (at the beginning of 
+the page's content stream).
 Otherwise, it will be appended.
+The default is I<false>.
+
+=over
+
+=item gfx('compress' => boolean_value)
+
+=back
+
+You may specify a compression flag saying whether the drawing instructions
+are to be compressed. If not given, the default is for the overall PDF
+compression setting to be used (I<on> by default).
 
 You may have more than one I<gfx> object. They and I<text> objects will be 
-output as objects and streams in the order defined, with all actions pertaining
+output as objects and streams I<in the order defined>, with all actions pertaining
 to this I<gfx> object appearing in one stream. However, note that graphics 
 and text objects are not fully independent of each other: the exit state 
 (linewidth, strokecolor, etc.) of one object is the entry state of the next 
@@ -494,26 +889,84 @@ after creating $I<type>:
 
 =back
 
+B<Alternate name:> C<graphics>
+
+This has been added for PDF::API2 compatibility.
+
 =cut
 
+sub graphics { return gfx(@_); } ## no critic
+
 sub gfx {
-    my ($self, $prepend) = @_;
+    my ($self, @params) = @_;
+
+    my ($prepend, $compress);
+    $prepend = $compress = 0; # default for both is False
+    if (scalar @params == 0) {
+	# gfx() call. no change
+    } elsif (scalar @params == 1) {
+	# one scalar value, $prepend
+	$prepend = $params[0];
+    } elsif ((scalar @params)%2) {
+	# odd number of values, can't be a hash list
+	carp "Invalid parameters passed to gfx or graphics call!";
+    } else {
+	# hash list with at least one element
+	my %hash = @params;
+	# copy dashed hash names to preferred undashed names
+	if (defined $hash{'-prepend'} && !defined $hash{'prepend'}) { $hash{'prepend'} = delete($hash{'-prepend'}); }
+	if (defined $hash{'-compress'} && !defined $hash{'compress'}) { $hash{'compress'} = delete($hash{'-compress'}); }
+
+	if (defined $hash{'prepend'}) { $prepend = $hash{'prepend'}; }
+	if (defined $hash{'compress'}) { $compress = $hash{'compress'}; }
+    }
+    if ($prepend) { $prepend = 1; }
+    $compress //= $self->{' api'}->{'forcecompress'} eq 'flate' ||
+                  $self->{' api'}->{'forcecompress'} =~ m/^[1-9]\d*$/;
 
     my $gfx = PDF::Builder::Content->new();
+    $gfx->compressFlate() if $compress;
     $self->content($gfx, $prepend);
-    $gfx->compressFlate() if ($self->{' api'}->{'forcecompress'} eq 'flate' ||
-                              $self->{' api'}->{'forcecompress'} =~ m/^[1-9]\d*$/);
 
     return $gfx;
 }
 
-=item $txt = $page->text($prepend)
+=item $text = $page->text(%opts)
 
-=item $txt = $page->text()
+=item $text = $page->text($prepend)
 
-Returns a text content object. 
-If $prepend is I<true>, the content will be prepended to the page description.
+=item $text = $page->text()
+
+Returns a text content object, for writing text.
+See L<PDF::Builder::Content> for details.
+
+You may specify the "prepend" flag in the old or new way. The old way is to
+give a single boolean value (0 false, non-zero true). The new way is to give
+a hash element named 'prepend', with the same values.
+
+=over
+
+=item text(boolean_value $prepend)
+
+=item text('prepend' => boolean_value)
+
+=back
+
+If $prepend is I<true>, or the option 'prepend' is given with a I<true> value, 
+the content will be prepended to the page description (at the beginning of 
+the page's content stream).
 Otherwise, it will be appended.
+The default is I<false>.
+
+=over
+
+=item text('compress' => boolean_value)
+
+=back
+
+You may specify a compression flag saying whether the text content is 
+to be compressed. If not given, the default is for the overall PDF
+compression setting to be used (I<on> by default).
 
 Please see the discussion above in C<gfx()> regarding multiple graphics and
 text objects on one page, how they are grouped into PDF objects and streams, 
@@ -528,14 +981,62 @@ calls can affect each other.
 =cut
 
 sub text {
-    my ($self, $prepend) = @_;
+    my ($self, @params) = @_;
+
+    my ($prepend, $compress);
+    $prepend = $compress = 0; # default for both is False
+    if (scalar @params == 0) {
+	# text() call. no change
+    } elsif (scalar @params == 1) {
+	# one scalar value, $prepend
+	$prepend = $params[0];
+    } elsif ((scalar @params)%2) {
+	# odd number of values, can't be a hash list
+	carp "Invalid parameters passed to text() call!";
+    } else {
+	# hash list with at least one element
+	my %hash = @params;
+	# copy dashed hash names to preferred undashed names
+	if (defined $hash{'-prepend'} && !defined $hash{'prepend'}) { $hash{'prepend'} = delete($hash{'-prepend'}); }
+	if (defined $hash{'-compress'} && !defined $hash{'compress'}) { $hash{'compress'} = delete($hash{'-compress'}); }
+
+	if (defined $hash{'prepend'}) { $prepend = $hash{'prepend'}; }
+	if (defined $hash{'compress'}) { $compress = $hash{'compress'}; }
+    }
+    if ($prepend) { $prepend = 1; }
+    $compress //= $self->{' api'}->{'forcecompress'} eq 'flate' ||
+                  $self->{' api'}->{'forcecompress'} =~ m/^[1-9]\d*$/;
 
     my $text = PDF::Builder::Content::Text->new();
+    $text->compressFlate() if $compress;
     $self->content($text, $prepend);
-    $text->compressFlate() if ($self->{' api'}->{'forcecompress'} eq 'flate' ||
-                               $self->{' api'}->{'forcecompress'} =~ m/^[1-9]\d*$/);
 
     return $text;
+}
+
+=item $page = $page->object($object, $x,$y, $scale_x,$scale_y)
+
+Places an image or other external object (a.k.a. XObject) on the page in the
+specified location.
+
+For images, C<$scale_x> and C<$scale_y> represent the width and height of the
+image on the page in points.  If C<$scale_x> is omitted, it will default to 72
+pixels per inch.  If C<$scale_y> is omitted, the image will be scaled
+proportionally based on the image dimensions.
+
+For other external objects, the scale is a multiplier, where 1 (the default)
+represents 100% (i.e. no change).
+
+If the object to be placed depends on a coordinate transformation (e.g. rotation
+or skew), first create a content object using L</"graphics">, then call
+L<PDF::Builder::Content/"object"> after making the appropriate transformations.
+
+=cut
+
+sub object {
+    my $self = shift();
+    $self->graphics()->object(@_);
+    return $self;
 }
 
 =item $ant = $page->annotation()
@@ -549,7 +1050,7 @@ sub annotation {
 
     unless (exists $self->{'Annots'}) {
         $self->{'Annots'} = PDFArray();
-        $self->update();
+        $self->{' apipdf'}->out_obj($self);
     } elsif (ref($self->{'Annots'}) =~ /Objind/) {
         $self->{'Annots'}->realise();
     }

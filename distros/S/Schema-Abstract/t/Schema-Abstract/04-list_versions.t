@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 use File::Object;
-use Schema::Abstract;
 use Test::More 'tests' => 2;
 use Test::NoWarnings;
 

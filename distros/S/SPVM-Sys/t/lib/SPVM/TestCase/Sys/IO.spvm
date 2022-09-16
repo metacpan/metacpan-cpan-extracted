@@ -1,0 +1,1278 @@
+class TestCase::Sys::IO {
+  use Sys::IO;
+  use Sys::IO::Constant as IO;
+  use Sys::FileTest;
+  use Fn;
+
+  static method open : int ($test_dir : string, $tmp_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_empty.txt";
+      my $fd = Sys::IO->open($file, IO->O_RDONLY, IO->O_TRUNC);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
+      Sys::IO->close($fd);
+    }
+    
+    {
+      my $file = "$test_dir/ftest/not_found.txt";
+      eval { Sys::IO->open($file, IO->O_RDWR, IO->O_TRUNC); };
+      
+      unless ($@) {
+        return 0;
+      }
+      
+      unless (error == class_id Error::System) {
+        return 0;
+      }
+    }
+    
+    {
+      my $file = "$tmp_dir/foo.txt";
+      my $fd = Sys::IO->open($file, IO->O_WRONLY | IO->O_CREAT, IO->S_IRUSR | IO->S_IWUSR | IO->S_IRGRP | IO->S_IWGRP | IO->S_IROTH | IO->S_IWOTH);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
+      Sys::IO->close($fd);
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method read : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $fd = Sys::IO->open($file, IO->O_RDONLY);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
+
+      my $buffer = (mutable string)new_string_len 4;
+      my $count = 4;
+      
+      my $read_length = 0;
+      
+      $read_length = Sys::IO->read($fd, $buffer, $count);
+      
+      unless ($buffer eq "abcd") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+
+      $read_length = Sys::IO->read($fd, $buffer, $count);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+
+      $read_length = Sys::IO->read($fd, $buffer, $count);
+      
+      unless ($read_length == 0) {
+        return 0;
+      }
+      Sys::IO->close($fd);
+    }
+    
+    return 1;
+  }
+
+  static method write : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/foo.txt";
+      my $fd = Sys::IO->open($file, IO->O_WRONLY | IO->O_CREAT, 0666);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
+
+      my $write_length = 0;
+      $write_length = Sys::IO->write($fd, "abcd", 4);
+      unless ($write_length == 4) {
+        return 0;
+      }
+      
+      $write_length = Sys::IO->write($fd, "efgh", 4);
+      unless ($write_length == 4) {
+        return 0;
+      }
+      
+      Sys::IO->close($fd);
+    }
+    
+    {
+      my $file = "$test_dir/foo.txt";
+      my $fd = Sys::IO->open($file, IO->O_RDONLY);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
+
+      my $buffer = (mutable string)new_string_len 4;
+      my $count = 4;
+      
+      my $read_length = 0;
+      
+      $read_length = Sys::IO->read($fd, $buffer, $count);
+      
+      unless ($buffer eq "abcd") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+
+      $read_length = Sys::IO->read($fd, $buffer, $count);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+
+      $read_length = Sys::IO->read($fd, $buffer, $count);
+      
+      unless ($read_length == 0) {
+        return 0;
+      }
+      Sys::IO->close($fd);
+    }
+    
+    return 1;
+  }
+
+  static method lseek : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $fd = Sys::IO->open($file, IO->O_RDONLY);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
+
+      my $buffer = (mutable string)new_string_len 4;
+      my $count = 4;
+      
+      my $read_length = 0;
+      
+      my $cur_offset = Sys::IO->lseek($fd, 4, IO->SEEK_SET);
+      
+      unless ($cur_offset == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->read($fd, $buffer, $count);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+
+      Sys::IO->close($fd);
+    }
+    
+    # The constant values for the seek functions
+    {
+      IO->SEEK_SET;
+      IO->SEEK_CUR;
+      IO->SEEK_END;
+    }
+    
+    return 1;
+  }
+
+  static method close : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_empty.txt";
+      my $fd = Sys::IO->open($file, IO->O_RDWR, IO->O_TRUNC);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
+      
+      my $status = Sys::IO->close($fd);
+      
+      unless ($status == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method fileno : int ($test_dir : string) {
+
+    my $file = "$test_dir/foo.txt";
+    my $fs = Sys::IO->fopen($file, "w");
+    
+    unless (Sys::FileTest->f($file)) {
+      return 0;
+    }
+    
+    my $fd = Sys::IO->fileno($fs);
+    
+    unless ($fd >= 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method fopen : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_empty.txt";
+      my $fs = Sys::IO->fopen($file, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+    }
+    
+    {
+      my $file = "$test_dir/ftest/not_found.txt";
+      eval { Sys::IO->fopen($file, "rb"); };
+      
+      unless ($@) {
+        return 0;
+      }
+      
+      unless (error == class_id Error::System) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method fdopen : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_empty.txt";
+      my $fd = Sys::IO->open($file, IO->O_RDWR, IO->O_TRUNC);
+      
+      unless ($fd >= 0) {
+        return 0;
+      }
+
+      my $fs = Sys::IO->fdopen($fd, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+    }
+    
+    {
+      eval { Sys::IO->fdopen(-1, "rb"); };
+      
+      unless ($@) {
+        return 0;
+      }
+      
+      unless (error == class_id Error::System) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method fread : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $fs = Sys::IO->fopen($file, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 4;
+      my $size = 1;
+      my $length = 4;
+      
+      my $read_length = 0;
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($buffer eq "abcd") {
+        return 0;
+      }
+     
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      unless ($read_length == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method feof : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $fs = Sys::IO->fopen($file, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 4;
+      my $size = 1;
+      my $length = 4;
+      
+      my $read_length = 0;
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($buffer eq "abcd") {
+        return 0;
+      }
+     
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      unless ($read_length == 0) {
+        return 0;
+      }
+      
+      my $feof = Sys::IO->feof($fs);
+      
+      unless ($feof) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method ferror : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $fs = Sys::IO->fopen($file, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 4;
+      my $size = 1;
+      my $length = 4;
+      
+      my $read_length = 0;
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($buffer eq "abcd") {
+        return 0;
+      }
+     
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      unless ($read_length == 0) {
+        return 0;
+      }
+      
+      my $ferror = Sys::IO->ferror($fs);
+      
+      if ($ferror) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method clearerr : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $fs = Sys::IO->fopen($file, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 4;
+      my $size = 1;
+      my $length = 4;
+      
+      my $read_length = 0;
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($buffer eq "abcd") {
+        return 0;
+      }
+     
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      unless ($read_length == 0) {
+        return 0;
+      }
+      
+      Sys::IO->clearerr($fs);
+    }
+    
+    return 1;
+  }
+
+  static method getc : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $fs = Sys::IO->fopen($file, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+      
+      my $char = 0;
+      
+      $char = Sys::IO->getc($fs);
+      unless ($char == 'a') {
+        return 0;
+      }
+      $char = Sys::IO->getc( $fs);
+      unless ($char == 'b') {
+        return 0;
+      }
+      $char = Sys::IO->getc( $fs);
+      unless ($char == 'c') {
+        return 0;
+      }
+      $char = Sys::IO->getc( $fs);
+      unless ($char == 'd') {
+        return 0;
+      }
+      $char = Sys::IO->getc( $fs);
+      unless ($char == 'e') {
+        return 0;
+      }
+      $char = Sys::IO->getc( $fs);
+      unless ($char == 'f') {
+        return 0;
+      }
+      $char = Sys::IO->getc( $fs);
+      unless ($char == 'g') {
+        return 0;
+      }
+      $char = Sys::IO->getc( $fs);
+      unless ($char == 'h') {
+        return 0;
+      }
+      $char = Sys::IO->getc( $fs);
+      unless ($char == IO->EOF) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method fgets : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_new_lines.txt";
+      my $stream = Sys::IO->fopen($file, "rb");
+      
+      unless ($stream) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 4;
+      my $buffer_zero = copy $buffer;
+      my $size = length $buffer;
+      
+      my $success = (string)undef;
+      
+      $success = Sys::IO->fgets($buffer, $size, $stream);
+      
+      unless ($success) {
+        return 0;
+      }
+      
+      unless ($buffer eq "a\n\0\0") {
+        return 0;
+      }
+      
+
+      Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
+      $success = Sys::IO->fgets($buffer, $size, $stream);
+      
+      unless ($success) {
+        return 0;
+      }
+      
+      unless ($buffer eq "xxx\0") {
+        return 0;
+      }
+
+      Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
+      $success = Sys::IO->fgets($buffer, $size, $stream);
+      
+      unless ($success) {
+        return 0;
+      }
+      
+      unless ($buffer->[0] == '\n') {
+        return 0;
+      }
+      unless ($buffer eq "\n\0\0\0") {
+        return 0;
+      }
+      
+      Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
+      $success = Sys::IO->fgets($buffer, $size, $stream);
+      
+      unless ($success) {
+        return 0;
+      }
+      
+      unless ($buffer eq "bc\n\0") {
+        return 0;
+      }
+
+      Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
+      $success = Sys::IO->fgets($buffer, $size, $stream);
+      
+      unless ($success) {
+        return 0;
+      }
+      
+      unless ($buffer eq "d\0\0\0") {
+        return 0;
+      }
+
+      Fn->memcpy($buffer, 0, $buffer_zero, 0, $size);
+      $success = Sys::IO->fgets($buffer, $size, $stream);
+      
+      if ($success) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method fwrite : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/foo.txt";
+      my $fs = Sys::IO->fopen($file, "wb");
+      
+      unless ($fs) {
+        return 0;
+      }
+
+      my $write_length = 0;
+      my $size = 1;
+      my $length = 4;
+      
+      $write_length = Sys::IO->fwrite("abcd", $size, $length, $fs);
+      unless ($write_length == 4) {
+        return 0;
+      }
+      
+      $write_length = Sys::IO->fwrite("efgh", $size, $length, $fs);
+      unless ($write_length == 4) {
+        return 0;
+      }
+      
+      Sys::IO->fclose($fs);
+    }
+    
+    {
+      my $file = "$test_dir/foo.txt";
+      my $fs = Sys::IO->fopen($file, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+
+      my $buffer = (mutable string)new_string_len 4;
+      my $size = 1;
+      my $length = 4;
+      
+      my $read_length = 0;
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($buffer eq "abcd") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($read_length == 0) {
+        return 0;
+      }
+      
+      Sys::IO->fclose($fs);
+    }
+    
+    return 1;
+  }
+
+  static method fseek : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $fs = Sys::IO->fopen($file, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 4;
+      my $size = 1;
+      my $length = 4;
+      
+      my $read_length = 0;
+      
+      my $fseek_status = Sys::IO->fseek($fs, 4, IO->SEEK_SET);
+      
+      unless ($fseek_status == 0) {
+        return 0;
+      }
+      
+      $read_length = Sys::IO->fread($buffer, $size, $length, $fs);
+      
+      unless ($buffer eq "efgh") {
+        return 0;
+      }
+      
+      unless ($read_length == 4) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method ftell : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_bytes8.txt";
+      my $fs = Sys::IO->fopen($file, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+      
+      my $buffer = (mutable string)new_string_len 4;
+      my $size = 1;
+      my $length = 4;
+      
+      my $read_length = 0;
+      
+      my $fseek_status = Sys::IO->fseek($fs, 4, IO->SEEK_SET);
+      
+      unless ($fseek_status == 0) {
+        return 0;
+      }
+      
+      my $offset = Sys::IO->ftell($fs);
+      
+      unless ($offset == 4) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method fflush : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_empty.txt";
+      my $fs = Sys::IO->fopen($file, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+      
+      my $fflush_status = Sys::IO->fflush($fs);
+
+      unless ($fflush_status == 0) {
+        return 0;
+      }
+      
+      my $fclose_status = Sys::IO->fclose($fs);
+      
+      unless ($fclose_status == 0) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method fclose : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_empty.txt";
+      my $fs = Sys::IO->fopen($file, "rb");
+      
+      unless ($fs) {
+        return 0;
+      }
+      
+      my $status = Sys::IO->fclose($fs);
+      
+      unless ($status == 0) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method flock : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/file_empty.txt";
+      my $fd = Sys::IO->open($file, IO->O_RDONLY, IO->O_TRUNC);
+      
+      my $status_lock = Sys::IO->flock($fd, IO->LOCK_SH);
+      
+      unless ($status_lock == 0) {
+        return 0;
+      }
+
+      my $status_unlock = Sys::IO->flock($fd, IO->LOCK_UN);
+      
+      unless ($status_unlock == 0) {
+        return 0;
+      }
+      
+      my $close_status = Sys::IO->close($fd);
+      
+      unless ($close_status == 0) {
+        return 0;
+      }
+    }
+    
+    # The constant values for the flock function
+    {
+      IO->LOCK_SH;
+      IO->LOCK_EX;
+      IO->LOCK_UN;
+    }
+    
+    return 1;
+  }
+
+
+  static method mkdir : int ($test_dir : string) {
+    my $dir = "$test_dir/foo";
+    
+    my $status = Sys::IO->mkdir($dir, 0755);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    unless (Sys::FileTest->d($dir)) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method umask : int ($test_dir : string) {
+    my $dir = "$test_dir/foo";
+    
+    my $old_mask = Sys::IO->umask(IO->S_IRUSR);
+    
+    my $cur_mask = Sys::IO->umask(IO->S_IWUSR);
+
+    unless ($cur_mask == IO->S_IRUSR) {
+      return 0;
+    }
+    
+    # Restore
+    Sys::IO->umask($old_mask);
+    
+    # The constant values for permissions
+    {
+      IO->S_IRUSR;
+      IO->S_IWUSR;
+      IO->S_IRGRP;
+      IO->S_IWGRP;
+      IO->S_IROTH;
+      IO->S_IWOTH;
+    }
+    
+    return 1;
+  }
+
+  static method rmdir : int ($test_dir : string) {
+    my $dir = "$test_dir/foo";
+    
+    Sys::IO->mkdir($dir, 0755);
+    
+    unless (Sys::FileTest->d($dir)) {
+      return 0;
+    }
+    
+    my $status = Sys::IO->rmdir($dir);
+
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    if (Sys::FileTest->e($dir)) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method unlink : int ($test_dir : string) {
+
+    my $file = "$test_dir/foo.txt";
+    Sys::IO->fopen($file, "w");
+    
+    unless (Sys::FileTest->f($file)) {
+      return 0;
+    }
+    
+    my $status = Sys::IO->unlink($file);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    if (Sys::FileTest->e($file)) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method rename : int ($test_dir : string) {
+
+    my $file = "$test_dir/foo.txt";
+    Sys::IO->fopen($file, "w");
+    
+    unless (Sys::FileTest->e($file)) {
+      return 0;
+    }
+    
+    my $new_file = "$test_dir/foo_new.txt";
+    my $status = Sys::IO->rename($file, $new_file);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    if (Sys::FileTest->e($file)) {
+      return 0;
+    }
+
+    unless (Sys::FileTest->e($new_file)) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method getcwd : int ($test_dir : string) {
+    
+    {
+      my $buf = (mutable string)new_string_len 100;
+      my $buf_length = length $buf;
+      my $ret_buf = Sys::IO->getcwd($buf, $buf_length);
+      
+      unless ($ret_buf) {
+        return 0;
+      }
+      
+      unless ($buf == $ret_buf) {
+        return 0;
+      }
+      
+      warn "getcwd:$ret_buf";
+    }
+
+    {
+      my $ret_buf = Sys::IO->getcwd(undef, 0);
+      
+      unless ($ret_buf) {
+        return 0;
+      }
+      
+      warn "getcwd(NULL, 0):$ret_buf";
+    }
+    
+    return 1;
+  }
+
+  static method realpath : int ($test_dir : string) {
+
+    my $file = "$test_dir/ftest/dir_empty/../file_empty.txt";
+    
+    {
+      my $resolved_path = (mutable string)new_string_len 100;
+      my $ret_resolved_path = Sys::IO->realpath($file, $resolved_path);
+      
+      unless ($ret_resolved_path) {
+        return 0;
+      }
+      
+      Fn->shorten_null_char($ret_resolved_path);
+      
+      unless ($ret_resolved_path eq "$test_dir/ftest/file_empty.txt") {
+        return 0;
+      }
+    }
+
+    {
+      my $ret_resolved_path = Sys::IO->realpath($file, undef);
+      
+      unless ($ret_resolved_path) {
+        return 0;
+      }
+      
+      Fn->shorten_null_char($ret_resolved_path);
+      
+      unless ($ret_resolved_path eq "$test_dir/ftest/file_empty.txt") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  private static method replace_chars : void ($string : mutable string, $from : byte, $to : byte) {
+    
+    unless ($string) {
+      die "The string must be defined";
+    }
+    
+    my $string_length = length $string;
+    for (my $i = 0; $i < $string_length; $i++) {
+      if ($string->[$i] == $from) {
+        $string->[$i] = $to;
+      }
+    }
+  }
+  
+  static method _fullpath : int ($test_dir : string) {
+    
+    my $test_dir_backslash = (mutable string)copy $test_dir;
+    &replace_chars($test_dir_backslash, '/', '\\');
+    
+    my $file = "$test_dir/ftest/dir_empty/../file_empty.txt";
+    
+    {
+      my $resolved_path = (mutable string)new_string_len 100;
+      my $ret_resolved_path = Sys::IO->_fullpath($resolved_path, $file, 100);
+      
+      unless ($ret_resolved_path) {
+        return 0;
+      }
+      
+      Fn->shorten_null_char($ret_resolved_path);
+      
+      unless ($ret_resolved_path eq "$test_dir_backslash\\ftest\\file_empty.txt") {
+        return 0;
+      }
+    }
+
+    {
+      my $ret_resolved_path = Sys::IO->_fullpath(undef, $file, 0);
+      
+      unless ($ret_resolved_path) {
+        return 0;
+      }
+      
+      Fn->shorten_null_char($ret_resolved_path);
+      
+      unless ($ret_resolved_path eq "$test_dir_backslash\\ftest\\file_empty.txt") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method chdir : int ($test_dir : string) {
+    my $dir = "$test_dir/ftest/dir_empty";
+    
+    my $status = Sys::IO->chdir($dir);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    my $cwd = Sys::IO->getcwd(undef, 0);
+    unless (Fn->contains($cwd, "dir_empty")) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method chmod : int ($test_dir : string) {
+    my $file = "$test_dir/foo.txt";
+    my $fs = Sys::IO->fopen($file, "w");
+    
+    unless (Sys::FileTest->f($file)) {
+      return 0;
+    }
+    
+    Sys::IO->fclose($fs);
+    
+    my $status = Sys::IO->chmod($file, 0755);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method chown : int ($test_dir : string) {
+    my $file = "$test_dir/foo.txt";
+    my $fs = Sys::IO->fopen($file, "w");
+    
+    unless (Sys::FileTest->f($file)) {
+      return 0;
+    }
+    
+    Sys::IO->fclose($fs);
+    
+    my $status = Sys::IO->chown($file, -1, -1);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method truncate : int ($test_dir : string) {
+    
+    my $file = "$test_dir/foo.txt";
+    {
+      my $fs = Sys::IO->fopen($file, "wb");
+      
+      unless ($fs) {
+        return 0;
+      }
+
+      my $write_length = 0;
+      my $size = 1;
+      my $length = 4;
+      
+      $write_length = Sys::IO->fwrite("abcd", $size, $length, $fs);
+      unless ($write_length == 4) {
+        return 0;
+      }
+      
+      Sys::IO->fclose($fs);
+    }
+    
+    {
+      my $size_first = Sys::FileTest->s($file);
+      
+      warn "AAA $size_first";
+      
+      unless ($size_first == 4) {
+        return 0;
+      }
+      
+      my $status = Sys::IO->truncate($file, 0);
+      
+      warn "BBB $status";
+      
+      unless ($status == 0) {
+        return 0;
+      }
+      
+      my $size_trancated = Sys::FileTest->s($file);
+      
+      warn "CCC $size_trancated";
+      
+      unless ($size_trancated == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method symlink : int ($test_dir : string) {
+    
+    my $file = "$test_dir/foo.txt";
+    {
+      my $fs = Sys::IO->fopen($file, "wb");
+      
+      unless ($fs) {
+        return 0;
+      }
+      Sys::IO->fclose($fs);
+    }
+    
+    {
+      my $file_symlink = "$test_dir/foo_link";
+      my $status = Sys::IO->symlink($file, $file_symlink);
+      
+      unless ($status == 0) {
+        return 0;
+      }
+      
+      my $exists_symlink_file = Sys::FileTest->l($file_symlink);
+      unless ($exists_symlink_file) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method readlink : int ($test_dir : string) {
+    
+    my $file = "$test_dir/foo.txt";
+    {
+      my $fs = Sys::IO->fopen($file, "wb");
+      
+      unless ($fs) {
+        return 0;
+      }
+      Sys::IO->fclose($fs);
+    }
+    
+    my $file_symlink = "$test_dir/foo_link";
+    {
+      my $status = Sys::IO->symlink($file, $file_symlink);
+      
+      unless ($status == 0) {
+        return 0;
+      }
+      
+      my $exists_symlink_file = Sys::FileTest->l($file_symlink);
+      unless ($exists_symlink_file) {
+        return 0;
+      }
+    }
+    
+    {
+      my $buffer = (mutable string)new_string_len 255;
+      my $replaced_length = Sys::IO->readlink($file_symlink, $buffer, length $buffer);
+      
+      unless ($replaced_length == length $file) {
+        return 0;
+      }
+      
+      Fn->shorten_null_char($buffer);
+      
+      unless ($buffer eq $file) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+}

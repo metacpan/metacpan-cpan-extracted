@@ -19,8 +19,8 @@ use strict;
 use warnings;
 use Scalar::Util 'isweak';
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -63,6 +63,8 @@ Holds a direct reference to the next free object in the free list.
 
 =head1 METHODS
 
+=over
+
 =cut
 
 use Scalar::Util qw(blessed reftype weaken);
@@ -74,7 +76,7 @@ $uidc = "pdfuid000";
 @inst = qw(parent objnum objgen isfree nextfree uid realised);
 $inst{" $_"} = 1 for @inst;
 
-=head2 PDF::Builder::Basic::PDF::Objind->new()
+=item PDF::Builder::Basic::PDF::Objind->new()
 
 Creates a new indirect object
 
@@ -86,7 +88,7 @@ sub new {
     return bless {}, ref $class || $class;
 }
 
-=head2 $UID = $r->uid()
+=item $UID = $r->uid()
 
 Returns a Unique id for this object, creating one if it didn't have one before
 
@@ -97,7 +99,7 @@ sub uid {
     return $_[0]->{' uid'};
 }
 
-=head2 $r->release()
+=item $r->release()
 
 Releases ALL of the memory used by this indirect object, and all of
 its component/child objects.  This method is called automatically by
@@ -121,6 +123,11 @@ sub release {
     my @tofree = grep { !isweak $_ } values %$self;
     %$self = ();
 
+    # PDFs with highly-interconnected page trees or outlines can hit Perl's
+    # recursion limit pretty easily, so disable the warning for this specific
+    # loop.
+    no warnings 'recursion'; ## no critic
+
     while (my $item = shift @tofree) {
         # common case: value is not reference
         my $ref = ref($item) || next;
@@ -136,7 +143,7 @@ sub release {
     return;
 }
 
-=head2 $value = $r->val()
+=item $value = $r->val()
 
 Returns the value of this object or reads the object and then returns
 its value.
@@ -163,7 +170,7 @@ sub val {
     }
 }
 
-=head2 $r->realise()
+=item $r->realise()
 
 Makes sure that the object is fully read in, etc.
 
@@ -177,7 +184,7 @@ sub realise {
     return $self;
 }
 
-=head2 $v = $r->outobjdeep($fh, $pdf)
+=item $v = $r->outobjdeep($fh, $pdf)
 
 If you really want to output this object, then you need to read it first.
 This also means that all direct subclasses must subclass this method, or they 
@@ -202,7 +209,7 @@ sub outobjdeep {
     }
 }
 
-=head2 $r->outobj($fh, $pdf)
+=item $r->outobj($fh, $pdf)
 
 If this is a full object then outputs a reference to the object, otherwise calls
 outobjdeep to output the contents of the object at this point.
@@ -220,7 +227,7 @@ sub outobj {
     return;
 }
 
-=head2 $s = $r->elements()
+=item $s = $r->elements()
 
 Abstract superclass function filler. Returns self here but should return
 something more useful if an array.
@@ -242,7 +249,7 @@ sub elements {
     }
 }
 
-=head2 $s = $r->empty()
+=item $s = $r->empty()
 
 Empties all content from this object to free up memory or to be read to pass
 the object into the free list. Simplistically undefs all instance variables
@@ -260,7 +267,7 @@ sub empty {
     return $self;
 }
 
-=head2 $o = $r->merge($objind)
+=item $o = $r->merge($objind)
 
 This merges content information into an object reference placeholder.
 This occurs when an object reference is read before the object definition
@@ -284,7 +291,7 @@ sub merge {
     return bless $self, ref($other);
 }
 
-=head2 $r->is_obj($pdf)
+=item $r->is_obj($pdf)
 
 Returns whether this object is a full object with its own object number or
 whether it is purely a sub-object. C<$pdf> indicates which output file we are
@@ -296,7 +303,7 @@ sub is_obj {
     return defined $_[1]->{' objects'}{$_[0]->uid()};
 }
 
-=head2 $r->copy($pdf, $res)
+=item $r->copy($pdf, $res)
 
 Returns a new copy of this object. The object is assumed to be some kind
 of associative array and the copy is a deep copy for elements which are
@@ -330,5 +337,9 @@ sub copy {
     }
     return $res;
 }
+
+=back
+
+=cut
 
 1;

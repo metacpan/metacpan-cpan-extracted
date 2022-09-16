@@ -40,8 +40,8 @@
       <input id="mailfield" name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control" trplaceholder="mail" required aria-required="true" autocomplete="email" />
     </div>
 
-    <TMPL_IF NAME=CAPTCHA_SRC>
-      <TMPL_INCLUDE NAME="captcha.tpl">
+    <TMPL_IF NAME=CAPTCHA_HTML>
+      <TMPL_VAR NAME=CAPTCHA_HTML>
     </TMPL_IF>
     <TMPL_IF NAME="TOKEN">
       <input id="token" type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />

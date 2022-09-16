@@ -16,11 +16,11 @@ sub _EQ       { return }
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.25'; # VERSION
+our $VERSION = '6.0.26'; # VERSION
 
 
 sub _allocate_newFrom {
-    my ($self, $eslifGrammar) = @_;  
+    my ($self, $eslifGrammar) = @_;
 
     return $self->allocate_newFrom($eslifGrammar)
 }
@@ -77,7 +77,7 @@ MarpaX::ESLIF::Recognizer - MarpaX::ESLIF's recognizer
 
 =head1 VERSION
 
-version 6.0.25
+version 6.0.26
 
 =head1 SYNOPSIS
 

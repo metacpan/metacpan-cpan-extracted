@@ -2,6 +2,7 @@ package Example::View::HTML;
 
 use Moose;
 use Valiant::HTML::SafeString 'concat';
+use Valiant::HTML::Form 'form_for';
 use Example::Syntax;
 
 extends 'Catalyst::View::BasePerRequest';

@@ -62,7 +62,7 @@ Readonly::Hash our %ZODIAC => (
 );
 Readonly::Scalar our $SPACE => ' ';
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -224,6 +224,8 @@ Returns angle.
 
 =head1 EXAMPLE1
 
+=for comment filename=angle_to_zodiac.pl
+
  use strict;
  use warnings;
 
@@ -253,6 +255,8 @@ Returns angle.
  # Zodiac angle: 0°♈30′
 
 =head1 EXAMPLE2
+
+=for comment filename=angle_to_zodiac_only_minute.pl
 
  use strict;
  use warnings;
@@ -285,6 +289,8 @@ Returns angle.
  # Zodiac angle: 0°♈
 
 =head1 EXAMPLE3
+
+=for comment filename=angle_to_zodiac_explicit_second_with_round.pl
 
  use strict;
  use warnings;
@@ -319,6 +325,8 @@ Returns angle.
  # Zodiac angle: 0°♈30′0.0000′′
 
 =head1 EXAMPLE4
+
+=for comment filename=angle_to_zodiac_ascii_output.pl
 
  use strict;
  use warnings;
@@ -365,6 +373,14 @@ L<Unicode::UTF8>.
 
 =over
 
+=item L<angle2zodiac>
+
+Script to convert angle to zodiac string.
+
+=item L<App::Angle2Zodiac>
+
+Base class for angle2zodiac script.
+
 =item L<Zodiac::Angle::SwissEph>
 
 Class for zodiac_angle manipulation based on SwissEph.
@@ -383,12 +399,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© 2020-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

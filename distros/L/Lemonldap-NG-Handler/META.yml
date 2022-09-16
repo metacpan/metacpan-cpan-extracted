@@ -8,12 +8,12 @@ build_requires:
   Env: '0'
   IO::Pipe: '0'
   Test::MockObject: '0'
-  Test::Pod: '0'
+  Test::Pod: '1'
   Time::Fake: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ recommends:
   SOAP::Lite: '0'
 requires:
   LWP::UserAgent: '0'
-  Lemonldap::NG::Common: v2.0.14
+  Lemonldap::NG::Common: v2.0.15.1
   Mouse: '0'
   URI: '0'
 resources:
@@ -39,5 +39,5 @@ resources:
   bugtracker: https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues
   homepage: https://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.14
+version: v2.0.15.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

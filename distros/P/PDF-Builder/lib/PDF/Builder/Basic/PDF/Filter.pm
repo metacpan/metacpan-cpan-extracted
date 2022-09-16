@@ -18,14 +18,15 @@ package PDF::Builder::Basic::PDF::Filter;
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Filter::ASCII85Decode;
 use PDF::Builder::Basic::PDF::Filter::ASCIIHexDecode;
 use PDF::Builder::Basic::PDF::Filter::FlateDecode;
 use PDF::Builder::Basic::PDF::Filter::LZWDecode;
 use PDF::Builder::Basic::PDF::Filter::RunLengthDecode;
+# use PDF::Builder::Basic::PDF::Filter::CCITTFaxDecode;   when TIFF changes in
 use Scalar::Util qw(blessed reftype);
 
 =head1 NAME
@@ -55,12 +56,14 @@ the same time.
 
 =head1 METHODS
 
-=head2 PDF::Builder::Basic::PDF::Filter->new()
+=over
+
+=item PDF::Builder::Basic::PDF::Filter->new()
 
 Creates a new filter object with empty state information ready for processing
 data both input and output.
 
-=head2 $dat = $f->infilt($str, $isend)
+=item $dat = $f->infilt($str, $isend)
 
 Filters from output to input the data. Notice that C<$isend == 0> implies that 
 there is more data to come and so following it C<$f> may contain state 
@@ -72,9 +75,11 @@ C<$f> will be that the state information is empty. Error messages are most
 likely to occur here since if there is required state information to be stored 
 following this data, then that would imply an error in the data.
 
-=head2 $str = $f->outfilt($dat, $isend)
+=item $str = $f->outfilt($dat, $isend)
 
 Filter stored data ready for output. Parallels C<infilt>.
+
+=back
 
 =cut
 

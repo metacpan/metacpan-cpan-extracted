@@ -7,7 +7,10 @@ use Carp;
 use Net::FTP;
 
 # ABSTRACT: HTTP repository handler
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.17'; # VERSION
+
+sub is_network_fetch { 1 }
+sub is_secure_fetch  { 0 }
 
 sub connection {
   my $self = shift;
@@ -68,7 +71,17 @@ Alien::Base::ModuleBuild::Repository::FTP - HTTP repository handler
 
 =head1 VERSION
 
-version 1.15
+version 1.17
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Alien>
+
+=item L<Alien::Base>
+
+=back
 
 =head1 AUTHOR
 
@@ -106,13 +119,13 @@ Kang-min Liu (劉康民, gugod)
 
 Nicholas Shipp (nshp)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Alberto Simões (ambs)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2020 by Joel A Berger.
+This software is copyright (c) 2012-2022 by Joel A Berger.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,7 +6,7 @@ use strict;
 
 use vars qw(@EXPORT @EXPORT_OK %EXPORT_TAG);
 
-our $VERSION = '4.11';
+our $VERSION = '4.12';
 
 @EXPORT = qw();
 @EXPORT_OK = qw(%OAI_ERRORS);

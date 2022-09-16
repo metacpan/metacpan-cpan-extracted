@@ -9,11 +9,12 @@ use Encode qw(encode);
 use Error::Pure qw(err);
 use Plack::Util::Accessor qw(author content_type css encoding
 	favicon flag_begin flag_end generator psgi_app status_code title tags);
+use Scalar::Util qw(blessed);
 use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub call {
 	my ($self, $env) = @_;
@@ -46,7 +47,7 @@ sub prepare_app {
 	my $self = shift;
 
 	if ($self->tags) {
-		if (! $self->tags->isa('Tags::Output')) {
+		if (! blessed($self->tags) || ! $self->tags->isa('Tags::Output')) {
 			err "Accessor 'tags' must be a 'Tags::Output' object.";
 		}
 	} else {
@@ -58,7 +59,7 @@ sub prepare_app {
 	}
 
 	if ($self->css) {
-		if (! $self->css->isa('CSS::Struct::Output')) {
+		if (! blessed($self->css) || ! $self->css->isa('CSS::Struct::Output')) {
 			err "Accessor 'css' must be a 'CSS::Struct::Output' object.";
 		}
 	} else {
@@ -327,6 +328,8 @@ and run _prepare_app().
 
 =head1 EXAMPLE1
 
+=for comment filename=hello_world_page_psgi.pl
+
  package App;
 
  use base qw(Plack::Component::Tags::HTML);
@@ -371,6 +374,8 @@ and run _prepare_app().
  # <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>My app</title></head><body>Hello world</body></html>
 
 =head1 EXAMPLE2
+
+=for comment filename=hello_world_element_psgi.pl
 
  package App;
 
@@ -421,6 +426,7 @@ L<CSS::Struct::Output::Raw>,
 L<Encode>,
 L<Plack::Component>,
 L<Plack::Util::Accessor>,
+L<Scalar::Util>,
 L<Tags::HTML::Page::Begin>,
 L<Tags::HTML::Page::End>,
 L<Tags::Output::Raw>.
@@ -447,12 +453,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020-2022
+© 2020-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

@@ -1,16 +1,17 @@
 package Dist::Util;
 
-our $DATE = '2014-12-26'; # DATE
-our $VERSION = '0.06'; # VERSION
-
-use 5.010001;
 use strict;
 use warnings;
 
 use Config;
+use Exporter 'import';
 use File::Spec;
 
-require Exporter;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-21'; # DATE
+our $DIST = 'Dist-Util'; # DIST
+our $VERSION = '0.070'; # VERSION
+
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
                        list_dist_modules
@@ -36,23 +37,30 @@ sub packlist_for {
 sub list_dists {
     require File::Find;
 
+    my %args = @_;
+
     my %dists;
     for my $inc (@INC) {
         next if ref($inc);
         my $prefix = "$inc/$Config{archname}/auto";
         next unless -d $prefix;
+
         File::Find::find(
             sub {
                 return unless $_ eq '.packlist';
                 my $dist = substr($File::Find::dir, length($prefix)+1);
                 # XXX use platform-neutral path separator
                 $dist =~ s!/!-!g;
-                $dists{$dist}++;
+                $dists{$dist} = {dist=>$dist, packlist => "$File::Find::dir/$_"};
             },
             $prefix,
         );
     }
-    sort(keys %dists);
+    if ($args{detail}) {
+        return values %dists;
+    } else {
+        return (sort keys %dists);
+    }
 }
 
 sub list_dist_modules {
@@ -112,7 +120,7 @@ Dist::Util - Dist-related utilities
 
 =head1 VERSION
 
-This document describes version 0.06 of Dist::Util (from Perl distribution Dist-Util), released on 2014-12-26.
+This document describes version 0.070 of Dist::Util (from Perl distribution Dist-Util), released on 2022-08-21.
 
 =head1 SYNOPSIS
 
@@ -137,7 +145,13 @@ C<Package::SubPkg> or C<Package/SubPkg.pm>). Return undef if none is found.
 Depending on the content of C<@INC>, the returned path may be absolute or
 relative.
 
-=head2 list_dists() => LIST
+Caveat: many Linux distributions strip C<.packlist> files.
+
+=head2 list_dists
+
+Usage:
+
+ list_dists(%opts) => LIST
 
 Find all C<.packlist> files in C<@INC> and then pick the dist names from the
 paths, because C<.packlist> files are put in:
@@ -145,6 +159,22 @@ paths, because C<.packlist> files are put in:
  $INC/$Config{archname}/auto/Foo/Bar/.packlist
 
 Caveat: many Linux distributions strip C<.packlist> files.
+
+Known options:
+
+=over
+
+=item * detail
+
+Bool. If set to true, instead of a list of distribution names, the function will
+return a list of hashrefs containing detailed information e.g.:
+
+ (
+   {dist=>"Foo-Bar", packlist=>"/home/u1/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/x86_64-linux/auto/Foo/Bar/.packlist"},
+   ...
+ )
+
+=back
 
 =head2 list_dist_modules($mod) => LIST
 
@@ -155,6 +185,8 @@ the packlist.
 
 Will return empty list if fails to get the packlist.
 
+Caveat: many Linux distributions strip C<.packlist> files.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Util>.
@@ -163,6 +195,45 @@ Please visit the project's homepage at L<https://metacpan.org/release/Dist-Util>
 
 Source repository is at L<https://github.com/perlancar/perl-Dist-Util>.
 
+=head1 SEE ALSO
+
+L<Dist::Util::Current>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Util>
@@ -170,16 +241,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

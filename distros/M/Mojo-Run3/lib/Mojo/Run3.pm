@@ -1,6 +1,7 @@
 package Mojo::Run3;
 use Mojo::Base 'Mojo::EventEmitter';
 
+use Carp qw(croak);
 use Errno qw(EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK EIO);
 use IO::Handle;
 use IO::Pty;
@@ -8,35 +9,43 @@ use Mojo::IOLoop::ReadWriteFork::SIGCHLD;
 use Mojo::IOLoop;
 use Mojo::Util qw(term_escape);
 use Mojo::Promise;
+use POSIX qw(sysconf _SC_OPEN_MAX);
 use Scalar::Util qw(blessed weaken);
 
-use constant DEBUG => $ENV{MOJO_RUN3_DEBUG} && 1;
+use constant DEBUG        => $ENV{MOJO_RUN3_DEBUG} && 1;
+use constant MAX_OPEN_FDS => sysconf(_SC_OPEN_MAX);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
-our @SAFE_SIG = grep {
-  !m!^(NUM\d+|__[A-Z0-9]+__|ALL|CATCHALL|DEFER|HOLD|IGNORE|MAX|PAUSE|RTMAX|RTMIN|SEGV|SETS)$!
-} keys %SIG;
+our @SAFE_SIG
+  = grep { !m!^(NUM\d+|__[A-Z0-9]+__|ALL|CATCHALL|DEFER|HOLD|IGNORE|MAX|PAUSE|RTMAX|RTMIN|SEGV|SETS)$! } keys %SIG;
 
 has driver => 'pipe';
 has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 
+sub bytes_waiting {
+  my ($self, $name) = (@_, 'stdin');
+  return length($self->{buffer}{$name} // '');
+}
+
 sub close {
   my ($self, $name) = @_;
-  my $fh      = $self->{fh};
-  my $reactor = $self->ioloop->reactor;
+  return $self->_close_other if $name eq 'other';
 
+  my $fh = $self->{fh};
+  return $self unless my $handle = $fh->{$name};
+
+  my $reactor = $self->ioloop->reactor;
   $self->_d('close %s (%s)', $name, $fh->{$name} // 'undef') if DEBUG;
-  my $h = $fh->{$name} or return $self;
 
   for my $sibling (keys %$fh) {
-    next if $fh->{$sibling} ne $h;
+    next if $fh->{$sibling} ne $handle;
     $self->{finish}{$name}++;
     $reactor->remove($fh->{$sibling});
     delete $fh->{$sibling};
   }
 
-  $h->close;
+  $handle->close;
   return $self;
 }
 
@@ -83,7 +92,26 @@ sub write {
 
 sub _cleanup {
   my ($self) = @_;
+  return if $self->{is_child};
   $self->close($_) for qw(pty stdin stderr stdout);
+}
+
+sub _close_other {
+  my ($self) = @_;
+  croak "Cannot close 'other' in parent process!" unless $self->{is_child};
+
+  my $fh = delete $self->{fh};
+  $fh->{$_}->close for keys %$fh;
+
+  local $!;
+  for my $fileno (0 .. MAX_OPEN_FDS - 1) {
+    next if fileno(STDIN) == $fileno;
+    next if fileno(STDOUT) == $fileno;
+    next if fileno(STDERR) == $fileno;
+    POSIX::close($fileno);
+  }
+
+  return $self;
 }
 
 sub _d {
@@ -150,15 +178,16 @@ sub _read {
   }
   else {
     $self->_d('%s !!! %s (%i)', $name, $!, $!) if DEBUG;
-    return undef                       if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;  # Retry
-    return $self->kill                 if $! == ECONNRESET || $! == EPIPE;                   # Error
-    return $self->_maybe_finish($name) if $! == EIO;    # EOF on PTY raises EIO
+    return undef                               if $! == EAGAIN     || $! == EINTR || $! == EWOULDBLOCK;    # Retry
+    return $self->kill                         if $! == ECONNRESET || $! == EPIPE;                         # Error
+    return $self->_maybe_finish($name)         if $! == EIO;    # EOF on PTY raises EIO
     return $self->emit(error => $!);
   }
 }
 
 sub _start_child {
   my ($self, $fh, $code) = @_;
+  $self->{is_child} = 1;
 
   if (my $pty = $fh->{parent}{pty}) {
     $pty->make_slave_controlling_terminal;
@@ -196,8 +225,7 @@ sub _start_parent {
   for my $name (qw(pty stderr stdout)) {
     my $h = $fh->{$name} or next;
     $h->close_slave if $name eq 'pty';    # TODO: This is EXPERIMENTAL
-    $reactor->io($h, sub { $self ? $self->_read($name => $h) : $_[0]->remove($h) })
-      ->watch($h, 1, 0);
+    $reactor->io($h, sub { $self ? $self->_read($name => $h) : $_[0]->remove($h) })->watch($h, 1, 0);
   }
 
   Mojo::IOLoop::ReadWriteFork::SIGCHLD->singleton->waitpid(
@@ -347,12 +375,32 @@ Holds a L<Mojo::IOLoop> object.
 
 =head1 METHODS
 
+=head2 bytes_waiting
+
+  $int = $run3->bytes_waiting;
+
+Returns how many bytes has been passed on to L</write> buffer, but not yet
+written to the child process.
+
 =head2 close
 
+  $run3 = $run3->close('other');
   $run3 = $run3->close('stdin');
 
-Can be used to close C<STDIN>. This is useful after piping data into a process
-like C<cat>.
+Can be used to close C<STDIN> or other filehandles that are not in use in a sub
+process.
+
+Closing "stdin" is useful after piping data into a process like C<cat>.
+
+Here is an example of closing "other":
+
+  $run3->start(sub ($run3, @) {
+    $run3->close('other');
+    exec telnet => '127.0.0.1';
+  });
+
+Closing "other" is currently EXPERIMENTAL and might be changed later on, but it
+is unlikely it will get removed.
 
 =head2 exit_status
 

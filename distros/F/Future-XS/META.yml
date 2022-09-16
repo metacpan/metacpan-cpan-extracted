@@ -4,10 +4,7 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  Test::Fatal: '0'
-  Test::Identity: '0'
   Test::More: '0.88'
-  Test::Refcount: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -20,10 +17,11 @@ name: Future-XS
 provides:
   Future::XS:
     file: lib/Future/XS.pm
-    version: '0.03'
+    version: '0.04'
 requires:
+  Future: 0.48_001
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

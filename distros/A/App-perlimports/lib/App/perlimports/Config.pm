@@ -3,7 +3,7 @@ package App::perlimports::Config;
 use Moo;
 use MooX::StrictConstructor;
 
-our $VERSION = '0.000045';
+our $VERSION = '0.000048';
 
 use List::Util      qw( uniq );
 use Path::Tiny      qw( path );
@@ -108,7 +108,7 @@ has padding => (
     is      => 'ro',
     isa     => Bool,
     lazy    => 1,
-    default => 1
+    default => 1,
 );
 
 has preserve_duplicates => (
@@ -201,7 +201,7 @@ App::perlimports::Config - Generic configuration options for C<perlimports>
 
 =head1 VERSION
 
-version 0.000045
+version 0.000048
 
 =head1 DESCRIPTION
 

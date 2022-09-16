@@ -1,0 +1,4 @@
+- Upgrade Github URL in the zef repository as well. Missed it in the last
+  update.
+- Detect S390 architecture.
+- Hint at the `build` command, when no precompiled release is available.

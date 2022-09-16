@@ -1,5 +1,8 @@
 Revision history for Perl module TestRail::API
 
+0.052 2022-09-10 TEODESIAN
+    - Add more new API methods and adjust for the bulk API, contributed by Matt Spahr
+
 0.051 2021-10-26 TEODESIAN
     - Fix broken testsuite due to use of Test::MockModule::redefine on old perls
 

@@ -176,9 +176,9 @@ sub _options {
             'log-level|l=s', 'Print messages to STDERR',
             { default => 'warning' }
         ],
-        [ 'help', "Print usage message and exit", { shortcircuit => 1 } ],
+        [ 'help', 'Print usage message and exit', { shortcircuit => 1 } ],
         [
-            'verbose-help', "Print usage message and documentation ",
+            'verbose-help', 'Print usage message and documentation ',
             { shortcircuit => 1 }
         ],
     );
@@ -199,7 +199,7 @@ dump-perl-exports - A command line utility for describing what a class exports
 
 =head1 VERSION
 
-version 0.000045
+version 0.000048
 
 =head1 SYNOPSIS
 

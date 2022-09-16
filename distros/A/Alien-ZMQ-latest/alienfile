@@ -38,9 +38,16 @@ EOF
 		requires 'Alien::cmake3';
 	}
 
-	plugin Download => (
-		url => 'https://github.com/zeromq/libzmq/releases',
-		version => qr/zeromq-([\d\.]+)\.tar\.gz/,
+	my $zeromq_qr = qr/zeromq-([\d\.]+)\.tar\.gz/;
+	plugin 'Prefer::SortVersions' => (
+		filter => $zeromq_qr,
+	);
+
+	plugin 'Download::GitHub' => (
+		github_user => 'zeromq',
+		github_repo => 'libzmq',
+		include_assets => $zeromq_qr,
+		version => $zeromq_qr,
 	);
 
 	plugin Extract => 'tar.gz';
@@ -49,8 +56,7 @@ EOF
 	my $enable_tests = 0;
 	if( $build_conf_pref eq BUILD_CONF_PREF_AUTOCONF ) {
 		plugin 'Build::Autoconf';
-		# OpenBSD / FreeBSD fixed in <https://github.com/zeromq/libzmq/pull/4174>.
-		my $should_stub_tests = $^O eq 'MSWin32' || $^O =~ /^(freebsd|openbsd)$/;
+		my $should_stub_tests = 1;
 		my @make_stub_tests = $should_stub_tests
 			? ( "noinst_LIBRARIES=" )
 			: ();
@@ -68,6 +74,7 @@ EOF
 		plugin 'Build::CMake';
 		build [
 			[ '%{cmake}', -G => '%{cmake_generator}',
+				'-DCMAKE_MAKE_PROGRAM:PATH=%{make}',
 				'-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
 				"-DBUILD_STATIC=@{[ $enable_static ? 'ON' : 'OFF' ]}",
 				"-DZMQ_BUILD_TESTS=@{[ $enable_tests ? 'ON' : 'OFF' ]}",

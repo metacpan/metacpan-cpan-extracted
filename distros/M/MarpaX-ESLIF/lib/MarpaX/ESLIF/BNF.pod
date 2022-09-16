@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 6.0.25
+version 6.0.26
 
 =head1 DESCRIPTION
 
@@ -322,7 +322,7 @@ A concrete lua example is e.g.:
      ["isWithTrack"]            = function(self) return false end,
      ["parameterizedRhs"]       = function(self, parameter)
         self._nbParameterizedRhsCalls = self._nbParameterizedRhsCalls + 1
-  
+
         local output
         if (self._nbParameterizedRhsCalls == 5) then
           output = "'5'"
@@ -335,7 +335,7 @@ A concrete lua example is e.g.:
         return output
      end
   }
-  
+
   local valueInterface = {
      ["isWithHighRankOnly"] = function(self) return true end,
      ["isWithOrderByRank"]  = function(self) return true end,
@@ -345,7 +345,7 @@ A concrete lua example is e.g.:
      ["getResult"]          = function(self) return self._result end,
      ["setResult"]          = function(self, result) self._result = result end,
   }
-  
+
   local logger = {
      ["trace"]     = function(self, msgs) self:tracef("%s", msgs) end,
      ["debug"]     = function(self, msgs) self:debugf("%s", msgs) end,
@@ -367,10 +367,10 @@ A concrete lua example is e.g.:
      ["criticalf"]  = function(self, fmts, ...) print(string.format("%-9s "..fmts, 'CRITICAL', ...)) end,
      ["emergencyf"] = function(self, fmts, ...) print(string.format("%-9s "..fmts, 'EMERGENCY', ...)) end
   }
-  
+
   local marpaESLIFLua = require 'marpaESLIFLua'
   local marpaESLIFp = marpaESLIFLua.MarpaX::ESLIF::new(logger)
-  
+
   marpaESLIFGrammarp = marpaESLIFp:marpaESLIFGrammar_new([[
   :default ::= action => ::shift
   top ::= . => parameterizedRhs->(1)
@@ -390,7 +390,7 @@ A concrete lua example is e.g.:
         | . => ::lua->grammar_ko->(10,12)
         | . => ::lua->action_raising_error->(10,12)
         | . => ::lua->unknown_action->(10,12)
-  
+
   <luascript>
   function grammar_ok(x,y)
     return "'Y'"
@@ -403,7 +403,7 @@ A concrete lua example is e.g.:
   end
   </luascript>
   ]])
-  
+
   recognizerInterface:init('5')
   marpaESLIFGrammarp:parse(recognizerInterface, valueInterface)
   logger:noticef('... Grammar parse result: %s', valueInterface:getResult())
@@ -1023,22 +1023,22 @@ Note that two terminals cannot share the same name adverb.
 MarpaX::ESLIF BNF can be expressed in itself:
 
   #######################################################
-  
+
   :desc ::= 'G1'
   :start ::= <statements>
-  
+
   :discard ::= /[\s]+/u
   :discard ::= /#[^\n]*/u
   :discard ::= /\/\/[^\n]*|\/\*(?:[^\*]+|\*(?!\/))*\*\//u
-  
+
   :symbol  ::= /::luac?\->function\(/ pause => after event => :discard[switch]
   :symbol  ::= /\-\-?>\(/' pause => after event => :discard[switch]
   :symbol   ::= <lua funcbody after lparen>@+2 pause => after event => :discard[switch] verbose => 1
   :symbol   ::= <lua args after lparen>@+2 pause => after event => :discard[switch] verbose => 1
-  
+
   event :discard[on]  = nulled <discard on>
   event :discard[off] = nulled <discard off>
-  
+
   <statements>                   ::= <statement>*
   <statement>                    ::= <start rule>
                                    | <desc rule>
@@ -1142,7 +1142,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <event initializer>            ::= '=' <on or off>
   <on or off>                    ::= 'on'
                                    | 'off'
-  <event initializer> ::= 
+  <event initializer> ::=
   <latm specification>           ::= 'latm' /=>|\x{21D2}/u <false>
                                    | 'latm' /=>|\x{21D2}/u <true>
   <discard is fallback specification> ::= 'discard-is-fallback' /=>|\x{21D2}/u <false>
@@ -1261,9 +1261,9 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <lua function>                 ::= /::luac?\->function\(/ <lua funcbody after lparen>@+2
   <lua functioncall>             ::= /\-\-?>\(/' <lua args after lparen>@+2
   <lua functiondecl>             ::= /<\-\-?\(/ <lua optional parlist after lparen>@+2
-  
+
   #######################################################
-  
+
   :desc ~ 'L0'
   <op declare any grammar>       ~ /:\[[\d]+\]:=/
   <op declare top grammar>       ~ '::='
@@ -1291,9 +1291,9 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <regular substitution>         ~ /'(?:[^\\']*(?:\\.[^\\']*)*)'|"(?:[^\\"]*(?:\\.[^\\"]*)*)"|\x{201C}(?:[^\\\x{201D}]*(?:\\.[^\\\x{201D}]*)*)\x{201D}/su
                                  | /'(?:[^\\']*(?:\\.[^\\']*)*)'|"(?:[^\\"]*(?:\\.[^\\"]*)*)"|\x{201C}(?:[^\\\x{201D}]*(?:\\.[^\\\x{201D}]*)*)\x{201D}/su ':' /[xgl!f]+/
   <graph ascii name>             ~ /[[:graph:]]+/
-  
+
   #######################################################
-  
+
   :desc                                  :[2]:= 'Lua 5.3'
   :discard                               :[2]:= /\s+/
   :discard                               :[2]:= /--(?:\[(?!=*\[)|(?!\[))[^\n]*/
@@ -1303,14 +1303,14 @@ MarpaX::ESLIF BNF can be expressed in itself:
   # Lua 5.3.4 grammar. Based on perl package MarpaX::Languages::Lua::Parser
   # -----------------------------------------------------------------------
   #
-  
+
   #
   # Special entries used to hook the lua grammar in ESLIF
   #
   <lua funcbody after lparen>            :[2]:= <lua optional parlist> ')' <lua block> <lua keyword end>
   <lua args after lparen>                :[2]:= <lua optional explist> ')'
   <lua optional parlist after lparen>    :[2]:= <lua optional parlist> ')'
-  
+
   <lua chunk>                            :[2]:=
   <lua chunk>                            :[2]:= <lua stat list>
                                               | <lua stat list> <lua laststat>
@@ -1424,12 +1424,12 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <lua optional parlist>                 :[2]:= <lua namelist>
                                               | <lua namelist> ',' '...'
                                               | '...'
-   
+
   # A lone comma is not allowed in an empty fieldlist,
   # apparently. This is why I use a dedicated rule
   # for an empty table and a '+' sequence,
   # instead of a '*' sequence.
-   
+
   <lua tableconstructor>                 :[2]:= '{' '}'
                                               | '{' <lua fieldlist> '}'
   <lua fieldlist>                        :[2]:= <lua field>+ separator => [,;]
@@ -1439,14 +1439,14 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <lua label>                            :[2]:= '::' <lua Name> '::'
   <lua Name>                             :[2]:= <LUA NAME> - <LUA RESERVED KEYWORDS>
   <lua String>                           :[2]:= /'(?:[^\\']*(?:\\.[^\\']*)*)'|"(?:[^\\"]*(?:\\.[^\\"]*)*)"|\[(=*)\[.*?\]\1\]/su
-  
+
   # A lua number can start with '.' if the later is followed by at least one (hex) digit
-  <lua Number>                           :[2]:= /(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][+-]?[0-9]+)?/ 
-                                              | /0[xX](?:\.[a-fA-F0-9]+|[a-fA-F0-9]+(?:\.[a-fA-F0-9]*)?)(?:\.[a-fA-F0-9]*)?(?:[pP][+-]?[0-9]+)?/ 
-  
-  
+  <lua Number>                           :[2]:= /(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][+-]?[0-9]+)?/
+                                              | /0[xX](?:\.[a-fA-F0-9]+|[a-fA-F0-9]+(?:\.[a-fA-F0-9]*)?)(?:\.[a-fA-F0-9]*)?(?:[pP][+-]?[0-9]+)?/
+
+
   #######################################################
-  
+
   <lua keyword and>                      :[3]:= 'and'
   <lua keyword break>                    :[3]:= 'break'
   <lua keyword do>                       :[3]:= 'do'
@@ -1469,7 +1469,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <lua keyword until>                    :[3]:= 'until'
   <lua keyword while>                    :[3]:= 'while'
   <lua keyword goto>                     :[3]:= 'goto'
-   
+
   <LUA NAME>                             :[3]:= /[a-zA-Z_][a-zA-Z_0-9]*/
   <LUA RESERVED KEYWORDS>                :[3]:= 'and'
                                               | 'break'

@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.48';
+$VERSION = '0.49';
 $VERSION = $VERSION;
 
 # internal use
@@ -89,7 +89,7 @@ sub import {
     # set script encoding
     if (defined $_[0]) {
         my $encoding = $_[0];
-        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | sjis | uhc | utf8 | wtf8 ) \z/xms) {
+        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | rfc2279 | sjis | uhc | utf8 | wtf8 ) \z/xms) {
             set_script_encoding($encoding);
         }
         else {
@@ -124,6 +124,7 @@ perl mb.pm -e big5hkscs script_by_big5hkscs.pl
 perl mb.pm -e eucjp     script_by_eucjp.pl
 perl mb.pm -e gb18030   script_by_gb18030.pl
 perl mb.pm -e gbk       script_by_gbk.pl
+perl mb.pm -e rfc2279   script_by_rfc2279.pl
 perl mb.pm -e sjis      script_by_sjis.pl
 perl mb.pm -e sjis      script_by_cp932.pl
 perl mb.pm -e uhc       script_by_uhc.pl
@@ -141,7 +142,7 @@ END
     # set script encoding from command line
     my $encoding = '';
     if (($encoding) = $ARGV[0] =~ /\A -e ( .+ ) \z/xms) {
-        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | sjis | uhc | utf8 | wtf8 ) \z/xms) {
+        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | rfc2279 | sjis | uhc | utf8 | wtf8 ) \z/xms) {
             set_script_encoding($encoding);
             shift @ARGV;
         }
@@ -151,7 +152,7 @@ END
     }
     elsif ($ARGV[0] =~ /\A -e \z/xms) {
         $encoding = $ARGV[1];
-        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | sjis | uhc | utf8 | wtf8 ) \z/xms) {
+        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | rfc2279 | sjis | uhc | utf8 | wtf8 ) \z/xms) {
             set_script_encoding($encoding);
             shift @ARGV;
             shift @ARGV;
@@ -458,7 +459,7 @@ sub mb::getc (;*) {
             }
         }
     }
-    elsif ($script_encoding =~ /\A (?: utf8 | wtf8 ) \z/xms) {
+    elsif ($script_encoding =~ /\A (?: rfc2279 | utf8 | wtf8 ) \z/xms) {
         if ($getc =~ /\A [\x00-\x7F\x80-\xC1\xF5-\xFF] \z/xms) {
         }
         elsif ($getc =~ /\A [\xC2-\xDF] \z/xms) {
@@ -732,7 +733,7 @@ sub mb::set_script_encoding ($) {
         'big5hkscs' => '(?>[\x81-\xFE][\x00-\xFF])',                                              # HKSCS support on top of traditional Chinese Windows
         'eucjp'     => '(?>[\xA1-\xFE][\x00-\xFF])',                                              # EUC-JP Japanese (JIS 0208-1990 and 0121-1990)
         'gb18030'   => '(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])', # GB18030 Windows XP and later: GB18030 Simplified Chinese (4 byte); Chinese Simplified (GB18030)
-    #   'utf8'      => '(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])', # utf-8 Unicode (UTF-8) RFC2279
+        'rfc2279'   => '(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])', # utf-8 Unicode (UTF-8) RFC2279
         'utf8'      => '(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])', # utf-8 Unicode (UTF-8) optimized RFC3629 for ja_JP
         'wtf8'      => '(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])',                                                                     # optimized WTF-8 for ja_JP
     }->{$script_encoding} || '[\x80-\xFF]';
@@ -774,7 +775,7 @@ sub mb::set_script_encoding ($) {
     # Break through the limitations of regular expressions of Perl
     # http://d.hatena.ne.jp/gfx/20110212/1297512479
 
-    if ($script_encoding =~ /\A (?: utf8 | wtf8 ) \z/xms) {
+    if ($script_encoding =~ /\A (?: rfc2279 | utf8 | wtf8 ) \z/xms) {
         ${mb::_anchor} = qr{.*?}xms;
     }
     elsif ($] >= 5.030000) {
@@ -1682,7 +1683,7 @@ sub mb::_unlink (@) {
 ######################################################################
 
 #---------------------------------------------------------------------
-# detect system encoding any of big5, big5hkscs, eucjp, gb18030, gbk, sjis, uhc, utf8, wtf8
+# detect system encoding any of big5, big5hkscs, eucjp, gb18030, gbk, rfc2279, sjis, uhc, utf8, wtf8
 sub detect_system_encoding {
 
     # running on Microsoft Windows
@@ -4507,7 +4508,7 @@ sub parse_re_codepoint_class {
             elsif ($script_encoding =~ /\A (?: gb18030 ) \z/xms) {
                 push @xbcs, list_all_by_hyphen_gb18030_like($a, $b);
             }
-            elsif ($script_encoding =~ /\A (?: utf8 | wtf8 ) \z/xms) {
+            elsif ($script_encoding =~ /\A (?: rfc2279 | utf8 | wtf8 ) \z/xms) {
                 push @xbcs, list_all_by_hyphen_utf8_like   ($a, $b);
             }
             else {
@@ -5282,6 +5283,7 @@ mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
   $ perl mb.pm -e gbk       script_by_gbk.pl
   $ perl mb.pm -e sjis      script_by_sjis.pl
   $ perl mb.pm -e sjis      script_by_cp932.pl
+  $ perl mb.pm -e rfc2279   script_by_rfc2279.pl
   $ perl mb.pm -e uhc       script_by_uhc.pl
   $ perl mb.pm -e utf8      script_by_utf8.pl
   $ perl mb.pm -e wtf8      script_by_wtf8.pl
@@ -5578,6 +5580,18 @@ The encodings supported by this software and their range of octets are as follow
                [|](7C) 亅(817C) 倈(827C) 億(837C) 剕(847C) 厊(857C) 唡(867C) 噟(877C) 坾(887C) 墊(897C) 妡(8A7C) 媩(8B7C) 寍(8C7C) 峾(8D7C) 巪(8E7C) 弢(8F7C) 恷(907C) 憒(917C) 抾(927C) 搢(937C) 攟(947C) 晐(957C) 東(967C) 梶(977C) 榺(987C) 檤(997C) 殀(9A7C) 泑(9B7C) 渱(9C7C) 潀(9D7C) 瀨(9E7C) 焲(9F7C) 爘(A07C) ▅ (A87C) ﹟(A97C) 獆(AA7C) 珅(AB7C) 瑋(AC7C) 瓅(AD7C) 畖(AE7C) 瘄(AF7C) 皘(B07C) 眧(B17C) 瞸(B27C) 硘(B37C) 磡(B47C) 祙(B57C) 秥(B67C) 穦(B77C) 竱(B87C) 箌(B97C) 簗(BA7C) 粅(BB7C) 紎(BC7C) 絴(BD7C) 緗(BE7C) 縷(BF7C) 纜(C07C) 羭(C17C) 聕(C27C) 脇(C37C) 膢(C47C) 舼(C57C) 苵(C67C) 莬(C77C) 葇(C87C) 蓔(C97C) 蕓(CA7C) 藎(CB7C) 蘾(CC7C) 蛗(CD7C) 蝲(CE7C) 蟶(CF7C) 衸(D07C) 褆(D17C) 襹(D27C) 觸(D37C) 詜(D47C) 諀(D57C) 謡(D67C) 讄(D77C) 貄(D87C) 質(D97C) 趞(DA7C) 踻(DB7C) 軀(DC7C) 輡(DD7C) 迀(DE7C) 遼(DF7C) 鄚(E07C) 醸(E17C) 鈢(E27C) 銃(E37C) 鋦(E47C) 鍇(E57C) 鎩(E67C) 鐋(E77C) 鑭(E87C) 閨(E97C) 陓(EA7C) 雦(EB7C) 靯(EC7C) 韡(ED7C) 顋(EE7C) 飢(EF7C) 饇(F07C) 駖(F17C) 騶(F27C) 髚(F37C) 魘(F47C) 鮸(F57C) 鰘(F67C) 鱸(F77C) 鴟(F87C) 鵿(F97C) 鷟(FA7C) 鹼(FB7C) 鼃(FC7C) 齶(FD7C) 
                [}](7D) 亇(817D) 倉(827D) 儅(837D) 剗(847D) 厎(857D) 唥(867D) 噠(877D) 坿(887D) 墋(897D) 妢(8A7D) 媫(8B7D) 寎(8C7D) 峿(8D7D) 巬(8E7D) 弣(8F7D) 恾(907D) 憓(917D) 拀(927D) 搣(937D) 攠(947D) 晑(957D) 杴(967D) 梷(977D) 榼(987D) 檥(997D) 殅(9A7D) 泒(9B7D) 渳(9C7D) 潁(9D7D) 瀩(9E7D) 焳(9F7D) 爙(A07D) ▆ (A87D) ﹠(A97D) 獇(AA7D) 珆(AB7D) 瑌(AC7D) 瓆(AD7D) 畗(AE7D) 瘆(AF7D) 皚(B07D) 眪(B17D) 瞹(B27D) 硙(B37D) 磢(B47D) 祡(B57D) 秨(B67D) 穧(B77D) 竲(B87D) 箎(B97D) 簘(BA7D) 粆(BB7D) 紏(BC7D) 絵(BD7D) 緘(BE7D) 縸(BF7D) 纝(C07D) 羮(C17D) 聖(C27D) 脈(C37D) 膤(C47D) 舽(C57D) 苶(C67D) 莭(C77D) 葈(C87D) 蓕(C97D) 蕔(CA7D) 藑(CB7D) 蘿(CC7D) 蛚(CD7D) 蝳(CE7D) 蟷(CF7D) 衹(D07D) 複(D17D) 襺(D27D) 觹(D37D) 詝(D47D) 諁(D57D) 謢(D67D) 讅(D77D) 貆(D87D) 賫(D97D) 趠(DA7D) 踼(DB7D) 軁(DC7D) 輢(DD7D) 迃(DE7D) 遾(DF7D) 鄛(E07D) 醹(E17D) 鈣(E27D) 銄(E37D) 鋧(E47D) 鍈(E57D) 鎪(E67D) 鐌(E77D) 鑮(E87D) 閩(E97D) 陖(EA7D) 雧(EB7D) 靰(EC7D) 韢(ED7D) 題(EE7D) 飣(EF7D) 饈(F07D) 駗(F17D) 騷(F27D) 髛(F37D) 魙(F47D) 鮹(F57D) 鰙(F67D) 鱹(F77D) 鴠(F87D) 鶀(F97D) 鷠(FA7D) 鹽(FB7D) 鼄(FC7D) 齷(FD7D) 
   ------------------------------------------------------------------------------
+  rfc2279 (UTF-8 RFC2279)
+             1st       2nd       3rd       4th
+             C2..DF    80..BF
+             E0..EF    80..BF    80..BF
+             F0..F4    80..BF    80..BF    80..BF
+             00..7F
+             https://www.ietf.org/rfc/rfc2279.txt
+             * needs no multibyte anchoring
+             * needs no escaping meta char of 2nd-4th octets
+             * safe US-ASCII casefolding of 2nd-4th octet
+             * allows encoding surrogate codepoints even if it is not pair
+  ------------------------------------------------------------------------------
   sjis (Shift_JIS-like encodings, ex. cp932)
              1st       2nd
              81..9F    00..FF
@@ -5608,7 +5622,7 @@ The encodings supported by this software and their range of octets are as follow
              * needs no escaping meta char of 2nd octet
              * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
   ------------------------------------------------------------------------------
-  utf8 (UTF-8)
+  utf8 (UTF-8 RFC3629)
              1st       2nd       3rd       4th
              E1..EC    80..BF    80..BF
              C2..DF    80..BF
@@ -5649,59 +5663,59 @@ If you like utf8 pragma, mb::* subroutines will help you.
 On other hand, If you love JPerl, those subroutines will not help you very much.
 Traditional functions of Perl are useful still now in octet-oriented semantics.
 
-  elder <--                            age                              --> younger
-  ---------------------------------------------------------------------------------
-  bare Perl4         JPerl4             use utf8;          mb.pm
-  bare Perl5         JPerl5             pragma             modulino
-  ---------------------------------------------------------------------------------
-  chop               ---                ---                chop
-  chr                chr                bytes::chr         chr
-  getc               getc               ---                getc
-  index              ---                bytes::index       index
-  lc                 ---                ---                CORE::lc (works as tr/\x41-\x5A/\x61-\x7A/)
-  lcfirst            ---                ---                CORE::lcfirst (works as tr/\x41-\x5A/\x61-\x7A/)
-  length             length             bytes::length      length
-  ord                ord                bytes::ord         ord
-  reverse            reverse            ---                reverse
-  rindex             ---                bytes::rindex      rindex
-  substr             substr             bytes::substr      substr
-  uc                 ---                ---                CORE::uc (works as tr/\x61-\x7A/\x41-\x5A/)
-  ucfirst            ---                ---                CORE::ucfirst (works as tr/\x61-\x7A/\x41-\x5A/)
-  ---                chop               chop               mb::chop
-  ---                ---                chr                mb::chr
-  ---                ---                getc               mb::getc
-  ---                index              ---                mb::index_byte
-  ---                ---                index              mb::index
-  ---                lc                 ---                lc (by internal mb::lc)
-  ---                lcfirst            ---                lcfirst (by internal mb::lcfirst)
-  ---                ---                length             mb::length
-  ---                ---                ord                mb::ord
-  ---                ---                reverse            mb::reverse
-  ---                rindex             ---                mb::rindex_byte
-  ---                ---                rindex             mb::rindex
-  ---                ---                substr             mb::substr
-  ---                uc                 ---                uc (by internal mb::uc)
-  ---                ucfirst            ---                ucfirst (by internal mb::ucfirst)
-  ---                ---                lc                 (mb::Casing::lc)
-  ---                ---                lcfirst            (mb::Casing::lcfirst)
-  ---                ---                uc                 (mb::Casing::uc)
-  ---                ---                ucfirst            (mb::Casing::ucfirst)
-  ---------------------------------------------------------------------------------
-  do 'file'          ---                ---                do 'file'
-  eval 'string'      ---                ---                eval 'string'
-  require 'file'     ---                ---                require 'file'
-  use Module         ---                ---                use Module
-  no Module          ---                ---                no Module
-  ---                do 'file'          do 'file'          mb::do 'file'
-  ---                eval 'string'      eval 'string'      mb::eval 'string'
-  ---                require 'file'     require 'file'     mb::require 'file'
-  ---                use Module         use Module         mb::use Module
-  ---                no Module          no Module          mb::no Module
-  $^X                ---                ---                $^X
-  ---                $^X                $^X                $mb::PERL
-  $0                 $0                 $0                 $mb::ORIG_PROGRAM_NAME
-  ---                ---                ---                $0
-  ---------------------------------------------------------------------------------
+  elder <<<---                                   age                                   --->>> younger
+  ---------------------------------------------------------------------------------------------------
+  bare Perl4       JPerl4           use utf8;        UTF8::R2                mb.pm
+  bare Perl5       JPerl5           pragma           module                  modulino
+  ---------------------------------------------------------------------------------------------------
+  chop             ---              ---              chop                    chop
+  chr              chr              bytes::chr       chr                     chr
+  getc             getc             ---              getc                    getc
+  index            ---              bytes::index     index                   index
+  lc               ---              ---              CORE::lc                CORE::lc (acts as tr/\x41-\x5A/\x61-\x7A/)
+  lcfirst          ---              ---              CORE::lcfirst           CORE::lcfirst (acts as tr/\x41-\x5A/\x61-\x7A/)
+  length           length           bytes::length    length                  length
+  ord              ord              bytes::ord       ord                     ord
+  reverse          reverse          ---              reverse                 reverse
+  rindex           ---              bytes::rindex    rindex                  rindex
+  substr           substr           bytes::substr    substr                  substr
+  uc               ---              ---              CORE::uc                CORE::uc (acts as tr/\x61-\x7A/\x41-\x5A/)
+  ucfirst          ---              ---              CORE::ucfirst           CORE::ucfirst (acts as tr/\x61-\x7A/\x41-\x5A/)
+  ---              chop             chop             UTF8::R2::chop          mb::chop
+  ---              ---              chr              UTF8::R2::chr           mb::chr
+  ---              ---              getc             UTF8::R2::getc          mb::getc
+  ---              index            ---              UTF8::R2::index_byte    mb::index_byte
+  ---              ---              index            UTF8::R2::index         mb::index
+  ---              lc               ---              lc                      lc (also mb::lc)
+  ---              lcfirst          ---              lcfirst                 lcfirst (also mb::lcfirst)
+  ---              ---              length           UTF8::R2::length        mb::length
+  ---              ---              ord              UTF8::R2::ord           mb::ord
+  ---              ---              reverse          UTF8::R2::reverse       mb::reverse
+  ---              rindex           ---              UTF8::R2::rindex_byte   mb::rindex_byte
+  ---              ---              rindex           UTF8::R2::rindex        mb::rindex
+  ---              ---              substr           UTF8::R2::substr        mb::substr
+  ---              uc               ---              uc                      uc (also mb::uc)
+  ---              ucfirst          ---              ucfirst                 ucfirst (also mb::ucfirst)
+  ---              ---              lc               (mb::Casing::lc)        (mb::Casing::lc)
+  ---              ---              lcfirst          (mb::Casing::lcfirst)   (mb::Casing::lcfirst)
+  ---              ---              uc               (mb::Casing::uc)        (mb::Casing::uc)
+  ---              ---              ucfirst          (mb::Casing::ucfirst)   (mb::Casing::ucfirst)
+  ---------------------------------------------------------------------------------------------------
+  do 'file'        ---              do 'file'        do 'file'               do 'file'
+  eval 'string'    ---              eval 'string'    eval 'string'           eval 'string'
+  require 'file'   ---              require 'file'   require 'file'          require 'file'
+  use Module       ---              use Module       use Module              use Module
+  no Module        ---              no Module        no Module               no Module
+  ---              do 'file'        do 'file'        do 'file'               mb::do 'file'
+  ---              eval 'string'    eval 'string'    eval 'string'           mb::eval 'string'
+  ---              require 'file'   require 'file'   require 'file'          mb::require 'file'
+  ---              use Module       use Module       use Module              mb::use Module
+  ---              no Module        no Module        no Module               mb::no Module
+  $^X              ---              $^X              $^X                     $^X
+  ---              $^X              $^X              $^X                     $mb::PERL
+  $0               $0               $0               $0                      $mb::ORIG_PROGRAM_NAME
+  ---              ---              ---              ---                     $0
+  ---------------------------------------------------------------------------------------------------
 
 DOS-like glob() as MBCS subroutine
 
@@ -6956,6 +6970,56 @@ P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
+  on rfc2279 encoding
+  ----------------------------------------------------------------------------------------------------------------------
+  in your script                             script transpiled by this software
+  ----------------------------------------------------------------------------------------------------------------------
+  qr'.'                                      qr{\G${mb::_anchor}@{[qr'(?:(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|.)' ]}@{[mb::_m_passed()]}}
+  qr'\B'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\D'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![0123456789])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\H'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x09\x20])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\N'                                     qr{\G${mb::_anchor}@{[qr'(?:(?!\n)(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\R'                                     qr{\G${mb::_anchor}@{[qr'(?>\r\n|[\x0A\x0B\x0C\x0D])' ]}@{[mb::_m_passed()]}}
+  qr'\S'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\t\n\f\r\x20])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\V'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![\x0A\x0B\x0C\x0D])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\W'                                     qr{\G${mb::_anchor}@{[qr'(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'\b'                                     qr{\G${mb::_anchor}@{[qr'(?:(?<![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])|(?<=[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_])(?![ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]))' ]}@{[mb::_m_passed()]}}
+  qr'\d'                                     qr{\G${mb::_anchor}@{[qr'[0123456789]' ]}@{[mb::_m_passed()]}}
+  qr'\h'                                     qr{\G${mb::_anchor}@{[qr'[\x09\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\s'                                     qr{\G${mb::_anchor}@{[qr'[\t\n\f\r\x20]' ]}@{[mb::_m_passed()]}}
+  qr'\v'                                     qr{\G${mb::_anchor}@{[qr'[\x0A\x0B\x0C\x0D]' ]}@{[mb::_m_passed()]}}
+  qr'\w'                                     qr{\G${mb::_anchor}@{[qr'[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_]' ]}@{[mb::_m_passed()]}}
+  qr'[\b]'                                   qr{\G${mb::_anchor}@{[qr'(?:(?=[\x08])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alnum:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:alpha:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:ascii:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x7F])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:blank:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x09\x20])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:cntrl:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x00-\x1F\x7F])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:digit:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:graph:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x7F])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:lower:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:print:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x20-\x7F])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:punct:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:space:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[\s\x0B])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:upper:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=[ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:word:]]'                             qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:xdigit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=[\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alnum:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^alpha:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x41-\x5A\x61-\x7A])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^ascii:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x7F])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^blank:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x09\x20])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^cntrl:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x00-\x1F\x7F])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^digit:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^graph:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x7F])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^lower:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![abcdefghijklmnopqrstuvwxyz])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^print:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x20-\x7F])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^punct:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^space:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\s\x0B])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^upper:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^word:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
+  ----------------------------------------------------------------------------------------------------------------------
+
   on sjis encoding
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
@@ -7337,7 +7401,7 @@ If you use perl 5.14 or later, you can use lvalue feature.
 
 =back
 
-=head1 Not Supported Features (Tell us Good Idea)
+=head1 Comming Features (Tell us Good Idea)
 
 Unfortunately, we couldn't make following features. Could you tell us better idea?
 
@@ -7355,7 +7419,7 @@ The look-behind assertion like (?<=[A-Z]) or (?<![A-Z]) are not prevented from m
 
 =back
 
-=head1 Removed Features and No Features
+=head1 Lost Features
 
 mb.pm modulino does not support the following features intentionally.
 There are no plans to implement it in the future, too.
@@ -7735,6 +7799,66 @@ Other one is the original data.
 Generally speaking, data conversion lose information -- unless perfectly convert one to one.
 Moreover, if you have made script's bug, you will know its bug on too late.
 If you convert encoding of file path -- not file contents, you will know its bug on the time when you test it.
+
+=head1 Using mb.pm Modulino vs. Using UTF8::R2 Module
+
+CPAN shows us there are mb.pm modulino and UTF8::R2 module.
+mb.pm modulino is a source code filter for MBCS encoding, and UTF8::R2 module is a utility for UTF-8 support.
+We can use each advantages using following hints.
+
+=head2 Advantages Of mb.pm Modulino
+
+=over 2
+
+=item * supports many MBCS encodings, Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, and WTF-8
+
+=item * JPerl-like syntax that supports "easy jobs must be easy"
+
+=item * regexp ("m//", "qr//", and "s///") works as codepoint
+
+=item * "split()" works as codepoint
+
+=item * "tr///" works as codepoint
+
+=back
+
+=head2 Disadvantages Of mb.pm Modulino
+
+=over 2
+
+=item * have to type "perl mb.pm your_script.pl ..." on command line everytime
+
+=item * have obtrusive files(your_script.oo.pl)
+
+=back
+
+=head2 Advantages Of UTF8::R2 Module
+
+=over 2
+
+=item * type only "perl your_script.pl ..." on command line
+
+=item * no obtrusive files(your_script.oo.pl)
+
+=back
+
+=head2 Disadvantages Of UTF8::R2 Module
+
+=over 2
+
+=item * supports only UTF-8 encoding
+
+=item * have to write "$mb{qr/regexp/imsxo}" to do "m/regexp/imsxo" that works as codepoint
+
+=item * have to write "m<\G$mb{qr/regexp/imsxo}>gc" to do "m/regexp/imsxogc" that works as codepoint
+
+=item * have to write "s<$mb{qr/before/imsxo}><after>egr" to do "s/before/after/imsxoegr" that works as codepoint
+
+=item * have to write "UTF8::R2::split(qr/regexp/, $_, 3)" to do "split(/regexp/, $_, 3)" that works as codepoint
+
+=item * have to write "UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/cdsr" that works as codepoint
+
+=back
 
 =head1 AUTHOR
 

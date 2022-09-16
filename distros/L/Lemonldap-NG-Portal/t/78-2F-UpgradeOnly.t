@@ -83,7 +83,7 @@ my $pdata = expectCookie( $res, 'lemonldappdata' );
 expectPortalError( $res, 103 );
 
 # CASE 2: has 2F available
-# -------------------
+# ------------------------
 $query = 'user=dwho&password=dwho';
 ok(
     $res = $client->_post(

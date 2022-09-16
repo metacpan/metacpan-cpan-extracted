@@ -24,6 +24,7 @@ has name => ( is => 'ro', required => 1 );
 has options => ( is => 'ro', required => 1, default => sub { +{} } );  
 has index => ( is => 'ro', required => 0, predicate => 'has_index' );
 has namespace => ( is => 'ro', required => 0, predicate => 'has_namespace' );
+has _theme => ( is => 'rw', required => 1, init_arg=>'theme', default => sub { +{} } );
 has _nested_child_index => (is=>'rw', init_arg=>undef, required=>1, default=>sub { +{} });
 
 around BUILDARGS => sub {
@@ -40,13 +41,19 @@ sub DEFAULT_MODEL_ERROR_TAG_ON_FIELD_ERRORS { return 'invalid_form' }
 sub DEFAULT_COLLECTION_CHECKBOX_BUILDER { return 'Valiant::HTML::FormBuilder::Checkbox' }
 sub DEFAULT_COLLECTION_RADIO_BUTTON_BUILDER { return 'Valiant::HTML::FormBuilder::RadioButton' }
 
+sub theme {
+  my ($self) = @_;
+  my $default_theme = $self->can('default_theme') ? $self->default_theme : +{};
+  return +{ %$default_theme, %{$self->_theme} };
+}
+
 sub sanitized_object_name {
   my $self = shift;
   return $self->{__cached_sanitized_object_name} if exists $self->{__cached_sanitized_object_name};
 
   my $value = $self->name;
-  $value =~ s/\]//g;
-  $value =~ s/[^a-zA-Z0-9:-]/_/g; # Different from Rails since I use foo.bar instead of foo[bar]
+  $value =~ s/\]\[|[^a-zA-Z0-9:-]/_/g;
+  $value =~s/_$//;
   $self->{__cached_sanitized_object_name} = $value;
   return $value;
 }
@@ -107,18 +114,22 @@ sub attribute_has_errors {
 sub model_errors {
   my ($self) = shift;
   my ($options, $content) = (+{}, undef);
+
   while(my $arg = shift) {
     $options = $arg if (ref($arg)||'') eq 'HASH';
     $content = $arg if (ref($arg)||'') eq 'CODE';
   }
+  $options = $self->merge_theme_field_opts('model_errors', undef, $options);
 
   my @errors = $self->_get_model_errors;
+  my $show_message_on_field_errors = delete $options->{show_message_on_field_errors};
 
   if(
-    $self->model->has_errors &&
-    (my $tag = delete $options->{show_message_on_field_errors})
+    $self->model->has_errors &&     # We have errors
+    # !scalar(@errors) &&             # but no model errors
+    ($show_message_on_field_errors)   # And a default model error
   ) {
-    unshift @errors, $self->_generate_default_model_error($tag);
+    unshift @errors, $self->_generate_default_model_error($show_message_on_field_errors);
   }
   return '' unless @errors;
 
@@ -159,6 +170,24 @@ sub _default_model_errors_content {
   }
 }
 
+sub merge_theme {
+  my ($self, %theme) = @_;
+  $self->_theme(+{ %{$self->_theme}, %theme });
+}
+
+sub merge_theme_field_opts {
+  my ($self, $type, $attribute, $existing) = @_;
+  my $theme = $self->theme;
+
+  if(exists $theme->{$type}) {
+    $existing = +{ %{$theme->{$type}}, %$existing };
+  }
+  if($attribute && exists $theme->{attributes}{$attribute}{$type}) {
+    $existing = +{ %{$theme->{attributes}{$attribute}{$type}}, %$existing };
+  }
+  return $existing;
+}
+
 # $fb->label($attribute)
 # $fb->label($attribute, \%options)
 # $fb->label($attribute, $content)
@@ -176,6 +205,8 @@ sub label {
   }
 
   set_unless_defined(for => $options, $self->tag_id_for_attribute($attribute));
+
+  $options = $self->merge_theme_field_opts(label=>$attribute, $options);
 
   if((ref($content)||'') eq 'CODE') {
     return Valiant::HTML::FormTags::label_tag($attribute, $options, sub { $content->($translated_attribute) } );
@@ -196,6 +227,7 @@ sub errors_for {
     $options = $arg if (ref($arg)||'') eq 'HASH';
     $content = $arg if (ref($arg)||'') eq 'CODE';
   }
+  $options = $self->merge_theme_field_opts(errors_for=>$attribute, $options);
 
   die "Can't display errors on a model that doesn't support the errors method" unless $self->model->can('errors');
 
@@ -246,6 +278,7 @@ sub process_options {
 
 sub input {
   my ($self, $attribute, $options) = (shift, shift, (@_ ? shift : +{}));
+  $options = $self->merge_theme_field_opts($options->{type} || 'input', $attribute, $options);
   my $errors_classes = exists($options->{errors_classes}) ? delete($options->{errors_classes}) : undef;
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
   
@@ -256,6 +289,7 @@ sub input {
   set_unless_defined(id => $options, $self->tag_id_for_attribute($attribute));
   set_unless_defined(name => $options, $self->tag_name_for_attribute($attribute));
   $options->{value} = $self->tag_value_for_attribute($attribute) unless defined($options->{value});
+
 
   return Valiant::HTML::FormTags::input_tag $attribute, $self->process_options($attribute, $options);
 }
@@ -275,6 +309,7 @@ sub hidden {
 
 sub text_area {
   my ($self, $attribute, $options) = (shift, shift, (@_ ? shift : +{}));
+  $options = $self->merge_theme_field_opts('text_area', $attribute, $options);
   my $errors_classes = exists($options->{errors_classes}) ? delete($options->{errors_classes}) : undef;
   
   $options->{class} = join(' ', (grep { defined $_ } $options->{class}, $errors_classes))
@@ -291,6 +326,8 @@ sub text_area {
 sub checkbox {
   my ($self, $attribute) = (shift, shift);
   my $options = (ref($_[0])||'') eq 'HASH' ? shift(@_) : +{};
+  $options = $self->merge_theme_field_opts('checkbox', $attribute, $options);
+
   my $checked_value = @_ ? shift : 1;
   my $unchecked_value = @_ ? shift : 0;
   my $errors_classes = exists($options->{errors_classes}) ? delete($options->{errors_classes}) : undef;
@@ -330,6 +367,8 @@ sub checkbox {
 sub radio_button {
   my ($self, $attribute) = (shift, shift);
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
+  $options = $self->merge_theme_field_opts('radio_button', $attribute, $options);
+
   my $value = @_ ? shift : undef;
 
   $options->{type} = 'radio';
@@ -377,8 +416,10 @@ sub time_field {
 
 sub submit {
   my ($self) = shift;
-  my $options = pop(@_) if (ref($_[-1])||'') eq 'HASH';
+  my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
   my $value = @_ ? shift(@_) : $self->_submit_default_value;
+  $options = $self->merge_theme_field_opts('submit', undef, $options);
+
   return Valiant::HTML::FormTags::submit_tag($value, $options);
 }
 
@@ -423,6 +464,7 @@ sub button {
   $attrs->{value} = $self->tag_value_for_attribute($attribute) unless exists($attrs->{value});
   $attrs->{name} = $self->tag_name_for_attribute($attribute) unless exists($attrs->{name});
   $attrs->{id} = $self->tag_id_for_attribute($attribute) unless exists($attrs->{id});
+  $attrs = $self->merge_theme_field_opts('button', $attribute, $attrs);
 
   return ref($content) ?
     Valiant::HTML::FormTags::button_tag($attrs, $content) :
@@ -449,6 +491,7 @@ sub legend_for {
   my $content = @_ ? shift(@_) : $self->human_name_for_attribute($attribute);
 
   $attrs->{id} = "@{[ $self->tag_id_for_attribute($attribute) ]}_legend" unless exists($attrs->{id});
+  $attrs = $self->merge_theme_field_opts('legend_for', $attribute, $attrs);
 
   return Valiant::HTML::FormTags::legend_tag($attrs, $content);
 }
@@ -463,7 +506,7 @@ sub _legend_default_value {
 
   return "@{[ _humanize($key) ]} ${model_placeholder}" unless $self->model->can('i18n');
 
-  push @defaults, _t "formbuilder.legend.@{[ $self->name ]}.${key}";
+  push @defaults, _t "formbuilder.legend.@{[ $self->model_name->i18n_key ]}.${key}";
   push @defaults, _t "formbuilder.legend.${key}";
   push @defaults, "@{[ _humanize($key) ]} ${model_placeholder}";
 
@@ -482,6 +525,7 @@ sub fields_for {
   my $finally_block = (ref($_[0])||'') eq 'CODE' ? shift(@_) : undef;
 
   $options->{builder} = $self->options->{builder} if !exists($options->{builder}) && !defined($options->{builder}) && defined($self->options->{builder});
+  $options->{include_id} = $self->options->{include_id} if !exists($options->{include_id}) && !defined($options->{include_id}) && defined($self->options->{include_id});
   $options->{namespace} = $self->namespace if $self->has_namespace;
   $options->{parent_builder} = $self;
 
@@ -546,7 +590,7 @@ sub fields_for_nested_model {
 
   return Valiant::HTML::Form::fields_for($name, $model, $options, sub {
     my $fb = shift;
-    my $output = Valiant::HTML::FormTags::capture($codeblock, $fb);
+    my $output = Valiant::HTML::FormTags::capture($codeblock, $fb, $model);
     if($output && $emit_hidden_id && $model->can('primary_columns')) {
       foreach my $id_field ($model->primary_columns) {
         $output = $output->concat($fb->hidden($id_field)); #TODO this cant be right...
@@ -560,6 +604,8 @@ sub select {
   my ($self, $attribute_proto) = (shift, shift);
   my $block = (ref($_[-1])||'') eq 'CODE' ? pop(@_) : undef;
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
+  $options = $self->merge_theme_field_opts('select', undef, $options);
+
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
   my $include_hidden = exists($options->{include_hidden}) ? $options->{include_hidden} : 1;
   my $unselected_default = exists($options->{unselected_value}) ? delete($options->{unselected_value}) : undef;
@@ -624,6 +670,8 @@ sub select {
 sub collection_select {
   my ($self, $method_proto, $collection) = (shift, shift, shift);
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
+  $options = $self->merge_theme_field_opts('collection_select', undef, $options);
+
   my ($value_method, $label_method) = (@_, 'value', 'label');
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
   my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : 1; 
@@ -687,6 +735,8 @@ sub collection_checkbox {
   my ($self, $attribute_spec, $collection) = (shift, shift, shift);
   my $codeblock = (ref($_[-1])||'') eq 'CODE' ? pop(@_) : undef;
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
+  $options = $self->merge_theme_field_opts('collection_checkbox', undef, $options);
+
   my $value_method = @_ ? shift(@_) : 'value';
   my $label_method = @_ ? shift(@_) : 'label';
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
@@ -735,6 +785,7 @@ sub collection_checkbox {
 
     $checkbox_builder_options->{index} = $index;
     $checkbox_builder_options->{checked} = $checked;
+    $checkbox_builder_options->{parent_builder} = $self;
 
     my $checkbox_fb = Valiant::HTML::Form::_instantiate_builder($name, $checkbox_model, $checkbox_builder_options);
     push @checkboxes, $codeblock->($checkbox_fb);
@@ -759,6 +810,8 @@ sub collection_radio_buttons {
   my ($self, $attribute, $collection) = (shift, shift, shift);
   my $codeblock = (ref($_[-1])||'') eq 'CODE' ? pop(@_) : undef;
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
+  $options = $self->merge_theme_field_opts('radio_button', $attribute, $options);
+
   my $value_method = @_ ? shift(@_) : 'value';
   my $label_method = @_ ? shift(@_) : 'label';
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
@@ -981,6 +1034,9 @@ add a model error if there's field errors (although it would be easy for you to 
 with a model validation) so this makes it easy to display such a message.  If a string or translation
 tag then show that, if its a '1' the show the default message, which is "Form has errors" unless
 you overide it.
+
+This can be a useful option when you have a long form and you want a user to know there's errors
+possibly off the browser screen.
 
 =back
 
@@ -1488,24 +1544,27 @@ $attribute.  Allows you to pass some additional HTML attributes to the legend ta
 =head2 fields_for
 
     $fb->fields_for($attribute, sub {
-      my $nested_$fb = shift;
+      my ($nested_fb, $model) = @_;
     });
 
     $fb->fields_for($attribute, \%options, sub {
-      my $nested_$fb = shift;
+      my ($nested_fb, $model) = @_;
     });
 
     # With a 'finally' block when $attribute is a collection
 
     $fb->fields_for($attribute, sub {
-      my $nested_$fb = shift;
+      my ($nested_fb, $model) = @_;
     }, sub {
-      my $finally_$fb = shift;
+      my ($nested_fb, $new_model) = @_;
     });
 
 
 Used to create sub form builders under the current one for nested models (either a collection of models
-or a single model.)
+or a single model.)  This sub form builder will be passed as the first argument to the enclosing subref
+and will encapsulate any indexing or namespacing; its model will be set to the sub model.   You also get
+a second argument which is the sub model for ease of access.  Note that if the $attribute refers to a collection
+then $model will be set to the current item model of that collection.
 
 When the $attribute refers to a collection the collection object must provide a C<next> method which should
 iterate thru the collection in the order desired and return C<undef> to indicate all records have been rolled
@@ -1826,6 +1885,24 @@ L<Valiant::HTML::FormBuilder::Checkbox>):
 In addition to overriding C<checkbox> and C<label> to already contain value and state (if its checked or
 not) information.   This special builder contains some additional methods of possible use, you should see
 the documentation of L<Valiant::HTML::FormBuilder::Checkbox> for more.
+
+If provided C<%options> is a hashref of the following optional values
+
+=over 4
+
+=item include_hidden
+
+Defaults to whatever the method C<default_collection_checkbox_include_hidden> returns.  In the core code
+the returns true.   If true will include a hidden field set to the name of the collection, which is uses
+to indicate 'no checked values' since HTML will send nothing by default if there's no checked values.  It
+will add this hidden field for each checkbox item to represent the 'off' value.
+
+=item builder
+
+Defaults to the values of C<DEFAULT_COLLECTION_CHECKBOX_BUILDER> method.  In core code this is
+L<Valiant::HTML::FormBuilder::Checkbox>.  Overide if you need to make a custom builder (tricky work).
+
+=back
 
 =head2 collection_radio_buttons
 

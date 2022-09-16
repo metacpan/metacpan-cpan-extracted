@@ -4,11 +4,11 @@ use Future::HTTP;
 use Moo;
 with 'Apache::Tika::Connection';
 
-use Filter::signatures;
+#use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 has ua => (
     is => 'ro',

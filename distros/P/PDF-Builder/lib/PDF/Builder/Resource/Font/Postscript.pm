@@ -4,10 +4,9 @@ use base 'PDF::Builder::Resource::Font';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use Encode qw(:all);
 use IO::File qw();
@@ -23,17 +22,24 @@ PDF::Builder::Resource::Font::Postscript - support routines for using PostScript
 
 sub new {
     my ($class, $pdf, $psfile, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-encode'} && !defined $opts{'encode'}) { $opts{'encode'} = delete($opts{'-encode'}); }
+    if (defined $opts{'-afmfile'} && !defined $opts{'afmfile'}) { $opts{'afmfile'} = delete($opts{'-afmfile'}); }
+    if (defined $opts{'-pfmfile'} && !defined $opts{'pfmfile'}) { $opts{'pfmfile'} = delete($opts{'-pfmfile'}); }
+    if (defined $opts{'-xfmfile'} && !defined $opts{'xfmfile'}) { $opts{'xfmfile'} = delete($opts{'-xfmfile'}); }
+    if (defined $opts{'-pdfname'} && !defined $opts{'pdfname'}) { $opts{'pdfname'} = delete($opts{'-pdfname'}); }
+    if (defined $opts{'-nocomps'} && !defined $opts{'nocomps'}) { $opts{'nocomps'} = delete($opts{'-nocomps'}); }
+    if (defined $opts{'-dokern'} && !defined $opts{'dokern'}) { $opts{'dokern'} = delete($opts{'-dokern'}); }
 
     my ($self);
     my ($data);
-    $opts{'-encode'} ||= 'asis';  # provide default encoding
 
-    if (defined $opts{'-afmfile'}) {
-        $data = $class->readAFM($opts{'-afmfile'});
-    } elsif (defined $opts{'-pfmfile'}) {
-        $data = $class->readPFM($opts{'-pfmfile'});
-    } elsif (defined $opts{'-xfmfile'}) {
-        $data = $class->readXFM($opts{'-xfmfile'});
+    if (defined $opts{'afmfile'}) {
+        $data = $class->readAFM($opts{'afmfile'});
+    } elsif (defined $opts{'pfmfile'}) {
+        $data = $class->readPFM($opts{'pfmfile'});
+    } elsif (defined $opts{'xfmfile'}) {
+        $data = $class->readXFM($opts{'xfmfile'});
     } else {
         die "No proper font-metrics file specified for PostScript file '$psfile'.";
     }
@@ -44,8 +50,8 @@ sub new {
     $pdf->new_obj($self) unless $self->is_obj($pdf);
     $self->{' data'} = $data;
 
-    if ($opts{'-pdfname'}) {
-        $self->name($opts{'-pdfname'});
+    if ($opts{'pdfname'}) {
+        $self->name($opts{'pdfname'});
     }
 
     $self->{'Subtype'} = PDFName("Type1");
@@ -70,14 +76,14 @@ sub new {
         $self->{'BaseFont'} = PDFName($self->fontname());
     }
 
-    if ($opts{'-encode'} =~ m/^utf/i) {
-	die "Invalid multibyte encoding for psfont: $opts{'-encode'}\n";
+    if (defined $opts{'encode'} && $opts{'encode'} =~ m/^utf/i) {
+	die "Invalid multibyte encoding for psfont: $opts{'encode'}\n";
 	# probably more encodings to check
     }
-    $self->encodeByData($opts{'-encode'});
+    $self->encodeByData($opts{'encode'});  # undef arg OK
 
-    $self->{'-nocomps'} = 1 if $opts{'-nocomps'};
-    $self->{'-dokern'} = 1 if $opts{'-dokern'};
+    $self->{'-nocomps'} = 1 if $opts{'nocomps'};
+    $self->{'-dokern'} = 1 if $opts{'dokern'};
 
     return $self;
 }  # end of new()

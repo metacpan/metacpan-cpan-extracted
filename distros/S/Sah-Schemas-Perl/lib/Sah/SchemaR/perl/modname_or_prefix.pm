@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::modname_or_prefix;
 
-our $DATE = '2021-12-01'; # DATE
-our $VERSION = '0.042'; # VERSION
+our $DATE = '2022-09-11'; # DATE
+our $VERSION = '0.045'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nContains coercion rule so inputing `Foo-Bar` or `Foo/Bar` will be normalized to\n`Foo::Bar` while inputing `Foo-Bar-` or `Foo/Bar/` will be normalized to\n`Foo::Bar::`\n\nSee also: `perl::modname` and `perl::modprefix`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,value=>"Foo::Bar::"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar::",value=>"Foo/Bar/"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar::",value=>"Foo-Bar-"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:::)?\\z",summary=>"Perl module name (e.g. Foo::Bar) or prefix (e.g. Foo::Bar::)","x.completion"=>"perl_modname_or_prefix","x.perl.coerce_rules"=>["From_str::normalize_perl_modname_or_prefix"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::perl::modname_or_prefix - Perl module name (e.g. Foo::Bar) or pref
 
 =head1 VERSION
 
-This document describes version 0.042 of Sah::SchemaR::perl::modname_or_prefix (from Perl distribution Sah-Schemas-Perl), released on 2021-12-01.
+This document describes version 0.045 of Sah::SchemaR::perl::modname_or_prefix (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
 
 =head1 DESCRIPTION
 
@@ -54,13 +54,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

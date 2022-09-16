@@ -322,6 +322,13 @@ t/mojolicious/ojo_signatures.t
 t/mojolicious/pattern.t
 t/mojolicious/production_app.t
 t/mojolicious/proxy_app.t
+t/mojolicious/public/assets/foo.ab1234cd5678ef.css
+t/mojolicious/public/assets/foo.ab1234cd5678ef.js
+t/mojolicious/public/assets/foo/bar.321.js
+t/mojolicious/public/assets/foo/bar/baz.123.js
+t/mojolicious/public/assets/foo/bar/baz.development.js
+t/mojolicious/public/assets/foo/bar/test.ab1234cd5678ef.min.js
+t/mojolicious/public/assets/foo/bar/yada.css
 t/mojolicious/public/hello.txt
 t/mojolicious/public/hello2.txt
 t/mojolicious/public/hello4.txt

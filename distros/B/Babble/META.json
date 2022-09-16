@@ -4,7 +4,7 @@
       "Matt S Trout (mst) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.023",
+   "generated_by" : "App::ModuleBuildTiny version 0.029",
    "license" : [
       "perl_5"
    ],
@@ -21,15 +21,16 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.023"
+            "App::ModuleBuildTiny" : "0.029"
          }
       },
       "runtime" : {
          "requires" : {
+            "List::Util" : "1.45",
             "Module::Runtime" : "0",
             "Moo" : "2",
             "Mu" : "0",
-            "PPR" : "0.000021",
+            "PPR" : "0.001006",
             "strictures" : "2"
          }
       }
@@ -41,7 +42,7 @@
       },
       "Babble" : {
          "file" : "lib/Babble.pm",
-         "version" : "0.090007"
+         "version" : "0.090008"
       },
       "Babble::Filter" : {
          "file" : "lib/Babble/Filter.pm"
@@ -57,6 +58,15 @@
       },
       "Babble::Plugin::DefinedOr" : {
          "file" : "lib/Babble/Plugin/DefinedOr.pm"
+      },
+      "Babble::Plugin::Ellipsis" : {
+         "file" : "lib/Babble/Plugin/Ellipsis.pm"
+      },
+      "Babble::Plugin::PackageBlock" : {
+         "file" : "lib/Babble/Plugin/PackageBlock.pm"
+      },
+      "Babble::Plugin::PackageVersion" : {
+         "file" : "lib/Babble/Plugin/PackageVersion.pm"
       },
       "Babble::Plugin::PostfixDeref" : {
          "file" : "lib/Babble/Plugin/PostfixDeref.pm"
@@ -84,6 +94,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.090007",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.090008",
+   "x_serialization_backend" : "JSON::PP version 4.08",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

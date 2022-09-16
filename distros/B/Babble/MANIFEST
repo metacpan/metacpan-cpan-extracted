@@ -13,6 +13,9 @@ lib/Babble/Grammar.pm
 lib/Babble/Match.pm
 lib/Babble/Plugin/CoreSignatures.pm
 lib/Babble/Plugin/DefinedOr.pm
+lib/Babble/Plugin/Ellipsis.pm
+lib/Babble/Plugin/PackageBlock.pm
+lib/Babble/Plugin/PackageVersion.pm
 lib/Babble/Plugin/PostfixDeref.pm
 lib/Babble/Plugin/SKT.pm
 lib/Babble/Plugin/Sigify.pm
@@ -24,9 +27,13 @@ lib/Babble/SymbolGenerator.pm
 script/sigfix
 t/plugin-coresignatures.t
 t/plugin-definedor.t
+t/plugin-ellipsis.t
+t/plugin-packageblock.t
+t/plugin-packageversion.t
 t/plugin-postfixderef.t
 t/plugin-sigify.t
 t/plugin-skt.t
 t/plugin-state.t
 t/plugin-substituteandreturn.t
 t/simple.t
+t/submatch-rule.t

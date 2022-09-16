@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use strict; # $Id: monm_whois 87 2019-07-14 15:36:48Z abalama $
+use strict; # $Id: monm_whois 119 2022-08-29 15:16:27Z abalama $
 use utf8;
 
 =encoding utf8
@@ -10,7 +10,7 @@ monm_whois - WHOIS checker for App::MonM
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -48,11 +48,11 @@ WHOIS checker for App::MonM
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 

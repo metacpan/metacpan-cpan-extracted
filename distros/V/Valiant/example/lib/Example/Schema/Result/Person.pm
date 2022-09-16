@@ -45,6 +45,13 @@ __PACKAGE__->has_many(
   { 'foreign.person_id' => 'self.id' }
 );
 
+__PACKAGE__->has_many(
+  contacts =>
+  'Example::Schema::Result::Contact',
+  { 'foreign.person_id' => 'self.id' }
+);
+
+
 __PACKAGE__->validates(username => presence=>1, length=>[3,24], format=>'alpha_numeric', unique=>1);
 __PACKAGE__->validates( password => (presence=>1, confirmation => 1,  on=>'create' ));
 __PACKAGE__->validates( password => (confirmation => { 
@@ -60,6 +67,7 @@ __PACKAGE__->accept_nested_for('credit_cards', +{allow_destroy=>1});
 
 __PACKAGE__->validates(person_roles => (set_size=>{min=>1}, on=>'account' ));
 __PACKAGE__->accept_nested_for('person_roles', {allow_destroy=>1});
+__PACKAGE__->accept_nested_for('contacts', {allow_destroy=>1});
 
 __PACKAGE__->accept_nested_for('profile');
 
@@ -78,11 +86,15 @@ sub authenticated($self) {
 sub authenticate($self, $request) {
   my ($username, $password) = $request->get('username', 'password');
   my $found = $self->result_source->resultset->find({username=>$username});
-  %$self = %$found if $found;
 
-  return 1 if $self->in_storage && $self->check_password($password);
-  $self->errors->add(undef, 'Invalid login credentials');
-  return 0;
+  if($found && $found->in_storage && $found->check_password($password)) {
+    %$self = %$found;
+    return $self;
+  } else {
+    $self->errors->add(undef, 'Invalid login credentials');
+    $self->username($username) if defined($username);
+    return 0;
+  }
 }
 
 sub registered($self) {
@@ -103,8 +115,7 @@ sub new_todo($self) {
 
 sub request_todos($self, $request) {
   my $todos = $self->todos->available->newer_first;
-  $todos = $todos->filter_by_request($request);
-  return $todos;
+  return $todos = $todos->filter_by_request($request);
 }
 
 # Update from request object methods

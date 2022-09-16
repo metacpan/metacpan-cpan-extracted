@@ -1,6 +1,6 @@
 package Catmandu::XML;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 __END__
 
@@ -12,8 +12,6 @@ Catmandu::XML - modules for handling XML data within the Catmandu framework
 
 # Status
 
-[![Build Status](https://travis-ci.org/LibreCat/Catmandu-XML.png)](https://travis-ci.org/LibreCat/Catmandu-XML)
-[![Coverage Status](https://coveralls.io/repos/LibreCat/Catmandu-XML/badge.png)](https://coveralls.io/r/LibreCat/Catmandu-XML)
 [![Kwalitee Score](http://cpants.cpanauthors.org/dist/Catmandu-XML.png)](http://cpants.cpanauthors.org/dist/Catmandu-XML)
 
 =end markdown

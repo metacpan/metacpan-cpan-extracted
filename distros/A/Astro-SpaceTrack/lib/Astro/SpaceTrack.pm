@@ -146,7 +146,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.156';
+our $VERSION = '0.157';
 our @EXPORT_OK = qw{
     shell
 
@@ -4148,6 +4148,8 @@ B<Notice:> NASA shut down the source of this information on February 25
 L<RETIREMENT OF NASA HUMAN SPACE FLIGHT WEB SITE|/ RETIREMENT OF NASA HUMAN SPACE FLIGHT WEB SITE>
 above for more information, including deprecation plans for this method.
 
+B<As of version 0.157 this method throws a fatal exception.>
+
 This method downloads current orbital elements from NASA's human
 spaceflight site, L<https://spaceflight.nasa.gov/>. As of July 21 2011
 you only get the International Space Station.
@@ -5201,7 +5203,7 @@ sub _check_cookie_generic {
 #	celestrak => {
 #	    sts	=> 3,
 #	},
-	spaceflight => 2,
+	spaceflight => 3,
 	attribute	=> {
 	    url_iridium_status_mccants	=> 3,
 	},

@@ -1,0 +1,34 @@
+class Sys::Socket::Sockaddr::In6 extends Sys::Socket::Sockaddr : pointer_t {
+  use Sys::Socket::In6_addr;
+  
+  # Class methods
+  native static method new : Sys::Socket::Sockaddr::In6 ();
+  
+  # Instance methods
+  native method DESTROY : void ();
+  
+  method sa_family : int () {
+    my $sin6_family = $self->sin6_family;
+    return $sin6_family;
+  }
+  
+  native method sin6_family : int ();
+  
+  native method set_sin6_family : void ();
+
+  native method sin6_flowinfo : int ();
+  
+  native method set_sin6_flowinfo : void ();
+  
+  native method sin6_scope_id : int ();
+  
+  native method set_sin6_scope_id : void ();
+
+  native method sin6_addr : Sys::Socket::In6_addr ();
+  
+  native method set_sin6_addr : void ($address : Sys::Socket::In6_addr);
+  
+  native method sin6_port : short ();
+  
+  native method set_sin6_port : void ($port : short);
+}

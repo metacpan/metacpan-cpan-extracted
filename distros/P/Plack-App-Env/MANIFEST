@@ -1,6 +1,6 @@
 Changes
 Env.pm
-examples/ex1.pl
+examples/plack_app_env.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

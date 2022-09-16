@@ -5,8 +5,8 @@ use base 'PDF::Builder::Content';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -31,12 +31,10 @@ sub new {
 
 =item $width = $content->text_left($text, %opts)
 
-=item $width = $content->text_left($text)
-
 Alias for C<text>. Implemented for symmetry, for those who use a lot of
-C<text_center> and C<text_right>, and desire a C<text_left>.
+C<text_center> and C<text_right>, and desire a matching C<text_left>.
 
-Adds text to the page (left justified). 
+Adds text to the page (left justified), at the current position. 
 Note that there is no maximum width, and nothing to keep you from overflowing
 the physical page on the right!
 The width used (in points) is B<returned>.
@@ -55,9 +53,7 @@ sub text_left {
 
 =item $width = $content->text_center($text, %opts)
 
-=item $width = $content->text_center($text)
-
-As C<text>, but centered on the current point.
+As C<text>, but I<centered> on the current point.
 
 Adds text to the page (centered). 
 The width used (in points) is B<returned>.
@@ -70,14 +66,12 @@ sub text_center {
     my ($self, $text, @opts) = @_;
 
     my $width = $self->advancewidth($text, @opts);
-    return $self->text($text, -indent => -($width/2), @opts);
+    return $self->text($text, 'indent' => -($width/2), @opts);
 }
 
 =over
 
 =item $width = $content->text_right($text, %opts)
-
-=item $width = $content->text_right($text)
 
 As C<text>, but right-aligned to the current point.
 
@@ -94,17 +88,15 @@ sub text_right {
     my ($self, $text, @opts) = @_;
 
     my $width = $self->advancewidth($text, @opts);
-    return $self->text($text, -indent => -$width, @opts);
+    return $self->text($text, 'indent' => -$width, @opts);
 }
 
 =over
 
 =item $width = $content->text_justified($text, $width, %opts)
  
-=item $width = $content->text_justified($text, $width)
-
-As C<text>, but stretches text (using C<wordspace>, C<charspace>, and (as a  
-last resort) C<hscale>) to fill the desired
+As C<text>, but stretches text using C<wordspace>, C<charspace>, and (as a  
+last resort) C<hscale>, to fill the desired
 (available) C<$width>. Note that if the desired width is I<less> than the
 natural width taken by the text, it will be I<condensed> to fit, using the
 same three routines.
@@ -116,7 +108,7 @@ B<Options:>
 
 =over
 
-=item -nocs => value
+=item 'nocs' => value
 
 If this option value is 1 (default 0), do B<not> use any intercharacter
 spacing. This is useful for connected characters, such as fonts for Arabic,
@@ -124,48 +116,48 @@ Devanagari, Latin cursive handwriting, etc. You don't want to add additional
 space between characters during justification, which would disconnect them.
 
 I<Word> (interword) spacing values (explicit or default) are doubled if
--nocs is 1. This is to make up for the lack of added/subtracted intercharacter
+nocs is 1. This is to make up for the lack of added/subtracted intercharacter
 spacing.
 
-=item -wordsp => value
+=item 'wordsp' => value
 
 The percentage of one space character (default 100) that is the maximum amount
 to add to (each) interword spacing to expand the line.
-If C<-nocs> is 1, double C<value>.
+If C<nocs> is 1, double C<value>.
 
-=item -charsp => value
+=item 'charsp' => value
 
 If adding interword space didn't do enough, the percentage of one em (default 
 100) that is the maximum amount to add to (each) intercharacter spacing to 
 further expand the line.
-If C<-nocs> is 1, force C<value> to 0.
+If C<nocs> is 1, force C<value> to 0.
 
-=item -wordspa => value
+=item 'wordspa' => value
 
 If adding intercharacter space didn't do enough, the percentage of one space
 character (default 100) that is the maximum I<additional> amount to add to 
 (each) interword spacing to further expand the line.
-If C<-nocs> is 1, double C<value>.
+If C<nocs> is 1, double C<value>.
 
-=item -charspa => value
+=item 'charspa' => value
 
 If adding more interword space didn't do enough, the percentage of one em 
 (default 100) that is the maximum I<additional> amount to add to (each) 
 intercharacter spacing to further expand the line.
-If C<-nocs> is 1, force C<value> to 0.
+If C<nocs> is 1, force C<value> to 0.
 
-=item -condw => value
+=item 'condw' => value
 
 The percentage of one space character (default 25) that is the maximum amount
 to subtract from (each) interword spacing to condense the line.
-If C<-nocs> is 1, double C<value>.
+If C<nocs> is 1, double C<value>.
 
-=item -condc => value
+=item 'condc' => value
 
 If removing interword space didn't do enough, the percentage of one em
 (default 10) that is the maximum amount to subtract from (each) intercharacter
 spacing to further condense the line.
-If C<-nocs> is 1, force C<value> to 0.
+If C<nocs> is 1, force C<value> to 0.
 
 =back
 
@@ -179,23 +171,31 @@ condensing the line to fit.
 
 sub text_justified {
     my ($self, $text, $width, %opts) = @_;
+    # copy dashed option names to the preferred undashed names
+    if (defined $opts{'-wordsp'} && !defined $opts{'wordsp'}) { $opts{'wordsp'} = delete($opts{'-wordsp'}); }
+    if (defined $opts{'-charsp'} && !defined $opts{'charsp'}) { $opts{'charsp'} = delete($opts{'-charsp'}); }
+    if (defined $opts{'-wordspa'} && !defined $opts{'wordspa'}) { $opts{'wordspa'} = delete($opts{'-wordspa'}); }
+    if (defined $opts{'-charspa'} && !defined $opts{'charspa'}) { $opts{'charspa'} = delete($opts{'-charspa'}); }
+    if (defined $opts{'-condw'} && !defined $opts{'condw'}) { $opts{'condw'} = delete($opts{'-condw'}); }
+    if (defined $opts{'-condc'} && !defined $opts{'condc'}) { $opts{'condc'} = delete($opts{'-condc'}); }
+    if (defined $opts{'-nocs'} && !defined $opts{'nocs'}) { $opts{'nocs'} = delete($opts{'-nocs'}); }
 
     # optional parameters to control how expansion or condensation are done
     # 1. expand interword space up to 100% of 1 space
-    my $wordsp = defined($opts{'-wordsp'})? $opts{'-wordsp'}: 100;
+    my $wordsp = defined($opts{'wordsp'})? $opts{'wordsp'}: 100;
     # 2. expand intercharacter space up to 100% of 1em
-    my $charsp = defined($opts{'-charsp'})? $opts{'-charsp'}: 100;
+    my $charsp = defined($opts{'charsp'})? $opts{'charsp'}: 100;
     # 3. expand interword space up to another 100% of 1 space
-    my $wordspa = defined($opts{'-wordspa'})? $opts{'-wordspa'}: 100;
+    my $wordspa = defined($opts{'wordspa'})? $opts{'wordspa'}: 100;
     # 4. expand intercharacter space up to another 100% of 1em
-    my $charspa = defined($opts{'-charspa'})? $opts{'-charspa'}: 100;
+    my $charspa = defined($opts{'charspa'})? $opts{'charspa'}: 100;
     # 5. condense interword space up to 25% of 1 space
-    my $condw = defined($opts{'-condw'})? $opts{'-condw'}: 25;
+    my $condw = defined($opts{'condw'})? $opts{'condw'}: 25;
     # 6. condense intercharacter space up to 10% of 1em
-    my $condc = defined($opts{'-condc'})? $opts{'-condc'}: 10;
+    my $condc = defined($opts{'condc'})? $opts{'condc'}: 10;
     # 7. if still short or long, hscale()
 
-    my $nocs = defined($opts{'-nocs'})? $opts{'-nocs'}: 0;
+    my $nocs = defined($opts{'nocs'})? $opts{'nocs'}: 0;
     if ($nocs) {
         $charsp = $charspa = $condc = 0;
 	$wordsp *= 2;
@@ -309,7 +309,7 @@ The string is split at regular blanks (spaces), x20, to find the longest
 substring that will fit the C<$width>. 
 If a single word is longer than C<$width>, it will overflow. 
 To stay strictly within the desired bounds, set the option
-C<-spillover>=>0 to disallow spillover.
+C<spillover>=>0 to disallow spillover.
 
 =head3 Hyphenation
 
@@ -329,29 +329,29 @@ I<paragraph shaping>.
 
 =over
 
-=item -hyphenate => value
+=item 'hyphenate' => value
 
 0: no hyphenation (B<default>), 1: do basic hyphenation. Always allows
 splitting at a soft hyphen (\xAD). Unicode hyphen (U+2010) and non-splitting
 hyphen (U+2011) are ignored as split points.
 
-=item -spHH => value
+=item 'spHH' => value
 
 0: do I<not> split at a hard hyphen (x\2D), 1: I<OK to split> (B<default>)
 
-=item -spOP => value
+=item 'spOP' => value
 
 0: do I<not> split after most punctuation, 1: I<OK to split> (B<default>)
 
-=item -spDR => value
+=item 'spDR' => value
 
 0: do I<not> split after a run of one or more digits, 1: I<OK to split> (B<default>)
 
-=item -spLR => value
+=item 'spLR' => value
 
 0: do I<not> split after a run of one or more ASCII letters, 1: I<OK to split> (B<default>)
 
-=item -spCC => value
+=item 'spCC' => value
 
 0: do I<not> split in camelCase between a lowercase letter and an
 uppercase letter, 1: I<OK to split> (B<default>)
@@ -369,12 +369,16 @@ uppercase letter, 1: I<OK to split> (B<default>)
 # accept the overflow.
 sub _text_fill_line {
     my ($self, $text, $width, $over, %opts) = @_;
+    # copy dashed option names to the preferred undashed names
+    if (defined $opts{'-hyphenate'} && !defined $opts{'hyphenate'}) { $opts{'hyphenate'} = delete($opts{'-hyphenate'}); }
+    if (defined $opts{'-lang'} && !defined $opts{'lang'}) { $opts{'lang'} = delete($opts{'-lang'}); }
+    if (defined $opts{'-nosplit'} && !defined $opts{'nosplit'}) { $opts{'nosplit'} = delete($opts{'-nosplit'}); }
 
     # options of interest
-    my $hyphenate = defined($opts{'-hyphenate'})? $opts{'-hyphenate'}: 0; # default off
-   #my $lang = defined($opts{'-lang'})? $opts{'-lang'}: 'en';  # English rules by default
+    my $hyphenate = defined($opts{'hyphenate'})? $opts{'hyphenate'}: 0; # default off
+   #my $lang = defined($opts{'lang'})? $opts{'lang'}: 'en';  # English rules by default
     my $lang = 'basic';
-   #my $nosplit = defined($opts{'-nosplit'})? $opts{'-nosplit'}: '';  # indexes NOT to split at, given
+   #my $nosplit = defined($opts{'nosplit'})? $opts{'nosplit'}: '';  # indexes NOT to split at, given
                                             # as string of integers
    #       my @noSplit = split /[,\s]+/, $nosplit;  # normally empty array
 	# 1. indexes start at 0 (split after character N not permitted)
@@ -537,16 +541,12 @@ sub _removeSHY {
 
 =item ($width, $leftover) = $content->text_fill_left($string, $width, %opts)
 
-=item ($width, $leftover) = $content->text_fill_left($string, $width)
-
 Fill a line of 'width' with as much text as will fit, 
 and outputs it left justified.
 The width actually used, and the leftover text (that didn't fit), 
 are B<returned>.
 
 =item ($width, $leftover) = $content->text_fill($string, $width, %opts)
-
-=item ($width, $leftover) = $content->text_fill($string, $width)
 
 Alias for text_fill_left().
 
@@ -556,8 +556,10 @@ Alias for text_fill_left().
 
 sub text_fill_left {
     my ($self, $text, $width, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-spillover'} && !defined $opts{'spillover'}) { $opts{'spillover'} = delete($opts{'-spillover'}); }
 
-    my $over = (not(defined($opts{'-spillover'}) and $opts{'-spillover'} == 0));
+    my $over = (not(defined($opts{'spillover'}) and $opts{'spillover'} == 0));
     my ($line, $ret) = $self->_text_fill_line($text, $width, $over, %opts);
     $width = $self->text($line, %opts);
     return ($width, $ret);
@@ -572,8 +574,6 @@ sub text_fill {
 
 =item ($width, $leftover) = $content->text_fill_center($string, $width, %opts)
 
-=item ($width, $leftover) = $content->text_fill_center($string, $width)
-
 Fill a line of 'width' with as much text as will fit, 
 and outputs it centered.
 The width actually used, and the leftover text (that didn't fit), 
@@ -585,8 +585,10 @@ are B<returned>.
 
 sub text_fill_center {
     my ($self, $text, $width, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-spillover'} && !defined $opts{'spillover'}) { $opts{'spillover'} = delete($opts{'-spillover'}); }
 
-    my $over = (not(defined($opts{'-spillover'}) and $opts{'-spillover'} == 0));
+    my $over = (not(defined($opts{'spillover'}) and $opts{'spillover'} == 0));
     my ($line, $ret) = $self->_text_fill_line($text, $width, $over, %opts);
     $width = $self->text_center($line, %opts);
     return ($width, $ret);
@@ -595,8 +597,6 @@ sub text_fill_center {
 =over
 
 =item ($width, $leftover) = $content->text_fill_right($string, $width, %opts)
-
-=item ($width, $leftover) = $content->text_fill_right($string, $width)
 
 Fill a line of 'width' with as much text as will fit, 
 and outputs it right justified.
@@ -609,8 +609,10 @@ are B<returned>.
 
 sub text_fill_right {
     my ($self, $text, $width, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-spillover'} && !defined $opts{'spillover'}) { $opts{'spillover'} = delete($opts{'-spillover'}); }
 
-    my $over = (not(defined($opts{'-spillover'}) and $opts{'-spillover'} == 0));
+    my $over = (not(defined($opts{'spillover'}) and $opts{'spillover'} == 0));
     my ($line, $ret) = $self->_text_fill_line($text, $width, $over, %opts);
     $width = $self->text_right($line, %opts);
     return ($width, $ret);
@@ -619,8 +621,6 @@ sub text_fill_right {
 =over
 
 =item ($width, $leftover) = $content->text_fill_justified($string, $width, %opts)
-
-=item ($width, $leftover) = $content->text_fill_justified($string, $width)
 
 Fill a line of 'width' with as much text as will fit, 
 and outputs it fully justified (stretched or condensed).
@@ -637,7 +637,7 @@ B<Options:>
 
 =over
 
-=item -last_align => place
+=item 'last_align' => place
 
 where place is 'left' (default), 'center', or 'right' (may be shortened to
 first letter) allows you to specify the alignment of the last line output.
@@ -650,16 +650,19 @@ first letter) allows you to specify the alignment of the last line output.
 
 sub text_fill_justified {
     my ($self, $text, $width, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-last_align'} && !defined $opts{'last_align'}) { $opts{'last_align'} = delete($opts{'-last_align'}); }
+    if (defined $opts{'-spillover'} && !defined $opts{'spillover'}) { $opts{'spillover'} = delete($opts{'-spillover'}); }
 
     my $align = 'l'; # default left align last line
-    if (defined($opts{'-last_align'})) {
-	if    ($opts{'-last_align'} =~ m/^l/i) { $align = 'l'; }
-	elsif ($opts{'-last_align'} =~ m/^c/i) { $align = 'c'; }
-	elsif ($opts{'-last_align'} =~ m/^r/i) { $align = 'r'; }
-	else { warn "Unknown -last_align for justified fill, 'left' used\n"; }
+    if (defined($opts{'last_align'})) {
+	if    ($opts{'last_align'} =~ m/^l/i) { $align = 'l'; }
+	elsif ($opts{'last_align'} =~ m/^c/i) { $align = 'c'; }
+	elsif ($opts{'last_align'} =~ m/^r/i) { $align = 'r'; }
+	else { warn "Unknown last_align for justified fill, 'left' used\n"; }
     }
 
-    my $over = (not(defined($opts{'-spillover'}) and $opts{'-spillover'} == 0));
+    my $over = (not(defined($opts{'spillover'}) and $opts{'spillover'} == 0));
     my ($line, $ret) = $self->_text_fill_line($text, $width, $over, %opts);
     # if last line, use $align (don't justify)
     if ($ret eq '') {
@@ -667,9 +670,9 @@ sub text_fill_justified {
 	if      ($align eq 'l') {
 	    $width = $self->text($line, %opts);
 	} elsif ($align eq 'c') {
-	    $width = $self->text($line, -indent => ($width-$lw)/2, %opts);
+	    $width = $self->text($line, 'indent' => ($width-$lw)/2, %opts);
 	} else {  # 'r'
-	    $width = $self->text($line, -indent => ($width-$lw), %opts);
+	    $width = $self->text($line, 'indent' => ($width-$lw), %opts);
 	}
     } else {
         $width = $self->text_justified($line, $width, %opts);
@@ -681,11 +684,7 @@ sub text_fill_justified {
 
 =item ($overflow_text, $unused_height) = $txt->paragraph($text, $width,$height, $continue, %opts)
 
-=item ($overflow_text, $unused_height) = $txt->paragraph($text, $width,$height, $continue)
-
 =item $overflow_text = $txt->paragraph($text, $width,$height, $continue, %opts)
-
-=item $overflow_text = $txt->paragraph($text, $width,$height, $continue)
 
 Print a single string into a rectangular area on the page, of given width and
 maximum height. The baseline of the first (top) line is at the current text
@@ -705,32 +704,32 @@ B<Options:>
 
 =over
 
-=item -pndnt => $indent
+=item 'pndnt' => $indent
 
 Give the amount of indent (positive) or outdent (negative, for "hanging")
 for paragraph first lines). This setting is ignored for centered text.
 
-=item -align => $choice
+=item 'align' => $choice
 
 C<$choice> is 'justified', 'right', 'center', 'left'; the default is 'left'.
 See C<text_justified> call for options to control how a line is expanded or
 condensed if C<$choice> is 'justified'. C<$choice> may be shortened to the
 first letter.
 
-=item -last_align => place
+=item 'last_align' => place
 
 where place is 'left' (default), 'center', or 'right' (may be shortened to
 first letter) allows you to specify the alignment of the last line output,
-but applies only when C<-align> is 'justified'.
+but applies only when C<align> is 'justified'.
 
-=item -underline => $distance
+=item 'underline' => $distance
 
-=item -underline => [ $distance, $thickness, ... ]
+=item 'underline' => [ $distance, $thickness, ... ]
 
 If a scalar, distance below baseline,
 else array reference with pairs of distance and line thickness.
 
-=item -spillover => $over
+=item 'spillover' => $over
 
 Controls if words in a line which exceed the given width should be 
 "spilled over" the bounds, or if a new line should be used for this word.
@@ -763,19 +762,22 @@ fit to a given width, and nothing is done for "widows and orphans".
 
 sub paragraph {
     my ($self, $text, $width,$height, $continue, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-align'} && !defined $opts{'align'}) { $opts{'align'} = delete($opts{'-align'}); }
+    if (defined $opts{'-pndnt'} && !defined $opts{'pndnt'}) { $opts{'pndnt'} = delete($opts{'-pndnt'}); }
 
     my @line = ();
     my $nwidth = 0;
     my $leading = $self->leading();
     my $align = 'l'; # default left
-    if (defined($opts{'-align'})) {
-	if    ($opts{'-align'} =~ /^l/i) { $align = 'l'; }
-	elsif ($opts{'-align'} =~ /^c/i) { $align = 'c'; }
-	elsif ($opts{'-align'} =~ /^r/i) { $align = 'r'; }
-	elsif ($opts{'-align'} =~ /^j/i) { $align = 'j'; }
-	else { warn "Unknown -align value for paragraph(), 'left' used\n"; }
+    if (defined($opts{'align'})) {
+	if    ($opts{'align'} =~ /^l/i) { $align = 'l'; }
+	elsif ($opts{'align'} =~ /^c/i) { $align = 'c'; }
+	elsif ($opts{'align'} =~ /^r/i) { $align = 'r'; }
+	elsif ($opts{'align'} =~ /^j/i) { $align = 'j'; }
+	else { warn "Unknown align value for paragraph(), 'left' used\n"; }
     } # default stays at 'l'
-    my $indent = defined($opts{'-pndnt'})? $opts{'-pndnt'}: 0;
+    my $indent = defined($opts{'pndnt'})? $opts{'pndnt'}: 0;
     if ($align eq 'c') { $indent = 0; } # indent/outdent makes no sense centered
     my $first_line = !$continue;
     my $lw;
@@ -822,11 +824,7 @@ sub paragraph {
 
 =item ($overflow_text, $continue, $unused_height) = $txt->section($text, $width,$height, $continue, %opts)
 
-=item ($overflow_text, $continue, $unused_height) = $txt->section($text, $width,$height, $continue)
-
 =item $overflow_text = $txt->section($text, $width,$height, $continue, %opts)
-
-=item $overflow_text = $txt->section($text, $width,$height, $continue)
 
 The C<$text> contains a string with one or more paragraphs C<$width> wide, 
 starting at the current text position, with a newline \n between each 
@@ -847,14 +845,14 @@ B<Options:>
 
 =over
 
-=item -pvgap => $vertical
+=item 'pvgap' => $vertical
 
 Additional vertical space (unit: pt) between paragraphs (default 0). Note that this space
 will also be added after the last paragraph printed.
 
 =back
 
-See C<paragraph> for other C<%opts> you can use, such as -align and -pndnt.
+See C<paragraph> for other C<%opts> you can use, such as C<align> and C<pndnt>.
 
 =back
 
@@ -867,9 +865,11 @@ sub paragraphs {
 
 sub section {
     my ($self, $text, $width,$height, $continue, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-pvgap'} && !defined $opts{'pvgap'}) { $opts{'pvgap'} = delete($opts{'-pvgap'}); }
 
     my $overflow = ''; # text to return if height fills up
-    my $pvgap = defined($opts{'-pvgap'})? $opts{'-pvgap'}: 0;
+    my $pvgap = defined($opts{'pvgap'})? $opts{'pvgap'}: 0;
     # $continue =0 if fresh paragraph, or =1 if continuing one cut in middle
 
     foreach my $para (split(/\n/, $text)) {
@@ -911,8 +911,6 @@ sub section {
 
 =item $width = $txt->textlabel($x,$y, $font, $size, $text, %opts)
 
-=item $width = $txt->textlabel($x,$y, $font, $size, $text)
-
 Place a line of text at an arbitrary C<[$x,$y]> on the page, with various text 
 settings (treatments) specified in the call.
 
@@ -936,49 +934,49 @@ B<Options:>
 
 =over
 
-=item -rotate => $deg
+=item 'rotate' => $deg
 
 Rotate C<$deg> degrees counterclockwise from due East.
 
-=item -color => $cspec
+=item 'color' => $cspec
 
 A color name or permitted spec, such as C<#CCE840>, for the character I<fill>.
 
-=item -strokecolor => $cspec
+=item 'strokecolor' => $cspec
 
 A color name or permitted spec, such as C<#CCE840>, for the character I<outline>.
 
-=item -charspace => $cdist
+=item 'charspace' => $cdist
 
 Additional distance between characters.
 
-=item -wordspace => $wdist
+=item 'wordspace' => $wdist
 
 Additional distance between words.
 
-=item -hscale => $hfactor
+=item 'hscale' => $hfactor
 
 Horizontal scaling mode (percentage of normal, default is 100).
 
-=item -render => $mode
+=item 'render' => $mode
 
 Character rendering mode (outline only, fill only, etc.). See C<render> call.
 
-=item -left => 1
+=item 'left' => 1
 
 Left align on the given point. This is the default.
 
-=item -center => 1
+=item 'center' => 1
 
 Center the text on the given point.
 
-=item -right => 1
+=item 'right' => 1
 
 Right align on the given point.
 
-=item -align => $placement
+=item 'align' => $placement
 
-Alternate to -left, -center, and -right. C<$placement> is 'left' (default),
+Alternate to left, center, and right. C<$placement> is 'left' (default),
 'center', or 'right'.
 
 =back
@@ -1005,11 +1003,23 @@ or C<text>) by adding the returned width to the original position's I<x> value
 
 sub textlabel {
     my ($self, $x,$y, $font, $size, $text, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-rotate'} && !defined $opts{'rotate'}) { $opts{'rotate'} = delete($opts{'-rotate'}); }
+    if (defined $opts{'-color'} && !defined $opts{'color'}) { $opts{'color'} = delete($opts{'-color'}); }
+    if (defined $opts{'-strokecolor'} && !defined $opts{'strokecolor'}) { $opts{'strokecolor'} = delete($opts{'-strokecolor'}); }
+    if (defined $opts{'-charspace'} && !defined $opts{'charspace'}) { $opts{'charspace'} = delete($opts{'-charspace'}); }
+    if (defined $opts{'-hscale'} && !defined $opts{'hscale'}) { $opts{'hscale'} = delete($opts{'-hscale'}); }
+    if (defined $opts{'-wordspace'} && !defined $opts{'wordspace'}) { $opts{'wordspace'} = delete($opts{'-wordspace'}); }
+    if (defined $opts{'-render'} && !defined $opts{'render'}) { $opts{'render'} = delete($opts{'-render'}); }
+    if (defined $opts{'-right'} && !defined $opts{'right'}) { $opts{'right'} = delete($opts{'-right'}); }
+    if (defined $opts{'-center'} && !defined $opts{'center'}) { $opts{'center'} = delete($opts{'-center'}); }
+    if (defined $opts{'-left'} && !defined $opts{'left'}) { $opts{'left'} = delete($opts{'-left'}); }
+    if (defined $opts{'-align'} && !defined $opts{'align'}) { $opts{'align'} = delete($opts{'-align'}); }
     my $wht;
 
-    my %trans_opts = ( -translate => [$x,$y] );
+    my %trans_opts = ( 'translate' => [$x,$y] );
     my %text_state = ();
-    $trans_opts{'-rotate'} = $opts{'-rotate'} if defined($opts{'-rotate'});
+    $trans_opts{'rotate'} = $opts{'rotate'} if defined($opts{'rotate'});
 
     my $wastext = $self->_in_text_object();
     if ($wastext) {
@@ -1021,24 +1031,24 @@ sub textlabel {
 
     $self->transform(%trans_opts);
 
-    $self->fillcolor(ref($opts{'-color'}) ? @{$opts{'-color'}} : $opts{'-color'}) if defined($opts{'-color'});
-    $self->strokecolor(ref($opts{'-strokecolor'}) ? @{$opts{'-strokecolor'}} : $opts{'-strokecolor'}) if defined($opts{'-strokecolor'});
+    $self->fillcolor(ref($opts{'color'}) ? @{$opts{'color'}} : $opts{'color'}) if defined($opts{'color'});
+    $self->strokecolor(ref($opts{'strokecolor'}) ? @{$opts{'strokecolor'}} : $opts{'strokecolor'}) if defined($opts{'strokecolor'});
 
     $self->font($font, $size);
 
-    $self->charspace($opts{'-charspace'}) if defined($opts{'-charspace'});
-    $self->hscale($opts{'-hscale'})       if defined($opts{'-hscale'});
-    $self->wordspace($opts{'-wordspace'}) if defined($opts{'-wordspace'});
-    $self->render($opts{'-render'})       if defined($opts{'-render'});
+    $self->charspace($opts{'charspace'}) if defined($opts{'charspace'});
+    $self->hscale($opts{'hscale'})       if defined($opts{'hscale'});
+    $self->wordspace($opts{'wordspace'}) if defined($opts{'wordspace'});
+    $self->render($opts{'render'})       if defined($opts{'render'});
 
-    if      (defined($opts{'-right'}) && $opts{'-right'} ||
-	     defined($opts{'-align'}) && $opts{'-align'} =~ /^r/i) {
+    if      (defined($opts{'right'}) && $opts{'right'} ||
+	     defined($opts{'align'}) && $opts{'align'} =~ /^r/i) {
         $wht = $self->text_right($text, %opts);
-    } elsif (defined($opts{'-center'}) && $opts{'-center'} ||
-	     defined($opts{'-align'}) && $opts{'-align'} =~ /^c/i) {
+    } elsif (defined($opts{'center'}) && $opts{'center'} ||
+	     defined($opts{'align'}) && $opts{'align'} =~ /^c/i) {
         $wht = $self->text_center($text, %opts);
-    } elsif (defined($opts{'-left'}) && $opts{'-left'} ||
-	     defined($opts{'-align'}) && $opts{'-align'} =~ /^l/i) {
+    } elsif (defined($opts{'left'}) && $opts{'left'} ||
+	     defined($opts{'align'}) && $opts{'align'} =~ /^l/i) {
         $wht = $self->text($text, %opts);  # explicitly left aligned
     } else {
         $wht = $self->text($text, %opts);  # left aligned by default

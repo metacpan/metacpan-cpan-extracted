@@ -1,0 +1,6 @@
+class Sys::User::Group : pointer_t {
+  native method gr_name : string ();
+  native method gr_passwd : string ();
+  native method gr_gid : int ();
+  native method gr_mem : string[] ();
+}

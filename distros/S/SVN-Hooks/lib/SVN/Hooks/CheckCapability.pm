@@ -1,6 +1,6 @@
 package SVN::Hooks::CheckCapability;
 # ABSTRACT: Check the svn client capabilities.
-$SVN::Hooks::CheckCapability::VERSION = '1.35';
+$SVN::Hooks::CheckCapability::VERSION = '1.36';
 use strict;
 use warnings;
 
@@ -55,7 +55,7 @@ SVN::Hooks::CheckCapability - Check the svn client capabilities.
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 SYNOPSIS
 

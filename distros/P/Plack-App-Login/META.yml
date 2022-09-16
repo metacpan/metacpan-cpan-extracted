@@ -4,6 +4,8 @@ author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   CSS::Struct::Output::Indent: 0
+  English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
   HTTP::Request: 0
   Plack::Test: 0
@@ -28,8 +30,10 @@ no_index:
     - xt
 requires:
   CSS::Struct::Output::Raw: 0
+  Error::Pure: 0
   Plack::Util::Accessor: 0
-  Tags::HTML::Login::Button: 0
+  Scalar::Util: 0
+  Tags::HTML::Login::Button: 0.02
   Tags::HTML::Page::Begin: 0.13
   Tags::HTML::Page::End: 0.04
   Tags::Output::Raw: 0
@@ -40,4 +44,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Plack-App-Login
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Login
-version: '0.04'
+version: '0.06'

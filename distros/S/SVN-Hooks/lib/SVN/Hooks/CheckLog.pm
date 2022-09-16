@@ -1,6 +1,6 @@
 package SVN::Hooks::CheckLog;
 # ABSTRACT: Check log messages in commits.
-$SVN::Hooks::CheckLog::VERSION = '1.35';
+$SVN::Hooks::CheckLog::VERSION = '1.36';
 use strict;
 use warnings;
 
@@ -59,7 +59,7 @@ SVN::Hooks::CheckLog - Check log messages in commits.
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 SYNOPSIS
 

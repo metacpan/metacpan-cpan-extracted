@@ -1,0 +1,158 @@
+NAME
+    Plack::Middleware::Auth::OAuth2 - Plack OAuth2 middleware.
+
+SYNOPSIS
+     use Plack::Builder;
+     use Plack::App::Env;
+     use Plack::App::Login;
+
+     my $app = Plack::App::Env->new;
+     builder {
+             enable 'Session';
+             enable 'Auth::OAuth2',
+                    'client_id' => '__CLIENT_ID__',
+                    'client_secret => '__CLIENT_SECRET__',
+                    'app_login' => Plack::App::Login->new,
+                    'app_login_url' => sub { $_[0]->login_link($_[1]); },
+                    'logout_path' => 'logout',
+                    'provider' => 'Google',
+                    'redirect_path' => 'code',
+                    'scope' => 'email',
+             ;
+             $app;
+     };
+
+DESCRIPTION
+    This middleware provides OAuth2 authentication for web application. Uses
+    LWP::Authen::OAuth2 for implementation.
+
+    Prerequisity is use of Plack session management and result is saved to
+    session.
+
+ACCESSORS
+  "app_login"
+    Plack application to login.
+
+    It's required.
+
+  "app_login_url"
+    Callback to set URL from OAuth2 provider to "app_login()" Plack
+    application.
+
+    First argument is "app_login()" application. Second argument is $url
+    variable from OAuth2 provider.
+
+    It's required.
+
+  "client_id"
+    OAuth2 client id.
+
+    It's required.
+
+  "client_secret"
+    OAuth2 client secret.
+
+    It's required.
+
+  "logout_path"
+    Logout path for creating of endpoint, which logout from OAuth2.
+
+    Default value is 'logout' (/logout).
+
+  "lwp_user_agent"
+    Explicit LWP::UserAgent instance.
+
+    Default value is LWP::UserAgent instance inside of LWP::Authen::OAuth2.
+
+  "redirect_path"
+    Redirect path for creating of endpoint, which is created for service
+    provider use to set authentication.
+
+    It's required.
+
+  "scope"
+    OAuth2 scopes in string.
+
+    Requirement is defined by provider. It's optional.
+
+  "service_provider"
+    Service provider.
+
+    Possible providers:
+
+    Dwolla
+        Via module LWP::Authen::OAuth2::ServiceProvider::Dwolla.
+
+    Google
+        Via module LWP::Authen::OAuth2::ServiceProvider::Google.
+
+    Line
+        Via module LWP::Authen::OAuth2::ServiceProvider::Line.
+
+    MediaWiki
+        Via module LWP::Authen::OAuth2::ServiceProvider::MediaWiki.
+
+    Strava
+        Via module LWP::Authen::OAuth2::ServiceProvider::Strava.
+
+    Wikimedia
+        Via module LWP::Authen::OAuth2::ServiceProvider::Wikimedia.
+
+    Withings
+        Via module LWP::Authen::OAuth2::ServiceProvider::Withings.
+
+    Yahoo
+        Via module LWP::Authen::OAuth2::ServiceProvider::Yahoo.
+
+ENDPOINTS
+  Logout
+    Logout endpoint is defined inside of this module by setting
+    "logout_path" (/__LOGOUT_PATH__).
+
+  Redirect
+    Redirect endpoint is defined inside of this module by setting
+    "redirect_path" (/__REDIRECT_PATH__).
+
+SESSION VARIABLES
+  oauth2.obj
+    Value is instance of LWP::Authen::OAuth2 used for authentization.
+
+  oauth2.service_provider
+    Value is authenticated service provider.
+
+  oauth2.token_string
+    Value is token string.
+
+ERRORS
+     prepare_app():
+             No OAuth2 'client_id' setting.
+             No OAuth2 'client_secret' setting.
+             No login application.
+             No login url call.
+             No redirect path.
+             No service provider.
+
+DEPENDENCIES
+    English, Error::Pure, JSON::XS, LWP::Authen::OAuth2, Plack::Middleware,
+    Plack::Response, Plack::Session, Plack::Util::Accessor.
+
+SEE ALSO
+    LWP::Authen::OAuth2
+        Make requests to OAuth2 APIs.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Plack-Middleware-Auth-OAuth2>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2020-2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

@@ -112,7 +112,7 @@ foreach (@available) {
         next if ( $opts{force} );
         exit 6;
     }
-    if ( my $r = $new->saveConf( $conf, %newargs ) ) {
+    if ( $new->saveConf( $conf, %newargs ) > 0 ) {
         print "Conf $conf->{cfgNum} stored\n";
         next;
     }

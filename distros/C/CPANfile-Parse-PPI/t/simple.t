@@ -19,25 +19,29 @@ CPANFILE
 my $cpanfile = CPANfile::Parse::PPI->new( \$required );
 
 my $modules = $cpanfile->modules;
-is_deeply $modules, [
-     {
-         name    => "CPANfile::Parse::PPI",
-         stage   => "",
-         type    => "requires",
-         version => '3.6'
-     },
-     {
-         name    => "Dist::Zilla",
-         stage   => "build",
-         type    => "recommends",
-         version => '4.0'
-     },
-     {
-         name    => "Test2",
-         stage   => "build",
-         type    => "requires",
-         version => '2.311'
-     }
-];
+is_deeply $modules,
+  [
+    {
+        name    => "CPANfile::Parse::PPI",
+        stage   => "",
+        type    => "requires",
+        feature => "",
+        version => '3.6'
+    },
+    {
+        name    => "Dist::Zilla",
+        stage   => "build",
+        type    => "recommends",
+        feature => "",
+        version => '4.0'
+    },
+    {
+        name    => "Test2",
+        stage   => "build",
+        type    => "requires",
+        feature => "",
+        version => '2.311'
+    }
+  ];
 
 done_testing();

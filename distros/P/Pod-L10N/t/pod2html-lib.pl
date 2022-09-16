@@ -10,11 +10,19 @@ use File::Copy;
 # filenames as '.' is the directory separator on VMS. All tests that require
 # testdir/test.lib to be present are skipped if test.lib cannot be created.
 sub make_test_dir {
-    if (-d 'testdir/test.lib') {
+    my $c = 30;
+    # ad-hoc semaphore
+    while(--$c) {
+        if (mkdir('testdir/test.lib')){
+            last;
+        }
+        sleep(1);
+    }
+    if ($c == 0 && -d 'testdir/test.lib') {
         warn "Directory 'test.lib' exists (it shouldn't yet) - removing it";
         rem_test_dir();
+        mkdir('testdir/test.lib') or return "Could not make test.lib directory: $!\n";
     }
-    mkdir('testdir/test.lib') or return "Could not make test.lib directory: $!\n";
     copy('testdir/perlpodspec-copy.pod', 'testdir/test.lib/podspec-copy.pod')
         or return "Could not copy perlpodspec-copy: $!";
     copy('testdir/perlvar-copy.pod', 'testdir/test.lib/var-copy.pod')

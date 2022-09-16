@@ -14,15 +14,15 @@ Alien::Base::ModuleBuild::Authoring - Authoring an C<Alien::> module using Alien
 
 =head1 VERSION
 
-version 1.15
+version 1.17
 
 =head1 DESCRIPTION
 
 B<NOTE>: Please consider for new development of L<Alien>s that you use
 L<Alien::Build> and L<alienfile> instead.  Like L<Alien::Base::ModuleBuild> they work
-with L<Alien::Base>.  Unlike L<Alien::Base::Module::Build> they are more easily customized
+with L<Alien::Base>.  Unlike L<Alien::Base::ModuleBuild> they are more easily customized
 and handle a number of corner cases better.  For a good place to start,
-please see L<Alien::Build::Manual::AlienAuthor>.  Although the 
+please see L<Alien::Build::Manual::AlienAuthor>.  Although the
 Alien-Base / Alien-Build team will continue to maintain this module,
 (we will continue to fix bugs where appropriate), we aren't adding any
 new features to this module.
@@ -31,8 +31,8 @@ Congratulations! You have made the decision to help the Perl community by provid
 
 =head1 STATUS
 
-L<Alien::Base> is under active development.  The API is relatively 
-stable, although breaking changes may be introduced if the rewards are 
+L<Alien::Base> is under active development.  The API is relatively
+stable, although breaking changes may be introduced if the rewards are
 deemed greater than the pains that they produce.
 
 =head1 ECOSYSTEM
@@ -65,7 +65,7 @@ C<Alien::MyLibrary> is called by C<Some::Library::MyLibrary>'s build script, eit
  # file: Some-Module-MyLibrary/Build.PL
  use Module::Build;
  use Alien::MyLibrary;
-
+ 
  my $alien = Alien::MyLibrary->new;
  my $builder = Module::Build->new(
    ...
@@ -82,22 +82,22 @@ C<Alien::MyLibrary> must be a subclass of L<Alien::Base>. This provides the C<im
 
  # file: Alien-MyLibrary/lib/Alien/MyLibrary.pm
  package Alien::MyLibrary;
-
+ 
  use parent 'Alien::Base';
-
+ 
  1;
 
 Finally, C<Alien::MyLibrary> must also be called by C<Some::Library::MyLibrary> before C<DynaLoader::bootstrap> or C<XSLoader::load>. The C<use> directive is recommended, however if you must use C<require> then be sure to call the C<import> method too. Without this C<import> call, the loader doesn't know where to find F<libmylibrary.so>.
 
  # file: Some-Module-MyLibrary/lib/Some/Module/MyLibrary.pm
  package Some::Module::MyLibrary;
-
+ 
  use Alien::MyLibrary;
  our $VERSION = '0.54';
-
+ 
  require XSLoader;
  XSLoader::load('Some::Module::MyLibrary', $VERSION);
-
+ 
  # your code
 
 =head1 EXAMPLES
@@ -140,7 +140,7 @@ L<Alien::gmake> -- Builds and installs GNU make.  Rather than being a library, t
 
 =over
 
-=item * 
+=item *
 
 L<Module::Build>
 
@@ -194,13 +194,13 @@ Kang-min Liu (劉康民, gugod)
 
 Nicholas Shipp (nshp)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Alberto Simões (ambs)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2020 by Joel A Berger.
+This software is copyright (c) 2012-2022 by Joel A Berger.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

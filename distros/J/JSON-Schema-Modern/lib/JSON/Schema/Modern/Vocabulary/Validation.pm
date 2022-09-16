@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.554';
+our $VERSION = '0.555';
 
 use 5.020;
 use Moo;
@@ -76,7 +76,6 @@ sub _eval_keyword_type ($self, $data, $schema, $state) {
 
 sub _traverse_keyword_enum ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'array');
-  return E($state, '"enum" values are not unique') if not is_elements_unique($schema->{enum});
   return 1;
 }
 
@@ -336,7 +335,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.554
+version 0.555
 
 =head1 DESCRIPTION
 
@@ -346,7 +345,7 @@ version 0.554
 
 Implementation of the JSON Schema Draft 2020-12 "Validation" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2020-12/vocab/validation> and formally specified in
-L<https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-validation-01#section-6>.
+L<https://json-schema.org/draft/2020-12/json-schema-validation.html#section-6>.
 
 Support is also provided for
 

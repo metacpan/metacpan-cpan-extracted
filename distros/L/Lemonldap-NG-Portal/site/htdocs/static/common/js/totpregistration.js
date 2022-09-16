@@ -100,6 +100,11 @@ LemonLDAP::NG TOTP registration script
               return setMsg(data.error, 'danger');
             }
           } else {
+            $(document).trigger("mfaAdded", [
+              {
+                "type": "totp"
+              }
+            ]);
             return setMsg('yourKeyIsRegistered', 'success');
           }
         }

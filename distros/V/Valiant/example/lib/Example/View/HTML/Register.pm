@@ -2,46 +2,31 @@ package Example::View::HTML::Register;
 
 use Moose;
 use Example::Syntax;
-use Valiant::HTML::TagBuilder 'div', 'fieldset';
+use Valiant::HTML::TagBuilder 'div', 'a', 'fieldset';
 
 extends 'Example::View::HTML';
 
-has 'unregistered_user' => (is=>'ro', required=>1);
+has 'registration' => (is=>'ro', required=>1, handles=>[qw/form/]);
+
+__PACKAGE__->views(
+  layout => 'HTML::Layout',
+);
 
 sub render($self, $c) {
-  $c->view('HTML::Layout', page_title=>'Homepage', sub($layout) {
-    $c->view('HTML::Form', $self->unregistered_user, +{style=>'width:35em; margin:auto'}, sub ($fb) {
+  $self->layout( page_title=>'Homepage', sub($layout) {
+    $self->form(sub ($reg, $fb) {
       fieldset [
         $fb->legend,
-        div +{ class=>'form-group' },
-          $fb->model_errors(+{class=>'alert alert-danger', role=>'alert'}),
-        div +{ class=>'form-group' }, [
-          $fb->label('first_name'),
-          $fb->input('first_name', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-          $fb->errors_for('first_name', +{ class=>'invalid-feedback' }),
-        ],
-        div +{ class=>'form-group' }, [
-          $fb->label('last_name'),
-          $fb->input('last_name', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-          $fb->errors_for('last_name', +{ class=>'invalid-feedback' }),
-        ],
-        div +{ class=>'form-group' }, [
-          $fb->label('username'),
-          $fb->input('username', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-          $fb->errors_for('username', +{ class=>'invalid-feedback' }),
-        ],
-        div +{ class=>'form-group' }, [
-          $fb->label('password'),
-          $fb->password('password', +{ autocomplete=>'new-password', class=>'form-control', errors_classes=>'is-invalid' }),
-          $fb->errors_for('password', +{ class=>'invalid-feedback' }),
-        ],
-        div +{ class=>'form-group' }, [
-          $fb->label('password_confirmation'),
-           $fb->password('password_confirmation', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-          $fb->errors_for('password_confirmation', +{ class=>'invalid-feedback' }),
-        ],
-        $fb->submit('Register for Account', +{class=>'btn btn-lg btn-primary btn-block'}),
+        map { div +{ class=>'form-group' }, $_ }
+          $fb->model_errors,
+          $reg->first_name,
+          $reg->last_name,
+          $reg->username,
+          $reg->password,
+          $reg->password_confirmation,
+          $fb->submit('Register for Account'),
       ],
+      div { class=>'text-center' }, a { href=>'/login' }, "Login to existing account."
     }),
   });
 }

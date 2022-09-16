@@ -7,7 +7,7 @@ package Business::Stripe::WebCheckout;
 # 12-04-21 - Improve obtaining success/cancel URLs from environment
 # 14-04-21 - Add P&P
 # 16-04-21 - Properly implement live testing without real Stripe keys
-# 
+#
 
 use HTTP::Tiny;
 use JSON::PP;
@@ -16,24 +16,24 @@ use Data::Dumper;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.3';
 $VERSION = eval $VERSION;
 
 sub new {
     my $class = shift;
     my %attrs = @_;
-    
+
     my @products;
     $attrs{'trolley'} = \@products;
-    
+
     $attrs{'currency'} //= 'GBP';
-    
+
     $attrs{'error'} = '';
 
     $attrs{'cancel-url'}  //= "$ENV{'REQUEST_SCHEME'}://$ENV{'HTTP_HOST'}$ENV{'SCRIPT_NAME'}";
     $attrs{'success-url'} //= "$ENV{'REQUEST_SCHEME'}://$ENV{'HTTP_HOST'}$ENV{'SCRIPT_NAME'}";
     $attrs{'error'}         = 'cancel-url and success-url cannot be derived from the environment and need to be provided' unless ($attrs{'cancel-url'} and $attrs{'success-url'});
-    
+
     # This is changed during testing only
     $attrs{'url'}         //= 'https://api.stripe.com/v1/checkout/sessions';
 
@@ -43,7 +43,7 @@ sub new {
     $attrs{'error'} = 'Public API key provided as Secret key' if $attrs{'api-secret'} =~ /^pk_/;
     $attrs{'error'} = 'Secret API key is too short' unless length $attrs{'api-secret'} > 100;
     $attrs{'error'} = 'Secret API key is missing' unless $attrs{'api-secret'};
-    
+
     return bless \%attrs, $class;
 }
 
@@ -60,7 +60,7 @@ sub error {
 sub add_product {
     my ($self, %product) = @_;
     $self->{'error'} = '';
-    
+
     unless ($product{'price'} > 0 and $product{'price'} !~ /\./) {
         $self->{'error'} = 'Invalid price.  Price is an integer of the lowest currency unit';
         return;
@@ -69,7 +69,7 @@ sub add_product {
         $self->{'error'} = 'Invalid qty.  Qty is a positive integer';
         return;
     }
-    
+
     unless ($product{'name'}) {
         $self->{'error'} = 'No product name supplied';
         return;
@@ -84,7 +84,7 @@ sub add_product {
             return scalar @{$self->{'trolley'}};
         }
     }
-    
+
     my $new_product;
     foreach my $field('id', 'name', 'description', 'qty', 'price') {
         $new_product->{$field} = $product{$field};
@@ -104,7 +104,7 @@ sub list_products {
 sub get_product {
     my ($self, $id) = @_;
     $self->{'error'} = '';
-    
+
     unless ($id) {
         $self->{'error'} = 'Product ID missing';
         return;
@@ -121,12 +121,12 @@ sub get_product {
 sub delete_product {
     my ($self, $id) = @_;
     $self->{'error'} = '';
-    
+
     unless ($id) {
         $self->{'error'} = 'Product ID missing';
         return;
     }
-    
+
     for (my $i = 0; $i < scalar @{$self->{'trolley'}}; $i++) {
         if (${$self->{'trolley'}}[$i]->{'id'} eq $id) {
             $self->{'intent'} = undef;
@@ -142,28 +142,29 @@ sub delete_product {
 # Returns existing session if it exists and Trolley hasn't changed
 sub _create_intent {
     my $self = shift;
-    
+
     if ($self->{'intent'}) {
         return $self->{'intent'};
     }
-    
+
     $self->{'reference'} //= __PACKAGE__;
-    
+
     my $http = HTTP::Tiny->new;
     my $headers = {
         'Authorization' => 'Bearer ' . $self->{'api-secret'},
+        'Stripe-Version'    => '2020-08-27',
     };
-    
+
     # Update URL and headers during stripe-live tests
     if ($self->{'url'} =~ /^https:\/\/www\.boddison\.com/) {
         $headers->{'BODTEST'} = __PACKAGE__ . " v$VERSION";
         $headers->{'Authorization'} = undef,
         $self->{'url'} .= '?fail' if $self->{'api-test-fail'};
     }
-    
+
     my $vars = {
-        'headers'       => $headers,
-        'agent'         => 'Perl-WebCheckout/$VERSION'
+        'headers'           => $headers,
+        'agent'             => 'Perl-WebCheckout/$VERSION',
     };
     my $payload = {
         'cancel_url'                => $self->{'cancel-url'},
@@ -173,7 +174,10 @@ sub _create_intent {
         'client_reference_id'       => $self->{'reference'},
     };
     $payload->{'customer_email'} = $self->{'email'} if $self->{'email'};
-    
+    if ($self->{'getShipping'}) {
+        $payload->{'shipping_address_collection[allowed_countries][0]'} = $self->{'getShipping'};
+    }
+
     my $i = 0;
     foreach my $prod(@{$self->{'trolley'}}) {
         $payload->{"line_items[$i][currency]"}      = $self->{'currency'};
@@ -185,7 +189,7 @@ sub _create_intent {
     }
 
     my $response = $http->post_form($self->{'url'}, $payload, $vars);
-    
+
     $self->{'error'} = '';
     if ($response->{'success'}) {
         $self->{'intent'} = $response->{'content'};
@@ -204,7 +208,7 @@ sub _create_intent {
 
 sub get_intent {
     my ($self, %attrs) = @_;
-    
+
     $self->{'reference'} = $attrs{'reference'} if $attrs{'reference'};
     $self->{'email'} = $attrs{'email'} if $attrs{'email'};
 
@@ -214,7 +218,7 @@ sub get_intent {
 
 sub get_intent_id {
     my ($self, %attrs) = @_;
-    
+
     $self->{'reference'} = $attrs{'reference'} if $attrs{'reference'};
     $self->{'email'} = $attrs{'email'} if $attrs{'email'};
 
@@ -229,20 +233,20 @@ sub get_intent_id {
 
 sub get_ids {
     my ($self, %attrs) = @_;
-    
+
     $self->{'public-key'} = $attrs{'public-key'} if $attrs{'public-key'};
-    
+
     $self->{'error'} = '';
     unless ($self->{'api-public'}) {
         $self->{'error'} = 'Required Public API Key missing';
         return;
     }
-    
+
     $self->{'reference'} = $attrs{'reference'} if $attrs{'reference'};
     $self->{'email'} = $attrs{'email'} if $attrs{'email'};
 
     my $intent_id = $self->get_intent_id;
-    
+
     my %result;
     if ($self->{'error'}) {
         $result{'status'}  = 'error';
@@ -252,7 +256,7 @@ sub get_ids {
         $result{'api-key'} = $self->{'api-public'};
         $result{'session'} = $intent_id;
     }
-    
+
     $attrs{'format'} = 'text' unless $attrs{'format'};
     return encode_json(\%result) if lc($attrs{'format'}) eq 'json';
     return $result{'message'} || "$result{'api-key'}:$result{'session'}";
@@ -260,18 +264,18 @@ sub get_ids {
 
 sub checkout {
     my $self = shift;
-    
+
     my $data = $self->get_ids( 'format' => 'text', @_);
-    
+
     return if $self->{'error'};
-    
+
     my ($key, $session) = split /:/, $data;
-    
+
     unless ($key and $session) {
         $self->{'error'} = 'Error getting key and session';
         return;
     }
-    
+
 return <<"END_HTML";
 Content-type: text/html
 
@@ -296,9 +300,9 @@ END_HTML
 __END__
 
 =pod
- 
+
 =encoding UTF-8
- 
+
 =head1 NAME
 
 Business::Stripe::WebCheckout - Simple way to implement payments using Stripe hosted checkout
@@ -306,11 +310,11 @@ Business::Stripe::WebCheckout - Simple way to implement payments using Stripe ho
 =head1 SYNOPSIS
 
   use Business::Stripe::WebCheckout;
-  
+
   my $stripe = Business::Stripe::WebCheckout->new(
       'api-secret'  => 'sk_test_00000000000000000000000000',
   );
-  
+
   # Note price is in lowest currency unit (i.e pence or cents not pounds or dollars)
   $stripe->add_product(
       'id'      => 1,
@@ -318,22 +322,24 @@ Business::Stripe::WebCheckout - Simple way to implement payments using Stripe ho
       'qty'     => 4,
       'price'   => 250,
   );
-  
+
   foreach my $id($stripe->list_products) {
       print "$id is " . $stripe->get_product($id)->{'name'} . "\n";
   }
-  
+
   $stripe->checkout(
       'api-public'  => 'pk_test_00000000000000000000000000',
   );
-  
+
 =head1 DESCRIPTION
-      
+
 A simple to use interface to the Stripe payment gateway utilising the Stripe hosted checkout.  The only dependencies are the core modules L<HTTP::Tiny> and L<JSON::PP>.
 
-L<Business::Stripe::WebCheckout> has a Trolley into which products are loaded.  Once the Trolley is full of the product(s) to be paid for, this is passed to the Stripe hosted checkout either using Javascript provided by Stripe (see L<https://stripe.com/docs/payments/accept-a-payment?integration=checkout>), Javascript provided in this document or the B<checkout> utility method that allows a server side script to send the user to Stripe invisibly. 
+L<Business::Stripe::WebCheckout> has a Trolley into which products are loaded.  Once the Trolley is full of the product(s) to be paid for, this is passed to the Stripe hosted checkout either using Javascript provided by Stripe (see L<https://stripe.com/docs/payments/accept-a-payment?integration=checkout>), Javascript provided in this document or the B<checkout> utility method that allows a server side script to send the user to Stripe invisibly.
 
 At present L<Business::Stripe::WebCheckout> only handles simple, one-off payments.  Manipulation of customers, handling subscriptions and user hosted checkout is not supported.  However, this implementation makes payment for a single item or group of items simple to implement.
+
+In August 2022 Stripe released a new version of their API.  Currently this module uses the previous version C<2020-08-27>.  The module overrides the setting in the Stripe dashboard so this requires no user input.  For the simple cases this module is intended for, this presents no problems and it is only pointed out to try and prevent confusion for anyone trying to cross reference the module calls with the Stripe API documentation.  The latest version of the API introduces some additional functionality which may be incorporated into this module in the future.
 
 =head2 Keys
 
@@ -364,7 +370,7 @@ Next, products are assembled in the Trolley.  There are methods to add, update, 
 Once the Trolley contains all the products, the user is redirected to the Stripe hosted checkout where they pay for the Trolley.  Once this happens, Stripe returns to your site using one of the URLs provided depending on whether the payment was successful or not.  Where no return URLs are provided, the script URL is used although in practice this is not usually sufficient and return URLs will be needed.
 
   $stripe->checkout;
-  
+
 Examples of other ways of redirecting the user to the Stripe hosted checkout and listed in the B<Examples> section.
 
 =head1 METHODS
@@ -372,7 +378,7 @@ Examples of other ways of redirecting the user to the Stripe hosted checkout and
 =head2 new
 
   Business::Stripe::WebCheckout->new('api-secret' => 'sk_test_00000000000000000000000000');
-  
+
 The constructor method.  The Secret Key is required.
 
 The following parameters may be provided:
@@ -411,6 +417,10 @@ Defaults to "Business::Stripe::WebCheckout" as this is required by Stripe.
 =item *
 
 C<email> - If provided, this pre-fills the user's email address in the Stripe hosted checkout.  If provided, this is then non editable during checkout.
+
+=item *
+
+C<getShipping> - If provided, this forces Stripe to capture the customer's shipping address during checkout.  This should be the country code for the customer's shipping location (see L<https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2>).
 
 =back
 
@@ -560,12 +570,12 @@ See L<https://stripe.com/docs/payments/accept-a-payment?integration=checkout>
     </head>
     <body>
       <button id="checkout-button">Checkout</button>
-  
+
       <script type="text/javascript">
         // Create an instance of the Stripe object with your publishable API key
         var stripe = Stripe('pk_test_00000000000000000000000000');
         var checkoutButton = document.getElementById('checkout-button');
-  
+
         checkoutButton.addEventListener('click', function() {
           // Create a new Checkout Session using the server-side endpoint you
           // created in step 3.
@@ -606,7 +616,7 @@ See L<https://stripe.com/docs/payments/accept-a-payment?integration=checkout>
     'cancel-url'    => 'https://www.example.com/ohdear.html',
     'reference'     => 'My Payment',
   );
-      
+
   $stripe->add_product(
     'id'          => 'test',
     'name'        => 'Expensive Thingy',
@@ -614,10 +624,10 @@ See L<https://stripe.com/docs/payments/accept-a-payment?integration=checkout>
     'qty'         => 1,
     'price'       => 50000,
   );
-      
+
   print "Content-Type: text/json\n\n";
   print $stripe->get_intent;
-  
+
 
 =head2 2 - Simpler Javascript using XHR without exposing Public Key
 
@@ -629,7 +639,7 @@ See L<https://stripe.com/docs/payments/accept-a-payment?integration=checkout>
   <script>
   var xhr=new XMLHttpRequest();
   function buyNow() {
-      xhr.open("POST", "https://www.example.com/cgi-bin/stripe_test.pl", true);
+      xhr.open("POST", "https://www.example.com/cgi-bin/trolley.pl", true);
       xhr.onreadystatechange=function() {
       if (xhr.readyState == 4 && xhr.status == 200) {
                   var keys = xhr.response.split(':');
@@ -661,7 +671,7 @@ See L<https://stripe.com/docs/payments/accept-a-payment?integration=checkout>
     'cancel-url'    => 'https://www.example.com/ohdear.html',
     'reference'     => 'My Payment',
   );
-      
+
   $stripe->add_product(
     'id'          => 'test',
     'name'        => 'Expensive Thingy',
@@ -669,10 +679,10 @@ See L<https://stripe.com/docs/payments/accept-a-payment?integration=checkout>
     'qty'         => 1,
     'price'       => 50000,
   );
-      
+
   print "Content-Type: text/text\n\n";
   print $stripe->get_ids;
-  
+
 =head2 3 - Simpest method (no Javascript required)
 
 =head3 HTML
@@ -687,7 +697,7 @@ See L<https://stripe.com/docs/payments/accept-a-payment?integration=checkout>
   </form>
   </body>
   </html>
-  
+
 =head3 Perl - trolley.pl
 
   use Business::Stripe::WebCheckout;
@@ -700,7 +710,7 @@ See L<https://stripe.com/docs/payments/accept-a-payment?integration=checkout>
     'cancel-url'    => 'https://www.example.com/ohdear.html',
     'reference'     => 'My Payment',
   );
-      
+
   $stripe->add_product(
     'id'          => 'test',
     'name'        => 'Expensive Thingy',
@@ -708,7 +718,7 @@ See L<https://stripe.com/docs/payments/accept-a-payment?integration=checkout>
     'qty'         => 1,
     'price'       => 50000,
   );
-      
+
   if ($stripe->success) {
      print $stripe->checkout;
   } else {
@@ -722,19 +732,19 @@ This last example prints out a fully formed HTML document to the browser contain
 
 
 =head1 SEE ALSO
- 
+
 L<Net::Stripe>, L<Net::Stripe::Simple>, L<Business::Stripe>
 
 =head1 AUTHOR
 
 =over 4
- 
+
 =item *
- 
+
 Ian Boddison <ian@boddison.com>
 
 =back
- 
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-business-stripe-webcheckout at rt.cpan.org>, or through

@@ -1,0 +1,31 @@
+0.43  2022-09-15  lichtkind
+-------
+    * = GUI cleanup
+    * + organize setting in tabs
+    * + clean up command buttons into a main menu
+    * + progress bar for drawing
+    * ! smooth loading of settings without sketch triggering event loops
+    * ~ doc typos
+
+0.42  2022-09-14  lichtkind
+-------
+    * = post first release bug fix release
+    * + sketch mode to get fast previews when playing with knobs
+    * - removing not working toggle button for tool tips
+    * ! fix visual element enable mechanism due changed key words of color flow
+    * ! crash when last settings list in config was empty
+    * ! crash when saving settings
+
+
+0.41  2022-09-14  lichtkind
+-------
+    * = initial CPAN release
+    * + 4 pendula: X, Y, Z (wobble), Rotating with haveing each setting of
+    *   - pendulum length (amplitude)
+    *   - frequency (integer + decimal), invertable 
+    *   - offset, checks for 90 and 180 degree
+    * + line length, dot denisty and dot size
+    * + color flow: no, linear, alternating, circular
+    * save images as SVG, JPEG and PNG
+    * save and load settings in INI files
+    * quick save of images and settings for series of files

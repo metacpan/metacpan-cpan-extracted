@@ -1,6 +1,6 @@
 package Date::Holidays::GB::EAW;
 
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 use strict;
 use warnings;

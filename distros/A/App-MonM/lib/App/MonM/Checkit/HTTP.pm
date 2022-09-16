@@ -1,4 +1,4 @@
-package App::MonM::Checkit::HTTP; # $Id: HTTP.pm 80 2019-07-08 10:41:47Z abalama $
+package App::MonM::Checkit::HTTP; # $Id: HTTP.pm 116 2022-08-27 08:57:12Z abalama $
 use strict;
 use utf8;
 
@@ -10,19 +10,21 @@ App::MonM::Checkit::HTTP - Checkit HTTP subclass
 
 =head1 VIRSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
     <Checkit "foo">
+
         Enable  yes
         Type    http
         URL     http://www.example.com
-        Method  GET
+        Method  POST
         TimeOut 180
         Target  code
         IsTrue  200
         Content "Blah-Blah-Blah"
+        Proxy   "http://http.example.com:8001"
         Set     X-Foo foo
         Set     X-Bar bar
 
@@ -67,6 +69,77 @@ Method and URL of request
 
 =back
 
+=head1 CONFIGURATION DIRECTIVES
+
+The basic Checkit configuration options (directives) detailed describes in L<App::MonM::Checkit/CONFIGURATION DIRECTIVES>
+
+=over 4
+
+=item B<Content>
+
+    Content  "Content for HTTP request"
+
+Specifies POST/PUT/PATCH request content
+
+Example:
+
+    Set Content-Type text/plain
+    Content "Content for POST HTTP request"
+
+Default: no content
+
+=item B<Method>
+
+    Method      GET
+
+Defines the HTTP method: GET, POST, PUT, HEAD, PATCH, DELETE, and etc.
+
+Default: GET
+
+=item B<Proxy>
+
+    Proxy http://http.example.com:8001/
+
+Defines the proxy URL for a http/https requests
+
+Default: no proxy
+
+=item B<Set>
+
+    Set X-Token mdffltrtkmdffltrtk
+
+Defines HTTP request headers. This directive allows you set case sensitive HTTP headers.
+There can be several such directives.
+
+Examples:
+
+    Set User-Agent  "MyAgent/1.00"
+    Set X-Token     "mdffltrtkmdffltrtk"
+
+
+=item B<Timeout>
+
+    Timeout    1m
+
+Defines the timeout of HTTP request
+
+Default: 180
+
+=item B<URL>
+
+    URL     https://www.example.com
+
+Defines the URL for HTTP/HTTPS requests
+
+Default: http://localhost
+
+Examples:
+
+    URL     https://user:password@www.example.com
+    URL     https://www.example.com
+
+=back
+
 =head1 HISTORY
 
 See C<Changes> file
@@ -85,11 +158,11 @@ L<App::MonM>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -101,7 +174,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use Encode;
 use CTK::ConfGenUtil;
@@ -110,7 +183,7 @@ use LWP::UserAgent();
 use HTTP::Request();
 
 use App::MonM::Const qw/PROJECTNAME/;
-use App::MonM::Util qw/set2attr/;
+use App::MonM::Util qw/set2attr getTimeOffset/;
 
 use constant {
         DEFAULT_URL     => "http://localhost",
@@ -121,29 +194,37 @@ use constant {
 sub check {
     my $self = shift;
     my $type = $self->type;
-    return $self->maybe::next::method() unless $type && $type eq 'http';
+    return $self->maybe::next::method() unless $type && ($type eq 'http' or $type eq 'https');
 
     # Init
-    my $url = value($self->config, 'url') || DEFAULT_URL;
-    my $method = value($self->config, 'method') || DEFAULT_METHOD;
-    my $timeout = value($self->config, 'timeout') || DEFAULT_TIMEOUT;
+    my $url = lvalue($self->config, 'url') || DEFAULT_URL;
+    my $method = lvalue($self->config, 'method') || DEFAULT_METHOD;
+    my $timeout = getTimeOffset(lvalue($self->config, 'timeout') || DEFAULT_TIMEOUT);
     my $attr = set2attr($self->config);
-    my $content = value($self->config, 'content') // '';
+    my $content = lvalue($self->config, 'content') // '';
+    my $proxy = lvalue($self->config, 'proxy') || "";
 
-    # Prepare request
-    my $uri = new URI($url);
-    my $ua = new LWP::UserAgent(
+    # Agent
+    my $uri = URI->new($url);
+    my $ua = LWP::UserAgent->new(
         agent               => sprintf("%s/%s", PROJECTNAME, $VERSION),
         timeout             => $timeout,
         protocols_allowed   => ['http', 'https'],
     );
     $ua->default_header($_, value($attr, $_)) for (keys %$attr);
-    my $request = new HTTP::Request(uc($method) => $uri);
+
+    # Proxy
+    $ua->proxy(['http', 'https'], $proxy) if $proxy;
+
+    # Prepare request data
+    my $request = HTTP::Request->new(uc($method) => $uri);
     if ($method =~ /PUT|POST|PATCH/) {
         Encode::_utf8_on($content);
         $request->header('Content-Length' => length(Encode::encode("utf8", $content)));
         $request->content(Encode::encode("utf8", $content));
     }
+
+    # Request
     my $response = $ua->request($request);
 
     # Result

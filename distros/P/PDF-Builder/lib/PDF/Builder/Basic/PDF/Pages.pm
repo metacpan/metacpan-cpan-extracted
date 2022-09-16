@@ -20,8 +20,8 @@ use warnings;
 
 use base 'PDF::Builder::Basic::PDF::Dict';
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Array;
 use PDF::Builder::Basic::PDF::Dict;
@@ -43,7 +43,9 @@ themselves.
 
 =head1 METHODS
 
-=head2 PDF::Builder::Basic::PDF::Pages->new($pdf, $parent)
+=over
+
+=item PDF::Builder::Basic::PDF::Pages->new($pdf, $parent)
 
 This creates a new Pages object in a PDF. Notice that the C<$parent> here is 
 not the file context for the object, but the parent pages object for these 
@@ -94,7 +96,7 @@ sub new {
 #    return $self;
 #}
 
-#=head2 $p->out_obj($is_new)
+#=item $p->out_obj($is_new)
 #
 #Tells all the files that this thing is destined for that they should output this
 #object, come time to output. If this object has no parent, then it must be the
@@ -128,7 +130,7 @@ sub _pdf {
     return $self->get_top()->{' parent'};
 }
 
-=head2 $p->find_page($page_number)
+=item $p->find_page($page_number)
 
 Returns the given page, using the page count values in the pages tree. Pages
 start at 0.
@@ -163,7 +165,7 @@ sub find_page_recursively {
     return;
 }
 
-=head2 $p->add_page($page, $page_number)
+=item $p->add_page($page, $page_number)
 
 Inserts the page before the given C<$page_number>. C<$page_number> can be 
 negative to count backwards from the END of the document. -1 is after the last 
@@ -273,7 +275,7 @@ sub set_modified {
     return;
 }
 
-#=head2 $root_pages = $p->rebuild_tree([@pglist])
+#=item $root_pages = $p->rebuild_tree([@pglist])
 #
 #B<WARNING: Not yet implemented. Do not attempt to use!>
 #
@@ -291,7 +293,7 @@ sub set_modified {
 #    return;
 #}
 
-=head2 @objects = $p->get_pages()
+=item @objects = $p->get_pages()
 
 Returns a list of page objects in the document, in page order.
 
@@ -323,7 +325,7 @@ sub get_pages_recursively {
     return @pages;
 }
 
-=head2 $p->find_prop($key)
+=item $p->find_prop($key)
 
 Searches up through the inheritance tree to find a property (key).
 
@@ -352,7 +354,7 @@ sub find_prop {
     return;
 }
 
-=head2 $p->add_font($pdf, $font)
+=item $p->add_font($pdf, $font)
 
 Creates or edits the resource dictionary at this level in the hierarchy. If
 the font is already supported, even through the hierarchy, then it is not added.
@@ -393,9 +395,9 @@ sub add_font {
     return $self;
 } # end of add_font()
 
-=head2 $p->bbox($xmin,$ymin, $xmax,$ymax, $param)
+=item $p->bbox($xmin,$ymin, $xmax,$ymax, $param)
 
-=head2 $p->bbox($xmin,$ymin, $xmax,$ymax)
+=item $p->bbox($xmin,$ymin, $xmax,$ymax)
 
 Specifies the bounding box for this and all child pages. If the values are
 identical to those inherited, no change is made. C<$param> specifies the 
@@ -426,7 +428,7 @@ sub bbox {
     return $self;
 }
 
-=head2 $p->proc_set(@entries)
+=item $p->proc_set(@entries)
 
 Ensures that the current resource contains all the entries in the proc_sets
 listed. If necessary, it creates a local resource dictionary to achieve this.
@@ -472,7 +474,7 @@ sub empty {
     return $self;
 }
 
-=head2 $p->get_top()
+=item $p->get_top()
 
 Returns the top of the pages tree.
 
@@ -486,5 +488,9 @@ sub get_top {
 
     return $top->realise();
 }
+
+=back
+
+=cut
 
 1;

@@ -1,6 +1,6 @@
 package Catmandu::Exporter::XML;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Catmandu::Sane;
 use Moo;

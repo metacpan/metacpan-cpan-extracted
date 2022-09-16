@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Init;
 
-our $VERSION = '2.0.6';
+our $VERSION = '2.0.15';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -50,7 +50,8 @@ sub init($$) {
 # Set log level for Lemonldap::NG logs
 sub logLevelInit {
     my ($class) = @_;
-    my $logger  = $class->localConfig->{logger} ||= $class->defaultLogger;
+    my $logger = $class->localConfig->{logger} ||=
+      $ENV{LLNG_DEFAULTLOGGER} || $class->defaultLogger;
     eval "require $logger";
     die $@ if ($@);
     my $err;

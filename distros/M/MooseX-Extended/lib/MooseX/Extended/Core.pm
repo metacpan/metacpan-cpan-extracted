@@ -28,7 +28,7 @@ use Ref::Util qw(
 );
 use Carp 'croak';
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 our @EXPORT_OK = qw(
   _assert_import_list_is_valid
@@ -210,6 +210,7 @@ sub _default_import_list () {
                       multi
                       async
                       try
+                      method
                       /
                 ]
             ]
@@ -235,6 +236,10 @@ sub _apply_optional_features ( $config, $for_class ) {
         # don't trap the error. Let it bubble up.
         load Future::AsyncAwait;
         Future::AsyncAwait->import::into($for_class);
+    }
+    if ( $config->{includes}{method} ) {
+        load Function::Parameters;
+        Function::Parameters->import::into( $for_class, 'method' );
     }
     if ( $config->{includes}{try} ) {
         if ( $^V && $^V lt v5.24.0 ) {
@@ -491,7 +496,7 @@ MooseX::Extended::Core - Internal module for MooseX::Extended
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 DESCRIPTION
 

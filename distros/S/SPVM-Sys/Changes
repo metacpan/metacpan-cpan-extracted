@@ -1,0 +1,64 @@
+0.04 2022-09-16
+  [Test Improvement]
+    * Add many tests.
+  [Bug Fix]
+    * Fix the bug that the l method in the Sys::FileTest class doesn't work well.
+  [Prerequirement Changes]
+    * Need SPVM::Errno 0.06+.
+    
+0.03 2022-09-15
+  [New Features]
+    * Add the getcwd method to the Sys::IO class.
+    
+      static method getcwd : mutable string ($buf : mutable string, $size : int);
+      static method realpath : mutable string ($path : string, $resolved_path : mutable string);
+      static method _getdcwd : mutable string ($drive : int, $buffer : mutable string, $maxlen : int);
+    
+    * Add the following methods to the Sys class.
+    
+      static method getenv : string ($name : string);
+      static method setenv : int ($name : string, $value : string, $overwrite : int);
+      static method unsetenv : int ($name : string);
+    
+      
+  [Incompatible Changes]
+    * Change the definition of the following method in the Sys::IO class.
+      [Before]
+        static method fwrite : int ($buffer : mutable string, $size : int, $data_length : int, $stream : Sys::IO::FileStream);
+      [After]
+        static method fwrite : int ($ptr : string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream);
+    * Change the definition of the following method in the Sys::IO class.
+      [Before]
+        static method truncate : long ($path : string, $offset : long);
+      [After]
+        static method truncate : int ($path : string, $length : long);
+  [Bug Fix]
+    * Fix the bug that lseek return value is wrong.
+    * Fix the bug that truncate return value is wrong.
+    * Fix the bug that the length argument of the truncate method in the Sys::IO class is int, not long.
+  [Test Improvement]
+    * Add many tests.
+  [Test Fix]
+    * Fix Github Action Windows 2019 test by adding ".gitattribute"
+    
+      # All files are binary files. CRLF is always CRLF. LF is always LF.
+      * -text
+    * Fix reference count tests.
+    
+  [Document Improvement]
+    * Add the link to this repository.
+0.02 2022-09-14
+  [Document Improvement]
+    * Add Sys::FileTest doc.
+  [Incompatible Changes]
+    * Remove Sys::IO->freopen.
+    * Simplify the implementation of the methods for file test in Sys::FileTest
+      If the file doesn't exists, an exception will be thrown except for e.
+
+  [Changes]
+    * Use access function for Sys::FileTest->e.
+  [Bug Fix]
+    * Fix the bug that ouble free or corruption (!prev) occur in Sys::IO->stat in Linux/Ubuntu 32bit.
+0.01 2022-09-13
+  
+  * First experimental release

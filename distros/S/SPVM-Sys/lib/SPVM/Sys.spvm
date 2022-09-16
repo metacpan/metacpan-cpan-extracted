@@ -1,0 +1,16 @@
+class Sys {
+  native static method is_D_WIN32 : int ();
+
+  native static method getenv : string ($name : string);
+
+  native static method setenv : int ($name : string, $value : string, $overwrite : int);
+
+  native static method unsetenv : int ($name : string);
+}
+
+=pod
+
+exit
+EXIT_FAILURE
+
+=cut

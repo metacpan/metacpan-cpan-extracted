@@ -1,12 +1,12 @@
 package App::PhoneNumberUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-03'; # DATE
-our $DIST = 'App-PhoneNumberUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
-
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-13'; # DATE
+our $DIST = 'App-PhoneNumberUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -15,6 +15,22 @@ our %arg0_phnum = (
         schema => ['str*', match => qr/[0-9]/],
         req => 1,
         pos => 0,
+    },
+);
+
+our %arg0_phnums = (
+    phnums => {
+        schema => ['array*', of=>['str*', match => qr/[0-9]/], min_len=>1],
+        pos => 0,
+        slurpy => 1,
+        cmdline_src => 'stdin_or_args',
+    },
+);
+
+our %argspecopt_strip_whitespace = (
+    strip_whitespace => {
+        schema => 'bool*',
+        cmdline_aliases => {S => {}},
     },
 );
 
@@ -44,7 +60,7 @@ sub phone_number_info {
     my %args = @_;
 
     my $np = Number::Phone->new($args{phnum})
-        or return [400, "Invalid phone number"];
+        or return [400, "Invalid phone number '$args{phnum}'"];
     [200, "OK", {
         is_valid => $np->is_valid,
         is_allocated => $np->is_allocated,
@@ -85,23 +101,81 @@ $SPEC{normalize_phone_number} = {
 This utility uses <pm:Number::Phone> to format the phone number, which supports
 country-specific formatting rules.
 
+The phone number must be an international phone number (e.g. +6281812345678
+instead of 081812345678). But if you specify the `default_country_code` option,
+you can supply a local phone number (e.g. 081812345678) and it will be formatted
+as international phone number.
+
+This utility can accept multiple numbers from command-line arguments or STDIN.
+
 _
     args => {
-        %arg0_phnum,
+        %arg0_phnums,
+        default_country_code => {
+            schema => 'country::code::alpha2',
+        },
+        %argspecopt_strip_whitespace,
     },
     examples => [
-        {args=>{phnum=>'+442087712924'}},
-        {args=>{phnum=>'+6281812345678'}},
+        {args=>{phnums=>['+442087712924']}},
+        {args=>{phnums=>['+6281812345678']}},
     ],
 };
 sub normalize_phone_number {
-    require Number::Phone;
-
     my %args = @_;
 
-    my $np = Number::Phone->new($args{phnum})
-        or return [400, "Invalid phone number"];
-    [200, "OK", $np->format];
+    my $mod = "Number::Phone";
+    if ($args{default_country_code}) {
+        return [400, "Bad syntax for country code, please specify 2-letter ISO country code"]
+            unless $args{default_country_code} =~ /\A[A-Za-z]{2}\z/;
+        $mod .= "::StubCountry::" . uc($args{default_country_code});
+    }
+
+    (my $modpm = "$mod.pm") =~ s!::!/!g;
+    require $modpm;
+
+    my @rows;
+    for my $num (@{ $args{phnums} }) {
+        my $np = $mod->new($num)
+            or return [400, "Invalid phone number '$num'"];
+        my $formatted = $np->format;
+        if ($args{strip_whitespace}) { $formatted =~ s/\s+//g }
+        push @rows, $formatted;
+    }
+
+    [200, "OK", @{$args{phnums}} == 1 ? $rows[0] : \@rows];
+}
+
+$SPEC{normalize_phone_number_idn} = {
+    v => 1.1,
+    summary => 'Normalize phone number (for Indonesian number)',
+    description => <<'_',
+
+This is a shortcut for:
+
+    % normalize-phone-number --default-country-code id
+
+_
+    args => {
+        # all args except default_country_code
+        %arg0_phnums,
+        %argspecopt_strip_whitespace,
+    },
+    examples => [
+        {args=>{phnums=>['+6281812345678']}},
+        {args=>{phnums=>['6281812345678']}},
+        {args=>{phnums=>['081812345678']}},
+    ],
+};
+sub normalize_phone_number_idn {
+    my %args = @_;
+
+    # preprocess
+    for (@{ $args{phnums} }) {
+        if (/\A62/) { $_ = "+$_" }
+    }
+
+    normalize_phone_number(%args, default_country_code=>'id');
 }
 
 $SPEC{phone_number_is_valid} = {
@@ -159,7 +233,7 @@ App::PhoneNumberUtils - Utilities related to phone numbers
 
 =head1 VERSION
 
-This document describes version 0.002 of App::PhoneNumberUtils (from Perl distribution App-PhoneNumberUtils), released on 2021-06-03.
+This document describes version 0.006 of App::PhoneNumberUtils (from Perl distribution App-PhoneNumberUtils), released on 2022-09-13.
 
 =head1 DESCRIPTION
 
@@ -167,7 +241,13 @@ This distributions provides the following command-line utilities:
 
 =over
 
+=item * L<format-phone-number>
+
+=item * L<format-phone-number-idn>
+
 =item * L<normalize-phone-number>
+
+=item * L<normalize-phone-number-idn>
 
 =item * L<phone-number-info>
 
@@ -192,16 +272,23 @@ Examples:
 
 =item * Example #1:
 
- normalize_phone_number(phnum => "+442087712924"); # -> [200, "OK", "+44 20 8771 2924", {}]
+ normalize_phone_number(phnums => ["+442087712924"]); # -> [200, "OK", "+44 20 8771 2924", {}]
 
 =item * Example #2:
 
- normalize_phone_number(phnum => "+6281812345678"); # -> [200, "OK", "+62 818 1234 5678", {}]
+ normalize_phone_number(phnums => ["+6281812345678"]); # -> [200, "OK", "+62 818 1234 5678", {}]
 
 =back
 
 This utility uses L<Number::Phone> to format the phone number, which supports
 country-specific formatting rules.
+
+The phone number must be an international phone number (e.g. +6281812345678
+instead of 081812345678). But if you specify the C<default_country_code> option,
+you can supply a local phone number (e.g. 081812345678) and it will be formatted
+as international phone number.
+
+This utility can accept multiple numbers from command-line arguments or STDIN.
 
 This function is not exported.
 
@@ -209,7 +296,67 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<phnum>* => I<str>
+=item * B<default_country_code> => I<country::code::alpha2>
+
+=item * B<phnums> => I<array[str]>
+
+=item * B<strip_whitespace> => I<bool>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 normalize_phone_number_idn
+
+Usage:
+
+ normalize_phone_number_idn(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Normalize phone number (for Indonesian number).
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ normalize_phone_number_idn(phnums => ["+6281812345678"]); # -> [200, "OK", "+62 818 1234 5678", {}]
+
+=item * Example #2:
+
+ normalize_phone_number_idn(phnums => [6281812345678]); # -> [200, "OK", "+62 818 1234 5678", {}]
+
+=item * Example #3:
+
+ normalize_phone_number_idn(phnums => ["081812345678"]); # -> [200, "OK", "+62 818 1234 5678", {}]
+
+=back
+
+This is a shortcut for:
+
+ % normalize-phone-number --default-country-code id
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<phnums> => I<array[str]>
+
+=item * B<strip_whitespace> => I<bool>
 
 
 =back
@@ -416,14 +563,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-PhoneN
 
 Source repository is at L<https://github.com/perlancar/perl-App-PhoneNumberUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PhoneNumberUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Number::Phone>
@@ -432,11 +571,37 @@ L<Number::Phone>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PhoneNumberUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

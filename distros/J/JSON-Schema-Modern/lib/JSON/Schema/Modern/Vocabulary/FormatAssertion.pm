@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.554';
+our $VERSION = '0.555';
 
 use 5.020;
 use Moo;
@@ -147,7 +147,7 @@ sub _traverse_keyword_format ($self, $schema, $state) {
 
 sub _eval_keyword_format ($self, $data, $schema, $state) {
   abort($state, 'unimplemented format "%s"', $schema->{format})
-    if $schema->{format} eq 'iri-reference' or $schema->{format} eq 'uri-template';
+    if $schema->{format} eq 'uri-template';
 
   try {
     if ($schema->{format} eq 'date-time' or $schema->{format} eq 'date') {
@@ -197,7 +197,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.554
+version 0.555
 
 =head1 DESCRIPTION
 
@@ -207,7 +207,7 @@ version 0.554
 
 Implementation of the JSON Schema Draft 2020-12 "Format-Assertion" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2020-12/vocab/format-assertion> and formally specified in
-L<https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-validation-01#section-7>.
+L<https://json-schema.org/draft/2020-12/json-schema-validation.html#section-7>.
 
 Support is also provided for
 
@@ -231,8 +231,8 @@ L<JSON::Schema::Modern/validate_formats> option.
 Overrides to particular format implementations, or additions of new ones, can be done through
 L<JSON::Schema::Modern/format_validations>.
 
-Formats C<iri-reference> and C<uri-template> are not yet implemented.
-Use of these formats will always result in an error.
+Format C<uri-template> is not yet implemented.
+Use of this format will always result in an error.
 
 =head1 SEE ALSO
 

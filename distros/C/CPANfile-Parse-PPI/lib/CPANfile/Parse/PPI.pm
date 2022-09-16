@@ -1,12 +1,14 @@
 package CPANfile::Parse::PPI;
-$CPANfile::Parse::PPI::VERSION = '0.05';
+
 # ABSTRACT: Parse I<cpanfile>s with PPI
 
 use strict;
 use warnings;
 
+our $VERSION = '0.06'; # VERSION
+
 use Carp qw(carp croak);
-use List::Util qw(first);
+use List::Util qw(first any);
 use Moo;
 use PPI;
 
@@ -71,23 +73,29 @@ sub _parse {
 
     REQUIRED:
     for my $required ( @{ $requires || [] } ) {
+
         # 'mirror' can be an attribute for "requires" as well as a keyword
         # _scan_attrs should have removed all 'mirrors' that are used as
         # an attribute for 'requires'. So skip those PPI nodes...
         next REQUIRED if !$required;
 
+
         my $value = $required->snext_sibling;
 
-        my $stage = '';
         my $type  = $required->content;
+        my %on_feature = (
+            on      => '',
+            feature => '',
+        );
 
         if ( $type eq 'mirror' or $type eq 'osname' ) {
             push @{ $meta->{$type} }, $value->content if $value;
         }
 
         if ( -1 != index $type, '_' ) {
-            ($stage, $type) = split /_/, $type, 2;
+            (my $stage, $type) = split /_/, $type, 2;
             $stage = 'develop' if $stage eq 'author';
+            $on_feature{on} = $stage;
         }
 
         my %attr = _scan_attrs( $required, $type );
@@ -121,17 +129,31 @@ sub _parse {
 
             if ( $parent_node->isa('PPI::Structure::Block') ) {
                 $parent_node = $parent_node->parent;
+                my ($on_feature) = $parent_node->find_first(
+                    sub {
+                        # need to create token var because 'any' messes up $_
+                        my $token = $_[1];
+                        $token->isa('PPI::Token::Word')
+                            && (
+                            any { $token->content eq $_ }
+                            (qw{on feature})
+                            );
+                    }
+                );
+                if ($on_feature) {
+                    my $word = $on_feature->snext_sibling;
+                    my $condition
+                        = $word->can('string')
+                        ? $word->string
+                        : $word->content;
+                    $on_feature{ $on_feature->content } = $condition;
+                    last PARENT;
 
-                my ($on) = $parent_node->find_first( sub { $_[1]->isa('PPI::Token::Word') && $_[1]->content eq 'on' } );
+                }
+                else {
+                    next PARENT;
+                }
 
-                next PARENT if !$on;
-
-                # TODO: Check for "feature"
-
-                my $word = $on->snext_sibling; 
-                $stage = $word->can('string') ? $word->string : $word->content;
-                
-                last PARENT;
             }
         }
 
@@ -155,7 +177,8 @@ sub _parse {
             name    => $prereq,
             version => $version,
             type    => $type,
-            stage   => $stage,
+            stage   => $on_feature{on},
+            feature => $on_feature{feature},
             %attr,
         };
     }
@@ -207,7 +230,7 @@ CPANfile::Parse::PPI - Parse I<cpanfile>s with PPI
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -221,9 +244,11 @@ version 0.05
     # my $cpanfile = CPANfile::Parse::PPI->new( \$content );
     
     for my $module ( $cpanfile->modules->@* ) {
-        my $stage = "";
-        $stage    = "on $module->{stage}" if $module->{stage};
-        say sprintf "%s is %s", $module->{name}, $module->{type};
+        my $stage   = $module->{stage}   ? " on $module->{stage}"            : '';
+        my $feature = $module->{feature} ? " for feature $module->{feature}" : '';
+
+        say sprintf "%s is %s",
+             $module->{name}, $module->{type}, $stage, $feature;
     }
 
 =begin pod_coverage
@@ -247,6 +272,9 @@ version 0.05
     on build => sub {
         recommends "Dist::Zilla" => 4.0;
         requires "Test2" => 2.311;
+    }
+    feature 'sqlite', "SQLite Support" => sub {
+        requires DBD::SQLite
     }
     CPANFILE
 
@@ -272,6 +300,8 @@ Each element is a hashref with these keys:
 =item * type
 
 =item * stage
+
+=item * feature
 
 =back
 

@@ -22,7 +22,7 @@ main() (
 )
 
 setup() {
-  : "${PERL:=$(which perl)}"
+  PERL=$(which perl)
   ZILD="$PERL -S zild"
 
   rm -fr cpan
@@ -101,7 +101,10 @@ make-doc() (
     pod=${pod/.swim/.pod}
     mkdir -p "$(dirname "$pod")"
     if [[ $doc == *.md ]]; then
-      zild-pandoc-json-to-pod < "$doc" > "$pod"
+      cat "$doc" |
+        zild-markdown-plus |
+        pandoc --from=gfm --to=json |
+        "$PERL" -S zild-pandoc-json-to-pod > "$pod"
     else
       if (grep -E '^=+$' "$doc" &> /dev/null) ||
         (grep -E '^<<<cpan-head>>>$' "$doc" &> /dev/null)

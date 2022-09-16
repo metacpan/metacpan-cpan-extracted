@@ -112,7 +112,7 @@ for (my $i = 0; $i <= $#strings; $i++) {
           }
       }
   }
-  
+
   $recognizerInterface = MyRecognizerInterface->new($string);
   $valueInterface = MyValueInterface->new();
   if ($eslifGrammar->parse($recognizerInterface, $valueInterface)) {

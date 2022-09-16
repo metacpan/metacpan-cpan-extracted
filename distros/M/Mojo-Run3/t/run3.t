@@ -4,8 +4,15 @@ use Test::More;
 
 subtest 'before start' => sub {
   my $run3 = Mojo::Run3->new;
-  is $run3->pid,    0,  'pid';
-  is $run3->status, -1, 'status';
+  is $run3->bytes_waiting, 0,  'zero bytes waiting';
+  is $run3->pid,           0,  'pid';
+  is $run3->status,        -1, 'status';
+
+  $run3->write('foo');
+  is $run3->bytes_waiting, 3, 'three bytes waiting';
+
+  $run3->write('bar');
+  is $run3->bytes_waiting, 6, 'six bytes waiting';
 };
 
 subtest 'stdout' => sub {
@@ -32,15 +39,18 @@ subtest 'stderr' => sub {
 
 subtest 'stdin' => sub {
   my $run3 = Mojo::Run3->new;
-  my ($drained, $stdout) = (0, '');
+  my ($drained, $waiting, $stdout) = (0, -1, '');
   $run3->on(stderr => sub { diag "STDERR <<< $_[1]" });
   $run3->on(stdout => sub { $stdout .= $_[1] });
   $run3->on(
     spawn => sub {
-      shift->write("cool beans\n", sub { $drained++ });
+      my ($run3) = @_;
+      $run3->write("cool beans\n", sub { $drained++ });
+      $waiting = $run3->bytes_waiting;
     }
   );
   $run3->run_p(sub { print scalar <STDIN> })->wait;
+  is $waiting, 0,              'all got written';
   is $drained, 1,              'drained';
   is $stdout,  "cool beans\n", 'read';
   ok $run3->pid > 0, 'pid';

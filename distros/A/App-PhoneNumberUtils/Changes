@@ -1,3 +1,36 @@
+0.006   2022-09-13  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild to fix rendering of examples in
+          normalize-phone-number-idn.
+
+
+0.005   2022-07-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli normalize-phone-number-idn] Accept 62xxx in addition to
+          +62xxx.
+
+        - [cli normalize-phone-number] Accept multiple numbers, from arg as
+          well as stdin.
+
+
+0.004   2022-07-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] [cli normalize-phone-number-*] Forgot to add other
+          options.
+
+
+0.003   2022-07-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli normalize-phone-number] Add options --default-country-code,
+          --strip-whitespace (-S).
+
+        - Add CLI normalize-phone-number-idn
+
+        - Add aliases CLIs format-phone-number{,-idn}.
+
+
 0.002   2021-06-03  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

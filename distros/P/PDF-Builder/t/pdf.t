@@ -13,10 +13,10 @@ $pdf->info(Producer => 'PDF::Builder Test Suite');
 my %info = $pdf->info();
 is($info{'Producer'}, 'PDF::Builder Test Suite', 'Check info string');
 
-my $gfx = $pdf->page->gfx();
+my $gfx = $pdf->page()->gfx();
 $gfx->fillcolor('blue');
 
-my $new = PDF::Builder->open_scalar($pdf->stringify());
+my $new = PDF::Builder->from_string($pdf->to_string());
 %info = $new->info();
 is($info{'Producer'}, 'PDF::Builder Test Suite', 'Check info string after save and reload');
 
@@ -27,82 +27,81 @@ is($info{'Producer'}, 'PDF::Builder Test Suite', 'Check info string after save a
 $pdf = $new;
 $new = PDF::Builder->new();
 my $form = $new->importPageIntoForm($pdf, 1);
-$form->{'-docompress'} = 0;
+#$form->{'-docompress'} = 0;  # not in API2 tests
 delete $form->{'Filter'};
-my $string = $new->stringify();
+my $string = $new->to_string();
 like($string, qr/0 0 1 rg/,
      q{Page imported by import_page contains content from original});
 
 # Add a second page with a different page size
 
-$new = PDF::Builder->open_scalar($string, '-compress' => 'none');
+$new = PDF::Builder->from_string($string, 'compress' => 'none');
 my $page = $pdf->page();
 my $font = $pdf->corefont('Helvetica');
 $page->mediabox(0, 0, 72, 144);
 my $text = $page->text();
 $text->font($font, 12);
 $text->text('This is a test');
-$pdf = PDF::Builder->open_scalar($pdf->stringify());
+$pdf = PDF::Builder->from_string($pdf->to_string()); 
 $form = $new->importPageIntoForm($pdf, 2);
-$form->{'-docompress'} = 0;
+#$form->{'-docompress'} = 0;  # not in API2 tests
 delete $form->{'Filter'};
 
 is(($form->bbox())[2], 72,
    q{Form bounding box is set from imported page});
 
-$string = $new->stringify();
+$string = $new->to_string();
 
 like($string, qr/\(This is a test\)/,
      q{Second imported page contains text});
 
-
 # Page Numbering
 
-$pdf = PDF::Builder->new('-compress' => 'none');
-$pdf->pageLabel(0, { -style => 'Roman' });
+$pdf = PDF::Builder->new('compress' => 'none');
+$pdf->pageLabel(0, { 'style' => 'Roman' });
 
-like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /S /R >> \] >>},
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /R >> \] >>},
      q{Page Numbering: Upper-case Roman Numerals});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
-$pdf->pageLabel(0, { -style => 'roman' });
-like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /S /r >> \] >>},
+$pdf = PDF::Builder->new('compress' => 'none');
+$pdf->pageLabel(0, { 'style' => 'roman' });
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /r >> \] >>},
      q{Page Numbering: Upper-case Roman Numerals});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
-$pdf->pageLabel(0, { -style => 'Alpha' });
-like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /S /A >> \] >>},
+$pdf = PDF::Builder->new('compress' => 'none');
+$pdf->pageLabel(0, { 'style' => 'Alpha' });
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /A >> \] >>},
      q{Page Numbering: Upper-case Alphabet Characters});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
-$pdf->pageLabel(0, { -style => 'alpha' });
-like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /S /a >> \] >>},
+$pdf = PDF::Builder->new('compress' => 'none');
+$pdf->pageLabel(0, { 'style' => 'alpha' });
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /a >> \] >>},
      q{Page Numbering: Lower-case Alphabet Characters});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
-$pdf->pageLabel(0, { -style => 'decimal' });
-like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /S /D >> \] >>},
+$pdf = PDF::Builder->new('compress' => 'none');
+$pdf->pageLabel(0, { 'style' => 'decimal' });
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /D >> \] >>},
      q{Page Numbering: Decimal Characters});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
-$pdf->pageLabel(0, { -start => 11 });
-like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /S /D /St 11 >> \] >>},
+$pdf = PDF::Builder->new('compress' => 'none');
+$pdf->pageLabel(0, { 'start' => 11 });
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /D /St 11 >> \] >>},
      q{Page Numbering: Decimal Characters (implicit), starting at 11});
 
-$pdf = PDF::Builder->new('-compress' => 'none');
-$pdf->pageLabel(0, { -prefix => 'Test' });
-like($pdf->stringify(), qr{/PageLabels << /Nums \[ 0 << /P \(Test\) /S /D >> \] >>},
+$pdf = PDF::Builder->new('compress' => 'none');
+$pdf->pageLabel(0, { 'prefix' => 'Test' });
+like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /P \(Test\) /S /D >> \] >>},
      q{Page Numbering: Decimal Characters (implicit), with prefix});
 
 ## 
-## stringify
+## to_string
 ##
 
-$pdf = PDF::Builder->new('-compress' => 'none');
+$pdf = PDF::Builder->new('compress' => 'none');
 $gfx = $pdf->page()->gfx();
 $gfx->fillcolor('blue');
 
-$string = $pdf->stringify();
+$string = $pdf->to_string();
 like($string, qr/0 0 1 rg/,
      q{Stringify of newly-created PDF contains expected content});
 
@@ -111,7 +110,7 @@ print $fh $string;
 close $fh;
 
 $pdf = PDF::Builder->open($filename);
-$string = $pdf->stringify();
+$string = $pdf->to_string();
 like($string, qr/0 0 1 rg/,
      q{Stringify of newly-opened PDF contains expected content});
 
@@ -120,21 +119,21 @@ like($string, qr/0 0 1 rg/,
 ## (in response to bug 134993, introduced by 113516, not yet in PDF::Builder)
 ##
 
-$pdf = PDF::Builder->new(-compress => 'none');
-$gfx = $pdf->page->gfx();
+$pdf = PDF::Builder->new('compress' => 'none');
+$gfx = $pdf->page()->gfx();
 $gfx->fillcolor('blue');
 
 ($fh, $filename) = tempfile();
-print $fh $pdf->stringify();
+print $fh $pdf->to_string();
 close $fh;
 
-$pdf = PDF::Builder->open($filename, -compress => 'none');
-$gfx = $pdf->page->gfx();
+$pdf = PDF::Builder->open($filename, 'compress' => 'none');
+$gfx = $pdf->page()->gfx();
 $gfx->fillcolor('red');
 $pdf->saveas($filename);
 
-$pdf = PDF::Builder->open($filename, -compress => 'none');
-$string = $pdf->stringify();
+$pdf = PDF::Builder->open($filename, 'compress' => 'none');
+$string = $pdf->to_string();
 like($string, qr/0 0 1 rg/,
      q{saveas($opened_filename) contains original content});
 like($string, qr/1 0 0 rg/,

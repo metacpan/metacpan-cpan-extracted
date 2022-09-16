@@ -9,7 +9,7 @@ use Future;
 # callback-based
 #use Future::AsyncAwait;
 
-use Filter::signatures;
+#use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
@@ -39,7 +39,7 @@ Apache::Tika::Server - Fire up/stop a Tika instance
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 extends 'Apache::Tika::Async';
 

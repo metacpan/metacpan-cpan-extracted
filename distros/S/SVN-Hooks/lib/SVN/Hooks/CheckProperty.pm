@@ -1,6 +1,6 @@
 package SVN::Hooks::CheckProperty;
 # ABSTRACT: Check properties in added files.
-$SVN::Hooks::CheckProperty::VERSION = '1.35';
+$SVN::Hooks::CheckProperty::VERSION = '1.36';
 use strict;
 use warnings;
 
@@ -87,7 +87,7 @@ SVN::Hooks::CheckProperty - Check properties in added files.
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 SYNOPSIS
 

@@ -2,17 +2,17 @@
 # ABSTRACT: Find runs and tests according to user specifications.
 
 package TestRail::Utils::Find;
-$TestRail::Utils::Find::VERSION = '0.051';
+$TestRail::Utils::Find::VERSION = '0.052';
 use strict;
 use warnings;
 
-use Carp qw{confess cluck};
-use Scalar::Util qw{blessed};
-use List::Util qw{any first};
+use Carp            qw{confess cluck};
+use Scalar::Util    qw{blessed};
+use List::Util      qw{any first};
 use List::MoreUtils qw{uniq};
 
 use File::Find;
-use Cwd qw{abs_path};
+use Cwd            qw{abs_path};
 use File::Basename qw{basename};
 
 use Hash::Merge qw{merge};
@@ -446,8 +446,7 @@ sub _filterResults {
             any {
                 my $df_case = $_;
                 any { $df_case eq $_ } @{ $opts->{defects} };
-            }
-            @$defects
+            } @$defects
         } @{ $c->{results} };
     }
 
@@ -478,7 +477,7 @@ TestRail::Utils::Find - Find runs and tests according to user specifications.
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =head1 DESCRIPTION
 
@@ -620,7 +619,7 @@ and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by George S. Baugh.
+This software is copyright (c) 2022 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

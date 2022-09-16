@@ -1,14 +1,17 @@
 #!/usr/bin/perl -w
-use strict; # $Id: monotifier 59 2019-07-14 09:14:38Z abalama $
+use strict; # $Id: monotifier 73 2022-09-15 13:29:50Z abalama $
+
+=encoding utf8
 
 =head1 NAME
 
-monotifier - extension for the monm notifications 
+monotifier - extension for the monm notifications
 
 =head1 SYNOPSIS
 
     monotifier [options] [commands [args]]
-    monotifier -u username -s "Subject" < /path/to/message/file.txt
+
+    monotifier
     monotifier show
     monotifier show <ID>
     monotifier remove <ID>
@@ -21,20 +24,16 @@ monotifier - extension for the monm notifications
 
 =item B<-c CONFIG_FILE, --config=CONFIG_FILE>
 
-Full path of the monm configuration file. The configuration file allows determine the
+Full path of the configuration file. The configuration file allows determine the
 basic default settings, which will use the system if it fails to specify additional
 configuration files in $CONFDIR directory. The default system
 path /etc/monm/monm.conf
 
-=item B<-D DATADIR, --datadir=DATADIR, --dir=DATADIR>
+=item B<-d DATADIR, --datadir=DATADIR, --dir=DATADIR>
 
 The directory of temporary files.
 
-Default: system temp directory
-
-=item B<-d, --debug>
-
-Enable debug mode. In this mode, debug messages are displayed on the screen
+Default: system temp directory (/tmp/monm)
 
 =item B<-h, --help>
 
@@ -43,33 +42,6 @@ Show short help information and quit
 =item B<-H, --longhelp>
 
 Show long help information and quit
-
-=item B<-l, --log>
-
-Enabling write debug information to syslog or user log file.
-
-Do not confuse the debug logging from regular logging to a file monm.log.
-Regular logging allows you to store information in monm.log on the progress of the processes 
-module, whereas debug logging for debugging of the internal components 
-of the module.
-
-To control the level of debugging see parameter LogEnable and LogLevel.
-
-=item B<-s SUBJECT, --subject=SUBJECT, --subj=SUBJECT>
-
-Sets the subject of message
-
-Default: System subject
-
-=item B<-t, --testmode>
-
-Enabling test mode. This key allows force sending notification while checking
-
-=item B<-u USERNAME, --user=USERNAME, --to=USERNAME>
-
-Recipient username
-
-Default: all users
 
 =item B<-v, --verbose>
 
@@ -90,13 +62,6 @@ Print the version number of the program and quit
     monotifier clean
 
 Remove incorrect messages
-
-=item B<create>
-
-    monotifier create -u username -s "Subject" < /path/to/message/file.txt
-    monotifier -u username -s "Subject" < /path/to/message/file.txt
-
-Create the message. This command name is optional and use by default!
 
 =item B<remove>
 
@@ -126,11 +91,11 @@ communication channels
 
 =head1 AUTHOR
 
-Serz Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -144,64 +109,54 @@ See L<https://dev.perl.org/licenses/>
 use Getopt::Long;
 use Pod::Usage;
 
-use App::MonM::Notifier;
+use File::Spec;
+
+use App::MonM::Notifier::Monotifier;
 use App::MonM::Const;
 
 use constant {
-    CMDDEFAULT  => 'create',
+    CMDDEFAULT  => 'info',
 };
-
-$| = 1;  # autoflush
 
 my $options = {};
 Getopt::Long::Configure("bundling");
 GetOptions($options,
     # NoUsed keys map:
     #
-    # a A b B   C     e E
+    # a A b B   C   D e E
     # f F g G     i I j J
-    # k K   L m M n N o O
-    # p P q Q r R   S   T
-    #   U     w W x X y Y
+    # k K l L m M n N o O
+    # p P q Q r R s S t T
+    # u U     w W x X y Y
     # z Z
 
     # Information and debug
     "help|usage|h",         # Show help page
     "longhelp|H|?",         # Show long help page
     "version|vers|ver|V",   # Print VERSION of the App::MonM
-    "debug|d",              # Debug mode
     "verbose|v",            # Verbose mode
-    "log|l",                # Log mode
-    "test|testmode|t",      # Test mode
 
     # CTK Application
     "config|conf|c=s",      # Config file
-    "datadir|dir|D=s",      # DataDir
-
-    # General
-    "username|user|to|u=s@",# Username (array)
-    "subject|subj|sbj|s=s", # Subject
+    "datadir|dir|d=s",      # DataDir
 
 ) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
 pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
 pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
-printf("Version: %s\n", App::MonM::Notifier->VERSION) && exit(0) if $options->{version};
+printf("Version: %s\n", App::MonM::Notifier::Monotifier->VERSION) && exit(0) if $options->{version};
 
 # VARS
 my $command = shift(@ARGV) || CMDDEFAULT;
 my @arguments = @ARGV;
 
-# App::MonM::Notifier instance
-my $app = new App::MonM::Notifier(
+# App::MonM::Monotifier instance
+my $app = App::MonM::Notifier::Monotifier->new(
         project => PROJECTNAME,
         prefix  => PREFIX,
         ($options->{config} && -e $options->{config} ? (configfile => $options->{config}) : ()),
         ($options->{datadir} ? (datadir => $options->{datadir}) : ()),
         options => $options,
-        debug   => $options->{debug},
         verbose => $options->{verbose},
-        log     => $options->{log},
-        test    => $options->{test},
     );
 pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS', -output => \*STDERR)
     unless $command && grep {$_ eq $command} ($app->list_handlers());

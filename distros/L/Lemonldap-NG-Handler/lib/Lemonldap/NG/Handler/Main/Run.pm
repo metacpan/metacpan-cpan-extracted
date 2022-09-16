@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -227,6 +227,7 @@ sub run {
         $class->cleanHeaders($req);
         return $class->OK;
     }
+
     elsif ( $protection == $class->MAYSKIP
         and $class->grant( $req, $session, $uri, $cond ) eq '999_SKIP' )
     {
@@ -327,8 +328,7 @@ sub getLevel {
         }
     }
     if ($level) {
-        $class->logger->debug(
-            'Found AuthnLevel=' . $level . ' for "' . "$vhost$uri" . '"' );
+        $class->logger->debug("Found AuthnLevel=$level for \"$vhost$uri\"");
         return $level;
     }
     else {
@@ -345,7 +345,7 @@ sub getLevel {
 sub grant {
     my ( $class, $req, $session, $uri, $cond, $vhost ) = @_;
 
-    return $cond->( $req, $session ) if ($cond);
+    return $cond->( $req, $session ) if $cond;
 
     $vhost ||= $class->resolveAlias($req);
     my $level = $class->getLevel( $req, $uri );
@@ -646,14 +646,10 @@ sub _getPort {
         return $class->tsv->{port}->{$vhost};
     }
     else {
-        if ( defined $class->tsv->{port}->{_}
-            and ( $class->tsv->{port}->{_} > 0 ) )
-        {
-            return $class->tsv->{port}->{_};
-        }
-        else {
-            return $req->port;
-        }
+        return ( defined $class->tsv->{port}->{_}
+              and ( $class->tsv->{port}->{_} > 0 ) )
+          ? $class->tsv->{port}->{_}
+          : $req->port;
     }
 }
 
@@ -670,14 +666,10 @@ sub _isHttps {
         return $class->tsv->{https}->{$vhost};
     }
     else {
-        if ( defined $class->tsv->{https}->{_}
-            and ( $class->tsv->{https}->{_} > -1 ) )
-        {
-            return $class->tsv->{https}->{_};
-        }
-        else {
-            return $req->secure;
-        }
+        return ( defined $class->tsv->{https}->{_}
+              and ( $class->tsv->{https}->{_} > -1 ) )
+          ? $class->tsv->{https}->{_}
+          : $req->secure;
     }
 }
 
@@ -715,9 +707,8 @@ sub isUnprotected {
         $i++
       )
     {
-        if ( $uri =~ $class->tsv->{locationRegexp}->{$vhost}->[$i] ) {
-            return $class->tsv->{locationProtection}->{$vhost}->[$i];
-        }
+        return $class->tsv->{locationProtection}->{$vhost}->[$i]
+          if ( $uri =~ $class->tsv->{locationRegexp}->{$vhost}->[$i] );
     }
     return $class->tsv->{defaultProtection}->{$vhost};
 }
@@ -785,8 +776,8 @@ sub resolveAlias {
 
     $vhost =~ s/:\d+//;
     return $class->tsv->{vhostAlias}->{$vhost}
-      if ( $class->tsv->{vhostAlias}->{$vhost} );
-    return $vhost if ( $class->tsv->{defaultCondition}->{$vhost} );
+      if $class->tsv->{vhostAlias}->{$vhost};
+    return $vhost if $class->tsv->{defaultCondition}->{$vhost};
     foreach ( @{ $class->tsv->{vhostReg} } ) {
         return $_->[1] if $vhost =~ $_->[0];
     }

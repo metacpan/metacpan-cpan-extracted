@@ -1,5 +1,25 @@
 Revision history for Perl module and script App::paperback.
 
+1.30  Wed Sep 14 16:00:00 2022
+	- Improve documentation
+
+1.28  Wed Sep 14 15:00:00 2022
+	- Improve documentation
+
+1.27  Wed Sep 14 12:00:00 2022
+	- Gain some speed by calling subs with "&" when empty of parameteres
+
+1.26  Tue Sep 13 09:00:00 2022
+	- General cleaning of syntax and faster xform inner sub
+
+1.25  Mon Sep 12 12:00:00 2022
+	- Deleted redundant check when opening input file
+	- Reformulated size checking
+
+1.24  Sun Sep 11 00:00:00 2022
+	- Replace global variable with state variable
+	- Avoid useless check for GpageXObject
+
 1.23  Fri Sep 9 10:00:00 2022
 	- Fix bug in 'state %known' (v1.22) that made PDF bigger than needed
 

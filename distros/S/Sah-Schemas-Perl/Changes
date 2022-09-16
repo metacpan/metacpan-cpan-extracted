@@ -1,3 +1,26 @@
+0.045   2022-09-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix off-by-one bug in wildcard expansion coerce rules.
+
+        - [doc] Add description to perl::distname schema.
+
+        - [dist] Add devnotes.org.
+
+
+0.044   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: perl::modname_pm.
+
+
+0.043   2022-07-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Tweak coerce rules expand_perl_modname_wildcard to skip module
+          name that contains optional args e.g. Foo::Bar=file,/foo.
+
+        - Remove unused args in Data::Sah::Value::* modules (copy-paste
+          mistake).
+
+
 0.042   2021-12-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Add default value rules: Perl::these_{dists,mods}.

@@ -20,8 +20,8 @@ use base 'PDF::Builder::Basic::PDF::String';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -31,7 +31,9 @@ B<true> or B<false>
 
 =head1 METHODS
 
-=head2 $b->convert($str)
+=over
+
+=item $b->convert($str)
 
 Converts a string into the string which will be stored.
 
@@ -41,7 +43,7 @@ sub convert {
     return $_[1] eq 'true';
 }
 
-=head2 $b->as_pdf()
+=item $b->as_pdf()
 
 Converts the value to a PDF output form.
 
@@ -50,5 +52,9 @@ Converts the value to a PDF output form.
 sub as_pdf {
     return $_[0]->{'val'}? 'true': 'false';
 }
+
+=back
+
+=cut
 
 1;

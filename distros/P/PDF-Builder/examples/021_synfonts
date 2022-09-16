@@ -65,9 +65,6 @@ if ($type == 0) {
     Symbol
     ZapfDingbats
     bankgothic
-    bankgothicbold
-    bankgothicbolditalic
-    bankgothicitalic
     georgia
     georgiaitalic
     georgiabold

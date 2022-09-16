@@ -3,13 +3,17 @@ package Babble::Match;
 use Babble::Grammar;
 use Babble::SymbolGenerator;
 use Mu;
+use List::Util 1.45;
 use re 'eval';
 
 ro 'top_rule';
 rwp 'text';
 
-lazy 'grammar' => sub { Babble::Grammar->new }
-  => handles => [ 'grammar_regexp' ];
+lazy 'grammar' => sub {
+  $_[0]->can('parent')
+    ? $_[0]->parent->grammar
+    : Babble::Grammar->new
+  } => handles => [ 'grammar_regexp' ];
 
 lazy 'symbol_generator' => sub {
   $_[0]->can('parent')
@@ -89,7 +93,9 @@ sub match_positions_of {
     /${\$self->top_re} ${wrapped}/x;
     @F;
   };
-  return @found;
+  return map { [ split ',', $_ ] }
+          List::Util::uniqstr
+          map { join ",", @$_ } @found;
 }
 
 sub each_match_of {

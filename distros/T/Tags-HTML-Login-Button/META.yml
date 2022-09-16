@@ -29,11 +29,11 @@ no_index:
 requires:
   Class::Utils: 0
   Error::Pure: 0
-  Tags::HTML: 0
+  Tags::HTML: 0.04
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Tags-HTML-Login-Button/issues
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Login-Button
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Login-Button
-version: '0.01'
+version: '0.02'

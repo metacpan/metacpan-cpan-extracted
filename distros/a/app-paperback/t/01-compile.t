@@ -5,4 +5,3 @@ use Test::More;
 BEGIN { use_ok('App::paperback') };
 
 done_testing;
-

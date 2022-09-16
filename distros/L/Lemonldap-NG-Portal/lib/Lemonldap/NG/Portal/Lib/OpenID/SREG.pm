@@ -21,9 +21,10 @@ sub sregHook {
     # Refuse federation if rejected by user
     if ( $req->param('confirm') and $req->param('confirm') == -1 ) {
         my %h;
-        $h{$_} = undef foreach (
+        $h{$_} = undef
+          foreach (
             qw(fullname nickname language postcode timezone country gender email dob)
-        );
+          );
         $self->p->updatePersistentSession( $req, \%h );
         return 0;
     }

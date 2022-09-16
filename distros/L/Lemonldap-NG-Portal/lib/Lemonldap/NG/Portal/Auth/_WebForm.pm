@@ -19,7 +19,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PASSWORDFORMEMPTY
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -44,7 +44,7 @@ sub init {
     my $self = shift;
 
     if ( $self->{conf}->{captcha_login_enabled} ) {
-        $self->captcha( $self->p->loadModule('::Lib::Captcha') ) or return 0;
+        $self->captcha(1);
     }
     else {
         $self->ott( $self->p->loadModule('::Lib::OneTimeToken') ) or return 0;
@@ -117,18 +117,15 @@ sub extractFormInfo {
         }
 
         if ( $self->captcha ) {
-            my $code = $req->param('captcha');
-            unless ($code) {
-                $self->captcha->setCaptcha($req);
-                return PE_CAPTCHAEMPTY;
+            my $result = $self->p->_captcha->check_captcha($req);
+            if ($result) {
+                $self->logger->debug("Captcha code verified");
             }
-            unless ( $self->captcha->validateCaptcha( $token, $code ) ) {
-                $self->captcha->setCaptcha($req);
-                $self->userLogger->warn(
-                    "Captcha failed: wrong or expired code");
+            else {
+                $self->p->_captcha->init_captcha($req);
+                $self->userLogger->warn("Captcha failed");
                 return PE_CAPTCHAERROR;
             }
-            $self->logger->debug("Captcha code verified");
         }
         elsif ( $self->ottRule->( $req, {} ) ) {
             unless ( $req->data->{tokenVerified}
@@ -179,7 +176,7 @@ sub setSecurity {
 
     # If captcha is enable, prepare it
     if ( $self->captcha ) {
-        $self->captcha->setCaptcha($req);
+        $self->p->_captcha->init_captcha($req);
     }
 
     # Else get token

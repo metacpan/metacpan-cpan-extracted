@@ -5,7 +5,7 @@ use Mouse;
 use JSON qw(from_json);
 use POSIX qw(strftime);
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
 no warnings 'redefine';
 
@@ -178,9 +178,8 @@ sub getNotifBack {
 
     # Search for Lemonldap::NG cookie (ciphered)
     my $id;
-    unless ( $id = $req->cookies->{ $self->{conf}->{cookieName} } ) {
-        return $self->p->sendError( $req, 'No cookie found', 401 );
-    }
+    return $self->p->sendError( $req, 'No cookie found', 401 )
+      unless ( $id = $req->cookies->{ $self->{conf}->{cookieName} } );
 
     if ( $req->param('cancel') ) {
         $self->logger->debug('Cancel called -> remove ciphered cookie');
@@ -197,12 +196,13 @@ sub getNotifBack {
         return $self->p->do( $req, [] );
     }
 
-    # Look if all notifications have been accepted. If not, redirect to
-    # portal
+    # Look if all notifications have been accepted.
+    # If not, redirect to Portal
 
     # Try to decrypt Lemonldap::NG ciphered cookie
     $id = $self->p->HANDLER->tsv->{cipher}->decrypt($id)
-      or return $self->p->sendError( $req, 'Unable to decrypt', 400 );
+      or
+      return $self->p->sendError( $req, 'Unable to decrypt ciphered id', 400 );
 
     # Check that session exists
     $req->userData( $self->p->HANDLER->retrieveSession( $req, $id ) )

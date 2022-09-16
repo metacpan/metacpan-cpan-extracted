@@ -16,12 +16,16 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -31,7 +35,8 @@
       "runtime" : {
          "requires" : {
             "JSON::Validator" : "5.09",
-            "Mojolicious::Plugin::OpenAPI" : "5.05"
+            "Mojolicious::Plugin::OpenAPI" : "5.05",
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -46,16 +51,28 @@
          "web" : "https://github.com/jhthorsen/openapi-client/issues"
       },
       "homepage" : "https://github.com/jhthorsen/openapi-client",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jhthorsen/openapi-client.git",
          "web" : "https://github.com/jhthorsen/openapi-client"
+      },
+      "x_IRC" : {
+         "url" : "irc://irc.libera.chat/#convos",
+         "web" : "https://web.libera.chat/#convos"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_contributors" : [
+      "Clive Holloway <clhollow@estee.com>",
+      "Ed J <mohawk2@users.noreply.github.com>",
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
-      "Ed J <etj@cpan.org>"
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Reneeb <info@perl-services.de>",
+      "Roy Storey <kiwiroy@users.noreply.github.com>",
+      "Veesh Goldman <rabbiveesh@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -7,7 +7,7 @@
     <div class="container text-center">
         <h1>LemonLDAP::NG Manager API</h1>
         <hr />
-        <a href="/doc/pages/manager-api/index.html" class="btn btn-lg btn-primary">API Reference</a>
+        <a href="<TMPL_VAR NAME="DOC_PREFIX">/pages/manager-api/index.html" class="btn btn-lg btn-primary">API Reference</a>
     </div>
 </body>
 </html>

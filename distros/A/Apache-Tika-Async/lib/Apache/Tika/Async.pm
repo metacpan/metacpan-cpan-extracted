@@ -4,7 +4,7 @@ use Moo 2;
 use JSON::XS qw(decode_json);
 use File::Temp 'tempfile';
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -26,13 +26,18 @@ Apache::Tika::Async - connect to Apache Tika
   print $info->meta->{"meta:language"};
   # en
 
+=head1 ACCESSORS
+
 =cut
 
-has java => (
-    is => 'rw',
-    #isa => 'Str',
-    default => 'java',
-);
+=head2 B<jarfile>
+
+  jarfile => '/opt/tika/tika-standard-2.9.9.jar',
+
+Sets the Tika Jarfile to be used. The default is to look
+in the directory C<jar/> below the current directory.
+
+=cut
 
 has 'jarfile' => (
     is => 'rw',
@@ -41,11 +46,49 @@ has 'jarfile' => (
 # tika-server-standard-2.3.0.jar
 
     default => sub {
+        $ENV{PERL_APACHE_TIKA_PATH} ||
         __PACKAGE__->best_jar_file(
               glob 'jar/tika-server-*.jar'
         );
     },
 );
+
+=head2 B<tika_args>
+
+  tika_args => [],
+
+Additional Tika command line options.
+
+=cut
+
+
+has tika_args => (
+    is => 'rw',
+    #isa => 'Array',
+    default => sub { [ ] },
+);
+
+=head2 B<java>
+
+  java => '/opt/openjdk-11-jre/bin/java',
+
+Sets the Java executable to be used.
+
+=cut
+
+has java => (
+    is => 'rw',
+    #isa => 'Str',
+    default => 'java',
+);
+
+=head2 B<java_args>
+
+  java_args => [],
+
+Sets the Java options to be used.
+
+=cut
 
 has java_args => (
     is => 'rw',
@@ -54,12 +97,6 @@ has java_args => (
         # So that Tika can re-read some problematic PDF files better
         '-Dorg.apache.pdfbox.baseParser.pushBackSize=1000000'
     ] },
-);
-
-has tika_args => (
-    is => 'rw',
-    #isa => 'Array',
-    default => sub { [ ] },
 );
 
 sub _tika_config_xml {
@@ -166,6 +203,11 @@ sub get_language {
 # __PACKAGE__->meta->make_immutable;
 
 1;
+
+=head1 ENVIRONMENT
+
+To specify the Tika jar file from the outside, you can set the
+C<PERL_APACHE_TIKA_PATH> environment variable.
 
 =head1 REPOSITORY
 

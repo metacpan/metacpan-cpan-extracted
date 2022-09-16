@@ -57,10 +57,16 @@ my @cand = (
     'sub foo ($) { my ($sig) = @_; }', ],
   [ 'sub foo :Foo :prototype($) ($sig) { }',
     'sub foo ($) :Foo { my ($sig) = @_; }', ],
+
   [ 'sub foo : Foo prototype($) ($sig) { }',
     'sub foo ($) : Foo { my ($sig) = @_; }', ],
   [ 'sub foo :prototype($) Foo ($sig) { }',
     'sub foo ($) :Foo { my ($sig) = @_; }', ],
+
+  [ 'sub foo : Foo prototype($) () { }',
+    'sub foo ($) : Foo {  }', ],
+  [ 'sub foo :prototype($) Foo () { }',
+    'sub foo ($) :Foo {  }', ],
   [ 'use Mojo::Base -base, -signatures;',
     'use Mojo::Base qw(-base);' ],
   [ 'use Mojo::Base -signatures;',

@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -23,24 +23,40 @@ PDF::Builder::Resource::XObject::Image::TIFF - TIFF image support
 
 =over
 
-=item  $res = PDF::Builder::Resource::XObject::Image::TIFF->new($pdf, $file, $name)
-
-=item  $res = PDF::Builder::Resource::XObject::Image::TIFF->new($pdf, $file)
+=item  $res = PDF::Builder::Resource::XObject::Image::TIFF->new($pdf, $file, %opts)
 
 Returns a TIFF-image object.
 
 If the Graphics::TIFF package is installed, the TIFF_GT library will be used
 instead of the TIFF library. In such a case, use of the TIFF library may be 
-forced via the C<-nouseGT> flag (see Builder documentation for C<image_tiff()>).
+forced via the C<nouseGT> flag (see Builder documentation for C<image_tiff()>).
+
+Options:
+
+=over
+
+=item 'name' => 'string'
+
+This is the name you can give for the TIFF image object. The default is Ixnnnn.
+
+=back
 
 =cut
 
 sub new {
-    my ($class, $pdf, $file, $name) = @_;
+    my ($class, $pdf, $file, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-nouseGT'} && !defined $opts{'nouseGT'}) { $opts{'nouseGT'} = delete($opts{'-nouseGT'}); }
+    if (defined $opts{'-name'} && !defined $opts{'name'}) { $opts{'name'} = delete($opts{'-name'}); }
+    if (defined $opts{'-compress'} && !defined $opts{'compress'}) { $opts{'compress'} = delete($opts{'-compress'}); }
+
+    my ($name, $compress);
+    if (exists $opts{'name'}) { $name = $opts{'name'}; }
+   #if (exists $opts{'compress'}) { $compress = $opts{'compress'}; }
 
     my $self;
 
-    my $tif = PDF::Builder::Resource::XObject::Image::TIFF::File->new($file);
+    my $tif = PDF::Builder::Resource::XObject::Image::TIFF::File->new($file, %opts);
 
  # dump everything in tif except huge data streams
 # foreach (sort keys %{ $tif }) {
@@ -58,7 +74,7 @@ sub new {
     # in case of problematic things
     #  proxy to other modules
 
-    $class = ref($class) if ref $class;
+    $class = ref($class) if ref($class);
 
     $self = $class->SUPER::new($pdf, $name || 'Ix'.pdfkey());
     $pdf->new_obj($self) unless $self->is_obj($pdf);
@@ -76,7 +92,7 @@ sub new {
 =item  $mode = $tif->usesLib()
 
 Returns 1 if Graphics::TIFF installed and used, 0 if not installed, or -1 if
-installed but not used (-nouseGT option given to C<image_tiff>).
+installed but not used (nouseGT option given to C<image_tiff>).
 
 B<Caution:> this method can only be used I<after> the image object has been
 created. It can't tell you whether Graphics::TIFF is available in

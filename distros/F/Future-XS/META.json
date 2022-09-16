@@ -26,22 +26,20 @@
       },
       "runtime" : {
          "requires" : {
+            "Future" : "0.48_001",
             "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Fatal" : "0",
-            "Test::Identity" : "0",
-            "Test::More" : "0.88",
-            "Test::Refcount" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Future::XS" : {
          "file" : "lib/Future/XS.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -50,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

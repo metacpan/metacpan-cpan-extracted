@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
+our $VERSION = '3.024'; # VERSION
 our $LAST_UPDATE = '2.029'; # manually update whenever code is changed
 
 use PDF::Builder;
@@ -27,7 +27,7 @@ foreach my $input_file (@ARGV) {
         print " $page_number,";
         $output_pdf->import_page($input_pdf, $page_number);
     }
-    $input_pdf->end();
+    $input_pdf->close();
     print " Done.\n\n";
 }
 

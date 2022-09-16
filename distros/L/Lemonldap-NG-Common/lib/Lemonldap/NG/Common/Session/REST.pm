@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 has sessionTypes => ( is => 'rw' );
 
@@ -45,8 +45,6 @@ sub hAttr {
 
 sub delSession {
     my ( $self, $req ) = @_;
-    return $self->sendJSONresponse( $req, { result => 1 } )
-      if ( $self->{demoMode} );
     my $mod = $self->getMod($req)
       or return $self->sendError( $req, undef, 400 );
     my $id = $req->params('sessionId')
@@ -64,8 +62,6 @@ sub delSession {
 
 sub deleteOIDCConsent {
     my ( $self, $req ) = @_;
-    return $self->sendJSONresponse( $req, { result => 1 } )
-      if ( $self->{demoMode} );
     my $mod = $self->getMod($req)
       or return $self->sendError( $req, undef, 400 );
     my $id = $req->params('sessionId')
@@ -137,8 +133,6 @@ sub deleteOIDCConsent {
 
 sub delete2F {
     my ( $self, $req ) = @_;
-    return $self->sendJSONresponse( $req, { result => 1 } )
-      if ( $self->{demoMode} );
     my $mod = $self->getMod($req)
       or return $self->sendError( $req, undef, 400 );
     my $id = $req->params('sessionId')

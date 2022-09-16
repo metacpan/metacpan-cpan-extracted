@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.05
+    version 0.06
 
 SYNOPSIS
 
@@ -18,9 +18,11 @@ SYNOPSIS
         # my $cpanfile = CPANfile::Parse::PPI->new( \$content );
         
         for my $module ( $cpanfile->modules->@* ) {
-            my $stage = "";
-            $stage    = "on $module->{stage}" if $module->{stage};
-            say sprintf "%s is %s", $module->{name}, $module->{type};
+            my $stage   = $module->{stage}   ? " on $module->{stage}"            : '';
+            my $feature = $module->{feature} ? " for feature $module->{feature}" : '';
+    
+            say sprintf "%s is %s",
+                 $module->{name}, $module->{type}, $stage, $feature;
         }
 
 METHODS
@@ -36,6 +38,9 @@ METHODS
         on build => sub {
             recommends "Dist::Zilla" => 4.0;
             requires "Test2" => 2.311;
+        }
+        feature 'sqlite', "SQLite Support" => sub {
+            requires DBD::SQLite
         }
         CPANFILE
     
@@ -60,6 +65,8 @@ ATTRIBUTES
       * type
 
       * stage
+
+      * feature
 
         use CPANfile::Parse::PPI;
         use Data::Printer;

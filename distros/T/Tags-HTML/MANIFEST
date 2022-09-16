@@ -1,5 +1,6 @@
 Changes
-examples/ex1.pl
+examples/trivial_html_css_example.pl
+examples/trivial_html_example.pl
 HTML.pm
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm

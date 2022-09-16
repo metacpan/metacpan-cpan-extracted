@@ -6,8 +6,8 @@ use utf8;
 use Test::More;
 use Data::Dumper;
 
-use lib 't';
-use Util;
+use lib '.';
+use t::Util;
 
 line(subst(qw(--check=all --dict t/JA-include.dict t/JA.txt))
      ->run->{stdout}, 1, "include");

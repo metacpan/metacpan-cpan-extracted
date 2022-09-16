@@ -25,7 +25,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -184,6 +184,12 @@ sub extractFormInfo {
                 $self->userLogger->error("No SAML response found");
                 return PE_SAML_SSO_ERROR;
             }
+
+            # Call samlGotAuthnResponse
+            my $h =
+              $self->p->processHook( $req, 'samlGotAuthnResponse', $idp,
+                $login );
+            return PE_SAML_SSO_ERROR if ( $h != PE_OK );
 
             # Check Destination
             return PE_SAML_DESTINATION_ERROR

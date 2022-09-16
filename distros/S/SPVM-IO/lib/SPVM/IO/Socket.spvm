@@ -1,6 +1,10 @@
 class IO::Socket extends IO::Handle {
-  method read : int ($buffer : byte[]) { die "This method must be overriden"; }
-  method write : int ($buffer : string, $length : int) { die "This method must be overriden"; }
-  method close : void () { die "This method must be overriden"; }
-  method fileno : int () { die "This method must be overriden"; }
+  interface IO::Socket::Interface;
+  
+  method has_interfaces : int () { return 1; }
+  
+  method read : int ($buffer : byte[]) { return $self->(IO::Socket::Interface)->read($buffer); }
+  method write : int ($buffer : string, $length : int) { return $self->(IO::Socket::Interface)->write($buffer, $length); }
+  method close : void () { $self->(IO::Socket::Interface)->close; }
+  method fileno : int () { return $self->(IO::Socket::Interface)->fileno; }
 }

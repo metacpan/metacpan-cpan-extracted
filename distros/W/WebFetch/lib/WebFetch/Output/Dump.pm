@@ -14,42 +14,26 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Output::Dump;
-$WebFetch::Output::Dump::VERSION = '0.14.0';
+$WebFetch::Output::Dump::VERSION = '0.15.1';
 use base "WebFetch";
 
-use Carp;
-use Scalar::Util qw( blessed );
-use Date::Calc qw(Today Delta_Days Month_to_Text);
-use LWP::UserAgent;
 use Data::Dumper;
 
 # define exceptions/errors
-use Exception::Class (
-);
-
-
-# set defaults
-our ( @url, $cat_priorities, $now, $nowstamp );
-
-our @Options = ();
-our $Usage = "";
-
-# configuration parameters
-our $num_links = 5;
+use Exception::Class ();
 
 # no user-servicable parts beyond this point
 
 # register capabilities with WebFetch
-__PACKAGE__->module_register( "output:dump" );
-
+__PACKAGE__->module_register("output:dump");
 
 # Perl structure dump format handler
 sub fmt_handler_dump
 {
-	my ( $self, $filename ) = @_;
+    my ( $self, $filename ) = @_;
 
-	$self->raw_savable( $filename, Dumper( $self->{data}));
-	return 1;
+    $self->raw_savable( $filename, Dumper( $self->{data} ) );
+    return 1;
 }
 
 1;
@@ -64,7 +48,7 @@ WebFetch::Output::Dump - save WebFetch data in a Perl structure dump
 
 =head1 VERSION
 
-version 0.14.0
+version 0.15.1
 
 =head1 SYNOPSIS
 

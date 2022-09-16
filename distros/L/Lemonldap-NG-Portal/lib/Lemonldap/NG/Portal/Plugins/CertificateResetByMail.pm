@@ -31,7 +31,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MAILCONFIRMATION_ALREADY_SENT
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -98,7 +98,7 @@ sub init {
 
     # Initialize Captcha if needed
     if ( $self->conf->{captcha_mail_enabled} ) {
-        $self->captcha( $self->p->loadModule('::Lib::Captcha') ) or return 0;
+        $self->captcha(1);
     }
 
     # Load registered module
@@ -179,46 +179,32 @@ sub _certificateReset {
         # Use submitted value
         $req->{user} = $req->param('mail');
 
-        # Check if token exists
-        my $token;
-        if ( $self->ottRule->( $req, {} ) or $self->captcha ) {
-            $token = $req->param('token');
+        # Captcha for register form
+        if ( $self->captcha ) {
+            my $result = $self->p->_captcha->check_captcha($req);
+            if ($result) {
+                $self->logger->debug("Captcha code verified");
+            }
+            else {
+                $self->setSecurity($req);
+                $self->userLogger->warn("Captcha failed");
+                return PE_CAPTCHAERROR;
+            }
+        }
+        elsif ( $self->ottRule->( $req, {} ) ) {
+            my $token = $req->param('token');
             unless ($token) {
                 $self->setSecurity($req);
                 $self->userLogger->warn('Reset try without token');
                 return PE_NOTOKEN;
             }
-        }
-
-        # Captcha for register form
-        if ( $self->captcha ) {
-            my $captcha = $req->param('captcha');
-
-            unless ($captcha) {
-                $self->userLogger->notice('Reset try with captcha not filled');
-
-                # Set captcha or token
-                $self->setSecurity($req);
-                return PE_CAPTCHAEMPTY;
-            }
-
-            # Check captcha
-            unless ( $self->captcha->validateCaptcha( $token, $captcha ) ) {
-                $self->userLogger->info('Captcha failed: wrong code');
-
-                # Set captcha or token
-                $self->setSecurity($req);
-                return PE_CAPTCHAERROR;
-            }
-            $self->logger->debug('Captcha code verified');
-        }
-        elsif ( $self->ottRule->( $req, {} ) ) {
             unless ( $self->ott->getToken($token) ) {
                 $self->setSecurity($req);
                 $self->userLogger->warn('Reset try with expired/bad token');
                 return PE_TOKENEXPIRED;
             }
         }
+
         unless ( $req->{user} =~ /$self->{conf}->{userControl}/o ) {
             $self->setSecurity($req);
             return PE_MALFORMEDUSER;
@@ -581,9 +567,11 @@ sub modifyCertificate {
 
 sub setSecurity {
     my ( $self, $req ) = @_;
+
     if ( $self->captcha ) {
-        $self->captcha->setCaptcha($req);
+        $self->p->_captcha->init_captcha($req);
     }
+
     elsif ( $self->ottRule->( $req, {} ) ) {
         $self->ott->setToken($req);
     }
@@ -608,9 +596,13 @@ sub display {
         STARTMAILDATE   => $req->data->{startMailDate},
         STARTMAILTIME   => $req->data->{startMailTime},
         MAILALREADYSENT => $req->data->{mailAlreadySent},
-        MAIL            => (
-            $self->p->checkXSSAttack( 'mail', $req->{user} )
-            ? ''
+        (
+            $req->data->{customScript}
+            ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
+            : ()
+        ),
+        MAIL => (
+              $self->p->checkXSSAttack( 'mail', $req->{user} ) ? ''
             : $req->{user}
         ),
         DISPLAY_FORM            => 0,
@@ -627,12 +619,17 @@ sub display {
     }
 
     # Display captcha if enabled
-    if ( $req->captcha ) {
-        $tplPrm{CAPTCHA_SRC}  = $req->captcha;
-        $tplPrm{CAPTCHA_SIZE} = $self->conf->{captcha_size};
+    if ( $req->captchaHtml ) {
+        $tplPrm{CAPTCHA_HTML} = $req->captchaHtml;
     }
     if ( $req->token ) {
         $tplPrm{TOKEN} = $req->token;
+    }
+
+    # DEPRECATED: This is only used for compatibility with existing templates
+    if ( $req->captcha ) {
+        $tplPrm{CAPTCHA_SRC}  = $req->captcha;
+        $tplPrm{CAPTCHA_SIZE} = $self->conf->{captcha_size};
     }
 
     # Display form the first time

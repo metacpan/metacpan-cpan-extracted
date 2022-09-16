@@ -12,7 +12,6 @@ on 'build' => sub {
   requires "Alien::Build::MM" => "0.32";
   requires "ExtUtils::MakeMaker" => "6.52";
   requires "Path::Tiny" => "0.077";
-  requires "Sort::Versions" => "0";
 };
 
 on 'test' => sub {

@@ -98,6 +98,8 @@ $ant4->file_attachment($base."pod2htmd.temp",
 	              );
 
 # None icon, 100x100 size at LL= 50,400, border 10pt thick
+# Notice that although the icon is "None", since an icon is "used", the 
+#   border is suppressed
 my $ant5 = $page->annotation();
 $ant5->file_attachment($base."sample.txt", 
 	               -rect=>[60,410, 160,510], 

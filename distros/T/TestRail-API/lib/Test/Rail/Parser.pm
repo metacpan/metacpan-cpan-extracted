@@ -2,15 +2,15 @@
 # PODNAME: Test::Rail::Parser
 
 package Test::Rail::Parser;
-$Test::Rail::Parser::VERSION = '0.051';
+$Test::Rail::Parser::VERSION = '0.052';
 use strict;
 use warnings;
 use utf8;
 
 use parent qw/TAP::Parser/;
-use Carp qw{cluck confess};
-use POSIX qw{floor strftime};
-use Clone qw{clone};
+use Carp   qw{cluck confess};
+use POSIX  qw{floor strftime};
+use Clone  qw{clone};
 
 use TestRail::API;
 use TestRail::Utils;
@@ -639,7 +639,8 @@ sub planCallback {
 
 sub _set_result {
     my ( $self, $run_id, $test_name, $status, $notes, $options,
-        $custom_options ) = @_;
+        $custom_options )
+      = @_;
     my $tc;
 
     print "# Test elapsed: " . $options->{'elapsed'} . "\n"
@@ -761,7 +762,7 @@ Test::Rail::Parser - Upload your TAP results to TestRail
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =head1 DESCRIPTION
 
@@ -926,7 +927,7 @@ and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by George S. Baugh.
+This software is copyright (c) 2022 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

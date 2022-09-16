@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 68;
+use Test::More tests => 71;
 
 use PDF::Builder;
 my ($pdf, $page, $pdf2, $pdf_string, $media, $sizes_PDF, $sizes_page, @box);
@@ -20,16 +20,18 @@ my ($pdf, $page, $pdf2, $pdf_string, $media, $sizes_PDF, $sizes_page, @box);
 # create a dummy PDF (as string) for further tests
 $pdf = PDF::Builder->new();
 $pdf->page()->gfx()->fillcolor('blue');
-$pdf_string = $pdf->stringify();
+$pdf_string = $pdf->to_string();
 
-## openScalar() -> open_scalar()
-#  removed from PDF::Builder, deprecated in PDF::API2
-#$pdf = PDF::Builder->openScalar($pdf_string);
-#is(ref($pdf), 'PDF::Builder',
-#   q{openScalar still works});
+## openScalar() -> open_scalar() -> from_string()
+$pdf = PDF::Builder->openScalar($pdf_string);
+is(ref($pdf), 'PDF::Builder',
+   q{openScalar still works});
 $pdf = PDF::Builder->open_scalar($pdf_string);
 is(ref($pdf), 'PDF::Builder',
    q{open_scalar replacement for openScalar IS available});
+$pdf = PDF::Builder->from_string($pdf_string);
+is(ref($pdf), 'PDF::Builder',
+   q{from_string replacement for openScalar and open_scalar IS available});
 
 ## importpage() -> import_page()
 #  removed from PDF::Builder, deprecated in PDF::API2
@@ -43,7 +45,7 @@ is(ref($page), 'PDF::Builder::Page',
 
 ## openpage() -> open_page()
 #  replaced by open_page in API2
-$pdf2 = PDF::Builder->open_scalar($pdf_string);
+$pdf2 = PDF::Builder->from_string($pdf_string);
 $page = $pdf2->openpage(1);
 is(ref($page), 'PDF::Builder::Page',
    q{openpage still works});
@@ -399,17 +401,26 @@ ok(array_comp($sizes_PDF, @box),
 ok(array_comp($sizes_page, @box),
     q{artbox replacement for get_artbox IS available for page-set page artbox size});
 
-#
+# Invalid input to pageLabel
+{ # for local declaration
+    $pdf = PDF::Builder->new();
+    local $SIG{__WARN__} = sub {};
+    $pdf->pageLabel(0, { 'style' => 'arabic' });
+    like($pdf->to_string(), qr{/PageLabels << /Nums \[ 0 << /S /D >> \] >>},
+	 q{pageLabel defaults to decimal if given invalid input});
+}
+
+# 
 # ===== scheduled to be REMOVED 3/2023
 #  lead() -> leading() 
-$pdf2 = PDF::Builder->new('-compress' => 'none');
+$pdf2 = PDF::Builder->new('compress' => 'none');
 my $text = $pdf2->page()->text();
 $text->lead(15);
-like($pdf2->stringify(), qr/15 TL/, q{lead still works });
-$pdf2 = PDF::Builder->new('-compress' => 'none');
+like($pdf2->to_string(), qr/15 TL/, q{lead still works });
+$pdf2 = PDF::Builder->new('compress' => 'none');
 $text = $pdf2->page()->text();
 $text->leading(15);
-like($pdf2->stringify(), qr/15 TL/, q{leading replacement for lead IS available});
+like($pdf2->to_string(), qr/15 TL/, q{leading replacement for lead IS available});
 #
 #  textlead() -> textleading()   Lite.pm only, no t test
 

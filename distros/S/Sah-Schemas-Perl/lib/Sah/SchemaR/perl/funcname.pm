@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::funcname;
 
-our $DATE = '2021-12-01'; # DATE
-our $VERSION = '0.042'; # VERSION
+our $DATE = '2022-09-11'; # DATE
+our $VERSION = '0.045'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nCurrently function name is restricted to this regex:\n\n    \\A[A-Za-z_][A-Za-z_0-9]*\\z\n\nFunction name can be qualified (prefixed) by a package name, which is restricted\nto this regex:\n\n    [A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\n\n",match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::)?[A-Za-z_]([A-Za-z_0-9]+)*\\z",summary=>"Perl function name, either qualified with package name (e.g. Foo::subname) or unqualified (e.g. subname)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::perl::funcname - Perl function name, either qualified with package
 
 =head1 VERSION
 
-This document describes version 0.042 of Sah::SchemaR::perl::funcname (from Perl distribution Sah-Schemas-Perl), released on 2021-12-01.
+This document describes version 0.045 of Sah::SchemaR::perl::funcname (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
 
 =head1 DESCRIPTION
 
@@ -54,13 +54,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

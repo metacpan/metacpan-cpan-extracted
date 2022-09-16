@@ -479,26 +479,43 @@ Revision history for Regexp-Grammars
 
 
 1.051  Tue Jul  2 20:17:55 2019
+st -
+  <BAR <BAR <List albertoprob Build.PL Changes cmp conjunction_experiment CONTRIBUTING CoreDumpProblem
+  debug_timeout_Grammars.pm demo demo_backtracking_problem.pl explore_regex.pl Hugo_BNF_to_RG
+  Hugo_lib_NL_RuleExpr_Grammar.pm Ingo problems lib Makefile.old Makefile.PL MANIFEST marcpatch1
+  memtest.c new_approach.pl old_stuff p43_out p43_out_debug parser.log parser_log
+  Perl5.20_regex_compilation_problem.pl pro36.pl prob.pl prob10.pl prob11.pl prob12.pl prob13.pl
+  prob14.pl prob15.pl prob16.pl prob17.pl prob18.pl prob19.pl prob2.pl prob20.pl prob21.pl prob22.pl
+  prob23.pl prob24.pl prob25.pl prob26.pl prob27.pl prob28.pl prob29.pl prob3.pl prob30.pl prob31.pl
+  prob32.pl prob33.pl prob34.pl prob35.pl prob36.pl prob37.pl prob38.pl prob39.pl prob4.pl prob40.pl
+  prob41.pl prob42.pl prob43.pl prob44.pl prob45.pl prob46.pl prob47.pl prob48.pl prob49.pl prob5.pl
+  prob50.pl prob51.pl prob6.pl prob7.pl prob8.pl prob9.pl prob_21_Parse.pm prob_518.pl prob_grammar
+  prototype_precedence.pl README Regexp-Grammers-1.016-ANDK-01.diff
+  rt_cpan_org104148argumentpassingintorulefailswhen.20150502101608
+  rt_cpan_org104148argumentpassingintorulefailswhen.zip Simon-Peyton-Jones-Concurrency st t t18 temp.log
+  terminal_profile time_LaTeXish_PRD.pl timing_201009021630 timing_201105031500 timing_201105031720
+  timing_201105041800 timing_201105041800_with_timout ToDo try Try.pm try10.pl try11.pl try12.pl try2
+  try3 try4 try5 try6.pl try7.pl try8.pl try9.pl trylog ubuntu_prob %
 
-    * Documented %% operator
+* Documented %% operator
 
-    * Numerous POD nits fixed (thanks, Ruud and Alex!)
+* Numerous POD nits fixed (thanks, Ruud and Alex!)
 
 
 1.052  Wed Jul 17 08:17:29 2019
 
-    * Fixed bug in <nocontext:> handling (thanks, Alex!)
+* Fixed bug in <nocontext:> handling (thanks, Alex!)
 
 
 1.053  Sun May  3 06:41:38 2020
 
-    * Fixed irritating "Satisified" typo in interface
-      (thanks, Stéphane!)
+* Fixed irritating "Satisified" typo in interface
+    (thanks, Stéphane!)
 
-    * Fixed equally irritating "???/!!!" typo in docs
-      (thanks, Stéphane!)
+* Fixed equally irritating "???/!!!" typo in docs
+    (thanks, Stéphane!)
 
-    * Other minor doc fixes
+* Other minor doc fixes
 
     * INCOMPATIBLE CHANGE: <, %, and %% are now never treated as literal.
       They are now always either part of the module's metasyntax,
@@ -530,3 +547,16 @@ Revision history for Regexp-Grammars
 
     * Fixed a very subtle bug with automatic whitespace matching under <debug: on>
       (thanks, Malan!)
+
+
+1.058  Thu Sep 15 01:30:29 2022
+
+    * Added a CONTRIBUTING file to the distribution.
+      (Thanks, Marc!)
+
+    * Removed unneeded dependency on B::Hooks::Parser
+      (Thanks, Lars!)
+
+    * Backed out a fix for a very subtle bug with automatic whitespace matching under <debug: on>
+      The original fix in 1.057 was insufficient. This will be fixed properly in the next release.
+      (sorry, Malan!)

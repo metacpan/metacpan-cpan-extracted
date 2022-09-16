@@ -7,7 +7,7 @@ package MarpaX::ESLIF::RegexCallout;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.25'; # VERSION
+our $VERSION = '6.0.26'; # VERSION
 
 
 use constant PCRE2_ERROR_NOMATCH => -1;
@@ -267,7 +267,7 @@ MarpaX::ESLIF::RegexCallout - ESLIF Regex Callout
 
 =head1 VERSION
 
-version 6.0.25
+version 6.0.26
 
 =head1 SYNOPSIS
 
@@ -349,7 +349,7 @@ The callout function is interpreted as an integer, whose value conforms to PCRE2
 
 =item If the value is greater than zero, matching fails at the current point, but the testing of other matching possibilities goes ahead, just as if a lookahead assertion had failed.
 
-=item If the value is less than zero, the match is abandoned, and the matching function returns the negative value. 
+=item If the value is less than zero, the match is abandoned, and the matching function returns the negative value.
 
 =back
 

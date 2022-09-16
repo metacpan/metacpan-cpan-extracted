@@ -3,7 +3,7 @@ package MooX::TaggedAttributes::Role;
 # ABSTRACT: "Parent" Tag Role
 
 ## no critic
-our $VERSION = '0.15';
+our $VERSION = '0.18';
 ## use critic
 
 use MRO::Compat;
@@ -39,6 +39,8 @@ around _tag_list => sub {
     my $code
       = Sub::Name::subname( "${package}::_tag_list" => $maybe_next_method );
     my $next = $_[0]->$code;
+
+    # say STDERR "$package => $code";;
 
     return [ @{&$orig}, $next ? @{$next} : () ];
 };
@@ -103,7 +105,7 @@ MooX::TaggedAttributes::Role - "Parent" Tag Role
 
 =head1 VERSION
 
-version 0.15
+version 0.18
 
 =head1 SUBROUTINES
 

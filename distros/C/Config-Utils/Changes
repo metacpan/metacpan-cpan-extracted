@@ -1,3 +1,11 @@
+0.08 2022-09-10T12:07:56+02:00
+ - Add REPOSITORY section to doc.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Rename examples to better names.
+ - Rewrite bugtracker to github.
+ - Rewrite doc to use =head2 + doc improves.
+ - Update copyright years.
+
 0.07 2020-01-12T00:03:27+01:00
  - Fix Makefile.PL fails with no '.' in @INC.
  - Fix doc.

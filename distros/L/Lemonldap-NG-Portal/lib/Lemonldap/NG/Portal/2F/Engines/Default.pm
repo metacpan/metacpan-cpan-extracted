@@ -23,7 +23,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_NO_SECOND_FACTORS
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
@@ -41,7 +41,8 @@ has ott => (
     default => sub {
         my $ott =
           $_[0]->{p}->loadModule('Lemonldap::NG::Portal::Lib::OneTimeToken');
-        $ott->timeout( $_[0]->{conf}->{formTimeout} );
+        $ott->timeout( $_[0]->{conf}->{sfLoginTimeout}
+              || $_[0]->{conf}->{formTimeout} );
         return $ott;
     }
 );
@@ -207,9 +208,11 @@ sub init {
 sub run {
     my ( $self, $req ) = @_;
     my $checkLogins   = $req->param('checkLogins');
+    my $forceUpgrade  = $req->param('forceUpgrade');
     my $stayconnected = $req->param('stayconnected');
     my $spoofId       = $req->param('spoofId') || '';
-    $self->logger->debug("2F checkLogins set") if ($checkLogins);
+    $self->logger->debug("2F checkLogins set")  if $checkLogins;
+    $self->logger->debug("2F forceUpgrade set") if $forceUpgrade;
 
     # Skip 2F unless a module has been registered
     unless ( @{ $self->sfModules } ) {
@@ -226,7 +229,8 @@ sub run {
 
     # Skip 2F if authnLevel is already high enough
     if (
-        $self->conf->{sfOnlyUpgrade}
+            $self->conf->{sfOnlyUpgrade}
+        and !$forceUpgrade
         and ( ( $req->pdata->{targetAuthnLevel} || 0 ) <=
             ( $req->sessionInfo->{authenticationLevel} || 0 ) )
       )
@@ -240,7 +244,7 @@ sub run {
     # Remove expired 2F devices
     my $session = $req->sessionInfo;
     if ( $session->{_2fDevices} ) {
-        $self->logger->debug("Loading 2F Devices ...");
+        $self->logger->debug("Loading 2F devices...");
 
         # Read existing 2FDevices
         my $_2fDevices =
@@ -365,6 +369,10 @@ sub run {
 
     # If only one 2F is authorized, display it
     unless ($#am) {
+        $self->userLogger->info( 'Second factor '
+              . $am[0]->prefix
+              . '2F selected for '
+              . $req->sessionInfo->{ $self->conf->{whatToTrace} } );
         my $res = $am[0]->run( $req, $token );
         $req->authResult($res);
         return $res;
@@ -425,7 +433,14 @@ sub _choice {
     my $session;
     unless ( $session = $self->ott->getToken($token) ) {
         $self->userLogger->info('Token expired');
+        $req->noLoginDisplay(1);
         return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
+    }
+
+    unless ( $session->{_2fRealSession} ) {
+        $self->logger->error("Invalid 2FA session token");
+        $req->noLoginDisplay(1);
+        return $self->p->do( $req, [ sub { PE_ERROR } ] );
     }
 
     $req->sessionInfo($session);
@@ -436,6 +451,10 @@ sub _choice {
     my $ch = $req->param('sf');
     foreach my $m ( @{ $self->sfModules } ) {
         if ( $m->{m}->prefix eq $ch ) {
+            $self->userLogger->info( 'Second factor '
+                  . $m->{m}->prefix
+                  . '2F selected for '
+                  . $req->sessionInfo->{ $self->conf->{whatToTrace} } );
             my $res = $m->{m}->run( $req, $token );
             $req->authResult($res);
             return $self->p->do(
@@ -485,7 +504,6 @@ sub _displayRegister {
         );
     }
 
-    # If only one 2F is available, redirect to it
     my @am;
     foreach my $m ( @{ $self->sfRModules } ) {
         $self->logger->debug(
@@ -493,19 +511,13 @@ sub _displayRegister {
         if ( $m->{r}->( $req, $req->userData ) ) {
             push @am,
               {
-                CODE => $m->{m}->prefix,
-                URL  => '/2fregisters/' . $m->{m}->prefix,
-                LOGO => $m->{m}->logo,
+                CODE  => $m->{m}->prefix,
+                URL   => '/2fregisters/' . $m->{m}->prefix,
+                LOGO  => $m->{m}->logo,
+                LABEL => $m->{m}->label
               };
         }
     }
-
-    return [ 302, [ Location => $self->conf->{portal} . $am[0]->{URL} ], [] ]
-      if (
-        @am == 1
-        and not( $req->userData->{_2fDevices}
-            or $req->data->{sfRegRequired} )
-      );
 
     # Retrieve user all second factors
     my $_2fDevices = [];
@@ -516,13 +528,21 @@ sub _displayRegister {
           }
           : undef;
         unless ($_2fDevices) {
-            $self->logger->debug("No 2F Device found");
+            $self->logger->debug("None 2F device found");
             $_2fDevices = [];
         }
     }
     else {
-        $self->userLogger->warn("Do not diplay 2F Devices!");
+        $self->userLogger->warn("Do not display 2F devices!");
     }
+
+    # If only one 2F is available, redirect to it
+    return [ 302, [ Location => $self->conf->{portal} . $am[0]->{URL} ], [] ]
+      if (
+        @am == 1
+        and not( @$_2fDevices
+            or $req->data->{sfRegRequired} )
+      );
 
    # Parse second factors to display delete button if allowed and upgrade button
     my $displayUpgBtn = 0;

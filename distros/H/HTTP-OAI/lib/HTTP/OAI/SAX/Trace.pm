@@ -4,7 +4,7 @@ package HTTP::OAI::SAX::Trace;
 
 our $AUTOLOAD;
 
-our $VERSION = '4.11';
+our $VERSION = '4.12';
 
 sub new
 {

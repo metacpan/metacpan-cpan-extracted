@@ -14,7 +14,7 @@ MarpaX::ESLIF::Tutorial::Calculator - MarpaX::ESLIF Calculator Tutorial
 
 =head1 VERSION
 
-version 6.0.25
+version 6.0.26
 
 =head1 DESCRIPTION
 
@@ -305,12 +305,12 @@ would produce:
   Expected terminal: '('
   --------------------------------------------
   UTF-8 converted data before the failure (16 bytes)
-  0x000000: 28 31 20 2b 20 32 29 20 2a 20 33 20 2b 20 28 20 (1 + 2) * 3 + ( 
+  0x000000: 28 31 20 2b 20 32 29 20 2a 20 33 20 2b 20 28 20 (1 + 2) * 3 + (
   --------------------------------------------
   <<<<<< RECOGNIZER FAILURE AFTER LINE No 1 COLUMN No 16, HERE: >>>>>>
   --------------------------------------------
   UTF-8 converted data after the failure (1 bytes)
-  0x000000: 61                                              a               
+  0x000000: 61                                              a
   --------------------------------------------
 
 This the I<default> behaviour: parsing failure always outputs:

@@ -68,6 +68,11 @@ LemonLDAP::NG WebAuthn registration script
                   return setMsg('webAuthnRegisterFailed', 'danger');
                 }
               } else if (resp.result) {
+                $(document).trigger("mfaAdded", [
+                  {
+                    "type": "webauthn"
+                  }
+                ]);
                 return setMsg('yourKeyIsRegistered', 'positive');
               }
             },

@@ -37,6 +37,10 @@ requires 'Dist::Zilla::Plugin::Git::Contributors';
 requires 'Dist::Zilla::Plugin::PodWeaver';
 requires 'Pod::Weaver::Section::Contributors';
 
+requires "Pod::Coverage::TrustPod";
+requires "Test::Pod", "1.41";
+requires "Test::Pod::Coverage", "1.08";
+
 on test => sub {
     requires 'Dist::Zilla::Role::MetaProvider';
     requires 'File::Spec';

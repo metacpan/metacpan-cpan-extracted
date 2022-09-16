@@ -11,7 +11,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(conflict hash hash_array);
 
 # Version.
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Check conflits.
 sub conflict {
@@ -119,42 +119,52 @@ Config::Utils - Common config utilities.
 
  use Config::Utils qw(conflict hash hash_array);
 
- conflict($self, {'key' => 1}, 'key');
- hash($self, ['one', 'two'], $val);
- hash_array($self, ['one', 'two'], $val);
+ conflict($self, $config_hr, $key);
+ hash($self, $key_ar, $val);
+ hash_array($self, $key_ar, $val);
 
 =head1 SUBOUTINES
 
-=over 8
+=head2 C<conflict>
 
-=item C<conflict($self, $config_hr, $key)>
+ conflict($self, $config_hr, $key);
 
- Check conflicts.
- Affected variables from $self:
+Check conflicts.
+Affected variables from C<$self>:
+
  - set_conflicts - Flag, then control conflicts.
- - stack - Reference to array with actual '$key' key position.
- Returns undef or fatal error.
+ - stack - Reference to array with actual 'C<$key>' key position.
 
-=item C<hash($self, $key_ar, $val)>
+Returns undef or fatal error.
 
- Create record to hash.
- Affected variables from $self:
+=head2 C<hash>
+
+ hash($self, $key_ar, $val);
+
+Create record to hash.
+Affected variables from C<$self>:
+
  - config - Actual configuration in hash reference.
  - set_conflicts - Flag, then control conflicts.
- - stack - Reference to array with actual '$key' key position.
- Returns undef or fatal error.
+ - stack - Reference to array with actual 'C<$key>' key position.
 
-=item C<hash_array($self, $key_ar, $val)>
+Returns undef or fatal error.
 
- Create record to hash.
- If exists more value record for one key, then create array of values.
- Affected variables from $self:
+=head2 C<hash_array>
+
+ hash_array($self, $key_ar, $val);
+
+Create record to hash.
+
+If exists more value record for one key, then create array of values.
+
+Affected variables from C<$self>:
+
  - config - Actual configuration in hash reference.
  - set_conflicts - Flag, then control conflicts.
- - stack - Reference to array with actual '$key' key position.
- Returns undef or fatal error.
+ - stack - Reference to array with actual 'C<$key>' key position.
 
-=back
+Returns undef or fatal error.
 
 =head1 ERRORS
 
@@ -168,6 +178,8 @@ Config::Utils - Common config utilities.
          Conflict in '%s'.
 
 =head1 EXAMPLE1
+
+=for comment filename=conflict.pl
 
  use strict;
  use warnings;
@@ -187,6 +199,8 @@ Config::Utils - Common config utilities.
  # ERROR: Conflict in 'key'.
 
 =head1 EXAMPLE2
+
+=for comment filename=hash.pl
 
  use strict;
  use warnings;
@@ -221,6 +235,8 @@ Config::Utils - Common config utilities.
 
 =head1 EXAMPLE3
 
+=for comment filename=hash_array.pl
+
  use strict;
  use warnings;
 
@@ -254,6 +270,8 @@ Config::Utils - Common config utilities.
  #         empty array
 
 =head1 EXAMPLE4
+
+=for comment filename=hash_array_with_cb.pl
 
  use strict;
  use warnings;
@@ -313,6 +331,10 @@ Module for simple configure file parsing with arrays.
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Config-Utils>
+
 =head1 AUTHOR
 
 Michal Josef Špaček L<mailto:skim@cpan.org>
@@ -321,11 +343,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Josef Špaček 2011-2020
- BSD 2-Clause License
+© 2011-2022 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

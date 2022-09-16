@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
 use version;
-our $VERSION = 'v0.2.1'; # VERSION
+our $VERSION = 'v0.3.0'; # VERSION
 
 use Carp;
 use Git::Wrapper;
@@ -12,6 +12,10 @@ with qw(
     Dist::Zilla::Role::PluginBundle::Easy
 );
 use namespace::autoclean;
+
+#pod =for Pod::Coverage configure mvp_multivalue_args
+#pod
+#pod =cut
 
 sub mvp_multivalue_args { qw(
     exclude_filename
@@ -124,6 +128,8 @@ sub configure {
         } ) ],
 
         'Test::ReportPrereqs',
+        'PodSyntaxTests',
+        'PodCoverageTests',
     );
 
     my ($gather_dir)
@@ -278,7 +284,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version v0.2.1
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -381,6 +387,8 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     ; test_compile_switch
 
     [Test::ReportPrereqs]
+    [PodSyntaxTests]
+    [PodCoverageTests]
 
 =head1 DESCRIPTION
 
@@ -406,6 +414,8 @@ L<Git::NextVersion Plugin|Dist::Zilla::Plugin::Git::NextVersion> documentation.
 The version regexps for both the Changelog and NextVersion
 should be open enough to pick up the older style tags we used
 as well as incrementing a more strict C<semver>.
+
+=for Pod::Coverage configure mvp_multivalue_args
 
 =head1 ATTRIBUTES / PARAMETERS
 

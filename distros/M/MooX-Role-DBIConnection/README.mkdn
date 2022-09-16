@@ -1,0 +1,92 @@
+
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/MooX-Role-DBIConnection?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/MooX-Role-DBIConnection)
+[![Windows](https://github.com/Corion/MooX-Role-DBIConnection/workflows/windows/badge.svg)](https://github.com/Corion/MooX-Role-DBIConnection/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/MooX-Role-DBIConnection/workflows/macos/badge.svg)](https://github.com/Corion/MooX-Role-DBIConnection/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/MooX-Role-DBIConnection/workflows/linux/badge.svg)](https://github.com/Corion/MooX-Role-DBIConnection/actions?query=workflow%3Alinux)
+
+# NAME
+
+MooX::Role::DBIConnection - handy mixin for objects with a DB connection
+
+# SYNOPSIS
+
+    { package My::Example;
+      use Moo 2;
+      with 'MooX::Role::DBIConnection';
+    };
+
+    # Lazily connect using the parameters
+    my $writer = My::Example->new(
+        dbh => {
+            dsn  => '...',
+            user => '...',
+            password => '...',
+            options => '...',
+        },
+    );
+
+    # ... or alternatively if you have a connection already
+    my $writer2 = My::Example->new(
+        dbh => $dbh,
+    );
+
+This module enhances your class constructor by allowing you to pass in either
+a premade `dbh` or the parameters needed to create one.
+
+The `dbh` method will then return either the passed-in database handle or
+try a connection to the database at the first use.
+
+# OPTIONS
+
+The following options can be passed in the hashref to specify
+
+- **dsn**
+
+    [DBI](https://metacpan.org/pod/DBI) dsn to connect to
+
+- **user**
+
+    Database user to use when connecting to the database. This is the second
+    parameter used in the call to `DBI->connect(...)`.
+
+- **password**
+
+    Database password to use when connecting to the database. This is the third
+    parameter used in the call to `DBI->connect(...)`.
+
+- **options**
+
+    Database options to use when connecting to the database. This is the fourth
+    parameter used in the call to `DBI->connect(...)`.
+
+- **eager**
+
+    Whether to connect to the database immediately or upon the first call to the
+    the `->dbh`. The default is to make the connection lazily on first use.
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/MooX-Role-DBIConnection](https://github.com/Corion/MooX-Role-DBIConnection).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Role-DBIConnection](https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Role-DBIConnection)
+or via mail to [MooX-Role-DBIConnection@rt.cpan.org](mailto:MooX-Role-DBIConnection@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2019-2022 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

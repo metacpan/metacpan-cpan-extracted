@@ -4,13 +4,13 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
 
      use Plack::App::GitHubPages::Faux;
      
-     my $app = Plack::App::File->new( root => "/path/to/htdocs" )->to_app;
+     my $app = Plack::App::GitHubPages::Faux->new( root => "/path/to/htdocs" )->to_app;
 
 DESCRIPTION
 

@@ -39,7 +39,7 @@ use PPIx::QuoteLike::Utils qw{
 };
 use Scalar::Util ();
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use constant CLASS_CONTROL       => 'PPIx::QuoteLike::Token::Control';
 use constant CLASS_DELIMITER     => 'PPIx::QuoteLike::Token::Delimiter';
@@ -1379,9 +1379,11 @@ or element zero if no argument is specified.
  say "Interpolates $_" for $str->variables();
 
 B<NOTE> that this method is discouraged, and may well be deprecated and
-removed. My problem with it is that it returns variable names rather
-than L<PPI::Element|PPI::Element> objects, leaving you no idea how the
-variables are used. It was originally written for the benefit of
+removed. I have two problems with it. The first is that it returns
+variable names rather than L<PPI::Element|PPI::Element> objects, leaving
+you no idea how the variables are used. The second is that it does not
+properly handle things like C<"${^CAPTURE[0]}">, and it seems infeasible
+to make it do so. It was originally written for the benefit of
 L<Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter|Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter>,
 but has proven inadequate to that policy's needs.
 

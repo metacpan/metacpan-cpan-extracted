@@ -13,6 +13,11 @@ subtest basics => sub {
     my @res;
     walk sub { push @res, $_ unless ref $_ }, $data;
     is_deeply(\@res, [0, 1, "2.0", "v1", "2.1.b.0", "2.2", 3]) or diag explain \@res;
+
+    @res = ();
+    # same thing, but using $_[0]
+    walk sub { push @res, $_[0] unless ref $_[0] }, $data;
+    is_deeply(\@res, [0, 1, "2.0", "v1", "2.1.b.0", "2.2", 3]) or diag explain \@res;
 };
 
 subtest "opt:bydepth" => sub {

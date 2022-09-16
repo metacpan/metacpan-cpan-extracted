@@ -9,6 +9,7 @@ lib/Lemonldap/NG/Portal/2F/Engines/Default.pm
 lib/Lemonldap/NG/Portal/2F/Ext2F.pm
 lib/Lemonldap/NG/Portal/2F/Mail2F.pm
 lib/Lemonldap/NG/Portal/2F/Radius.pm
+lib/Lemonldap/NG/Portal/2F/Register/Base.pm
 lib/Lemonldap/NG/Portal/2F/Register/TOTP.pm
 lib/Lemonldap/NG/Portal/2F/Register/U2F.pm
 lib/Lemonldap/NG/Portal/2F/Register/WebAuthn.pm
@@ -48,6 +49,8 @@ lib/Lemonldap/NG/Portal/Auth/Slave.pm
 lib/Lemonldap/NG/Portal/Auth/SSL.pm
 lib/Lemonldap/NG/Portal/Auth/Twitter.pm
 lib/Lemonldap/NG/Portal/Auth/WebID.pm
+lib/Lemonldap/NG/Portal/Captcha.pod
+lib/Lemonldap/NG/Portal/Captcha/SecurityImage.pm
 lib/Lemonldap/NG/Portal/CDC.pm
 lib/Lemonldap/NG/Portal/CertificateResetByMail/Custom.pm
 lib/Lemonldap/NG/Portal/CertificateResetByMail/Demo.pm
@@ -57,10 +60,12 @@ lib/Lemonldap/NG/Portal/Issuer/Get.pm
 lib/Lemonldap/NG/Portal/Issuer/OpenID.pm
 lib/Lemonldap/NG/Portal/Issuer/OpenIDConnect.pm
 lib/Lemonldap/NG/Portal/Issuer/SAML.pm
+lib/Lemonldap/NG/Portal/Lib/2fDevices.pm
 lib/Lemonldap/NG/Portal/Lib/_tokenRule.pm
 lib/Lemonldap/NG/Portal/Lib/Captcha.pm
 lib/Lemonldap/NG/Portal/Lib/CAS.pm
 lib/Lemonldap/NG/Portal/Lib/Choice.pm
+lib/Lemonldap/NG/Portal/Lib/Code2F.pm
 lib/Lemonldap/NG/Portal/Lib/CustomModule.pm
 lib/Lemonldap/NG/Portal/Lib/DBI.pm
 lib/Lemonldap/NG/Portal/Lib/LDAP.pm
@@ -398,11 +403,9 @@ site/htdocs/static/languages/fi.json
 site/htdocs/static/languages/fr.json
 site/htdocs/static/languages/he.json
 site/htdocs/static/languages/it.json
-site/htdocs/static/languages/nl.json
 site/htdocs/static/languages/pl.json
 site/htdocs/static/languages/pt.json
 site/htdocs/static/languages/pt_BR.json
-site/htdocs/static/languages/ro.json
 site/htdocs/static/languages/tr.json
 site/htdocs/static/languages/vi.json
 site/htdocs/static/languages/zh.json
@@ -477,6 +480,7 @@ site/templates/bootstrap/yubikeyform.tpl
 site/templates/common/bullet_go.png
 site/templates/common/key.png
 site/templates/common/mail/ar.json
+site/templates/common/mail/de.json
 site/templates/common/mail/en.json
 site/templates/common/mail/es.json
 site/templates/common/mail/fi.json
@@ -556,7 +560,6 @@ t/30-Auth-and-issuer-SAML-Artifact-with-SOAP-SLO-IdP-initiated.t
 t/30-Auth-and-issuer-SAML-Artifact-with-SOAP-SLO.t
 t/30-Auth-and-issuer-SAML-Metadata.t
 t/30-Auth-and-issuer-SAML-NameID.t
-t/30-Auth-and-issuer-SAML-POST-Hook.t
 t/30-Auth-and-issuer-SAML-POST-IdP-initiated.t
 t/30-Auth-and-issuer-SAML-POST-Missing-SLO.t
 t/30-Auth-and-issuer-SAML-POST.t
@@ -565,6 +568,7 @@ t/30-Auth-and-issuer-SAML-Redirect-MultipleSP-Missing-SLO.t
 t/30-Auth-and-issuer-SAML-Redirect-MultipleSP.t
 t/30-Auth-and-issuer-SAML-Redirect-With-Info.t
 t/30-Auth-and-issuer-SAML-Redirect.t
+t/30-Auth-ResolutionRule.t
 t/30-Auth-SAML-with-choice.t
 t/30-CDC.t
 t/30-SAML-Head-to-Tail-POST.t
@@ -609,15 +613,17 @@ t/32-CAS-Proxy.t
 t/32-CAS-Security.t
 t/32-OIDC-ClaimTypes.t
 t/32-OIDC-ClientCredentials-Grant.t
-t/32-OIDC-Code-Flow-with-2F-UpgradeOnly.t
 t/32-OIDC-Code-Flow-with-2F.t
+t/32-OIDC-Code-Flow-with-2F-UpgradeOnly.t
 t/32-OIDC-Grant-Type-OAuth2-Handler-Rules.t
 t/32-OIDC-Grant-Type-Rules.t
 t/32-OIDC-Hooks.t
+t/32-OIDC-Logout-from-RP-bypass-confirm.t
+t/32-OIDC-Logout-redirect-uri-not-allowed.t
 t/32-OIDC-Macro.t
 t/32-OIDC-Offline-Session.t
-t/32-OIDC-Password-Grant-with-Bruteforce-and-Choice.t
 t/32-OIDC-Password-Grant.t
+t/32-OIDC-Password-Grant-with-Bruteforce-and-Choice.t
 t/32-OIDC-Refresh-Token.t
 t/32-OIDC-Register.t
 t/32-OIDC-RP-rule.t
@@ -669,6 +675,7 @@ t/40-Notifications-JSON-Server.t
 t/40-Notifications-XML-DBI.t
 t/40-Notifications-XML-File.t
 t/40-Notifications-XML-Server.t
+t/41-Captcha-old-api.t
 t/41-Captcha.t
 t/41-Token-with-global-storage.t
 t/41-Token.t
@@ -788,6 +795,7 @@ t/71-2F-U2F-with-History.t
 t/71-2F-U2F-with-TTL-and-msg.t
 t/71-2F-U2F-with-TTL.t
 t/71-2F-U2F.t
+t/72-2F-REST-CodeActivation-Resend.t
 t/72-2F-REST-with-History.t
 t/73-2F-UTOTP-TOTP-and-U2F-with-History.t
 t/73-2F-UTOTP-TOTP-and-U2F.t
@@ -797,6 +805,7 @@ t/74-2F-Required-Issuer-Timeouts.t
 t/74-2F-Required.t
 t/75-2F-Registers.t
 t/76-2F-Ext-with-BruteForce.t
+t/76-2F-Ext-with-CodeActivation-Resend.t
 t/76-2F-Ext-with-CodeActivation.t
 t/76-2F-Ext-with-GrantSession.t
 t/76-2F-Ext-with-History.t
@@ -806,6 +815,7 @@ t/77-2F-Mail-with-global-storage.t
 t/77-2F-Mail.t
 t/78-2F-Upgrade-Many.t
 t/78-2F-Upgrade.t
+t/78-2F-UpgradeOnly-with-forceFlag.t
 t/78-2F-UpgradeOnly-without-2F.t
 t/78-2F-UpgradeOnly.t
 t/79-2F-Yubikey-from-Session.t
@@ -817,6 +827,7 @@ t/99-Bad-logLevel.t
 t/99-Dont-load-Dumper.t
 t/99-pod.t
 t/AfterDataCustomPlugin.pm
+t/CaptchaOldApi.pm
 t/CasHookPlugin.pm
 t/Custom.pm
 t/gpghome/key.asc

@@ -93,6 +93,8 @@ site/htdocs/static/bwr/es5-shim/es5-shim.min.js
 site/htdocs/static/bwr/file-saver.js/FileSaver.js
 site/htdocs/static/bwr/file-saver.js/FileSaver.min.js
 site/htdocs/static/bwr/file-saver.js/FileSaver.min.js.map
+site/htdocs/static/css/custom.css
+site/htdocs/static/css/custom.min.css
 site/htdocs/static/css/manager.css
 site/htdocs/static/css/manager.min.css
 site/htdocs/static/forms/authChoice.html
@@ -189,10 +191,10 @@ site/htdocs/static/js/viewer.js
 site/htdocs/static/js/viewer.min.js
 site/htdocs/static/js/viewer.min.js.map
 site/htdocs/static/languages/ar.json
-site/htdocs/static/languages/de.json
 site/htdocs/static/languages/en.json
 site/htdocs/static/languages/es.json
 site/htdocs/static/languages/fr.json
+site/htdocs/static/languages/he.json
 site/htdocs/static/languages/it.json
 site/htdocs/static/languages/pl.json
 site/htdocs/static/languages/tr.json
@@ -207,6 +209,7 @@ site/htdocs/static/logos/en.png
 site/htdocs/static/logos/es.png
 site/htdocs/static/logos/favicon.ico
 site/htdocs/static/logos/fr.png
+site/htdocs/static/logos/he.png
 site/htdocs/static/logos/it.png
 site/htdocs/static/logos/llng-icon-32.png
 site/htdocs/static/logos/llng-logo-32.png

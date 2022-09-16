@@ -14,77 +14,103 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Input::SiteNews;
-$WebFetch::Input::SiteNews::VERSION = '0.14.0';
+$WebFetch::Input::SiteNews::VERSION = '0.15.1';
 use base "WebFetch";
 
 use Carp;
-use Date::Calc qw(Today Delta_Days Month_to_Text);
-
+use Readonly;
+use Scalar::Util qw(reftype);
+use DateTime;
+use DateTime::Format::ISO8601;
 
 # set defaults
-our ( $cat_priorities, $now, $nowstamp );
-
-our @Options = (
-    "short=s",
-    "long=s",
-);
-our $Usage = "--short short-output-file --long long-output-file";
+my ( $cat_priorities, $now );
+Readonly::Array my @Options => ( "short_path|short=s", "long_path|long=s", );
+Readonly::Scalar my $Usage  => "--short short-output-file --long long-output-file";
 
 # configuration parameters
-our $num_links = 5;
+Readonly::Scalar my $num_links => 5;
+Readonly::Array my @dt_keys    => qw(locale time_zone);
+
+# functions for access to internal data for testing
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+sub _config_params
+{
+    return { Options => \@Options, Usage => $Usage, num_links => $num_links };
+}
+sub _cat_priorities { return $cat_priorities; }
+## critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 
 # no user-servicable parts beyond this point
 
 # register capabilities with WebFetch
-__PACKAGE__->module_register( "cmdline", "input:sitenews" );
-
+__PACKAGE__->module_register( _config_params(), "cmdline", "input:sitenews", "output:sitenews_long" );
 
 # constants for state names
 sub initial_state { return 0; }
-sub attr_state { return 1; }
-sub text_state { return 2; }
+sub attr_state    { return 1; }
+sub text_state    { return 2; }
 
+# fetch() is the WebFetch API call point to run this module
 sub fetch
 {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     # set parameters for WebFetch routines
-    if (not defined $self->{num_links}) {
-        $self->{num_links} = $WebFetch::Input::SiteNews::num_links;
+    if ( not defined $self->{num_links} ) {
+        $self->set_param( "num_links", WebFetch->config("num_links") );
     }
-    if (not defined $self->{style}) {
-        $self->{style} = {};
-        $self->{style}{para} = 1;
-    }
+    $self->set_param( "para", 1 );
 
     # set up Webfetch Embedding API data
-    $self->{actions} = {}; 
-    $self->data->add_fields( "date", "title", "priority", "expired",
-        "position", "label", "url", "category", "text" );
+    $self->{actions} = {};
+    $self->data->add_fields( "date", "title", "priority", "expired", "position", "label", "url", "category", "text" );
+
     # defined which fields match to which "well-known field names"
     $self->data->add_wk_names(
-        "title" => "title",
-        "url" => "url",
-        "date" => "date",
-        "summary" => "text",
+        "title"    => "title",
+        "url"      => "url",
+        "date"     => "date",
+        "summary"  => "text",
         "category" => "category"
     );
 
     # process the links
 
     # get local time for various date comparisons
-    $now = [ Today ];
-    $nowstamp = sprintf "%04d%02d%02d", @$now;
+    my %dt_opts;
+    if ( exists $self->{datetime_settings} and reftype( $self->{datetime_settings} ) eq "HASH" ) {
+        %dt_opts = %{ $self->{datetime_settings} };    # get locale and time_zone settings if available
+    }
+    if ( exists $self->{testing_faketime} ) {
 
-    # parse data file
-    if (( exists $self->{sources}) and ( ref $self->{sources} eq "ARRAY" )) {
-        foreach my $source ( @{$self->{sources}}) {
-            $self->parse_input( $source );
+        # use a pre-specified timestamp for testing purposes so news elements are same age as expected result
+        $now = DateTime::Format::ISO8601->parse_datetime( $self->{testing_faketime}, %dt_opts );
+        if ( exists $dt_opts{locale} ) {
+            $now->set_locale( $dt_opts{locale} );
         }
+        if ( exists $dt_opts{time_zone} ) {
+            $now->set_time_zone( $dt_opts{time_zone} );
+        }
+    } else {
+        $now = DateTime->now(%dt_opts);
+    }
+
+    # parse data file(s)
+    my @sources;
+    if ( ( exists $self->{sources} ) and ( ref $self->{sources} eq "ARRAY" ) ) {
+        @sources = @{ $self->{sources} };
+    }
+    if ( exists $self->{source} ) {
+        push @sources, $self->{source};
+    }
+    foreach my $source (@sources) {
+        $self->parse_input($source);
     }
 
     # set parameters for the short news format
     if ( defined $self->{short_path} ) {
+
         # create the HTML actions list
         $self->{actions}{html} = [];
 
@@ -102,8 +128,8 @@ sub fetch
 
             # check expirations first
             my $exp_fnum = $self->fname2fnum("expired");
-            ( $a->[$exp_fnum] and not $b->[$exp_fnum]) and return 1;
-            ( not $a->[$exp_fnum] and $b->[$exp_fnum]) and return -1;
+            ( $a->[$exp_fnum] and not $b->[$exp_fnum] ) and return 1;
+            ( not $a->[$exp_fnum] and $b->[$exp_fnum] ) and return -1;
 
             # compare priority - posting category w/ age penalty
             my $pri_fnum = $self->fname2fnum("priority");
@@ -116,33 +142,103 @@ sub fetch
             return $a->[$lbl_fnum] cmp $b->[$lbl_fnum];
         };
         $params->{filter_func} = sub {
+
             # filter: skip expired items
             my $exp_fnum = $self->fname2fnum("expired");
             return not $_[$exp_fnum];
         };
         $params->{format_func} = sub {
+
             # generate HTML text
             my $txt_fnum = $self->fname2fnum("text");
             my $pri_fnum = $self->fname2fnum("priority");
-            return $_[$txt_fnum]
-                ."\n<!--- priority ".$_[$pri_fnum]." --->";
+            return $_[$txt_fnum] . "\n<!--- priority " . $_[$pri_fnum] . " --->";
         };
 
         # put parameters for fmt_handler_html() on the html list
-        push @{$self->{actions}{html}}, [ $self->{short_path}, $params ];
+        push @{ $self->{actions}{html} }, [ $self->{short_path}, $params ];
     }
 
     # set parameters for the long news format
     if ( defined $self->{long_path} ) {
+
         # create the SiteNews-specific action list
         # It will use WebFetch::Input::SiteNews::fmt_handler_sitenews_long()
         # which is defined in this file
         $self->{actions}{sitenews_long} = [];
 
         # put parameters for fmt_handler_sitenews_long() on the list
-        push @{$self->{actions}{sitenews_long}}, [ $self->{long_path} ];
+        push @{ $self->{actions}{sitenews_long} }, [ $self->{long_path} ];
     }
     return;
+}
+
+# inner portion of input parsing - called by parse_input()
+# read SiteNews text file and parse it into news items to return to caller
+sub parse_input_inner
+{
+    my ( $self, $news_data_fd ) = @_;
+    my @news_items;
+    my $position = 0;
+    my $state    = initial_state;    # before first entry
+    my ($current);
+    $cat_priorities = {};            # priorities for sorting
+    while (<$news_data_fd>) {
+        chomp;
+        /^\s*\#/x and next;          # skip comments
+        /^\s*$/x  and next;          # skip blank lines
+
+        if (/^[^\s]/x) {
+
+            # found attribute line
+            if ( $state == initial_state ) {
+                if (/^categories:\s*(.*)/x) {
+                    my @cats = split( ' ', $1 );
+                    my ($i);
+                    $cat_priorities->{"default"} = 999;
+                    for ( $i = 0 ; $i <= $#cats ; $i++ ) {
+                        $cat_priorities->{ $cats[$i] } = $i + 1;
+                    }
+                    next;
+                } elsif (/^(\w+):\s*(.*)/x) {
+                    $self->set_param( $1, $2 );
+                }
+            }
+            if ( $state == initial_state or $state == text_state ) {
+
+                # found first attribute of a new entry
+                if (/^([^=]+)=(.*)/x) {
+                    $current             = {};
+                    $current->{position} = $position++;
+                    $current->{$1}       = $2;
+                    push( @news_items, $current );
+                    $state = attr_state;
+                }
+            } elsif ( $state == attr_state ) {
+
+                # found a followup attribute
+                if (/^([^=]+)=(.*)/x) {
+                    $current->{$1} = $2;
+                }
+            }
+        } else {
+
+            # found text line
+            if ( $state == initial_state ) {
+
+                # cannot accept text before any attributes
+                next;
+            } elsif ( $state == attr_state or $state == text_state ) {
+                if ( defined $current->{text} ) {
+                    $current->{text} .= "\n$_";
+                } else {
+                    $current->{text} = $_;
+                }
+                $state = text_state;
+            }
+        }
+    }
+    return @news_items;
 }
 
 # parse input file
@@ -152,95 +248,139 @@ sub parse_input
 
     # parse data file
     my $news_data;
-    if ( not open ($news_data, "<", $input)) {
+    if ( not open( $news_data, "<", $input ) ) {
         croak "$0: failed to open $input: $!\n";
     }
-    my @news_items;
-    my $position = 0;
-    my $state = initial_state;      # before first entry
-    my ( $current );
-    $cat_priorities = {};                   # priorities for sorting
-    while ( <$news_data> ) {
-        chop;
-        /^\s*\#/x and next; # skip comments
-        /^\s*$/x and next;  # skip blank lines
-
-        if ( /^[^\s]/x ) {
-            # found attribute line
-            if ( $state == initial_state ) {
-                if ( /^categories:\s*(.*)/x ) {
-                    my @cats = split(' ', $1);
-                    my ( $i );
-                    $cat_priorities->{"default"} = 999;
-                    for ( $i=0; $i<=$#cats; $i++ ) {
-                        $cat_priorities->{$cats[$i]}
-                            = $i + 1;
-                    }
-                    next;
-                } elsif ( /^url-prefix:\s*(.*)/x ) {
-                    $self->{url_prefix} = $1;
-                }
-            }
-            if ( $state == initial_state or $state == text_state )
-            {
-                # found first attribute of a new entry
-                if ( /^([^=]+)=(.*)/x ) {
-                    $current = {};
-                    $current->{position} = $position++;
-                    $current->{$1} = $2;
-                    push( @news_items, $current );
-                    $state = attr_state;
-                }
-            } elsif ( $state == attr_state ) {
-                # found a followup attribute
-                if ( /^([^=]+)=(.*)/x ) {
-                    $current->{$1} = $2;
-                }
-            }
-        } else {
-            # found text line
-            if ( $state == initial_state ) {
-                # cannot accept text before any attributes
-                next;
-            } elsif ( $state == attr_state or $state == text_state ) {
-                if ( defined $current->{text}) {
-                    $current->{text} .= "\n$_";
-                } else {
-                    $current->{text} = $_;
-                }
-                $state = text_state;
-            }
-        }
-    }
+    my @news_items = $self->parse_input_inner($news_data);
     close $news_data;
 
     # translate parsed news into the WebFetch Embedding API data table
     my ( %label_hash, $pos );
     $pos = 0;
-    foreach my $item ( @news_items ) {
+    foreach my $item (@news_items) {
+
+        # collect fields for the data record
+        my $title    = ( defined $item->{title} )    ? $item->{title}    : "";
+        my $posted   = ( defined $item->{posted} )   ? $item->{posted}   : "";
+        my $category = ( defined $item->{category} ) ? $item->{category} : "";
+        my $text     = ( defined $item->{text} )     ? $item->{text}     : "";
+        my $url_prefix =
+            ( defined $self->{url_prefix} ) ? $self->{url_prefix} : "";
+
+        # timestamp processing using optional locale and time_zone from WebFetch object's datetime_settings hash
+        # This is usually set by SiteNews file's global settings at the top
+        my ( %dt_opts, $time_str, $anchor_time );
+        if ( exists $self->{datetime_settings} and reftype $self->{datetime_settings} eq "HASH" ) {
+            %dt_opts = %{ $self->{datetime_settings} };    # get locale and time_zone settings if available
+        }
+        if ($posted) {
+            my $date_ref = WebFetch::parse_date( \%dt_opts, $posted );
+            if ( defined $date_ref ) {
+                my $dt = ( ref $date_ref eq "DateTime" ) ? $date_ref : DateTime->new( @$date_ref, %dt_opts );
+                $time_str    = WebFetch::gen_timestamp( \%dt_opts, $dt );
+                $anchor_time = WebFetch::anchor_timestr( \%dt_opts, $dt );
+            }
+        }
+        if ( not defined $time_str or not defined $anchor_time ) {
+            $time_str    = "undated";
+            $anchor_time = "0000-undated";
+        }
 
         # generate an intra-page link label
         my ( $label, $count );
-        $count=0;
-        while (( $label = $item->{posted}."-".sprintf("%03d",$count)) and defined $label_hash{$label}) {
+        $count = 0;
+        while ( ( $label = $anchor_time . "-" . sprintf( "%03d", $count ) )
+            and defined $label_hash{$label} )
+        {
             $count++;
         }
         $label_hash{$label} = 1;
 
-        # save the data record
-        my $title = ( defined $item->{title}) ? $item->{title} : "";
-        my $posted = ( defined $item->{posted}) ? $item->{posted} : "";
-        my $category = ( defined $item->{category})
-            ? $item->{category} : "";
-        my $text = ( defined $item->{text}) ? $item->{text} : "";
-        my $url_prefix = ( defined $self->{url_prefix})
-            ? $self->{url_prefix} : "";
+        # generate data record for output
         $self->data->add_record(
-            printstamp($posted), $title, priority( $item ),
-                expired( $item ), $pos, $label,
-                $url_prefix."#".$label, $category, $text );
+            $time_str,      $title, $self->priority($item),
+            expired($item), $pos,   $label, $url_prefix . "#" . $label,
+            $category,      $text
+        );
         $pos++;
     }
+    return;
+}
+
+# format handler function specific to this module's long-news output format
+sub fmt_handler_sitenews_long
+{
+    # TODO move sort block to separate function and remove the no-critic exemption
+    ## no critic ( BuiltinFunctions::RequireSimpleSortBlock )
+    my ($self) = @_;
+
+    # sort events for long display
+    my @long_news = sort {
+
+        # sort news entries for long display
+        # sorting priority:
+        #	date first
+        #	category/priority second
+        #	reverse file order last
+
+        # sort by date
+        my $lbl_fnum = $self->fname2fnum("label");
+        my ( $a_date, $b_date ) = ( $a->[$lbl_fnum], $b->[$lbl_fnum] );
+        $a_date =~ s/-.*//x;
+        $b_date =~ s/-.*//x;
+        if ( $a_date ne $b_date ) {
+            return $b_date cmp $a_date;
+        }
+
+        # sort by priority (within same date)
+        my $pri_fnum = $self->fname2fnum("priority");
+        if ( $a->[$pri_fnum] != $b->[$pri_fnum] ) {
+            return $a->[$pri_fnum] <=> $b->[$pri_fnum];
+        }
+
+        # sort by chronological order (within same date and priority)
+        return $a->[$lbl_fnum] cmp $b->[$lbl_fnum];
+    } @{ $self->{data}{records} };
+
+    # process the links for the long list
+    my ( @long_text, $prev, $url_prefix, $i );
+    $url_prefix =
+        ( defined $self->{url_prefix} )
+        ? $self->{url_prefix}
+        : "";
+    $prev = undef;
+    push @long_text, "<dl>";
+    my $lbl_fnum   = $self->fname2fnum("label");
+    my $date_fnum  = $self->fname2fnum("date");
+    my $title_fnum = $self->fname2fnum("title");
+    my $txt_fnum   = $self->fname2fnum("text");
+    my $exp_fnum   = $self->fname2fnum("expired");
+    my $pri_fnum   = $self->fname2fnum("priority");
+
+    for ( $i = 0 ; $i <= $#long_news ; $i++ ) {
+        my $news = $long_news[$i];
+        if ( ( !defined $prev->[$date_fnum] )
+            or $prev->[$date_fnum] ne $news->[$date_fnum] )
+        {
+            push @long_text, "<dt>" . $news->[$date_fnum];
+            push @long_text, "<dd>";
+        }
+        push @long_text,
+              "<a name=\""
+            . $news->[$lbl_fnum] . "\">"
+            . $news->[$title_fnum]
+            . "</a>\n"
+            . $news->[$txt_fnum]
+            . "<!--- priority: "
+            . $news->[$pri_fnum]
+            . ( $news->[$exp_fnum] ? " expired" : "" ) . " --->";
+        push @long_text, "<p>";
+        $prev = $news;
+    }
+    push @long_text, "</dl>";
+
+    # store it for later save to disk
+    $self->html_savable( $self->{long_path}, join( "\n", @long_text ) . "\n" );
     return;
 }
 
@@ -248,45 +388,47 @@ sub parse_input
 # utility functions
 #
 
-# generate a printable version of the datestamp
-sub printstamp
-{
-    my ( $stamp ) = @_;
-    my ( $year, $mon, $day ) = ( $stamp =~ /^(....)(..)(..)/x );
-
-    return Month_to_Text(int($mon))." ".int($day).", $year";
-}
-
 # function to detect if a news entry is expired
 sub expired
 {
-    my ( $entry ) = @_;
-    return (( defined $entry->{expires}) and
-        ( $entry->{expires} lt $nowstamp ));
+    my ($entry) = @_;
+    return 0 if not exists $entry->{expires};
+    return 0 if not defined $entry->{expires};
+    return $entry->{expires} < $now;
 }
 
-# function to get the priority value from 
+# function to compute a priority value which decays with age
 sub priority
 {
-    my ( $entry ) = @_;
+    my ( $self, $entry ) = @_;
 
-    ( defined $entry->{posted}) or return 999;
-    my ( $year, $mon, $day ) = ( $entry->{posted} =~ /^(....)(..)(..)/x );
-    my $age = Delta_Days( $year, $mon, $day, @$now );
+    return 999 if not exists $entry->{posted};
+    return 999 if not defined $entry->{posted};
+
+    my $date_ref = WebFetch::parse_date( $entry->{posted} );
+    return 999 if not defined $date_ref;
+
+    my %dt_opts;
+    if ( exists $self->{datetime_settings} and reftype( $self->{datetime_settings} ) eq "HASH" ) {
+        %dt_opts = %{ $self->{datetime_settings} };    # get locale and time_zone settings if available
+    }
+    my $dt    = ( ref $date_ref eq "DateTime" ) ? $date_ref : DateTime->new( @$date_ref, %dt_opts );
+    my $age   = ( $now->subtract_datetime($dt) )->delta_days();
     my $bonus = 0;
 
     if ( $age <= 2 ) {
         $bonus -= 2 - $age;
     }
-    if (( defined $entry->{category}) and
-        ( defined $cat_priorities->{$entry->{category}}))
+    if (    ( defined $entry->{category} )
+        and ( defined $cat_priorities->{ $entry->{category} } ) )
     {
-        my $cat_pri = ( exists $cat_priorities->{$entry->{category}})
-            ? $cat_priorities->{$entry->{category}} : 0;
+        my $cat_pri =
+            ( exists $cat_priorities->{ $entry->{category} } )
+            ? $cat_priorities->{ $entry->{category} }
+            : 0;
         return $cat_pri + $age * 0.025 + $bonus;
     } else {
-        return $cat_priorities->{"default"} + $age * 0.025
-            + $bonus;
+        return $cat_priorities->{"default"} + $age * 0.025 + $bonus;
     }
 }
 
@@ -302,7 +444,7 @@ WebFetch::Input::SiteNews - download and save SiteNews headlines from a local fi
 
 =head1 VERSION
 
-version 0.14.0
+version 0.15.1
 
 =head1 SYNOPSIS
 

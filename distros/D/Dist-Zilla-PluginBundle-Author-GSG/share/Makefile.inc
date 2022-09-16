@@ -46,7 +46,7 @@ else
 	MAKEFILE_SHARE := $(wildcard $(SHARE_DIR)/Makefile*)
 endif
 
-.PHONY : test clean realclean develop carton
+.PHONY : test disttest clean distclean realclean develop carton
 
 test : $(CPANFILE_SNAPSHOT)
 	@nice $(CARTON) exec prove -lfr t
@@ -56,16 +56,21 @@ test : $(CPANFILE_SNAPSHOT)
 testcoverage : $(CPANFILE_SNAPSHOT)
 	$(CARTON) exec -- cover -test -ignore . -select ^lib
 
+disttest: $(DZIL)
+	$(CARTON) exec -- dzil test --all
+
 $(MAKEFILE_TARGET): $(MAKEFILE_SHARE)
 	install -m 644 $< $@
 	@echo Makefile updated>&2
 
-clean:
-	$(CARTON) exec dzil clean || true
-	rm -rf .build
+clean: distclean
+	rm -rf .build dzpbag-*
 
-realclean: clean
+realclean: clean distclean
 	rm -rf local
+
+distclean:
+	test -e "$(DZIL)" && $(CARTON) exec dzil clean
 
 update: README.md LICENSE.txt $(EXTRA_UPDATES)
 	@echo Everything is up to date

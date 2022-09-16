@@ -10,6 +10,7 @@ lib/Pod/L10N/Format.pod
 lib/Pod/L10N/Html.pm
 minil.toml
 script/pod2htmll10n
+t/80_help.t
 t/cache.pod
 t/cache.t
 t/crossref.pod

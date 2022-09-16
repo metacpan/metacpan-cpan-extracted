@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/PhoneNumberUtils.pm','script/normalize-phone-number','script/phone-number-info','script/phone-number-is-valid'];
+my $filenames = ['lib/App/PhoneNumberUtils.pm','script/format-phone-number','script/format-phone-number-idn','script/normalize-phone-number','script/normalize-phone-number-idn','script/phone-number-info','script/phone-number-is-valid'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

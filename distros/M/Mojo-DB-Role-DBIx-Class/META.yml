@@ -3,6 +3,7 @@ abstract: 'provides a convenience role creating a DBIx::Class for your Mojo data
 author:
   - 'simone cesano <scesano@cpan.org>'
 build_requires:
+  DBIx::Class::Schema::Loader: '0'
   DateTime::Format::SQLite: '0'
   Mojo::SQLite: '0'
 configure_requires:
@@ -17,7 +18,9 @@ name: Mojo-DB-Role-DBIx-Class
 recommends:
   Mojo::Pg: '0'
   Mojo::SQLite: '0'
-version: '0.001'
+requires:
+  Role::Tiny: '0'
+version: '0.002'
 x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

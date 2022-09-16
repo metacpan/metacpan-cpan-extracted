@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Zilla::Dist;
+use IO::All;
+
+my $o = Zilla::Dist->get_meta;
+$o->{name_underline} = '=' x length($o->{name});
+
+sub main {
+    my $text = io('-')->utf8->all;
+
+    $text =~ s{
+      (
+        <!--\s+
+        (.*?)
+        \s+-->
+      )
+    }
+    { macro($1, $2) }sexg;
+
+    io('-')->utf8->print($text);
+}
+
+sub macro {
+    my ($all, $macro) = @_;
+
+    my @words = split /\s+/, $macro;
+
+    if (@words and $words[0] =~ /^([-\w]+):$/) {
+        my $method = "do_$1";
+        $method =~ s/-/_/g;
+        if ('main'->can($method)) {
+            shift @words;
+            if (my $text = 'main'->$method(@words)) {
+                return $text;
+            }
+        }
+    }
+
+    return $all;
+}
+
+sub do_doc_head {
+    return <<"...";
+$o->{name}
+$o->{name_underline}
+
+$o->{abstract}
+...
+}
+
+sub do_doc_tail {
+    return <<"...";
+# Author
+
+$o->{author}{name} <$o->{author}{email}>
+
+# Copyright and License
+
+Copyright $o->{copyright} - $o->{author}{name}
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>
+...
+}
+
+sub do_badge {
+    my ($class, $type, @args) = @_;
+
+    if ($type eq 'gha') {
+        my ($flow) = @args;
+        return <<"...";
+[![$flow](
+https://github.com/ingydotnet/yaml-libyaml-pm/actions/workflows/$flow.yml/badge.svg)](
+https://github.com/ingydotnet/yaml-libyaml-pm/actions/workflows/$flow.yml)
+...
+    }
+
+    return;
+}
+
+main @ARGV;

@@ -20,6 +20,7 @@ no_index:
     - examples
     - t
   package:
+    - Mojo::Log::_Capture
     - Mojo::Server::PSGI::_IO
     - Mojo::Util::_Guard
 requires:
@@ -34,5 +35,5 @@ resources:
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/mojo.git
-version: '9.25'
+version: '9.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

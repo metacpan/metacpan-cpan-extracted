@@ -1,0 +1,17 @@
+class Sys::Socket::Sockaddr::Storage extends Sys::Socket::Sockaddr : pointer_t {
+  
+  # Class methods
+  native static method new : Sys::Socket::Sockaddr::Storage ();
+  
+  # Instance methods
+  native method DESTROY : void ();
+  
+  method sa_family : int () {
+    my $sin_family = $self->ss_family;
+    return $sin_family;
+  }
+  
+  native method ss_family : int ();
+
+  native method set_ss_family : void ();
+}

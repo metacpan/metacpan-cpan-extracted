@@ -6,8 +6,8 @@ use utf8;
 use Test::More;
 use Data::Dumper;
 
-use lib 't';
-use Util;
+use lib '.';
+use t::Util;
 
 my $has_devfd = -r sprintf "/dev/fd/%d", DATA->fileno;
 

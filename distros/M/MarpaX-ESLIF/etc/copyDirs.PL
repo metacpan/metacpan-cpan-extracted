@@ -294,6 +294,7 @@ sub _dircopy {
         next if $_ eq 'CMake-codecov';
         next if $_ eq 'testdata';
         next if $_ =~ /\.tar\.orig\.gz$/;
+        next if $_ eq 'doc';
         if ($_ eq 'tar') {
           #
           # We skip only 'tar' directory of marpaESLIF

@@ -29,7 +29,7 @@ our $VERSION = '2.0.12';
 has type  => ( is => 'rw' );
 has path  => ( is => 'rw' );
 has ipath => ( is => 'rw' );
-has _ott  => (
+has _ott => (
     is      => 'rw',
     lazy    => 1,
     default => sub {

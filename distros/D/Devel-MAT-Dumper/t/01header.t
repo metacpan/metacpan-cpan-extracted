@@ -36,7 +36,14 @@ is( $zero, 0, 'Zero' );
 
 is( $major, 0, 'Major' );
 
-is( $minor, 4, 'Minor' );
+require feature;
+no warnings 'once';
+if( $feature::feature{class} ) {
+   is( $minor, 5, 'Minor' );
+}
+else {
+   is( $minor, 4, 'Minor' );
+}
 
 my ( $rev, $sub ) = $] =~ m/^5\.(...)(...)$/;
 is( $perlver, ( 5 << 24 ) | ( $rev << 16 ) | ( $sub + 0 ), 'Perlver' );

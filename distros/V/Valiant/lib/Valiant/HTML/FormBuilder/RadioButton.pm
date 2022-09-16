@@ -3,6 +3,8 @@ package Valiant::HTML::FormBuilder::RadioButton;
 use Moo;
 extends 'Valiant::HTML::FormBuilder';
 
+has 'parent_builder' => (is=>'ro', required=>1);
+
 sub text { 
   my $self = shift;
   return $self->tag_value_for_attribute($self->options->{label_method});

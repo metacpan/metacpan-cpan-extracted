@@ -165,7 +165,7 @@ my @inputs = (
     "{\"test\":\"1.25e4\"}",
     "[]",
     "[
-       { 
+       {
           \"precision\": \"zip\",
           \"Latitude\":  37.7668,
           \"Longitude\": -122.3959,

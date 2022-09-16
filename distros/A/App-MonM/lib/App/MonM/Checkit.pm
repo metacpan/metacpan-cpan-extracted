@@ -1,4 +1,4 @@
-package App::MonM::Checkit; # $Id: Checkit.pm 80 2019-07-08 10:41:47Z abalama $
+package App::MonM::Checkit; # $Id: Checkit.pm 116 2022-08-27 08:57:12Z abalama $
 use warnings;
 use strict;
 use utf8;
@@ -11,7 +11,7 @@ App::MonM::Checkit - App::MonM checkit class
 
 =head1 VIRSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ App::MonM checkit class
 
 =head2 new
 
-    my $checker = new App::MonM::Checkit;
+    my $checker = App::MonM::Checkit->new;
 
 Returns checker object
 
@@ -75,6 +75,13 @@ Sets and returns the error value
 
 Sets and returns the message value
 
+=head2 note
+
+    my $note = $checker->note;
+    $checker->note("Blah-Blah-Blah");
+
+Sets and returns the note value
+
 =head2 source
 
     my $source = $checker->source;
@@ -96,6 +103,199 @@ Sets and returns the status value
 
 Sets and returns the type value
 
+=head1 CONFIGURATION DIRECTIVES
+
+General configuration options (directives) detailed describes in L<App::MonM/GENERAL DIRECTIVES>
+
+The checkit configuration directives are specified in named
+sections <checkit NAME> where NAME is the name of the checkit section.
+The NAME is REQUIRED attribute. For example:
+
+    <Checkit "foo">
+        Enable      yes
+        URL         https://www.example.com
+        Target      code
+        IsTrue      200
+    </Checkit>
+
+Each the checkit section can contain the following basic directives:
+
+=over 4
+
+=item B<Enable>
+
+    Enable  yes
+
+The main switcher of the checkit section
+
+Default: no
+
+=item B<Interval>
+
+    Interval 20s
+
+Defines the time interval between two checks
+
+Format for time can be in any of the following forms:
+
+    20   -- in 20 seconds
+    180s -- in 180 seconds
+    2m   -- in 2 minutes
+    12h  -- in 12 hours
+    1d   -- in 1 day
+    3M   -- in 3 months
+    2y   -- in 2 years
+    3m   -- 3 minutes ago(!)
+
+Default: 0
+
+=item B<IsFalse>
+
+    IsFalse  Error.
+
+The definition of "What is bad?"
+
+Default: !!perl/regexp (?i-xsm:^\s*(0|error|fail|no|false))
+
+Examples:
+
+    IsFalse   !!perl/regexp (?i-xsm:^\s*(0|error|fail|no|false))
+    IsFalse   0
+    IsFalse   Error.
+
+=item B<IsTrue>
+
+    IsTrue  Ok.
+
+The definition of "What is good?"
+
+Default: !!perl/regexp (?i-xsm:^\s*(1|ok|pass|yes|true))
+
+Examples:
+
+    IsTrue    !!perl/regexp (?i-xsm:^\s*(1|ok|pass|yes|true))
+    IsTrue    1
+    IsTrue    Ok.
+
+=item B<OrderBy>
+
+    OrderBy True,False
+
+Controls the order in which True and False are evaluated.
+The OrderBy directive, along with the IsTrue and IsFalse directives,
+controls a two-pass resolve system. The first pass processes IsTrue
+or IsFalse directive, as specified by the OrderBy directive.
+The second pass parses the rest of the directive (IsFalse or IsTrue).
+
+Ordering is one of:
+
+    OrderBy True,False
+
+First, IsTrue directive is evaluated. Next, IsFalse directive is evaluated.
+If matches IsTrue, the check's result sets to true (PASSED), otherwise
+result sets to false (FAILED)
+
+    OrderBy False,True
+
+First, IsFalse directive is evaluated. Next, IsTrue directive is evaluated.
+If matches IsFalse, the check's result sets to false (FAILED), otherwise
+result sets to true (PASSED)
+
+Default: "True,False"
+
+Examples:
+
+    OrderBy   True,False
+    OrderBy   ASC # Is same as: "True,False"
+    OrderBy   False,True
+    OrderBy   DESC # Is same as: "False,True"
+
+=item B<SendTo>
+
+    SendTo  Alice
+
+Defines a List of Recipients for notifications.
+There can be several such directives
+
+Email addresses for sending notifications directly (See Channel SendMail):
+
+    SendTo  foo@example.com
+    SendTo  bar@example.com
+
+...or SMS phone numbers (See Channel SMSGW):
+
+    SendTo 11231230002
+    SendTo +11231230001
+    SendTo +1-123-123-0003
+
+...or a notify users:
+
+    SendTo Bob, Alice
+    SendTo Fred
+
+...or a notify groups:
+
+    SendTo @Foo, @Bar
+    SendTo @Baz
+
+=item B<Target>
+
+    Target    content
+
+Defines a target for analysis of results
+
+    status  - the status of the check operation is analyzed
+    code    - the return code is analyzed (HTTP code, error code and etc.)
+    content - the content is analyzed (data from HTTP response, data
+              from command's STDOUT or data from DB)
+    message - the message is analyzed (HTTP message, eg.)
+
+Default: status
+
+=item B<Trigger>
+
+    Trigger "curl http://cam.com/[NAME]/[ID]?[MSISDN] >/tmp/photo.jpg"
+
+Defines triggers (system commands) that runs before sending notifications
+There can be several such directives
+Each trigger can contents the variables for auto replacement, for example:
+
+    Trigger  "mycommand1 "[MESSAGE]""
+
+Replacement variables:
+
+    [ID]        -- Internal ID of the message
+    [MESSAGE], [MSG] -- The checker message content
+    [MSISDN]    -- Phone number, recipient
+    [NAME]      -- Checkit section name
+    [NOTE]      -- The checker notes
+    [RESULT]    -- The check result: PASSED/FAILED
+    [SOURCE], [SRC]  -- Source string (URL, Command, etc.)
+    [STATUS]    -- The checker status: OK/ERROR
+    [SUBJECT], [SBJ] -- Subject of message (MIME)
+    [TYPE]      -- Type of checkit: http/dbi/command
+
+=item B<Type>
+
+    Type      https
+
+Defines checking type. As of today, three types are supported:
+http(s), command and dbi(db)
+
+Default: http
+
+Examples:
+
+    Type      http
+    Type      dbi
+    Type      command
+
+=back
+
+The HTTP checkit directives are describes in L<App::MonM::Checkit::HTTP/CONFIGURATION DIRECTIVES>,
+the "Command" checkit directives are describes in L<App::MonM::Checkit::Command/CONFIGURATION DIRECTIVES>,
+the DBI checkit directives are describes in L<App::MonM::Checkit::DBI/CONFIGURATION DIRECTIVES>
+
 =head1 HISTORY
 
 See C<Changes> file
@@ -114,11 +314,11 @@ L<App::MonM>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -130,13 +330,14 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.02';
+$VERSION = '1.03';
 
-use Class::C3::Adopt::NEXT;
+use mro;
+
 use CTK::ConfGenUtil;
 use CTK::TFVals qw/ :ALL /;
 
-use base qw/
+use parent qw/
         App::MonM::Checkit::HTTP
         App::MonM::Checkit::Command
         App::MonM::Checkit::DBI
@@ -144,7 +345,7 @@ use base qw/
 
 use constant {
     TRUERX      => qr/^\s*(1|ok|pass|yes|true)/i, # True regexp
-    FALSERX     => qr/^\s*(0|error|fail|no|false)/i, # False regext
+    FALSERX     => qr/^\s*(0|error|fail|no|false)/i, # False regexp
     ORDERBY     => "true,false",
     TARGET      => "status",
     FAIL        => 0,
@@ -179,12 +380,13 @@ sub cleanup {
     my $self = shift;
     $self->{config}  = {}; # Config
     $self->{status}  = undef; # 1 - Ok; 0 - Error
-    $self->{error}   = ''; # Error message
+    $self->{error}   = ''; # Error string
     $self->{code}    = undef; # 200
     $self->{type}    = undef; # http/dbi/command
     $self->{source}  = ''; # URL/DSN/Command
     $self->{message} = ''; # Message string or error
     $self->{content} = ''; # Content data or STDOUT data
+    $self->{note} = ''; # Note
     return $self;
 }
 sub config {
@@ -233,54 +435,76 @@ sub content {
     $self->{content} = $v if defined $v;
     return $self->{content};
 }
+sub note {
+    my $self = shift;
+    my $v = shift;
+    $self->{note} = $v if defined $v;
+    return $self->{note};
+}
 sub check {
     my $self = shift;
     my $conf = shift;
-    my $status = FAIL;
+    my $result = FAIL;
     $self->cleanup;
     $self->{config} = $conf if ref($conf) eq 'HASH';
-    $self->type(lc(value($conf, 'type') || 'http'));
+    $self->type(lc(lvalue($conf, 'type') || 'http'));
     $self->maybe::next::method();
 
     # Check response
-    my $true_regexp = _qrreconstruct(value($conf, 'istrue'));
-    my $false_regexp= _qrreconstruct(value($conf, 'isfalse'));
-    my $orderby     = value($conf, 'orderby') || ORDERBY;
-    my $target      = lc(value($conf, 'target') || TARGET);
-    my $result;
-    if ($target eq 'code') { $result = $self->code } # code
-    elsif ($target eq 'message') { $result = $self->message } # message
-    elsif ($target eq 'content') { $result = $self->content } # content
-    else { $result = $self->status } # status
-    $result //= '';
+    my $true_regexp = _qrreconstruct(lvalue($conf, 'istrue'));
+    my $false_regexp= _qrreconstruct(lvalue($conf, 'isfalse'));
+    my $orderby     = lvalue($conf, 'orderby') || ORDERBY;
+    my $target      = lc(lvalue($conf, 'target') || TARGET);
+    my $test; # Value for testing
+    if ($target eq 'code') { $test = $self->code } # code
+    elsif ($target eq 'message') { $test = $self->message } # message
+    elsif ($target eq 'content') { $test = $self->content } # content
+    else { # status (default)
+        $target = TARGET;
+        $test = $self->status;
+    }
+    $test //= '';
 
-    # Check result
-    my $rtt = (defined($true_regexp) && ref($true_regexp)) ? ref($true_regexp) : 'String';
-    my $rtf = (defined($false_regexp) && ref($false_regexp)) ? ref($false_regexp) : 'String';
+    # Check test value
+    my ($direct, $rule);
     if (($orderby =~ /false\s*\,\s*true/i) || ($orderby =~ /desc/i)) { # DESC
+        $direct = "DESC";
         if (defined $false_regexp) {
-            $status = _cmp($result, $false_regexp, [FAIL, PASS]);
-            $self->error("RESULT == FALSE (DEC ORDERED) [AS $rtf]") if !$status && !$self->error;
+            $result = _cmp($test, $false_regexp, [FAIL, PASS]);
+            $rule = $result ? "!= FALSE" : "== FALSE";
         } elsif (defined $true_regexp) {
-            $status = _cmp($result, $true_regexp, [PASS, FAIL]);
-            $self->error("RESULT != TRUE (DEC ORDERED) [AS $rtt]") if !$status && !$self->error;
+            $result = _cmp($test, $true_regexp, [PASS, FAIL]);
+            $rule = $result ? "== TRUE" : "!= TRUE";
         } else {
-            $status = _cmp($result, FALSERX, [FAIL, PASS]);
-            $self->error("RESULT == FALSE-DEFAULT (DEC ORDERED) [AS Regexp (DEFAULT)]") if !$status && !$self->error;
+            $result = _cmp($test, FALSERX, [FAIL, PASS]);
+            $rule = $result ? "!= FALSE-DEFAULT" : "== FALSE-DEFAULT";
         }
     } else { # ASC
+        $direct = "ASC";
         if (defined $true_regexp) {
-            $status = _cmp($result, $true_regexp, [PASS, FAIL]);
-            $self->error("RESULT != TRUE (ASC ORDERED) [AS $rtt]") if !$status && !$self->error;
+            $result = _cmp($test, $true_regexp, [PASS, FAIL]);
+            $rule = $result ? "== TRUE" : "!= TRUE";
         } elsif (defined $false_regexp) {
-            $status = _cmp($result, $false_regexp, [FAIL, PASS]);
-            $self->error("RESULT == FALSE (ASC ORDERED) [AS $rtf]") if !$status && !$self->error;
+            $result = _cmp($test, $false_regexp, [FAIL, PASS]);
+            $rule = $result ? "!= FALSE" : "== FALSE";
         } else {
-            $status = _cmp($result, TRUERX, [PASS, FAIL]);
-            $self->error("RESULT != TRUE-DEFAULT (ASC ORDERED) [AS Regexp (DEFAULT)]") if !$status && !$self->error;
+            $result = _cmp($test, TRUERX, [PASS, FAIL]);
+            $rule = $result ? "== TRUE-DEFAULT" : "!= TRUE-DEFAULT";
         }
     }
-    return $status;
+
+    # Set errors and note
+    my $rtt = (defined($true_regexp) && ref($true_regexp)) ? ref($true_regexp) : 'String';
+    my $rtf = (defined($false_regexp) && ref($false_regexp)) ? ref($false_regexp) : 'String';
+    my $note = sprintf("Check [%s] %s: RESULT [%s] %s (%s) [%s]",
+        $self->type,
+        $result ? "PASSED" : "FAILED",
+        $target, $rule, $direct,
+        $rule =~ /DEF/ ? 'Regexp (DEFAULT)' : $rule =~ /TRUE/ ? $rtt : $rtf);
+    $self->note($note);
+    $self->error($note) if !$result && !$self->error; # Set error if NO erorrs from backends
+
+    return $result;
 }
 
 sub _qrreconstruct {

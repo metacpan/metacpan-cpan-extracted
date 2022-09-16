@@ -1,0 +1,140 @@
+class TestCase::Sys::FileTest {
+  use Sys::FileTest;
+
+  static method s : int () {
+    
+    {
+      # File
+      {
+        my $file = "t/ftest/file_empty.txt";
+        my $size = Sys::FileTest->s($file);
+        unless ($size == 0) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method z : int () {
+    
+    {
+      # File
+      {
+        my $file = "t/ftest/file_empty.txt";
+        my $non_zero = Sys::FileTest->z($file);
+        unless ($non_zero) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method e : int () {
+    
+    {
+      # File
+      {
+        my $file = "t/ftest/file_empty.txt";
+        my $result = Sys::FileTest->e($file);
+        unless ($result) {
+          return 0;
+        }
+      }
+      
+      # Not exists
+      {
+        my $file = "t/ftest/not_found_file";
+        my $result = Sys::FileTest->e($file);
+        unless ($result == 0) {
+          return 0;
+        }
+      }
+      
+      # Directory
+      {
+        my $file = "t/ftest/dir_empty";
+        my $result = Sys::FileTest->e($file);
+        unless ($result) {
+          return 0;
+        }
+      }
+    }
+    return 1;
+  }
+  
+  static method f : int () {
+    
+    {
+      # Not exists
+      {
+        my $file = "t/ftest/not_found_file";
+        eval { Sys::FileTest->f($file); };
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      # File
+      {
+        my $file = "t/ftest/file_empty.txt";
+        my $result = Sys::FileTest->f($file);
+        unless ($result) {
+          return 0;
+        }
+      }
+      
+      # Directory
+      {
+        my $file = "t/ftest/dir_empty";
+        my $result = Sys::FileTest->f($file);
+        unless ($result == 0) {
+          return 0;
+        }
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method d : int () {
+    
+    {
+      # Not exists
+      {
+        my $file = "t/ftest/not_found_file";
+        eval { Sys::FileTest->d($file); };
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      # File
+      {
+        my $file = "t/ftest/file_empty.txt";
+        my $result = Sys::FileTest->d($file);
+        unless ($result == 0) {
+          return 0;
+        }
+      }
+      
+      # Directory
+      {
+        my $file = "t/ftest/dir_empty";
+        my $result = Sys::FileTest->d($file);
+        unless ($result) {
+          return 0;
+        }
+      }
+    }
+
+    $@ = undef;
+    
+    return 1;
+  }
+}

@@ -24,6 +24,10 @@ my %builder = (
         require Lemonldap::NG::Manager;
         return Lemonldap::NG::Manager->run( {} );
     },
+    portal => sub {
+        require Lemonldap::NG::Portal;
+        return Lemonldap::NG::Portal->run( {} );
+    },
     cgi => sub {
         require CGI::Emulate::PSGI;
         require CGI::Compile;

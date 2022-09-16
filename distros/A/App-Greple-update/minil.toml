@@ -1,0 +1,9 @@
+name = "App-Greple-update"
+badges = [ 'github-actions/test', 'metacpan' ]
+authority = "cpan:UTASHIRO"
+
+module_maker = "ModuleBuildTiny"
+static_install = "auto"
+
+[release]
+branch = "main"

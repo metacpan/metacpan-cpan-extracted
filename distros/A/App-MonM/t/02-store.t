@@ -1,20 +1,18 @@
 #!/usr/bin/perl -w
 #########################################################################
 #
-# Serz Minus (Sergey Lepenkov), <abalama@cpan.org>
+# Serż Minus (Sergey Lepenkov), <abalama@cpan.org>
 #
-# Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+# Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 #
 # This is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-#
-# $Id: 02-store.t 71 2019-07-05 18:17:43Z abalama $
 #
 #########################################################################
 use Test::More tests => 8;
 use App::MonM::Store;
 
-my $dbi = new App::MonM::Store();
+my $dbi = App::MonM::Store->new();
 
 ok(!$dbi->error, "DBI errors") or diag($dbi->error);
 #note(explain($dbi));

@@ -23,21 +23,21 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Data::Store;
-$WebFetch::Data::Store::VERSION = '0.14.0';
+$WebFetch::Data::Store::VERSION = '0.15.1';
 use strict;
 use warnings;
 use WebFetch;
 use base qw( WebFetch );
 
 # define exceptions/errors
-use Exception::Class (
-);
+use Exception::Class ();
 
 # no user-servicable parts beyond this point
 
 # instantiate new object
-sub new {
-    my ($class, @params) = @_;
+sub new
+{
+    my ( $class, @params ) = @_;
     my $self = {};
     bless $self, $class;
     $self->init(@params);
@@ -47,197 +47,186 @@ sub new {
 # initialization
 sub init
 {
-	my ($self, @params) = @_;
-	$self->{fields} = [];
-	$self->{findex} = {};
-	$self->{records} = [];
-	$self->{wk_names} = {};
-	$self->{wkindex} = {};
-	$self->{feed} = {};
+    my ( $self, @params ) = @_;
+    $self->{fields}   = [];
+    $self->{findex}   = {};
+    $self->{records}  = [];
+    $self->{wk_names} = {};
+    $self->{wkindex}  = {};
+    $self->{feed}     = {};
 
-	# signal WebFetch that Data subclasses do not provide a fetch function
-	$self->{no_fetch} = 1;
-	$self->SUPER::init( @params );
+    # signal WebFetch that Data subclasses do not provide a fetch function
+    $self->{no_fetch} = 1;
+    $self->SUPER::init(@params);
 
-	return $self;
+    return $self;
 }
-
 
 # add field names
 sub add_fields
 {
-	my ($self, @fields) = @_;
-	foreach my $field ( @fields ) {
-		$self->{findex}{$field} = scalar @{$self->{fields}};
-		push @{$self->{fields}}, $field;
-	}
+    my ( $self, @fields ) = @_;
+    foreach my $field (@fields) {
+        $self->{findex}{$field} = scalar @{ $self->{fields} };
+        push @{ $self->{fields} }, $field;
+    }
     return;
 }
-
 
 # get number of fields
 sub num_fields
 {
-	my $self = shift;
-	return scalar @{$self->{fields}};
+    my $self = shift;
+    return scalar @{ $self->{fields} };
 }
-
 
 # get field names
 sub get_fields
 {
-	my $self = shift;
-	return keys %{$self->{fields}};
+    my $self = shift;
+    return keys %{ $self->{fields} };
 }
-
 
 # get field name by number
 sub field_bynum
 {
-	my $self = shift;
-	my $num = shift;
-	return $self->{fields}[$num];
+    my $self = shift;
+    my $num  = shift;
+    return $self->{fields}[$num];
 }
-
 
 # add well-known names
 sub add_wk_names
 {
-	my $self = shift;
-	my ( $wk_name, $field );
+    my $self = shift;
+    my ( $wk_name, $field );
 
-	while ( @_ >= 2 ) {
-		$wk_name = shift;
-		$field = shift;
-		WebFetch::debug "add_wk_names $wk_name => $field";
-		$self->{wk_names}{$wk_name} = $field;
-		$self->{wkindex}{$wk_name} = $self->{findex}{$field};
-	}
+    while ( @_ >= 2 ) {
+        $wk_name = shift;
+        $field   = shift;
+        WebFetch::debug "add_wk_names $wk_name => $field";
+        $self->{wk_names}{$wk_name} = $field;
+        $self->{wkindex}{$wk_name}  = $self->{findex}{$field};
+    }
     return;
 }
-
 
 # get feed info
 sub get_feed
 {
-	my $self = shift;
-	my $name = shift;
-	return (exists $self->{$name}) ? $self->{$name} : undef;
+    my $self = shift;
+    my $name = shift;
+    return ( exists $self->{$name} ) ? $self->{$name} : undef;
 }
-
 
 # set feed info
 sub set_feed
 {
-	my $self = shift;
-	my $name = shift;
-	my $value = shift;
-	my $retval = (exists $self->{$name}) ? $self->{$name} : undef;
-	$self->{$name} = $value;
-	return $retval;
+    my $self   = shift;
+    my $name   = shift;
+    my $value  = shift;
+    my $retval = ( exists $self->{$name} ) ? $self->{$name} : undef;
+    $self->{$name} = $value;
+    return $retval;
 }
-
 
 # add a data record
 # this adds the field values in the same order the field names were added
 sub add_record
 {
-	my ($self, @args) = @_;
-	push @{$self->{records}}, [ @args ];
+    my ( $self, @args ) = @_;
+    push @{ $self->{records} }, [@args];
     return;
 }
 
 # TODO: add a function add_record_unordered( name => value, ... )
 # less efficient, but may be OK for cases where that doesn't matter
 
-
 # get the number of data records
 sub num_records
 {
-	my $self = shift;
-	return scalar @{$self->{records}};
+    my $self = shift;
+    return scalar @{ $self->{records} };
 }
-
 
 # get a data record by index
 sub get_record
 {
-	my $self = shift;
-	my $n = shift;
-	WebFetch::debug "get_record $n";
-	require WebFetch::Data::Record;
-	return WebFetch::Data::Record->new( $self, $n );
+    my $self = shift;
+    my $n    = shift;
+    WebFetch::debug "get_record $n";
+    require WebFetch::Data::Record;
+    return WebFetch::Data::Record->new( $self, $n );
 }
-
 
 # reset iterator position
 sub reset_pos
 {
-	my $self = shift;
+    my $self = shift;
 
-	WebFetch::debug "reset_pos";
-	delete $self->{pos};
+    WebFetch::debug "reset_pos";
+    delete $self->{pos};
     return;
 }
-
 
 # get next record
 sub next_record
 {
-	my $self = shift;
+    my $self = shift;
 
-	# initialize if necessary
-	if ( !exists $self->{pos}) {
-		$self->{pos} = 0;
-	}
-	WebFetch::debug "next_record n=".$self->{pos}." of "
-		.scalar @{$self->{records}};
+    # initialize if necessary
+    if ( !exists $self->{pos} ) {
+        $self->{pos} = 0;
+    }
+    WebFetch::debug "next_record n=" . $self->{pos} . " of " . scalar @{ $self->{records} };
 
-	# return undef if position is out of bounds
-	( $self->{pos} < 0 ) and return;
-	( $self->{pos} > scalar @{$self->{records}} - 1 ) and return;
-	
-	# get record
-	return $self->get_record( $self->{pos}++ );
+    # return undef if position is out of bounds
+    ( $self->{pos} < 0 ) and return;
+    ( $self->{pos} > scalar @{ $self->{records} } - 1 ) and return;
+
+    # get record
+    return $self->get_record( $self->{pos}++ );
 }
-
 
 # convert well-known name to field name
 sub wk2fname
 {
-	my $self = shift;
-	my $wk = shift;
+    my $self = shift;
+    my $wk   = shift;
 
-	WebFetch::debug "wk2fname $wk => ".(( exists $self->{wk_names}{$wk}) ? $self->{wk_names}{$wk} : "undef");
-	return ( exists $self->{wk_names}{$wk})
-		? $self->{wk_names}{$wk}
-		: undef;
+    WebFetch::debug "wk2fname $wk => " . ( ( exists $self->{wk_names}{$wk} ) ? $self->{wk_names}{$wk} : "undef" );
+    return ( exists $self->{wk_names}{$wk} )
+        ? $self->{wk_names}{$wk}
+        : undef;
 }
-
 
 # convert a field name to a field number
 sub fname2fnum
 {
-	my $self = shift;
-	my $fname = shift;
+    my $self  = shift;
+    my $fname = shift;
 
-	WebFetch::debug "fname2fnum $fname => ".(( exists $self->{findex}{$fname}) ? $self->{findex}{$fname} : "undef" );
-	return ( exists $self->{findex}{$fname})
-		? $self->{findex}{$fname}
-		: undef;
+    WebFetch::debug "fname2fnum $fname => "
+        . (
+        ( exists $self->{findex}{$fname} )
+        ? $self->{findex}{$fname}
+        : "undef"
+        );
+    return ( exists $self->{findex}{$fname} )
+        ? $self->{findex}{$fname}
+        : undef;
 }
-
 
 # convert well-known name to field number
 sub wk2fnum
 {
-	my $self = shift;
-	my $wk = shift;
+    my $self = shift;
+    my $wk   = shift;
 
-	WebFetch::debug "wk2fnum $wk => ".(( exists $self->{wkindex}{$wk}) ? $self->{wkindex}{$wk} : "undef" );
-	return ( exists $self->{wkindex}{$wk})
-		? $self->{wkindex}{$wk}
-		: undef;
+    WebFetch::debug "wk2fnum $wk => " . ( ( exists $self->{wkindex}{$wk} ) ? $self->{wkindex}{$wk} : "undef" );
+    return ( exists $self->{wkindex}{$wk} )
+        ? $self->{wkindex}{$wk}
+        : undef;
 }
 
 1;
@@ -254,7 +243,7 @@ WebFetch::Data::Store - WebFetch Embedding API top-level data store
 
 =head1 VERSION
 
-version 0.14.0
+version 0.15.1
 
 =head1 SYNOPSIS
 

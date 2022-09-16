@@ -12,7 +12,7 @@ push @expected, Data::Gimei::Name->new();
 push @expected, Data::Gimei::Name->new();
 push @expected, Data::Gimei::Address->new();
 
-# Deteministic random returns same result
+# Same seed generates same result.
 {
     my @actual;
     Data::Gimei::set_random_seed(42);
@@ -23,7 +23,7 @@ push @expected, Data::Gimei::Address->new();
     is_deeply [ map { $_->kanji } @expected ], [ map { $_->kanji } @actual ];
 }
 
-# Different seed
+# Different seed might generates different result.
 {
     my @actual;
     Data::Gimei::set_random_seed(43);
@@ -36,7 +36,7 @@ push @expected, Data::Gimei::Address->new();
     isnt $actual[2]->kanji, $expected[2]->kanji;
 }
 
-# Deteministic random SHOULD NOT depend on calling rand()
+# SHOULD NOT depend on calling rand()
 {
     my @actual;
     Data::Gimei::set_random_seed(42);

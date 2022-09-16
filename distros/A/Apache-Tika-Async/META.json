@@ -39,8 +39,8 @@
             "Carp" : "0",
             "Exporter" : "5",
             "Future" : "0",
+            "Future::HTTP" : "0",
             "JSON::XS" : "0",
-            "LWP::UserAgent" : "6",
             "Moo" : "2",
             "Try::Tiny" : "0",
             "perl" : "5.020"
@@ -64,7 +64,7 @@
          "web" : "https://github.com/Corion/Apache-Tika-Async"
       }
    },
-   "version" : "0.09",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

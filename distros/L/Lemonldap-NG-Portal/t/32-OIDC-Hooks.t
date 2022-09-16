@@ -43,10 +43,12 @@ my $op = LLNG::Manager::Test->new( {
                     oidcRPMetaDataOptionsClientID              => "rpid",
                     oidcRPMetaDataOptionsIDTokenSignAlg        => "HS512",
                     oidcRPMetaDataOptionsAccessTokenJWT        => 1,
-                    oidcRPMetaDataOptionsClientSecret          => "rpsecret",
+                    oidcRPMetaDataOptionsClientSecret          => "rpid",
                     oidcRPMetaDataOptionsUserIDAttr            => "",
                     oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                     oidcRPMetaDataOptionsBypassConsent         => 1,
+                    oidcRPMetaDataOptionsRefreshToken          => 1,
+                    oidcRPMetaDataOptionsAllowOffline          => 1,
                 },
                 oauth => {
                     oidcRPMetaDataOptionsDisplayName  => "oauth",
@@ -104,7 +106,7 @@ ok(
         accept => 'text/html',
         length => length($query),
         custom => {
-            HTTP_AUTHORIZATION => "Basic " . encode_base64("rpid:rpsecret"),
+            HTTP_AUTHORIZATION => "Basic " . encode_base64("rpid:rpid"),
         },
     ),
     "Post token"
@@ -114,6 +116,8 @@ my $token = $json->{access_token};
 ok( $token, 'Access token present' );
 my $id_token = $json->{id_token};
 ok( $id_token, 'ID token present' );
+my $refresh_token = $json->{refresh_token};
+ok( $refresh_token, 'Refresh token present' );
 my $id_token_payload = id_token_payload($id_token);
 is( $id_token_payload->{id_token_hook}, 1, "Found hooked claim in ID token" );
 
@@ -130,6 +134,8 @@ $res = $op->_post(
 
 $json = expectJSON($res);
 is( $json->{userinfo_hook}, 1, "Found hooked claim in Userinfo token" );
+is( $json->{_auth}, "Demo",    "Found session variable in Userinfo token" );
+like( $json->{_scope}, qr/\bopenid\b/, "Scopes are visible in hook" );
 
 expectJWT( $token, access_token_hook => 1 );
 
@@ -152,6 +158,38 @@ expectOK($res);
 $json = from_json( $res->[2]->[0] );
 like( $json->{scope}, qr/\bmy_hooked_scope\b/, "Found hook defined scope" );
 like( $json->{scope}, qr/\bmyscope\b/, "Found result of oidcResolveScope" );
+
+# Refresh access token
+$res  = refreshGrant( $op, 'rpid', $refresh_token );
+$json = expectJSON($res);
+
+$token = $json->{access_token};
+ok( $token, 'Access token present' );
+
+# Make sure the Refresh hook added a scope to the token
+expectJWT( $token,
+    scope =>
+      "openid profile email my_hooked_scope myscope refreshed_online_french" );
+
+## Test Offline refresh hook
+$code = authorize(
+    $op, $idpId,
+    {
+        response_type => 'code',
+        scope         => 'openid profile email offline_access',
+        client_id     => 'rpid',
+        state         => 'af0ifjsldkj',
+        redirect_uri  => 'http://rp2.com/',
+    }
+);
+
+$json = expectJSON( codeGrant( $op, 'rpid', $code, "http://rp2.com/" ) );
+$refresh_token = $json->{refresh_token};
+ok( $refresh_token, 'Refresh token present' );
+
+$json = expectJSON( refreshGrant( $op, 'rpid', $refresh_token ) );
+expectJWT( $json->{access_token},
+    scope => "openid profile email my_hooked_scope myscope refreshed_french" );
 
 clean_sessions();
 done_testing();

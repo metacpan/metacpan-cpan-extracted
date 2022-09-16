@@ -32,7 +32,7 @@ for ( my $i = 0 ; $i < @ARGV ; $i++ ) {
 $action ||= "usage";
 
 if ( $action =~
-    /^(?:[gs]et|del|(?:add|del)Key|(?:add|del)PostVars|save|restore|rollback)$/
+/^(?:[gs]et|del|(?:add|del)Key|(?:add|del)PostVars|merge|save|restore|rollback)$/
   )
 {
     eval { require Lemonldap::NG::Manager::Cli; };
@@ -80,6 +80,7 @@ Available actions:
  delKey KEY SUBKEY               : delete subkey of a parameter
  addPostVars HOST URI KEY VALUE  : add post vars for form replay
  delPostVars HOST URI KEY        : delete post vars for form replay
+ merge FILE [FILE ...]           : merge JSON/YAML files with existing configuration
  save                            : export configuration to STDOUT
  restore -                       : import configuration from STDIN
  restore FILE                    : import configuration from file
@@ -203,6 +204,11 @@ This action lets you add a new POST var in a form replay configuration.
 =item B<delPostVars I<HOST> I<URI> I<KEY>>
 
 This action lets you delete a new POST var in a form replay configuration.
+
+=item B<merge I<FILE> [I<FILE> ...]>
+
+This action iterates through the given JSON or YAML files and merges the
+existing configuration with the keys contained in those files
 
 =item B<save>
 

@@ -4,10 +4,9 @@ use base 'PDF::Builder::Resource::ColorSpace::Indexed';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -36,7 +35,7 @@ sub new {
     my ($class, $pdf, $file) = @_;
 
     die "could not find act-file '$file'." unless -f $file;
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
     my $self = $class->SUPER::new($pdf, pdfkey());
     $pdf->new_obj($self) unless $self->is_obj($pdf);
     $self->{' apipdf'} = $pdf;
@@ -44,20 +43,21 @@ sub new {
     my $csd = PDFDict();
     $pdf->new_obj($csd);
     $csd->{'Filter'} = PDFArray(PDFName('FlateDecode'));
-    $csd->{'WhitePoint'} = PDFArray(map {PDFNum($_)} (0.95049, 1, 1.08897));
-    $csd->{'BlackPoint'} = PDFArray(map {PDFNum($_)} (0, 0, 0));
-    $csd->{'Gamma'} = PDFArray(map {PDFNum($_)} (2.22218, 2.22218, 2.22218));
+    # default values in case file is missing or bad??
+   #$csd->{'WhitePoint'} = PDFArray(map {PDFNum($_)} (0.95049, 1, 1.08897));
+   #$csd->{'BlackPoint'} = PDFArray(map {PDFNum($_)} (0, 0, 0));
+   #$csd->{'Gamma'} = PDFArray(map {PDFNum($_)} (2.22218, 2.22218, 2.22218));
 
     my $fh;
     open($fh, "<", $file) or die "$!: $file";
-    binmode($fh,':raw');
+    binmode($fh, ':raw');
     read($fh, $csd->{' stream'}, 768);
     close($fh);
 
     $csd->{' stream'} .= "\x00" x 768;
     $csd->{' stream'} = substr($csd->{' stream'}, 0, 768);
 
-    $self->add_elements(PDFName('DeviceRGB'), PDFNum(255),$csd);
+    $self->add_elements(PDFName('DeviceRGB'), PDFNum(255), $csd);
     $self->{' csd'} = $csd;
 
     return $self;

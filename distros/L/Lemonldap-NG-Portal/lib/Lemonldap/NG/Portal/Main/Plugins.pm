@@ -19,6 +19,7 @@ our @pList = (
     portalStatus                        => '::Plugins::Status',
     cda                                 => '::Plugins::CDA',
     notification                        => '::Plugins::Notifications',
+    rememberAuthChoiceRule              => '::Plugins::RememberAuthChoice',
     stayConnected                       => '::Plugins::StayConnected',
     portalCheckLogins                   => '::Plugins::History',
     bruteForceProtection                => '::Plugins::BruteForceProtection',

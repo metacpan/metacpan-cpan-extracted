@@ -9,7 +9,7 @@ package Lemonldap::NG::Common::Session;
 use strict;
 use Lemonldap::NG::Common::Apache::Session;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.15';
 
 # Workaround for another ModPerl/Mouse issue...
 BEGIN {
@@ -213,7 +213,8 @@ sub update {
         return 0;
     }
 
-    my $data = $self->_tie_session($tieOptions);
+    my $data = $self->_tie_session(
+        { ( $tieOptions ? %$tieOptions : () ), noCache => 1 } );
 
     if ($data) {
         foreach ( keys %$infos ) {

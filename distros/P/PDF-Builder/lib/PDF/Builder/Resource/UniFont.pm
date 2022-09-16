@@ -3,8 +3,8 @@ package PDF::Builder::Resource::UniFont;
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -52,7 +52,7 @@ B<NOTE:> if you want to register a font for the entire unicode space
 
 Valid %options are:
 
-  '-encode' ... changes the encoding of the font from its default.
+  'encode' ... changes the encoding of the font from its default.
     (see "perldoc Encode" for a list of valid tags)
 
 =cut
@@ -73,8 +73,11 @@ sub new {
     push @fonts, shift() while ref($_[0]);
 
     my %options = @_;
-    $self->{'encode'} = $options{'-encode'} if defined $options{'-encode'};
-    # note that self->encode is undefined if -encode not given!
+    # copy dashed option names to preferred undashed names
+    if (defined $options{'-encode'} && !defined $options{'encode'}) { $options{'encode'} = delete($options{'-encode'}); }
+
+    $self->{'encode'} = $options{'encode'} if defined $options{'encode'};
+    # note that self->encode is undefined if encode not given!
 
     my $font_number = 0;
     foreach my $font (@fonts) {
@@ -98,7 +101,7 @@ sub new {
 		ref($font->{'blocks'}) eq 'ARRAY') {
                 foreach my $blockspec (@{$font->{'blocks'}}) {
                     if (ref($blockspec)) {
-                        foreach my $block($blockspec->[0] .. $blockspec->[-1]) {
+                        foreach my $block ($blockspec->[0] .. $blockspec->[-1]) {
                             $self->{'block'}->{$block} = $font_number;
                         }
                     } else {
@@ -136,9 +139,9 @@ sub isvirtual {
 }
 
 sub fontlist {
-    my ($self) = @_;
+    my $self = shift;
 
-    return [@{$self->{'fonts'}}];
+    return [@{ $self->{'fonts'} }];
 }
 
 sub width {

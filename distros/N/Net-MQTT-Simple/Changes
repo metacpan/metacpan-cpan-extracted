@@ -3,6 +3,10 @@ Revision history for Perl extension Net::MQTT::Simple.
 Incompatible changes are marked with "!!". Incompatibility with and changes in
 "undocumented features" are not always specifically mentioned here.
 
+1.27  2022-09-11 02:22
+        - Fix: Support messages larger than 16 kB on TLS (Reported by CRCinAU
+          via GitHub)
+
 1.26  2021-05-17 16:22
         - Fix: Packet parsing timing (Contributed by Balazs Szabo via email)
 

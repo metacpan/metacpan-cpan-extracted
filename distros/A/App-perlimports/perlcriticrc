@@ -24,7 +24,7 @@ set_themes = core
 
 [InputOutput::RequireCheckedSyscalls]
 functions = :builtins
-exclude_functions = sleep
+exclude_functions = binmode print say sleep
 severity = 3
 
 [Moose::RequireCleanNamespace]
@@ -32,7 +32,7 @@ modules = Moose Moose::Role MooseX::Role::Parameterized Moose::Util::TypeConstra
 cleaners = namespace::autoclean
 
 [NamingConventions::Capitalization]
-package_exemptions = *
+package_exemptions = perlimports
 file_lexical_variables = [A-Z]\w+|[^A-Z]+
 global_variables = :starts_with_upper
 scoped_lexical_variables = [A-Z]\w+|[^A-Z]+
@@ -90,3 +90,6 @@ add_packages = Test::Builder
 [-ValuesAndExpressions::ProhibitVersionStrings]
 
 [-Subroutines::ProhibitExplicitReturnUndef]
+
+# Too many false positives
+[-ValuesAndExpressions::ProhibitAccessOfPrivateData]

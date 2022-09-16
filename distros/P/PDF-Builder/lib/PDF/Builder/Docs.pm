@@ -3,8 +3,8 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
 
@@ -148,7 +148,7 @@ capabilities are available for declaring a I<file> to be in a certain encoding.
 Be aware that if you use UTF-8 encoding for your text, that only TrueType font
 output (C<ttfont>) can handle it directly. Corefont and Type1 output will 
 require that the text will have to be converted back into a single-byte encoding
-(using C<Encode::encode>), which may need to be declared with C<-encode> (for 
+(using C<Encode::encode>), which may need to be declared with C<encode> (for 
 C<corefont> or C<psfont>). If you have any characters I<not> found in the 
 selected single-byte I<encoding> (but I<are> found in the font itself), you 
 will need to use C<automap> to break up the font glyphs into 256 character 
@@ -201,7 +201,7 @@ hopefully illustrate the issue:
  my $paper_size = "Letter";
 
  # see the text and graphics stream contents
- my $pdf = PDF::Builder->new(-compress => 'none');
+ my $pdf = PDF::Builder->new(compress => 'none');
  $pdf->mediabox($paper_size);
  my $page = $pdf->page();
  # adjust path for your operating system
@@ -509,7 +509,24 @@ Hosken's Text::PDF via the Text::PDF::API wrapper.
 In 2009, Otto Hirr started the PDF::API3 fork, but it never went anywhere.
 In 2011, PDF::API2 maintenance was taken over by Steve Simms. 
 In 2017, PDF::Builder was forked by Phil M. Perry, who desired a more aggressive
-schedule of new features and bug fixes than Simms was providing. 
+schedule of new features and bug fixes than Simms was providing, although some 
+of Simms's work I<has> been ported from PDF::API2.
+
+According to "pdfapi2_for_fun_and_profit_APW2005.pdf" (on 
+http://pdfapi2.sourceforge.net, an unmaintained site), the history of PDF::API2
+(the predecessor to PDF::Builder) goes as such:
+
+=over
+
+=item E<nbsp> E<nbsp> E<bull>E<nbsp> First Code implemented based on PDFlib-0.6 (AFPL)
+
+=item E<nbsp> E<nbsp> E<bull>E<nbsp> Changed to Text::PDF with a total rewrite as Text::PDF::API (procedural)
+
+=item E<nbsp> E<nbsp> E<bull>E<nbsp> Unmaintainable Code triggered rewrite into new Namespace PDF::API2 (object-oriented, LGPL)
+
+=item E<nbsp> E<nbsp> E<bull>E<nbsp> Object-Structure streamlined in 0.4x
+
+=back
 
 At Simms's request, the name of the new offering was changed from PDF::API4
 to PDF::Builder, to reduce the chance of confusion due to parallel development.
@@ -530,6 +547,13 @@ Steve Simms (via PDF::API2 fixes), and Johan Vromans.
 Drop me a line if I've overlooked your contribution!
 
 =head1 DETAILED NOTES ON METHODS
+
+B<Note:> older versions of this package named various (hash element) options
+with leading dashes (hyphens) in the name, e.g., '-encode'. The use of a dash
+is now optional, and options are documented with names I<not> using dashes. At
+some point in the future, it is possible that support for dashed names will be
+deprecated (and eventually withdrawn), so it would be good practice to start
+using undashed names in new and revised code.
 
 =head2 After saving a file...
 
@@ -573,7 +597,7 @@ Notes include, in no place was the (optional) /Info object specified, or if it w
 The version is a string (e.g., '1.5') if found, otherwise C<undef> (undefined value) is returned.
 
 For controlling the "automatic" call to IntegrityCheck (via opens), the level 
-may be given with the option (flag) C<-diaglevel =E<gt> I<n>>, where C<n> is between 0 and 5.
+may be given with the option (flag) C<diaglevel =E<gt> I<n>>, where C<n> is between 0 and 5.
 
 =head2 Preferences - set user display preferences
 
@@ -591,15 +615,15 @@ Controls viewing preferences for the PDF.
 
 =over
 
-=item -fullscreen
+=item fullscreen
 
 Full-screen mode, with no menu bar, window controls, or any other window visible.
 
-=item -thumbs
+=item thumbs
 
 Thumbnail images visible.
 
-=item -outlines
+=item outlines
 
 Document outline visible.
 
@@ -613,19 +637,19 @@ Document outline visible.
 
 =over
 
-=item -singlepage
+=item singlepage
 
 Display one page at a time.
 
-=item -onecolumn
+=item onecolumn
 
 Display the pages in one column.
 
-=item -twocolumnleft
+=item twocolumnleft
 
 Display the pages in two columns, with oddnumbered pages on the left.
 
-=item -twocolumnright
+=item twocolumnright
 
 Display the pages in two columns, with oddnumbered pages on the right.
 
@@ -639,53 +663,53 @@ Display the pages in two columns, with oddnumbered pages on the right.
 
 =over
 
-=item -hidetoolbar
+=item hidetoolbar
 
 Specifying whether to hide tool bars.
 
-=item -hidemenubar
+=item hidemenubar
 
 Specifying whether to hide menu bars.
 
-=item -hidewindowui
+=item hidewindowui
 
 Specifying whether to hide user interface elements.
 
-=item -fitwindow
+=item fitwindow
 
 Specifying whether to resize the document's window to the size of the displayed page.
 
-=item -centerwindow
+=item centerwindow
 
 Specifying whether to position the document's window in the center of the screen.
 
-=item -displaytitle
+=item displaytitle
 
 Specifying whether the window's title bar should display the
 document title taken from the Title entry of the document information
 dictionary.
 
-=item -afterfullscreenthumbs
+=item afterfullscreenthumbs
 
 Thumbnail images visible after Full-screen mode.
 
-=item -afterfullscreenoutlines
+=item afterfullscreenoutlines
 
 Document outline visible after Full-screen mode.
 
-=item -printscalingnone
+=item printscalingnone
 
 Set the default print setting for page scaling to none.
 
-=item -simplex
+=item simplex
 
 Print single-sided by default.
 
-=item -duplexflipshortedge
+=item duplexflipshortedge
 
 Print duplex by default and flip on the short edge of the sheet.
 
-=item -duplexfliplongedge
+=item duplexfliplongedge
 
 Print duplex by default and flip on the long edge of the sheet.
 
@@ -693,89 +717,94 @@ Print duplex by default and flip on the long edge of the sheet.
 
 =back
 
-=head3 Initial Page Options
+=head3 Page Fit Options
+
+These options are used for the C<firstpage> layout, as well as for 
+Annotations, Named Destinations and Outlines.
 
 =over
 
-=item -firstpage => [ $page, %options ]
+=item 'fit' => 1
 
-Specifying the page (either a page number or a page object) to be
-displayed, plus one of the following options:
-
-=over
-
-=item -fit => 1
-
-Display the page designated by page, with its contents magnified just
+Display the page designated by C<$page>, with its contents magnified just
 enough to fit the entire page within the window both horizontally and
 vertically. If the required horizontal and vertical magnification
 factors are different, use the smaller of the two, centering the page
 within the window in the other dimension.
 
-=item -fith => $top
+=item 'fith' => $top
 
-Display the page designated by page, with the vertical coordinate top
+Display the page designated by C<$page>, with the vertical coordinate C<$top>
 positioned at the top edge of the window and the contents of the page
 magnified just enough to fit the entire width of the page within the
 window.
 
-=item -fitv => $left
+=item 'fitv' => $left
 
-Display the page designated by page, with the horizontal coordinate
-left positioned at the left edge of the window and the contents of the
+Display the page designated by C<$page>, with the horizontal coordinate
+C<$left> positioned at the left edge of the window and the contents of the
 page magnified just enough to fit the entire height of the page within
 the window.
 
-=item -fitr => [ $left, $bottom, $right, $top ]
+=item 'fitr' => [ $left, $bottom, $right, $top ]
 
-Display the page designated by page, with its contents magnified just
-enough to fit the rectangle specified by the coordinates left, bottom,
-right, and top entirely within the window both horizontally and
+Display the page designated by C<$page>, with its contents magnified just
+enough to fit the rectangle specified by the coordinates C<$left>, C<$bottom>,
+C<$right>, and C<$top> entirely within the window both horizontally and
 vertically. If the required horizontal and vertical magnification
 factors are different, use the smaller of the two, centering the
 rectangle within the window in the other dimension.
 
-=item -fitb => 1
+=item 'fitb' => 1
 
-Display the page designated by page, with its contents magnified just
+Display the page designated by C<$page>, with its contents magnified just
 enough to fit its bounding box entirely within the window both
 horizontally and vertically. If the required horizontal and vertical
 magnification factors are different, use the smaller of the two,
 centering the bounding box within the window in the other dimension.
 
-=item -fitbh => $top
+=item 'fitbh' => $top
 
-Display the page designated by page, with the vertical coordinate top
+Display the page designated by C<$page>, with the vertical coordinate C<$top>
 positioned at the top edge of the window and the contents of the page
 magnified just enough to fit the entire width of its bounding box
 within the window.
 
-=item -fitbv => $left
+=item 'fitbv' => $left
 
-Display the page designated by page, with the horizontal coordinate
-left positioned at the left edge of the window and the contents of the
+Display the page designated by C<$page>, with the horizontal coordinate
+C<$left> positioned at the left edge of the window and the contents of the
 page magnified just enough to fit the entire height of its bounding
 box within the window.
 
-=item -xyz => [ $left, $top, $zoom ]
+=item 'xyz' => [ $left, $top, $zoom ]
 
-Display the page designated by page, with the coordinates (left, top)
+Display the page designated by C<$page>, with the coordinates C<$[$left, $top]>
 positioned at the top-left corner of the window and the contents of
-the page magnified by the factor zoom. A zero (0) value for any of the
-parameters left, top, or zoom specifies that the current value of that
-parameter is to be retained unchanged.
+the page magnified by the factor C<$zoom>. A zero (0) value for any of the
+parameters C<$left>, C<$top>, or C<$zoom> specifies that the current value of 
+that parameter is to be retained unchanged.
 
 =back
+
+=head3 Initial Page Options
+
+=over
+
+=item firstpage => [ $page, %options ]
+
+Specifying the page (either a page number or a page object) to be
+displayed, plus one of the location options listed above in L<Page Fit Options>.
 
 =back
 
 =head3 Example
 
     $pdf->preferences(
-        -fullscreen => 1,
-        -onecolumn => 1,
-        -afterfullscreenoutlines => 1,
-        -firstpage => [$page, -fit => 1],
+        fullscreen => 1,
+        onecolumn => 1,
+        afterfullscreenoutlines => 1,
+        firstpage => [$page, fit => 1],
     );
 
 =head2 info Example
@@ -926,7 +955,7 @@ may be scaled down to the current User Unit.
 
 =item $pdf->mediabox($name)
 
-=item $pdf->mediabox($name, -orient => 'orientation' )
+=item $pdf->mediabox($name, orient => 'orientation' )
 
 =item $pdf->mediabox($w,$h)
 
@@ -968,7 +997,7 @@ mediabox setting, as only the last one will be used.
 
 If you give a single string name (e.g., 'A4'), you may optionally add an
 orientation to turn the page 90 degrees into Landscape mode: 
-C<< -orient => 'L' >> or C<< -orient => 'l' >>. C<-orient> is the only option
+C<< orient => 'L' >> or C<< orient => 'l' >>. C<orient> is the only option
 recognized, and a string beginning with an 'L' or 'l' (for Landscape) is the 
 only value of interest (anything else is treated as Portrait mode). The I<y>
 axis still runs from 0 at the bottom of the page to what used to be the page
@@ -1018,7 +1047,7 @@ size as the full media (Media Box), and you don't mind their starting at 0,0.
 
 =item $pdf->cropbox($name)
 
-=item $pdf->cropbox($name, -orient => 'orientation')
+=item $pdf->cropbox($name, orient => 'orientation')
 
 =item $pdf->cropbox($w,$h)
 
@@ -1085,7 +1114,7 @@ Crop Box (and other boxes).
 
 =item $pdf->bleedbox($name)
 
-=item $pdf->bleedbox($name, -orient => 'orientation')
+=item $pdf->bleedbox($name, orient => 'orientation')
 
 =item $pdf->bleedbox($w,$h)
 
@@ -1135,7 +1164,7 @@ the page Bleed Box (and other boxes).
 
 =item $pdf->trimbox($name)
 
-=item $pdf->trimbox($name, -orient => 'orientation')
+=item $pdf->trimbox($name, orient => 'orientation')
 
 =item $pdf->trimbox($w,$h)
 
@@ -1178,7 +1207,7 @@ the page Trim Box (and other boxes).
 
 =item $pdf->artbox($name)
 
-=item $pdf->artbox($name, -orient => 'orientation')
+=item $pdf->artbox($name, orient => 'orientation')
 
 =item $pdf->artbox($w,$h)
 
@@ -1308,7 +1337,7 @@ I<effective> dimensions clipped by the Media Box.
 Core fonts are limited to single byte encodings. You cannot use UTF-8 or other
 multibyte encodings with core fonts. The default encoding for the core fonts is
 WinAnsiEncoding (roughly the CP-1252 superset of ISO-8859-1). See the 
-C<-encode> option below to change this encoding.
+C<encode> option below to change this encoding.
 See L<PDF::Builder::Resource::Font/font automap> method for information on
 accessing more than 256 glyphs in a font, using planes, I<although there is no
 guarantee that future changes to font files will permit consistent results>.
@@ -1326,7 +1355,7 @@ consider replacing your use of core fonts with TrueType (.ttf) and OpenType
 
 B<Examples:>
 
-    $font1 = $pdf->corefont('Times-Roman', -encode => 'latin2');
+    $font1 = $pdf->corefont('Times-Roman', encode => 'latin2');
     $font2 = $pdf->corefont('Times-Bold');
     $font3 = $pdf->corefont('Helvetica');
     $font4 = $pdf->corefont('ZapfDingbats');
@@ -1335,14 +1364,14 @@ Valid %options are:
 
 =over
 
-=item -encode
+=item encode
 
 Changes the encoding of the font from its default. Notice that the encoding
 (I<not> the entire font's glyph list) is shown in a PDF object (record), listing
 256 glyphs associated with this encoding (I<and> that are available in this 
 font). 
 
-=item -dokern
+=item dokern
 
 Enables kerning if data is available.
 
@@ -1388,7 +1417,7 @@ PS (T1) fonts are limited to single byte encodings. You cannot use UTF-8 or
 other multibyte encodings with T1 fonts.
 The default encoding for the T1 fonts is
 WinAnsiEncoding (roughly the CP-1252 superset of ISO-8859-1). See the 
-C<-encode> option below to change this encoding.
+C<encode> option below to change this encoding.
 See L<PDF::Builder::Resource::Font/font automap> method for information on
 accessing more than 256 glyphs in a font, using planes, I<although there is no
 guarantee that future changes to font files will permit consistent results>.
@@ -1408,31 +1437,31 @@ consider replacing your use of Type1 fonts with TrueType (.ttf) and OpenType
 
 B<Examples:>
 
-    $font1 = $pdf->psfont('Times-Book.pfa', -afmfile => 'Times-Book.afm');
-    $font2 = $pdf->psfont('/fonts/Synest-FB.pfb', -pfmfile => '/fonts/Synest-FB.pfm');
+    $font1 = $pdf->psfont('Times-Book.pfa', afmfile => 'Times-Book.afm');
+    $font2 = $pdf->psfont('/fonts/Synest-FB.pfb', pfmfile => '/fonts/Synest-FB.pfm');
 
 Valid %options are:
 
 =over
 
-=item -encode
+=item encode
 
 Changes the encoding of the font from its default. Notice that the encoding
 (I<not> the entire font's glyph list) is shown in a PDF object (record), listing
 256 glyphs associated with this encoding (I<and> that are available in this 
 font). 
 
-=item -afmfile
+=item afmfile
 
 Specifies the location of the I<ASCII> font metrics file (.afm). It may be used
 with either an ASCII (.pfa) or binary (.pfb) glyph file.
 
-=item -pfmfile
+=item pfmfile
 
 Specifies the location of the I<binary> font metrics file (.pfm). It may be used
 with either an ASCII (.pfa) or binary (.pfb) glyph file.
 
-=item -dokern
+=item dokern
 
 Enables kerning if data is available.
 
@@ -1450,9 +1479,9 @@ See also L<PDF::Builder::Resource::Font::Postscript>.
 
 B<Warning:> BaseEncoding is I<not> set by default for TrueType fonts, so B<text 
 in the PDF isn't searchable> (by the PDF reader) unless a ToUnicode CMap is 
-included. A ToUnicode CMap I<is> included by default (-unicodemap set to 1) by
+included. A ToUnicode CMap I<is> included by default (unicodemap set to 1) by
 PDF::Builder, but allows it to be disabled (for performance and file size 
-reasons) by setting -unicodemap to 0. This will produce non-searchable text, 
+reasons) by setting unicodemap to 0. This will produce non-searchable text, 
 which, besides being annoying to users, may prevent screen 
 readers and other aids to disabled users from working correctly!
 
@@ -1465,7 +1494,7 @@ Valid %options are:
 
 =over
 
-=item -encode
+=item encode
 
 Changes the encoding of the font from its default (WinAnsiEncoding).
 
@@ -1474,21 +1503,21 @@ characters defined for that encoding. 'automap' does not work with TrueType.
 If you want more characters than that, use 'utf8' encoding with a UTF-8
 encoded text string.
 
-=item -isocmap
+=item isocmap
 
 Use the ISO Unicode Map instead of the default MS Unicode Map.
 
-=item -unicodemap
+=item unicodemap
 
 If 1 (default), output ToUnicode CMap to permit text searches and screen
 readers. Set to 0 to save space by I<not> including the ToUnicode CMap, but
 text searching and screen reading will not be possible.
 
-=item -dokern
+=item dokern
 
 Enables kerning if data is available.
 
-=item -noembed
+=item noembed
 
 Disables embedding of the font file. B<Note that this is potentially hazardous,
 as the glyphs provided on the PDF reader machine may not match what was used on
@@ -1499,7 +1528,7 @@ PDF file size. Note that the Reader needs to know where to find the font file
 -- it can't be in any random place, but typically needs to be listed in a path 
 that the Reader follows. Otherwise, it will be unable to render the text!
 
-The only value for the C<-noembed> flag currently checked for is B<1>, which
+The only value for the C<noembed> flag currently checked for is B<1>, which
 means to I<not> embed the font file in the PDF. Any other value currently
 results in the font file being embedded (by B<default>), although in the future,
 other values might be given significance (such as checking permission bits).
@@ -1514,31 +1543,31 @@ font (e.g., may or may not be extracted for further use beyond displaying this
 one PDF). When you choose to use (and embed) a font, you should be aware of any
 such licensing issues.
 
-=item -nosubset
+=item nosubset
 
 Disables subsetting of a TTF/OTF font, when embedded. By default, only the
 glyphs used by a document are included in the file, and I<not> the entire font.
 This can result in a tremendous savings in PDF file size. If you intend to 
 allow the PDF to be edited by users, not having the entire font glyph set
 available may cause problems, so be aware of that (and consider using 
-C<< -nosubset => 1 >>. Setting this flag to any value results in the entire
+C<< nosubset => 1 >>. Setting this flag to any value results in the entire
 font glyph set being embedded in the file. It might be a good idea to use only
 the value B<1>, in case other values are assigned roles in the future.
 
-=item -debug
+=item debug
 
 If set to 1 (default is 0), diagnostic information is output about the CMap
 processing.
 
-=item -usecmf
+=item usecmf
 
 If set to 1 (default is 0), the first priority is to make use of one of the
 four C<.cmap> files for CJK fonts. This is the I<old> way of processing TTF
 files. If, after all is said and done, a working I<internal> CMap hasn't been
-found (for -usecmf=>0), C<ttfont()> will fall back to using a C<.cmap> file
+found (for usecmf=>0), C<ttfont()> will fall back to using a C<.cmap> file
 if possible.
 
-=item -cmaps
+=item cmaps
 
 This flag may be set to a string listing the Platform/Encoding pairs to look 
 for of any internal CMaps in the font file, in the desired order (highest 
@@ -1549,11 +1578,11 @@ given, with the first being used for a Windows platform and the second for
 non-Windows. The default list is C<0/6 3/10 0/4 3/1 0/3; 0/6 0/4 3/10 0/3 3/1>. 
 Finally, instead of a P/E list, a string C<find_ms> may be given to tell it to 
 simply call the Font::TTF C<find_ms()> method to find a (preferably Windows) 
-internal CMap. C<-cmaps> set to 'find_ms' would emulate the I<old> way of 
+internal CMap. C<cmaps> set to 'find_ms' would emulate the I<old> way of 
 looking for CMaps. Symbol fonts (3/0) always use find_ms(), and the new default 
-lookup is (if C<.cmap> isn't used, see C<-usecmf>) to try to get a match with 
+lookup is (if C<.cmap> isn't used, see C<usecmf>) to try to get a match with 
 the default list for the appropriate OS. If none can be found, find_ms() is 
-tried, and as last resort use the C<.cmap> (if available), even if C<-usecmf> 
+tried, and as last resort use the C<.cmap> (if available), even if C<usecmf> 
 is not 1.
 
 =back
@@ -1569,7 +1598,7 @@ Valid %options are:
 
 =over
 
-=item -encode
+=item encode
 
 Changes the encoding of the font from its default.
 
@@ -1584,7 +1613,7 @@ create a PDF using C<cjkfont>, and then use an external utility (e.g.,
 C<pdfcairo>) to embed the font in the PDF. It may also be possible to use 
 C<ttfont> instead, to produce the PDF, provided you can deduce the correct 
 font file name from examining the PDF file (e.g., on my Windows system, the 
-"Ming" font would be C<< $font = $pdf->ttfont("C:/Program Files (x86)/Adobe/Acrobat Reader DC/Resource/CIDFont/AdobeMingStd-Light.otf") >>.
+"Ming" font would be C<< $font = $pdf->ttfont("C:/Program Files/Adobe/Acrobat DC/Resource/CIDFont/AdobeMingStd-Light.otf") >>.
 Of course, the font file used would have to be C<.ttf> or C<.otf>.
 It may act a little differently than C<cjkfont> (due a a different Cmap), but 
 you I<should> be able to embed the font file into the PDF.
@@ -1595,42 +1624,42 @@ See also L<PDF::Builder::Resource::CIDFont::CJKFont>
 
 B<Warning:> BaseEncoding is I<not> set by default for these fonts, so text 
 in the PDF isn't searchable (by the PDF reader) unless a ToUnicode CMap is 
-included. A ToUnicode CMap I<is> included by default (-unicodemap set to 1) by
+included. A ToUnicode CMap I<is> included by default (unicodemap set to 1) by
 PDF::Builder, but allows it to be disabled (for performance and file size 
-reasons) by setting -unicodemap to 0. This will produce non-searchable text, 
+reasons) by setting unicodemap to 0. This will produce non-searchable text, 
 which, besides being annoying to users, may prevent screen 
 readers and other aids to disabled users from working correctly!
 
 B<Examples:>
 
-    $cf  = $pdf->corefont('Times-Roman', -encode => 'latin1');
-    $sf  = $pdf->synfont($cf, -condense => 0.85);   # compressed 85%
-    $sfb = $pdf->synfont($cf, -bold => 1);          # embolden by 10em
-    $sfi = $pdf->synfont($cf, -oblique => -12);     # italic at -12 degrees
+    $cf  = $pdf->corefont('Times-Roman', encode => 'latin1');
+    $sf  = $pdf->synfont($cf, condense => 0.85);   # compressed 85%
+    $sfb = $pdf->synfont($cf, bold => 1);          # embolden by 10em
+    $sfi = $pdf->synfont($cf, oblique => -12);     # italic at -12 degrees
 
 Valid %options are:
 
 =over
 
-=item -condense
+=item condense
 
 Character width condense/expand factor (0.1-0.9 = condense, 1 = normal/default, 
 1.1+ = expand). It is the multiplier to apply to the width of each character.
 
-=item -oblique
+=item oblique
 
 Italic angle (+/- degrees, default 0), sets B<skew> of character box.
 
-=item -bold
+=item bold
 
 Emboldening factor (0.1+, bold = 1, heavy = 2, ...), additional thickness to
 draw outline of character (with a heavier B<line width>) before filling.
 
-=item -space
+=item space
 
 Additional character spacing in milliems (0-1000)
 
-=item -caps
+=item caps
 
 0 for normal text, 1 for small caps. 
 Implemented by asking the font what the uppercased translation (single 
@@ -1748,7 +1777,7 @@ C<< $pdf->LA_GT() >>.
 
 =item = -1 
 
-Graphics::TIFF I<is> installed, but your code has specified C<-nouseGT>, to 
+Graphics::TIFF I<is> installed, but your code has specified C<nouseGT>, to 
 I<not> use it. The old, pure Perl, code (buggy!) will be used instead, as if 
 Graphics::TIFF was not installed.
 
@@ -1767,13 +1796,13 @@ Options:
 
 =over
 
-=item -nouseGT => 1
+=item nouseGT => 1
 
 Do B<not> use the Graphics::TIFF library, even if it's available. Normally
 you I<would> want to use this library, but there may be cases where you don't,
 such as when you want to use a file I<handle> instead of a I<name>.
 
-=item -silent => 1
+=item silent => 1
 
 Do not give the message that Graphics::TIFF is not B<installed>. This message
 will be given only once, but you may want to suppress it, such as during 
@@ -1792,7 +1821,7 @@ C<< $pdf->LA_IPL() >>.
 
 =item = -1 
 
-Image::PNG::Libpng I<is> installed, but your code has specified C<-nouseIPL>, 
+Image::PNG::Libpng I<is> installed, but your code has specified C<nouseIPL>, 
 to I<not> use it. The old, pure Perl, code (slower and less capable) will be 
 used instead, as if Image::PNG::Libpng was not installed.
 
@@ -1811,19 +1840,19 @@ Options:
 
 =over
 
-=item -nouseIPL => 1
+=item nouseIPL => 1
 
 Do B<not> use the Image::PNG::Libpng library, even if it's available. Normally
 you I<would> want to use this library, when available, but there may be cases 
 where you don't.
 
-=item -silent => 1
+=item silent => 1
 
 Do not give the message that Image::PNG::Libpng is not B<installed>. This 
 message will be given only once, but you may want to suppress it, such as 
 during t-tests.
 
-=item -notrans => 1
+=item notrans => 1
 
 No transparency -- ignore tRNS chunk if provided, ignore Alpha channel if
 provided.
@@ -1862,18 +1891,18 @@ provided.
     #$settings{'language'} = 'en';
     #$hb->set_language( 'en_US' );
     # -- turn OFF ligatures
-    #push @{ $settings{'features'} }, '-liga';
-    #$hb->add_features( '-liga' );
+    #push @{ $settings{'features'} }, 'liga';
+    #$hb->add_features( 'liga' );
     # -- turn OFF kerning
-    #push @{ $settings{'features'} }, '-kern'; 
-    #$hb->add_features( '-kern' );
+    #push @{ $settings{'features'} }, 'kern'; 
+    #$hb->add_features( 'kern' );
     $hb->set_font($fontfile);
     $hb->set_size($fontsize);
     $hb->set_text("Let's eat waffles in the field for brunch.");
       # expect ffl and fi ligatures, and perhaps some kerning
 
     my $info = $hb->shaper();
-    $text->textHS($info, \%settings); # -strikethru, -underline allowed
+    $text->textHS($info, \%settings); # strikethru, underline allowed
 
 The package HarfBuzz::Shaper may be optionally installed in order to use the
 text-shaping capabilities of the HarfBuzz library. These include kerning and

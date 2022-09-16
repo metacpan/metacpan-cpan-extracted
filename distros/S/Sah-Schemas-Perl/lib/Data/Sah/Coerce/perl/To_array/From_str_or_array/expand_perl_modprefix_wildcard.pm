@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-01'; # DATE
+our $DATE = '2022-09-11'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.045'; # VERSION
 
 sub meta {
     +{
@@ -42,15 +42,16 @@ sub coerce {
         "",
         "do { ",
         "my \$tmp = $dt; \$tmp = [\$tmp] unless ref \$tmp eq 'ARRAY'; ",
-        "my \$i = 0; ",
-        "while (\$i < \@\$tmp) { ",
+        "my \$i = -1; ",
+        "while (++\$i < \@\$tmp) { ",
+        "  next if \$tmp->[\$i] =~ /=/; ", # probably a perl::modname_with_optional_args instead of just perl::modname, skip expanding wildcard
         "  \$tmp->[\$i] =~ s!/!::!g; ",
-        "  my \$el = \$tmp->[\$i++]; ",
+        "  my \$el = \$tmp->[\$i]; ",
         "  next unless String::Wildcard::Bash::contains_wildcard(\$el); ",
         "  my \$mods = PERLANCAR::Module::List::list_modules(" . (defined($ns_prefix) ? Data::Dmp::dmp($ns_prefix) . " . " : "") . "\$el, {wildcard=>1, list_modules=>0, list_prefixes=>1}); ",
         "  my \@mods = sort keys \%\$mods; ",
         (defined($ns_prefix) ? "  for (\@mods) { substr(\$_, 0, ".length($ns_prefix).") = '' } " : ""),
-        "  if (\@mods) { splice \@\$tmp, \$i-1, 1, \@mods; \$i += \@mods - 1 } ",
+        "  if (\@mods) { splice \@\$tmp, \$i, 1, \@mods; \$i += \@mods - 1 } ",
         "} ", # while
         "\$tmp ",
         "}", # do
@@ -74,7 +75,7 @@ Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modprefix_wild
 
 =head1 VERSION
 
-This document describes version 0.042 of Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modprefix_wildcard (from Perl distribution Sah-Schemas-Perl), released on 2021-12-01.
+This document describes version 0.045 of Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modprefix_wildcard (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
 
 =head1 DESCRIPTION
 
@@ -139,13 +140,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,13 @@
+class Sys::IO::Utimbuf : pointer_t {
+  # Class methods
+  native static method new : Sys::IO::Utimbuf ();
+  
+  # Instance methods
+  native method DESTROY : void ();
+
+  native method actime : long ();
+  native method set_actime : long ($actime : long);
+
+  native method modtime : long ();
+  native method set_modtime : long ($modtime : long);
+}

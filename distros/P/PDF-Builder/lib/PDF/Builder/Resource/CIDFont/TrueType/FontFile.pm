@@ -4,10 +4,9 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 
 use strict;
 use warnings;
-#no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -20,7 +19,7 @@ use PDF::Builder::Basic::PDF::Utils;
 our $cmap = {};
 
 # for new() if not using find_ms() or .cmap files
-# may be overridden fully or partially by -cmaps option
+# may be overridden fully or partially by cmaps option
 # [0] is Windows list, [1] is non-Windows list  Platform/Encoding
 # can substitute 'find_ms' instead of a list of P/E
 # suggested default list by Alfred Reibenschuh (original PDF::API2 author)
@@ -34,7 +33,8 @@ PDF::Builder::Resource::CIDFont::TrueType::FontFile - additional code support fo
 
 # identical routine in Resource/CIDFont/CJKFont.pm
 sub _look_for_cmap {
-    my $fname = lc(shift);
+    my $map = shift;
+    my $fname = lc($map);
 
     $fname =~ s/[^a-z0-9]+//gi;
     return ({%{$cmap->{$fname}}}) if defined $cmap->{$fname};
@@ -42,7 +42,7 @@ sub _look_for_cmap {
     unless ($@) {
         return {%{$cmap->{$fname}}};
     } else {
-        die "requested cmap '$fname' not installed ";
+        die "requested cmap '$map' not installed ";
     }
 }
 
@@ -52,7 +52,7 @@ sub readcffindex {
     my @idx = ();
     my $index = [];
     seek($fh, $off, 0);
-    read($fh,$buf,3);
+    read($fh, $buf, 3);
     my ($count, $offsize) = unpack('nC', $buf);
     foreach (0 .. $count) {
         read($fh, $buf, $offsize);
@@ -168,10 +168,12 @@ sub readcffdict {
             read($fh, $buf, 2);
             $v = unpack('n', $buf);
             $v = -(0x10000 - $v) if $v > 0x7fff;
+	    # alt: $v = unpack('n!', $buf);
         } elsif ($b0 == 29) { # int32
             read($fh, $buf, 4);
             $v = unpack('N', $buf);
             $v = -$v + 0xffffffff+1 if $v > 0x7fffffff;
+	    # alt: $v = unpack('N!', $buf);
         } elsif ($b0 == 30) { # float
             my $e = 1;
             while ($e) {
@@ -215,16 +217,12 @@ sub readcffdict {
 }
 
 sub read_kern_table {
-    my $font = shift;
-    my $upem = shift;
-    my $self = shift;
-
+    my ($font, $upem, $self) = @_;
     my $fh = $font->{' INFILE'};
-    my $data = undef;
+    my $data;
+    my $buf;
 
-    return (undef) unless $font->{'kern'};  # need () so critic happy
-
-    my $buf = undef;
+    return unless $font->{'kern'};
 
     seek($fh, $font->{'kern'}->{' OFFSET'}+2, 0);
     read($fh, $buf, 2);
@@ -240,12 +238,16 @@ sub read_kern_table {
             my $nc = unpack('n', $buf);
             foreach (1 .. $nc) {
                 read($fh, $buf, 6);
-                my ($idx1, $idx2, $val) = unpack('nnn', $buf);
+                my ($idx1, $idx2, $val) = unpack('n2n!', $buf);
+		# alt: unpack('nnn', $buf);
                 $val -= 65536 if $val > 32767;
                 $val = $val<0? -floor($val*1000/$upem): -ceil($val*1000/$upem);
                 if ($val != 0) {
                     $data->{"$idx1:$idx2"} = $val;
-                    $data->{$self->data()->{'g2n'}->[$idx1].':'.$self->data->{'g2n'}->[$idx2]} = $val;
+                    $data->{join(':',
+		                 ($self->data()->{'g2n'}->[$idx1] // ''),
+				 ($self->data()->{'g2n'}->[$idx2] // '')
+				)} = $val;
                 }
             }
         } elsif ($fmt==2) {
@@ -293,7 +295,7 @@ sub readcffstructs {
     push(@{$data->{'string'}}, { 'VAL' => 'Book' });
     push(@{$data->{'string'}}, { 'VAL' => 'Light' });
     push(@{$data->{'string'}}, { 'VAL' => 'Medium' });
-    push(@{$data->{'string'}}, { 'VAL' => 'Regular' });
+    ush(@{$data->{'string'}}, { 'VAL' => 'Regular' });
     push(@{$data->{'string'}}, { 'VAL' => 'Roman' });
     push(@{$data->{'string'}}, { 'VAL' => 'Semibold' });
 
@@ -320,14 +322,20 @@ sub readcffstructs {
 
 sub new {
     my ($class, $pdf, $file, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-noembed'} && !defined $opts{'noembed'}) { $opts{'noembed'} = delete($opts{'-noembed'}); }
+    if (defined $opts{'-isocmap'} && !defined $opts{'isocmap'}) { $opts{'isocmap'} = delete($opts{'-isocmap'}); }
+    if (defined $opts{'-debug'} && !defined $opts{'debug'}) { $opts{'debug'} = delete($opts{'-debug'}); }
+    if (defined $opts{'-cmaps'} && !defined $opts{'cmaps'}) { $opts{'cmaps'} = delete($opts{'-cmaps'}); }
+    if (defined $opts{'-usecmf'} && !defined $opts{'usecmf'}) { $opts{'usecmf'} = delete($opts{'-usecmf'}); }
 
     my $data = {};
 # some debug settings
-#$opts{'-debug'} = 1;
-#$opts{'-cmaps'} = '0/6, 0/4, 3/10, 0/3, 3/1';
-#$opts{'-cmaps'} = '7/8; 8/7';  # invalid P/E, should use find_ms instead
-#$opts{'-cmaps'} = 'find_ms;   find_ms ';
-#$opts{'-usecmf'} = 1;
+#$opts{'debug'} = 1;
+#$opts{'cmaps'} = '0/6, 0/4, 3/10, 0/3, 3/1';
+#$opts{'cmaps'} = '7/8; 8/7';  # invalid P/E, should use find_ms instead
+#$opts{'cmaps'} = 'find_ms;   find_ms ';
+#$opts{'usecmf'} = 1;
 
     confess "cannot find font '$file'" unless -f $file;
     my $font = Font::TTF::Font->open($file);
@@ -340,7 +348,7 @@ sub new {
     $self->{' font'} = $font;
     $self->{' data'} = $data;
     
-    $data->{'noembed'} = ($opts{'-noembed'}||0)==1? 1: 0;
+    $data->{'noembed'} = ($opts{'noembed'}||0)==1? 1: 0;
     $data->{'iscff'} = (defined $font->{'CFF '})? 1: 0;
 
     $self->{'Subtype'} = PDFName('CIDFontType0C') if $data->{'iscff'};
@@ -380,7 +388,8 @@ sub new {
     $data->{'subname'} = $font->{'name'}->find_name(2);
     $data->{'subname'} =~ s/[\x00-\x1f\s]//og;
 
-    $font->{'cmap'}->read()->find_ms($opts{'-isocmap'} || 0);
+    # TBD in PDF::API2 the following line is just find_ms()
+    $font->{'cmap'}->read()->find_ms($opts{'isocmap'} || 0);
     if (defined $font->{'cmap'}->find_ms()) {
         $data->{'issymbol'} = ($font->{'cmap'}->find_ms()->{'Platform'} == 3 &&
 	                      $font->{'cmap'}->read()->find_ms()->{'Encoding'} == 0) || 0;
@@ -422,7 +431,7 @@ sub new {
         $data->{'e2u'} = [ unpack('U*', decode('cp1252', pack('C*', 0..255))) ];
     }
 
-    if (($font->{'post'}->read()->{'FormatType'} == 3) && defined($font->{'cmap'}->read()->find_ms())) {
+    if ($font->{'post'}->read()->{'FormatType'} == 3 && defined($font->{'cmap'}->read()->find_ms())) {
         $data->{'g2n'} = [];
         foreach my $u (sort {$a <=> $b} keys %{$font->{'cmap'}->read()->find_ms()->{'val'}}) {
             my $n = nameByUni($u);
@@ -441,15 +450,15 @@ sub new {
         $data->{'cff'} = readcffstructs($font);
     }
 
-    if ($opts{'-debug'}) {
+    if ($opts{'debug'}) {
         print "CMap determination for file $file\n";
     }
     if ($data->{'issymbol'}) {
 	# force 'find_ms' if we know it's a symbol font anyway
-	if ($opts{'-debug'}) {
+	if ($opts{'debug'}) {
             print "This is a symbol font 3/0\n";
 	}
-	$opts{'-cmaps'} = 'find_ms';
+	$opts{'cmaps'} = 'find_ms';
     }
 
     # first, see if CJK .cmap file exists, and want to use it
@@ -463,7 +472,7 @@ sub new {
             'Adobe:GB1'    => 'simplified',
         );
         $CMapfile = $cffcmap{"$data->{'cff'}->{'ROS'}->[0]:$data->{'cff'}->{'ROS'}->[1]"};
-	if ($opts{'-debug'}) {
+	if ($opts{'debug'}) {
 	    if ($CMapfile ne '') {
 		print "Available CMap file $CMapfile.cmap\n";
 	    } else {
@@ -472,18 +481,18 @@ sub new {
 	}
     }
     my $CMap = $CMapfile;  # save original name for later
-    if ($CMapfile ne '' && $opts{'-usecmf'}) {
+    if ($CMapfile ne '' && $opts{'usecmf'}) {
         my $ccmap = _look_for_cmap($CMapfile);
         $data->{'u2g'} = $ccmap->{'u2g'};
         $data->{'g2u'} = $ccmap->{'g2u'};
     } else {
 	# there is no .cmap file for this alphabet, or we don't want to use it
-	if ($opts{'-debug'} && $CMapfile ne '') {
+	if ($opts{'debug'} && $CMapfile ne '') {
 	    print "Choose not to use .cmap file\n";
 	}
         $data->{'u2g'} = {};
 
-	if ($opts{'-debug'}) {
+	if ($opts{'debug'}) {
             # debug stuff
             my $numTables = $font->{'cmap'}{'Num'}; # number of subtables in cmap table
             for my $iii (0 .. $numTables-1) {
@@ -535,24 +544,24 @@ sub new {
 
 	my $cmap_list = '';
 	my $OS = $^O;
-	if ($opts{'-debug'}) {
+	if ($opts{'debug'}) {
 	    print "OS string is '$OS', ";
 	}
 	if ($OS eq 'MSWin32' || $OS eq 'dos' || 
 	    $OS eq 'os2' || $OS eq 'cygwin') {
 	    $OS = 0; # Windows request
-	    if ($opts{'-debug'}) {
+	    if ($opts{'debug'}) {
 	        print "treat as Windows platform\n";
 	    }
 	} else {
 	    $OS = 1; # non-Windows request
-	    if ($opts{'-debug'}) {
+	    if ($opts{'debug'}) {
 	        print "treat as non-Windows platform\n";
 	    }
 	}
 	my $gmap;
-	if (defined $opts{'-cmaps'}) {
-	    $CMap = $opts{'-cmaps'};
+	if (defined $opts{'cmaps'}) {
+	    $CMap = $opts{'cmaps'};
 	    # 1 or 2 lists, Windows and non-Windows, separated by ;
 	    # if no ;, assume same list applies to both Platforms
 	    # a list may be the string 'find_ms' to just use that mode
@@ -574,8 +583,8 @@ sub new {
 	    $cmap_list = $default_CMap[$OS];
 	}
 	# now we have a cmap_list string of target P/E's to look for (either
-	# specified with -cmap, or default), OR just 'find_ms'
-	if ($opts{'-debug'}) {
+	# specified with cmap, or default), OR just 'find_ms'
+	if ($opts{'debug'}) {
 	    print "search list '$cmap_list' for match, else find_ms()\n";
 	}
 	if ($cmap_list eq 'find_ms') {
@@ -596,7 +605,7 @@ sub new {
 		if ($_ eq '') { next; } # empty entry got into list?
 		if (exists $cmaps{$_}) {
 		    $cmap->{' mstable'} = $cmaps{$_}; # might be unnecessary
-		    if ($opts{'-debug'}) {
+		    if ($opts{'debug'}) {
 			print "found internal cmap table '$_' on search list\n";
 		    }
 		    $gmap = $cmaps{$_};
@@ -608,8 +617,8 @@ sub new {
 	# final check (.cmap wasn't used). no useful internal cmap found?
 	if (! $gmap) {
 	    # ignored existing .cmap before? use it anyway
-            if ($CMapfile ne '' && !$opts{'-usecmf'}) {
-		if ($opts{'-debug'}) {
+            if ($CMapfile ne '' && !$opts{'usecmf'}) {
+		if ($opts{'debug'}) {
 		    print "need to use .cmap file '$CMapfile.cmap' anyway\n";
 		}
                 my $ccmap = _look_for_cmap($CMapfile);
@@ -650,9 +659,13 @@ sub new {
     $data->{'u2n'} = { map { $data->{'g2u'}->[$_] => $data->{'g2n'}->[$_] } (0 .. (scalar @{$data->{'g2u'}} -1)) };
 
     $data->{'wx'} = [];
-    foreach my $w (0..(scalar @{$data->{'g2u'}}-1)) {
-        $data->{'wx'}->[$w] = int($font->{'hmtx'}->read()->{'advance'}[$w]*1000/$data->{'upem'})
-            || $data->{'missingwidth'};
+    foreach my $i (0..(scalar @{$data->{'g2u'}}-1)) {
+	my $hmtx = $font->{'hmtx'}->read()->{'advance'}->[$i];
+	if ($hmtx) {
+            $data->{'wx'}->[$i] = int($hmtx * 1000/ $data->{'upem'});
+	} else {
+            $data->{'wx'}->[$i] = $data->{'missingwidth'};
+	}
     }
 
     $data->{'kern'} = read_kern_table($font, $data->{'upem'}, $self);
@@ -699,6 +712,12 @@ sub subsetByCId {
     $self->data()->{'subset'} = 1;
     vec($self->data()->{'subvec'}, $g, 1) = 1;
     return if $self->iscff();
+    # if loca table not defined in the font (offset into glyf table), is there
+    # an alternative we can use, or just return undef? per Apple TT Ref:
+    # The 'loca' table only used with fonts that have TrueType outlines (that 
+    # is, a 'glyf' table). Fonts that have no TrueType outlines do not require 
+    # a 'loca' table. 
+    return if !defined $self->font()->{'loca'};
     if (defined $self->font()->{'loca'}->read()->{'glyphs'}->[$g]) {
         $self->font()->{'loca'}->read()->{'glyphs'}->[$g]->read();
         return map { vec($self->data()->{'subvec'}, $_, 1) = 1; } $self->font()->{'loca'}->{'glyphs'}->[$g]->get_refs();
@@ -714,7 +733,8 @@ sub subvec {
 }
 
 sub glyphNum { 
-    return $_[0]->font()->{'maxp'}->read()->{'numGlyphs'}; 
+    my $self = shift;
+    return $self->font()->{'maxp'}->read()->{'numGlyphs'}; 
 }
 
 sub outobjdeep {
@@ -724,18 +744,20 @@ sub outobjdeep {
 
     if ($self->iscff()) {
         $f->{'CFF '}->read_dat();
-	# OTF files were always being written into PDF, even if -noembed = 1
+	# OTF files were always being written into PDF, even if noembed = 1
 	if ($self->data()->{'noembed'} != 1) {
             $self->{' stream'} = $f->{'CFF '}->{' dat'};
 	}
     } else {
         if ($self->data()->{'subset'} && !$self->data()->{'nosubset'}) {
+	  # glyf table is optional, according to Apple
+	  if (defined $f->{'glyf'}) {
             $f->{'glyf'}->read();
             for (my $i = 0; $i < $self->glyphNum(); $i++) {
                 next if $self->subvec($i);
                 $f->{'loca'}{'glyphs'}->[$i] = undef;
-            #    print STDERR "$i,";
             }
+          }
         }
 
 	if ($self->data()->{'noembed'} != 1) {

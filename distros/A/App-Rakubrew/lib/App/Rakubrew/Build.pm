@@ -189,6 +189,11 @@ sub build_triple {
     return $name;
 }
 
+sub _verify_git_branch_exists {
+    my $branch = shift;
+    return system("$GIT show-ref --verify -q refs/heads/" . $branch) == 0;
+}
+
 sub build_zef {
     my $version = shift;
     my $zef_version = shift;
@@ -197,7 +202,10 @@ sub build_zef {
 
     if (-d $zef_dir) {
         chdir $zef_dir;
-        run "$GIT checkout -f -q master && git reset --hard HEAD && $GIT pull -q";
+        if (!_verify_git_branch_exists('main')) {
+            run "$GIT fetch -q origin main";
+        }
+        run "$GIT checkout -f -q main && git reset --hard HEAD && $GIT pull -q";
     } else {
         run "$GIT clone $git_repos{zef} $zef_dir";
         chdir $zef_dir;
@@ -211,7 +219,7 @@ sub build_zef {
     if ( $zef_version ) {
         run "$GIT checkout tags/$zef_version";
     } else {
-        run "$GIT checkout master";
+        run "$GIT checkout main";
     }
     run get_raku($version) . " -I. bin/zef test .";
     run get_raku($version) . " -I. bin/zef --/test --force install .";

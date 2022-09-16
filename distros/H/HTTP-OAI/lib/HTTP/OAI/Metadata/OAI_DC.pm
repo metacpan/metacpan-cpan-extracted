@@ -4,7 +4,7 @@ package HTTP::OAI::Metadata::OAI_DC;
 
 use strict;
 
-our $VERSION = '4.11';
+our $VERSION = '4.12';
 
 our $OAI_DC_SCHEMA = 'http://www.openarchives.org/OAI/2.0/oai_dc/';
 our $DC_SCHEMA = 'http://purl.org/dc/elements/1.1/';

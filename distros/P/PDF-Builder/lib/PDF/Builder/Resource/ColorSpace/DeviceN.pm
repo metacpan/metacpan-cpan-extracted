@@ -4,10 +4,9 @@ use base 'PDF::Builder::Resource::ColorSpace';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -21,15 +20,11 @@ CMYK. Inherits from L<PDF::Builder::Resource::ColorSpace>
 =cut
 
 sub new {
-    my ($class, $pdf, $key, @opts) = @_;
+    my ($class, $pdf, $key, $clrs) = @_;
 
-    # this is a bit odd, but the only use of ->new() has two values, $clrs
-    #  and $sampled, in the argument list
-    my ($clrs, $sampled) = @opts;
+    my $sampled = 2;
 
-    $sampled = 2;
-
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
     my $self = $class->SUPER::new($pdf, $key);
     $pdf->new_obj($self) unless $self->is_obj($pdf);
     $self->{' apipdf'} = $pdf;
@@ -37,10 +32,13 @@ sub new {
 
     my $fct = PDFDict();
 
-    my $csname = $clrs->[0]->type();
+    my $csname = 'DeviceCMYK';  # $clrs->[0]->type()
+    # The base colorspace was formerly chosen based on the base colorspace of
+    # the first color component, but since only DeviceCMYK has been implemented
+    # (everything else throws an error), always use DeviceCMYK.
+    
     my @xclr = map { $_->color() } @{$clrs};
     my @xnam = map { $_->tintname() } @{$clrs};
-    # $self->{' comments'} = "DeviceN ColorSpace\n";
     if ($csname eq 'DeviceCMYK') {
         @xclr = map { [ namecolor_cmyk($_) ] } @xclr;
 
@@ -59,33 +57,32 @@ sub new {
             foreach my $n (0 .. ($sampled**(scalar @xclr))-1) {
                 $spec[$n] ||= [0,0,0,0];
                 my $factor = ($n/($sampled**$xc)) % $sampled;
-                # $self->{' comments'}.="C($n): xc=$xc i=$factor ";
                 my @thiscolor = map { ($_*$factor)/($sampled-1) } @{$xclr[$xc]};
-                # $self->{' comments'}.="(@{$xclr[$xc]}) --> (@thiscolor) ";
                 foreach my $s (0..3) {
                     $spec[$n]->[$s] += $thiscolor[$s];
                 }
                 @{$spec[$n]} = map { $_>1? 1: $_ } @{$spec[$n]};
-                # $self->{' comments'}.="--> (@{$spec[$n]})\n";
-                # $self->{' comments'}.="\n";
             }
         }
-        my @b = ();
+        my @b;
         foreach my $s (@spec) {
-            push(@b,(map { pack('C', ($_*255)) } @{$s}));
+            push @b,(map { pack('C', $_*255) } @{$s});
         }
         $fct->{' stream'} = join('', @b);
     } else {
-        die "unsupported colorspace specification (=$csname).";
+        die "unsupported colorspace specification ($csname).";
     }
     $fct->{'Filter'} = PDFArray(PDFName('ASCIIHexDecode'));
     $self->type($csname);
     $pdf->new_obj($fct);
     my $attr = PDFDict();
-    foreach my $cs (@{$clrs}) {
+    foreach my $cs (@$clrs) {
         $attr->{$cs->tintname()} = $cs;
     }
-    $self->add_elements(PDFName('DeviceN'), PDFArray(map { PDFName($_) } @xnam), PDFName($csname), $fct);
+    $self->add_elements(PDFName('DeviceN'), 
+	                PDFArray(map { PDFName($_) } @xnam), 
+			PDFName($csname), 
+			$fct);
 
     return $self;
 }
@@ -93,7 +90,7 @@ sub new {
 sub param {
     my $self = shift;
 
-    return (@_);
+    return @_;
 }
 
 1;

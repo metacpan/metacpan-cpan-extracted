@@ -1,0 +1,3 @@
+class Sys::IO::FileStream : pointer_t {
+  native method DESTROY : void ();
+}

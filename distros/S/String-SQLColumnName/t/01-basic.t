@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 17;
 
 use String::SQLColumnName qw(fix_name fix_reserved);
 
@@ -24,6 +24,11 @@ is(fix_name('44 wives'),  'forty_four_wives');
 is(fix_name('33ist'), 'thirty_threeist');
 is(fix_name('33rd'), 'thirty_third');
 is(fix_name('53rd and 1st'), 'fifty_third_and_first');
+
+is(fix_name('one || two'), 'one_two');
+
+is(fix_name('price * units * (1 - discount)'), 'price_times_units_times_1_minus_discount');
+
 
 # -----------------------------------------------------------------------------
 # End of File.

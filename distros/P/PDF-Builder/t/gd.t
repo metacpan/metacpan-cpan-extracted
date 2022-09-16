@@ -19,11 +19,11 @@ SKIP: {
 
     my $img = $pdf->image_gd($gd);
     isa_ok($img, 'PDF::Builder::Resource::XObject::Image::GD',
-           q{$pdf->image_gif()});
+           q{$pdf->image_gd()});
 
-    my $gfx = $pdf->page->gfx();
+    my $gfx = $pdf->page()->gfx();
     $gfx->image($img, 72, 144, 216, 288);
-    like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
+    like($pdf->to_string(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
          q{Add GD to PDF});
 }
 

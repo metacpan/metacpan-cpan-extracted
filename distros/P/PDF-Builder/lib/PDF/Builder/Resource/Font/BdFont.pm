@@ -4,10 +4,9 @@ use base 'PDF::Builder::Resource::Font';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -47,35 +46,42 @@ for body text!
 
 =item $font = PDF::Builder::Resource::Font::BdFont->new($pdf, $font, %options)
 
-=item $font = PDF::Builder::Resource::Font::BdFont->new($pdf, $font)
-
 Returns a BmpFont object.
 
 =cut
 
-#I<-encode>
+#I<encode>
 #... changes the encoding of the font from its default.
 #See I<Perl's Encode> for the supported values.
 #
+#I<pdfname> ... changes the reference-name of the font from its default.
+#The reference-name is normally generated automatically and can be
+#retrieved via C<$pdfname=$font->name()>.
+
 =pod
 
 Valid %options are:
 
-I<-pdfname> ... changes the reference-name of the font from its default.
-The reference-name is normally generated automatically and can be
-retrieved via C<$pdfname=$font->name()>.
+=over
 
-I<-style> ... a value of 'block' (default) assembles a character from
+=item I<style> 
+
+A value of 'block' (default) assembles a character from
 contiguous square blocks. A value of 'dot' assembles a character from 
 overlapping filled circles, in the style of a dot matrix printer.
 
+=back
+
 =cut
-# -style => 'image' doesn't seem to want to work (see examples/024_bdffonts
+# style => 'image' doesn't seem to want to work (see examples/024_bdffonts
 # for code). it's not clear whether a 1000 x 1000 pixel bitmap needs to be
 # generated, to be scaled down to the text size. if so, that's very wasteful.
 
 sub new {
     my ($class, $pdf, $file, %opts) = @_;
+    # copy dashed name options to preferred undashed names
+    if (defined $opts{'-style'} && !defined $opts{'style'}) { $opts{'style'} = delete($opts{'-style'}); }
+    # pdfname doesn't seem to be used here. consider name as alias
 
     my ($self, $data);
     my $dot_ratio = 1.2;  # diameter of a dot (dot style) relative to
@@ -85,10 +91,11 @@ sub new {
 			  # calculations of max extents for block and dot.
 
     $class = ref $class if ref $class;
-    $self = $class->SUPER::new($pdf, sprintf('%s+Bdf%02i', pdfkey(), ++$BmpNum));
+    $self = $class->SUPER::new($pdf, 
+	                       sprintf('%s+Bdf%02i', pdfkey(), ++$BmpNum));
     $pdf->new_obj($self) unless $self->is_obj($pdf);
 
-    # Adobe bitmap distribution format
+    # Adobe Bitmap Distribution Format
     $self->{' data'} = $self->readBDF($file);
 
     # character coordinate units for block and dots styles (cell sizes)
@@ -119,7 +126,7 @@ sub new {
 
     my $first = 0; # we'll always do the full single byte encoding
     my $last = 255;
-    $opts{'-style'} = 'block' unless defined $opts{'-style'};
+    $opts{'style'} = 'block' unless defined $opts{'style'};
 
     $self->{'Subtype'} = PDFName('Type3');
     $self->{'FirstChar'} = PDFNum($first);
@@ -186,7 +193,7 @@ sub new {
 
         # Reader will save graphics state (q) and restore (Q) around each
         # glyph's drawing commands
-        if ($opts{'-style'} eq 'image') {
+        if ($opts{'style'} eq 'image') {
             # note that each character presented as an image
             # CAUTION: using this image code for a font doesn't seem to work
             # well. block and dot look quite nice, so for now, use one of those.
@@ -235,7 +242,7 @@ sub new {
                     for (my $col=0; $col<$BBX[0]; $col++) {
                         if (!$dots[$row][$col]) { next; }
 
-                        if ($opts{'-style'} eq 'block') {
+                        if ($opts{'style'} eq 'block') {
                             # TBD merge neighbors to form larger rectangles
                             $char->{' stream'} .= int(($col+$BBX[2])*$csizeH+0.5).' '.
                                                   int(($row+$BBX[3])*$csizeV+0.5).' '.
@@ -435,6 +442,6 @@ __END__
 
 =head1 AUTHOR
 
-alfred reibenschuh
+Alfred Reibenschuh, extensively rewritten by Phil Perry
 
 =cut

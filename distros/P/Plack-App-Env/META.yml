@@ -33,4 +33,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Plack-App-Env
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Env
-version: '0.08'
+version: '0.09'

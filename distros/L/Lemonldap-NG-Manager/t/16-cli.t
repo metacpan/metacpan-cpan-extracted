@@ -4,7 +4,7 @@ use JSON;
 use strict;
 require 't/test-lib.pm';
 
-my $tests = 17;
+my $tests = 18;
 
 use_ok('Lemonldap::NG::Common::Cli');
 use_ok('Lemonldap::NG::Manager::Cli');
@@ -93,8 +93,16 @@ combined_like( sub { llcommonClient->run(@cmd) },
 combined_like(
     sub { llclient->run(@cmd) },
     qr/Configuration \d+ has been rolled back/,
-    '"Author IP" OK'
+    'Configuration rollback OK'
 );
+
+@cmd = qw(-yes 1 merge t/test-merge.json);
+combined_like(
+    sub { llclient->run(@cmd) },
+    qr/Saved under number \d+/,
+    'Configuration merge OK'
+);
+
 
 count($tests);
 done_testing( count() );

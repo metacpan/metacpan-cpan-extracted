@@ -162,3 +162,13 @@ pwdCheckQuality: 0
 pwdMaxAge: 5
 pwdGraceAuthnLimit: 2
 
+dn: ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: cn=mygroup,ou=groups,dc=example,dc=com
+objectClass: groupOfNames
+objectClass: top
+cn: mygroup
+member: uid=dwho,ou=users,dc=example,dc=com

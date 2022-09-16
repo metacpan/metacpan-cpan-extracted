@@ -22,6 +22,38 @@ Apache::Tika::Async - connect to Apache Tika
     print $info->meta->{"meta:language"};
     # en
 
+# ACCESSORS
+
+## **jarfile**
+
+    jarfile => '/opt/tika/tika-standard-2.9.9.jar',
+
+Sets the Tika Jarfile to be used. The default is to look
+in the directory `jar/` below the current directory.
+
+## **tika\_args**
+
+    tika_args => [],
+
+Additional Tika command line options.
+
+## **java**
+
+    java => '/opt/openjdk-11-jre/bin/java',
+
+Sets the Java executable to be used.
+
+## **java\_args**
+
+    java_args => [],
+
+Sets the Java options to be used.
+
+# ENVIRONMENT
+
+To specify the Tika jar file from the outside, you can set the
+`PERL_APACHE_TIKA_PATH` environment variable.
+
 # REPOSITORY
 
 The public repository of this module is

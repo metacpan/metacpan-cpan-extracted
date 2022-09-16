@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -205,7 +205,8 @@ sub jailInit {
 sub defaultValuesInit {
     my ( $class, $conf ) = @_;
 
-    $class->tsv->{$_} = $conf->{$_} foreach ( qw(
+    $class->tsv->{$_} = $conf->{$_}
+      foreach ( qw(
         cookieExpiration        cookieName         customFunctions httpOnly
         securedCookie           timeout            timeoutActivity
         timeoutActivityInterval useRedirectOnError useRedirectOnForbidden
@@ -214,7 +215,7 @@ sub defaultValuesInit {
         authChoiceAuthBasic     authChoiceParam    hiddenAttributes
         upgradeSession
         )
-    );
+      );
 
     $class->tsv->{cipher} = Lemonldap::NG::Common::Crypto->new( $conf->{key} );
 
@@ -550,6 +551,7 @@ sub conditionSub {
     # logout_app
     if ( $cond =~ /^logout_app(?:\s+(.*))?$/i ) {
         my $u = $1 || $class->tsv->{portal}->();
+        $class->logger->debug("logout_app redirect to $u");
         eval 'use Apache2::Filter' unless ( $INC{"Apache2/Filter.pm"} );
         return (
             sub {
@@ -565,6 +567,7 @@ sub conditionSub {
     }
     elsif ( $cond =~ /^logout_app_sso(?:\s+(.*))?$/i ) {
         my $u = $1 || $class->tsv->{portal}->();
+        $class->logger->debug("logout_app_sso redirect to $u");
         eval 'use Apache2::Filter' unless ( $INC{"Apache2/Filter.pm"} );
         return (
             sub {

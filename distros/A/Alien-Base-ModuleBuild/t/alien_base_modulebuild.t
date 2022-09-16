@@ -111,6 +111,8 @@ subtest 'override temp and share' => sub {
 subtest 'destdir' => sub {
   skip_all 'TODO on MSWin32' if $^O eq 'MSWin32';
 
+  local $ENV{ALIEN_DOWNLOAD_RULE} = 'digest_or_encrypt';
+
   local $CWD = _new_temp();
 
   open my $fh, '>', 'build.pl';
@@ -234,6 +236,7 @@ subtest 'alien_bin_requires' => sub {
 
 subtest 'alien_check_built_version' => sub {
 
+  local $ENV{ALIEN_DOWNLOAD_RULE} = 'digest_or_encrypt';
   local $CWD = _new_temp();
 
   open my $fh, '>', 'build.pl';
@@ -291,6 +294,7 @@ EOF
 subtest 'multi arg do_system' => sub {
 
   local $CWD = _new_temp();
+  local $ENV{ALIEN_DOWNLOAD_RULE} = 'digest_or_encrypt';
 
   open my $fh, '>', 'build.pl';
   print $fh <<'EOF';
@@ -916,6 +920,95 @@ subtest 'ALIEN_FORCE and ALIEN_INSTALL_TYPE vars' => sub {
       call [ config_data => 'ForceSystem' ] => F();
     },
   ;
+
+};
+
+subtest 'alien_install_network method' => sub {
+
+  local $ENV{ALIEN_INSTALL_NETWORK};
+  delete $ENV{ALIEN_INSTALL_NETWORK};
+
+  is(
+    Alien::Base::ModuleBuild->alien_install_network,
+    1,
+    'default',
+  );
+
+  $ENV{ALIEN_INSTALL_NETWORK} = 10;
+
+  is(
+    Alien::Base::ModuleBuild->alien_install_network,
+    1,
+    'ALIEN_INSTALL_NETWORK=10',
+  );
+
+
+  $ENV{ALIEN_INSTALL_NETWORK} = 0;
+
+  is(
+    Alien::Base::ModuleBuild->alien_install_network,
+    '',
+    'ALIEN_INSTALL_NETWORK=0',
+  );
+
+};
+
+subtest 'alien_download_rule method' => sub {
+
+  local $ENV{ALIEN_DOWNLOAD_RULE};
+  delete $ENV{ALIEN_DOWNLOAD_RULE};
+
+  is(
+    Alien::Base::ModuleBuild->alien_download_rule,
+    'warn',
+    'default',
+  );
+
+  $ENV{ALIEN_DOWNLOAD_RULE} = 'default';
+
+  is(
+    Alien::Base::ModuleBuild->alien_download_rule,
+    'warn',
+    'explicit default',
+  );
+
+  foreach my $value (qw( warn digest encrypt digest_or_encrypt digest_and_encrypt ))
+  {
+    $ENV{ALIEN_DOWNLOAD_RULE} = $value;
+
+    is(
+      Alien::Base::ModuleBuild->alien_download_rule,
+      $value,
+      "override $value",
+    );
+  }
+
+  $ENV{ALIEN_DOWNLOAD_RULE} = 'bogus';
+
+  my @warnings;
+
+  local $SIG{__WARN__} = sub {
+    my($message) = @_;
+    if($message =~ /^unknown ALIEN_DOWNLOAD_RULE/) {
+      push @warnings, $message;
+    } else {
+      print STDERR $message;
+    }
+  };
+
+  is(
+    Alien::Base::ModuleBuild->alien_download_rule,
+    'warn',
+    'bogus value reverts to default',
+  );
+
+  is(
+    \@warnings,
+    array {
+      item match qr/unknown ALIEN_DOWNLOAD_RULE "ALIEN_DOWNLOAD_RULE", using "warn" instead/;
+    },
+    'emitted expected warnings',
+  );
 
 };
 

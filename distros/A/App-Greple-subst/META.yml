@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple::subst:
     file: lib/App/Greple/subst.pm
-    version: '2.3002'
+    version: '2.3102'
   App::Greple::subst::Dict:
     file: lib/App/Greple/subst/Dict.pm
   App::Greple::subst::Dict::Ent:
@@ -34,21 +34,21 @@ provides:
   App::Greple::subst::dyncmap:
     file: lib/App/Greple/subst/dyncmap.pm
 requires:
-  App::Greple: '8.53'
+  App::Greple: '8.58'
+  App::Greple::update: '0.03'
   File::Share: '0'
   Getopt::EX: '0'
-  Getopt::EX::termcolor: '1.07'
+  Getopt::EX::termcolor: '1.08'
   List::Util: '0'
   Mo: '0'
-  Regexp::Assemble: '0'
   Text::VisualPrintf: '4.01'
   Text::VisualWidth::PP: '0.05'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-subst/issues
   homepage: https://github.com/kaz-utashiro/greple-subst
-  repository: git://github.com/kaz-utashiro/greple-subst.git
-version: '2.3002'
+  repository: https://github.com/kaz-utashiro/greple-subst.git
+version: '2.3102'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

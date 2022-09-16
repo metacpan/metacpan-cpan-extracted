@@ -7,10 +7,9 @@ use v5.10.1;
 use strict;
 use warnings;
 
-use Hash::Util;
+our $VERSION = '0.18';
 
-our $VERSION = '0.15';
-
+use Const::Fast ();
 use overload '%{}' => \&tag_hash, fallback => 1;
 
 
@@ -51,24 +50,84 @@ sub new {
 
 
 
-sub tag_hash {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub tag_attr_hash {
 
     my $self = shift;
 
     no overloading;
 
-    return $self->{tag_hash} ||= do {
+    return $self->{tag_attr_hash} //= do {
         my %tags;
         for my $tuple ( @{ $self->{list} } ) {
             # my ( $tag, $attrs, $value ) = @$tuple;
-            my $tag = ( $tags{ $tuple->[0] } ||= {} );
+            my $tag = ( $tags{ $tuple->[0] } //= {} );
             $tag->{$_} = $tuple->[2] for @{ $tuple->[1] };
         }
-        Hash::Util::lock_hash( %tags );
-        \%tags;
+        Const::Fast::const my %rtags => %tags;
+        \%rtags;
     };
 }
+*tag_hash = \&tag_attr_hash;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub tag_value_hash {
+
+    my $self = shift;
+
+    no overloading;
+
+    return $self->{tag_value_hash} //= do {
+        my %tags;
+        for my $tuple ( @{ $self->{list} } ) {
+            # my ( $tag, $attrs, $value ) = @$tuple;
+            my $tag = ( $tags{ $tuple->[0] } //= {} );
+            # copy so don't corrupt internal list.
+            push @{ $tag->{ $tuple->[2] } //= [] }, @{ $tuple->[1] };
+        }
+        Const::Fast::const my %rtags => %tags;
+        \%rtags;
+    };
+}
 
 
 
@@ -86,19 +145,17 @@ sub attr_hash {
 
     no overloading;
 
-    return $self->{attr_hash} ||= do {
+    return $self->{attr_hash} //= do {
         my %attrs;
         for my $tuple ( @{ $self->{list} } ) {
             # my ( $tag, $attrs, $value ) = @$tuple;
-            ( $attrs{$_} ||= {} )->{ $tuple->[0] } = $tuple->[2]
+            ( $attrs{$_} //= {} )->{ $tuple->[0] } = $tuple->[2]
               for @{ $tuple->[1] };
         }
-        Hash::Util::lock_hash( %attrs );
-        \%attrs;
+        Const::Fast::const my %rattrs => %attrs;
+        \%rattrs;
     };
 }
-
-
 
 
 
@@ -118,12 +175,15 @@ sub tags {
     no overloading;
 
     if ( !defined $attr ) {
-        return $self->{tags} ||= [ keys %{ $self->tag_hash } ];
+        return $self->{tags} //= do {
+            Const::Fast::const my @tags => keys %{ $self->tag_hash };
+            \@tags;
+        }
     }
 
-    return ( $self->{attr} ||= {} )->{$attr} ||= do {
+    return ( $self->{attr} //= {} )->{$attr} //= do {
         my $attrs = $self->attr_hash;
-        [ keys %{ $attrs->{$attr} || {} } ];
+        [ keys %{ $attrs->{$attr} // {} } ];
     };
 }
 
@@ -164,7 +224,7 @@ MooX::TaggedAttributes::Cache - Extract information from a Tagged Attribute Cach
 
 =head1 VERSION
 
-version 0.15
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -191,14 +251,51 @@ Create a cache object for the C<$class>, which must have a C<_tag_list> method.
 
 =head1 METHODS
 
+=head2 tag_attr_hash
+
+   $tags = $cache->tag_attr_hash;
+
+Returns a reference to a read-only hash keyed off of the tags in the
+cache.  The values are hashes which map attribute names to tag values.
+
+For example, given:
+
+   has attr1 => ( ..., tag1 => 'foo' );
+   has attr2 => ( ..., tag1 => 'foo' );
+   has attr3 => ( ..., tag2 => 'bar' );
+   has attr4 => ( ..., tag2 => 'bar' );
+
+this will be returned:
+
+  {
+     tag1 => { attr1 => 'foo', attr2 => 'foo' },
+     tag2 => { attr3 => 'bar', attr4 => 'bar' },
+  }
+
 =head2 tag_hash
 
-   $tags = $cache->tag_hash;
+This is a deprecated alias for L</tag_attr_hash>
+
+=head2 tag_value_hash
+
+   $tags = $cache->tag_value_hash;
 
 Returns a reference to a hash keyed off of the tags in the cache.  The
-values are hashes which map attribute names to tag values.
+values are hashes which map tag values to attribute names (as an
+arrayref of names ).
 
-B<Do Not Modify This Hash.>
+For example, given:
+
+   has attr1 => ( ..., tag1 => 'foo' );
+   has attr2 => ( ..., tag1 => 'foo' );
+   has attr3 => ( ..., tag1 => 'bar' );
+   has attr4 => ( ..., tag1 => 'bar' );
+
+this may be returned (the order of the attribute names is arbitrary):
+
+  { tag1 => { foo => [ 'attr1', 'attr2' ],
+              bar => [ 'attr3', 'attr4' ],
+  },
 
 =head2 attr_hash
 
@@ -206,8 +303,6 @@ B<Do Not Modify This Hash.>
 
 Returns a reference to a hash keyed off of the attributes in the
 cache.  The values are hashes which map tag names to tag values.
-
-B<Do Not Modify This Hash.>
 
 =head2 tags
 
@@ -218,8 +313,6 @@ B<Do Not Modify This Hash.>
    $tags = $cache->tags( $attr );
 
 Returns a reference to an array containing tags.
-
-B<Do Not Modify This Array.>
 
 =head2 value
 

@@ -69,10 +69,11 @@ check_file_type( $svg_file, qr/^(image\/svg|text\/plain)/ );
 SKIP: {
     eval {
         require Chart::Plotly::Plot;
+        Chart::Plotly::Plot->VERSION('0.038');
         require Chart::Plotly::Trace::Scatter;
     };
     if ($@) {
-        skip "requires Chart::Plot", 1;
+        skip "requires Chart::Plotly >= 0.038", 1;
     }
 
     my $x       = [ 1 .. 15 ];

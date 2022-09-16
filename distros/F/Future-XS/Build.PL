@@ -10,21 +10,14 @@ push @extra_compiler_flags, qw( -std=c99 ) if $^V lt v5.36.0;
 
 push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 
-# Author support for shared test file
-if( -f( my $TESTSRC = "../Future/t/lib/FutureTests.pm" ) ) {
-   system( "cp", $TESTSRC, "t/lib/" );
-}
-
 my $build = Module::Build->new(
    module_name => 'Future::XS',
    requires => {
       'perl' => '5.014',
+      'Future' => '0.48_001', # for Future::_base
    },
    test_requires => {
-      'Test::Fatal' => 0,
-      'Test::Identity' => 0,
       'Test::More' => '0.88', # done_testing
-      'Test::Refcount' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
@@ -28,72 +28,72 @@ Inherits from L<PDF::Builder::Resource::XObject::Image>
 
 =over
 
-=item $res = PDF::Builder::Resource::XObject::Image::PNG_IPL->new($pdf, $file, $name, %opts)
-
-=item $res = PDF::Builder::Resource::XObject::Image::PNG_IPL->new($pdf, $file, $name)
-
-=item $res = PDF::Builder::Resource::XObject::Image::PNG_IPL->new($pdf, $file)
-
-=back 
+=item $res = PDF::Builder::Resource::XObject::Image::PNG_IPL->new($pdf, $file, %opts)
 
 Returns a PNG-image object. C<$pdf> is the PDF object being added to, C<$file>
 is the input PNG file, and the optional C<$name> of the new parent image object
 defaults to PxAAA.
 
 If the Image::PNG::Libpng package is installed, and its use is not suppressed
-via the C<-nouseIPL> flag (see Builder documentation for C<image_png>), the
+via the C<nouseIPL> flag (see Builder documentation for C<image_png>), the
 PNG_IPL library will be used. Otherwise, the PNG library will be used instead.
 
 B<opts:>
 
 =over
 
-=item -notrans => 1
+=item 'notrans' => 1
 
 No transparency -- ignore tRNS chunk if provided, ignore Alpha channel
 if provided.
 
-=item -force8bps => 1
+=item 'force8bps' => 1
 
 If the PNG source is 16bps, tell the libpng library to strip down all
 channels to 8bps, permitting use on PDF 1.4 output.
 
+=item 'name' => 'string'
+
+This is the name you can give for the PNG image object. The default is Pxnnnn.
+
 =back
+
+=back 
 
 =head2 Supported PNG types
 
    (0) Gray scale of depth 1, 2, 4, 8, or 16 bits per pixel (2, 4, 16, 256,
        or 65536 gray levels). Full transparency (of one 16-bit gray value) 
-       via the tRNS chunk is allowed, unless the -notrans option specifies 
+       via the tRNS chunk is allowed, unless the notrans option specifies 
        that it be ignored.
 
    (2) RGB truecolor with 8 or 16 bits per sample (3 samples: 16.7 million 
        or 281.5 trillion colors). Full transparency (of one 3x16-bit RGB 
-       color value) via the tRNS chunk is allowed, unless the -notrans 
+       color value) via the tRNS chunk is allowed, unless the notrans 
        option specifies that it be ignored.
 
    (3) Palette color with 1, 2, 4, or 8 bits per pixel (2, 4, 16, or 256
        color table/palette entries). 16 bpp is not currently supported by
        PNG or PDF. Partial transparency (8-bit Alpha) for each palette
-       entry via the tRNS chunk is allowed, unless the -notrans option 
+       entry via the tRNS chunk is allowed, unless the notrans option 
        specifies that it be ignored (all entries fully opaque).
 
    (4) Gray scale of depth 8 or 16 bits per pixel plus equal-sized Alpha
        channel (256 or 65536 gray levels and 256 or 65536 levels of
-       transparency). The Alpha channel is ignored if the -notrans 
+       transparency). The Alpha channel is ignored if the notrans 
        option is given. The tRNS chunk is not permitted.
 
    (5) B<RESERVED> for grayscale via palette + Alpha channel
 
    (6) RGB truecolor with 8 or 16 bits per sample, with equal-sized 
        Alpha channel (256 or 65536 levels of transparency). The Alpha 
-       channel is ignored if the -notrans option is given. The tRNS 
+       channel is ignored if the notrans option is given. The tRNS 
        chunk is not permitted.
 
    (7) B<RESERVED> for truecolor via palette + Alpha channel
 
 In all cases, 16 bits per sample forces PDF 1.5 (or higher) output, unless
-you give the C<-force8bps> option, to "strip" 16 bit samples to 8 bits, and
+you give the C<force8bps> option, to "strip" 16 bit samples to 8 bits, and
 permit PDF 1.4-compatible output.
 The libpng.a library is assuming standard "network" bit and 
 byte ordering (Big Endian), although flags might be added to change this.
@@ -113,7 +113,17 @@ be unsupported methods.
 # TBD: gAMA (gamma) chunk, perhaps some others?
 
 sub new {
-    my ($class, $pdf, $file, $name, %opts) = @_;
+    my ($class, $pdf, $file, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-nouseIPL'} && !defined $opts{'nouseIPL'}) { $opts{'nouseIPL'} = delete($opts{'-nouseIPL'}); }
+    if (defined $opts{'-name'} && !defined $opts{'name'}) { $opts{'name'} = delete($opts{'-name'}); }
+    if (defined $opts{'-compress'} && !defined $opts{'compress'}) { $opts{'compress'} = delete($opts{'-compress'}); }
+    if (defined $opts{'-notrans'} && !defined $opts{'notrans'}) { $opts{'notrans'} = delete($opts{'-notrans'}); }
+    if (defined $opts{'-force8bps'} && !defined $opts{'force8bps'}) { $opts{'force8bps'} = delete($opts{'-force8bps'}); }
+
+    my ($name, $compress);
+    if (exists $opts{'name'}) { $name = $opts{'name'}; }
+   #if (exists $opts{'compress'}) { $compress = $opts{'compress'}; }
 
     my $self;
 
@@ -142,12 +152,12 @@ sub new {
     # slurp whole PNG file into $png structure
     my $xform = PNG_TRANSFORM_IDENTITY;  # default bit flag (0)
     my $transparency = 1; # default YES, allow transparency/Alpha
-    if ($opts{'-notrans'}) { 
+    if ($opts{'notrans'}) { 
         $transparency = 0;
 	$xform |= PNG_TRANSFORM_STRIP_ALPHA; 
 	# this appears to turn cs=4 into cs=0, and cs=6 into cs=2
     }
-    if ($opts{'-force8bps'}) {
+    if ($opts{'force8bps'}) {
 	$xform |= PNG_TRANSFORM_STRIP_16;
 	# this reduces 16bps channels to 8bps
     }
@@ -173,8 +183,8 @@ sub new {
 
     $bpc = $IHDR->{'bit_depth'}; # bits-per-channel
     if ($bpc > 8) {
-        PDF::Builder->verCheckOutput(1.5, "image sample depth > 8 bits");
-        # if don't want to allow > 8 bits, can use -force8bps
+        $PDF::Builder::global_pdf->verCheckOutput(1.5, "image sample depth > 8 bits");
+        # if don't want to allow > 8 bits, can use force8bps
         # if later PDFs allow other depths > 8, give them their own test
     }
 
@@ -445,7 +455,7 @@ sub new {
         $dict->{'Columns'} = PDFNum($w);
 
         $dict = PDFDict();
-        if ($transparency) { # will be in cs=0 if stripped Alpha for -notrans
+        if ($transparency) { # will be in cs=0 if stripped Alpha for notrans
             $pdf->new_obj($dict);
             $dict->{'Type'} = PDFName('XObject');
             $dict->{'Subtype'} = PDFName('Image');
@@ -487,7 +497,7 @@ sub new {
 	    delete $dict->{'Filter'};
 	    $dict->{' nofilt'} = 1;
 	}
-	# if -notrans, Alpha channel should have been stripped off
+	# if notrans, Alpha channel should have been stripped off
 	# and we are told it is cs = 0 (visit other section, not this one)
 
     # cs=5 reserved for grayscale given by palette+Alpha (2 channels) -- 
@@ -497,7 +507,7 @@ sub new {
     #   a constant Alpha per palette entry, NOT an Alpha per pixel!
 
     } elsif ($cs == PNG_COLOR_TYPE_RGB_ALPHA) {  
-       # about 50 times slower than cs=2! (withOUT -notrans) due to Alpha move
+       # about 50 times slower than cs=2! (withOUT notrans) due to Alpha move
         # cs=6 RGB+Alpha 8 or 16 bps, NO tRNS
 	# $png->get_channels() should return 4 (4 samples per pixel)
         $self->filters('FlateDecode');
@@ -510,7 +520,7 @@ sub new {
         $dict->{'Columns'} = PDFNum($w);
 
         $dict = PDFDict();
-        if ($transparency) { # will be in cs=2 if stripped Alpha for -notrans
+        if ($transparency) { # will be in cs=2 if stripped Alpha for notrans
             $pdf->new_obj($dict);
             $dict->{'Type'} = PDFName('XObject');
             $dict->{'Subtype'} = PDFName('Image');
@@ -553,7 +563,7 @@ sub new {
 	    delete $dict->{'Filter'};
 	    $dict->{' nofilt'} = 1;
 	}
-	# if -notrans, Alpha channel should have been stripped off
+	# if notrans, Alpha channel should have been stripped off
 	# and we are told it is cs = 2 (visit other section, not this one)
 
     # cs=7 reserved for RGB given by palette+Alpha (2 channels) -- 
@@ -573,7 +583,7 @@ sub new {
 =item  $mode = $png->usesLib()
 
 Returns 1 if Image::PNG::Libpng installed and used, 0 if not installed, or -1 
-if installed but not used (-nouseIPL option given to C<image_png>).
+if installed but not used (nouseIPL option given to C<image_png>).
 
 B<Caution:> this method can only be used I<after> the image object has been
 created. It can't tell you whether Image::PNG::Libpng is available in

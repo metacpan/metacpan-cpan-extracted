@@ -28,7 +28,7 @@ sub startup($self) {
 
 }
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 
 1;
 __END__
@@ -145,7 +145,7 @@ referenced by absolute path or relative to where the application is run from.
     {
       "directory": "darkpan",
       "compress_index": true,
-      "path": "darkpan,
+      "path": "darkpan",
       "basic_auth": {
         "Realm Name": {
           "host": "ldaps://my.ldap.server.org",
@@ -183,9 +183,9 @@ Authentication is handled by L<Mojolicious::Plugin::BasicAuthPlus|https://metacp
 To configure basic auth, see the configuration options for L<Mojolicious::Plugin::BasicAuthPlus|https://metacpan.org/pod/Mojolicious::Plugin::BasicAuthPlus>
 and add your settings to the basic auth section of the config.json file.     
 
-=head2 How to Deploy 
+=head2 How to Publish 
 
-=head3 Deploying with POST
+=head3 Publishing with POST
 
 Publishing to darkpan can be done using a post request and a URL to git or bitbucket repo.
     
@@ -194,12 +194,18 @@ Publishing to darkpan can be done using a post request and a URL to git or bitbu
     curl --data-urlencode 'module=git+file:///home/rshingleton/project/MyModule.git' --data-urlencode 'author=reshingleton' http://localhost:3000/publish
     curl --data-urlencode 'module=git@github.com:rshingleton/perl-module-test.git' --data-urlencode 'author=reshingleton' http://localhost:3000/publish
 
+Publishing with a local file
+
+    #upload file from disk via curl
+    curl -F 'pause99_add_uri_httpupload=@filename.tar.gz' http://localhost:3000/publish
+
+
 The module parameter can also be an HTTP url. see L<OrePAN2::Injector|https://metacpan.org/pod/OrePAN2::Injector> for 
 additional details.
 
     curl --data-urlencode 'module=https://cpan.metacpan.org/authors/id/O/OA/OALDERS/OrePAN2-0.48.tar.gz' --data-urlencode 'author=OALDERS' http://localhost:3000/publish
     
-=head3 Deploying with L<Minilla|https://metacpan.org/pod/Minilla>
+=head3 Publishing with L<Minilla|https://metacpan.org/pod/Minilla>
 
 Minilla is a cpan authoring tool, see L<Minilla|https://metacpan.org/pod/Minilla> for more details.
 

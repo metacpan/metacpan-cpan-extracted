@@ -33,13 +33,13 @@ svn ci -mx $file
 EOS
 
 set_conf(<<'EOS');
-DENY_ADDITION(qr/add/, qr/ADD/);
+DENY_ADDITION(qr/add/, qr/addmore/);
 DENY_DELETION(qr/del/);
 DENY_UPDATE  (qr/upd/);
 EOS
 
 my $add = catfile($wc, 'add');
-my $ADD = catfile($wc, 'ADD');
+my $addmore = catfile($wc, 'addmore');
 my $del = catfile($wc, 'del');
 my $upd = catfile($wc, 'upd');
 
@@ -50,9 +50,9 @@ svn ci -mx $add
 EOS
 
 work_nok('deny second arg', 'Cannot add:', <<"EOS");
-echo txt >$ADD
-svn add -q --no-auto-props $ADD
-svn ci -mx $ADD
+echo txt >$addmore
+svn add -q --no-auto-props $addmore
+svn ci -mx $addmore
 EOS
 
 work_ok('add del upd', <<"EOS");

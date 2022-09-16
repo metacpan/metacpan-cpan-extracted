@@ -1,3 +1,12 @@
+0.1.14 Fri Sep  9 04:07:04 PM EDT 2022
+ - Remove XXX usage
+
+0.1.13 Fri Sep  9 03:02:55 PM EDT 2022
+ - Generate special functions in markdown (badges)
+
+0.1.12 Sat Sep  3 10:53:33 AM PDT 2022
+ - Testing release with PST
+
 0.1.11 Sat Sep  3 10:33:43 AM PDT 2022
  - Simpler way for shared Makefile to find its path
 

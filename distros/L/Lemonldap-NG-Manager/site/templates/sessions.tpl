@@ -107,9 +107,6 @@
        <td class="col-md-4 data-{{node.epoch}}" ng-if="node.epoch > 1500000000">{{localeDate(node.epoch)}}</td>
        <td class="data-{{node.epoch}}">
 	      <span ng-if="node.td=='2'" class="link text-danger glyphicon glyphicon-minus-sign" ng-click="deleteOIDCConsent(node.title, node.epoch)"></span>
-		  <!--
-		  <span ng-if="$last && ( node.title=='TOTP' || node.title=='UBK' || node.title=='U2F' || node.title=='WebAuthn' )" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newRule'})"></span>
-		  -->
        </td>
     </div>
   </script>

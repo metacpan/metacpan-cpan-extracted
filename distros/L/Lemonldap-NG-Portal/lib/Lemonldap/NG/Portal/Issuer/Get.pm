@@ -7,7 +7,7 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants
   qw(PE_OK PE_BADURL PE_GET_SERVICE_NOT_ALLOWED URIRE);
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer';
 
@@ -29,7 +29,7 @@ sub init {
         return 0;
     }
     $self->{rule} = $rule;
-    return 0 unless ( $self->SUPER::init() );
+    return 0 unless $self->SUPER::init();
     return 1;
 }
 
@@ -71,7 +71,7 @@ sub run {
 
 # Nothing to do here for now
 sub logout {
-    PE_OK;
+    return PE_OK;
 }
 
 # INTERNAL METHODS

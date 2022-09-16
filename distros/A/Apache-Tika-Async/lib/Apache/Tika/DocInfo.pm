@@ -1,6 +1,6 @@
 package Apache::Tika::DocInfo;
 use Moo;
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 has meta => (
     is => 'ro',

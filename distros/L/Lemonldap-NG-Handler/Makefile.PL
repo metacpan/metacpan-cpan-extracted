@@ -13,7 +13,7 @@ WriteMakefile(
         'Env'               => 0,
         'IO::Pipe'          => 0,
         'Test::MockObject'  => 0,
-        'Test::Pod'         => 0,
+        'Test::Pod'         => 1.00,
         'Time::Fake'        => 0,
         'Cwd'               => 0,
     },
@@ -33,13 +33,13 @@ WriteMakefile(
             MailingList => 'mailto:lemonldap-ng-dev@ow2.org',
             license     => 'http://opensource.org/licenses/GPL-2.0',
             homepage    => 'https://lemonldap-ng.org/',
-            bugtracker =>
+            bugtracker  =>
               'https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues',
             x_twitter => 'https://twitter.com/lemonldapng',
         },
     },
     PREREQ_PM => {
-        'Lemonldap::NG::Common' => '2.0.14',
+        'Lemonldap::NG::Common' => '2.0.15.1',
         'LWP::UserAgent'        => 0,
         'Mouse'                 => 0,
         'URI'                   => 0,

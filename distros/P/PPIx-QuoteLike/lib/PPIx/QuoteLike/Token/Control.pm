@@ -9,7 +9,7 @@ use base qw{ PPIx::QuoteLike::Token };
 
 use PPIx::QuoteLike::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 {
     # TODO make this a state variable when we can require Perl 5.10.

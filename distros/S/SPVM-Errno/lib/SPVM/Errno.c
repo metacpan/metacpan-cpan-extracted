@@ -2,6 +2,10 @@
 
 #include <errno.h>
 
+#ifdef _WIN32
+# include <winsock2.h>
+#endif
+
 const char* FILE_NAME = "Sys/Errno.c";
 
 int32_t SPVM__Errno__errno(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -1458,3 +1462,602 @@ int32_t SPVM__Errno__EXFULL(SPVM_ENV* env, SPVM_VALUE* stack) {
   
 }
 
+int32_t SPVM__Errno__WSAEACCES(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEACCES
+  stack[0].ival = WSAEACCES;
+  return 0;
+#else
+  env->die(env, stack, "WSAEACCES is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEADDRINUSE(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEADDRINUSE
+  stack[0].ival = WSAEADDRINUSE;
+  return 0;
+#else
+  env->die(env, stack, "WSAEADDRINUSE is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEADDRNOTAVAIL(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEADDRNOTAVAIL
+  stack[0].ival = WSAEADDRNOTAVAIL;
+  return 0;
+#else
+  env->die(env, stack, "WSAEADDRNOTAVAIL is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEAFNOSUPPORT(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEAFNOSUPPORT
+  stack[0].ival = WSAEAFNOSUPPORT;
+  return 0;
+#else
+  env->die(env, stack, "WSAEAFNOSUPPORT is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEALREADY(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEALREADY
+  stack[0].ival = WSAEALREADY;
+  return 0;
+#else
+  env->die(env, stack, "WSAEALREADY is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEBADF(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEBADF
+  stack[0].ival = WSAEBADF;
+  return 0;
+#else
+  env->die(env, stack, "WSAEBADF is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAECANCELLED(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAECANCELLED
+  stack[0].ival = WSAECANCELLED;
+  return 0;
+#else
+  env->die(env, stack, "WSAECANCELLED is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAECONNABORTED(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAECONNABORTED
+  stack[0].ival = WSAECONNABORTED;
+  return 0;
+#else
+  env->die(env, stack, "WSAECONNABORTED is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAECONNREFUSED(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAECONNREFUSED
+  stack[0].ival = WSAECONNREFUSED;
+  return 0;
+#else
+  env->die(env, stack, "WSAECONNREFUSED is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAECONNRESET(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAECONNRESET
+  stack[0].ival = WSAECONNRESET;
+  return 0;
+#else
+  env->die(env, stack, "WSAECONNRESET is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEDESTADDRREQ(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEDESTADDRREQ
+  stack[0].ival = WSAEDESTADDRREQ;
+  return 0;
+#else
+  env->die(env, stack, "WSAEDESTADDRREQ is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEDISCON(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEDISCON
+  stack[0].ival = WSAEDISCON;
+  return 0;
+#else
+  env->die(env, stack, "WSAEDISCON is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEDQUOT(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEDQUOT
+  stack[0].ival = WSAEDQUOT;
+  return 0;
+#else
+  env->die(env, stack, "WSAEDQUOT is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEFAULT(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEFAULT
+  stack[0].ival = WSAEFAULT;
+  return 0;
+#else
+  env->die(env, stack, "WSAEFAULT is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEHOSTDOWN(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEHOSTDOWN
+  stack[0].ival = WSAEHOSTDOWN;
+  return 0;
+#else
+  env->die(env, stack, "WSAEHOSTDOWN is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEHOSTUNREACH(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEHOSTUNREACH
+  stack[0].ival = WSAEHOSTUNREACH;
+  return 0;
+#else
+  env->die(env, stack, "WSAEHOSTUNREACH is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEINPROGRESS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEINPROGRESS
+  stack[0].ival = WSAEINPROGRESS;
+  return 0;
+#else
+  env->die(env, stack, "WSAEINPROGRESS is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEINTR(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEINTR
+  stack[0].ival = WSAEINTR;
+  return 0;
+#else
+  env->die(env, stack, "WSAEINTR is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEINVAL(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEINVAL
+  stack[0].ival = WSAEINVAL;
+  return 0;
+#else
+  env->die(env, stack, "WSAEINVAL is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEINVALIDPROCTABLE(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEINVALIDPROCTABLE
+  stack[0].ival = WSAEINVALIDPROCTABLE;
+  return 0;
+#else
+  env->die(env, stack, "WSAEINVALIDPROCTABLE is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEINVALIDPROVIDER(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEINVALIDPROVIDER
+  stack[0].ival = WSAEINVALIDPROVIDER;
+  return 0;
+#else
+  env->die(env, stack, "WSAEINVALIDPROVIDER is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEISCONN(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEISCONN
+  stack[0].ival = WSAEISCONN;
+  return 0;
+#else
+  env->die(env, stack, "WSAEISCONN is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAELOOP(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAELOOP
+  stack[0].ival = WSAELOOP;
+  return 0;
+#else
+  env->die(env, stack, "WSAELOOP is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEMFILE(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEMFILE
+  stack[0].ival = WSAEMFILE;
+  return 0;
+#else
+  env->die(env, stack, "WSAEMFILE is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEMSGSIZE(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEMSGSIZE
+  stack[0].ival = WSAEMSGSIZE;
+  return 0;
+#else
+  env->die(env, stack, "WSAEMSGSIZE is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAENAMETOOLONG(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAENAMETOOLONG
+  stack[0].ival = WSAENAMETOOLONG;
+  return 0;
+#else
+  env->die(env, stack, "WSAENAMETOOLONG is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAENETDOWN(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAENETDOWN
+  stack[0].ival = WSAENETDOWN;
+  return 0;
+#else
+  env->die(env, stack, "WSAENETDOWN is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAENETRESET(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAENETRESET
+  stack[0].ival = WSAENETRESET;
+  return 0;
+#else
+  env->die(env, stack, "WSAENETRESET is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAENETUNREACH(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAENETUNREACH
+  stack[0].ival = WSAENETUNREACH;
+  return 0;
+#else
+  env->die(env, stack, "WSAENETUNREACH is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAENOBUFS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAENOBUFS
+  stack[0].ival = WSAENOBUFS;
+  return 0;
+#else
+  env->die(env, stack, "WSAENOBUFS is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAENOMORE(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAENOMORE
+  stack[0].ival = WSAENOMORE;
+  return 0;
+#else
+  env->die(env, stack, "WSAENOMORE is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAENOPROTOOPT(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAENOPROTOOPT
+  stack[0].ival = WSAENOPROTOOPT;
+  return 0;
+#else
+  env->die(env, stack, "WSAENOPROTOOPT is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAENOTCONN(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAENOTCONN
+  stack[0].ival = WSAENOTCONN;
+  return 0;
+#else
+  env->die(env, stack, "WSAENOTCONN is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAENOTEMPTY(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAENOTEMPTY
+  stack[0].ival = WSAENOTEMPTY;
+  return 0;
+#else
+  env->die(env, stack, "WSAENOTEMPTY is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAENOTSOCK(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAENOTSOCK
+  stack[0].ival = WSAENOTSOCK;
+  return 0;
+#else
+  env->die(env, stack, "WSAENOTSOCK is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEOPNOTSUPP(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEOPNOTSUPP
+  stack[0].ival = WSAEOPNOTSUPP;
+  return 0;
+#else
+  env->die(env, stack, "WSAEOPNOTSUPP is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEPFNOSUPPORT(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEPFNOSUPPORT
+  stack[0].ival = WSAEPFNOSUPPORT;
+  return 0;
+#else
+  env->die(env, stack, "WSAEPFNOSUPPORT is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEPROCLIM(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEPROCLIM
+  stack[0].ival = WSAEPROCLIM;
+  return 0;
+#else
+  env->die(env, stack, "WSAEPROCLIM is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEPROTONOSUPPORT(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEPROTONOSUPPORT
+  stack[0].ival = WSAEPROTONOSUPPORT;
+  return 0;
+#else
+  env->die(env, stack, "WSAEPROTONOSUPPORT is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEPROTOTYPE(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEPROTOTYPE
+  stack[0].ival = WSAEPROTOTYPE;
+  return 0;
+#else
+  env->die(env, stack, "WSAEPROTOTYPE is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEPROVIDERFAILEDINIT(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEPROVIDERFAILEDINIT
+  stack[0].ival = WSAEPROVIDERFAILEDINIT;
+  return 0;
+#else
+  env->die(env, stack, "WSAEPROVIDERFAILEDINIT is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEREFUSED(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEREFUSED
+  stack[0].ival = WSAEREFUSED;
+  return 0;
+#else
+  env->die(env, stack, "WSAEREFUSED is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEREMOTE(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEREMOTE
+  stack[0].ival = WSAEREMOTE;
+  return 0;
+#else
+  env->die(env, stack, "WSAEREMOTE is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAESHUTDOWN(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAESHUTDOWN
+  stack[0].ival = WSAESHUTDOWN;
+  return 0;
+#else
+  env->die(env, stack, "WSAESHUTDOWN is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAESOCKTNOSUPPORT(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAESOCKTNOSUPPORT
+  stack[0].ival = WSAESOCKTNOSUPPORT;
+  return 0;
+#else
+  env->die(env, stack, "WSAESOCKTNOSUPPORT is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAESTALE(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAESTALE
+  stack[0].ival = WSAESTALE;
+  return 0;
+#else
+  env->die(env, stack, "WSAESTALE is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAETIMEDOUT(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAETIMEDOUT
+  stack[0].ival = WSAETIMEDOUT;
+  return 0;
+#else
+  env->die(env, stack, "WSAETIMEDOUT is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAETOOMANYREFS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAETOOMANYREFS
+  stack[0].ival = WSAETOOMANYREFS;
+  return 0;
+#else
+  env->die(env, stack, "WSAETOOMANYREFS is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEUSERS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEUSERS
+  stack[0].ival = WSAEUSERS;
+  return 0;
+#else
+  env->die(env, stack, "WSAEUSERS is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Errno__WSAEWOULDBLOCK(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef WSAEWOULDBLOCK
+  stack[0].ival = WSAEWOULDBLOCK;
+  return 0;
+#else
+  env->die(env, stack, "WSAEWOULDBLOCK is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}

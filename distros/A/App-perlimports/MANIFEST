@@ -177,6 +177,10 @@ test-data/lib/Local/UsesUsesImportInto.pm
 test-data/lib/Local/ViaExporter.pm
 test-data/lib/Local/ViaSubExporter.pm
 test-data/lib/Local/WithInnerPkg.pm
+test-data/lint-failure-duplicate-import.pl
+test-data/lint-failure-import-args.pl
+test-data/lint-failure-unused-import.pl
+test-data/lint-success.pl
 test-data/lookalike-words.pl
 test-data/messy-imports.pl
 test-data/meta.t

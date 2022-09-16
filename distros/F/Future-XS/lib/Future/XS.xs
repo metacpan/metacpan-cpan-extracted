@@ -15,12 +15,24 @@
 
 #include "av-utils.c.inc"
 
+#define warn_void_context(func)  S_warn_void_context(aTHX_ func)
+static void S_warn_void_context(pTHX_ const char *func)
+{
+  if(GIMME_V == G_VOID)
+    warn("Calling ->%s in void context", func);
+}
+
 MODULE = Future::XS    PACKAGE = Future::XS
 
 SV *
-new(char *cls)
+new(SV *proto)
   CODE:
-    RETVAL = future_new(cls);
+    if(SvROK(proto) && SvOBJECT(SvRV(proto))) {
+      HV *protostash = SvSTASH(SvRV(proto));
+      RETVAL = future_new(HvNAME(protostash));
+    }
+    else
+      RETVAL = future_new(SvPV_nolen(proto));
   OUTPUT:
     RETVAL
 
@@ -125,11 +137,17 @@ on_ready(SV *self, SV *code)
   OUTPUT:
     RETVAL
 
-void
+SV *
 await(SV *self)
   CODE:
+    if(future_is_ready(self)) {
+      RETVAL = newSVsv(ST(0));
+      XSRETURN(1);
+    }
     croak("%" SVf " is not yet complete and does not provide an ->await method",
       SVfARG(self));
+  OUTPUT:
+    RETVAL
 
 void
 result(SV *self)
@@ -206,6 +224,18 @@ then(SV *self, ...)
     then        = 0
     then_with_f = FUTURE_THEN_WITH_F
   CODE:
+    if(GIMME_V == G_VOID) {
+      // Need to ensure we print the ->transform message right
+      const PERL_CONTEXT *cx = caller_cx(0, NULL);
+      if(CxTYPE(cx) == CXt_SUB &&
+        strEQ(GvNAME(CvGV(cx->blk_sub.cv)), "transform")) {
+        warn_void_context("transform");
+      }
+      else {
+        warn_void_context(ix ? "then_with_f" : "then");
+      }
+    }
+
     items--; /* account for self */
 
     SV *thencode = &PL_sv_undef;
@@ -240,6 +270,7 @@ else(SV *self, SV *code)
     else        = 0
     else_with_f = FUTURE_THEN_WITH_F
   CODE:
+    warn_void_context(ix ? "else_with_f" : "else");
     RETVAL = future_then(self, ix, NULL, code);
   OUTPUT:
     RETVAL
@@ -250,6 +281,7 @@ catch(SV *self, ...)
     catch        = 0
     catch_with_f = FUTURE_THEN_WITH_F
   CODE:
+    warn_void_context(ix ? "catch_with_f" : "catch");
     items--; /* account for self */
 
     SV *elsecode = &PL_sv_undef;
@@ -270,6 +302,7 @@ catch(SV *self, ...)
 SV *
 followed_by(SV *self, SV *code)
   CODE:
+    warn_void_context("followed_by");
     RETVAL = future_followed_by(self, code);
   OUTPUT:
     RETVAL
@@ -371,6 +404,11 @@ udata(SV *self, SV *name)
     RETVAL = newSVsv(future_get_udata(self, name));
   OUTPUT:
     RETVAL
+
+void
+reread_environment()
+  CODE:
+    Future_reread_environment(aTHX);
 
 BOOT:
   future_boot();

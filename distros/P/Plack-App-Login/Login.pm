@@ -5,14 +5,16 @@ use strict;
 use warnings;
 
 use CSS::Struct::Output::Raw;
+use Error::Pure qw(err);
 use Plack::Util::Accessor qw(css generator login_link login_title tags title);
+use Scalar::Util qw(blessed);
 use Tags::HTML::Login::Button;
 use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 
 sub call {
 	my ($self, $env) = @_;
@@ -33,11 +35,19 @@ sub call {
 sub prepare_app {
 	my $self = shift;
 
-	if (! $self->css || ! $self->css->isa('CSS::Struct::Output')) {
+	if ($self->css) {
+		if (! blessed($self->css) || ! $self->css->isa('CSS::Struct::Output')) {
+			err "Bad 'CSS::Struct::Output' object.";
+		}
+	} else {
 		$self->css(CSS::Struct::Output::Raw->new);
 	}
 
-	if (! $self->tags || ! $self->tags->isa('Tags::Output')) {
+	if ($self->tags) {
+		if (! blessed($self->tags) || ! $self->tags->isa('Tags::Output')) {
+			err "Bad 'Tags::Output' object.";
+		}
+	} else {
 		$self->tags(Tags::Output::Raw->new('xml' => 1));
 	}
 
@@ -185,6 +195,8 @@ Returns Plack::Component object.
 
 =head1 EXAMPLE
 
+=for comment filename=login_psgi.pl
+
  use strict;
  use warnings;
 
@@ -248,7 +260,9 @@ Returns Plack::Component object.
 =head1 DEPENDENCIES
 
 L<CSS::Struct::Output::Raw>,
+L<Error::Pure>,
 L<Plack::Util::Accessor>,
+L<Scalar::Util>,
 L<Tags::HTML::Login::Button>,
 L<Tags::HTML::Page::Begin>,
 L<Tags::HTML::Page::End>,
@@ -273,6 +287,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.06
 
 =cut

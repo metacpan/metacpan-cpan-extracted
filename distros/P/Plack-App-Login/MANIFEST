@@ -1,5 +1,5 @@
 Changes
-examples/ex1.pl
+examples/login_psgi.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -21,5 +21,6 @@ SIGNATURE
 t/Plack-App-Login/01-use.t
 t/Plack-App-Login/02-version.t
 t/Plack-App-Login/03-general.t
+t/Plack-App-Login/04-prepare_app_errors.t
 xt/Plack-App-Login/01-pod_coverage.t
 xt/Plack-App-Login/02-pod.t

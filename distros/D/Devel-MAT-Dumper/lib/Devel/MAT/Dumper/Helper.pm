@@ -8,7 +8,7 @@ package Devel::MAT::Dumper::Helper;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 =head1 NAME
 
@@ -25,14 +25,14 @@ In F<Build.PL>
 In your module's XS source:
 
    #ifdef HAVE_DMD_HELPER
-   #  WANT_DMD_API_044
+   #  define WANT_DMD_API_044
    #  include "DMD_helper.h"
    #endif
 
    ...
 
    #ifdef HAVE_DMD_HELPER
-   static int dumpstruct(pTHX_ const SV *sv)
+   static int dumpstruct(pTHX_ DMDContext *ctx, const SV *sv)
    {
      int ret = 0;
 
@@ -43,7 +43,7 @@ In your module's XS source:
      return ret;
    }
 
-   static int dumpmagic(pTHX_ const SV *sv, MAGIC *mg)
+   static int dumpmagic(pTHX_ DMDContext *ctx, const SV *sv, MAGIC *mg)
    {
      int ret = 0;
 

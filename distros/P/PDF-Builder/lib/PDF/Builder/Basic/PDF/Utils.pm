@@ -18,8 +18,8 @@ package PDF::Builder::Basic::PDF::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -30,6 +30,8 @@ PDF::Builder::Basic::PDF::Utils - Utility functions for PDF library
 A set of utility functions to save the fingers of the PDF library users!
 
 =head1 FUNCTIONS
+
+=over
 
 =cut
 
@@ -48,7 +50,7 @@ use vars qw(@EXPORT @ISA);
 @EXPORT = qw(PDFBool PDFArray PDFDict PDFName PDFNull
              PDFNum PDFString PDFStr PDFStrHex PDFUtf);
 
-=head2 PDFBool()
+=item PDFBool()
 
 Creates a Bool via PDF::Builder::Basic::PDF::Bool->new()
 
@@ -58,7 +60,7 @@ sub PDFBool {
     return PDF::Builder::Basic::PDF::Bool->new(@_);
 }
 
-=head2 PDFArray()
+=item PDFArray()
 
 Creates an array via PDF::Builder::Basic::PDF::Array->new()
 
@@ -68,7 +70,7 @@ sub PDFArray {
     return PDF::Builder::Basic::PDF::Array->new(@_);
 }
 
-=head2 PDFDict()
+=item PDFDict()
 
 Creates a dict via PDF::Builder::Basic::PDF::Dict->new()
 
@@ -78,7 +80,7 @@ sub PDFDict {
     return PDF::Builder::Basic::PDF::Dict->new(@_);
 }
 
-=head2 PDFName()
+=item PDFName()
 
 Creates a name via PDF::Builder::Basic::PDF::Name->new()
 
@@ -88,7 +90,7 @@ sub PDFName {
     return PDF::Builder::Basic::PDF::Name->new(@_);
 }
 
-=head2 PDFNull()
+=item PDFNull()
 
 Creates a null via PDF::Builder::Basic::PDF::Null->new()
 
@@ -98,7 +100,7 @@ sub PDFNull {
     return PDF::Builder::Basic::PDF::Null->new(@_);
 }
 
-=head2 PDFNum()
+=item PDFNum()
 
 Creates a number via PDF::Builder::Basic::PDF::Number->new()
 
@@ -108,7 +110,7 @@ sub PDFNum {
     return PDF::Builder::Basic::PDF::Number->new(@_);
 }
 
-=head2 PDFString($text, $usage)
+=item PDFString($text, $usage)
 
 Returns either PDFStr($text) or PDFUtf($text), depending on whether C<$text>
 is already in UTF-8 and whether the C<$usage> permits UTF-8. If UTF-8 is I<not>
@@ -182,7 +184,7 @@ sub PDFString {
     }
 }
 
-=head2 PDFStr()
+=item PDFStr()
 
 Creates a string via PDF::Builder::Basic::PDF::String->new()
 
@@ -194,7 +196,7 @@ sub PDFStr {
     return PDF::Builder::Basic::PDF::String->new(@_);
 }
 
-=head2 PDFStrHex()
+=item PDFStrHex()
 
 Creates a hex-string via PDF::Builder::Basic::PDF::String->new()
 
@@ -206,7 +208,7 @@ sub PDFStrHex {
     return $string;
 }
 
-=head2 PDFUtf()
+=item PDFUtf()
 
 Creates a utf8-string via PDF::Builder::Basic::PDF::String->new()
 
@@ -219,5 +221,9 @@ sub PDFUtf {
     $string->{' isutf'} = 1;
     return $string;
 }
+
+=back
+
+=cut
 
 1;

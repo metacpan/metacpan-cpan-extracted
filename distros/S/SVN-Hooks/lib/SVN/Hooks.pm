@@ -1,6 +1,6 @@
 package SVN::Hooks;
 # ABSTRACT: Framework for implementing Subversion hooks
-$SVN::Hooks::VERSION = '1.35';
+$SVN::Hooks::VERSION = '1.36';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ sub run_hook {
 
         # The configuration file must be evaluated in the main:: namespace
 	package main;
-$main::VERSION = '1.35';
+$main::VERSION = '1.36';
 unless (my $return = do $conffile) {
 	    die "couldn't parse '$conffile': $@\n" if $@;
 	    die "couldn't do '$conffile': $!\n"    unless defined $return;
@@ -196,7 +196,7 @@ SVN::Hooks - Framework for implementing Subversion hooks
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 SYNOPSIS
 

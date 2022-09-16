@@ -4,10 +4,9 @@ use base 'PDF::Builder::Resource::Font';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use File::Basename;
 
@@ -20,16 +19,22 @@ our $subs;
 
 =head1 NAME
 
-PDF::Builder::Resource::Font::CoreFont - Module for using the 14 PDF built-in Fonts.
+PDF::Builder::Resource::Font::CoreFont - Module for using the 14 standard PDF built-in Fonts (plus 15 Windows Fonts).
 
 =head1 SYNOPSIS
 
     #
     use PDF::Builder;
     #
-    $pdf = PDF::Builder->new();
-    $cft = $pdf->corefont('Times-Roman');
+    my $pdf = PDF::Builder->new();
+    my $cft = $pdf->font('Times-Roman');
+   #my $cft = $pdf->corefont('Times-Roman');
     #
+    my $page = $pdf->page();
+    my $text = $page->text();
+    $text->font($cft, 20);
+    $text->translate(200, 700);
+    $text->text("Hello, World!");
 
 =head1 METHODS
 
@@ -37,24 +42,22 @@ PDF::Builder::Resource::Font::CoreFont - Module for using the 14 PDF built-in Fo
 
 =item $font = PDF::Builder::Resource::Font::CoreFont->new($pdf, $fontname, %options)
 
-=item $font = PDF::Builder::Resource::Font::CoreFont->new($pdf, $fontname)
-
 Returns a corefont object.
-
-=cut
-
-=pod
 
 Valid %options are:
 
-I<-encode>
+=over
+
+I<encode>
 ... changes the encoding of the font from its default.
 See I<perl's Encode> for the supported values. B<Warning:> only single byte 
 encodings are permitted. Multibyte encodings such as 'utf8' are forbidden.
 
-I<-pdfname> ... changes the reference-name of the font from its default.
+I<pdfname> ... changes the reference-name of the font from its default.
 The reference-name is normally generated automatically and can be
 retrieved via C<$pdfname=$font->name()>.
+
+=back
 
 =back
 
@@ -64,19 +67,23 @@ B<standard PDF types>
 
 =over
 
-=item helvetica helveticaoblique helveticabold helvetiaboldoblique
+=over
+
+=item * helvetica helveticaoblique helveticabold helvetiaboldoblique
 
 May have Arial substituted on some systems (e.g., Windows)
 
-=item courier courieroblique courierbold courierboldoblique
+=item * courier courieroblique courierbold courierboldoblique
 
 Fixed pitch, may have Courier New substituted on some systems (e.g., Windows)
 
-=item timesroman timesitalic timesbold timesbolditalic
+=item * timesroman timesitalic timesbold timesbolditalic
 
 May have Times New Roman substituted on some systems (e.g., Windows)
 
-=item symbol zapfdingbats
+=item * symbol zapfdingbats
+
+=back
 
 =back
 
@@ -84,17 +91,21 @@ B<Primarily Windows typefaces>
 
 =over
 
-=item georgia georgiaitalic georgiabold georgiabolditalic
+=over
 
-=item verdana verdanaitalic verdanabold verdanabolditalic
+=item * georgia georgiaitalic georgiabold georgiabolditalic
 
-=item trebuchet trebuchetitalic trebuchetbold trebuchetbolditalic
+=item * verdana verdanaitalic verdanabold verdanabolditalic
 
-=item bankgothic bankgothicitalic bankgothicbold bankgothicitalic
+=item * trebuchet trebuchetitalic trebuchetbold trebuchetbolditalic
+
+=item * bankgothic bankgothicitalic bankgothicbold bankgothicitalic
 
 Free versions of Bank Gothic are often only medium weight.
 
-=item webdings wingdings
+=item * webdings wingdings
+
+=back
 
 =back
 
@@ -161,6 +172,7 @@ sub new {
 
     my ($self,$data);
     my %opts = ();
+    my $is_standard = is_standard($name);
 
     if (-f $name) {
         eval "require '$name'; "; ## no critic
@@ -169,9 +181,14 @@ sub new {
     my $lookname = lc($name);
     $lookname =~ s/[^a-z0-9]+//gi;
     %opts = @opts if (scalar @opts)%2 == 0;
-    $opts{'-encode'} ||= 'asis';
+    # copy dashed name options to preferred undashed names
+    if (defined $opts{'-encode'} && !defined $opts{'encode'}) { $opts{'encode'} = delete($opts{'-encode'}); }
+    if (defined $opts{'-metrics'} && !defined $opts{'metrics'}) { $opts{'metrics'} = delete($opts{'-metrics'}); }
+    if (defined $opts{'-dokern'} && !defined $opts{'dokern'}) { $opts{'dokern'} = delete($opts{'-dokern'}); }
+    if (defined $opts{'-pdfname'} && !defined $opts{'pdfname'}) { $opts{'pdfname'} = delete($opts{'-pdfname'}); }
 
-    $lookname = defined($alias->{$lookname})? $alias->{$lookname}: $lookname ;
+    $opts{'encode'} //= 'latin1';
+    $lookname = $alias->{$lookname} if $alias->{$lookname};
 
     if (defined $subs->{$lookname}) {
         $data = {_look_for_font($subs->{$lookname}->{'-alias'})};
@@ -180,10 +197,10 @@ sub new {
             $data->{$k} = $subs->{$lookname}->{$k};
         }
     } else {
-        unless (defined $opts{'-metrics'}) {
+        unless (defined $opts{'metrics'}) {
             $data = {_look_for_font($lookname)};
         } else {
-            $data = {%{$opts{'-metrics'}}};
+            $data = {%{$opts{'metrics'}}};
         }
     }
 
@@ -207,28 +224,69 @@ sub new {
     $self = $class->SUPER::new($pdf, $data->{'apiname'}.pdfkey());
     $pdf->new_obj($self) unless $self->is_obj($pdf);
     $self->{' data'} = $data;
-    $self->{'-dokern'} = 1 if $opts{'-dokern'};
+    $self->{'-dokern'} = 1 if $opts{'dokern'};
 
     $self->{'Subtype'} = PDFName($self->data()->{'type'});
     $self->{'BaseFont'} = PDFName($self->fontname());
-    if ($opts{'-pdfname'}) {
-        $self->name($opts{'-pdfname'});
+    if ($opts{'pdfname'}) {
+        $self->name($opts{'pdfname'});
     }
 
     unless ($self->data()->{'iscore'}) {
         $self->{'FontDescriptor'} = $self->descrByData();
     }
 
-    if ($opts{'-encode'} =~ m/^utf/i) {
-	die "Invalid multibyte encoding for corefont: $opts{'-encode'}\n";
+    if ($opts{'encode'} =~ m/^utf/i) {
+	die "Invalid multibyte encoding for corefont: $opts{'encode'}\n";
 	# probably more encodings to check
     }
-    $self->encodeByData($opts{'-encode'});
+    $self->encodeByData($opts{'encode'});
+
+    # The standard non-symbolic fonts use unmodified WinAnsiEncoding.
+    if ($is_standard and not $self->issymbol() and not $opts{'encode'}) {
+        $self->{'Encoding'} = PDFName('WinAnsiEncoding');
+        delete $self->{'FirstChar'};
+        delete $self->{'LastChar'};
+        delete $self->{'Widths'};
+    }
 
     return $self;
 }
 
 =over
+
+=item $bool = $class->is_standard($name)
+
+Returns true if C<$name> is an exact, case-sensitive match for one of the
+standard font names shown above.
+
+=cut
+
+sub is_standard {
+    my $name = pop();
+
+    return 1 if $name eq 'Courier';
+    return 1 if $name eq 'Courier-Bold';
+    return 1 if $name eq 'Courier-BoldOblique';
+    return 1 if $name eq 'Courier-Oblique';
+    return 1 if $name eq 'Helvetica';
+    return 1 if $name eq 'Helvetica-Bold';
+    return 1 if $name eq 'Helvetica-BoldOblique';
+    return 1 if $name eq 'Helvetica-Oblique';
+    return 1 if $name eq 'Symbol';
+    return 1 if $name eq 'Times-Bold';
+    return 1 if $name eq 'Times-BoldItalic';
+    return 1 if $name eq 'Times-Italic';
+    return 1 if $name eq 'Times-Roman';
+    return 1 if $name eq 'ZapfDingbats';
+    # TBD what about the 15 Windows fonts?
+    # BankGothic
+    # Georgia (plus italic, bold, bold-italic)
+    # Trebuchet (plus italic, bold, bold-italic)
+    # Verdana (plus italic, bold, bold-italic)
+    # Webdings, Wingdings
+    return;
+}
 
 =item PDF::Builder::Resource::Font::CoreFont->loadallfonts()
 
@@ -238,7 +296,7 @@ sub new {
 
 sub loadallfonts {
     foreach my $f (qw[
-	    bankgothic bankgothicbold bankgothicbolditalic bankgothicitalic
+	bankgothic 
         courier courierbold courierboldoblique courieroblique
         georgia georgiabold georgiabolditalic georgiaitalic
         helveticaboldoblique helveticaoblique helveticabold helvetica

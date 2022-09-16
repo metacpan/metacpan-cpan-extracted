@@ -4,11 +4,8 @@ use Path::Tiny qw(path);
 plugin 'PkgConfig' => 'libmaxminddb';
 
 share {
-  start_url 'https://github.com/maxmind/libmaxminddb/releases';
-  plugin 'Download' => (
-    filter => qr/^libmaxminddb-[0-9\.]+\.tar\.gz$/,
-    version => qr/^libmaxminddb-([0-9\.]+)\.tar\.gz$/,
-  );
+  start_url 'https://github.com/maxmind/libmaxminddb/releases/download/1.6.0/libmaxminddb-1.6.0.tar.gz';
+  plugin 'Download';
   plugin 'Extract' => 'tar.gz';
   plugin 'Build::Autoconf';
   patch \&patch_pkgconfig;

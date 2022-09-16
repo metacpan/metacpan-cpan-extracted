@@ -4,10 +4,9 @@ use base 'PDF::Builder::Resource::ColorSpace';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -21,26 +20,24 @@ PDF::Builder::Resource::ColorSpace::Separation - Support for color space separat
 
 =over
 
-=item $cs = PDF::Builder::Resource::ColorSpace::Separation->new($pdf, $key, %parameters)
+=item $cs = PDF::Builder::Resource::ColorSpace::Separation->new($pdf, $key, @colors)
 
 Returns a new colorspace object.
 
 =cut
 
 sub new {
-    my ($class, $pdf, $key, @opts) = @_;
+    my ($class, $pdf, $key, $name, @clr) = @_;
 
-    my ($name, @clr) = @opts;
-
-    $class = ref $class if ref $class;
-    my $self = $class->SUPER::new($pdf, $key, @opts);
+    $class = ref($class) if ref($class);
+    my $self = $class->SUPER::new($pdf, $key);
     $pdf->new_obj($self) unless $self->is_obj($pdf);
     $self->{' apipdf'} = $pdf;
     weaken $self->{' apipdf'};
 
     my $fct = PDFDict();
 
-    my $csname = 'DeviceRGB';
+    my $csname;
     $clr[0] = lc($clr[0]);
     $self->color(@clr);
     if      ($clr[0] =~ /^[a-z\#\!]+/) {
@@ -48,6 +45,7 @@ sub new {
         # with rgb target colorspace
         # namecolor returns always a RGB
         my ($r,$g,$b) = namecolor($clr[0]);
+	$csname = 'DeviceRGB';
 
         $fct->{'FunctionType'} = PDFNum(0);
         $fct->{'Size'} = PDFArray(PDFNum(2));
@@ -69,9 +67,8 @@ sub new {
         $fct->{' stream'}="\x00\x00\x00\x00\xff\xff\xff\xff";
     } elsif (scalar @clr == 1) {
         # grey color spec.
-        while ($clr[0] > 1) { 
-	    $clr[0] /= 255; 
-        }
+	$clr[0] /= 255 while $clr[0] > 1; 
+
         # adjusted for 8/16/32bit spec.
         my $g = $clr[0];
         $csname = 'DeviceGray';
@@ -85,6 +82,7 @@ sub new {
     } elsif (scalar @clr == 3) {
         # legacy rgb color-spec (0 <= x <= 1)
         my ($r,$g,$b) = @clr;
+        $csname = 'DeviceRGB';
 
         $fct->{'FunctionType'} = PDFNum(0);
         $fct->{'Size'} = PDFArray(PDFNum(2));
@@ -108,7 +106,10 @@ sub new {
     }
     $self->type($csname);
     $pdf->new_obj($fct);
-    $self->add_elements(PDFName('Separation'), PDFName($name), PDFName($csname), $fct);
+    $self->add_elements(PDFName('Separation'), 
+	                PDFName($name), 
+			PDFName($csname), 
+			$fct);
     $self->tintname($name);
     return $self;
 }
@@ -122,10 +123,10 @@ Returns the base-color of the Separation-Colorspace.
 sub color {
     my $self = shift;
 
-    if (scalar @_ >0 && defined($_[0])) {
+    if (@_ && defined $_[0]) {
         $self->{' color'} = [@_];
     }
-    return (@{$self->{' color'}});
+    return @{$self->{' color'}};
 }
 
 =item $tintname = $res->tintname($tintname)
@@ -137,10 +138,10 @@ Returns the tint-name of the Separation-Colorspace.
 sub tintname {
     my $self = shift;
 
-    if (scalar @_ >0 && defined($_[0])) {
+    if (@_ && defined $_[0]) {
         $self->{' tintname'} = [@_];
     }
-    return (@{$self->{' tintname'}});
+    return @{$self->{' tintname'}};
 }
 
 sub param {

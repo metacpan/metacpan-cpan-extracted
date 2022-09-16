@@ -14,7 +14,7 @@ MarpaX::ESLIF::Introduction - MarpaX::ESLIF's Introduction
 
 =head1 VERSION
 
-version 6.0.25
+version 6.0.26
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,7 @@ version 6.0.25
    *
   */
   :discard ::= /[\s]+/
-  
+
   exp ::=
       /[\d]+/
       |    "("  exp ")"    assoc => group action => ::copy[1]

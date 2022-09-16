@@ -8,22 +8,13 @@ my $build_requires = {
     };
 
 my $prereq_pm = {
-        'App::MonM'             => 1.06,
-        'Class::C3::Adopt::NEXT'=> 0.13,
-        'Compress::Raw::Zlib'   => 0,
-        'CTK'                   => 2.01,
-        'DBI'                   => 1.60,
-        'DBD::SQLite'           => 1.40,
-        'Email::MIME'           => 1.90, # libemail-mime-perl
-        'Email::Sender'         => 1.30, # libemail-sender-perl
-        'File::Copy'            => 2.18,
-        'File::Find'            => 1.15,
-        'File::HomeDir'         => 1.00,
-        'Text::SimpleTable'     => 2.03,
-        'Time::Local'           => 0,
-        'Try::Tiny'             => 0.07,
+        'App::MonM'             => 1.09,
+        'CTK'                   => 2.09, # libctk-perl
+        'DBI'                   => 1.60, # libdbi-perl
+        'DBD::SQLite'           => 1.40, # libdbd-sqlite3-perl
+        'Text::SimpleTable'     => 2.03, # libtext-simpletable-perl
+        'MIME::Base64'          => 3.00, # libemail-mime-encodings-perl
     };
-
 
 my $exefiles = [qw(
         bin/monotifier
@@ -45,6 +36,9 @@ WriteMakefile(
             repository      => 'https://svn.code.sf.net/p/app-monm-notifier/code/trunk',
             license         => 'https://dev.perl.org/licenses',
         },
+    },
+    clean => {
+        FILES => '*.db',
     },
 );
 

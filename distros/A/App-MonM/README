@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 1.06
+    Version 1.09
 
 SYNOPSIS
 
@@ -37,14 +37,17 @@ DESCRIPTION
 
     Perl v5.16+
 
-    libwww
+    libwww <https://github.com/libwww-perl/libwww-perl>
 
-    libnet
+    libnet <https://metacpan.org/dist/libnet>
 
-    Net-SNMP <http://net-snmp.sourceforge.net>
+    Email::MIME <https://github.com/rjbs/Email-MIME>
 
-      To use this module, you must have Net-SNMP installed on your system.
-      More specifically you need the Perl modules that come with it.
+    Net-SNMP <https://net-snmp.sourceforge.io/>
+
+      To use this module in full powerful, you must have Net-SNMP installed
+      on your system. More specifically you need the Perl modules that come
+      with it.
 
       DO NOT INSTALL SNMP or Net::SNMP from CPAN!
 
@@ -56,7 +59,7 @@ DESCRIPTION
       ./configure --with-perl-modules from the top directory of the
       net-snmp distribution.
 
-      Net-SNMP can be found at http://net-snmp.sourceforge.net
+      Net-SNMP can be found at https://net-snmp.sourceforge.io/
 
  INSTALLATION
 
@@ -70,20 +73,151 @@ DESCRIPTION
 
     By default configuration file located in /etc/monm directory
 
-    Every configuration directive detailed described in monm.conf file,
-    also see conf.d/checkit-foo.conf.sample file for MonM checkit
-    configuration
+    NOTE: each configuration option (directive) detailed describes in
+    monm.conf file, see also conf.d/checkit-foo.conf.sample file for
+    example of MonM checkit configuration
+
+  GENERAL DIRECTIVES
+
+    DaemonUser, DaemonGroup
+
+          DaemonUser monmu
+          DaemonGroup monmu
+
+      Defines a username and groupname for daemon working
+
+      Default: monmu
+
+    Expires
+
+          Expires 1d
+
+      Defines the lifetime of a record in the database. After this time,
+      the record from the database will be deleted automatically.
+
+      Format for time can be in any of the following forms:
+
+          20   -- in 20 seconds
+          180s -- in 180 seconds
+          2m   -- in 2 minutes
+          12h  -- in 12 hours
+          1d   -- in 1 day
+          3M   -- in 3 months
+          2y   -- in 2 years
+          3m   -- 3 minutes ago(!)
+
+      Default: 1d (1 day)
+
+    Interval
+
+          Interval 20
+
+      Defines worker interval. This interval determines how often the cycle
+      of checks will be started.
+
+      Default: 20
+
+    LogEnable
+
+          LogEnable on
+
+      Activate or deactivate the logging: on/off (yes/no)
+
+      Default: off
+
+    LogFile
+
+          LogFile /var/log/monm.log
+
+      Defines path to custom log file
+
+      Default: use syslog
+
+    LogIdent
+
+          LogIdent myProgramName
+
+      Defines LogIdent string. We not recommended use it
+
+      Default: none
+
+    LogLevel
+
+          LogLevel warning
+
+      Defines log level
+
+      Allowed levels: debug, info, notice, warning, error, crit, alert,
+      emerg, fatal, except
+
+      Default: debug
+
+    Workers
+
+          Workers 3
+
+      Defines workers number
+
+      Default: 3
+
+  USER AND GROUP DIRECTIVES
+
+    Group
+
+      The "Group" section combines several users into named groups. This
+      allows you to reduce the lists of recipients of notifications
+
+          <Group Foo>
+              Enable on
+              User Bob, Alice
+              User Ted
+          </Group>
+
+      Each group has a status - enabled/disabled (see Enable directive)
+
+    User
+
+      The User section allows you to define the user name and settings.
+
+          <User Bob>
+              Enable on
+
+              At Sun[off];Mon-Thu[08:30-12:30,13:30-18:00];Fri[10:00-20:30];Sat[off]
+
+              <Channel SendMail>
+                  To bob@example.com
+              </Channel>
+
+              <Channel SMSGW>
+                  To +1-424-254-5301
+                  At Mon-Fri[08:30-18:30]
+              </Channel>
+          </User>
+
+      Each user has a status - enabled/disabled (see Enable directive).
+      User settings are disabled by default. User settings contains channel
+      sections, the settings of which are taken either from globally
+      defined channel sections or from those defines within the scope of
+      this user only
+
+  CHANNEL DIRECTIVES
+
+    See "CONFIGURATION DIRECTIVES" in App::MonM::Channel
+
+  CHECKIT DIRECTIVES
+
+    See "CONFIGURATION DIRECTIVES" in App::MonM::Checkit
 
  CRONTAB
 
-    To automatically launch the program, we recommend using standard
+    To automatically launch the program, you can using standard
     scheduling tools, such as crontab
 
-        * * * * * monm -l checkit >/dev/null 2>>/var/log/monm-error.log
+        * * * * * monm checkit >/dev/null 2>>/var/log/monm-error.log
 
     For daily reporting:
 
-        0 8 * * * monm -l report >/dev/null 2>>/var/log/monm-error.log
+        0 8 * * * monm report >/dev/null 2>>/var/log/monm-error.log
 
 INTERNAL METHODS
 
@@ -93,23 +227,11 @@ INTERNAL METHODS
 
       See "again" in CTK
 
-    configure
+    notifier
 
-      The internal method for initializing the project
+          my $notifier = $app->notifier;
 
-    getdbi
-
-          my $dbi = $app->getdbi;
-
-      Returns DBI object
-
-    nope, skip, wow, yep
-
-          my $status = $app->nope("Format %s", "text");
-
-      Prints status message and returns status.
-
-      For nope returns - 0; for skip, wow, yep - 1
+      Returns the Notifier object
 
     notify
 
@@ -117,9 +239,21 @@ INTERNAL METHODS
 
       Sends notifications
 
+    raise
+
+          return $app->raise("Red message");
+
+      Sends message to STDERR and returns 0
+
+    store
+
+          my $store = $app->store();
+
+      Returns store object
+
     trigger
 
-          $app->trigger();
+          my @errors = $app->trigger();
 
       Runs triggers
 
@@ -127,29 +261,21 @@ HISTORY
 
     See Changes file
 
-DEPENDENCIES
-
-    CTK
-
 TO DO
 
     See TODO file
 
-BUGS
-
-    * none noted
-
 SEE ALSO
 
-    CTK
+    CTK, Email::MIME
 
 AUTHOR
 
-    Serż Minus (Sergey Lepenkov) http://www.serzik.com <abalama@cpan.org>
+    Serż Minus (Sergey Lepenkov) https://www.serzik.com <abalama@cpan.org>
 
 COPYRIGHT
 
-    Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+    Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 LICENSE
 

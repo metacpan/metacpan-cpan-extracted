@@ -1,0 +1,16 @@
+class Sys::Process::Tms : pointer_t {
+  # Class methods
+  
+  native static method new : Sys::Process::Tms ();
+  
+  # Instance methods
+  native method DESTROY : void ();
+  native method tms_utime : long ();
+  native method set_tms_utime : void ($time : long);
+  native method tms_stime : long ();
+  native method set_tms_stime : void ($time : long);
+  native method tms_cutime : long ();
+  native method set_tms_cutime : void ($time : long);
+  native method tms_cstime : long ();
+  native method set_tms_cstime : void ($time : long);
+}

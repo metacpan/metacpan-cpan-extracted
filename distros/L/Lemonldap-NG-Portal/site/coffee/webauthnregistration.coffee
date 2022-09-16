@@ -53,6 +53,7 @@ register = ->
 								setMsg resp.error, 'danger'
 							else setMsg 'webAuthnRegisterFailed', 'danger'
 						else if resp.result
+							$(document).trigger "mfaAdded", [ { "type": "webauthn" } ]
 							setMsg 'yourKeyIsRegistered', 'positive'
 					error: displayError
 			. catch (error) ->

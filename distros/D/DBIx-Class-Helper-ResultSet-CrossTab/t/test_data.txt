@@ -1,700 +1,700 @@
-Currant	Central African Republic	wholesale	619
-Currant	Central African Republic	e-commerce	589
-Currant	Central African Republic	own retail	899
-Currant	Central African Republic	broker	714
-Currant	Cocos (keeling) Islands	wholesale	272
-Currant	Cocos (keeling) Islands	e-commerce	4
-Currant	Cocos (keeling) Islands	own retail	401
-Currant	Cocos (keeling) Islands	broker	789
-Currant	Congo	wholesale	374
-Currant	Congo	e-commerce	899
-Currant	Congo	own retail	360
-Currant	Congo	broker	71
-Currant	Ecuador	wholesale	799
-Currant	Ecuador	e-commerce	400
-Currant	Ecuador	own retail	235
-Currant	Ecuador	broker	849
-Currant	Egypt	wholesale	818
-Currant	Egypt	e-commerce	317
-Currant	Egypt	own retail	74
-Currant	Egypt	broker	456
-Currant	Faroe Islands	wholesale	891
-Currant	Faroe Islands	e-commerce	438
-Currant	Faroe Islands	own retail	15
-Currant	Faroe Islands	broker	175
-Currant	Germany	wholesale	856
-Currant	Germany	e-commerce	124
-Currant	Germany	own retail	330
-Currant	Germany	broker	729
-Currant	Guinea-bissau	wholesale	463
-Currant	Guinea-bissau	e-commerce	594
-Currant	Guinea-bissau	own retail	961
-Currant	Guinea-bissau	broker	917
-Currant	Heard Island And Mcdonald Islands	wholesale	321
-Currant	Heard Island And Mcdonald Islands	e-commerce	138
-Currant	Heard Island And Mcdonald Islands	own retail	976
-Currant	Heard Island And Mcdonald Islands	broker	248
-Currant	India	wholesale	624
-Currant	India	e-commerce	730
-Currant	India	own retail	678
-Currant	India	broker	88
-Currant	Lebanon	wholesale	931
-Currant	Lebanon	e-commerce	952
-Currant	Lebanon	own retail	530
-Currant	Lebanon	broker	816
-Currant	Macau	wholesale	83
-Currant	Macau	e-commerce	293
-Currant	Macau	own retail	856
-Currant	Macau	broker	221
-Currant	Madagascar	wholesale	843
-Currant	Madagascar	e-commerce	767
-Currant	Madagascar	own retail	507
-Currant	Madagascar	broker	298
-Currant	Malaysia	wholesale	214
-Currant	Malaysia	e-commerce	816
-Currant	Malaysia	own retail	585
-Currant	Malaysia	broker	254
-Currant	Myanmar	wholesale	901
-Currant	Myanmar	e-commerce	816
-Currant	Myanmar	own retail	726
-Currant	Myanmar	broker	846
-Currant	Nauru	wholesale	17
-Currant	Nauru	e-commerce	434
-Currant	Nauru	own retail	745
-Currant	Nauru	broker	688
-Currant	Netherlands Antilles	wholesale	670
-Currant	Netherlands Antilles	e-commerce	45
-Currant	Netherlands Antilles	own retail	48
-Currant	Netherlands Antilles	broker	396
-Currant	Saint Pierre And Miquelon	wholesale	297
-Currant	Saint Pierre And Miquelon	e-commerce	423
-Currant	Saint Pierre And Miquelon	own retail	793
-Currant	Saint Pierre And Miquelon	broker	934
-Currant	Serbia	wholesale	807
-Currant	Serbia	e-commerce	803
-Currant	Serbia	own retail	271
-Currant	Serbia	broker	329
-Currant	Singapore	wholesale	411
-Currant	Singapore	e-commerce	762
-Currant	Singapore	own retail	270
-Currant	Singapore	broker	609
-Currant	Svalbard And Jan Mayen	wholesale	115
-Currant	Svalbard And Jan Mayen	e-commerce	532
-Currant	Svalbard And Jan Mayen	own retail	908
-Currant	Svalbard And Jan Mayen	broker	977
-Currant	Turkey	wholesale	821
-Currant	Turkey	e-commerce	567
-Currant	Turkey	own retail	534
-Currant	Turkey	broker	496
-Currant	Tuvalu	wholesale	910
-Currant	Tuvalu	e-commerce	66
-Currant	Tuvalu	own retail	156
-Currant	Tuvalu	broker	944
-Currant	United States	wholesale	516
-Currant	United States	e-commerce	822
-Currant	United States	own retail	540
-Currant	United States	broker	807
-Currant	Virgin Islands, U.s.	wholesale	925
-Currant	Virgin Islands, U.s.	e-commerce	993
-Currant	Virgin Islands, U.s.	own retail	684
-Currant	Virgin Islands, U.s.	broker	69
-Cherry	Central African Republic	wholesale	105
-Cherry	Central African Republic	e-commerce	200
-Cherry	Central African Republic	own retail	976
-Cherry	Central African Republic	broker	363
-Cherry	Cocos (keeling) Islands	wholesale	72
-Cherry	Cocos (keeling) Islands	e-commerce	673
-Cherry	Cocos (keeling) Islands	own retail	775
-Cherry	Cocos (keeling) Islands	broker	212
-Cherry	Congo	wholesale	980
-Cherry	Congo	e-commerce	951
-Cherry	Congo	own retail	697
-Cherry	Congo	broker	339
-Cherry	Ecuador	wholesale	820
-Cherry	Ecuador	e-commerce	935
-Cherry	Ecuador	own retail	954
-Cherry	Ecuador	broker	939
-Cherry	Egypt	wholesale	517
-Cherry	Egypt	e-commerce	747
-Cherry	Egypt	own retail	200
-Cherry	Egypt	broker	221
-Cherry	Faroe Islands	wholesale	809
-Cherry	Faroe Islands	e-commerce	182
-Cherry	Faroe Islands	own retail	487
-Cherry	Faroe Islands	broker	634
-Cherry	Germany	wholesale	714
-Cherry	Germany	e-commerce	101
-Cherry	Germany	own retail	814
-Cherry	Germany	broker	739
-Cherry	Guinea-bissau	wholesale	591
-Cherry	Guinea-bissau	e-commerce	603
-Cherry	Guinea-bissau	own retail	35
-Cherry	Guinea-bissau	broker	505
-Cherry	Heard Island And Mcdonald Islands	wholesale	998
-Cherry	Heard Island And Mcdonald Islands	e-commerce	494
-Cherry	Heard Island And Mcdonald Islands	own retail	425
-Cherry	Heard Island And Mcdonald Islands	broker	605
-Cherry	India	wholesale	92
-Cherry	India	e-commerce	480
-Cherry	India	own retail	302
-Cherry	India	broker	458
-Cherry	Lebanon	wholesale	213
-Cherry	Lebanon	e-commerce	596
-Cherry	Lebanon	own retail	758
-Cherry	Lebanon	broker	45
-Cherry	Macau	wholesale	419
-Cherry	Macau	e-commerce	106
-Cherry	Macau	own retail	748
-Cherry	Macau	broker	832
-Cherry	Madagascar	wholesale	947
-Cherry	Madagascar	e-commerce	56
-Cherry	Madagascar	own retail	735
-Cherry	Madagascar	broker	255
-Cherry	Malaysia	wholesale	182
-Cherry	Malaysia	e-commerce	669
-Cherry	Malaysia	own retail	282
-Cherry	Malaysia	broker	544
-Cherry	Myanmar	wholesale	425
-Cherry	Myanmar	e-commerce	175
-Cherry	Myanmar	own retail	916
-Cherry	Myanmar	broker	135
-Cherry	Nauru	wholesale	358
-Cherry	Nauru	e-commerce	572
-Cherry	Nauru	own retail	409
-Cherry	Nauru	broker	280
-Cherry	Netherlands Antilles	wholesale	174
-Cherry	Netherlands Antilles	e-commerce	388
-Cherry	Netherlands Antilles	own retail	843
-Cherry	Netherlands Antilles	broker	858
-Cherry	Saint Pierre And Miquelon	wholesale	47
-Cherry	Saint Pierre And Miquelon	e-commerce	32
-Cherry	Saint Pierre And Miquelon	own retail	475
-Cherry	Saint Pierre And Miquelon	broker	995
-Cherry	Serbia	wholesale	542
-Cherry	Serbia	e-commerce	911
-Cherry	Serbia	own retail	932
-Cherry	Serbia	broker	103
-Cherry	Singapore	wholesale	152
-Cherry	Singapore	e-commerce	500
-Cherry	Singapore	own retail	486
-Cherry	Singapore	broker	109
-Cherry	Svalbard And Jan Mayen	wholesale	935
-Cherry	Svalbard And Jan Mayen	e-commerce	76
-Cherry	Svalbard And Jan Mayen	own retail	645
-Cherry	Svalbard And Jan Mayen	broker	67
-Cherry	Turkey	wholesale	177
-Cherry	Turkey	e-commerce	369
-Cherry	Turkey	own retail	488
-Cherry	Turkey	broker	507
-Cherry	Tuvalu	wholesale	336
-Cherry	Tuvalu	e-commerce	862
-Cherry	Tuvalu	own retail	842
-Cherry	Tuvalu	broker	695
-Cherry	United States	wholesale	798
-Cherry	United States	e-commerce	709
-Cherry	United States	own retail	652
-Cherry	United States	broker	620
-Cherry	Virgin Islands, U.s.	wholesale	271
-Cherry	Virgin Islands, U.s.	e-commerce	871
-Cherry	Virgin Islands, U.s.	own retail	599
-Cherry	Virgin Islands, U.s.	broker	914
-Custard apple	Central African Republic	wholesale	834
-Custard apple	Central African Republic	e-commerce	232
-Custard apple	Central African Republic	own retail	997
-Custard apple	Central African Republic	broker	635
-Custard apple	Cocos (keeling) Islands	wholesale	877
-Custard apple	Cocos (keeling) Islands	e-commerce	542
-Custard apple	Cocos (keeling) Islands	own retail	258
-Custard apple	Cocos (keeling) Islands	broker	49
-Custard apple	Congo	wholesale	561
-Custard apple	Congo	e-commerce	557
-Custard apple	Congo	own retail	170
-Custard apple	Congo	broker	151
-Custard apple	Ecuador	wholesale	150
-Custard apple	Ecuador	e-commerce	689
-Custard apple	Ecuador	own retail	187
-Custard apple	Ecuador	broker	5
-Custard apple	Egypt	wholesale	45
-Custard apple	Egypt	e-commerce	849
-Custard apple	Egypt	own retail	812
-Custard apple	Egypt	broker	399
-Custard apple	Faroe Islands	wholesale	776
-Custard apple	Faroe Islands	e-commerce	572
-Custard apple	Faroe Islands	own retail	493
-Custard apple	Faroe Islands	broker	252
-Custard apple	Germany	wholesale	334
-Custard apple	Germany	e-commerce	333
-Custard apple	Germany	own retail	828
-Custard apple	Germany	broker	477
-Custard apple	Guinea-bissau	wholesale	141
-Custard apple	Guinea-bissau	e-commerce	554
-Custard apple	Guinea-bissau	own retail	989
-Custard apple	Guinea-bissau	broker	125
-Custard apple	Heard Island And Mcdonald Islands	wholesale	880
-Custard apple	Heard Island And Mcdonald Islands	e-commerce	774
-Custard apple	Heard Island And Mcdonald Islands	own retail	300
-Custard apple	Heard Island And Mcdonald Islands	broker	939
-Custard apple	India	wholesale	293
-Custard apple	India	e-commerce	91
-Custard apple	India	own retail	770
-Custard apple	India	broker	459
-Custard apple	Lebanon	wholesale	537
-Custard apple	Lebanon	e-commerce	979
-Custard apple	Lebanon	own retail	881
-Custard apple	Lebanon	broker	445
-Custard apple	Macau	wholesale	614
-Custard apple	Macau	e-commerce	198
-Custard apple	Macau	own retail	129
-Custard apple	Macau	broker	124
-Custard apple	Madagascar	wholesale	832
-Custard apple	Madagascar	e-commerce	541
-Custard apple	Madagascar	own retail	264
-Custard apple	Madagascar	broker	148
-Custard apple	Malaysia	wholesale	940
-Custard apple	Malaysia	e-commerce	797
-Custard apple	Malaysia	own retail	916
-Custard apple	Malaysia	broker	584
-Custard apple	Myanmar	wholesale	984
-Custard apple	Myanmar	e-commerce	564
-Custard apple	Myanmar	own retail	700
-Custard apple	Myanmar	broker	909
-Custard apple	Nauru	wholesale	705
-Custard apple	Nauru	e-commerce	311
-Custard apple	Nauru	own retail	122
-Custard apple	Nauru	broker	224
-Custard apple	Netherlands Antilles	wholesale	331
-Custard apple	Netherlands Antilles	e-commerce	859
-Custard apple	Netherlands Antilles	own retail	613
-Custard apple	Netherlands Antilles	broker	483
-Custard apple	Saint Pierre And Miquelon	wholesale	426
-Custard apple	Saint Pierre And Miquelon	e-commerce	697
-Custard apple	Saint Pierre And Miquelon	own retail	174
-Custard apple	Saint Pierre And Miquelon	broker	812
-Custard apple	Serbia	wholesale	377
-Custard apple	Serbia	e-commerce	149
-Custard apple	Serbia	own retail	94
-Custard apple	Serbia	broker	276
-Custard apple	Singapore	wholesale	531
-Custard apple	Singapore	e-commerce	630
-Custard apple	Singapore	own retail	382
-Custard apple	Singapore	broker	119
-Custard apple	Svalbard And Jan Mayen	wholesale	708
-Custard apple	Svalbard And Jan Mayen	e-commerce	144
-Custard apple	Svalbard And Jan Mayen	own retail	381
-Custard apple	Svalbard And Jan Mayen	broker	393
-Custard apple	Turkey	wholesale	75
-Custard apple	Turkey	e-commerce	921
-Custard apple	Turkey	own retail	40
-Custard apple	Turkey	broker	444
-Custard apple	Tuvalu	wholesale	370
-Custard apple	Tuvalu	e-commerce	984
-Custard apple	Tuvalu	own retail	508
-Custard apple	Tuvalu	broker	233
-Custard apple	United States	wholesale	392
-Custard apple	United States	e-commerce	376
-Custard apple	United States	own retail	917
-Custard apple	United States	broker	492
-Custard apple	Virgin Islands, U.s.	wholesale	149
-Custard apple	Virgin Islands, U.s.	e-commerce	402
-Custard apple	Virgin Islands, U.s.	own retail	963
-Custard apple	Virgin Islands, U.s.	broker	45
-Jackfruit	Central African Republic	wholesale	67
-Jackfruit	Central African Republic	e-commerce	198
-Jackfruit	Central African Republic	own retail	260
-Jackfruit	Central African Republic	broker	817
-Jackfruit	Cocos (keeling) Islands	wholesale	368
-Jackfruit	Cocos (keeling) Islands	e-commerce	164
-Jackfruit	Cocos (keeling) Islands	own retail	548
-Jackfruit	Cocos (keeling) Islands	broker	471
-Jackfruit	Congo	wholesale	957
-Jackfruit	Congo	e-commerce	735
-Jackfruit	Congo	own retail	982
-Jackfruit	Congo	broker	848
-Jackfruit	Ecuador	wholesale	447
-Jackfruit	Ecuador	e-commerce	773
-Jackfruit	Ecuador	own retail	620
-Jackfruit	Ecuador	broker	314
-Jackfruit	Egypt	wholesale	118
-Jackfruit	Egypt	e-commerce	842
-Jackfruit	Egypt	own retail	391
-Jackfruit	Egypt	broker	316
-Jackfruit	Faroe Islands	wholesale	493
-Jackfruit	Faroe Islands	e-commerce	180
-Jackfruit	Faroe Islands	own retail	556
-Jackfruit	Faroe Islands	broker	470
-Jackfruit	Germany	wholesale	658
-Jackfruit	Germany	e-commerce	369
-Jackfruit	Germany	own retail	703
-Jackfruit	Germany	broker	765
-Jackfruit	Guinea-bissau	wholesale	600
-Jackfruit	Guinea-bissau	e-commerce	248
-Jackfruit	Guinea-bissau	own retail	596
-Jackfruit	Guinea-bissau	broker	194
-Jackfruit	Heard Island And Mcdonald Islands	wholesale	471
-Jackfruit	Heard Island And Mcdonald Islands	e-commerce	343
-Jackfruit	Heard Island And Mcdonald Islands	own retail	556
-Jackfruit	Heard Island And Mcdonald Islands	broker	718
-Jackfruit	India	wholesale	389
-Jackfruit	India	e-commerce	10
-Jackfruit	India	own retail	168
-Jackfruit	India	broker	667
-Jackfruit	Lebanon	wholesale	797
-Jackfruit	Lebanon	e-commerce	178
-Jackfruit	Lebanon	own retail	945
-Jackfruit	Lebanon	broker	962
-Jackfruit	Macau	wholesale	550
-Jackfruit	Macau	e-commerce	363
-Jackfruit	Macau	own retail	436
-Jackfruit	Macau	broker	111
-Jackfruit	Madagascar	wholesale	294
-Jackfruit	Madagascar	e-commerce	912
-Jackfruit	Madagascar	own retail	305
-Jackfruit	Madagascar	broker	390
-Jackfruit	Malaysia	wholesale	789
-Jackfruit	Malaysia	e-commerce	667
-Jackfruit	Malaysia	own retail	92
-Jackfruit	Malaysia	broker	569
-Jackfruit	Myanmar	wholesale	88
-Jackfruit	Myanmar	e-commerce	774
-Jackfruit	Myanmar	own retail	948
-Jackfruit	Myanmar	broker	802
-Jackfruit	Nauru	wholesale	633
-Jackfruit	Nauru	e-commerce	893
-Jackfruit	Nauru	own retail	325
-Jackfruit	Nauru	broker	792
-Jackfruit	Netherlands Antilles	wholesale	868
-Jackfruit	Netherlands Antilles	e-commerce	583
-Jackfruit	Netherlands Antilles	own retail	716
-Jackfruit	Netherlands Antilles	broker	69
-Jackfruit	Saint Pierre And Miquelon	wholesale	31
-Jackfruit	Saint Pierre And Miquelon	e-commerce	361
-Jackfruit	Saint Pierre And Miquelon	own retail	532
-Jackfruit	Saint Pierre And Miquelon	broker	623
-Jackfruit	Serbia	wholesale	636
-Jackfruit	Serbia	e-commerce	417
-Jackfruit	Serbia	own retail	486
-Jackfruit	Serbia	broker	119
-Jackfruit	Singapore	wholesale	509
-Jackfruit	Singapore	e-commerce	832
-Jackfruit	Singapore	own retail	532
-Jackfruit	Singapore	broker	654
-Jackfruit	Svalbard And Jan Mayen	wholesale	167
-Jackfruit	Svalbard And Jan Mayen	e-commerce	700
-Jackfruit	Svalbard And Jan Mayen	own retail	125
-Jackfruit	Svalbard And Jan Mayen	broker	262
-Jackfruit	Turkey	wholesale	939
-Jackfruit	Turkey	e-commerce	686
-Jackfruit	Turkey	own retail	992
-Jackfruit	Turkey	broker	924
-Jackfruit	Tuvalu	wholesale	581
-Jackfruit	Tuvalu	e-commerce	348
-Jackfruit	Tuvalu	own retail	591
-Jackfruit	Tuvalu	broker	487
-Jackfruit	United States	wholesale	659
-Jackfruit	United States	e-commerce	205
-Jackfruit	United States	own retail	305
-Jackfruit	United States	broker	906
-Jackfruit	Virgin Islands, U.s.	wholesale	687
-Jackfruit	Virgin Islands, U.s.	e-commerce	923
-Jackfruit	Virgin Islands, U.s.	own retail	151
-Jackfruit	Virgin Islands, U.s.	broker	483
-Orange	Central African Republic	wholesale	741
-Orange	Central African Republic	e-commerce	500
-Orange	Central African Republic	own retail	396
-Orange	Central African Republic	broker	60
-Orange	Cocos (keeling) Islands	wholesale	903
-Orange	Cocos (keeling) Islands	e-commerce	779
-Orange	Cocos (keeling) Islands	own retail	91
-Orange	Cocos (keeling) Islands	broker	314
-Orange	Congo	wholesale	719
-Orange	Congo	e-commerce	487
-Orange	Congo	own retail	778
-Orange	Congo	broker	783
-Orange	Ecuador	wholesale	657
-Orange	Ecuador	e-commerce	57
-Orange	Ecuador	own retail	882
-Orange	Ecuador	broker	861
-Orange	Egypt	wholesale	965
-Orange	Egypt	e-commerce	387
-Orange	Egypt	own retail	746
-Orange	Egypt	broker	671
-Orange	Faroe Islands	wholesale	116
-Orange	Faroe Islands	e-commerce	981
-Orange	Faroe Islands	own retail	490
-Orange	Faroe Islands	broker	392
-Orange	Germany	wholesale	220
-Orange	Germany	e-commerce	657
-Orange	Germany	own retail	736
-Orange	Germany	broker	633
-Orange	Guinea-bissau	wholesale	977
-Orange	Guinea-bissau	e-commerce	341
-Orange	Guinea-bissau	own retail	394
-Orange	Guinea-bissau	broker	854
-Orange	Heard Island And Mcdonald Islands	wholesale	475
-Orange	Heard Island And Mcdonald Islands	e-commerce	886
-Orange	Heard Island And Mcdonald Islands	own retail	765
-Orange	Heard Island And Mcdonald Islands	broker	539
-Orange	India	wholesale	860
-Orange	India	e-commerce	220
-Orange	India	own retail	963
-Orange	India	broker	786
-Orange	Lebanon	wholesale	532
-Orange	Lebanon	e-commerce	198
-Orange	Lebanon	own retail	318
-Orange	Lebanon	broker	773
-Orange	Macau	wholesale	504
-Orange	Macau	e-commerce	12
-Orange	Macau	own retail	974
-Orange	Macau	broker	86
-Orange	Madagascar	wholesale	80
-Orange	Madagascar	e-commerce	884
-Orange	Madagascar	own retail	241
-Orange	Madagascar	broker	267
-Orange	Malaysia	wholesale	597
-Orange	Malaysia	e-commerce	491
-Orange	Malaysia	own retail	481
-Orange	Malaysia	broker	175
-Orange	Myanmar	wholesale	55
-Orange	Myanmar	e-commerce	549
-Orange	Myanmar	own retail	985
-Orange	Myanmar	broker	328
-Orange	Nauru	wholesale	548
-Orange	Nauru	e-commerce	272
-Orange	Nauru	own retail	708
-Orange	Nauru	broker	548
-Orange	Netherlands Antilles	wholesale	386
-Orange	Netherlands Antilles	e-commerce	829
-Orange	Netherlands Antilles	own retail	17
-Orange	Netherlands Antilles	broker	874
-Orange	Saint Pierre And Miquelon	wholesale	935
-Orange	Saint Pierre And Miquelon	e-commerce	285
-Orange	Saint Pierre And Miquelon	own retail	329
-Orange	Saint Pierre And Miquelon	broker	43
-Orange	Serbia	wholesale	963
-Orange	Serbia	e-commerce	814
-Orange	Serbia	own retail	343
-Orange	Serbia	broker	465
-Orange	Singapore	wholesale	693
-Orange	Singapore	e-commerce	977
-Orange	Singapore	own retail	322
-Orange	Singapore	broker	679
-Orange	Svalbard And Jan Mayen	wholesale	821
-Orange	Svalbard And Jan Mayen	e-commerce	693
-Orange	Svalbard And Jan Mayen	own retail	850
-Orange	Svalbard And Jan Mayen	broker	863
-Orange	Turkey	wholesale	288
-Orange	Turkey	e-commerce	863
-Orange	Turkey	own retail	556
-Orange	Turkey	broker	335
-Orange	Tuvalu	wholesale	59
-Orange	Tuvalu	e-commerce	752
-Orange	Tuvalu	own retail	641
-Orange	Tuvalu	broker	751
-Orange	United States	wholesale	306
-Orange	United States	e-commerce	665
-Orange	United States	own retail	423
-Orange	United States	broker	73
-Orange	Virgin Islands, U.s.	wholesale	14
-Orange	Virgin Islands, U.s.	e-commerce	811
-Orange	Virgin Islands, U.s.	own retail	577
-Orange	Virgin Islands, U.s.	broker	584
-Peach	Central African Republic	wholesale	879
-Peach	Central African Republic	e-commerce	749
-Peach	Central African Republic	own retail	104
-Peach	Central African Republic	broker	466
-Peach	Cocos (keeling) Islands	wholesale	527
-Peach	Cocos (keeling) Islands	e-commerce	341
-Peach	Cocos (keeling) Islands	own retail	43
-Peach	Cocos (keeling) Islands	broker	542
-Peach	Congo	wholesale	339
-Peach	Congo	e-commerce	768
-Peach	Congo	own retail	526
-Peach	Congo	broker	817
-Peach	Ecuador	wholesale	940
-Peach	Ecuador	e-commerce	50
-Peach	Ecuador	own retail	315
-Peach	Ecuador	broker	956
-Peach	Egypt	wholesale	321
-Peach	Egypt	e-commerce	429
-Peach	Egypt	own retail	650
-Peach	Egypt	broker	808
-Peach	Faroe Islands	wholesale	640
-Peach	Faroe Islands	e-commerce	443
-Peach	Faroe Islands	own retail	990
-Peach	Faroe Islands	broker	616
-Peach	Germany	wholesale	306
-Peach	Germany	e-commerce	94
-Peach	Germany	own retail	526
-Peach	Germany	broker	718
-Peach	Guinea-bissau	wholesale	515
-Peach	Guinea-bissau	e-commerce	925
-Peach	Guinea-bissau	own retail	639
-Peach	Guinea-bissau	broker	869
-Peach	Heard Island And Mcdonald Islands	wholesale	254
-Peach	Heard Island And Mcdonald Islands	e-commerce	461
-Peach	Heard Island And Mcdonald Islands	own retail	427
-Peach	Heard Island And Mcdonald Islands	broker	28
-Peach	India	wholesale	731
-Peach	India	e-commerce	365
-Peach	India	own retail	239
-Peach	India	broker	482
-Peach	Lebanon	wholesale	524
-Peach	Lebanon	e-commerce	945
-Peach	Lebanon	own retail	498
-Peach	Lebanon	broker	920
-Peach	Macau	wholesale	574
-Peach	Macau	e-commerce	606
-Peach	Macau	own retail	940
-Peach	Macau	broker	825
-Peach	Madagascar	wholesale	792
-Peach	Madagascar	e-commerce	490
-Peach	Madagascar	own retail	540
-Peach	Madagascar	broker	919
-Peach	Malaysia	wholesale	963
-Peach	Malaysia	e-commerce	345
-Peach	Malaysia	own retail	421
-Peach	Malaysia	broker	58
-Peach	Myanmar	wholesale	5
-Peach	Myanmar	e-commerce	449
-Peach	Myanmar	own retail	975
-Peach	Myanmar	broker	662
-Peach	Nauru	wholesale	391
-Peach	Nauru	e-commerce	951
-Peach	Nauru	own retail	445
-Peach	Nauru	broker	638
-Peach	Netherlands Antilles	wholesale	756
-Peach	Netherlands Antilles	e-commerce	869
-Peach	Netherlands Antilles	own retail	553
-Peach	Netherlands Antilles	broker	593
-Peach	Saint Pierre And Miquelon	wholesale	711
-Peach	Saint Pierre And Miquelon	e-commerce	242
-Peach	Saint Pierre And Miquelon	own retail	182
-Peach	Saint Pierre And Miquelon	broker	661
-Peach	Serbia	wholesale	594
-Peach	Serbia	e-commerce	970
-Peach	Serbia	own retail	93
-Peach	Serbia	broker	189
-Peach	Singapore	wholesale	180
-Peach	Singapore	e-commerce	998
-Peach	Singapore	own retail	573
-Peach	Singapore	broker	260
-Peach	Svalbard And Jan Mayen	wholesale	937
-Peach	Svalbard And Jan Mayen	e-commerce	877
-Peach	Svalbard And Jan Mayen	own retail	361
-Peach	Svalbard And Jan Mayen	broker	170
-Peach	Turkey	wholesale	600
-Peach	Turkey	e-commerce	982
-Peach	Turkey	own retail	256
-Peach	Turkey	broker	502
-Peach	Tuvalu	wholesale	225
-Peach	Tuvalu	e-commerce	685
-Peach	Tuvalu	own retail	259
-Peach	Tuvalu	broker	59
-Peach	United States	wholesale	249
-Peach	United States	e-commerce	553
-Peach	United States	own retail	611
-Peach	United States	broker	53
-Peach	Virgin Islands, U.s.	wholesale	874
-Peach	Virgin Islands, U.s.	e-commerce	744
-Peach	Virgin Islands, U.s.	own retail	615
-Peach	Virgin Islands, U.s.	broker	331
-Tomato	Central African Republic	wholesale	506
-Tomato	Central African Republic	e-commerce	528
-Tomato	Central African Republic	own retail	37
-Tomato	Central African Republic	broker	118
-Tomato	Cocos (keeling) Islands	wholesale	412
-Tomato	Cocos (keeling) Islands	e-commerce	675
-Tomato	Cocos (keeling) Islands	own retail	220
-Tomato	Cocos (keeling) Islands	broker	364
-Tomato	Congo	wholesale	735
-Tomato	Congo	e-commerce	805
-Tomato	Congo	own retail	900
-Tomato	Congo	broker	63
-Tomato	Ecuador	wholesale	891
-Tomato	Ecuador	e-commerce	959
-Tomato	Ecuador	own retail	232
-Tomato	Ecuador	broker	387
-Tomato	Egypt	wholesale	62
-Tomato	Egypt	e-commerce	421
-Tomato	Egypt	own retail	500
-Tomato	Egypt	broker	448
-Tomato	Faroe Islands	wholesale	322
-Tomato	Faroe Islands	e-commerce	138
-Tomato	Faroe Islands	own retail	695
-Tomato	Faroe Islands	broker	600
-Tomato	Germany	wholesale	84
-Tomato	Germany	e-commerce	112
-Tomato	Germany	own retail	2
-Tomato	Germany	broker	125
-Tomato	Guinea-bissau	wholesale	373
-Tomato	Guinea-bissau	e-commerce	591
-Tomato	Guinea-bissau	own retail	741
-Tomato	Guinea-bissau	broker	714
-Tomato	Heard Island And Mcdonald Islands	wholesale	481
-Tomato	Heard Island And Mcdonald Islands	e-commerce	171
-Tomato	Heard Island And Mcdonald Islands	own retail	533
-Tomato	Heard Island And Mcdonald Islands	broker	479
-Tomato	India	wholesale	68
-Tomato	India	e-commerce	554
-Tomato	India	own retail	949
-Tomato	India	broker	208
-Tomato	Lebanon	wholesale	720
-Tomato	Lebanon	e-commerce	379
-Tomato	Lebanon	own retail	535
-Tomato	Lebanon	broker	851
-Tomato	Macau	wholesale	526
-Tomato	Macau	e-commerce	583
-Tomato	Macau	own retail	500
-Tomato	Macau	broker	708
-Tomato	Madagascar	wholesale	735
-Tomato	Madagascar	e-commerce	34
-Tomato	Madagascar	own retail	27
-Tomato	Madagascar	broker	665
-Tomato	Malaysia	wholesale	61
-Tomato	Malaysia	e-commerce	914
-Tomato	Malaysia	own retail	965
-Tomato	Malaysia	broker	35
-Tomato	Myanmar	wholesale	567
-Tomato	Myanmar	e-commerce	682
-Tomato	Myanmar	own retail	661
-Tomato	Myanmar	broker	836
-Tomato	Nauru	wholesale	111
-Tomato	Nauru	e-commerce	253
-Tomato	Nauru	own retail	44
-Tomato	Nauru	broker	621
-Tomato	Netherlands Antilles	wholesale	399
-Tomato	Netherlands Antilles	e-commerce	958
-Tomato	Netherlands Antilles	own retail	300
-Tomato	Netherlands Antilles	broker	549
-Tomato	Saint Pierre And Miquelon	wholesale	549
-Tomato	Saint Pierre And Miquelon	e-commerce	363
-Tomato	Saint Pierre And Miquelon	own retail	100
-Tomato	Saint Pierre And Miquelon	broker	205
-Tomato	Serbia	wholesale	354
-Tomato	Serbia	e-commerce	54
-Tomato	Serbia	own retail	406
-Tomato	Serbia	broker	628
-Tomato	Singapore	wholesale	876
-Tomato	Singapore	e-commerce	466
-Tomato	Singapore	own retail	90
-Tomato	Singapore	broker	921
-Tomato	Svalbard And Jan Mayen	wholesale	707
-Tomato	Svalbard And Jan Mayen	e-commerce	749
-Tomato	Svalbard And Jan Mayen	own retail	686
-Tomato	Svalbard And Jan Mayen	broker	294
-Tomato	Turkey	wholesale	703
-Tomato	Turkey	e-commerce	835
-Tomato	Turkey	own retail	381
-Tomato	Turkey	broker	182
-Tomato	Tuvalu	wholesale	870
-Tomato	Tuvalu	e-commerce	582
-Tomato	Tuvalu	own retail	289
-Tomato	Tuvalu	broker	296
-Tomato	United States	wholesale	696
-Tomato	United States	e-commerce	206
-Tomato	United States	own retail	966
-Tomato	United States	broker	37
-Tomato	Virgin Islands, U.s.	wholesale	625
-Tomato	Virgin Islands, U.s.	e-commerce	709
-Tomato	Virgin Islands, U.s.	own retail	373
-Tomato	Virgin Islands, U.s.	broker	51
+Currant	Central African Republic	wholesale	619	35	0.1875
+Currant	Central African Republic	e-commerce	589	35	0.035
+Currant	Central African Republic	own retail	899	35	0.0025
+Currant	Central African Republic	broker	714	35	0.0625
+Currant	Cocos (keeling) Islands	wholesale	272	35	0.0
+Currant	Cocos (keeling) Islands	e-commerce	4	35	0.145
+Currant	Cocos (keeling) Islands	own retail	401	35	0.1875
+Currant	Cocos (keeling) Islands	broker	789	35	0.1
+Currant	Congo	wholesale	374	35	0.105
+Currant	Congo	e-commerce	899	35	0.0525
+Currant	Congo	own retail	360	35	0.0275
+Currant	Congo	broker	71	35	0.135
+Currant	Ecuador	wholesale	799	35	0.11
+Currant	Ecuador	e-commerce	400	35	0.0175
+Currant	Ecuador	own retail	235	35	0.0275
+Currant	Ecuador	broker	849	35	0.21
+Currant	Egypt	wholesale	818	35	0.0975
+Currant	Egypt	e-commerce	317	35	0.0425
+Currant	Egypt	own retail	74	35	0.1625
+Currant	Egypt	broker	456	35	0.025
+Currant	Faroe Islands	wholesale	891	35	0.0525
+Currant	Faroe Islands	e-commerce	438	35	0.0325
+Currant	Faroe Islands	own retail	15	35	0.0575
+Currant	Faroe Islands	broker	175	35	0.1
+Currant	Germany	wholesale	856	35	0.1475
+Currant	Germany	e-commerce	124	35	0.1325
+Currant	Germany	own retail	330	35	0.0825
+Currant	Germany	broker	729	35	0.23
+Currant	Guinea-bissau	wholesale	463	35	0.1575
+Currant	Guinea-bissau	e-commerce	594	35	0.19
+Currant	Guinea-bissau	own retail	961	35	0.235
+Currant	Guinea-bissau	broker	917	35	0.2275
+Currant	Heard Island And Mcdonald Islands	wholesale	321	35	0.245
+Currant	Heard Island And Mcdonald Islands	e-commerce	138	35	0.0425
+Currant	Heard Island And Mcdonald Islands	own retail	976	35	0.0825
+Currant	Heard Island And Mcdonald Islands	broker	248	35	0.07
+Currant	India	wholesale	624	35	0.1675
+Currant	India	e-commerce	730	35	0.0725
+Currant	India	own retail	678	35	0.09
+Currant	India	broker	88	35	0.055
+Currant	Lebanon	wholesale	931	35	0.2375
+Currant	Lebanon	e-commerce	952	35	0.13
+Currant	Lebanon	own retail	530	35	0.09
+Currant	Lebanon	broker	816	35	0.2025
+Currant	Macau	wholesale	83	35	0.0425
+Currant	Macau	e-commerce	293	35	0.1475
+Currant	Macau	own retail	856	35	0.06
+Currant	Macau	broker	221	35	0.11
+Currant	Madagascar	wholesale	843	35	0.0625
+Currant	Madagascar	e-commerce	767	35	0.0625
+Currant	Madagascar	own retail	507	35	0.175
+Currant	Madagascar	broker	298	35	0.195
+Currant	Malaysia	wholesale	214	35	0.0975
+Currant	Malaysia	e-commerce	816	35	0.0
+Currant	Malaysia	own retail	585	35	0.0325
+Currant	Malaysia	broker	254	35	0.2275
+Currant	Myanmar	wholesale	901	35	0.0975
+Currant	Myanmar	e-commerce	816	35	0.1025
+Currant	Myanmar	own retail	726	35	0.1425
+Currant	Myanmar	broker	846	35	0.2475
+Currant	Nauru	wholesale	17	35	0.22
+Currant	Nauru	e-commerce	434	35	0.2375
+Currant	Nauru	own retail	745	35	0.0575
+Currant	Nauru	broker	688	35	0.0775
+Currant	Netherlands Antilles	wholesale	670	35	0.0275
+Currant	Netherlands Antilles	e-commerce	45	35	0.19
+Currant	Netherlands Antilles	own retail	48	35	0.15
+Currant	Netherlands Antilles	broker	396	35	0.04
+Currant	Saint Pierre And Miquelon	wholesale	297	35	0.2125
+Currant	Saint Pierre And Miquelon	e-commerce	423	35	0.2475
+Currant	Saint Pierre And Miquelon	own retail	793	35	0.1625
+Currant	Saint Pierre And Miquelon	broker	934	35	0.0875
+Currant	Serbia	wholesale	807	35	0.01
+Currant	Serbia	e-commerce	803	35	0.03
+Currant	Serbia	own retail	271	35	0.035
+Currant	Serbia	broker	329	35	0.16
+Currant	Singapore	wholesale	411	35	0.1675
+Currant	Singapore	e-commerce	762	35	0.225
+Currant	Singapore	own retail	270	35	0.2075
+Currant	Singapore	broker	609	35	0.2425
+Currant	Svalbard And Jan Mayen	wholesale	115	35	0.0725
+Currant	Svalbard And Jan Mayen	e-commerce	532	35	0.1875
+Currant	Svalbard And Jan Mayen	own retail	908	35	0.1525
+Currant	Svalbard And Jan Mayen	broker	977	35	0.1775
+Currant	Turkey	wholesale	821	35	0.0375
+Currant	Turkey	e-commerce	567	35	0.1725
+Currant	Turkey	own retail	534	35	0.235
+Currant	Turkey	broker	496	35	0.085
+Currant	Tuvalu	wholesale	910	35	0.0775
+Currant	Tuvalu	e-commerce	66	35	0.01
+Currant	Tuvalu	own retail	156	35	0.0925
+Currant	Tuvalu	broker	944	35	0.0025
+Currant	United States	wholesale	516	35	0.16
+Currant	United States	e-commerce	822	35	0.1675
+Currant	United States	own retail	540	35	0.1475
+Currant	United States	broker	807	35	0.12
+Currant	Virgin Islands, U.s.	wholesale	925	35	0.1325
+Currant	Virgin Islands, U.s.	e-commerce	993	35	0.05
+Currant	Virgin Islands, U.s.	own retail	684	35	0.005
+Currant	Virgin Islands, U.s.	broker	69	35	0.2025
+Cherry	Central African Republic	wholesale	105	30	0.015
+Cherry	Central African Republic	e-commerce	200	30	0.0625
+Cherry	Central African Republic	own retail	976	30	0.0325
+Cherry	Central African Republic	broker	363	30	0.15
+Cherry	Cocos (keeling) Islands	wholesale	72	30	0.055
+Cherry	Cocos (keeling) Islands	e-commerce	673	30	0.17
+Cherry	Cocos (keeling) Islands	own retail	775	30	0.1925
+Cherry	Cocos (keeling) Islands	broker	212	30	0.1075
+Cherry	Congo	wholesale	980	30	0.0575
+Cherry	Congo	e-commerce	951	30	0.23
+Cherry	Congo	own retail	697	30	0.19
+Cherry	Congo	broker	339	30	0.225
+Cherry	Ecuador	wholesale	820	30	0.2475
+Cherry	Ecuador	e-commerce	935	30	0.1425
+Cherry	Ecuador	own retail	954	30	0.24
+Cherry	Ecuador	broker	939	30	0.0475
+Cherry	Egypt	wholesale	517	30	0.0625
+Cherry	Egypt	e-commerce	747	30	0.1675
+Cherry	Egypt	own retail	200	30	0.0625
+Cherry	Egypt	broker	221	30	0.1425
+Cherry	Faroe Islands	wholesale	809	30	0.075
+Cherry	Faroe Islands	e-commerce	182	30	0.0
+Cherry	Faroe Islands	own retail	487	30	0.1825
+Cherry	Faroe Islands	broker	634	30	0.2325
+Cherry	Germany	wholesale	714	30	0.0325
+Cherry	Germany	e-commerce	101	30	0.225
+Cherry	Germany	own retail	814	30	0.1675
+Cherry	Germany	broker	739	30	0.015
+Cherry	Guinea-bissau	wholesale	591	30	0.23
+Cherry	Guinea-bissau	e-commerce	603	30	0.18
+Cherry	Guinea-bissau	own retail	35	30	0.05
+Cherry	Guinea-bissau	broker	505	30	0.215
+Cherry	Heard Island And Mcdonald Islands	wholesale	998	30	0.1725
+Cherry	Heard Island And Mcdonald Islands	e-commerce	494	30	0.015
+Cherry	Heard Island And Mcdonald Islands	own retail	425	30	0.1075
+Cherry	Heard Island And Mcdonald Islands	broker	605	30	0.205
+Cherry	India	wholesale	92	30	0.2075
+Cherry	India	e-commerce	480	30	0.2
+Cherry	India	own retail	302	30	0.1
+Cherry	India	broker	458	30	0.0625
+Cherry	Lebanon	wholesale	213	30	0.1875
+Cherry	Lebanon	e-commerce	596	30	0.17
+Cherry	Lebanon	own retail	758	30	0.1125
+Cherry	Lebanon	broker	45	30	0.045
+Cherry	Macau	wholesale	419	30	0.0075
+Cherry	Macau	e-commerce	106	30	0.15
+Cherry	Macau	own retail	748	30	0.1075
+Cherry	Macau	broker	832	30	0.01
+Cherry	Madagascar	wholesale	947	30	0.0875
+Cherry	Madagascar	e-commerce	56	30	0.2225
+Cherry	Madagascar	own retail	735	30	0.0175
+Cherry	Madagascar	broker	255	30	0.2475
+Cherry	Malaysia	wholesale	182	30	0.0375
+Cherry	Malaysia	e-commerce	669	30	0.155
+Cherry	Malaysia	own retail	282	30	0.2
+Cherry	Malaysia	broker	544	30	0.02
+Cherry	Myanmar	wholesale	425	30	0.2225
+Cherry	Myanmar	e-commerce	175	30	0.1975
+Cherry	Myanmar	own retail	916	30	0.195
+Cherry	Myanmar	broker	135	30	0.0975
+Cherry	Nauru	wholesale	358	30	0.065
+Cherry	Nauru	e-commerce	572	30	0.1525
+Cherry	Nauru	own retail	409	30	0.1975
+Cherry	Nauru	broker	280	30	0.1725
+Cherry	Netherlands Antilles	wholesale	174	30	0.2
+Cherry	Netherlands Antilles	e-commerce	388	30	0.045
+Cherry	Netherlands Antilles	own retail	843	30	0.2375
+Cherry	Netherlands Antilles	broker	858	30	0.23
+Cherry	Saint Pierre And Miquelon	wholesale	47	30	0.09
+Cherry	Saint Pierre And Miquelon	e-commerce	32	30	0.18
+Cherry	Saint Pierre And Miquelon	own retail	475	30	0.0525
+Cherry	Saint Pierre And Miquelon	broker	995	30	0.16
+Cherry	Serbia	wholesale	542	30	0.1175
+Cherry	Serbia	e-commerce	911	30	0.0275
+Cherry	Serbia	own retail	932	30	0.205
+Cherry	Serbia	broker	103	30	0.145
+Cherry	Singapore	wholesale	152	30	0.0925
+Cherry	Singapore	e-commerce	500	30	0.07
+Cherry	Singapore	own retail	486	30	0.045
+Cherry	Singapore	broker	109	30	0.0975
+Cherry	Svalbard And Jan Mayen	wholesale	935	30	0.155
+Cherry	Svalbard And Jan Mayen	e-commerce	76	30	0.0775
+Cherry	Svalbard And Jan Mayen	own retail	645	30	0.025
+Cherry	Svalbard And Jan Mayen	broker	67	30	0.0275
+Cherry	Turkey	wholesale	177	30	0.0675
+Cherry	Turkey	e-commerce	369	30	0.0975
+Cherry	Turkey	own retail	488	30	0.0225
+Cherry	Turkey	broker	507	30	0.0775
+Cherry	Tuvalu	wholesale	336	30	0.1675
+Cherry	Tuvalu	e-commerce	862	30	0.22
+Cherry	Tuvalu	own retail	842	30	0.0375
+Cherry	Tuvalu	broker	695	30	0.025
+Cherry	United States	wholesale	798	30	0.245
+Cherry	United States	e-commerce	709	30	0.0975
+Cherry	United States	own retail	652	30	0.0125
+Cherry	United States	broker	620	30	0.1
+Cherry	Virgin Islands, U.s.	wholesale	271	30	0.115
+Cherry	Virgin Islands, U.s.	e-commerce	871	30	0.1175
+Cherry	Virgin Islands, U.s.	own retail	599	30	0.0375
+Cherry	Virgin Islands, U.s.	broker	914	30	0.215
+Custard apple	Central African Republic	wholesale	834	65	0.175
+Custard apple	Central African Republic	e-commerce	232	65	0.1375
+Custard apple	Central African Republic	own retail	997	65	0.01
+Custard apple	Central African Republic	broker	635	65	0.055
+Custard apple	Cocos (keeling) Islands	wholesale	877	65	0.1725
+Custard apple	Cocos (keeling) Islands	e-commerce	542	65	0.075
+Custard apple	Cocos (keeling) Islands	own retail	258	65	0.165
+Custard apple	Cocos (keeling) Islands	broker	49	65	0.035
+Custard apple	Congo	wholesale	561	65	0.145
+Custard apple	Congo	e-commerce	557	65	0.03
+Custard apple	Congo	own retail	170	65	0.21
+Custard apple	Congo	broker	151	65	0.02
+Custard apple	Ecuador	wholesale	150	65	0.0275
+Custard apple	Ecuador	e-commerce	689	65	0.1725
+Custard apple	Ecuador	own retail	187	65	0.19
+Custard apple	Ecuador	broker	5	65	0.225
+Custard apple	Egypt	wholesale	45	65	0.145
+Custard apple	Egypt	e-commerce	849	65	0.185
+Custard apple	Egypt	own retail	812	65	0.1375
+Custard apple	Egypt	broker	399	65	0.0925
+Custard apple	Faroe Islands	wholesale	776	65	0.215
+Custard apple	Faroe Islands	e-commerce	572	65	0.005
+Custard apple	Faroe Islands	own retail	493	65	0.08
+Custard apple	Faroe Islands	broker	252	65	0.1825
+Custard apple	Germany	wholesale	334	65	0.18
+Custard apple	Germany	e-commerce	333	65	0.24
+Custard apple	Germany	own retail	828	65	0.1475
+Custard apple	Germany	broker	477	65	0.0425
+Custard apple	Guinea-bissau	wholesale	141	65	0.035
+Custard apple	Guinea-bissau	e-commerce	554	65	0.215
+Custard apple	Guinea-bissau	own retail	989	65	0.155
+Custard apple	Guinea-bissau	broker	125	65	0.155
+Custard apple	Heard Island And Mcdonald Islands	wholesale	880	65	0.0425
+Custard apple	Heard Island And Mcdonald Islands	e-commerce	774	65	0.2175
+Custard apple	Heard Island And Mcdonald Islands	own retail	300	65	0.04
+Custard apple	Heard Island And Mcdonald Islands	broker	939	65	0.0775
+Custard apple	India	wholesale	293	65	0.035
+Custard apple	India	e-commerce	91	65	0.0925
+Custard apple	India	own retail	770	65	0.125
+Custard apple	India	broker	459	65	0.08
+Custard apple	Lebanon	wholesale	537	65	0.0875
+Custard apple	Lebanon	e-commerce	979	65	0.165
+Custard apple	Lebanon	own retail	881	65	0.185
+Custard apple	Lebanon	broker	445	65	0.0725
+Custard apple	Macau	wholesale	614	65	0.155
+Custard apple	Macau	e-commerce	198	65	0.14
+Custard apple	Macau	own retail	129	65	0.07
+Custard apple	Macau	broker	124	65	0.0225
+Custard apple	Madagascar	wholesale	832	65	0.1
+Custard apple	Madagascar	e-commerce	541	65	0.13
+Custard apple	Madagascar	own retail	264	65	0.24
+Custard apple	Madagascar	broker	148	65	0.0175
+Custard apple	Malaysia	wholesale	940	65	0.1075
+Custard apple	Malaysia	e-commerce	797	65	0.1575
+Custard apple	Malaysia	own retail	916	65	0.08
+Custard apple	Malaysia	broker	584	65	0.205
+Custard apple	Myanmar	wholesale	984	65	0.1475
+Custard apple	Myanmar	e-commerce	564	65	0.025
+Custard apple	Myanmar	own retail	700	65	0.2275
+Custard apple	Myanmar	broker	909	65	0.15
+Custard apple	Nauru	wholesale	705	65	0.1825
+Custard apple	Nauru	e-commerce	311	65	0.2125
+Custard apple	Nauru	own retail	122	65	0.0975
+Custard apple	Nauru	broker	224	65	0.085
+Custard apple	Netherlands Antilles	wholesale	331	65	0.245
+Custard apple	Netherlands Antilles	e-commerce	859	65	0.2475
+Custard apple	Netherlands Antilles	own retail	613	65	0.125
+Custard apple	Netherlands Antilles	broker	483	65	0.1425
+Custard apple	Saint Pierre And Miquelon	wholesale	426	65	0.135
+Custard apple	Saint Pierre And Miquelon	e-commerce	697	65	0.0775
+Custard apple	Saint Pierre And Miquelon	own retail	174	65	0.22
+Custard apple	Saint Pierre And Miquelon	broker	812	65	0.175
+Custard apple	Serbia	wholesale	377	65	0.17
+Custard apple	Serbia	e-commerce	149	65	0.0525
+Custard apple	Serbia	own retail	94	65	0.0875
+Custard apple	Serbia	broker	276	65	0.2025
+Custard apple	Singapore	wholesale	531	65	0.2025
+Custard apple	Singapore	e-commerce	630	65	0.2275
+Custard apple	Singapore	own retail	382	65	0.105
+Custard apple	Singapore	broker	119	65	0.125
+Custard apple	Svalbard And Jan Mayen	wholesale	708	65	0.075
+Custard apple	Svalbard And Jan Mayen	e-commerce	144	65	0.225
+Custard apple	Svalbard And Jan Mayen	own retail	381	65	0.1175
+Custard apple	Svalbard And Jan Mayen	broker	393	65	0.05
+Custard apple	Turkey	wholesale	75	65	0.245
+Custard apple	Turkey	e-commerce	921	65	0.165
+Custard apple	Turkey	own retail	40	65	0.2375
+Custard apple	Turkey	broker	444	65	0.2075
+Custard apple	Tuvalu	wholesale	370	65	0.0175
+Custard apple	Tuvalu	e-commerce	984	65	0.2
+Custard apple	Tuvalu	own retail	508	65	0.0375
+Custard apple	Tuvalu	broker	233	65	0.08
+Custard apple	United States	wholesale	392	65	0.2
+Custard apple	United States	e-commerce	376	65	0.15
+Custard apple	United States	own retail	917	65	0.0125
+Custard apple	United States	broker	492	65	0.05
+Custard apple	Virgin Islands, U.s.	wholesale	149	65	0.2025
+Custard apple	Virgin Islands, U.s.	e-commerce	402	65	0.17
+Custard apple	Virgin Islands, U.s.	own retail	963	65	0.1725
+Custard apple	Virgin Islands, U.s.	broker	45	65	0.215
+Jackfruit	Central African Republic	wholesale	67	45	0.205
+Jackfruit	Central African Republic	e-commerce	198	45	0.0775
+Jackfruit	Central African Republic	own retail	260	45	0.085
+Jackfruit	Central African Republic	broker	817	45	0.1925
+Jackfruit	Cocos (keeling) Islands	wholesale	368	45	0.1475
+Jackfruit	Cocos (keeling) Islands	e-commerce	164	45	0.0025
+Jackfruit	Cocos (keeling) Islands	own retail	548	45	0.0875
+Jackfruit	Cocos (keeling) Islands	broker	471	45	0.1125
+Jackfruit	Congo	wholesale	957	45	0.045
+Jackfruit	Congo	e-commerce	735	45	0.1725
+Jackfruit	Congo	own retail	982	45	0.2075
+Jackfruit	Congo	broker	848	45	0.1375
+Jackfruit	Ecuador	wholesale	447	45	0.1575
+Jackfruit	Ecuador	e-commerce	773	45	0.08
+Jackfruit	Ecuador	own retail	620	45	0.2225
+Jackfruit	Ecuador	broker	314	45	0.0225
+Jackfruit	Egypt	wholesale	118	45	0.105
+Jackfruit	Egypt	e-commerce	842	45	0.2
+Jackfruit	Egypt	own retail	391	45	0.17
+Jackfruit	Egypt	broker	316	45	0.0975
+Jackfruit	Faroe Islands	wholesale	493	45	0.075
+Jackfruit	Faroe Islands	e-commerce	180	45	0.215
+Jackfruit	Faroe Islands	own retail	556	45	0.2275
+Jackfruit	Faroe Islands	broker	470	45	0.22
+Jackfruit	Germany	wholesale	658	45	0.0875
+Jackfruit	Germany	e-commerce	369	45	0.1475
+Jackfruit	Germany	own retail	703	45	0.22
+Jackfruit	Germany	broker	765	45	0.1975
+Jackfruit	Guinea-bissau	wholesale	600	45	0.205
+Jackfruit	Guinea-bissau	e-commerce	248	45	0.0225
+Jackfruit	Guinea-bissau	own retail	596	45	0.2025
+Jackfruit	Guinea-bissau	broker	194	45	0.1725
+Jackfruit	Heard Island And Mcdonald Islands	wholesale	471	45	0.0925
+Jackfruit	Heard Island And Mcdonald Islands	e-commerce	343	45	0.005
+Jackfruit	Heard Island And Mcdonald Islands	own retail	556	45	0.1625
+Jackfruit	Heard Island And Mcdonald Islands	broker	718	45	0.1325
+Jackfruit	India	wholesale	389	45	0.1475
+Jackfruit	India	e-commerce	10	45	0.055
+Jackfruit	India	own retail	168	45	0.01
+Jackfruit	India	broker	667	45	0.205
+Jackfruit	Lebanon	wholesale	797	45	0.1775
+Jackfruit	Lebanon	e-commerce	178	45	0.1675
+Jackfruit	Lebanon	own retail	945	45	0.14
+Jackfruit	Lebanon	broker	962	45	0.2075
+Jackfruit	Macau	wholesale	550	45	0.0625
+Jackfruit	Macau	e-commerce	363	45	0.22
+Jackfruit	Macau	own retail	436	45	0.1975
+Jackfruit	Macau	broker	111	45	0.17
+Jackfruit	Madagascar	wholesale	294	45	0.0925
+Jackfruit	Madagascar	e-commerce	912	45	0.1225
+Jackfruit	Madagascar	own retail	305	45	0.0175
+Jackfruit	Madagascar	broker	390	45	0.13
+Jackfruit	Malaysia	wholesale	789	45	0.0875
+Jackfruit	Malaysia	e-commerce	667	45	0.0975
+Jackfruit	Malaysia	own retail	92	45	0.1225
+Jackfruit	Malaysia	broker	569	45	0.075
+Jackfruit	Myanmar	wholesale	88	45	0.1475
+Jackfruit	Myanmar	e-commerce	774	45	0.1225
+Jackfruit	Myanmar	own retail	948	45	0.0625
+Jackfruit	Myanmar	broker	802	45	0.11
+Jackfruit	Nauru	wholesale	633	45	0.1175
+Jackfruit	Nauru	e-commerce	893	45	0.075
+Jackfruit	Nauru	own retail	325	45	0.1425
+Jackfruit	Nauru	broker	792	45	0.1225
+Jackfruit	Netherlands Antilles	wholesale	868	45	0.095
+Jackfruit	Netherlands Antilles	e-commerce	583	45	0.1175
+Jackfruit	Netherlands Antilles	own retail	716	45	0.08
+Jackfruit	Netherlands Antilles	broker	69	45	0.15
+Jackfruit	Saint Pierre And Miquelon	wholesale	31	45	0.045
+Jackfruit	Saint Pierre And Miquelon	e-commerce	361	45	0.235
+Jackfruit	Saint Pierre And Miquelon	own retail	532	45	0.0625
+Jackfruit	Saint Pierre And Miquelon	broker	623	45	0.0225
+Jackfruit	Serbia	wholesale	636	45	0.2375
+Jackfruit	Serbia	e-commerce	417	45	0.205
+Jackfruit	Serbia	own retail	486	45	0.005
+Jackfruit	Serbia	broker	119	45	0.1
+Jackfruit	Singapore	wholesale	509	45	0.0025
+Jackfruit	Singapore	e-commerce	832	45	0.1225
+Jackfruit	Singapore	own retail	532	45	0.11
+Jackfruit	Singapore	broker	654	45	0.1425
+Jackfruit	Svalbard And Jan Mayen	wholesale	167	45	0.1725
+Jackfruit	Svalbard And Jan Mayen	e-commerce	700	45	0.0375
+Jackfruit	Svalbard And Jan Mayen	own retail	125	45	0.185
+Jackfruit	Svalbard And Jan Mayen	broker	262	45	0.0025
+Jackfruit	Turkey	wholesale	939	45	0.0525
+Jackfruit	Turkey	e-commerce	686	45	0.1175
+Jackfruit	Turkey	own retail	992	45	0.185
+Jackfruit	Turkey	broker	924	45	0.0175
+Jackfruit	Tuvalu	wholesale	581	45	0.22
+Jackfruit	Tuvalu	e-commerce	348	45	0.1325
+Jackfruit	Tuvalu	own retail	591	45	0.1925
+Jackfruit	Tuvalu	broker	487	45	0.045
+Jackfruit	United States	wholesale	659	45	0.145
+Jackfruit	United States	e-commerce	205	45	0.025
+Jackfruit	United States	own retail	305	45	0.0
+Jackfruit	United States	broker	906	45	0.065
+Jackfruit	Virgin Islands, U.s.	wholesale	687	45	0.19
+Jackfruit	Virgin Islands, U.s.	e-commerce	923	45	0.1675
+Jackfruit	Virgin Islands, U.s.	own retail	151	45	0.17
+Jackfruit	Virgin Islands, U.s.	broker	483	45	0.05
+Orange	Central African Republic	wholesale	741	30	0.1325
+Orange	Central African Republic	e-commerce	500	30	0.07
+Orange	Central African Republic	own retail	396	30	0.06
+Orange	Central African Republic	broker	60	30	0.2075
+Orange	Cocos (keeling) Islands	wholesale	903	30	0.11
+Orange	Cocos (keeling) Islands	e-commerce	779	30	0.14
+Orange	Cocos (keeling) Islands	own retail	91	30	0.09
+Orange	Cocos (keeling) Islands	broker	314	30	0.005
+Orange	Congo	wholesale	719	30	0.115
+Orange	Congo	e-commerce	487	30	0.1325
+Orange	Congo	own retail	778	30	0.21
+Orange	Congo	broker	783	30	0.185
+Orange	Ecuador	wholesale	657	30	0.185
+Orange	Ecuador	e-commerce	57	30	0.0025
+Orange	Ecuador	own retail	882	30	0.2425
+Orange	Ecuador	broker	861	30	0.0725
+Orange	Egypt	wholesale	965	30	0.2225
+Orange	Egypt	e-commerce	387	30	0.185
+Orange	Egypt	own retail	746	30	0.1675
+Orange	Egypt	broker	671	30	0.0825
+Orange	Faroe Islands	wholesale	116	30	0.19
+Orange	Faroe Islands	e-commerce	981	30	0.1225
+Orange	Faroe Islands	own retail	490	30	0.1625
+Orange	Faroe Islands	broker	392	30	0.0375
+Orange	Germany	wholesale	220	30	0.1
+Orange	Germany	e-commerce	657	30	0.03
+Orange	Germany	own retail	736	30	0.2075
+Orange	Germany	broker	633	30	0.1425
+Orange	Guinea-bissau	wholesale	977	30	0.1725
+Orange	Guinea-bissau	e-commerce	341	30	0.2425
+Orange	Guinea-bissau	own retail	394	30	0.085
+Orange	Guinea-bissau	broker	854	30	0.1275
+Orange	Heard Island And Mcdonald Islands	wholesale	475	30	0.045
+Orange	Heard Island And Mcdonald Islands	e-commerce	886	30	0.05
+Orange	Heard Island And Mcdonald Islands	own retail	765	30	0.075
+Orange	Heard Island And Mcdonald Islands	broker	539	30	0.215
+Orange	India	wholesale	860	30	0.0125
+Orange	India	e-commerce	220	30	0.2275
+Orange	India	own retail	963	30	0.1525
+Orange	India	broker	786	30	0.05
+Orange	Lebanon	wholesale	532	30	0.1
+Orange	Lebanon	e-commerce	198	30	0.05
+Orange	Lebanon	own retail	318	30	0.0375
+Orange	Lebanon	broker	773	30	0.075
+Orange	Macau	wholesale	504	30	0.07
+Orange	Macau	e-commerce	12	30	0.05
+Orange	Macau	own retail	974	30	0.01
+Orange	Macau	broker	86	30	0.08
+Orange	Madagascar	wholesale	80	30	0.1725
+Orange	Madagascar	e-commerce	884	30	0.1325
+Orange	Madagascar	own retail	241	30	0.17
+Orange	Madagascar	broker	267	30	0.0175
+Orange	Malaysia	wholesale	597	30	0.0875
+Orange	Malaysia	e-commerce	491	30	0.0275
+Orange	Malaysia	own retail	481	30	0.09
+Orange	Malaysia	broker	175	30	0.0425
+Orange	Myanmar	wholesale	55	30	0.24
+Orange	Myanmar	e-commerce	549	30	0.0925
+Orange	Myanmar	own retail	985	30	0.215
+Orange	Myanmar	broker	328	30	0.17
+Orange	Nauru	wholesale	548	30	0.04
+Orange	Nauru	e-commerce	272	30	0.21
+Orange	Nauru	own retail	708	30	0.195
+Orange	Nauru	broker	548	30	0.185
+Orange	Netherlands Antilles	wholesale	386	30	0.025
+Orange	Netherlands Antilles	e-commerce	829	30	0.2125
+Orange	Netherlands Antilles	own retail	17	30	0.185
+Orange	Netherlands Antilles	broker	874	30	0.08
+Orange	Saint Pierre And Miquelon	wholesale	935	30	0.0375
+Orange	Saint Pierre And Miquelon	e-commerce	285	30	0.2275
+Orange	Saint Pierre And Miquelon	own retail	329	30	0.1925
+Orange	Saint Pierre And Miquelon	broker	43	30	0.0575
+Orange	Serbia	wholesale	963	30	0.14
+Orange	Serbia	e-commerce	814	30	0.1675
+Orange	Serbia	own retail	343	30	0.145
+Orange	Serbia	broker	465	30	0.1725
+Orange	Singapore	wholesale	693	30	0.24
+Orange	Singapore	e-commerce	977	30	0.095
+Orange	Singapore	own retail	322	30	0.21
+Orange	Singapore	broker	679	30	0.245
+Orange	Svalbard And Jan Mayen	wholesale	821	30	0.1925
+Orange	Svalbard And Jan Mayen	e-commerce	693	30	0.2175
+Orange	Svalbard And Jan Mayen	own retail	850	30	0.035
+Orange	Svalbard And Jan Mayen	broker	863	30	0.055
+Orange	Turkey	wholesale	288	30	0.0075
+Orange	Turkey	e-commerce	863	30	0.1725
+Orange	Turkey	own retail	556	30	0.1225
+Orange	Turkey	broker	335	30	0.065
+Orange	Tuvalu	wholesale	59	30	0.0975
+Orange	Tuvalu	e-commerce	752	30	0.005
+Orange	Tuvalu	own retail	641	30	0.155
+Orange	Tuvalu	broker	751	30	0.17
+Orange	United States	wholesale	306	30	0.1325
+Orange	United States	e-commerce	665	30	0.19
+Orange	United States	own retail	423	30	0.175
+Orange	United States	broker	73	30	0.16
+Orange	Virgin Islands, U.s.	wholesale	14	30	0.2225
+Orange	Virgin Islands, U.s.	e-commerce	811	30	0.035
+Orange	Virgin Islands, U.s.	own retail	577	30	0.2325
+Orange	Virgin Islands, U.s.	broker	584	30	0.1425
+Peach	Central African Republic	wholesale	879	25	0.0175
+Peach	Central African Republic	e-commerce	749	25	0.02
+Peach	Central African Republic	own retail	104	25	0.2475
+Peach	Central African Republic	broker	466	25	0.2275
+Peach	Cocos (keeling) Islands	wholesale	527	25	0.065
+Peach	Cocos (keeling) Islands	e-commerce	341	25	0.135
+Peach	Cocos (keeling) Islands	own retail	43	25	0.095
+Peach	Cocos (keeling) Islands	broker	542	25	0.19
+Peach	Congo	wholesale	339	25	0.1775
+Peach	Congo	e-commerce	768	25	0.0575
+Peach	Congo	own retail	526	25	0.135
+Peach	Congo	broker	817	25	0.025
+Peach	Ecuador	wholesale	940	25	0.165
+Peach	Ecuador	e-commerce	50	25	0.0975
+Peach	Ecuador	own retail	315	25	0.0575
+Peach	Ecuador	broker	956	25	0.1625
+Peach	Egypt	wholesale	321	25	0.09
+Peach	Egypt	e-commerce	429	25	0.08
+Peach	Egypt	own retail	650	25	0.15
+Peach	Egypt	broker	808	25	0.1325
+Peach	Faroe Islands	wholesale	640	25	0.0475
+Peach	Faroe Islands	e-commerce	443	25	0.0525
+Peach	Faroe Islands	own retail	990	25	0.12
+Peach	Faroe Islands	broker	616	25	0.205
+Peach	Germany	wholesale	306	25	0.1925
+Peach	Germany	e-commerce	94	25	0.14
+Peach	Germany	own retail	526	25	0.005
+Peach	Germany	broker	718	25	0.1375
+Peach	Guinea-bissau	wholesale	515	25	0.16
+Peach	Guinea-bissau	e-commerce	925	25	0.0625
+Peach	Guinea-bissau	own retail	639	25	0.135
+Peach	Guinea-bissau	broker	869	25	0.1175
+Peach	Heard Island And Mcdonald Islands	wholesale	254	25	0.1875
+Peach	Heard Island And Mcdonald Islands	e-commerce	461	25	0.115
+Peach	Heard Island And Mcdonald Islands	own retail	427	25	0.0675
+Peach	Heard Island And Mcdonald Islands	broker	28	25	0.1
+Peach	India	wholesale	731	25	0.1875
+Peach	India	e-commerce	365	25	0.105
+Peach	India	own retail	239	25	0.1275
+Peach	India	broker	482	25	0.12
+Peach	Lebanon	wholesale	524	25	0.0475
+Peach	Lebanon	e-commerce	945	25	0.215
+Peach	Lebanon	own retail	498	25	0.0675
+Peach	Lebanon	broker	920	25	0.0775
+Peach	Macau	wholesale	574	25	0.07
+Peach	Macau	e-commerce	606	25	0.15
+Peach	Macau	own retail	940	25	0.1375
+Peach	Macau	broker	825	25	0.1775
+Peach	Madagascar	wholesale	792	25	0.0975
+Peach	Madagascar	e-commerce	490	25	0.2475
+Peach	Madagascar	own retail	540	25	0.145
+Peach	Madagascar	broker	919	25	0.0475
+Peach	Malaysia	wholesale	963	25	0.1225
+Peach	Malaysia	e-commerce	345	25	0.1625
+Peach	Malaysia	own retail	421	25	0.205
+Peach	Malaysia	broker	58	25	0.0375
+Peach	Myanmar	wholesale	5	25	0.1225
+Peach	Myanmar	e-commerce	449	25	0.0975
+Peach	Myanmar	own retail	975	25	0.145
+Peach	Myanmar	broker	662	25	0.01
+Peach	Nauru	wholesale	391	25	0.1025
+Peach	Nauru	e-commerce	951	25	0.095
+Peach	Nauru	own retail	445	25	0.11
+Peach	Nauru	broker	638	25	0.12
+Peach	Netherlands Antilles	wholesale	756	25	0.01
+Peach	Netherlands Antilles	e-commerce	869	25	0.08
+Peach	Netherlands Antilles	own retail	553	25	0.09
+Peach	Netherlands Antilles	broker	593	25	0.0175
+Peach	Saint Pierre And Miquelon	wholesale	711	25	0.1525
+Peach	Saint Pierre And Miquelon	e-commerce	242	25	0.0825
+Peach	Saint Pierre And Miquelon	own retail	182	25	0.005
+Peach	Saint Pierre And Miquelon	broker	661	25	0.0325
+Peach	Serbia	wholesale	594	25	0.0625
+Peach	Serbia	e-commerce	970	25	0.0825
+Peach	Serbia	own retail	93	25	0.1125
+Peach	Serbia	broker	189	25	0.0725
+Peach	Singapore	wholesale	180	25	0.2375
+Peach	Singapore	e-commerce	998	25	0.0425
+Peach	Singapore	own retail	573	25	0.125
+Peach	Singapore	broker	260	25	0.2075
+Peach	Svalbard And Jan Mayen	wholesale	937	25	0.075
+Peach	Svalbard And Jan Mayen	e-commerce	877	25	0.0
+Peach	Svalbard And Jan Mayen	own retail	361	25	0.2475
+Peach	Svalbard And Jan Mayen	broker	170	25	0.155
+Peach	Turkey	wholesale	600	25	0.13
+Peach	Turkey	e-commerce	982	25	0.0075
+Peach	Turkey	own retail	256	25	0.0525
+Peach	Turkey	broker	502	25	0.1625
+Peach	Tuvalu	wholesale	225	25	0.1275
+Peach	Tuvalu	e-commerce	685	25	0.0
+Peach	Tuvalu	own retail	259	25	0.1875
+Peach	Tuvalu	broker	59	25	0.205
+Peach	United States	wholesale	249	25	0.0575
+Peach	United States	e-commerce	553	25	0.1075
+Peach	United States	own retail	611	25	0.225
+Peach	United States	broker	53	25	0.02
+Peach	Virgin Islands, U.s.	wholesale	874	25	0.16
+Peach	Virgin Islands, U.s.	e-commerce	744	25	0.12
+Peach	Virgin Islands, U.s.	own retail	615	25	0.02
+Peach	Virgin Islands, U.s.	broker	331	25	0.0825
+Tomato	Central African Republic	wholesale	506	30	0.0675
+Tomato	Central African Republic	e-commerce	528	30	0.125
+Tomato	Central African Republic	own retail	37	30	0.1075
+Tomato	Central African Republic	broker	118	30	0.0775
+Tomato	Cocos (keeling) Islands	wholesale	412	30	0.0475
+Tomato	Cocos (keeling) Islands	e-commerce	675	30	0.0775
+Tomato	Cocos (keeling) Islands	own retail	220	30	0.0025
+Tomato	Cocos (keeling) Islands	broker	364	30	0.005
+Tomato	Congo	wholesale	735	30	0.0025
+Tomato	Congo	e-commerce	805	30	0.0175
+Tomato	Congo	own retail	900	30	0.1725
+Tomato	Congo	broker	63	30	0.23
+Tomato	Ecuador	wholesale	891	30	0.2125
+Tomato	Ecuador	e-commerce	959	30	0.215
+Tomato	Ecuador	own retail	232	30	0.175
+Tomato	Ecuador	broker	387	30	0.125
+Tomato	Egypt	wholesale	62	30	0.225
+Tomato	Egypt	e-commerce	421	30	0.1025
+Tomato	Egypt	own retail	500	30	0.2175
+Tomato	Egypt	broker	448	30	0.1975
+Tomato	Faroe Islands	wholesale	322	30	0.0975
+Tomato	Faroe Islands	e-commerce	138	30	0.2175
+Tomato	Faroe Islands	own retail	695	30	0.1725
+Tomato	Faroe Islands	broker	600	30	0.14
+Tomato	Germany	wholesale	84	30	0.145
+Tomato	Germany	e-commerce	112	30	0.0375
+Tomato	Germany	own retail	2	30	0.2375
+Tomato	Germany	broker	125	30	0.02
+Tomato	Guinea-bissau	wholesale	373	30	0.0075
+Tomato	Guinea-bissau	e-commerce	591	30	0.2325
+Tomato	Guinea-bissau	own retail	741	30	0.065
+Tomato	Guinea-bissau	broker	714	30	0.0625
+Tomato	Heard Island And Mcdonald Islands	wholesale	481	30	0.0675
+Tomato	Heard Island And Mcdonald Islands	e-commerce	171	30	0.1175
+Tomato	Heard Island And Mcdonald Islands	own retail	533	30	0.1775
+Tomato	Heard Island And Mcdonald Islands	broker	479	30	0.055
+Tomato	India	wholesale	68	30	0.24
+Tomato	India	e-commerce	554	30	0.09
+Tomato	India	own retail	949	30	0.1625
+Tomato	India	broker	208	30	0.105
+Tomato	Lebanon	wholesale	720	30	0.145
+Tomato	Lebanon	e-commerce	379	30	0.035
+Tomato	Lebanon	own retail	535	30	0.115
+Tomato	Lebanon	broker	851	30	0.0625
+Tomato	Macau	wholesale	526	30	0.1325
+Tomato	Macau	e-commerce	583	30	0.1575
+Tomato	Macau	own retail	500	30	0.1925
+Tomato	Macau	broker	708	30	0.155
+Tomato	Madagascar	wholesale	735	30	0.04
+Tomato	Madagascar	e-commerce	34	30	0.135
+Tomato	Madagascar	own retail	27	30	0.245
+Tomato	Madagascar	broker	665	30	0.145
+Tomato	Malaysia	wholesale	61	30	0.1875
+Tomato	Malaysia	e-commerce	914	30	0.145
+Tomato	Malaysia	own retail	965	30	0.0475
+Tomato	Malaysia	broker	35	30	0.2
+Tomato	Myanmar	wholesale	567	30	0.21
+Tomato	Myanmar	e-commerce	682	30	0.24
+Tomato	Myanmar	own retail	661	30	0.235
+Tomato	Myanmar	broker	836	30	0.125
+Tomato	Nauru	wholesale	111	30	0.1625
+Tomato	Nauru	e-commerce	253	30	0.19
+Tomato	Nauru	own retail	44	30	0.03
+Tomato	Nauru	broker	621	30	0.2025
+Tomato	Netherlands Antilles	wholesale	399	30	0.0375
+Tomato	Netherlands Antilles	e-commerce	958	30	0.065
+Tomato	Netherlands Antilles	own retail	300	30	0.14
+Tomato	Netherlands Antilles	broker	549	30	0.2225
+Tomato	Saint Pierre And Miquelon	wholesale	549	30	0.0525
+Tomato	Saint Pierre And Miquelon	e-commerce	363	30	0.1725
+Tomato	Saint Pierre And Miquelon	own retail	100	30	0.1025
+Tomato	Saint Pierre And Miquelon	broker	205	30	0.025
+Tomato	Serbia	wholesale	354	30	0.145
+Tomato	Serbia	e-commerce	54	30	0.1025
+Tomato	Serbia	own retail	406	30	0.125
+Tomato	Serbia	broker	628	30	0.18
+Tomato	Singapore	wholesale	876	30	0.0775
+Tomato	Singapore	e-commerce	466	30	0.0625
+Tomato	Singapore	own retail	90	30	0.135
+Tomato	Singapore	broker	921	30	0.0375
+Tomato	Svalbard And Jan Mayen	wholesale	707	30	0.195
+Tomato	Svalbard And Jan Mayen	e-commerce	749	30	0.19
+Tomato	Svalbard And Jan Mayen	own retail	686	30	0.245
+Tomato	Svalbard And Jan Mayen	broker	294	30	0.195
+Tomato	Turkey	wholesale	703	30	0.095
+Tomato	Turkey	e-commerce	835	30	0.0675
+Tomato	Turkey	own retail	381	30	0.2025
+Tomato	Turkey	broker	182	30	0.205
+Tomato	Tuvalu	wholesale	870	30	0.2425
+Tomato	Tuvalu	e-commerce	582	30	0.2225
+Tomato	Tuvalu	own retail	289	30	0.1725
+Tomato	Tuvalu	broker	296	30	0.0225
+Tomato	United States	wholesale	696	30	0.105
+Tomato	United States	e-commerce	206	30	0.0925
+Tomato	United States	own retail	966	30	0.2175
+Tomato	United States	broker	37	30	0.175
+Tomato	Virgin Islands, U.s.	wholesale	625	30	0.235
+Tomato	Virgin Islands, U.s.	e-commerce	709	30	0.0725
+Tomato	Virgin Islands, U.s.	own retail	373	30	0.1675
+Tomato	Virgin Islands, U.s.	broker	51	30	0.07

@@ -129,5 +129,6 @@ is legend_tag('test', +{class=>'foo'}), '<legend class="foo">test</legend>';
 is legend_tag('test'), '<legend>test</legend>';
 is legend_tag({class=>'foo'}, sub { 'test' }), '<legend class="foo">test</legend>';
 is legend_tag(sub { 'test' }), '<legend>test</legend>';
+is legend_tag({class=>['foo']}, sub { 'test' }), '<legend class="foo">test</legend>';
 
 done_testing;

@@ -4,143 +4,82 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
+  PE_NOTOKEN
+  PE_TOKENEXPIRED
   PE_ERROR
   PE_BADOTP
   PE_FORMEMPTY
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.15';
 
-extends 'Lemonldap::NG::Portal::Main::SecondFactor';
+extends 'Lemonldap::NG::Portal::Lib::Code2F';
 
 # INITIALIZATION
 
+# Prefix can overriden by sfExtra and is used for routes
 has prefix => ( is => 'rw', default => 'ext' );
-has random => ( is => 'rw' );
+
+# Type is used to lookup config
+has type   => ( is => 'ro', default => 'ext' );
+has legend => ( is => 'rw', default => 'enterExt2fCode' );
 
 sub init {
     my ($self) = @_;
-    unless ( $self->conf->{ext2fCodeActivation} ) {
+
+    if ( $self->code_activation ) {
+        unless ( $self->conf->{ext2FSendCommand} ) {
+            $self->error("Missing 'ext2FSendCommand' parameter, aborting");
+            return 0;
+        }
+    }
+    else {
         foreach (qw(ext2FSendCommand ext2FValidateCommand)) {
             unless ( $self->conf->{$_} ) {
                 $self->error("Missing $_ parameter, aborting");
                 return 0;
             }
         }
-        $self->prefix( $self->conf->{sfPrefix} )
-          if ( $self->conf->{sfPrefix} );
-        return $self->SUPER::init();
     }
-    if ( $self->conf->{ext2fCodeActivation} ) {
-        unless ( $self->conf->{ext2FSendCommand} ) {
-            $self->error("Missing 'ext2FSendCommand' parameter, aborting");
-            return 0;
-        }
-        $self->random( Lemonldap::NG::Common::Crypto::srandom() );
-        $self->prefix( $self->conf->{sfPrefix} )
-          if ( $self->conf->{sfPrefix} );
-        return $self->SUPER::init();
-    }
-    return 0;
+
+    $self->prefix( $self->conf->{sfPrefix} ) if ( $self->conf->{sfPrefix} );
+    return $self->SUPER::init();
 }
 
 # RUNNING METHODS
 
-sub run {
-    my ( $self, $req, $token ) = @_;
+sub verify_external {
+    my ( $self, $req, $session, $code ) = @_;
 
-    my $checkLogins = $req->param('checkLogins');
-    $self->logger->debug("Ext2F: checkLogins set") if $checkLogins;
-
-    my $stayconnected = $req->param('stayconnected');
-    $self->logger->debug("Ext2F: stayconnected set") if $stayconnected;
-
-    # Generate Code to send
-    my $code;
-    if ( $self->conf->{ext2fCodeActivation} ) {
-        $code = $self->random->randregex( $self->conf->{ext2fCodeActivation} );
-        $self->logger->debug("Generated ext2f code : $code");
-        $self->ott->updateToken( $token, __ext2fcode => $code );
+    # Prepare command and launch it
+    $self->logger->debug( 'Launching "Validate" external 2F command -> '
+          . $self->conf->{ext2FValidateCommand} );
+    $self->logger->debug(" code -> $code");
+    if ( my $c =
+        $self->launch( $session, $self->conf->{ext2FValidateCommand}, $code ) )
+    {
+        $self->userLogger->warn( 'Second factor failed for '
+              . $session->{ $self->conf->{whatToTrace} } );
+        $self->logger->error("External verify command failed (code $c)");
+        return PE_BADOTP;
     }
+    return PE_OK;
+}
+
+sub sendCode {
+    my ( $self, $req, $sessionInfo, $code ) = @_;
 
     # Prepare command and launch it
     $self->logger->debug( 'Launching "Send" external 2F command -> '
           . $self->conf->{ext2FSendCommand} );
-    if (
-        my $c = $self->launch(
-            $req->sessionInfo, $self->conf->{ext2FSendCommand}, $code
-        )
-      )
+    if ( my $c =
+        $self->launch( $sessionInfo, $self->conf->{ext2FSendCommand}, $code ) )
     {
         $self->logger->error("External send command failed (code $c)");
-        return PE_ERROR;
+        return 0;
     }
-
-    # Prepare form
-    my $tmp = $self->p->sendHtml(
-        $req,
-        'ext2fcheck',
-        params => {
-            MAIN_LOGO => $self->conf->{portalMainLogo},
-            SKIN      => $self->p->getSkin($req),
-            TOKEN     => $token,
-            PREFIX    => $self->prefix,
-            TARGET    => '/'
-              . $self->prefix
-              . '2fcheck?skin='
-              . $self->p->getSkin($req),
-            CHECKLOGINS   => $checkLogins,
-            STAYCONNECTED => $stayconnected
-        }
-    );
-    $self->logger->debug("Prepare external 2F verification");
-
-    $req->response($tmp);
-    return PE_SENDRESPONSE;
-}
-
-sub verify {
-    my ( $self, $req, $session ) = @_;
-    my $usercode;
-    unless ( $usercode = $req->param('code') ) {
-        $self->userLogger->error('External 2F: no code found');
-        return PE_FORMEMPTY;
-    }
-
-    unless ( $self->conf->{ext2fCodeActivation} ) {
-
-        # Prepare command and launch it
-        $self->logger->debug( 'Launching "Validate" external 2F command -> '
-              . $self->conf->{ext2FValidateCommand} );
-        $self->logger->debug(" code -> $usercode");
-        if (
-            my $c = $self->launch(
-                $session, $self->conf->{ext2FValidateCommand}, $usercode
-            )
-          )
-        {
-            $self->userLogger->warn( 'Second factor failed for '
-                  . $session->{ $self->conf->{whatToTrace} } );
-            $self->logger->error("External verify command failed (code $c)");
-            return PE_BADOTP;
-        }
-        return PE_OK;
-    }
-
-    my $savedcode = $session->{__ext2fcode};
-    unless ($savedcode) {
-        $self->logger->error(
-            'Unable to find generated 2F code in token session');
-        return PE_ERROR;
-    }
-
-    $self->logger->debug("Verifying Ext 2F code: $usercode VS $savedcode");
-    return PE_OK if ( $usercode eq $savedcode );
-
-    $self->userLogger->warn( 'Second factor failed for '
-          . $session->{ $self->conf->{whatToTrace} } );
-    return PE_BADOTP;
+    return 1;
 }
 
 # system() is used with an array to avoid shell injection

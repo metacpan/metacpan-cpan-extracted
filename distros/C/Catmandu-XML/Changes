@@ -1,6 +1,6 @@
 Changelog for Catmandu-XML
 
-0.16  2015-06-15 11:49:10 CEST
+0.17 2022-09-15T05:19:34Z
   - fixed failing importer tests
   - additional xml_transform option 'format'
   - Catmandu::Importer::XML option 'transform' renamed to 'xslt'

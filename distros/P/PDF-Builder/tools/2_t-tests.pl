@@ -7,13 +7,15 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 # command line flags, mutually exclusive:
 # -raw   show full output of each t-test run
 # -noOK  exclude "ok" lines so can easily spot error lines  DEFAULT
 
+ # add after filter-lzwdecode when new TIFF code finished
+ #   filter-ccittfaxdecode
 my @test_list = qw(
  00-all-usable
  01-basic
@@ -27,11 +29,13 @@ my @test_list = qw(
  circular-references
  cmap
  content
+ content-deprecated
  cs-webcolor
  deprecations
  extgstate
  filter-ascii85decode
  filter-asciihexdecode
+ filter-lzwdecode
  filter-runlengthdecode
  font-corefont
  font-synfont
@@ -39,8 +43,10 @@ my @test_list = qw(
  font-type1
  gd
  gif
+ info
  jpg
  lite
+ named-destinations
  outline
  page
  papersizes
@@ -55,6 +61,7 @@ my @test_list = qw(
  string
  text
  tiff
+ version
  viewer-preferences
                   );
 # override full list above, and run just one or two tests

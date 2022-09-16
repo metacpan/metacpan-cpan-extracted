@@ -1,5 +1,9 @@
 Revision history for FFI-CheckLib
 
+0.29      2022-09-10 01:46:05 -0600
+  - Handle Windows DLLs using underscores instead of dashes in version
+    numbers (gh#44, gh#45, shawnlaffan++)
+
 0.28      2021-05-16 15:10:34 -0600
   - Avoid undef warning from File::Spec->catpath (gh#30, gh#33)
   - The alien option now works in fallback mode; if one or more of the 

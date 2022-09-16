@@ -341,6 +341,20 @@ sub inject {
   return *{"${class}::${name}"} = $coderef || sub{$class};
 }
 
+sub integrates {
+  my ($self) = @_;
+
+  my $roles = $self->meta->roles;
+
+  return $roles || [];
+}
+
+sub lfile {
+  my ($self) = @_;
+
+  return $self->format('path', '%s.pm');
+}
+
 sub load {
   my ($self) = @_;
 
@@ -424,6 +438,12 @@ sub parts {
   my ($self) = @_;
 
   return $self->parse;
+}
+
+sub pfile {
+  my ($self) = @_;
+
+  return $self->format('path', '%s.pod');
 }
 
 sub prepend {
@@ -591,6 +611,12 @@ sub splice {
   }
 
   return $class->new(join '/', @$parts);
+}
+
+sub tfile {
+  my ($self) = @_;
+
+  return $self->format('label', '%s.t');
 }
 
 sub tryload {
@@ -1720,6 +1746,71 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 integrates
+
+  integrates() (ArrayRef)
+
+The integrates method returns the list of roles integrated into the target
+package.
+
+I<Since C<1.30>>
+
+=over 4
+
+=item integrates example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $integrates = $space->integrates;
+
+  # []
+
+=back
+
+=over 4
+
+=item integrates example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Venus::Test');
+
+  my $integrates = $space->integrates;
+
+  # [...]
+
+=back
+
+=cut
+
+=head2 lfile
+
+  lfile() (Str)
+
+The lfile method returns a C<.pm> file path for the underlying package.
+
+I<Since C<1.30>>
+
+=over 4
+
+=item lfile example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $lfile = $space->lfile;
+
+  # "Foo/Bar.pm"
+
+=back
+
+=cut
+
 =head2 load
 
   load() (Str)
@@ -2087,6 +2178,30 @@ I<Since C<0.01>>
   my $parts = $space->parts;
 
   # ["FooBar"]
+
+=back
+
+=cut
+
+=head2 pfile
+
+  pfile() (Str)
+
+The pfile method returns a C<.pod> file path for the underlying package.
+
+I<Since C<1.30>>
+
+=over 4
+
+=item pfile example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $pfile = $space->pfile;
+
+  # "Foo/Bar.pod"
 
 =back
 
@@ -2539,6 +2654,30 @@ I<Since C<0.09>>
   my $splice = $space->splice(1);
 
   # bless({ value => "Foo" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 tfile
+
+  tfile() (Str)
+
+The tfile method returns a C<.t> file path for the underlying package.
+
+I<Since C<1.30>>
+
+=over 4
+
+=item tfile example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $tfile = $space->tfile;
+
+  # "Foo_Bar.t"
 
 =back
 

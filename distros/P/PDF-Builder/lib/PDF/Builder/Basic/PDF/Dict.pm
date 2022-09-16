@@ -19,10 +19,9 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 our $mincache = 16 * 1024 * 1024;
 
@@ -61,10 +60,12 @@ source PDF the stream starts.
 
 =head1 METHODS
 
+=over
+
 =cut
 
 sub new {
-    my ($class) = @_;
+    my $class = shift();  # have @_ used, later
 
     $class = ref($class) if ref($class);
 
@@ -73,7 +74,7 @@ sub new {
     return $self;
 }
 
-=head2 $type = $d->type($type)
+=item $type = $d->type($type)
 
 Get/Set the standard Type key. It can be passed, and will return, a text value rather than a Name object.
 
@@ -89,7 +90,7 @@ sub type {
     return $self->{'Type'}->val();
 }
 
-=head2 @filters = $d->filter(@filters)
+=item @filters = $d->filter(@filters)
 
 Get/Set one or more filters being used by the optional stream attached to the dictionary.
 
@@ -115,7 +116,7 @@ sub filter {
 # Undocumented alias, which may be removed in a future release
 sub filters { return filter(@_); }
 
-=head2 $d->outobjdeep($fh, $pdf)
+=item $d->outobjdeep($fh, $pdf)
 
 Outputs the contents of the dictionary to a PDF file. This is a recursive call.
 
@@ -233,7 +234,7 @@ sub outobjdeep {
     return;
 }
 
-=head2 $d->read_stream($force_memory)
+=item $d->read_stream($force_memory)
 
 Reads in a stream from a PDF file. If the stream is greater than
 C<PDF::Dict::mincache> (defaults to 32768) bytes to be stored, then
@@ -315,7 +316,7 @@ sub read_stream {
     return $self;
 }
 
-=head2 $d->val()
+=item $d->val()
 
 Returns the dictionary, which is itself.
 
@@ -324,5 +325,9 @@ Returns the dictionary, which is itself.
 sub val {
     return $_[0];
 }
+
+=back
+
+=cut
 
 1;

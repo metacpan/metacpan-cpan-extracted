@@ -1,4 +1,4 @@
-package App::MonM::Const; # $Id: Const.pm 76 2019-07-07 05:20:28Z abalama $
+package App::MonM::Const; # $Id: Const.pm 125 2022-09-06 17:24:56Z abalama $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ App::MonM::Const - Interface for App::MonM general constants
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -24,25 +24,33 @@ This module provide interface for App::MonM general constants
 
 =over 4
 
+=item DAEMONMAME
+
+Daemon name
+
+=item GROUPNAME, USERNAME
+
+Daemon user and group name
+
 =item HOSTNAME
 
-    Hostname
+Hostname
 
 =item PREFIX
 
-    Prefix of project
+Prefix of project
 
 =item PROJECTNAME
 
-    Project name
+Project name
 
 =item PROJECTNAMEL
 
-    Project name in lower case
+Project name in lower case
 
 =item IS_TTY
 
-    Returns boolean TTY status if current session runs under terminal
+Returns boolean TTY status if current session runs under terminal
 
 =back
 
@@ -52,11 +60,11 @@ This module provide interface for App::MonM general constants
 
 =item TRUE, FALSE, VOID
 
-    1, 0, '' values
+1, 0, '' values
 
 =item OK, DONE, ERROR, SKIPPED, PASSED, FAILED, UNKNOWN, PROBLEM
 
-    Test result statuses
+Test result statuses
 
 =back
 
@@ -70,11 +78,11 @@ See C<TODO> file
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -86,7 +94,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION @EXPORT @EXPORT_OK/;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use Sys::Hostname qw/hostname/;
 use Try::Tiny;
@@ -97,6 +105,9 @@ use constant {
         PROJECTNAME         => "MonM",
         PROJECTNAMEL        => "monm",
         PREFIX              => "monm",
+        DAEMONMAME          => 'monmd',
+        USERNAME            => 'monmu',
+        GROUPNAME           => 'monmu',
 
         # TTY
         IS_TTY              => (-t STDOUT) ? 1 : 0,
@@ -106,6 +117,10 @@ use constant {
         TRUE                => 1,
         FALSE               => 0,
         VOID                => '',
+
+        # Date & Time
+        DATETIME_FORMAT     => "%w, %DD %MON %YYYY %hh:%mm:%ss",
+        DATETIME_GMT_FORMAT => "%w, %DD %MON %YYYY %hh:%mm:%ss %G",
 
         # Test results
         OK                  => "OK",        # for SMALL operations
@@ -119,12 +134,12 @@ use constant {
     };
 
 @EXPORT = (qw/
-        PROJECTNAME
-        PROJECTNAMEL
-        PREFIX
+        PROJECTNAME PROJECTNAMEL PREFIX DAEMONMAME
+        USERNAME GROUPNAME
         HOSTNAME
         IS_TTY
         SCREENWIDTH
+        DATETIME_FORMAT DATETIME_GMT_FORMAT
     /);
 @EXPORT_OK = (qw/
         TRUE FALSE VOID
@@ -133,7 +148,7 @@ use constant {
 
 my $myhostname = undef;
 *HOSTNAME = sub {
-    $myhostname ||= (hostname() // 'unknown host');
+    $myhostname ||= (hostname() // 'localhost');
     return $myhostname;
 };
 

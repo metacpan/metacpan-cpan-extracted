@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::Lib::Slave;
 use strict;
 use Mouse;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.15';
 
 # RUNNING METHODS
 
@@ -33,7 +33,7 @@ sub checkHeader {
       unless ( $self->conf->{slaveHeaderName}
         and $self->conf->{slaveHeaderContent} );
 
-    my $slave_header = 'HTTP_' . uc( $self->{conf}->{slaveHeaderName} );
+    my $slave_header = 'HTTP_' . uc( $self->conf->{slaveHeaderName} );
     $slave_header =~ s/\-/_/g;
     my $headerContent = $req->env->{$slave_header};
     $self->logger->debug(

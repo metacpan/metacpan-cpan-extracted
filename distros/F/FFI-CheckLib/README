@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.28
+    version 0.29
 
 SYNOPSIS
 
@@ -186,7 +186,7 @@ FUNCTIONS
 
     [version 0.17]
 
-     my $path = where($name);
+     my $path = which($name);
 
     Return the path to the first library that matches the given name.
 
@@ -306,7 +306,11 @@ AUTHOR
 
     Shawn Laffan (SLAFFAN)
 
-    Petr Pisar (ppisar)
+    Petr Písař (ppisar)
+
+    Michael R. Davis (MRDVT)
+
+    Shawn Laffan (SLAFFAN)
 
 COPYRIGHT AND LICENSE
 

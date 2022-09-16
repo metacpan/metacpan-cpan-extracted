@@ -6,7 +6,7 @@ use JSON;
 use Lemonldap::NG::Common::PSGI::Constants;
 use Lemonldap::NG::Common::PSGI::Request;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.15';
 
 our $_json = JSON->new->allow_nonref;
 
@@ -18,6 +18,7 @@ has logLevel     => ( is => 'rw', isa     => 'Str', default => 'info' );
 has portal       => ( is => 'rw', isa     => 'Str' );
 has staticPrefix => ( is => 'rw', isa     => 'Str' );
 has instanceName => ( is => 'rw', isa     => 'Str', default => '' );
+has customCSS    => ( is => 'rw', isa     => 'Str', default => '' );
 has templateDir  => ( is => 'rw', isa     => 'Str|ArrayRef' );
 has links        => ( is => 'rw', isa     => 'ArrayRef' );
 has menuLinks    => ( is => 'rw', isa     => 'ArrayRef' );
@@ -256,8 +257,9 @@ sub sendJs {
     my ( $self, $req ) = @_;
     my $sp = $self->staticPrefix;
     $sp =~ s/\/*$/\//;
-    my $sc = $req->script_name;
-    $sc = '.' unless ($sc);
+    my $sc = $req->script_name // "";
+
+    # Javascript scriptname is assumed by our JS code to end with /
     $sc =~ s#/*$#/#;
     my $s =
         sprintf 'var staticPrefix="%s";'
@@ -280,8 +282,9 @@ sub sendHtml {
     my ( $self, $req, $template, %args ) = @_;
     my $sp = $self->staticPrefix;
     $sp =~ s/\/*$/\//;
-    my $sc = $req->script_name;
-    $sc = '.' unless ($sc);
+    my $sc = $req->script_name // "";
+
+    # SCRIPTNAME is assumed by our templates to end with /
     $sc =~ s#/*$#/#;
     $args{code}    ||= 200;
     $args{headers} ||= [ $req->spliceHdrs ];
@@ -308,6 +311,7 @@ sub sendHtml {
         $htpl->param(
             STATIC_PREFIX => $sp,
             INSTANCE_NAME => $self->instanceName,
+            CUSTOM_CSS    => $self->customCSS,
             SCRIPTNAME    => $sc,
             ( $self->can('tplParams') ? ( $self->tplParams($req) ) : () ),
             (

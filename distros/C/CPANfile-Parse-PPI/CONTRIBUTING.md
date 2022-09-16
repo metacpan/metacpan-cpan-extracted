@@ -5,7 +5,7 @@ The distribution is contained in a Git repository, so simply clone the
 repository
 
 ```
-$ git clone https://github.com/perlservices/CPANfile-Parse-PPI.git
+$ git clone git://github.com/perlservices/CPANfile-Parse-PPI.git
 ```
 
 and change into the newly-created directory.

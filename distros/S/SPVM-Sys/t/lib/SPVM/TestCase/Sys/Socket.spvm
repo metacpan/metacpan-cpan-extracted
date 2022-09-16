@@ -1,0 +1,12 @@
+class TestCase::Sys::Socket {
+  use Sys::Socket;
+  use Sys::Socket::Constant as Sock;
+  
+  static method socket : int () {
+    
+     my $sock = Sys::Socket->socket(Sock->AF_INET, Sock->SOCK_STREAM, 0);
+     
+     return 1;
+  }
+  
+}

@@ -1,5 +1,38 @@
 Revision history for Babble
 
+0.090008
+          - No change from 0.090007_03.
+
+0.090007_03
+          - Add minimum dependency on PPR 0.001006 which fixes RT#144248.
+            Revert the squashed regex compilation warning from
+            Babble 0.090007_02.
+
+0.090007_02
+          - Squash regex compilation warning that appears on perl >= v5.30.0,
+            PPR >= 0.001000, <= 0.001005. See RT#144248.
+
+0.090007_01
+          - Fix bug where positions transformed are not unique (GH#6). Fixes bug
+            reported by Mark Fowler (2shortplanks++) at GH#1.
+          - CoreSignatures: Do not output empty signature. Fixed by
+            Diab Jerius (djerius++) at GH#2.
+          - Ellipsis: new plugin for ... statement at GH#4.
+          - Pass parent grammar from ::Match to ::SubMatch at GH#5.
+          - SubstituteAndReturn: support implicit s///r on $_
+            and chained s///r at GH#7, GH#8.
+          - PackageBlock, PackageVersion: new plugins for extended
+            package declaration syntax at GH#9, GH#10.
+          - PostfixDeref: Add minimum dependency on PPR 0.001004 which updates
+            definition of PerlTerm (GH#11) which fixes bug reported by
+            Diab Jerius (djerius++) at GH#3. Thanks to Damian Conway on the fix.
+          - PostfixDeref: Add support for postderef_qq interpolation, ->$#*,
+            and consecutive arrowless subscripts at GH#12.
+          - DefinedOr: Fix parentheses for transformation of //= due to
+            precedence at GH#14.
+          - PostfixDeref: change transform to dereference directly instead of
+            using map at GH#13, GH#15.
+          - Add documentation for plugins.
 0.090007
           - Escape unescaped { chars in regexps to avoid deprecation warnings
 0.090006

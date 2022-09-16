@@ -1,3 +1,11 @@
+0.009		2022-09-11	T. R. Wyant
+    Add canned 'ignore_url' value MAYBE_IGNORE_GITHUB.  This causes
+    GitHub URLs to be ignored unless the source directory contains a Git
+    repository and GitHub is configured as a remote.  This is intended
+    to be useful to authors whose boiler plate contains GitHub links, in
+    the early stages of the project before the GitHub repository has
+    been created.
+
 0.008		2021-09-26	T. R. Wyant
     Provide fake modules for testing to prevent test failures on systems
     that have stripped POD from core modules.

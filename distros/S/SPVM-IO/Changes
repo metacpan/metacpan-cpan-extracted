@@ -1,3 +1,11 @@
+0.10 2022-09-16
+  [New Features]
+    * Add the IO::Socket::Interface interface.
+    * The IO::Socket class has the IO::Socket::Interface interface.
+  [Bug Fix]
+    * Fix the bug that IO::Socket::INET doesn't work in SPVM 0.9648+.
+  [Prerequirement Changes]
+    * SPVM 0.9652+ is needed.
 0.09 2022-08-01
   [Internal Ineffective Changes]
     * Use get_field_object_by_name_v2 in SPVM/IO/File.c

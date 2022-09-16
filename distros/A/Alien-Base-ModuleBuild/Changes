@@ -1,5 +1,16 @@
 Revision history for Perl module Alien-Base-ModuleBuild
 
+1.17      2022-09-13 05:27:09 -0600
+  - Documentation improvements (gh#30, gh#31)
+  - Production release otherwise identical to 1.16_01
+
+1.16_01   2022-09-11 15:29:26 -0600
+  - Add support for ALIEN_DOWNLOAD_RULE (gh#28, gh#29)
+  - Add support for ALIEN_INSTALL_NETWORK (gh#28, gh#29)
+  - Verify hostnames for SSL connections when ALIEN_DOWNLOAD_RULE
+    requires encryption (gh#28, gh#29)
+  - Downgrade from https to http is no longer allowed (gh#28, gh#29)
+
 1.15      2020-08-28 09:50:28 -0600
   - Move inline tests from this distro to Acme::Alien::DontPanic
     and Acme::Alien::DontPanic2 (gh#22)

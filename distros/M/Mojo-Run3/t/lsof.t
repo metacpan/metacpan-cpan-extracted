@@ -35,7 +35,7 @@ for my $driver (@drivers) {
   };
 }
 
-subtest undef => sub {
+subtest 'force run3 out of scope' => sub {
   my $run3 = Mojo::Run3->new(driver => 'pty');
   $run3->on(stdout => sub { Mojo::IOLoop->stop });
   $run3->start(sub { print 'started'; sleep 2 });
@@ -47,6 +47,26 @@ subtest undef => sub {
   is lsof(), $initial, 'lsof after undef';
   Mojo::Promise->timer(0.1)->wait;
   is kill(0 => $pid), 0, 'kill';
+};
+
+subtest 'close other' => sub {
+  my $run3 = Mojo::Run3->new;
+  my %read = (stderr => '', stdout => '');
+  $run3->on(stderr => sub { $read{stderr} .= $_[1] });
+  $run3->on(stdout => sub { $read{stdout} .= $_[1] });
+
+  $run3->run_p(sub {
+    my ($run3) = @_;
+    system "lsof -p $$ | grep PIPE | grep $$ | wc -l 1>&2";
+    $run3->close('other');
+    system "lsof -p $$ | grep PIPE | grep $$ | wc -l";
+  })->wait;
+
+  chomp $read{stderr};
+  chomp $read{stdout};
+
+  ok $read{stderr} > $read{stdout}, 'before close other';
+  like $read{stdout}, qr{^4\b}, 'after close other';
 };
 
 done_testing;

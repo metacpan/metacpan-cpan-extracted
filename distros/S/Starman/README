@@ -96,6 +96,28 @@ NOTES
     Starman workers behind the frontend servers such as nginx, and use HTTP
     proxy with TCP or UNIX sockets.
 
+PSGI EXTENSIONS
+
+ psgix.informational
+
+    Starman exposes a callback named psgix.informational that can be used
+    for sending an informational response. The callback accepts two
+    arguments, the first argument being the status code and the second
+    being an arrayref of the headers to be sent. Example below sends an 103
+    Early Hints response before processing the request to build a final
+    response.
+
+        sub {
+            my $env = shift;
+    
+            $env->{'psgix.informational'}->( 103, [
+                "Link" => "</style.css>; rel=preload"
+            ] );
+    
+            my $rest = ...
+            $resp;
+        }
+
 AUTHOR
 
     Tatsuhiko Miyagawa <miyagawa@bulknews.net>
@@ -105,6 +127,8 @@ AUTHOR
 
     Kazuho Oku wrote Net::Server::SS::PreFork that makes it easy to add
     Server::Starter support to this software.
+
+    The psgix.informational callback comes from Starlet by Kazuho Oku.
 
 COPYRIGHT
 

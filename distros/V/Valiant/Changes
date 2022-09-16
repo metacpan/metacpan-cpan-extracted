@@ -1,5 +1,25 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001016 2022 September 11
+          - Distribution is no longer labled 'early access'.  This means I've used it on
+            enough projects to feel there are no massive bugs / gotchas and that I'm pretty
+            committed to the current API. I will only break compatibility if needed to fix
+            security problems or when there's no other way to move the code forward.
+          - New ability to 'theme' Formbuilder by setting default html attributes for the
+            various form elements.  This feature is still evolving so if you use it please
+            be sure to check notes when upgrading.
+          - Improved Formbuilder documentation
+          - clarified the use of the parent_builder option for some Formbuilder methods
+          - Formbuilder callback method now includes the wrapped model.  This could be a
+            breaking change for you if you use method signatures.
+          - New attribute on Formbuilder to track the parent builder if one exists.
+          - Updates to the HTML Tagbuilder to improve looping and related logic.
+          - lots of updates to the example application
+          - In dedication to the living memory of 9/11.  I will never forget the unity
+            and strength of my fellow NYC citizens on that day.  If you visit NYC and go
+            to the Reflecting Pool, please consider not taking a selfie on those hallowed
+            grounds out of respect for those who have experienced what you can never know.
+
 0.001015 2022 August 3
           - lots of cleanup and changes to the example Catalyst application as well as
             more testing of the DBIC wrapper for Valiant Validations.

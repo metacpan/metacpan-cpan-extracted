@@ -5,11 +5,11 @@ use base 'PDF::Builder::Resource';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.018'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use Compress::Zlib;
-use Encode qw(:all);
+#use Encode qw(:all);
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
 use Scalar::Util qw(weaken);
@@ -550,7 +550,7 @@ sub mapByUni {
 =item $name = $font->glyphByUni($unicode)
 
 Return the glyph's name by the font's Unicode map.
-B<BEWARE:> non-standard glyph-names are mapped onto
+B<CAUTION:> non-standard glyph-names are mapped onto
 the ms-symbol area (0xF000).
 
 =cut
@@ -689,7 +689,7 @@ sub wxByMap {
 =item $wd = $font->width($text)
 
 Return the width of $text as if it were at size 1.
-B<BEWARE:> works only correctly if a proper Perl string
+B<CAUTION:> works correctly only if a proper Perl string
 is used, either in native or UTF-8 format (check utf8-flag).
 
 =cut

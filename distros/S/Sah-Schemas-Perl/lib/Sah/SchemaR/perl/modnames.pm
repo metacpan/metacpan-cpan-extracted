@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::modnames;
 
-our $DATE = '2021-12-01'; # DATE
-our $VERSION = '0.042'; # VERSION
+our $DATE = '2022-09-11'; # DATE
+our $VERSION = '0.045'; # VERSION
 
 our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nArray of Perl module names, where each element is of `perl::modname` schema,\ne.g. `Foo`, `Foo::Bar`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Module::P*\n\nand it will be expanded to e.g.:\n\n    [\"Module::Patch\", \"Module::Path\", \"Module::Pluggable\"]\n\nThe wildcard syntax supports jokers (`?`, `*`, `**`), brackets (`[abc]`), and\nbraces (`{one,two}`). See <pm:Module::List::Wildcard> for more details.\n\n",of=>["perl::modname",{req=>1},{}],summary=>"Array of Perl module names, e.g. [\"Foo::Bar\", \"Baz\"]","x.element_completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str_or_array::expand_perl_modname_wildcard"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::perl::modnames - Array of Perl module names, e.g. ["Foo::Bar", "Ba
 
 =head1 VERSION
 
-This document describes version 0.042 of Sah::SchemaR::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2021-12-01.
+This document describes version 0.045 of Sah::SchemaR::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
 
 =head1 DESCRIPTION
 
@@ -54,13 +54,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

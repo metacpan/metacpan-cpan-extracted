@@ -1,0 +1,28 @@
+
+StationId	Country	State	Active	Lat	Long	Elev	Location	Notes	StnIdx	Grid
+USC00305798	US	NY	1951-1953	40.6	-73.9667	6.1	NEW YORK BENSONHURST		3	40.6N 74.0W
+USC00305799	US	NY	1973-1976	40.8667	-73.8833	27.1	NEW YORK BOTANICAL GRD		11	40.9N 73.9W
+USC00305804	US	NY	1922-1983	40.7333	-73.9333	3	NEW YORK LAUREL HILL		6	40.7N 73.9W
+USC00305806	US	NY	1939	40.85	-73.9167	54.9	NEW YORK UNIV ST		10	40.9N 73.9W
+USC00305816	US	NY	1871-1960	40.7	-74.0167	3	NEW YORK WB CITY		5	40.7N 74.0W
+USW00014732	US	NY	1939-2022	40.7794	-73.8803	3.4	NEW YORK LAGUARDIA AP		8	40.8N 73.9W
+USW00014786	US	NY	1945-1970	40.5833	-73.8833	4.9	NEW YORK FLOYD BENNETT FLD		2	40.6N 73.9W
+USW00093732	US	NY	1958-1960	39.8	-72.6667	25.9	NEW YORK SHOALS AFS		1	39.8N 72.7W
+USW00094728	US	NY	1869-2022	40.7789	-73.9692	39.6	NEW YORK CNTRL PK TWR		7	40.8N 74.0W
+USW00094789	US	NY	1948-2022	40.6386	-73.7622	3.4	NEW YORK JFK INTL AP		4	40.6N 73.8W
+
+Stations that failed to meet range or quality criteria:
+US1NYNY0074	US	NY		40.7969	-73.933	6.1	NEW YORK 8.8 N	[2]	9	40.8N 73.9W
+
+Options:
+	-baseline 1971-2000  -color red  -country US  -location "New York"  -nonetwork -1  -quality 90  -radius 50  -state NY
+
+	Note that quality is a percentage; radius in km
+	Note that nonetwork values mean the following:
+	 -1 refresh the cache if last page not refreshed this year
+	  0 always check for a fresher copy of the page
+	  1 do not contact the server, just use what is cached
+
+Script:
+	C:\Users\jgpuckering\MyScripts\MyPerl\bin\ghcn_fetch.pl
+	Last modified 2022-09-07 14:05:06

@@ -8,6 +8,7 @@ use Scalar::Util 'blessed';
 
 our $ATTRIBUTE_SEPARATOR = ' ';
 our %SUBHASH_ATTRIBUTES = map { $_ => 1} qw(data aria);
+our %ARRAY_ATTRIBUTES = map { $_ => 1 } qw(class);
 our %HTML_VOID_ELEMENTS = map { $_ => 1 } qw(area base br col circle embed hr img input keygen link meta param source track wbr);
 our %BOOLEAN_ATTRIBUTES = map { $_ => 1 } qw(
   allowfullscreen allowpaymentrequest async autofocus autoplay checked compact controls declare default
@@ -44,6 +45,9 @@ our %EXPORT_TAGS = (
   all => \@EXPORT_OK,
   utils => ['tag', 'content_tag', 'capture', @ALL_FLOW_CONTROL],
   html => \@ALL_HTML_TAGS,
+  form =>[qw/form input select options button datalist fieldset label legend meter optgroup output progress textarea/],
+  headers => [qw/h1 h2 h3 h4 5 h6 header/],
+  table => [qw/table td th tbody thead tfoot trow caption/],
 );
 
 sub _dasherize {
@@ -64,6 +68,9 @@ sub _tag_options {
       foreach my $subkey (sort keys %{$attrs{$attr}}) {
         push @attrs, _tag_option("${attr}-@{[ _dasherize $subkey ]}", $attrs{$attr}{$subkey});
       }
+    } elsif($ARRAY_ATTRIBUTES{$attr}) {
+      my $class = ((ref($attrs{$attr})||'') eq 'ARRAY') ? join(' ', @{$attrs{$attr}}) : $attrs{$attr};
+      push @attrs, _tag_option($attr, $class);
     } else {
       push @attrs, _tag_option($attr, $attrs{$attr});
     }
@@ -78,6 +85,11 @@ sub _tag_option {
 
 sub tag {
   my ($name, $attrs) = (@_, +{});
+  if(exists $attrs->{omit_tag}) {
+    my $omit_tag = delete $attrs->{omit_tag};
+    return '' if $omit_tag;
+  }
+
   die "'$name' is not a valid VOID HTML element" unless $HTML_VOID_ELEMENTS{$name};
   return raw "<${name}@{[ _tag_options(%{$attrs}) ]}/>";
 }
@@ -88,6 +100,12 @@ sub content_tag {
   my $block = ref($_[-1]) eq 'CODE' ? pop(@_) : undef;
   my $attrs = ref($_[-1]) eq 'HASH' ? pop(@_) : +{};
   my $content = flattened_safe(defined($block) ? $block->() : (shift || ''));
+
+  if(exists $attrs->{omit_tag}) {
+    my $omit_tag = delete $attrs->{omit_tag};
+    return $content if $omit_tag;
+  }
+
   return raw "<${name}@{[ _tag_options(%{$attrs}) ]}>$content</${name}>";
 }
 
@@ -96,10 +114,43 @@ sub capture {
   return flattened_safe $block->(@_);
 }
 
+## TODO 
+## trinary or some sort of otherwise for cond
+## better $index for things like is_last is_first is_even/odd, etc
+
 sub html_content_tag {
   my $tag = shift;
   my $attrs = (ref($_[0])||'') eq 'HASH' ? shift(@_) : +{};
   my $content;
+
+  if(exists $attrs->{cond}) {
+    my $cond = delete $attrs->{cond};
+    unless($cond) {
+      shift @_ unless $HTML_VOID_ELEMENTS{$tag}; # throw away the content if a content tag
+      return @_;
+    }
+  }
+
+  if(exists $attrs->{map}) {
+    my $map = delete $attrs->{map};
+    my $code = shift @_; # must be code.
+
+    my $index = 0;
+    my @content = ();
+    if(blessed($map) && $map->can('next')) {
+      while (my $next = $map->next) {
+        push @content, content_tag($tag, $code->($next, $index), $attrs);
+        $index++;
+      }
+      $map->reset if $map->can('reset');
+    } else {
+      foreach my $item (@$map) {
+        push @content, content_tag($tag, $code->($item, $index), $attrs);
+        $index++;
+      }
+    }
+    return \@content, @_;
+  }
 
   if( (ref(\$_[0])||'') eq 'SCALAR' ) {  # or isa SafeString...
     $content = shift(@_);
@@ -108,8 +159,28 @@ sub html_content_tag {
   } elsif( (ref($_[0])||'') eq 'ARRAY' ) {
     $content = concat(@{shift(@_)});
   } elsif( (ref($_[0])||'') eq 'CODE' ) {
-    $content = concat(shift->());
+    my $code = shift;
+    if(my $repeated = delete $attrs->{repeat}) {
+      my $index = 0;
+      my @content = ();
+      if(blessed($repeated) && $repeated->can('next')) {
+        while (my $next = $repeated->next) {
+          push @content, $code->($next, $index);
+          $index++;
+        }
+        $repeated->reset if $repeated->can('reset');
+      } else {
+        foreach my $item (@$repeated) {
+
+          push @content, $code->($item, $index);
+          $index++;
+        }
+      }
+      $content = concat(@content);
+    }
+    $content = concat(shift->()) unless $content;
   }
+
 
   return defined($content) ?
     (content_tag($tag, $content, $attrs), @_) :
@@ -119,6 +190,40 @@ sub html_content_tag {
 sub html_tag {
   my $tag = shift;
   my $attrs = (ref($_[0])||'') eq 'HASH' ? shift(@_) : +{};
+
+  if(exists $attrs->{cond}) {
+    my $cond = delete $attrs->{cond};
+    unless($cond) {
+      shift @_ unless $HTML_VOID_ELEMENTS{$tag}; # throw away the content if a content tag
+      return @_;
+    }
+  }
+
+  if(exists $attrs->{map}) {
+    my $map = delete $attrs->{map};
+    my $index = 0;
+    my @content = ();
+    if(blessed($map) && $map->can('next')) {
+      while (my $next = $map->next) {
+        foreach my $key (keys %$attrs) {
+          $attrs->{$key} = $attrs->{$key}->($next, $index) if (ref($attrs->{$_})||'') eq 'CODE';
+        }
+        push @content, tag($tag, $attrs);
+        $index++;
+      }
+      $map->reset if $map->can('reset');
+    } else {
+      foreach my $item (@$map) {
+        foreach my $key (keys %$attrs) {
+          $attrs->{$key} = $attrs->{$key}->($item, $index) if (ref($attrs->{$_})||'') eq 'CODE';
+        }
+        push @content, tag($tag, $attrs);
+        $index++;
+      }
+    }
+    return \@content, @_;
+  }
+
   return (tag($tag, $attrs), @_);
 }
 

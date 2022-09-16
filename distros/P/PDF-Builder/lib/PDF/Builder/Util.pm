@@ -2,10 +2,9 @@ package PDF::Builder::Util;
 
 use strict;
 use warnings;
-#no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 # note: $a and $b are "Magic variables" according to perlcritic, and so it
 # has conniptions over using them as variable names (even with "my"). so, I
@@ -71,8 +70,6 @@ PDF::Builder::Util - utility package for often-used methods across the package.
 
     %colors = PDF::Builder::Resource::Colors->get_colors();
     %PaperSizes = PDF::Builder::Resource::PaperSizes->get_paper_sizes();
-
-#   no warnings qw[ recursion uninitialized ];
 
     $key_var = 'CBA';
 

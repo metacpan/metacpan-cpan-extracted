@@ -1,7 +1,7 @@
-# Yubikey second factor authentication
+# Yubico OTP second factor authentication
 #
 # This plugin handle authentications to ask Yubikey second factor for users that
-# have registered their Yubikey
+# have registered their Yubikey using legacy OTP mode
 package Lemonldap::NG::Portal::2F::Yubikey;
 
 use strict;

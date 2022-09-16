@@ -116,7 +116,7 @@ setKey = (key,val,success,error) ->
 	# First request to get token
 	$.ajax
 		type: "GET"
-		url: datas['scriptname'] + '/mysession/?gettoken'
+		url: scriptname + 'mysession/?gettoken'
 		dataType: 'json'
 		error: error
 		# On success, value is set
@@ -126,7 +126,7 @@ setKey = (key,val,success,error) ->
 			d[key] = val
 			$.ajax
 				type: "PUT"
-				url: datas['scriptname'] + '/mysession/persistent'
+				url: scriptname + 'mysession/persistent'
 				dataType: 'json'
 				data: d
 				success: success
@@ -135,14 +135,14 @@ setKey = (key,val,success,error) ->
 delKey = (key,sub,success,error) ->
 	$.ajax
 		type: "GET"
-		url: datas['scriptname'] + '/mysession/?gettoken'
+		url: scriptname + 'mysession/?gettoken'
 		dataType: 'json'
 		error: error
 		# On success, value is set
 		success: (data) ->
 			$.ajax
 				type: "DELETE"
-				url: "#{datas['scriptname']}/mysession/persistent/#{key}?sub=#{sub}&token=#{data.token}"
+				url: "#{scriptname}mysession/persistent/#{key}?sub=#{sub}&token=#{data.token}"
 				dataType: 'json'
 				success: success
 				error: error
@@ -199,7 +199,7 @@ isHiddenFormValueSet = (option) ->
 ping = ->
 	$.ajax
 		type: "POST"
-		url: datas['scriptname']
+		url: scriptname
 		data:
 			ping: 1
 		dataType: 'json'
@@ -228,21 +228,6 @@ setCookie = (name, value, samesite, exdays) ->
 	d = new Date()
 	d.setTime d.getTime() + exdays*86400000
 	document.cookie = "#{name}=#{value}; expires=#{d.toUTCString()}; path=/; SameSite=#{samesite}"
-
-# Function to change password using Ajax (instead of POST)
-# NOT USED FOR NOW
-#changePwd = (event) ->
-#	event.preventDefault()
-#	$.ajax
-#		type: 'POST'
-#		url: datas['scriptname']
-#		dataType: 'json'
-#		data:
-#			oldpassword: $('#oldpassword').val()
-#			newpassword: $('#newpassword').val()
-#			confirmpassword: $('#confirmpassword').val()
-#		success: (data) ->
-#			console.log "R", data
 
 # Initialization
 datas = {}
@@ -491,20 +476,27 @@ $(window).on 'load', () ->
 
 	# Functions to show/hide display password button
 	if datas['enablePasswordDisplay']
+		field = ''
 		if datas['dontStorePassword']
 			$(".toggle-password").mousedown () ->
+				field = $(this).attr 'id'
+				field = field.replace /^toggle_/, ''
+				console.log 'Display', field
 				$(this).toggleClass("fa-eye fa-eye-slash")
-				$("input[name=password]").attr('class', 'form-control')
+				$("input[name=#{field}]").attr('class', 'form-control')
 			$(".toggle-password").mouseup () ->
 				$(this).toggleClass("fa-eye fa-eye-slash")
-				$("input[name=password]").attr('class', 'form-control key') if $("input[name=password]").get(0).value 
+				$("input[name=#{field}]").attr('class', 'form-control key') if $("input[name=#{field}]").get(0).value
 		else
 			$(".toggle-password").mousedown () ->
+				field = $(this).attr 'id'
+				field = field.replace /^toggle_/, ''
+				console.log 'Display', field
 				$(this).toggleClass("fa-eye fa-eye-slash")
-				$("input[name=password]").attr("type", "text")
+				$("input[name=#{field}]").attr("type", "text")
 			$(".toggle-password").mouseup () ->
 				$(this).toggleClass("fa-eye fa-eye-slash")
-				$("input[name=password]").attr("type", "password")
+				$("input[name=#{field}]").attr("type", "password")
 
 	# Ping if asked
 	if datas['pingInterval'] and datas['pingInterval'] > 0
@@ -517,31 +509,6 @@ $(window).on 'load', () ->
 
 	$('.oidcConsent').on 'click', () ->
 		removeOidcConsent $(this).attr 'partner'
-
-	# Functions to show/hide change password inputs
-	$('#show-hide-button').on 'click', () ->
-		if datas['dontStorePassword']
-			if  $("#newpassword").attr('class') == 'form-control key' || $("#confirmpassword").attr('class') == 'form-control key'
-				console.log 'Show passwords'
-				$("#newpassword").attr('class', 'form-control')
-				$("#confirmpassword").attr('class', 'form-control')
-				$("#show-hide-icon-button").attr('class', 'fa fa-eye-slash')
-			else
-				console.log 'Hide passwords'
-				$("#newpassword").attr('class', 'form-control key') if $("#newpassword").get(0).value
-				$("#confirmpassword").attr('class', 'form-control key') if $("#confirmpassword").get(0).value
-				$("#show-hide-icon-button").attr('class', 'fa fa-eye') if ($("#newpassword").get(0).value || $("#confirmpassword").get(0).value)
-		else
-			if  $("#newpassword").attr('type') == 'password'
-				console.log 'Show passwords'
-				$("#newpassword").attr('type', 'text')
-				$("#confirmpassword").attr('type', 'text')
-				$("#show-hide-icon-button").attr('class', 'fa fa-eye-slash')
-			else
-				console.log 'Hide passwords'
-				$("#newpassword").attr('type', 'password')
-				$("#confirmpassword").attr('type', 'password')
-				$("#show-hide-icon-button").attr('class', 'fa fa-eye')
 
 	# Functions to show/hide placeholder password inputs
 	$('#passwordfield').on 'input', () ->
@@ -556,12 +523,12 @@ $(window).on 'load', () ->
 			$("#oldpassword").attr('class', 'form-control')
 	$('#newpassword').on 'input', () ->
 		if $('#newpassword').get(0).value && datas['dontStorePassword']
-			$("#newpassword").attr('class', 'form-control key') if $("#show-hide-icon-button").attr('class') == 'fa fa-eye'
+			$("#newpassword").attr('class', 'form-control key')
 		else
 			$("#newpassword").attr('class', 'form-control')
 	$('#confirmpassword').on 'input', () ->
 		if $('#confirmpassword').get(0).value && datas['dontStorePassword']
-			$("#confirmpassword").attr('class', 'form-control key') if $("#show-hide-icon-button").attr('class') == 'fa fa-eye'
+			$("#confirmpassword").attr('class', 'form-control key')
 		else
 			$("#confirmpassword").attr('class', 'form-control')
 
@@ -603,3 +570,14 @@ $(window).on 'load', () ->
 				res = JSON.parse j.responseText if j
 				if res and res.error
 					console.log 'Returned error', res
+
+	$('#btn-back-to-top').on 'click', () ->
+		console.log 'Back to top'
+		document.body.scrollTop = 0
+		document.documentElement.scrollTop = 0
+
+	$(window).on 'scroll', () ->
+		if datas['scrollTop'] && (document.body.scrollTop > Math.abs(datas['scrollTop']) || document.documentElement.scrollTop > Math.abs(datas['scrollTop']))
+			$('#btn-back-to-top').css("display","block")
+		else
+    		$('#btn-back-to-top').css("display","none")

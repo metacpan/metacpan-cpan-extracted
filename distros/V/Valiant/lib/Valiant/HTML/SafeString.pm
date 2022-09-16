@@ -5,7 +5,11 @@ use strict;
 use Exporter 'import';
 use HTML::Escape ();
 use Scalar::Util (); 
-use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
+
+use overload 
+  bool => sub {1}, 
+  '""' => sub { shift->to_string },
+  fallback => 1;
 
 our @EXPORT_OK = qw(raw flattened_raw safe flattened_safe is_safe escape_html concat);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -43,7 +47,7 @@ sub is_safe {
 }
 
 sub safe {
-  if(scalar(@_) == 1) {;
+  if(scalar(@_) == 1) {
     return is_safe($_[0]) ? $_[0] : _make_safe(escape_html($_[0]))
   } else {
     return map { is_safe($_) ? $_ : _make_safe(escape_html($_)) } @_;
@@ -130,7 +134,8 @@ Instances of L<Valiant::HTML::SafeString> expose the following public methods
 =head2 concat
 
 Returns a new safe string which appends a list of strings to the old one, making those new strings
-'safe' as needed.
+'safe' as needed.  Basically this will escape any strings not marked safe already and then joins them
+altogether in a single safe string.
 
 =head2 to_string
 

@@ -1,6 +1,6 @@
 package Catalyst::View::BasePerRequest;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 our $DEFAULT_FACTORY = 'Catalyst::View::BasePerRequest::Factory';
 
 use Moose;
@@ -11,8 +11,8 @@ use Module::Runtime ();
 extends 'Catalyst::View';
 
 has 'catalyst_component_name' => (is=>'ro');
-has 'app' => (is=>'ro');
-has 'ctx' => (is=>'ro');
+has 'app' => (is=>'ro', required=>1);
+has 'ctx' => (is=>'ro', required=>1);
 has 'root' => (is=>'rw', required=>1, default=>sub { shift });
 has 'parent' => (is=>'rw', predicate=>'has_parent');
 has 'content_type' => (is=>'ro', required=>0, predicate=>'has_content_type');
@@ -20,6 +20,8 @@ has 'code' => (is=>'rw', predicate=>'has_code');
 has 'status_codes' => (is=>'rw', predicate=>'has_status_codes');
 has 'injected_views' => (is=>'rw', predicate=>'has_injected_views');
 has 'forwarded_args' => (is=>'rw', predicate=>'has_forwarded_args');
+
+sub application { shift->app }
 
 sub views {
   my ($app, %views) = @_;

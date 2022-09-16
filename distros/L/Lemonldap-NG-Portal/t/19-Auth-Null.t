@@ -12,12 +12,17 @@ my $client = LLNG::Manager::Test->new( {
             useSafeJail    => 1,
             authentication => 'Null',
             userDB         => 'Same',
+            scrollTop      => 100
         }
     }
 );
 
-ok( $res = $client->_get('/'), 'Auth query' );
-count(1);
+ok( $res = $client->_get( '/', accept => 'text/html' ), 'Auth query' );
+ok( $res->[2]->[0] =~ m%"scrollTop":100%, 'scrollTop param found' )
+  or print STDERR Dumper( $res->[2]->[0] );
+ok( $res->[2]->[0] =~ m%id="btn-back-to-top"%, 'scrollTop button found' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(3);
 expectOK($res);
 my $id = expectCookie($res);
 

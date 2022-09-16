@@ -20,7 +20,7 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
+our $VERSION = '3.024'; # VERSION
 our $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Dict;
@@ -52,7 +52,9 @@ The currently open stream
 
 =head1 METHODS
 
-=head2 PDF::Builder::Basic::PDF::Page->new($pdf, $parent, $index)
+=over
+
+=item PDF::Builder::Basic::PDF::Page->new($pdf, $parent, $index)
 
 Creates a new page based on a pages object (perhaps the root object).
 
@@ -85,7 +87,7 @@ sub new {
 # the add() method was deleted from PDF::API2 2.034, but it looks like it
 # still may be used in Builder.pm! apparently calls Content.pm's add().
 
-#=head2 $p->add($str)
+#=item $p->add($str)
 #
 #Adds the string to the currently active stream for this page. If no stream
 #exists, then one is created and added to the list of streams for this page.
@@ -118,7 +120,7 @@ sub new {
 #    return $self;
 #}
 
-=head2 $p->ship_out($pdf)
+=item $p->ship_out($pdf)
 
 Ships the page out to the given output file context
 
@@ -134,5 +136,9 @@ sub ship_out {
 
     return $self;
 }
+
+=back
+
+=cut
 
 1;

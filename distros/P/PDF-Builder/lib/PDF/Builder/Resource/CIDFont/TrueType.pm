@@ -4,10 +4,9 @@ use base 'PDF::Builder::Resource::CIDFont';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Resource::CIDFont::TrueType::FontFile;
@@ -23,38 +22,38 @@ PDF::Builder::Resource::CIDFont::TrueType - TrueType font support
 
 =item $font = PDF::Builder::Resource::CIDFont::TrueType->new($pdf, $file, %options)
 
-=item $font = PDF::Builder::Resource::CIDFont::TrueType->new($pdf, $file)
-
 Returns a font object.
 
 Defined Options:
 
-    -encode ... specify fonts encoding for non-UTF-8 text.
+    encode ... specify fonts encoding for non-UTF-8 text.
 
-    -nosubset ... disables subsetting. Any value causes the full font to be
-                  embedded, rather than only the glyphs needed.
+    nosubset ... disables subsetting. Any value causes the full font to be
+                 embedded, rather than only the glyphs needed.
 
 =cut
 
 sub new {
-    my ($class, $pdf, $file, @opts) = @_;
+    my ($class, $pdf, $file, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-encode'} && !defined $opts{'encode'}) { $opts{'encode'} = delete($opts{'-encode'}); }
+    if (defined $opts{'-nosubset'} && !defined $opts{'nosubset'}) { $opts{'nosubset'} = delete($opts{'-nosubset'}); }
+    if (defined $opts{'-noembed'} && !defined $opts{'noembed'}) { $opts{'noembed'} = delete($opts{'-noembed'}); }
+    if (defined $opts{'-dokern'} && !defined $opts{'dokern'}) { $opts{'dokern'} = delete($opts{'-dokern'}); }
 
-    my %opts = ();
-    %opts = @opts if (scalar @opts)%2 == 0;
-    $opts{'-encode'} ||= 'latin1';
-    my ($ff, $data) = PDF::Builder::Resource::CIDFont::TrueType::FontFile->new($pdf, $file, @opts);
+    $opts{'encode'} //= 'latin1';
+    my ($ff, $data) = PDF::Builder::Resource::CIDFont::TrueType::FontFile->new($pdf, $file, %opts);
 
     $class = ref $class if ref $class;
 #   my $self = $class->SUPER::new($pdf, $data->{'apiname'}.pdfkey().'~'.time());
-    my $self = $class->SUPER::new($pdf, $data->{'apiname'}.pdfkey());
+    my $self = $class->SUPER::new($pdf, $data->{'apiname'} . pdfkey());
     $pdf->new_obj($self) if defined($pdf) && !$self->is_obj($pdf);
 
     $self->{' data'} = $data;
 
-    my $des = $self->descrByData();
-
     $self->{'BaseFont'} = PDFName($self->fontname());
 
+    my $des = $self->descrByData();
     my $de = $self->{' de'};
 
     $de->{'FontDescriptor'} = $des;
@@ -62,23 +61,23 @@ sub new {
     ## $de->{'BaseFont'} = PDFName(pdfkey().'+'.($self->fontname()).'~'.time());
     $de->{'BaseFont'} = PDFName($self->fontname());
     $de->{'DW'} = PDFNum($self->missingwidth());
-    if (($opts{'-noembed'}||0) != 1) {
+    if (($opts{'noembed'}||0) != 1) {
     	$des->{$self->data()->{'iscff'}? 'FontFile3': 'FontFile2'} = $ff;
     }
     unless ($self->issymbol()) {
-        $self->encodeByName($opts{'-encode'});
-        $self->data->{'encode'} = $opts{'-encode'};
+        $self->encodeByName($opts{'encode'});
+        $self->data->{'encode'} = $opts{'encode'};
         $self->data->{'decode'} = 'ident';
     }
 
-    if ($opts{'-nosubset'}) {
+    if ($opts{'nosubset'}) {
         $self->data()->{'nosubset'} = 1;
     }
 
     $self->{' ff'} = $ff;
     $pdf->new_obj($ff);
 
-    $self->{'-dokern'} = 1 if $opts{'-dokern'};
+    $self->{'-dokern'} = 1 if $opts{'dokern'};
 
     return $self;
 }
@@ -155,7 +154,6 @@ sub outobjdeep {
         #   $ml->add_elements(PDFNum($self->data()->{'wx'}->[$w]));
             $ml->add_elements(PDFNum($self->wxByCId($w)));
         } elsif ($self->subvec($w) && $notdefbefore == 0) {
-            $notdefbefore = 0;
         #   $ml->add_elements(PDFNum($self->data()->{'wx'}->[$w]));
             $ml->add_elements(PDFNum($self->wxByCId($w)));
         } else {

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    0.009001
+    0.090008
 
 SYNOPSIS
 
@@ -23,9 +23,10 @@ SYNOPSIS
     to rewrite for shipping.
 
     Current core plugins are ::CoreSignatures, ::State, ::DefinedOr,
-    ::PostfixDeref, ::SubstituteAndReturn (s//r), and ::SKT (which is a
-    start on rewriting Syntax::Keyword::Try). For an example of an external
-    plugin, see Method::Signatures::PP.
+    ::PostfixDeref, ::SubstituteAndReturn (s///r), ::Ellipsis,
+    ::PackageBlock, ::PackageVersion, and ::SKT (which is a start on
+    rewriting Syntax::Keyword::Try). For an example of an external plugin,
+    see Method::Signatures::PP.
 
     Not for 'normal' use but still interesting, ::Sigify attempts to
     convert simple @_ unrolls into signatures - best used on its own,

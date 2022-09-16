@@ -1,6 +1,11 @@
 Changelog for Dist-Zilla-PluginBundle-Author-GSG
 
-v0.2.1 2022-07-20T18:16:42
+v0.3.0 2022-09-09T21:06:12
+ - Pull request #16: SRE-5622 - Add POD tests to dzil tests (Andrew Fresh)
+ - Add disttest make target to run dzil test --all (Andrew Hewus Fresh)
+ - Have Dist::Zilla generate POD tests (Andrew Hewus Fresh)
+
+v0.2.1 2022-07-20T18:16:27
  - Update README (Andrew Hewus Fresh)
  - Pull request #15: SM-3648 - Improve detection of Dist::Zilla being
    installed (Andrew Fresh)

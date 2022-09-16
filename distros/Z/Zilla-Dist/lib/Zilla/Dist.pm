@@ -1,14 +1,12 @@
 use strict; use warnings;
 package Zilla::Dist;
-our $VERSION = '0.1.11';
+our $VERSION = '0.1.14';
 
 use version;
 use File::Share;
 use Hash::Merge 'merge';
 use IO::All;
 use YAML::PP;
-
-use XXX;
 
 sub new {
     my $class = shift;
@@ -37,7 +35,7 @@ sub run {
 sub get_meta {
     my ($self) = @_;
     my $meta = -f 'Meta'
-      ? YAML::PP::LoadFile('Meta')
+      ? eval { YAML::PP::LoadFile('Meta') } || {}
       : {};
     if (my $base_file = delete($meta->{base})) {
         my $base = YAML::PP::LoadFile($base_file);

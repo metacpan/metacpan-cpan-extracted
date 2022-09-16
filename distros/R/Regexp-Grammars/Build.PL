@@ -11,9 +11,6 @@ my $builder = Module::Build->new(
         'Test::More'   => 0,
         'version'      => 0,
         'perl'         => '5.10.0',
-    ($] >= 5.018 ? (
-        'B::Hooks::Parser' => 0.16,
-    ) : ())
     },
     add_to_cleanup      => [ 'Regexp-Grammars-*' ],
 );

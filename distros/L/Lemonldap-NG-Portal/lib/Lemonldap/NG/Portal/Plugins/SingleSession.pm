@@ -23,7 +23,7 @@ use constant endAuth => 'run';
 has singleIPRule       => ( is => 'rw' );
 has singleSessionRule  => ( is => 'rw' );
 has singleUserByIPRule => ( is => 'rw' );
-has ott                => (
+has ott => (
     is      => 'rw',
     lazy    => 1,
     default => sub {

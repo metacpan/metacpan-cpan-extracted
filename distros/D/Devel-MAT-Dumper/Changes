@@ -1,5 +1,18 @@
 Revision history for Devel-MAT-Dumper
 
+0.46    2022-09-12
+        [CHANGES]
+         * Bugfixes to SYNOPSIS example for latest v0.44 API shape
+         * Make sure to run package helpers for superclasses too
+         * No longer follow legacy %HELPER_PER_{PACKAGE,MAGIC} hashes; warn
+           at dump time if they are nonempty
+         * Defined experimental new v0.5 dumpfile version for `feature-class`
+           perl branch. This remains experimental while the branch is.
+
+        [BUGFIXES]
+         * Fix for module load order problems, by not overwriting entries in
+           PL_modglobal if already present
+
 0.45    2022-04-02
         [CHANGES]
          * Added `DMD_ADD_ROOT()`

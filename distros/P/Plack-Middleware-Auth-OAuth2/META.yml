@@ -1,0 +1,41 @@
+---
+abstract: 'Plack OAuth2 middleware.'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  Error::Pure: 0
+  ExtUtils::MakeMaker: 6.59
+  File::Object: 0
+  HTTP::Request: 0
+  Plack::Test: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Auth-OAuth2
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  English: 0
+  Error::Pure: 0
+  JSON::XS: 0
+  LWP::Authen::OAuth2: 0
+  Plack::Response: 0
+  Plack::Session: 0
+  perl: 5.8.0
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/Plack-Middleware-Auth-OAuth2/issues
+  homepage: https://github.com/michal-josef-spacek/Plack-Middleware-Auth-OAuth2
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/Plack-Middleware-Auth-OAuth2
+version: '0.01'

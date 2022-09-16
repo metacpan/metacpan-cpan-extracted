@@ -84,6 +84,7 @@ scripts/lmMigrateConfFiles2ini
 scripts/rotateOidcKeys
 t/01-Common-Conf.t
 t/02-Common-Conf-File.t
+t/02-Common-Conf-ServerEnv.t
 t/03-Common-Conf-CDBI.t
 t/03-Common-Conf-RDBI.t
 t/05-Common-Conf-LDAP.t

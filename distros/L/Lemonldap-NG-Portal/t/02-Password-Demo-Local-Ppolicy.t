@@ -327,11 +327,9 @@ ok(
 m%\Q<span trspan="passwordPolicySpecialChar">Allowed special characters:</span> [ } \E%,
     ' passwordPolicySpecialChar'
 ) or print STDERR Dumper( $res->[2]->[0], 'passwordPolicySpecialChar' );
-ok(
-    $res->[2]->[0] =~
-      m%<span id=\'show-hide-icon-button\' class="fa fa-eye"></span>%,
-    'Show/Hide toogle button'
-) or print STDERR Dumper( $res->[2]->[0], 'Toogle button' );
+ok( $res->[2]->[0] !~ m%class="fa fa-eye-slash toggle-password">%,
+    ' no toggle icon found' )
+  or print STDERR Dumper( $res->[2]->[0] );
 count(8);
 
 # Test $client->logout

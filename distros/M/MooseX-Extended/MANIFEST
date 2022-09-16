@@ -16,6 +16,7 @@ lib/MooseX/Extended/Core.pm
 lib/MooseX/Extended/Custom.pm
 lib/MooseX/Extended/Manual/Cloning.pod
 lib/MooseX/Extended/Manual/Construction.pod
+lib/MooseX/Extended/Manual/Includes.pod
 lib/MooseX/Extended/Manual/Overview.pod
 lib/MooseX/Extended/Manual/Shortcuts.pod
 lib/MooseX/Extended/Manual/Tutorial.pod
@@ -40,6 +41,7 @@ t/lib/My/Moose.pm
 t/lib/My/Moose/Role.pm
 t/lib/Not/Corinna.pm
 t/lib/Not/Corinna/Role/Created.pm
+t/method-keyword.t
 t/moose_compatibility.t
 t/multimethods.t
 t/roles.t

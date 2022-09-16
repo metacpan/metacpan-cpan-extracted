@@ -1,0 +1,62 @@
+{
+   "abstract" : "alternative distribution of Lexical::Var, with support for more modern versions of Perl",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::Simple version 0.026, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alt-Lexical-Var-ButSupportModernPerl",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "Lexical::Var",
+         "Lexical::Var",
+         "Lexical::Sub"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "recommends" : {
+            "CPAN::Meta::Requirements" : "2.000"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "conflicts" : {
+            "B::Hooks::OP::Check" : "< 0.19"
+         },
+         "requires" : {
+            "Lexical::SealRequireHints" : "0.006",
+            "XSLoader" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alt::Lexical::Var::ButSupportModernPerl" : {
+         "file" : "lib/Alt/Lexical/Var/ButSupportModernPerl.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.09"
+}

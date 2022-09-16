@@ -15,6 +15,7 @@ my $check = [
         'stage' => '',
         'type' => 'recommends',
         'version' => '0.26',
+        'feature' => '',
         'name' => 'Path::Class',
         'dist' => 'KWILLIAMS/Path-Class-0.26.tar.gz'
     },
@@ -23,7 +24,8 @@ my $check = [
         'stage' => '',
         'dist' => 'MIYAGAWA/Hash-MultiValue-0.15.tar.gz',
         'name' => 'Hash::MultiValue',
-        'version' => ''
+        'version' => '',
+        'feature' => '',
     },
     {
         'stage' => '',
@@ -31,37 +33,50 @@ my $check = [
         'type' => 'recommends',
         'name' => 'Cookie::Baker',
         'dist' => 'KAZEBURO/Cookie-Baker-0.08.tar.gz',
-        'version' => ''
+        'version' => '',
+        'feature' => '',
     },
     {
         'name' => 'Try::Tiny',
         'version' => '0.28',
         'type' => 'recommends',
-        'stage' => ''
+        'stage' => '',
+        'feature' => '',
     },
     {
         'stage' => '',
         'type' => 'recommends',
         'name' => 'DBI',
-        'version' => ''
+        'version' => '',
+        'feature' => '',
     },
     {
         'type' => 'recommends',
         'stage' => '',
         'version' => '0.9970',
-        'name' => 'Plack'
+        'name' => 'Plack',
+        'feature' => '',
     },
     {
         'name' => 'Test::More',
         'version' => '',
         'stage' => 'test',
-        'type' => 'recommends'
+        'type' => 'recommends',
+        'feature' => '',
+    },
+    {
+        'name' => 'Test::Feature',
+        'version' => '',
+        'stage' => '',
+        'type' => 'recommends',
+        'feature' => 'xyz',
     },
     {
         'name' => 'perl',
         'version' => '>= 5.10.1, != 5.17, != 5.19.3',
         'type' => 'recommends',
-        'stage' => ''
+        'stage' => '',
+        'feature' => '',
     }
 ];
 
@@ -92,6 +107,10 @@ recommends 'Plack', '0.9970';
 
 on 'test' => sub {
     recommends 'Test::More';
+};
+
+feature 'xyz', 'great new feature' => sub {
+    recommends 'Test::Feature';
 };
 
 recommends 'perl' => '>= 5.10.1, != 5.17, != 5.19.3';

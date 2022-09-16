@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
 # Sample accounts from Doctor Who characters
 our %demoAccounts = (
@@ -156,7 +156,7 @@ sub setGroups {
     my $groups  = $req->sessionInfo->{groups}  || '';
     my $hGroups = $req->sessionInfo->{hGroups} || {};
     for my $grp ( keys %demoGroups ) {
-        if ( grep { $_ eq $user } @{ $demoGroups{$grp} } ) {
+        if ( grep { $user && $user eq $_ } @{ $demoGroups{$grp} } ) {
             $hGroups->{$grp} = { 'name' => $grp };
             $groups =
               ($groups)

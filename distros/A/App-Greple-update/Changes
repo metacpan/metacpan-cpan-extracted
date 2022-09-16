@@ -1,0 +1,15 @@
+Revision history for Perl extension App-Greple-update
+
+0.03 2022-09-14T10:16:38Z
+
+    - correct typo
+    - add test code
+
+0.02 2022-09-12T04:35:28Z
+
+    - introduce --update::{diff,create,update} option to avoid conflict with other modules.
+
+0.01 2022-09-10T01:58:40Z
+
+    - spun off from App::Greple::subst
+

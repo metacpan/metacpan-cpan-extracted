@@ -101,7 +101,7 @@ for (my $i = 0; $i <= $#strings; $i++) {
           }
       }
   }
-  
+
   if ($eslifGrammar->parse($recognizerInterface, $valueInterface)) {
     my $result = $valueInterface->getResult;
     if (defined($result)) {

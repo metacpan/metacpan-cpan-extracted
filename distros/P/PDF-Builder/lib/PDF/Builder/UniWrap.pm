@@ -2,10 +2,9 @@ package PDF::Builder::UniWrap;
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -147,7 +146,6 @@ sub text_properties {
 # Returns a list of breaking properties for the provided breaking classes
 sub class_properties {
     my $self = ref($_[0])? shift(): self();
-#   no warnings 'uninitialized';
 
     my @breaks;
     my $last_class = $_[0];
@@ -217,8 +215,6 @@ sub class_properties {
 sub find_breaks {
     my $self = ref($_[0])? shift(): self();
     my $text = shift;
-
-#   no warnings 'uninitialized';    # since we do a lot of subscript +/- 1 checks
 
     my @characters = split(//, $text);
 

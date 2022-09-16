@@ -15,7 +15,7 @@ sub _EQ {
 
         my $definedStrict = defined($strict);
         my $_definedStrict = defined($args_ref->[1]);
-    
+
         return
             ($eslif == $args_ref->[0])
             &&
@@ -27,7 +27,7 @@ sub _EQ {
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.25'; # VERSION
+our $VERSION = '6.0.26'; # VERSION
 
 
 
@@ -53,7 +53,7 @@ MarpaX::ESLIF::JSON::Decoder - ESLIF's JSON decoder interface
 
 =head1 VERSION
 
-version 6.0.25
+version 6.0.26
 
 =head1 DESCRIPTION
 

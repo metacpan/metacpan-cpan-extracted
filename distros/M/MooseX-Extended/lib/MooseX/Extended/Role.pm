@@ -25,7 +25,7 @@ use true;
 use feature _enabled_features();
 no warnings _disabled_warnings();
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 # Should this be in the metaclass? It feels like it should, but
 # the MOP really doesn't support these edge cases.
@@ -88,7 +88,7 @@ MooseX::Extended::Role - MooseX::Extended roles
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -175,68 +175,12 @@ Excluding this will make the C<field> function unavailable.
 
 Some experimental features are useful, but might not be quite what you want.
 
-=over 4
-
-=item * C<multi>
-
     use MooseX::Extended::Role includes => [qw/multi/];
 
     multi sub foo ($self, $x)      { ... }
     multi sub foo ($self, $x, $y ) { ... }
 
-Allows you to redeclare a method (or subroutine) and the dispatch will use the number
-of arguments to determine which subroutine to use. Note that "slurpy" arguments such as
-arrays or hashes will take precedence over scalars:
-
-    multi sub foo ($self, @x) { ... }
-    multi sub foo ($self, $x) { ... } # will never be called
-
-Only available on Perl v5.26.0 or higher. Requires L<Syntax::Keyword::MultiSub>.
-
-=item * C<async>
-
-    package My::Thing {
-        use MooseX::Extended
-        types    => [qw/Str/],
-        includes => ['async'];
-        use IO::Async::Loop;
-
-        field output => ( is => 'rw', isa => Str, default => '' );
-
-        async sub doit ( $self, @list ) {
-            my $loop = IO::Async::Loop->new;
-            $self->output('> ');
-            foreach my $item (@list) {
-                await $loop->delay_future( after => 0.01 );
-                $self->output( $self->output . "$item " );
-            }
-        }
-    }
-
-Allows you to write asynchronous code with C<async> and C<await>.
-
-Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
-
-=item * C<try>
-
-    package My::Try {
-        use MooseX::Extended includes => [qw/try/];
-
-        sub reciprocal ( $self, $num ) {
-            try {
-                return 1 / $num;
-            }
-            catch {
-                croak "Could not calculate reciprocal of $num: $@";
-            }
-        }
-    }
-
-Allows you to use try/catch blocks, via L<Syntax::Keyword::Try>.
-
-Only available on Perl v5.24.0 or higher. Requires L<Syntax::Keyword::Try>.
-
-=back
+See L<MooseX::Extended::Manual::Includes> for more information.
 
 =head1 IDENTICAL METHOD NAMES IN CLASSES AND ROLES
 

@@ -18,7 +18,7 @@ use Path::Tiny;
 use IO::Handle;
 use POSIX qw/:errno_h/;
 
-our $VERSION     = '0.24';
+our $VERSION     = '0.25';
 our @EXPORT_OK   = qw/hosts_from_map is_host multi_run shell_quote tmux/;
 our %EXPORT_TAGS = ();
 
@@ -280,7 +280,7 @@ App::MultiSsh - Multi host ssh executer
 
 =head1 VERSION
 
-This documentation refers to App::MultiSsh version 0.24
+This documentation refers to App::MultiSsh version 0.25
 
 =head1 SYNOPSIS
 

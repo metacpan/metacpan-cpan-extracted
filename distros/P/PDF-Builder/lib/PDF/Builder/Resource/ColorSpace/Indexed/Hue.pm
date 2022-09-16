@@ -4,10 +4,9 @@ use base 'PDF::Builder::Resource::ColorSpace::Indexed';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -22,7 +21,7 @@ PDF::Builder::Resource::ColorSpace::Indexed::Hue - colorspace support for Device
 sub new {
     my ($class, $pdf) = @_;
 
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
     my $self = $class->SUPER::new($pdf, pdfkey());
     $pdf->new_obj($self) unless $self->is_obj($pdf);
     $self->{' apipdf'} = $pdf;
@@ -31,24 +30,26 @@ sub new {
     $pdf->new_obj($csd);
     $csd->{'Filter'} = PDFArray(PDFName('FlateDecode'));
 
-    ## $csd->{'WhitePoint'} = PDFArray(map { PDFNum($_) } (0.95049, 1, 1.08897));
-    ## $csd->{'BlackPoint'} = PDFArray(map { PDFNum($_) } (0, 0, 0));
-    ## $csd->{'Gamma'} = PDFArray(map { PDFNum($_) } (2.22218, 2.22218, 2.22218));
-
-    $csd->{' stream'} = '';
-
-    my %cc = ();
+    my %cc;
+    my $stream = '';
 
     foreach my $s (4,3,2,1) {
         foreach my $v (4,3) {
             foreach my $r (0..31) {
-                $csd->{' stream'} .= pack('CCC', map { $_*255 } namecolor('!'.sprintf('%02X', $r*255/31).sprintf('%02X', $s*255/4).sprintf('%02X', $v*255/4)));
+                $stream .= pack('CCC', 
+			        map { $_*255 } 
+				namecolor(join('',
+					       '!',
+					       sprintf('%02X', $r*255/31),
+					       sprintf('%02X', $s*255/4),
+					       sprintf('%02X', $v*255/4))));
             }
         }
     }
 
-    $csd->{' stream'} .= "\x00" x 768;
-    $csd->{' stream'} = substr($csd->{' stream'}, 0, 768);
+    $stream .= "\x00" x 768;
+    $stream = substr($stream, 0, 768);
+    $csd->{' stream'} = $stream;
 
     $self->add_elements(PDFName('DeviceRGB'), PDFNum(255), $csd);
     $self->{' csd'} = $csd;

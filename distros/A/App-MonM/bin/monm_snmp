@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use strict; # $Id: monm_snmp 79 2019-07-08 07:17:07Z abalama $
+use strict; # $Id: monm_snmp 119 2022-08-29 15:16:27Z abalama $
 use utf8;
 
 =encoding utf8
@@ -10,7 +10,7 @@ monm_snmp - SNMP checker for App::MonM
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -201,11 +201,11 @@ B<Ubuntu Users>: sudo apt-get install snmp snmp-mibs-downloader libsnmp-perl
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -296,7 +296,7 @@ $ENV{'MIBS'} = $options->{mibs} if $options->{mibs};
 &SNMP::initMib();
 
 # Create SNMP::Session
-my $snmp = new SNMP::Session(
+my $snmp = SNMP::Session->new(
         DestHost    => $host,
         Version     => $ver,
         Community   => $community,
@@ -337,7 +337,7 @@ if ($strictm) {
     if ($obj =~ /\.0$/) {
         $myobj = [$obj];
     } else {
-        $myobj = new SNMP::Varbind([$obj,0]);
+        $myobj = SNMP::Varbind->new([$obj,0]);
     }
 } else {
     $obj .= '.0' unless $obj =~ /\.0$/;

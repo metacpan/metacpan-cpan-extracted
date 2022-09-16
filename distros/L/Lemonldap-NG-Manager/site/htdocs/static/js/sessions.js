@@ -122,11 +122,11 @@
     dateTitle: ['_utime', '_startTime', '_updateTime', '_lastAuthnUTime', '_lastSeen'],
     connectionTitle: ['ipAddr', '_timezone', '_url'],
     authenticationTitle: ['_session_id', '_user', '_password', 'authenticationLevel'],
-    modulesTitle: ['_auth', '_userDB', '_passwordDB', '_issuerDB', '_authChoice', '_authMulti', '_userDBMulti'],
+    modulesTitle: ['_auth', '_userDB', '_passwordDB', '_issuerDB', '_authChoice', '_authMulti', '_userDBMulti', '_2f'],
     saml: ['_idp', '_idpConfKey', '_samlToken', '_lassoSessionDump', '_lassoIdentityDump'],
     groups: ['groups', 'hGroups'],
     ldap: ['dn'],
-    OpenIDConnect: ['_oidc_id_token', '_oidc_OP', '_oidc_access_token'],
+    OpenIDConnect: ['_oidc_id_token', '_oidc_OP', '_oidc_access_token', '_oidc_refresh_token', '_oidc_access_token_eol'],
     sfaTitle: ['_2fDevices'],
     oidcConsents: ['_oidcConsents']
   };
@@ -233,20 +233,30 @@
         transformSession = function(session) {
           var _insert, array, attr, attrs, category, cv, element, epoch, i, j, k, key, l, len, len1, len2, len3, len4, len5, m, name, o, oidcConsent, p, real, ref, ref1, res, sfDevice, spoof, subres, tab, time, title, tmp, value;
           _insert = function(re, title) {
-            var key, reg, tmp, value;
+            var cv, i, key, len, reg, tab, tmp, val, value, vk;
             tmp = [];
             reg = new RegExp(re);
+            cv = "";
             for (key in session) {
               value = session[key];
               if (key.match(reg) && value) {
-                tmp.push({
-                  title: key,
-                  value: value
-                });
+                cv += value + ":" + key + ",";
                 delete session[key];
               }
             }
-            if (tmp.length > 0) {
+            if (cv) {
+              cv = cv.replace(/,$/, '');
+              tab = cv.split(',');
+              tab.sort();
+              tab.reverse();
+              for (i = 0, len = tab.length; i < len; i++) {
+                val = tab[i];
+                vk = val.split(':');
+                tmp.push({
+                  title: vk[1],
+                  value: $scope.localeDate(vk[0])
+                });
+              }
               return res.push({
                 title: title,
                 nodes: tmp
@@ -280,34 +290,36 @@
             for (i = 0, len = attrs.length; i < len; i++) {
               attr = attrs[i];
               if (session[attr]) {
-                if (session[attr].toString().match(/"type":\s*"(?:TOTP|U2F|UBK|WebAuthn)"/)) {
-                  subres.push({
-                    title: "type",
-                    value: "name",
-                    epoch: "date",
-                    td: "0"
-                  });
+                if (attr === "_2fDevices" && session[attr]) {
                   array = JSON.parse(session[attr]);
-                  for (j = 0, len1 = array.length; j < len1; j++) {
-                    sfDevice = array[j];
-                    for (key in sfDevice) {
-                      value = sfDevice[key];
-                      if (key === 'type') {
-                        title = value;
-                      }
-                      if (key === 'name') {
-                        name = value;
-                      }
-                      if (key === 'epoch') {
-                        epoch = value;
-                      }
-                    }
+                  if (array.length > 0) {
                     subres.push({
-                      title: title,
-                      value: name,
-                      epoch: epoch,
-                      td: "1"
+                      title: "type",
+                      value: "name",
+                      epoch: "date",
+                      td: "0"
                     });
+                    for (j = 0, len1 = array.length; j < len1; j++) {
+                      sfDevice = array[j];
+                      for (key in sfDevice) {
+                        value = sfDevice[key];
+                        if (key === 'type') {
+                          title = value;
+                        }
+                        if (key === 'name') {
+                          name = value;
+                        }
+                        if (key === 'epoch') {
+                          epoch = value;
+                        }
+                      }
+                      subres.push({
+                        title: title,
+                        value: name,
+                        epoch: epoch,
+                        td: "1"
+                      });
+                    }
                   }
                   delete session[attr];
                 } else if (session[attr].toString().match(/"rp":\s*"[\w-]+"/)) {

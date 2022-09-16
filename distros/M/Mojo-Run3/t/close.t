@@ -42,4 +42,25 @@ subtest 'close stdout from parent' => sub {
   is $run3->exit_status, 13, 'exit_status';
 };
 
+subtest 'close other' => sub {
+  my $run3 = Mojo::Run3->new;
+  my %read = (stderr => '', stdout => '');
+  $run3->on(stderr => sub { $read{stderr} .= $_[1] });
+  $run3->on(stdout => sub { $read{stdout} .= $_[1] });
+
+  eval { $run3->close('other') };
+  like $@, qr{Cannot close 'other'}, 'close other in parent';
+
+  open my $CLOSE_ME, '<', __FILE__;
+  $run3->run_p(sub {
+    my ($run3) = @_;
+    printf STDERR "%s\n", int grep { open my $FH, '<&=', $_ } 0 .. (Mojo::Run3->MAX_OPEN_FDS - 1);
+    $run3->close('other');
+    printf STDOUT "%s\n", int grep { open my $FH, '<&=', $_ } 0 .. (Mojo::Run3->MAX_OPEN_FDS - 1);
+  })->wait;
+
+  ok $read{stderr} > $read{stdout}, 'before close other';
+  like $read{stdout}, qr{^3\b}, 'after close other';
+};
+
 done_testing;

@@ -17,8 +17,8 @@ use Path::Tiny;
 use POSIX ":sys_wait_h";
 use App::MultiSsh qw/hosts_from_map is_host multi_run shell_quote/;
 
-our $VERSION = '0.24';
-my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+our $VERSION = '0.25';
+my ($name) = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
     host      => [],
@@ -43,25 +43,16 @@ sub main {
 
     Getopt::Long::Configure('bundling');
     GetOptions(
-        \%option,
-        'cssh|c',
-        'cssh_cmd|cssh-cmd|C=s',
-        'fork|f',
-        'group|g=s@',
-        'host|h=s@',
-        'interleave|i!',
-        'parallel|p=i',
-        'script|s=s',
-        'tmux_cmd|tmux-cmd|T=s',
-        'tmux|m',
-        'tmux_nested|tmux-nested|n',
-        'tmux_sync|tmux-sync|sync|S!',
-        'only|only-hosts|o!',
-        'test|t!',
-        'verbose|v+',
-        'man',
-        'help',
-        'VERSION!',
+        \%option,                    'cssh|c',
+        'cssh_cmd|cssh-cmd|C=s',     'fork|f',
+        'group|g=s@',                'group_list|group-list|G',
+        'host|h=s@',                 'interleave|i!',
+        'parallel|p=i',              'script|s=s',
+        'tmux_cmd|tmux-cmd|T=s',     'tmux|m',
+        'tmux_nested|tmux-nested|n', 'tmux_sync|tmux-sync|sync|S!',
+        'only|only-hosts|o!',        'test|t!',
+        'verbose|v+',                'man',
+        'help',                      'VERSION!',
     ) or pod2usage(2);
 
     if ( $option{'VERSION'} ) {
@@ -74,12 +65,18 @@ sub main {
     elsif ( $option{'help'} ) {
         pod2usage( -verbose => 1 );
     }
+    elsif ( $option{group_list} ) {
+        my $config = App::MultiSsh::config();
+        warn "Groups:\n  ", ( join "\n  ", sort keys %{ $config->{groups} } ),
+            "\n";
+        exit 0;
+    }
     elsif (
-        !@ARGV &&
-        !(
-            ( $option{cssh_cmd} && -x $option{cssh_cmd} ) ||
-            ( $option{tmux_cmd} && -x $option{tmux_cmd} ) ||
-            ( $option{script}   && -x $option{script}   )
+        !@ARGV
+        && !(
+               ( $option{cssh_cmd} && -x $option{cssh_cmd} )
+            || ( $option{tmux_cmd} && -x $option{tmux_cmd} )
+            || ( $option{script}   && -x $option{script} )
         )
     ) {
         warn "You must specify a command or script or install / specify the"
@@ -96,13 +93,15 @@ sub main {
     }
 
     # --fork implies --parallel 4 and defaults --interleve on
-    if ($option{fork}) {
-        $option{parallel}   ||= 4;
+    if ( $option{fork} ) {
+        $option{parallel} ||= 4;
         $option{interleave} //= 1;
     }
 
     # no command and not specified cssh or tmux
-    if ( !@ARGV && !($option{cssh} || $option{tmux} || $option{tmux_nested}) ) {
+    if (   !@ARGV
+        && !( $option{cssh} || $option{tmux} || $option{tmux_nested} ) ) {
+
         # pick cssh or tmux
         $option{cssh} = !!$option{cssh_cmd};
         $option{tmux} = !!$option{tmux_cmd};
@@ -110,16 +109,16 @@ sub main {
 
     # --tmux-nested implies --tmux
     if ( $option{tmux_nested} ) {
-         $option{tmux} = 1;
-     }
+        $option{tmux} = 1;
+    }
 
     # add any group hosts to the current hosts
-    if ($option{group}) {
-        push @{ $option{host} }, App::MultiSsh::get_groups($option{group});
+    if ( $option{group} ) {
+        push @{ $option{host} }, App::MultiSsh::get_groups( $option{group} );
     }
 
     if ( !@ARGV && $option{cssh} ) {
-        exec $option{cssh_cmd}, hosts_from_map($option{host});
+        exec $option{cssh_cmd}, hosts_from_map( $option{host} );
     }
 
     # get the remote command to run
@@ -127,10 +126,10 @@ sub main {
 
     # any parameters left over are assumed to be host specifications
     if (@ARGV) {
-        push @{$option{host}}, @ARGV;
+        push @{ $option{host} }, @ARGV;
     }
 
-    my @hosts = hosts_from_map($option{host});
+    my @hosts = hosts_from_map( $option{host} );
 
     if ( !@hosts ) {
         warn "You must specify at least one host!\n";
@@ -140,7 +139,7 @@ sub main {
     print join "\n", @hosts, '' if $option{verbose} > 1 or $remote_cmd eq '-';
     return if $remote_cmd eq '-';
 
-    multi_run(\@hosts, $remote_cmd, \%option);
+    multi_run( \@hosts, $remote_cmd, \%option );
 
     return;
 }
@@ -148,9 +147,9 @@ sub main {
 sub which {
     my ($cmd) = @_;
 
-    for my $path (split /:/, $ENV{PATH}) {
-        next if !-d $path || !-x path($path, $cmd);
-        return '' . path($path, $cmd);
+    for my $path ( split /:/, $ENV{PATH} ) {
+        next if !-d $path || !-x path( $path, $cmd );
+        return '' . path( $path, $cmd );
     }
 
     return;
@@ -164,7 +163,7 @@ mssh - Multi host ssh executer
 
 =head1 VERSION
 
-This documentation refers to mssh version 0.24.
+This documentation refers to mssh version 0.25.
 
 =head1 SYNOPSIS
 

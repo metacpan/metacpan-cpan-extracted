@@ -17,7 +17,7 @@ use RPC::Switch::Client::Tiny::Netstring;
 use RPC::Switch::Client::Tiny::Async;
 use RPC::Switch::Client::Tiny::SessionCache;
 
-our $VERSION = '1.58';
+our $VERSION = '1.63';
 
 sub new {
 	my ($class, %args) = @_;
@@ -402,14 +402,21 @@ sub _worker_child_get {
 
 	# First try to reuse child for existing session
 	#
-	if ($self->{sessioncache}) {
+	if (my $sessioncache = $self->{sessioncache}) {
 		if (my $session_req = $self->is_session_req($msg->{params})) {
-			if (my $child = $self->{sessioncache}->session_get($session_req->{id}, $msg->{id})) {
+			if (my $child = $sessioncache->session_get($session_req->{id}, $msg->{id}, $msg->{rpcswitch}{vci})) {
 				return $child;
+			}
+		} elsif ($sessioncache->{session_persist_user}) {
+			if (exists $msg->{params}{$sessioncache->{session_persist_user}}) {
+				my $user = $msg->{params}{$sessioncache->{session_persist_user}};
+				if (my $child = $sessioncache->session_get_per_user($user, $msg->{id}, $msg->{rpcswitch}{vci})) {
+					return $child;
+				}
 			}
 		}
 	}
-	my $child = $self->{async}->child_start($self, $msg->{id});
+	my $child = $self->{async}->child_start($self, $msg->{id}, $msg->{rpcswitch}{vci});
 	return $child;
 }
 
@@ -465,6 +472,14 @@ sub _worker_child_read_and_finish {
 						}
 					}
 					$child = undef;
+				} elsif (my $idle_child = $sessioncache->session_get_per_user_idle($child)) {
+					# update idle user session with older session_id
+					#
+					$self->{async}->child_finish($idle_child, 'update');
+
+					if ($sessioncache->session_put($child)) {
+						$child = undef;
+					}
 				}
 			}
 			if ($child) {
@@ -613,7 +628,9 @@ sub work {
 		if (keys %{$async->{finished}}) {
 			local $SIG{ALRM} = sub { warn "worker child wait timeout\n" };
 			alarm(1); # wait at most for one second
-			$async->childs_reap(); # blocking
+			unless ($async->childs_reap()) { # blocking
+				$async->childs_reap(nonblock => 1); # continue nonblocking after timeout
+			}
 			alarm(0);
 		}
 
@@ -970,6 +987,10 @@ connection, and there are no outstanding requests ($@ == '' for eval).
 =item options->{max_session}: enable session cache for async worker childs
 
 =item options->{session_expire}: default session expire time in seconds
+
+=item options->{session_idle}: session idle time in seconds for user session updates
+
+=item options->{session_persist_user}: reuse active user sessions for given user param
 
 =item options->{max_user_session}: limit session cache per optional user field
 

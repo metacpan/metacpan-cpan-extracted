@@ -79,7 +79,7 @@ SKIP: {
     expectCookie( $res, 'lemonldappdata' );
 
     # A message warns the user that they do not have any 2FA available
-    expectPortalError( $res, 83 );
+    expectPortalError( $res, 103 );
 
     $query = 'user=rtyler&password=rtyler';
     ok(

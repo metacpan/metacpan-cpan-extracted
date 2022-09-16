@@ -1,5 +1,13 @@
 Revision history for Perl extension Mojo::Darkpan
 
+0.08 2022-09-15T14:47:49Z
+    - Documentation fixes
+
+0.07 2022-09-15T14:42:40Z
+    - Updated documentation with additional example for publishing local files
+    - Canged wording from "Deploy" to "Publish" in doco
+    - Fixed example JSON config to add missing double quote in JSON definition
+
 0.06 2021-12-13T18:02:19Z
     - Added missing depency
     - Removed use v5.25 in Mojo::Darkpan::Util since min version set to v5.20

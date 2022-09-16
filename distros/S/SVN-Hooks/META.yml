@@ -21,49 +21,49 @@ name: SVN-Hooks
 provides:
   SVN::Hooks:
     file: lib/SVN/Hooks.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::AllowLogChange:
     file: lib/SVN/Hooks/AllowLogChange.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::AllowPropChange:
     file: lib/SVN/Hooks/AllowPropChange.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::CheckCapability:
     file: lib/SVN/Hooks/CheckCapability.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::CheckJira:
     file: lib/SVN/Hooks/CheckJira.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::CheckLog:
     file: lib/SVN/Hooks/CheckLog.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::CheckMimeTypes:
     file: lib/SVN/Hooks/CheckMimeTypes.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::CheckProperty:
     file: lib/SVN/Hooks/CheckProperty.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::CheckStructure:
     file: lib/SVN/Hooks/CheckStructure.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::DenyChanges:
     file: lib/SVN/Hooks/DenyChanges.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::DenyFilenames:
     file: lib/SVN/Hooks/DenyFilenames.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::Generic:
     file: lib/SVN/Hooks/Generic.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::Mailer:
     file: lib/SVN/Hooks/Mailer.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::Notify:
     file: lib/SVN/Hooks/Notify.pm
-    version: '1.35'
+    version: '1.36'
   SVN::Hooks::UpdateConfFile:
     file: lib/SVN/Hooks/UpdateConfFile.pm
-    version: '1.35'
+    version: '1.36'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -80,8 +80,8 @@ requires:
   warnings: '0'
 resources:
   bugtracker: https://github.com/gnustavo/SVN-Hooks/issues
-  homepage: http://search.cpan.org/dist/SVN-Hooks/
+  homepage: https://metacpan.org/release/SVN-Hooks/
   repository: git://github.com/gnustavo/SVN-Hooks.git
-version: '1.35'
+version: '1.36'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -460,28 +460,23 @@ sub newRawConf {
     }
 
     my $res = {};
-    if ( $self->p->{demoMode} ) {
-        $res->{message} = '__demoModeOn__';
+
+    # When uploading a new conf, always force it since cfgNum has a few
+    # chances to be equal to last config cfgNum
+    my $s = $self->confAcc->saveConf( $new, force => 1 );
+    if ( $s > 0 ) {
+        $self->userLogger->notice(
+            'User ' . $self->p->userId($req) . " has stored (raw) conf $s" );
+        $res->{result} = 1;
+        $res->{cfgNum} = $s;
     }
     else {
-        # When uploading a new conf, always force it since cfgNum has a few
-        # chances to be equal to last config cfgNum
-        my $s = $self->confAcc->saveConf( $new, force => 1 );
-        if ( $s > 0 ) {
-            $self->userLogger->notice( 'User '
-                  . $self->p->userId($req)
-                  . " has stored (raw) conf $s" );
-            $res->{result} = 1;
-            $res->{cfgNum} = $s;
-        }
-        else {
-            $self->userLogger->notice(
-                'Raw saving attempt rejected, asking for confirmation to '
-                  . $self->p->userId($req) );
-            $res->{result}      = 0;
-            $res->{needConfirm} = 1 if ( $s == CONFIG_WAS_CHANGED );
-            $res->{message} .= '__needConfirmation__';
-        }
+        $self->userLogger->notice(
+            'Raw saving attempt rejected, asking for confirmation to '
+              . $self->p->userId($req) );
+        $res->{result}      = 0;
+        $res->{needConfirm} = 1 if ( $s == CONFIG_WAS_CHANGED );
+        $res->{message} .= '__needConfirmation__';
     }
     return $self->sendJSONresponse( $req, $res );
 }

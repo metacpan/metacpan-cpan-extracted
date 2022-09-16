@@ -1,5 +1,10 @@
 Revision history for MooseX-Extended
 
+0.30      2022-09-15 09:54:00 CEST
+
+          - Add support for a `method` keyword via Function::Parameters.
+          - Move "includes" docs to its own POD doc.
+
 0.29      2022-08-23 09:05:52 CEST
 
           - Bump minimum version of B::Hooks::AtRuntime to avoid a sporadic

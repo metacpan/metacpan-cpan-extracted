@@ -7,6 +7,26 @@ Bug fixes to PDF::API2 (in PDF::Builder) are not mentioned if they correct
 an error (that produces an error message and/or incorrect output) and do not 
 affect the operation or results of otherwise correct code.
 
+3.024     2022-09-12
+
+   PDF::API2 now initializes page display to a fairly tightly zoomed-in
+     (approx. 115%) scale, while PDF::Builder continues to initialize to the
+     entire page being displayed (zoomed-out at less than 100% scale).
+
+   PDF::API2 added a bar code convenience function "barcode()", which is not
+     in PDF::Builder. Something like this might be added in the future.
+
+   PDF::API2 formerly (and PDF::Builder still does) define "fit" (destination)
+     elements as hash elements (e.g., 'fitb'=> 1) for NamedDestination,
+     Outline, selected Annotation entries, and startup preferences; while it 
+     now names the destination as a location string (e.g., 'fitb') and an 
+     array of data (e.g., [ 1 ]). Staying with the old system permits the 
+     continued use an options hash, which PDF::API2 no longer supports.
+
+   PDF::API2 allows a GIF version of 00 to 99, a to z, while PDF::Builder
+     permits 00 to 99, a to b. I am not aware of any GIF versions other than
+     GIF87a and GIF89a, so what is intended is not clear.
+
 3.022     2021-03-03
 
    PDF::API2 "exposed" paragraph() and paragraphs() and documented them.

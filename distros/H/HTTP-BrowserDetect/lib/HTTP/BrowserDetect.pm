@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.36';
+our $VERSION = '3.37';
 
 # Operating Systems
 our @OS_TESTS = qw(
@@ -2387,6 +2387,10 @@ sub _init_device {
         =~ /\b((alcatel|huawei|lg|nokia|samsung|sonyericsson)[\w\-]*)\//i ) {
         $device_string = $1;
     }
+    elsif ( $self->{user_agent} =~ /CrKey/ ) {
+        $device        = 'chromecast';
+        $device_string = 'Chromecast';
+    }
     elsif ($device) {
         $device_string = $DEVICE_NAMES{$device};
     }
@@ -2982,7 +2986,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.36
+version 3.37
 
 =head1 SYNOPSIS
 

@@ -24,7 +24,7 @@ my $lookbehind = do {
 };
 
 if ($] < 5.018 || $] >= 5.020) {
-    ok !defined $WARNINGS => "No warnings found '$WARNINGS'";
+    ok !$WARNINGS => "No warnings found '$WARNINGS'";
 }
 
 ok +('"abc"' =~ $parser) => 'Matched <str>';

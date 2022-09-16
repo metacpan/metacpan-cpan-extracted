@@ -1,5 +1,11 @@
 Revision history for Perl extension Date::Holidays::EnglandWales.
 
+0.10  Mon Sep 12 10:52:00 2022
+    - Update changes file after adding State Funeral of Queen Elizabeth II
+
+0.09  Mon Sep 12 10:49:00 2022
+    - Bank holiday for the State Funeral of Queen Elizabeth II
+
 0.08  Sat Apr 16 13:11:00 2022
     - Move Spring Bank Holiday and add Platinum Jubilee
 

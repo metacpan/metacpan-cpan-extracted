@@ -147,6 +147,13 @@ function templates(tpl,key) {
             "title" : "casSrvMetaDataOptionsIcon"
          },
          {
+            "default" : "",
+            "get" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsResolutionRule",
+            "id" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsResolutionRule",
+            "title" : "casSrvMetaDataOptionsResolutionRule",
+            "type" : "longtext"
+         },
+         {
             "get" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsSortNumber",
             "id" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsSortNumber",
             "title" : "casSrvMetaDataOptionsSortNumber",
@@ -363,6 +370,13 @@ function templates(tpl,key) {
             "title" : "oidcOPMetaDataOptionsIcon"
          },
          {
+            "default" : "",
+            "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsResolutionRule",
+            "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsResolutionRule",
+            "title" : "oidcOPMetaDataOptionsResolutionRule",
+            "type" : "longtext"
+         },
+         {
             "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsSortNumber",
             "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsSortNumber",
             "title" : "oidcOPMetaDataOptionsSortNumber",
@@ -425,9 +439,24 @@ function templates(tpl,key) {
       "type" : "keyTextContainer"
    },
    {
+      "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataScopeRules",
+      "default" : [],
+      "help" : "idpopenidconnect.html#scope-rules",
+      "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataScopeRules",
+      "title" : "oidcRPMetaDataScopeRules",
+      "type" : "keyTextContainer"
+   },
+   {
       "_nodes" : [
          {
             "_nodes" : [
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPublic",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPublic",
+                  "title" : "oidcRPMetaDataOptionsPublic",
+                  "type" : "bool"
+               },
                {
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientID",
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientID",
@@ -438,13 +467,6 @@ function templates(tpl,key) {
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsClientSecret",
                   "title" : "oidcRPMetaDataOptionsClientSecret",
                   "type" : "password"
-               },
-               {
-                  "default" : 0,
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPublic",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPublic",
-                  "title" : "oidcRPMetaDataOptionsPublic",
-                  "type" : "bool"
                },
                {
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRedirectUris",
@@ -461,15 +483,9 @@ function templates(tpl,key) {
                {
                   "default" : 0,
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsBypassConsent",
-                  "help" : "openidconnectclaims.html",
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsBypassConsent",
                   "title" : "oidcRPMetaDataOptionsBypassConsent",
                   "type" : "bool"
-               },
-               {
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserIDAttr",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserIDAttr",
-                  "title" : "oidcRPMetaDataOptionsUserIDAttr"
                },
                {
                   "default" : 0,
@@ -493,16 +509,21 @@ function templates(tpl,key) {
                   "type" : "bool"
                },
                {
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAdditionalAudiences",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAdditionalAudiences",
-                  "title" : "oidcRPMetaDataOptionsAdditionalAudiences"
-               },
-               {
                   "default" : 0,
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRefreshToken",
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRefreshToken",
                   "title" : "oidcRPMetaDataOptionsRefreshToken",
                   "type" : "bool"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserIDAttr",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsUserIDAttr",
+                  "title" : "oidcRPMetaDataOptionsUserIDAttr"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAdditionalAudiences",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAdditionalAudiences",
+                  "title" : "oidcRPMetaDataOptionsAdditionalAudiences"
                }
             ],
             "id" : "oidcRPMetaDataOptionsAdvanced",
@@ -688,14 +709,18 @@ function templates(tpl,key) {
          {
             "_nodes" : [
                {
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPostLogoutRedirectUris",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPostLogoutRedirectUris",
-                  "title" : "oidcRPMetaDataOptionsPostLogoutRedirectUris"
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutBypassConfirm",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutBypassConfirm",
+                  "title" : "oidcRPMetaDataOptionsLogoutBypassConfirm",
+                  "type" : "bool"
                },
                {
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutUrl",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutUrl",
-                  "title" : "oidcRPMetaDataOptionsLogoutUrl"
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutSessionRequired",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutSessionRequired",
+                  "title" : "oidcRPMetaDataOptionsLogoutSessionRequired",
+                  "type" : "bool"
                },
                {
                   "default" : "front",
@@ -711,11 +736,14 @@ function templates(tpl,key) {
                   "type" : "select"
                },
                {
-                  "default" : 0,
-                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutSessionRequired",
-                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutSessionRequired",
-                  "title" : "oidcRPMetaDataOptionsLogoutSessionRequired",
-                  "type" : "bool"
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutUrl",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutUrl",
+                  "title" : "oidcRPMetaDataOptionsLogoutUrl"
+               },
+               {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPostLogoutRedirectUris",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsPostLogoutRedirectUris",
+                  "title" : "oidcRPMetaDataOptionsPostLogoutRedirectUris"
                }
             ],
             "id" : "logout",
@@ -733,14 +761,6 @@ function templates(tpl,key) {
       "help" : "exportedvars.html#extend-variables-using-macros-and-groups",
       "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataMacros",
       "title" : "oidcRPMetaDataMacros",
-      "type" : "keyTextContainer"
-   },
-   {
-      "cnodes" : tpl+"s/"+key+"/"+"oidcRPMetaDataScopeRules",
-      "default" : [],
-      "help" : "idpopenidconnect.html#scope-rules",
-      "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataScopeRules",
-      "title" : "oidcRPMetaDataScopeRules",
       "type" : "keyTextContainer"
    },
    {
@@ -978,13 +998,6 @@ function templates(tpl,key) {
       "_nodes" : [
          {
             "default" : "",
-            "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsResolutionRule",
-            "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsResolutionRule",
-            "title" : "samlIDPMetaDataOptionsResolutionRule",
-            "type" : "longtext"
-         },
-         {
-            "default" : "",
             "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsNameIDFormat",
             "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsNameIDFormat",
             "select" : [
@@ -1113,6 +1126,13 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsIcon",
             "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsIcon",
             "title" : "samlIDPMetaDataOptionsIcon"
+         },
+         {
+            "default" : "",
+            "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsResolutionRule",
+            "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsResolutionRule",
+            "title" : "samlIDPMetaDataOptionsResolutionRule",
+            "type" : "longtext"
          },
          {
             "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsSortNumber",

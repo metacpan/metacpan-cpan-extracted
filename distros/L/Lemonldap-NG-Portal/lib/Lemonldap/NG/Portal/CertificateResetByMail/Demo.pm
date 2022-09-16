@@ -4,10 +4,10 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.15';
 
 sub init {
-    1;
+    return 1;
 }
 
 ## @method int modifCertificate

@@ -1,6 +1,6 @@
 NAME
 
-    YAML::XS - Perl YAML Serialization using XS and libyaml
+    YAML-LibYAML - Perl YAML Serialization using XS and libyaml
 
 SYNOPSIS
 
@@ -24,7 +24,7 @@ DESCRIPTION
 
 CONFIGURATION
 
-    $YAML::XS::LoadBlessed (since v0.69)
+      * $YAML::XS::LoadBlessed (since v0.69)
 
       Default: false.
 
@@ -47,9 +47,9 @@ CONFIGURATION
       not the critical part. If the class has a DESTROY method, it will be
       called once the object is deleted. An example with File::Temp
       removing files can be found at
-      https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=862373
+      https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=862373.
 
-    $YAML::XS::ForbidDuplicateKeys` (since 0.84)
+      * $YAML::XS::ForbidDuplicateKeys (since 0.84)
 
       Default: false
 
@@ -63,18 +63,18 @@ CONFIGURATION
       obvious, and it is recommended to set it to true. That's also what a
       YAML loader should do by default according to the YAML specification.
 
-    $YAML::XS::UseCode
+      * $YAML::XS::UseCode
 
-    $YAML::XS::DumpCode
+      * $YAML::XS::DumpCode
 
-    $YAML::XS::LoadCode
+      * $YAML::XS::LoadCode
 
       If enabled supports deparsing and evaling of code blocks.
 
       Note that support for loading code was added in version 0.75,
       although $LoadCode was documented already in earlier versions.
 
-    $YAML::XS::QuoteNumericStrings
+      * $YAML::XS::QuoteNumericStrings
 
       When true (the default) strings that look like numbers but have not
       been numified will be quoted when dumping.
@@ -82,7 +82,7 @@ CONFIGURATION
       This ensures leading that things like leading zeros and other
       formatting are preserved.
 
-    $YAML::XS::Boolean (since v0.67)
+      * $YAML::XS::Boolean (since v0.67)
 
       Default is undef.
 
@@ -91,18 +91,18 @@ CONFIGURATION
       objects. Those objects will be dumped again as plain "true" or
       "false".
 
-      It will try to load JSON::PP or boolean and die if it can't be
+      It will try to load [JSON::PP] or [boolean] and die if it can't be
       loaded.
 
       With that it's possible to add new "real" booleans to a data
       structure:
 
-            local $YAML::XS::Boolean = "JSON::PP"; # or "boolean"
-            my $data = Load("booltrue: true");
-            $data->{boolfalse} = JSON::PP::false;
-            my $yaml = Dump($data);
-            # boolfalse: false
-            # booltrue: true
+          local $YAML::XS::Boolean = "JSON::PP"; # or "boolean"
+          my $data = Load("booltrue: true");
+          $data->{boolfalse} = JSON::PP::false;
+          my $yaml = Dump($data);
+          # boolfalse: false
+          # booltrue: true
 
       It also lets booleans survive when loading YAML via YAML::XS and
       encode it in JSON via one of the various JSON encoders, which mostly
@@ -118,7 +118,7 @@ CONFIGURATION
       If you simply need to load "perl booleans" that are true or false in
       boolean context, you will be fine with the default setting.
 
-    $YAML::XS::Indent (since v0.76)
+      * $YAML::XS::Indent (since v0.76)
 
       Default is 2.
 
@@ -141,7 +141,7 @@ LIBYAML
     You can find out (since v.079) which libyaml version this module was
     built with:
 
-          my $libyaml_version = YAML::XS::LibYAML::libyaml_version();
+        my $libyaml_version = YAML::XS::LibYAML::libyaml_version();
 
 SEE ALSO
 
@@ -157,11 +157,11 @@ SEE ALSO
 
 AUTHOR
 
-    Ingy döt Net <ingy@cpan.org>
+    Ingy döt Net ingy@ingy.net <mailto:ingy@ingy.net>
 
 COPYRIGHT AND LICENSE
 
-    Copyright 2007-2022. Ingy döt Net.
+    Copyright 2007-2022 - Ingy döt Net
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

@@ -7,7 +7,7 @@
 <br /> 
 <br /> 
 <span trspan="yourLoginIs">Your login is</span> 
-<span><img src="cid:key:../common/bullet_go.png" alt="go"/></span>
+<span><img src="cid:arrow:../common/bullet_go.png" alt="go"/></span>
 <b><TMPL_VAR NAME="login" ESCAPE=HTML></b>
 <br /> 
 <span trspan="pwdIs">Your password is</span> 

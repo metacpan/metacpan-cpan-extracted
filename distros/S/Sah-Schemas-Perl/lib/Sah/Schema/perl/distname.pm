@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-01'; # DATE
+our $DATE = '2022-09-11'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.045'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl distribution name, e.g. Foo-Bar',
@@ -20,14 +20,23 @@ our $schema = [str => {
 
     description => <<'_',
 
-For convenience (particularly in CLI with tab completion), you can input one of:
+This is a schema you can use when you want to accept a Perl distribution name,
+e.g. `WWW-Mechanize`. It offers basic checking of syntax as well as a couple of
+conveniences. First, it offers completion from list of locally installed Perl
+distribution. Second, it contains coercion rule so you can also input
+`Foo::Bar`, `Foo/Bar`, `Foo/Bar.pm`, or even 'Foo.Bar' and it will be normalized
+into `Foo-Bar`.
 
-    Foo::Bar
-    Foo/Bar
-    Foo/Bar.pm
-    Foo.Bar
+To see this schema in action on the CLI, you can try e.g. the `dist-has-deb`
+script from <pm:App::DistUtils> and activate its tab completion (see its manpage
+for more details). Then on the CLI try typing:
 
-and it will be coerced into Foo-Bar form.
+    % dist-has-deb WWW-<tab>
+    % dist-has-deb dzp/<tab>
+
+Note that this schema does not check that the Perl disribution exists on CPAN or
+is installed locally. To check that, use the `perl::distname::installed` schema.
+And there's also a `perl::distname::not_installed` schema.
 
 _
 }];
@@ -47,9 +56,11 @@ Sah::Schema::perl::distname - Perl distribution name, e.g. Foo-Bar
 
 =head1 VERSION
 
-This document describes version 0.042 of Sah::Schema::perl::distname (from Perl distribution Sah-Schemas-Perl), released on 2021-12-01.
+This document describes version 0.045 of Sah::Schema::perl::distname (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
 
 =head1 SYNOPSIS
+
+=head2 Using with Data::Sah
 
 To check data against this schema (requires L<Data::Sah>):
 
@@ -57,10 +68,28 @@ To check data against this schema (requires L<Data::Sah>):
  my $validator = gen_validator("perl::distname*");
  say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create validator that returns nice error message string
- # and/or coerced value. Data::Sah can even create validator that targets other
- # language, like JavaScript. All from the same schema. See its documentation
- # for more details.
+The above schema returns a boolean result (true if data is valid, false if
+otherwise). To return an error message string instead (empty string if data is
+valid, a non-empty error message otherwise):
+
+ my $validator = gen_validator("perl::distname", {return_type=>'str_errmsg'});
+ my $errmsg = $validator->($data);
+
+Often a schema has coercion rule or default value, so after validation the
+validated value is different. To return the validated (set-as-default, coerced,
+prefiltered) value:
+
+ my $validator = gen_validator("perl::distname", {return_type=>'str_errmsg+val'});
+ my $res = $validator->($data); # [$errmsg, $validated_val]
+
+Data::Sah can also create validator that returns a hash of detailed error
+message. Data::Sah can even create validator that targets other language, like
+JavaScript, from the same schema. Other things Data::Sah can do: show source
+code for validator, generate a validator code with debug comments and/or log
+statements, generate human text from schema. See its documentation for more
+details.
+
+=head2 Using with Params::Sah
 
 To validate function parameters against this schema (requires L<Params::Sah>):
 
@@ -73,11 +102,14 @@ To validate function parameters against this schema (requires L<Params::Sah>):
      ...
  }
 
+=head2 Using with Perinci::CmdLine::Lite
+
 To specify schema in L<Rinci> function metadata and use the metadata with
-L<Perinci::CmdLine> to create a CLI:
+L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -97,9 +129,10 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help
@@ -112,14 +145,23 @@ L<Perinci::CmdLine> to create a CLI:
 
 =head1 DESCRIPTION
 
-For convenience (particularly in CLI with tab completion), you can input one of:
+This is a schema you can use when you want to accept a Perl distribution name,
+e.g. C<WWW-Mechanize>. It offers basic checking of syntax as well as a couple of
+conveniences. First, it offers completion from list of locally installed Perl
+distribution. Second, it contains coercion rule so you can also input
+C<Foo::Bar>, C<Foo/Bar>, C<Foo/Bar.pm>, or even 'Foo.Bar' and it will be normalized
+into C<Foo-Bar>.
 
- Foo::Bar
- Foo/Bar
- Foo/Bar.pm
- Foo.Bar
+To see this schema in action on the CLI, you can try e.g. the C<dist-has-deb>
+script from L<App::DistUtils> and activate its tab completion (see its manpage
+for more details). Then on the CLI try typing:
 
-and it will be coerced into Foo-Bar form.
+ % dist-has-deb WWW-<tab>
+ % dist-has-deb dzp/<tab>
+
+Note that this schema does not check that the Perl disribution exists on CPAN or
+is installed locally. To check that, use the C<perl::distname::installed> schema.
+And there's also a C<perl::distname::not_installed> schema.
 
 =head1 HOMEPAGE
 
@@ -146,13 +188,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

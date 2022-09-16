@@ -28,16 +28,8 @@
         <input id="mailfield" name="mail" type="text" value="<TMPL_VAR NAME="MAIL">" class="form-control"  trplaceholder="mail" required />
       </div>
 
-      <TMPL_IF NAME=CAPTCHA_SRC>
-        <div class="form-group">
-          <img src="<TMPL_VAR NAME=CAPTCHA_SRC>" class="img-thumbnail" />
-        </div>
-        <div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <span class="input-group-text"><label for="captchafield" class="mb-0"><i class="fa fa-eye"></i></label></span>
-          </div>
-          <input id="captchafield" type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" trplaceholder="captcha" required autocomplete="off" />
-        </div>
+      <TMPL_IF NAME=CAPTCHA_HTML>
+        <TMPL_VAR NAME=CAPTCHA_HTML>
       </TMPL_IF>
       <TMPL_IF NAME="TOKEN">
         <input type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />

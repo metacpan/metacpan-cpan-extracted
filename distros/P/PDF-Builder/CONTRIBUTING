@@ -29,13 +29,16 @@ even a replacement file or manual patch will do, so long as it's clear where it
 goes and what it does. If the volume of such work becomes excessive (i.e., a 
 burden to us), we reserve the right to limit the ways that code changes can be 
 submitted. At this point, the volume is low enough that almost anything can be 
-handled.
+handled. Please DO NOT send us code changes "out of the blue" (without prior
+discussion), unless they are very small, so that you're not out a lot of
+effort if we decline the offer.
 
 Do NOT under ANY circumstances open a PR (Pull Request) to report a bug. It is 
 a waste of both your and our time and effort. Open a regular ticket (issue), 
 and attach a Perl (.pl) program illustrating the problem, if possible. If you
-believe that you have a program patch, and offer to share it as a PR, we may
-give the go-ahead. Unsolicited PRs may be closed without further action.
+believe that you have a program patch (i.e., a permanent change to the code), 
+and offer to share it as a PR, we may give the go-ahead. Unsolicited PRs may be 
+closed without further action.
 
 Please do not start on a massive project (especially, new function), without 
 discussing it with us first (via email or one of the discussion areas). This 

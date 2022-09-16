@@ -15,3 +15,7 @@ on build => sub {
     requires 'Test::RedisServer', '0.12';
     requires 'Test::TCP', '1.18';
 };
+
+on develop => sub {
+    requires 'Redis';
+};

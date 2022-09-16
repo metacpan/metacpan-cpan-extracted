@@ -1,0 +1,413 @@
+class Sys::Socket::Constant {
+  use Sys::Socket::In6_addr;
+  
+  native static method AF_ALG : int ();
+
+  native static method AF_APPLETALK : int ();
+
+  native static method AF_AX25 : int ();
+
+  native static method AF_BLUETOOTH : int ();
+
+  native static method AF_CAN : int ();
+
+  native static method AF_DEC : int ();
+
+  native static method AF_IB : int ();
+
+  native static method AF_INET : int ();
+
+  native static method AF_INET6 : int ();
+
+  native static method AF_IPX : int ();
+
+  native static method AF_KCM : int ();
+
+  native static method AF_KEY : int ();
+
+  native static method AF_LLC : int ();
+
+  native static method AF_LOCAL : int ();
+
+  native static method AF_MPLS : int ();
+
+  native static method AF_NETLINK : int ();
+
+  native static method AF_PACKET : int ();
+
+  native static method AF_PPPOX : int ();
+
+  native static method AF_RDS : int ();
+
+  native static method AF_TIPC : int ();
+
+  native static method AF_UNIX : int ();
+
+  native static method AF_UNSPEC : int ();
+
+  native static method AF_VSOCK : int ();
+
+  native static method AF_X25 : int ();
+
+  native static method AF_XDP : int ();
+
+  native static method INADDR_ANY : int ();
+
+  native static method INADDR_BROADCAST : int ();
+
+  native static method INADDR_LOOPBACK : int ();
+
+  native static method INADDR_NONE : int ();
+
+  native static method IPPROTO_IP : int ();
+
+  native static method IPPROTO_SCTP : int ();
+
+  native static method IPPROTO_TCP : int ();
+
+  native static method IPPROTO_UDP : int ();
+
+  native static method IPPROTO_UDPLITE : int ();
+
+  native static method IPTOS_LOWDELAY : int ();
+
+  native static method IPTOS_MINCOST : int ();
+
+  native static method IPTOS_RELIABILITY : int ();
+
+  native static method IPTOS_THROUGHPUT : int ();
+
+  native static method IP_ADD_MEMBERSHIP : int ();
+
+  native static method IP_ADD_SOURCE_MEMBERSHIP : int ();
+
+  native static method IP_BIND_ADDRESS_NO_PORT : int ();
+
+  native static method IP_BLOCK_SOURCE : int ();
+
+  native static method IP_DROP_MEMBERSHIP : int ();
+
+  native static method IP_DROP_SOURCE_MEMBERSHIP : int ();
+
+  native static method IP_FREEBIND : int ();
+
+  native static method IP_HDRINCL : int ();
+
+  native static method IP_MSFILTER : int ();
+
+  native static method IP_MTU : int ();
+
+  native static method IP_MTU_DISCOVER : int ();
+
+  native static method IP_MULTICAST_ALL : int ();
+
+  native static method IP_MULTICAST_IF : int ();
+
+  native static method IP_MULTICAST_LOOP : int ();
+
+  native static method IP_MULTICAST_TTL : int ();
+
+  native static method IP_NODEFRAG : int ();
+
+  native static method IP_OPTION : int ();
+
+  native static method IP_OPTIONS : int ();
+
+  native static method IP_ORIGDSTADDR : int ();
+
+  native static method IP_PASSSEC : int ();
+
+  native static method IP_PKTINFO : int ();
+
+  native static method IP_PMTUDISC_DO : int ();
+
+  native static method IP_PMTUDISC_DONT : int ();
+
+  native static method IP_PMTUDISC_PROBE : int ();
+
+  native static method IP_PMTUDISC_WANT : int ();
+
+  native static method IP_RCVDSTADDR : int ();
+
+  native static method IP_RECVERR : int ();
+
+  native static method IP_RECVIF : int ();
+
+  native static method IP_RECVOPTS : int ();
+
+  native static method IP_RECVORIGDSTADDR : int ();
+
+  native static method IP_RECVTOS : int ();
+
+  native static method IP_RECVTTL : int ();
+
+  native static method IP_RETOPTS : int ();
+
+  native static method IP_ROUTER_ALERT : int ();
+
+  native static method IP_TOS : int ();
+
+  native static method IP_TRANSPARENT : int ();
+
+  native static method IP_TTL : int ();
+
+  native static method IP_UNBLOCK_SOURCE : int ();
+
+  native static method MCAST_EXCLUDE : int ();
+
+  native static method MCAST_INCLUDE : int ();
+
+  native static method MSG_CMSG_CLOEXEC : int ();
+
+  native static method MSG_CONFIRM : int ();
+
+  native static method MSG_CTRUNC : int ();
+
+  native static method MSG_DONTROUTE : int ();
+
+  native static method MSG_DONTWAIT : int ();
+
+  native static method MSG_EOR : int ();
+
+  native static method MSG_ERRQUEUE : int ();
+
+  native static method MSG_ERRQUIE : int ();
+
+  native static method MSG_MORE : int ();
+
+  native static method MSG_NOSIGNAL : int ();
+
+  native static method MSG_OOB : int ();
+
+  native static method MSG_PEEK : int ();
+
+  native static method MSG_TRUNC : int ();
+
+  native static method MSG_WAITALL : int ();
+
+  native static method PF_INET : int ();
+
+  native static method PF_UNIX : int ();
+
+  native static method SCM_RIGHTS : int ();
+
+  native static method SCM_SECURITY : int ();
+
+  native static method SOCK_CLOEXEC : int ();
+
+  native static method SOCK_DGRAM : int ();
+
+  native static method SOCK_NONBLOCK : int ();
+
+  native static method SOCK_PACKET : int ();
+
+  native static method SOCK_RAW : int ();
+
+  native static method SOCK_RDM : int ();
+
+  native static method SOCK_SEQPACKET : int ();
+
+  native static method SOCK_STREAM : int ();
+
+  native static method SOL_IP : int ();
+
+  native static method SOL_SOCKET : int ();
+
+  native static method SO_BROADCAST : int ();
+
+  native static method SO_EE_OFFENDER : int ();
+
+  native static method SO_EE_ORIGIN_ICMP : int ();
+
+  native static method SO_EE_ORIGIN_ICMP6 : int ();
+
+  native static method SO_EE_ORIGIN_LOCAL : int ();
+
+  native static method SO_EE_ORIGIN_NONE : int ();
+
+  native static method SO_ERROR : int ();
+
+  native static method SO_KEEPALIVE : int ();
+
+  native static method SO_PEERSEC : int ();
+
+  native static method SO_REUSEADDR : int ();
+
+  native static method TCP_CORK : int ();
+
+  native static method UDP_CORK : int ();
+
+  native static method INET_ADDRSTRLEN : int ();
+
+  native static method INET6_ADDRSTRLEN : int ();
+
+  native static method IPPROTO_IPV6 : int ();
+
+  native static method IPV6_ADDRFORM : int ();
+
+  native static method IPV6_ADD_MEMBERSHIP : int ();
+
+  native static method IPV6_AUTHHDR : int ();
+
+  native static method IPV6_DROP_MEMBERSHIP : int ();
+
+  native static method IPV6_DSTOPS : int ();
+
+  native static method IPV6_DSTOPTS : int ();
+
+  native static method IPV6_FLOWINFO : int ();
+
+  native static method IPV6_HOPLIMIT : int ();
+
+  native static method IPV6_HOPOPTS : int ();
+
+  native static method IPV6_MTU : int ();
+
+  native static method IPV6_MTU_DISCOVER : int ();
+
+  native static method IPV6_MULTICAST_HOPS : int ();
+
+  native static method IPV6_MULTICAST_IF : int ();
+
+  native static method IPV6_MULTICAST_LOOP : int ();
+
+  native static method IPV6_PKTINFO : int ();
+
+  native static method IPV6_RECVERR : int ();
+
+  native static method IPV6_ROUTER_ALERT : int ();
+
+  native static method IPV6_RTHDR : int ();
+
+  native static method IPV6_UNICAST_HOPS : int ();
+
+  native static method IPV6_V6ONLY : int ();
+
+  native static method PF_INET6 : int ();
+
+  native static method SO_ACCEPTCONN : int ();
+
+  native static method SO_ATTACH_BPF : int ();
+
+  native static method SO_ATTACH_FILTER : int ();
+
+  native static method SO_ATTACH_REUSEPORT_CBPF : int ();
+
+  native static method SO_ATTACH_REUSEPORT_EBPF : int ();
+
+  native static method SO_BINDTODEVICE : int ();
+
+  native static method SO_BSDCOMPAT : int ();
+
+  native static method SO_BUSY_POLL : int ();
+
+  native static method SO_DEBUG : int ();
+
+  native static method SO_DETACH_BPF : int ();
+
+  native static method SO_DETACH_FILTER : int ();
+
+  native static method SO_DOMAIN : int ();
+
+  native static method SO_DONTROUTE : int ();
+
+  native static method SO_INCOMING_CPU : int ();
+
+  native static method SO_INCOMING_NAPI_ID : int ();
+
+  native static method SO_LINGER : int ();
+
+  native static method SO_LOCK_FILTER : int ();
+
+  native static method SO_MARK : int ();
+
+  native static method SO_OOBINLINE : int ();
+
+  native static method SO_PASSCRED : int ();
+
+  native static method SO_PASSSEC : int ();
+
+  native static method SO_PEEK_OFF : int ();
+
+  native static method SO_PEERCRED : int ();
+
+  native static method SO_PRIORITY : int ();
+
+  native static method SO_PROTOCOL : int ();
+
+  native static method SO_RCVBUF : int ();
+
+  native static method SO_RCVBUFFORCE : int ();
+
+  native static method SO_RCVLOWAT : int ();
+
+  native static method SO_RCVTIMEO : int ();
+
+  native static method SO_REUSEPORT : int ();
+
+  native static method SO_RXQ_OVFL : int ();
+
+  native static method SO_SELECT_ERR_QUEUE : int ();
+
+  native static method SO_SNDBUF : int ();
+
+  native static method SO_SNDBUFFORCE : int ();
+
+  native static method SO_SNDLOWAT : int ();
+
+  native static method SO_SNDTIMEO : int ();
+
+  native static method SO_TIMESTAMP : int ();
+
+  native static method SO_TIMESTAMPNS : int ();
+
+  native static method SO_TYPE : int ();
+
+  native static method MSG_BCAST : int ();
+
+  native static method MSG_COPY : int ();
+
+  native static method MSG_EXCEPT : int ();
+
+  native static method MSG_MCAST : int ();
+
+  native static method MSG_NOERROR : int ();
+
+  native static method SHUT_RD : int ();
+
+  native static method SHUT_WR : int ();
+
+  native static method SHUT_RDWR : int ();
+
+  native static method TCP_CONGESTION : int ();
+
+  native static method TCP_DEFER_ACCEPT : int ();
+
+  native static method TCP_INFO : int ();
+
+  native static method TCP_KEEPCNT : int ();
+
+  native static method TCP_KEEPIDLE : int ();
+
+  native static method TCP_KEEPINTVL : int ();
+
+  native static method TCP_LINGER2 : int ();
+
+  native static method TCP_MAXSEG : int ();
+
+  native static method TCP_NODELAY : int ();
+
+  native static method TCP_QUICKACK : int ();
+
+  native static method TCP_SYNCNT : int ();
+
+  native static method TCP_SYNQ_HSIZE : int ();
+
+  native static method TCP_USER_TIMEOUT : int ();
+
+  native static method TCP_WINDOW_CLAMP : int ();
+
+  native static method IN6ADDR_ANY : Sys::Socket::In6_addr ();
+  
+  native static method IN6ADDR_LOOPBACK : Sys::Socket::In6_addr ();
+}

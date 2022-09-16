@@ -15,6 +15,7 @@ dist.ini
 examples/ua.pl
 lib/HTTP/BrowserDetect.pm
 perlcriticrc
+perlimports.toml
 perltidyrc
 precious.toml
 t/00-report-prereqs.dd

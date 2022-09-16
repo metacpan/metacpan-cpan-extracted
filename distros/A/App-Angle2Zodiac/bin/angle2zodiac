@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Angle2Zodiac;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::Angle2Zodiac->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+angle2zodiac - Script to convert angle to zodiac string.
+
+=head1 SYNOPSIS
+
+ angle2zodiac [-a] [-h] [--version] angle
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-a>
+
+ Output will be in ascii form (e.g. 2 sc 31'28.9560'')
+
+=item * C<-h>
+
+ Print help.
+
+=item * C<--version>
+
+ Print version of script.
+
+=item * C<angle>
+
+Angle in numeric. (e.g. 212.5247100).
+
+=back
+
+=head1 EXAMPLE1
+
+ angle2zodiac 212.5247100
+
+ # Output:
+ # 2°♏31′28.9560′′
+
+=head1 EXAMPLE2
+
+ angle2zodiac -a 212.5247100
+
+ # Output:
+ # 2 sc 31'28.9560''
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-Angle2Zodiac>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2020-2022 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

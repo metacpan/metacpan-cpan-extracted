@@ -6,7 +6,7 @@ use warnings;
 
 use Data::Printer;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub call {
 	my ($self, $env) = @_;
@@ -68,6 +68,8 @@ Creates Plack application.
 Returns Plack::Component object.
 
 =head1 EXAMPLE
+
+=for comment filename=plack_app_env.pl
 
  use strict;
  use warnings;
@@ -131,12 +133,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020 Michal Josef Špaček
+© 2020-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

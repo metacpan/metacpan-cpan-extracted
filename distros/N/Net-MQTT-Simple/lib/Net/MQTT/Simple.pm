@@ -3,7 +3,7 @@ package Net::MQTT::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 # Please note that these are not documented and are subject to change:
 our $KEEPALIVE_INTERVAL = 60;
@@ -11,6 +11,7 @@ our $PING_TIMEOUT = 10;
 our $RECONNECT_INTERVAL = 5;
 our $MAX_LENGTH = 2097152;    # 2 MB
 our $READ_BYTES = 16 * 1024;  # 16 kB per IO::Socket::SSL recommendation
+our $WRITE_BYTES = 16 * 1024; # 16 kB per IO::Socket::SSL maximum
 our $PROTOCOL_LEVEL = 0x04;   # 0x03 in v3.1, 0x04 in v3.1.1
 our $PROTOCOL_NAME = "MQTT";  # MQIsdp in v3.1, MQTT in v3.1.1
 
@@ -192,8 +193,10 @@ sub _send {
 
     my $socket = $self->{socket} or return;
 
-    syswrite $socket, $data
-        or $self->_drop_connection;  # reconnect on next message
+    while (my $chunk = substr $data, 0, $WRITE_BYTES, "") {
+        syswrite $socket, $chunk
+            or $self->_drop_connection;  # reconnect on next message
+    }
 
     $self->{last_send} = time;
 }

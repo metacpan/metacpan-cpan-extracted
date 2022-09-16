@@ -4,10 +4,9 @@ use base 'PDF::Builder::Resource::BaseFont';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -29,17 +28,14 @@ Returns a cid-font object, base class for all CID-based fonts.
 =cut
 
 sub new {
-    my ($class, $pdf, $name, @opts) = @_;
+    my ($class, $pdf, $name, %opts) = @_;
 
-    my %opts = ();
-    %opts = @opts if (scalar @opts)%2 == 0;
-
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
     my $self = $class->SUPER::new($pdf, $name);
     $pdf->new_obj($self) if defined($pdf) && !$self->is_obj($pdf);
 
-    $self->{'Type'} = PDFName('Font');
-    $self->{'Subtype'} = PDFName('Type0');
+    $self->{'Type'}     = PDFName('Font');
+    $self->{'Subtype'}  = PDFName('Type0');
     $self->{'Encoding'} = PDFName('Identity-H');
 
     my $de = PDFDict();
@@ -59,7 +55,8 @@ sub new {
 }
 
 sub glyphByCId { 
-    return $_[0]->data()->{'g2n'}->[$_[1]]; 
+    my ($self, $gid) = @_;
+    return $self->data()->{'g2n'}->[$gid]; 
 }
 
 sub uniByCId { 
@@ -70,28 +67,28 @@ sub uniByCId {
     return $uni;
 }
 
-# note that cidByUni has been seen returning 'undef' in some cases. be sure
-# to handle this!
+# TBD note that cidByUni has been seen returning 'undef' in some cases. 
+# be sure to handle this!
 sub cidByUni { 
-    return $_[0]->data()->{'u2g'}->{$_[1]}; 
+    my ($self, $gid) = @_;
+    return $self->data()->{'u2g'}->{$gid}; 
 }
 
 sub cidByEnc { 
-    return $_[0]->data()->{'e2g'}->[$_[1]]; 
+    my ($self, $gid) = @_;
+    return $self->data()->{'e2g'}->[$gid]; 
 }
 
 sub wxByCId {
-    my $self = shift;
-    my $g = shift;
+    my ($self, $g) = @_;
 
     my $w;
+    my $widths = $self->data()->{'wx'};
 
-    if      (ref($self->data()->{'wx'}) eq 'ARRAY' && 
-	     defined $self->data()->{'wx'}->[$g]) {
-        $w = int($self->data()->{'wx'}->[$g]);
-    } elsif (ref($self->data()->{'wx'}) eq 'HASH' && 
-	     defined $self->data()->{'wx'}->{$g}) {
-        $w = int($self->data()->{'wx'}->{$g});
+    if      (ref($widths) eq 'ARRAY' && defined $widths->[$g]) {
+        $w = int($widths->[$g]);
+    } elsif (ref($widths) eq 'HASH' && defined $widths->{$g}) {
+        $w = int($widths->{$g});
     } else {
         $w = $self->missingwidth();
     }
@@ -100,16 +97,17 @@ sub wxByCId {
 }
 
 sub wxByUni { 
-    return $_[0]->wxByCId($_[0]->data()->{'u2g'}->{$_[1]}); 
+    my ($self, $gid) = @_;
+    return $self->wxByCId($self->data()->{'u2g'}->{$gid}); 
 }
 
 sub wxByEnc { 
-    return $_[0]->wxByCId($_[0]->data()->{'e2g'}->[$_[1]]); 
+    my ($self, $gid) = @_;
+    return $self->wxByCId($self->data()->{'e2g'}->[$gid]); 
 }
 
 sub width {
     my ($self, $text) = @_;
-
     return $self->width_cid($self->cidsByStr($text));
 }
 
@@ -151,15 +149,19 @@ sub cidsByStr {
 	    defined $self->data()->{'decode'} && 
 	    $self->data()->{'decode'} ne 'ident') {
         $text = encode($self->data()->{'decode'}, $text);
-    } elsif (utf8::is_utf8($text) && $self->data()->{'decode'} eq 'ident') {
+    } elsif (utf8::is_utf8($text) && 
+	    defined $self->data()->{'decode'} && 
+	    $self->data()->{'decode'} eq 'ident') {
         $text = $self->cidsByUtf($text);
     } elsif (!utf8::is_utf8($text) && 
 	    defined $self->data()->{'encode'} && 
+	    defined $self->data()->{'decode'} && 
 	    $self->data()->{'decode'} eq 'ident') {
         $text = $self->cidsByUtf(decode($self->data()->{'encode'}, $text));
     } elsif (!utf8::is_utf8($text) && 
 	    $self->can('issymbol') && 
 	    $self->issymbol() && 
+	    defined $self->data()->{'decode'} && 
 	    $self->data()->{'decode'} eq 'ident') {
         $text = pack('U*', (map { $_+0xf000 } unpack('C*', $text)));
         $text = $self->cidsByUtf($text);
@@ -178,20 +180,24 @@ Returns the CID-encoded string from utf8-string.
 sub cidsByUtf {
     my ($self, $s) = @_;
 
-    $s = pack('n*', map { $self->cidByUni($_)||0 } (map { $_>0x7f && $_<0xA0? uniByName(nameByUni($_)): $_ } unpack('U*', $s)));
+    $s = pack('n*', 
+	    map { $self->cidByUni($_)||0 } 
+	    (map {
+		    ($_ and $_>0x7f and $_<0xA0)? uniByName(nameByUni($_)): $_ 
+	    } 
+	    unpack('U*', $s)));
+
     utf8::downgrade($s);
     return $s;
 }
 
 sub textByStr {
     my ($self, $text) =  @_;
-
     return $self->text_cid($self->cidsByStr($text));
 }
 
 sub textByStrKern {
     my ($self, $text, $size, $indent) = @_;
-
     return $self->text_cid_kern($self->cidsByStr($text), $size, $indent);
 }
 
@@ -237,7 +243,7 @@ sub text_cid_kern {
             $self->fontfile()->subsetByCId($g);
         }
     }
-    if      (defined $size && $self->{'-dokern'} && $self->haveKernPairs()) {
+    if (defined $size && $self->{'-dokern'} && $self->haveKernPairs()) {
         my $newtext = ' ';
         my $lastglyph = 0;
         my $tBefore = 0;
@@ -249,7 +255,7 @@ sub text_cid_kern {
             }
             $lastglyph = $n;
             my $t = sprintf('%04X', $n);
-            $newtext .= '<' if !$tBefore;
+            $newtext .= '<' unless $tBefore;
             $newtext .= $t;
             $tBefore = 1;
         }
@@ -277,7 +283,7 @@ sub kernPairCid {
 }
 
 sub haveKernPairs {
-    return 0;
+    return 0;  # PDF::API2 changed to just 'return;'
 }
 
 sub encodeByName {
@@ -285,14 +291,24 @@ sub encodeByName {
 
     return if $self->issymbol();
 
-    $self->data()->{'e2u'} = [ map { $_>0x7f && $_<0xA0? uniByName(nameByUni($_)): $_ } unpack('U*', decode($enc, pack('C*', 0..255))) ] if defined $enc;
-    $self->data()->{'e2n'} = [ map { $self->data()->{'g2n'}->[$self->data()->{'u2g'}->{$_} || 0] || '.notdef' } @{$self->data()->{'e2u'}} ];
-    $self->data()->{'e2g'} = [ map { $self->data()->{'u2g'}->{$_} || 0 } @{$self->data()->{'e2u'}} ];
+    if (defined $enc) {
+        $self->data()->{'e2u'} = [ 
+	    map { ($_ and $_>0x7f and $_<0xA0)? uniByName(nameByUni($_)): $_ } 
+	    unpack('U*', decode($enc, pack('C*', 0..255)))
+	];
+    }
+    $self->data()->{'e2n'} = [ 
+	map { $self->data()->{'g2n'}->[$self->data()->{'u2g'}->{$_} || 0] || '.notdef' } 
+	@{$self->data()->{'e2u'}}
+    ];
+    $self->data()->{'e2g'} = [ 
+	map { $self->data()->{'u2g'}->{$_} || 0 } 
+	@{$self->data()->{'e2u'}} 
+    ];
 
     $self->data()->{'u2e'} = {};
     foreach my $n (reverse 0..255) {
-        $self->data()->{'u2e'}->{$self->data()->{'e2u'}->[$n]} = $n
-	    unless defined $self->data()->{'u2e'}->{$self->data()->{'e2u'}->[$n]};
+        $self->data()->{'u2e'}->{$self->data()->{'e2u'}->[$n]} //= $n;
     }
 
     return $self;

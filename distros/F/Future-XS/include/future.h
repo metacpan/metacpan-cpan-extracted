@@ -112,4 +112,6 @@ void Future_set_udata(pTHX_ SV *f, SV *key, SV *value);
 #define future_get_udata(f, key)  Future_get_udata(aTHX_ f, key)
 SV *Future_get_udata(pTHX_ SV *f, SV *key);
 
+void Future_reread_environment(pTHX);
+
 #endif

@@ -10,7 +10,7 @@ CTK::Daemon - Abstract class to implement Daemons
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 SYNOPSIS
 
@@ -99,6 +99,7 @@ Run as different user using setuid/setgid
         forks       => 3, # Default: 1
         uid         => "username", # Default: undef
         gid         => "groupname", # Default: undef
+        saferun     => 0, # Set to 1 to enable safe mode for the run method calling
     ));
 
 Daemon constructor
@@ -381,7 +382,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/$VERSION @EXPORT $DEV_DEBUG/;
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 use Carp;
 use File::Spec;
@@ -539,6 +540,7 @@ sub new {
         gid         => $params{gid} || undef,
         uid         => $params{uid} || undef,
         forkers     => $forkers,
+        saferun     => $params{saferun} || 0,
 
         debug       => $debug,
         loglevel    => $loglevel,
@@ -594,13 +596,20 @@ sub worker {
         $self->reload(); # User defined method
     }
 
+    # Running
     my $status;
-    eval { $status = $self->run(); };
-    if (my $err = $@) {
-        $self->hangup(1);
-        $logger->log_error($err) if $logger;
-        mysleep(STEP); # avoid fast restarts
+    if ($self->{saferun}) { # In safe mode
+        eval { $status = $self->run(); };
+        if (my $err = $@) {
+            $self->hangup(1);
+            $logger->log_error($err) if $logger;
+            mysleep(STEP); # avoid fast restarts
+        }
+    } else { # No safe mode. This is good idea!
+        $status = $self->run();
     }
+
+    # Validation
     if (!$status) { # Abort
         $logger->log_debug("Abort worker #%d pid=%d (finished with negative status)", $j, $$) if $self->{debug} && $logger;
         return 1; # For exit!

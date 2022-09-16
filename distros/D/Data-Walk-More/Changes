@@ -1,3 +1,9 @@
+0.002   2022-07-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Also pass the node in $_[0], to increase compatibility with
+          Data::Walk.
+
+
 0.001   2020-04-15  Released-By: PERLANCAR
 
 	- First release.

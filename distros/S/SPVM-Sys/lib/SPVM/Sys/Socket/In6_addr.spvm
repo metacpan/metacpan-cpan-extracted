@@ -1,0 +1,8 @@
+class Sys::Socket::In6_addr : pointer_t {
+  
+  # Class methods
+  native static method new : Sys::Socket::In6_addr ();
+  
+  # Instance methods
+  native method DESTROY : void ();
+}

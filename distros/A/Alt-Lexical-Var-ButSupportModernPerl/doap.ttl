@@ -1,0 +1,13 @@
+@prefix :     <http://usefulinc.com/ns/doap#>.
+@prefix dc:   <http://purl.org/dc/terms/>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#>.
+
+[]
+  a :Project;
+  :name "Alt-Lexical-Var-ButSupportModernPerl";
+  :shortdesc "alternative distribution of Lexical::Var, with support for more modern versions of Perl";
+  :developer [ a foaf:Person; foaf:name "Andrew Main"; foaf:nick "Zefram"; foaf:mbox <mailto:zefram@fysh.org> ];
+  :license <http://dev.perl.org/licenses/>;
+  :programming-language "Perl".

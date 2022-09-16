@@ -13,7 +13,7 @@ BEGIN {
 }
 
 my ( $res, $user, $pwd );
-my $maintests = 17;
+my $maintests = 22;
 my $mailSend  = 0;
 
 my $mail2 = 0;
@@ -54,7 +54,13 @@ SKIP: {
                 dbiAuthPasswordHash         => '',
                 dbiDynamicHashEnabled       => 0,
                 dbiMailCol                  => 'mail',
+                portalEnablePasswordDisplay => 1,
+                portalDisplayPasswordPolicy => 1,
+                passwordPolicyActivation    => 0,
                 passwordResetAllowedRetries => 4,
+                passwordPolicyMinDigit      => 2,
+                passwordPolicyMinSpeChar    => 1,
+                passwordPolicySpecialChar   => '__ALL__'
             }
         }
     );
@@ -92,7 +98,23 @@ SKIP: {
 
     # Post mismatched passwords
     ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
-    ok( $res->[2]->[0] =~ /newpassword/s, ' Ask for a new password #1' );
+    ok( $res->[2]->[0] =~ /newpassword/s, ' Ask for a new password #1' )
+      or print STDERR Dumper( $res->[2]->[0] );
+    ok(
+        $res->[2]->[0] =~
+m%<i id="toggle_newpassword" class="fa fa-eye-slash toggle-password">%,
+        ' toggle newpassword icon found'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    ok(
+        $res->[2]->[0] =~
+m%<i id="toggle_confirmpassword" class="fa fa-eye-slash toggle-password">%,
+        ' toggle confirmpassword icon found'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    ok(
+        $res->[2]->[0] =~
+m%<input id="newpassword" name="newpassword" type="password" class="form-control"%,
+        ' input type password found'
+    ) or print STDERR Dumper( $res->[2]->[0] );
 
     $query .= '&newpassword=zz&confirmpassword=z';
     ok(
@@ -124,7 +146,8 @@ SKIP: {
 
     # Post empty password 2
     ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
-    ok( $res->[2]->[0] =~ /newpassword/s, ' Ask for a new password #3' );
+    ok( $res->[2]->[0] =~ /newpassword/s, ' Ask for a new password #3' )
+      or print STDERR Dumper( $res->[2]->[0] );
 
     $query .= '&newpassword=zz&confirmpassword=';
     ok(
@@ -141,8 +164,16 @@ SKIP: {
     # Post new password
     ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
     ok( $res->[2]->[0] =~ /newpassword/s, ' Ask for a new password #4' );
-
-    $query .= '&newpassword=zz&confirmpassword=zz';
+    ok(
+        $res->[2]->[0] !~ /passwordPolicySpecialChar/,
+        ' Password special char list not found'
+    );
+    ok(
+        $res->[2]->[0] =~
+/<span trspan="passwordPolicyMinDigit">Minimal digit characters:<\/span> 2/,
+        ' Found password policy min digit == 2'
+    );
+    $query .= '&newpassword=zz11#&confirmpassword=zz11#';
     ok(
         $res = $client->_post(
             '/resetpwd', IO::String->new($query),
@@ -157,8 +188,8 @@ SKIP: {
     ok(
         $res = $client->_post(
             '/',
-            IO::String->new('user=dwho&password=zz'),
-            length => 21
+            IO::String->new('user=dwho&password=zz11#'),
+            length => 24
         ),
         'Auth query'
     );

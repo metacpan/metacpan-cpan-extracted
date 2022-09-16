@@ -6,23 +6,25 @@ use Example::Syntax;
 
 extends 'Example::Controller';
 
-has todo => (is=>'rw');
-
-sub root :Chained(/auth) PathPart('todos') Args(0) Does(Verbs) View(HTML::Todos) RequestModel(TodosQuery) ($self, $c, $q) {
-  $c->build_view(
-    list => $c->user->request_todos($q),
-    todo => my $todo = $c->user->new_todo,
-  );
-  $self->todo($todo);
+sub todos :Chained(../auth) CaptureArgs(0) ($self, $c, $user) {
+  my $collection = $user->todos;
+  $c->next_action($collection);
 }
 
-  sub GET :Action ($self, $c) { return $c->view->set_http_ok }
-
-  sub POST :Action RequestModel(TodoRequest) ($self, $c, $request) {
-    $self->todo->set_from_request($request);
-    return $self->todo->valid ?
-      $c->redirect_to_action('root') :
-        $c->view->set_http_bad_request;
+  sub list :Chained(todos) PathPart('') Args(0) Verbs(GET,POST) RequestModel(TodosQuery) Name(TodosList) ($self, $c, $q, $collection) {
+    my $sessioned_query = $c->model('TodosQuery::Session', $q);
+    $c->view('HTML::Todos',
+      todo => my $todo = $c->user->new_todo,
+      list => $collection->filter_by_request($sessioned_query),
+    );
+    $c->next_action($todo);
   }
+
+    sub POST :Action RequestModel(TodoRequest) ($self, $c, $request, $todo) {
+      $todo->set_from_request($request);
+      return $todo->valid ?
+        $c->redirect_to_action('#TodoEdit', [$todo->id]) :
+          $c->view->set_http_bad_request;
+    }
 
 __PACKAGE__->meta->make_immutable;

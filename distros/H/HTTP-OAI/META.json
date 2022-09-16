@@ -71,7 +71,7 @@
          "web" : "https://github.com/LibreCat/perl-oai-lib"
       }
    },
-   "version" : "4.11",
+   "version" : "4.12",
    "x_contributors" : [
       "gregor herrmann <gregoa@debian.org>",
       "Jakob Voss <voss@gbv.de>",

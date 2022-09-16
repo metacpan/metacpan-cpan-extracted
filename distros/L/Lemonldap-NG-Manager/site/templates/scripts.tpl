@@ -19,7 +19,7 @@
 
 
 <!-- Constants -->
-<script type="text/JavaScript" src="<TMPL_VAR NAME="SCRIPTNAME">/psgi.js"></script>
+<script type="text/JavaScript" src="<TMPL_VAR NAME="SCRIPTNAME">psgi.js"></script>
 
 <!-- //if:usedebianlibs
 <script type="text/javascript" src="/javascript/es5-shim/es5-shim.min.js"></script>

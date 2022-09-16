@@ -141,6 +141,7 @@ loquiter
 matthew
 milesort
 mohammad
+mpspahr
 neil
 nick
 parseConfig

@@ -22,12 +22,13 @@ use Scalar::Util ();		# Core since 5.7.3
 use Storable ();		# Core since 5.7.3
 use Test::Builder ();		# Core since 5.6.2
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 our @ISA = qw{ Exporter };
 
 our @EXPORT_OK = qw{
     ALLOW_REDIRECT_TO_INDEX
+    MAYBE_IGNORE_GITHUB
 };
 
 our %EXPORT_TAGS = (
@@ -68,6 +69,22 @@ use constant ALLOW_REDIRECT_TO_INDEX => sub {
     ( my $resp_url = $resp->{url} ) =~ s| (?<= / ) [^/]* \z ||smx;
     return $resp_url ne $url;
 };
+
+use constant MAYBE_IGNORE_GITHUB	=> sub {
+    m< \A https://github\.com \b >smx
+	or return;
+    my $git_dir = $ENV{GIT_DIR} || '.git';
+    -d $git_dir
+	or return 1;
+    open my $fh, '-|', qw{ git remote --verbose }	## no critic (RequireBriefOpen)
+	or return 1;
+    while ( <$fh> ) {
+	m< \b https://github\.com \b >smx
+	    and return;
+    }
+    return 1;
+};
+
 
 # NOTE that Test::Builder->new() gets us a singleton. For this reason I
 # use $Test::Builder::Level (localized) to get tests reported relative
@@ -1354,7 +1371,7 @@ By default all indices are considered.
 
 =item prohibit_redirect
 
-Added in version 0.004
+Added in version 0.004.
 
 This argument controls whether redirects are allowed in the resolution
 of a URL link.
@@ -1502,7 +1519,7 @@ failures, passes, and skipped tests, in that order.
  $t->prohibit_redirect()
      and say 'All URL links must resolve without redirection';
 
-Added in version 0.004
+Added in version 0.004.
 
 This method returns the value of the C<'prohibit_redirect'> attribute.
 
@@ -1522,12 +1539,14 @@ Added in version 0.002.
 
 This method returns the value of the C<'skip_server_errors'> attribute.
 
-=head1 MANIFEST CONSTANT
+=head1 MANIFEST CONSTANTS
 
-The following manifest constant can be imported by name, or using the
+The following manifest constants can be imported by name, or using the
 C<:const> tag:
 
 =head2 ALLOW_REDIRECT_TO_INDEX
+
+Added in version 0.003.
 
 This manifest constant is intended to be used as a value of the
 C<'prohibit_redirect'> attribute. It is a reference to a piece of code
@@ -1545,6 +1564,19 @@ This mess exists because of my bias that old-style redirection to an
 index is a different beast than indirection in general, and ought to be
 allowed. If you disagree you can ignore this functionality, or
 re-implement to suit yourself.
+
+=head2 MAYBE_IGNORE_GITHUB
+
+Added in version 0.009.
+
+This manifest constant is intended to be used as a value of the
+C<'ignore_url'> attribute. It is a reference to a piece of code that
+ignores GitHub urls unless the directory specified by environment
+variable C<GIT_DIR> (default: F<.git/> exists, and GitHub is a remote
+for the repository.
+
+This is (maybe) a convenience for developers whose boilerplate includes
+GitHub links but have not yet uploaded to GitHub.
 
 =head1 SEE ALSO
 
@@ -1588,7 +1620,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2019-2021 by Thomas R. Wyant, III
+Copyright (C) 2019-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

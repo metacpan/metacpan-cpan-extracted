@@ -228,7 +228,6 @@ sub init {
     $self->setTypes($conf);
     $self->{multiValuesSeparator} ||= '; ';
     $self->{hiddenAttributes} //= "_password";
-    $self->{TOTPCheck} = $self->{U2FCheck} = $self->{UBKCheck} = '1';
     return 1;
 }
 

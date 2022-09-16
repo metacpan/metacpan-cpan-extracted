@@ -17,7 +17,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
 # INITIALIZATION
 
@@ -59,7 +59,8 @@ sub _modifyPassword {
         )
     );
     unless ($oldPwdRule) {
-        my $error = $self->p->HANDLER->tsv->{jail}->error || '???';
+        my $error =
+          $self->p->HANDLER->tsv->{jail}->error || 'Unable to compile rule';
     }
 
     my $pwdPolicyRule = $self->p->HANDLER->buildSub(
@@ -68,13 +69,12 @@ sub _modifyPassword {
         )
     );
     unless ($pwdPolicyRule) {
-        my $error = $self->p->HANDLER->tsv->{jail}->error || '???';
+        my $error =
+          $self->p->HANDLER->tsv->{jail}->error || 'Unable to compile rule';
     }
 
     # Check if portal require old password
     if ( $oldPwdRule->( $req, $req->userData ) or $requireOldPwd ) {
-
-        # TODO: verify oldpassword
         unless ( $req->data->{oldpassword} = $req->param('oldpassword') ) {
             $self->logger->warn("Portal require old password");
             return PE_PP_MUST_SUPPLY_OLD_PASSWORD;
@@ -82,7 +82,7 @@ sub _modifyPassword {
 
         # Verify old password
         return PE_BADOLDPASSWORD
-          unless ( $self->confirm( $req, $req->data->{oldpassword} ) );
+          unless $self->confirm( $req, $req->data->{oldpassword} );
     }
 
     my $cpq =
@@ -240,12 +240,7 @@ sub setNewPassword {
         $hook_result =
           $self->p->processHook( $req, 'passwordAfterChange', $req->user,
             $pwd );
-        if ( $hook_result != PE_OK ) {
-            return $hook_result;
-        }
-        else {
-            return PE_PASSWORD_OK;
-        }
+        return ( $hook_result != PE_OK ) ? $hook_result : PE_PASSWORD_OK;
     }
     else {
         return $mod_result;

@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -94,15 +94,18 @@
             "Test::Script" : "1.25",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0",
-            "Test::Vars" : "0",
+            "Test::Vars" : "0.015",
             "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
             "Class::Method::Modifiers" : "2.12",
+            "Const::Fast" : "0",
             "MRO::Compat" : "0",
             "Moo" : "2.003004",
+            "Package::Stash" : "0",
+            "Role::Hooks" : "0",
             "Scalar::Util" : "0",
             "Sub::Name" : "0",
             "autovivification" : "0",
@@ -119,6 +122,8 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Module::Path" : "0",
+            "Package::Stash" : "0",
             "Sub::Name" : "0",
             "Test2::V0" : "0",
             "Test::CleanNamespaces" : "0",
@@ -131,15 +136,19 @@
    "provides" : {
       "MooX::TaggedAttributes" : {
          "file" : "lib/MooX/TaggedAttributes.pm",
-         "version" : "0.15"
+         "version" : "0.18"
       },
       "MooX::TaggedAttributes::Cache" : {
          "file" : "lib/MooX/TaggedAttributes/Cache.pm",
-         "version" : "0.15"
+         "version" : "0.18"
+      },
+      "MooX::TaggedAttributes::Propagate" : {
+         "file" : "lib/MooX/TaggedAttributes/Propagate.pm",
+         "version" : "0.18"
       },
       "MooX::TaggedAttributes::Role" : {
          "file" : "lib/MooX/TaggedAttributes/Role.pm",
-         "version" : "0.15"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -154,9 +163,9 @@
          "web" : "https://gitlab.com/djerius/moox-taggedattributes"
       }
    },
-   "version" : "0.15",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "0.18",
+   "x_generated_by_perl" : "v5.34.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

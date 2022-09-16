@@ -2,7 +2,7 @@ use Test::More;
 use strict;
 use IO::String;
 use JSON;
-use Lemonldap::NG::Portal::Main::Constants 'PE_CAPTCHAEMPTY';
+use Lemonldap::NG::Portal::Main::Constants 'PE_CAPTCHAERROR';
 
 require 't/test-lib.pm';
 
@@ -42,8 +42,8 @@ SKIP: {
     my $json;
     ok( $json = eval { from_json( $res->[2]->[0] ) }, 'Response is JSON' )
       or print STDERR "$@\n" . Dumper($res);
-    ok( $json->{error} == PE_CAPTCHAEMPTY, 'Response is PE_CAPTCHAEMPTY' )
-      or explain( $json, "error => 77" );
+    ok( $json->{error} == PE_CAPTCHAERROR, 'Response is PE_CAPTCHAERROR' )
+      or explain( $json, "error => 76" );
 
     # Test normal first access
     # ------------------------

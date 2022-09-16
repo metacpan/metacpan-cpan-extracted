@@ -16,6 +16,7 @@ my $check = [
         'type' => 'requires',
         'version' => '0.26',
         'name' => 'Path::Class',
+        'feature' => '',
         'dist' => 'KWILLIAMS/Path-Class-0.26.tar.gz'
     },
     {
@@ -23,6 +24,7 @@ my $check = [
         'stage' => '',
         'dist' => 'MIYAGAWA/Hash-MultiValue-0.15.tar.gz',
         'name' => 'Hash::MultiValue',
+        'feature' => '',
         'version' => ''
     },
     {
@@ -31,48 +33,70 @@ my $check = [
         'type' => 'requires',
         'name' => 'Cookie::Baker',
         'dist' => 'KAZEBURO/Cookie-Baker-0.08.tar.gz',
+        'feature' => '',
         'version' => ''
     },
     {
         'name' => 'Try::Tiny',
         'version' => '0.28',
         'type' => 'requires',
+        'feature' => '',
         'stage' => ''
     },
     {
         'stage' => '',
         'type' => 'requires',
         'name' => 'DBI',
+        'feature' => '',
         'version' => ''
     },
     {
         'type' => 'requires',
         'stage' => '',
         'version' => '0.9970',
+        'feature' => '',
         'name' => 'Plack'
     },
     {
         'name' => 'Test::More',
         'version' => '',
         'stage' => 'test',
+        'feature' => '',
         'type' => 'requires'
     },
     {
         'stage' => 'test',
         'type' => 'requires',
         'version' => '0.1',
+        'feature' => '',
         'name' => 'Test::Warn'
     },
     {
         'stage' => 'develop',
         'type' => 'requires',
         'name' => 'Module::Install',
+        'feature' => '',
         'version' => '0.99'
+    },
+    {
+        'stage' => 'test',
+        'type' => 'requires',
+        'version' => '0.26',
+        'feature' => '',
+        'name' => 'Path::Class',
+    },
+    {
+        'stage' => '',
+        'type' => 'requires',
+        'version' => '0.26',
+        'feature' => 'xyz',
+        'name' => 'Path::Class',
     },
     {
         'name' => 'perl',
         'version' => '>= 5.10.1, != 5.17, != 5.19.3',
         'type' => 'requires',
+        'feature' => '',
         'stage' => ''
     }
 ];
@@ -108,6 +132,14 @@ on 'test' => sub {
 
 test_requires 'Test::Warn', 0.1;
 author_requires 'Module::Install', 0.99;
+
+on 'test' => sub {
+    requires 'Path::Class', 0.26;
+};
+
+feature 'xyz', 'great new feature' => sub {
+    requires 'Path::Class', 0.26;
+};
 
 requires 'perl' => '>= 5.10.1, != 5.17, != 5.19.3';
 

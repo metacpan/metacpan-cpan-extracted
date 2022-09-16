@@ -26,9 +26,9 @@ my %WriteMakefileArgs = (
     "bin/zild-convert-dist",
     "bin/zild-git-commit",
     "bin/zild-make-cpan",
+    "bin/zild-markdown-plus",
     "bin/zild-massive-attack",
     "bin/zild-pandoc-json-to-pod",
-    "bin/zild-pandoc-json-to-pod.pl",
     "bin/zild-render-template",
     "bin/zild-setup-release",
     "bin/zild-version-update"
@@ -61,7 +61,7 @@ my %WriteMakefileArgs = (
     "YAML::PP" => "0.034",
     "version" => "0.9929"
   },
-  "VERSION" => "0.1.11",
+  "VERSION" => "0.1.14",
   "test" => {
     "TESTS" => "t/*.t"
   }

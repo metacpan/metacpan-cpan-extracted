@@ -5,8 +5,8 @@ use base 'PDF::Builder::Content::Text';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -35,6 +35,12 @@ word-splitting rules, as well as worrying about the appearance of the results
 # line (usually not empty).
 sub splitWord {
     my ($self, $word, $width, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-spHH'} && !defined $opts{'spHH'}) { $opts{'spHH'} = delete($opts{'-spHH'}); }
+    if (defined $opts{'-spOP'} && !defined $opts{'spOP'}) { $opts{'spOP'} = delete($opts{'-spOP'}); }
+    if (defined $opts{'-spDR'} && !defined $opts{'spDR'}) { $opts{'spDR'} = delete($opts{'-spDR'}); }
+    if (defined $opts{'-spLR'} && !defined $opts{'spLR'}) { $opts{'spLR'} = delete($opts{'-spLR'}); }
+    if (defined $opts{'-spCC'} && !defined $opts{'spCC'}) { $opts{'spCC'} = delete($opts{'-spCC'}); }
 
     my ($leftWord, $rightWord, @splitLoc, @chars, $i, $j, $len);
 
@@ -52,11 +58,11 @@ sub splitWord {
        #  -   en-dash em-dash /
 	  45, 8211,   8212,   47,
                          );
-    my $splitHardH = defined($opts{'-spHH'})? $opts{'-spHH'}: 1;  # 1=OK to split on hard (explicit) hyphen U+002D
-    my $otherPunc = defined($opts{'-spOP'})? $opts{'-spOP'}: 1;  # 1=OK to split after most punctuation
-    my $digitRun = defined($opts{'-spDR'})? $opts{'-spDR'}: 1;  # 1=OK to split after run of digit(s)
-    my $letterRun = defined($opts{'-spLR'})? $opts{'-spLR'}: 1;  # 1=OK to split after run of ASCII letter(s)
-    my $camelCase = defined($opts{'-spCC'})? $opts{'-spCC'}: 1;  # 1=OK to split camelCase on ASCII lc-to-UC transition
+    my $splitHardH = defined($opts{'spHH'})? $opts{'spHH'}: 1;  # 1=OK to split on hard (explicit) hyphen U+002D
+    my $otherPunc = defined($opts{'spOP'})? $opts{'spOP'}: 1;  # 1=OK to split after most punctuation
+    my $digitRun = defined($opts{'spDR'})? $opts{'spDR'}: 1;  # 1=OK to split after run of digit(s)
+    my $letterRun = defined($opts{'spLR'})? $opts{'spLR'}: 1;  # 1=OK to split after run of ASCII letter(s)
+    my $camelCase = defined($opts{'spCC'})? $opts{'spCC'}: 1;  # 1=OK to split camelCase on ASCII lc-to-UC transition
 
     # note that we are ignoring U+2010 "hyphen" and U+2011 "non-splitting 
     # hyphen". The first is probably rare enough to not be worth the bother,

@@ -9,5 +9,5 @@ help:
 	@echo ""
 
 server:
-	@CATALYST_DEBUG=1 perl -Ilib -I ../lib/  ./lib/Example/Server.pm
+	@CATALYST_DEBUG=1 perl -Ilib -I ../lib/ ./lib/Example/Server.pm
 

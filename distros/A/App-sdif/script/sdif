@@ -16,7 +16,7 @@ sdif - side-by-side diff viewer for ANSI terminal
 
 =head1 VERSION
 
-Version 4.22.1
+Version 4.22.3
 
 =head1 SYNOPSIS
 
@@ -141,7 +141,7 @@ my $opt_tabspace = undef;
 #
 # options only for cdif
 #
-my $opt_unit = my $opt_unit_default = 'word';
+my $opt_unit;
 
 ##
 ## Special treatment --noenv option.
@@ -207,7 +207,7 @@ my @optargs = (
     "tabspace=s" => \$opt_tabspace,
 
     "unit|by=s"  => \$opt_unit,
-    "mecab!"     => sub { $opt_unit = $_[1] ? 'mecab' : $opt_unit_default },
+    "mecab!"     => sub { $opt_unit = $_[1] ? 'mecab' : undef },
 );
 
 my @SAVEDARGV = @ARGV;
@@ -323,7 +323,7 @@ if (defined $opt_cdif and $opt_cdif eq '') {
 }
 
 for (
-    [ "unit"     , "=" , \$opt_unit     , $opt_unit_default     ] ,
+    [ "unit"     , "=" , \$opt_unit     , undef     ] ,
     [ "256"      , "!" , \$opt_256      , $opt_256_default      ] ,
     [ "prefix"   , "!" , \$opt_prefix   , $opt_prefix_default   ] ,
     [ "lenience" , "!" , \$opt_lenience , $opt_lenience_default ] ,
@@ -335,7 +335,7 @@ for (
 	next if $$var == $default;
 	unshift @opt_cdifopts, sprintf("--%s%s", $$var ? '' : 'no-', $name);
     } elsif ($type eq "=") {
-	next if $$var eq $default;
+	next if not defined $$var;
 	unshift @opt_cdifopts, sprintf("--%s=%s", $name, $$var);
     } else {
 	die;
@@ -395,7 +395,7 @@ sub column_width {
 ## --colortable
 ##
 if ($opt_colortable) {
-    Getopt::EX::Colormap::colortable $screen_width;
+    Getopt::EX::Colormap::colortable($screen_width);
     exit;
 }
 
@@ -1085,9 +1085,9 @@ Specify options for back-end B<cdif> command.
 =item B<--mecab>
 
 These options are simply sent to back-end B<cdif> command.  Choose
-value from C<word> (default), C<letter>, C<char> or I<mecab>.  Option
-B<--by> is an alias for B<--unit>.  Option B<--mecab> is shortcut for
-B<--unit=mecab>.  Consult L<cdif> manual for detail.
+value from C<word> (default), C<letter>, C<char> or C<mecab>.  Option
+B<--by> is an alias for B<--unit>.  Option B<--mecab> is a shortcut
+for B<--unit=mecab>.  Consult L<cdif> manual for detail.
 
 Use B<--cdifopts> to set other options.
 
@@ -1102,13 +1102,13 @@ Specify options for back-end B<diff> command.
 
 =item B<--mark>=I<position>
 
-Specify the position for a mark.  Choose from I<left>, I<right>,
-I<center>, I<side> or I<no>.  Default is I<center>.
+Specify the position for a mark.  Choose from C<left>, C<right>,
+C<center>, C<side> or C<no>.  Default is C<center>.
 
 =item B<--column>=I<order>
 
 Specify the order of each column by B<O> (1: old), B<N> (2: new) and
-B<M> (3: merge).  Default order is "ONM" or "123".  If you want to
+B<M> (3: merged).  Default order is "ONM" or "123".  If you want to
 show new file on left side and old file in right side, use like:
 
     $ sdif --column NO

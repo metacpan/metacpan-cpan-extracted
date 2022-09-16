@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -10,11 +10,13 @@ use Mouse;
 use JSON;
 use URI;
 
-has isPP          => ( is => 'rw' );
-has speChars      => ( is => 'rw' );
-has skinRules     => ( is => 'rw' );
-has stayConnected => ( is => 'rw', default => sub { 0 } );
-has requireOldPwd => ( is => 'rw', default => sub { 1 } );
+has isPP                     => ( is => 'rw' );
+has speChars                 => ( is => 'rw' );
+has skinRules                => ( is => 'rw' );
+has stayConnected            => ( is => 'rw', default => sub { 0 } );
+has requireOldPwd            => ( is => 'rw', default => sub { 1 } );
+has rememberAuthChoice       => ( is => 'rw', default => sub { 0 } );
+has passwordPolicyActivation => ( is => 'rw', default => sub { 0 } );
 
 sub displayInit {
     my ($self) = @_;
@@ -48,6 +50,21 @@ sub displayInit {
         $self->logger->error("Bad stayConnected rule: $error");
     }
     $self->stayConnected($rule);
+    $rule =
+      HANDLER->buildSub(
+        HANDLER->substitute( $self->conf->{passwordPolicyActivation} ) );
+    unless ($rule) {
+        my $error = HANDLER->tsv->{jail}->error || 'Unable to compile rule';
+        $self->logger->error("Bad passwordPolicyActivation rule: $error");
+    }
+    $self->passwordPolicyActivation($rule);
+    $rule =
+      HANDLER->buildSub( HANDLER->substitute( $self->conf->{rememberAuthChoiceRule} ) );
+    unless ($rule) {
+        my $error = HANDLER->tsv->{jail}->error || 'Unable to compile rule';
+        $self->logger->error("Bad rememberAuthChoiceRule rule: $error");
+    }
+    $self->rememberAuthChoice($rule);
 
     my $speChars =
       $self->conf->{passwordPolicySpecialChar} eq '__ALL__'
@@ -83,8 +100,6 @@ sub display {
         $self->logger->debug('Display: notification detected');
         $skinfile       = 'notification';
         %templateParams = (
-            MAIN_LOGO       => $self->conf->{portalMainLogo},
-            LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR_TYPE => $req->error_type,
             AUTH_ERROR_ROLE => $req->error_role,
             NOTIFICATION    => $notif,
@@ -106,8 +121,6 @@ sub display {
         $self->logger->debug('Display: confirm detected');
         $skinfile       = 'confirm';
         %templateParams = (
-            MAIN_LOGO       => $self->conf->{portalMainLogo},
-            LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR      => $req->error,
             AUTH_ERROR_TYPE => $req->error_type,
             AUTH_ERROR_ROLE => $req->error_role,
@@ -138,8 +151,6 @@ sub display {
         $self->logger->debug('Display: IDP choice detected');
         $skinfile       = 'idpchoice';
         %templateParams = (
-            MAIN_LOGO       => $self->conf->{portalMainLogo},
-            LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR      => $req->error,
             AUTH_ERROR_TYPE => $req->error_type,
             AUTH_ERROR_ROLE => $req->error_role,
@@ -173,8 +184,6 @@ sub display {
           for keys %{ $req->{portalHiddenFormValues} // {} };
         $skinfile       = 'info';
         %templateParams = (
-            MAIN_LOGO       => $self->conf->{portalMainLogo},
-            LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR      => $self->error,
             AUTH_ERROR_TYPE => $req->error_type,
             AUTH_ERROR_ROLE => $req->error_role,
@@ -207,8 +216,6 @@ sub display {
         my $id = $req->{sessionInfo}
           ->{ $self->conf->{openIdAttr} || $self->conf->{whatToTrace} };
         %templateParams = (
-            MAIN_LOGO       => $self->conf->{portalMainLogo},
-            LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR      => $self->error,
             AUTH_ERROR_TYPE => $req->error_type,
             AUTH_ERROR_ROLE => $req->error_role,
@@ -230,8 +237,6 @@ sub display {
         my $method = $req->data->{redirectFormMethod} || 'get';
         $skinfile       = "redirect";
         %templateParams = (
-            MAIN_LOGO     => $self->conf->{portalMainLogo},
-            LANGS         => $self->conf->{showLanguages},
             URL           => $req->{urldc},
             HIDDEN_INPUTS => $self->buildOutgoingHiddenForm( $req, $method ),
             FORM_METHOD   => $method,
@@ -249,22 +254,22 @@ sub display {
 
         #utf8::decode($auth_user);
         %templateParams = (
-            MAIN_LOGO => $self->conf->{portalMainLogo},
-            LANGS     => $self->conf->{showLanguages},
             AUTH_USER => $req->{sessionInfo}->{ $self->conf->{portalUserAttr} },
             NEWWINDOW => $self->conf->{portalOpenLinkInNewWindow},
-            LOGOUT_URL          => $self->conf->{portal} . "?logout=1",
-            APPSLIST_ORDER      => $req->{sessionInfo}->{'_appsListOrder'},
-            PING                => $self->conf->{portalPingInterval},
-            DONT_STORE_PASSWORD => $self->conf->{browsersDontStorePassword},
-            HIDE_OLDPASSWORD    => 0,
-            PPOLICY_NOPOLICY    => !$self->isPP(),
-            DISPLAY_PPOLICY     => $self->conf->{portalDisplayPasswordPolicy},
-            PPOLICY_MINSIZE     => $self->conf->{passwordPolicyMinSize},
-            PPOLICY_MINLOWER    => $self->conf->{passwordPolicyMinLower},
-            PPOLICY_MINUPPER    => $self->conf->{passwordPolicyMinUpper},
-            PPOLICY_MINDIGIT    => $self->conf->{passwordPolicyMinDigit},
-            PPOLICY_MINSPECHAR  => $self->conf->{passwordPolicyMinSpeChar},
+            LOGOUT_URL              => $self->conf->{portal} . "?logout=1",
+            APPSLIST_ORDER          => $req->{sessionInfo}->{'_appsListOrder'},
+            PING                    => $self->conf->{portalPingInterval},
+            DONT_STORE_PASSWORD     => $self->conf->{browsersDontStorePassword},
+            HIDE_OLDPASSWORD        => 0,
+            PPOLICY_NOPOLICY        => !$self->isPP(),
+            ENABLE_PASSWORD_DISPLAY =>
+              $self->conf->{portalEnablePasswordDisplay},
+            DISPLAY_PPOLICY    => $self->conf->{portalDisplayPasswordPolicy},
+            PPOLICY_MINSIZE    => $self->conf->{passwordPolicyMinSize},
+            PPOLICY_MINLOWER   => $self->conf->{passwordPolicyMinLower},
+            PPOLICY_MINUPPER   => $self->conf->{passwordPolicyMinUpper},
+            PPOLICY_MINDIGIT   => $self->conf->{passwordPolicyMinDigit},
+            PPOLICY_MINSPECHAR => $self->conf->{passwordPolicyMinSpeChar},
             (
                 $self->requireOldPwd->( $req, $req->userData )
                 ? ( REQUIRE_OLDPASSWORD => 1 )
@@ -289,8 +294,6 @@ sub display {
     elsif ( $req->error == PE_UPGRADESESSION ) {
         $skinfile       = 'upgradesession';
         %templateParams = (
-            MAIN_LOGO    => $self->conf->{portalMainLogo},
-            LANGS        => $self->conf->{showLanguages},
             FORMACTION   => '/upgradesession',
             MSG          => 'askToUpgrade',
             PORTALBUTTON => 1,
@@ -310,8 +313,6 @@ sub display {
     elsif ( $req->error == PE_RENEWSESSION ) {
         $skinfile       = 'upgradesession';
         %templateParams = (
-            MAIN_LOGO    => $self->conf->{portalMainLogo},
-            LANGS        => $self->conf->{showLanguages},
             FORMACTION   => '/renewsession',
             MSG          => 'askToRenew',
             CONFIRMKEY   => $self->stamp,
@@ -331,8 +332,6 @@ sub display {
     elsif ( $req->error == PE_MUSTAUTHN ) {
         $skinfile       = 'upgradesession';
         %templateParams = (
-            MAIN_LOGO  => $self->conf->{portalMainLogo},
-            LANGS      => $self->conf->{showLanguages},
             FORMACTION => '/renewsession',
             MSG        => 'PE87',
             CONFIRMKEY => $self->stamp,
@@ -365,8 +364,6 @@ sub display {
     {
         $skinfile       = 'error';
         %templateParams = (
-            MAIN_LOGO       => $self->conf->{portalMainLogo},
-            LANGS           => $self->conf->{showLanguages},
             AUTH_ERROR      => $req->error,
             AUTH_ERROR_TYPE => $req->error_type,
             AUTH_ERROR_ROLE => $req->error_role,
@@ -384,8 +381,6 @@ sub display {
         $skinfile = 'login';
         my $login = $req->user;
         %templateParams = (
-            MAIN_LOGO             => $self->conf->{portalMainLogo},
-            LANGS                 => $self->conf->{showLanguages},
             AUTH_ERROR            => $req->error,
             AUTH_ERROR_TYPE       => $req->error_type,
             AUTH_ERROR_ROLE       => $req->error_role,
@@ -413,6 +408,14 @@ sub display {
                 : ()
             ),
             (
+                $self->rememberAuthChoice->( $req, $req->sessionInfo )
+                ? ( REMEMBERAUTHCHOICE => 1 )
+                : ()
+            ),
+            REMEMBERAUTHCHOICEDEFAULTCHECKED => $self->conf->{rememberDefaultChecked} // 0,
+            REMEMBERAUTHCHOICECOOKIENAME => $self->conf->{rememberCookieName} // 'llngrememberauthchoice',
+            REMEMBERAUTHCHOICETIMER => $self->conf->{rememberTimer} // 5,
+            (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
                 : ()
@@ -434,15 +437,21 @@ sub display {
         }
 
         # Display captcha if it's enabled
+        if ( $req->captchaHtml ) {
+            %templateParams =
+              ( %templateParams, CAPTCHA_HTML => $req->captchaHtml, );
+        }
+        if ( $req->token ) {
+            %templateParams = ( %templateParams, TOKEN => $req->token, );
+        }
+
+       # DEPRECATED: This is only used for compatibility with existing templates
         if ( $req->captcha ) {
             %templateParams = (
                 %templateParams,
                 CAPTCHA_SRC  => $req->captcha,
                 CAPTCHA_SIZE => $self->{conf}->{captcha_size} || 6
             );
-        }
-        if ( $req->token ) {
-            %templateParams = ( %templateParams, TOKEN => $req->token, );
         }
 
         # Show password form if password policy error
@@ -474,11 +483,13 @@ sub display {
                 CHOICE_PARAM          => $self->conf->{authChoiceParam},
                 CHOICE_VALUE          => $req->data->{_authChoice},
                 OLDPASSWORD           => $self->checkXSSAttack( 'oldpassword',
-                    $req->data->{oldpassword} ) ? ""
+                    $req->data->{oldpassword} ) ? ''
                 : $req->data->{oldpassword},
                 HIDE_OLDPASSWORD    => $self->conf->{hideOldPassword},
                 DONT_STORE_PASSWORD => $self->conf->{browsersDontStorePassword},
                 PPOLICY_NOPOLICY    => !$self->isPP(),
+                ENABLE_PASSWORD_DISPLAY =>
+                  $self->conf->{portalEnablePasswordDisplay},
                 DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy},
                 PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
                 PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
@@ -751,8 +762,12 @@ sub mkSessionArray {
                         user   => $session->{user},
                         utime  => $session->{_utime},
                         ip     => $session->{ipAddr},
-                        values => [ map { { v => $session->{$_} } } @fields ],
-                        error  => $session->{error},
+                        values => [
+                            map {
+                                { v => $session->{$_}, k => $_, "k_$_" => 1 }
+                            } @fields
+                        ],
+                        error        => $session->{error},
                         displayUser  => $displayUser,
                         displayError => $displayError,
                     }

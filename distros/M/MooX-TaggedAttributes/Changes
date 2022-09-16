@@ -1,5 +1,37 @@
 Revision history for MooX-TaggedAttributes
 
+0.18      2022-09-12 23:58:45-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * new method on cache object, tag_value_hash
+
+    * all summary objects returned by the cache object are now deep readonly
+      to prevent foot-guns
+
+0.17      2022-09-11 17:07:46-04:00 America/New_York (TRIAL RELEASE)
+
+  [ENHANCEMENT]
+
+    * Switch to Role::Hooks from MooX::CaptainHook to simplify
+      use of new '-propagate' mode      
+
+  [TESTS]
+
+    * test suite updated for new mode of consuming tag classes
+
+
+0.16      2022-09-10 15:31:13-04:00 America/New_York (TRIAL RELEASE)
+
+  [EXPERIMENTAL]
+
+    * In order for a class or role to assign tags defined in a tag
+      role, the tag role had to be consumed with 'use' rathe than the
+      standard 'with'.  The experimental options '-install_hook' and
+      '-propagate' (used correctly) will automatically convey the tag
+      assignation ability upon role consumption using 'with'.
+    
+
 0.15      2022-03-21 20:24:26-04:00 America/New_York
 
   [BUG FIX]

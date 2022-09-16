@@ -56,7 +56,7 @@ sub genRoute {
         else {
             $dest ||= $word;
         }
-        if ( $dest =~ /^(.+)\.html$/ ) {
+        if ( $word =~ /^(.+)\.html$/ and $word eq $dest ) {
             my $tpl = $1 or die;
             $self->logger->debug("route $dest will use $tpl");
             $routes->{$word} = sub { $self->sendHtml( $_[1], $tpl ) };
@@ -305,8 +305,8 @@ the subroutine will be called with the word of path_info as second argument
 
 =item 'something.html':
 
-if $word finishes with '.html', then sendHtml() will be called with
-'something.tpl' as template name. In this case, $dest is not used.
+if $word finishes with '.html', and $dest is undef, then sendHtml() will be
+called with 'something.tpl' as template name.
 
 =back
 

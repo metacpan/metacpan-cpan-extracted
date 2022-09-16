@@ -37,9 +37,11 @@ WriteMakefile(
     LICENSE        => 'gpl',
     BUILD_REQUIRES => {
         'IO::String'     => 0,
+        'MIME::Entity'   => 0,
         'Net::LDAP'      => 0,
         'String::Random' => 0,
         'Test::Pod'      => 1.00,
+        'Test::Output'   => 0,
     },
     META_MERGE => {
         'recommends' => {
@@ -63,7 +65,7 @@ WriteMakefile(
             MailingList => 'mailto:lemonldap-ng-dev@ow2.org',
             license     => 'http://opensource.org/licenses/GPL-2.0',
             homepage    => 'https://lemonldap-ng.org/',
-            bugtracker =>
+            bugtracker  =>
               'https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues',
             x_twitter => 'https://twitter.com/lemonldapng',
         },
@@ -83,7 +85,6 @@ WriteMakefile(
         'JSON::XS'               => 0,
         'Mouse'                  => 0,
         'Plack'                  => 0,
-        'Test::Pod'              => 1.00,
         'URI'                    => 0,
     },    # e.g., Module::Name => 1.1
           #EXE_FILES => [ 'scripts/convertConfig', ],

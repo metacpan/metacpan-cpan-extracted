@@ -10,7 +10,7 @@ use DateTime::Event::Easter;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw( is_holiday is_uk_holiday );
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 
 =head1 NAME
@@ -120,6 +120,10 @@ sub is_uk_holiday {
     if ( $year == 2022 && $month == 6) {
         return "Spring Bank Holiday" if $day == 2;
         return "Queen's Platinum Jubilee" if $day == 3; # She's still here
+    }
+
+    if ( $year == 2022 && $month == 9 ) {
+	return "State Funeral of Queen Elizabeth II" if $day == 19; # May she rest in peace.
     }
 
     if ( $month == 8 ) {

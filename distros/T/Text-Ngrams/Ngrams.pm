@@ -1,4 +1,4 @@
-# (c) 2003-2017 Vlado Keselj http://web.cs.dal.ca/~vlado
+# (c) 2003-2022 Vlado Keselj http://web.cs.dal.ca/~vlado
 #
 # Text::Ngrams - A Perl module for N-grams processing
 
@@ -12,7 +12,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 %EXPORT_TAGS = ( 'all' => [ qw(new encode_S decode_S) ] );
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 @EXPORT = qw(new);
-$VERSION = '2.006';
+$VERSION = '2.007';
 
 use vars qw($Version);
 $Version = $VERSION;
@@ -29,7 +29,8 @@ sub new {
 
   $self->{windowsize} = exists($params{windowsize}) ?
       $params{windowsize} : 3;
-  die "nonpositive window size: $self->{windowsize}" unless $self->{windowsize} > 0;
+  die "nonpositive window size: $self->{windowsize}"
+    unless $self->{windowsize} > 0;
   delete($params{windowsize});
 
   if (! exists($params{type}) or $params{type} eq 'character') {
@@ -46,8 +47,9 @@ sub new {
                              |[\x00-\xFF])/x;
       $self->{processtoken} = '';
   }
-  #MJ ->
-  #this type is analogous to the "character" type but defined for utf8 characters
+  # MJ ->
+  # This type is analogous to the "character" type but defined for the utf8
+  # characters
   elsif ($params{type} eq 'utf8_character') {
     # $self->{inputlayer}
     # input layer to be put on the input stream by the function binmode
@@ -87,8 +89,10 @@ sub new {
   elsif ($params{type} eq 'word') {
       $self->{skiprex} = qr/[^a-zA-Z0-9]+/;
       $self->{skipinsert} = ' ';
-      $self->{tokenrex} = qr/([a-zA-Z]+|(\d+(\.\d+)?|\d*\.\d+)([eE][-+]?\d+)?)/;
-      $self->{processtoken} = sub { s/(\d+(\.\d+)?|\d*\.\d+)([eE][-+]?\d+)?/<NUMBER>/ }
+      $self->{tokenrex} =
+	qr/([a-zA-Z]+|(\d+(\.\d+)?|\d*\.\d+)([eE][-+]?\d+)?)/;
+      $self->{processtoken} = sub
+	{ s/(\d+(\.\d+)?|\d*\.\d+)([eE][-+]?\d+)?/<NUMBER>/ }
   }
   else { die "unknown type: $params{type}" }
   delete($params{type});
@@ -986,7 +990,7 @@ that you used the module.
 
 Author:
 
- 2003-2017 Vlado Keselj http://web.cs.dal.ca/~vlado
+ 2003-2022 Vlado Keselj http://web.cs.dal.ca/~vlado
 
 Contributors:
 
@@ -1039,18 +1043,18 @@ A n-gram language modeling package written in C++.
 
 =item CPAN N-gram module comparison article by Ben Bullock.
 
-The page is available
-  at F<http://www.lemoda.net/perl/cpan-n-gram-modules/> gives an interesting list of
-  modules, although the review seem to be superficial and only partially correct.
-  The following modules are listed in this review:
-  Algorithm::NGram, IDS::Algorithm::Ngram, Lingua::EN::Bigram, Linuga::EN::Ngram,
-  Lingua::Gram, Lingua::Identify, Text::Mining::Algorithm::Ngram,
-  Text::Ngram, Text::Ngram::LanguageDetermine, Text::Ngramize, Ntext::Ngrams, and
-  Text::Positional::Ngram.
+This page used to be available at
+F<http://www.lemoda.net/perl/cpan-n-gram-modules/>, but it seems not to be
+available any more.  It included a list of the following modules:
+Algorithm::NGram, IDS::Algorithm::Ngram, Lingua::EN::Bigram, Linuga::EN::Ngram,
+Lingua::Gram, Lingua::Identify, Text::Mining::Algorithm::Ngram,
+Text::Ngram, Text::Ngram::LanguageDetermine, Text::Ngramize, Ntext::Ngrams, and
+Text::Positional::Ngram.
 
 =back
 
-Some links to these resources should be available at F<http://web.cs.dal.ca/~vlado/nlp>.
+Some links to these resources should be available at
+F<http://web.cs.dal.ca/~vlado/nlp>.
 
 =cut
 # $Id: $

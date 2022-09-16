@@ -54,3 +54,18 @@ sub transform_to_plain {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Babble::Plugin::State - Plugin for state keyword
+
+=head1 SYNOPSIS
+
+Converts usage of C<state> variable to C<my>.
+
+=head1 SEE ALSO
+
+L<state feature|feature/"The 'state' feature">
+
+=cut

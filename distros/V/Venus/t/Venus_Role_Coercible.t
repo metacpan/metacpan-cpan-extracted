@@ -36,11 +36,11 @@ $test->for('abstract');
 
 =includes
 
-method: coerce
 method: coerce_args
 method: coerce_attr
 method: coerce_into
 method: coerce_onto
+method: coercers
 method: coercion
 
 =cut
@@ -60,7 +60,7 @@ $test->for('includes');
   attr 'mother';
   attr 'siblings';
 
-  sub coerce {
+  sub coercers {
     {
       father => 'Person',
       mother => 'Person',
@@ -148,55 +148,6 @@ into object construction and coercing arguments into objects and values.
 =cut
 
 $test->for('description');
-
-=method coerce
-
-The coerce method, if defined, is called during object construction, or by the
-L</coercion> method, and returns key/value pairs where the keys map to class
-attributes (or input parameters) and the values are L<Venus::Space> compatible
-package names.
-
-=signature coerce
-
-  coerce() (HashRef)
-
-=metadata coerce
-
-{
-  since => '0.02',
-}
-
-=example-1 coerce
-
-  package main;
-
-  my $person = Person->new(
-    name => 'me',
-  );
-
-  my $coerce = $person->coerce;
-
-  # {
-  #   father   => "Person",
-  #   mother   => "Person",
-  #   name     => "Venus/String",
-  #   siblings => "Person",
-  # }
-
-=cut
-
-$test->for('example', 1, 'coerce', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, {
-    father   => "Person",
-    mother   => "Person",
-    name     => "Venus/String",
-    siblings => "Person",
-  };
-
-  $result
-});
 
 =method coerce_args
 
@@ -394,6 +345,119 @@ $test->for('example', 1, 'coerce_onto', sub {
   ok $result->isa('Person');
   ok $result->name->isa('Venus::String');
   is $result->name->value, 'friend';
+
+  $result
+});
+
+=example-2 coerce_onto
+
+  package Player;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Coercible';
+
+  attr 'name';
+  attr 'teammates';
+
+  sub coercers {
+    {
+      teammates => 'Person',
+    }
+  }
+
+  sub coerce_into_person {
+    my ($self, $class, $value) = @_;
+
+    return $class->new($value);
+  }
+
+  sub coerce_into_venus_string {
+    my ($self, $class, $value) = @_;
+
+    return $class->new($value);
+  }
+
+  sub coerce_teammates {
+    my ($self, $code, $class, $value) = @_;
+
+    return [map $self->$code($class, $_), @$value];
+  }
+
+  package main;
+
+  my $player = Player->new;
+
+  my $data = { teammates => [{ name => 'player2' }, { name => 'player3' }] };
+
+  my $teammates = $player->coerce_onto($data, 'teammates', 'Person');
+
+  # [bless({...}, 'Person'), bless({...}, 'Person')]
+
+  # $data was updated
+  #
+  # {
+  #   teammates => [bless({...}, 'Person'), bless({...}, 'Person')],
+  # }
+
+=cut
+
+$test->for('example', 2, 'coerce_onto', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->[0]->isa('Person');
+  is $result->[0]->name, 'player2';
+  ok $result->[1]->isa('Person');
+  is $result->[1]->name, 'player3';
+
+  $result
+});
+
+=method coercers
+
+The coercers method, if defined, is called during object construction, or by the
+L</coercion> method, and returns key/value pairs where the keys map to class
+attributes (or input parameters) and the values are L<Venus::Space> compatible
+package names.
+
+=signature coercers
+
+  coercers() (HashRef)
+
+=metadata coercers
+
+{
+  since => '0.02',
+}
+
+=example-1 coercers
+
+  package main;
+
+  my $person = Person->new(
+    name => 'me',
+  );
+
+  my $coercers = $person->coercers;
+
+  # {
+  #   father   => "Person",
+  #   mother   => "Person",
+  #   name     => "Venus/String",
+  #   siblings => "Person",
+  # }
+
+=cut
+
+$test->for('example', 1, 'coercers', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {
+    father   => "Person",
+    mother   => "Person",
+    name     => "Venus/String",
+    siblings => "Person",
+  };
 
   $result
 });

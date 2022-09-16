@@ -20,8 +20,8 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -30,7 +30,9 @@ Inherits from L<PDF::Builder::Basic::PDF::Objind>
 
 =head1 METHODS
 
-=head2 PDF::Array->new($parent, @values)
+=over
+
+=item PDF::Array->new($parent, @values)
 
 Creates an array with the given storage parent and an optional list of values to
 initialise the array with.
@@ -47,7 +49,7 @@ sub new {
     return $self;
 }
 
-=head2 $a->outobjdeep($fh, $pdf)
+=item $a->outobjdeep($fh, $pdf)
 
 Outputs an array as a PDF array to the given filehandle.
 
@@ -65,7 +67,7 @@ sub outobjdeep {
     return;
 }
 
-=head2 $a->elements()
+=item $a->elements()
 
 Returns the contents of the array.
 
@@ -80,7 +82,7 @@ sub elements {
     return @{$self->{' val'}};
 }
 
-=head2 $a->add_elements(@elements)
+=item $a->add_elements(@elements)
 
 Appends the given elements to the array. An element is only added if it
 is defined.
@@ -97,7 +99,7 @@ sub add_elements {
     return $self;
 }
 
-=head2 $a->remove_element($element)
+=item $a->remove_element($element)
 
 Removes all occurrences of an element from an array.
 
@@ -116,7 +118,7 @@ sub remove_element {
     return $self;
 }
 
-=head2 $a->val()
+=item $a->val()
 
 Returns a reference to the contents of the array.
 
@@ -126,7 +128,7 @@ sub val {
     return $_[0]->{' val'};
 }
 
-=head2 $a->copy($pdf)
+=item $a->copy($pdf)
 
 Copies the array with deep-copy on elements which are not full PDF objects
 with respect to a particular $pdf output context.
@@ -148,5 +150,9 @@ sub copy {
     }
     return $res;
 }
+
+=back
+
+=cut
 
 1;

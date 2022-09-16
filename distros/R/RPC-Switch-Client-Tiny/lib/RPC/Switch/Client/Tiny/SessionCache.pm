@@ -7,7 +7,7 @@ use warnings;
 use Time::HiRes qw(time);
 use Time::Local;
 
-our $VERSION = 1.16;
+our $VERSION = 1.20;
 
 sub new {
 	my ($class, %args) = @_;
@@ -20,6 +20,8 @@ sub new {
 	}, $class;
 	$self->{lru}{prev} = $self->{lru}{next} = $self->{lru};
 	$self->{session_expire} = 60 unless $self->{session_expire};
+	$self->{session_idle} = 1 unless $self->{session_idle};
+	$self->{session_persist_user} = '' unless $self->{session_persist_user};
 	$self->{max_user_session} = 0 unless $self->{max_user_session};
 	return $self;
 }
@@ -110,7 +112,7 @@ sub list_del {
 
 sub session_put {
 	my ($self, $child) = @_;
-	my $runtime = sprintf "%.02f", time() - $child->{start};
+	my %runtime = (exists $child->{runtime}) ? (runtime => $child->{runtime}) : ();
 
 	return unless exists $child->{session};
 
@@ -131,15 +133,17 @@ sub session_put {
 		}
 		$self->{per_user}{$user}{$child->{session}{id}} = 1;
 	}
-	$self->{trace_cb}->('PUT', {pid => $child->{pid}, id => $child->{id}, session => $child->{session}{id}, runtime => $runtime}) if $self->{trace_cb};
+	$self->{trace_cb}->('PUT', {pid => $child->{pid}, id => $child->{id}, session => $child->{session}{id}, %runtime}) if $self->{trace_cb};
 	$self->{active}{$child->{session}{id}} = $child;
 	list_add($self->{lru}{prev}, $child);
+	delete $child->{runtime};
 	return 1;
 }
 
 sub session_get {
-	my ($self, $session_id, $msg_id) = @_;
+	my ($self, $session_id, $msg_id, $msg_vci) = @_;
 	my %id = (defined $msg_id) ? (id => $msg_id) : ();
+	my %vci = (defined $msg_vci) ? (vci => $msg_vci) : ();
 
 	if (exists $self->{active}{$session_id}) {
 		my $child = delete $self->{active}{$session_id};
@@ -153,8 +157,39 @@ sub session_get {
 		}
 
 		my $stoptime = sprintf "%.02f", time() - $child->{start};
-		$self->{trace_cb}->('GET', {pid => $child->{pid}, %id, session => $session_id, stoptime => $stoptime}) if $self->{trace_cb};
+		$self->{trace_cb}->('GET', {pid => $child->{pid}, %id, %vci, session => $session_id, stoptime => $stoptime}) if $self->{trace_cb};
 		return $child;
+	}
+	return;
+}
+
+sub session_get_per_user {
+	my ($self, $user, $msg_id, $msg_vci) = @_;
+
+	if ($self->{max_user_session}) {
+		foreach my $session_id (keys %{$self->{per_user}{$user}}) {
+			return $self->session_get($session_id, $msg_id, $msg_vci);
+		}
+	}
+	return;
+}
+
+sub session_get_per_user_idle {
+	my ($self, $child) = @_;
+
+	return unless exists $child->{session};
+
+	if ($self->{max_user_session} && exists $child->{session}{user}) {
+		my $user = $child->{session}{user};
+		foreach my $session_id (keys %{$self->{per_user}{$user}}) {
+			if (exists $self->{active}{$session_id}) {
+				my $other_child = $self->{active}{$session_id};
+				my $idle = time() - $other_child->{start};
+				if ($idle >= $self->{session_idle}) {
+					return $self->session_get($session_id);
+				}
+			}
+		}
 	}
 	return;
 }

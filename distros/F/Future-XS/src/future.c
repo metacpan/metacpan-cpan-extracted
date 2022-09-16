@@ -25,6 +25,9 @@
 #  define XS_INTERNAL(name)  static XS(name)
 #endif
 
+#define mPUSHpvs(s)   mPUSHp("" s "", sizeof(s)-1)
+
+static bool future_debug;
 static bool capture_times;
 
 /* There's no reason these have to match those in Future.pm but for now we
@@ -70,7 +73,7 @@ struct FutureXSCallback
 struct FutureXSRevocation
 {
   SV *precedent_f;
-  SV *toclear_sv;
+  SV *toclear_sv_at;
 };
 
 #define CB_NONSEQ_CODE(cb)  \
@@ -91,6 +94,7 @@ struct FutureXS
   HV *udata;
 
   struct timeval btime, rtime;
+  SV *constructed_at;
 
   /* For convergents
    * TODO: consider making this an optional extra part of the body, only
@@ -117,8 +121,12 @@ bool Future_sv_is_future(pTHX_ SV *sv)
 #define get_future(sv)  S_get_future(aTHX_ sv)
 static struct FutureXS *S_get_future(pTHX_ SV *sv)
 {
-  // TODO: Add some safety checking
-  return INT2PTR(struct FutureXS *, SvIV(SvRV(sv)));
+  assert(sv);
+  assert(SvROK(sv) && SvOBJECT(SvRV(sv)));
+  // TODO: Add some safety checking about class
+  struct FutureXS *self = INT2PTR(struct FutureXS *, SvIV(SvRV(sv)));
+  assert(self);
+  return self;
 }
 
 SV *Future_new(pTHX_ const char *cls)
@@ -141,6 +149,11 @@ SV *Future_new(pTHX_ const char *cls)
     self->btime = (struct timeval){ 0 };
 
   self->rtime = (struct timeval){ 0 };
+
+  if(future_debug)
+    self->constructed_at = newSVpvf("constructed at %s line %d", CopFILE(PL_curcop), CopLINE(PL_curcop));
+  else
+    self->constructed_at = NULL;
 
   self->result  = NULL;
   self->failure = NULL;
@@ -192,38 +205,66 @@ static void S_destroy_callbacks(pTHX_ struct FutureXS *self)
 
 void Future_destroy(pTHX_ SV *f)
 {
+#ifdef DEBUGGING
+// Every pointer in this function ought to have been uniquely held
+#  define UNREF(p)  \
+    do {                                \
+      if(p) assert(SvREFCNT(p) == 1);   \
+      SvREFCNT_dec((SV *)p);            \
+      (p) = (void *)0xAA55AA55;         \
+    } while(0)
+#else
+#  define UNREF(p)  SvREFCNT_dec((SV *)p)
+#endif
+
   struct FutureXS *self = get_future(f);
 
-  SvREFCNT_dec((SV *)self->label);
+  if(future_debug &&
+    (!self->ready || (self->failure && !self->reported))) {
+    if(!self->ready)
+      warn("%" SVf " was %" SVf " and was lost near %s line %d before it was ready\n",
+          SVfARG(f), SVfARG(self->constructed_at),
+          CopFILE(PL_curcop), CopLINE(PL_curcop));
+    else {
+      SV *failure = AvARRAY(self->failure)[0];
+      warn("%" SVf " was %" SVf " and was lost near %s line %d with an unreported failure of: %" SVf "\n",
+          SVfARG(f), SVfARG(self->constructed_at),
+          CopFILE(PL_curcop), CopLINE(PL_curcop),
+          SVfARG(failure));
+    }
+  }
 
-  SvREFCNT_dec((SV *)self->result);
+  UNREF(self->label);
 
-  SvREFCNT_dec((SV *)self->failure);
+  UNREF(self->result);
+
+  UNREF(self->failure);
 
   destroy_callbacks(self);
-  SvREFCNT_dec((SV *)self->callbacks);
+  UNREF(self->callbacks);
 
-  SvREFCNT_dec((SV *)self->on_cancel);
+  UNREF(self->on_cancel);
 
   AV *revocationsav = self->revoke_when_ready;
   while(revocationsav && AvFILLp(revocationsav) > -1) {
     struct FutureXSRevocation *rev = (struct FutureXSRevocation *)AvARRAY(revocationsav)[AvFILLp(revocationsav)--];
-    SvREFCNT_dec(rev->precedent_f);
-    /* No need to unref ->toclear_sv */
+    UNREF(rev->precedent_f);
+    UNREF(rev->toclear_sv_at);
     Safefree(rev);
   }
-  SvREFCNT_dec(revocationsav);
+  UNREF(self->revoke_when_ready);
 
-  SvREFCNT_dec((SV *)self->udata);
+  UNREF(self->udata);
 
-  if(self->subs) {
-    SvREFCNT_dec((SV *)self->subs);
-  }
+  UNREF(self->constructed_at);
 
-  if(self->precedent_f)
-    SvREFCNT_dec(self->precedent_f);
+  UNREF(self->subs);
+
+  UNREF(self->precedent_f);
 
   Safefree(self);
+
+#undef UNREF
 }
 
 bool Future_is_ready(pTHX_ SV *f)
@@ -285,11 +326,31 @@ static void S_push_callback(pTHX_ struct FutureXS *self, struct FutureXSCallback
   av_push(self->callbacks, (SV *)new);
 }
 
-#define wrap_cb(self, cb)  S_wrap_cb(aTHX_ self, cb)
-static struct FutureXSCallback *S_wrap_cb(pTHX_ struct FutureXS *self, struct FutureXSCallback *cb)
+#define wrap_cb(f, name, cv)  S_wrap_cb(aTHX_ f, name, cv)
+static SV *S_wrap_cb(pTHX_ SV *f, const char *name, SV *cv)
 {
-  cb->code = newSVsv(CB_NONSEQ_CODE(cb));
-  return cb;
+  // TODO: This is quite the speed bump having to do this, in the common case
+  // that it isn't overridden
+  dSP;
+  ENTER;
+  SAVETMPS;
+
+  EXTEND(SP, 3);
+  PUSHMARK(SP);
+  PUSHs(sv_mortalcopy(f));
+  mPUSHp(name, strlen(name));
+  PUSHs(sv_mortalcopy(cv));
+  PUTBACK;
+
+  call_method("wrap_cb", G_SCALAR);
+
+  SPAGAIN;
+  SV *ret = newSVsv(POPs);
+
+  FREETMPS;
+  LEAVE;
+
+  return ret;
 }
 
 #define invoke_seq_callback(self, selfsv, cb)  S_invoke_seq_callback(aTHX_ self, selfsv, cb)
@@ -417,7 +478,12 @@ static void S_invoke_callback(pTHX_ struct FutureXS *self, SV *selfsv, struct Fu
     SV *fseq  = cb->seq.f;
 
     if(!SvOK(fseq)) {
-      warn("(SELF) lost a sequence Future");
+      if(self->constructed_at)
+        warn("%" SVf " (%" SVf ") lost a sequence Future",
+            SVfARG(selfsv), SVfARG(self->constructed_at));
+      else
+        warn("%" SVf " lost a sequence Future",
+            SVfARG(selfsv));
       return;
     }
 
@@ -471,7 +537,13 @@ static void S_invoke_callback(pTHX_ struct FutureXS *self, SV *selfsv, struct Fu
 #define revoke_on_cancel(rev)  S_revoke_on_cancel(aTHX_ rev)
 static void S_revoke_on_cancel(pTHX_ struct FutureXSRevocation *rev)
 {
-  sv_set_undef(rev->toclear_sv);
+  if(rev->toclear_sv_at && SvROK(rev->toclear_sv_at)) {
+    assert(SvTYPE(rev->toclear_sv_at) <= SVt_PVMG);
+    assert(SvROK(rev->toclear_sv_at));
+    sv_set_undef(SvRV(rev->toclear_sv_at));
+    SvREFCNT_dec(rev->toclear_sv_at);
+    rev->toclear_sv_at = NULL;
+  }
 
   // TODO: Account for on_cancel compation if required
 }
@@ -484,6 +556,10 @@ static void S_mark_ready(pTHX_ struct FutureXS *self, SV *selfsv, const char *st
   if(capture_times)
     gettimeofday(&self->rtime, NULL);
 
+  /* Make sure self doesn't disappear during this function */
+  SvREFCNT_inc(SvRV(selfsv));
+  SAVEFREESV(SvRV(selfsv));
+
   if(self->precedent_f) {
     SvREFCNT_dec(self->precedent_f);
     self->precedent_f = NULL;
@@ -495,7 +571,14 @@ static void S_mark_ready(pTHX_ struct FutureXS *self, SV *selfsv, const char *st
     for(size_t i = 0; i < av_count(revocations); i++) {
       struct FutureXSRevocation *rev = (struct FutureXSRevocation *)AvARRAY(revocations)[i];
       revoke_on_cancel(rev);
+
+      SvREFCNT_dec(rev->precedent_f);
+      Safefree(rev);
     }
+    AvFILLp(revocations) = -1;
+    SvREFCNT_dec(revocations);
+
+    self->revoke_when_ready = NULL;
   }
 
   if(!self->callbacks)
@@ -533,9 +616,9 @@ static SV *S_make_sequence(pTHX_ SV *f1, struct FutureXSCallback *cb)
 
   cb->flags |= CB_DONE|CB_FAIL;
   if(cb->seq.thencode)
-    cb->seq.thencode = newSVsv(cb->seq.thencode);
+    cb->seq.thencode = wrap_cb(f1, "sequence", cb->seq.thencode);
   if(cb->seq.elsecode)
-    cb->seq.elsecode = newSVsv(cb->seq.elsecode);
+    cb->seq.elsecode = wrap_cb(f1, "sequence", cb->seq.elsecode);
   cb->seq.f = sv_rvweaken(newSVsv(fseq));
 
   push_callback(self, cb);
@@ -587,7 +670,79 @@ void Future_failv(pTHX_ SV *f, SV **svp, size_t n)
   if(self->ready)
     croak("(SELF) is already (STATE) and cannot be ->fail'ed");
 
-  self->failure = newAV_svn_dup(svp, n);
+  if(n == 1 && SvROK(svp[0]) && SvOBJECT(SvRV(svp[0])) /* TODO: and is Future::Exception */) {
+    SV *exception = svp[0];
+    AV *failure = self->failure = newAV();
+
+    dSP;
+
+    {
+      ENTER;
+      SAVETMPS;
+
+      EXTEND(SP, 1);
+      PUSHMARK(SP);
+      PUSHs(sv_mortalcopy(exception));
+      PUTBACK;
+
+      call_method("message", G_SCALAR);
+
+      SPAGAIN;
+
+      av_push(failure, SvREFCNT_inc(POPs));
+
+      FREETMPS;
+      LEAVE;
+    }
+
+    {
+      ENTER;
+      SAVETMPS;
+
+      EXTEND(SP, 1);
+      PUSHMARK(SP);
+      PUSHs(sv_mortalcopy(exception));
+      PUTBACK;
+
+      call_method("category", G_SCALAR);
+
+      SPAGAIN;
+
+      av_push(failure, SvREFCNT_inc(POPs));
+
+      FREETMPS;
+      LEAVE;
+    }
+
+    {
+      ENTER;
+      SAVETMPS;
+
+      EXTEND(SP, 1);
+      PUSHMARK(SP);
+      PUSHs(sv_mortalcopy(exception));
+      PUTBACK;
+
+      SSize_t count = call_method("details", G_LIST);
+
+      SPAGAIN;
+
+      SV **retp = SP - count + 1;
+
+      for(SSize_t i = 0; i < count; i++)
+        av_push(failure, SvREFCNT_inc(retp[i]));
+      SP -= count;
+
+      PUTBACK;
+
+      FREETMPS;
+      LEAVE;
+    }
+  }
+  else {
+    self->failure = newAV_svn_dup(svp, n);
+  }
+
   mark_ready(self, f, "failed");
 }
 
@@ -628,7 +783,7 @@ void Future_on_cancel(pTHX_ SV *f, SV *code)
     Newx(rev, 1, struct FutureXSRevocation);
 
     rev->precedent_f = sv_rvweaken(newSVsv(f));
-    rev->toclear_sv  = rv; /* no SvREFCNT_inc() */
+    rev->toclear_sv_at = sv_rvweaken(newRV_inc(rv));
 
     struct FutureXS *codeself = get_future(code);
     if(!codeself->revoke_when_ready)
@@ -656,8 +811,10 @@ void Future_on_ready(pTHX_ SV *f, SV *code)
 
   if(self->ready)
     invoke_callback(self, f, &cb);
-  else
-    push_callback(self, wrap_cb(self, &cb));
+  else {
+    cb.code = wrap_cb(f, "on_ready", cb.code);
+    push_callback(self, &cb);
+  }
 }
 
 void Future_on_done(pTHX_ SV *f, SV *code)
@@ -678,8 +835,10 @@ void Future_on_done(pTHX_ SV *f, SV *code)
 
   if(self->ready)
     invoke_callback(self, f, &cb);
-  else
-    push_callback(self, wrap_cb(self, &cb));
+  else {
+    cb.code = wrap_cb(f, "on_done", cb.code);
+    push_callback(self, &cb);
+  }
 }
 
 void Future_on_fail(pTHX_ SV *f, SV *code)
@@ -700,8 +859,10 @@ void Future_on_fail(pTHX_ SV *f, SV *code)
 
   if(self->ready)
     invoke_callback(self, f, &cb);
-  else
-    push_callback(self, wrap_cb(self, &cb));
+  else {
+    cb.code = wrap_cb(f, "on_fail", cb.code);
+    push_callback(self, &cb);
+  }
 }
 
 #define future_await(f)  Future_await(aTHX_ f)
@@ -736,7 +897,27 @@ AV *Future_get_result_av(pTHX_ SV *f, bool await)
     self->reported = true;
 
     SV *exception = AvARRAY(self->failure)[0];
-    // TODO: fiddle with Future::Exception
+    if(av_count(self->failure) > 1) {
+      dSP;
+      ENTER;
+      SAVETMPS;
+
+      PUSHMARK(SP);
+      EXTEND(SP, 1 + av_count(self->failure));
+      mPUSHpvs("Future::Exception");
+      for(SSize_t i = 0; i < av_count(self->failure); i++)
+        PUSHs(sv_mortalcopy(AvARRAY(self->failure)[i]));
+      PUTBACK;
+
+      call_method("new", G_SCALAR);
+
+      SPAGAIN;
+
+      exception = SvREFCNT_inc(POPs);
+
+      FREETMPS;
+      LEAVE;
+    }
 
     if(!SvROK(exception) && SvPV_nolen(exception)[SvCUR(exception)-1] == '\n')
       die_sv(exception);
@@ -881,8 +1062,8 @@ SV *Future_thencatch(pTHX_ SV *f, U32 flags, SV *thencode, HV *catches, SV *else
 #define future_new_subsv(cls, subs, n)  S_future_new_subsv(aTHX_ cls, subs, n)
 static SV *S_future_new_subsv(pTHX_ const char *cls, SV **subs, size_t n)
 {
-  HV *future_xs_stash = get_hv("Future::XS::", 0);
-  assert(future_xs_stash);
+  HV *future_stash = get_hv("Future::", 0);
+  assert(future_stash);
 
   /* Find the best prototype; pick the first derived instance if there is
    * one */
@@ -891,7 +1072,7 @@ static SV *S_future_new_subsv(pTHX_ const char *cls, SV **subs, size_t n)
     if(!SvROK(subs[i]) || !SvOBJECT(SvRV(subs[i])))
       croak("Expected a Future, got %" SVf, SVfARG(subs[i]));
 
-    if(SvSTASH(SvRV(subs[i])) != future_xs_stash) {
+    if(SvSTASH(SvRV(subs[i])) != future_stash) {
       proto = subs[i];
       break;
     }
@@ -924,6 +1105,9 @@ static void S_copy_result(pTHX_ struct FutureXS *self, SV *src)
 #define cancel_pending_subs(self)  S_cancel_pending_subs(aTHX_ self)
 static void S_cancel_pending_subs(pTHX_ struct FutureXS *self)
 {
+  if(!self->subs)
+    return;
+
   for(Size_t i = 0; i < av_count(self->subs); i++) {
     SV *sub = AvARRAY(self->subs)[i];
     if(!future_is_ready(sub))
@@ -936,6 +1120,13 @@ XS_INTERNAL(sub_on_ready_waitall)
   dXSARGS;
 
   SV *f = XSANY_sv;
+  if(!SvOK(f))
+    return;
+
+  /* Make sure self doesn't disappear during this function */
+  SvREFCNT_inc(SvRV(f));
+  SAVEFREESV(SvRV(f));
+
   struct FutureXS *self = get_future(f);
 
   self->pending_subs--;
@@ -991,6 +1182,13 @@ XS_INTERNAL(sub_on_ready_waitany)
   SV *thissub = ST(0);
 
   SV *f = XSANY_sv;
+  if(!SvOK(f))
+    return;
+
+  /* Make sure self doesn't disappear during this function */
+  SvREFCNT_inc(SvRV(f));
+  SAVEFREESV(SvRV(f));
+
   struct FutureXS *self = get_future(f);
 
   if(self->result || self->failure)
@@ -1082,6 +1280,13 @@ XS_INTERNAL(sub_on_ready_needsall)
   SV *thissub = ST(0);
 
   SV *f = XSANY_sv;
+  if(!SvOK(f))
+    return;
+
+  /* Make sure self doesn't disappear during this function */
+  SvREFCNT_inc(SvRV(f));
+  SAVEFREESV(SvRV(f));
+
   struct FutureXS *self = get_future(f);
 
   if(self->result || self->failure)
@@ -1165,6 +1370,13 @@ XS_INTERNAL(sub_on_ready_needsany)
   SV *thissub = ST(0);
 
   SV *f = XSANY_sv;
+  if(!SvOK(f))
+    return;
+
+  /* Make sure self doesn't disappear during this function */
+  SvREFCNT_inc(SvRV(f));
+  SAVEFREESV(SvRV(f));
+
   struct FutureXS *self = get_future(f);
 
   if(self->result || self->failure)
@@ -1373,7 +1585,7 @@ static int dumpstruct_revocation(pTHX_ DMDContext *ctx, struct FutureXSRevocatio
   DMD_DUMP_STRUCT(ctx, "Future::XS/FutureXSRevocation", rev, sizeof(struct FutureXSRevocation),
     2, ((const DMDNamedField []){
       {"the precedent future SV", DMD_FIELD_PTR, .ptr = rev->precedent_f},
-      {"the SV to clear",         DMD_FIELD_PTR, .ptr = rev->toclear_sv},
+      {"the SV to clear RV",      DMD_FIELD_PTR, .ptr = rev->toclear_sv_at},
     })
   );
 
@@ -1388,7 +1600,7 @@ static int dumpstruct(pTHX_ DMDContext *ctx, const SV *sv)
   struct FutureXS *self = INT2PTR(struct FutureXS *, SvIV((SV *)sv));
 
   DMD_DUMP_STRUCT(ctx, "Future::XS/FutureXS", self, sizeof(struct FutureXS),
-    11, ((const DMDNamedField []){
+    12, ((const DMDNamedField []){
       {"ready",                    DMD_FIELD_BOOL, .b   = self->ready},
       {"cancelled",                DMD_FIELD_BOOL, .b   = self->cancelled},
       {"the label SV",             DMD_FIELD_PTR,  .ptr = self->label},
@@ -1398,6 +1610,7 @@ static int dumpstruct(pTHX_ DMDContext *ctx, const SV *sv)
       {"the on_cancel AV",         DMD_FIELD_PTR,  .ptr = self->on_cancel},
       {"the revoke_when_ready AV", DMD_FIELD_PTR,  .ptr = self->revoke_when_ready},
       {"the udata HV",             DMD_FIELD_PTR,  .ptr = self->udata},
+      {"the constructed-at SV",    DMD_FIELD_PTR,  .ptr = self->constructed_at},
       {"the subs AV",              DMD_FIELD_PTR,  .ptr = self->subs},
       {"the pending sub count",    DMD_FIELD_UINT, .n   = self->pending_subs},
     })
@@ -1419,7 +1632,8 @@ static int dumpstruct(pTHX_ DMDContext *ctx, const SV *sv)
 }
 #endif
 
-static bool getenv_bool(const char *key)
+#define getenv_bool(key)  S_getenv_bool(aTHX_ key)
+static bool S_getenv_bool(pTHX_ const char *key)
 {
   const char *val = getenv(key);
   if(!val || !val[0])
@@ -1429,18 +1643,26 @@ static bool getenv_bool(const char *key)
   return true;
 }
 
+#ifndef newSVbool
+#  define newSVbool(b)  newSVsv(b ? &PL_sv_yes : &PL_sv_no)
+#endif
+
+void Future_reread_environment(pTHX)
+{
+  future_debug = getenv_bool("PERL_FUTURE_DEBUG");
+
+  capture_times = future_debug || getenv_bool("PERL_FUTURE_TIMES");
+  sv_setsv(get_sv("Future::TIMES", GV_ADDMULTI), capture_times ? &PL_sv_yes : &PL_sv_no);
+}
+
 void Future_boot(pTHX)
 {
 #ifdef HAVE_DMD_HELPER
   DMD_SET_PACKAGE_HELPER("Future::XS", dumpstruct);
 #endif
 
-  bool debug = getenv_bool("PERL_FUTURE_DEBUG");
-  /* TODO: store and use debug for more things */
+  Future_reread_environment(aTHX);
 
-  capture_times = debug || getenv_bool("PERL_FUTURE_TIMES");
-
-  if(capture_times) {
-    sv_setsv(get_sv("Future::TIMES", GV_ADDMULTI), &PL_sv_yes);
-  }
+  // We can only do this once
+  newCONSTSUB(gv_stashpvn("Future::XS", 10, TRUE), "DEBUG", newSVbool(future_debug));
 }

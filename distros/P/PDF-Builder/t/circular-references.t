@@ -12,10 +12,14 @@ use Test::Memory::Cycle;
 # RT #56681: Devel::Cycle throws spurious warnings since 5.12
 local $SIG{'__WARN__'} = sub { warn $_[0] unless $_[0] =~ /Unhandled type: GLOB/ };
 
-# Read a simple PDF
+# (1) Read a simple PDF
 
 my $pdf = PDF::Builder->open('t/resources/sample.pdf');
 memory_cycle_ok($pdf, q{Open sample.pdf});
+
+# TODO: Create a sample PDF that uses as much PDF::Builder functionality as
+# possible (outlines and annotations in particular) to build confidence that all
+# circular references have been removed.
 
 # Check pagestack weakened status
 
@@ -37,7 +41,7 @@ ok(isweak($pdf->{'pagestack'}->[1]),
     $pdf->corefont('Helvetica');
 }
 
-lives_ok(sub { $pdf->stringify() }, 'Font added inside a block is still present on save');
+lives_ok(sub { $pdf->to_string() }, 'Font added inside a block is still present on save');
 
 done_testing();
 

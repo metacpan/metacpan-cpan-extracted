@@ -20,7 +20,7 @@ readme_from 'Button.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'Error::Pure' => 0;
-requires 'Tags::HTML' => 0;
+requires 'Tags::HTML' => 0.04;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-Login-Button/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-Login-Button';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-HTML-Login-Button';
@@ -31,7 +31,7 @@ test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

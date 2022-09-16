@@ -20,6 +20,13 @@ check_token( q<'foo$bar'> );
 
 check_class( q<"foo$bar">, qw< PPIx::QuoteLike $bar > );
 
+check( q<"${^MATCH}">, qw{ ${^MATCH} } );
+
+TODO: {
+    local $TODO = 'A restriction, probably permanent';
+    check( q<"${^CAPTURE[0]}">, qw{ @{^CAPTURE} } );
+}
+
 # Note -- the following was done using the trinary operator rather than
 # if/else because I hoped that with the former implementation, when I
 # added tests I would do so correctly.

@@ -48,6 +48,7 @@ sub id_token_payload {
 }
 
 sub login {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $op, $uid ) = @_;
     my $res;
     my $query = buildForm( {
@@ -65,6 +66,7 @@ sub login {
 }
 
 sub authorize {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $op, $id, $params ) = @_;
     my $query = buildForm($params);
     my $res   = $op->_get(
@@ -153,6 +155,7 @@ sub introspect {
 }
 
 sub expectJWT {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $token, %claims ) = @_;
     my $payload = getJWTPayload($token);
     ok( $payload, "Token is a JWT" );

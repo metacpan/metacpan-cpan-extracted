@@ -86,10 +86,7 @@
       $scope.currentSession = null;
       $scope.menu = menu;
       $scope.searchString = '';
-      $scope.U2FCheck = "1";
-      $scope.TOTPCheck = "1";
-      $scope.UBKCheck = "1";
-      $scope.WebAuthnCheck = "1";
+      $scope.sfatypes = {};
       $scope.translateP = $translator.translateP;
       $scope.translate = $translator.translate;
       $scope.translateTitle = function(node) {
@@ -206,32 +203,35 @@
             for (i = 0, len = attrs.length; i < len; i++) {
               attr = attrs[i];
               if (session[attr]) {
-                if (session[attr].toString().match(/"type":\s*"(?:TOTP|U2F|UBK|WebAuthn)"/)) {
-                  subres.push({
-                    title: "type",
-                    value: "name",
-                    epoch: "date"
-                  });
+                if (attr === "_2fDevices" && session[attr]) {
                   array = JSON.parse(session[attr]);
-                  for (k = 0, len1 = array.length; k < len1; k++) {
-                    sfDevice = array[k];
-                    for (key in sfDevice) {
-                      value = sfDevice[key];
-                      if (key === 'type') {
-                        title = value;
-                      }
-                      if (key === 'name') {
-                        name = value;
-                      }
-                      if (key === 'epoch') {
-                        epoch = value;
-                      }
-                    }
+                  if (array.length > 0) {
                     subres.push({
-                      title: title,
-                      value: name,
-                      epoch: epoch
+                      title: "type",
+                      value: "name",
+                      epoch: "date"
                     });
+                    for (k = 0, len1 = array.length; k < len1; k++) {
+                      sfDevice = array[k];
+                      for (key in sfDevice) {
+                        value = sfDevice[key];
+                        if (key === 'type') {
+                          title = value;
+                        }
+                        if (key === 'name') {
+                          name = value;
+                        }
+                        if (key === 'epoch') {
+                          epoch = value;
+                        }
+                      }
+                      subres.push({
+                        title: title,
+                        value: name,
+                        epoch: epoch,
+                        sfrow: true
+                      });
+                    }
                   }
                   delete session[attr];
                 } else if (session[attr].toString().match(/\w+/)) {
@@ -304,7 +304,13 @@
         } else {
           over = 0;
         }
-        return $http.get(scriptname + "sfa/" + sessionType + "?" + query + "&U2FCheck=" + $scope.U2FCheck + "&TOTPCheck=" + $scope.TOTPCheck + "&UBKCheck=" + $scope.UBKCheck + "&WebAuthnCheck=" + $scope.WebAuthnCheck).then(function(response) {
+        return $http.get((scriptname + "sfa/" + sessionType + "?" + query) + Object.entries($scope.sfatypes).map(function(x) {
+          if (x[1]) {
+            return "&type=" + x[0];
+          } else {
+            return "";
+          }
+        }).join("")).then(function(response) {
           var data, i, len, n, ref;
           data = response.data;
           if (data.result) {
@@ -346,7 +352,13 @@
         } else {
           over = 0;
         }
-        return $http.get(scriptname + "sfa/" + sessionType + "?_session_uid=" + $scope.searchString + "*&groupBy=substr(_session_uid," + $scope.searchString.length + ")&U2FCheck=" + $scope.U2FCheck + "&TOTPCheck=" + $scope.TOTPCheck + "&UBKCheck=" + $scope.UBKCheck + "&WebAuthnCheck=" + $scope.WebAuthnCheck).then(function(response) {
+        return $http.get((scriptname + "sfa/" + sessionType + "?_session_uid=" + $scope.searchString + "*&groupBy=substr(_session_uid," + $scope.searchString.length + ")") + Object.entries($scope.sfatypes).map(function(x) {
+          if (x[1]) {
+            return "&type=" + x[0];
+          } else {
+            return "";
+          }
+        }).join("")).then(function(response) {
           var data, i, len, n, ref;
           data = response.data;
           if (data.result) {

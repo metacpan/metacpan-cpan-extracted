@@ -1,6 +1,6 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -40,7 +40,7 @@ sub process {
         }
     }
     $self->logger->debug( "Returned " . $self->_formatProcessResult($err) )
-      if ($err);
+      if $err;
     return $err;
 }
 
@@ -79,7 +79,7 @@ sub _formatProcessResult {
 sub restoreArgs {
     my ( $self, $req ) = @_;
     $req->mustRedirect(1);
-    PE_OK;
+    return PE_OK;
 }
 
 sub importHandlerData {
@@ -87,7 +87,7 @@ sub importHandlerData {
     $req->{sessionInfo} = $req->userData;
     $req->id( $req->sessionInfo->{_session_id} );
     $req->user( $req->sessionInfo->{ $self->conf->{whatToTrace} } );
-    PE_OK;
+    return PE_OK;
 }
 
 # Verify url and confirm parameter
@@ -165,10 +165,10 @@ sub controlUrl {
 
         # Try to resolve alias
         my $originalVhost = $self->HANDLER->resolveAlias($vhost);
-        $vhost = $proto . '://' . $originalVhost;
-        $self->logger->debug( "Required URL (param: "
-              . ( $req->param('logout') ? 'HTTP Referer' : 'urldc' )
-              . " | value: $tmp | alias: $vhost)" );
+        $vhost = "$proto://$originalVhost";
+        $self->logger->debug( 'Required URL (param: '
+              . ( $req->param('logout') ? 'HTTP Referer'   : 'urldc' )
+              . ( $tmp ? " | value: $tmp | alias: $vhost)" : ')' ) );
 
         # If the target URL has an authLevel set in config, remember it.
         my $level = $self->HANDLER->getLevel( $req, $appuri, $originalVhost );
@@ -191,7 +191,7 @@ sub controlUrl {
         $req->data->{_url} = $req->pdata->{_url} =
           encode_base64( $req->{urldc}, '' );    # Avoid \n or \r
     }
-    PE_OK;
+    return PE_OK;
 }
 
 sub checkLogout {
@@ -200,7 +200,7 @@ sub checkLogout {
         $req->steps(
             [ @{ $self->beforeLogout }, 'authLogout', 'deleteSession' ] );
     }
-    PE_OK;
+    return PE_OK;
 }
 
 sub checkUnauthLogout {
@@ -221,7 +221,7 @@ sub checkUnauthLogout {
         );
         $req->steps( [ sub { PE_LOGOUT_OK } ] );
     }
-    PE_OK;
+    return PE_OK;
 }
 
 sub authLogout {
@@ -297,7 +297,7 @@ sub deleteSession {
         # Redirect on logout page if no other target defined
         if ( !$req->urldc and !$req->postUrl ) {
             $self->logger->debug('No other target defined, redirect on logout');
-            $req->urldc( $req->script_name . "?logout=1" );
+            $req->urldc( $self->buildUrl( { logout => 1 } ) );
         }
     }
     $req->userData( {} );
@@ -461,7 +461,6 @@ sub setSessionInfo {
 
     # Call UserDB setSessionInfo
     return $self->_userDB->setSessionInfo($req);
-    PE_OK;
 }
 
 sub setMacros {
@@ -470,7 +469,7 @@ sub setMacros {
         $req->{sessionInfo}->{$_} =
           $self->_macros->{$_}->( $req, $req->sessionInfo );
     }
-    PE_OK;
+    return PE_OK;
 }
 
 sub setGroups {
@@ -488,7 +487,6 @@ sub setPersistentSessionInfo {
         return PE_OK unless ( $key and length($key) );
 
         my $persistentSession = $self->getPersistentSession($key);
-
         if ($persistentSession) {
             $self->logger->debug("Persistent session found for $key");
             foreach my $k ( keys %{ $persistentSession->data } ) {
@@ -500,7 +498,7 @@ sub setPersistentSessionInfo {
             }
         }
     }
-    PE_OK;
+    return PE_OK;
 }
 
 sub setLocalGroups {
@@ -520,7 +518,7 @@ sub setLocalGroups {
         $req->{sessionInfo}->{groups} =~
           s/^$self->{conf}->{multiValuesSeparator}//o;
     }
-    PE_OK;
+    return PE_OK;
 }
 
 sub store {
@@ -547,11 +545,10 @@ sub store {
     foreach my $k ( keys %{ $req->{sessionInfo} } ) {
         next unless defined $req->{sessionInfo}->{$k};
         my $displayValue = $req->{sessionInfo}->{$k};
-        if (    $self->conf->{hiddenAttributes}
-            and $self->conf->{hiddenAttributes} =~ /\b$k\b/ )
-        {
-            $displayValue = '****';
-        }
+        $displayValue = '****'
+          if (  $self->conf->{hiddenAttributes}
+            and $self->conf->{hiddenAttributes} =~ /\b$k\b/ );
+
         $self->logger->debug("Store $displayValue in session key $k");
         $self->_dump($displayValue) if ref($displayValue);
         $infos->{$k} = $req->{sessionInfo}->{$k};
@@ -563,7 +560,7 @@ sub store {
         force => $req->{force},
         info  => $infos
     );
-    return PE_APACHESESSIONERROR unless ($session);
+    return PE_APACHESESSIONERROR unless $session;
 
     # Update current request
     $req->id( $session->id );
@@ -582,7 +579,7 @@ sub store {
               . $req->{sessionInfo}->{_httpSession} );
     }
     $req->refresh(0);
-    PE_OK;
+    return PE_OK;
 }
 
 sub buildCookie {
@@ -616,7 +613,7 @@ sub buildCookie {
           . $ref->{ $self->conf->{whatToTrace} }
           . " successfully authenticated at level $ref->{authenticationLevel}"
     );
-    PE_OK;
+    return PE_OK;
 }
 
 sub secondFactor {
@@ -629,7 +626,7 @@ sub storeHistory {
     if ( $self->conf->{loginHistoryEnabled} ) {
         $self->registerLogin($req);
     }
-    PE_OK;
+    return PE_OK;
 }
 
 1;

@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 #define FORMAT_VERSION_MAJOR 0
-#define FORMAT_VERSION_MINOR 4
+#define FORMAT_VERSION_MINOR 4 /* Actually 5 if HAVE_FEATURE_CLASS */
 
 #ifndef SvOOK_offset
 #  define SvOOK_offset(sv, len) STMT_START { len = SvIVX(sv); } STMT_END
@@ -35,6 +35,10 @@
 /* This technically applies all the way back to 5.6 if we need it... */
 #if (PERL_REVISION == 5) && (PERL_VERSION == 10) && (PERL_SUBVERSION == 0)
 #  define CxOLD_OP_TYPE(cx) ((cx)->blk_eval.old_op_type)
+#endif
+
+#ifdef ObjectFIELDS
+#  define HAVE_FEATURE_CLASS
 #endif
 
 static int max_string;
@@ -87,6 +91,10 @@ static uint8_t sv_sizes[] = {
   0,                          0,     0,     /* UNDEF */
   0,                          0,     0,     /* YES */
   0,                          0,     0,     /* NO */
+#ifdef HAVE_FEATURE_CLASS
+  UVSIZE,                     0,     0,     /* OBJECT */
+  UVSIZE + 0,                 1+4+1, 0+1,   /* CLASS = extends STASH */
+#endif
 };
 
 static uint8_t svx_sizes[] = {
@@ -127,6 +135,8 @@ enum PMAT_SVt {
   PMAT_SVtUNDEF,
   PMAT_SVtYES,
   PMAT_SVtNO,
+  PMAT_SVtOBJ,
+  PMAT_SVtCLASS,
 
   PMAT_SVtSTRUCT      = 0x7F,  /* fields as described by corresponding META_STRUCT */
 
@@ -154,6 +164,11 @@ enum PMAT_CODEx {
   PMAT_CODEx_PADNAMES = 7,
   PMAT_CODEx_PAD,
   PMAT_CODEx_PADNAME_FLAGS,
+  PMAT_CODEx_PADNAME_FIELD,
+};
+
+enum PMAT_CLASSx {
+  PMAT_CLASSx_FIELD = 1,
 };
 
 enum PMAT_CTXt {
@@ -505,18 +520,10 @@ static void write_private_hv(FILE *fh, const HV *hv)
     write_hv_body_elems(fh, hv);
 }
 
-static void write_private_stash(FILE *fh, const HV *stash)
+static void write_stash_ptrs(FILE *fh, const HV *stash)
 {
   struct mro_meta *mro_meta = HvAUX(stash)->xhv_mro_meta;
 
-  int nkeys = write_hv_header(fh, stash,
-    sizeof(struct xpvhv_aux) + (mro_meta ? sizeof(struct mro_meta) : 0));
-
-  // Header
-  // HASH
-  write_uint(fh, nkeys);
-
-  // PTRs
   if(SvOOK(stash) && HvAUX(stash))
     write_svptr(fh, (SV*)HvAUX(stash)->xhv_backreferences);
   else
@@ -542,6 +549,21 @@ static void write_private_stash(FILE *fh, const HV *stash)
     write_svptr(fh, NULL);
     write_svptr(fh, NULL);
   }
+}
+
+static void write_private_stash(FILE *fh, const HV *stash)
+{
+  struct mro_meta *mro_meta = HvAUX(stash)->xhv_mro_meta;
+
+  int nkeys = write_hv_header(fh, stash,
+    sizeof(struct xpvhv_aux) + (mro_meta ? sizeof(struct mro_meta) : 0));
+
+  // Header
+  // HASH
+  write_uint(fh, nkeys);
+
+  // PTRs
+  write_stash_ptrs(fh, stash);
 
   // STRs
   write_str(fh, HvNAME(stash));
@@ -661,13 +683,28 @@ static void write_private_cv(FILE *fh, const CV *cv)
         write_svptr(fh, (SV*)PadnameOURSTASH(pn));
 
         if(PadnameFLAGS(pn)) {
-          write_u8(fh, PMAT_CODEx_PADNAME_FLAGS);
-          write_uint(fh, padix);
-          write_u8(fh, (PadnameOUTER(pn)   ? 0x01 : 0) |
-                       (PadnameIsSTATE(pn) ? 0x02 : 0) |
-                       (PadnameLVALUE(pn)  ? 0x04 : 0) |
-                       (PadnameFLAGS(pn) & PADNAMEt_TYPED ? 0x08 : 0) |
-                       (PadnameFLAGS(pn) & PADNAMEt_OUR   ? 0x10 : 0));
+          uint8_t flags = 0;
+
+          if(PadnameOUTER(pn))   flags |= 0x01;
+          if(PadnameIsSTATE(pn)) flags |= 0x02;
+          if(PadnameLVALUE(pn))  flags |= 0x04;
+          if(PadnameFLAGS(pn) & PADNAMEt_TYPED) flags |= 0x08;
+          if(PadnameFLAGS(pn) & PADNAMEt_OUR)   flags |= 0x10;
+
+          if(flags) {
+            write_u8(fh, PMAT_CODEx_PADNAME_FLAGS);
+            write_uint(fh, padix);
+            write_u8(fh, flags);
+          }
+
+#ifdef HAVE_FEATURE_CLASS
+          if(PadnameIsFIELD(pn)) {
+            write_u8(fh, PMAT_CODEx_PADNAME_FIELD);
+            write_uint(fh, padix);
+            write_uint(fh, PadnameFIELDINFO(pn)->fieldix);
+            write_svptr(fh, (SV *)PadnameFIELDINFO(pn)->fieldstash);
+          }
+#endif
         }
       }
     }
@@ -716,6 +753,61 @@ static void write_private_lv(FILE *fh, const SV *sv)
   write_svptr(fh, LvTARG(sv));
 }
 
+#ifdef HAVE_FEATURE_CLASS
+static void write_private_obj(FILE *fh, const SV *obj)
+{
+  int nfields = ObjectMAXFIELD(obj) + 1;
+
+  write_common_sv(fh, obj, sizeof(XPVOBJ));
+
+  // Header
+  write_uint(fh, nfields);
+
+  SV **fields = ObjectFIELDS(obj);
+  int i;
+  for(i = 0; i < nfields; i++)
+    write_svptr(fh, fields[i]);
+}
+
+static void write_private_class(FILE *fh, const HV *cls)
+{
+  struct mro_meta *mro_meta = HvAUX(cls)->xhv_mro_meta;
+
+  int nkeys = write_hv_header(fh, cls,
+    sizeof(struct xpvhv_aux) + (mro_meta ? sizeof(struct mro_meta) : 0));
+
+  // Header
+  // HASH
+  write_uint(fh, nkeys);
+
+  // PTRs
+  write_stash_ptrs(fh, cls);
+  write_ptr(fh, HvAUX(cls)->xhv_class_adjust_blocks);
+
+  // STRs
+  write_str(fh, HvNAME(cls));
+
+  // Body
+  if(HvARRAY(cls))
+    write_hv_body_elems(fh, cls);
+
+  {
+    PADNAMELIST *fields = HvAUX(cls)->xhv_class_fields;
+
+    int nfields = PadnamelistMAX(fields)+1;
+    for(int i = 0; i < nfields; i++) {
+      PADNAME *pn = PadnamelistARRAY(fields)[i];
+
+      write_u8(fh, PMAT_CLASSx_FIELD);
+      write_uint(fh, PadnameFIELDINFO(pn)->fieldix);
+      write_str(fh, PadnamePV(pn));
+    }
+  }
+
+  write_u8(fh, 0);
+}
+#endif
+
 static void write_annotations_from_stack(FILE *fh, int n)
 {
   dSP;
@@ -734,6 +826,42 @@ static void write_annotations_from_stack(FILE *fh, int n)
       default:
         fprintf(stderr, "ARG: Unsure how to handle PMAT_SVn annotation type %02x\n", type);
         p = SP + 1;
+    }
+  }
+}
+
+static void run_package_helpers(DMDContext *ctx, const SV *sv, HV *stash);
+static void run_package_helpers(DMDContext *ctx, const SV *sv, HV *stash)
+{
+  FILE *fh = ctx->fh;
+  SV **svp;
+
+  DMD_Helper *helper = NULL;
+  if((svp = hv_fetch(helper_per_package, HvNAME(stash), HvNAMELEN(stash), 0)))
+    helper = (DMD_Helper *)SvUV(*svp);
+
+  if(helper) {
+    ENTER;
+    SAVETMPS;
+
+    int ret = (*helper)(aTHX_ ctx, sv);
+
+    if(ret > 0)
+      write_annotations_from_stack(fh, ret);
+
+    FREETMPS;
+    LEAVE;
+  }
+
+  AV *isa_av;
+  if((svp = hv_fetchs(stash, "ISA", 0)) &&
+      SvTYPE(*svp) == SVt_PVGV &&
+      (isa_av = GvAV((GV *)*svp)) &&
+      AvFILL(isa_av) > -1) {
+    SSize_t i;
+    for(i = 0; i <= AvFILL(isa_av); i++) {
+      HV *superstash = gv_stashsv(AvARRAY(isa_av)[i], 0);
+      run_package_helpers(ctx, sv, superstash);
     }
   }
 }
@@ -765,10 +893,23 @@ static void write_sv(DMDContext *ctx, const SV *sv)
     case SVt_PVLV: type = PMAT_SVtLVALUE; break;
     case SVt_PVAV: type = PMAT_SVtARRAY; break;
     // HVs with names we call STASHes
-    case SVt_PVHV: type = HvNAME(sv) ? PMAT_SVtSTASH : PMAT_SVtHASH; break;
+    case SVt_PVHV:
+#ifdef HAVE_FEATURE_CLASS
+      if(HvNAME(sv) && HvSTASH_IS_CLASS(sv))
+        type = PMAT_SVtCLASS;
+      else
+#endif
+      if(HvNAME(sv))
+        type = PMAT_SVtSTASH;
+      else
+        type = PMAT_SVtHASH;
+      break;
     case SVt_PVCV: type = PMAT_SVtCODE; break;
     case SVt_PVFM: type = PMAT_SVtFORMAT; break;
     case SVt_PVIO: type = PMAT_SVtIO; break;
+#ifdef HAVE_FEATURE_CLASS
+    case SVt_PVOBJ: type = PMAT_SVtOBJ; break;
+#endif
     default:
       fprintf(stderr, "dumpsv %p has unknown SvTYPE %d\n", sv, SvTYPE(sv));
       break;
@@ -794,6 +935,10 @@ static void write_sv(DMDContext *ctx, const SV *sv)
     case PMAT_SVtCODE:   write_private_cv   (fh, (CV*)sv); break;
     case PMAT_SVtIO:     write_private_io   (fh, (IO*)sv); break;
     case PMAT_SVtLVALUE: write_private_lv   (fh,      sv); break;
+#ifdef HAVE_FEATURE_CLASS
+    case PMAT_SVtOBJ:    write_private_obj(fh, sv); break;
+    case PMAT_SVtCLASS:  write_private_class(fh, (HV*)sv); break;
+#endif
 
 #if (PERL_REVISION == 5) && (PERL_VERSION >= 12)
     case PMAT_SVtREGEXP: write_common_sv(fh, sv, sizeof(regexp)); break;
@@ -829,20 +974,11 @@ static void write_sv(DMDContext *ctx, const SV *sv)
         if(he)
           helper = (DMD_MagicHelper *)SvUV(HeVAL(he));
 
-        DMD_LegacyMagicHelper *legacy_helper = NULL;
-        he = hv_fetch_ent(legacy_helper_per_magic, key, 0, 0);
-        if(he)
-          legacy_helper = (DMD_LegacyMagicHelper *)SvUV(HeVAL(he));
-
-        if(helper || legacy_helper) {
+        if(helper) {
           ENTER;
           SAVETMPS;
 
-          int ret;
-          if(helper)
-            ret = (helper)(aTHX_ ctx, sv, mg);
-          else
-            ret = (*legacy_helper)(aTHX_ sv, mg);
+          int ret = (helper)(aTHX_ ctx, sv, mg);
 
           if(ret > 0)
             write_annotations_from_stack(fh, ret);
@@ -855,33 +991,7 @@ static void write_sv(DMDContext *ctx, const SV *sv)
   }
 
   if(SvOBJECT(sv)) {
-    HV *stash = SvSTASH(sv);
-    SV **svp;
-
-    DMD_Helper *helper = NULL;
-    if((svp = hv_fetch(helper_per_package, HvNAME(stash), HvNAMELEN(stash), 0)))
-      helper = (DMD_Helper *)SvUV(*svp);
-
-    DMD_LegacyHelper *legacy_helper = NULL;
-    if((svp = hv_fetch(legacy_helper_per_package, HvNAME(stash), HvNAMELEN(stash), 0)))
-      legacy_helper = (DMD_LegacyHelper *)SvUV(*svp);
-
-    if(helper || legacy_helper) {
-      ENTER;
-      SAVETMPS;
-
-      int ret;
-      if(helper)
-        ret = (*helper)(aTHX_ ctx, sv);
-      else
-        ret = (*legacy_helper)(aTHX_ sv);
-
-      if(ret > 0)
-        write_annotations_from_stack(fh, ret);
-
-      FREETMPS;
-      LEAVE;
-    }
+    run_package_helpers(ctx, sv, SvSTASH(sv));
   }
 
 #ifdef DEBUG_LEAKING_SCALARS
@@ -1046,6 +1156,26 @@ static void dumpfh(FILE *fh)
 {
   max_string = SvIV(get_sv("Devel::MAT::Dumper::MAX_STRING", GV_ADD));
 
+  {
+    HE *he;
+
+    if(hv_iterinit(legacy_helper_per_package)) {
+      warn("Legacy per-package helpers in %HELPER_PER_PACKAGE are no longer followed\n");
+      while((he = hv_iternext(legacy_helper_per_package))) {
+        STRLEN len;
+        warn("  %s\n", HePV(he, len));  // package names won't contain embedded NULs
+      }
+    }
+
+    if(hv_iterinit(legacy_helper_per_magic)) {
+      warn("Legacy per-magic helpers in %HELPER_PER_MAGIC are no longer followed\n");
+      while((he = hv_iternext(legacy_helper_per_magic))) {
+        STRLEN len;
+        warn("  %s\n", HePV(he, len)); // magic addresses are decimal integers
+      }
+    }
+  }
+
   DMDContext ctx = {
     .fh = fh,
     .next_structid = 0,
@@ -1088,7 +1218,11 @@ static void dumpfh(FILE *fh)
   write_u8(fh, flags);
   write_u8(fh, 0);
   write_u8(fh, FORMAT_VERSION_MAJOR);
+#ifdef HAVE_FEATURE_CLASS
+  write_u8(fh, 5);
+#else
   write_u8(fh, FORMAT_VERSION_MINOR);
+#endif
 
   write_u32(fh, PERL_REVISION<<24 | PERL_VERSION<<16 | PERL_SUBVERSION);
 
@@ -1499,10 +1633,21 @@ void
 dumpfh(FILE *fh)
 
 BOOT:
-  hv_stores(PL_modglobal, "Devel::MAT::Dumper/%helper_per_package",
-    newRV_noinc((SV *)(helper_per_package = newHV())));
-  hv_stores(PL_modglobal, "Devel::MAT::Dumper/%helper_per_magic",
-    newRV_noinc((SV *)(helper_per_magic = newHV())));
+  SV *sv, **svp;
+
+  if((svp = hv_fetchs(PL_modglobal, "Devel::MAT::Dumper/%helper_per_package", 0)))
+    sv = *svp;
+  else
+    hv_stores(PL_modglobal, "Devel::MAT::Dumper/%helper_per_package",
+      sv = newRV_noinc((SV *)(newHV())));
+  helper_per_package = (HV *)SvRV(sv);
+
+  if((svp = hv_fetchs(PL_modglobal, "Devel::MAT::Dumper/%helper_per_magic", 0)))
+    sv = *svp;
+  else
+    hv_stores(PL_modglobal, "Devel::MAT::Dumper/%helper_per_magic",
+      sv = newRV_noinc((SV *)(newHV())));
+  helper_per_magic = (HV *)SvRV(sv);
 
   legacy_helper_per_package = get_hv("Devel::MAT::Dumper::HELPER_PER_PACKAGE", GV_ADD);
   legacy_helper_per_magic   = get_hv("Devel::MAT::Dumper::HELPER_PER_MAGIC", GV_ADD);

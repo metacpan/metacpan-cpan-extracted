@@ -63,6 +63,12 @@ LemonLDAP::NG 2F registration script
           }
         } else if (resp.result) {
           $("#delete-" + epoch).hide();
+          $(document).trigger("mfaDeleted", [
+            {
+              "type": device,
+              "epoch": epoch
+            }
+          ]);
           return setMsg('yourKeyIsUnregistered', 'positive');
         }
       },

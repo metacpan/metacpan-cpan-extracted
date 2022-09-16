@@ -19,9 +19,10 @@ SKIP: {
                 totp2fActivation       => 1,
                 sfRequired             => 1,
                 sfRegisterTimeout      => 600,
+                sfLoginTimeout         => 600,
                 tokenUseGlobalStorage  => 1,
                 issuerDBCASActivation  => 1,
-                issuersTimeout         => 600,
+                issuersTimeout         => 1200,
             }
         }
     );
@@ -128,9 +129,14 @@ SKIP: {
     $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
     my ( $host, $url, $query ) =
       expectForm( $res, undef, '/totp2fcheck', 'token' );
+
+    # Test Login timeout
+    Time::Fake->offset("+10m");
+
     ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
         'Code' );
     $query =~ s/code=/code=$code/;
+
     ok(
         $res = $client->_post(
             '/totp2fcheck', IO::String->new($query),

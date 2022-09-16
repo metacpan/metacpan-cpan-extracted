@@ -15,8 +15,8 @@
     <textarea id="passwordfield" name="password" class="form-control" trplaceholder="Signed text" required aria-required="true"></textarea>
   </div>
 
-  <TMPL_IF NAME=CAPTCHA_SRC>
-    <TMPL_INCLUDE NAME="captcha.tpl">
+  <TMPL_IF NAME=CAPTCHA_HTML>
+    <TMPL_VAR NAME=CAPTCHA_HTML>
   </TMPL_IF>
   <input id="token" type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
 

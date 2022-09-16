@@ -7,9 +7,9 @@ use JSON qw(from_json to_json);
 use MIME::Base64 qw(encode_base64url decode_base64url);
 use Crypt::URandom;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
-extends 'Lemonldap::NG::Portal::Main::Plugin';
+extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::WebAuthn';
 
 # INITIALIZATION
@@ -18,7 +18,7 @@ has prefix   => ( is => 'rw', default => 'webauthn' );
 has template => ( is => 'ro', default => 'webauthn2fregister' );
 has welcome  => ( is => 'ro', default => 'webauthn2fWelcome' );
 has logo     => ( is => 'rw', default => 'webauthn.png' );
-has ott      => (
+has ott => (
     is      => 'ro',
     lazy    => 1,
     default => sub {
@@ -52,8 +52,6 @@ has rpName => (
     }
 );
 
-sub init { return 1; }
-
 # RUNNING METHODS
 
 # Return a Base64url encoded user handle
@@ -82,11 +80,9 @@ sub _generate_user_handle {
 sub _registrationchallenge {
     my ( $self, $req, $user ) = @_;
 
-    my @_2fDevices = $self->find2fByType( $req, $req->userData );
-
-    # Check if user can register one more 2F device
-    my $size    = @_2fDevices;
-    my $maxSize = $self->conf->{max2FDevices};
+    my @alldevices = $self->find2fDevicesByType( $req, $req->userData );
+    my $size       = @alldevices;
+    my $maxSize    = $self->conf->{max2FDevices};
     $self->logger->debug("Registered 2F Device(s): $size / $maxSize");
     if ( $size >= $maxSize ) {
         $self->userLogger->warn("Max number of 2F devices is reached");
@@ -179,7 +175,7 @@ sub _registration {
           . "\n" );
 
     if (
-        $self->find2fByKey(
+        $self->find2fDevicesByKey(
             $req, $req->userData, $self->type,
             "_credentialId", $credential_id
         )

@@ -1,5 +1,12 @@
 Revision history for Perl module Pod::L10N
 
+1.07 2022-09-16T09:45:36Z
+
+	- ad-hoc fix for parallel tests
+	- change minimal perl version to 5.10.0
+	  (actually this is from 1.06)
+	- add some tests
+
 1.06 2022-09-03T09:45:33Z
 
 	- separate Pod::L10N::Model to Pod-L10N-Model

@@ -3,8 +3,8 @@
 # LemonLDAP::NG session conversion tool
 #
 # This script lets an administrator migrate existing sessions from one backend
-# to another. It is mostly useful when run on persistant sessions, but it can be
-# useful in some other cases too, such as OIDC Offline sessions
+# to another. It is mostly useful when run on persistant sessions, but it can
+# be useful in some other cases too, such as OIDC Offline sessions
 #
 # This is part of LemonLDAP::NG product, released under GPL
 #=============================================================================

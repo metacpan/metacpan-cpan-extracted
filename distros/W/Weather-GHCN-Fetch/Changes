@@ -1,0 +1,30 @@
+Revision history for Perl module libary Windows-GHCN-Fetch
+
+
+v0.0.002       2022-09-16
+  - cleanup done, apps now included
+  - should be ready for public use now
+
+v0.0.001       2022-09-16
+  - repackaged with name changed to Windows-GHCN-Fetch
+  - still some cleanup needed; apps not included
+  - not for public use
+
+v0.22.258      2022-09-15
+  - As GHCN (never indexed, scheduled for deletion (2022-09-18)
+  - Builds, passes tests, installs and runs ok on Windows and WSL Ubuntu
+  - Change dist.in main_module to bin/ghcn_fetch.pl
+  - gui works on Windows if Tk is installed
+  - gui work on WSL Ubuntu using GWSL
+  - Suppress printing the "Hash sizes" header when there are no hash statistics (i.e. when -report "").
+  - Add some documentation in Readme.pm about the GUI and Windows clipboard support.
+  - Replace Syntax::Keyword::Try with Try::Tiny
+  - bug fixes
+
+
+v0.22.257      2022-09-14
+  - As GHCN (never indexed, scheduled for deletion (2022-09-18)
+  - Builds, passes tests, installs and runs ok on Windows and WSL Ubuntu
+  - Tk not tested
+  - PAUSE upload failed (it didn't like main_module as lib/GHCN/StationTable.pm)
+  

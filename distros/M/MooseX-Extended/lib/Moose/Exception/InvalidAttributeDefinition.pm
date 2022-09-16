@@ -4,7 +4,7 @@ package Moose::Exception::InvalidAttributeDefinition;
 
 use Moose;
 extends 'Moose::Exception';
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 with 'Moose::Exception::Role::Class';
 
 has 'attribute_name' => (
@@ -29,7 +29,7 @@ Moose::Exception::InvalidAttributeDefinition - MooseX::Extended exception for in
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 WHY NOT MOOSEX?
 

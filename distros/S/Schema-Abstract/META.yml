@@ -34,8 +34,8 @@ requires:
   Perl6::Slurp: 0
   perl: 5.6.2
 resources:
-  bugtracker: https://github.com/commons-vote/Schema-Abstract/issues
-  homepage: https://github.com/commons-vote/Schema-Abstract
+  bugtracker: https://github.com/michal-josef-spacek/Schema-Abstract/issues
+  homepage: https://github.com/michal-josef-spacek/Schema-Abstract
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/commons-vote/Schema-Abstract
-version: '0.03'
+  repository: git://github.com/michal-josef-spacek/Schema-Abstract
+version: '0.04'

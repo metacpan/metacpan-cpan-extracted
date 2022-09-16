@@ -22,6 +22,10 @@ sub runTest {
 
     my $idpId = login( $op, 'french' );
 
+    # Inital first name
+    $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{french}->{cn} =
+      'Frédéric Accents';
+
     my $code = authorize(
         $op, $idpId,
         {
@@ -98,9 +102,14 @@ sub runTest {
     ok( $json->{name} eq "Frédéric Accents", "Correct user info" );
     ok( $json->{'sub'} eq "customfrench",    'Got User Info' );
 
-# Make sure offline session is still valid long after natural session expiration time
+    # Make sure offline session is still valid long after natural session
+    # expiration time
 
     Time::Fake->offset("+10d");
+
+    # Change attribute value
+    $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{french}->{cn} =
+      'Frédéric Freedom';
 
     $json = expectJSON( refreshGrant( $op, 'rpid', $refresh_token ) );
 
@@ -108,7 +117,7 @@ sub runTest {
     if ($jwt) {
         expectJWT(
             $access_token,
-            name => "Frédéric Accents",
+            name => "Frédéric Freedom",
             sub  => "customfrench"
         );
     }
@@ -123,7 +132,7 @@ sub runTest {
         $auth_time, 'Original auth_time retained' );
     is(
         $id_token_payload->{name},
-        'Frédéric Accents',
+        'Frédéric Freedom',
         'Found claim in ID token'
     );
     ok( ( grep { $_ eq "rpid" } @{ $id_token_payload->{aud} } ),
@@ -139,8 +148,8 @@ sub runTest {
 
     $json = expectJSON( getUserinfo( $op, $access_token ) );
 
-    ok( $json->{name} eq "Frédéric Accents", "Correct user info" );
-    ok( $json->{'sub'} eq "customfrench",    'Got User Info' );
+    is( $json->{name},  "Frédéric Freedom", "Correct user info" );
+    is( $json->{'sub'}, "customfrench",     'Got User Info' );
 
     ## Test introspection of refreshed token #2171
     $json = expectJSON( introspect( $op, 'rpid', $access_token ) );

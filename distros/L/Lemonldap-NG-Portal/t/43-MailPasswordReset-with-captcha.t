@@ -10,7 +10,7 @@ BEGIN {
 }
 
 my ( $res, $host, $url, $query );
-my $maintests = 16;
+my $maintests = 18;
 my $mailSend  = 0;
 my $mail2     = 0;
 
@@ -33,6 +33,13 @@ SKIP: {
                 requireToken               => 1,
                 portalDisplayResetPassword => 1,
                 portalMainLogo             => 'common/logos/logo_llng_old.png',
+                passwordPolicyActivation   => 1,
+                passwordPolicyMinUpper     => 1,
+                passwordPolicyMinLower     => 1,
+                passwordPolicyMinDigit     => 2,
+                passwordPolicyMinSpeChar   => 1,
+                randomPasswordRegexp       => '',
+                passwordPolicySpecialChar  => '*#@'
             }
         }
     );
@@ -104,7 +111,7 @@ m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png"#,
     ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
     ok( $res->[2]->[0] =~ /newpassword/s, ' Ask for a new password' );
 
-    $query .= '&newpassword=zz&confirmpassword=zz';
+    $query .= '&reset=1';
 
     # Post new password
     ok(
@@ -115,7 +122,12 @@ m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png"#,
         ),
         'Post new password'
     );
-    ok( mail() =~ /Your password was changed/, 'Password was changed' );
+    ok( mail() =~ /<span>Your new password is<\/span>/, 'New password sent' );
+    ok( mail() =~ /<b>(.+?)<\/b>/s, 'New generated password found' );
+    ok(
+        $1 =~ /[A-Z]{1}[a-z]{1}\d{2}[*#@]{1}/,
+        'New generated password matches'
+    );
 
     #print STDERR Dumper($query);
 }

@@ -1,3 +1,4 @@
+requires 'perl', '5.010000';
 requires 'Pod::L10N::Model';
 requires 'Pod::Simple', '>=3.18, !=3.26, !=3.30';
 

@@ -1,9 +1,10 @@
 #!/usr/bin/perl
 #=============================================================================
-# Cleaner for LemonLDAP::NG: removes old sessions from Apache::Session
+# Cleaner for LemonLDAP::NG: 
 #
-# This module is written to be used by cron to clean old sessions from
-# Apache::Session. It does not works with Apache::Session::Memcached
+# It removes old sessions from Apache::Session
+# This script is written to be used by cron to clean old sessions from
+# Apache::Session. It does not work with Apache::Session::Memcached
 #
 # This is part of LemonLDAP::NG product, released under GPL
 #=============================================================================

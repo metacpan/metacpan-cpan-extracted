@@ -6,14 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/PhoneNumberUtils.pm'
 );
 
 my @scripts = (
+    'script/format-phone-number',
+    'script/format-phone-number-idn',
     'script/normalize-phone-number',
+    'script/normalize-phone-number-idn',
     'script/phone-number-info',
     'script/phone-number-is-valid'
 );

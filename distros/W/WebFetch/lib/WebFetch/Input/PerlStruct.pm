@@ -14,58 +14,55 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Input::PerlStruct;
-$WebFetch::Input::PerlStruct::VERSION = '0.14.0';
+$WebFetch::Input::PerlStruct::VERSION = '0.15.1';
 use base "WebFetch";
 
 # define exceptions/errors
 use Exception::Class (
-	"WebFetch::Input::PerlStruct::Exception::NoStruct" => {
-		isa => "WebFetch::Exception",
-		alias => "throw_nostruct",
-		description => "no 'content' structure was provided",
-	},
+    "WebFetch::Input::PerlStruct::Exception::NoStruct" => {
+        isa         => "WebFetch::Exception",
+        alias       => "throw_nostruct",
+        description => "no 'content' structure was provided",
+    },
 
-	"WebFetch::Input::PerlStruct::Exception::BadStruct" => {
-		isa => "WebFetch::Exception",
-		alias => "throw_badstruct",
-		description => "content of 'content' was not recognizable",
-	},
+    "WebFetch::Input::PerlStruct::Exception::BadStruct" => {
+        isa         => "WebFetch::Exception",
+        alias       => "throw_badstruct",
+        description => "content of 'content' was not recognizable",
+    },
 
 );
-
-our @Options = ( );
-our $Usage = "";
 
 # configuration parameters
 
 # no user-servicable parts beyond this point
 
 # register capabilities with WebFetch
-__PACKAGE__->module_register( "input:perlstruct" );
+__PACKAGE__->module_register("input:perlstruct");
 
 sub fetch
 {
-	my ( $self ) = @_;
+    my ($self) = @_;
 
-	# get the content from the provided perl structure
-	if ( !defined $self->{content}) {
-		throw_nostruct "content struct does not exist";
-	}
-	if ( ref($self->{content})->isa( "WebFetch::Data::Store" )) {
-		$self->{data} = $self->{content};
-		return;
-	} elsif ( ref($self->{content}) eq "HASH" ) {
-		if (( exists $self->{content}{fields})
-			and ( exists $self->{content}{records})
-			and ( exists $self->{content}{wk_names}))
-		{
-			$self->data->{fields} = $self->{content}{fields};
-			$self->data->{wk_names} = $self->{content}{wk_names};
-			$self->data->{records} = $self->{content}{records};
-			return;
-		}
-	}
-	throw_badstruct "content should be a WebFetch::Data::Store";
+    # get the content from the provided perl structure
+    if ( !defined $self->{content} ) {
+        throw_nostruct "content struct does not exist";
+    }
+    if ( ref( $self->{content} )->isa("WebFetch::Data::Store") ) {
+        $self->{data} = $self->{content};
+        return;
+    } elsif ( ref( $self->{content} ) eq "HASH" ) {
+        if (    ( exists $self->{content}{fields} )
+            and ( exists $self->{content}{records} )
+            and ( exists $self->{content}{wk_names} ) )
+        {
+            $self->data->{fields}   = $self->{content}{fields};
+            $self->data->{wk_names} = $self->{content}{wk_names};
+            $self->data->{records}  = $self->{content}{records};
+            return;
+        }
+    }
+    throw_badstruct "content should be a WebFetch::Data::Store";
 }
 
 1;
@@ -80,7 +77,7 @@ WebFetch::Input::PerlStruct - accept a Perl structure with pre-parsed news into 
 
 =head1 VERSION
 
-version 0.14.0
+version 0.15.1
 
 =head1 SYNOPSIS
 

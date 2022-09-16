@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -178,7 +178,67 @@ Returns undef.
          Need to be implemented in inherited class in _process_css() method.
          Parameter 'css' isn't defined.
 
-=head1 EXAMPLE
+=head1 EXAMPLE1
+
+=for comment filename=trivial_html_example.pl
+
+ use strict;
+ use warnings;
+
+ package Foo;
+
+ use base qw(Tags::HTML);
+
+ sub new {
+         my ($class, @params) = @_;
+ 
+         # No CSS support.
+         push @params, 'no_css', 1;
+ 
+         my $self = $class->SUPER::new(@params);
+ 
+         # Object.
+         return $self;
+ }
+
+ sub _process {
+         my ($self, $value) = @_;
+
+         $self->{'tags'}->put(
+                 ['b', 'div'],
+                 ['d', $value],
+                 ['e', 'div'],
+         );
+
+         return;
+ }
+
+ package main;
+
+ use Tags::Output::Indent;
+
+ # Object.
+ my $tags = Tags::Output::Indent->new;
+ my $obj = Foo->new(
+         'tags' => $tags,
+ );
+
+ # Process indicator.
+ $obj->process('value');
+
+ # Print out.
+ print "HTML\n";
+ print $tags->flush."\n";
+
+ # Output:
+ # HTML
+ # <div>
+ #   value
+ # </div>
+
+=head1 EXAMPLE2
+
+=for comment filename=trivial_html_css_example.pl
 
  use strict;
  use warnings;
@@ -277,12 +337,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2022
+© 2021-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

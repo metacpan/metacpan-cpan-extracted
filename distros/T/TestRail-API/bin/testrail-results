@@ -3,7 +3,7 @@
 # PODNAME: TestRail::Bin::Results
 
 package TestRail::Bin::Results;
-$TestRail::Bin::Results::VERSION = '0.051';
+$TestRail::Bin::Results::VERSION = '0.052';
 use strict;
 use warnings;
 use utf8;
@@ -12,12 +12,12 @@ use TestRail::API;
 use TestRail::Utils;
 use TestRail::Utils::Find;
 
-use Getopt::Long qw{GetOptionsFromArray};
+use Getopt::Long  qw{GetOptionsFromArray};
 use File::HomeDir qw{my_home};
 use JSON::MaybeXS ();
 use Statistics::Descriptive;
 use List::MoreUtils qw{uniq};
-use File::Basename qw{basename};
+use File::Basename  qw{basename};
 
 if ( !caller() ) {
     my ( $out, $code ) = run( 'args' => \@ARGV );
@@ -343,7 +343,7 @@ TestRail::Bin::Results - List results for specified test(s).
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =head1 SYNOPSIS
 
@@ -470,7 +470,7 @@ and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by George S. Baugh.
+This software is copyright (c) 2022 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,14 +2,14 @@
 # PODNAME: TestRail::API
 
 package TestRail::API;
-$TestRail::API::VERSION = '0.051';
+$TestRail::API::VERSION = '0.052';
 
 use 5.010;
 
 use strict;
 use warnings;
 
-use Carp qw{cluck confess};
+use Carp         qw{cluck confess};
 use Scalar::Util qw{reftype looks_like_number};
 use Clone 'clone';
 use Try::Tiny;
@@ -27,7 +27,8 @@ use List::Util 1.33;
 use Encode ();
 
 sub new {
-    state $check = compile( ClassName,
+    state $check = compile(
+        ClassName,
         Str,
         Str,
         Str,
@@ -139,7 +140,8 @@ sub debug {
 
 #Convenient JSON-HTTP fetcher
 sub _doRequest {
-    state $check = compile( Object, Str,
+    state $check = compile(
+        Object, Str,
         Optional [ Maybe [Str] ],
         Optional [ Maybe [HashRef] ]
     );
@@ -306,7 +308,8 @@ sub userNamesToIds {
 }
 
 sub createProject {
-    state $check = compile( Object, Str,
+    state $check = compile(
+        Object, Str,
         Optional [ Maybe [Str] ],
         Optional [ Maybe [Bool] ]
     );
@@ -338,18 +341,18 @@ sub getProjects {
 
     my $result = $self->_doRequest( 'index.php?/api/v2/get_projects'
           . _convert_filters_to_string($filters) );
+    return -500 if !$result || ( reftype($result) || 'undef' ) ne 'HASH';
+    my $projects = $result->{'projects'};
+    return -500 if !$projects || ( reftype($projects) || 'undef' ) ne 'ARRAY';
 
     #Save state for future use, if needed
-    return -500 if !$result || ( reftype($result) || 'undef' ) ne 'ARRAY';
-    $self->{'testtree'} = $result;
+    $self->{'testtree'} = $projects;
 
-    #Note that it's a project for future reference by recursive tree search
-    return -500 if !$result || ( reftype($result) || 'undef' ) ne 'ARRAY';
-    foreach my $pj ( @{$result} ) {
+    foreach my $pj ( @{$projects} ) {
         $pj->{'type'} = 'project';
     }
 
-    return $result;
+    return $projects;
 }
 
 sub getProjectByName {
@@ -467,8 +470,13 @@ sub getSections {
 
     #Cache sections to reduce requests in tight loops
     return $self->{'sections'}->{$suite_id} if $self->{'sections'}->{$suite_id};
-    $self->{'sections'}->{$suite_id} = $self->_doRequest(
+    my $response = $self->_doRequest(
         "index.php?/api/v2/get_sections/$project_id&suite_id=$suite_id");
+    return -500 if !$response || ( reftype($response) || 'undef' ) ne 'HASH';
+    my $sections = $response->{'sections'};
+    return -500 if !$sections || ( reftype($sections) || 'undef' ) ne 'ARRAY';
+
+    $self->{'sections'}->{$suite_id} = $sections;
 
     return $self->{'sections'}->{$suite_id};
 }
@@ -547,7 +555,8 @@ sub typeNamesToIds {
 }
 
 sub createCase {
-    state $check = compile( Object, Int, Str,
+    state $check = compile(
+        Object, Int, Str,
         Optional [ Maybe [Int] ],
         Optional [ Maybe [HashRef] ],
         Optional [ Maybe [HashRef] ]
@@ -605,7 +614,11 @@ sub getCases {
     my $url = "index.php?/api/v2/get_cases/$project_id&suite_id=$suite_id";
     $url .= _convert_filters_to_string($filters);
 
-    return $self->_doRequest($url);
+    my $response = $self->_doRequest($url);
+    return -500 if !$response || ( reftype($response) || 'undef' ) ne 'HASH';
+    my $cases = $response->{'cases'};
+    return -500 if !$cases || ( reftype($cases) || 'undef' ) ne 'ARRAY';
+    return $cases;
 }
 
 sub getCaseByName {
@@ -680,7 +693,8 @@ sub priorityNamesToIds {
 
 #If you pass an array of case ids, it implies include_all is false
 sub createRun {
-    state $check = compile( Object, Int, Int, Str,
+    state $check = compile(
+        Object, Int, Int, Str,
         Optional [ Maybe [Str] ],
         Optional [ Maybe [Int] ],
         Optional [ Maybe [Int] ],
@@ -729,6 +743,8 @@ sub getRuns {
             $self->{'global_limit'},
             ( $self->{'global_limit'} * $offset ), $filters
         );
+        return $initial_runs
+          unless ( reftype($initial_runs) || 'undef' ) eq 'ARRAY';
         push( @$runs, @$initial_runs );
         $offset++;
     }
@@ -736,7 +752,8 @@ sub getRuns {
 }
 
 sub getRunsPaginated {
-    state $check = compile( Object,
+    state $check = compile(
+        Object,
         Int,
         Optional [ Maybe [Int] ],
         Optional [ Maybe [Int] ],
@@ -751,7 +768,11 @@ sub getRunsPaginated {
     $apiurl .= "&limit=$limit"
       if $limit;    #You have problems if you want 0 results
     $apiurl .= _convert_filters_to_string($filters);
-    return $self->_doRequest($apiurl);
+    my $response = $self->_doRequest($apiurl);
+    return -500 if !$response || ( reftype($response) || 'undef' ) ne 'HASH';
+    my $runs = $response->{'runs'};
+    return -500 if !$runs || ( reftype($runs) || 'undef' ) ne 'ARRAY';
+    return $runs;
 }
 
 sub getRunByName {
@@ -848,6 +869,8 @@ sub getRunResults {
             $self->{'global_limit'},
             ( $self->{'global_limit'} * $offset ), $filters
         );
+        return $initial_results
+          unless ( reftype($initial_results) || 'undef' ) eq 'ARRAY';
         push( @$results, @$initial_results );
         $offset++;
     }
@@ -855,7 +878,8 @@ sub getRunResults {
 }
 
 sub getRunResultsPaginated {
-    state $check = compile( Object,
+    state $check = compile(
+        Object,
         Int,
         Optional [ Maybe [Int] ],
         Optional [ Maybe [Int] ],
@@ -870,7 +894,8 @@ sub getRunResultsPaginated {
     $apiurl .= "&limit=$limit"
       if $limit;    #You have problems if you want 0 results
     $apiurl .= _convert_filters_to_string($filters);
-    return $self->_doRequest($apiurl);
+    my $response = $self->_doRequest($apiurl);
+    return $response->{'results'};
 }
 
 sub getChildRuns {
@@ -891,7 +916,8 @@ sub getChildRuns {
 }
 
 sub getChildRunByName {
-    state $check = compile( Object, HashRef, Str,
+    state $check = compile(
+        Object, HashRef, Str,
         Optional [ Maybe [ ArrayRef [Str] ] ],
         Optional [ Maybe [Int] ]
     );
@@ -933,7 +959,8 @@ sub getChildRunByName {
 }
 
 sub createPlan {
-    state $check = compile( Object, Int, Str,
+    state $check = compile(
+        Object, Int, Str,
         Optional [ Maybe [Str] ],
         Optional [ Maybe [Int] ],
         Optional [ Maybe [ ArrayRef [HashRef] ] ]
@@ -978,6 +1005,8 @@ sub getPlans {
             $self->{'global_limit'},
             ( $self->{'global_limit'} * $offset ), $filters
         );
+        return $initial_plans
+          unless ( reftype($initial_plans) || 'undef' ) eq 'ARRAY';
         push( @$plans, @$initial_plans );
         $offset++;
     }
@@ -985,7 +1014,8 @@ sub getPlans {
 }
 
 sub getPlansPaginated {
-    state $check = compile( Object,
+    state $check = compile(
+        Object,
         Int,
         Optional [ Maybe [Int] ],
         Optional [ Maybe [Int] ],
@@ -1000,7 +1030,11 @@ sub getPlansPaginated {
     $apiurl .= "&limit=$limit"
       if $limit;    #You have problems if you want 0 results
     $apiurl .= _convert_filters_to_string($filters);
-    return $self->_doRequest($apiurl);
+    my $response = $self->_doRequest($apiurl);
+    return -500 if !$response || ( reftype($response) || 'undef' ) ne 'HASH';
+    my $plans = $response->{'plans'};
+    return -500 if !$plans || ( reftype($plans) || 'undef' ) ne 'ARRAY';
+    return $plans;
 }
 
 sub getPlanByName {
@@ -1056,7 +1090,8 @@ sub getPlanSummary {
 
 #If you pass an array of case ids, it implies include_all is false
 sub createRunInPlan {
-    state $check = compile( Object, Int, Int, Str,
+    state $check = compile(
+        Object, Int, Int, Str,
         Optional [ Maybe [Int] ],
         Optional [ Maybe [ ArrayRef [Int] ] ],
         Optional [ Maybe [ ArrayRef [Int] ] ]
@@ -1094,7 +1129,8 @@ sub closePlan {
 }
 
 sub createMilestone {
-    state $check = compile( Object, Int, Str,
+    state $check = compile(
+        Object, Int, Str,
         Optional [ Maybe [Str] ],
         Optional [ Maybe [Int] ]
     );
@@ -1122,8 +1158,14 @@ sub getMilestones {
     state $check = compile( Object, Int, Optional [ Maybe [HashRef] ] );
     my ( $self, $project_id, $filters ) = $check->(@_);
 
-    return $self->_doRequest( "index.php?/api/v2/get_milestones/$project_id"
+    my $response =
+      $self->_doRequest( "index.php?/api/v2/get_milestones/$project_id"
           . _convert_filters_to_string($filters) );
+    return -500 if !$response || ( reftype($response) || 'undef' ) ne 'HASH';
+    my $milestones = $response->{'milestones'};
+    return -500
+      if !$milestones || ( reftype($milestones) || 'undef' ) ne 'ARRAY';
+    return $milestones;
 }
 
 sub getMilestoneByName {
@@ -1147,7 +1189,8 @@ sub getMilestoneByID {
 }
 
 sub getTests {
-    state $check = compile( Object, Int,
+    state $check = compile(
+        Object, Int,
         Optional [ Maybe [ ArrayRef [Int] ] ],
         Optional [ Maybe [ ArrayRef [Int] ] ]
     );
@@ -1156,8 +1199,13 @@ sub getTests {
     my $query_string = '';
     $query_string = '&status_id=' . join( ',', @$status_ids )
       if defined($status_ids) && scalar(@$status_ids);
-    my $results =
+    my $response =
       $self->_doRequest("index.php?/api/v2/get_tests/$run_id$query_string");
+
+    return -500 if !$response || ( reftype($response) || 'undef' ) ne 'HASH';
+    my $results = $response->{'tests'};
+    return -500 if !$results || ( reftype($results) || 'undef' ) ne 'ARRAY';
+
     @$results = grep {
         my $aid = $_->{'assignedto_id'};
         grep { defined($aid) && $aid == $_ } @$assignedto_ids
@@ -1271,7 +1319,8 @@ sub _X_in_my_Y {
 }
 
 sub createTestResults {
-    state $check = compile( Object, Int, Int,
+    state $check = compile(
+        Object, Int, Int,
         Optional [ Maybe [Str] ],
         Optional [ Maybe [HashRef] ],
         Optional [ Maybe [HashRef] ]
@@ -1328,7 +1377,8 @@ sub bulkAddResultsByCase {
 }
 
 sub getTestResults {
-    state $check = compile( Object,
+    state $check = compile(
+        Object,
         Int,
         Optional [ Maybe [Int] ],
         Optional [ Maybe [Int] ],
@@ -1340,11 +1390,16 @@ sub getTestResults {
     $url .= "&limit=$limit"   if $limit;
     $url .= "&offset=$offset" if defined($offset);
     $url .= _convert_filters_to_string($filters);
-    return $self->_doRequest($url);
+    my $response = $self->_doRequest($url);
+    return -500 if !$response || ( reftype($response) || 'undef' ) ne 'HASH';
+    my $results = $response->{'results'};
+    return -500 if !$results || ( reftype($results) || 'undef' ) ne 'ARRAY';
+    return $results;
 }
 
 sub getResultsForCase {
-    state $check = compile( Object, Int,
+    state $check = compile(
+        Object,                   Int,
         Int,                      Optional [ Maybe [Int] ],
         Optional [ Maybe [Int] ], Optional [ Maybe [HashRef] ]
     );
@@ -1354,7 +1409,8 @@ sub getResultsForCase {
     $url .= "&limit=$limit"   if $limit;
     $url .= "&offset=$offset" if defined($offset);
     $url .= _convert_filters_to_string($filters);
-    return $self->_doRequest($url);
+    my $response = $self->_doRequest($url);
+    return $response->{'results'};
 }
 
 sub getConfigurationGroups {
@@ -1506,7 +1562,7 @@ TestRail::API - Provides an interface to TestRail's REST api via HTTP
 
 =head1 VERSION
 
-version 0.051
+version 0.052
 
 =head1 SYNOPSIS
 
@@ -3069,6 +3125,10 @@ Matthew Spahr <matthew.spahr@cpanel.net>
 
 =item *
 
+Matthew Spahr <mpspahr@gmail.com>
+
+=item *
+
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
@@ -3092,7 +3152,7 @@ and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by George S. Baugh.
+This software is copyright (c) 2022 by George S. Baugh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

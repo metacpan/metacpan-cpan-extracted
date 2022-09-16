@@ -38,7 +38,12 @@ has allowed_verbs => (
   sub _build_allowed_verbs {
     my $self = shift;
     my @core_allowed = $self->can('allowed_http_methods') ? $self->allowed_http_methods : ();
-    my %allow = map { $_=~s/^\s+|\s+$//g; $_=>1  } map { split(',',$_) } (@{$self->attributes->{Allow} || []}, @core_allowed);
+    my %allow = map { $_=~s/^\s+|\s+$//g; $_=>1;  } map { 
+      split(',',$_) } (
+      @{$self->attributes->{Verbs} || []}, 
+      @{$self->attributes->{Allow} || []}, 
+      @core_allowed );
+
     my @verbs =
       grep { 
         $self->class->can("${_}_${\$self->name}")
@@ -83,7 +88,7 @@ around 'execute', sub {
   my ($orig, $self, $controller, $ctx, @args) = @_;
   my $method = $ctx->req->method;
   my @allowed = @{$self->allowed_verbs||[]};
-  $ctx->response->header( 'Allow' => \@allowed );
+  $ctx->response->header( 'Allow' => (@allowed ? \@allowed : '') );
 
   return Catalyst::ActionRole::Verbs::Utils::MethodNotAllowed->throw(attempted_method=>$method, allowed_methods=>\@allowed, resource=>$ctx->req->uri)
     unless grep { $_ eq $method } @allowed; # TODO need to thow not allowed exception
@@ -110,8 +115,15 @@ around 'dispatch', sub {
 sub _dispatch_to_verb {
   my ($self, $ctx, $action_handler, @return) = @_;
 
+  # We do this dance to make sure this works properly when someone ->detaches to this
+  my ($controller_name) = ($self->class =~m/Controller\:\:(.+)$/);
+  my $action = $ctx->controller($controller_name)->action_for($action_handler);
+
   ## TODO @return seems to contain undef when it really means empty.
-  return $ctx->forward($action_handler, [@return]);
+  $ctx->stats->profile(begin =>  '-dispatch HTTP method');
+  return $ctx->forward($action, [@return]);
+  $ctx->stats->profile(end =>  '-dispatch HTTP method');
+
   #return $ctx->forward($action_handler, $ctx->req->args)
 }
 

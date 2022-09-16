@@ -81,6 +81,7 @@ verify = ->
 					else
 						setMsg data.error, 'danger'
 				else
+					$(document).trigger "mfaAdded", [ { "type": "totp" } ]
 					setMsg 'yourKeyIsRegistered', 'success'					
 					
 $(document).ready ->

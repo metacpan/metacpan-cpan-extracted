@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 
 # ABSTRACT: Private class
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.17'; # VERSION
 
 sub new {
   my $class = shift;
@@ -36,6 +36,8 @@ sub get {
   if (defined $self->{sha1} || defined $self->{sha256}) {
     unless (eval { require Digest::SHA }) {
       warn "sha1 or sha256 sums are specified but cannot be checked since Digest::SHA is not installed";
+      require Alien::Base::ModuleBuild;
+      return undef if Alien::Base::ModuleBuild->alien_download_rule =~ /digest/;
       return $filename;
     }
 
@@ -83,7 +85,17 @@ Alien::Base::ModuleBuild::File - Private class
 
 =head1 VERSION
 
-version 1.15
+version 1.17
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Alien>
+
+=item L<Alien::Base>
+
+=back
 
 =head1 AUTHOR
 
@@ -121,13 +133,13 @@ Kang-min Liu (劉康民, gugod)
 
 Nicholas Shipp (nshp)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Alberto Simões (ambs)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2020 by Joel A Berger.
+This software is copyright (c) 2012-2022 by Joel A Berger.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

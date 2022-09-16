@@ -8,7 +8,7 @@ use IO::Socket;
 use Time::HiRes qw(time);
 use POSIX ":sys_wait_h"; # WNOHANG
 
-our $VERSION = 1.16;
+our $VERSION = 1.19;
 
 sub new {
 	my ($class, %args) = @_;
@@ -26,7 +26,7 @@ sub child_stop {
 	my ($rc, $sig, $core) = ($status >> 8, $status & 127, $status & 128);
 	my $stoptime = sprintf "%.02f", time() - $child->{start};
 	my %runtime = (exists $child->{runtime}) ? (runtime => $child->{runtime}) : ();
-	my %id = (exists $child->{id}) ? (id => exists $child->{id}) : ();
+	my %id = (exists $child->{id}) ? (id => $child->{id}) : ();
 	my %reason = ();
 
 	if ($^O eq 'MSWin32') { # cpantester: strawberry perl does not support WIF calls
@@ -76,12 +76,14 @@ sub childs_reap {
 				$child->{state} = 'term';
 			}
 		} elsif ($res < 0) {
+			return 0 if (($flags == 0) && $!{EINTR}); # blocking waitpid might be interrupted by signal
 			warn "worker child $child->{pid}: disappeared" unless ($^O eq 'MSWin32');
 			$self->child_stop($child->{pid}, 0);
 		} else {
 			$self->child_stop($child->{pid}, $?);
 		}
 	}
+	return 1;
 }
 
 sub childs_kill {
@@ -129,8 +131,9 @@ sub child_finish {
 }
 
 sub child_start {
-	my ($self, $worker, $msg_id) = @_;
+	my ($self, $worker, $msg_id, $msg_vci) = @_;
 	my %id = (defined $msg_id) ? (id => $msg_id) : ();
+	my %vci = (defined $msg_vci) ? (vci => $msg_vci) : ();
 
 	# Handle waitpid() explicitly instead of using open('-|');
 	# see: https://perldoc.perl.org/perlipc#Safe-Pipe-Opens
@@ -142,7 +145,7 @@ sub child_start {
 
 	if ($pid != 0) { # parent
 		my $child = {reader => $rd, pid => $pid, start => time(), %id};
-		$self->{trace_cb}->('RUN', {pid => $pid, %id}) if $self->{trace_cb};
+		$self->{trace_cb}->('RUN', {pid => $pid, %id, %vci}) if $self->{trace_cb};
 		close($wr);
 		return $child;
 	}

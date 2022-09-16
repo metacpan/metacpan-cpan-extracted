@@ -12,7 +12,7 @@ use vars ();
 use Scalar::Util qw< blessed reftype >;
 use Data::Dumper qw< Dumper  >;
 
-our $VERSION = '1.057';
+our $VERSION = '1.058';
 
 my $anon_scalar_ref = \do{my $var};
 my $MAGIC_VARS = q{my ($CAPTURE, $CONTEXT, $DEBUG, $INDEX, $MATCH, %ARG, %MATCH);};
@@ -567,18 +567,18 @@ sub _build_raw_debugging_statements {
         return (
             q{},
             qq{(?{;Regexp::Grammars::_debug_trying(\@Regexp::Grammars::RESULT_STACK+$extra_pre_indent,
-                \$Regexp::Grammars::RESULT_STACK[-2+$extra_pre_indent], 'next alternative')
-                    if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})},
+                  \$Regexp::Grammars::RESULT_STACK[-2+$extra_pre_indent], 'next alternative')
+                      if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})},
         );
     }
     else {
         return (
             qq{(?{;Regexp::Grammars::_debug_trying(\@Regexp::Grammars::RESULT_STACK+$extra_pre_indent,
-                \$Regexp::Grammars::RESULT_STACK[-2+$extra_pre_indent], q{subpattern /$subpattern/}, \$^N)
-                    if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})},
+                  \$Regexp::Grammars::RESULT_STACK[-2+$extra_pre_indent], q{subpattern /$subpattern/}, \$^N)
+                        if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})},
             qq{(?{;Regexp::Grammars::_debug_matched(\@Regexp::Grammars::RESULT_STACK+1,
-                \$Regexp::Grammars::RESULT_STACK[-1], q{subpattern /$subpattern/}, \$^N)
-                    if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})},
+                  \$Regexp::Grammars::RESULT_STACK[-1], q{subpattern /$subpattern/}, \$^N)
+                        if \$Regexp::Grammars::DEBUG_LEVEL{\$Regexp::Grammars::DEBUG};})},
         );
     }
 }
@@ -970,13 +970,17 @@ sub _translate_raw_regex {
 
     # Replace negative lookahead with one that works under R::G...
     $regex =~ s{\(\?!}{(?!(?!)|}gxms;
-    # ToDo: Also replace positive lookahead with one that works under R::G...
+    # TODO: Also replace positive lookahead with one that works under R::G...
     #       This replacement should be of the form:
     #           $regex =~ s{\(\?!}{(?!(?!)|(?!(?!)|}gxms;
     #       but need to find a way to insert the extra ) at the other end
 
     return $debug_runtime && $regex eq '|'   ?  $regex . $debug_post
          : $debug_runtime && $regex =~ /\S/  ?  "(?#)(?:$debug_pre($regex)$debug_post(?#))"
+
+# TODO: REWORK THIS INSUFFICENT FIX FOR t/grammar_autospace.t...
+#         :                   $regex !~ /\S/  ?  "(?:$regex)"
+
          :                                      $regex;
 }
 
@@ -1495,7 +1499,7 @@ sub _translate_subrule_calls {
     # Remember the preceding construct, so as to implement the +% etc. operators...
     my $prev_construct   = q{};
     my $prev_translation = q{};
-    my $curr_line_num = 1;
+    my $curr_line_num    = 1;
 
     # Translate all other calls (MAIN GRAMMAR FOR MODULE)...
     $grammar_spec =~ s{
@@ -2516,7 +2520,7 @@ sub _build_grammar {
             0,                          # Whitespace isn't magical
         );
 
-        # Wrap the main regex (to ensure |'s don't segment pre and # post commands)...
+        # Wrap the main regex (to ensure |'s don't segment pre and post commands)...
         $regex = "(?:$regex)";
 
         # Report how construct was interpreted, if requested to...
@@ -2618,19 +2622,25 @@ sub _build_grammar {
 
             # Implement auto-whitespace...
             state $CODE_OR_SPACE = qr{
-                (?<ignorable_space>          # These are not magic...
-                    \( \?\?? (?&BRACED) \)   #     Embedded code blocks
-                  | \s++                     #     Whitespace not followed by...
-                    (?= \|                   #         ...an OR
-                      | \(\?\#\)             #         ...a null comment
-                      | (?: \) \s* )? \z     #         ...the end of the rule
-                      | \(\(?\?\&ws\)        #         ...an explicit ws match
-                      | \(\?\??\{            #         ...an embedded code block
-                      | \\[shv]              #         ...an explicit space match
+
+# TODO: REWORK THIS INSUFFICENT FIX FOR t/grammar_autospace.t...
+#
+#                (?<magic_space> \(\?: \s++ \) )   # Explicitly walled off space is magic
+#                |
+
+                (?<ignorable_space>               # These are not magic...
+                    \( \?\?? (?&BRACED) \)        #     Embedded code blocks
+                  | \s++                          #     Whitespace followed by...
+                    (?= \|                        #         ...an OR
+                      | \(\?\#\)                  #         ...a null comment
+                      | (?: \) \s* )? \z          #         ...the end of the rule
+                      | \(\(?\?\&ws\)             #         ...an explicit ws match
+                      | \(\?\??\{                 #         ...an embedded code block
+                      | \\[shv]                   #         ...an explicit space match
                     )
                 )
                 |
-                (?<magic_space> \s++ )       # All other whitespace is magic
+                (?<magic_space> \s++ )            # All other whitespace is magic
 
                 (?(DEFINE) (?<BRACED> \{ (?: \\. | (?&BRACED) | [^{}] )* \} ) )
             }xms;
@@ -2698,7 +2708,7 @@ Regexp::Grammars - Add grammatical parsing features to Perl 5.10 regexes
 
 =head1 VERSION
 
-This document describes Regexp::Grammars version 1.057
+This document describes Regexp::Grammars version 1.058
 
 
 =head1 SYNOPSIS
@@ -6868,6 +6878,15 @@ No bugs have been reported.
 Please report any bugs or feature requests to
 C<bug-regexp-grammars@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.
+
+
+=head1 CONTRIBUTING
+
+Patches and other similar contributions are always welcome.
+
+For more details on how best to contribute improvements to this module,
+see L<https://metacpan.org/dist/Regexp-Grammars/contribute>
+or the CONTRIBUTING file in the module's distribution.
 
 
 =head1 AUTHOR

@@ -12,13 +12,13 @@ use Lemonldap::NG::Common::IPv6;
 use JSON::XS;
 use Date::Parse;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
 # Set here all the names of functions that must be available in Safe objects.
-# Not that only functions, not methods, can be written here
+# Note that only functions, not methods, can be written here
 our $functions =
   [
-    qw(&checkLogonHours &date &dateToTime &checkDate &basic &unicode2iso &iso2unicode &groupMatch &isInNet6 &varIsInUri &has2f_internal)
+    qw(&checkLogonHours &date &dateToTime &checkDate &basic &unicode2iso &unicode2isoSafe &iso2unicode &iso2unicodeSafe &groupMatch &isInNet6 &varIsInUri &has2f_internal)
   ];
 
 ## @function boolean checkLogonHours(string logon_hours, string syntax, string time_correction, boolean default_access)
@@ -202,6 +202,21 @@ sub unicode2iso {
     return encode( "iso-8859-1", decode( "utf-8", $string ) );
 }
 
+## @function string unicode2isoSafe(string string)
+## This function is compliant with the Safe jail
+## but not as portable as the original one
+# Convert UTF-8 in ISO-8859-1
+# @param string UTF-8 string
+# @return ISO string
+sub unicode2isoSafe {
+    my ($string) = @_;
+
+    my $res = $string;
+    utf8::decode($res);
+    utf8::downgrade($res);
+    return $res;
+}
+
 ## @function string iso2unicode(string string)
 # Convert ISO-8859-1 in UTF-8
 # @param string ISO string
@@ -210,6 +225,20 @@ sub iso2unicode {
     my ($string) = @_;
 
     return encode( "utf-8", decode( "iso-8859-1", $string ) );
+}
+
+## @function string iso2unicodeSafe(string string)
+## This function is compliant with the Safe jail
+## but not as portable as the original one
+# Convert ISO-8859-1 in UTF-8
+# @param string ISO string
+# @return UTF-8 string
+sub iso2unicodeSafe {
+    my ($string) = @_;
+
+    my $res = $string;
+    utf8::encode($res);
+    return $res;
 }
 
 ## @function int groupMatch(hashref groups, string attribute, string value)

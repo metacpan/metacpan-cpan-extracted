@@ -40,7 +40,7 @@ ENDKEY
             ini => {
                 logLevel                   => 'error',
                 useSafeJail                => 1,
-                webauthn2fSelfRegistration => 1,
+                webauthn2fSelfRegistration => 0,
                 webauthn2fActivation       => 1,
                 webauthn2fUserCanRemoveKey => 1,
             }

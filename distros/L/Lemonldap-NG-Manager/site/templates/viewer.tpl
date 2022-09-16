@@ -59,7 +59,7 @@
       <div id="bottom" ng-if="showH" class="hidden-xs">
         <div class="panel panel-default">
           <div class="panel-body">
-            <iframe id="helpframe" width="100%" height="100%" ng-src="{{translate('/doc/')+'pages/documentation/current/'+helpUrl}}" frameborder="0"></iframe>
+            <iframe id="helpframe" width="100%" height="100%" ng-src="{{'<TMPL_VAR NAME="DOC_PREFIX">/pages/documentation/current/'+helpUrl}}" frameborder="0"></iframe>
           </div>
         </div>
       </div>

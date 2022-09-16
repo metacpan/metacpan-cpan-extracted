@@ -1,5 +1,15 @@
 Revision history for Future-XS
 
+0.04    2022-09-13
+        [CHANGES]
+         * Implement remaining bits of API and behaviour in order to make the
+           full set of Future dist tests pass
+
+        [BUGFIXES]
+         * Many many (many) bugfixes to refcounting and reference tracking,
+           especially around the on_cancel revocation list
+         * getenv() needs aTHX when running on Windows
+
 0.03    2022-08-16
         [CHANGES]
          * Added many new methods:

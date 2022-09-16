@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::Logger::Syslog;
 use strict;
 use Sys::Syslog qw(:standard);
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 sub new {
     my ( $class, $conf, %args ) = @_;
@@ -20,6 +20,7 @@ sub new {
     eval { openlog( 'LLNG', $self->{options}, $self->{facility} ) };
     no warnings 'redefine';
     my $show = 1;
+
     foreach (qw(error warn notice info debug)) {
         if ($show) {
             my $name = $_;
@@ -34,7 +35,8 @@ sub new {
         }
         $show = 0 if ( $level eq $_ );
     }
-    die "Unknown logLevel $level" if ($show);
+    die "Unknown logLevel $level" if $show;
+
     return $self;
 }
 

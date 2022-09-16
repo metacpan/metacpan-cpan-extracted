@@ -5,11 +5,13 @@ package Lemonldap::NG::Handler::Server::Main;
 
 use strict;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.15';
 
 use base 'Lemonldap::NG::Handler::PSGI::Main';
 
 use constant defaultLogger => 'Lemonldap::NG::Common::Logger::Syslog';
+
+$ENV{LLNG_DEFAULTLOGGER} ||= defaultLogger;
 
 # In server mode, headers are not passed to a PSGI application but returned
 # to the server

@@ -6,7 +6,7 @@ use Test::More tests => 4;
 
 use PDF::Builder;
 
-my $pdf = PDF::Builder->new(-outver => 1.5);
+my $pdf = PDF::Builder->new('msgver' => 0);
 $pdf = PDF::Builder->open('t/resources/sample-xrefstm.pdf');
 
 isa_ok($pdf,

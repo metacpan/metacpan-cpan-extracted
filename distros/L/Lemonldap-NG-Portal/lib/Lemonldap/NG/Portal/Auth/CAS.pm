@@ -5,16 +5,19 @@ use Mouse;
 use URI::Escape;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_ERROR
-  PE_IDPCHOICE
   PE_OK
+  PE_ERROR
   PE_REDIRECT
+  PE_IDPCHOICE
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
-extends 'Lemonldap::NG::Portal::Main::Auth', 'Lemonldap::NG::Portal::Lib::CAS';
+extends qw(
+  Lemonldap::NG::Portal::Main::Auth
+  Lemonldap::NG::Portal::Lib::CAS
+);
 
 # PROPERTIES
 
@@ -133,14 +136,24 @@ sub extractFormInfo {
 
         else {
 
-            # Server list
-            my $portalPath = $self->conf->{portal};
-            $portalPath =~ s#^https?://[^/]+/?#/#;
+            # Try to use server resolution rules
+            foreach ( keys %{ $self->srvRules } ) {
+                my $cond = $self->srvRules->{$_} or next;
+                if ( $cond->( $req, $req->sessionInfo ) ) {
+                    $self->logger->debug(
+                        "CAS Server $_ selected from resolution rule");
+                    $srv = $_;
+                    last;
+                }
+            }
 
-            $req->data->{list} = $self->srvList;
+            unless ($srv) {
 
-            $req->data->{login} = 1;
-            return PE_IDPCHOICE;
+                # Server list
+                $req->data->{list}  = $self->srvList;
+                $req->data->{login} = 1;
+                return PE_IDPCHOICE;
+            }
         }
     }
 

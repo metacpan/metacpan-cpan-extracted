@@ -1,6 +1,6 @@
 package Date::Holidays::GB;
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 # ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2023
 
@@ -196,7 +196,7 @@ sub _holiday {
     return join( ', ', @strings );
 }
 
-sub date_generated { '2021-12-22' }
+sub date_generated { '2022-09-10' }
 
 1;
 
@@ -497,6 +497,9 @@ __DATA__
 2022-08-01	SCT	Summer bank holiday
 2022-08-29	EAW	Summer bank holiday
 2022-08-29	NIR	Summer bank holiday
+2022-09-19	EAW	Bank Holiday for the State Funeral of Queen Elizabeth II
+2022-09-19	NIR	Bank Holiday for the State Funeral of Queen Elizabeth II
+2022-09-19	SCT	Bank Holiday for the State Funeral of Queen Elizabeth II
 2022-11-30	SCT	St Andrew’s Day
 2022-12-26	EAW	Boxing Day
 2022-12-26	NIR	Boxing Day

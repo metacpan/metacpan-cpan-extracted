@@ -1,0 +1,47 @@
+Win32::Elevate version 0.01
+==========================
+
+Win32::Elevate provides a few simple facilities on Windows to elevate
+your currently running perl process or thread to higher credentials,
+namely SYSTEM and TrustedInstaller. To achieve this feat, this package
+uses the standard Win32 API mangled through some rudimentary XS code.
+Obviously, this only works on Windows, starting with Vista, and will
+fail to even compile on any other platform. Your Perl distribution
+needs a C compiler and access to the standard windows header files.
+
+Please note, that you must run your perl script with administrative
+privileges. It's possible to circumvent Window's user account protection
+or even gain admin elevation programmatically without user interaction,
+but for security reasons, this package does not provide such a function.
+
+This module was tested on Windows 7 and Windows 10.
+
+
+INSTALLATION
+
+To install this module, either use CPAN or install manually.
+For manual installation, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Depending on your distribution, you will have to use the appropriate
+make command. To find out what flavour of make your perl distribution
+comes with, simply run
+
+   perl -V:make
+
+
+DEPENDENCIES
+
+Obviously, this only runs on Windows.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2021 by Daniel Just
+
+This library is free software; you can redistribute it and/or modify
+it under the GNU General Public License.

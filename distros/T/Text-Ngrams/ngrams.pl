@@ -2,9 +2,10 @@
 
 use strict;
 use vars qw($VERSION);
-#<? read_starfish_conf(); echo "\$VERSION = $ModuleVersion;"; !>
+#<? read_starfish_conf(); echo "\$VERSION = $ModuleVersion;"; !>#+
+$VERSION = 2.007;#-
 #+
-$VERSION = 2.005;
+$VERSION = 2.007;
 #-
 # $Revision: 1.26 $
 
@@ -159,7 +160,7 @@ Text::Ngrams module.
 
 =head1 COPYRIGHT
 
-Copyright 2003-2017 Vlado Keselj F<http://web.cs.dal.ca/~vlado>
+Copyright 2003-2019 Vlado Keselj F<http://web.cs.dal.ca/~vlado>
 
 This module is provided "as is" without expressed or implied warranty.
 This is free software; you can redistribute it and/or modify it under

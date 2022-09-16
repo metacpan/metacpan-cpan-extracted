@@ -11,11 +11,22 @@ use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::Session;
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.0.15';
 our @ISA     = ('Exporter');
 our @EXPORT  = qw(fetchId retrieveSession createSession hideCookie goToPortal);
 our @EXPORT_OK = @EXPORT;
 our $_ua;
+
+sub ua {
+    my ($class) = @_;
+    return $_ua if $_ua;
+    $_ua = Lemonldap::NG::Common::UserAgent->new( {
+            lwpOpts    => $class->tsv->{lwpOpts},
+            lwpSslOpts => $class->tsv->{lwpSslOpts}
+        }
+    );
+    return $_ua;
+}
 
 ## @rmethod protected fetchId
 # Get user session id from Authorization header
@@ -161,17 +172,6 @@ sub goToPortal {
             'WWW-Authenticate' => 'Basic realm="LemonLDAP::NG"' );
         return $class->AUTH_REQUIRED;
     }
-}
-
-sub ua {
-    my ($class) = @_;
-    return $_ua if ($_ua);
-    $_ua = Lemonldap::NG::Common::UserAgent->new( {
-            lwpOpts    => $class->tsv->{lwpOpts},
-            lwpSslOpts => $class->tsv->{lwpSslOpts}
-        }
-    );
-    return $_ua;
 }
 
 1;

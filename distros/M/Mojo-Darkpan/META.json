@@ -62,7 +62,7 @@
    "provides" : {
       "Mojo::Darkpan" : {
          "file" : "lib/Mojo/Darkpan.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       },
       "Mojo::Darkpan::Config" : {
          "file" : "lib/Mojo/Darkpan/Config.pm"
@@ -91,10 +91,10 @@
          "web" : "https://github.com/rshingleton/Mojo-Darkpan"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_contributors" : [
       "shingler <shingler@oclc.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

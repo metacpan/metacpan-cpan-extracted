@@ -11,7 +11,7 @@ use Plack::Util::Accessor qw(indent);
 use Tags::Output::Raw;
 use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub serve_path {
 	my ($self, $env, $path_to_file_or_dir) = @_;
@@ -126,6 +126,8 @@ Returns Plack::Component object.
 
 =head1 EXAMPLE1
 
+=for comment filename=pyx_minimal_psgi.pl
+
  use strict;
  use warnings;
 
@@ -165,6 +167,8 @@ Returns Plack::Component object.
  # <html><head><title>Title</title></head><body><div>Hello world</div></body></html>
 
 =head1 EXAMPLE2
+
+=for comment filename=pyx_indent_psgi.pl
 
  use strict;
  use warnings;
@@ -240,12 +244,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2016-2020 Michal Josef Špaček
+© 2016-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

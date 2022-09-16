@@ -1,4 +1,4 @@
-package App::MonM::ConfigSkel; # $Id: ConfigSkel.pm 90 2019-07-18 09:47:29Z abalama $
+package App::MonM::ConfigSkel; # $Id: ConfigSkel.pm 134 2022-09-09 10:33:00Z abalama $
 use strict;
 use utf8;
 
@@ -10,7 +10,7 @@ App::MonM::ConfigSkel - Configuration skeleton for App::MonM
 
 =head1 VIRSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -32,11 +32,11 @@ L<App::MonM>, L<CTK::Skel>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -50,7 +50,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 use constant SIGNATURE => "config";
 
 use vars qw/ $VERSION /;
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub build { # Building
     my $self = shift;
@@ -96,92 +96,72 @@ Mode: 644
 # See Config::General for syntax details
 #
 
-##############################################################################
-##
-## General
-##
-##############################################################################
+#
+# Expires of data in database
+# Default: 1d
+#
+#Expires 1d
 
 #
-# Expire data in database
+# Use extended notifier (monotifier)
+# Default: no
 #
-Expire +1M
-
-
-##############################################################################
-##
-## Logging
-##
-##############################################################################
+#UseMonotifier no
 
 #
-# Activate or deactivate the logging: on/off (yes/no). Default: on
+# Activate or deactivate the logging: on/off (yes/no).
+# Default: off
 #
 LogEnable on
 
 #
-# Loglevel: debug, info, notice, warning, error,
-#              crit, alert, emerg, fatal, except
+# Defines log level
+# Allowed levels: debug, info, notice, warning, error,
+#     crit, alert, emerg, fatal, except
 # Default: debug
 #
 LogLevel warning
 
 #
-# LogIdent string. Default: none
+# Defines LogIdent string
+# Default: none
 #
 LogIdent %PREFIX%
 
 #
-# LogFile: path to log file
-#
-# Default: using syslog
+# Defines path to custom log file
+# Default: use syslog
 #
 #LogFile /var/log/%PREFIX%.log
 
-
-##############################################################################
-##
-## SendMail & SMSGW
-##
-##############################################################################
-
-<SendMail>
-    To          to@example.com
-    Cc          cc@example.com
-    From        from@example.com
-
-    # SMTP server
-    SMTP        192.168.0.1
-    # Authorization SMTP
-    #SMTPuser   user
-    #SMTPpass   password
-</SendMail>
+#
+# Defines workers number
+#
+# Default: 3
+#
+#Workers 3
 
 #
-# GateWay for sending SMS
+# Defines worker interval. This interval determines how often
+# the cycle of checks will be started.
 #
-#   [PHONE]   -- Phone number
-#   [SUBJECT] -- Subject of message
-#   [MESSAGE] -- SMS body
+# Default: 20
 #
-# SMSGW "sendalertsms "[NUMBER]" "[SUBJECT]" "[MESSAGE]""
-# SMSGW "monm_dbi -s SIDNAME -u USER -p PASSWORD -q "SELECT SMS_FUNCTION('[PHONE]', '[MESSAGE]') FROM DUAL" [PHONE]"
-# SMSGW "smsbox -D /tmp/smsbox create [PHONE] "[MESSAGE]""
-SMSGW "echo "[NUMBER]; [SUBJECT]; [MESSAGE]" >> ./fakesmsgw.txt"
-
-
-##############################################################################
-##
-## MonM database interface
-##
-##############################################################################
+#Interval 20
 
 #
-# !!! WARNING !!!
+# Defines a username and groupname for daemon working
 #
-# Before using the third-party database, please create the monm table
+# Default: monmu
 #
+#DaemonUser monmu
+#DaemonGroup monmu
 
+#
+# MonM database options
+#
+# NOTE! Before using the third-party database, please create the monm table
+#
 #-- For SQLite DB
 #CREATE TABLE IF NOT EXISTS monm (
 #    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -192,7 +172,7 @@ SMSGW "echo "[NUMBER]; [SUBJECT]; [MESSAGE]" >> ./fakesmsgw.txt"
 #    `status` INTEGER DEFAULT 0,       -- status value
 #    `message` TEXT DEFAULT NULL       -- message
 #)
-
+#
 #-- For MySQL DB
 #CREATE TABLE `monm` (
 #  `id` int(11) NOT NULL auto_increment,
@@ -205,37 +185,229 @@ SMSGW "echo "[NUMBER]; [SUBJECT]; [MESSAGE]" >> ./fakesmsgw.txt"
 #  PRIMARY KEY  (`id`),
 #  UNIQUE KEY `id` (`id`)
 #) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+#
 
+#
 # Section for connection with Your database.
-# Recommended for use follow databases: SQLite, MySQL, Oracle or PostgreSQL
+# Recommended for use follow databases: SQLite, MySQL or PostgreSQL
+#
 # Default: SQLite
-
+#
 # SQLite example:
-#<DBI>
+# <Store>
 #    DSN "dbi:SQLite:dbname=/tmp/monm/monm.db"
 #    Set RaiseError     0
 #    Set PrintError     0
 #    Set sqlite_unicode 1
-#</DBI>
-
+# </Store>
+#
 # MySQL example:
-#<DBI>
+# <Store>
 #    DSN "DBI:mysql:database=monm;host=mysql.example.com"
 #    User username
 #    Password password
 #    Set RaiseError          0
 #    Set PrintError          0
 #    Set mysql_enable_utf8   1
-#</DBI>
+#    Set mysql_auto_reconnect 1
+# </Store>
+#
 
-# Oracle Example
-#<DBI>
-#    DSN "dbi:Oracle:MYSID"
-#    User username
-#    Password password
-#    Set RaiseError 0
-#    Set PrintError 0
-#</DBI>
+#
+# REQUIRED channel (SendMail) that defines default options for sending
+# email-notifications and email-reports
+#
+<Channel SendMail>
+    Type    Email
+    Enable  on
+
+    # Real Email addresses
+    To      to@example.com
+    #Cc     cc@example.com
+    #Bcc    bcc@example.com
+    From    from@example.com
+
+    # MIME options
+    Encoding base64
+
+    # SMTP extra headers
+    #<Headers>
+    #    X-Foo foo
+    #    X-Bar bar
+    #</Headers>
+
+    # Attachments
+    #<Attachment>
+    #    Filename    screenshot.png
+    #    Type        image/png
+    #    Encoding    base64
+    #    Disposition attachment
+    #    Path        ./screenshot.png
+    #</Attachment>
+    #<Attachment>
+    #    Filename    payment.pdf
+    #    Type        application/pdf
+    #    Encoding    base64
+    #    Disposition attachment
+    #    Path        ./payment.pdf
+    #</Attachment>
+
+    # SMTP options
+    # If there are requirements to the case sensitive of parameter
+    # names, use the "Set" directives
+    Set host 192.168.0.1
+    Set port 25
+    #Set sasl_username TestUser
+    #Set sasl_password MyPassword
+    Set timeout 20
+</Channel>
+
+#
+# OPTIONAL channel (SMSGW) that defines default options for sending
+# SMS-notifications
+#
+<Channel SMSGW>
+    Type    Command
+    Enable  on
+
+    #At Sun-Sat[08:00-19:00]
+
+    # Default phone number (MSISDN)
+    To +1-424-254-5300
+
+    # SMS Gateway timeout (to SMDP server, eg.)
+    Timeout 10s
+
+    # Command for sending
+    #Command "echo "[MSISDN]; [SUBJECT]; [MESSAGE]" >> /tmp/fakesms.txt"
+    #Command "sendalertsms "[MSISDN]" "[SUBJECT]" "[MESSAGE]""
+    #Command "monm_dbi -s SIDNAME -u USER -p PASSWORD -q "SELECT SMS_FUNCTION('[MSISDN]', '[MESSAGE]') FROM DUAL" [MSISDN]"
+    #Command "smsbox -D /tmp/smsbox create [MSISDN] "[MESSAGE]""
+    #Command curl -d "[MESSAGE]" "https://sms.com/?[MSISDN]"
+    Command "echo "[MSISDN];[MESSAGE]" >> /tmp/fakesms.txt"
+
+    #
+    # Replacement variables:
+    #
+    #   [ID]      -- Internal ID of the message
+    #   [MSISDN]  -- Phone number
+    #   [SUBJECT] -- Subject of message
+    #   [MESSAGE] -- SMS body (reality this is also a subject)
+    #
+
+</Channel>
+
+#
+# Named users
+#
+#
+#<User Bob>
+#    Enable on
+#
+#    At Sun[off];Mon-Thu[08:30-12:30,13:30-18:00];Fri[10:00-20:30];Sat[off]
+#
+#    <Channel SendMail>
+#        To bob@example.com
+#    </Channel>
+#
+#    <Channel MySMS>
+#        BasedOn SMSGW
+#        To +1-424-254-5301
+#        At Mon-Fri[08:30-18:30]
+#    </Channel>
+#</User>
+#
+#<User Alice>
+#    Enable on
+#
+#    At Mon-Fri[08:30-18:30]
+#
+#    <Channel SendMail>
+#        To alice@example.com
+#    </Channel>
+#
+#    <Channel AliceGW>
+#        Type    Command
+#        To  +1-424-254-5301
+#        Content email
+#        Command "tee /tmp/alice.msg > /dev/null"
+#    </Channel>
+#</User>
+#
+#<User Ted>
+#    Enable on
+#
+#    <Channel SendMail>
+#        Enable  on
+#    </Channel>
+#    <Channel SMSGW>
+#        Enable  on
+#    </Channel>
+#</User>
+#
+#<User Fred>
+#    Enable on
+#    <Channel FredFile>
+#        Type    File
+#
+#        To      fred@example.com
+#
+#        # MIME options
+#        Encoding base64
+#
+#        # File options
+#        Dir     /tmp
+#        File    [ID].[EXT]
+#    </Channel>
+#</User>
+#
+#<User Carol>
+#    Enable on
+#
+#    <Channel SMSGW>
+#        Command "echo "[MSISDN];[MESSAGE]" >> /tmp/carolsms.txt"
+#    </Channel>
+#</User>
+#
+#<User Dave>
+#    Enable on
+#
+#    <Channel Mail>
+#        BasedOn SendMail
+#        At Sun-Sat[off]
+#        To dave@example.com
+#    </Channel>
+#</User>
+#
+#<User Eve>
+#    Enable off
+#</User>
+
+#
+# Named groups
+#
+#
+#<Group Foo>
+#    Enable on
+#    User Bob, Alice
+#    User Ted
+#</Group>
+#
+#<Group Bar>
+#    Enable on
+#    User Ted, Fred, Carol
+#</Group>
+#
+#<Group Baz>
+#    Enable off
+#    User Dave, Eve
+#</Group>
+#
+#<Group All>
+#    Enable on
+#    User Bob, Alice, Ted, Fred, Carol, Dave, Eve
+#</Group>
+
 
 Include conf.d/*.conf
 
@@ -246,50 +418,64 @@ Name: checkit-foo.conf.sample
 File: conf.d/checkit-foo.conf.sample
 Mode: 644
 
-<Checkit "foo">
+<Checkit foo>
 
     #
-    # Switch of checkit section
+    # The main switcher of the checkit section
     #
-    # Default: no
+    # Default: off
     #
-    Enable      yes
+    Enable      on
 
     #
-    # The definition of "What is bad!"
+    # The definition of "What is bad?"
     #
     # Default: !!perl/regexp (?i-xsm:^\s*(0|error|fail|no|false))
     #
     #IsFalse   !!perl/regexp (?i-xsm:^\s*(0|error|fail|no|false))
-    #IsFalse   ERROR
-    #IsFalse   ERROR.
+    #IsFalse   0
+    #IsFalse   Error.
 
     #
-    # The definition of "What is good!"
+    # The definition of "What is good?"
     #
     # Default: !!perl/regexp (?i-xsm:^\s*(1|ok|pass|yes|true))
     #
     #IsTrue    !!perl/regexp (?i-xsm:^\s*(1|ok|pass|yes|true))
-    #IsTrue    OK
+    #IsTrue    1
     #IsTrue    Ok.
 
     #
-    # Direct sort order of resolution
+    # Controls the order in which True and False are evaluated.
+    # The OrderBy directive, along with the IsTrue and IsFalse directives,
+    # controls a two-pass resolve system. The first pass processes IsTrue
+    # or IsFalse directive, as specified by the OrderBy directive.
+    # The second pass parses the rest of the directive (IsFalse or IsTrue).
     #
-    # Default: "true, false"
+    # Ordering is one of:
     #
-    #OrderBy   true, false
-    #OrderBy   ASC # Is same as: "true, false"
-    #OrderBy   ASC
+    #   OrderBy True,False
+    #
+    # First, IsTrue directive is evaluated. Next, IsFalse directive is evaluated.
+    # If matches IsTrue, the check's result sets to true (PASSED), otherwise
+    # result sets to false (FAILED)
+    #
+    #   OrderBy False,True
+    #
+    # First, IsFalse directive is evaluated. Next, IsTrue directive is evaluated.
+    # If matches IsFalse, the check's result sets to false (FAILED), otherwise
+    # result sets to true (PASSED)
+    #
+    # Default: "True,False"
+    #
+    #OrderBy   True,False
+    #OrderBy   ASC # Is same as: "True,False"
+    #OrderBy   False,True
+    #OrderBy   DESC # Is same as: "False,True"
 
     #
-    # Reverse Sort Order
-    #
-    #OrderBy   false, true
-    #OrderBy   DESC # Is same as: "false, true"
-
-    #
-    # Request type
+    # Defines checking type. As of today, three types are supported:
+    #   http(s), command and dbi(db)
     #
     # Default: http
     #
@@ -297,116 +483,201 @@ Mode: 644
     #Type      dbi
     #Type      command
 
+    #
+    # Defines the target for analysis of results
+    #
+    #   status  - the status of the check operation is analyzed
+    #   code    - the return code is analyzed (HTTP code, error code and etc.)
+    #   content - the content is analyzed (data from HTTP response, data
+    #             from command's STDOUT or data from DB)
+    #   message - the message is analyzed (HTTP message, eg.)
+    #
+    # Default: status
+    #
+    #Target    content
+
+    #
+    # Defines the time interval between two checks
+    #
+    #  Default: 0
+    #
+    # Format for time can be in any of the following forms:
+    #
+    #   20   -- in 20 seconds
+    #   180s -- in 180 seconds
+    #   2m   -- in 2 minutes
+    #   12h  -- in 12 hours
+    #   1d   -- in 1 day
+    #   3M   -- in 3 months
+    #   2y   -- in 2 years
+    #   3m   -- 3 minutes ago(!)
+    #
+    #Interval 20s
+
+    #
+    # Defines triggers (system commands) that runs before sending notifications
+    # There can be several such directives
+    # Each trigger can contents the variables for auto replacement, for example:
+    #
+    #   Trigger  "mycommand1 "[MESSAGE]""
+    #
+    # Replacement variables:
+    #
+    #   [ID]        -- Internal ID of the message
+    #   [MESSAGE], [MSG] -- The checker message content
+    #   [MSISDN]    -- Phone number, recipient
+    #   [NAME]      -- Checkit section name
+    #   [NOTE]      -- The checker notes
+    #   [RESULT]    -- The check result: PASSED/FAILED
+    #   [SOURCE], [SRC]  -- Source string (URL, Command, etc.)
+    #   [STATUS]    -- The checker status: OK/ERROR
+    #   [SUBJECT], [SBJ] -- Subject of message (MIME)
+    #   [TYPE]      -- Type of checkit: http/dbi/command
+    #
+    #Trigger  "curl http://mywebcam.com/[NAME]/[ID]?[MSISDN] >/tmp/snapshot.jpg"
+
+    #
+    # Defines a List of Recipients for notifications.
+    # There can be several such directives
+    #
+    # Email addresses for sending notifications directly (See Channel SendMail)
+    #SendTo  foo@example.com
+    #SendTo  bar@example.com
+    #
+    # ...or SMS phone numbers (See Channel SMSGW):
+    #SendTo 11231230002
+    #SendTo +11231230001
+    #SendTo +1-123-123-0003
+    #
+    # ...or a notify users:
+    #SendTo Bob, Alice
+    #SendTo Fred
+    SendTo  Alice
+    #
+    # ...or a notify groups:
+    #SendTo @Foo, @Bar
+    #SendTo @Baz
+
+
+
     ###################################
-    ## For HTTP requests             ##
+    ## For HTTP requests (Type http) ##
     ###################################
 
     #
-    # URL of resource for request
+    # Defines the URL for HTTP/HTTPS requests
     #
-    #URL   http://user:password@www.example.com
-    URL    http://www.example.com
+    # Default: http://localhost
+    #
+    #URL   https://user:password@www.example.com
+    URL    https://www.example.com
 
     #
-    # The HTTP method: HTTP, GET, POST, PUT, HEAD, PATCH, DELETE, and etc.
+    # Defines the HTTP method: GET, POST, PUT, HEAD, PATCH, DELETE, and etc.
     #
     # Default: GET
     #
     #Method    GET
-    #Method    HEAD
-    #Method    POST
 
     #
-    # Timeout of HTTP request, secs
+    # Defines the timeout of HTTP requests
     #
     # Default: 180
     #
     #Timeout    180
 
     #
-    # Target of the analysis
+    # Defines HTTP request headers.
+    # This directive allows you set case sensitive HTTP headers.
+    # There can be several such directives.
     #
-    # Default: content
-    #
-    #Target    content # Status is ok, when: ok, yes (see IsTrue/IsFalse)
-    #Target    code # HTTP status code, rc (response code)
-    #Target    status # HTTP status (status is ok, when: 1xx, 2xx, 3xx)
+    # Set User-Agent  "MyAgent/1.00"
+    # Set X-Token     "mdffltrtkmdffltrtk"
 
     #
-    # HTTP request headers
+    # Specifies POST/PUT/PATCH request content
     #
-    #Set User-Agent  "MyAgent/1.00"
-    #Set X-Token     "mdffltrtkmdffltrtk"
+    # Set Content-Type text/plain
+    # Content  "Content for HTTP request"
+    #
+    # Default: no content
 
     #
-    # POST/PUT/PATCH content
+    # Defines the proxy URL for a http/https requests
     #
-    #Content  "Content for HTTP request"
-    #Set Content-Type text/plain
+    # Default: no proxy
+    #
+    #Proxy http://http.example.com:8001/
+
+
 
     ##################################
-    ## For DBI requests             ##
+    ## For DBI requests (Type dbi)  ##
     ##################################
 
-    DSN         DBI:mysql:database=DATABASE;host=HOSTNAME
-    #SQL       "SELECT 'OK' AS OK FROM DUAL" # By default
-    User        USER
-    Password    PASSWORD
-    #Timeout    180 # Connect and request timeout, secs
+    #
+    # Sets Database DSN string
+    #
+    # Default: dbi:Sponge:
+    #
+    #DSN     DBI:mysql:database=DATABASE;host=HOSTNAME
 
     #
-    # DBI Attributes
+    # Specifies the SQL query string (content)
+    #
+    # Default: "SELECT 'OK' AS OK FROM DUAL"
+    #
+    #SQL "SELECT 'OK' AS OK FROM DUAL"
+
+    #
+    # Defines database credential: username and password
+    #
+    #User        USER
+    #Password    PASSWORD
+
+    #
+    # Defines the timeout of DBI requests
+    #
+    # Default: off
+    #
+    #Timeout    20s
+
+    #
+    # Defines DBI Attributes.
+    # This directive allows you set case sensitive DBI Attributes.
+    # There can be several such directives.
+    #
+    #Set sqlite_unicode 1
     #
     #Set RaiseError     0
     #Set PrintError     0
-    #Set sqlite_unicode 1
 
-    ##################################
-    ## For system command requests  ##
-    ##################################
 
-    Command     "ls -la"
-    IsTrue      !!perl/regexp (?i-xsm:README)
-    #Content    "STDIN content for Command"
+
+    #######################################
+    ## For system command (Type command) ##
+    #######################################
 
     #
-    # Target of the analysis
+    # Defines full path to external program (command line)
     #
-    # Default: status
+    # Default: none
     #
-    #Target    content # Status is ok, when: ok, yes (see IsTrue/IsFalse)
-    #Target    code # Exit status code
-    #Target    status # Status (0 or 1)
+    Command     perl -w
 
     #
-    # Recipient List
+    # Sets the content for command STDIN
     #
-    #SendTo  foo@example.com
-    #SendTo  bar@example.com
-    #SendTo  baz@example.com
-
-    # ...and SMS phone numbers
-    #SendTo  +11231230001
-    #SendTo  11231230002
-    #SendTo  +1 (123) 123-00-03
-
-    # ...and a notify user (if App::MonM::Notifier is installed)
-    #SendTo  user1 user2
-    #SendTo  user3
+    # Default: no content
+    #
+    Content     "print q/Blah-Blah-Blah/"
 
     #
-    # Triggers: system commands
+    # Defines the execute timeout
     #
-    # [SUBJECT], [SUBJ] -- Subject
-    # [MESSAGE], [MSG] -- Message
-    # [SOURCE] -- Source
-    # [NAME] -- Checkit section name
-    # [TYPE] -- Checkit type: http/dbi/command
-    # [STATUS] -- 0/1
+    # Default: off
     #
-    #Trigger  "mycommand1 \"[SUBJECT]\" \"[MESSAGE]\""
-    #Trigger  "mycommand2 \"[MESSAGE]\""
-    #Trigger  "mycommand3"
+    #Timeout    1m
 
 </Checkit>
 
@@ -422,7 +693,7 @@ Mode: 644
 #
 <Checkit "foo">
     Enable      yes
-    URL         http://www.example.com
+    URL         https://www.example.com
     Target      code
     IsTrue      200
 </Checkit>

@@ -69,6 +69,23 @@ subtest 'lib with name like libname-1-2___.dll' => sub {
 
 };
 
+subtest 'lib with name like libname_1_2.dll' => sub {
+  my($path) = find_lib( lib => 'brevipalatus_mcculloughi' );
+  ok -r $path, "path = $path is readable";
+
+  my $path2 = find_lib( lib => 'brevipalatus_mcculloughi' );
+  is $path, $path2, 'scalar context';
+
+};
+
+subtest 'lib with name like libname_ext.dll' => sub {
+  my($path) = find_lib( lib => 'apatosaurus_ajax' );
+  ok -r $path, "path = $path is readable";
+
+  my $path2 = find_lib( lib => 'apatosaurus_ajax' );
+  is $path, $path2, 'scalar context';
+
+};
 
 sub p
 {

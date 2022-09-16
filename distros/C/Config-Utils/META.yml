@@ -29,8 +29,8 @@ requires:
   Readonly: 0
   perl: 5.6.2
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Utils
+  bugtracker: https://github.com/michal-josef-spacek/Config-Utils/issues
   homepage: https://github.com/michal-josef-spacek/Config-Utils
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Config-Utils
-version: '0.07'
+version: '0.08'

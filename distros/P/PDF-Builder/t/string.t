@@ -210,11 +210,12 @@ is($string->as_pdf(),
    '<0000005C00000000>',
    q{[RT #63918] Incorrect handling of literal backslashes 2/2});
 
-
 # RT 134957
 $string = PDFStr("\x00\n\x00");
 is($string->as_pdf(),
    '<000A00>',
    q{\n in a string containing non-printable characters is hex-encoded});
    
+done_testing();
+
 1;

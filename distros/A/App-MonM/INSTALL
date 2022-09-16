@@ -4,4 +4,37 @@ INSTALLATION INSTRUCTIONS
     make
     make test
     make install
+    make clean
     monm configure
+
+INSTALLATION ON RHEL 7 (CENTOS 7.x)
+
+1. Install the epel and abalama repositories
+
+    sudo yum install epel-release
+    sudo rpm -Uvh https://dist.suffit.org/repo/rhel7/abalama-release-1.00-1.el7.noarch.rpm
+    sudo yum clean all
+    sudo yum update
+
+2. Install the project
+
+    sudo yum install perl-App-MonM
+
+INSTALLATION ON RHEL 8 (ROCKY LINUX 8.x)
+
+1. Install the epel and abalama repository
+
+    sudo dnf install epel-release
+    sudo rpm -Uvh https://dist.suffit.org/repo/rhel8/abalama-release-1.00-1.el8.noarch.rpm
+    sudo dnf clean all
+    sudo dnf update
+
+2. Install the App-MonM project
+
+    sudo dnf install perl-App-MonM
+
+INSTALLATION ON UBUNTU 20.x
+
+    sudo add-apt-repository ppa:abalama/v1.00
+    sudo apt update
+    sudo apt install libapp-monm-perl

@@ -4,7 +4,7 @@
       "NAKAJIMA Yusaku < youpong@cpan.org >"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.14",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "mit"
    ],
@@ -59,7 +59,7 @@
    "provides" : {
       "Data::Gimei" : {
          "file" : "lib/Data/Gimei.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.3.0"
       },
       "Data::Gimei::Address" : {
          "file" : "lib/Data/Gimei/Address.pm"
@@ -81,16 +81,17 @@
       },
       "homepage" : "https://github.com/youpong/pl-gimei",
       "repository" : {
-         "url" : "git://github.com/youpong/pl-gimei.git",
+         "type" : "git",
+         "url" : "https://github.com/youpong/pl-gimei.git",
          "web" : "https://github.com/youpong/pl-gimei"
       }
    },
-   "version" : "v0.2.0",
+   "version" : "v0.3.0",
    "x_authority" : "cpan:YOUPONG",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",
       "youpong <43817652+youpong@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

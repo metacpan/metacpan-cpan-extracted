@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_REGISTERFORMEMPTY
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -65,14 +65,10 @@ sub display {
 
     # Display form
     my $params = {
-        PORTAL    => $self->conf->{portal},
-        MAIN_LOGO => $self->conf->{portalMainLogo},
-        SKIN      => $self->p->getSkin($req),
-        LANGS     => $self->conf->{showLanguages},
-        DOWNLOAD  => $self->conf->{checkDevOpsDownload},
-        MSG       => 'checkDevOps',
-        ALERTE    => 'alert-info',
-        TOKEN     => (
+        DOWNLOAD => $self->conf->{checkDevOpsDownload},
+        MSG      => 'checkDevOps',
+        ALERTE   => 'alert-info',
+        TOKEN    => (
               $self->ottRule->( $req, {} )
             ? $self->ott->createToken()
             : ''
@@ -110,14 +106,10 @@ sub parse {
 
         # Prepare form
         my $params = {
-            PORTAL    => $self->conf->{portal},
-            MAIN_LOGO => $self->conf->{portalMainLogo},
-            SKIN      => $self->p->getSkin($req),
-            LANGS     => $self->conf->{showLanguages},
-            DOWNLOAD  => $self->conf->{checkDevOpsDownload},
-            MSG       => "PE$msg",
-            ALERTE    => 'alert-warning',
-            TOKEN     => $token
+            DOWNLOAD => $self->conf->{checkDevOpsDownload},
+            MSG      => "PE$msg",
+            ALERTE   => 'alert-warning',
+            TOKEN    => $token
         };
         return $self->p->sendJSONresponse( $req, $params )
           if ( $req->wantJSON && $msg );
@@ -304,19 +296,15 @@ sub parse {
 
     # Prepare form
     my $params = {
-        PORTAL    => $self->conf->{portal},
-        MAIN_LOGO => $self->conf->{portalMainLogo},
-        SKIN      => $self->p->getSkin($req),
-        LANGS     => $self->conf->{showLanguages},
-        DOWNLOAD  => $self->conf->{checkDevOpsDownload},
-        MSG       => $msg,
-        UNKNOWN   => join( $self->conf->{multiValuesSeparator}, @$unknown ),
-        ALERTE    => $alert,
-        FILE      => $json,
-        HEADERS   => $headers,
-        RULES     => $rules,
-        URL       => $url,
-        TOKEN     => (
+        DOWNLOAD => $self->conf->{checkDevOpsDownload},
+        MSG      => $msg,
+        UNKNOWN  => join( $self->conf->{multiValuesSeparator}, @$unknown ),
+        ALERTE   => $alert,
+        FILE     => $json,
+        HEADERS  => $headers,
+        RULES    => $rules,
+        URL      => $url,
+        TOKEN    => (
               $self->ottRule->( $req, {} )
             ? $self->ott->createToken()
             : ''

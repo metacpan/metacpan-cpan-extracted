@@ -1,4 +1,4 @@
-package Custom;
+package Lemonldap::NG::Portal::Custom;
 
 sub empty {
     return '';
@@ -9,7 +9,7 @@ sub undefined {
 }
 
 sub test_uc {
-    return uc $_[0];
+    return uc( $_[0] . '_' . $_[1] );
 }
 
 1;

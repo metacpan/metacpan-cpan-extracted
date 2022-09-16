@@ -3,12 +3,22 @@ package PDF::Builder::Resource::Glyphs;
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
 PDF::Builder::Resource::Glyphs - preparsed uniglyph.txt file information
+
+=head1 SYNOPSIS
+
+This is a list of glyph names for many Unicode points (over 9000 of them).
+The data in this file is generated from the uniglyph.txt file, included with
+PDF::Builder. If you should change that file, use _generate to create new 
+hashes, and paste the output into this file.
+
+The data in question is consolidated from AGL/WGL4, XML, (X)HTML, and
+SGML specifications.
 
 =cut
 
@@ -30,23 +40,24 @@ sub _generate {
     my $fh;
     open $fh, '<', $uniglyph_file or
         die "Can't open input uniglyph file $uniglyph_file";
-    my $uuu = {};
+    my $u = {};
+    my $g = {};
     while (my $line = <$fh>) {
         next if $line =~ m|^#|;
         chomp $line;
         $line =~ s|\s+\#.+$||go;
-        my ($uni, $name, $prio) = split(/\s+;\s+/, $line);
+        my ($uni, $name, $priority) = split(/\s+;\s+/, $line);
         $uni = hex($uni);
-        $uuu->{'u'}->{$uni} ||= [];
-        $uuu->{'g'}->{$name} ||= [];
-        push @{$uuu->{'u'}->{$uni}},  { uni => $uni, name => $name, prio => $prio };
-        push @{$uuu->{'g'}->{$name}}, { uni => $uni, name => $name, prio => $prio };
+        $u->{$uni} ||= [];
+        $g->{$name} ||= [];
+        push @{$u->{$uni}},  { uni => $uni, name => $name, priority => $priority };
+        push @{$g->{$name}}, { uni => $uni, name => $name, priority => $priority };
     }
     close($fh);
 
     my %u2n;
-    foreach my $k (keys %{$uuu->{'u'}}) {
-        $u2n{$k} = $uuu->{'u'}->{$k}->[0]->{'name'};
+    foreach my $k (keys %$u) {
+        $u2n{$k} = $u->{$k}->[0]->{'name'};
     }
     print "our \$u2n = {\n";
     foreach my $key (sort { $a <=> $b } keys %u2n) {
@@ -55,8 +66,8 @@ sub _generate {
     print "};\n\n";
 
     my %n2u;
-    foreach my $k (keys %{$uuu->{'g'}}) {
-        my ($r) = sort { $a->{'prio'} <=> $b->{'prio'}} @{$uuu->{'g'}->{$k}};
+    foreach my $k (keys %$g) {
+        my ($r) = sort { $a->{'priority'} <=> $b->{'priority'}} @{$g->{$k}};
         $n2u{$k} = $r->{'uni'};
     }
     print "our \$n2u = {\n";

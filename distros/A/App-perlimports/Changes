@@ -1,5 +1,15 @@
 Revision history for App-perlimports
 
+0.000048  2022-09-13 21:49:19Z
+    - Make diagnostic message from linter less confusing (GH#88) (Olaf Alders)
+
+0.000047  2022-09-12 15:31:01Z
+    - Bump PPI from 1.274 to 1.276 (GH#87) (Olaf Alders)
+
+0.000046  2022-09-09 22:26:52Z
+    - Add a --lint flag to force perlimports to behave as a linter (GH#85)
+      (Olaf Alders)
+
 0.000045  2022-06-16 21:18:31Z
     - Document config file creation and Vim + ALE configuration (GH#83) (Olaf
       Alders)

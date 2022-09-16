@@ -20,3 +20,14 @@ say "You won \$"
   . $second_game->winnings . " on "
   . $second_game->draws
   . " draws.";
+
+my $third_game = App::Games::Keno->new(
+	spots => [ 45, 33, 12, 20 ],
+	draws => 1000,
+	verbose => 1
+);
+$third_game->PlayKeno;
+say "You won \$"
+  . $third_game->winnings . " on "
+  . $third_game->draws
+  . " draws.";

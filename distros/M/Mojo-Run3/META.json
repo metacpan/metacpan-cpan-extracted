@@ -16,12 +16,16 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -34,7 +38,8 @@
             "IO::Socket::IP" : "0.37",
             "Mojo::IOLoop::ReadWriteFork" : "1.00",
             "Mojolicious" : "8.25",
-            "Sub::Util" : "1.41"
+            "Sub::Util" : "1.41",
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -49,15 +54,22 @@
          "web" : "https://github.com/jhthorsen/mojo-run3/issues"
       },
       "homepage" : "https://github.com/jhthorsen/mojo-run3",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jhthorsen/mojo-run3.git",
          "web" : "https://github.com/jhthorsen/mojo-run3"
+      },
+      "x_IRC" : {
+         "url" : "irc://irc.libera.chat/#convos",
+         "web" : "https://web.libera.chat/#convos"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
-      "Jan Henning Thorsen"
+      "Jan Henning Thorsen <jan.henning@thorsen.pm>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -38,7 +38,7 @@ This module connected to [EV](https://metacpan.org/pod/EV) with C-Level interfac
 
 # ANYEVENT INTEGRATION
 
-[AnyEvent](https://metacpan.org/pod/AnyEvent) has a support for EV as its one of backends, so [EV::Hiredis](https://metacpan.org/pod/EV::Hiredis) can be used in your AnyEvent applications seamlessly.
+[AnyEvent](https://metacpan.org/pod/AnyEvent) has a support for EV as its one of backends, so [EV::Hiredis](https://metacpan.org/pod/EV%3A%3AHiredis) can be used in your AnyEvent applications seamlessly.
 
 # NO UTF-8 SUPPORT
 
@@ -60,7 +60,7 @@ This module handle all variables as bytes. You should encode your utf-8 string b
 
 ## new(%options);
 
-Create new [EV::Hiredis](https://metacpan.org/pod/EV::Hiredis) instance.
+Create new [EV::Hiredis](https://metacpan.org/pod/EV%3A%3AHiredis) instance.
 
 Available `%options` are:
 

@@ -135,14 +135,6 @@ sub checkGetList {
     return $ret;
 }
 
-sub checkGetBadType {
-    my ( $uid, $type ) = splice @_;
-    my ( $test, $res );
-    $test = "Get for uid $uid and type \"$type\" should get rejected.";
-    $res  = get( $test, $uid, $type );
-    check400( $test, $res );
-}
-
 sub checkGetOnIds {
     my ( $uid, $ret ) = splice @_;
     foreach (@$ret) {
@@ -313,7 +305,7 @@ checkGetList( 1, 'dwho', 'U2F' );
 checkGetList( 1, 'dwho', 'TOTP' );
 checkGetList( 1, 'dwho', 'UBK' );
 checkGetList( 1, 'dwho', 'WebAuthn' );
-checkGetBadType( 'dwho', 'UBKIKI' );
+checkGetList( 0, 'dwho', 'UBKIKI' );
 $ret = checkGetList( 4, 'dwho' );
 checkGetOnIds( 'dwho', $ret );
 checkDelete( 'dwho', @$ret[0]->{id} );

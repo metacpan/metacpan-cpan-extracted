@@ -10,6 +10,7 @@ use PDF::Builder;
 my @possible_locations = (
     '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf',
     '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+    '/var/lib/defoma/gs.d/dirs/fonts/DejaVuSans.ttf',
     'C:/Windows/fonts/DejaVuSans.ttf',
 );
 
@@ -20,7 +21,7 @@ SKIP: {
         unless $font_file;
 
     my $pdf = PDF::Builder->new();
-    my $font = $pdf->ttfont($font_file);
+    my $font = $pdf->font($font_file); # originally ttfont()
 
     # Do something with the font to see if it appears to have opened
     # properly.

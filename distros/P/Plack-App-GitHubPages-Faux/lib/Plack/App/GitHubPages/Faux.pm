@@ -1,4 +1,4 @@
-package Plack::App::GitHubPages::Faux 0.02 {
+package Plack::App::GitHubPages::Faux 0.03 {
 
   use strict;
   use warnings;
@@ -72,13 +72,13 @@ Plack::App::GitHubPages::Faux - PSGI app to test your GitHub Pages site
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
  use Plack::App::GitHubPages::Faux;
  
- my $app = Plack::App::File->new( root => "/path/to/htdocs" )->to_app;
+ my $app = Plack::App::GitHubPages::Faux->new( root => "/path/to/htdocs" )->to_app;
 
 =head1 DESCRIPTION
 

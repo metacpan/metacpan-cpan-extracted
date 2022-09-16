@@ -1,3 +1,109 @@
+0.06 2022-09-16
+  [New Features]
+    * Add the methods that return the error numbers of Winsock to the Errno class.
+    
+      static method WSAEACCES : int ();
+
+      static method WSAEADDRINUSE : int ();
+
+      static method WSAEADDRNOTAVAIL : int ();
+
+      static method WSAEAFNOSUPPORT : int ();
+
+      static method WSAEALREADY : int ();
+
+      static method WSAEBADF : int ();
+
+      static method WSAECANCELLED : int ();
+
+      static method WSAECONNABORTED : int ();
+
+      static method WSAECONNREFUSED : int ();
+
+      static method WSAECONNRESET : int ();
+
+      static method WSAEDESTADDRREQ : int ();
+
+      static method WSAEDISCON : int ();
+
+      static method WSAEDQUOT : int ();
+
+      static method WSAEFAULT : int ();
+
+      static method WSAEHOSTDOWN : int ();
+
+      static method WSAEHOSTUNREACH : int ();
+
+      static method WSAEINPROGRESS : int ();
+
+      static method WSAEINTR : int ();
+
+      static method WSAEINVAL : int ();
+
+      static method WSAEINVALIDPROCTABLE : int ();
+
+      static method WSAEINVALIDPROVIDER : int ();
+
+      static method WSAEISCONN : int ();
+
+      static method WSAELOOP : int ();
+
+      static method WSAEMFILE : int ();
+
+      static method WSAEMSGSIZE : int ();
+
+      static method WSAENAMETOOLONG : int ();
+
+      static method WSAENETDOWN : int ();
+
+      static method WSAENETRESET : int ();
+
+      static method WSAENETUNREACH : int ();
+
+      static method WSAENOBUFS : int ();
+
+      static method WSAENOMORE : int ();
+
+      static method WSAENOPROTOOPT : int ();
+
+      static method WSAENOTCONN : int ();
+
+      static method WSAENOTEMPTY : int ();
+
+      static method WSAENOTSOCK : int ();
+
+      static method WSAEOPNOTSUPP : int ();
+
+      static method WSAEPFNOSUPPORT : int ();
+
+      static method WSAEPROCLIM : int ();
+
+      static method WSAEPROTONOSUPPORT : int ();
+
+      static method WSAEPROTOTYPE : int ();
+
+      static method WSAEPROVIDERFAILEDINIT : int ();
+
+      static method WSAEREFUSED : int ();
+
+      static method WSAEREMOTE : int ();
+
+      static method WSAESHUTDOWN : int ();
+
+      static method WSAESOCKTNOSUPPORT : int ();
+
+      static method WSAESTALE : int ();
+
+      static method WSAETIMEDOUT : int ();
+
+      static method WSAETOOMANYREFS : int ();
+
+      static method WSAEUSERS : int ();
+
+      static method WSAEWOULDBLOCK : int ();
+  [Test Fix]
+    * Fix the test bug that the tests failed on Windows.
+
 0.05 2022-08-31
   [Incompativle Changes]
     * All constant methods set the class id of Error::NotSupported to the error if the constant is not supported on the system.

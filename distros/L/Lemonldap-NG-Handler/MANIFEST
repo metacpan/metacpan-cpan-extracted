@@ -56,6 +56,7 @@ lib/Lemonldap/NG/Handler/Server/OAuth2.pm
 lib/Lemonldap/NG/Handler/Server/SecureToken.pm
 lib/Lemonldap/NG/Handler/Server/ServiceToken.pm
 lib/Lemonldap/NG/Handler/Server/ZimbraPreAuth.pm
+lib/Lemonldap/NG/SSOaaS/Apache/Client.pm
 lib/Plack/Middleware/Auth/LemonldapNG.pm
 Makefile.PL
 MANIFEST			This list of files

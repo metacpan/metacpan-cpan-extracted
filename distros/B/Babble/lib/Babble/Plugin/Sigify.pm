@@ -28,3 +28,14 @@ sub transform_to_plain {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Babble::Plugin::Sigify - Plugin to convert @_ unpacking to signature syntax
+
+=head1 SEE ALSO
+
+L<signatures feature|feature/"The 'signatures' feature">
+
+=cut

@@ -10,7 +10,7 @@ CTK - CTK ToolKit library (CTKlib)
 
 =head1 VERSION
 
-Version 2.08
+Version 2.09
 
 =head1 NOTE
 
@@ -493,7 +493,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses>
 =cut
 
 use vars qw/ $VERSION %PLUGIN_ALIAS_MAP %EXPORT_TAGS @EXPORT_OK /;
-$VERSION = '2.08';
+$VERSION = '2.09';
 
 use base qw/Exporter/;
 

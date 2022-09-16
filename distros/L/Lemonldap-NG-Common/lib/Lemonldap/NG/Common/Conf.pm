@@ -27,9 +27,11 @@ use Config::IniFiles;
 #inherits Lemonldap::NG::Common::Conf::Backends::SOAP
 #inherits Lemonldap::NG::Common::Conf::Backends::LDAP
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 our $msg     = '';
 our $iniObj;
+
+our $PlaceHolderRe = '%SERVERENV:(.*?)%';
 
 BEGIN {
     eval {
@@ -115,7 +117,7 @@ sub new {
 # Serialize $conf and call store().
 # @param $conf Lemonldap::NG configuration hashRef
 # @param %args Parameters
-# @return Number of the saved configuration, 0 in case of error.
+# @return Number of the saved configuration, <=0 in case of error.
 sub saveConf {
     my ( $self, $conf, %args ) = @_;
 
@@ -228,9 +230,10 @@ sub getConf {
         $res = $r;
     }
 
-    # Create cipher object
+    # Create cipher object and replace variable placeholder
     unless ( $args->{raw} ) {
 
+        $self->replacePlaceholders($res) if $self->{useServerEnv};
         eval {
             $res->{cipher} = Lemonldap::NG::Common::Crypto->new( $res->{key} );
         };
@@ -502,6 +505,46 @@ sub delete {
 
 sub logError {
     return shift->_launch( 'logError', @_ );
+}
+
+sub _substPlaceHolders {
+    return $_[0] unless $_[0];
+    $_[0] =~ s/$PlaceHolderRe/$ENV{$1}/geo;
+    return $_[0];
+}
+
+## @method void replacePlaceholders(res: LLNG_Conf)
+#
+# Recursively replace %SERVERENV:VariableName% by $ENV{VariableName} value
+sub replacePlaceholders {
+    my ( $self, $conf ) = @_;
+    if ( ref $conf eq 'HASH' ) {
+        foreach my $key ( keys %$conf ) {
+            if ( $key =~ /$PlaceHolderRe/o ) {
+                my $val = $conf->{$key};
+                delete $conf->{$key};
+                my $nk = _substPlaceHolders($key);
+                $conf->{$nk} = $val;
+            }
+            next unless ( $conf->{$key} );
+            if ( ref $conf->{$key} ) {
+                $self->replacePlaceholders( $conf->{$key} );
+            }
+            elsif ( $conf->{$key} =~ /$PlaceHolderRe/o ) {
+                $conf->{$key} = _substPlaceHolders( $conf->{$key} );
+            }
+        }
+    }
+    elsif ( ref $conf eq 'ARRAY' ) {
+        for ( my $i = 0 ; $i < @$conf ; $i++ ) {
+            if ( ref $conf->[$i] ) {
+                $self->replacePlaceholders( $conf->[$i] );
+            }
+            elsif ( $conf->[$i] =~ /$PlaceHolderRe/o ) {
+                $conf->[$i] = _substPlaceHolders( $conf->[$i] );
+            }
+        }
+    }
 }
 
 1;

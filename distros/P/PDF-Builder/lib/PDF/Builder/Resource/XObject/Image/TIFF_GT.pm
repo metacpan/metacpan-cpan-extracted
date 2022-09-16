@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.023'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -25,27 +25,27 @@ PDF::Builder::Resource::XObject::Image::TIFF_GT - TIFF image support
 
 =over
 
-=item  $res = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($pdf, $file, $name, %opts)
-
-=item  $res = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($pdf, $file, $name)
-
-=item  $res = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($pdf, $file)
+=item  $res = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($pdf, $file, %opts)
 
 Returns a TIFF-image object. C<$pdf> is the PDF object being added to, C<$file>
 is the input TIFF file, and the optional C<$name> of the new parent image object
 defaults to IxAAA.
 
 If the Graphics::TIFF package is installed, and its use is not suppressed via
-the C<-nouseGT> flag (see Builder documentation for C<image_tiff>), the TIFF_GT
+the C<nouseGT> flag (see Builder documentation for C<image_tiff>), the TIFF_GT
 library will be used. Otherwise, the TIFF library will be used instead.
 
 Options:
 
 =over
 
-=item -notrans => 1
+=item 'notrans' => 1
 
 Ignore any alpha layer (transparency) and make the image fully opaque.
+
+=item 'name' => 'string'
+
+This is the name you can give for the TIFF image object. The default is Ixnnnn.
 
 =back
 
@@ -72,16 +72,25 @@ so he can't do anything about it!
 =cut
 
 sub new {
-    my ($class, $pdf, $file, $name, %opts) = @_;
+    my ($class, $pdf, $file, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-nouseGT'} && !defined $opts{'nouseGT'}) { $opts{'nouseGT'} = delete($opts{'-nouseGT'}); }
+    if (defined $opts{'-name'} && !defined $opts{'name'}) { $opts{'name'} = delete($opts{'-name'}); }
+    if (defined $opts{'-compress'} && !defined $opts{'compress'}) { $opts{'compress'} = delete($opts{'-compress'}); }
+    if (defined $opts{'-notrans'} && !defined $opts{'notrans'}) { $opts{'notrans'} = delete($opts{'-notrans'}); }
+
+    my ($name, $compress);
+    if (exists $opts{'name'}) { $name = $opts{'name'}; }
+   #if (exists $opts{'compress'}) { $compress = $opts{'compress'}; }
 
     my $self;
 
-    my $tif = PDF::Builder::Resource::XObject::Image::TIFF::File_GT->new($file);
+    my $tif = PDF::Builder::Resource::XObject::Image::TIFF::File_GT->new($file, %opts);
 
     # in case of problematic things
     #  proxy to other modules
 
-    $class = ref($class) if ref $class;
+    $class = ref($class) if ref($class);
 
     $self = $class->SUPER::new($pdf, $name || 'Ix'.pdfkey());
     $pdf->new_obj($self) unless $self->is_obj($pdf);
@@ -131,7 +140,7 @@ sub new {
 =item  $mode = $tif->usesLib()
 
 Returns 1 if Graphics::TIFF installed and used, 0 if not installed, or -1 if
-installed but not used (-nouseGT option given to C<image_tiff>).
+installed but not used (nouseGT option given to C<image_tiff>).
 
 B<Caution:> this method can only be used I<after> the image object has been
 created. It can't tell you whether Graphics::TIFF is available in
@@ -160,7 +169,7 @@ sub decode_all_strips {
 
 sub handle_alpha {
     my ($self, $pdf, $tif, %opts) = @_;
-    my $transparency = (defined $opts{'-notrans'} && $opts{'-notrans'} == 1)? 0: 1;
+    my $transparency = (defined $opts{'notrans'} && $opts{'notrans'} == 1)? 0: 1;
     my ($alpha, $dict);
 
     # handle any Alpha channel/layer

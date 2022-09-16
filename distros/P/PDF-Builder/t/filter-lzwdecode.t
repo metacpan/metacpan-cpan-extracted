@@ -5,6 +5,7 @@ use strict;
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Basic::PDF::Filter::LZWDecode;
 use Test::More tests => 9;
+#-# 4 note() debugs presently commented out
 
 my $filter = PDF::Builder::Basic::PDF::Filter::LZWDecode->new();
 my $in = 'BT /F1 24 Tf 100 700 Td (Hello World)Tj ET';
@@ -14,10 +15,10 @@ is $filter->infilt($out), $in, 'LZWDecode test string round-tripped correctly';
 ###
 
 my $repeat = 22;
-note( 'Test data size: ' . length($in)*$repeat );
+#-#note( 'Test data size: ' . length($in)*$repeat );
 $filter = PDF::Builder::Basic::PDF::Filter::LZWDecode->new();
 $out = $filter->outfilt($in x $repeat);
-note( 'Final bits: '.$filter->{code_length} );
+#-#note( 'Final bits: '.$filter->{code_length} );
 cmp_ok length($out), '<', length($in)*$repeat, "Data compresses smaller";
 
 $filter = PDF::Builder::Basic::PDF::Filter::LZWDecode->new();
@@ -41,10 +42,10 @@ is $out, $expected, 'compress binary data';
 $repeat = 30000;
 $in = '';
 for (0..$repeat) {$in .= chr(int(rand(256)))}
-note( 'Test data size: ' . length($in) );
+#-#note( 'Test data size: ' . length($in) );
 $filter = PDF::Builder::Basic::PDF::Filter::LZWDecode->new();
 $out = $filter->outfilt($in);
-note( 'Final bits: '.$filter->{'code_length'} );
+#-#note( 'Final bits: '.$filter->{'code_length'} );
 
 $filter = PDF::Builder::Basic::PDF::Filter::LZWDecode->new();
 is $filter->infilt($out), $in, 'Data decompresses unchanged after reaching max code length';

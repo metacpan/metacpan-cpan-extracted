@@ -20,8 +20,8 @@ use base 'PDF::Builder::Basic::PDF::String';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.022'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -30,7 +30,9 @@ and stores PDF names (things beginning with /)
 
 =head1 METHODS
 
-=head2 $n = PDF::Builder::Basic::PDF::Name->from_pdf($string)
+=over
+
+=item $n = PDF::Builder::Basic::PDF::Name->from_pdf($string)
 
 Creates a new string object (not a full object yet) from a given
 string.  The string is parsed according to input criteria with
@@ -47,7 +49,7 @@ sub from_pdf {
     return $self;
 }
 
-=head2 $n->convert($string, $pdf)
+=item $n->convert($string, $pdf)
 
 Converts a name into a string by removing the / and converting any hex
 munging.
@@ -61,7 +63,7 @@ sub convert {
     return $string;
 }
 
-=head2 $s->as_pdf($pdf)
+=item $s->as_pdf($pdf)
 
 Returns a name formatted as PDF. C<$pdf> is optional but should be the
 PDF File object for which the name is intended if supplied.
@@ -82,7 +84,7 @@ sub as_pdf {
 # spaces were implicitly allowed in names as well but it would be best
 # to ignore that (PDF 1.3, section H.3.2.4.3).
 
-=head2 PDF::Builder::Basic::PDF::Name->string_to_name($string, $pdf)
+=item PDF::Builder::Basic::PDF::Name->string_to_name($string, $pdf)
 
 Suitably encode the string C<$string> for output in the File object C<$pdf>
 (the exact format may depend on the version of $pdf).
@@ -100,7 +102,7 @@ sub string_to_name {
     return $string;
 }
 
-=head2 PDF::Builder::Basic::PDF::Name->name_to_string($string, $pdf)
+=item PDF::Builder::Basic::PDF::Name->name_to_string($string, $pdf)
 
 Suitably decode the string C<$string> as read from the File object C<$pdf>
 (the exact decoding may depend on the version of $pdf).  Principally,
@@ -120,5 +122,9 @@ sub name_to_string {
 
     return $string;
 }
+
+=back
+
+=cut
 
 1;

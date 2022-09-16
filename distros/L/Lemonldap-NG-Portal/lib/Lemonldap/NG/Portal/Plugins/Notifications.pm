@@ -20,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_NOTIFICATION
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.15';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -189,10 +189,6 @@ sub myNotifs {
 
     # Build template
     my $params = {
-        PORTAL        => $self->conf->{portal},
-        MAIN_LOGO     => $self->conf->{portalMainLogo},
-        SKIN          => $self->p->getSkin($req),
-        LANGS         => $self->conf->{showLanguages},
         NOTIFICATIONS => $_notifications,
         MSG           => $msg
     };

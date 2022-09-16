@@ -1,6 +1,13 @@
-Revision history for Dist-Util
+0.070   2022-08-21  Released-By: PERLANCAR; Urgency: medium
 
-0.06    2014-12-26 (PERLANCAR)
+        - Add option 'detail' to list_dists().
+
+        - [doc] Mention Dist::Util::Current.
+
+        - Remove requirement of perl version.
+
+
+0.06    2014-12-26  Released-By: PERLANCAR
 
 	- Note about the fact that many linux distros strip .packlist
 	  files.
@@ -8,19 +15,19 @@ Revision history for Dist-Util
 	- Move bin/packlist-for to App-DistUtils.
 
 
-0.05    2014-12-03 (PERLANCAR)
+0.05    2014-12-03  Released-By: PERLANCAR
 
 	- Rename dist from SHARYANTO-Dist-Util to Dist-Util.
 
         - Add function: list_dists().
 
 
-0.04    2014-11-20 (PERLANCAR)
+0.04    2014-11-20  Released-By: PERLANCAR
 
 	- Accept Foo-Bar as well as Foo::Bar.
 
 
-0.03    2014-07-02 (SHARYANTO)
+0.03    2014-07-02  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -29,13 +36,13 @@ Revision history for Dist-Util
           installing [RT#96884]
 
 
-0.02    2014-04-11 (SHARYANTO)
+0.02    2014-04-11  Released-By: SHARYANTO
 
         - Add command-line script: packlist-for.
 
         - Add function: list_dist_modules().
 
 
-0.01    2014-04-05 (SHARYANTO)
+0.01    2014-04-05  Released-By: SHARYANTO
 
         - First release.

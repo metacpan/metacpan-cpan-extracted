@@ -1,0 +1,44 @@
+---
+abstract: 'Greple module to update file content'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Greple-update
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Greple::update:
+    file: lib/App/Greple/update.pm
+    version: '0.03'
+requires:
+  App::Greple: '8.58'
+  List::Util: '0'
+  Text::ParseWords: '0'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/kaz-utashiro/greple-update/issues
+  homepage: https://github.com/kaz-utashiro/greple-update
+  repository: https://github.com/kaz-utashiro/greple-update.git
+version: '0.03'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,3 +1,10 @@
+0.023		2022-09-16	T. R. Wyant
+    Update discouragement notice for variables(), and add a TODO in
+    t/variables.t for why.
+
+    Correct normalization of ${^FOO} for PPI. If the caret is present
+    the braces are not removed.
+
 0.022		2022-04-15	T. R. Wyant
     Remove 'postderef' argument to new().  Postfix dereference is always
     recognized.

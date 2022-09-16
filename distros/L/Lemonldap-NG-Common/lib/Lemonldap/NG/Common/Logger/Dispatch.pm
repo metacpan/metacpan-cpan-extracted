@@ -2,19 +2,18 @@ package Lemonldap::NG::Common::Logger::Dispatch;
 
 use strict;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 sub new {
     no warnings 'redefine';
     my $self = bless {}, shift;
     my ( $conf, %args ) = @_;
-    my %bck;
-    my $last;
-    my $show = 1;
+    my ( %bck, $last );
     my $root = $args{user} ? 'userLogDispatch' : 'logDispatch';
-    unless ( $conf->{ $root . 'Error' } ) {
-        die "At least, ${root}Error must be defined in conf";
-    }
+    my $show = 1;
+    die "At least, ${root}Error must be defined in conf"
+      unless ( $conf->{ $root . 'Error' } );
+
     foreach my $l (qw(error warn notice info debug)) {
         if ($show) {
             $last = $conf->{ $root . ucfirst($l) } || $last;
@@ -33,9 +32,9 @@ sub new {
             eval qq'sub $l {1}';
         }
         $show = 0 if ( $conf->{logLevel} eq $l );
-
     }
-    die "Unknown logLevel $conf->{logLevel}" if ($show);
+    die "Unknown logLevel $conf->{logLevel}" if $show;
+
     return $self;
 }
 

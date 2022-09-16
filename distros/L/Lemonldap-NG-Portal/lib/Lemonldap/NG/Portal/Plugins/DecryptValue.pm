@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_DECRYPTVALUE_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -17,7 +17,7 @@ extends qw(
 
 # INITIALIZATION
 has rule => ( is => 'rw', default => sub { 0 } );
-has ott  => (
+has ott => (
     is      => 'rw',
     lazy    => 1,
     default => sub {
@@ -37,13 +37,7 @@ sub init {
     $self->rule(
         $self->p->buildRule( $self->conf->{decryptValueRule}, 'decryptValue' )
     );
-    return 0 unless $self->rule;
-
-    # Add warning in log
-    $self->logger->warn(
-        "DecryptValue plugin is enabled. You are using a beta version!");
-
-    return 1;
+    return $self->rule ? 1 : 0;
 }
 
 # RUNNING METHOD
@@ -59,13 +53,9 @@ sub display {
 
     # Display form
     my $params = {
-        PORTAL    => $self->conf->{portal},
-        MAIN_LOGO => $self->conf->{portalMainLogo},
-        SKIN      => $self->p->getSkin($req),
-        LANGS     => $self->conf->{showLanguages},
-        MSG       => 'decryptCipheredValue',
-        ALERTE    => 'alert-warning',
-        TOKEN     => (
+        MSG    => 'decryptCipheredValue',
+        ALERTE => 'alert-warning',
+        TOKEN  => (
               $self->ottRule->( $req, {} )
             ? $self->ott->createToken()
             : ''
@@ -106,16 +96,12 @@ sub run {
         }
 
         my $params = {
-            PORTAL    => $self->conf->{portal},
-            MAIN_LOGO => $self->conf->{portalMainLogo},
-            SKIN      => $self->p->getSkin($req),
-            LANGS     => $self->conf->{showLanguages},
-            MSG       => "PE$msg",
-            ALERTE    => 'alert-warning',
-            TOKEN     => $token,
+            MSG    => "PE$msg",
+            ALERTE => 'alert-warning',
+            TOKEN  => $token,
         };
         return $self->p->sendJSONresponse( $req, $params )
-          if ( $req->wantJSON );
+          if $req->wantJSON;
         return $self->p->sendHtml( $req, 'decryptvalue', params => $params )
           if $msg;
     }
@@ -124,18 +110,20 @@ sub run {
     $self->logger->debug("decryptValue tried with value: $cipheredValue");
 
     if ($cipheredValue) {
-        if (    $self->{conf}->{decryptValueFunctions}
-            and $self->{conf}->{decryptValueFunctions} =~
+        if (    $self->conf->{decryptValueFunctions}
+            and $self->conf->{decryptValueFunctions} =~
             qr/^(?:\w+(?:::\w+)*(?:\s+\w+(?:::\w+)*)*)?$/ )
         {
             foreach ( split( /\s+/, $self->{conf}->{decryptValueFunctions} ) ) {
                 $self->userLogger->notice(
                     "Try to decrypt value with function: $_");
                 /^([\w:{2}]*?)(?:::)?(?:\w+)$/;
-                eval "require Lemonldap::NG::Portal::$1";
+                eval "require $1";
                 $self->logger->debug("Unable to load decrypt module: $@")
                   if ($@);
-                $decryptedValue = eval "$_" . '($cipheredValue)' unless ($@);
+                my $key = $self->conf->{key};
+                $decryptedValue = eval "$_" . '($cipheredValue, $key)'
+                  unless ($@);
                 $self->logger->debug(
                     $@
                     ? "Unable to eval decrypt function: $@"
@@ -146,7 +134,7 @@ sub run {
         }
         else {
             $self->userLogger->notice("Malformed decrypt functions")
-              if $self->{conf}->{decryptValueFunctions};
+              if $self->conf->{decryptValueFunctions};
             $self->userLogger->notice(
                 "Try to decrypt value with internal LL::NG decrypt function");
             $decryptedValue =
@@ -161,10 +149,6 @@ sub run {
 
     # Display form
     my $params = {
-        PORTAL    => $self->conf->{portal},
-        MAIN_LOGO => $self->conf->{portalMainLogo},
-        SKIN      => $self->p->getSkin($req),
-        LANGS     => $self->conf->{showLanguages},
         MSG       => 'decryptCipheredValue',
         DECRYPTED => (
             $decryptedValue ? $decryptedValue

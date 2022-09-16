@@ -7,7 +7,7 @@ use XML::Simple;
 use Lemonldap::NG::Common::UserAgent;
 use URI;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 # PROPERTIES
 
@@ -26,6 +26,7 @@ has ua => (
 
 has casSrvList => ( is => 'rw', default => sub { {} }, );
 has casAppList => ( is => 'rw', default => sub { {} }, );
+has srvRules   => ( is => 'rw', default => sub { {} }, );
 has spRules    => ( is => 'rw', default => sub { {} }, );
 has spMacros   => ( is => 'rw', default => sub { {} }, );
 
@@ -41,6 +42,19 @@ sub loadSrv {
         return 0;
     }
     $self->casSrvList( $self->conf->{casSrvMetaDataOptions} );
+
+    # Set rule
+    foreach ( keys %{ $self->conf->{casSrvMetaDataOptions} } ) {
+        my $cond = $self->conf->{casSrvMetaDataOptions}->{$_}
+          ->{casSrvMetaDataOptionsResolutionRule};
+        if ( length $cond ) {
+            my $rule_sub =
+              $self->p->buildRule( $cond, "CAS server resolution" );
+            if ($rule_sub) {
+                $self->srvRules->{$_} = $rule_sub;
+            }
+        }
+    }
     return 1;
 }
 

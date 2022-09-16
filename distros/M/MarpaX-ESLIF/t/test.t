@@ -1647,7 +1647,7 @@ done_testing();
 
 sub doScan {
     my ($log, $eslifRecognizer, $initialEvents) = @_;
-		
+
     $log->debugf(" =============> scan(initialEvents=%s", $initialEvents);
     if (! $eslifRecognizer->scan($initialEvents)) {
         return 0;
@@ -1656,7 +1656,7 @@ sub doScan {
     showRecognizerInput($context, $log, $eslifRecognizer);
     showEvents($context, $log, $eslifRecognizer);
     showNameExpected($context, $log, $eslifRecognizer);
-		
+
     return 1;
 }
 
@@ -1682,7 +1682,7 @@ sub showNameExpected {
 sub doResume {
     my ($log, $eslifRecognizer, $deltaLength) = @_;
     my $context;
-		
+
     $log->debugf(" =============> resume(deltaLength=%d)", $deltaLength);
     if (! $eslifRecognizer->resume($deltaLength)) {
         return 0;
@@ -1692,7 +1692,7 @@ sub doResume {
     showRecognizerInput($context, $log, $eslifRecognizer);
     showEvents($context, $log, $eslifRecognizer);
     showNameExpected($context, $log, $eslifRecognizer);
-		
+
     return 1;
 }
 
@@ -1786,7 +1786,7 @@ sub doAlternativeRead {
     showRecognizerInput($context, $log, $eslifRecognizer);
     showEvents($context, $log, $eslifRecognizer);
     showNameExpected($context, $log, $eslifRecognizer);
-		
+
     return 1;
 }
 

@@ -1,0 +1,118 @@
+class TestCase::Sys::User {
+  use Sys::User;
+  
+  static method getuid_value : int () {
+    
+    my $getuid = Sys::User->getuid;
+    
+    return $getuid;
+  }
+
+  static method geteuid_value : int () {
+    
+    my $geteuid = Sys::User->geteuid;
+    
+    return $geteuid;
+  }
+
+  static method getgid_value : int () {
+    
+    my $getgid = Sys::User->getgid;
+    
+    return $getgid;
+  }
+
+  static method getegid_value : int () {
+    
+    my $getegid = Sys::User->getegid;
+    
+    return $getegid;
+  }
+
+  static method setuid : int () {
+    
+    my $error_code = Sys::User->setuid(Sys::User->getuid);
+    
+    unless ($error_code == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method seteuid : int () {
+    
+    my $error_code = Sys::User->seteuid(Sys::User->geteuid);
+    
+    unless ($error_code == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method setgid : int () {
+    
+    my $error_code = Sys::User->setgid(Sys::User->getgid);
+    
+    unless ($error_code == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method setegid : int () {
+    
+    my $error_code = Sys::User->setegid(Sys::User->getegid);
+    
+    unless ($error_code == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method setpwent : int () {
+    
+    Sys::User->setpwent;
+    
+    return 1;
+  }
+
+  static method endpwent : int () {
+    
+    Sys::User->endpwent;
+    
+    return 1;
+  }
+  
+  static method setgrent : int () {
+    
+    Sys::User->setgrent;
+    
+    return 1;
+  }
+  
+  static method endgrent : int () {
+    
+    Sys::User->endgrent;
+    
+    return 1;
+  }
+  
+  static method getgroups_value : int[] () {
+    
+    my $groups = Sys::User->getgroups;
+    
+    return $groups;
+  }
+
+  static method setgroups : int () {
+    
+    # TODO
+    Sys::User->setgroups(Sys::User->getgroups);
+    
+    return 1;
+  }
+}

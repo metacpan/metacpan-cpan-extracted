@@ -33,13 +33,13 @@ use Test::More;
     my $r     = Data::Gimei::Random->new;
 
     $r->set_seed(42);
-    my $expected = $r->next_sample( \@array );
+    my $expected = $r->sample( \@array );
 
     random_uniform_integer( 1, 0, 1 );
     rand(1);
 
     $r->set_seed(42);
-    is $r->next_sample( \@array ), $expected;
+    is $r->sample( \@array ), $expected;
 }
 
 done_testing;

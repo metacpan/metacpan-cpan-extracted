@@ -6,6 +6,7 @@
 
 <form id="upgrd" action="<TMPL_VAR NAME="FORMACTION">" method="post" class="password" role="form">
   <input type="hidden" name="confirm" value="<TMPL_VAR NAME="CONFIRMKEY">">
+  <input type="hidden" id="forceUpgrade" name="forceUpgrade" value="<TMPL_VAR NAME="FORCEUPGRADE">" />
   <input type="hidden" name="url" value="<TMPL_VAR NAME="URL">">
   <div class="buttons">
     <button type="submit" class="btn btn-success">

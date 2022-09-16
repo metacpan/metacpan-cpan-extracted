@@ -10,7 +10,7 @@ use namespace::clean; # to avoid having an "in_global_destruction" method
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.25'; # VERSION
+our $VERSION = '6.0.26'; # VERSION
 
 
 #
@@ -30,7 +30,7 @@ our $VERSION = '6.0.25'; # VERSION
 # - MULTITONS_FOR_GLOBAL_DESTRUCTION when in global destruction
 #
 # CLONE() is completely reaffecting the keys of both hashes.
-# - 
+# -
 #
 my %MULTITONS;
 my %MULTITONS_FOR_GLOBAL_DESTRUCTION;
@@ -39,7 +39,7 @@ sub _find {
     my ($class, $eq, @arguments) = @_;
 
     foreach (grep { $_->{class} eq $class } values %MULTITONS) {
-	return $_ if $_->$eq($_->{arguments}, @arguments)
+        return $_ if $_->$eq($_->{arguments}, @arguments)
     }
 
     return
@@ -253,7 +253,7 @@ MarpaX::ESLIF::Base - ESLIF base
 
 =head1 VERSION
 
-version 6.0.25
+version 6.0.26
 
 =head1 DESCRIPTION
 

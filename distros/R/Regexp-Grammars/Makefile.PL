@@ -12,9 +12,6 @@ WriteMakefile(
     PREREQ_PM           => {
             'Test::More'    => 0,
             'version'       => 0,
-        ($] >= 5.018 ? (
-            'B::Hooks::Parser' => 0.16,
-        ) : ())
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Regexp-Grammars-*' },

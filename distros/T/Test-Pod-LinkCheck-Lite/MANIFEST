@@ -22,6 +22,7 @@ t/data/_lib/My/Test/Module.pm
 t/data/not_ok/bug_other_distros.pod
 t/data/not_ok/external_installed_bad_section.pod
 t/data/not_ok/external_installed_section.pod
+t/data/not_ok/github_error.pod
 t/data/not_ok/internal_error.pod
 t/data/not_ok/man_bad.pod
 t/data/not_ok/redirect.pod

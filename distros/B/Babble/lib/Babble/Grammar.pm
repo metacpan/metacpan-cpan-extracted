@@ -32,7 +32,8 @@ lazy grammar_regexp => sub {
   return $base_re unless @parts;
   my $define_block = join "\n", '(?(DEFINE)', '', @parts, '', ')';
   use re 'eval';
-  # For reasons I don't understand, this stringify is required (RT #126285)
+  # This stringify is required for Perl v5.18 - v5.28
+  # (RT #126285, RT #144248).
   my $final_re = "${define_block} ${base_re}";
   return qr{$final_re}x;
 };

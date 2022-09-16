@@ -1,74 +1,21 @@
 Revision history for Perl extension Text::Ngrams.
 
-0.01  Wed Jun  4 20:52:49 ADT 2003
-	- initial version, ported from code from 2000
+2.007  Sat Sep 10 21:16:02 ADT 2022
+	- documentation improvements
+	- import to GitHub under https://github.com/vkeselj/Text-Ngrams
 
-0.02  Fri Jun  6 16:00:00 ADT 2003
-	- fixed installation of ngrams.pl man page
+2.006  Sun Feb 12 11:15:29 AST 2017
+	- fixed that files are always read in binary mode (for
+  	  text/binary distinguishing systems)
 
-0.03  Mon Jun  9 07:05:00 ADT 2003
-	- fixed test cases 3, 5, and 7 (problems found thanks to
-	  cpan-testers, Josts Smokehouse)
+2.005  Wed Feb  8 12:49:17 AST 2017
+	- when sorted by frequency, introducing secondary
+	  lexicographic sorting
+	- documentation improvements
+	- removed $Revision variable
 
-0.04  Jun 11 2003
-	- added parameter 'limit' to new
-        - added non-ordered print
-        - added parameter 'onlyfirst' to print
-
-0.05  Wed Sep  3 13:00:43 ADT 2003	 
-	- fixed README
-
-1.0   Thu Dec 18 13:09:45 AST 2003
-	- added parameter 'normalize' to ngrams.pl and to_string
-	  method in Ngrams.pm
-
-1.1   Sat May 29 16:15:34 ADT 2004
-	- corrected typo submitted by Shlomo Yona
-
-1.2   Thu Jul 29 15:05:28 ADT 2004
-	- documentation improvement
-	- introduced first and last n-gram in the output
-	- made _reduce_to_limit more efficient (--limit parameter)
-	  thanks to observations by David Allen
-
-1.3   Mon Nov  1 12:52:02 AST 2004
-	- Improved for multi-line token processing
-	- resolved efficiency issue with binary file (not reading line
-  	  by line any more)
-	- introduced parameters skipinsert and allow_iproc
-	- thanks to Andrija Tomovic, Roger Zhang for suggestions
-
-1.4   Wed Nov  3 08:45:27 AST 2004
-	- Fixed minor testing bugs, a warning
-
-1.5   Wed Nov  3 14:04:30 AST 2004
-        - minor testing bug (rounding error)
-
-1.6   Thu Dec  2 23:00:42 AST 2004
-	- added utf8 type n-grams
-
-1.7   Wed Dec  8 11:01:07 AST 2004
-	- fixed a documentation typo (thanks to Kevin J. Ziese)
-	- solving "our deprecated" warning
-
-1.8   Thu Dec 15 11:45:38 AST 2005
-	- debuging
-	- introduced spartan option in to_string
-	- function get_ngrams added
-	- changed output format to include space between tokens
-	  (no token separator)
-
-1.9   Mon Nov  6 07:20:42 AST 2006
-	- bug fixed in get_ngrams
-	- added option spartan to script ngrams.pl
-
-2.001  Sat Oct 25 00:10:40 ADT 2008
-	- fixed bug in to_string for writing to a file with given name
-
-2.002  Sat Oct 25 09:31:17 ADT 2008
-	- Improved documentation.
-	- changed perl to $^X in test 06, which may cause problems
-  	  with testing
+2.004  Sun Feb 17 11:28:22 AST 2013
+	- documentation improvements
 
 2.003  Wed Dec 12 23:38:15 AST 2012
 	- minor code improvements
@@ -78,15 +25,72 @@ Revision history for Perl extension Text::Ngrams.
           thanks to Magdalena Jankowska
 	- a bug fix thanks to Magdalena Jankowska
 
-2.004  Sun Feb 17 11:28:22 AST 2013
-	- documentation improvements
+2.002  Sat Oct 25 09:31:17 ADT 2008
+	- Improved documentation.
+	- changed perl to $^X in test 06, which may cause problems
+  	  with testing
 
-2.005  Wed Feb  8 12:49:17 AST 2017
-	- when sorted by frequency, introducing secondary
-	  lexicographic sorting
-	- documentation improvements
-	- removed $Revision variable
+2.001  Sat Oct 25 00:10:40 ADT 2008
+	- fixed bug in to_string for writing to a file with given name
 
-2.006  Sun Feb 12 11:15:29 AST 2017
-	- fixed that files are always read in binary mode (for
-  	  text/binary distinguishing systems)
+1.9   Mon Nov  6 07:20:42 AST 2006
+	- bug fixed in get_ngrams
+	- added option spartan to script ngrams.pl
+
+1.8   Thu Dec 15 11:45:38 AST 2005
+	- debuging
+	- introduced spartan option in to_string
+	- function get_ngrams added
+	- changed output format to include space between tokens
+	  (no token separator)
+
+1.7   Wed Dec  8 11:01:07 AST 2004
+	- fixed a documentation typo (thanks to Kevin J. Ziese)
+	- solving "our deprecated" warning
+
+1.6   Thu Dec  2 23:00:42 AST 2004
+	- added utf8 type n-grams
+
+1.5   Wed Nov  3 14:04:30 AST 2004
+        - minor testing bug (rounding error)
+
+1.4   Wed Nov  3 08:45:27 AST 2004
+	- Fixed minor testing bugs, a warning
+
+1.3   Mon Nov  1 12:52:02 AST 2004
+	- Improved for multi-line token processing
+	- resolved efficiency issue with binary file (not reading line
+  	  by line any more)
+	- introduced parameters skipinsert and allow_iproc
+	- thanks to Andrija Tomovic, Roger Zhang for suggestions
+
+1.2   Thu Jul 29 15:05:28 ADT 2004
+	- documentation improvement
+	- introduced first and last n-gram in the output
+	- made _reduce_to_limit more efficient (--limit parameter)
+	  thanks to observations by David Allen
+
+1.1   Sat May 29 16:15:34 ADT 2004
+	- corrected typo submitted by Shlomo Yona
+
+1.0   Thu Dec 18 13:09:45 AST 2003
+	- added parameter 'normalize' to ngrams.pl and to_string
+	  method in Ngrams.pm
+
+0.05  Wed Sep  3 13:00:43 ADT 2003	 
+	- fixed README
+
+0.04  Jun 11 2003
+	- added parameter 'limit' to new
+        - added non-ordered print
+        - added parameter 'onlyfirst' to print
+
+0.03  Mon Jun  9 07:05:00 ADT 2003
+	- fixed test cases 3, 5, and 7 (problems found thanks to
+	  cpan-testers, Josts Smokehouse)
+
+0.02  Fri Jun  6 16:00:00 ADT 2003
+	- fixed installation of ngrams.pl man page
+
+0.01  Wed Jun  4 20:52:49 ADT 2003
+	- initial version, ported from code from 2000

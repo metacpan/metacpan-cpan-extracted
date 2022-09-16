@@ -1,0 +1,3 @@
+class Sys::IO::DirStream : pointer_t {
+  native method DESTROY : void ();
+}

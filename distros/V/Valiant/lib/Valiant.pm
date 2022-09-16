@@ -1,6 +1,6 @@
 package Valiant;
 
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 $VERSION = eval $VERSION;
 
 1;
@@ -70,16 +70,7 @@ Valiant - Object validation inspired by Ruby on Rails and more.
 
 =head1 DESCRIPTION
 
-B<WARNING>: This is early release code.  I've been using it for a while on personal projects
-and have a lot of test cases but there's probably corners I've not hit yet.   All documented
-features should work as described.  I will only change API and functionality in a breaking
-manner if its the only way to fix problems (caveat that I am reserving the right to change
-the way errors are listed and structured for nested validations, for now, as well as the
-way we resolve files for internationalization, whose current code may not be as performant
-as needed; additionally the L<Valiant::DBIx::Class> packages are all currently subject to
-breaking changes as needed).
-
-Domain level validations for L<Moo> classes and related capabilities such as attribute
+Domain level validations for L<Moo> or L<Moose> classes and related capabilities such as attribute
 filtering and internationalization.  Provides a domain specific language
 which allows you to defined for a given class what a valid state for an instance of that
 class would be and to gather reportable error messages.  Used to defined constraints

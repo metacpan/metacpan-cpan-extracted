@@ -6,10 +6,10 @@ use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64 qw(encode_base64url decode_base64url);
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
 extends qw(
-  Lemonldap::NG::Portal::Main::Plugin
+  Lemonldap::NG::Portal::2F::Register::Base
   Lemonldap::NG::Portal::Lib::U2F
 );
 
@@ -22,8 +22,8 @@ has logo     => ( is => 'rw', default => 'u2f.png' );
 
 sub init {
     my ($self) = @_;
-    return 0 unless $self->SUPER::init;
-    return 1;
+    return 0 unless ( $self->Lemonldap::NG::Portal::Lib::U2F::init() );
+    return ( $self->Lemonldap::NG::Portal::2F::Register::Base::init() );
 }
 
 # RUNNING METHODS

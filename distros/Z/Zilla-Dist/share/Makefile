@@ -39,6 +39,16 @@ DIST := $(DISTDIR).tar.gz
 NAMEPATH := $(subst -,/,$(NAMEPATH))
 SUCCESS := "$(DIST) Released!!!"
 
+README :=
+ifeq (,$(shell zild meta =zild/no-readme))
+  ifneq (,$(wildcard $(BASE)/ReadMe.pod))
+    README := ReadMe.pod
+  endif
+  ifneq (,$(wildcard $(BASE)/ReadMe.md))
+    README := ReadMe.md
+  endif
+endif
+
 export TESTML_RUN := perl
 
 default: help
@@ -196,17 +206,22 @@ upgrade:
 	@echo '***** Checking that Zilla-Dist Makefile is up to date'
 	cp `$(ZILD) sharedir`/Makefile ./
 
-readme:
-ifeq (,$(shell zild meta =zild/no-readme))
+readme: $(README)
+
+ReadMe.pod:
 ifneq (,$(wildcard doc/$(NAMEPATH).md))
-	zild-pandoc-json-to-pod \
-	    < doc/$(NAMEPATH).md \
-	    > ReadMe.pod
+	cat doc/$(NAMEPATH).md | \
+	  zild-markdown-plus \
+	  pandoc --from=gfm --to=json | \
+	  zild-pandoc-json-to-pod \
+	  > $@
 else
 	swim --to=pod --complete --wrap --meta=Meta \
-	  doc/$(NAMEPATH).swim > ReadMe.pod
+	  doc/$(NAMEPATH).swim > $@
 endif
-endif
+
+ReadMe.md: doc/$(NAMEPATH).md force
+	zild-markdown-plus < $< > $@
 
 about:
 ifeq (,$(shell zild meta =zild/no-about))
@@ -227,6 +242,9 @@ clean:
 	find . -type d | grep '\.testml' | xargs rm -fr
 
 distclean purge: clean
+
+force:
+	true
 
 #------------------------------------------------------------------------------
 # Non-pulic-facing targets:

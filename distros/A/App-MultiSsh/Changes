@@ -1,5 +1,10 @@
 Revision history for App-MultiSsh
 
+0.25   2022-09-10
+        Updating for release of version 0.25
+        Updated (Ivan Wills)
+        Adding listing of groups option (Ivan Wills)
+
 0.24   2020-04-02
         Updating for release of version 0.24
         Got tests to match code changes (Ivan Wills)

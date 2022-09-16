@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Form::BarCode';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ PDF::Builder::Resource::XObject::Form::BarCode::code128 - Code 128 and EAN-128 b
 
 =item $res = PDF::Builder::Resource::XObject::Form::BarCode::code128->new($pdf, %options)
 
-Returns a code128 object. Use '-ean' to encode using EAN128 mode.
+Returns a code128 object. Use 'ean' option to encode using EAN128 mode.
 
 =back
 
@@ -26,16 +26,20 @@ Returns a code128 object. Use '-ean' to encode using EAN128 mode.
 
 sub new {
     my ($class, $pdf, %options) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $options{'-ean'} && !defined $options{'ean'}) { $options{'ean'} = delete($options{'-ean'}); }
+    if (defined $options{'-code'} && !defined $options{'code'}) { $options{'code'} = delete($options{'-code'}); }
+    if (defined $options{'-type'} && !defined $options{'type'}) { $options{'type'} = delete($options{'-type'}); }
 
     $class = ref($class) if ref($class);
 
     my $self = $class->SUPER::new($pdf, %options);
 
     my @bars;
-    if ($options{'-ean'}) {
-        @bars = $self->encode_ean128($options{'-code'});
+    if ($options{'ean'}) {
+        @bars = $self->encode_ean128($options{'code'});
     } else {
-        @bars = $self->encode_128($options{'-type'}, $options{'-code'});
+        @bars = $self->encode_128($options{'type'}, $options{'code'});
     }
 
     $self->drawbar(\@bars, $options{'caption'});

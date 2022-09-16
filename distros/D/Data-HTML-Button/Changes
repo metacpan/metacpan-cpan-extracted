@@ -1,0 +1,6 @@
+0.02 2022-09-14T10:44:03+02:00
+ - Add constructor tests.
+ - Fix minimal dependency for none().
+
+0.01 2022-09-12T17:20:41+02:00
+ - First version.

@@ -4,17 +4,30 @@ use strict;
 use Lemonldap::NG::Common::UserAgent;
 use JSON qw(from_json);
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 our $_ua;
 
 sub ua {
-    return $_ua if ($_ua);
-    return $_ua = Lemonldap::NG::Common::UserAgent->new( $_[0]->localConfig );
+    my ($class) = @_;
+    return $_ua if $_ua;
+    $_ua = Lemonldap::NG::Common::UserAgent->new( {
+            lwpOpts    => $class->tsv->{lwpOpts},
+            lwpSslOpts => $class->tsv->{lwpSslOpts}
+        }
+    );
+    return $_ua;
 }
 
 sub checkMaintenanceMode {
     my ( $class, $req ) = @_;
     my $vhost = $class->resolveAlias($req);
+
+    unless ($vhost) {
+        $class->logger->error('No VHost provided');
+        return $class->Lemonldap::NG::Handler::Main::checkMaintenanceMode($req);
+    }
+
+    $class->logger->info("DevOps request from $vhost");
     $class->tsv->{lastVhostUpdate} //= {};
     $class->_loadVhostConfig( $req, $vhost )
       unless (

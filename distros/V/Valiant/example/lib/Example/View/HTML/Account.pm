@@ -7,6 +7,12 @@ use Valiant::HTML::Form 'form_for';
 
 extends 'Example::View::HTML';
 
+__PACKAGE__->views(
+  layout => 'HTML::Layout',
+  navbar => 'HTML::Navbar',
+  form_for => 'HTML::FormFor',
+);
+
 has 'account' => (
   is=>'ro', 
   required=>1,
@@ -21,11 +27,10 @@ sub status_options($self) {
 }
 
 sub render($self, $c) {
-  $c->view('HTML::Layout' => page_title=>'Homepage', sub($layout) {
-    $c->view('HTML::Navbar' => active_link=>'/account'),
-    $c->view('HTML::Form', $self->account, +{style=>'width:35em; margin:auto'}, sub ($fb) {
-     cond { $self->account->validated && !$self->account->has_errors }
-        div +{ class=>'alert alert-success', role=>'alert' }, 'Successfully Updated',
+  $self->layout(page_title=>'Homepage', sub($layout) {
+    $self->navbar(active_link=>'/account'),
+    $self->form_for($self->account, +{style=>'width:35em; margin:auto'}, sub ($ff, $fb, $account) {
+      div +{ cond=>$fb->successfully_updated, class=>'alert alert-success', role=>'alert' }, 'Successfully Updated',
       fieldset [
         $fb->legend,
         div +{ class=>'form-group' },
@@ -49,7 +54,7 @@ sub render($self, $c) {
       fieldset [
         legend $self->account->human_attribute_name('profile'),
         $fb->errors_for('profile', +{ class=>'alert alert-danger', role=>'alert' }),
-        $fb->fields_for('profile', sub ($fb_profile) {
+        $fb->fields_for('profile', sub ($fb_profile, $profile) {
           div +{ class=>'form-group' }, [
             $fb_profile->label('address'),
             $fb_profile->input('address', +{ class=>'form-control', errors_classes=>'is-invalid' }),
@@ -121,7 +126,7 @@ sub render($self, $c) {
         legend $self->account->human_attribute_name('credit_cards'),
         div +{ class=>'form-group' }, [
           $fb->errors_for('credit_cards', +{ class=>'alert alert-danger', role=>'alert' }),
-          $fb->fields_for('credit_cards', sub($fb_cc) {
+          $fb->fields_for('credit_cards', sub($fb_cc, $cc) {
             div +{ class=>'form-row' }, [
               div +{ class=>'col form-group' }, [
                 $fb_cc->label('card_number'),
@@ -138,7 +143,7 @@ sub render($self, $c) {
                 $fb_cc->checkbox('_delete', +{ checked=>$fb_cc->model->is_marked_for_deletion }),
               ],
             ]
-          }, sub ($fb_final) {
+          }, sub ($fb_final, $new_cc) {
             $fb_final->button( '_add', +{ class=>'btn btn-lg btn-primary btn-block', value=>1 }, 'Add Credit Card')
           }),
         ],

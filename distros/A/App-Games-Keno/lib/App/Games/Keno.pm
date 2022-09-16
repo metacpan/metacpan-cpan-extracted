@@ -1,7 +1,7 @@
 package App::Games::Keno;
 use Moose;
-use Types::Standard qw(Int ArrayRef HashRef);
-use Carp            qw(croak);
+use Types::Standard qw(Int ArrayRef HashRef Bool);
+use Carp            qw(croak carp);
 use List::Compare   qw (get_intersection);
 use List::Util      qw(any uniq);
 use Scalar::Util    qw(looks_like_number);
@@ -39,6 +39,19 @@ This is how you choose your own spots.
    . $second_game->draws
    . " draws.";
 
+Several verbosity levels exist, use theme like this:
+
+ my $third_game = App::Games::Keno->new(
+   spots => [ 45, 33, 12, 20, 75 ],
+   draws => 1000,
+   verbose => 1
+ );
+ 
+Verbose level 0 is the default and prints nothing.  
+Verbose level 1 prints the amount won on winning draws.  
+Verbose level 2 prints evrything from verbose level 1 and the 
+numbers drawn on each draw and the numbers that matched.
+
 =cut
 
 sub BUILD {
@@ -51,10 +64,16 @@ sub BUILD {
 	croak "Need spots or number of spots"
 	  if ( !defined $self->spots && !defined $self->num_spots );
 
+	if ( !defined $self->verbose ) { $self->verbose(0); }
+	if ( $self->verbose < 0 || $self->verbose > 2 ) {
+		warn "'" . $self->verbose . "' is not a valid verbose level, using '0'";
+		$self->verbose(0);
+	}
+
 	if ( defined $self->spots ) {
 		if ( any { !looks_like_number($_) } @{ $self->spots } ) {
 			croak "One of the spots you chose doesn't look like a number.";
-		}			
+		}
 		if ( any { $_ < 1 || $_ > 80 } @{ $self->spots } ) {
 			croak "You chose a spot that is out of the 1 to 80 range";
 		}
@@ -74,6 +93,10 @@ sub BUILD {
 	}
 	else {
 		croak "You must ask for between 1 and 10 spots.";
+	}
+
+	if ( !defined $self->verbose ) {
+		$self->verbose(0);
 	}
 
 	return;
@@ -104,6 +127,12 @@ has 'num_spots' => (
 has 'spots' => (
 	is  => 'rw',
 	isa => ArrayRef,
+);
+
+has 'verbose' => (
+	is      => 'rw',
+	isa     => Int,
+	default => 0
 );
 
 has 'payout_table' => (
@@ -173,20 +202,61 @@ has 'payout_table' => (
 );
 
 sub PlayKeno {
-	my $self = shift;
+	my $self          = shift;
+	my $num_won_draws = 0;
+	if ( $self->verbose > 0 ) {
+		print "You are playing "
+		  . $self->draws
+		  . " draws with "
+		  . scalar @{ $self->spots }
+		  . " spots:  "
+		  . join( "  ", sort { $a <=> $b } @{ $self->spots } )
+		  . "\n\n";
+	}
 	for ( 1 .. $self->draws ) {
 		my $drawnNumbers   = get_random_set(20);
 		my $list_compare   = List::Compare->new( $self->spots, $drawnNumbers );
 		my @matchedNumbers = $list_compare->get_intersection;
 		my $matches        = scalar @matchedNumbers;
 		my $this_payout    = $self->get_payout($matches);
-		my $winningsIn     = $self->winnings;
 		if ( $matches > 6 && $matches == $self->num_spots ) {
 			print
 "You matched all $matches spots and won \$$this_payout on draw $_\n";
 		}
-		my $winningsOut = $winningsIn += $this_payout;
+		if ( $this_payout > 0 ) {
+			$num_won_draws++;
+		}
+		my $winningsIn  = $self->winnings;
+		my $winningsOut = $winningsIn + $this_payout;
 		$self->winnings($winningsOut);
+
+		if ( $self->verbose > 1 ) {
+			print "** Draw $_:  ";
+			print join( "  ", sort { $a <=> $b } @{$drawnNumbers} );
+			if ( $matches > 0 ) {
+				print "\nYou matched $matches numbers: ("
+				  . join( "  ", sort { $a <=> $b } @matchedNumbers ) . ") ";
+
+			}
+			else {
+				print "\nYou matched no numbers.";
+			}
+			if ( $this_payout == 0 ) {
+				print " There is no payout for that.  You LOSE!!";
+			}
+			print "\n";
+		}
+
+		if ( $self->verbose > 0 && $this_payout > 0 ) {
+			print
+"You matched $matches numbers and won \$$this_payout on draw $_\n";
+		}
+	}
+	if ( $self->verbose > 0 ) {
+		print "\nYou won "
+		  . commify($num_won_draws) . " of "
+		  . commify( $self->draws )
+		  . " draws.\n";
 	}
 	return;
 }
@@ -216,6 +286,12 @@ sub get_payout {
 	else {
 		return 0;
 	}
+}
+
+sub commify {
+	my $text = reverse $_[0];
+	$text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
+	return scalar reverse $text;
 }
 
 1;

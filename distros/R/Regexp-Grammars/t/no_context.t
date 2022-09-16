@@ -53,17 +53,17 @@ my $target = {
           bless({
             "command" => bless({
               "args" => bless({
-                
+
                 "element" => [
                   bless({
-                    
+
                     "literal" => bless({ "" => "article", }, "literal"),
                   }, "element"),
                 ],
               }, "args"),
               "name" => bless({ "" => "documentclass", }, "literal"),
               "options" => bless({
-                
+
                 "option" => [
                   bless({ "" => "a4paper", }, "option"),
                   bless({ "" => "11pt", }, "option"),
@@ -72,14 +72,14 @@ my $target = {
             }, "command"),
           }, "element"),
           bless({
-            
+
             "command" => bless({
-              
+
               "args" => bless({
-                
+
                 "element" => [
                   bless({
-                    
+
                     "literal" => bless({ "" => "latexsym", }, "literal"),
                   }, "element"),
                 ],
@@ -88,18 +88,18 @@ my $target = {
             }, "command"),
           }, "element"),
           bless({
-            
+
             "command" => bless({
-              
+
               "args" => bless({
-                
+
                 "element" => [
                   bless({
-                    
+
                     "literal" => bless({ "" => "D.", }, "literal"),
                   }, "element"),
                   bless({
-                    
+
                     "literal" => bless({ "" => "Conway", }, "literal"),
                   }, "element"),
                 ],
@@ -108,20 +108,20 @@ my $target = {
             }, "command"),
           }, "element"),
           bless({
-            
+
             "command" => bless({
-              
+
               "args" => bless({
-                
+
                 "element" => [
                   bless({
-                    
+
                     "literal" => bless({ "" => "Parsing", }, "literal"),
                   }, "element"),
                   bless({
-                    
+
                     "command" => bless({
-                      
+
                       "args" => bless({ "" => "{}", }, "args"),
                       "name" => bless({ "" => "LaTeX", }, "literal"),
                     }, "command"),
@@ -132,14 +132,14 @@ my $target = {
             }, "command"),
           }, "element"),
           bless({
-            
+
             "command" => bless({
-              
+
               "args" => bless({
-                
+
                 "element" => [
                   bless({
-                    
+
                     "literal" => bless({ "" => "document", }, "literal"),
                   }, "element"),
                 ],
@@ -148,28 +148,28 @@ my $target = {
             }, "command"),
           }, "element"),
           bless({
-            
+
             "command" => bless({
-              
+
               "name" => bless({ "" => "maketitle", }, "literal"),
             }, "command"),
           }, "element"),
           bless({
-            
+
             "command" => bless({
-              
+
               "name" => bless({ "" => "tableofcontents", }, "literal"),
             }, "command"),
           }, "element"),
           bless({
-            
+
             "command" => bless({
-              
+
               "args" => bless({
-                
+
                 "element" => [
                   bless({
-                    
+
                     "literal" => bless({ "" => "Description", }, "literal"),
                   }, "element"),
                 ],
@@ -178,37 +178,37 @@ my $target = {
             }, "command"),
           }, "element"),
           bless({
-            
+
             "literal" => bless({ "" => "...is", }, "literal"),
           }, "element"),
           bless({
-            
+
             "literal" => bless({ "" => "easy", }, "literal"),
           }, "element"),
           bless({
-            
+
             "command" => bless({
-              
+
               "args" => bless({
-                
+
                 "element" => [
                   bless({
-                    
+
                     "literal" => bless({ "" => "But", }, "literal"),
                   }, "element"),
                   bless({
-                    
+
                     "literal" => bless({ "" => "not", }, "literal"),
                   }, "element"),
                   bless({
-                    
+
                     "command" => bless({
-                      
+
                       "args" => bless({
-                        
+
                         "element" => [
                           bless({
-                            
+
                             "literal" => bless({ "" => "necessarily", }, "literal"),
                           }, "element"),
                         ],
@@ -217,7 +217,7 @@ my $target = {
                     }, "command"),
                   }, "element"),
                   bless({
-                    
+
                     "literal" => bless({ "" => "simple", }, "literal"),
                   }, "element"),
                 ],
@@ -226,18 +226,18 @@ my $target = {
             }, "command"),
           }, "element"),
           bless({
-            
+
             "literal" => bless({ "" => ".", }, "literal"),
           }, "element"),
           bless({
-            
+
             "command" => bless({
-              
+
               "args" => bless({
-                
+
                 "element" => [
                   bless({
-                    
+
                     "literal" => bless({ "" => "document", }, "literal"),
                   }, "element"),
                 ],

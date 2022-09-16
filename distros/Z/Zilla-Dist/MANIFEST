@@ -12,9 +12,9 @@ bin/zild-check-release
 bin/zild-convert-dist
 bin/zild-git-commit
 bin/zild-make-cpan
+bin/zild-markdown-plus
 bin/zild-massive-attack
 bin/zild-pandoc-json-to-pod
-bin/zild-pandoc-json-to-pod.pl
 bin/zild-render-template
 bin/zild-setup-release
 bin/zild-version-update

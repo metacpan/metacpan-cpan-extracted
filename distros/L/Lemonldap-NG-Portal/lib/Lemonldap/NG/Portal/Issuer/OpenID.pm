@@ -5,18 +5,18 @@ use JSON;
 use Mouse;
 use Lemonldap::NG::Common::Regexp;
 use Lemonldap::NG::Portal::Main::Constants qw(
-  PE_BADPARTNER
-  PE_CONFIRM
-  PE_ERROR
   PE_OK
+  PE_ERROR
+  PE_CONFIRM
+  PE_REDIRECT
+  PE_BADPARTNER
   PE_OPENID_BADID
   PE_OPENID_EMPTY
-  PE_REDIRECT
   PE_SENDRESPONSE
   PE_OID_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.15';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer';
 
@@ -131,7 +131,7 @@ sub run {
 }
 
 sub logout {
-    PE_OK;
+    return PE_OK;
 }
 
 # INTERNAL METHODS

@@ -1,0 +1,6 @@
+requires 'Lexical::SealRequireHints', '0.006';
+requires 'XSLoader';
+requires 'perl', '5.008001';
+requires 'strict';
+requires 'warnings';
+conflicts 'B::Hooks::OP::Check', '< 0.19';

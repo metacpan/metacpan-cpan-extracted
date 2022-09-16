@@ -21,6 +21,7 @@
          "t"
       ],
       "package" : [
+         "Mojo::Log::_Capture",
          "Mojo::Server::PSGI::_IO",
          "Mojo::Util::_Guard"
       ]
@@ -63,6 +64,6 @@
          "web" : "https://web.libera.chat/#mojo"
       }
    },
-   "version" : "9.25",
+   "version" : "9.27",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

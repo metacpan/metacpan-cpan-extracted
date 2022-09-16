@@ -15,7 +15,7 @@ sub build {
   my ($factory, $c, @args) = @_;
   my $class = $factory->{class};
   @args = $class->prepare_build_args($c, @args) if $class->can('prepare_build_args');
-  my %build_args = $factory->prepare_build_args($c, @args);
+  my %build_args = $factory->prepare_build_args($c, @args);  
   my $view = eval {
     $class->build(%build_args);
   } || do {
@@ -38,8 +38,7 @@ sub prepare_build_args {
   my ($factory, $c, @args) = @_;
   my %args = $factory->prepare_args(@args);
   my %merged_args = %{$factory->{merged_args}||+{}};
-
-  return (%merged_args, %args, ctx=>$c);
+  return (%merged_args, %args, app=>$factory->{app}, ctx=>$c);
 }
 
 sub prepare_args {

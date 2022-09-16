@@ -4,7 +4,7 @@ use Moo;
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
-our $VERSION = '0.000045';
+our $VERSION = '0.000048';
 
 use App::perlimports::Sandbox ();
 use Class::Inspector          ();
@@ -409,8 +409,9 @@ EOF
 
     local $SIG{__WARN__} = $logger_cb;
 
-    local $@;
+    local $@ = undef;
     ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
     eval $to_eval;
 
     if ($@) {
@@ -522,7 +523,7 @@ App::perlimports::ExportInspector - Inspect code for exportable symbols
 
 =head1 VERSION
 
-version 0.000045
+version 0.000048
 
 =head1 SYNOPSIS
 

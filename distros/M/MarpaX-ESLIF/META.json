@@ -4,7 +4,7 @@
       "Jean-Damien Durand <jeandamiendurand@free.fr>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -70,7 +70,6 @@
             "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
             "Test::More" : "0.96",
-            "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
@@ -135,87 +134,87 @@
    "provides" : {
       "MarpaX::ESLIF" : {
          "file" : "lib/MarpaX/ESLIF.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Base" : {
          "file" : "lib/MarpaX/ESLIF/Base.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Event::Type" : {
          "file" : "lib/MarpaX/ESLIF/Event/Type.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Grammar" : {
          "file" : "lib/MarpaX/ESLIF/Grammar.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Grammar::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Properties.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Grammar::Rule::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Rule/Properties.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Grammar::Symbol::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Symbol/Properties.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::JSON" : {
          "file" : "lib/MarpaX/ESLIF/JSON.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::JSON::Decoder" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Decoder.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::JSON::Decoder::RecognizerInterface" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Decoder/RecognizerInterface.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::JSON::Encoder" : {
          "file" : "lib/MarpaX/ESLIF/JSON/Encoder.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Logger::Level" : {
          "file" : "lib/MarpaX/ESLIF/Logger/Level.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Recognizer" : {
          "file" : "lib/MarpaX/ESLIF/Recognizer.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::RegexCallout" : {
          "file" : "lib/MarpaX/ESLIF/RegexCallout.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Rule::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Rule/PropertyBitSet.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::String" : {
          "file" : "lib/MarpaX/ESLIF/String.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Symbol" : {
          "file" : "lib/MarpaX/ESLIF/Symbol.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Symbol::EventBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/EventBitSet.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Symbol::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/PropertyBitSet.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Symbol::Type" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/Type.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       },
       "MarpaX::ESLIF::Value" : {
          "file" : "lib/MarpaX/ESLIF/Value.pm",
-         "version" : "v6.0.25"
+         "version" : "v6.0.26"
       }
    },
    "release_status" : "stable",
@@ -230,7 +229,7 @@
          "web" : "https://github.com/jddurand/c-marpaeslif"
       }
    },
-   "version" : "6.0.25",
+   "version" : "6.0.26",
    "x_authority" : "cpan:JDDPAUSE",
    "x_contributors" : [
       "Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>",

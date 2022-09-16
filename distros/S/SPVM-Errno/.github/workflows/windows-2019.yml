@@ -1,0 +1,21 @@
+name: windows-2019
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  perl:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@master
+      - run: perl -V
+      - run: perl -MConfig -MData::Dumper -e 'local $Data::Dumper::Sortkeys = 1;warn Dumper \%Config;'
+      - run: perl cpanm -n SPVM
+      - run: perl Makefile.PL
+      - run: gmake
+      - run: gmake disttest

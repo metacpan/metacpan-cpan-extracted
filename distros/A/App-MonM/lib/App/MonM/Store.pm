@@ -1,4 +1,4 @@
-package App::MonM::Store; # $Id: Store.pm 76 2019-07-07 05:20:28Z abalama $
+package App::MonM::Store; # $Id: Store.pm 108 2022-08-24 14:30:32Z abalama $
 use strict;
 use utf8;
 
@@ -10,13 +10,13 @@ App::MonM::Store - DBI interface for checkit's data storing
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
     use App::MonM::Store;
 
-    my $dbi = new App::MonM::Store(
+    my $store = App::MonM::Store->new(
         dsn => "DBI:mysql:database=monm;host=mysql.example.com",
         user => "username",
         password => "password",
@@ -26,15 +26,15 @@ Version 1.00
             "mysql_enable_utf8 1",
         ],
     );
-    print STDERR $dbi->error if $dbi->error;
+    die($store->error) if $store->error;
 
 =head1 DESCRIPTION
 
-DBI interface for checkit's data storing
+DBI interface for checkit's data storing. This module provides store methods
 
 =head2 new
 
-    my $dbi = new App::MonM::Store(
+    my $store = App::MonM::Store->new(
         dsn => "DBI:mysql:database=monm;host=mysql.example.com",
         user => "username",
         password => "password",
@@ -49,48 +49,51 @@ Creates DBI object
 
 =head2 add
 
-    $dbi->add(
+    $store->add(
         name    => "foo",
         type    => "http",
         source  => "http://example.com",
         status  => 1,
         message => "Ok"
-    ) or die $dbi->error;
+    ) or die $store->error;
 
 Add new record on database
 
 =head2 clean
 
-    $dbi->clean(
+    $store->clean(
         period => 600
-    ) or die $dbi->error;
+    ) or die $store->error;
 
 Delete too old records from database
 
 =head2 del
 
-    $dbi->del(
+    $store->del(
         id => 1
-    ) or die $dbi->error;
+    ) or die $store->error;
 
 Delete record from database
 
 =head2 dsn
 
-    my $dsn = $dbi->dsn;
+    my $dsn = $store->dsn;
 
 Returns DSN string of current database connection
 
 =head2 error
 
-    my $error = $dbi->error;
-    $dbi->error("Error message");
+    my $error = $store->error;
 
-Gets/sets error string
+Returns error message
+
+    $store->error("Error message");
+
+Sets error message if argument is provided.
 
 =head2 get
 
-    my %info = $dbi->get(
+    my %info = $store->get(
         name    => "foo"
     );
 
@@ -148,28 +151,34 @@ Default: http
 
 =head2 is_sqlite
 
-    print $dbi->is_sqlite ? "Is SQLite" : "Is not SQLite"
+    print $store->is_sqlite ? "Is SQLite" : "Is not SQLite"
 
 Returns true if type of current database is SQLite
 
 =head2 getall
 
-    my @files = $dbi->getall();
+    my @files = $store->getall();
 
 Returns list of all checkit values
 
 Record format of return result: see L</get>
 
+=head2 ping
+
+    $store->ping ? 'OK' : 'Database session is expired';
+
+Checks the connection to database
+
 =head2 set
 
-    $dbi->set(
+    $store->set(
         id      => 1,
         name    => "foo",
         type    => "http",
         source  => "http://example.com",
         status  => 1,
         message => "Ok"
-    ) or die $dbi->error;
+    ) or die $store->error;
 
 Update existing record on database
 
@@ -179,11 +188,11 @@ L<App::MonM>, L<CTK::DBI>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -195,7 +204,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use Carp;
 use CTK::DBI;
@@ -279,7 +288,7 @@ sub new {
     my $dsn = $args{dsn} || sprintf(DEFAULT_DSN_MASK, $file);
 
     # DB
-    my $db = new CTK::DBI(
+    my $db = CTK::DBI->new(
         -dsn    => $dsn,
         -debug  => 0,
         -username => $args{'user'},
@@ -305,6 +314,7 @@ sub new {
         $issqlite = 1;
     }
 
+    # Errors
     my $error = "";
     if (!$db) {
         $error = sprintf("Can't init database \"%s\"", $dsn);
@@ -312,7 +322,7 @@ sub new {
         $error = sprintf("Can't connect to database \"%s\": %s", $dsn, $DBI::errstr || "unknown error");
     } elsif ($fnew) {
         $db->execute(CHECKIT_DDL);
-        $error = $dbh->errstr();
+        $error = $dbh->errstr() if $dbh->err;
     }
     unless ($error) {
         $error = sprintf("Can't init database \"%s\". Ping failed: %s",
@@ -323,8 +333,8 @@ sub new {
             file    => $file,
             issqlite=> $issqlite,
             dsn     => $dsn,
-            error   => $error,
-            db      => $db,
+            error   => $error // "",
+            dbi     => $db,
         }, $class;
 
     return $self;
@@ -336,6 +346,16 @@ sub error {
     $self->{error} = $err;
     return $self->{error};
 }
+sub ping {
+    my $self = shift;
+    return 0 unless $self->{dsn};
+    my $dbi = $self->{dbi};
+    return 0 unless $dbi;
+    my $dbh = $dbi->{dbh};
+    return 0 unless $dbh;
+    return 0 unless $dbh->can('ping');
+    return $dbh->ping();
+}
 sub dsn {
     my $self = shift;
     return $self->{dsn};
@@ -344,17 +364,18 @@ sub is_sqlite {
     my $self = shift;
     return $self->{issqlite} ? 1 : 0;
 }
+
+# CRUD Methods
+
 sub add {
     my $self = shift;
     my %params = @_;
-    my $db = $self->{db};
-    unless ($db) {
-        $self->error(sprintf("Database \"%s\" connect failed", $self->dsn))
-            unless $self->error;
-        return 0;
-    }
+    return unless $self->ping;
     $self->error("");
-    $db->execute(CHECKIT_INSERT,
+    my $dbi = $self->{dbi};
+
+    # Add
+    $dbi->execute(CHECKIT_INSERT,
         time(),
         $params{name},
         $params{type},
@@ -362,23 +383,22 @@ sub add {
         $params{status} || 0,
         $params{message},
     )->finish;
-    if (my $dberr = $db->connect->errstr()) {
-        $self->error($dberr || $DBI::errstr || "unknown error");
-        return 0;
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't insert new record: %s", uv2null($dbi->connect->errstr)));
+        return;
     }
+
     return 1;
 }
 sub set {
     my $self = shift;
     my %params = @_;
-    my $db = $self->{db};
-    unless ($db) {
-        $self->error(sprintf("Database \"%s\" connect failed", $self->dsn))
-            unless $self->error;
-        return 0;
-    }
+    return unless $self->ping;
     $self->error("");
-    $db->execute(CHECKIT_UPDATE,
+    my $dbi = $self->{dbi};
+
+    # Update
+    $dbi->execute(CHECKIT_UPDATE,
         time(),
         $params{name},
         $params{type},
@@ -387,64 +407,61 @@ sub set {
         $params{message},
         $params{id},
     )->finish;
-    if (my $dberr = $db->connect->errstr()) {
-        $self->error($dberr || $DBI::errstr || "unknown error");
-        return 0;
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't update record: %s", uv2null($dbi->connect->errstr)));
+        return;
     }
+
     return 1;
 }
 sub del {
     my $self = shift;
     my %params = @_;
-    my $db = $self->{db};
-    unless ($db) {
-        $self->error(sprintf("Database \"%s\" connect failed", $self->dsn))
-            unless $self->error;
-        return 0;
-    }
+    return unless $self->ping;
     $self->error("");
-    $db->execute(CHECKIT_DELETE, $params{id})->finish;
+    my $dbi = $self->{dbi};
 
-    if (my $dberr = $db->connect->errstr()) {
-        $self->error($dberr || $DBI::errstr || "unknown error");
-        return 0;
+    # Del
+    $dbi->execute(CHECKIT_DELETE, $params{id})->finish;
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't delete record: %s", uv2null($dbi->connect->errstr)));
+        return;
     }
+
     return 1;
 }
 sub get {
     my $self = shift;
     my %params = @_;
-    my $db = $self->{db};
-    unless ($db) {
-        $self->error(sprintf("Database \"%s\" connect failed", $self->dsn))
-            unless $self->error;
-        return;
-    }
+    return () unless $self->ping;
     $self->error("");
-    my $name = $params{name} || "";
-    my %info = $db->recordh(CHECKIT_SELECT, $name);
+    my $dbi = $self->{dbi};
 
-    if (my $dberr = $db->connect->errstr()) {
-        $self->error($dberr || $DBI::errstr || "unknown error");
+    # Get
+    my $name = $params{name} || "";
+    my %info = $dbi->recordh(CHECKIT_SELECT, $name);
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't get record: %s", uv2null($dbi->connect->errstr)));
         return ();
     }
+
     return %info;
 }
 sub getall {
     my $self = shift;
     my %params = @_;
-    my $db = $self->{db};
-    unless ($db) {
-        $self->error(sprintf("Database \"%s\" connect failed", $self->dsn))
-            unless $self->error;
-        return ();
-    }
+    return () unless $self->ping;
     $self->error("");
-    my %table = $db->tableh("id", CHECKIT_SELECT_ALL);
-    if (my $dberr = $db->connect->errstr()) {
-        $self->error($dberr || $DBI::errstr || "unknown error");
+    my $dbi = $self->{dbi};
+
+    # Get table
+    my %table = $dbi->tableh("id", CHECKIT_SELECT_ALL);
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't get records: %s", uv2null($dbi->connect->errstr)));
         return ();
     }
+
+    # Out
     my @out = ();
     foreach my $k (sort {$a <=> $b} keys %table) {
         push @out, $table{$k};
@@ -454,20 +471,18 @@ sub getall {
 sub clean {
     my $self = shift;
     my %params = @_;
-    my $db = $self->{db};
-    unless ($db) {
-        $self->error(sprintf("Database \"%s\" connect failed", $self->dsn))
-            unless $self->error;
-        return 0;
-    }
+    return unless $self->ping;
     $self->error("");
-    my $period = $params{period} || 0;
-    $db->execute(CHECKIT_CLEAN, time() - $period)->finish;
+    my $dbi = $self->{dbi};
 
-    if (my $dberr = $db->connect->errstr()) {
-        $self->error($dberr || $DBI::errstr || "unknown error");
-        return 0;
+    # Clean
+    my $period = $params{period} || 0;
+    $dbi->execute(CHECKIT_CLEAN, time() - $period)->finish;
+    if ($dbi->connect->err) {
+        $self->error(sprintf("Can't clean (truncate) table: %s", uv2null($dbi->connect->errstr)));
+        return;
     }
+
     return 1;
 }
 

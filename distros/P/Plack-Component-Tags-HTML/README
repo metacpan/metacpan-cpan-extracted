@@ -220,8 +220,8 @@ EXAMPLE2
 
 DEPENDENCIES
     CSS::Struct::Output::Raw, Encode, Plack::Component,
-    Plack::Util::Accessor, Tags::HTML::Page::Begin, Tags::HTML::Page::End,
-    Tags::Output::Raw.
+    Plack::Util::Accessor, Scalar::Util, Tags::HTML::Page::Begin,
+    Tags::HTML::Page::End, Tags::Output::Raw.
 
 SEE ALSO
     Plack::Component
@@ -236,10 +236,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2020-2022
+    © 2020-2022 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

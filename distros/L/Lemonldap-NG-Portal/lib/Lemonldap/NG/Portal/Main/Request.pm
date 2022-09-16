@@ -7,7 +7,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants ':all';
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.15';
 
 extends 'Lemonldap::NG::Common::PSGI::Request';
 
@@ -74,7 +74,10 @@ has lockTime => ( is => 'rw' );
 
 # Security
 #
-# Captcha
+# Captcha HTML code to display in forms
+has captchaHtml => ( is => 'rw' );
+
+# DEPRECATED: 2.0 captcha compatibility
 has captcha => ( is => 'rw' );
 
 # Token

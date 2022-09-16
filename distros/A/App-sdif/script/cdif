@@ -213,7 +213,7 @@ my %colormap = do {
 	NCHANGE => [ "K/445"    , "BD/W" ] ,
 	DELETE  => [ "K/544"    , "RD/W" ] ,
 	APPEND  => [ "K/544"    , "RD/W" ] ,
-	VISIBLE => "S",
+	VISIBLE => "",
     );
 };
 
@@ -339,8 +339,6 @@ if (my @names = grep $opt_visible{$_}, keys %opt_visible) {
 use App::cdif::Tmpfile;
 my $T1 = App::cdif::Tmpfile->new;
 my $T2 = App::cdif::Tmpfile->new;
-binmode $T1->fh, ":encoding(utf8)";
-binmode $T2->fh, ":encoding(utf8)";
 
 ##
 ## Total statistic info
@@ -915,7 +913,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.22.1
+Version 4.22.3
 
 =head1 SYNOPSIS
 
@@ -1091,6 +1089,8 @@ where the FIELD is one from these :
     NCHANGE  New change part
     APPEND   Appended part
     DELETE   Deleted part
+
+=for comment
     VISIBLE  Visualized invisible chars
 
 and additional I<Common> and I<Merged> FIELDs for git-diff combined
@@ -1276,11 +1276,18 @@ comma (C<,>) like C<--visible ht=1,sp=1>; or connecting them by equal
 sign (C<=>) like C<--visible ht=sp=1>.  Character name accept
 wildcard; C<--visible '*=1'>.
 
+=begin comment
+
 Colormap label C<VISIBLE> is applied to those characters.  Default
 setting is C<S>, and visible characters are displayed in reverse
 video.  Unlike other colormaps, only special effects can be set to
 this label.  Effect C<D> (double-struck) is exception (See
 L<Getopt::EX::Colormap/~>).
+
+=end comment
+
+B<sdif> command also support B<--visible> option for horizontal tab
+with better visibility.
 
 =begin deprecated
 

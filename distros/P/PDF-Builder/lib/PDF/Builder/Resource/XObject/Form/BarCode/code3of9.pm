@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Form::BarCode';
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -16,11 +16,15 @@ PDF::Builder::Resource::XObject::Form::BarCode::code3of9 - specific information 
 
 sub new {
     my ($class, $pdf, %options) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $options{'-code'} && !defined $options{'code'}) { $options{'code'} = delete($options{'-code'}); }
+    if (defined $options{'-chk'} && !defined $options{'chk'}) { $options{'chk'} = delete($options{'-chk'}); }
+    if (defined $options{'-ext'} && !defined $options{'ext'}) { $options{'ext'} = delete($options{'-ext'}); }
 
     my $self = $class->SUPER::new($pdf, %options);
-    my @bars = encode_3of9($options{'-code'},
-                           $options{'-chk'}? 1: 0,
-                           $options{'-ext'}? 1: 0);
+    my @bars = encode_3of9($options{'code'},
+                           $options{'chk'}? 1: 0,
+                           $options{'ext'}? 1: 0);
 
     $self->drawbar([@bars], $options{'caption'});
 

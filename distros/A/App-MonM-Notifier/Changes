@@ -1,4 +1,4 @@
-# $Id: Changes 66 2019-07-16 04:27:38Z abalama $
+# $Id: Changes 77 2022-09-16 08:10:00Z abalama $
 # Version/Revision history.
 
 1.00 Wed Oct 11 11:13:25 2017 GMT
@@ -13,3 +13,7 @@
 
 1.03 Sun 14 Jul 22:51:50 MSK 2019
     * Documentation modified
+
+1.04 Fri 16 Sep 2022 10:59:41 MSK
+    * The project has been reorganised
+    * Added class Monotifier

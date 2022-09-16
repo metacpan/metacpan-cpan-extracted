@@ -30,7 +30,7 @@ use Alien::Base::ModuleBuild::Repository::FTP;
 use Alien::Base::ModuleBuild::Repository::Local;
 
 # ABSTRACT: A Module::Build subclass for building Alien:: modules and their libraries
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.17'; # VERSION
 
 # setup protocol specific classes
 # Alien:: author can override these defaults using alien_repository_class property
@@ -439,7 +439,7 @@ sub ACTION_alien_code {
   my $cabinet = Alien::Base::ModuleBuild::Cabinet->new;
 
   foreach my $repo (@repos) {
-    $cabinet->add_files( $repo->probe() );
+    $cabinet->add_files( $repo->probe );
   }
 
   $cabinet->sort_files;
@@ -962,7 +962,7 @@ sub do_system {
   # restore wd
   $CWD = $initial_cwd;
 
-  return wantarray ? %return : $return{success};  ## no critic (Policy::Freenode::Wantarray)
+  return wantarray ? %return : $return{success};  ## no critic (Policy::Community::Wantarray)
 }
 
 sub _alien_execute_helper {
@@ -1277,6 +1277,21 @@ sub _catdir {
   $dir;
 }
 
+sub alien_install_network {
+  defined $ENV{ALIEN_INSTALL_NETWORK} ? !!$ENV{ALIEN_INSTALL_NETWORK} : 1;
+}
+
+sub alien_download_rule {
+
+  if(defined $ENV{ALIEN_DOWNLOAD_RULE}) {
+    return 'warn' if $ENV{ALIEN_DOWNLOAD_RULE} eq 'default';
+    return $ENV{ALIEN_DOWNLOAD_RULE} if $ENV{ALIEN_DOWNLOAD_RULE} =~ /^(warn|digest|encrypt|digest_or_encrypt|digest_and_encrypt)$/;
+    warn "unknown ALIEN_DOWNLOAD_RULE \"ALIEN_DOWNLOAD_RULE\", using \"warn\" instead";
+  }
+
+  return 'warn';
+}
+
 1;
 
 =pod
@@ -1289,7 +1304,7 @@ Alien::Base::ModuleBuild - A Module::Build subclass for building Alien:: modules
 
 =head1 VERSION
 
-version 1.15
+version 1.17
 
 =head1 SYNOPSIS
 
@@ -1313,7 +1328,7 @@ In your Build.PL:
                               # system version of the mylibrary
  
    alien_repository => {
-     protocol => 'http',
+     protocol => 'https',
      host     => 'myhost.org',
      location => '/path/to/tarballs',
      pattern  => qr{^mylibrary-([0-9\.]+)\.tar\.gz$},
@@ -1426,11 +1441,12 @@ this method.
 
   my %result = $amb->alien_do_system($cmd)
 
-Similar to L<Module::Build::do_system>, also sets the path and several
-environment variables in accordance to the object configuration
-(i.e. C<alien_bin_requires>) and performs the interpolation of the
-patterns described in L<Alien::Base::ModuleBuild::API/COMMAND
-INTERPOLATION>.
+Similar to
+L<Module::Build's do_system|Module::Build::API/"do_system($cmd, @args)">,
+also sets the path and several environment variables in accordance
+to the object configuration (i.e. C<alien_bin_requires>) and
+performs the interpolation of the patterns described in
+L<Alien::Base::ModuleBuild::API/"COMMAND INTERPOLATION">.
 
 Returns a set of key value pairs including C<stdout>, C<stderr>,
 C<success> and C<command>.
@@ -1446,6 +1462,25 @@ Executes the commands for the given phase.
  my $string = $amb->alien_interpolate($string);
 
 Takes the input string and interpolates the results.
+
+=head2 alien_install_network
+
+[version 1.16]
+
+ my $bool = $amb->alien_install_network;
+
+Returns true if downloading source from the internet is allowed.  This
+is true unless C<ALIEN_INSTALL_NETWORK> is defined and false.
+
+=head2 alien_download_rule
+
+[version 1.16]
+
+ my $rule = $amb->alien_download_rule;
+
+This will return one of C<warn>, C<digest>, C<encrypt>, C<digest_or_encrypt>
+or C<digest_and_encrypt>.  This is based on the C<ALIEN_DOWNLOAD_RULE>
+environment variable.
 
 =head1 GUIDE TO DOCUMENTATION
 
@@ -1484,28 +1519,81 @@ L<Alien::Base> projects, it is located in the upper namespace.
 This is a reference to the C<Alien::Base::ModuleBuild> API beyond that contained
 in C<Module::Build::API>.
 
+=item Using the resulting L<Alien> (L<Alien::Build::Manual::AlienUser>)
+
+Once you have an L<Alien> you or your users can review this manual for how to use
+it.  Generally speaking you should have some useful usage information in your
+L<Alien>'s POD, but some authors choose to direct their users to this manual
+instead.
+
+=item Using L<Alien::Build> instead (L<Alien::Build::Manual>)
+
+As mentioned at the top, you are encouraged to use the L<Alien::Build> and
+L<alienfile> system instead.  This manual is a starting point for the other
+L<Alien::Build> documentation.
+
 =back
 
 =head1 ENVIRONMENT
 
 =over 4
 
-=item B<ALIEN_VERBOSE>
+=item B<ALIEN_ARCH>
 
-Enables verbose output from L<M::B::do_system|Module::Build#do_system>.
+Set to a true value to install to an arch-specific directory.
+
+=item B<ALIEN_DOWNLOAD_RULE>
+
+This controls security options for fetching alienized packages over the internet.
+The legal values are:
+
+=over 4
+
+=item C<warn>
+
+Warn if the package is either unencrypted or lacks a digest.  This is currently
+the default, but will change in the near future.
+
+=item C<digest>
+
+Fetch will not happen unless there is a digest for the alienized package.
+
+=item C<encrypt>
+
+Fetch will not happen unless via an encrypted protocol like C<https>, or if the
+package is bundled with the L<Alien>.
+
+=item C<digest_or_encrypt>
+
+Fetch will only happen if the alienized package has a cryptographic signature digest,
+or if an encrypted protocol like C<https> is used, or if the package is bundled with
+the L<Alien>.  This will be the default in the near future.
+
+=item C<digest_and_encrypt>
+
+Fetch will only happen if the alienized package has a cryptographic signature digest,
+and is fetched via a secure protocol (like C<https>).  Bundled packages are also
+considered fetch via a secure protocol, but will still require a digest.
+
+=back
 
 =item B<ALIEN_FORCE>
 
 Skips checking for an installed version and forces reinstalling the Alien target.
 
+=item B<ALIEN_INSTALL_NETWORK>
+
+If true (the default if not defined), then network installs will be allowed.
+Set to C<0> or another false value to turn off network installs.
+
 =item B<ALIEN_INSTALL_TYPE>
 
-Set to 'share' or 'system' to override the install type.  Set to 'default' or unset
+Set to C<share> or C<system> to override the install type.  Set to C<default> or unset
 to restore the default.
 
-=item B<ALIEN_ARCH>
+=item B<ALIEN_VERBOSE>
 
-Set to a true value to install to an arch-specific directory.
+Enables verbose output from L<M::B::do_system|Module::Build#do_system>.
 
 =item B<ALIEN_${MODULENAME}_REPO_${PROTOCOL}_${KEY}>
 
@@ -1588,13 +1676,13 @@ Kang-min Liu (劉康民, gugod)
 
 Nicholas Shipp (nshp)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Alberto Simões (ambs)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2020 by Joel A Berger.
+This software is copyright (c) 2012-2022 by Joel A Berger.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

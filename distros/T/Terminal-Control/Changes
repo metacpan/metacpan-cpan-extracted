@@ -1,5 +1,15 @@
 Revision history for Perl extension Terminal::Control.
 
+0.17  2022-09-11
+        - Major changes in code. Improvement in documentation. Bug fixing. 
+
+0.16  2022-09-10
+        - Minor changes in code. Minor changes in documentation. Bugfixing. 
+          Method which_terminal() added.  
+
+0.15  2022-09-9
+        - Major changes in code. Major changes in documentation. 
+
 0.14  2022-09-8
         - Changes in code. Changes in documentation. 
 

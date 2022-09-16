@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.15';
 
 extends qw(
   Lemonldap::NG::Portal::Main::SecondFactor
@@ -30,14 +30,11 @@ has logo   => ( is => 'rw', default => 'totp.png' );
 sub init {
     my ($self) = @_;
 
-    # If self registration is enabled and "activation" is just set to
-    # "enabled", replace the rule to detect if user has registered its key
-    if (    $self->conf->{totp2fSelfRegistration}
-        and $self->conf->{totp2fActivation} eq '1' )
-    {
-        $self->conf->{totp2fActivation} =
-          '$_2fDevices && $_2fDevices =~ /"type":\s*"TOTP"/s';
-    }
+    # If "activation" is just set to "enabled",
+    # replace the rule to detect if user has registered its key
+    $self->conf->{totp2fActivation} = 'has2f("TOTP")'
+      if $self->conf->{totp2fActivation} eq '1';
+
     return $self->SUPER::init();
 }
 

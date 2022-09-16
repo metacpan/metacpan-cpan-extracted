@@ -1,31 +1,35 @@
 # This file is manually maintained
+# if add or delete a .pm file, also update META.yml and META.json files
+# if add or delete a .t file, also update tools/2_t-tests.pl
+# if add or delete an example file, also update tools/3_examples.pl
+# if add or delete a contribution, also update tools/4_contrib.pl
 .perlcriticrc
 Changes
 CONTRIBUTING
+LICENSE
 Makefile.PL
 MANIFEST
 META.json
 META.yml
-optional_update.pl
 README.md
 tools/1_pc.pl
 tools/2_t-tests.pl
 tools/3_examples.pl
 tools/4_contrib.pl
+tools/optional_update.pl
 tools/TTFdump.pl
 INFO/Changes_2017
 INFO/Changes_2018
 INFO/Changes_2019
 INFO/Changes_2020
+INFO/Changes_2021
 INFO/Changes-ver_2
 INFO/CONVERSION
 INFO/DEPRECATED
 INFO/KNOWN_INCOMP
-INFO/LICENSE
 INFO/PATENTS
 INFO/RoadMap
 INFO/SUPPORT
-INFO/old/.travis.yml.HOLD
 INFO/old/contrib.bat
 INFO/old/dist.ini.old
 INFO/old/examples.bat
@@ -55,6 +59,7 @@ examples/023_cjkfonts
 examples/024_bdffonts
 examples/025_unifonts
 examples/026_unifont2
+# examples/027_winfont
 examples/030_colorspecs
 examples/031_color_hsv
 examples/032_separation
@@ -81,6 +86,9 @@ lib/PDF/Builder.pm
 lib/PDF/Builder/Basic/PDF.pm
 lib/PDF/Builder/Basic/PDF/Filter/ASCII85Decode.pm
 lib/PDF/Builder/Basic/PDF/Filter/ASCIIHexDecode.pm
+# lib/PDF/Builder/Basic/PDF/Filter/CCITTFaxDecode/Reader.pm
+# lib/PDF/Builder/Basic/PDF/Filter/CCITTFaxDecode/Writer.pm
+# lib/PDF/Builder/Basic/PDF/Filter/CCITTFaxDecode.pm
 lib/PDF/Builder/Basic/PDF/Filter/FlateDecode.pm
 lib/PDF/Builder/Basic/PDF/Filter/LZWDecode.pm
 lib/PDF/Builder/Basic/PDF/Filter/RunLengthDecode.pm
@@ -98,6 +106,7 @@ lib/PDF/Builder/Basic/PDF/Page.pm
 lib/PDF/Builder/Basic/PDF/Pages.pm
 lib/PDF/Builder/Basic/PDF/String.pm
 lib/PDF/Builder/Basic/PDF/Utils.pm
+# lib/PDF/Builder/Content/Barcode/DataMatrix.pm
 lib/PDF/Builder/Content/Hyphenate_basic.pm
 lib/PDF/Builder/Content/Text.pm
 lib/PDF/Builder/Resource/CIDFont/CJKFont/adobemingstdlightacro.data
@@ -197,6 +206,7 @@ lib/PDF/Builder/Page.pm
 lib/PDF/Builder/Resource.pm
 lib/PDF/Builder/UniWrap.pm
 lib/PDF/Builder/Util.pm
+lib/PDF/Builder/ViewerPreferences.pm
 t/resources/1x1.gif
 t/resources/1x1.jpg
 t/resources/1x1.pbm
@@ -206,6 +216,7 @@ t/resources/1x1-lzw.tif
 t/resources/sample.pdf
 t/resources/sample-xrefstm.pdf
 t/resources/sample-xrefstm-index.pdf
+t/resources/test-rgba.png
 t/00-all-usable.t
 t/01-basic.t
 t/02-xrefstm.t
@@ -218,11 +229,13 @@ t/bbox.t
 t/circular-references.t
 t/cmap.t
 t/content.t
+t/content-deprecated.t
 t/cs-webcolor.t
 t/deprecations.t
 t/extgstate.t
 t/filter-ascii85decode.t
 t/filter-asciihexdecode.t
+# t/filter-ccittfaxdecode.t
 t/filter-lzwdecode.t
 t/filter-runlengthdecode.t
 t/font-corefont.t
@@ -231,8 +244,10 @@ t/font-ttf.t
 t/font-type1.t
 t/gd.t
 t/gif.t
+t/info.t
 t/jpg.t
 t/lite.t
+t/named-destinations.t
 t/outline.t
 t/page.t
 t/papersizes.t
@@ -247,4 +262,5 @@ t/rt126274.t
 t/string.t
 t/text.t
 t/tiff.t
+t/version.t
 t/viewer-preferences.t

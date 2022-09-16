@@ -1,0 +1,170 @@
+#!/usr/bin/perl -w
+use strict;
+
+=encoding utf8
+
+=head1 NAME
+
+monmd - is the daemon of MonM
+
+=head1 SYNOPSIS
+
+    monmd [-v] [-c /etc/monm.conf] [-d /tmp/monm]
+      -k start|status|stop|restart|reload
+
+=head1 DESCRIPTION
+
+Is the daemon of MonM
+
+See C<README> file
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-c /etc/monm.conf, --config=/etc/monm.conf>
+
+Sets config file
+
+Default: /etc/monm/monm.conf
+
+=item B<-d /tmp/monm, --datadir=/tmp/monm>
+
+The directory of temporary files.
+
+Default: system tmp directory (/tmp)
+
+=item B<-h, --help>
+
+Show short help information and quit
+
+=item B<-H, --longhelp>
+
+Show long help information and quit
+
+=item B<-k start|status|stop|restart|reload>
+
+LSB command
+
+=item B<-s, --safemode>
+
+This option enables safe mode. Not recommended, because this mode suppress any
+exceptions. The option allows wrap the calling of your run() method in eval{}
+construction and catche any errors that occur.
+
+=item B<-v, --verbose>
+
+Verbose option. Include Verbose debug data in the STDOUT and to error-log output
+
+=item B<-V, --version>
+
+Print the version number of the program and quit
+
+=back
+
+=head1 AUTHOR
+
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut
+
+use Getopt::Long;
+use Pod::Usage;
+
+use File::Spec;
+use Sys::Syslog qw//;
+
+use CTK::App;
+use CTK::Util qw/ :CORE /;
+use CTK::ConfGenUtil;
+use CTK::FilePid;
+
+use App::MonM::Daemon;
+use App::MonM::Const;
+
+my $options = {};
+Getopt::Long::Configure ("bundling");
+GetOptions($options,
+    # NoUsed keys map:
+    #
+    # a A b B   C   D e E
+    # f F g G     i I j J
+    #   K l L m M n N o O
+    # p P q Q r R   S   T
+    # u U     w W x X y Y
+    # z Z
+
+    # Information and debug
+    "help|usage|h",         # Show help page
+    "longhelp|H|?",         # Show long help page
+    "version|vers|ver|V",   # Print VERSION of the project
+    "verbose|v",            # Verbose mode
+    "safemode|s",           # Safe mode (saferun)
+
+    # CTK Application
+    "config|conf|c=s",      # Config file
+    "datadir|dir|d=s",      # DataDir
+    "kill|k=s",             # Kill (signal name)
+
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
+pod2usage(-exitval => 0, -verbose => 2) if $options->{longhelp};
+printf("Daemon version: %s\n", App::MonM::Daemon->VERSION) && exit(0) if $options->{version};
+my @arguments = @ARGV ? @ARGV : ();
+my $exitval = 0;
+
+# Dash k - is daemon mode!
+my $dash_k = $options->{kill};
+pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR)
+	unless ($dash_k && grep {$_ eq $dash_k} @{(CTK::Daemon::LSB_COMMANDS())});
+
+# CTK Singleton instance
+my $ctk = CTK::App->new(
+        project => PROJECTNAME,
+        prefix  => PREFIX,
+        options => $options,
+        verbose => $options->{verbose},
+        logfacility => Sys::Syslog::LOG_DAEMON,
+        ident   => DAEMONMAME,
+        datadir => $options->{datadir} || File::Spec->catdir(sharedstatedir(), PREFIX), # /var/lib/monm
+        $options->{config} ? (configfile => $options->{config}) : (),
+    );
+
+# Prepare work directory
+my $ddir = $ctk->datadir;
+exit 1 unless CTK::Util::preparedir( $ddir );
+
+# User and Group
+my $usr = lvalue($ctk->config("daemonuser")) || USERNAME;
+my $grp = lvalue($ctk->config("daemongroup")) || GROUPNAME;
+
+# Set permisions (GID and UID) for work directory
+my $uid = getpwnam($usr) || die "getpwnam failed - $!\n";
+if ((stat($ddir))[4] != $uid) {
+    my $gid = getgrnam($grp) || die "getgrnam failed - $!\n";
+    chown($uid, $gid, $ddir);
+}
+
+# Daemon
+my $daemon = App::MonM::Daemon->new(DAEMONMAME,
+        ctk     => $ctk,
+        forks   => lvalue($ctk->config("workers")) || App::MonM::Daemon::DAEMONFORKS,
+        uid     => $usr,
+        gid     => $grp,
+        saferun => $options->{safemode},
+    );
+$exitval = $daemon->ctrl($dash_k); # For exiting
+exit $exitval;
+
+__END__

@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::Apache::Session::Store;
 
 use strict;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.15';
 
 sub new {
     my $class = shift;
@@ -56,7 +56,7 @@ sub materialize {
 
     # Get session from cache
     my $id = $session->{data}->{_session_id};
-    if ( $self->cache->get($id) ) {
+    if ( !$self->{args}->{noCache} and $self->cache->get($id) ) {
         $session->{serialized} = $self->cache->get($id);
         return;
     }

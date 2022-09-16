@@ -30,6 +30,10 @@ norm( '@{ [ foo() ] }', 'foo()' );
 
 norm( '${ \\ ( foo() ) }', 'foo()' );
 
+norm( '${^MATCH}', '${^MATCH}' );
+
+norm( '${^CAPTURE[0]}', '${^CAPTURE[0]}' );
+
 done_testing;
 
 sub norm {

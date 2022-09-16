@@ -1,7 +1,7 @@
 {
   "abstract": "A Perl module and standalone script for imposition of small pages on bigger paper.",
   "author": [
-    "Héctor M. Monacci <hector.monacci@gmail.com>"
+    "Héctor M. Monacci <monacci@cpan.org>"
   ],
   "dynamic_config": 0,
   "generated_by": "hand",
@@ -46,7 +46,7 @@
   "provides" : {
     "App::paperback" : {
       "file" : "lib/App/paperback.pm",
-      "version" : "1.23"
+      "version" : "1.28"
     }
   },
   "resources": {
@@ -61,7 +61,7 @@
     }
   },
   "release_status": "stable",
-  "version": "1.23",
+  "version": "1.30",
   "x_authority": "cpan:MONACCI",
   "x_serialization_backend": "JSON::PP version 4.07",
   "x_static_install": 0,

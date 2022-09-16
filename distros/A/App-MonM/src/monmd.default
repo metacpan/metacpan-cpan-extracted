@@ -1,0 +1,11 @@
+#
+# This file must only contain KEY=VALUE lines. Do not use advanced
+# shell script constructs and etc.
+#
+
+## General options:
+## -c /etc/monm/monm.conf
+## -d /tmp/monm
+## -v : verbose/debug mode
+
+MONMD_OPTS=""

@@ -1,0 +1,153 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Lemonldap:NG::Portal::Captcha - Writing CAPTCHA modules for LemonLDAP::NG.
+
+=head1 SYNOPSIS
+
+  package Lemonldap::NG::Portal::Captcha::My;
+
+  use strict;
+  use Mouse;
+  # Add constants used by this module
+
+  our $VERSION = '0.1';
+
+  extends 'Lemonldap::NG::Portal::Main::Plugin';
+
+  sub init {
+      my $self = shift;
+      return 1;
+  }
+
+  sub init_captcha {
+    my ( $self, $req ) = @_;
+
+    # Read option from the manager configuration
+    my $option = $self->conf->{captchaOptions}->{option1};
+
+    # This can be used to inject custom JS code at the beginning
+    # of the page
+    my $script = <your html code>;
+    $req->data->{customScript} .= $script;
+
+    # This will add your custom HTML code to the protected form
+    my $html = <your html code>;
+    $req->captchaHtml($html);
+  }
+
+  sub check_captcha {
+    my ( $self, $req ) = @_;
+
+    my $captcha_input = $req->param('some_post_param');
+    my $is_captcha_valid = <your code here>;
+
+    if($is_captcha_valid) {
+        return 1;
+    } else {
+        return 0;
+    }
+  }
+
+  1;
+
+=head1 DESCRIPTION
+
+Captcha modules only need to implement two methods: one for initializing the
+challenge, before the form is displayed, and the other to verify that the
+submitted response is correct.
+
+=head1 METHODS
+
+=head2 Accessors and methods provided by Lemonldap::NG::Portal::Main::Plugin
+
+=over
+
+=item p: portal object
+
+=item conf: configuration hash (as reference)
+
+=item logger alias for p->logger accessor
+
+=item userLogger alias for p->userLogger accessor
+
+=item error: alias for p->error method
+
+=back
+
+=head2 "Routes" management
+
+Like each module that inherits from Lemonldap::NG::Portal::Plugin,
+you can define dedicated routes in a Captcha plugin.
+
+=over
+
+=item addAuthRoute: wrapper to L<Lemonldap::NG::Handler::PSGI::Try>
+addAuthRoute() method
+
+=item addUnauthRoute: wrapper to L<Lemonldap::NG::Handler::PSGI::Try>
+addUnauthRoute() method
+
+=back
+
+=head2 Methods that must be provided by a Captcha module
+
+=head3 init_captcha($req)
+
+This method is called when the protected form is built by LemonLDAP::NG.
+Your responsibility is to do any preparatory step, and provide LemonLDAP::NG
+with the HTML code that it has to display in the form to enable the Captcha.
+
+This is done by setting C<$req-E<gt>captchaHtml>
+
+=head3 check_captcha($req)
+
+This method is called after the user submitted the protected form. Your
+responibility is to check the user's response (usually provided as a POST
+field), and return 0 if the response is incorrect, 1 if the response is
+correct.
+
+=head1 LOGGING
+
+Logging is provided by C<$self-E<gt>logger> and C<$self-E<gt>userLogger>. See
+L<Lemonldap::NG::Portal::Main::Plugin> for a detailed description of logging levels.
+
+=head1 AUTHORS
+
+=over
+
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
+
+=head1 DOWNLOAD
+
+Lemonldap::NG is available at
+L<https://lemonldap-ng.org/download>
+
+=head1 COPYRIGHT AND LICENSE
+
+See COPYING file for details.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

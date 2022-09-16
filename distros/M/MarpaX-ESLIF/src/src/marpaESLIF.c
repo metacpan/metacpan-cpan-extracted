@@ -4429,7 +4429,7 @@ static inline short _marpaESLIFGrammar_validateb(marpaESLIFGrammar_t *marpaESLIF
 
       /* Since we loop on symbols of every rule, it can very well happen that we hit */
       /* the same meta symbol more than once.                                        */
-      if ((metap->marpaWrapperGrammarStartp == NULL)) {
+      if (metap->marpaWrapperGrammarStartp == NULL) {
         /* Clone for the symbol in lexeme mode: no event except when this is on the left side of an exception character '-' */
         /* meta terminals are an exception: they will raise a peeking recognizer, then we want to keep everything intact.   */
         marpaESLIF_cloneContext.grammarp = subGrammarp;
@@ -4504,7 +4504,7 @@ static inline short _marpaESLIFGrammar_validateb(marpaESLIFGrammar_t *marpaESLIF
 
       /* Since we loop on symbols of every rule, it can very well happen that we hit */
       /* the same meta symbol more than once.                                        */
-      if ((metap->marpaWrapperGrammarStartNoEventp == NULL)) {
+      if (metap->marpaWrapperGrammarStartNoEventp == NULL) {
         /* Clone for the symbol in lexeme mode: no event except when this is on the left side of an exception character '-' */
         /* meta terminals are an exception: they will raise a peeking recognizer, then we want to keep everything intact.   */
         marpaESLIF_cloneContext.grammarp = subGrammarp;
@@ -11822,7 +11822,7 @@ static inline short _marpaESLIFRecognizer_checkStartCompletionb(marpaESLIFRecogn
     }
   }
 
-  if (marpaESLIFRecognizerp->atStartCompletionb = atStartCompletionb) {
+  if ((marpaESLIFRecognizerp->atStartCompletionb = atStartCompletionb)) {
     /* Count the number of start completions */
     numberOfStartCompletionsPrevi = numberOfStartCompletionsi = marpaESLIFRecognizerp->numberOfStartCompletionsi;
     MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, "numberOfStartCompletionsi = %d => ++numberOfStartCompletionsi = %d", numberOfStartCompletionsi, numberOfStartCompletionsi+1);

@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojo-Run3
 
+0.06 2022-09-14T19:41:37
+ - Add bytes_waiting()
+ - Add support for close("other");
+
 0.05 2022-06-13T18:53:02+0900
  - Will automatically clean up on destroy
 

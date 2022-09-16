@@ -54,6 +54,7 @@ do { my $x = {
                                       'warnings' => '0'
                                     },
                       'suggests' => {
+                                      'Function::Parameters' => '2.001003',
                                       'Future::AsyncAwait' => '0.58',
                                       'Syntax::Keyword::MultiSub' => '0.02',
                                       'Syntax::Keyword::Try' => '0.027'

@@ -12,43 +12,215 @@ my $compress = 'flate';  # compressed stream
 my $pdf = PDF::Builder->new(-compress => $compress);
 
 my $f1=$pdf->corefont('Helvetica', -encode=>'latin1');
-my $f2=$pdf->corefont('Helvetica-Bold', -encode=>'latin1');
+my $f2=$pdf->corefont('Helvetica-Oblique', -encode=>'latin1');
 
 my $page = $pdf->page();
-$page->mediabox(595,842);
+$page->mediabox(595,842);  # A4 paper
 
 my $txt = $page->text();
-$txt->font($f1, 20);
+my $grf = $page->gfx();
+#$txt->font($f1, 20);
+my $fsize = 20;       # our standard font size for this page
+my $subsupscl = 0.7;  # scale factor for sub and superscripts
+
+$grf->strokecolor('green'); # just leave line color as green
 
 # rises (up +, down -) are relative to original baseline, not previous text
+# further note that these are baseline changes, with no guarantee that text
+#   will not ascend above the original baseline (i.e., it is NOT the distance
+#   between the baseline and the TOP of the text!)
 
+$grf->poly(50,800, 430,800);
+$grf->poly(420,805, 430,805, 430,795, 420,795);
+$grf->stroke();
+$txt->translate(435,800);
+$txt->fillcolor('green');
+$txt->font($f1, $fsize*$subsupscl);
+$txt->text('Baseline');
+
+$txt->fillcolor('black');
+$txt->font($f1, $fsize);
 $txt->translate(50,800);
-$txt->text('normal text');
+$txt->text('normal text ');
 $txt->rise(5);
 $txt->text('rise = 5 units');
 $txt->rise(-5);
 $txt->text('rise = -5 units');
 $txt->rise(0);
 
+# ----------------------------
+$grf->poly(50,600, 430,600);
+$grf->poly(420,610, 430,610, 430,590, 420,590);
+$grf->stroke();
+$txt->translate(435,600);
+$txt->fillcolor('green');
+$txt->font($f1, $fsize*$subsupscl);
+$txt->text('Baseline');
+
+$txt->fillcolor('black');
+$txt->font($f1, $fsize);
 $txt->translate(50,600);
-$txt->text('normal text');
+$txt->text('normal text ');
 $txt->rise(10);
 $txt->text('rise = 10 units');
 $txt->rise(-10);
 $txt->text('rise = -10 units');
 $txt->rise(0);
 
+# ----------------------------
+$grf->poly(50,400, 430,400);
+$grf->poly(420,420, 430,420, 430,380, 420,380);
+$grf->stroke();
+$txt->translate(435,400);
+$txt->fillcolor('green');
+$txt->font($f1, $fsize*$subsupscl);
+$txt->text('Baseline');
+
+$txt->fillcolor('black');
+$txt->font($f1, $fsize);
 $txt->translate(50,400);
-$txt->text('normal text');
+$txt->text('normal text ');
 $txt->rise(20);
 $txt->text('rise = 20 units');
 $txt->rise(-20);
 $txt->text('rise = -20 units');
 $txt->rise(0);
 
+# ----------------------------
+# now for a line of text
+# it would be good to consider a convenience function for 
+# subscript($scale,$font,$fontsize,$text) and likewise for superscript()
+$txt->translate(50, 200);
+$txt->text('The gases CO');
+# $txt->subscript($subsupscl, $f1, $fsize, '2');
+  $txt->font($f1,$fsize*$subsupscl);
+  $txt->rise(-10*$subsupscl);
+  $txt->text('2');
+  $txt->rise(0);
+$txt->font($f1,$fsize);
+$txt->text(' and CH');
+# $txt->subscript($subsupscl, $f1, $fsize, '4');
+  $txt->font($f1,$fsize*$subsupscl);
+  $txt->rise(-10*$subsupscl);
+  $txt->text('4');
+  $txt->rise(0);
+$txt->font($f1,$fsize);
+$txt->text(' are of concern for climate change.');
+
+# ----------------------------
+# and a math equation with sub- and superscripts
+# italicize all variable name letters not function names
+$txt->translate(50,100);
+$txt->font($f2, $fsize);  # italic y
+$txt->text('y'); 
+$txt->font($f1, $fsize);  # roman = a
+$txt->text(' = a');
+# $txt->subscript($subsupscl, $f1, $fsize, '2');
+  $txt->font($f1,$fsize*$subsupscl);  # <sub>2</sub>
+  $txt->rise(-10*$subsupscl);
+  $txt->text('2');
+  $txt->rise(0);
+$txt->font($f2,$fsize);  # italic x
+$txt->text('x');
+# $txt->superscript($subsupscl, $f1, $fsize, '2');
+  $txt->font($f1,$fsize*$subsupscl);  # <sup>2</sup>
+  $txt->rise(10*$subsupscl);
+  $txt->text('2');
+  $txt->rise(0);
+$txt->font($f1,$fsize);
+$txt->text(' + a');       # roman + a
+# $txt->subscript($subsupscl, $f1, $fsize, '1');
+  $txt->font($f1,$fsize*$subsupscl);  # <sub>1</sub>
+  $txt->rise(-10*$subsupscl);
+  $txt->text('1');
+  $txt->rise(0);
+$txt->font($f2,$fsize);  # italic x
+$txt->text('x');
+# $txt->superscript($subsupscl, $f1, $fsize, '2');
+  $txt->font($f1,$fsize*$subsupscl);  # <sup>1</sup>
+  $txt->rise(10*$subsupscl);
+  $txt->text('1');
+  $txt->rise(0);
+$txt->font($f1,$fsize);
+$txt->text(' + a');       # roman + a
+# $txt->subscript($subsupscl, $f1, $fsize, '0');
+  $txt->font($f1,$fsize*$subsupscl);  # <sub>0</sub>
+  $txt->rise(-10*$subsupscl);
+  $txt->text('0');
+  $txt->rise(0);
+$txt->font($f1,$fsize);
+$txt->text(' is an equation.');
+
+# ----------------------------
+# ah, just for the halibut, use functions
+$txt->translate(50,65);
+$txt->font($f2, $fsize);                   # italic y
+$txt->text('y'); 
+$txt->font($f1, $fsize);                   # roman = a
+$txt->text(' = a');
+subscript($subsupscl, $f1, $fsize, '3');   #  <sub>3</sub>
+$txt->font($f2,$fsize);                    # italic x
+$txt->text('x');
+superscript($subsupscl, $f1, $fsize, '3'); #  <sup>3</sup>
+$txt->font($f1,$fsize);
+$txt->text(' + a');                        # roman + a
+subscript($subsupscl, $f1, $fsize, '2');   #  <sub>2</sub>
+$txt->font($f2,$fsize);                    # italic x
+$txt->text('x');
+superscript($subsupscl, $f1, $fsize, '2'); #  <sup>2</sup>
+$txt->font($f1,$fsize);
+$txt->text(' + a');                        # roman + a
+subscript($subsupscl, $f1, $fsize, '1');   #  <sub>1</sub>
+$txt->font($f2,$fsize);                    # italic x
+$txt->text('x');
+superscript($subsupscl, $f1, $fsize, '1'); #  <sup>1</sup>
+$txt->font($f1,$fsize);
+$txt->text(' + a');                        # roman + a
+subscript($subsupscl, $f1, $fsize, '0');   #  <sub>0</sub>
+$txt->font($f1,$fsize);
+$txt->text(' is done with functions.');
+
+# ----------------------------
 $pdf->saveas("$0.pdf");
 $pdf->end();
 
 exit;
+
+# TBD These might go into content or content::text.
+#     As a method, $txt might not have to be passed in if can use $self.
+#     It might be a good idea to save and restore the font and size, too
+#     (might need to extend font() method to return the current font and size).
+#     Restores old rise() value, such as for putting superscript on a
+#     subscript, etc., instead of hardcoded 0. Use the current font size 
+#     instead of passing it in. Could have optional values to override the 
+#     font, size, rise %, etc., by default using the old font. The sub/sup scale
+#     might default, with an override (is it strongly dependent on font?).
+#     Potentially only the $text might be a mandatory parameter, or combine
+#     the functions with a 'sup' or 'sub' parameter, since only one line diff.
+# TBD Probably doesn't yet handle super on sub and vice-versa, or super on
+#     super, etc. Needs more thought.
+sub subscript {
+  my ($subsupscl, $font, $fsize, $text) = @_;
+  my $oldRise = $txt->rise();
+  # save old font here -- need anyway for font() call unless override given
+  $txt->font($font, $fsize*$subsupscl);
+  $txt->rise(-$fsize/2*$subsupscl);
+  $txt->text($text);
+  # restore old font here
+  $txt->rise($oldRise);
+  return;
+}
+
+sub superscript {
+  my ($subsupscl, $font, $fsize, $text) = @_;
+  my $oldRise = $txt->rise();
+  # save old font here -- need anyway for font() call unless override given
+  $txt->font($font, $fsize*$subsupscl);
+  $txt->rise($fsize/2*$subsupscl);
+  $txt->text($text);
+  # restore old font here
+  $txt->rise($oldRise);
+  return;
+}
 
 __END__

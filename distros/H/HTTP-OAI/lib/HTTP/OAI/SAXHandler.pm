@@ -7,7 +7,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 use Data::Dumper; # debugging for here
 
-our $VERSION = '4.11';
+our $VERSION = '4.12';
 
 @ISA = qw( Exporter XML::SAX::Base );
 

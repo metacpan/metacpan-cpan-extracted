@@ -7,4 +7,5 @@ README
 dist.ini
 lib/App/Games/Keno.pm
 playKenoTest.pl
+playKenoTestArgs.pl
 t/playKenoTest.t

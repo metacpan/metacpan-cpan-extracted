@@ -149,7 +149,8 @@ sub canUpdateSfa {
         if (
             $req->userData->{
                 "$self->{conf}->{contextSwitchingPrefix}_session_id"}
-            && !$self->conf->{contextSwitchingAllowed2fModifications} )
+            && !$self->conf->{contextSwitchingAllowed2fModifications}
+          )
         {
             $self->userLogger->warn(
 "ContextSwitching in progress! $user is not allowed to update 2FA."

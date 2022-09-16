@@ -226,7 +226,8 @@ m%<div class="alert alert-success"><div class="text-center"><b><span trspan="all
       or explain( $res->[2]->[0], 'Header Key: Auth-User' );
     ok( $res->[2]->[0] =~ m%: dwho<br/>%, 'Found dwho' )
       or explain( $res->[2]->[0], 'Header Value: dwho' );
-    ok( $res->[2]->[0] =~ m%<div class="col">su</div>%, 'Found su' )
+    ok( $res->[2]->[0] =~ m%<div class="card-text text-left ml-2">su</div>%,
+        'Found su' )
       or explain( $res->[2]->[0], 'SSO Groups: su' );
     ok( $res->[2]->[0] =~ m%<td scope="row">uid</td>%, 'Found uid' )
       or explain( $res->[2]->[0], 'Attribute Value uid' );

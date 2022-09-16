@@ -1,14 +1,13 @@
-Road Map for Future Development of PDF::Builder                  02 July 2021
+Road Map for Future Development of PDF::Builder                   20 Aug 2022
 
 In order to encourage others to contribute code and/or algorithms to the
 effort, I am publishing this road map of where I would like the product to go.
 Please, no copyrighted code or patented algorithms, unless the owner releases
 them under an Open Source license! The content of this road map is open to
-discussion, too, either on the GitHub bugs list (feature requests with the
-"enhancement" label or "general discussion" label) or under the forum (Feature 
-Requests or General Discussions). If you have a one-off suggestion, there is
-a contact link on the forum so you don't have to sign up for either the forum
-or GitHub to be heard.
+discussion, too, on the GitHub bugs list (feature requests with the
+"enhancement" label or "general discussion" label). If you have a one-off 
+suggestion, there is a contact page on my site, so you don't have to sign up 
+for GitHub to be heard.
 
 If there are no contributions on something, I reserve the right to write my
 own modules (dependent on PDF::Builder) and sell them.
@@ -48,7 +47,20 @@ A. ## DONE ## release 3.018
 
    UPDATE: See Text::Layout and HarfBuzz::Shaper packages. Layout is usable
      with Builder (but no explicit support yet). Shaper is supported by Builder
-     for ligatures and complex scripts.
+     for ligatures and complex scripts. Need to see if it supports true small
+     and petite capitals (included with font) as a sort of alternate glyphs.
+     It's probably not feasible to decompose outline fonts and shrink them
+     down nonlinearly (stroke widths reduced less than overall height/width)
+     and recreate the new outlines as synthetic small/petite caps.
+
+(A1.) Look at examples/HarfBuzz.pl to see some problems with ligatures. In some
+     cases, such as "waffle", a PDF Reader can search for and find it even if
+     "ffl" has been replaced by a ligature (single glyph). However, in other
+     cases, such as "strasse", the Reader can NOT find the word when "ss" has
+     been replaced by an eszet. My keyboard doesn't have an eszet, so I can't
+     easily test if it can be searched for. I don't think there's anything in
+     the PDF::Builder code which is substituting eszet for "ss". Interestingly, 
+     the "st" ligature in the same word does not present any problem.
 
 B. Unification of font support: including character set and encoding support
    improvements [see CTS 16 and CTS 23] to make more commonality between using 
@@ -62,6 +74,11 @@ B. Unification of font support: including character set and encoding support
    have to be done to split the page internally into two or more sections, 
    each with their own embedded virtual font. Glyph widths would have to be 
    available for all characters.
+
+   Add: start a subfont with the ASCII set and empty top 128. Add new chars
+   to it (from x80 to xFF) as single byte glyphs (not matching any standard
+   encoding) and use this new subfont. When it fills up and more characters
+   are needed on a page, start another subfont.
 
 C. Improved documentation, possibly even a book giving detailed explanations
    and examples, as both a reference and a tutorial. Needless to say, there
@@ -214,6 +231,29 @@ S. Many requests in wkHTMLtoPDF to output an entire web page into a single
    Y-coordinate to mean "place me at the bottom". Also remember that beyond 
    200 inches in height, support in readers and tools will vary.
 
+T. Extend the pageLabel() call to not only label the reader's thumb, but 
+   also place the SAME page label text somewhere on the page. This might be
+   combined with header() and footer() calls, possibly to call pageLabel()
+   when the page numbering field is encountered (if flag set to do both).
+   The idea is to minimize labor and ensure a consistent page numbering 
+   between the paper and the reader's thumb. header() and footer() might be
+   placed in the top and bottom margins, leaving it to the user not to write
+   into these areas. See #171 for pageLabel() enhancements. Also, page label
+   for outlines/bookmarks should be consistent with the thumb and what's
+   printed on the page. A manual page number call to put the page label on
+   an arbitrary place (such as centered in the outside margin) would be good.
+
+U. Consider PCF (bitmapped font format) font support, in a manner similar to
+   the more primitive BDF support. PCF fonts are common on some systems (X11
+   used them extensively), but it's unlikely that there would be much interest
+   to widely use them today. 
+   See https://fontforge.org/docs/techref/pcf-format.html
+
+V. Add calls to insert Javascript actions for various objects. Not all Readers
+   may support the same Javascript level, so be careful. There are many actions
+   and many triggers that are supported. There may be some overlap with 
+   annotation links (such as opening files or links on a click).
+
 =============================================================================
 II. Items to add to a separate area (new module or sub-module)
 
@@ -304,6 +344,13 @@ F. Support for SVG graphics (drawing), support for troff's eqn, pic, and tbl
    having to rewrite marked up text. Also provide a full graphing functions 
    library (stacked/unstacked line, bar, scatter plots etc. in 2D and 3D).
 
+   eqn might be done with something based on (translated from) the MathJax
+   Javascript package (TypeScript source). There doesn't appear to be a Perl
+   implementation, and supposedly MathJax is highly dependent on the browser
+   DOM, which could be a problem. However, it might be easier than starting
+   from scratch (with all due credit and links to the MathJax authors/site).
+   I won't know unless I take a deep dive into the MathJax source.
+
 G. Prepress production markup: convenience functions to place a watermark or
    draft notice on all (or selected) pages, crop marks (based on trimbox),
    temporarily draw page bounding boxes, temporarily draw object limit boxes,
@@ -386,3 +433,99 @@ L. (See B and H items above) Consider a $page->subpage(x, y, w, h, opts) to
    as PDF::Builder::Table, and can have arbitrary content in a table cell.
 
 =============================================================================
+III. A new architecture, in a new package
+
+These are things that would be useful in being able to handle page design
+in a higher-level manner. This would almost certainly be another package,
+such as PDF::Builder::Environments.
+
+A. Introduce the concept of environments, which take care of handling much of
+   the busy-work of laying out a page.
+
+   page -- including margins (define the work area); page numbering, outline,
+           and slider thumb consistent page numbers; headings/footings. also 
+           odd/even page layouts, odd-only, or single page (roll printer) layout
+     column(s) -- define single or multiple columns, not necessarily of
+                  rectangular outline or of the same width or height. lower
+                  level environments can modify the initial outline (eat
+                  away at it). balanced columns could be done
+       heading -- per column or per page, keep together along with first two
+                  lines of following paragraph
+       footnote -- per column or per page, grows up from the bottom and can
+                   spill to the next page. mostly for keeping track of the
+                   bottom of the usable area
+       margin note -- a minipage eating into a column and margin, limited to
+                      column height. must be defined before filling column
+       inset -- usually rectangular (but could be any shape) that eats into
+                the space for one or two columns
+       floats -- per column or per page, for images, etc., may float left or 
+                 right (but not cause a hole in the middle of a column)
+       table -- per column or per page, somewhat like PDF::Table, but probably 
+                only fixed width columns, and content fill left to author
+       list -- per column or per page; sl, ul, ol, dl; content fill left to
+               author
+     span all or selected columns
+       heading 
+       footnote
+       floats -- may be centered here
+       table
+       list
+
+   The idea is that you start an environment (either implicitly or explicitly)
+   and are responsible for all the content. At the start, you are told the
+   position of the upper left corner (not necessarily a baseline), the allowed
+   width, and the maximum height on this page. You fill in the content as you
+   wish. At the end, you close the environment. The current PDF::Builder is
+   only used for low-level stuff (primitives); the higher-level structure is
+   in this package.
+
+   The purpose is to allow you to put any kind of content anywhere, such as
+   another list within a list item, or another table within a table cell (as 
+   well as a table within a list or a list within a table cell). The current
+   PDF::Table severely limits your content to (currently) simple text of
+   constant font, font size, color, etc. It is up to you to obey the limits
+   of the extent of your content (no checks for overflow). Some environments
+   (e.g., insets) will eat into the real estate defined for their parents, so 
+   they will have to be fully defined and filled before you start filling 
+   their parents.
+
+   A table row would need to be defined (filled) before ink can be put down,
+   so there may also need to be a table row environment. To handle vertical
+   alignment, or decide where to split a row across a page break, the table
+   environment needs to know the height of each row. This may need a means of
+   tentatively writing a virtual row, moving part to a new page (or down their
+   cell) if necessary, and commanding that the ink be put down. It may even be
+   necessary to move the entire row to the next page (e.g., a cell's content
+   is an image). Note that a new page is handled by the top-level program, 
+   rather than having one automatically created -- unlike PDF::Table, 
+   permitting more control over the layout and appearance.
+
+   Balanced columns could be done. If the columns are purely rectangular (no
+   insets, floats, etc.) and of the same width (not necessarily the same 
+   height), we could fill in the same order as they are read and if not
+   completely filled, move already-formatted lines one at a time until 
+   balanced. Columns which do not meet these criteria would be more difficult. 
+   An estimate could be made of where to cut the columns by tracking the "area" 
+   used by the longer column(s), and redistributing it to the short column(s), 
+   then refilling the columns to the new height limit. This would be expensive, 
+   particularly if using Knuth-Plass paragraph shaping, as it might have to be 
+   done several times per page. Likewise, fixing widows and orphans by changing
+   leading would be much more expensive in non-rectangular columns.
+
+   Lists are vertical, and include unordered lists (you select marker), simple
+   lists (like unordered, but no marker), ordered list (decimal, lc roman,
+   UC Roman, lc alpha, UC Alpha) with selectable starting value (default 1).
+   For unordered and ordered lists, the marker is right justified in a 
+   specified width, with a specified gutter before the content (and specified 
+   prefix and suffix strings around the marker). The marker can be specified to 
+   be 'inside' or 'outside' the content (if inside, the content is indented). 
+   The content area coordinates are returned to the user, who fills it in with 
+   whatever they want, obeying the size limits and any indentation. Reasonable 
+   defaults can be used for all these settings. Definition lists would have 
+   the term(s) by default bold, and always break and indent for the content, 
+   or only if the term exceeds some maximum width. Again, the content is the 
+   responsibility of the user, so any kind of content can be given. Each list
+   item is handled separately, although a wrapper could be written to do
+   multiple items at once (simple text only).
+
+B. Before implementing any of "A", see how a RTL language should be handled.

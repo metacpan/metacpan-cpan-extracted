@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 2;
-use Test::MockModule;
+use Test::MockModule ;
 
 use TestRail::API;
 

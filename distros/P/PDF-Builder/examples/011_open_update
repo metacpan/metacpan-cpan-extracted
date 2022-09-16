@@ -46,11 +46,11 @@ $page->mediabox(595,842);
 $text = $page->text();
 $text->textlabel(50,780, $f1, 20, "Hello World! (3)");
 
-$str = $pdf->stringify();
+$str = $pdf->to_string();
 $pdf->end();
 
 # open and read string $str, rewrite "Hello World! (4)", save as STRING
-$pdf = PDF::Builder->open_scalar($str, -compress => $compress);
+$pdf = PDF::Builder->from_string($str, -compress => $compress);
 $f1 = $pdf->corefont('Verdana');
 
 $page = $pdf->page();

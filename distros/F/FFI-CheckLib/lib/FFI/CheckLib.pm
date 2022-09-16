@@ -23,7 +23,7 @@ our @EXPORT_OK = qw(
 );
 
 # ABSTRACT: Check that a library is available for FFI
-our $VERSION = '0.28'; # VERSION
+our $VERSION = '0.29'; # VERSION
 
 
 our $system_path = [];
@@ -65,9 +65,9 @@ elsif($os eq 'msys')
 }
 elsif($os eq 'MSWin32')
 {
-  #  handle cases like libgeos-3-7-0___.dll and libgtk-2.0-0.dll
-  $pattern = [ qr{^(?:lib)?(\w+?)(?:-([0-9-\.]+))?_*\.dll$}i ];
-  $version_split = qr/\-/;
+  #  handle cases like libgeos-3-7-0___.dll, libproj_9_1.dll and libgtk-2.0-0.dll
+  $pattern = [ qr{^(?:lib)?(\w+?)(?:[_-]([0-9\-\._]+))?_*\.dll$}i ];
+  $version_split = qr/[_\-]/;
 }
 elsif($os eq 'darwin')
 {
@@ -406,7 +406,7 @@ FFI::CheckLib - Check that a library is available for FFI
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 
@@ -595,7 +595,7 @@ false (0) otherwise.
 
 [version 0.17]
 
- my $path = where($name);
+ my $path = which($name);
 
 Return the path to the first library that matches the given name.
 
@@ -721,7 +721,11 @@ Ilya Pavlov (Ilya, ILUX)
 
 Shawn Laffan (SLAFFAN)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
+
+Michael R. Davis (MRDVT)
+
+Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 

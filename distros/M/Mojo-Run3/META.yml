@@ -3,6 +3,7 @@ abstract: 'Run a subprocess and read/write to it'
 author:
   - 'Jan Henning Thorsen <jan.henning@thorsen.pm>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -17,17 +18,24 @@ no_index:
   directory:
     - t
     - inc
+    - examples
+    - t
 requires:
   IO::Pty: '1.16'
   IO::Socket::IP: '0.37'
   Mojo::IOLoop::ReadWriteFork: '1.00'
   Mojolicious: '8.25'
   Sub::Util: '1.41'
+  perl: '5.016'
 resources:
+  IRC:
+    url: irc://irc.libera.chat/#convos
+    web: https://web.libera.chat/#convos
   bugtracker: https://github.com/jhthorsen/mojo-run3/issues
   homepage: https://github.com/jhthorsen/mojo-run3
+  license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/mojo-run3.git
-version: '0.05'
+version: '0.06'
 x_contributors:
-  - 'Jan Henning Thorsen'
+  - 'Jan Henning Thorsen <jan.henning@thorsen.pm>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

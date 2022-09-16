@@ -19,19 +19,17 @@ sub errno_ok {
   
   my $errno_perl_func = "Errno::$errno_func_name";
   
-  my $success;
-  if (exists $!{$errno_func_name}) {
-    no strict 'refs';
-    $success = is(SPVM::Errno->$errno_func_name, &$errno_perl_func);
+  my $match;
+  eval { SPVM::Errno->$errno_func_name };
+  if ($@) {
+    warn "\"$errno_func_name\" is not supported on this system";
   }
   else {
-    eval { SPVM::Errno->$errno_func_name };
-    my $error = $@;
-    $success = like($error, qr/not defined/);
-  }
-  
-  unless ($success) {
-    warn "$errno_func_name test failed at $file $line\n";
+    no strict 'refs';
+    my $errno = SPVM::Errno->$errno_func_name;
+    my $errno_expected = &$errno_perl_func;
+    is($errno, $errno_expected);
+    warn "$errno_func_name: $errno";
   }
 }
 
@@ -397,5 +395,56 @@ ok(SPVM::TestCase::Errno->errno);
 {
   errno_ok('EXFULL');
 }
+
+errno_ok('WSAEACCES');
+errno_ok('WSAEADDRINUSE');
+errno_ok('WSAEADDRNOTAVAIL');
+errno_ok('WSAEAFNOSUPPORT');
+errno_ok('WSAEALREADY');
+errno_ok('WSAEBADF');
+errno_ok('WSAECANCELLED');
+errno_ok('WSAECONNABORTED');
+errno_ok('WSAECONNREFUSED');
+errno_ok('WSAECONNRESET');
+errno_ok('WSAEDESTADDRREQ');
+errno_ok('WSAEDISCON');
+errno_ok('WSAEDQUOT');
+errno_ok('WSAEFAULT');
+errno_ok('WSAEHOSTDOWN');
+errno_ok('WSAEHOSTUNREACH');
+errno_ok('WSAEINPROGRESS');
+errno_ok('WSAEINTR');
+errno_ok('WSAEINVAL');
+errno_ok('WSAEINVALIDPROCTABLE');
+errno_ok('WSAEINVALIDPROVIDER');
+errno_ok('WSAEISCONN');
+errno_ok('WSAELOOP');
+errno_ok('WSAEMFILE');
+errno_ok('WSAEMSGSIZE');
+errno_ok('WSAENAMETOOLONG');
+errno_ok('WSAENETDOWN');
+errno_ok('WSAENETRESET');
+errno_ok('WSAENETUNREACH');
+errno_ok('WSAENOBUFS');
+errno_ok('WSAENOMORE');
+errno_ok('WSAENOPROTOOPT');
+errno_ok('WSAENOTCONN');
+errno_ok('WSAENOTEMPTY');
+errno_ok('WSAENOTSOCK');
+errno_ok('WSAEOPNOTSUPP');
+errno_ok('WSAEPFNOSUPPORT');
+errno_ok('WSAEPROCLIM');
+errno_ok('WSAEPROTONOSUPPORT');
+errno_ok('WSAEPROTOTYPE');
+errno_ok('WSAEPROVIDERFAILEDINIT');
+errno_ok('WSAEREFUSED');
+errno_ok('WSAEREMOTE');
+errno_ok('WSAESHUTDOWN');
+errno_ok('WSAESOCKTNOSUPPORT');
+errno_ok('WSAESTALE');
+errno_ok('WSAETIMEDOUT');
+errno_ok('WSAETOOMANYREFS');
+errno_ok('WSAEUSERS');
+errno_ok('WSAEWOULDBLOCK');
 
 done_testing;

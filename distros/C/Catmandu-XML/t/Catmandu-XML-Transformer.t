@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use Test::More;
+# See https://github.com/LibreCat/Catmandu-XML/issues/19
+use Test::More skip_all => "Module only used internally";
 use Catmandu::XML::Transformer;
 use XML::LibXML;
 

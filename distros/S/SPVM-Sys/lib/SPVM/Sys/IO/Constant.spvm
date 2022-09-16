@@ -1,0 +1,265 @@
+class Sys::IO::Constant {
+  native static method AT_EMPTY_PATH : int ();
+
+  native static method AT_FDCWD : int ();
+
+  native static method AT_NO_AUTOMOUNT : int ();
+
+  native static method AT_SYMLINK_FOLLOW : int ();
+
+  native static method AT_SYMLINK_NOFOLLOW : int ();
+
+  native static method CAP_CHOWN : int ();
+
+  native static method CAP_DAC_READ_SEARCH : int ();
+
+  native static method CAP_FOWNER : int ();
+
+  native static method CAP_FSETID : int ();
+
+  native static method CAP_LEASE : int ();
+
+  native static method CAP_SYS_RESOURCE : int ();
+
+  native static method DN_ACCESS : int ();
+
+  native static method DN_ATTRIB : int ();
+
+  native static method DN_CREATE : int ();
+
+  native static method DN_DELETE : int ();
+
+  native static method DN_MODIFY : int ();
+
+  native static method DN_MULTISHOT : int ();
+
+  native static method DN_RENAME : int ();
+
+  native static method EOF : int ();
+
+  native static method FD_CLOEXEC : int ();
+
+  native static method F_ADD_SEALS : int ();
+
+  native static method F_DUPFD : int ();
+
+  native static method F_DUPFD_CLOEXEC : int ();
+
+  native static method F_GETFD : int ();
+
+  native static method F_GETFL : int ();
+
+  native static method F_GETLEASE : int ();
+
+  native static method F_GETLK : int ();
+
+  native static method F_GETLK64 : int ();
+
+  native static method F_GETOWN : int ();
+
+  native static method F_GETOWN_EX : int ();
+
+  native static method F_GETPIPE_SZ : int ();
+
+  native static method F_GETSIG : int ();
+
+  native static method F_GET_FILE_RW_HINT : int ();
+
+  native static method F_GET_RW_HINT : int ();
+
+  native static method F_GET_SEALS : int ();
+
+  native static method F_NOTIFY : int ();
+
+  native static method F_OFD_GETLK : int ();
+
+  native static method F_OFD_SETLK : int ();
+
+  native static method F_OFD_SETLKW : int ();
+
+  native static method F_OWNER_PGRP : int ();
+
+  native static method F_OWNER_PID : int ();
+
+  native static method F_OWNER_TID : int ();
+
+  native static method F_RDLCK : int ();
+
+  native static method F_SEAL_FUTURE_WRITE : int ();
+
+  native static method F_SEAL_GROW : int ();
+
+  native static method F_SEAL_SEAL : int ();
+
+  native static method F_SEAL_SHRINK : int ();
+
+  native static method F_SEAL_WRITE : int ();
+
+  native static method F_SETFD : int ();
+
+  native static method F_SETFL : int ();
+
+  native static method F_SETLEASE : int ();
+
+  native static method F_SETLK : int ();
+
+  native static method F_SETLK64 : int ();
+
+  native static method F_SETLKW : int ();
+
+  native static method F_SETLKW64 : int ();
+
+  native static method F_SETOWN : int ();
+
+  native static method F_SETOWN_EX : int ();
+
+  native static method F_SETPIPE_SZ : int ();
+
+  native static method F_SETSIG : int ();
+
+  native static method F_SET_FILE_RW_HINT : int ();
+
+  native static method F_SET_RW_HINT : int ();
+
+  native static method F_UNLCK : int ();
+
+  native static method F_WRLCK : int ();
+
+  native static method O_APPEND : int ();
+
+  native static method O_ASYNC : int ();
+
+  native static method O_CLOEXEC : int ();
+
+  native static method O_CREAT : int ();
+
+  native static method O_DIRECT : int ();
+
+  native static method O_DIRECTORY : int ();
+
+  native static method O_DSYNC : int ();
+
+  native static method O_EXCL : int ();
+
+  native static method O_EXEC : int ();
+
+  native static method O_LARGEFILE : int ();
+
+  native static method O_NDELAY : int ();
+
+  native static method O_NOATIME : int ();
+
+  native static method O_NOCTTY : int ();
+
+  native static method O_NOFOLLOW : int ();
+
+  native static method O_NONBLOCK : int ();
+
+  native static method O_PATH : int ();
+
+  native static method O_RDONLY : int ();
+
+  native static method O_RDWR : int ();
+
+  native static method O_RSYNC : int ();
+
+  native static method O_SYNC : int ();
+
+  native static method O_TMPFILE : int ();
+
+  native static method O_TRUNC : int ();
+
+  native static method O_WRONLY : int ();
+
+  native static method SEEK_CUR : int ();
+
+  native static method SEEK_DATA : int ();
+
+  native static method SEEK_END : int ();
+
+  native static method SEEK_HOLE : int ();
+
+  native static method SEEK_SET : int ();
+
+  native static method R_OK : int ();
+
+  native static method W_OK : int ();
+
+  native static method X_OK : int ();
+
+  native static method F_OK : int ();
+
+  native static method S_CDF : int ();
+  native static method S_ENFMT : int ();
+  native static method S_IF : int ();
+  native static method S_IFBLK : int ();
+  native static method S_IFCHR : int ();
+  native static method S_IFCMP : int ();
+  native static method S_IFDIR : int ();
+  native static method S_IFDOOR : int ();
+  native static method S_IFIFO : int ();
+  native static method S_IFLNK : int ();
+  native static method S_IFMPB : int ();
+  native static method S_IFMPC : int ();
+  native static method S_IFMT : int ();
+  native static method S_IFNAM : int ();
+  native static method S_IFNWK : int ();
+  native static method S_IFREG : int ();
+  native static method S_IFSHAD : int ();
+  native static method S_IFSOCK : int ();
+  native static method S_IFWHT : int ();
+  native static method S_INSEM : int ();
+  native static method S_INSHD : int ();
+  native static method S_IREAD : int ();
+  native static method S_IRGRP : int ();
+  native static method S_IROTH : int ();
+  native static method S_IRUSR : int ();
+  native static method S_IRWXG : int ();
+  native static method S_IRWXO : int ();
+  native static method S_IRWXU : int ();
+  native static method S_ISBLK : int ($mode : int);
+  native static method S_ISCHR : int ($mode : int);
+  native static method S_ISDIR : int ($mode : int);
+  native static method S_ISFIFO : int ($mode : int);
+  native static method S_ISGID : int ();
+  native static method S_ISLNK : int ($mode : int);
+  native static method S_ISREG : int ($mode : int);
+  native static method S_ISSOCK : int ($mode : int);
+  native static method S_ISUID : int ();
+  native static method S_ISVTX : int ();
+  native static method S_IWGRP : int ();
+  native static method S_IWOTH : int ();
+  native static method S_IWUSR : int ();
+  native static method S_IXGRP : int ();
+  native static method S_IXOTH : int ();
+  native static method S_IXUSR : int ();
+
+  native static method POLLERR : int ();
+
+  native static method POLLHUP : int ();
+
+  native static method POLLIN : int ();
+
+  native static method POLLNORM : int ();
+
+  native static method POLLNVAL : int ();
+
+  native static method POLLOUT : int ();
+
+  native static method POLLPRI : int ();
+
+  native static method POLLRDBAND : int ();
+
+  native static method POLLRDNORM : int ();
+
+  native static method POLLWRBAND : int ();
+
+  native static method POLLWRNORM : int ();
+
+  native static method LOCK_SH : int ();
+
+  native static method LOCK_EX : int ();
+
+  native static method LOCK_UN : int ();
+
+}

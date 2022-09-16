@@ -7,36 +7,71 @@ use v5.10.1;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.18';
 
 use MRO::Compat;
 
-use Class::Method::Modifiers ();
-
 use Sub::Name ();
 use Moo::Role ();
+use Role::Hooks;
+
+use Moo::_Utils ();
 use MooX::TaggedAttributes::Cache;
 
 our %TAGSTORE;
 our %TAGCACHE;
 our %TAGHANDLER;
 
-my %ARGS = ( -tags => 1, -handler => 1 );
+# when using -propagate, make sure we don't duplicate role application.
+# can't use simply role checks because of inheritance
+our %APPLIED_ROLE;
+
+my %ARGS = ( -tags => 1, -handler => 1, -propagate => undef );
 
 sub _croak {
     require Carp;
     goto \&Carp::croak;
 }
 
+sub _install_on_application {
+    my ( $target ) = @_;
+
+    return
+      if Moo::Role::does_role( $target, 'MooX::TaggedAttributes::Propagate' );
+
+    Moo::Role->apply_roles_to_package( $target,
+        'MooX::TaggedAttributes::Role' );
+    Moo::Role->apply_roles_to_package( $target,
+        'MooX::TaggedAttributes::Propagate' );
+
+    Role::Hooks->after_apply(
+        $target,
+        sub {
+            my ( $role, $ltarget ) = @_;
+
+            # Multiple instances of this hook may get installed
+            # through application of multiple tag roles to a class
+            # but, we don't want to repeat installation of tags or
+            # another instance of this hook. (the latter
+            # this is guarded against in _install_on_application
+            # but this'll take care of it as a sideeffect)
+
+            return if $APPLIED_ROLE{$ltarget}{$role}++;
+
+            # this is guarded in _install_on_application so that
+            # the modifier is  done only once for the target
+            _install_on_application( $ltarget );
+
+
+            role_import( $role, $ltarget );
+        } );
+
+}
+
 sub import {
 
     my ( $class, @args ) = @_;
     my $target = caller;
-
-    Moo::Role->apply_roles_to_package( $target,
-        'MooX::TaggedAttributes::Role' );
-
-    return unless @args;
 
     my %args;
 
@@ -47,6 +82,11 @@ sub import {
         $args{$arg} = defined $ARGS{$arg} ? shift @args : 1;
     }
 
+    Moo::Role->apply_roles_to_package( $target, 'MooX::TaggedAttributes::Role' )
+      unless Moo::Role::does_role( $target, 'MooX::TaggedAttributes::Role' );
+
+    return unless %args;
+
     if ( defined $args{-tags} ) {
         $args{-tags} = [ $args{-tags} ]
           unless 'ARRAY' eq ref $args{-tags};
@@ -54,6 +94,10 @@ sub import {
         $args{-class} = $class;
         install_tags( $target, %args )
           if @{ $args{-tags} };
+    }
+
+    if ( defined $args{-propagate} && $args{-propagate} ) {
+        _install_on_application( $target );
     }
 
     no strict 'refs';    ## no critic
@@ -85,21 +129,50 @@ sub import {
 
 
 sub role_import {
-    my $class = shift;
-    return unless Moo::Role->is_role( $class );
-    my $target = caller;
-    if ( Moo::Role->is_role( $target ) ) {
-        Moo::Role->apply_roles_to_package( $target, $class );
+    my $role = shift;
+    return unless Moo::Role->is_role( $role );
+    my $target = shift // caller;
+
+    unless ( Moo::Role::does_role( $target, $role ) ) {
+
+        if ( Moo::Role->is_role( $target ) ) {
+            Moo::Role->apply_roles_to_package( $target, $role );
+        }
+        else {
+            # Prevent installation of the import routine from a tagged role
+            # into the consumer.  Roles won't overwrite an existing method,
+            # so create one which goes away when this block exits.
+
+            # localized globs don't seem work on 5.10.1, result in an error
+            #    Attempt to free unreferenced scalar: SV 0x564fc668eb60
+            #    at [...]MooX/TaggedAttributes.pm line 147.
+
+            if ( $^V lt v5.14 ) {
+                require Package::Stash;
+                my $pkg = Package::Stash->new( $target );
+                if ( $pkg->has_symbol( '&import' ) ) {
+                    Moo::Role->apply_roles_to_package( $target, $role );
+                }
+                else {
+                    $pkg->add_symbol( '&import', sub { } );
+                    eval {
+                        Moo::Role->apply_roles_to_package( $target, $role );
+                    };
+                    my $e = $@;
+                    $pkg->remove_symbol( '&import' );
+                    die $e if $e ne '';
+                }
+            }
+            else {
+                no strict 'refs';    ## no critic
+                my $glob = *${ \"${target}::import" };
+                !defined *{$glob}{CODE}
+                  and local *{$glob} = sub { };
+                Moo::Role->apply_roles_to_package( $target, $role );
+            }
+        }
     }
-    else {
-        # Prevent installation of the import routine from a tagged role
-        # into the consumer.  Roles won't overwrite an existing method,
-        # so create one which goes away when this block exits.
-        no strict 'refs';    ## no critic
-        local *${ \"${target}::import" } = sub { };
-        Moo::Role->apply_roles_to_package( $target, $class );
-    }
-    install_tags( $target, -class => $class );
+    install_tags( $target, -class => $role );
 }
 
 
@@ -123,7 +196,11 @@ sub install_tags {
 
     my $tags = $opt{-tags}
       // ( defined( $opt{-class} ) && $TAGSTORE{ $opt{-class} } )
-      || _croak( "-tags or -class not specified" );
+      || do {
+        my $class = $opt{-class};
+        _croak( "-tags or -class not specified" ) if !defined $class;
+        _croak( "Class '$class' has not yet been registered" );
+      };
 
     # first time importing a tag role, install our tag handler
     install_tag_handler( $target, \&make_tag_handler )
@@ -153,11 +230,24 @@ sub install_tags {
 
 
 
-
 sub install_tag_handler {
     my ( $target, $handler ) = @_;
-    Class::Method::Modifiers::install_modifier( $target,
+    Moo::_Utils::_install_modifier( $target,
         around => has => $handler->( $target ) );
+}
+
+
+
+
+
+
+
+
+
+sub _install_role_modifier {
+    my $target = shift;
+    push @{ $Moo::Role::INFO{$target}{modifiers} ||= [] }, [@_];
+    Moo::Role->_maybe_reset_handlemoose( $target );
 }
 
 
@@ -180,26 +270,33 @@ sub make_tag_handler {
     # so that if namespace::clean is called on the target class
     # we don't lose access to it.
 
-
-    my $target = shift;
-    my $around = \&${ \"${target}::around" };
+    my $target  = shift;
+    my $is_role = Moo::Role->is_role( $target );
 
     return Sub::Name::subname "${target}::tag_handler" => sub {
+
         my ( $orig, $attrs, %opt ) = @_;
         $orig->( $attrs, %opt );
 
         $attrs = ref $attrs ? $attrs : [$attrs];
         my @tags = @{ $TAGSTORE{$target} };
-        $around->(
-            "_tag_list" => sub {
+
+        my @args = (
+            $target,
+            around => "_tag_list" => sub {
                 my $orig = shift;
                 ## no critic (ProhibitAccessOfPrivateData)
-                return [
+                my @ret = (
                     @{&$orig},
                     map    { [ $_, $attrs, $opt{$_} ] }
                       grep { exists $opt{$_} } @tags,
-                ];
+                );
+                return \@ret;
             } );
+
+        $is_role
+          ? _install_role_modifier( @args )
+          : Moo::_Utils::_install_modifier( @args );
     }
 }
 
@@ -228,7 +325,7 @@ MooX::TaggedAttributes - Add a tag with an arbitrary value to a an attribute
 
 =head1 VERSION
 
-version 0.15
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -392,7 +489,9 @@ are identical.
 
 =head1 ADVANCED USE
 
-B<Experimental>
+=head2 Experimental!
+
+=head3 Additional tag handlers
 
 C<MooX::TaggedAttributes> works in part by wrapping L<Moo/has> in
 logic which handles the association of tags with attributes.  This
@@ -406,10 +505,35 @@ C<$handler> is a subroutine reference which will be called as
 
   $coderef = $handler->($class);
 
-Its return value must be a coderef suitable for passing to
-L<Class::Method::Modifiers/around> to wrap C<has>, e.g.
+Its return value must be a coderef suitable for passing as an 'around'
+modifier for 'has' to L<Moo::_Utils::_install_modifier> to wrap
+C<has>, e.g.
 
-  around has => $coderef;
+  Moo::_Utils::_install_modifier( $target, around has => $coderef );
+
+=head3 Automatically propagating tagging abilities
+
+As mentioned previously, a package load a tag role using the C<use>
+statement (not the C<with> statement) to be able tag attributes.
+
+An (experimental) alternative is to pass the C<-propagate> option when
+defining a tag role, e.g.
+
+ # define a Tag Role
+ package T1;
+ use Moo::Role;
+ 
+ use MooX::TaggedAttributes -tags => [qw( t1 t2 )], -propagate;
+ 1;
+
+Classes or roles consuming this role via C<with> will be able to tag
+attributes, and will pass that capability on to classes which consume
+them.
+
+This results in different behavior than the previous (soon to be
+deprecated) mode.  There, consuming a role using C<with> does not
+convey tagging abilities to the consumer. That is done with the C<use>
+command.
 
 =head1 BUGS, LIMITATIONS, TRAPS FOR THE UNWARY
 
@@ -524,6 +648,12 @@ which as already been registered with L<MooX::TaggedAttributes>.
 This installs a wrapper around the C<has> routine in C<$class>. C<$factory>
 is called as C<< $factory->($class) >> and should return a wrapper compatible
 with L<Class::Method::Modifiers/around>.
+
+=head2 _install_role_modifier
+
+Our own purloined version of code to register modifiers for roles. See
+L<Role::Tiny>'s C<_gen_subs> or L<Moo::Role>'s similarly named routine.
+Unfortunately, there's no way of easily calling that code
 
 =head2 make_tag_handler
 

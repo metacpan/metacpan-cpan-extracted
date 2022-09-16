@@ -7,6 +7,12 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.34: Thu 15 Sep 09:43:40 CEST 2022
+
+	Fixes:
+	- ::Exception::isFatal() did not respect the is_fatal overrule.
+	  Spotted by [Andy Berverley]
+
 version 1.33: Sat Jul 17 10:56:52 CEST 2021
 
 	Changes:

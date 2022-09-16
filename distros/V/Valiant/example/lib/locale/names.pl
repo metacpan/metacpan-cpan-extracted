@@ -4,7 +4,9 @@
       state_id => "State",
     },
     valiant => {
-      models => { Authenticate => 'Sign In' }
+      models => { 
+        Authenticate => 'Sign In',
+      },
     }
   },
 };

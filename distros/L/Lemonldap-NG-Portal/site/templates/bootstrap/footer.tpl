@@ -1,5 +1,11 @@
   </div>
 
+<TMPL_IF NAME="SCROLL_TOP">
+  <button type="button" class="btn btn-danger btn-floating btn-lg" id="btn-back-to-top">
+    <i class="fa fa-arrow-circle-up"></i>
+  </button>
+</TMPL_IF>
+
   <div id="footer">
     <div class="row">
     <div class="col-md-2"></div>

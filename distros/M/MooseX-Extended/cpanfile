@@ -33,6 +33,7 @@ requires "perl" => "v5.20.0";
 requires "strict" => "0";
 requires "true" => "v1.0.2";
 requires "warnings" => "0";
+suggests "Function::Parameters" => "2.001003";
 suggests "Future::AsyncAwait" => "0.58";
 suggests "Syntax::Keyword::MultiSub" => "0.02";
 suggests "Syntax::Keyword::Try" => "0.027";

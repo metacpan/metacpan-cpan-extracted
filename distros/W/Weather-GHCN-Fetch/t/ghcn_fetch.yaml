@@ -1,0 +1,10 @@
+---
+cache:
+    root: ./ghcn_cache
+    namespace: ghcn
+
+aliases:
+    yow: CA006106000,CA006106001    # Ottawa airport
+    cda: CA006105976,CA006105978    # Ottawa Central Experimental farm (CDA and CDA RCS)
+    nacenter: USC00326365           # New Salem 5NW, near the geographic center of North America
+    

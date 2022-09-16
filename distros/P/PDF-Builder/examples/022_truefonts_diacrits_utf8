@@ -21,7 +21,9 @@ my $compress = 'flate'; # compressed streams
 my $sx = 33;
 my $sy = 45;
 my $fx = 20;
+#my $LoremIpsum = qq|Spin\x{0308}al Tap says: Sed ut perspici\x{0361}atis.|;  # times.ttf includes
 my $LoremIpsum = qq|Sed ut perspici\x{0361}atis.|;  # times.ttf includes
+# U+0308 is combining diaeresis (spans n) unfortunately, doesn't quite align
 # U+0361 is combining double inverted breve (spans i to t)
 # "use utf8" says to interpret string as UTF-8
 my $encoding = 'latin1';

@@ -110,11 +110,11 @@ categories =
     dateTitle:          ['_utime', '_startTime', '_updateTime', '_lastAuthnUTime', '_lastSeen']
     connectionTitle:    ['ipAddr', '_timezone', '_url']
     authenticationTitle:['_session_id', '_user', '_password', 'authenticationLevel']
-    modulesTitle:       ['_auth', '_userDB', '_passwordDB', '_issuerDB', '_authChoice', '_authMulti', '_userDBMulti']
+    modulesTitle:       ['_auth', '_userDB', '_passwordDB', '_issuerDB', '_authChoice', '_authMulti', '_userDBMulti', '_2f']
     saml:               ['_idp', '_idpConfKey', '_samlToken', '_lassoSessionDump', '_lassoIdentityDump']
     groups:             ['groups', 'hGroups']
     ldap:               ['dn']
-    OpenIDConnect:      ['_oidc_id_token', '_oidc_OP', '_oidc_access_token']
+    OpenIDConnect:      ['_oidc_id_token', '_oidc_OP', '_oidc_access_token', '_oidc_refresh_token', '_oidc_access_token_eol']
     sfaTitle:			['_2fDevices']
     oidcConsents:		['_oidcConsents']
 
@@ -212,13 +212,21 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 			_insert = (re, title) ->
 				tmp = []
 				reg = new RegExp(re)
+				cv  = ""
 				for key,value of session
 					if key.match(reg) and value
-						tmp.push
-							title: key
-							value: value
+						cv += "#{value}:#{key},"
 						delete session[key]
-				if tmp.length > 0
+				if cv
+					cv = cv.replace(/,$/, '')
+					tab = cv.split ','
+					tab.sort()
+					tab.reverse()
+					for val in tab
+						vk = val.split ':'
+						tmp.push
+							title: vk[1]
+							value: $scope.localeDate vk[0]
 					res.push
 						title: title
 						nodes: tmp
@@ -246,26 +254,27 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 				subres = []
 				for attr in attrs
 					if session[attr]
-						if session[attr].toString().match(/"type":\s*"(?:TOTP|U2F|UBK|WebAuthn)"/)
-							subres.push
-								title: "type"
-								value: "name"
-								epoch: "date"
-								td: "0"
+						if attr == "_2fDevices" && session[attr]
 							array = JSON.parse(session[attr])
-							for sfDevice in array
-								for key, value of sfDevice
-									if key == 'type'
-										title = value
-									if key == 'name'
-										name = value
-									if key == 'epoch'
-										epoch = value
+							if array.length > 0
 								subres.push
-									title: title
-									value: name
-									epoch: epoch
-									td: "1"
+									title: "type"
+									value: "name"
+									epoch: "date"
+									td: "0"
+								for sfDevice in array
+									for key, value of sfDevice
+										if key == 'type'
+											title = value
+										if key == 'name'
+											name = value
+										if key == 'epoch'
+											epoch = value
+									subres.push
+										title: title
+										value: name
+										epoch: epoch
+										td: "1"
 							delete session[attr]
 						else if session[attr].toString().match(/"rp":\s*"[\w-]+"/)
 							subres.push

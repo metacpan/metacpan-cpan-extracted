@@ -14,22 +14,22 @@ Alien::Base::ModuleBuild::API - API Reference for Alien:: Authors
 
 =head1 VERSION
 
-version 1.15
+version 1.17
 
 =head1 DESCRIPTION
 
 B<NOTE>: Please consider for new development of L<Alien>s that you use
-L<Alien::Build> and L<alienfile> instead.  Like L<Alien::Base::ModuleBUild> they work
-with L<Alien::Base>.  Unlike L<Alien::Base::Module::Build> they are more easily customized
+L<Alien::Build> and L<alienfile> instead.  Like L<Alien::Base::ModuleBuild> they work
+with L<Alien::Base>.  Unlike L<Alien::Base::ModuleBuild> they are more easily customized
 and handle a number of corner cases better.  For a good place to start,
-please see L<Alien::Build::Manual::AlienAuthor>.  Although the 
+please see L<Alien::Build::Manual::AlienAuthor>.  Although the
 Alien-Base / Alien-Build team will continue to maintain this module,
 (we will continue to fix bugs where appropriate), we aren't adding any
 new features to this module.
 
-A list of extra properties and methods provided by 
+A list of extra properties and methods provided by
 L<Alien::Base::ModuleBuild> beyond those contained in L<Module::Build::API>.
-Note that all property and method names are prefixed with C<alien_> to prevent future 
+Note that all property and method names are prefixed with C<alien_> to prevent future
 collisions L<Module::Build> builtins.
 
 =head2 CONSTRUCTOR
@@ -92,14 +92,14 @@ to remove the variable.
  );
  ...
 
-Please keep in mind that frequently users have a good reason to have set 
-environment variables, and you should not override them without a good 
-reason.  An example of a good justification would be if a project has a 
-Makefile that interacts badly with common environment variables.  This 
+Please keep in mind that frequently users have a good reason to have set
+environment variables, and you should not override them without a good
+reason.  An example of a good justification would be if a project has a
+Makefile that interacts badly with common environment variables.  This
 can sometimes be a problem since Makefile variables can be overridden with
 environment variables.
 
-A useful pattern is to use a helper to only override an environment 
+A useful pattern is to use a helper to only override an environment
 variable if it is not already set.
 
  ...
@@ -115,7 +115,7 @@ variable if it is not already set.
  );
  ...
 
-A common pitfall with environment variables is that setting one to the 
+A common pitfall with environment variables is that setting one to the
 empty string (C<''>) is not portable.  On Unix it works fine as you would
 expect, but in Windows it actually unsets the environment variable, which
 may not be what you intend.
@@ -178,10 +178,10 @@ By default alien_name is used with any C<lib> prefix removed.  For example C<lib
 
 [version 0.020]
 
-Provide helpers to generate commands or arguments at build or install time.  This property is a hash 
-reference.  The keys are the helper names and the values are strings containing Perl code that will 
-be evaluated and interpolated into the command before execution.  Because helpers are only needed 
-when building a package from the source code, any dependency may be specified as an 
+Provide helpers to generate commands or arguments at build or install time.  This property is a hash
+reference.  The keys are the helper names and the values are strings containing Perl code that will
+be evaluated and interpolated into the command before execution.  Because helpers are only needed
+when building a package from the source code, any dependency may be specified as an
 C<alien_bin_requires>.  For example:
 
  ...
@@ -358,7 +358,7 @@ The name of the temporary folder which will house the library when it is downloa
 
 [version 0.001]
 
-An arrayref of commands used to test the library.  Each command is first 
+An arrayref of commands used to test the library.  Each command is first
 passed through the L<command interpolation engine|/"COMMAND INTERPOLATION">,
 so those variables may be used.  The default is to do no tests.  The most
 common command used by the GNU toolchain is C<[ 'make check' ]>, but beware
@@ -366,7 +366,7 @@ that is not supported by all packages.
 
 [version 0.009]
 
-Each command may be either a string or an array reference.  If the array 
+Each command may be either a string or an array reference.  If the array
 reference form is used, then the multiple argument form of system is used.
 
 =item alien_version_check
@@ -393,7 +393,7 @@ integrators creating a single non-architecture specific RPM, .deb or similar pac
 
 =item $ENV{ALIEN_BLIB}
 
-Setting this to true indicates that you don't intend to actually install your Alien::Base subclass, but rather use it from the built F<blib> directory. This behavior is mostly to support automated testing from CPANtesters and should be automagically determined. If by chance you happen to trip the behavior accidentally, setting this environment variable to false (0) before building should prevent problems. 
+Setting this to true indicates that you don't intend to actually install your Alien::Base subclass, but rather use it from the built F<blib> directory. This behavior is mostly to support automated testing from CPANtesters and should be automagically determined. If by chance you happen to trip the behavior accidentally, setting this environment variable to false (0) before building should prevent problems.
 
 =item $Alien::Base::ModuleBuild::Force
 
@@ -409,7 +409,7 @@ Setting to C<share> will ignore a system-wide installation and build a local ver
 
 =item $ENV{ALIEN_VERBOSE}
 
-Setting the either to a true value will output a little more info from within the module itself. At this point L<Alien::Base> is going to be fairly verbose without this enabled. 
+Setting the either to a true value will output a little more info from within the module itself. At this point L<Alien::Base> is going to be fairly verbose without this enabled.
 
 =back
 
@@ -525,7 +525,7 @@ A literal C<%>.
 
 =over
 
-=item * 
+=item *
 
 L<Module::Build::API>
 
@@ -567,13 +567,13 @@ Kang-min Liu (劉康民, gugod)
 
 Nicholas Shipp (nshp)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Alberto Simões (ambs)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2020 by Joel A Berger.
+This software is copyright (c) 2012-2022 by Joel A Berger.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

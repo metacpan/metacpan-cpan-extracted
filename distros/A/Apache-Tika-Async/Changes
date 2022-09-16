@@ -1,3 +1,10 @@
+0.11 2022-09-13
+    * Fix prerequisites
+      We need Future::HTTP, not LWP::UserAgent now ...
+
+0.10 2022-09-12
+    * Introduce $ENV{PERL_APACHE_TIKA_PATH} for finding the Tika jar file
+
 0.09 2022-09-04
     * Switch from Promises to Future
     * Most likely only support Tika 2.x due to changed handling of

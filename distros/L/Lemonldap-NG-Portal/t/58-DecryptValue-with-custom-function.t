@@ -14,12 +14,13 @@ my $client = LLNG::Manager::Test->new( {
             logLevel              => 'error',
             authentication        => 'Demo',
             userDB                => 'Same',
+            key                   => 'Demo',
             loginHistoryEnabled   => 0,
             brutForceProtection   => 0,
             requireToken          => 0,
             decryptValueRule      => 1,
             decryptValueFunctions =>
-              'Custom::empty Custom::test_uc Custom::undefined',
+'Lemonldap::NG::Portal::Custom::empty Lemonldap::NG::Portal::Custom::test_uc Lemonldap::NG::Portal::Custom::undefined',
         }
     }
 );
@@ -84,7 +85,7 @@ ok(
     ),
     'POST decryptvalue with valid value'
 );
-ok( $res->[2]->[0] =~ m%<span trspan="LOWERCASE"></span>%,
+ok( $res->[2]->[0] =~ m%<span trspan="LOWERCASE_DEMO"></span>%,
     'Found decryted value' )
   or explain( $res->[2]->[0], 'Decryted value NOT found' );
 count(2);

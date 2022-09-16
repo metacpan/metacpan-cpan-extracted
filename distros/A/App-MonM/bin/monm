@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
-use strict; # $Id: monm 84 2019-07-10 15:13:28Z abalama $
+use strict; # $Id: monm 136 2022-09-09 15:37:03Z abalama $
+
+=encoding utf8
 
 =head1 NAME
 
@@ -7,18 +9,28 @@ monm - simple monitoring tool
 
 =head1 SYNOPSIS
 
-    monm [options] [commands [args]] 
+    monm [options] [commands [args]]
 
-    monm [-dltUvI] 
+    monm [-dltUvI]
 
-    monm [--debug] [--log] [--testmode] [--config=CONFIG_FILE] [--datadir=DATADIR]
-         [ configure | checkit [NAMEs] | report [NAMEs] ]
+    monm [-c CONFIG_FILE] [-d DATADIR]
+         [ configure | checkit [NAMEs] | report [Emails] 
+           | info | remind | show ]
 
-    monm checkit www.example.com ftp.example.com
+    monm configure [/tmp/testconf]
 
-    monm report www.example.com ftp.example.com
+    monm checkit foo bar baz
+
+    monm report -o /tmp/report.msg
+    monm report foo@example.com bar@example.com
+
+    monm remind
+
+    monm info
+    monm -D info
 
     monm show
+    monm -D show
 
 =head1 OPTIONS
 
@@ -26,20 +38,20 @@ monm - simple monitoring tool
 
 =item B<-c CONFIG_FILE, --config=CONFIG_FILE>
 
-Full path of the configuration file. The configuration file allows determine the 
-basic default settings, which will use the system if it fails to specify additional 
-configuration files in $CONFDIR directory. The default system 
+Full path of the configuration file. The configuration file allows determine the
+basic default settings, which will use the system if it fails to specify additional
+configuration files in $CONFDIR directory. The default system
 path /etc/monm/monm.conf
 
-=item B<-D DATADIR, --datadir=DATADIR, --dir=DATADIR>
+=item B<-d DATADIR, --datadir=DATADIR, --dir=DATADIR>
 
 The directory of temporary files.
 
-Default: system temp directory
+Default: system temp directory (/tmp/monm)
 
-=item B<-d, --debug>
+=item B<-D, --daemondir>
 
-Enable debug mode. In this mode, debug messages are displayed on the screen
+Use sharedstatedir (/var/lib/monm) directory of daemon process
 
 =item B<-h, --help>
 
@@ -54,15 +66,15 @@ Show long help information and quit
 Enabling write debug information to syslog or user log file.
 
 Do not confuse the debug logging from regular logging to a file monm.log.
-Regular logging allows you to store information in monm.log on the progress of the processes 
-module, whereas debug logging for debugging of the internal components 
+Regular logging allows you to store information in monm.log on the progress of the processes
+module, whereas debug logging for debugging of the internal components
 of the module.
 
 To control the level of debugging see parameter LogEnable and LogLevel.
 
-=item B<-t, --testmode>
+=item B<-o OUTPUTFILE, --outfile=OUTPUTFILE>
 
-Enabling test mode. This key allows force sending notification while checking
+Sets path to file for output (for reports, eg.)
 
 =item B<-v, --verbose>
 
@@ -83,6 +95,10 @@ Print the version number of the program and quit
 Configure (initializing) of the App::MonM. This command should be performed
 after the first installation of the module App::MonM
 
+    monm configure /root/monm
+
+This example shows how to extract configuration into NON system directory /root/monm
+
 =item B<checkit>
 
 Checking the status of services with the possibility of informing about the change of these states
@@ -97,6 +113,14 @@ Shows current table data of the checkit DB
 
 If -v flag is specified - shows table as dump
 
+=item B<info>
+
+Shows statistic data, tests config file
+
+=item B<remind>
+
+Retries sending notifies
+
 =back
 
 =head1 DESCRIPTION
@@ -105,11 +129,11 @@ Simple monitoring tool
 
 =head1 AUTHOR
 
-Serz Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -136,8 +160,6 @@ use constant {
     PIDREQS     => [qw/checkit report/],
 };
 
-$| = 1;  # autoflush
-
 my $options = {};
 Getopt::Long::Configure("bundling");
 GetOptions($options,
@@ -145,8 +167,8 @@ GetOptions($options,
     #
     # a A b B   C     e E
     # f F g G     i I j J
-    # k K   L m M n N o O
-    # p P q Q r R s S   T
+    # k K   L m M n N   O
+    # p P q Q r R s S t T
     # u U     w W x X y Y
     # z Z
 
@@ -154,14 +176,16 @@ GetOptions($options,
     "help|usage|h",         # Show help page
     "longhelp|H|?",         # Show long help page
     "version|vers|ver|V",   # Print VERSION of the App::MonM
-    "debug|d",              # Debug mode
     "verbose|v",            # Verbose mode
     "log|l",                # Log mode
-    "test|testmode|t",      # Test mode
 
     # CTK Application
     "config|conf|c=s",      # Config file
-    "datadir|dir|D=s",      # DataDir
+    "datadir|dir|d=s",      # DataDir
+    "daemondir|D",          # Daemon dir (/var/lib/monm) as datadir
+
+    # MonM Application
+    "outfile|o=s",          # Output file
 
 ) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
 pod2usage(-exitval => 0, -verbose => 1) if $options->{help};
@@ -181,22 +205,20 @@ $SIG{INT} = sub {
 };
 
 # App::MonM instance
-my $app = new App::MonM(
+my $app = App::MonM->new(
         project => PROJECTNAME,
         prefix  => PREFIX,
         ($options->{config} && -e $options->{config} ? (configfile => $options->{config}) : ()),
         ($options->{datadir} ? (datadir => $options->{datadir}) : ()),
         options => $options,
-        debug   => $options->{debug},
         verbose => $options->{verbose},
         log     => $options->{log},
-        test    => $options->{test},
     );
 pod2usage(-exitval => 1, -verbose => 99, -sections => 'SYNOPSIS|OPTIONS|COMMANDS', -output => \*STDERR)
     unless $command && grep {$_ eq $command} ($app->list_handlers());
 
 if (grep {$_ eq $command} @{(PIDREQS())}) {
-    $pidfile = new CTK::FilePid({
+    $pidfile = CTK::FilePid->new({
         file => File::Spec->catfile($app->tempdir(), sprintf(PIDMASK, PREFIX, $command))
     });
     $pidstat = $pidfile->running || 0;

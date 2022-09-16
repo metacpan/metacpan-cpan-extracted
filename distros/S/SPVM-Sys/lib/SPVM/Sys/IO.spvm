@@ -1,0 +1,107 @@
+class Sys::IO {
+
+  use Sys::IO::FileStream;
+  use Sys::IO::Stat;
+  use Sys::IO::DirStream;
+  use Sys::IO::Dirent;
+  use Sys::IO::Utimbuf;
+  use Sys::IO::Flock;
+  use Sys::IO::PollfdArray;
+  use Sys::IO::Constant;
+  
+  native static method open : int ($path : string, $flags : int, $mode = 0 : int);
+  
+  native static method read : int ($fd : int, $buf : mutable string, $count : int);
+  
+  native static method write : int ($fd : int, $buffer : string, $count : int);
+
+  native static method lseek : long ($fd : int, $offset : long, $whence : int);
+  
+  native static method close : int ($fd : int);
+  
+  native static method fopen : Sys::IO::FileStream ($path : string, $mode : string);
+  
+  native static method fdopen : Sys::IO::FileStream ($fd : int, $mode : string);
+  
+  native static method fileno : int ($stream : Sys::IO::FileStream);
+  
+  native static method fread : int ($ptr : mutable string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream);
+  
+  native static method feof : int ($stream : Sys::IO::FileStream);
+  
+  native static method ferror : int ($stream : Sys::IO::FileStream);
+  
+  native static method clearerr : void ($stream : Sys::IO::FileStream);
+  
+  native static method getc : int ($stream : Sys::IO::FileStream);
+  
+  native static method fgets : mutable string ($s : mutable string, $size : int, $stream : Sys::IO::FileStream);
+  
+  native static method fwrite : int ($ptr : string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream);
+  
+  native static method fseek : int ($stream : Sys::IO::FileStream, $offset : long, $whence : int);
+  
+  native static method ftell : long ($stream : Sys::IO::FileStream);
+  
+  native static method fclose : int ($stream : Sys::IO::FileStream);
+  
+  native static method fflush : int ($stream : Sys::IO::FileStream);
+  
+  native static method flock : int ($fd : int, $operation : int);
+
+  native static method mkdir : int ($path : string, $mode : int);
+  
+  native static method umask : int ($mode : int);
+  
+  native static method rmdir : int ($path : string);
+  
+  native static method unlink : int ($pathname : string);
+  
+  native static method rename : int ($oldpath : string, $newpath : string);
+
+  native static method getcwd : mutable string ($buf : mutable string, $size : int);
+
+  native static method _getdcwd : mutable string ($drive : int, $buffer : mutable string, $maxlen : int);
+
+  native static method realpath : mutable string ($path : string, $resolved_path : mutable string);
+
+  native static method _fullpath : mutable string ($absPath : mutable string, $relPath : string, $maxLength : int);
+
+  native static method chdir : int ($path : string);
+  
+  native static method chmod : int ($path : string, $mode :int);
+  
+  native static method chown : int ($path : string, $owner : int, $group : int);
+  
+  native static method truncate : int ($path : string, $length : long);
+  
+  native static method symlink : int ($oldpath : string, $newpath : string);
+  
+  native static method readlink : int ($path : string, $buf : mutable string, $bufsiz : int);
+  
+  native static method opendir : Sys::IO::DirStream ($dir : string);
+  
+  native static method closedir : int ($dir_stream : Sys::IO::DirStream);
+  
+  native static method readdir : Sys::IO::Dirent ($dir_stream : Sys::IO::DirStream); # Non-thead safe
+  
+  native static method rewinddir : void ($dir_stream : Sys::IO::DirStream);
+  
+  native static method telldir : long ($dir_stream : Sys::IO::DirStream);
+  
+  native static method seekdir : void ($dir_stream : Sys::IO::DirStream, $offset : long);
+  
+  native static method utime : int ($filename : string, $times : Sys::IO::Utimbuf);
+  
+  native static method access : int ($path : string, $mode : int);
+  
+  native static method stat : int ($path : string, $stat : Sys::IO::Stat);
+  
+  native static method lstat : int ($path : string, $stat : Sys::IO::Stat);
+  
+  native static method fcntl : int ($fd : int, $command : int, $command_arg = undef : object of Byte|Short|Int|Long|Float|Double|Sys::IO::Flock|object);
+  
+  native static method ioctl : int ($fd : int, $request : int, $request_arg = undef : object of Byte|Short|Int|Long|Float|Double|object);
+  
+  native static method poll : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int);
+}

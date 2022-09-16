@@ -5,6 +5,136 @@ use File::chdir;
 use File::Temp;
 use URI::file;
 
+subtest 'network fetch' => sub {
+
+  is(
+    Alien::Base::ModuleBuild::Repository::HTTP->is_network_fetch,
+    1
+  );
+
+};
+
+subtest 'secure fetch' => sub {
+
+  is(
+    Alien::Base::ModuleBuild::Repository::HTTP->new( protocol => 'http' )->is_secure_fetch,
+    F(),
+  );
+
+  is(
+    Alien::Base::ModuleBuild::Repository::HTTP->new( protocol => 'https' )->is_secure_fetch,
+    T(),
+  );
+
+  is(
+    Alien::Base::ModuleBuild::Repository::HTTP->new( protocol => 'http', exact_filename => 'https://foo' )->is_secure_fetch,
+    T(),
+  );
+
+  is(
+    Alien::Base::ModuleBuild::Repository::HTTP->new( protocol => 'http', exact_filename => 'http://foo' )->is_secure_fetch,
+    F(),
+  );
+
+};
+
+subtest 'verify tls' => sub {
+
+  local $ENV{ALIEN_DOWNLOAD_RULE};
+  delete $ENV{ALIEN_DOWNLOAD_RULE};
+
+  subtest 'HTTP::Tiny' => sub {
+
+    my $new_args;
+
+    my $mock = mock 'HTTP::Tiny' => (
+      around => [
+        new => sub {
+          my($orig, $self, @args) = @_;
+          $new_args = { @args };
+          $self->$orig(@args);
+        },
+      ],
+    );
+
+    $ENV{ALIEN_DOWNLOAD_RULE} = 'warn';
+
+    Alien::Base::ModuleBuild::Repository::HTTP->new->connection;
+
+    is(
+      $new_args,
+      hash {
+        field agent => match qr/^Alien-Base-ModuleBuild\/HTTP::Tiny\//;
+        end;
+      },
+      'warn',
+    );
+
+    $ENV{ALIEN_DOWNLOAD_RULE} = 'digest_or_encrypt';
+    $new_args = {};
+
+    Alien::Base::ModuleBuild::Repository::HTTP->new->connection;
+
+    is(
+      $new_args,
+      hash {
+        field agent      => match qr/Alien-Base-ModuleBuild\/HTTP::Tiny\//;
+        field verify_SSL => 1;
+        end;
+      },
+      'digest_or_encrypt',
+    );
+
+  };
+
+  subtest 'LWP' => sub {
+
+    skip_all 'subtest requires LWP::UserAgent' unless eval { require LWP::UserAgent; 1 };
+
+    my $new_args;
+
+    my $mock = mock 'LWP::UserAgent' => (
+      around => [
+        new => sub {
+          my($orig, $self, @args) = @_;
+          $new_args = { @args };
+          $self->$orig(@args);
+        },
+      ],
+    );
+
+    $ENV{ALIEN_DOWNLOAD_RULE} = 'warn';
+
+    Alien::Base::ModuleBuild::Repository::HTTP->new( protocol_class => 'LWP::UserAgent' )->connection;
+
+    is(
+      $new_args,
+      hash {
+        field agent => match qr/^Alien-Base-ModuleBuild\/LWP::UserAgent\//;
+        end;
+      },
+      'warn',
+    );
+
+    $ENV{ALIEN_DOWNLOAD_RULE} = 'digest_or_encrypt';
+    $new_args = {};
+
+    Alien::Base::ModuleBuild::Repository::HTTP->new( protocol_class => 'LWP::UserAgent' )->connection;
+
+    is(
+      $new_args,
+      hash {
+        field agent    => match qr/Alien-Base-ModuleBuild\/LWP::UserAgent\//;
+        field ssl_opts => { verify_hostname => 1 };
+        end;
+      },
+      'digest_or_encrypt',
+    );
+
+  };
+
+};
+
 my $index_path = path('corpus/alien_base_modulebuild_repository_http/index.html')->absolute->stringify;
 
 my $mock = mock 'HTTP::Tiny' => (

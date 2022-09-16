@@ -1,0 +1,179 @@
+NAME
+    Data::HTML::Form - Data object for HTML form.
+
+SYNOPSIS
+     use Data::HTML::Form;
+
+     my $obj = Data::HTML::Form->new(%params);
+     my $action = $obj->action;
+     my $css_class = $obj->css_class;
+     my $enctype = $obj->enctype;
+     my $id = $obj->id;
+     my $label = $obj->label;
+     my $method = $obj->method;
+
+METHODS
+  "new"
+     my $obj = Data::HTML::Form->new(%params);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "action"
+
+            Form action.
+
+            Default value is undef.
+
+    *       "css_class"
+
+            Form CSS class.
+
+            Default value is undef.
+
+    *       "enctype"
+
+            Form enctype, attribute which specifies how the form-data should
+            be encoded when submitting it to the server.
+
+            Possible values are:
+
+            *   (undefined - same as application/x-www-form-urlencoded)
+
+            *   application/x-www-form-urlencoded
+
+            *   multipart/form-data
+
+            *   text/plain
+
+            Default value is undef.
+
+    *       "id"
+
+            Form identifier.
+
+            Default value is undef.
+
+    *       "label"
+
+            Form label.
+
+            Default value is undef.
+
+    *       "method"
+
+            Form method.
+
+            Default value is 'get'.
+
+            Possible methods are: get and post
+
+  "action"
+     my $action = $obj->action;
+
+    Get form action.
+
+    Returns string.
+
+  "css_class"
+     my $css_class = $obj->css_class;
+
+    Get CSS class for form.
+
+    Returns string.
+
+  "enctype"
+     my $enctype = $obj->enctype;
+
+    Get enctype, attribute which specifies how the form-data should be
+    encoded when submitting it to the server.
+
+    Returns string.
+
+  "id"
+    Get form identifier.
+
+    Returns string.
+
+  "label"
+    Get form label.
+
+    Returns string.
+
+  "method"
+    Get form method.
+
+    Returns string.
+
+ERRORS
+     new():
+             Parameter 'enctype' has bad value.
+                     Value: %s
+             Parameter 'method' has bad value.
+                     Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Data::HTML::Form;
+
+     my $obj = Data::HTML::Form->new;
+
+     # Print out.
+     print 'Method: '.$obj->method."\n";
+
+     # Output:
+     # Method: get
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Data::HTML::Form;
+
+     my $obj = Data::HTML::Form->new(
+            'action' => '/action.pl',
+            'css_class' => 'form',
+            'enctype' => 'multipart/form-data',
+            'id' => 'form-id',
+            'label' => 'Form label',
+            'method' => 'post',
+     );
+
+     # Print out.
+     print 'Action: '.$obj->action."\n";
+     print 'CSS class: '.$obj->css_class."\n";
+     print 'Enctype: '.$obj->enctype."\n";
+     print 'Id: '.$obj->id."\n";
+     print 'Label: '.$obj->label."\n";
+     print 'Method: '.$obj->method."\n";
+
+     # Output:
+     # Action: /action.pl
+     # CSS class: form
+     # Enctype: multipart/form-data
+     # Id: form-id
+     # Label: Form label
+     # Method: post
+
+DEPENDENCIES
+    Error::Pure, List::Util, Mo, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-HTML-Form>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

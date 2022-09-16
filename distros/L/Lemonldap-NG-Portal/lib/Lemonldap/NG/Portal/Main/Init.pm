@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -30,6 +30,7 @@ has _authentication => ( is => 'rw' );
 has _userDB         => ( is => 'rw' );
 has _passwordDB     => ( is => 'rw' );
 has _sfEngine       => ( is => 'rw' );
+has _captcha        => ( is => 'rw' );
 
 has loadedModules => ( is => 'rw' );
 
@@ -336,6 +337,14 @@ sub reloadConf {
       unless $self->{_sfEngine} =
       $self->loadPlugin( $self->conf->{'sfEngine'} );
 
+    # Load Captcha module
+    return $self->fail
+      unless $self->_captcha(
+        $self->loadPlugin(
+            $self->conf->{'captcha'} || '::Captcha::SecurityImage'
+        )
+      );
+
     # Compile macros in _macros, groups in _groups
     foreach my $type (qw(macros groups)) {
         $self->{"_$type"} = {};
@@ -625,7 +634,8 @@ sub buildRule {
     my $compiledRule =
       $self->HANDLER->buildSub( $self->HANDLER->substitute($rule) );
     unless ($compiledRule) {
-        my $error = $self->HANDLER->tsv->{jail}->error || '???';
+        my $error =
+          $self->HANDLER->tsv->{jail}->error || 'Unable to compile rule';
         $self->logger->error( "Bad" . $ruleDesc . "rule: " . $error );
     }
     return $compiledRule,;

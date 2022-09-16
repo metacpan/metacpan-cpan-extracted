@@ -11,7 +11,7 @@ our $VERSION = '2.0.14';
 has locationAttribute        => ( is => 'rw' );
 has locationDisplayAttribute => ( is => 'rw' );
 has locationMaxValues        => ( is => 'rw' );
-has mailSessionKey           => (
+has mailSessionKey => (
     is      => 'rw',
     lazy    => 1,
     default => sub {

@@ -2,14 +2,14 @@
 use warnings;
 use strict;
 
-use Test::More tests => 52;
+use Test::More tests => 84;
 
 use PDF::Builder;
 
 my $pdf = PDF::Builder->new();
 my $page = $pdf->page();
 
-# Global Boxes
+# Global Boxes (deprecated get_* names)
 
 $pdf->mediabox(100, 200);
 my @mediabox = $page->get_mediabox();
@@ -46,7 +46,69 @@ is($artbox[1], 0, 'Global Artbox LLY');
 is($artbox[2], 200, 'Global Artbox URX');
 is($artbox[3], 300, 'Global Artbox URY');
 
-# Page-Specific Boxes
+# Page Size
+
+$page->size('letter');
+my @box = $page->_bounding_box('MediaBox');
+is($box[0],   0, q{$page->size('letter') X1});
+is($box[1],   0, q{$page->size('letter') Y1});
+is($box[2], 612, q{$page->size('letter') X2});
+is($box[3], 792, q{$page->size('letter') Y2});
+
+# Page Boundaries
+
+$page->boundaries('media' => 'letter');
+@box = $page->_bounding_box('MediaBox');
+is($box[0],   0, q{$page->boundaries(media => 'letter') X1});
+is($box[1],   0, q{$page->boundaries(media => 'letter') Y1});
+is($box[2], 612, q{$page->boundaries(media => 'letter') X2});
+is($box[3], 792, q{$page->boundaries(media => 'letter') Y2});
+
+$page->boundaries('media' => '12x18', 'trim'  => 0.5 * 72);
+@box = $page->_bounding_box('MediaBox');
+is($box[0], 0,       q{$page->boundaries('media' => '12x18') X1});
+is($box[1], 0,       q{$page->boundaries('media' => '12x18') Y1});
+is($box[2], 12 * 72, q{$page->boundaries('media' => '12x18') X2});
+is($box[3], 18 * 72, q{$page->boundaries('media' => '12x18') Y2});
+
+@box = $page->_bounding_box('TrimBox');
+is($box[0],   36, q{Single-argument trim X1});
+is($box[1],   36, q{Single-argument trim Y1});
+is($box[2],  828, q{Single-argument trim X2});
+is($box[3], 1260, q{Single-argument trim Y2});
+
+# Default Page Size
+
+$pdf->default_page_size('letter');
+@box = $pdf->_bounding_box('MediaBox');
+is($box[0],   0, q{$pdf->default_page_size('letter') X1});
+is($box[1],   0, q{$pdf->default_page_size('letter') Y1});
+is($box[2], 612, q{$pdf->default_page_size('letter') X2});
+is($box[3], 792, q{$pdf->default_page_size('letter') Y2});
+
+# Default Page Boundaries
+
+$pdf->default_page_boundaries('media' => 'letter');
+@box = $pdf->_bounding_box('MediaBox');
+is($box[0],   0, q{$page->boundaries('media' => 'letter') X1});
+is($box[1],   0, q{$page->boundaries('media' => 'letter') Y1});
+is($box[2], 612, q{$page->boundaries('media' => 'letter') X2});
+is($box[3], 792, q{$page->boundaries('media' => 'letter') Y2});
+
+$pdf->default_page_boundaries(media => '12x18', trim  => 0.5 * 72);
+@box = $pdf->_bounding_box('MediaBox');
+is($box[0], 0,       q{$page->boundaries('media' => '12x18') X1});
+is($box[1], 0,       q{$page->boundaries('media' => '12x18') Y1});
+is($box[2], 12 * 72, q{$page->boundaries('media' => '12x18') X2});
+is($box[3], 18 * 72, q{$page->boundaries('media' => '12x18') Y2});
+
+@box = $pdf->_bounding_box('TrimBox');
+is($box[0],   36, q{Single-argument trim X1});
+is($box[1],   36, q{Single-argument trim Y1});
+is($box[2],  828, q{Single-argument trim X2});
+is($box[3], 1260, q{Single-argument trim Y2});
+
+# Page-Specific Boxes (deprecated get_* names)
 
 $page->mediabox(720, 1440);
 @mediabox = $page->get_mediabox();
@@ -103,5 +165,7 @@ is($artbox[0], 0, 'Artbox LLX');
 is($artbox[1], 0, 'Artbox LLY');
 is($artbox[2], 70, 'Artbox URX');
 is($artbox[3], 80, 'Artbox URY');
+
+done_testing();
 
 1;

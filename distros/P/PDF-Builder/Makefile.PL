@@ -2,13 +2,13 @@
 
 use strict;
 use warnings;
-use 5.022000;
+use 5.024000;
 use ExtUtils::MakeMaker 6.66;
 
-my $PERL_version = '5.022000';  # Both here and in "use" statement above,
+my $PERL_version = '5.024000';  # Both here and in "use" statement above,
                                 # PDFbuild.pl updates from 'version' file
 my $MakeMaker_version = '6.66';
-my $version = '3.023';          # PDFbuild.pl updates from 'version' file
+my $version = '3.024';          # PDFbuild.pl updates from 'version' file
 
 # optional libraries... most users will attempt to install full set. they are
 # nice to have but not vital for many users. if one fails to install, it might 
@@ -50,6 +50,7 @@ my %WriteMakefileArgs =
   PREREQ_PM => {
     "Compress::Zlib" => 1.0,
     "Font::TTF" => 1.04,
+ #  "Readonly" => 0,      use when TIFF changes go in
 
     # === found in CORE, so no need to explicitly list
     #"Carp" => 0,
@@ -98,7 +99,8 @@ my %WriteMakefileArgs =
     # recommends (optional prereqs) goes here
     # if remove or comment out any, also do so in META.json and META.yml
     "recommends" => {
-      "Graphics::TIFF" => 16,
+      # fast TIFF image processing.
+      "Graphics::TIFF" => 19, 
       # advanced/fast PNG image processing.
       "Image::PNG::Libpng" => 0.57,
       # text shaping for Latin script ligatures and kerning, and for 

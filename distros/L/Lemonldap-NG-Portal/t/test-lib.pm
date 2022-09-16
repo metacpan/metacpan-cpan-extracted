@@ -56,6 +56,7 @@ C<LLNG::Manager::Test::_post()> call I<(see below)>.
 use strict;
 use Data::Dumper;
 use File::Find;
+use JSON;
 use LWP::UserAgent;
 use Time::Fake;
 use URI::Escape;
@@ -237,6 +238,7 @@ matching strings are returned. Example:
 =cut
 
 sub expectRedirection {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $res, $location ) = @_;
     ok( $res->[0] == 302, ' Get redirection' )
       or explain( $res->[0], 302 );
@@ -265,6 +267,8 @@ TODO: verify javascript
 =cut
 
 sub expectAutoPost {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
     my @r      = expectForm(@_);
     my $method = pop @r;
     ok( $method =~ /^post$/i, ' Method is POST' ) or explain( $method, 'POST' );
@@ -296,6 +300,7 @@ in $query
 =cut
 
 sub expectForm {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $res, $hostRe, $uriRe, @requiredFields ) = @_;
     expectOK($res);
     count(1);
@@ -371,9 +376,46 @@ Verify that result has a C<Lm-Remote-User> header and value is $user
 =cut
 
 sub expectAuthenticatedAs {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $res, $user ) = @_;
     is( getHeader( $res, 'Lm-Remote-User' ), $user, "Authenticated as $user" );
     count(1);
+}
+
+=head4 expectSessionAttributes($app,$id,%attributes)
+
+Verify that the session contains attributes with these values
+
+=cut
+
+sub expectSessionAttributes {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ( $app, $id, %attributes ) = @_;
+
+    my $res = getSessionAttributes( $app, $id );
+
+    for my $attr ( keys %attributes ) {
+        is( $res->{$attr}, $attributes{$attr},
+            "Session has correct value for $attr" );
+        count(1);
+    }
+}
+
+sub getSessionAttributes {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ( $app, $id ) = @_;
+    my $res;
+    ok(
+        $res = $app->_get("/sessions/global/$id"),
+        "Get session using restSessionServer"
+    );
+    count(1);
+    expectOK($res);
+    ok( $res = eval { from_json( $res->[2]->[0] ) },
+        "Deserialize session content" );
+    count(1);
+
+    return $res;
 }
 
 =head4 expectOK($res)
@@ -383,6 +425,7 @@ Verify that returned code is 200
 =cut
 
 sub expectOK {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ($res) = @_;
     ok( $res->[0] == 200, ' HTTP code is 200' ) or explain( $res, 200 );
     count(1);
@@ -395,6 +438,7 @@ Verify that the HTTP response contains valid JSON and returns the corresponding 
 =cut
 
 sub expectJSON {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ($res) = @_;
     is( $res->[0], 200, ' HTTP code is 200' ) or explain( $res, 200 );
     my %hdr = @{ $res->[1] };
@@ -415,6 +459,7 @@ Verify that returned code is 403.
 =cut
 
 sub expectForbidden {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ($res) = @_;
     ok( $res->[0] == 403, ' HTTP code is 403' ) or explain( $res->[0], 403 );
     count(1);
@@ -428,6 +473,7 @@ Verify that returned code is 400. Note that it works only for Ajax request
 =cut
 
 sub expectBadRequest {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ($res) = @_;
     ok( $res->[0] == 400, ' HTTP code is 400' ) or explain( $res->[0], 400 );
     count(1);
@@ -439,6 +485,7 @@ Verify that an error is displayed on the portal
 =cut
 
 sub expectPortalError {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $res, $errnum, $message ) = @_;
     $errnum ||= 9;
     like( $res->[2]->[0], qr/<span trmsg="$errnum">/, $message );
@@ -453,6 +500,7 @@ C<error:"$code">.  Note that it works only for Ajax request (see below).
 =cut
 
 sub expectReject {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $res, $status, $code ) = @_;
     $status ||= 401;
     cmp_ok( $res->[0], '==', $status, " Response status is $status" );
@@ -476,6 +524,7 @@ its value.
 =cut
 
 sub expectCookie {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $res, $cookieName ) = @_;
     $cookieName ||= 'lemonldap';
     my $cookies = getCookies($res);
@@ -495,6 +544,7 @@ Check if the pdata cookie exists and returns its deserialized value.
 =cut
 
 sub expectPdata {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ($res) = @_;
     my $val = expectCookie( $res, "lemonldappdata" );
     ok( $val, "Pdata is not empty" );
@@ -512,6 +562,7 @@ Verify that C<Content-Security-Policy> header allows one to connect to $host.
 =cut
 
 sub exceptCspFormOK {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $res, $host ) = @_;
     return 1 unless ($host);
     my $csp = getHeader( $res, 'Content-Security-Policy' );
@@ -534,6 +585,7 @@ sub exceptCspFormOK {
 }
 
 sub expectCspChildOK {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $res, $host ) = @_;
     return 1 unless ($host);
     my $csp = getHeader( $res, 'Content-Security-Policy' );
@@ -624,6 +676,7 @@ Registers a new LLNG instance
 =cut
 
 sub register {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $type, $constructor ) = @_;
     my $obj;
     @Lemonldap::NG::Handler::Main::_onReload = ();
@@ -847,6 +900,7 @@ Launch a C</?logout=1> request an test:
 =cut
 
 sub logout {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $self, $id, $cookieName ) = @_;
     my $res;
     $cookieName ||= 'lemonldap';

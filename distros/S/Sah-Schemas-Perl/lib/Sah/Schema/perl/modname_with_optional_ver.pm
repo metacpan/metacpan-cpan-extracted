@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-01'; # DATE
+our $DATE = '2022-09-11'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.042'; # VERSION
+our $VERSION = '0.045'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module name (e.g. Foo::Bar) with optional version number suffix (e.g. Foo::Bar@0.001)',
@@ -46,9 +46,29 @@ Sah::Schema::perl::modname_with_optional_ver - Perl module name (e.g. Foo::Bar) 
 
 =head1 VERSION
 
-This document describes version 0.042 of Sah::Schema::perl::modname_with_optional_ver (from Perl distribution Sah-Schemas-Perl), released on 2021-12-01.
+This document describes version 0.045 of Sah::Schema::perl::modname_with_optional_ver (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
 
 =head1 SYNOPSIS
+
+=head2 Sample data and validation results against this schema
+
+ ""  # INVALID
+
+ "Foo-Bar"  # valid, becomes "Foo::Bar"
+
+ "Foo::Bar"  # valid
+
+ "Foo-Bar\@1.0.0"  # valid, becomes "Foo::Bar\@1.0.0"
+
+ "Foo::Bar\@1.0.0"  # valid
+
+ "Foo-Bar\@0.5_001"  # valid, becomes "Foo::Bar\@0.5_001"
+
+ "Foo::Bar\@0.5_001"  # valid
+
+ "Foo::Bar\@a"  # INVALID
+
+=head2 Using with Data::Sah
 
 To check data against this schema (requires L<Data::Sah>):
 
@@ -56,10 +76,44 @@ To check data against this schema (requires L<Data::Sah>):
  my $validator = gen_validator("perl::modname_with_optional_ver*");
  say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create validator that returns nice error message string
- # and/or coerced value. Data::Sah can even create validator that targets other
- # language, like JavaScript. All from the same schema. See its documentation
- # for more details.
+The above schema returns a boolean result (true if data is valid, false if
+otherwise). To return an error message string instead (empty string if data is
+valid, a non-empty error message otherwise):
+
+ my $validator = gen_validator("perl::modname_with_optional_ver", {return_type=>'str_errmsg'});
+ my $errmsg = $validator->($data);
+ 
+ # a sample valid data
+ $data = "Foo-Bar\@0.5_001";
+ my $errmsg = $validator->($data); # => ""
+ 
+ # a sample invalid data
+ $data = "";
+ my $errmsg = $validator->($data); # => "Must match regex pattern \\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(\@[0-9][0-9A-Za-z]*(\\.[0-9A-Za-z_]+)*)?\\z"
+
+Often a schema has coercion rule or default value, so after validation the
+validated value is different. To return the validated (set-as-default, coerced,
+prefiltered) value:
+
+ my $validator = gen_validator("perl::modname_with_optional_ver", {return_type=>'str_errmsg+val'});
+ my $res = $validator->($data); # [$errmsg, $validated_val]
+ 
+ # a sample valid data
+ $data = "Foo-Bar\@0.5_001";
+ my $res = $validator->($data); # => ["","Foo::Bar\@0.5_001"]
+ 
+ # a sample invalid data
+ $data = "";
+ my $res = $validator->($data); # => ["Must match regex pattern \\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(\@[0-9][0-9A-Za-z]*(\\.[0-9A-Za-z_]+)*)?\\z",""]
+
+Data::Sah can also create validator that returns a hash of detailed error
+message. Data::Sah can even create validator that targets other language, like
+JavaScript, from the same schema. Other things Data::Sah can do: show source
+code for validator, generate a validator code with debug comments and/or log
+statements, generate human text from schema. See its documentation for more
+details.
+
+=head2 Using with Params::Sah
 
 To validate function parameters against this schema (requires L<Params::Sah>):
 
@@ -72,11 +126,14 @@ To validate function parameters against this schema (requires L<Params::Sah>):
      ...
  }
 
+=head2 Using with Perinci::CmdLine::Lite
+
 To specify schema in L<Rinci> function metadata and use the metadata with
-L<Perinci::CmdLine> to create a CLI:
+L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  # in lib/MyApp.pm
- package MyApp;
+ package
+   MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
      v => 1.1,
@@ -96,9 +153,10 @@ L<Perinci::CmdLine> to create a CLI:
  1;
 
  # in myapp.pl
- package main;
+ package
+   main;
  use Perinci::CmdLine::Any;
- Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+ Perinci::CmdLine::Any->new(url=>'/MyApp/myfunc')->run;
 
  # in command-line
  % ./myapp.pl --help
@@ -108,24 +166,6 @@ L<Perinci::CmdLine> to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
-
-Sample data:
-
- ""  # INVALID
-
- "Foo-Bar"  # valid, becomes "Foo::Bar"
-
- "Foo::Bar"  # valid
-
- "Foo-Bar\@1.0.0"  # valid, becomes "Foo::Bar\@1.0.0"
-
- "Foo::Bar\@1.0.0"  # valid
-
- "Foo-Bar\@0.5_001"  # valid, becomes "Foo::Bar\@0.5_001"
-
- "Foo::Bar\@0.5_001"  # valid
-
- "Foo::Bar\@a"  # INVALID
 
 =head1 HOMEPAGE
 
@@ -152,13 +192,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

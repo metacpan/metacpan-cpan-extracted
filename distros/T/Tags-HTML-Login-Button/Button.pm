@@ -7,7 +7,7 @@ use warnings;
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -65,14 +65,22 @@ sub _process_css {
 
 		['s', '.login'],
 		['d', 'text-align', 'center'],
-		['d', 'background-color', 'blue'],
-		['d', 'padding', '1em'],
 		['e'],
 
 		['s', '.login a'],
 		['d', 'text-decoration', 'none'],
-		['d', 'color', 'white'],
-		['d', 'font-size', '3em'],
+		['d', 'background-image', 'linear-gradient(to bottom,#fff 0,#e0e0e0 100%)'],
+		['d', 'background-repeat', 'repeat-x'],
+		['d', 'border', '1px solid #adadad'],
+		['d', 'border-radius', '4px'],
+		['d', 'color', 'black'],
+		['d', 'font-family', 'sans-serif!important'],
+		['d', 'padding', '15px 40px'],
+		['e'],
+
+		['s', '.login a:hover'],
+		['d', 'background-color', '#e0e0e0'],
+		['d', 'background-image', 'none'],
 		['e'],
 	);
 
@@ -172,6 +180,8 @@ Returns undef.
 
 =head1 EXAMPLE
 
+=for comment filename=button_html_css.pl
+
  use strict;
  use warnings;
 
@@ -209,13 +219,20 @@ Returns undef.
  # }
  # .login {
  #         text-align: center;
- #         background-color: blue;
- #         padding: 1em;
  # }
  # .login a {
  #         text-decoration: none;
- #         color: white;
- #         font-size: 3em;
+ #         background-image: linear-gradient(to bottom,#fff 0,#e0e0e0 100%);
+ #         background-repeat: repeat-x;
+ #         border: 1px solid #adadad;
+ #         border-radius: 4px;
+ #         color: black;
+ #         font-family: sans-serif!important;
+ #         padding: 15px 40px;
+ # }
+ # .login a:hover {
+ #         background-color: #e0e0e0;
+ #         background-image: none;
  # }
  #
  # HTML
@@ -251,6 +268,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 ccba6c694f37e6d0be4602337eb1f63fdf9e96413efafbf3251d13eedb027183 Angle2Zodiac.pm
+SHA256 5fd2842ee9e9b6d618241ee3799d51d29ca6012ae325ba3e78555f0139eb83c3 Changes
+SHA256 646b585cad6e1d1c58801eb95d8eed9a95084ea344f0f4ee32eb0474dafd83b7 LICENSE
+SHA256 a266ff34333cd57cbff3042a02f25c19dfb892937f40b3b5b285ee717dd8ccbb MANIFEST
+SHA256 9aa58e541a99e327129b07fa1d99127519c3e4e9254761048c376e4753b63fc3 META.yml
+SHA256 05a48bc1d304c081bacd1f7b0e991d59341e4bf45f254cc50d622937865defbc Makefile.PL
+SHA256 706ad084f2aa98b404953f26c9e1392cfda4808eeebf92dccce456d0c879f010 README
+SHA256 ee0dfcfb03c827e8f81c011d7ee03f4864fa8a730e6bbb9cbb76616526ec82ce bin/angle2zodiac
+SHA256 f10a67468e579febf72d51c0d665d993e10d5a33317e8bd8478763f2fd919ba5 examples/example_convert.pl
+SHA256 943b14af9f69672e40ba6c3f8ef411f10135445f0771308592893cb37fea049d examples/example_convert_ascii.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 ecda0c015c5e2622e06badf8a9d91d96e3892daa55500233645720f679f382d5 t/App-Angle2Zodiac/01-use.t
+SHA256 3becc6eadef199c535df9ec8957e488f6e7d230f152f7a52d6379161f7a78b8a t/App-Angle2Zodiac/02-version.t
+SHA256 09a1e4c29859c9f8502ae2db7fcccb434575bdb444ab71a871a8b949ea2d0750 xt/App-Angle2Zodiac/01-pod_coverage.t
+SHA256 4c1f2fba5411f01c033be5a56027709654772894cafcd6cca9bee22a5347d752 xt/App-Angle2Zodiac/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmMcZmoACgkQgmqNLzlX
+aRdlFQv9H5PN21aDWAdcKe7ODl4CjhbAzGFCVEQuxnTNmW695oli94g+7cOna3+f
+eGfZRHqsmCpyV+tNCOFhlf66VoIEMNkhhzn0koicRAbHolIsPMJ3MqWqovzkFDxQ
+wXcS5XZwejgZdZXPt4C+fc4UatHuMSzNqL8LhyQdjlvdLkjqbSUAqqY115mga3xB
+njonT6+kAAjSW2gjhF3GmjUN5mWZNgskXEyyr0cz7qv32/5c8DL/90qXH3jNjMpP
+zKlXikqJuRGPFICOTMZCaNHzIF9LLfM7jvQ88f4v3HKVZg/R/9KqIhvJu+OCQfph
+uFu9DkZAemsextksJ1kXEQrzU5hOv+/KVyTLYloS16ZmqRJTGfxIMtsk2m69MEGj
+I3AVJKAXTXNQKqtKbLftKrQSn7EOuaz6BqqcA2CxIkRMEx0XqAzs9UKA7AN+/g+i
+bhHuVGS9NxleDjAFB9IZdueSAuGv8HKuFWe/6QwxxeCs9vVp6VK3GEO00t17lHQe
+kxIm4Te/
+=h2dV
+-----END PGP SIGNATURE-----

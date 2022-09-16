@@ -1,4 +1,4 @@
-package App::MonM::Checkit::Command; # $Id: Command.pm 80 2019-07-08 10:41:47Z abalama $
+package App::MonM::Checkit::Command; # $Id: Command.pm 133 2022-09-09 07:49:00Z abalama $
 use strict;
 use utf8;
 
@@ -10,11 +10,12 @@ App::MonM::Checkit::Command - Checkit Command subclass
 
 =head1 VIRSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
     <Checkit "foo">
+
         Enable  yes
         Type    command
         Command     ls -la
@@ -28,12 +29,14 @@ Version 1.00
 Or with STDIN pipe:
 
     <Checkit "foo">
+
         Enable   yes
         Type     command
         Command  perl
         Content  "print q/Oops/"
         Target   content
         IsTrue   Oops
+        Timeout  5s
 
         # . . .
 
@@ -78,6 +81,38 @@ Command string
 
 =back
 
+=head1 CONFIGURATION DIRECTIVES
+
+The basic Checkit configuration options (directives) detailed describes in L<App::MonM::Checkit/CONFIGURATION DIRECTIVES>
+
+=over 4
+
+=item B<Command>
+
+    Command  "perl -w"
+
+Defines full path to external program (command line)
+
+Default: none
+
+=item B<Content>
+
+    Content     "print q/Blah-Blah-Blah/"
+
+Sets the content for command STDIN
+
+Default: no content
+
+=item B<Timeout>
+
+    Timeout    1m
+
+Defines the execute timeout
+
+Default: off
+
+=back
+
 =head1 HISTORY
 
 See C<Changes> file
@@ -96,11 +131,11 @@ L<App::MonM>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -112,10 +147,11 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION/;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use CTK::Util qw/ execute /;
 use CTK::ConfGenUtil;
+use App::MonM::Util qw/getTimeOffset run_cmd/;
 
 sub check {
     my $self = shift;
@@ -123,8 +159,11 @@ sub check {
     return $self->maybe::next::method() unless $type && $type eq 'command';
 
     # Init
-    my $command = value($self->config, 'command') || '';
-    my $content = value($self->config, 'content') // '';
+    my $to = CTK::Timeout->new(); # Create the timeout object
+    my $command = lvalue($self->config, 'command') || '';
+    my $content = lvalue($self->config, 'content') // '';
+       $content = undef unless length $content;
+    my $timeout = getTimeOffset(lvalue($self->config, 'timeout') || 0);
     unless (length($command)) {
         $self->status(0);
         $self->source("NOOP");
@@ -134,23 +173,12 @@ sub check {
     $self->source($command);
 
     # Run command
-    my $exe_err = '';
-    my $exe_out = execute($command, length($content) ? $content : undef, \$exe_err);
-    my $stt = $? >> 8;
-    my $exe_stt = $stt ? 0 : 1;
-    $self->status($exe_stt);
-    $self->code($stt);
-    $self->message($exe_stt ? "OK" : "ERROR");
-    if (defined($exe_out) && length($exe_out)) {
-        chomp($exe_out);
-        $self->content($exe_out) ;
-    }
-    if (!$exe_stt && $exe_err) {
-        chomp($exe_err);
-        $self->error($exe_err);
-    } elsif ($stt) {
-        $self->error(sprintf("Exitval=%d", $stt));
-    }
+    my $r = run_cmd($command, $timeout, $content);
+    $self->status($r->{status});
+    $self->message($r->{message});
+    $self->code($r->{code});
+    $self->content($r->{stdout});
+    $self->error($r->{stderr});
 
     return;
 }

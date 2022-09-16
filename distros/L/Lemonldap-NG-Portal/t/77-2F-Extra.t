@@ -84,6 +84,7 @@ ok(
 );
 count(1);
 my $id = expectCookie($res);
+expectSessionAttributes( $client, $id, _2f => "work" );
 $client->logout($id);
 
 clean_sessions();
@@ -167,6 +168,7 @@ ok(
 );
 count(1);
 $id = expectCookie($res);
+expectSessionAttributes( $client, $id, _2f => "home" );
 
 # Verify Authn Level
 ok( $res = $client->_get("/sessions/global/$id"), 'Get session' );

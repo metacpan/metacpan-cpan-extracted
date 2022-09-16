@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000045';
+our $VERSION = '0.000048';
 
 use Data::Dumper qw( Dumper );
 use List::Util   qw( any none uniq );
@@ -161,6 +161,7 @@ sub _build_explicit_exports {
         : $self->_export_inspector->implicit_exports;
 }
 
+## no critic (Subroutines::ProhibitExcessComplexity)
 sub _build_imports {
     my $self = shift;
 
@@ -377,6 +378,8 @@ sub _build_imports {
     return \@found;
 }
 
+## use critic
+
 sub _build_is_ignored {
     my $self = shift;
 
@@ -437,6 +440,7 @@ sub _build_is_translatable {
     return 1;
 }
 
+## no critic (Subroutines::ProhibitExcessComplexity)
 sub _build_formatted_ppi_statement {
     my $self = shift;
 
@@ -600,6 +604,8 @@ sub _build_formatted_ppi_statement {
     return $self->_maybe_get_new_include($statement);
 }
 
+## use critic
+
 sub _imports_remain {
     my $self  = shift;
     my $found = shift;
@@ -714,6 +720,7 @@ sub _sort_symbols {
     my $self = shift;
     my @list = @_;
 
+    ## no critic (BuiltinFunctions::RequireSimpleSortBlock)
     my @sorted = sort {
         my $A = _transform_before_cmp($a);
         my $B = _transform_before_cmp($b);
@@ -754,7 +761,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000045
+version 0.000048
 
 =head1 METHODS
 

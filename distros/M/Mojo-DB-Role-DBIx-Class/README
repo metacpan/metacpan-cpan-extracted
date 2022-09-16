@@ -1,5 +1,5 @@
 This archive contains the distribution Mojo-DB-Role-DBIx-Class,
-version 0.001:
+version 0.002:
 
   provides a convenience role creating a DBIx::Class for your Mojo database
 

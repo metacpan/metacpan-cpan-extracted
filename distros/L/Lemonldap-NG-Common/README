@@ -1,5 +1,5 @@
 LemonLDAP::NG
-====================
+=============
 
 LemonLDAP::NG is a modular Web-SSO based on Apache::Session modules.
 This is the common part of it. You can find documentation here:

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.15
+    version 1.17
 
 SYNOPSIS
 
@@ -29,7 +29,7 @@ SYNOPSIS
                                   # system version of the mylibrary
      
        alien_repository => {
-         protocol => 'http',
+         protocol => 'https',
          host     => 'myhost.org',
          location => '/path/to/tarballs',
          pattern  => qr{^mylibrary-([0-9\.]+)\.tar\.gz$},
@@ -138,7 +138,7 @@ METHODS
 
       my %result = $amb->alien_do_system($cmd)
 
-    Similar to Module::Build::do_system, also sets the path and several
+    Similar to Module::Build's do_system, also sets the path and several
     environment variables in accordance to the object configuration (i.e.
     alien_bin_requires) and performs the interpolation of the patterns
     described in "COMMAND INTERPOLATION" in Alien::Base::ModuleBuild::API.
@@ -157,6 +157,25 @@ METHODS
      my $string = $amb->alien_interpolate($string);
 
     Takes the input string and interpolates the results.
+
+ alien_install_network
+
+    [version 1.16]
+
+     my $bool = $amb->alien_install_network;
+
+    Returns true if downloading source from the internet is allowed. This
+    is true unless ALIEN_INSTALL_NETWORK is defined and false.
+
+ alien_download_rule
+
+    [version 1.16]
+
+     my $rule = $amb->alien_download_rule;
+
+    This will return one of warn, digest, encrypt, digest_or_encrypt or
+    digest_and_encrypt. This is based on the ALIEN_DOWNLOAD_RULE
+    environment variable.
 
 GUIDE TO DOCUMENTATION
 
@@ -193,25 +212,78 @@ GUIDE TO DOCUMENTATION
       This is a reference to the Alien::Base::ModuleBuild API beyond that
       contained in Module::Build::API.
 
+    Using the resulting Alien (Alien::Build::Manual::AlienUser)
+
+      Once you have an Alien you or your users can review this manual for
+      how to use it. Generally speaking you should have some useful usage
+      information in your Alien's POD, but some authors choose to direct
+      their users to this manual instead.
+
+    Using Alien::Build instead (Alien::Build::Manual)
+
+      As mentioned at the top, you are encouraged to use the Alien::Build
+      and alienfile system instead. This manual is a starting point for the
+      other Alien::Build documentation.
+
 ENVIRONMENT
 
-    ALIEN_VERBOSE
+    ALIEN_ARCH
 
-      Enables verbose output from M::B::do_system.
+      Set to a true value to install to an arch-specific directory.
+
+    ALIEN_DOWNLOAD_RULE
+
+      This controls security options for fetching alienized packages over
+      the internet. The legal values are:
+
+      warn
+
+	Warn if the package is either unencrypted or lacks a digest. This
+	is currently the default, but will change in the near future.
+
+      digest
+
+	Fetch will not happen unless there is a digest for the alienized
+	package.
+
+      encrypt
+
+	Fetch will not happen unless via an encrypted protocol like https,
+	or if the package is bundled with the Alien.
+
+      digest_or_encrypt
+
+	Fetch will only happen if the alienized package has a cryptographic
+	signature digest, or if an encrypted protocol like https is used,
+	or if the package is bundled with the Alien. This will be the
+	default in the near future.
+
+      digest_and_encrypt
+
+	Fetch will only happen if the alienized package has a cryptographic
+	signature digest, and is fetched via a secure protocol (like
+	https). Bundled packages are also considered fetch via a secure
+	protocol, but will still require a digest.
 
     ALIEN_FORCE
 
       Skips checking for an installed version and forces reinstalling the
       Alien target.
 
+    ALIEN_INSTALL_NETWORK
+
+      If true (the default if not defined), then network installs will be
+      allowed. Set to 0 or another false value to turn off network
+      installs.
+
     ALIEN_INSTALL_TYPE
 
-      Set to 'share' or 'system' to override the install type. Set to
-      'default' or unset to restore the default.
+      Set to share or system to override the install type. Set to default
+      or unset to restore the default.
 
-    ALIEN_ARCH
+    ALIEN_VERBOSE
 
-      Set to a true value to install to an arch-specific directory.
+      Enables verbose output from M::B::do_system.
 
     ALIEN_${MODULENAME}_REPO_${PROTOCOL}_${KEY}
 
@@ -285,13 +357,13 @@ AUTHOR
 
     Nicholas Shipp (nshp)
 
-    Petr Pisar (ppisar)
+    Petr Písař (ppisar)
 
     Alberto Simões (ambs)
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2012-2020 by Joel A Berger.
+    This software is copyright (c) 2012-2022 by Joel A Berger.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

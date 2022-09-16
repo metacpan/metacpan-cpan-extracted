@@ -1,196 +1,213 @@
 See also INFO/Changes-ver_2 for changes released for PDF::API2, and 
 incorporated into PDF::Builder.
-See also INFO/Changes_2020 for earlier version 3 release logs.
+See also INFO/Changes_2021 for earlier version 3 release logs.
 
-3.023     2021-07-15 
+3.024     2022-09-12
 
-    lib/PDF/Builder.pm, INFO/DEPRECATED
-     FUTURE: Builder.pm's "default()" method may need to be renamed. 
-      Some time after Perl 5.26, Perl::Critic started flagging "default" as a 
-      reserved keyword. This needs to be further investigated.
+    lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm
+     "loca" table in TTF is optional, so to fix PDFAPI2#47, return from 
+     subsetByCId() method early if no such table. According to PDFAPI2#37, it
+     may be necessary to instruct ttfont() to NOT subset the font. Also, it
+     appears that 'glyf' table may be missing in some fonts, so add check.
+     Doesn't blow up any more, but problem #47 persists even with this fix.
 
-    .github/workflows/test.yml Update PATH for new ImageMagick level.
+    t/info.t (new), t/version.t (new), MANIFEST, tools/2_t-tests.pl
+     New t-tests per PDF::API2.
 
-    lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm, t/tiff.t
-     Fix for ticket #154 by @carygravel, and add a test for bilevel+alpha
-      where rows are not filling out a full array of bytes.
-
-    version (for distribution build), README.md, lib/PDF/Builder.pm,
-      t/00-all-usable.t, .gitignore
-     Modified to prereq Perl 5.22 instead of 5.20 (is 6 years old now). Also 
-      Graphics::TIFF minimum upped to 16 and Image::PNG::Libpng to 0.57 due 
-      to changes. Keep files up to date on GitHub so can successfully run 
-      without full build. Put "version" in GitHub as it's now fairly involved 
-      and I don't want to accidentally lose it!
-
-    Makefile.PL, MANIFEST, META.json (add), META.yml (add), .perl-version 
-      (deleted), optional_update.pl (add), README.md
-     Modify build process to have optional prereqs properly installed. Also
-      ensure that mandatory and optional prereqs are consistently updated and
-      handled. Since the vast majority of users will use the default of
-      installing all optional prereqs, the selection process has been moved
-      from Makefile.PL to optional_update.pl (for those manually running
-      Makefile.PL). optional_update.pl updates Makefile.PL, META.json, and
-      META.yml upon selection of which (if any) optional prerequisites are to
-      be installed on a manual run of Makefile.PL. I don't want to risk 
-      getting META.json and META.yml (needed for properly installing the 
-      "recommends" optionals) out of sync by failing to update them at install 
-      from Makefile.PL, so all are now shipped with all optionals selected.
-
-    .gitattributes, .github/workflows/test.yml
-     Added .gitattributes to stop certain line-end changes that were causing 
-      CI tests to fail, add Windows tests to CI. From @carygravel.
+    All "options" whose name begins with a dash (hyphen) "-" may now be given
+     without a dash. E.g., "-translate => [30,25]" may now be given as
+     "translate => [30,25]", or "'translate' => [30,25]". This is in keeping 
+     with the new practices on PDF::API2. The old (dashed) names are still 
+     valid, although they may be deprecated in the future.
 
     lib/PDF/Builder/Content.pm
-     Problem with use of "pi" constant caused a warning on compile in one 
-      CPAN smoke test (Perl 5.20 for one tester). Changed "-pi" in one
-      expression to "-1*pi" and hopefully that will silence the messages.
+     advancewidth() adds alias text_width(), per PDF::API2 changes.
 
-    lib/PDF/Builder.pm, lib/PDF/Builder/Page.pm, INFO/DEPRECATED, 
-      t/annotate-deprecations.t
-     Per PDF::API2, simplify Builder's ' fixed' to ' opened'. Rename
-      'openpage()' to 'open_page()' and deprecate old name.
+    lib/PDF/Builder/Content.pm
+     Fix problems in position() and textpos() methods reported by J Vromans,
+      where the returned X coordinate was incorrect after being set twice.
 
-    INFO/Changes-ver_2, t/pdf.t
-     Per changes in PDF::API2, sync up with 2.040 release. There are still
-      a small number of changes not implemented (yet) in PDF::Builder, which
-      either appear to be unnecessary, or the underlying code has changed too
-      much to cleanly port the changes without a massive rewrite.
+    lib/PDF/Builder.pm
+     New interfaces added for metadata query and set.
 
-    t/deprecations.t
-     Update for new PDF::API2 t-tests and a number of other deprecated items.
-      Test both deprecated interfaces and their replacements.
+    INFO/RoadMap  Add thoughts on an Environments package
 
-    lib/PDF/Builder/Content/Text.pm, examples/BarCode-Boxes-Content-
-      ContentText-Rotated.pl, examples/021_synfonts-022_truefonts-
-      022_truefonts_diacrits_utf8-023_cjkfonts-024_bdffonts-040_annotation
-     Per 3.022 change of lead() to leading(), update examples to use leading() 
-      instead of lead().
+    lib/PDF/Builder.pm, INFO/KNOWN_INCOMPAT
+     Various changes to keep compatibility with latest PDF::API2, although
+      not all old methods are deprecated. Some methods are added, some are
+      renamed (alternate names added), and some may have minor changes or
+      extended functionality. See KNOWN_INCOMPAT for a description of these
+      minor differences.
 
-    In releases 3.020 through 3.022, INFO/DEPRECATED erroneously listed
-     PDFStr() and PDFUtf() as being scheduled for removal after October 2022.
-     These two routines ARE deprecated (use PDFString() instead), but there
-     are currently no plans to REMOVE them.
+    lib/PDF/Builder.pm, lib/PDF/Builder/ViewerPreferences.pm (new), MANIFEST
+     Per PDF::API2 change, split up function of $pdf->preferences into several
+      easier-to-use methods: page_mode(), page_layout(), viewer_preferences(),
+      open_action().
 
-    .gitignore, lib/PDF/Builder.pm, lib/PDF/Builder/Basic/PDF/File.pm, t/tiff.t
-     Some minor cleanup, fix TIFF tests because grouped skips don't seem to
-      work properly on Strawberry Perl, initialize $xmin in File.pm to prevent
-      error message.
+    lib/PDF/Builder/NamedDestination-Annotation.pm, t/named-destinations.t 
+      (new), MANIFEST, tools/2_t-tests.pl, examples/042_links
+     Minor cleanup plus locations may now be given without leading dashes.
+      'link' is now alias for 'goto', 'file' is now alias for 'launch', 'url' 
+      is now alias for 'uri', and 'pdf_file' and 'pdfile' are now aliases for 
+      'pdf' method names.
 
-    lib/PDF/Builder/Basic/PDF/Filter/LZWDecode.pm, lib/PDF/Builder.pm,
-      lib/PDF/Builder/Resource/XObject/Image/TIFF-TIFF_GT.pm, 
-      lib/PDF/Builder/Resource/XObject/Image/TIFF/File-File_GT.pm, 
-      t/filter-lzwdecode.t, t/tiff.t, t/00-all-usable.t, Makefile.PL
-     Further improvements to TIFF LZW file handling [ref GH 151 and PR 156] for 
-      single and multi-strip, and horizontal predictor. Continuation of work
-      to stop converting LZW-compressed TIFF to Flate. Code by @carygravel.
-      Increase required Graphics::TIFF version to 10 due to fix in GT.
+    lib/PDF/Builder/Dict.pm
+     Fix doubled $class (per PDF::API2 fix).
 
-    examples/README, examples/examples.output
-     Discuss the issue of close, heavy lines in the example bar codes appearing 
-      to merge or "blot" together. This is at least partially a consequence of 
-      lower resolution display screens (rounding errors), and although the bars 
-      separate when printed, I'm still concerned that they will not be reliably 
-      scannable.  
+    INFO/old/.travis.yml.HOLD
+     Remove per PDF::API2 removal of .travis.yml
 
-    All files (.pm and .pl) containing $LAST_UPDATE can now access this
-      string from outside the file, in the same manner as $VERSION. The
-      variable declarator has been changed from 'my' to 'our' during package
-      build.
+    lib/PDF/Builder/Content.pm
+     For linejoin()/line_join() and linecap()/line_cap(), allow alpha
+      strings ("miter" or "m", etc.) in addition to numeric values (0, etc.).
+      For PDF::API2 compatibility, many alternate method names exist now, such 
+      as line_join() in addition to linejoin().
 
-    INFO/Changes-ver_2, /lib/PDF/Builder/Basic/PDF/String.pm, t/string.t
-     Per PDF::API2 changes related to [RT 134957], change some regex flags 
-      to fix encoding of \n in a PDF string.
+    lib/PDF/Builder/Resource/XObject/Form/BarCode.pm
+     Some minor fixes to improve spacing between bars and labels when both 
+      -lmzn and -fnsz are set and the font size is larger than -lmzn. Per
+      PDF::API2 change. The barcode() convenience function has not been
+      implemented.
 
-    t/tiff.t add version check (not just if installed) for ImageMagick and
-      Ghostscript. Some smoke tests apparently blew up for using too low
-      level versions. If too low version, or any problems determining the
-      version, tiff.t fails gracefully by skipping those tests. From
-      @carygravel.
+    lib/PDF/Builder.pm, t/gif.t, t/jpg.t, t/png.t
+     Add convenience image() method to simplify use of image_jpeg(), 
+      image_tiff(), image_pnm(), image_png(), image_gif(), and image_gd().
+      This is for PDF::API2 compatibility, and the original methods are
+      unchanged.
 
-    t/tiff.t use a temporary directory for various test files, enabling use
-      from a Read-Only directory and/or running tests in parallel (from
-      @ppisar, #153).
+    lib/PDF/Builder.pm, t/font-ttf.t, font-type1.t
+     Add convenience font() method to combine corefont(), ttfont(), psfont(),
+      and bdfont(). This is for PDF::API2 compatibility, and the original
+      methods are unchanged. Font search path changes: add font_path() and
+      set_font_path() for base search paths for fonts. Rename addFontDirs()
+      to add_to_font_path() (keeping the old name around). Note that, unlike
+      corefont(), font() requires the exact name of a standard core font.
+      Kerning defaults to "on" when using font(), unlike other font methods.
 
-3.022     2021-03-27
+    lib/PDF/Builder/Page.pm, lib/PDF/Builder.pm
+     Deprecate unneeded update() method. Per PDF::API2 changes.
 
-    docs/buildDoc.pl add "end of page" (###) marker to make it clear that
-      you're seeing the bottom of the HTML page.
+    lib/PDF/Builder.pm
+     Rename method end() to close(). close should be used for new work.
 
-    Update build process to ensure consistent "unix" formatting of most 
-      human-readable files (#150). Some non-CPAN builds were complaining
-      about MS-DOS format (CRLF line ends) on some files.
+    lib/PDF/Builder.pm, t/deprecations.t, t/pdf.t, t/rt67767.t
+     Rename method open_scalar() to from_string(). from_string() should be
+      used for new work. This is for compatibility with PDF::API2 changes
+      renaming open_scalar() to from_string(). Although open_scalar() should 
+      still be supported for some time, it is possible that it may be 
+      deprecated and removed in the future.
 
-    t/tiff.t, lib/PDF/Builder/Resource/XObject/Image/TIFF-TIFF_GT.pm
-     Per #148, update by carygravel to stop converting LZW-compressed TIFFs
-      to Flate compression (unnecessary, as PDF directly supports LZW, and 
-      there were supposedly some edge-case bugs in the code).
-      == REMOVED == still problems, development under way
+    lib/PDF/Builder.pm
+     Permit the save(filename) method to be used as an alias for 
+      saveas(filename). This is for compatibility with PDF::API2 changes 
+      combining save() and saveas(). Note that this is NOT good interface
+      design, to use 'save' for both purposes.
 
-    t/tiff.t per #143, update by carygravel to enable proper TIFF testing 
-      on all platforms including Windows.
+    lib/PDF/Builder.pm, lib/PDF/Builder/Lite.pm, t/annotate.t, t/barcode.t,
+      t/bbox.t, t/circular-references.t, t/content.t, t/cs-webcolor.t, 
+      t/deprecations.t, t/extgstate.t, t/gd.t, t/gif.t, t/jpg.t, t/outlines.t, 
+      t/pdf.t, t/png.t, t/pnm.t, t/rt120450.t, t/rt67767.t, t/69503.t,
+      t/text.t, t/tiff.t, t/viewer-preferences.t, examples/011_open_update,
+      t/resources/test-rgba.png (new), MANIFEST
+     pdf->stringify() renamed to pdf->to_string() (original still available).
+      Also catch up on some new t-tests from API2.
 
-    lib/PDF/Builder/Content-Lite.pm, INFO/DEPRECATED, t/content.t
-     Per PDF::API2, deprecated lead() and replace by leading(). Lite's
-      textlead() deprecated and replaced by textleading().
+    lib/PDF/Builder/Basic/PDF/File-Objind.pm  
+     Per RT131657 PDF::API2 fix, Suppress recursion warnings while releasing 
+      (destroying) PDF indirect objects, which can be highly-interconnected 
+      (reported by Leon Winter).
 
-    t/text.t
-     Per PDF::API2 add two tests for charspace and wordspace override, and
-     18 more tests for basic text calls. 
+    lib/PDF/Builder.pm
+     Revise RT41971 fix per PDF::API2 change for outlines (no functional change)
 
-    lib/PDF/Builder/Content/Text.pm, INFO/KNOWN_INCOMP
-     Per PDF::API2, add paragraphs() as an alias for section(). Document some
-      minor inconsistencies in option names and behavior introduced with
-      these changes.
+    lib/PDF/Resource/Font/SynFont.pm   
+     Code cleanup per PDF::API2. This includes a number of renamed options
+      (old ones are still supported) and changed behavior for 'bold' if
+      coming through alternate name synthetic_font(). Read the documentation
+      for synfont/synthetic_font to ensure that you won't be tripped up by
+      any changes, or differences between the two.
 
-    lib/PDF/Builder/Annotation.pm, lib/PDF/Builder/Basic/PDF/Dict-File.pm, 
-      lib/PDF/Builder/Resource/Font/SynFont.pm, examples/041_annot_fileattach,
-      examples/060_transparency, examples/resources/sample_55.pdf, 
-      examples/resources/HarfBuzz_example.pdf
-     Output 'endobj' starting its own line. Some PDF validators raise a
-      stink if endobj continues a line with other commands on it. 
-      While we're at it, put 'stream' starting its own line, too.
-      Fix two examples that failed to validate. There is a third failure, but
-      it appears to be an issue with PDF/A disallowed content (embedded files),
-      not a bug in PDF production here.
+    lib/PDF/Builder.pm  per PDF::API2 fix, messages if fail to open input PDF
 
-    lib/PDF/Builder/Resource/Font/SynFont.pm, INFO/DEPRECATED, 
-      examples/025_unifonts, lib/PDF/Builder/Docs.pm
-     Fix uninitialized value (missingwidth), remove -slant (deprecated).
+    CONTRIBUTING  minor update
 
-    lib/PDF/Builder/Resource/XObject/Image/TIFF.pm
-     Corrected some bilevel color inverts.
+    docs/buildDoc.pl  update to better handle non-PDF::Builder doc builds
 
-    lib/PDF/Builder/Resource/XObject/Image/TIFF/File_GT.pm,
-      lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm
-     Some improvements to deal with inverted colors (black/white) on certain
-      TIFF images. Now G3 and G4 (CCITT Fax) get flipped to the correct
-      colors, as does uncompressed bilevel. There are still some TIFF cases 
-      which are not fully properly dealt with; we are still working on them.
-     
-    lib/PDF/Builder/Annotation.pm, examples/040_annotation, 
-      examples/041_annot_fileattach
-     Add "-opacity" option to control the opacity (opaqueness) of the icon,
-      where the default of 1.0 is fully opaque, and 0.0 is fully transparent.
-      Add "markup" method to implement "highlighted" text annotations, per
-      [GitHub #142]. These include "Highlight" (in the manner of a highlighter
-      marker), "Squiggly" (squiggly underline), "Underline", and "StrikeOut".
-      These behave like a "text" annotation, but instead of an icon, the
-      document text is highlighted.
+    Makefile.PL, META.json, META.yml, README.md
+     Perl 5.24 is the earliest supported version.
 
-    lib/PDF/Builder/Content.pm  improve -strikethru placement
+    README.md add manual build section
 
-    INFO/LICENSE, README.md, lib/PDF/Builder/Basic/PDF/Array-Bool-Dict-
-      File-Filter-Name-Null-Number-Objind-Page-Pages-String-Utils.pm
-     Update file headers on code originally written by Martin Hosken to
-      reflect that he has granted permission to use the MIT license instead
-      of the Perl Artistic License on his code. This change was made so
-      that Red Hat could have licensing compatible with LGPL for releasing
-      PDF::Builder as part of Fedora.
+    t/tiff.t add exclude_version() function to exclude GhostScript or
+      ImageMagick from all or selected uses, if your installed version
+      falls with a range of excluded version numbers. This is to fix a problem
+      where certain GhostScript versions were built with a bad library.
+      Currently, the bad builds are believed to be limited to GhostScript 
+      9.56.0 and 9.56.1. If you have this version, two of the tests in tiff.t
+      (13 and 16, lzw+horizontal predictor, not converted to flate) will be
+      skipped with "GhostScript not found".
 
-    INFO/Changes_2020, Changes, MANIFEST, lib/PDF/Builder.pm, README.md,
-      INFO/LICENSE
-     2021 copyright, archive 2020 changes.
-      
-(see INFO/Changes_2020 for earlier changes)
-(see INFO/Changes-ver_2 for changes to PDF::API2 up through 2.033)
+    META.json, META.yml, MANIFEST add "provides" entry to make package
+      sites happier.
+
+    INFO/RoadMap add comments on PCF-format bitmapped fonts, and possible
+      MathJax-based eqn support.
+
+    INFO/LICENSE, MANIFEST 
+      License moved up to top level, to make package sites happier.
+
+    examples/HarfBuzz.pl, examples/resources/HarfBuzz_example.pdf
+     Add 'fj' and 'ij' ligatures, although Times doesn't appear to include 
+     them.
+
+    examples/020_textrise add baselines and additional examples
+
+    lib/PDF/Builder/Docs.pm, examples/HarfBuzz.pl
+     Adobe Acrobat DC has changed its installed fonts location, so several
+      non-Latin entries had to be updated.
+
+    lib/PDF/Builder/Resource/CIDFont.pm
+     Per PDF::API2 code style changes and uninitialized variable fix.
+
+    INFO/Changes_2021, MANIFEST, README.md, lib/PDF/Builder.pm, INFO/LICENSE
+     2022 copyright.
+
+    lib/PDF/Builder/Annotation.pm, t/annotate.t, examples/040_annotation, 
+      examples/041_annot_fileattach, examples/042_links
+     Annotations revert to "no border" [#176] to match up with PDF::API2 
+      behavior.
+
+    lib/PDF/Builder.pm  per #171, allow blank or prefix-only page label (on 
+     Reader's thumb slider) with -style => 'nocounter'.
+
+    lib/PDF/Builder/Basic/PDF/File.pm
+     Per RT 136648, PDF::API2 fix when writing xref streams. Note that while
+      there is no longer an error message (fixed some time ago in PDF::Builder),
+      there is still some new material (an XRef stream) added at the end of 
+      the PDF, at each save (for both PDF::API2 and PDF::Builder). Something
+      still needs to be done about this, some time later.
+
+    lib/PDF/Builder/Resource/XObject/Image/GD-GIF-JPEG-PNG-PNM-TIFF.pm
+     Add -name option to name the image object if desired.
+      In sync with PDF::API2, add -compress option for PNM. 
+
+    lib/PDF/Builder/Resource/XObject/Image/GIF-PNM.pm minor changes to sync
+      with PDF::API2 changes.
+
+    examples/HarfBuzz.pl, examples/resources/HarfBuzz_example.pdf
+     show a better Chinese (CJK) example in vertical mode, which demonstrates 
+      rotation of punctuation such as ( ). Continuation of #144.
+
+    INFO/RoadMap  comments on page labeling (slider thumb) enhancements per 
+      #171, including possibly integrating with header() and footer() calls
+      that place a page number on the paper, and any outline/bookmarks, so
+      that they all give a consistent page label (number).
+
+    optional_update.pl, MANIFEST, README.md 
+     optional_update moved to tools/, otherwise it
+      was being placed in the PDF/ directory by the installer. Note that you 
+      should be in your PDF::Builder root (parent of tools/) and run
+      tools/optional_update.pl.
+
+(see INFO/Changes_2021 for earlier changes)
+(see INFO/Changes-ver_2 for changes to PDF::API2 up through 2.034)

@@ -15,12 +15,15 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Mojo-DB-Role-DBIx-Class",
   "LICENSE" => "perl",
   "NAME" => "Mojo::DB::Role::DBIx::Class",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Role::Tiny" => 0
+  },
   "TEST_REQUIRES" => {
+    "DBIx::Class::Schema::Loader" => 0,
     "DateTime::Format::SQLite" => 0,
     "Mojo::SQLite" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -28,8 +31,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "DBIx::Class::Schema::Loader" => 0,
   "DateTime::Format::SQLite" => 0,
-  "Mojo::SQLite" => 0
+  "Mojo::SQLite" => 0,
+  "Role::Tiny" => 0
 );
 
 

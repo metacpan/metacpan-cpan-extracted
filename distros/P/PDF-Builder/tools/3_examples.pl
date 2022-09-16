@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.023'; # VERSION
+our $VERSION = '3.024'; # VERSION
 our $LAST_UPDATE = '3.018'; # manually update whenever code is changed
 
 # dependent on optional packages:
@@ -123,6 +123,9 @@ my (@example_list, @example_results);
   # require provision of a core font in %args
   push @example_list, "ShowFont.pl";
   push @example_results, "create examples/ShowFont.<type>.<font name>.pdf, showing multiple pages\n demonstrating the display of various encodings.\n";
+ 
+# push @example_list, "examples/Windows/027_winfont.pl";
+# push @example_results, "create examples/Windows/027_winfont.<type>.<font name>.pdf, showing multiple pages\n demonstrating the display of various encodings.\n";
  
 # run with perl examples/<file> [args]
 

@@ -52,6 +52,17 @@ like(
 ok(
 	lives {
 		App::Games::Keno->new(
+			spots   => [80],
+			draws   => 1000,
+			verbose => 1
+		);
+	},
+	"Verbose level 1 did not die"
+) or note($@);
+
+ok(
+	lives {
+		App::Games::Keno->new(
 			spots => [80],
 			draws => 1000
 		);
@@ -136,7 +147,7 @@ like(
 like(
 	dies {
 		App::Games::Keno->new(
-			spots => [ 1 ],
+			spots => [1],
 			draws => 'asdf'
 		);
 	},
@@ -147,12 +158,34 @@ like(
 like(
 	dies {
 		App::Games::Keno->new(
-			spots => [ 'f' ],
+			spots => ['f'],
 			draws => 1
 		);
 	},
 	qr/One of the spots you chose doesn't look like a number/,
 	"non numeric chosen spot dies as expected",
 );
+
+ok(
+	lives {
+		App::Games::Keno->new(
+			spots   => [1],
+			draws   => 1,
+			verbose => -2
+		);
+	},
+	"negative verbose level does not die",
+) or note($@);
+
+ok(
+	lives {
+		App::Games::Keno->new(
+			spots   => [1],
+			draws   => 1,
+			verbose => 40
+		);
+	},
+	"Verbose level out of range does not die",
+) or note($@);
 
 done_testing;

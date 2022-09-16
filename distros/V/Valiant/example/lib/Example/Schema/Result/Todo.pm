@@ -29,4 +29,12 @@ sub set_from_request($self, $request) {
       ->insert_or_update;
 }
 
+sub status_options($self) {
+  return [qw/
+    active
+    completed
+    archived
+  /];
+}
+
 1;

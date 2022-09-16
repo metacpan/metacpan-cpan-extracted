@@ -32,7 +32,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.0.15';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::SMTP
@@ -58,6 +58,9 @@ has ott => (
 # Captcha generator
 has captcha => ( is => 'rw' );
 
+# Password policy activation rule
+has passwordPolicyActivationRule => ( is => 'rw', default => sub { 0 } );
+
 # INITIALIZATION
 
 sub init {
@@ -68,8 +71,17 @@ sub init {
 
     # Initialize Captcha if needed
     if ( $self->conf->{captcha_mail_enabled} ) {
-        $self->captcha( $self->p->loadModule('::Lib::Captcha') ) or return 0;
+        $self->captcha(1);
     }
+
+    # Parse password policy activation rule
+    $self->passwordPolicyActivationRule(
+        $self->p->buildRule(
+            $self->conf->{passwordPolicyActivation},
+            'passwordPolicyActivation'
+        )
+    );
+    return 0 unless $self->passwordPolicyActivationRule;
     return 1;
 }
 
@@ -142,46 +154,32 @@ sub _reset {
         # Use submitted value
         $req->{user} = $req->param('mail');
 
-        # Check if token exists
-        my $token;
-        if ( $self->ottRule->( $req, {} ) or $self->captcha ) {
-            $token = $req->param('token');
+        # Captcha for register form
+        if ( $self->captcha ) {
+            my $result = $self->p->_captcha->check_captcha($req);
+            if ($result) {
+                $self->logger->debug("Captcha code verified");
+            }
+            else {
+                $self->setSecurity($req);
+                $self->userLogger->warn("Captcha failed");
+                return PE_CAPTCHAERROR;
+            }
+        }
+        elsif ( $self->ottRule->( $req, {} ) ) {
+            my $token = $req->param('token');
             unless ($token) {
                 $self->setSecurity($req);
                 $self->userLogger->warn('Reset try without token');
                 return PE_NOTOKEN;
             }
-        }
-
-        # Captcha for register form
-        if ( $self->captcha ) {
-            my $captcha = $req->param('captcha');
-
-            unless ($captcha) {
-                $self->userLogger->notice('Reset try with captcha not filled');
-
-                # Set captcha or token
-                $self->setSecurity($req);
-                return PE_CAPTCHAEMPTY;
-            }
-
-            # Check captcha
-            unless ( $self->captcha->validateCaptcha( $token, $captcha ) ) {
-                $self->userLogger->info('Captcha failed: wrong code');
-
-                # Set captcha or token
-                $self->setSecurity($req);
-                return PE_CAPTCHAERROR;
-            }
-            $self->logger->debug('Captcha code verified');
-        }
-        elsif ( $self->ottRule->( $req, {} ) ) {
             unless ( $self->ott->getToken($token) ) {
                 $self->setSecurity($req);
                 $self->userLogger->warn('Reset try with expired/bad token');
                 return PE_TOKENEXPIRED;
             }
         }
+
         unless ( $req->{user} =~ /$self->{conf}->{userControl}/o ) {
             $self->setSecurity($req);
             return PE_MALFORMEDUSER;
@@ -442,8 +440,32 @@ sub changePwd {
             "Reset password request for $req->{sessionInfo}->{_user}");
 
         # Generate a complex password
-        my $password =
-          $self->gen_password( $self->conf->{randomPasswordRegexp} );
+        my $pwdRegEx;
+        if ( $self->passwordPolicyActivationRule->( $req, $req->sessionInfo )
+            && !$self->conf->{randomPasswordRegexp} )
+        {
+            my $uppers = $self->conf->{passwordPolicyMinUpper} || 3;
+            my $lowers = $self->conf->{passwordPolicyMinLower} || 5;
+            my $digits = $self->conf->{passwordPolicyMinDigit} || 2;
+            my $chars =
+              $self->conf->{passwordPolicyMinSize} -
+              $self->conf->{passwordPolicyMinUpper} -
+              $self->conf->{passwordPolicyMinLower} -
+              $self->conf->{passwordPolicyMinDigit};
+            $chars    = 1 if $chars < 1;
+            $pwdRegEx = "[A-Z]{$uppers}[a-z]{$lowers}\\d{$digits}";
+            $pwdRegEx .=
+              $self->conf->{passwordPolicySpecialChar} eq '__ALL__'
+              ? "\\W{$chars}"
+              : "[$self->{conf}->{passwordPolicySpecialChar}]{$chars}";
+            $self->logger->debug("Generated password RegEx: $pwdRegEx");
+        }
+        else {
+            $pwdRegEx =
+              $self->conf->{randomPasswordRegexp} || '[A-Z]{3}[a-z]{5}.\d{2}';
+            $self->logger->debug("Used password RegEx: $pwdRegEx");
+        }
+        my $password = $self->gen_password($pwdRegEx);
         $self->logger->debug("Generated password: $password");
         $req->data->{newpassword}     = $password;
         $req->data->{confirmpassword} = $password;
@@ -467,11 +489,13 @@ sub changePwd {
         }
     }
 
-    # Check password quality
+    # Check password quality if enabled
     require Lemonldap::NG::Portal::Password::Base;
     my $cpq =
-      $self->Lemonldap::NG::Portal::Password::Base::checkPasswordQuality(
-        $req->data->{newpassword} );
+      $self->passwordPolicyActivationRule->( $req, $req->sessionInfo )
+      ? $self->Lemonldap::NG::Portal::Password::Base::checkPasswordQuality(
+        $req->data->{newpassword} )
+      : PE_OK;
     unless ( $cpq == PE_OK ) {
         $self->ott->setToken( $req, $req->sessionInfo );
         return $cpq;
@@ -545,7 +569,7 @@ sub changePwd {
 sub setSecurity {
     my ( $self, $req ) = @_;
     if ( $self->captcha ) {
-        $self->captcha->setCaptcha($req);
+        $self->p->_captcha->init_captcha($req);
     }
     elsif ( $self->ottRule->( $req, {} ) ) {
         $self->ott->setToken($req);
@@ -555,9 +579,19 @@ sub setSecurity {
 
 sub display {
     my ( $self, $req ) = @_;
-    my $speChars = $self->conf->{passwordPolicySpecialChar};
+    my $speChars =
+      $self->conf->{passwordPolicySpecialChar} eq '__ALL__'
+      ? ''
+      : $self->conf->{passwordPolicySpecialChar};
     $speChars =~ s/\s+/ /g;
     $speChars =~ s/(?:^\s|\s$)//g;
+    my $isPP =
+         $self->conf->{passwordPolicyMinSize}
+      || $self->conf->{passwordPolicyMinLower}
+      || $self->conf->{passwordPolicyMinUpper}
+      || $self->conf->{passwordPolicyMinDigit}
+      || $self->conf->{passwordPolicyMinSpeChar}
+      || $speChars;
     $self->logger->debug( 'Display called with code: ' . $req->error );
 
     my %tplPrm = (
@@ -575,7 +609,12 @@ sub display {
         STARTMAILDATE   => $req->data->{startMailDate},
         STARTMAILTIME   => $req->data->{startMailTime},
         MAILALREADYSENT => $req->data->{mailAlreadySent},
-        MAIL            => (
+        (
+            $req->data->{customScript}
+            ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
+            : ()
+        ),
+        MAIL => (
               $self->p->checkXSSAttack( 'mail', $req->{user} ) ? ''
             : $req->{user}
         ),
@@ -584,17 +623,15 @@ sub display {
         DISPLAY_CONFIRMMAILSENT => 0,
         DISPLAY_MAILSENT        => 0,
         DISPLAY_PASSWORD_FORM   => 0,
-        DISPLAY_PPOLICY         => $self->conf->{portalDisplayPasswordPolicy},
-        PPOLICY_MINSIZE         => $self->conf->{passwordPolicyMinSize},
-        PPOLICY_MINLOWER        => $self->conf->{passwordPolicyMinLower},
-        PPOLICY_MINUPPER        => $self->conf->{passwordPolicyMinUpper},
-        PPOLICY_MINDIGIT        => $self->conf->{passwordPolicyMinDigit},
-        PPOLICY_ALLOWEDSPECHAR  => $speChars,
-        (
-            $speChars
-            ? ( PPOLICY_MINSPECHAR => $self->conf->{passwordPolicyMinSpeChar} )
-            : ()
-        ),
+        ENABLE_PASSWORD_DISPLAY => $self->conf->{portalEnablePasswordDisplay},
+        DONT_STORE_PASSWORD     => $self->conf->{browsersDontStorePassword},
+        DISPLAY_PPOLICY  => $self->conf->{portalDisplayPasswordPolicy} && $isPP,
+        PPOLICY_MINSIZE  => $self->conf->{passwordPolicyMinSize},
+        PPOLICY_MINLOWER => $self->conf->{passwordPolicyMinLower},
+        PPOLICY_MINUPPER => $self->conf->{passwordPolicyMinUpper},
+        PPOLICY_MINDIGIT => $self->conf->{passwordPolicyMinDigit},
+        PPOLICY_MINSPECHAR        => $self->conf->{passwordPolicyMinSpeChar},
+        PPOLICY_ALLOWEDSPECHAR    => $speChars,
         DISPLAY_GENERATE_PASSWORD =>
           $self->conf->{portalDisplayGeneratePassword},
     );
@@ -606,12 +643,17 @@ sub display {
     }
 
     # Display captcha if it's enabled
-    if ( $req->captcha ) {
-        $tplPrm{CAPTCHA_SRC}  = $req->captcha;
-        $tplPrm{CAPTCHA_SIZE} = $self->conf->{captcha_size};
+    if ( $req->captchaHtml ) {
+        $tplPrm{CAPTCHA_HTML} = $req->captchaHtml;
     }
     if ( $req->token ) {
         $tplPrm{TOKEN} = $req->token;
+    }
+
+    # DEPRECATED: This is only used for compatibility with existing templates
+    if ( $req->captcha ) {
+        $tplPrm{CAPTCHA_SRC}  = $req->captcha;
+        $tplPrm{CAPTCHA_SIZE} = $self->conf->{captcha_size};
     }
 
     # Display form the first time

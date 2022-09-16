@@ -9,9 +9,9 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.15';
 
-extends 'Lemonldap::NG::Portal::Main::Plugin';
+extends 'Lemonldap::NG::Portal::2F::Register::Base';
 
 # INITIALIZATION
 
@@ -19,11 +19,6 @@ has prefix   => ( is => 'rw', default => 'yubikey' );
 has template => ( is => 'ro', default => 'yubikey2fregister' );
 has welcome  => ( is => 'ro', default => 'clickOnYubikey' );
 has logo     => ( is => 'rw', default => 'yubikey.png' );
-
-sub init {
-    my ($self) = @_;
-    return 1;
-}
 
 # RUNNING METHODS
 

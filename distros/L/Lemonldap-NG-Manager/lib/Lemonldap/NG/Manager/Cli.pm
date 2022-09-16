@@ -5,6 +5,7 @@ use Crypt::URandom;
 use Mouse;
 use Data::Dumper;
 use JSON;
+use Hash::Merge::Simple;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
 our $VERSION = '2.0.12';
@@ -136,6 +137,73 @@ sub del {
         delete $new->{$_};
     }
     return $self->_save($new);
+}
+
+sub merge {
+    my ( $self, @files ) = @_;
+    die 'merge requires at least one file' unless (@files);
+    require Clone;
+    my $old = Clone::clone( $self->mgr->hLoadedPlugins->{conf}->currentConf );
+    my $new;
+    my @valid_files;
+
+    foreach my $file (@files) {
+
+        my $merging;
+        if ( $file =~ /\.ya?ml/ ) {
+            eval {
+                require YAML;
+                $merging = YAML::LoadFile($file);
+            };
+            if ($@) {
+                print STDERR "Skipping invalid YAML file $file: " . $@;
+            }
+        }
+        else {
+            eval {
+                local $/ = undef;
+                open my $fh, '<', $file or die $!;
+                $merging = from_json(<$fh>);
+            };
+            if ($@) {
+                print STDERR "Skipping invalid JSON file $file: " . $@;
+            }
+        }
+        if ( ref($merging) eq "HASH" ) {
+            $new = Hash::Merge::Simple::merge( $new, $merging );
+            push @valid_files, $file;
+        }
+    }
+    die "Nothing to do" unless ref($new) eq "HASH";
+
+    unless ( $self->yes ) {
+        print "Merge configuration changes from "
+          . join( " ", @valid_files ) . " \n";
+        print Dumper($new);
+        print "Confirm (N/y)? ";
+        my $c = <STDIN>;
+        unless ( $c =~ /^y(?:es)?$/ ) {
+            die "Aborting";
+        }
+    }
+
+    $new = Hash::Merge::Simple::merge( $old, $new );
+    _clean_hash_undef($new);
+    return $self->_save($new);
+}
+
+# Remove key => undef from hashes
+# This allows you to remove keys from the config
+sub _clean_hash_undef {
+    my ($hash) = @_;
+    for my $key ( keys %$hash ) {
+        if ( !defined( $hash->{$key} ) ) {
+            delete $hash->{$key};
+        }
+        if ( ref( $hash->{$key} ) eq "HASH" ) {
+            _clean_hash_undef( $hash->{$key} );
+        }
+    }
 }
 
 sub addKey {
@@ -512,11 +580,11 @@ sub run {
     }
     my $action = shift;
     unless ( $action =~
-/^(?:get|set|del|addKey|delKey|addPostVars|delPostVars|save|restore|rollback)$/
+/^(?:get|set|del|addKey|delKey|addPostVars|delPostVars|merge|save|restore|rollback)$/
       )
     {
         die
-"Unknown action $action. Only get, set, del, addKey, delKey, addPostVars, delPostVars, save, restore, rollback allowed";
+"Unknown action $action. Only get, set, del, addKey, delKey, addPostVars, delPostVars, merge, save, restore, rollback allowed";
     }
 
     unless ( $action eq "restore" ) {

@@ -4,10 +4,9 @@ use base 'PDF::Builder::Resource::BaseFont';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -25,7 +24,7 @@ sub encodeByData {
 
     my $data = $self->data();
 
-    if ($self->issymbol() || ($encoding||'') eq 'asis') {
+    if ($self->issymbol()) {
         $encoding = undef;
     }
 
@@ -55,62 +54,29 @@ sub encodeByData {
     foreach my $n (0..255) {
         my $xchar = undef;
         my $xuni = undef;
-        if (defined $data->{'char'}->[$n]) {
-            $xchar = $data->{'char'}->[$n];
-        } else {
-            $xchar = '.notdef';
-        }
-        $data->{'n2c'}->{$xchar} = $n unless defined $data->{'n2c'}->{$xchar};
+        $xchar = $data->{'char'}->[$n] // '.notdef';
+        $data->{'n2c'}->{$xchar} //= $n;
 
-        if (defined $data->{'e2n'}->[$n]) {
-            $xchar = $data->{'e2n'}->[$n];
-        } else {
-            $xchar = '.notdef';
-        }
-        $data->{'n2e'}->{$xchar} = $n unless defined $data->{'n2e'}->{$xchar};
+        $xchar = $data->{'e2n'}->[$n] // '.notdef';
+        $data->{'n2e'}->{$xchar} //= $n;
 
-        $data->{'n2u'}->{$xchar} = $data->{'e2u'}->[$n] 
-	    unless defined $data->{'n2u'}->{$xchar};
+        $data->{'n2u'}->{$xchar} //= $data->{'e2u'}->[$n];
 
-        if (defined $data->{'char'}->[$n]) {
-            $xchar = $data->{'char'}->[$n];
-        } else {
-            $xchar = '.notdef';
-        }
-        if (defined $data->{'uni'}->[$n]) {
-            $xuni = $data->{'uni'}->[$n];
-        } else {
-            $xuni = 0;
-        }
-        $data->{'n2u'}->{$xchar} = $xuni unless defined $data->{'n2u'}->{$xchar};
+        $xchar = $data->{'char'}->[$n] // '.notdef';
+        $xuni = $data->{'uni'}->[$n] // 0;
+        $data->{'n2u'}->{$xchar} //= $xuni;
 
-        $data->{'u2c'}->{$xuni} ||= $n unless defined $data->{'u2c'}->{$xuni};
+        $data->{'u2c'}->{$xuni} //= $n;
 
-        if (defined $data->{'e2u'}->[$n]) {
-            $xuni = $data->{'e2u'}->[$n];
-        } else {
-            $xuni = 0;
-        }
-        $data->{'u2e'}->{$xuni} ||= $n unless defined $data->{'u2e'}->{$xuni};
+        $xuni = $data->{'e2u'}->[$n] // 0;
+        $data->{'u2e'}->{$xuni} //= $n;
 
-        if (defined $data->{'e2n'}->[$n]) {
-            $xchar = $data->{'e2n'}->[$n];
-        } else {
-            $xchar = '.notdef';
-        }
-        $data->{'u2n'}->{$xuni} = $xchar unless defined $data->{'u2n'}->{$xuni};
+        $xchar = $data->{'e2n'}->[$n] // '.notdef';
+        $data->{'u2n'}->{$xuni} //= $xchar;
 
-        if (defined $data->{'char'}->[$n]) {
-            $xchar = $data->{'char'}->[$n];
-        } else {
-            $xchar = '.notdef';
-        }
-        if (defined $data->{'uni'}->[$n]) {
-            $xuni = $data->{'uni'}->[$n];
-        } else {
-            $xuni = 0;
-        }
-        $data->{'u2n'}->{$xuni} = $xchar unless defined $data->{'u2n'}->{$xuni};
+        $xchar = $data->{'char'}->[$n] // '.notdef';
+        $xuni = $data->{'uni'}->[$n] //= 0;
+        $data->{'u2n'}->{$xuni} //= $xchar;
     }
 
     my $en = PDFDict();
@@ -121,7 +87,8 @@ sub encodeByData {
 
     $en->{'Differences'} = PDFArray(PDFNum(0));
     foreach my $n (0..255) {
-        $en->{'Differences'}->add_elements(PDFName($self->glyphByEnc($n) || '.notdef'));
+        my $element = $self->glyphByEnc($n) || '.notdef';
+        $en->{'Differences'}->add_elements(PDFName($element));
     }
 
     $self->{'FirstChar'} = PDFNum($data->{'firstchar'});
@@ -175,7 +142,7 @@ glyphs to new positions, and even to the next plane.
 
 An example:
 
-    $fnt = $pdf->corefont('Times-Roman', -encode => 'latin1');
+    $fnt = $pdf->corefont('Times-Roman', 'encode' => 'latin1');
     @planes = ($fnt, $fnt->automap());  # two planes
     $text->font($planes[0], 15);  # or just $fnt will work
     $text->text('!');  # prints !
@@ -203,9 +170,9 @@ order to be able to use UTF-8 may be easier.
 
 sub automap {
     my ($self) = @_;
-	my $data = $self->data();
+    my $data = $self->data();
 
-    my %gl = map { $_=>defineName($_) } keys %{$data->{'wx'}};
+    my %gl = map { $_ => defineName($_) } keys %{$data->{'wx'}};
 
     foreach my $n (0..255) {
         delete $gl{$data->{'e2n'}->[$n]};
@@ -219,14 +186,15 @@ sub automap {
 
     my @nm = sort { $gl{$a} <=> $gl{$b} } keys %gl;
 
-    my @fnts = ();
+    my @fonts = ();
     my $count = 0;
     while (my @glyphs = splice(@nm, 0, 223)) {
-        my $obj = $self->SUPER::new($self->{' apipdf'}, $self->name().'am'.$count);
-        $obj->{' data'} = { %{$data} };
+        my $obj = $self->SUPER::new($self->{' apipdf'}, 
+		                    $self->name() . 'am' . $count);
+        $obj->{' data'} = { %$data };
         $obj->data()->{'firstchar'} = 32;
-        $obj->data()->{'lastchar'} = 32+scalar(@glyphs);
-        push(@fnts, $obj);
+        $obj->data()->{'lastchar'} = 32 + scalar(@glyphs);
+        push(@fonts, $obj);
         foreach my $key (qw( Subtype BaseFont FontDescriptor )) {
             $obj->{$key} = $self->{$key} if defined $self->{$key};
         }
@@ -251,13 +219,14 @@ sub automap {
         $count++;
     }
 
-    return @fnts;
+    return @fonts;
 }
 
 sub remap {
     my ($self, $enc) = @_;
 
-    my $obj = $self->SUPER::new($self->{' apipdf'}, $self->name().'rm'.pdfkey());
+    my $obj = $self->SUPER::new($self->{' apipdf'}, 
+	                        $self->name() . 'rm' . pdfkey());
     $obj->{' data'}={ %{$self->data()} };
     foreach my $key (qw( Subtype BaseFont FontDescriptor )) {
         $obj->{$key} = $self->{$key} if defined $self->{$key};

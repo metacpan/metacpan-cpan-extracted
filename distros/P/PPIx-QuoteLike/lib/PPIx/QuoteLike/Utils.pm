@@ -39,7 +39,7 @@ our @EXPORT_OK = qw{
     __variables
 };
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 # Readonly::Scalar my $BRACED_RE	=> __match_enclosed( LEFT_CURLY );
 Readonly::Scalar my $BRACKETED_RE	=> __match_enclosed( '[' ); # ]
@@ -48,14 +48,18 @@ Readonly::Scalar my $PARENTHESIZED_RE	=> __match_enclosed( '(' ); # )
 Readonly::Scalar my $SIGIL_AND_CAST_RE	=> qr/ \$ \# \$* | [\@\$] \$* /smx;
 # The following is an interpretation of perldata Identifier Parsing for
 # Perls before 5.10.
-Readonly::Scalar my $SYMBOL_NAME_RE	=> qr/
-    \^? (?:
+Readonly::Scalar my $NORMAL_SYMBOL_NAME_RE	=> qr/
+    (?:
 	(?: :: )* '?
 	    \w+ (?: (?: (?: :: )+ '? | (?: :: )* ' ) \w+ )*
 	    (?: :: )* |
 	[[:punct:]]
     )
 /smx;
+
+Readonly::Scalar my $SYMBOL_NAME_RE	=> qr/
+    \^ \w+ | $NORMAL_SYMBOL_NAME_RE
+/smxo;
 
 sub column_number {
     my ( $self ) = @_;
@@ -393,7 +397,7 @@ sub __normalize_interpolation_for_ppi {
     ( local $_ ) = @_;
 
     # "@{[ foo() ]}" => 'foo()'
-    if ( m/ \A \@ [{] \s* ( $BRACKETED_RE ) \s* [}] \z /smx ) {
+    if ( m/ \A \@ [{] \s* ( $BRACKETED_RE ) \s* [}] \z /smxo ) {
 	$_ = $1;
 	s/ \A [[] \s* //smx;
 	s/ \s* []] \z //smx;
@@ -401,7 +405,7 @@ sub __normalize_interpolation_for_ppi {
     }
 
     # "${\( foo() )}" => 'foo()'
-    if ( m/ \A \$ [{] \s* \\ \s* ( $PARENTHESIZED_RE ) \s* [}] \z /smx ) {
+    if ( m/ \A \$ [{] \s* \\ \s* ( $PARENTHESIZED_RE ) \s* [}] \z /smox ) {
 	$_ = $1;
 	s/ \A [(] \s* //smx;
 	s/ \s* [)] \z //smx;
@@ -409,7 +413,8 @@ sub __normalize_interpolation_for_ppi {
     }
 
     # "${foo}" => '$foo'
-    m/ \A ( $SIGIL_AND_CAST_RE ) \s* [{] \s* ( $SYMBOL_NAME_RE ) \s* [}] \z /smx
+    m/ \A ( $SIGIL_AND_CAST_RE ) \s*
+	[{] \s* ( $NORMAL_SYMBOL_NAME_RE ) \s* [}] \z /smxo
 	and return "$1$2";
 
     # "${foo{bar}}" => '$foo{bar}'
@@ -422,7 +427,7 @@ sub __normalize_interpolation_for_ppi {
 #    }
 
     # "$ foo->{bar}" => '$foo->{bar}'
-    if ( m/ \A ( $SIGIL_AND_CAST_RE ) \s+ ( $SYMBOL_NAME_RE ) ( .* ) /smx ) {
+    if ( m/ \A ( $SIGIL_AND_CAST_RE ) \s+ ( $SYMBOL_NAME_RE ) ( .* ) /smxo ) {
 	return "$1$2$3";
     }
 
@@ -624,10 +629,12 @@ can not be determined.
 
  say for __variables( PPI::Document->new( \'$foo' );
 
-B<NOTE> that this subroutine is discouraged, and may well be deprecated
-and removed. My problem with it is that it returns variable names rather
-than L<PPI::Element|PPI::Element> objects, leaving you no idea how the
-variables are used. It was originally written for the benefit of
+B<NOTE> that this subroutine is discouraged, and may well be deprecated and
+removed. I have two problems with it. The first is that it returns
+variable names rather than L<PPI::Element|PPI::Element> objects, leaving
+you no idea how the variables are used. The second is that it does not
+properly handle things like C<"${^CAPTURE[0]}">, and it seems infeasible
+to make it do so. It was originally written for the benefit of
 L<Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter|Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter>,
 but has proven inadequate to that policy's needs.
 

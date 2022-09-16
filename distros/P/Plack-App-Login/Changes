@@ -1,3 +1,10 @@
+0.06 2022-09-14T11:04:14+02:00
+ - Update CSS output for new Tags::HTML::Login::Button@0.02.
+
+0.05 2022-09-12T18:52:17+02:00
+ - Add better check for instances in css() and tags().
+ - Rename example to better name.
+
 0.04 2022-07-07T22:44:36+02:00
  - Change default of generator() setting.
  - Fix comment in example.

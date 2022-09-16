@@ -26,6 +26,7 @@ perl t\deprecations.t
 perl t\extgstate.t
 perl t\filter-ascii85decode.t
 perl t\filter-asciihexdecode.t
+REM perl t\filter-ccittfaxdecode.t  # add when TIFF changes go in
 perl t\filter-runlengthdecode.t
 perl t\font-corefont.t
 perl t\font-synfont.t

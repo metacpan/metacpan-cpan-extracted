@@ -12,11 +12,11 @@ my $page = $empty_page_pdf->page();
 $page->mediabox('Letter');
 
 # Save and reopen the PDF
-$empty_page_pdf = PDF::Builder->open_scalar($empty_page_pdf->stringify());
+$empty_page_pdf = PDF::Builder->from_string($empty_page_pdf->to_string());
 
 my $container_pdf = PDF::Builder->new();
 
-# This dies through version 2.025.
+# This dies through API2 version 2.025.
 eval {
     $container_pdf->importPageIntoForm($empty_page_pdf, 1);
 };

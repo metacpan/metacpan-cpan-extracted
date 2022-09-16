@@ -66,6 +66,12 @@
 
             <TMPL_IF NAME="sslform">
               <TMPL_INCLUDE NAME="sslformChoice.tpl">
+
+              <!-- Remember my authentication choice for this module -->
+              <TMPL_IF NAME="REMEMBERAUTHCHOICE">
+                <input type="hidden" id="rememberauthchoice" name="rememberauthchoice" value="<TMPL_IF NAME="REMEMBERAUTHCHOICEDEFAULTCHECKED">true</TMPL_IF>" />
+              </TMPL_IF>
+
             </TMPL_IF>
 
             <TMPL_IF NAME="gpgform">
@@ -92,6 +98,11 @@
 
               </div>
 
+              <!-- Remember my authentication choice for this module -->
+              <TMPL_IF NAME="REMEMBERAUTHCHOICE">
+                <input type="hidden" id="rememberauthchoice" name="rememberauthchoice" value="<TMPL_IF NAME="REMEMBERAUTHCHOICEDEFAULTCHECKED">true</TMPL_IF>" />
+              </TMPL_IF>
+
             </TMPL_IF>
 
           </form>
@@ -103,6 +114,34 @@
     </div>
 
     </div> <!-- end authMenu -->
+
+    <TMPL_IF NAME="REMEMBERAUTHCHOICE">
+    <div class="input-group col-md-6 offset-md-3">
+
+      <!-- Global checkbox for remembering the authentication choice for all modules -->
+      <div id="globalrememberauthchoicecontainer" class="input-group-prepend input-group">
+        <div class="input-group-text">
+          <input type="checkbox" id="globalrememberauthchoice" name="globalrememberauthchoice" aria-describedby="globalrememberauthchoiceLabel" <TMPL_IF NAME="REMEMBERAUTHCHOICEDEFAULTCHECKED">checked</TMPL_IF> />
+          <input id="rememberCookieName" name="rememberCookieName" type="hidden" value="<TMPL_VAR NAME="REMEMBERAUTHCHOICECOOKIENAME">">
+        </div>
+          <p class="form-control">
+            <label id="globalrememberauthchoiceLabel" for="globalrememberauthchoice" trspan="rememberChoice">Remember my choice</label>
+          </p>
+      </div>
+
+      <!-- Timer + stop button for triggering the remembered authentication choice -->
+      <div id="remembertimercontainer" class="input-group">
+        <p class="form-control">
+          <span id="remembertimer"><TMPL_VAR NAME="REMEMBERAUTHCHOICETIMER"></span>
+          <label id="rememberTimerLabel" trspan="rememberTimerLabel">s before automatic authentication</label>
+        </p>
+        <input id="rememberStopped" name="rememberStopped" type="hidden" value="">
+        <div class="input-group-append inout-group">
+          <button class="btn btn-danger" id="buttonRememberStopped"><i class="fa fa-stop-circle-o"></i> Stop</button>
+        </div>
+      </div>
+    </div>
+    </TMPL_IF>
 
   </TMPL_IF>
 

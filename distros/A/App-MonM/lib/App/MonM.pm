@@ -1,4 +1,4 @@
-package App::MonM; # $Id: MonM.pm 89 2019-07-15 05:19:11Z abalama $
+package App::MonM; # $Id: MonM.pm 151 2022-09-16 07:45:23Z abalama $
 use warnings;
 use strict;
 use utf8;
@@ -11,7 +11,7 @@ App::MonM - Simple monitoring tool
 
 =head1 VERSION
 
-Version 1.07
+Version 1.09
 
 =head1 SYNOPSIS
 
@@ -49,14 +49,16 @@ Simple monitoring tool
 
 =item Perl v5.16+
 
-=item libwww
+=item L<libwww|https://github.com/libwww-perl/libwww-perl>
 
-=item libnet
+=item L<libnet|https://metacpan.org/dist/libnet>
 
-=item L<Net-SNMP|http://net-snmp.sourceforge.net>
+=item L<Email::MIME|https://github.com/rjbs/Email-MIME>
 
-To use this module, you must have Net-SNMP installed on your system.
-More specifically you need the Perl modules that come with it.
+=item L<Net-SNMP|https://net-snmp.sourceforge.io/>
+
+To use this module in full powerful, you must have Net-SNMP installed
+on your system. More specifically you need the Perl modules that come with it.
 
 DO NOT INSTALL SNMP or Net::SNMP from CPAN!
 
@@ -68,7 +70,7 @@ F<perl/> directory of the distribution to install it, or run
 C<./configure --with-perl-modules> from the top directory of the net-snmp
 distribution.
 
-Net-SNMP can be found at http://net-snmp.sourceforge.net
+Net-SNMP can be found at https://net-snmp.sourceforge.io/
 
 =back
 
@@ -84,18 +86,155 @@ Net-SNMP can be found at http://net-snmp.sourceforge.net
 
 By default configuration file located in C</etc/monm> directory
 
-Every configuration directive detailed described in C<monm.conf> file, also
-see C<conf.d/checkit-foo.conf.sample> file for MonM checkit configuration
+B<NOTE:> each configuration option (directive) detailed describes in C<monm.conf> file,
+see also C<conf.d/checkit-foo.conf.sample> file for example of MonM checkit configuration
+
+=head3 GENERAL DIRECTIVES
+
+=over 4
+
+=item B<DaemonUser>, B<DaemonGroup>
+
+    DaemonUser monmu
+    DaemonGroup monmu
+
+Defines a username and groupname for daemon working
+
+Default: monmu
+
+=item B<Expires>
+
+    Expires 1d
+
+Defines the lifetime of a record in the database.
+After this time, the record from the database will be deleted automatically.
+
+Format for time can be in any of the following forms:
+
+    20   -- in 20 seconds
+    180s -- in 180 seconds
+    2m   -- in 2 minutes
+    12h  -- in 12 hours
+    1d   -- in 1 day
+    3M   -- in 3 months
+    2y   -- in 2 years
+
+Default: 1d (1 day)
+
+=item B<Interval>
+
+    Interval 20
+
+Defines worker interval. This interval determines how often
+the cycle of checks will be started.
+
+Default: 20
+
+=item B<LogEnable>
+
+    LogEnable on
+
+Activate or deactivate the logging: on/off (yes/no)
+
+Default: off
+
+=item B<LogFile>
+
+    LogFile /var/log/monm.log
+
+Defines path to custom log file
+
+Default: use syslog
+
+=item B<LogIdent>
+
+    LogIdent myProgramName
+
+Defines LogIdent string. We not recommended use it
+
+Default: none
+
+=item B<LogLevel>
+
+    LogLevel warning
+
+Defines log level
+
+Allowed levels: debug, info, notice, warning, error,
+crit, alert, emerg, fatal, except
+
+Default: debug
+
+=item B<Workers>
+
+    Workers 3
+
+Defines workers number
+
+Default: 3
+
+=back
+
+=head3 USER AND GROUP DIRECTIVES
+
+=over 4
+
+=item B<Group>
+
+The "Group" section combines several users into named groups.
+This allows you to reduce the lists of recipients of notifications
+
+    <Group Foo>
+        Enable on
+        User Bob, Alice
+        User Ted
+    </Group>
+
+Each group has a status - enabled/disabled (see Enable directive)
+
+=item B<User>
+
+The User section allows you to define the user name and settings.
+
+    <User Bob>
+        Enable on
+
+        At Sun[off];Mon-Thu[08:30-12:30,13:30-18:00];Fri[10:00-20:30];Sat[off]
+
+        <Channel SendMail>
+            To bob@example.com
+        </Channel>
+
+        <Channel SMSGW>
+            To +1-424-254-5301
+            At Mon-Fri[08:30-18:30]
+        </Channel>
+    </User>
+
+Each user has a status - enabled/disabled (see Enable directive). User settings
+are disabled by default. User settings contains channel sections, the settings
+of which are taken either from globally defined channel sections or from those
+defines within the scope of this user only
+
+=back
+
+=head3 CHANNEL DIRECTIVES
+
+See L<App::MonM::Channel/CONFIGURATION DIRECTIVES>
+
+=head3 CHECKIT DIRECTIVES
+
+See L<App::MonM::Checkit/CONFIGURATION DIRECTIVES>
 
 =head2 CRONTAB
 
-To automatically launch the program, we recommend using standard scheduling tools, such as crontab
+To automatically launch the program, you can using standard scheduling tools, such as crontab
 
-    * * * * * monm -l checkit >/dev/null 2>>/var/log/monm-error.log
+    * * * * * monm checkit >/dev/null 2>>/var/log/monm-error.log
 
 For daily reporting:
 
-    0 8 * * * monm -l report >/dev/null 2>>/var/log/monm-error.log
+    0 8 * * * monm report >/dev/null 2>>/var/log/monm-error.log
 
 =head1 INTERNAL METHODS
 
@@ -107,23 +246,11 @@ The CTK method for classes extension. For internal use only!
 
 See L<CTK/again>
 
-=item B<configure>
+=item B<notifier>
 
-The internal method for initializing the project
+    my $notifier = $app->notifier;
 
-=item B<getdbi>
-
-    my $dbi = $app->getdbi;
-
-Returns DBI object
-
-=item B<nope>, B<skip>, B<wow>, B<yep>
-
-    my $status = $app->nope("Format %s", "text");
-
-Prints status message and returns status.
-
-For nope returns - 0; for skip, wow, yep - 1
+Returns the Notifier object
 
 =item B<notify>
 
@@ -131,9 +258,21 @@ For nope returns - 0; for skip, wow, yep - 1
 
 Sends notifications
 
+=item B<raise>
+
+    return $app->raise("Red message");
+
+Sends message to STDERR and returns 0
+
+=item B<store>
+
+    my $store = $app->store();
+
+Returns store object
+
 =item B<trigger>
 
-    $app->trigger();
+    my @errors = $app->trigger();
 
 Runs triggers
 
@@ -143,29 +282,21 @@ Runs triggers
 
 See C<Changes> file
 
-=head1 DEPENDENCIES
-
-L<CTK>
-
 =head1 TO DO
 
 See C<TODO> file
 
-=head1 BUGS
-
-* none noted
-
 =head1 SEE ALSO
 
-L<CTK>
+L<CTK>, L<Email::MIME>
 
 =head1 AUTHOR
 
-Serż Minus (Sergey Lepenkov) L<http://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
+Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2019 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2022 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -177,97 +308,304 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION /;
-$VERSION = '1.07';
+$VERSION = '1.09';
 
 use feature qw/ say /;
 
-use Carp;
 use Text::SimpleTable;
 use File::Spec;
-use File::Path; # mkpath / rmtree
-use Try::Tiny;
-use Text::ParseWords qw/shellwords/;
+use File::stat qw//;
+use Text::ParseWords qw/shellwords quotewords/;
+use Text::Wrap qw/wrap/;
 
 use CTK::Skel;
-use CTK::Util qw/ preparedir dformat execute dtf sendmail variant_stf /;
+use CTK::Util qw/ preparedir dformat execute dtf tz_diff sendmail variant_stf lf_normalize sharedstatedir /;
 use CTK::ConfGenUtil;
 use CTK::TFVals qw/ :ALL /;
 
 use App::MonM::Const;
 use App::MonM::Util qw/
-        blue green red yellow cyan
+        blue green red yellow cyan magenta gray
+        yep nope skip wow
         getBit setBit
-        getExpireOffset explain
+        node2anode getCheckitByName
+        getExpireOffset getTimeOffset explain
+        slurp spurt
+        merge
     /;
 use App::MonM::Store;
 use App::MonM::Checkit;
+use App::MonM::QNotifier;
+use App::MonM::Report;
 
-use base qw/ CTK::App /;
+use parent qw/CTK::App/;
 
 use constant {
     TAB9            => " " x 9,
-    EXPIRES          => 24*60*60, # 1 day
+    EXPIRES         => 24*60*60, # 1 day
     SMSSBJ          => 'MONM CHECKIT REPORT',
     DATE_FORMAT     => '%YYYY-%MM-%DD %hh:%mm:%ss',
     TABLE_HEADERS   => [(
             [32, 'NAME'],
             [7,  'TYPE'],
             [19, 'LAST CHECK DATE'],
-            [7,  'STATUS'],
+            [7,  'RESULT'],
         )],
+
+    # Markers
+    MARKER_OK       => '[  OK  ]',
+    MARKER_FAIL     => '[ FAIL ]',
+    MARKER_SKIP     => '[ SKIP ]',
+    MARKER_INFO     => '[ INFO ]',
 };
 
-eval { require App::MonM::Notifier::Agent };
+eval { require App::MonM::Notifier };
 my $NOTIFIER_LOADED = 1 unless $@;
+$NOTIFIER_LOADED = 0 if $NOTIFIER_LOADED && (App::MonM::Notifier->VERSION * 1) < 1.04;
 
 sub again {
     my $self = shift;
+       $self->SUPER::again(); # CTK::App again first!!
 
     # Datadir & Tempdir
     if ($self->option("datadir")) {
-        preparedir( $self->datadir() );
+        # Prepare DataDir
+        preparedir( $self->datadir() ) or do {
+            $self->status(0);
+            $self->raise("Can't prepare directory %s", $self->datadir());
+        };
+    } elsif ($self->option("daemondir")) {
+        $self->datadir(File::Spec->catdir(sharedstatedir(), PREFIX));
     } else {
         $self->datadir($self->tempdir());
     }
-    preparedir( $self->tempdir() );
+    # Prepare TempDir
+    preparedir( $self->tempdir() ) or do {
+        $self->status(0);
+        $self->raise("Can't prepare directory %s", $self->tempdir());
+    };
 
-    # Notifier agent init
-    $self->{notifier} = undef;
+    # Store
+    my $db_file = File::Spec->catfile($self->datadir, App::MonM::Store::DB_FILENAME());
+    my $store_conf = $self->config("store") || $self->config('dbi') || {file => $db_file};
+       $store_conf = {file => $db_file} unless is_hash($store_conf);
+    my %store_args = %$store_conf;
+    $store_args{file} = $db_file unless ($store_args{file} || $store_args{dsn});
+    my $store = App::MonM::Store->new(%store_args);
+    $self->{store} = $store;
+    #$self->debug(explain($store));
 
-    return $self->SUPER::again;
+    # Notifier object init
+    my %nargs = (config => $self->configobj);
+    $self->{notifier} = $NOTIFIER_LOADED && lvalue($self->config("usemonotifier"))
+        ? App::MonM::Notifier->new(%nargs)
+        : App::MonM::QNotifier->new(%nargs);
+
+    #$self->status($self->raise("Test error"));
+
+    return $self; # CTK requires!
 }
-sub configure {
+sub raise {
     my $self = shift;
-    my $config = $self->configobj;
+    say STDERR red(@_);
+    $self->log_error(sprintf(shift, @_));
+    return 0;
+}
+sub store {
+    my $self = shift;
+    return $self->{store};
+}
+sub notifier {
+    my $self = shift;
+    return $self->{notifier};
+}
 
-    # DBI object
-    my $dbi_file = File::Spec->catfile($self->datadir, App::MonM::Store::DB_FILENAME());
-    my $dbi_conf = $self->config('dbi') || {file => $dbi_file};
-       $dbi_conf = {file => $dbi_file} unless is_hash($dbi_conf);
-    my $dbi = new App::MonM::Store(%$dbi_conf);
-    $self->{_dbi} = $dbi;
-    if ($config->status) {
-        $self->error($dbi->error) if $dbi->error;
-        return 1;
+__PACKAGE__->register_handler(
+    handler     => "info",
+    description => "Show statistic information",
+    code => sub {
+### CODE:
+    my ($self, $meta, @arguments) = @_;
+    my $store = $self->store;
+
+    # General info
+    printf("Hostname            : %s\n", HOSTNAME);
+    printf("MonM version        : %s\n", $self->VERSION);
+    printf("Date                : %s\n", _fdate());
+    printf("Data dir            : %s\n", $self->datadir);
+    printf("Temp dir            : %s\n", $self->tempdir);
+    printf("Config file         : %s\n", $self->configfile);
+    printf("Config status       : %s\n", $self->conf("loadstatus") ? green("OK") : magenta("ERROR: not loaded"));
+    $self->raise($self->configobj->error) if !$self->configobj->status and length($self->configobj->error);
+    printf("Notifier class      : %s\n", ref($self->notifier) || magenta("not initialized"));
+    #$self->debug(explain($self->config)) if $self->conf("loadstatus") && $self->verbosemode;
+
+    # DB status
+    printf("DB DSN              : %s\n", $store->dsn);
+    printf("DB status           : %s\n", $store->error ? red("ERROR") : green("OK"));
+    my $db_is_ok = $store->error ? 0 : 1;
+    if ($db_is_ok && $store->{file} && -e $store->{file}) {
+        my $s = File::stat::stat($store->{file})->size;
+        printf("DB file             : %s\n", $store->{file});
+        printf("DB size             : %s\n", sprintf("%s (%d bytes)", _fbytes($s), $s));
+        printf("DB modified         : %s\n", _fdate(File::stat::stat($store->{file})->mtime || 0));
+    }
+    $self->raise($store->error) unless $db_is_ok;
+
+    # Checkets
+    my @checkits = getCheckitByName($self->config("checkit"));
+    my $noc = scalar(@checkits);
+    printf("Checkits            : %s\n", $noc ? $noc : yellow("none"));
+    if ($noc) {
+        #print explain(\@checkits);
+        my $tbl = Text::SimpleTable->new(
+            [20, 'CHECKIT NAME'], # name
+            [7,  'TYPE'], # type
+            [7,  'TARGET'], # target
+            [6,  'INTRVL'], # interval
+            [3,  'TRG'], # trigger
+            [27, 'RECIPIENTS'], # sendto
+        );
+        foreach my $ch (@checkits) {
+            my $triggers = array($ch, "trigger");
+            my $recipients = array($ch, "sendto");
+            $tbl->row( # variant_stf($v->{source} // '', $src_len),
+                variant_stf($ch->{name} // '', 20),
+                $ch->{type} // 'http',
+                $ch->{target} // 'status',
+                $ch->{interval} || 0,
+                scalar(@$triggers),
+                join(", ", @$recipients),
+            );
+        }
+        print $tbl->draw();
     }
 
-    # Creting DB
-    if ($dbi->is_sqlite) {
-        printf("Creating local database %s...\n", $dbi->{file});
-    } else {
-        printf("Checking database %s...\n", $dbi->dsn);
+    # Scheduler
+    my $scheduler = App::MonM::Util::Scheduler->new;
+
+    # Channels
+    my $channels = $self->notifier->{ch_def} || {};
+    my $chcnt = scalar(keys %$channels);
+    printf("Channels            : %s\n", $chcnt ? $chcnt : yellow("none"));
+    if ($chcnt) {
+        my $tbl = Text::SimpleTable->new(
+            [20, 'CHANNEL NAME'],
+            [7,  'TYPE'],
+            [42, 'TO (FROM)'],
+            [7,  'ON/NOW'],
+        );
+        foreach my $ch_name (keys %$channels) {
+            my $ch = hash($channels, $ch_name);
+            $scheduler->add($ch_name, lvalue($ch, "at"));
+            $tbl->row(
+                $ch_name,
+                lvalue($ch, "type") || '',
+                lvalue($ch, "from")
+                    ? sprintf("%s (%s)", lvalue($ch, "to") || '', lvalue($ch, "from"))
+                    : lvalue($ch, "to") || '',
+                sprintf("%s/%s",
+                    lvalue($ch, "enable") || lvalue($ch, "enabled") ? 'Yes' : 'No',
+                    $scheduler->check($ch_name) ? "Yes" : "No",
+                ),
+            );
+            if ($self->verbosemode && $scheduler->getAtString($ch_name)) {
+                printf("  Ch=%s; At=%s\n", $ch_name, $scheduler->getAtString($ch_name));
+            }
+
+        }
+        print $tbl->draw();
     }
-    if ($dbi->error) {
-        say( IS_TTY ? red("Fail") : "Fail");
-        $self->error($dbi->error);
-    } else {
-        say( IS_TTY ? green("Done") : "Done");
+
+    # Users
+    my @users = $self->notifier->getUsers;
+    printf("Allowed users       : %s\n", @users ? join(", ", @users) : yellow("none"));
+    if (@users) {
+        my $tbl = Text::SimpleTable->new(
+            [20, 'USERNAME'],
+            [20, 'CHANNEL (BASEDON)'],
+            [7,  'TYPE'],
+            [19, 'TO'],
+            [7,  'ON/NOW'],
+        );
+        my $old = "";
+        foreach my $u (sort {$a cmp $b} @users) {
+            # Get User node
+            my $usernode = node($self->conf("user"), $u);
+            next unless is_hash($usernode) && keys %$usernode;
+            #print App::MonM::Util::explain($usernode);
+
+            # Get user channels
+            my $channels_usr = hash($usernode => "channel");
+            foreach my $ch_name (keys %$channels_usr) {
+                my $at = lvalue($channels_usr, $ch_name, "at") || lvalue($usernode, "at");
+                my $basedon = lvalue($channels_usr, $ch_name, "basedon") || lvalue($channels_usr, $ch_name, "baseon") || '';
+                my $ch = merge(
+                    hash($self->notifier->{ch_def}, $basedon || $ch_name),
+                    hash($channels_usr, $ch_name),
+                    {$at ? (at => $at) : ()},
+                );
+                $scheduler->add($ch_name, lvalue($ch, "at"));
+                #print App::MonM::Util::explain($ch);
+                $tbl->row(
+                    ($old eq $u) ? "" : $u,
+                    $basedon ? sprintf("%s (%s)", $ch_name, $basedon): $ch_name,
+                    lvalue($ch, "type") || '',
+                    lvalue($ch, "to") || '',
+                    sprintf("%s/%s",
+                        lvalue($ch, "enable") || lvalue($ch, "enabled") ? 'Yes' : 'No',
+                        $scheduler->check($ch_name) ? "Yes" : "No",
+                    ),
+                );
+                if ($self->verbosemode && $scheduler->getAtString($ch_name)) {
+                    printf("  Usr=%s; Ch=%s; At=%s\n", $u, $ch_name, $scheduler->getAtString($ch_name));
+                }
+            } continue {
+                $old = $u;
+            }
+            unless (%$channels_usr) {
+                $tbl->row( $u, '', '', '', '-------' );
+            }
+        }
+        print $tbl->draw();
     }
+
+    # Groups
+    my @groups = $self->notifier->getGroups;
+    printf("Allowed groups      : %s\n", @groups ? join(", ", @groups) : yellow("none"));
+    if (@groups) {
+        my $tbl = Text::SimpleTable->new(
+            [20, 'GROUP NAME'],
+            [62, 'USERS'],
+        );
+        foreach my $g (sort {$a cmp $b} @groups) {
+            my @us = $self->notifier->getUsersByGroup($g);
+            $tbl->row(
+                $g,
+                join(", ", @us),
+            );
+        }
+        print $tbl->draw();
+    }
+
+    #print explain([$self->notifier->getUsersByGroup("Bar")]);
+
+    return 1;
+});
+
+__PACKAGE__->register_handler(
+    handler     => "configure",
+    description => "Generate configuration files",
+    code => sub {
+### CODE:
+    my ($self, $meta, @arguments) = @_;
+    my $store = $self->store;
+    my $dir = shift(@arguments) || $self->root;
 
     # Creating configuration
-    my $skel = new CTK::Skel (
+    my $skel = CTK::Skel->new(
             -name   => PROJECTNAME,
-            -root   => $self->root,
+            -root   => $dir,
             -skels  => {
                         config => 'App::MonM::ConfigSkel',
                     },
@@ -276,37 +614,17 @@ sub configure {
                     PROJECTNAME     => PROJECTNAME,
                     PREFIX          => PREFIX,
                 },
-            -debug  => $self->debugmode,
+            -debug  => $self->verbosemode,
         );
-    #say("Skel object: ", explain($skel));
-    printf("Creating configuration to %s...\n", $self->root);
+    printf("Installing configuration to \"%s\"...\n", $dir);
     if ($skel->build("config")) {
-        $self->CTK::Plugin::Config::init;
-        $config = $self->configobj;
-        unless ($config->status) {
-            say( IS_TTY ? red("Fail") : "Fail");
-            return 0;
-        }
-        say( IS_TTY ? green("Done") : "Done");
+        say green("Done. Configuration has been installed");
     } else {
-        say( IS_TTY ? red("Fail") : "Fail");
-        $self->error(sprintf("Can't %s initialize: %s", PREFIX, $self->root));
-        return 0;
+        return $self->raise("Can't install configuration");
     }
 
     return 1;
-}
-sub getdbi {shift->{_dbi}}
-
-__PACKAGE__->register_handler(
-    handler     => "configure",
-    description => sprintf("Configure %s", PROJECTNAME),
-    code => sub { shift->configure });
-
-__PACKAGE__->register_handler(
-    handler     => "config",
-    description => "Alias for configure command",
-    code => sub { shift->configure });
+});
 
 __PACKAGE__->register_handler(
     handler     => "checkit",
@@ -314,129 +632,146 @@ __PACKAGE__->register_handler(
     code => sub {
 ### CODE:
     my ($self, $meta, @arguments) = @_;
-    $self->configure or return 0;
-    my $status = 1;
+    my $store = $self->store;
+    return $self->raise($store->error) if $store->error;
 
-    printf("Start of checking for %s...\n", HOSTNAME);
-    $self->wow("Will checked: %s", join(", ", @arguments)) if @arguments;
-
-    # Get DBI
-    my $dbi = $self->getdbi;
-    return 0 if $dbi->error;
+    # Check configuration
+    unless ($self->configobj->status) {
+        return length($self->configobj->error)
+            ? $self->raise($self->configobj->error)
+            : "Can't load configuration file";
+    }
 
     # Get checkits
-    my @checkits = $self->_getCheckits(@arguments);
-    unless (scalar(@checkits)) {
-        $self->log_warn("No enabled <Checkit> configuration section found");
+    my @checkits = getCheckitByName($self->config("checkit"), @arguments);
+    my $noc = scalar(@checkits);
+    unless ($noc) {
+        skip("No enabled <Checkit> configuration section found");
+        $self->log_info("No enabled <Checkit> configuration section found");
         return 1;
     }
 
     # Create Checkit object
-    my $checker = new App::MonM::Checkit;
+    my $checker = App::MonM::Checkit->new;
 
     # Get all records from DB
     my %all;
-    foreach my $r ($dbi->getall) {
+    foreach my $r ($store->getall) {
         $all{$r->{name}} = $r;
     }
-    if ($dbi->error) {
-        $self->error($dbi->error);
-        return 0;
-    }
-
-    # Init notifier and sending messages
-    if ($NOTIFIER_LOADED) {
-        $self->{notifier} = App::MonM::Notifier::Agent->new(
-            configobj => $self->configobj,
-        );
-        my $agent = $self->{notifier};
-        unless ($agent->status) {
-            $self->error($agent->error);
-            return 0;
-        }
-
-        # Run sending messages
-        $agent->trysend() or do {
-            $self->log_error($agent->error);
-        };
-    }
+    return $self->raise($store->error) if $store->error;
+    # print explain(\@checkits);
 
     # Start
+    my $curtime = time;
+    my $status = 1;
+    my $passed = 0;
     foreach my $checkit (sort {$a->{name} cmp $b->{name}} @checkits) {
-        my $ostat = 1; # Operation status
+        my $result = 1; # Check result
         my $name = $checkit->{name};
-        my $info = $all{$name} || {};
+        my $info = $all{$name} || {}; # from database
         my $id = $info->{id} || 0;
         my $old = $info->{status} || 0;
         my $got = ($old << 1) & 15;
+        my $pub = $info->{'time'} || 0;
+        my $interval = getTimeOffset(lvalue($checkit, "interval") || 0);
+
+        # Check interval first
+        if ($interval) {
+            if (($pub + $interval) >= $curtime) {
+                print gray MARKER_SKIP;
+                printf(" %s (%s)\n", $name, "Too little time has passed before a next check [delay $interval sec]");
+                next;
+            }
+        }
 
         # Check
-        $ostat = $checker->check($checkit);
-        $self->log_info("Checking %s (%s >>> %s): %s", $name, $checker->source, $checker->message, $ostat ? 'OK' : "FAIL");
-        if ($ostat) {
-            $self->yep("Checking %s (%s >>> %s)", $name, $checker->source, $checker->message);
-            $got = setBit($got, 0); # Set first bit
+        $result = $checker->check($checkit);
+        if ($result) {
+            $got = setBit($got, 0); # Set first bit if result is PASSED
+            $passed++;
         } else {
-            $self->nope("Checking %s (%s >>> %s)", $name, $checker->source, $checker->message);
-            say(TAB9, red($checker->error));
+            $status = 0; # General status
+        }
+
+        # Show resulsts
+        print $result ? green(MARKER_OK) : red(MARKER_FAIL);
+        printf(" %s (%s >>> %s)\n", $name, $checker->source, $checker->message);
+        if ($self->verbosemode) {
+            printf "%sStatus=%s; Code=%s\n", TAB9,
+                $checker->status || 0, $checker->code // '';
+            say TAB9, $checker->note;
+            if (defined($checker->content) && length($checker->content)) {
+                $Text::Wrap::columns = SCREENWIDTH - 10;
+                say TAB9, "-----BEGIN CONTENT-----";
+                say wrap(TAB9, TAB9, lf_normalize($checker->content));
+                say TAB9, "-----END CONTENT-----";
+            }
+        }
+        if ($result && !$checker->status) {
+            wow("%s", $checker->error);
+        } elsif (!$result) {
+            nope("%s", $checker->error);
         }
 
         # Save data to database
-        my %rec = (
+        my %data = (
             id      => $id,
-            name    => $name,
-            type    => $checker->type,
-            source  => $checker->source,
-            status  => $got,
-            message => $checker->message,
+            name    => $name, # Checkit name
+            type    => $checker->type, # Checkit type
+            result  => $result, # Checkit result
+            source  => $checker->source, # Source string
+            code    => $checker->code, # Checkit code value
+            message => $checker->message, # Checkit message string
+            note    => $checker->note, # Checkit note string
+            status  => $got, # New status value (code of result) for store only!
+            subject => sprintf("%s: Available %s [%s]", $result ? 'OK' : 'PROBLEM', $name, HOSTNAME), # Subject
         );
-        if ($id) {
-            $dbi->set(%rec) or do {
-                $self->error($dbi->error);
-                $status = 0;
-                next;
-            };
-        } else {
-            $dbi->add(%rec) or do {
-                $self->error($dbi->error);
-                $status = 0;
-                next;
-            };
+        my $chst = $id ? $store->set(%data) : $store->add(%data);
+        unless ($chst) {
+            $self->raise($store->error) if $store->error;
+            $status = 0;
+            next;
         }
 
-        # Triggers, Sending and notifies
-        # [0-0-1-1] = 3  -- OK
-        # [1-1-0-0] = 12 -- PROBLEM
-        if ($got == 3 or $got == 12 or $self->testmode) {
-            my %data = (
-                    name    => $name,
-                    type    => $checker->type,
-                    source  => $checker->source,
-                    status  => $ostat,
-                    error   => $checker->error,
-                    message => $checker->message,
-                    sendto  => array($checkit, "sendto"),
-                    trigger => array($checkit, "trigger"),
-                );
-            $self->notify(%data);
-            $self->trigger(%data);
-        }
+        # Triggers and notifications
+        # GOT = [0-0-1-1] = 3  -- OK
+        # GOT = [1-1-0-0] = 12 -- PROBLEM
+        if ($got == 3 or $got == 12) {
+            my @errs;
+            push @errs, $checker->error if $checker->error; # Checkit error string
+            $data{status} = $checker->status; # Checkit status (NO RESULT!!);
 
-        # General status
-        $status = 0 unless $ostat;
+            # Run triggers (FIRST)
+            push @errs, $self->trigger(%data, trigger => array($checkit, "trigger"));
+
+            # Send message via notifier (SECOND)
+            $self->notify(%data, sendto => array($checkit, "sendto"), errors => \@errs);
+        }
     }
 
+    # Show Total resulsts
+    print $status ? green(MARKER_OK) : red(MARKER_FAIL);
+    printf(" Total passed %d checks of %d in %s\n", $passed, $noc, $self->tms());
+
     # Cleaning DB
-    my $expire = getExpireOffset($self->config("expires") || $self->config("expire") || EXPIRES);
-    $dbi->clean(period => $expire) or do {
-        $self->error($dbi->error);
-        return 0;
+    my $expire = getExpireOffset(lvalue($self->config("expires"))
+        || lvalue($self->config("expire")) || EXPIRES);
+    $store->clean(period => $expire) or do {
+        return $store->error ? $self->raise($store->error) : 0;
     };
 
-    # Finish
-    printf("Finish of checking for %s (%s)\n", HOSTNAME, $self->tms);
-
     return $status;
+});
+
+__PACKAGE__->register_handler(
+    handler     => "remind",
+    description => "Retries sending notifies",
+    code => sub {
+### CODE:
+    my ($self, $meta, @arguments) = @_;
+    return $self->raise(($self->notifier->error)) unless $self->notifier->remind;
+    return 1;
 });
 
 __PACKAGE__->register_handler(
@@ -445,130 +780,157 @@ __PACKAGE__->register_handler(
     code => sub {
 ### CODE:
     my ($self, $meta, @arguments) = @_;
-    $self->configure or return 0;
-    my (@header, @errors, @report, @table);
-    my $status = 1;
+    my $store = $self->store;
 
     # Init
+    my (@errors, @table);
+    my $status = 1;
     my $tbl = Text::SimpleTable->new(@{(TABLE_HEADERS)});
 
-    # Start reporting
-    printf("Start of the checkit reporting for %s...\n", HOSTNAME);
-    $self->wow("Will checked: %s", join(", ", @arguments)) if @arguments;
-    $self->log_info("Start of the checkit reporting for \"%s\"", HOSTNAME);
-
     # Header
+    my @header;
     push @header, ["Hostname", HOSTNAME];
-
-    # Get DBI
-    my $dbi = $self->getdbi;
-    push @header, ["Database DSN", $dbi->dsn];
-    if ($dbi->error) {
-        push @errors, $dbi->dsn, $dbi->error, "";
-        $self->log_error("%s: %s", $dbi->dsn, $dbi->error);
-        $self->nope($dbi->dsn);
-        say(TAB9, red($dbi->error));
-        $status = 0;
+    push @header, ["Database DSN", $store->dsn];
+    my $db_is_ok = $store->error ? 0 : 1;
+    push @header, ["Database status", $db_is_ok ? "OK" : "ERROR"];
+    unless ($db_is_ok) {
+        push @errors, $store->dsn, $store->error, "";
+        $status = $self->raise("%s: %s", $store->dsn, $store->error);
     }
 
-    # Get checkits
-    my @checkits = $self->_getCheckits(@arguments);
+    # Get checkits from config
+    my @checkits = getCheckitByName($self->config("checkit"));
     my $noc = scalar(@checkits);
     push @header, ["Number of checks", $noc ? $noc : "no checks"];
     unless ($noc) {
-        $self->log_warn("No enabled <Checkit> configuration section found");
+        skip("No enabled <Checkit> configuration section found");
+        $self->log_info("No enabled <Checkit> configuration section found");
         $status = 0;
     }
 
     # Get all records from DB
     my %all;
-    if ($status) {
-        foreach my $r ($dbi->getall) {
+    if ($db_is_ok) {
+        foreach my $r ($store->getall) {
             $all{$r->{name}} = $r;
         }
-        if ($dbi->error) {
-            push @errors, $dbi->dsn, $dbi->error, "";
-            $self->log_error("%s: %s", $dbi->dsn, $dbi->error);
-            $self->nope($dbi->dsn);
-            say(TAB9, red($dbi->error));
-            $status = 0;
+        if ($store->error) {
+            push @errors, $store->dsn, $store->error, "";
+            $status = $self->raise("%s: %s", $store->dsn, $store->error);
         }
     }
 
-    #
-    # General cycle
-    #
-    foreach my $checkit (sort {$a->{name} cmp $b->{name}} @checkits) {
-        my $name = $checkit->{name};
-        my $info = $all{$name} || {};
-        my $last = $info->{"time"} || 0;
-        my $v    = $info->{status} || 0;
-        my $ostat = -1;
-        if (getBit($v, 0) && getBit($v, 1) && getBit($v, 2)) { # Ok
-            $ostat = 1;
-        } elsif ((getBit($v, 0) + getBit($v, 1)) == 0) { # Problem
-            $ostat = 0;
-            $status = 0;
+    # Checkits
+    if ($status) {
+        foreach my $checkit (sort {$a->{name} cmp $b->{name}} @checkits) {
+            my $name = $checkit->{name};
+            my $info = $all{$name} || {};
+            my $last = $info->{"time"} || 0;
+            my $v    = $info->{status} || 0;
+            my $ostat = -1;
+            if (getBit($v, 0) && getBit($v, 1) && getBit($v, 2)) { # Ok
+                $ostat = 1;
+            } elsif ((getBit($v, 0) + getBit($v, 1)) == 0) { # Problem
+                $ostat = 0;
+                $status = 0;
+            }
+            $tbl->row($name, $info->{type} || 'http',
+                $last ? dtf(DATE_FORMAT, $last) : "",
+                $ostat ? $ostat > 0 ? 'PASSED' : 'UNKNOWN' : 'FAILED',
+            );
+            unless ($ostat) {
+                push @errors, sprintf("%s (%s >>> %s)", $name, $info->{source} || '', $info->{message} || ''), "";
+            }
+            #say(explain($info));
         }
-        $tbl->row($name, $info->{type} || 'http',
-            $last ? dtf(DATE_FORMAT, $last) : "",
-            $ostat ? $ostat > 0 ? 'OK' : 'UNKNOWN' : 'PROBLEM',
-        );
-        unless ($ostat) {
-            push @errors, sprintf("%s (%s >>> %s)", $name, $info->{source} || '', $info->{message} || ''), "";
-        }
-        #say(explain($info));
+        $tbl->hr;
     }
-    $tbl->hr;
-    $tbl->row('SUMMARY', "", "", $noc ? $status ? 'OK' : 'PROBLEM' : 'UNKNOWN');
+    $tbl->row('SUMMARY', "", "", $noc ? $status ? 'PASSED' : 'FAILED' : 'UNKNOWN');
 
     # Get SendMail config
-    my $sendmail = hash($self->config('sendmail'));
-    my $to = uv2null(value($sendmail, "to"));
-    my $send_report = 1 if $to && $to !~ /\@example.com$/;
-    push @header, ["Send report to", $to] if $send_report;
+    my $sendmail = hash($self->config('channel'), "SendMail");
 
-    #
-    # Report generate
-    #
-    push @header, ["Summary status", $status ? 'OK' : 'PROBLEM'];
-    my $report_name = $status ? "checking report" : "error report";
-    push @report, $self->_report_common(@header); # Common information
-    push @report, $self->_report_summary($status ? "All last checks successful" : "Errors occurred while checking"); # Summary table
-    push @report, $tbl->draw(); # Report table
-    push @report, $self->_report_errors(@errors); # List of occurred errors
-    if (IS_TTY || $self->verbosemode) { # Draw to TTY
-        printf("%s\n\n", "~" x SCREENWIDTH);
-        printf("The %s for last checks on %s\n\n", $report_name, HOSTNAME);
-        print join("\n", @report, "");
-    }
-
-    #
-    # SendMail (Send report)
-    #
-    if ($send_report) {
-        unshift @report, $self->_report_title($report_name, "last checks");
-        push @report, $self->_report_footer();
-        my %ma = (); foreach my $k (keys %$sendmail) { $ma{"-".$k} = $sendmail->{$k} };
-        $ma{"-subject"} = sprintf("%s %s (%s on %s)", PROJECTNAME, $report_name, "last checks", HOSTNAME);
-        $ma{"-message"} = join("\n", @report);
-
-        # Send!
-        my $sent = sendmail(%ma);
-        if ($sent) {
-            my $msg = sprintf("Mail has been sent to: %s", $to);
-            $self->wow($msg);
-            $self->log_info($msg);
-        } else {
-            my $msg = sprintf("Mail was not sent to: %s", $to);
-            $self->skip($msg);
-            $self->log_warning($msg);
+    # Get output file
+    my $outfile = $self->option("outfile");
+    if ($outfile) {
+        unless (File::Spec->file_name_is_absolute($outfile)) {
+            $outfile = File::Spec->catfile($self->datadir, $outfile);
         }
     }
 
-    # Finish reporting
-    printf("Finish of the checkit reporting for %s (%s)\n", HOSTNAME, $self->tms);
-    $self->log_info("Finish of the checkit reporting for \"%s\" (%s)", HOSTNAME, $self->tms);
+    # Get To value
+    my $to = scalar(@arguments)
+        ? join(", ", @arguments)
+        : uv2null(value($sendmail, "to"));
+    my $send_report = 1 if $to && $to !~ /\@example.com$/;
+       $send_report = 0 if $outfile;
+    push @header, ["Send report to", $to] if $send_report;
+    push @header, ["Summary result", $status ? 'PASSED' : 'FAILED'];
+
+    # Report generate
+    my $report = App::MonM::Report->new(name => "last checks", configfile => $self->configfile);
+    my $report_title = $status ? "checking report" : "error report";
+    $report->common(@header); # Add common information
+    $report->summary(         # Add summary table
+        $status ? "All last checks successful" : "Errors occurred while checking",
+        $tbl->draw(),         # Add report table
+    );
+    $report->errors(@errors); # Add list of occurred errors
+    if ($outfile) {
+        $report->abstract(sprintf("The %s for last checks on %s\n", $report_title, HOSTNAME));
+        if (my $err = spurt($outfile, $report->as_string)) {
+            nope($err);
+            $self->log_error($err);
+        } else {
+            my $msg = sprintf("The report successfully saved to file: %s", $outfile);
+            yep($msg);
+            $self->log_debug($msg);
+        }
+        return $status;
+    } elsif ($self->verbosemode) { # Draw to STDOUT
+        printf("%s BEGIN REPORT ~~~\n", "~" x (SCREENWIDTH()-17)) if IS_TTY;
+        printf("The %s for last checks on %s\n\n", $report_title, HOSTNAME);
+        print $report->as_string;
+        printf("%s END REPORT ~~~\n", "~" x (SCREENWIDTH()-15)) if IS_TTY;
+    }
+
+    # Send report
+    if ($send_report) {
+        $report->title($report_title);
+        $report->footer($self->tms);
+
+        # Send
+        my $ns = $self->notifier->notify(
+                to      => $to,
+                subject => sprintf("%s %s (%s on %s)", PROJECTNAME, $report_title, "last checks", HOSTNAME),
+                message => $report->as_string,
+                after   => sub {
+                    my $this = shift;
+                    my $message = shift;
+                    my $sent = shift;
+
+                    if ($sent) {
+                        my $msg = $this->channel->error
+                            ? sprintf("Report was not sent to %s: %s", $message->recipient, $this->channel->error)
+                            : sprintf("Report has been sent to %s", $message->recipient);
+                        if ($this->channel->error) { skip($msg) }
+                        else { yep($msg) }
+                        $self->log_debug($msg);
+                    } else {
+                        my $err = sprintf("Report was not sent to %s: %s", $message->recipient, $this->channel->error || "unknown error");
+                        nope($err);
+                        $self->log_warning($err);
+                    }
+
+                    1;
+                },
+            );
+        unless ($ns) {
+            my $err = sprintf("Report was not sent to %s: %s", $to, $self->notifier->error);
+            nope($err);
+            $self->log_warning($err);
+        }
+    }
 
     return $status;
 });
@@ -579,442 +941,242 @@ __PACKAGE__->register_handler(
     code => sub {
 ### CODE:
     my ($self, $meta, @arguments) = @_;
-    $self->configure or return 0;
-    my (@header, @errors, @report, @table);
-    my $status = 1;
-
-    # Start
-    printf("Getting checkit data for %s...\n", HOSTNAME);
-
-    # Get DBI
-    my $dbi = $self->getdbi;
-    if ($dbi->error) {
-        $self->log_error("%s: %s", $dbi->dsn, $dbi->error);
-        $self->nope($dbi->dsn);
-        say(TAB9, red($dbi->error));
-        return 0;
-    }
+    my $store = $self->store;
+    return $self->raise($store->error) if $store->error;
 
     # Get all records from DB
     my %all;
-    foreach my $r ($dbi->getall) {
+    foreach my $r ($store->getall) {
         $all{$r->{name}} = $r;
     }
-    if ($dbi->error) {
-        $self->log_error("%s: %s", $dbi->dsn, $dbi->error);
-        $self->nope($dbi->dsn);
-        say(TAB9, red($dbi->error));
-        return 0
-    }
+    return $self->raise($store->error) if $store->error;
+
+    # Check data
     my $n = scalar(keys %all) || 0;
-    unless ($n) {
-        $self->skip("No data");
-        return 1;
+    if ($n) {
+        printf("Number of records: %d\n", $n);
+    } else {
+        return skip("No data");
     }
 
+    # Show dump
     if ($self->verbosemode) {
         print(explain(\%all));
-        $self->yep("Number of records: %d", $n);
         return 1;
     }
 
-    # Show table
-eval <<'FORMATTING';
-my @arr;
-my $total;
-say "";
-say "Actual table data:
-----------------------+----------------------------------+---------------------+---------";
-format STDOUT_TOP =
- Name                 | Source string                    | Date                | Status
-----------------------+----------------------------------+---------------------+---------
-.
-format STDOUT =
- @<<<<<<<<<<<<<<<<<<< | @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< | @<<<<<<<<<<<<<<<<<< | @||||||
-@arr
-.
-format STDOUTBOT =
-----------------------+----------------------------------+---------------------+---------
- SUMMARY                                                                       | @||||||
-$total
-.
-foreach my $v (sort {$a->{name} cmp $b->{name}} values %all) {
-    @arr = ();
-    my $stv = $v->{status} || 0;
-    my $ostat = -1;
-    if (getBit($stv, 0) && getBit($stv, 1) && getBit($stv, 2)) { # Ok
-        $ostat = 1;
-    } elsif ((getBit($stv, 0) + getBit($stv, 1)) == 0) { # Problem
-        $ostat = 0;
-        $status = 0;
+    # Checkets
+    my @checkits = getCheckitByName($self->config("checkit"));
+    my %chckts = ();
+    foreach my $ch (@checkits) {
+        $chckts{$ch->{name}} = $ch;
     }
-    push @arr, variant_stf($v->{name} // '', 20);
-    push @arr, variant_stf($v->{source} // '', 32);
-    push @arr, $v->{"time"} ? dtf(DATE_FORMAT, $v->{"time"})  : '';
-    push @arr, $ostat ? $ostat > 0 ? 'OK' : 'UNKNOWN' : 'PROBLEM';
-    write;
-}
-local $~ = "STDOUTBOT";
-$total = $status ? "OK" : "PROBLEM";
-write;
-FORMATTING
-say "";
 
-    $self->yep("Number of records: %d", $n);
+    # Generate table
+    my $src_len = (SCREENWIDTH() - 88);
+       $src_len = 32 if $src_len < 32;
+    my $tbl = Text::SimpleTable->new(
+            [20, 'CHECKIT'],
+            [7,  'TYPE'],
+            [7,  'TARGET'],
+            [$src_len, 'SOURCE STRING'],
+            [19, 'LAST CHECK DATE'],
+            [6,  'INTRVL'], # interval
+            [7,  'RESULT']
+        );
+
+    # Show table
+    my $status = 1;
+    foreach my $v (sort {$a->{name} cmp $b->{name}} values %all) {
+        my $stv = $v->{status} || 0;
+        my $ostat = -1;
+        if (getBit($stv, 0) && getBit($stv, 1) && getBit($stv, 2)) { # Ok
+            $ostat = 1;
+        } elsif ((getBit($stv, 0) + getBit($stv, 1)) == 0) { # Problem
+            $ostat = 0;
+            $status = 0;
+        }
+
+        $tbl->row(
+            variant_stf($v->{name} // '', 20),
+            $v->{type} || 'http',
+            lvalue(\%chckts, $v->{name} // '__default', "target") // 'status',
+            variant_stf($v->{source} // '', $src_len),
+            $v->{"time"} ? dtf(DATE_FORMAT, $v->{"time"})  : '',
+            lvalue(\%chckts, $v->{name} // '__default', "interval") || 0,
+            $ostat ? $ostat > 0 ? 'PASSED' : 'UNKNOWN' : 'FAILED'
+        );
+
+    }
+    $tbl->hr;
+    $tbl->row('SUMMARY', "", "", "", "", "", $status ? 'PASSED' : 'FAILED');
+    say $tbl->draw();
+
     return $status;
 });
 
-sub notify {
-    my $self = shift;
-    my %args = @_;
-    my $name = $args{name} || 'virtual';
-    my @errors;
-    push @errors, $args{error} if $args{error};
-
-    # Get SendMail config
-    my $sendmail = hash($self->config('sendmail'));
-    #say(explain($sendmail));
-
-    # Get SMSGW
-    my $smsgw = $self->config('smsgw');
-    #say(explain($sendmail));
-
-    #
-    # Sorting receivers
-    #
-    my $sendto = $args{sendto} || [];
-    my (@for_sendmail, @for_smsgw, @for_notifier);
-    foreach my $rec (@$sendto) {
-        next unless $rec;
-        if ($rec =~ /\@/) { push @for_sendmail, $rec }
-        elsif ($rec =~ /^[\(+]*\d+/) {
-            $rec =~ s/[^0-9]//g;
-            push @for_smsgw, $rec;
-        }
-        else { push @for_notifier, $rec }
-    }
-
-    #
-    # Make subject and sms body
-    #
-    my $subject = sprintf("%s: Available %s [%s]",
-        $args{status} ? 'OK' : 'PROBLEM',
-        $name,
-        HOSTNAME,
-    );
-
-    #
-    # Send SMS
-    #
-    foreach my $phone (@for_smsgw) {
-        unless ($smsgw) {
-            my $msg = sprintf("Can't send SMS to %s: SMSGW is not defined!", $phone);
-            $self->skip($msg);
-            $self->log_error($msg);
-            push @errors, $msg;
-            next;
-        }
-        my $cmd = dformat($smsgw, {
-            PHONE       => $phone,
-            NUM         => $phone,
-            TEL         => $phone,
-            PHONE       => $phone,
-            NUM         => $phone,
-            NUMBER      => $phone,
-            SUBJECT     => SMSSBJ,
-            SUBJ        => SMSSBJ,
-            MSG         => $subject,
-            MESSAGE     => $subject,
-        });
-        my $exe_err = '';
-        my $exe_out = execute($cmd, undef, \$exe_err);
-        my $exe_stt = ($? >> 8) ? 0 : 1;
-        if ($exe_stt) {
-            my $msg = sprintf("# %s", $cmd);
-            $self->wow($msg);
-            $self->log_info($msg);
-            if (defined($exe_out) && length($exe_out) && $self->verbosemode) {
-                say(TAB9, cyan($exe_out)) if IS_TTY;
-                $self->log_info($exe_out);
-            }
-        } else {
-            my $msg = sprintf("Can't send SMS: %s", $cmd);
-            $self->skip($msg);
-            $self->log_warning($msg);
-            push @errors, $msg;
-            if ($exe_err) {
-                chomp($exe_err);
-                IS_TTY ? say(TAB9, yellow($exe_err)) : say($exe_err);
-                $self->log_error($exe_err);
-                push @errors, $exe_err;
-            }
-            push @errors, "";
-        }
-    }
-
-    #
-    # Make headers
-    #
-    my @header;
-    push @header, (
-        ["Checkit", $name],
-        ["Type", $args{type} || 'http'],
-        ["Status", $args{status} ? 'OK' : 'PROBLEM'],
-        ["Source", $args{source} || "UNKNOWN"],
-        ["Message", $args{message} // ""],
-    );
-
-    #
-    # Make email report message
-    #
-    my @report;
-    my $report_name = $args{status} ? "checking report" : "error report";
-    push @report, $self->_report_common(@header); # Common information
-    push @report, $self->_report_summary($args{status} ? "All checks successful" : "Errors occurred while checking"); # Summary table
-    push @report, $self->_report_errors(@errors); # List of occurred errors
-
-    # Data for Emails only
-    unshift @report, $self->_report_title($report_name, $name);
-    push @report, $self->_report_footer();
-
-    #
-    # Send report to Notifier (if installed)
-    #
-    my $agent = $self->{notifier};
-    if ($NOTIFIER_LOADED && $agent && @for_notifier) {
-        foreach my $to (shellwords(@for_notifier)) {
-            $agent->create(
-                to => $to,
-                subject => $subject,
-                message => join("\n", @report),
-            ) or do {
-                my $msg = sprintf("Can't send message via notifier: %s", $agent->error);
-                $self->skip($msg);
-                $self->log_warning($msg);
-            };
-            if ($agent->status) {
-                my $msg = sprintf("The message has been successfully queued for sending to: %s", $to);
-                $self->wow($msg);
-                $self->log_info($msg);
-            }
-        }
-    }
-
-    #
-    # SendMail (Send report)
-    #
-    my %ma = (); foreach my $k (keys %$sendmail) { $ma{"-".$k} = $sendmail->{$k} };
-    $ma{"-subject"} = $subject;
-    $ma{"-message"} = join("\n", @report);
-    foreach my $to (@for_sendmail) {
-        $ma{"-to"} = $to;
-        my $sent = sendmail(%ma) if $to !~ /\@example.com$/;
-        if ($sent) {
-            my $msg = sprintf("Mail has been sent to: %s", $to);
-            $self->wow($msg);
-            $self->log_info($msg);
-        } else {
-            my $msg = sprintf("Mail was not sent to: %s", $to);
-            $self->skip($msg);
-            $self->log_warning($msg);
-        }
-    }
-
-    return 1;
-}
 sub trigger {
     my $self = shift;
     my %args = @_;
     my $name = $args{name} || 'virtual';
-    my $message = $args{message} || "";
-    my $source = $args{source} || "";
+    my $message = $args{message} // "";
+    my $source = $args{source} // "";
+    my $subject = $args{subject};
 
-    #
-    # Make subject and sms body
-    #
-    my $subject = sprintf("%s: Available %s [%s]",
-        $args{status} ? 'OK' : 'PROBLEM',
-        $name,
-        HOSTNAME,
-    );
-
-    #
-    # Execute
-    #
+    # Execute triggers
     my $triggers = $args{trigger} || [];
+    my @errs;
     foreach my $trg (@$triggers) {
         next unless $trg;
         my $cmd = dformat($trg, {
-            SUBJECT     => $subject,
-            SUBJ        => $subject,
-            MSG         => $message,
-            MESSAGE     => $message,
-            SOURCE      => $source,
+            SUBJECT     => $subject,    SUBJ => $subject, SBJ => $subject,
+            MESSAGE     => $message,    MSG  => $message,
+            SOURCE      => $source,     SRC  => $source,
             NAME        => $name,
-            TYPE        => $args{type} || "http",
-            STATUS      => $args{status} ? 1 : 0,
+            TYPE        => $args{type} // "http",
+            CODE        => $args{code} // '',
+            STATUS      => $args{status} ? 'OK' : 'ERROR',
+            RESULT      => $args{result} ? 'PASSED' : 'FAILED',
+            NOTE        => $args{note} // '',
         });
         my $exe_err = '';
         my $exe_out = execute($cmd, undef, \$exe_err);
         my $exe_stt = ($? >> 8) ? 0 : 1;
         if ($exe_stt) {
             my $msg = sprintf("# %s", $cmd);
-            $self->yep($msg);
+            print cyan MARKER_INFO;
+            say " ", $msg;
             $self->log_info($msg);
             if (defined($exe_out) && length($exe_out) && $self->verbosemode) {
-                say(TAB9, green($exe_out)) if IS_TTY;
+                say $exe_out if IS_TTY;
                 $self->log_info($exe_out);
             }
         } else {
-            my $msg = sprintf("Can't execute trigger: %s", $cmd);
-            $self->nope($msg);
+            my $msg = sprintf("Can't execute trigger %s", $cmd);
+            print red MARKER_FAIL;
+            say " ", $msg;
             $self->log_error($msg);
+            push @errs, $msg;
             if ($exe_err) {
                 chomp($exe_err);
-                IS_TTY ? say(TAB9, red($exe_err)) : say($exe_err);
+                nope($exe_err);
                 $self->log_error($exe_err);
+                push @errs, $exe_err;
             }
         }
     }
 
-    return 1;
+    return @errs;
 }
+sub notify {
+    my $self = shift;
+    my %args = @_;
+    my $name = $args{name} || 'virtual';
+    my $sendto = $args{sendto} || [];
+    my $subject = $args{subject};
+    my @errors;
+    my $errs = $args{errors};
+    push @errors, @$errs if is_array($errs);
+    #say(explain(\%args));
 
-#######################
-# Colored says methods
-#######################
-sub yep {
-    my $self = shift;
-    print(IS_TTY ? green('[  OK  ]') : '[  OK  ]', ' ', IS_TTY ? green(shift, @_) : sprintf(shift, @_), "\n");
-    return 1;
-}
-sub nope {
-    my $self = shift;
-    print(IS_TTY ? red('[ FAIL ]') : '[ FAIL ]', ' ', IS_TTY ? red(shift, @_) : sprintf(shift, @_), "\n");
-    return 0;
-}
-sub skip {
-    my $self = shift;
-    print(IS_TTY ? yellow('[ SKIP ]') : '[ SKIP ]', ' ', IS_TTY ? yellow(shift, @_) : sprintf(shift, @_), "\n");
-    return 1;
-}
-sub wow {
-    my $self = shift;
-    print(IS_TTY ? blue('[ INFO ]') : '[ INFO ]', ' ', IS_TTY ? blue(shift, @_) : sprintf(shift, @_), "\n");
+    # Header
+    my @header;
+    push @header, (
+        ["Checkit",     $name], # Checkit name
+        ["Type",        $args{type} || 'http'], # Checkit type
+        ["Result",      $args{result} ? 'PASSED' : 'FAILED'], # Checkit result
+        ["Source",      $args{source} || "UNKNOWN"], # Source string
+        ["Status",      $args{status} ? 'OK' : 'ERROR'], # Checkit status (NO RESULT!!);
+        ["Code",        $args{code} // "UNKNOWN"], # Checkit code value
+        ["Note",        $args{note} // "No comments"], # Checkit note string
+        ["Message",     $args{message} // ""], # Checkit message string
+    );
+
+    # Report
+    my $report = App::MonM::Report->new(name => $name, configfile => $self->configfile);
+    $report->title($args{result} ? "checking report" : "error report");
+    $report->common(@header); # Common information
+    $report->summary($args{result} ? "All checks successful" : "Errors occurred while checking"); # Summary
+    $report->errors(@errors) if @errors; # List of occurred errors
+    $report->footer($self->tms);
+
+    # Send
+    my $notify_status = $self->notifier->notify(
+            to      => $sendto,
+            subject => $subject,
+            message => $report->as_string,
+            before => sub {
+                my $this = shift; # App::MonM::QNotifier object (this)
+                my $message = shift; # App::MonM::Message object
+
+                # Check internal errors
+                if ($this->error) {
+                    nope($this->error);
+                    $self->log_error($this->error);
+                }
+
+                return 1;
+            },
+            after => sub {
+                my $this = shift; # App::MonM::QNotifier object (this)
+                my $message = shift; # App::MonM::Message object
+                my $sent = shift; # Status of sending
+
+                # Check internal errors
+                if ($this->error) {
+                    nope($this->error);
+                    $self->log_error($this->error);
+                }
+
+                # Check sending status
+                if ($sent) {
+                    my $msg = $this->channel->error
+                        ? sprintf("Message was not sent to %s: %s", $message->recipient, $this->channel->error)
+                        : sprintf("Message has been sent to %s", $message->recipient);
+                    if ($this->channel->error) { print red MARKER_FAIL }
+                    else { print cyan MARKER_INFO }
+                    say " ", $msg;
+                    $self->log_debug($msg);
+                } else {
+                    my $err = sprintf("Message was not sent to %s: %s", $message->recipient, $this->channel->error || "unknown error");
+                    print red MARKER_FAIL;
+                    print " ";
+                    nope($err);
+                    $self->log_warning($err);
+                }
+
+                return 1;
+            },
+        );
+    unless ($notify_status) {
+        print red MARKER_FAIL;
+        print " ";
+        nope($self->notifier->error);
+        $self->log_error($self->notifier->error);
+    }
+
     return 1;
 }
 
 # Private methods
-sub _getCheckits {
-    my $self = shift;
-    my @names = @_;
-    my $sects = $self->config("checkit");
-    my $i = 0;
-    my @j = ();
-    if (ref($sects) eq 'ARRAY') { # Array
-        foreach my $r (@$sects) {
-            if ((ref($r) eq 'HASH') && exists $r->{enable}) { # Anonymous
-                $r->{name} = sprintf("virtual%d", ++$i);
-                next unless (!@names || grep {$r->{name} eq lc($_)} @names);
-                push @j, $r;
-            } elsif (ref($r) eq 'HASH') { # Named
-                foreach my $k (keys %$r) {
-                    my $v = $r->{$k};
-                    next unless ref($v) eq 'HASH';
-                    $v->{name} = lc($k);
-                    next unless (!@names || grep {$v->{name} eq lc($_)} @names);
-                    push @j, $v;
-                }
-            }
-        }
-    } elsif ((ref($sects) eq 'HASH') && !exists $sects->{enable}) { # Hash {name => {...}}
-        foreach my $k (keys %$sects) {
-            my $v = $sects->{$k};
-            next unless ref($v) eq 'HASH';
-            $v->{name} = lc($k);
-            next unless (!@names || grep {$v->{name} eq lc($_)} @names);
-            push @j, $v;
-        }
-    } elsif (ref($sects) eq 'HASH') { # Hash {...}
-        $sects->{name} = sprintf("virtual%d", ++$i);
-        push @j, $sects if (!@names || grep {$sects->{name} eq lc($_)} @names);
-    }
-    return grep {$_->{enable}} @j;
-}
-sub _report_title {
-    my $self = shift;
-    my $title = shift || "report";
-    my $name = shift || "virtual";
-    return (
-        sprintf("Dear %s user,", PROJECTNAME),"",
-        sprintf("This is a automatic-generated %s for %s\non %s, created by %s/%s",
-            $title, $name, HOSTNAME, __PACKAGE__, $VERSION),"",
-        "Sections of this report:","",
-        " * Common information",
-        " * Summary",
-        " * List of occurred errors","",
-    );
-}
-sub _report_common {
-    my $self = shift;
-    my @hdr = @_;
-    my @rep = (
-        "-"x32,
-        "COMMON INFORMATION",
-        "-"x32,"",
-    );
-    my $maxlen = 0;
-    foreach my $r (@hdr) {
-        $maxlen = length($r->[0]) if $maxlen < length($r->[0])
-    }
-    foreach my $r (@hdr) {
-        push @rep, sprintf("%s %s: %s", $r->[0], " "x($maxlen-length($r->[0])),  $r->[1]);
-    }
-    push @rep, "";
-    return (@rep);
-}
-sub _report_summary {
-    my $self = shift;
-    my $summary = shift || "Ok";
-    my @rep = (
-        "-"x32,
-        "SUMMARY",
-        "-"x32,"",
-    );
-    push @rep, $summary, "";
-    return (@rep);
-}
-sub _report_errors {
-    my $self = shift;
-    my @errs = @_;
-    my @rep = (
-        "-"x32,
-        "LIST OF OCCURRED ERRORS",
-        "-"x32,"",
-    );
-    if (@errs) {
-        push @rep, @errs;
+sub _fbytes {
+    my $n = int(shift);
+    if ($n >= 1024 ** 3) {
+        return sprintf "%.3g GB", $n / (1024 ** 3);
+    } elsif ($n >= 1024 ** 2) {
+        return sprintf "%.3g MB", $n / (1024.0 * 1024);
+    } elsif ($n >= 1024) {
+        return sprintf "%.3g KB", $n / 1024.0;
     } else {
-        push @rep, "No errors occurred";
+        return "$n B";
     }
-    return (@rep, "");
 }
-sub _report_footer {
-    my $self = shift;
-    return sprintf(join("\n",
-            "",
-            "---",
-            "Hostname    : %s",
-            "Program     : %s (%s, Perl %s)",
-            "Version     : %s/%s",
-            "Config file : %s",
-            "PID         : %d",
-            "Work time   : %s",
-            "Generated   : %s"
-        ),
-        HOSTNAME, $0, $^O, $^V, PROJECTNAME, $VERSION, $self->configfile(),
-        $$, $self->tms(), dtf("%w, %DD %MON %YYYY %hh:%mm:%ss"),
-    );
+sub _fdate {
+    my $d = shift || time;
+    my $g = shift || 0;
+    return "unknown" unless $d;
+    return dtf(DATETIME_GMT_FORMAT, $d, 1) if $g;
+    return dtf(DATETIME_FORMAT . " " . tz_diff(), $d);
 }
 
 1;

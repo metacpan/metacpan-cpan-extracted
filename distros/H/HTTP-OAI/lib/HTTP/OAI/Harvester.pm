@@ -4,7 +4,7 @@ use base HTTP::OAI::UserAgent;
 
 use strict;
 
-our $VERSION = '4.11';
+our $VERSION = '4.12';
 
 sub new {
 	my ($class,%args) = @_;
@@ -16,7 +16,12 @@ sub new {
 
 	$self->{'resume'} = exists($args{resume}) ? $args{resume} : 1;
 
-	$self->agent('OAI-PERL/'.$HTTP::OAI::VERSION);
+	if ($ENV{HTTP_OAI_AGENT}) {
+		$self->agent($ENV{HTTP_OAI_AGENT});
+	}
+	else {
+		$self->agent('OAI-PERL/'.$HTTP::OAI::VERSION);
+	}
 
 	# Record the base URL this harvester instance is associated with
 	$self->{repository} =
@@ -185,10 +190,30 @@ In the examples I use arXiv.org's and cogprints OAI interfaces. To avoid causing
 		}
 	);
 
-	# Offline parsing
-	$I = HTTP::OAI::Identify->new();
+	# End program
+	#################
+
+	#################
+	# If you have some local OAI-PMH reponse data you want to
+	# parse you can use the OAI-PMH verb as in:
+
+	use HTTP::OAI;
+	my $I = HTTP::OAI::Identify->new();
+
+	# If you have a $content string with some cached OAI-PMH verb=Identify response
+	# it can be parsed like this..
 	$I->parse_string($content);
+
+	# Or if you have an opened file handle $fh to a file with a cached
+	# OAI-PMH verb=Identify response
 	$I->parse_file($fh);
+
+	# Using either method now you can do something like
+
+	printf "RepositoryName: %s\n" , $I->repositoryName;
+	for ($I->adminEmail) {
+		print $_, "\n";
+	}
 
 =head1 METHODS
 
@@ -324,6 +349,11 @@ Return a list of sets provided by the repository. The scope of sets is undefined
 	die $ls->message if $ls->is_error;
 
 =back
+
+=head1 ENVIRONMENT
+
+The HTTP Agent is default OAI-PERL/<Version> where <Version> is the HTTP::OAI version. 
+This Agent can be set via an environment variable HTTP_OAI_AGENT.
 
 =head1 AUTHOR
 

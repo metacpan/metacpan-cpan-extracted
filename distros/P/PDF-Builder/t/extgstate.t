@@ -11,13 +11,13 @@ use PDF::Builder;
 my $pdf = PDF::Builder->new('-compress' => 'none');
 my $egs = $pdf->egstate();
 $egs->dash(2, 1);
-like($pdf->stringify, qr{<< /Type /ExtGState /D \[ \[ 2 1 \] 0 \] /Name /[\w]+ >>}, 'dash');
+like($pdf->to_string, qr{<< /Type /ExtGState /D \[ \[ 2 1 \] 0 \] /Name /[\w]+ >>}, 'dash');
 
 # Rendering Intent
 
 $pdf = PDF::Builder->new('-compress' => 'none');
 $egs = $pdf->egstate();
 $egs->renderingintent('Perceptual');
-like($pdf->stringify, qr{<< /Type /ExtGState /Name /[\w]+ /RI /Perceptual >>}, 'renderingintent');
+like($pdf->to_string, qr{<< /Type /ExtGState /Name /[\w]+ /RI /Perceptual >>}, 'renderingintent');
 
 1;

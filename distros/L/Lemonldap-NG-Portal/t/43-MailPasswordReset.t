@@ -10,7 +10,7 @@ BEGIN {
 }
 
 my ( $res, $user, $pwd );
-my $maintests = 12;
+my $maintests = 18;
 
 SKIP: {
     eval
@@ -21,15 +21,22 @@ SKIP: {
 
     my $client = LLNG::Manager::Test->new( {
             ini => {
-                logLevel                   => 'error',
-                useSafeJail                => 1,
-                portalDisplayRegister      => 1,
-                authentication             => 'Demo',
-                userDB                     => 'Same',
-                passwordDB                 => 'Demo',
-                captcha_mail_enabled       => 0,
-                portalDisplayResetPassword => 1,
-                portalMainLogo             => 'common/logos/logo_llng_old.png',
+                logLevel                    => 'error',
+                useSafeJail                 => 1,
+                portalDisplayRegister       => 1,
+                authentication              => 'Demo',
+                userDB                      => 'Same',
+                passwordDB                  => 'Demo',
+                captcha_mail_enabled        => 0,
+                portalDisplayResetPassword  => 1,
+                portalMainLogo              => 'common/logos/logo_llng_old.png',
+                portalDisplayPasswordPolicy => 1,
+                passwordPolicyActivation    => 1,
+                passwordPolicyMinUpper      => 1,
+                passwordPolicyMinLower      => 1,
+                passwordPolicyMinDigit      => 2,
+                passwordPolicyMinSpeChar    => 1,
+                passwordPolicySpecialChar   => '&%#'
             }
         }
     );
@@ -87,8 +94,34 @@ SKIP: {
     );
     ( $host, $url, $query ) = expectForm( $res, '#', undef, 'token' );
     ok( $res->[2]->[0] =~ /newpassword/s, ' Ask for a new password' );
-
-    $query .= '&newpassword=zz&confirmpassword=zz';
+    ok( $res->[2]->[0] =~ /<span trspan="passwordPolicy">/,
+        ' Found password policy' );
+    ok(
+        $res->[2]->[0] =~
+/<span trspan="passwordPolicyMinLower">Minimal lower characters:<\/span> 1/,
+        ' Found password policy min lower == 1'
+    );
+    ok(
+        $res->[2]->[0] =~
+/<span trspan="passwordPolicyMinUpper">Minimal upper characters:<\/span> 1/,
+        ' Found password policy min upper == 1'
+    );
+    ok(
+        $res->[2]->[0] =~
+/<span trspan="passwordPolicyMinDigit">Minimal digit characters:<\/span> 2/,
+        ' Found password policy min digit == 2'
+    );
+    ok(
+        $res->[2]->[0] =~
+/<span trspan="passwordPolicyMinSpeChar">Minimal special characters:<\/span> 1/,
+        ' Found password policy min speChar == 1'
+    );
+    ok(
+        $res->[2]->[0] =~
+/<span trspan="passwordPolicySpecialChar">Allowed special characters:<\/span> &%#/,
+        ' Found password special char list'
+    );
+    $query .= '&newpassword=zZ11#&confirmpassword=zZ11#';
 
     # Post new password
     ok(

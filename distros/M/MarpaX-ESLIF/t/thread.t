@@ -199,7 +199,7 @@ sub unit_test {
 
     return ($eslif_with_logger, $eslif2_with_logger, $eslif_without_logger, $eslif2_without_logger, $eslifGrammar, $eslifGrammar2);
 }
-                                                
+
 done_testing($number_of_tests);
 
 package MyRecognizerInterface;

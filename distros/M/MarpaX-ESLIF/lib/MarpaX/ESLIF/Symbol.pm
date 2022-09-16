@@ -102,7 +102,7 @@ sub _EQ {
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.25'; # VERSION
+our $VERSION = '6.0.26'; # VERSION
 
 
 1;
@@ -119,7 +119,7 @@ MarpaX::ESLIF::Symbol - MarpaX::ESLIF's symbol
 
 =head1 VERSION
 
-version 6.0.25
+version 6.0.26
 
 =head1 SYNOPSIS
 
@@ -246,8 +246,6 @@ It must follow the substitution specification of the I<Terminals> section of L<M
   f                                    PCRE2_SUBSTITUTE_UNSET_EMPTY
   ----------------------------------------------------------------
 
-=back
-
 =item C<grammar>
 
 Value is an external grammar. Required for "meta" type.
@@ -255,6 +253,8 @@ Value is an external grammar. Required for "meta" type.
 =item C<symbol>
 
 Value is a lexeme in the external grammar. Required for "meta" type.
+
+=back
 
 =head2 $symbol->try($eslif, $scalar)
 

@@ -1,5 +1,12 @@
 Revision history for SVN-Hooks. -*- text -*-
 
+1.36      2022-09-09 22:02:37-03:00 America/Sao_Paulo
+
+  [Fix]
+
+  - Fix the SVN::Hooks::DenyChanges test to work on case-insensitive
+    filesystems.
+
 1.35      2022-09-03 22:00:58-03:00 America/Sao_Paulo
 
   [Fix]

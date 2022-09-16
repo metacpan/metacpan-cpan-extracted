@@ -1,5 +1,10 @@
 Revision history for Perl extension EV::Hiredis
 
+0.05 2022-09-11T04:27:59Z
+     - bump ppport.h Version 3.68
+     - bump hiredis v1.0.2
+     - fix Assertion failed: ((PL_markstack_ptr > PL_markstack) || !"MARK underflow"), function Perl_POPMARK
+
 0.04 2017-04-23T10:08:16Z
      - Fix build issue on newer Perl
 

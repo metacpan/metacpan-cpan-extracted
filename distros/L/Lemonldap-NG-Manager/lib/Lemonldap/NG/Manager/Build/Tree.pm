@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.0.15';
 
 # TODO: Missing:
 #  * activeTimer
@@ -53,7 +53,9 @@ sub tree {
                             help  => 'portalcustom.html',
                             nodes => [
                                 'portalMainLogo',
+                                'portalFavicon',
                                 'showLanguages',
+                                'scrollTop',
                                 'portalCustomCss',
                                 'portalSkin',
                                 'portalSkinBackground',
@@ -72,14 +74,14 @@ sub tree {
                                 },
                                 {
                                     title => 'passwordManagement',
-                                    help =>
+                                    help  =>
                                       'portalcustom.html#password-management',
                                     form  => 'simpleInputContainer',
                                     nodes => [
                                         'portalRequireOldPassword',
+                                        'portalEnablePasswordDisplay',
                                         'hideOldPassword',
                                         'mailOnPasswordChange',
-                                        'portalEnablePasswordDisplay',
                                     ]
                                 },
                                 {
@@ -99,7 +101,7 @@ sub tree {
                                 },
                                 {
                                     title => 'portalOther',
-                                    help =>
+                                    help  =>
                                       'portalcustom.html#other-parameters',
                                     form  => 'simpleInputContainer',
                                     nodes => [
@@ -116,20 +118,24 @@ sub tree {
                         },
                         {
                             title => 'portalCaptcha',
-                            help  => 'captcha.html',
-                            form  => 'simpleInputContainer',
+                            help  => 'captcha.html#configuration',
                             nodes => [
                                 'captcha_login_enabled',
                                 'captcha_mail_enabled',
                                 'captcha_register_enabled',
                                 'captcha_size',
+                                {
+                                    title => 'captchaCustom',
+                                    help  => 'captcha.html#configuration',
+                                    nodes => [ 'captcha', 'captchaOptions', ]
+                                },
                             ]
                         }
                     ]
                 },
                 {
                     title => 'authParams',
-                    help =>
+                    help  =>
                       'start.html#authentication-users-and-password-databases',
                     form  => 'authParams',
                     nodes => [
@@ -650,7 +656,7 @@ sub tree {
                                 },
                                 {
                                     title => 'soapServices',
-                                    help =>
+                                    help  =>
                                       'portalservers.html#SOAP_(deprecated)',
                                     form  => 'simpleInputContainer',
                                     nodes => [
@@ -684,7 +690,7 @@ sub tree {
                                 'notificationStorageOptions',
                                 {
                                     title => 'serverNotification',
-                                    help =>
+                                    help  =>
                                       'notifications.html#notification-server',
                                     nodes => [
                                         'notificationServer',
@@ -864,6 +870,18 @@ sub tree {
                             ]
                         },
                         {
+                            title => 'rememberAuthChoice',
+                            help  => 'rememberauthchoice.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'rememberAuthChoiceRule',
+                                'rememberCookieName',
+                                'rememberCookieTimeout',
+                                'rememberDefaultChecked',
+                                'rememberTimer',
+                            ]
+                        },
+                        {
                             title => 'decryptValue',
                             help  => 'decryptvalue.html',
                             form  => 'simpleInputContainer',
@@ -884,6 +902,7 @@ sub tree {
                         'sfManagerRule',
                         'sfRequired',
                         'sfOnlyUpgrade',
+                        'sfLoginTimeout',
                         'sfRegisterTimeout',
                         {
                             title => 'utotp2f',
@@ -949,11 +968,11 @@ sub tree {
                             help  => 'mail2f.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'mail2fActivation', 'mail2fCodeRegex',
-                                'mail2fTimeout',    'mail2fSubject',
-                                'mail2fBody',       'mail2fSessionKey',
-                                'mail2fAuthnLevel', 'mail2fLabel',
-                                'mail2fLogo'
+                                'mail2fActivation',     'mail2fCodeRegex',
+                                'mail2fTimeout',        'mail2fSubject',
+                                'mail2fBody',           'mail2fSessionKey',
+                                'mail2fResendInterval', 'mail2fAuthnLevel',
+                                'mail2fLabel',          'mail2fLogo'
                             ]
                         },
                         {
@@ -961,10 +980,10 @@ sub tree {
                             help  => 'external2f.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'ext2fActivation',  'ext2fCodeActivation',
-                                'ext2FSendCommand', 'ext2FValidateCommand',
-                                'ext2fAuthnLevel',  'ext2fLabel',
-                                'ext2fLogo'
+                                'ext2fActivation',     'ext2fCodeActivation',
+                                'ext2FSendCommand',    'ext2FValidateCommand',
+                                'ext2fResendInterval', 'ext2fAuthnLevel',
+                                'ext2fLabel',          'ext2fLogo',
                             ]
                         },
                         {
@@ -987,10 +1006,16 @@ sub tree {
                             help  => 'rest2f.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'rest2fActivation', 'rest2fInitUrl',
-                                'rest2fInitArgs',   'rest2fVerifyUrl',
-                                'rest2fVerifyArgs', 'rest2fAuthnLevel',
-                                'rest2fLabel',      'rest2fLogo'
+                                'rest2fActivation',
+                                'rest2fCodeActivation',
+                                'rest2fInitUrl',
+                                'rest2fInitArgs',
+                                'rest2fVerifyUrl',
+                                'rest2fVerifyArgs',
+                                'rest2fResendInterval',
+                                'rest2fAuthnLevel',
+                                'rest2fLabel',
+                                'rest2fLogo'
                             ]
                         },
                         {
@@ -1067,6 +1092,7 @@ sub tree {
                                 'requireToken',
                                 'formTimeout',
                                 'tokenUseGlobalStorage',
+                                'strictTransportSecurityMax_Age',
                                 {
                                     title => 'CrowdSecPlugin',
                                     help  => 'crowdsec.html',
@@ -1224,8 +1250,8 @@ sub tree {
                     nodes => [
                         'samlAuthnContextMapPassword',
                         'samlAuthnContextMapPasswordProtectedTransport',
-                        'samlAuthnContextMapTLSClient',
-                        'samlAuthnContextMapKerberos'
+                        'samlAuthnContextMapKerberos',
+                        'samlAuthnContextMapTLSClient'
                     ]
                 },
                 {
@@ -1396,6 +1422,7 @@ sub tree {
                 },
                 {
                     title => 'oidcServiceMetaDataTimeouts',
+                    form  => 'simpleInputContainer',
                     nodes => [
                         'oidcServiceAuthorizationCodeExpiration',
                         'oidcServiceIDTokenExpiration',

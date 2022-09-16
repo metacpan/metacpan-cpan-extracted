@@ -398,50 +398,18 @@ sub run {
                 return PE_SAML_SSO_ERROR;
             }
 
-            my $h =
-              $self->p->processHook( $req, 'samlGotAuthnRequest', $login );
-            return $h if ( $h != PE_OK );
-
             # Get SP entityID
             my $sp = $request ? $login->remote_providerID() : $idp_initiated_sp;
-
             $self->logger->debug("Found entityID $sp in SAML message");
-            $req->env->{llng_saml_sp} = $sp;
 
             # SP conf key
             my $spConfKey = $self->spList->{$sp}->{confKey};
-
             unless ($spConfKey) {
                 $self->userLogger->error(
                     "$sp do not match any SP in configuration");
                 return PE_SAML_UNKNOWN_ENTITY;
             }
-
             $self->logger->debug("$sp match $spConfKey SP in configuration");
-            $req->env->{llng_saml_spconfkey} = $spConfKey;
-
-            if ( $login->request ) {
-                my $acs = $login->request->AssertionConsumerServiceURL;
-                if ($acs) {
-                    $req->env->{llng_saml_acs} = $acs;
-                    $self->logger->debug(
-                        "Using AssertionConsumerServiceURL $acs");
-                }
-            }
-
-            # Check access rule
-            if ( my $rule = $self->spRules->{$spConfKey} ) {
-                unless ( $rule->( $req, $req->sessionInfo ) ) {
-                    $self->userLogger->warn( 'User '
-                          . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-                          . " is not authorized to access to $spConfKey" );
-                    return PE_UNAUTHORIZEDPARTNER;
-                }
-            }
-
-            $self->userLogger->notice( 'User '
-                  . $req->sessionInfo->{ $self->conf->{whatToTrace} }
-                  . " is authorized to access to $spConfKey" );
 
             # Do we check signature?
             my $checkSSOMessageSignature =
@@ -472,6 +440,37 @@ sub run {
             else {
                 $self->logger->debug("Message signature will not be checked");
             }
+
+            # Hook must be run after processAuthnRequestMsg
+            my $h =
+              $self->p->processHook( $req, 'samlGotAuthnRequest', $login );
+            return $h if ( $h != PE_OK );
+
+            # Set environment for rule/macro evaluation
+            $req->env->{llng_saml_sp} = $sp;
+            $req->env->{llng_saml_spconfkey} = $spConfKey;
+            if ( $login->request ) {
+                my $acs = $login->request->AssertionConsumerServiceURL;
+                if ($acs) {
+                    $req->env->{llng_saml_acs} = $acs;
+                    $self->logger->debug(
+                        "Using AssertionConsumerServiceURL $acs");
+                }
+            }
+
+            # Check access rule
+            if ( my $rule = $self->spRules->{$spConfKey} ) {
+                unless ( $rule->( $req, $req->sessionInfo ) ) {
+                    $self->userLogger->warn( 'User '
+                          . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+                          . " is not authorized to access to $spConfKey" );
+                    return PE_UNAUTHORIZEDPARTNER;
+                }
+            }
+
+            $self->userLogger->notice( 'User '
+                  . $req->sessionInfo->{ $self->conf->{whatToTrace} }
+                  . " is authorized to access to $spConfKey" );
 
             my $nameIDFormat;
 
@@ -1407,7 +1406,7 @@ sub logout {
     # for them.
     # Redirect on logout page when all is done.
     if ( $self->sendLogoutRequestToProviders( $req, $logout ) ) {
-        $self->{urldc} = $req->script_name . "?logout=1";
+        $req->urldc( $self->p->buildUrl({logout => 1}));
         return PE_OK;
     }
 

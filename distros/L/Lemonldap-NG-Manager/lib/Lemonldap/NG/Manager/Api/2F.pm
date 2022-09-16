@@ -139,11 +139,6 @@ sub _get2F {
     my ( $self, $uid, $type, $id ) = @_;
     my ( $res, $psessions, @secondFactors );
 
-    if ( defined $type ) {
-        $res = $self->_checkType($type);
-        return $res if ( $res->{res} ne 'ok' );
-    }
-
     $psessions = $self->_getSessions2F( $self->_getPersistentMod, 'Persistent',
         '_session_uid', $uid );
 
@@ -279,10 +274,6 @@ sub _delete2FFromSessions {
 sub _delete2F {
     my ( $self, $uid, $type, $id ) = @_;
     my ( $res, $removed, $count );
-    if ( defined $type ) {
-        $res = $self->_checkType($type);
-        return $res if ( $res->{res} ne 'ok' );
-    }
 
     $res =
       $self->_delete2FFromSessions( $uid, $type, $id, $self->_getPersistentMod,
@@ -329,20 +320,6 @@ sub _getDevicesFromSessionData {
         }
     }
     return [];
-}
-
-sub _checkType {
-    my ( $self, $type ) = @_;
-
-    return {
-        res  => "ko",
-        code => 400,
-        msg  =>
-"Invalid input: Type \"$type\" does not exist. Allowed values for type are: \"U2F\", \"TOTP\", \"WebAuthn\" or \"UBK\""
-      }
-      unless ( $type =~ /\b(?:U2F|TOTP|UBK|WebAuthn)\b/i );
-
-    return { res => "ok" };
 }
 
 1;

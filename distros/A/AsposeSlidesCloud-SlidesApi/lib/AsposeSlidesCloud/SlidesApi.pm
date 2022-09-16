@@ -8476,6 +8476,212 @@ sub delete_document_property {
 }
 
 #
+# delete_embedded_font
+#
+# Removes specified embedded font and returns presentation fonts info.
+# 
+# @param string $name Document name. (required)
+# @param string $font_name Font name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'font_name' => {
+        data_type => 'string',
+        description => 'Font name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_embedded_font' } = { 
+    	summary => 'Removes specified embedded font and returns presentation fonts info.',
+        params => $params,
+        returns => 'FontsData',
+        };
+}
+# @return FontsData
+#
+sub delete_embedded_font {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_embedded_font");
+    }
+
+    # verify the required parameter 'font_name' is set
+    unless (exists $args{'font_name'} && $args{'font_name'}) {
+      croak("Missing the required parameter 'font_name' when calling delete_embedded_font");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/fonts/embedded/{fontName}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'font_name'}) {
+        my $_base_variable = "{" . "fontName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'font_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FontsData', $response);
+    return $_response_object;
+}
+
+#
+# delete_embedded_font_online
+#
+# Removes specified embedded font and returns presentation.
+# 
+# @param File $document Document data. (required)
+# @param string $font_name Document name. (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'font_name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_embedded_font_online' } = { 
+    	summary => 'Removes specified embedded font and returns presentation.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub delete_embedded_font_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling delete_embedded_font_online");
+    }
+
+    # verify the required parameter 'font_name' is set
+    unless (exists $args{'font_name'} && $args{'font_name'}) {
+      croak("Missing the required parameter 'font_name' when calling delete_embedded_font_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/fonts/embedded/{fontName}/delete';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'font_name'}) {
+        my $_base_variable = "{" . "fontName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'font_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
 # delete_file
 #
 # Delete file
@@ -14765,6 +14971,198 @@ sub delete_unused_layout_slides_online {
 }
 
 #
+# delete_unused_master_slides
+#
+# Removes unused master slides.
+# 
+# @param string $name Document name. (required)
+# @param boolean $ignore_preserve_field Determines, whether this method should remove unused master even if its             preserve property is set to true. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'ignore_preserve_field' => {
+        data_type => 'boolean',
+        description => 'Determines, whether this method should remove unused master even if its             preserve property is set to true.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_unused_master_slides' } = { 
+    	summary => 'Removes unused master slides.',
+        params => $params,
+        returns => 'MasterSlides',
+        };
+}
+# @return MasterSlides
+#
+sub delete_unused_master_slides {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_unused_master_slides");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/masterSlides';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'ignore_preserve_field'} && defined $args{'ignore_preserve_field'}) {
+        $query_params->{'ignorePreserveField'} = $self->{api_client}->to_boolean_query_value($args{'ignore_preserve_field'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('MasterSlides', $response);
+    return $_response_object;
+}
+
+#
+# delete_unused_master_slides_online
+#
+# Removes unused master slides.
+# 
+# @param File $document Document data (required)
+# @param boolean $ignore_preserve_field Determines, whether this method should remove unused master even if its             preserve property is set to true. (optional, default to false)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data',
+        required => '1',
+    },
+    'ignore_preserve_field' => {
+        data_type => 'boolean',
+        description => 'Determines, whether this method should remove unused master even if its             preserve property is set to true.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_unused_master_slides_online' } = { 
+    	summary => 'Removes unused master slides.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub delete_unused_master_slides_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling delete_unused_master_slides_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/masterSlides/delete';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'ignore_preserve_field'} && defined $args{'ignore_preserve_field'}) {
+        $query_params->{'ignorePreserveField'} = $self->{api_client}->to_boolean_query_value($args{'ignore_preserve_field'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
 # delete_watermark
 #
 # Removes shapes with name \"watermark\" from the presentation.
@@ -15972,7 +16370,7 @@ sub download_notes_slide {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -16132,7 +16530,7 @@ sub download_notes_slide_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -17039,7 +17437,7 @@ sub download_slide {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -17216,7 +17614,7 @@ sub download_slide_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -18982,6 +19380,176 @@ sub get_font_scheme {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('FontScheme', $response);
+    return $_response_object;
+}
+
+#
+# get_fonts
+#
+# Returns presentation fonts info.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_fonts' } = { 
+    	summary => 'Returns presentation fonts info.',
+        params => $params,
+        returns => 'FontsData',
+        };
+}
+# @return FontsData
+#
+sub get_fonts {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_fonts");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/fonts';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FontsData', $response);
+    return $_response_object;
+}
+
+#
+# get_fonts_online
+#
+# Returns presentation fonts info.
+# 
+# @param File $document Document data. (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_fonts_online' } = { 
+    	summary => 'Returns presentation fonts info.',
+        params => $params,
+        returns => 'FontsData',
+        };
+}
+# @return FontsData
+#
+sub get_fonts_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling get_fonts_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/fonts';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FontsData', $response);
     return $_response_object;
 }
 
@@ -27438,6 +28006,186 @@ sub import_from_pdf {
 }
 
 #
+# import_shapes_from_svg
+#
+# Imports shapes from SVG file.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param File $image SVG image data. (optional)
+# @param int $x The X coordinate of the imported group of shapes (0 is default if not specified). (optional)
+# @param int $y The Y coordinate of the imported group of shapes (0 is default if not specified). (optional)
+# @param int $width The width of the imported group of shapes (default is SVG image width). (optional)
+# @param int $height The height of the imported group of shapes (default is SVG image width). (optional)
+# @param string $shapes Indexes of shapes to import. All shapes are imported if not specified. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'image' => {
+        data_type => 'File',
+        description => 'SVG image data.',
+        required => '0',
+    },
+    'x' => {
+        data_type => 'int',
+        description => 'The X coordinate of the imported group of shapes (0 is default if not specified).',
+        required => '0',
+    },
+    'y' => {
+        data_type => 'int',
+        description => 'The Y coordinate of the imported group of shapes (0 is default if not specified).',
+        required => '0',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'The width of the imported group of shapes (default is SVG image width).',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'The height of the imported group of shapes (default is SVG image width).',
+        required => '0',
+    },
+    'shapes' => {
+        data_type => 'string',
+        description => 'Indexes of shapes to import. All shapes are imported if not specified.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'import_shapes_from_svg' } = { 
+    	summary => 'Imports shapes from SVG file.',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub import_shapes_from_svg {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling import_shapes_from_svg");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling import_shapes_from_svg");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/fromSvg';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'x'} && defined $args{'x'}) {
+        $query_params->{'x'} = $self->{api_client}->to_query_value($args{'x'});
+    }
+
+    # query params
+    if (exists $args{'y'} && defined $args{'y'}) {
+        $query_params->{'y'} = $self->{api_client}->to_query_value($args{'y'});
+    }
+
+    # query params
+    if (exists $args{'width'} && defined $args{'width'}) {
+        $query_params->{'width'} = $self->{api_client}->to_query_value($args{'width'});
+    }
+
+    # query params
+    if (exists $args{'height'} && defined $args{'height'}) {
+        $query_params->{'height'} = $self->{api_client}->to_query_value($args{'height'});
+    }
+
+    # query params
+    if (exists $args{'shapes'} && defined $args{'shapes'}) {
+        $query_params->{'shapes'} = $self->{api_client}->to_query_value($args{'shapes'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'image'} && $args{'image'}) {
+        push(@$files, $args{'image'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Shapes', $response);
+    return $_response_object;
+}
+
+#
 # merge
 #
 # Merge the presentation with other presentations specified in the request parameter.
@@ -30234,7 +30982,7 @@ sub save_slide {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -30423,7 +31171,7 @@ sub save_slide_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -31674,6 +32422,670 @@ sub set_background_color {
 }
 
 #
+# set_chart_axis
+#
+# Set chart axis.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $axis_type Axis type. Horizontal, Vertical, SecondaryHorizontal or SecondaryVertical. (required)
+# @param Axis $axis Axis DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'axis_type' => {
+        data_type => 'string',
+        description => 'Axis type. Horizontal, Vertical, SecondaryHorizontal or SecondaryVertical.',
+        required => '1',
+    },
+    'axis' => {
+        data_type => 'Axis',
+        description => 'Axis DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'set_chart_axis' } = { 
+    	summary => 'Set chart axis.',
+        params => $params,
+        returns => 'Axis',
+        };
+}
+# @return Axis
+#
+sub set_chart_axis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling set_chart_axis");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling set_chart_axis");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling set_chart_axis");
+    }
+
+    # verify the required parameter 'axis_type' is set
+    unless (exists $args{'axis_type'} && $args{'axis_type'}) {
+      croak("Missing the required parameter 'axis_type' when calling set_chart_axis");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'axis_type'}$/i, ( 'HorizontalAxis', 'VerticalAxis', 'SecondaryHorizontalAxis', 'SecondaryVerticalAxis' ))) {
+      croak("Invalid value for 'axis_type': " . $args{'axis_type'});
+    }
+
+    # verify the required parameter 'axis' is set
+    unless (exists $args{'axis'} && $args{'axis'}) {
+      croak("Missing the required parameter 'axis' when calling set_chart_axis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/{axisType}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'axis_type'}) {
+        my $_base_variable = "{" . "axisType" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'axis_type'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'axis'} && $args{'axis'}) {
+        $_body_data = $args{'axis'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Axis', $response);
+    return $_response_object;
+}
+
+#
+# set_chart_legend
+#
+# Set chart axis.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param Legend $legend Chart legend DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'legend' => {
+        data_type => 'Legend',
+        description => 'Chart legend DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'set_chart_legend' } = { 
+    	summary => 'Set chart axis.',
+        params => $params,
+        returns => 'Legend',
+        };
+}
+# @return Legend
+#
+sub set_chart_legend {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling set_chart_legend");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling set_chart_legend");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling set_chart_legend");
+    }
+
+    # verify the required parameter 'legend' is set
+    unless (exists $args{'legend'} && $args{'legend'}) {
+      croak("Missing the required parameter 'legend' when calling set_chart_legend");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/legend';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'legend'} && $args{'legend'}) {
+        $_body_data = $args{'legend'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Legend', $response);
+    return $_response_object;
+}
+
+#
+# set_chart_series_group
+#
+# Set a series group in a chart.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index (must be a chart). (required)
+# @param int $series_group_index Series group index. (required)
+# @param ChartSeriesGroup $series_group Series group DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index (must be a chart).',
+        required => '1',
+    },
+    'series_group_index' => {
+        data_type => 'int',
+        description => 'Series group index.',
+        required => '1',
+    },
+    'series_group' => {
+        data_type => 'ChartSeriesGroup',
+        description => 'Series group DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'set_chart_series_group' } = { 
+    	summary => 'Set a series group in a chart.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub set_chart_series_group {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling set_chart_series_group");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling set_chart_series_group");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling set_chart_series_group");
+    }
+
+    # verify the required parameter 'series_group_index' is set
+    unless (exists $args{'series_group_index'}) {
+      croak("Missing the required parameter 'series_group_index' when calling set_chart_series_group");
+    }
+
+    # verify the required parameter 'series_group' is set
+    unless (exists $args{'series_group'} && $args{'series_group'}) {
+      croak("Missing the required parameter 'series_group' when calling set_chart_series_group");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/seriesGroup/{seriesGroupIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'series_group_index'}) {
+        my $_base_variable = "{" . "seriesGroupIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'series_group_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'series_group'} && $args{'series_group'}) {
+        $_body_data = $args{'series_group'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Chart', $response);
+    return $_response_object;
+}
+
+#
+# set_chart_wall
+#
+# Set 3D chart wall.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $chart_wall_type Chart wall type: floor, sideWall or backWall. (required)
+# @param ChartWall $chart_wall Chart wall DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'chart_wall_type' => {
+        data_type => 'string',
+        description => 'Chart wall type: floor, sideWall or backWall.',
+        required => '1',
+    },
+    'chart_wall' => {
+        data_type => 'ChartWall',
+        description => 'Chart wall DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'set_chart_wall' } = { 
+    	summary => 'Set 3D chart wall.',
+        params => $params,
+        returns => 'ChartWall',
+        };
+}
+# @return ChartWall
+#
+sub set_chart_wall {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling set_chart_wall");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling set_chart_wall");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling set_chart_wall");
+    }
+
+    # verify the required parameter 'chart_wall_type' is set
+    unless (exists $args{'chart_wall_type'} && $args{'chart_wall_type'}) {
+      croak("Missing the required parameter 'chart_wall_type' when calling set_chart_wall");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'chart_wall_type'}$/i, ( 'Floor', 'SideWall', 'BackWall' ))) {
+      croak("Invalid value for 'chart_wall_type': " . $args{'chart_wall_type'});
+    }
+
+    # verify the required parameter 'chart_wall' is set
+    unless (exists $args{'chart_wall'} && $args{'chart_wall'}) {
+      croak("Missing the required parameter 'chart_wall' when calling set_chart_wall");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/{chartWallType}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'chart_wall_type'}) {
+        my $_base_variable = "{" . "chartWallType" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'chart_wall_type'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # body params
+    if ( exists $args{'chart_wall'} && $args{'chart_wall'}) {
+        $_body_data = $args{'chart_wall'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ChartWall', $response);
+    return $_response_object;
+}
+
+#
 # set_document_properties
 #
 # Set document properties.
@@ -31916,6 +33328,234 @@ sub set_document_property {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('DocumentProperty', $response);
+    return $_response_object;
+}
+
+#
+# set_embedded_font
+#
+# Embeds specified font and returns presentation fonts info.
+# 
+# @param string $name Document name. (required)
+# @param string $font_name Document name. (required)
+# @param boolean $only_used Only used characters will be embedded. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'font_name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'only_used' => {
+        data_type => 'boolean',
+        description => 'Only used characters will be embedded.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'set_embedded_font' } = { 
+    	summary => 'Embeds specified font and returns presentation fonts info.',
+        params => $params,
+        returns => 'FontsData',
+        };
+}
+# @return FontsData
+#
+sub set_embedded_font {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling set_embedded_font");
+    }
+
+    # verify the required parameter 'font_name' is set
+    unless (exists $args{'font_name'} && $args{'font_name'}) {
+      croak("Missing the required parameter 'font_name' when calling set_embedded_font");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/fonts/embedded/{fontName}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'only_used'} && defined $args{'only_used'}) {
+        $query_params->{'onlyUsed'} = $self->{api_client}->to_boolean_query_value($args{'only_used'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'font_name'}) {
+        my $_base_variable = "{" . "fontName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'font_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FontsData', $response);
+    return $_response_object;
+}
+
+#
+# set_embedded_font_online
+#
+# Embeds specified font and returns presentation.
+# 
+# @param File $document Document data. (required)
+# @param string $font_name Font name. (required)
+# @param boolean $only_used Only used characters will be embedded. (optional, default to false)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'font_name' => {
+        data_type => 'string',
+        description => 'Font name.',
+        required => '1',
+    },
+    'only_used' => {
+        data_type => 'boolean',
+        description => 'Only used characters will be embedded.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'set_embedded_font_online' } = { 
+    	summary => 'Embeds specified font and returns presentation.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub set_embedded_font_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling set_embedded_font_online");
+    }
+
+    # verify the required parameter 'font_name' is set
+    unless (exists $args{'font_name'} && $args{'font_name'}) {
+      croak("Missing the required parameter 'font_name' when calling set_embedded_font_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/fonts/embedded/{fontName}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'only_used'} && defined $args{'only_used'}) {
+        $query_params->{'onlyUsed'} = $self->{api_client}->to_boolean_query_value($args{'only_used'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'font_name'}) {
+        my $_base_variable = "{" . "fontName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'font_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
     return $_response_object;
 }
 
@@ -33243,7 +34883,7 @@ sub split {
     }
 
     # verify enum value
-    if (exists $args{'format'} && $args{'format'} && !grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml' ))) {
+    if (exists $args{'format'} && $args{'format'} && !grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -33427,7 +35067,7 @@ sub split_and_save_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -33593,7 +35233,7 @@ sub split_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -34562,174 +36202,6 @@ sub update_chart_series {
     # body params
     if ( exists $args{'series'} && $args{'series'}) {
         $_body_data = $args{'series'};
-    }
-
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $files);
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('Chart', $response);
-    return $_response_object;
-}
-
-#
-# update_chart_series_group
-#
-# Update a series group in a chart.
-# 
-# @param string $name Document name. (required)
-# @param int $slide_index Slide index. (required)
-# @param int $shape_index Shape index (must be a chart). (required)
-# @param int $series_group_index Series group index. (required)
-# @param ChartSeriesGroup $series_group Series group DTO. (required)
-# @param string $password Document password. (optional)
-# @param string $folder Document folder. (optional)
-# @param string $storage Document storage. (optional)
-{
-    my $params = {
-    'name' => {
-        data_type => 'string',
-        description => 'Document name.',
-        required => '1',
-    },
-    'slide_index' => {
-        data_type => 'int',
-        description => 'Slide index.',
-        required => '1',
-    },
-    'shape_index' => {
-        data_type => 'int',
-        description => 'Shape index (must be a chart).',
-        required => '1',
-    },
-    'series_group_index' => {
-        data_type => 'int',
-        description => 'Series group index.',
-        required => '1',
-    },
-    'series_group' => {
-        data_type => 'ChartSeriesGroup',
-        description => 'Series group DTO.',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Document folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'update_chart_series_group' } = { 
-    	summary => 'Update a series group in a chart.',
-        params => $params,
-        returns => 'Chart',
-        };
-}
-# @return Chart
-#
-sub update_chart_series_group {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling update_chart_series_group");
-    }
-
-    # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling update_chart_series_group");
-    }
-
-    # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling update_chart_series_group");
-    }
-
-    # verify the required parameter 'series_group_index' is set
-    unless (exists $args{'series_group_index'}) {
-      croak("Missing the required parameter 'series_group_index' when calling update_chart_series_group");
-    }
-
-    # verify the required parameter 'series_group' is set
-    unless (exists $args{'series_group'} && $args{'series_group'}) {
-      croak("Missing the required parameter 'series_group' when calling update_chart_series_group");
-    }
-
-    # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/seriesGroup/{seriesGroupIndex}';
-
-    my $_method = 'PUT';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # header params
-    if ( exists $args{'password'}) {
-        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
-    }
-
-    # path params
-    if ( exists $args{'name'}) {
-        my $_base_variable = "{" . "name" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'slide_index'}) {
-        my $_base_variable = "{" . "slideIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'shape_index'}) {
-        my $_base_variable = "{" . "shapeIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'series_group_index'}) {
-        my $_base_variable = "{" . "seriesGroupIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'series_group_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    my $_body_data;
-    my $files = [];
-    # body params
-    if ( exists $args{'series_group'} && $args{'series_group'}) {
-        $_body_data = $args{'series_group'};
     }
 
     # make the API Call

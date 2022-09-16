@@ -26,7 +26,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::AccessLib
 );
 
-has server        => ( is => 'rw' );
+has server => ( is => 'rw' );
 has configStorage => (
     is      => 'ro',
     lazy    => 1,

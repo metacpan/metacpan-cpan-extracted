@@ -77,8 +77,13 @@ static void EV__hiredis_connect_cb(redisAsyncContext* c, int status) {
     else {
         if (NULL == self->connect_handler) return;
 
+        dSP;
+
         ENTER;
         SAVETMPS;
+
+        PUSHMARK(SP);
+        PUTBACK;
 
         call_sv(self->connect_handler, G_DISCARD);
 
@@ -164,7 +169,6 @@ static SV* EV__hiredis_decode_reply(redisReply* reply) {
 static void EV__hiredis_reply_cb(redisAsyncContext* c, void* reply, void* privdata) {
     ev_hiredis_cb_t* cbt;
     SV* sv_reply;
-    SV* sv_undef;
     SV* sv_err;
 
     PERL_UNUSED_VAR(c);
@@ -179,11 +183,10 @@ static void EV__hiredis_reply_cb(redisAsyncContext* c, void* reply, void* privda
         ENTER;
         SAVETMPS;
 
-        sv_undef = sv_2mortal(newSV(0));
         sv_err = sv_2mortal(newSVpv(c->errstr, 0));
 
         PUSHMARK(SP);
-        PUSHs(sv_undef);
+        PUSHs(&PL_sv_undef);
         PUSHs(sv_err);
         PUTBACK;
 
@@ -201,8 +204,7 @@ static void EV__hiredis_reply_cb(redisAsyncContext* c, void* reply, void* privda
         PUSHMARK(SP);
         sv_reply = EV__hiredis_decode_reply((redisReply*)reply);
         if (((redisReply*)reply)->type == REDIS_REPLY_ERROR) {
-            sv_undef = sv_2mortal(newSV(0));
-            PUSHs(sv_undef);
+            PUSHs(&PL_sv_undef);
             PUSHs(sv_reply);
         }
         else {

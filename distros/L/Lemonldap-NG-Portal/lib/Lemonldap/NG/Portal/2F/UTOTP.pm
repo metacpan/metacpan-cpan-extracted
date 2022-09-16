@@ -6,7 +6,7 @@ use JSON qw(from_json to_json);
 use Lemonldap::NG::Portal::Main::Constants qw(
 );
 
-our $VERSION = '2.0.8';
+our $VERSION = '2.0.15';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 
@@ -26,16 +26,9 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 sub init {
     my ($self) = @_;
-    if ( (
-               $self->conf->{totp2fSelfRegistration}
-            or $self->conf->{u2fSelfRegistration}
-        )
-        and $self->conf->{utotp2fActivation} eq '1'
-      )
-    {
-        $self->conf->{utotp2fActivation} =
-          '$_2fDevices && $_2fDevices =~ /"type":\s*"(?:TOTP|U2F)"/s';
-    }
+    $self->conf->{utotp2fActivation} = 'has2f("TOTP") or has2f("U2F")'
+      if $self->conf->{utotp2fActivation} eq '1';
+
     foreach (qw(U2F TOTP)) {
 
         # Arg "noRoute" is set for sub 2F modules to avoid enabling direct

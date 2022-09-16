@@ -20,8 +20,8 @@ plan tests => int(@modules);
 
 # test loading modules
 foreach my $mod (@modules) {
-    use_ok($mod);
+    require_ok($mod);
 }
 
 require WebFetch;
-diag( "Testing WebFetch $WebFetch::VERSION, Perl $], $^X" );
+diag( "Testing WebFetch " . WebFetch->version() . ", Perl $], $^X" );

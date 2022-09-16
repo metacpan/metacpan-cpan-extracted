@@ -1,4 +1,4 @@
-# $Id: Changes 90 2019-07-18 09:47:29Z abalama $
+# $Id: Changes 151 2022-09-16 07:45:23Z abalama $
 # Version/Revision history.
 
 1.00 Wed Sep 10 10:42:03 2014 GMT
@@ -32,3 +32,15 @@
 1.07 Mon 15 Jul 08:17:00 MSK 2019
     * Documentation modified
     * Configuration skeleton modified
+
+1.08 Tue 06 Sep 2022 19:41:34 MSK
+    * Added new features
+    * Added CTK::Timeout to checkits
+    * Added -D (daemondir) flag for monm program
+    * Added -s (safemode) flag for monmd program
+    * Bug fixed: corrected the info method, added condition for SQLite file information
+    * Added BasedOn directive to Channel od user context
+
+1.09 Fri 16 Sep 2022 10:31:31 MSK
+    * App::MonM::QNotifier: Added the getChanelsBySendTo method
+    * Optimized the notify methods

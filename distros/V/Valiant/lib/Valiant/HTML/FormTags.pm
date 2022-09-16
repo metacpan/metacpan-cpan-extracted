@@ -31,6 +31,18 @@ sub _merge_attrs {
       my $data1 = exists($attrs1->{$key}) ? $attrs1->{$key} : +{};
       my $data2 = exists($attrs2->{$key}) ? $attrs2->{$key} : +{};
       $attrs1->{$key} = +{ %$data1, %$data2 };
+    } elsif($key eq 'class') {
+      my $data = $attrs2->{$key};
+      my @data = ref($data) ? @$data : ($data);
+      if(exists $attrs1->{$key}) {
+        if(ref $attrs1->{$key}) {
+          push @{$attrs1->{$key}}, @data;
+        } else {
+          $attrs1->{$key} = [$attrs1->{$key}, @data];
+        }
+      } else {
+        $attrs1->{$key} = $attrs2->{$key};
+      }
     } else {
       $attrs1->{$key} = $attrs2->{$key};
     }

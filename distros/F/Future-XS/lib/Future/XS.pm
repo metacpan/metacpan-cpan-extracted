@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Future::XS 0.03;
+package Future::XS 0.04;
 
 use v5.14;
 use warnings;
@@ -14,6 +14,12 @@ require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
 
 use Time::HiRes qw( tv_interval );
+
+# Future::_base is provided in Future.pm itself
+require Future;
+our @ISA = qw( Future::_base );
+
+require Future::Exception;
 
 =head1 NAME
 
@@ -62,38 +68,6 @@ sub import
 
    croak "Unrecognised $pkg\->import symbols - " . join( ", ", sort keys %syms )
       if %syms;
-}
-
-# These methods aren't on the "fast path" so for now we'll just implement them in Perl
-
-sub transform
-{
-   my $self = shift;
-   my %args = @_;
-
-   my $xfrm_done = $args{done};
-   my $xfrm_fail = $args{fail};
-
-   return $self->then_with_f(
-      sub {
-         my $self = shift;
-         return $self unless $xfrm_done;
-         return $self->done( $xfrm_done->( $self->result ) );
-      },
-      sub {
-         my $self = shift;
-         return $self unless $xfrm_fail;
-         return $self->fail( $xfrm_fail->( $self->failure ) );
-      },
-   );
-}
-
-sub elapsed
-{
-   my $self = shift;
-   return undef unless
-      defined( my $btime = $self->btime ) and defined( my $rtime = $self->rtime );
-   return tv_interval( $btime, $rtime );
 }
 
 =head1 AUTHOR

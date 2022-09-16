@@ -73,8 +73,9 @@ sub translate {
       . " ($self->{conf}->{templateDir}/$lang_code.json or $self->{conf}->{templateDir}/common/mail/en.json)";
     $json = join '', <F>;
     close F;
-    my $lang     = from_json( $json,            { allow_nonref => 1 } );
-    my $langOver = from_json( $self->p->trOver, { allow_nonref => 1 } );
+    my $lang = from_json( $json, { allow_nonref => 1 } );
+    my $langOver =
+      from_json( $self->p->getTrOver($req), { allow_nonref => 1 } );
 
     if ($langOver) {
         for my $k ( keys %{ $langOver->{all} || {} } ) {

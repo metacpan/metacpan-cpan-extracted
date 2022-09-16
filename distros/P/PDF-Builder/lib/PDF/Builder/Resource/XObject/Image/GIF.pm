@@ -4,10 +4,9 @@ use base 'PDF::Builder::Resource::XObject::Image';
 
 use strict;
 use warnings;
-#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.023'; # VERSION
-our $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.024'; # VERSION
+our $LAST_UPDATE = '3.024'; # manually update whenever code is changed
 
 use IO::File;
 use PDF::Builder::Util;
@@ -17,6 +16,16 @@ use Scalar::Util qw(weaken);
 =head1 NAME
 
 PDF::Builder::Resource::XObject::Image::GIF - support routines for GIF image library. Inherits from L<PDF::Builder::Resource::XObject::Image>
+
+=head2 History
+
+GIF89a Specification: https://www.w3.org/Graphics/GIF/spec-gif89a.txt
+
+A fairly thorough description of the GIF format may be found in 
+L<http://giflib.sourceforge.net/whatsinagif/bits_and_bytes.html>.
+
+Code originally from PDF::Create, PDF::Image::GIFImage - GIF image support
+Author: Michael Gross <mdgrosse@sboxtugraz.at>
 
 =head1 Supported Formats
 
@@ -33,21 +42,22 @@ If given, Local Color Tables are read and used, supposedly permitting more
 than 256 colors to be used overall in the image (despite the 8 bit color table
 depth).
 
-A fairly thorough description of the GIF format may be found in 
-L<http://giflib.sourceforge.net/whatsinagif/bits_and_bytes.html>.
-
 =head2 Options
 
 =over
 
-=item -notrans
+=item notrans
 
-When defined and not 0, C<-notrans> suppresses the use of transparency if such
+When defined and not 0, C<notrans> suppresses the use of transparency if such
 is defined in the GIF file.
 
-=item -multi
+=item name => 'string'
 
-When defined and not 0, C<-multi> continues processing past the end of the 
+This is the name you can give for the GIF image object. The default is Gxnnnn.
+
+=item multi
+
+When defined and not 0, C<multi> continues processing past the end of the 
 first Image Block. The old behavior, which is now the default, is to stop 
 processing at the end of the first Image Block.
 
@@ -55,9 +65,6 @@ processing at the end of the first Image Block.
 
 =cut
 
-# added from PDF::Create:
-# PDF::Image::GIFImage - GIF image support
-# Author: Michael Gross <mdgrosse@sbox.tugraz.at>
 # modified for internal use. (c) 2004 fredo.
 sub unInterlace {
     my $self = shift;
@@ -69,7 +76,7 @@ sub unInterlace {
     my $height = $self->height();
     my $idx = 0;
 
-    #Pass 1 - every 8th row, starting with row 0
+    # Pass 1 - every 8th row, starting with row 0
     $row = 0;
     while ($row < $height) {
         $result[$row] = substr($data, $idx*$width, $width);
@@ -77,7 +84,7 @@ sub unInterlace {
         $idx++;
     }
 
-    #Pass 2 - every 8th row, starting with row 4
+    # Pass 2 - every 8th row, starting with row 4
     $row = 4;
     while ($row < $height) {
         $result[$row] = substr($data, $idx*$width, $width);
@@ -85,7 +92,7 @@ sub unInterlace {
         $idx++;
     }
 
-    #Pass 3 - every 4th row, starting with row 2
+    # Pass 3 - every 4th row, starting with row 2
     $row = 2;
     while ($row < $height) {
         $result[$row] = substr($data, $idx*$width, $width);
@@ -93,7 +100,7 @@ sub unInterlace {
         $idx++;
     }
 
-    #Pass 4 - every 2nd row, starting with row 1
+    # Pass 4 - every 2nd row, starting with row 1
     $row = 1;
     while ($row < $height) {
         $result[$row] = substr($data, $idx*$width, $width);
@@ -132,7 +139,7 @@ sub deGIF {
     #        $tag |= vec($stream, $ptr+$off, 1);
     #    }
     #    print STDERR "ptr=$ptr,tag=$tag,bits=$bits,next=$nextcode\n";
-    #    print STDERR "tag to large\n" if($tag>$nextcode);
+    #    print STDERR "tag too large\n" if($tag>$nextcode);
         $ptr += $bits;
         $bits++ if $nextcode == 1 << $bits and $bits < 12;
         if      ($tag == $resetcode) {
@@ -156,13 +163,22 @@ sub deGIF {
 }
 
 sub new {
-    my ($class, $pdf, $file, $name, %opts) = @_;
+    my ($class, $pdf, $file, %opts) = @_;
+    # copy dashed option names to preferred undashed names
+    if (defined $opts{'-notrans'} && !defined $opts{'notrans'}) { $opts{'notrans'} = delete($opts{'-notrans'}); }
+    if (defined $opts{'-name'} && !defined $opts{'name'}) { $opts{'name'} = delete($opts{'-name'}); }
+    if (defined $opts{'-multi'} && !defined $opts{'multi'}) { $opts{'multi'} = delete($opts{'-multi'}); }
+    if (defined $opts{'-compress'} && !defined $opts{'compress'}) { $opts{'compress'} = delete($opts{'-compress'}); }
+
+    my ($name, $compress);
+    if (exists $opts{'name'}) { $name = $opts{'name'}; }
+   #if (exists $opts{'compress'}) { $compress = $opts{'compress'}; }
 
     my $self;
 
-    my $inter = 0;
+    my $interlaced = 0;
 
-    $class = ref $class if ref $class;
+    $class = ref($class) if ref($class);
 
     $self = $class->SUPER::new($pdf, $name || 'Gx'.pdfkey());
     $pdf->new_obj($self) unless $self->is_obj($pdf);
@@ -184,11 +200,15 @@ sub new {
     #   GIF Header
     #     6 bytes "GIF87a" or "GIF89a"
     $fh->read($buf, 6); # signature
-    die "unknown image signature '$buf' -- not a GIF." unless $buf =~ /^GIF[0-9][0-9][a-b]/;  # TBD b? is anything other than 87a and 89a valid?
+    unless ($buf =~ /^GIF[0-9][0-9][a-b]/) {
+        # TBD b? is anything other than 87a and 89a valid?
+	#     PDF::API2 allows a-z, not just a-b
+        die "unknown image signature '$buf' -- not a GIF." 
+    }
 
     #     4 bytes logical screen width and height (2 x 16 bit LSB first)
     #     1 byte flags, 1 byte background color index, 1 byte pixel aspect ratio
-    $fh->read($buf, 7); # logical descr.
+    $fh->read($buf, 7); # logical screen descriptor
     my($wg, $hg, $flags, $bgColorIndex, $aspect) = unpack('vvCCC', $buf);
 
     #       flags numbered left to right 0-7:
@@ -200,7 +220,10 @@ sub new {
         my $colSize = 2**(($flags & 0x7)+1);  # 2 - 256 entries
         my $dict = PDFDict();
         $pdf->new_obj($dict);
-        $self->colorspace(PDFArray(PDFName('Indexed'), PDFName('DeviceRGB'), PDFNum($colSize-1), $dict));
+        $self->colorspace(PDFArray(PDFName('Indexed'), 
+			  PDFName('DeviceRGB'), 
+			  PDFNum($colSize-1), 
+			  $dict));
         $fh->read($dict->{' stream'}, 3*$colSize); # Global Color Table
     }
 
@@ -211,7 +234,7 @@ sub new {
 
         if      ($sep == 0x2C) {
 	    # x2C = image block (separator, equals ASCII comma ',')
-            $fh->read($buf, 9); # image-descr.
+            $fh->read($buf, 9); # image descriptor
 	    #   image left (16 bits), image top (16 bits LSB first)
 	    #   image width (16 bits), image height (16 bits LSB first)
 	    #   flags (1 byte):
@@ -230,11 +253,14 @@ sub new {
                 my $colSize = 2**(($flags & 0x7)+1);
                 my $dict = PDFDict();
                 $pdf->new_obj($dict);
-                $self->colorspace(PDFArray(PDFName('Indexed'), PDFName('DeviceRGB'), PDFNum($colSize-1), $dict));
+                $self->colorspace(PDFArray(PDFName('Indexed'), 
+				           PDFName('DeviceRGB'), 
+					   PDFNum($colSize-1), 
+					   $dict));
                 $fh->read($dict->{' stream'}, 3*$colSize); # Local Color Table
             }
             if ($flags & 0x40) { # need de-interlace
-                $inter = 1;  # default to 0 earlier
+                $interlaced = 1;  # default to 0 earlier
             }
 
 	    # LZW Minimum Code Size
@@ -253,11 +279,11 @@ sub new {
                 $len = unpack('C', $buf);
             }
             $self->{' stream'} = deGIF($sep+1, $stream);
-            $self->unInterlace() if $inter;
+            $self->unInterlace() if $interlaced;
             # old (and current default) behavior is to quit processing at the
 	    # end of the first Image Block. This means that any other blocks,
 	    # including the Trailer, will not be processed.
-	    if (!$opts{'-multi'}) { last; }
+	    if (!$opts{'multi'}) { last; }
 
         } elsif ($sep == 0x3b) {
 	    # trailer (EOF) equals ASCII semicolon (;)
@@ -280,8 +306,9 @@ sub new {
                     $len = unpack('C', $buf);
                 }
                 my ($cFlags, $delay, $transIndex) = unpack('CvC', $stream);
-                if (($cFlags & 0x01) && !$opts{'-notrans'}) {
-                    $self->{'Mask'} = PDFArray(PDFNum($transIndex), PDFNum($transIndex));
+                if (($cFlags & 0x01) && !$opts{'notrans'}) {
+                    $self->{'Mask'} = PDFArray(PDFNum($transIndex), 
+			                       PDFNum($transIndex));
                 }
 
 	    } elsif ($tag == 0xFE) {

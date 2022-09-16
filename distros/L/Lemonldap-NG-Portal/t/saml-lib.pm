@@ -1363,6 +1363,7 @@ Match a XPath expression against the provided string, and verify that the correc
 =cut
 
 sub expectXPath {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ( $xml_string, $xpath, $value, $message ) = @_;
     my $dom = XML::LibXML->load_xml( string => $xml_string );
     return unless ok( $dom, 'XML successfully parsed' );
@@ -1399,6 +1400,7 @@ sub expectXPath {
 }
 
 sub expectSamlRequest {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ($string) = @_;
     my ($sr)     = $string =~ m/SAMLRequest=([^&]*)/;
     ok( $sr, "Found SAMLRequest" );
@@ -1406,6 +1408,7 @@ sub expectSamlRequest {
 }
 
 sub expectSamlResponse {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ($string) = @_;
     my ($sr)     = $string =~ m/SAMLResponse=([^&]*)/;
     ok( $sr, "Found SAMLResponse" );

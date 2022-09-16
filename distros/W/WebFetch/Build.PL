@@ -18,19 +18,24 @@ my %module_build_args = (
     "Ian Kluft <https://github.com/ikluft>"
   ],
   "dist_name" => "WebFetch",
-  "dist_version" => "0.14.0",
+  "dist_version" => "0.15.1",
   "license" => "gpl",
   "module_name" => "WebFetch",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
+    "Class::Singleton" => 0,
     "DB_File" => 0,
     "Data::Dumper" => 0,
     "Date::Calc" => 0,
+    "DateTime" => 0,
+    "DateTime::Format::ISO8601" => 0,
+    "DateTime::Locale" => 0,
     "Exception::Class" => 0,
     "Getopt::Long" => 0,
     "HTTP::Request" => 0,
     "LWP::UserAgent" => 0,
+    "Readonly" => 0,
     "Scalar::Util" => 0,
     "Try::Tiny" => 0,
     "base" => 0,
@@ -39,20 +44,34 @@ my %module_build_args = (
     "warnings" => 0
   },
   "test_requires" => {
+    "File::Basename" => 0,
+    "File::Compare" => 0,
     "File::Slurp" => 0,
     "File::Temp" => 0,
+    "IO::Capture::Stderr" => 0,
+    "String::Interpolate::Named" => 0,
     "Test::Exception" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "YAML::XS" => 0,
+    "autodie" => 0,
+    "open" => 0
   }
 );
 
 
 my %fallback_build_requires = (
+  "File::Basename" => 0,
+  "File::Compare" => 0,
   "File::Slurp" => 0,
   "File::Temp" => 0,
+  "IO::Capture::Stderr" => 0,
   "Module::Build" => "0.28",
+  "String::Interpolate::Named" => 0,
   "Test::Exception" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "YAML::XS" => 0,
+  "autodie" => 0,
+  "open" => 0
 );
 
 

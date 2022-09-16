@@ -8,15 +8,16 @@ my $build_requires = {
     };
 
 my $prereq_pm = {
-        'Class::C3::Adopt::NEXT'=> 0.13,
-        'CTK'                   => 2.01,
-        'DBI'                   => 1.60,
+        'AnyEvent'              => 7.07, # perl(AnyEvent)
+        'Clone'                 => 0.32, # perl(Clone)
+        'CTK'                   => 2.08,
         'DBD::SQLite'           => 1.50,
-        'File::Copy'            => 2.18,
-        'File::Path'            => 2.00,
-        'HTTP::Message'         => 6.02,
+        'Email::MIME'           => 1.90, # libemail-mime-perl
+        'Email::Sender'         => 1.30, # libemail-sender-perl
+        'IPC::Cmd'              => 0.80,
         'LWP'                   => 5.80,
         'LWP::MediaTypes'       => 6.00,
+        'LWP::Protocol::https'  => 6.00,
         'Mail::POP3Client'      => 2.18,
         'Module::Loaded'        => 0.04,
         'Net::Ping'             => 2.36,
@@ -25,14 +26,16 @@ my $prereq_pm = {
         'Socket'                => 0,
         'Sys::Hostname'         => 0,
         'Term::ReadKey'         => 2.33,
+        'Text::Tabs'            => 0,
+        'Text::Wrap'            => 0,
         'Text::ParseWords'      => 0,
-        'Text::SimpleTable'     => 2.03,
-        'Try::Tiny'             => 0.07,
-        'URI'                   => 1.50,
+        'Try::Tiny'             => 0,
+        'URI'                   => 0,
     };
 
 my $exefiles = [qw[
         bin/monm
+        bin/monmd
         bin/monm_dbi
         bin/monm_snmp
         bin/monm_nginx
@@ -60,7 +63,7 @@ WriteMakefile(
             'Data::Dumper'  => 0,
         },
         resources => {
-            homepage        => 'http://app-monm.sourceforge.net',
+            homepage        => 'https://app-monm.sourceforge.io',
             repository      => 'https://svn.code.sf.net/p/app-monm/code/trunk',
             license         => 'https://dev.perl.org/licenses',
         },

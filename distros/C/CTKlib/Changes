@@ -186,3 +186,6 @@
     * CTK::Log: Added log_critical method
     * CTK::Configuration: added the load and reload methods
     * CTK::Daemon: added the cleanup and reload methods
+
+2.09 Fri 09 Sep 2022 08:32:56 MSK
+    * CTK::Daemon: deleted outer eval construction for the run method

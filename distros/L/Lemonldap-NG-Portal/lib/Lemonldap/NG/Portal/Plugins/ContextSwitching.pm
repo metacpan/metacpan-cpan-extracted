@@ -14,7 +14,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_IMPERSONATION_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.0.15';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -119,10 +119,6 @@ sub display {
 
     # Display form
     my $params = {
-        PORTAL        => $self->conf->{portal},
-        MAIN_LOGO     => $self->conf->{portalMainLogo},
-        SKIN          => $self->p->getSkin($req),
-        LANGS         => $self->conf->{showLanguages},
         MSG           => 'contextSwitching_ON',
         ALERTE        => 'alert-danger',
         IMPERSONATION => $self->conf->{contextSwitchingRule},

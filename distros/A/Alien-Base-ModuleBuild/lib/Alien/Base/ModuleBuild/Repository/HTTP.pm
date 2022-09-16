@@ -10,9 +10,17 @@ use Alien::Base::ModuleBuild::Utils;
 use parent 'Alien::Base::ModuleBuild::Repository';
 
 # ABSTRACT: HTTP repository handler
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.17'; # VERSION
 
 our $Has_HTML_Parser = eval { require HTML::LinkExtor; 1 };
+
+sub is_network_fetch { 1 }
+
+sub is_secure_fetch {
+  my($self) = @_;
+
+  (defined $self->{exact_filename} && $self->{exact_filename} =~ /^https:/) || ($self->{protocol}||'http') eq 'https';
+}
 
 sub connection {
 
@@ -29,7 +37,26 @@ sub connection {
   eval { require $module; 1 }
     or croak "Could not load protocol_class '$self->{protocol_class}': $@";
 
-  my $http = $self->{protocol_class}->new();
+  my %args;
+
+  if($self->{protocol_class}->isa('HTTP::Tiny'))
+  {
+    $args{agent} = "Alien-Base-ModuleBuild/HTTP::Tiny/@{[ $Alien::Base::ModuleBuild::VERSION || 'dev' ]}";
+    require Alien::Base::ModuleBuild;
+    $args{verify_SSL} = 1 if Alien::Base::ModuleBuild->alien_download_rule =~ /encrypt/;
+  }
+  elsif($self->{protocol_class}->isa('LWP::UserAgent'))
+  {
+    $args{agent} = "Alien-Base-ModuleBuild/LWP::UserAgent/@{[ $Alien::Base::ModuleBuild::VERSION || 'dev' ]}";
+    # Note this is the default for recent LWP
+    $args{ssl_opts} = { verify_hostname => 1 } if Alien::Base::ModuleBuild->alien_download_rule =~ /encrypt/;
+  }
+  else
+  {
+    die "unsupported protocol class: @{[ $self->{protocol_class} ]}";
+  }
+
+  my $http = $self->{protocol_class}->new(%args);
 
   $self->{connection} = $http;
 
@@ -47,6 +74,9 @@ sub get_file {
 
   my $uri = $self->build_uri($protocol, $host, $from, $file);
   $file = ($uri->path_segments())[-1];
+
+  die "Attempted downgrad from https to http on URL $uri" if $self->is_secure_fetch && $uri !~ /^https:/;
+
   my $res = $self->connection->mirror($uri, $file);
   my ( $is_error, $content, $headers ) = $self->check_http_response( $res );
   croak "Download failed: " . $content if $is_error;
@@ -68,6 +98,8 @@ sub list_files {
   my $host = $self->host;
   my $location = $self->location;
   my $uri = $self->build_uri($protocol, $host, $location);
+
+  die "Attempted downgrad from https to http on URL $uri" if $self->is_secure_fetch && $uri !~ /^https:/;
 
   my $res = $self->connection->get($uri);
 
@@ -183,7 +215,17 @@ Alien::Base::ModuleBuild::Repository::HTTP - HTTP repository handler
 
 =head1 VERSION
 
-version 1.15
+version 1.17
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Alien>
+
+=item L<Alien::Base>
+
+=back
 
 =head1 AUTHOR
 
@@ -221,13 +263,13 @@ Kang-min Liu (劉康民, gugod)
 
 Nicholas Shipp (nshp)
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 Alberto Simões (ambs)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2020 by Joel A Berger.
+This software is copyright (c) 2012-2022 by Joel A Berger.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

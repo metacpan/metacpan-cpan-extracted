@@ -77,10 +77,16 @@
     <div class="card border-secondary">
       <div class="card-body py-3">
       <a href="<TMPL_VAR NAME="URL">" class="nodecor">
-        <img src="<TMPL_VAR NAME="STATIC_PREFIX"><TMPL_VAR NAME="SKIN">/<TMPL_VAR NAME="LOGO">" alt="<TMPL_VAR NAME="CODE">2F" title="<TMPL_VAR NAME="CODE">2F" />
+        <img src="<TMPL_VAR NAME="STATIC_PREFIX"><TMPL_VAR NAME="SKIN">/<TMPL_VAR NAME="LOGO">" alt="<TMPL_VAR NAME="CODE">2f" title="<TMPL_VAR NAME="LABEL">" />
       </a>
       </div>
-      <div class="card-footer text-white text-uppercase bg-secondary"><TMPL_VAR NAME="CODE">2F</div>
+      <div class="card-footer text-white text-uppercase bg-secondary">
+      <TMPL_IF LABEL>
+        <p><TMPL_VAR NAME="LABEL"></p>
+      <TMPL_ELSE>
+        <p trspan="<TMPL_VAR NAME="CODE">2f"></p>
+      </TMPL_IF>
+      </div>
     </div>
     </div>
     </TMPL_LOOP>
@@ -90,7 +96,7 @@
 
 <div class="buttons">
   <TMPL_IF NAME="DISPLAY_UPG">
-    <a href="<TMPL_VAR NAME="PORTAL_URL">upgradesession?url=<TMPL_VAR NAME="SFREGISTERS_URL">" class="btn btn-success" role="button">
+    <a href="<TMPL_VAR NAME="PORTAL_URL">upgradesession?forceUpgrade=1&url=<TMPL_VAR NAME="SFREGISTERS_URL">" class="btn btn-success" role="button">
       <span class="fa fa-sign-in"></span>
       <span trspan="upgradeSession">Upgrade session</span>
     </a>

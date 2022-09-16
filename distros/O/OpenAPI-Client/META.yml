@@ -3,6 +3,7 @@ abstract: 'A client for talking to an Open API powered server'
 author:
   - 'Jan Henning Thorsen <jan.henning@thorsen.pm>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -17,15 +18,27 @@ no_index:
   directory:
     - t
     - inc
+    - examples
+    - t
 requires:
   JSON::Validator: '5.09'
   Mojolicious::Plugin::OpenAPI: '5.05'
+  perl: '5.016'
 resources:
+  IRC:
+    url: irc://irc.libera.chat/#convos
+    web: https://web.libera.chat/#convos
   bugtracker: https://github.com/jhthorsen/openapi-client/issues
   homepage: https://github.com/jhthorsen/openapi-client
+  license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/openapi-client.git
-version: '1.05'
+version: '1.06'
 x_contributors:
+  - 'Clive Holloway <clhollow@estee.com>'
+  - 'Ed J <mohawk2@users.noreply.github.com>'
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
-  - 'Ed J <etj@cpan.org>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Reneeb <info@perl-services.de>'
+  - 'Roy Storey <kiwiroy@users.noreply.github.com>'
+  - 'Veesh Goldman <rabbiveesh@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

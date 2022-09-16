@@ -57,6 +57,10 @@ __PACKAGE__->add_columns(
   { data_type => "varchar", is_nullable => 1, size => 16 },
   "units",
   { data_type => "integer", is_nullable => 1 },
+  "price",
+  { data_type => "integer", is_nullable => 1 },
+  "discount",
+  { data_type => "float", is_nullable => 1 },
 );
 
 
