@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.554-5-ge35df8e0
+package JSON::Schema::Modern; # git description: v0.555-12-g5cd1dee9
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.555';
+our $VERSION = '0.556';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -355,6 +355,13 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       } qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans strict)),
     };
 
+    if ($state->{validate_formats}) {
+      $state->{vocabularies} = [
+        map s/^JSON::Schema::Modern::Vocabulary::Format\KAnnotation$/Assertion/r, $state->{vocabularies}->@*
+      ];
+      require JSON::Schema::Modern::Vocabulary::FormatAssertion;
+    }
+
     $valid = $self->_eval_subschema($data, $schema_info->{schema}, $state);
     warn 'result is false but there are no errors' if not $valid and not $state->{errors}->@*;
   }
@@ -426,6 +433,18 @@ my %removed_keywords = (
   },
 );
 
+# {
+#   $spec_version => {
+#     $vocabulary_class => {
+#       traverse => [ [ $keyword => $subref ], [ ... ] ],
+#       evaluate => [ [ $keyword => $subref ], [ ... ] ],
+#     }
+#   }
+# }
+# If we could serialize coderefs, this could be an object attribute;
+# otherwise, we might as well persist this for the lifetime of the process.
+our $vocabulary_cache = {};
+
 sub _traverse_subschema ($self, $schema, $state) {
   delete $state->{keyword};
 
@@ -444,7 +463,15 @@ sub _traverse_subschema ($self, $schema, $state) {
   # we must check the array length on every iteration because some keywords can change it!
   for (my $idx = 0; $idx <= $state->{vocabularies}->$#*; ++$idx) {
     my $vocabulary = $state->{vocabularies}[$idx];
-    foreach my $keyword ($vocabulary->keywords($state->{spec_version})) {
+
+    # [ [ $keyword => $subref ], [ ... ] ]
+    my $keyword_list = $vocabulary_cache->{$state->{spec_version}}{$vocabulary}{traverse} //= [
+      map [ $_ => $vocabulary->can('_traverse_keyword_'.($_ =~ s/^\$//r)) ],
+        $vocabulary->keywords($state->{spec_version})
+    ];
+
+    foreach my $keyword_tuple ($keyword_list->@*) {
+      my ($keyword, $sub) = $keyword_tuple->@*;
       next if not exists $schema->{$keyword};
 
       # keywords adjacent to $ref are not evaluated before draft2019-09
@@ -452,16 +479,15 @@ sub _traverse_subschema ($self, $schema, $state) {
 
       delete $unknown_keywords{$keyword};
       $state->{keyword} = $keyword;
-      my $method = '_traverse_keyword_'.($keyword =~ s/^\$//r);
 
-      if (not $vocabulary->$method($schema, $state)) {
+      if (not $sub->($vocabulary, $schema, $state)) {
         die 'traverse returned false but we have no errors' if not $state->{errors}->@*;
         $valid = 0;
         next;
       }
 
-      if (my $sub = $state->{callbacks}{$keyword}) {
-        $sub->($schema, $state);
+      if (my $callback = $state->{callbacks}{$keyword}) {
+        $callback->($schema, $state);
       }
     }
   }
@@ -501,6 +527,14 @@ sub _eval_subschema ($self, $data, $schema, $state) {
   abort($state, 'EXCEPTION: maximum evaluation depth exceeded')
     if $state->{depth}++ > $self->max_traversal_depth;
 
+  my $schema_type = get_type($schema);
+  return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
+
+  # this should never happen, due to checks in traverse
+  abort($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
+
+  return 1 if not keys %$schema;
+
   # find all schema locations in effect at this data path + canonical_uri combination
   # if any of them are absolute prefix of this schema location, we are in a loop.
   my $canonical_uri = canonical_uri($state);
@@ -510,29 +544,22 @@ sub _eval_subschema ($self, $data, $schema, $state) {
       keys $state->{seen}{$state->{data_path}}{$canonical_uri}->%*;
   $state->{seen}{$state->{data_path}}{$canonical_uri}{$schema_location}++;
 
-  my $schema_type = get_type($schema);
-  return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
-
-  # this should never happen, due to checks in traverse
-  abort($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
-
-  return 1 if not keys %$schema;
-
   my $valid = 1;
   my %unknown_keywords = map +($_ => undef), keys %$schema;
   my $orig_annotations = $state->{annotations};
   $state->{annotations} = [];
   my @new_annotations;
 
-  my @vocabularies = $state->{vocabularies}->@*; # override locally only (copy, not reference)
-  if ($state->{validate_formats}) {
-    s/^JSON::Schema::Modern::Vocabulary::Format\KAnnotation$/Assertion/ foreach @vocabularies;
-    require JSON::Schema::Modern::Vocabulary::FormatAssertion;
-  }
-
   ALL_KEYWORDS:
-  foreach my $vocabulary (@vocabularies) {
-    foreach my $keyword ($vocabulary->keywords($state->{spec_version})) {
+  foreach my $vocabulary ($state->{vocabularies}->@*) {
+    # [ [ $keyword => $subref|undef ], [ ... ] ]
+    my $keyword_list = $vocabulary_cache->{$state->{spec_version}}{$vocabulary}{evaluate} //= [
+      map [ $_ => $vocabulary->can('_eval_keyword_'.($_ =~ s/^\$//r)) ],
+        $vocabulary->keywords($state->{spec_version})
+    ];
+
+    foreach my $keyword_tuple ($keyword_list->@*) {
+      my ($keyword, $sub) = $keyword_tuple->@*;
       next if not exists $schema->{$keyword};
 
       # keywords adjacent to $ref are not evaluated before draft2019-09
@@ -541,8 +568,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
       delete $unknown_keywords{$keyword};
       $state->{keyword} = $keyword;
 
-      my $method = '_eval_keyword_'.($keyword =~ s/^\$//r);
-      if (my $sub = $vocabulary->can($method)) {
+      if ($sub) {
         my $error_count = $state->{errors}->@*;
 
         if (not $sub->($vocabulary, $data, $schema, $state)) {
@@ -555,8 +581,8 @@ sub _eval_subschema ($self, $data, $schema, $state) {
         }
       }
 
-      if (my $sub = $state->{callbacks}{$keyword}) {
-        $sub->($data, $schema, $state);
+      if (my $callback = $state->{callbacks}{$keyword}) {
+        $callback->($data, $schema, $state);
       }
 
       push @new_annotations, $state->{annotations}->@[$#new_annotations+1 .. $state->{annotations}->$#*];
@@ -962,7 +988,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.555
+version 0.556
 
 =head1 SYNOPSIS
 
@@ -995,9 +1021,6 @@ the latest version (currently C<draft2020-12>).
 The use of this option is I<HIGHLY> encouraged to ensure continued correct operation of your schema.
 The current default value will not stay the same over time.
 
-Note that you can also use a C<$schema> keyword in the schema itself, to specify a different metaschema or
-specification version.
-
 May be one of:
 
 =over 4
@@ -1015,6 +1038,9 @@ L<C<draft2019-09> or C<2019-09>|https://json-schema.org/specification-links.html
 L<C<draft7> or C<7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
 
 =back
+
+Note that you can also use a C<$schema> keyword in the schema itself, to specify a different metaschema or
+specification version.
 
 =head2 output_format
 
@@ -1220,6 +1246,7 @@ For example, to find the locations where all C<$ref> keywords are applied B<succ
   });
 
 The return value is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
+Callbacks are not compatible with L</short_circuit> mode.
 
 =head2 validate_schema
 

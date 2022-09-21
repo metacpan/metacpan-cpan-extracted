@@ -39,7 +39,7 @@
    "provides" : {
       "Perinci::Manual" : {
          "file" : "lib/Perinci/Manual.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -54,7 +54,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Manual"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

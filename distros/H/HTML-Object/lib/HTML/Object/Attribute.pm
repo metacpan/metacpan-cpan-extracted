@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Attribute.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/22
-## Modified 2021/08/23
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,11 +17,15 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     use HTML::Object::Literal;
     use HTML::Object::Number;
     use Want;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -40,7 +45,7 @@ sub init
     $self->{rank}    = '';
     $self->{value}   = '';
     $self->{_init_strict_use_sub} = 1;
-    $this->{_exception_class} = 'HTML::Object::Exception';
+    $self->{_exception_class} = 'HTML::Object::Exception';
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     return( $self );
 }
@@ -66,7 +71,7 @@ sub value
 
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -83,7 +88,7 @@ HTML::Object::Attribute - HTML Object Element Attribute Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

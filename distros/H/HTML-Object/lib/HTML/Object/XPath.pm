@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XPath.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/04
-## Modified 2021/12/04
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,6 +17,11 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw(
+        $CACHE $AXES $AXES_KEYS $NC_NAME_RE $QNAME_RE $NC_WILD_RE $QN_WILD_RE 
+        $NODE_TYPE_RE $AXIS_NAME_RE $NUMBER_RE $LITERAL_RE $REGEXP_RE $REGEXP_MOD_RE
+        $BASE_CLASS $VERSION
+    );
     use HTML::Object::XPath::Step;
     use HTML::Object::XPath::Expr;
     use HTML::Object::XPath::Function;
@@ -25,7 +31,7 @@ BEGIN
     use HTML::Object::XPath::Number;
     use HTML::Object::XPath::NodeSet;
     use HTML::Object::XPath::Root;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
     our $CACHE = {};
     # Axis name to principal node type mapping
     our $AXES =
@@ -57,6 +63,9 @@ BEGIN
     our $REGEXP_MOD_RE = qr{(?:[imsx]+)};
     our $BASE_CLASS    = __PACKAGE__;
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -99,22 +108,17 @@ sub find
     my( $path, $context ) = @_;
     # _parse returns an HTML::Object::XPath::Expr object
     my $parsed_path = $self->_parse( $path );
-    $self->message( 3, "\$parsed_path is '$parsed_path'. Calling $parsed_path->evalute( $context )" );
     # $parsed_path is an HTML:: Object::XPath::Expr object
     # $results could be a HTML::Object::XPath::NodeSet or something else like HTML::Object::XPath::Number
     my $results = $parsed_path->evaluate( $context );
-    # $self->message( 3, "results are: '$results' (", overload::StrVal( $results ), ") -> ", join( '', map{ $_->as_xml } @$results ) );
-    $self->message( 3, "results are: '$results' (", overload::StrVal( $results ), ")" );
     # if( $results->isa( 'HTML::Object::XPath::NodeSet') )
     # if( $self->isa_nodeset( $results ) ) 
     if( $self->_is_a( $results, 'HTML::Object::XPath::NodeSet' ) )
     {
-        $self->message( 3, "Results is a ", ref( $results ), " object, sort ", scalar( @$results ), " elements and removing duplicates." );
         return( $results->sort->remove_duplicates );
     }
     else
     {
-        $self->message( 3, "Returning \$results" );
         return( $results );
     }
 }
@@ -123,19 +127,16 @@ sub findnodes
 {
     my $self = shift( @_ );
     my( $path, $context ) = @_;
-    $self->message( 4, "Finding nodes with path '$path' and context '$context'" );
     
     my $results = $self->find( $path, $context );
     
     if( $self->_is_a( $results => 'HTML::Object::XPath::NodeSet' ) )
     {
-        # $self->message( 5, "Returning results -> '", overload::StrVal( $results ), "'" );
         return( wantarray() ? $results->get_nodelist : $results );
     }
     # result should be SCALAR
     else
     {
-        # $self->message( 5, "Returning results -> '", overload::StrVal( $results ), "'" );
         return( wantarray() ? $self->new_nodeset( $results ) : $results );
     }
     #{ return wantarray ? ($results) : $results; } # result should be SCALAR
@@ -242,7 +243,6 @@ sub matches
     my $self = shift( @_ );
     my( $node, $path, $context ) = @_;
     my @nodes = $self->findnodes( $path, $context );
-    $self->messagef( 4, "%d nodes returned from findnodes( $path, $context )", scalar( @nodes ) );
     return(1) if( grep{ "$node" eq "$_" } @nodes );
     return;
 }
@@ -300,7 +300,6 @@ sub _analyze
     if( $self->debug )
     {
         my( $p, $f, $l ) = caller;
-        $self->message( 4, "Returning call to _expr( $tokens ). Called from package $p at line $l" );
     }
     return( $self->_expr( $tokens ) );
 }
@@ -308,7 +307,6 @@ sub _analyze
 sub _arguments
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _arguments" );
     my $args = $self->new_array;
     if( $tokens->[ $self->{_tokpos} ] eq ')' )
     {
@@ -328,19 +326,18 @@ sub _class_for
     my( $self, $mod ) = @_;
     eval( "require ${BASE_CLASS}\::${mod};" );
     die( $@ ) if( $@ );
-    ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $self->debug;
+    # ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $self->debug;
+    eval( "\$${BASE_CLASS}\::${mod}\::DEBUG = " . ( $self->debug // 0 ) );
     return( "${BASE_CLASS}::${mod}" );
 }
 
 sub _expr
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _expr" );
     # $tokens are an array object of xpath expression token
 #     if( $self->debug )
 #     {
 #         my( $p, $f, $l ) = caller;
-#         $self->message( 4, "Returning call to _expr_or( $tokens ). Called from package $p at line $l" );
 #     }
     # Returning an HTML::Object::XPath::Expr object
     return( $self->_expr_or( $tokens ) );
@@ -349,7 +346,6 @@ sub _expr
 sub _expr_additive
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _expr_additive" );
     
     my $expr = $self->_expr_multiplicative( $tokens );
     while( $self->_match( $tokens, qr/[\+\-]/ ) )
@@ -369,7 +365,6 @@ sub _expr_additive
 sub _expr_and
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _expr_and" );
     my $expr = $self->_expr_match( $tokens );
     while( $self->_match( $tokens, 'and' ) )
     {
@@ -386,7 +381,6 @@ sub _expr_and
 sub _expr_equality
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _expr_equality" );
     
     my $expr = $self->_expr_relational( $tokens );
     while( $self->_match( $tokens, qr/!?=/ ) )
@@ -407,7 +401,6 @@ sub _expr_filter
 {
     my( $self, $tokens ) = @_;
     
-    $self->message( 4, "in _expr_filter" );
     
     my $expr = $self->_expr_primary( $tokens );
     while( $self->_match( $tokens, qr/\[/ ) )
@@ -422,7 +415,6 @@ sub _expr_filter
 sub _expr_match
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _expr_match" );
     
     my $expr = $self->_expr_equality( $tokens );
 
@@ -443,7 +435,6 @@ sub _expr_match
 sub _expr_multiplicative
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _expr_multiplicative" );
     
     my $expr = $self->_expr_unary( $tokens );
     while( $self->_match( $tokens, qr/(\*|div|mod)/ ) )
@@ -463,7 +454,6 @@ sub _expr_multiplicative
 sub _expr_or
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _expr_or" );
     
     my $expr = $self->_expr_and( $tokens );
     while( $self->_match( $tokens, 'or' ) )
@@ -480,7 +470,6 @@ sub _expr_or
     if( $self->debug )
     {
         my( $p, $f, $l ) = caller;
-        $self->message( 4, "Returning '$expr'. Called from package $p at line $l" );
     }
     return( $expr );
 }
@@ -488,7 +477,6 @@ sub _expr_or
 sub _expr_path
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _expr_path" );
     # _expr_path is _location_path | _expr_filter | _expr_filter '//?' _relative_location_path
     # Since we are being predictive we need to find out which function to call next, then.
     # LocationPath either starts with "/", "//", ".", ".." or a proper Step.
@@ -534,7 +522,6 @@ sub _expr_path
 sub _expr_primary
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _expr_primary" );
     
     my $expr = $self->new_expr( $self );
     
@@ -599,7 +586,6 @@ sub _expr_primary
 sub _expr_relational
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _expr_relational" );
     
     my $expr = $self->_expr_additive( $tokens );
     while( $self->_match( $tokens, qr/(<|>|<=|>=)/ ) )
@@ -620,7 +606,6 @@ sub _expr_unary
 {
     my( $self, $tokens ) = @_;
     # $tokens are an array object of expression tokens
-    $self->message( 3, "in _expr_unary" );
     
     if( $self->_match( $tokens, qr/-/ ) )
     {
@@ -640,7 +625,6 @@ sub _expr_union
 {
     my( $self, $tokens ) = @_;
     # $tokens are an array object of expression tokens
-    $self->message( 3, "in _expr_union" );
     
     my $expr = $self->_expr_path( $tokens );
     while( $self->_match( $tokens, qr/\|/ ) )
@@ -670,7 +654,6 @@ sub _is_step
     my $token = $tokens->[ $self->{_tokpos} ];
     return unless( defined( $token ) );
 
-    $self->message( 3, "p: Checking if '$token' is a step" );
     # local $^W = 0;
     if( ( $token eq 'processing-instruction' ) || 
         ( $token =~ /^\@($NC_WILD_RE|$QNAME_RE|$QN_WILD_RE)$/o ) || 
@@ -684,7 +667,6 @@ sub _is_step
     }
     else
     {
-        $self->message( 3, "p: '$token' not a step" );
         return;
     }
 }
@@ -692,19 +674,16 @@ sub _is_step
 sub _location_path
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _location_path" );
     my $loc_path = $self->new_location_path;
     
     if( $self->_match( $tokens, qr/\// ) )
     {
         # root
-        $self->message( 3, "h: Matched root" );
         # push @$loc_path, HTML::Object::XPath::Root->new();
         $loc_path->push( $self->new_root );
         # Is it a valid token step?
         if( $self->_is_step( $tokens ) )
         {
-            $self->message( 3, "Next is step" );
             # push @$loc_path, $self->_relative_location_path( $tokens);
             $loc_path->push( $self->_relative_location_path( $tokens ) );
         }
@@ -742,14 +721,12 @@ sub _match
 #     if( $self->debug )
 #     {
 #         my( $p, $f, $l ) = caller;
-#         $self->message( 4, "Checking regular expression '$match' against ", $tokens->length, " nodes and object property _tokpos is '$self->{_tokpos}'. Called from package $p in file $f at line $l" );
 #     }
     $self->{_curr_match} = '';
     return(0) unless( $self->{_tokpos} < scalar( @$tokens ) );
     # return(0) unless( $self->{_tokpos} < $tokens->length );
 
     # local $^W;
-    $self->message( 5, "Checking token No '$self->{_tokpos}' against regexp '$match'" );
     if( $tokens->[ $self->{_tokpos} ] =~ /^$match$/ )
     {
         $self->{_curr_match} = $tokens->[ $self->{_tokpos} ];
@@ -773,7 +750,6 @@ sub _match
 sub _optimise_descendant_or_self
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _optimise_descendant_or_self" );
     
     my $tokpos = $self->{_tokpos};
     
@@ -790,7 +766,6 @@ sub _optimise_descendant_or_self
     }                                                                                              
     else
     {
-        $self->message( 3, "Trying to optimise //" );
         my $step = $self->_step( $tokens );
         if( $step->axis ne 'child' )
         {
@@ -814,7 +789,6 @@ sub _parse
     # $context is something like: //*[@att2="vv"]
     # my $context = join( '&&', $path, map { "$_=>$self->{namespaces}->{$_}" } sort keys %{$self->{namespaces}});
     my $context = $self->namespaces->keys->sort->map(sub{ sprintf( '%s=>%s', $_, $self->namespaces->get( $_ ) ); })->prepend( $path )->join( '&&' );
-    $self->message( 4, "Created context from namespeace is '$context'" );
     
     return( $CACHE->{ $context } ) if( $CACHE->{ $context } );
 
@@ -823,7 +797,6 @@ sub _parse
 
     $self->{_tokpos} = 0;
     my $tree = $self->_analyze( $tokens );
-    $self->message( 4, "Tree returned from _analyze is '$tree'" );
     
     if( $self->{_tokpos} < $tokens->length )
     {
@@ -840,8 +813,6 @@ sub _parse
     if( $self->debug )
     {
         my( $p, $f, $l ) = caller;
-        # $self->message( 3, "PARSED Expr to:\n", $tree->as_string );
-        $self->message( 4, "Returning tree '$tree'. Called from package $p at line $l" );
     }
     return( $tree );
 }
@@ -849,7 +820,6 @@ sub _parse
 sub _relative_location_path
 {
     my( $self, $tokens ) = @_;
-    $self->message( 3, "in _relative_location_path" );
     my @steps;
     
     push( @steps, $self->_step( $tokens ) );
@@ -885,7 +855,6 @@ sub _set_context_set { return( shift->_set_get_scalar( 'context_set', @_ ) ); }
 sub _step
 {
     my( $self, $tokens ) = @_;
-    $self->message( 4, "in _step" );
     if( $self->_match( $tokens, qr/\./ ) )
     {
         # self::node()
@@ -900,7 +869,6 @@ sub _step
     {
         # AxisSpecifier NodeTest Predicate(s?)
         my $token = $tokens->[ $self->{_tokpos} ];
-        $self->message( 4, "p: Checking $token" );
         
         my $step;
         if( $token eq 'processing-instruction' )
@@ -1112,7 +1080,6 @@ sub _tokenize
     my $path = shift( @_ );
     my $tokens = $self->new_array;
     
-    $self->message( 3, "Parsing: $path" );
     
     # Bug: We do not allow "'@' NodeType" which is in the grammar, but I think is just plain stupid.
     
@@ -1122,7 +1089,6 @@ sub _tokenize
     while( length( $path ) )
     {
         my $token = '';
-        $self->message( 4, "Checking path '$path'" );
         if( $expected eq 'RE' && ( $path =~ m{\G\s*($REGEXP_RE $REGEXP_MOD_RE?)\s*}gcxso ) )
         {
             # special case: regexp expected after =~ or !~, regular parsing rules do not apply
@@ -1163,7 +1129,6 @@ sub _tokenize
 
         if( length( $token ) )
         {
-            $self->message( 3, "TOKEN: $token" );
             # push( @tokens, $token );
             $tokens->push( $token );
         }
@@ -1179,7 +1144,6 @@ sub _tokenize
         # return( $self->error( "Query:\n", "$path\n", $marker, "^^^\n", "Invalid query somewhere around here (I think)" ) );
     }
     # return( \@tokens );
-    $self->message( 4, "Returning tokens array '$tokens' containing '", scalar( @$tokens ), " path tokens: '", $tokens->join( "', '" ), "'" );
     return( $tokens );
 }
 
@@ -1192,7 +1156,7 @@ sub _xml_escape_text
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -1221,7 +1185,7 @@ HTML::Object::XPath - HTML Object XPath Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

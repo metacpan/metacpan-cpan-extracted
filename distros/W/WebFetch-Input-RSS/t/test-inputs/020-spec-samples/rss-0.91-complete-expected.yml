@@ -1,0 +1,42 @@
+---
+'0.9':
+- &1
+  - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''
+'0.91':
+- *1
+- &2
+  - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''
+'1.0':
+- *1
+- *2
+- &3
+  - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''
+'2.0':
+- *1
+- *2
+- *3
+- - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''

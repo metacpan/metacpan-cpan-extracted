@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
-package Term::VTerm 0.07;
+package Term::VTerm 0.08;
 
 use v5.14;
 use warnings;
@@ -18,6 +18,7 @@ our @EXPORT_OK; # set up from XS
 our %EXPORT_TAGS = (
    types      => [ grep m/^VALUETYPE_/, @EXPORT_OK ],
    attrs      => [ grep m/^ATTR_/, @EXPORT_OK ],
+   baselines  => [ grep m/^BASELINE_/, @EXPORT_OK ],
    props      => [ grep m/^PROP_/, @EXPORT_OK ],
    mod        => [ grep m/^MOD_/, @EXPORT_OK ],
    damage     => [ grep m/^DAMAGE_/, @EXPORT_OK ],
@@ -43,6 +44,10 @@ and C<get_prop_type>.
 =head2 ATTR_* (:attrs)
 
 Attribute constants for pen attributes.
+
+=head2 BASELINE_* (:baselines)
+
+Pen attribute value constants for the C<baseline> attribute.
 
 =head2 PROP_* (:props)
 

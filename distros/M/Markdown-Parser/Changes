@@ -1,7 +1,12 @@
 Revision history for Perl module Markdown::Parser
 
-v0.1.1 2021-12-22T12:39:25+0900
+v0.2.1 2022-09-19T14:02:24+0900
+
+v0.2.0 2022-09-19T08:30:31Z +0900
+    - Added methods 'as_pod' in all modules to enable parsing markdown and converting it to pod.
+
+v0.1.1 2021-12-22T12:39:25Z +0900
     - Updated distribution missing required module
 
-v0.1.0 2021-08-14T18:52:50+0900
+v0.1.0 2021-08-14T18:52:50Z +0900
     - original release

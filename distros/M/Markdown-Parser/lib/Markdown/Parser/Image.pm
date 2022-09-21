@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Image.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,10 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -54,6 +57,16 @@ sub as_markdown
         $arr->push( ')' );
     }
     return( $arr->join( '' )->scalar );
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    my $arr = $self->new_array;
+    $arr->push( "=begin html\n" );
+    $arr->push( $self->as_string );
+    $arr->push( "\n=end html" );
+    return( $arr->join( "\n" )->scalar );
 }
 
 sub as_string
@@ -96,7 +109,7 @@ sub title { return( shift->_set_get_scalar_as_object( 'title', @_ ) ); }
 sub url { return( shift->_set_get_uri( 'url', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -113,7 +126,7 @@ Markdown::Parser::Image - Markdown Image Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -130,6 +143,12 @@ Returns the current value.
 =head2 as_markdown
 
 Returns a string representation of the image formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the image formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

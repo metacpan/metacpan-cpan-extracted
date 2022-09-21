@@ -4,7 +4,7 @@ Plack::App::ServiceStatus - Check and report status of various services needed b
 
 # VERSION
 
-version 0.906
+version 0.908
 
 # SYNOPSIS
 
@@ -71,6 +71,16 @@ it.
 
 You can then use some monitoring software to periodically check if
 your app is running and has access to all needed services.
+
+## Options to new
+
+- version
+
+    Set the version of your app.
+
+- show\_hostname
+
+    If set to a true value, show the hostname.
 
 ## Checks
 

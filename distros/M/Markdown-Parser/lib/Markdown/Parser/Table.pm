@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Table.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,13 +16,16 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use POSIX ();
     use Scalar::Util ();
     use Devel::Confess;
     use constant CHAR2PIXELS => 8;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -38,7 +41,6 @@ sub init
 sub as_css_grid
 {
     my $self = shift( @_ );
-    $self->message( 3, "Returning table as css grid." );
     return( $self->{_as_css_grid} ) if( $self->{_as_css_grid} );
     ## css(9 method is inherited from Markdown::Parser::Element
     my $css  = $self->css || return( $self->error( "No CSS::Object was set using the css() method. This should be set by Markdown::Parser::parse_table" ) );
@@ -80,13 +82,11 @@ sub as_css_grid
     $arr->push( "<div class=\"grid-${id}\">" );
     if( $hdr )
     {
-        $self->message( 3, "Generating header" );
         $arr->push( $hdr->as_css_grid );
     }
     $bodies->for(sub
     {
         my( $i, $body ) = @_;
-        $self->message( 3, "Generating a table body" );
         ## If there is more than one body, we separate them with one blank line
         $arr->push( "\n" ) if( $i > 0 );
         $arr->push( $body->as_css_grid );
@@ -121,7 +121,6 @@ sub as_markdown
     $arr->push( $tmp->join( '' )->scalar );
     if( $hdr )
     {
-        $self->message( 3, "Generating header" );
         $arr->push( $hdr->as_markdown );
     }
     $arr->push( "\n" ) if( $bodies->length );
@@ -129,7 +128,6 @@ sub as_markdown
     $bodies->for(sub
     {
         my( $i, $body ) = @_;
-        $self->message( 3, "Generating a table body" );
         ## If there is more than one body, we separate them with one blank line
         $arr->push( "\n" ) if( $i > 0 );
         $arr->push( $body->as_markdown );
@@ -140,7 +138,38 @@ sub as_markdown
     return( $self->{_as_mardown} );
 }
 
-## Ref: https://www.w3schools.com/TAgs/tag_col.asp
+sub as_pod
+{
+    my $self = shift( @_ );
+    return( $self->{_as_pod} ) if( $self->{_as_pod} );
+    my $arr  = $self->new_array;
+    my $cap  = $self->caption;
+    my $hdr  = $self->header;
+    my $bodies = $self->bodies;
+    
+    $arr->push( ' ' . $cap->as_pod ) if( $cap && $cap->position eq 'top' );
+    my $tag = $self->tag_name;
+    my $tag_open = $tag;
+    if( $hdr )
+    {
+        $arr->push( $hdr->as_pod );
+    }
+    $arr->push( "\n" ) if( $bodies->length );
+    
+    $bodies->for(sub
+    {
+        my( $i, $body ) = @_;
+        # If there is more than one body, we separate them with one blank line
+        $arr->push( "\n" ) if( $i > 0 );
+        $arr->push( $body->as_pod );
+        $arr->push( "\n" );
+    });
+    $arr->push( ' ' . $cap->as_pod ) if( $cap && $cap->position eq 'bottom' );
+    $self->{_as_pod} = $arr->join( '' )->scalar;
+    return( $self->{_as_pod} );
+}
+
+# Ref: https://www.w3schools.com/TAgs/tag_col.asp
 sub as_string
 {
     my $self = shift( @_ );
@@ -179,16 +208,16 @@ sub add_body
 
 sub bodies { return( shift->_set_get_object_array_object( 'bodies', 'Markdown::Parser::TableBody', @_ ) ); }
 
-## Alias
+# Alias
 sub body { return( shift->bodies( @_ ) ); }
 
 sub caption
 {
     my $self = shift( @_ );
+    my $base = $self->base_class;
     if( @_ )
     {
         my $val = shift( @_ );
-        my $base = $self->base_class;
         return( $self->error( "Value provided (", overload::StrVal( $val ), ") is not a ${base}::TableCaption object" ) ) if( !$self->_is_a( $val, "${base}::TableCaption" ) );
         $val->parent( $self );
         $self->_set_get_object( 'caption', "${base}::TableCaption", $val );
@@ -230,15 +259,16 @@ sub reset_stat
     return( $self );
 }
 
-## Contains an hash of property and values providing stats on the table and collected upon parsing
-## They are used to produce the html table or css grid
-## sub stat { return( shift->_set_get_hash_as_mix_object( 'stat', @_ ) ); }
+# Contains an hash of property and values providing stats on the table and collected upon parsing
+# They are used to produce the html table or css grid
+# sub stat { return( shift->_set_get_hash_as_mix_object( 'stat', @_ ) ); }
 sub stat
 {
     my $self = shift( @_ );
     my $info = $self->_set_get_hash_as_mix_object( 'stat' );
     return( $info ) if( $info && $info->length );
-    local $get_width = sub
+    my $get_width;
+    $get_width = sub
     {
         my $row = shift( @_ );
         $row->children->for(sub
@@ -309,7 +339,7 @@ sub stat
 sub use_css_grid { return( shift->_set_get_boolean( 'use_css_grid', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -329,7 +359,7 @@ Markdown::Parser::Table - Markdown Table Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -395,6 +425,12 @@ This is quite a nifty feature that enables you to transform effortlessly a table
 Returns a string representation of the table formatted in markdown.
 
 This method will call L</caption> if one is set, L</header> and L</bodies> and get their respective markdown representation of their part.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the table formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

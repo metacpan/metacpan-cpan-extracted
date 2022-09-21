@@ -22,4 +22,4 @@ requires:
   HTTP::Request::Common: '0'
 resources:
   repository: https://github.com/vkeselj/CGI-AuthRegister.git
-version: '1.403'
+version: '1.404'

@@ -5,7 +5,7 @@ require Exporter;
 require DynaLoader;
 @ISA =         qw(DynaLoader Exporter);
 @EXPORT_OK   = qw(reset to scale time);
-$VERSION     = '0.54';
+$VERSION     = '0.55';
 
 __PACKAGE__->bootstrap($VERSION);
 

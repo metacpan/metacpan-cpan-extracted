@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Insertion.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,10 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -34,6 +37,13 @@ sub as_markdown
     my $self = shift( @_ );
     my $str = $self->children->map(sub{ $_->as_markdown })->join( '' );
     return( "~~${str}~~" );
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    my $str = $self->children->map(sub{ $_->as_markdown })->join( '' );
+    return( "${str}" );
 }
 
 sub as_string
@@ -56,7 +66,7 @@ sub as_string
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -73,7 +83,7 @@ Markdown::Parser::Insertion - Markdown Insertion Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -96,6 +106,12 @@ With C<€5> being stroken through and C<€10> being highlighted as being added
 Returns a string representation of the insertion formatted in markdown.
 
 It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the insertion formatted in L<pod|perlpod>.
+
+It returns a plain string, but it actually returns the original string whatever it was, because there is no equivalent to C<insertion> in pod.
 
 =head2 as_string
 

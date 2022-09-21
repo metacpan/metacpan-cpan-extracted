@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.033     2022-09-18 23:10:04Z
+          - bump dependency on JSON::Schema::Modern, to pick up changes to
+            error output when an openapi document is invalid
+
 0.032     2022-08-13 23:17:31Z
           - error when a uri path specification contains duplicate capture
             names

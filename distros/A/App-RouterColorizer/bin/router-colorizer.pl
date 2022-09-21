@@ -79,7 +79,7 @@ router-colorizer.pl - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.222220
+version 1.222630
 
 =head1 DESCRIPTION
 

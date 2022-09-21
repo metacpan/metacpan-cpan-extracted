@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## HTML Object - ~/lib/HTML/Object/DOM/NodeIterator.pm
-## Version v0.1.0
+## HTML Object - ~/lib/HTML/Object/DOM/NodeIteratorShared.pm
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/20
-## Modified 2021/12/20
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,11 +17,15 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     # To import its constants
     use HTML::Object::DOM::Node;
     use HTML::Object::DOM::NodeFilter qw( :all );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -86,7 +90,6 @@ sub init
     # This is the position of our cursor in the flatten tree represented by an array of all elements
     $self->{_pos} = 0;
     my $elems = $self->_flatten;
-    $self->messagef( 4, "%d elements found in the entire tree.", $elems->length );
     $self->_elements( $elems );
     return( $self );
 }
@@ -118,8 +121,6 @@ sub nextNode
             class => 'HTML::Object::TypeError',
         }) );
     }
-    # XXX Remove me
-    $self->message( 4, "ELEMENT_NODE is '", ELEMENT_NODE, "', TEXT_NODE = '", TEXT_NODE, "', SHOW_ALL = '", SHOW_ALL, "'. whatToShow is SHOW_ALL ($whattoshow) ? ", ( ( $whattoshow & SHOW_ALL ) ? 'yes' : 'no' ) );
     my $node;
     my $tmpPos = $self->{_pos} + 1;
     while(1)
@@ -133,9 +134,8 @@ sub nextNode
         $self->{_relative_pos} = $tmpNode->parent->children->pos( $tmpNode );
         local $_ = $tmpNode;
         my $rv = $filter->( $tmpNode );
-        $self->message( 4, "Callback returned '$rv' (", ( defined( $rv ) ? 'defined' : 'undefined' ), ")." );
-        # Filter should return FILTER_ACCEPT or FILTER_DENY or FILTER_SKIP
-        $tmpPos++, next if( !defined( $rv ) || $rv == FILTER_DENY || $rv == FILTER_SKIP );
+        # Filter should return FILTER_ACCEPT or FILTER_REJECT or FILTER_SKIP
+        $tmpPos++, next if( !defined( $rv ) || $rv == FILTER_REJECT || $rv == FILTER_SKIP );
         $node = $tmpNode;
         $self->{_pos} = $tmpPos;
         last;
@@ -180,9 +180,8 @@ sub previousNode
         $self->{_relative_pos} = $tmpNode->parent->children->pos( $tmpNode );
         local $_ = $tmpNode;
         my $rv = $filter->( $tmpNode );
-        $self->message( 4, "Callback returned '$rv' (", ( defined( $rv ) ? 'defined' : 'undefined' ), ")." );
-        # Filter should return FILTER_ACCEPT or FILTER_DENY or FILTER_SKIP
-        $tmpPos--, next if( !defined( $rv ) || $rv == FILTER_DENY || $rv == FILTER_SKIP );
+        # Filter should return FILTER_ACCEPT or FILTER_REJECT or FILTER_SKIP
+        $tmpPos--, next if( !defined( $rv ) || $rv == FILTER_REJECT || $rv == FILTER_SKIP );
         $node = $tmpNode;
         # Decrement the position for the next turn
         $self->{_pos} = $tmpPos;
@@ -204,7 +203,6 @@ sub _check_element
     my $node = shift( @_ ) || return;
     my $type = $node->nodeType;
     my $whattoshow = $self->whatToShow;
-    $self->message( 4, "Checking node (", overload::StrVal( $node ), ") at position '$self->{_pos}' with tag '", $node->tag, "' with type '$type'" );
     unless( $whattoshow == SHOW_ALL )
     {
         if( ( $type == ELEMENT_NODE && !( $whattoshow & SHOW_ELEMENT ) ) ||
@@ -237,7 +235,8 @@ sub _flatten
     return( $self->error( "root element is gone!" ) ) if( !defined( $root ) );
     my $elems = $self->new_array;
     my $seen = {};
-    local $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $e = shift( @_ );
         my $addr = $self->_refaddr( $e );
@@ -260,7 +259,7 @@ sub _flatten
 sub _parent { return( shift->_set_get_object_without_init( '_parent', 'HTML::Object::DOM::Node', @_ ) ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -310,7 +309,7 @@ Choose C<NodeIterator> when you only need a simple iterator to filter and browse
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

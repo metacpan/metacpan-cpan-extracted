@@ -110,14 +110,22 @@ subtest '_get_config_options' => sub {
 
     is_deeply _get_config_options(undef), {}, '_get_config_options(undef) returns {}';
 
-    my $href = _get_config_options("");
-    my @got_keys = sort keys $href->%*;
-    my @expected_keys = qw(aliases cache);
-    is_deeply \@got_keys, \@expected_keys, '_get_config_options("")';
+    my $href;
+    my @got_keys;
+    my @expected_keys;
+    
+    if ( _get_default_config_filespec() ) {
+        $href = _get_config_options("");
+        is ref $href, 'HASH', '_get_config_options("") loaded a default config';
+    } else {
+        ok 1, 'no default config file found';
+    }
+    
 
     my $fname = $FindBin::Bin . '/ghcn_fetch.yaml';
     $href = _get_config_options($fname);
     @got_keys = sort keys $href->%*;
+
     @expected_keys = qw(aliases cache);
     is_deeply \@got_keys, \@expected_keys, "_get_config_options($fname)";
 };

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/Shared.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/25
-## Modified 2021/12/25
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    use vars qw( @EXPORT_OK %EXPORT_TAGS $VERSION );
     use Exporter qw( import );
     our @EXPORT_OK = qw(
         accept accessKey align allowdirs alt autocapitalize autocomplete autofocus checked checkValidity compact crossOrigin currentSrc defaultChecked defaultValue dirName disabled download files form formAction formEnctype formMethod formNoValidate formTarget hash height host hostname href hreflang indeterminate inputmode labels list max maxLength min minLength multiple name origin password pathname pattern placeholder port protocol readOnly referrerPolicy rel relList reportValidity required selectionDirection selectionEnd selectionStart search setCustomValidity size src step target type useMap username value validationMessage validity valueAsDate valueAsNumber webkitdirectory webkitEntries willValidate width
@@ -87,8 +88,11 @@ BEGIN
         video   => [qw( height width )],
     );
     $EXPORT_TAGS{all} = [@EXPORT_OK];
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 # Note: property for input
 sub accept : lvalue { return( shift->_set_get_property( 'accept', @_ ) ); }
@@ -271,7 +275,8 @@ sub origin
     # I need a way to remove the port if it is standard. URI->canonical gives us that, but also includes the path, which we do not want
     # and we do not want a trailing '/', which canonical adds
     my $origin = URI->new( join( '', $uri->scheme, '://', $uri->host_port ) )->canonical;
-    substr( $origin, -1, 1, '' ) if( substr( $origin, -1, 1 ) eq '/' );
+    # substr( $origin, -1, 1, '' ) if( substr( $origin, -1, 1 ) eq '/' );
+    $origin->path( substr( $origin->path, 0, -1 ) ) if( substr( $origin->path, -1, 1 ) eq '/' );
     return( $origin );
 }
 
@@ -386,7 +391,7 @@ sub willValidate : lvalue { return( shift->_set_get_boolean( 'willvalidate', @_ 
 sub width : lvalue { return( shift->_set_get_property( 'width', @_ ) ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -401,7 +406,7 @@ HTML::Object::DOM::Element::Shared - HTML Object DOM Form Shared Code
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

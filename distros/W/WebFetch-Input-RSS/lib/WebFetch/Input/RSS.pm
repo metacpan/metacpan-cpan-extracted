@@ -14,145 +14,199 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Input::RSS;
-$WebFetch::Input::RSS::VERSION = '0.1.0';
+$WebFetch::Input::RSS::VERSION = '0.2.0';
 use base "WebFetch";
 
+use WebFetch "0.15.2";
+use Readonly;
 use Carp;
+use Try::Tiny;
 use Scalar::Util qw( blessed );
-use Date::Calc qw(Today Delta_Days Month_to_Text);
 use XML::RSS;
-use LWP::UserAgent;
 
-use Exception::Class (
-);
-
-
-our @Options = ();
-our $Usage = "";
+use Exception::Class ();
 
 # configuration parameters
+Readonly::Scalar my $default_rss_version => "2.0";
 
 # no user-servicable parts beyond this point
 
 # register capabilities with WebFetch
-__PACKAGE__->module_register( "input:rss" );
-
+__PACKAGE__->module_register("input:rss");
 
 # called from WebFetch main routine
 sub fetch
 {
-	my ( $self ) = @_;
+    my ($self) = @_;
 
-	# set up Webfetch Embedding API data
-	$self->data->add_fields( "pubDate", "title", "link", "category",
-		"description" );
-	# defined which fields match to which "well-known field names"
-	$self->data->add_wk_names(
-		"title" => "title",
-		"url" => "link",
-		"date" => "pubDate",
-		"summary" => "description",
-		"category" => "category",
-	);
+    # set up Webfetch Embedding API data
+    $self->data->add_fields( "pubDate", "title", "link", "category", "description", "author", "id" );
 
-	# parse data file
-	$self->parse_input();
+    # defined which fields match to which "well-known field names"
+    $self->data->add_wk_names(
+        "title"    => "title",
+        "url"      => "link",
+        "date"     => "pubDate",
+        "summary"  => "description",
+        "category" => "category",
+        "author"   => "author",
+        "id"       => "id",
+    );
 
-	# return and let WebFetch handle the data
+    # parse data file
+    $self->parse_input();
+
+    # return and let WebFetch handle the data
     return;
 }
 
 # extract a string value from a scalar/ref if possible
 sub extract_value
 {
-	my $thing = shift;
+    my $thing = shift;
 
-	( defined $thing ) or return;
-	if ( ref $thing ) {
-		if ( !blessed $thing ) {
-			# it's a HASH/ARRAY/etc, not an object
-			return;
-		}
-		if ( $thing->can( "as_string" )) {
-			return $thing->as_string;
-		}
-		return;
-	} else {
-		$thing =~ s/\s+$//xs;
-		length $thing > 0 or return;
-		return $thing;
-	}
+    ( defined $thing ) or return;
+    if ( ref $thing ) {
+        if ( !blessed $thing ) {
+
+            # it's a HASH/ARRAY/etc ref
+            if ( ref $thing eq "HASH" ) {
+
+                # we need sub-hashes for module namespaces
+                return $thing;
+            }
+
+            # other refs are not useable here
+            return;
+        }
+        if ( $thing->can("as_string") ) {
+            return $thing->as_string;
+        }
+        return;
+    } else {
+        $thing =~ s/\s+$//xs;
+        length $thing > 0 or return;
+        return $thing;
+    }
 }
 
 # parse RSS feed into hash structure
 sub parse_rss
 {
-	my $text = shift;
-	my $rss = XML::RSS->new();
-	$rss->parse($text);
+    my @args    = @_;
+    my $version = $default_rss_version;
+    my %params;
+    if ( ref $args[0] eq "HASH" ) {
+        %params = %{ shift @args };
+    }
+    my $text = shift @args;
+    my $rss  = XML::RSS->new( version => $version );
+    try {
+        $rss->parse($text);
+    } catch {
+        WebFetch::throw_network_get( error => "" . $_, client => $rss );
+    };
+    my ( %feed, @buckets );
 
-	# parse values from top of structure
-	my ( %feed, @buckets );
-	foreach my $field ( keys %$rss ) {
-		if ( ref $rss->{$field} eq "HASH" ) {
-			push @buckets, $field;
-		}
-		my $value = extract_value( $rss->{$field});
-		( defined $value ) or next;
-		$feed{$field} = $value;
-	}
+    # copy RSS channel data to WebFetch feed data
+    if ( exists $rss->{channel} ) {
+        $feed{info} = $rss->{channel};
+    }
 
-	# parse hashes, i.e. channel parameters, XML/RSS modeules, etc
-	foreach my $bucket ( @buckets ) {
-		( defined $rss->{$bucket}) or next;
-		$feed{$bucket} = {};
-		foreach my $field ( keys %{$rss->{$bucket}} ) {
-			my $value = extract_value( $rss->{$bucket}{$field});
-			( defined $value ) or next;
-			$feed{$bucket}{$field} = $value;
-		}
-	}
+    # parse values from top of structure
+    foreach my $field ( keys %$rss ) {
+        if ( ref $rss->{$field} eq "HASH" ) {
+            push @buckets, $field;
+        }
+        my $value = extract_value( $rss->{$field} );
+        ( defined $value ) or next;
+        $feed{$field} = $value;
+    }
 
-	# parse each item from the news feed
-	$feed{items} = [];
-	foreach my $item ( @{$rss->{items}}) {
-		my $f_item = {};
-		foreach my $field ( keys %$item ) {
-			my $value = extract_value( $item->{$field});
-			( defined $value ) or next;
-			$f_item->{$field} = $value;
-		}
-		push @{$feed{items}}, $f_item;
-	}
+    # parse hashes, i.e. channel parameters, XML/RSS modeules, etc
+    foreach my $bucket (@buckets) {
+        ( exists $rss->{$bucket} ) or next;
+        $feed{$bucket} = {};
+        foreach my $field ( keys %{ $rss->{$bucket} } ) {
+            my $value = extract_value( $rss->{$bucket}{$field} );
+            ( defined $value ) or next;
+            $feed{$bucket}{$field} = $value;
+        }
+    }
 
-	return \%feed;
+    # parse each item from the news feed
+    $feed{items} = [];
+    foreach my $item ( @{ $rss->{items} } ) {
+        my $f_item = {};
+        foreach my $field ( keys %$item ) {
+            my $value = extract_value( $item->{$field} );
+            ( defined $value ) or next;
+            $f_item->{$field} = $value;
+        }
+        push @{ $feed{items} }, $f_item;
+    }
+
+    return \%feed;
+}
+
+# retrieve first of multiple keys found in a hash
+# The keys should be given in order from highest to lowest priority.
+# This handles various RSS feeds which may use original RSS field names or new Dublin Core (dc) synonyms.
+sub get_first
+{
+    my ( $hashref, @keys ) = @_;
+    my $result = "";
+    foreach my $key (@keys) {
+
+        # search field alternatives in modules such as syndication(sy) or Dublin Core(dc)
+        if ( index( $key, ':' ) != -1 ) {
+            my ( $module, $field ) = split /:/x, $key, 2;
+            if ( exists $hashref->{$module}{$field} ) {
+                $result = $hashref->{$module}{$field};
+                last;
+            }
+        }
+
+        # search for key string
+        if ( exists $hashref->{$key} ) {
+            $result = $hashref->{$key};
+            last;
+        }
+    }
+    return $result;
 }
 
 # parse RSS input
 sub parse_input
 {
-	my $self = shift;
+    my $self = shift;
 
-	# parse data file
-	my $raw_rss = $self->get();
-	my $feed = parse_rss( $$raw_rss );
+    # parse data file
+    my $raw_rss = $self->get();
+    my %params;
+    if ( exists $self->{rss_version} ) {
+        $params{version} = $self->{rss_version};
+    }
+    my $feed = parse_rss( \%params, $$raw_rss );
 
-	# translate parsed RSS feed into the WebFetch Embedding API data table
-	my $pos = 0;
-	foreach my $item ( @{$feed->{items}} ) {
-		# save the data record
-		my $title = ( defined $item->{title}) ? $item->{title} : "";
-		my $link = ( defined $item->{link}) ? $item->{link} : "";
-		my $pub_date = ( defined $item->{pubDate})
-			? $item->{pubDate} : "";
-		my $category = ( defined $item->{category})
-			? $item->{category} : "";
-		my $description = ( defined $item->{description})
-			? $item->{description} : "";
-		$self->data->add_record( $pub_date, $title, $link,
-			$category, $description );
-		$pos++;
-	}
+    # copy channel info if present
+    if ( exists $feed->{info} ) {
+        $self->{data}{feed} = $feed->{info};
+    }
+
+    # translate parsed RSS feed into the WebFetch Embedding API data table
+    foreach my $item ( @{ $feed->{items} } ) {
+
+        # save the data record
+        my $date        = get_first( $item, qw(pubDate date dc:date) );
+        my $title       = get_first( $item, qw(title dc:title) );
+        my $link        = get_first( $item, qw(link dc:source) );
+        my $category    = get_first( $item, qw(category) );
+        my $description = get_first( $item, qw(description dc:description) );
+        my $author      = get_first( $item, qw(author dc:creator) );
+        my $id          = get_first( $item, qw(id identifier dc:identifier) );
+        $self->{data}->add_record( $date, $title, $link, $category, $description, $author, $id );
+    }
     return;
 }
 
@@ -168,7 +222,7 @@ WebFetch::Input::RSS - get headlines for WebFetch from RSS feed
 
 =head1 VERSION
 
-version 0.1.0
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -183,26 +237,19 @@ C<perl -w -MWebFetch::Input::RSS -e "&fetch_main" -- --dir directory
 
 =head1 DESCRIPTION
 
-This module gets the current headlines from a site-local file.
+This module reads news items from an RSS feed.
 
-The I<--input> parameter specifies a file name which contains news to be
-posted.  See L<"FILE FORMAT"> below for details on contents to put in the
-file.  I<--input> may be specified more than once, allowing a single news
-output to come from more than one input.  For example, one file could be
-manually maintained in CVS or RCS and another could be entered from a
-web form.
-
-After this runs, the file C<site_news.html> will be created or replaced.
-If there already was a C<site_news.html> file, it will be moved to
-C<Osite_news.html>.
+This module uses WebFetch's I<--source> parameter to specify the URL of an RSS feed or a local file
+containing RSS XML text.
 
 =head1 RSS FORMAT
 
 RSS is an XML format defined at http://www.rssboard.org/rss-specification
 
 WebFetch::Input::RSS uses Perl's XML::RSS to parse RSS "Really Simple
-Syndication" version 0.9, 0.91, 1.0 or 2.0,
-whichever is provided by the server.
+Syndication" version 0.9, 0.91, 1.0 or 2.0, whichever is provided by the server.
+An optional "--rss_version" command-line parameter or "rss_version" initialization parameter
+can set the RSS version number for the parser. If not specified, it defaults to RSS 2.0.
 
 =head1 SEE ALSO
 

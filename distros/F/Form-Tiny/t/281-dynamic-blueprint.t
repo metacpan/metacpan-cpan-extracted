@@ -55,14 +55,6 @@ sub fdef
 	die "Unknown field name: $name";
 }
 
-my $expected = {
-	static => fdef('static'),
-	dynamic_field => fdef('dynamic_field'),
-	nested => {
-		dynamic_nested => fdef('nested')->type->field_defs->[0],
-	},
-};
-
 dies_ok {
 	TestForm->form_meta->blueprint;
 };
@@ -71,8 +63,48 @@ dies_ok {
 	TestForm->form_meta->static_blueprint;
 };
 
-is_deeply($form->form_meta->blueprint($form), $expected, 'dynamic blueprint structure ok');
-note Dumper(TestForm->form_meta->blueprint($form));
+subtest 'no options' => sub {
+	my $expected = {
+		static => fdef('static'),
+		dynamic_field => fdef('dynamic_field'),
+		nested => {
+			dynamic_nested => fdef('nested')->type->field_defs->[0],
+		},
+	};
+
+	is_deeply($form->form_meta->blueprint($form), $expected, 'blueprint structure ok');
+	note Dumper(TestForm->form_meta->blueprint($form));
+};
+
+subtest 'no recursion' => sub {
+	my $expected = {
+		static => fdef('static'),
+		dynamic_field => fdef('dynamic_field'),
+		nested => fdef('nested'),
+	};
+
+	is_deeply($form->form_meta->blueprint($form, recurse => 0), $expected, 'blueprint structure ok');
+};
+
+subtest 'custom transform' => sub {
+	my $expected = {
+		static => fdef('static'),
+		dynamic_field => fdef('dynamic_field'),
+		nested => fdef('nested')->type,
+	};
+
+	my $transform = sub {
+		my ($def, $default) = @_;
+
+		if ($def->is_subform) {
+			return $def->type;
+		}
+
+		return $default->($def);
+	};
+
+	is_deeply($form->form_meta->blueprint($form, transform => $transform), $expected, 'blueprint structure ok');
+};
 
 done_testing;
 

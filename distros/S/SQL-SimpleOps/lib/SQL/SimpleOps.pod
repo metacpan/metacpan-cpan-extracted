@@ -1,0 +1,3784 @@
+=encoding utf8
+X<CONTENTS>
+
+=head1 NAME
+X<NAME>
+
+SQL::SimpleOps - SQL Simple Operations
+
+=head1 PREFACE
+X<PREFACE>
+
+This module was created for my personal projects and now, after standardization for CPAN Project, i released it for general use.
+
+This module is not a statement parser, contrariwise, it consists of an SQL command builder and executor.
+
+This documment do not will provide concepts about SQL Commands and Relational Database Services.
+We understand that the developer has adequate knowledge of these parameters and commands.
+
+Before any implementation, we recommend seeing the section L<DESCRIPTION> for considerations and restrictions.
+
+I wish it to be useful in the development of your applications.
+
+=head1 SYNOPSIS
+X<SYNOPSIS>
+
+=head2 Constructor (method new)
+X<Constructor>
+
+ use SQL::SimpleOps;
+
+ new
+    $my_module = SQL::SimpleOps->new
+    (
+       # load by config file
+       configfile => filename,					# load options by configfile
+
+       # connections process
+
+       interface => interface_name,				# (default: 'dbi')
+       interface_options =>
+       {
+          ...							# (see interface options)
+       },
+       driver => mysql | mariadb | postgres | sqlite,		# (no defaults)
+       db => dnsname,						# (no defaults)
+       server => dbservername,					# (no defaults)
+       port => tcpport_number,					# (optional)
+       login => login_name,					# (optional)
+       password => login_password,				# (optional)
+
+       # tables definitions					# (no defaults)
+
+       tables =>
+       {
+          table1_alias =>
+          {
+             name => real_table_name_on_database,
+             cols =>
+             {
+                col1_alias_name => col1_real_name,
+             },
+          },
+          table2_alias => { ... },
+          ...
+       },
+
+       # generic options
+
+       quote => character,			# (default: apostrophe)
+       connect => 0 | 1,			# (default: 1 )
+       commit => 0 | 1,				# (default: 0 )
+
+       # message log options			# (default: SQL_SIMPLE_LOG_STD)
+
+       message_log => SQL_SIMPLE_LOG_OFF | SQL_SIMPLE_LOG_SYS + SQL_SIMPLE_LOG_STD,
+
+       message_syslog_facility => string,	# (default: 'local0')
+       message_syslog_service => string,	# (default: 'SQL-SimpleOps')
+
+       # sql_save options			# (default: disabled)
+
+       sql_save => SQL_SIMPLE_CMD_OFF | SQL_SIMPLE_CMD_ON | SQL_SIMPLE_CMD_ALL,
+
+       sql_save_bydate => 0 | 1,		# (default: 0)
+       sql_save_dir => fullpath,		# (default: (linux) '/var/spool/sql')
+       						# (default: (windows) 'c:/windows/temp')
+       sql_save_name => string,			# (default: 'sql')
+       sql_save_ignore => 0 | 1,		# (default: 1)
+    );
+
+=head2 Database Initializations
+
+ Open
+    $rc = SQL::SimpleOps->Open();
+
+ Wait
+    $rc = SQL::SimpleOps->Wait(
+       count => number,				# (default: 1 occurs)
+       interval => number,			# (default: 5 secs)
+    );
+
+ Close
+    $rc = SQL::SimpleOps->Close();
+
+=head2 SQL Commands
+X<SQL Commands>
+
+ Commit
+    $rc = SQL::SimpleOps->Commit();
+
+ Delete
+    $rc = SQL::SimpleOps->Delete
+    (
+       # table alias name
+
+       table => table_alias_name,
+
+       # where clause
+
+       where => [ condition1, ... ], 		# (see below: WHERE)
+
+       # generic options
+
+       force => 0 | 1,				# (default: 0)
+       notfound => 0 | 1			# (default: 0)
+
+       commit => 0 | 1,				# (default: global value)
+       message_log => 0 | 1,			# (default: global value)
+       sql_save => 0 | 1,			# (default: global value)
+
+       make_only => 0 | 1,			# (default: 0)
+       flush => 0 | 1,				# (default: 1)
+    );
+
+ Insert
+    $rc = SQL::SimpleOps->Insert
+    (
+       # table alias name
+
+       table => table_alias_name
+
+       # fields to insert
+
+       fields =>				# (no defaults)
+       {
+          col1_alias => value,
+          col2_alias => value,
+          ...
+       },
+       or
+       fields => [ col_1,col_2,... ],		# (multiple fields)
+       values =>				# (multiple lines)
+       [
+          [ val_01,val_02,... ],
+          [ val_11,val_12,... ],
+          ...
+       ]
+       or
+       fields => [ col_1 ],			# (one field only)
+       values => [ val_11,val_21,... ],		# (multiple lines)
+
+       # fields for update if already exists
+
+       conflict =>				# (no defaults)
+       {
+          col1_alias => value,
+          col2_alias => value,
+          ...
+       },
+       conflict_key => col_name,		# (no defaults)
+
+       # generic options
+
+       commit => 0 | 1,				# (default: global value)
+       message_log => 0 | 1,			# (default: global value)
+       sql_save => 0 | 1,			# (default: global value)
+       quote => string,				# (default: global value)
+
+       make_only => 0 | 1,			# (default: 0)
+       flush => 0 | 1,				# (default: 1)
+    );
+
+ Select
+    $rc = SQL::SimpleOps->Select
+    (
+       # list of tables
+
+       table => table_alias_name,
+       or
+       table => [ table1_alias, table2_alias, ... ],
+
+       # list of fields
+
+       fields => [ col1_alias, col2_alias, ... ],
+
+       # where clause
+
+       where => [ condition1, ... ], 		# (see below: WHERE)
+
+       # group by options
+
+       group_by => col_alias,
+       or
+       group_by => [ col1_alias, col2_alias, ... ],
+
+       # order by options
+
+       order_by => undef,		# (disable the order process)
+       or
+       order_by => col_alias,
+       or
+       order_by =>
+       [
+          col1_alias => SQL_SIMPLE_ORDER_ASC | USERSOPTS_ORDER_DESC,
+          col2_alias => ...
+          ...
+       ],
+
+       # return buffer				# (no defaults)
+
+       buffer => hash_ref | array_ref | scalar_ref | callback_ref,
+       buffer_options => hash_ref | array_ref | scalar_ref | value_ref,
+
+       # generic options
+
+       limit => value_max_lines,		# (default: ulimited lines) 
+       notfound => 0 | 1,			# (default: 0)
+
+       message_log => 0 | 1,			# (default: global value)
+       quote => string,				# (default: global value)
+       sql_save => 0 | 1,			# (default: global value)
+
+       make_only => 0 | 1,			# (default: 0)
+       flush => 0 | 1,				# (default: 1)
+    );
+
+ SelectCursor
+    $rc = SQL::SimpleOps->SelectCursor
+    (
+       # list of tables
+
+       table => table_alias_name,
+       or
+       table => [ table1_alias, table2_alias, ... ],
+
+       # see Command Select for Fields, Where and More
+       ...
+
+       # cursor options
+
+       cursor => current_cursor_key,				# (no defaults)
+       cursor_key => col_alias,					# (no defaults)
+       cursor_info = array_ref | hash_ref | scalar_ref>,	# (no defaults)
+       cursor_command =>					# (default: TOP)
+          SQL_SIMPLE_CURSOR_RELOAD |
+          SQL_SIMPLE_CURSOR_BACK | SQL_SIMPLE_CURSOR_NEXT |
+          SQL_SIMPLE_CURSOS_TOP | SQL_SIMPLE_CURSOR_LAST,
+       ...
+       limit =>					# (default: no defaults)
+    );
+
+ Update
+    $rc = SQL::SimpleOps->Update
+    (
+       table => table_alias_name,
+
+       fields =>				# (no defaults)
+       {
+          col1_alias => value,
+          col2_alias => value,
+          ...
+       },
+
+       # where clause
+
+       where => [ condition1, ... ], 		# (see below: WHERE)
+
+       # options
+
+       commit => 0 | 1,				# (default: global value)
+       force => 0 | 1,				# (default: 0)
+       notfound => 0 | 1,			# (default: 0)
+
+       commit => 0 | 1,				# (default: global value)
+       message_log => 0 | 1,			# (default: global value)
+       sql_save => 0 | 1,			# (default: global value)
+       quote => string,				# (default: global value)
+
+       make_only => 0 | 1,			# (default: 0)
+       flush => 0 | 1,				# (default: 1)
+    );
+
+=head2 Call SQL
+X<Call SQL>
+
+ Call
+    $rc = SQL::SimpleOps->Call
+    (
+       # sql command
+
+       command => sql_command_string,		# (no defaults)
+
+       # return values				# (no defaults)
+
+       buffer => hash_ref | array_ref | scalar_ref | callback_ref,
+       buffer_options => any_ref_type,
+
+       # options
+
+       commit => 0 | 1,				# (default: global value)
+       message_log => 0 | 1,			# (default: global value)
+       sql_save => 0 | 1,			# (default: global value)
+
+       make_only => 0 | 1,			# (default: 0)
+       flush => 0 | 1,				# (default: 1)
+    );
+
+=head2 General Methods
+X<General Methods>
+
+ getAliasCols
+    $realname_cols = SQL::SimpleOps->getAliasCols(alias_table,alias_cols); 
+
+ getAliasTable
+    $realname_table = SQL::SimpleOps->getAliasCols(alias_table); 
+
+ getDBH
+    $dbh = SQL::SimpleOps->getDBH();
+
+ getLastCursor
+    $hash_ref = SQL::SimpleOps->getLastCursor();
+
+ getLastSave
+    $last_saved_logfile = SQL::SimpleOps->getLastSave();
+
+ getLastSQL
+    $last_sql_command = SQL::SimpleOps->getLastSQL();
+
+ getMessage
+    $message = SQL::SimpleOps->getMessage();
+
+ getRC
+    $rc = SQL::SimpleOps->getRC();
+
+ getRows
+    $rows = SQL::SimpleOps->getRows();
+
+ getWhere
+    $rc = SQL::SimpleOps->getWhere
+    (
+       # list of tables
+
+       table => table,
+       or
+       table => [ table1, table2, ... ],
+
+       # where clause
+
+       where => where_clause,			# (se: Where Clause) 
+
+       # return buffer
+
+       buffer => scalar_ref,
+    );
+
+=head1 DESCRIPTION
+X<DESCRIPTION>
+
+This module was created to execute basic SQL commands in a database engine,
+where it proposes the most common and basic operations with low parameter complexity.
+
+The module allow switch between database engine without recoding.
+It makes the necessary adjusments in SQL statement according the database engine in use,
+reducing the complexity in the applications's code,
+where the current version has built-in support for the databases: I<MySQL>, I<MariaDB>, I<Postgres> and I<SQLite3>.
+
+However, the module does not convert the fields format in the databases,
+where each one has its restrictions and rules.
+We understand that the table in use have same format and data type and supported by all engines.
+
+By default, evey command invoked will be effectively executed in database,
+however this process can be suppressed if requested and the SQL command can retrieve (if neeeded, see: L<make_only> option).
+
+All parameters set in the Constructor (method new) are defined as Global Parameters, and some options can be enable/disable by the Methods, for more information see L<Global Options>.
+
+All executed commands can saved in flat files for Debugging and/or Control and/or Recovery purposes, for more infomration se L<Global Options>.
+
+All implemented methods deliver standards return code, where can be:
+
+=over
+
+=item *
+
+B<rc E<lt> 0,>	Parameters and/or options have syntax errors;
+
+=item *
+
+B<rc = 0,>	SQL command successful executed;
+
+=item *
+
+B<rc = 1,>	SQL command execute with errors;
+
+=item *
+
+B<rc = 2,>	SQL command successful executed without match.
+
+=back
+
+The message details and return code must be extracted by:
+
+=over
+
+=item *
+
+For I<Constructor (new) Method:> Use C<SQL::SimpleOps::err> and C<SQL::SimpleOps::errstr values>.
+
+=item *
+
+For I<Other Methods:> Use C<getRC> and C<getMessage> modules (recommended).
+
+=back
+
+By default the module send the messages on C<STDERR>, unless that requested by the application (see C<message_log> option in L<Global Options>).
+
+=head2 Constructor Initialization
+X<Constructor Initialization>
+
+The constructor (new method) will load and validate all options and initialize the controls.
+
+The execution of the constructor is a mandatory requirement for the others methods.
+You must load the constructor and use the object address created by it to run the methods.
+
+  my $mymod = SQL::SimpleOps->new ( ... );
+  ...
+  my $rc = $mymod->[methods] ( ... );
+  ...
+
+However, in this document have references and examples using the format "SQL::SimpleOps->[method]" just for simple illustration,
+but this format is not supported in encoding. (see L<EXAMPLES>)
+
+The controls can initialized by the Options Arguments and/or L<Configuration File>.
+The module will load the arguments and at end will apply the L<Configuration File> changes,
+where the L<Configuration File> is the highest priority value over the arguments.
+
+=head3 Configuration File
+X<Configuration File>
+
+The config file is not mandatory.
+
+It is the resource used to load the options to initialize the constructor and was created to minize the risk of code changes. 
+You can specify all options and provide changes without recoding.
+
+The format of config file must be JSON and respect the struct below.
+
+  {
+    "db":"database_name",
+    "schema":"schema-name",
+    "driver":"mysql | mariadb | postgres | sqlite",
+    "login":"login",
+    "password":"password",
+    "server":"hostname",
+    "commit":"0 | 1",
+    "connect":"0 | 1",
+    "interface":"dbi",
+    "interface_options":{
+        "options1":"value",
+        "options2":"value",
+        "...":"..."					<- no comma at end is allowed
+     },
+    "message_log":"value",
+    "message_syslog_facility":"string",
+    "message_syslog_service":"string",
+    "port":"tcp_port",
+    "quote":"apostrophe|quote",
+    "sql_save":"0 | 1",
+    "sql_save_ignore":"0 | 1",
+    "sql_save_name":"string",
+    "sql_save_dir":"string",
+    "sql_save_bydate":"0 | 1",
+    "tables":{
+       "table1_alias":{
+           "cols":{
+              "col1_alias_name":"col1_real_name",
+              "...":"..."				<- no comma at end is allowed
+           },
+          "name":"real_table_name_on_database"
+        },
+       "...":"..."					<- no comma at end is allowed
+     }							<- no comma at end is allowed
+  }
+
+B<NOTE:> The example listed above is a simple illustration,
+where you do not need to parameterize all the options.
+you must need use only the mandatory options for your application.
+
+B<REMEMBER:> The JSON format does not allow comma at the end of last field in braces.
+
+=head3 Loading Data into Applications
+X<Loading Data into Applicatons>
+
+Exists two different process to manipulate the application data with the module.
+The first put data into the database (L<Insert> and L<Update>) and the second get data from the database (L<Select> and L<SelectCursor>).
+
+The first process the data will be sent by arguments, where the module will convert to SQL command and run it.
+
+The second process the data will be load into variable sent by arguments, where the module will store the data.
+
+=over
+
+=item *
+
+B<Example1:> Putting the data into the database.
+
+  SQL::SimpleOps->Insert
+  (
+     table => "my_table",
+     fields =>					# (assign by hash)
+     {
+       id => 1,
+       name => "my_name",
+       ...
+     }
+  );
+  or
+  SQL::SimpleOps->Insert
+  (
+     table => "my_table",
+     fields => [ id, name ],			# (array of fields)
+     values => [ [ 1, "my_name"] ],		# (array into array)
+  );
+
+B<NOTE:> The return code must be C<SQL_SIMPLE_RC_OK> for successful or C<SQL_SIMPLE_RC_ERROR> if any errors.
+
+=item *
+
+B<Example2> Getting the data into the database using the C<buffer> option.
+
+  SQL::SimpleOps->Select
+  (
+     table => "my_table",
+     where => [ id => 1 ],
+     ...
+     buffer => hash_ref | array_ref | scalar_ref | callback_ref,
+  );
+
+B<NOTE:> The return code must be C<SQL_SIMPLE_RC_OK> for successful or C<SQL_SIMPLE_RC_ERROR> if any errors.
+
+=back
+
+We have four different types of return values for the C<buffer> option, can be:
+
+=over
+
+=item *
+
+B<Extracting Single Row>
+
+The Single Extraction consists in queries that return only one row.
+The best type of C<buffer> is the C<hash_ref>, where each column will be the index key in the hash.
+
+B<Example3:>
+
+  SQL::SimpleOps->Select( buffer => \%my_buffer, ... );
+
+  foreach my $id(sort(keys(%my_buffer)))
+  {
+     print "id=".$id." -- value=".$my_buffer{$id}."\n";
+  }
+
+B<BEWARE:> Only the last row will be returned for queries with multiple rows.
+
+=item *
+
+B<Extracting Multiple Rows>
+
+The Multiple Extraction consists in queries that return tow or more rows.
+The best type of C<buffer> is the C<array_ref>, where each line will be a hash_ref for each extracted row.
+
+B<Example4:>
+
+  SQL::SimpleOps->Select( buffer => \@my_buffer, ... );
+
+  my $line=0;
+  foreach my $ref(@my_buffer)
+  {
+     foreach my $id(sort(keys(%{$my_buffer{$ref}})))
+     {
+        print $line." -- id=".$id." -- value=".$my_buffer{$ref}->{$id}."\n";
+     }
+     $line++;
+  } 
+
+=item *
+
+B<Extracting Specfic Column in Single Row>
+
+The Single Extraction for specific Column in queries that return only one row/column. 
+The best type of C<buffer> is the C<scalar_ref>, where the column will be stored.
+
+B<Example5:>
+
+  SQL::SimpleOps->Select( buffer => \$my_scalar, ... );
+
+  print "id=".$my_scalar."\n":
+
+=item *
+
+B<Complex Extractions>
+
+The most case you need provide a lot number of process before select the rows.
+The C<callback> will be executed for each extracted rows and depending on the return code, the lines will buffered or ignored (no stored).
+
+B<Example6:>
+
+  my @any_info;
+
+  SQL::SimpleOps->Select
+  (
+     table => table1,
+     fields => [ id, register, counter ],
+     where => [ id => 1 ],
+     buffer => \&subrot_1,
+     buffer_options => \@any_info,
+  );
+  ...
+  sub subrot_1()
+  {
+     my $ref = shift;			# my hash of extracted row from table1
+     my $any = shift;			# my 'buffer_options' option.
+     ...
+     return SQL::SimpleOps->Select		# returing the code of call
+     (
+        table => table2,
+        where => [ id => $ref->{register} ],
+        buffer => \&subrot_2,
+	buffer_options = $any,
+     );
+  }
+  ...
+  sub subrot_2()
+  {
+     my $ref = shift;		# my hash of extracted row from table2
+     my $any = shift;		# my 'buffer_options' options created on table1
+     ...
+     return 1 if (...any condition..);	# rc != 0 will ignore the row
+     ...
+     push(@{any},$ref);		# putting the data into @any_info array
+     return 0;
+  };
+
+B<NOTE:> This example is not a real use case, it is simple sample for references.
+
+=back
+
+=head2 Aliases Table
+X<Aliases Table>
+
+The can be used to abstract the real names on the tables and the columns, reducing the recoding.
+
+The Aliases Table is not mandatory, use it you necessary. See L<EXAMPLES>
+
+When mapped the B<Aliases Column> these aliases will be the keys in the C<hashref buffers>
+
+B<Why should I?> Some companies disallow tables using generic names (out of the norms), in this case, you can use aliases to abstract the real name in your the databases.
+
+B<REMEMBER:> Do not use I<reserved words>, like function names (etc), as aliases. This keywords are reserved and is not allowed to assign as aliases (SQL will be fail).
+
+=over 
+
+=item *
+
+B<Defaults:> no Defaults.
+
+=item *
+
+B<Format:>
+
+  my %contents =
+  (
+     aliases_table_0 =>				# table without list of fields
+     {
+        name => realname_table_0,
+     },
+     aliases_table_1 =>				# table with list of fields
+     {
+        name => realname_table_1,
+        cols =>
+        {
+           aliases_col_1_table_1 => realname_col_1_table_1,
+           aliases_col_2_table_1 => realname_col_2_table_1,
+           ...
+        }
+     },
+     ...
+  );
+
+=item *
+
+B<Examples:>
+
+  my %contents =
+  (
+     users =>
+     {
+        name => "table_for_users",
+        cols =>
+        {
+           _id   => 'fld_id',
+           _name => 'fld_name',
+           _desc => 'fld_description',
+        },
+     },
+  );
+
+  SQL::SimpleOps->Select ( table => "users", fields => [ "_id", "_name", "_desc" ], ... );
+  or
+  SQL::SimpleOps->Select ( table => "users", ... );	# without fields option
+
+Results:
+
+  SELECT fld_id _id, fld_name _name, fld_description _desc FROM table_for_users;
+  or
+  SELECT * FROM table_for_users;
+
+B<NOTE:> This last will not assign the alias names in the SQL Command.
+
+=back
+
+=head2 Escape or Backslash
+
+The L<escape> operand (or L<backslash>) is the format used to force the methods to ignore the translating data as arguments.
+The data with escape information will passed to SQL command without check or decode.
+
+To escape the data, you must use as prefix the backslash caracter ('\').
+
+B<REMEMBER:> The backslash is a control character in the Perl. To use you must insert double backslash.
+
+You can L<escape> the following options:
+
+ SQL::SimpleOps->Select ( ... , fields => [ '\\my_by_pass_as_fields', ... ], ... );
+
+ SQL::SimpleOps->Insert ( ... , conflict => { my_col => '\\my_bypass_as_value', }, ... );
+
+ SQL::SimpleOps->Update ( ... , fields => { my_col => '\\my_bypass_as_value', }, ... );
+
+ SQL::SimpleOps->getWhere ( ... , where => [ '\\my_bypass_as_col_name' => '\\my_bypass_as_value', ... ], ... );
+
+B<NOTE:> The escape is valid in the 'where' clause of L<Select>, L<SelectCursor>, L<Delete> and L<Update> command.
+
+B<Example1:> L<Select> or L<SelectCursor>
+
+ SQL::SimpleOps->Select ( ... fields => [ '\\concat(col1,col2,col3)' ], table => tb1, ... );
+
+Result:
+
+ SELECT ... concat(col1,col2,col3) FROM tb1 ... ;
+
+B<Example2:> L<Insert>
+
+ SQL::SimpleOps->Insret ( ... table => tb1, conflict => { last_update => '\\concat(substr(col1_date,1,4),"-01-01")' ], ... );
+
+Result:
+
+ INSERT INTO tb1 ... ON DUPLICATE last_update = concat(substr(col1_date,1,4),"-01-01") ... ;
+
+B<NOTE:> The L<'on duplicate'> is I<MySQL/MariaDB> database engine, for I<SQLite> and I<Postgres> will be L<'on conflict'>.
+
+B<Example3:> L<Update>
+
+ SQL::SimpleOps->Update ( ... table => tb1, fields => { last_update => '\\concat(substr(col1_date,1,4),"-01-01")' ], ... );
+
+Result:
+
+ UPDATE tb1 ... SET last_update = concat(substr(col1_date,1,4),"-01-01") ... ;
+
+B<Example4:> L<getWhere>
+
+ SQL::SimpleOps->getWhere ( ... where => [ col1 => '\\my_expression', '\\my_col_expression' => my_value ], ... );
+
+Result:
+
+ ... WHERE col1 = my_expression AND my_col_expression = 'my_value' ...
+
+B<NOTE:> The 'my_value' will have quote as applied and 'no quotes' will be in escaped expressions.
+
+=head2 Where Clause
+X<Where Clause>
+
+We belive that the most important situations will was created,
+however we understand that some format will not be supported.
+
+The Where Clause was be create based C<array_ref>, no others options exists.
+We must remember that some engines explore the sequence in the I<Where Clause> to establish de best way to extract data (index and match condition),
+using this point of view the best way is this type of struct.
+
+If you any item (or sub-item) specifies C<hash_ref>, the process is aborted with C<SQL_SIMPLE_RC_SYNTAX> as the return code.
+ 
+=over 
+
+=item *
+
+B<Operators:> The follow operators was been builtin:
+
+  Operator	Description
+  undef		"is null"
+  =		"equal" condition (default)
+  !		"not equal"
+  !=		"not equal"
+  <>		"not equal"
+  >		"greater than"
+  <		"less than"
+  >=		"greater or equal than"
+  <=		"less or equal than"
+  !>		"less or equal than"
+  !<		"greater or equal than"
+  %%		"like %[value]%"
+  ^%		"like [value]%"
+  %^		"like %[value]"
+  ^^		"like [value]"		# no '%' will be added
+  !%%		"not like %[value]%"
+  !^%		"not like [value]%"
+  !%^		"not like %[value]"
+  !^^		"not like [value]"	# no '%' will be added
+  \		"escape value"		# no quote will be applied
+
+=item *
+
+B<Format:>
+
+  SQL::SimpleOps->Select
+  (
+     where =>
+     [
+       fld000 => undef,					# ... fld000 IS NULL
+
+       fld010 => 1,					# ... fld010 = '1'
+
+       fld020 => [ '>', 1 ],				# ... fld020 > '1'
+
+       fld021 => [ '!', undef ],			# ... fld021 NOT NULL
+
+       fld030 => [ 1, 2 ],				# ... fld030 IN ('1','2')
+
+       fld031 => [ '!', 1, 2 ],				# ... fld031 NOT IN ('1','2')
+
+       fld040 => [ 1, '..', 3 ],			# ... fld040 BETWEEN ('1','3')
+
+       fld041 => [ '!', 1, '..', 3 ],			# ... fld041 NOT BETWEEN ('1','3')
+
+     [ fld050 => 1, fld051 => 2 ],			# ... ( fld050 = '1' and fld051 = '2' )
+
+     [ fld060 => 1, 'or', fld061 => 2 ],		# ... ( fld060 = '1' or fld061 = '2' )
+
+     [ fld070 => 1, 'and', fld071 => 2 ],		# ... ( fld070 = '1' and fld071 = '2' )
+
+       fld080 => 1, 'or', [ fld081 => 2, fld082 => 3 ],	# ... fld080 = '1' or ( fld081 = '2' and fld082 = '3' )
+
+       fld090 => 1, [ fld091 => 2, 'or', fld092 => 3 ], # ... fld090 = '1' and ( fld091 = '2' or fld092 = '3' )
+
+       fld100 => [ '%%', 'abc' ],			# ... fld100 LIKE '%abc%'
+
+       fld110 => [ '^%', 'abc' ],			# ... fld110 LIKE 'abc%'
+
+       fld120 => [ '%^', 'abc' ],			# ... fld120 LIKE '%abc'
+
+       fld121 => [ '^^', 'ab%de' ],			# ... fld121 LIKE 'ab%de'  	# you can use '%' if required
+
+       fld130 => '\\concat(fld130,"xxxx")',		# ... fld130 = concat(fld130,"xxxx")  	# without quote
+     ],
+
+  );
+
+B<IMPORTANT:> Do not use aliases column name on the right side. The translation for this side does not apply.
+
+B<BEWARE:> The operators (if used) must be the first field on the C<array_ref>.
+
+=back
+
+=head1 METHODS
+X<METHODS>
+
+Following methods can be exported:
+
+=head2 Constructor (method new)
+X<Method Constructor>
+
+  SQL::-Simple->new
+  (
+     # your global options
+  );
+
+The method load the B<interface> driver and your B<interface options>.
+It is highly recommended to see L<DBI> to understand about the C<interface_options>, see L<Global Options>.
+
+By default, the constructor establish the first connect on database engine.
+If you do not need open the database yet, you can disable by the Constructor using the C<connect> option,
+disabling the connection process at initialization of module.
+However, the first connect will automatic create before the first SQL execution.
+
+B<REMEMBER:> Before implementing the SQL Open Command, make sure the login and password are valid. Perform a iteractive tests from command line, connecting to the database using the login and password, performing the basic functions that the profile needs to do.
+
+B<BEWARE:> If some wrong happens the module will not be die by C<croack> or C<die> operations. You must interpreter the return code and abort it.
+
+=head3 Global Options
+X<Global Options>
+
+All parameters set in the Constructor (method new) are defined as Global Parameters and part of then can be temporarily modified for a specific SQL Command (if needed).
+
+=over
+
+=item *
+
+B<commit:> Enable/disable commit after updates.
+Do not to be confused with the I<commit> available in the options for B<interface driver> (see L<DBI>), it has an other escope.
+
+Defaults: The default value is disabled.
+
+=item *
+
+B<db:> The name of database name. The value depend of type of interface and driver option. see L<DBI> module.
+
+Defaults: no defaults
+
+=item *
+
+B<driver:> Sets the name of database engine. see L<DBI> module.
+
+Defaults: no defaults
+
+=item *
+
+B<interface:> Sets the interface module to use.
+The current version support only C<interface=dbi>.
+
+Defaults: The defaul value is C<dbi>.
+
+=item *
+
+B<interface_options:> See options for L<DBI> module.
+
+Defaults: The default values for C<interface=dbi> are: C<RaiseError=0> and C<PrintError=0>.
+
+=item *
+
+B<login:> Sets the user/profile login for authenticated connection.
+For security reasons and best practices, the module expects that all connections will be authenticated. 
+
+Defaults: no defaults
+
+=item *
+
+B<message_log:> Sets message log mode, can be:
+
+  SQL_SIMPLE_LOG_OFF:	No message will be shown. Use getMessage required to get the messages;
+  SQL_SIMPLE_LOG_SYS:	Write messages on System Syslog Services;
+  SQL_SIMPLE_LOG_STD:	Write messages on STDERR (default);
+  SQL_SIMPLE_LOG_ALL:	Write messages on Syslog/STDERR both.
+
+Defaults: The default value is C<SQL_SIMPLE_LOG_STD>.
+
+B<NOTE:> You can enable Syslog and C<STDERR> simultanely. Use the C<SQL_SIMPLE_LOG_ALL>.
+
+=item *
+
+B<message_syslog_service:> Sets an identifier string on the System Syslog Messages.
+see: L<Sys::Syslg>
+
+Defaults: The default value is C<message_syslog_service=SQL-SimpleOps>
+
+=item *
+B<message_syslog_facility:> Sets the Syslog Facility for the messages on the System Syslog Messages, must be: C<local0> to C<local7>.
+see: L<Sys::Syslg>
+
+Defaults: The default value is C<local0>.
+
+=item *
+
+B<password:> The password/profile for authentication process.
+
+Defaults: no defaults
+
+B<NOTE:> For C<driver=sqlite> this item is ignored.
+
+=item *
+
+B<port:> This option consists the TCP Port to use for connection.
+The option is not mandatory because it is common to use the default database port,
+however some installations may modify the default port. The following defaul pors are known:
+
+  DB2:		50000/tcp
+  MySQL:	3306/tcp
+  Oracle:	1521/tcp
+  Postgres:	5432/tcp
+  SyBase:	5000/tcp
+  SQLite:	not required
+
+Defaults: The default value depend of database engine.
+
+=item *
+
+B<quote:> Sets the quote caracter on string commands (see C<setQuote> method), must be: apostrophe or quote.
+
+Defaults: apostrophe.
+
+=item *
+
+B<server:> Sets the hostname or ip address of hosted database server.
+
+Defaults: no defaults.
+
+=item *
+
+B<sql_save:> Sets the SQL log file mode, can be:
+
+  SQL_SIMPLE_CMD_OFF:	No log file will be written;
+  SQL_SIMPLE_CMD_ON:	Write only update commands;
+  SQL_SIMPLE_CMD_ALL:	Write all commands.
+
+B<BEWARE:> You can use this feature as "Recover Database" if your engine does not support this process.
+However, it is highly recommended that you use the Database Native Resource for this purpose.
+Examples: Archive Logs, Backup Mode, and Others.
+
+Defaults: The default value is C<SQL_SIMPLE_CMD_OFF>.
+ 
+=item *
+
+B<sql_save_bydate:> Sets enable/disable writing log files into distinct folders.
+The folder will be create as:
+
+F<[sql_save_dir]/C<YYYY/YYYYmm/YYYYmmdd>/[logfile]>
+
+Defaults: The option is disabled. See C<sql_save_dir> option.
+
+=item *
+
+B<sql_save_dir:> Sets the folder for writes log file process.
+
+Defaults: (unix/linux) F</var/spool/sql/> or (windows) F<c:\windows\temp>
+
+=item *
+
+B<sql_save_name:> Sets the filename string  for writes log file process.
+
+Defaults: The default value is C<sql>.
+
+=item *
+
+B<sql_save_ignore:> Sets enable/disable option to abort if there are errors wrtten to the Log File.
+
+Defaults: The default value is disabled. If errors the return code will be C<SQL_SIMPLE_RC_ERROR>.
+
+=item *
+
+B<tables:> Sets the list of aliases rules for the tables and fields. See L<Aliases Table>.
+
+Defaults: no defaults.
+
+=back
+
+The follow options can be temporarily modified:
+
+=over
+
+=item *
+
+B<commit:> Enable/Disable the commit after a specific update command.
+
+=item *
+
+B<message_log:> Enable/Disable the written on System Syslog Services.
+
+=item *
+
+B<quote:> Change the quote character.
+
+=item *
+
+B<sql_save:> Enable/Disable the written for SQL Log Files.
+
+=back
+
+B<NOTE:> This Options can be modified with each SQL Command execution.
+These changes will be valid only in this process,
+where the global values will be restored after each execution.
+
+=over
+
+=item *
+
+B<Example1:> The database "my_db" using "interface_options". see L<DBI>
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     db => "my_db",
+     ...
+     interface_options =>
+     {
+        RaiserError => 1, 			# (default: 0)
+        PrintError => 1,			# (default: 0)
+        AutoCommit => 1,
+        InactiveDestroy => 1,
+        AutoInactiveDestroy => 1,
+     },
+  );
+
+B<NOTE:> Do not use this example as template for your implementations, you must see L<DBI> do understand about each options.
+
+=item *
+
+B<Example2:> The database "my_db" writing on System Syslog Service. see L<Sys::Syslog>
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "mariadb",
+     db => "my_db",
+     ...
+     message_log => SQL_SIMPLE_LOG_SYS,		# (default is STDERR)
+     message_syslog_facility => "local7",	# (default is "local0")
+     message_syslog_service => "my_service",	# (default is "SQL-SimpleOps")
+     ...
+  );
+
+Notifications will be sent to the system messages file (in Linux the file F</var/log/messages>).
+
+We recommended to use the "System Syslog Services" as standard in your applications and create rules to write in separeted log files. 
+For more information see the documentation related to the "Syslog Service" on your System.
+ 
+=item *
+
+B<Example3:> The database "my_db" writing SQL Log Files.
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "mysql",
+     db => "my_db",
+     ...
+     sql_save => SQL_SIMPLE_CMD_ALL,		# (default is OFF)
+     sql_save_name => "my_cmds",		# (default is "sql")
+     sql_save_dir => "/var/tmp/sql",		# (default is "/var/spool/sql")
+     ...
+  );
+
+The SQL Command will be written as flat file and your the filesystem name will be:
+
+F</var/tmp/sql/[sql_save_name].[database_name].[today].[pid].[counter]>
+
+Where:
+
+=over
+
+=item *
+
+B<sql_save_name:> Consists in the C<sql_save_name> option value.
+
+=item *
+
+B<database_name:> Consists in the C<my_db> database value.
+
+=item *
+
+B<today:> Current day formated as C<YYYYmmdd> (year+month+day).
+
+=item *
+
+B<pid:> Current Pid (system process identifier) in execution.
+
+=item *
+
+B<counter:> Indexer for each SQL Command executed by the Current Pid.
+A Pid that runs multiple commands will have the multiple SQL Log Files.
+
+=back
+
+=item *
+
+B<Example4:> The database "my_db" writing SQL Log Files splited by date.
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "mysql",
+     db => "my_db",
+     ...
+     sql_save => SQL_SIMPLE_CMD_ALL,		# (default is OFF)
+     sql_save_name => "my_cmds",		# (default is "sql")
+     sql_save_dir => "/var/tmp/sql",		# (default is "/var/spool/sql")
+     sql_save_bydate => 1,			# (default is OFF)
+     ...
+  );
+
+The SQL Command will be written as flat file separeted into distinct folders by date identifier.
+
+The folder will be create as:
+
+F</var/tmp/sql/YYYY/YYYYmm/YYYYmmdd/[sql_save_name].[database_name].[today].[pid].[counter]>
+
+=item *
+
+B<Example5:> The database "my_db" forcing commit for each update command.
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "mysql",
+     db => "my_db",
+     ...
+     commit => 1,				# (default is OFF)
+     ...
+  );
+
+The C<commit> option for each update command can cause degradation in the process or even the database engine.
+Use this option wisely.
+
+B<When can i use it?>
+The C<commit> option (or command) can be used at the end of a long process of updates,
+and that at a certain point you need to create relational consistency to reduce B<rollback> process.
+
+In this case, you can either execute the Commit SQL Command or execute the last update command of the cycle using C<commit> option.
+
+  SQL::SimpleOps->Commit();			# (simple commit command)
+  or
+  SQL::SimpleOps->Update
+  (
+     table => "my_table",
+     ...
+     commit => 1,				# (default is OFF)
+  );
+
+=back
+
+=head3 Interface MySQL/MariaDB
+X<Interface MySQL/MariaDB>
+
+=over
+
+=item *
+
+B<Format:> see L<DBI>
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "mysql" | "mariadb",
+     interface_options =>
+     {
+        mysql_auto_reconnect => 0 | 1,
+        ...
+     },
+     ...
+  );
+
+=item *
+
+B<Example1:> The database as "my_info", loging "my_user", password "my_auth":
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "mysql",
+     db => "my_info",
+     login => "my_user",
+     password => "my_auth",
+     interface_options => { mysql_auto_reconnect => 0 },
+  );
+
+=back
+
+=head3 Interface SQLite
+X<Interface SQLite>
+
+=over
+
+=item *
+
+B<Format:> see L<DBI>
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "sqlite",
+     interface_options =>
+     {
+        # no special options 
+     },
+     ...
+  );
+
+=item *
+
+B<Example1:> The database as "my_info" and fileset as "my_info.db":
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "sqlite",
+     db => "my_info",
+  );
+
+=item *
+
+B<Example2:> The database as "my_db" and fileset as "my_file.db":
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "sqlite",
+     db => "my_db"
+     dbfile => "my_file.db"		# (or: dbfile => "my_file")
+     interface_options =>
+     {
+        RaiseError => 1,		# (the default is 0)
+        PrintError => 1,		# (the default is 0)
+     },
+  );
+
+=back
+
+=head3 Interface Postgres
+X<Interface Postgres>
+
+=over
+
+B<Format:> see L<DBI>
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "pg",
+     db => "my_db",
+     schema => "my_schema",
+     interface_options =>
+     {
+        # no special options
+     },
+  );
+
+=item *
+
+B<Example1>: Using default database, public schema, as "my_user" and "my_auth" password:
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "pg",
+     login => "my_user",
+     password => "my_auth",
+  );
+
+=item *
+
+B<Example2>: Using default database, "my_schema" schema, as "my_user" and "my_auth" password:
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "pg",
+     schema => "my_schema",
+     login => "my_user",
+     password => "my_auth",
+  );
+
+=item *
+
+B<Example3>: Using "my_database" database, public schema, as "my_user" and "my_auth" password:
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "pg",
+     db => "my_database",
+     login => "my_user",
+     password => "my_auth",
+  );
+
+=item *
+
+B<Example4>: Using "my_database" database, "my_schema" schema, as "my_user" and "my_auth" password:
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     driver => "pg",
+     db => "my_database",
+     schema => "my_schema",
+     login => "my_user",
+     password => "my_auth",
+  );
+
+=back
+
+=head2 Delete
+X<Delete>
+
+This method removes the selected rows from a table based the conditions in the C<where> clause.
+
+For security rasons the command does not perform removals if C<where> clause is omitted or empty, in this case, you must add the C<force> option to do.
+
+  SQL::SimpleOps->Delete(
+  (
+     table => "my_table",
+     where =>
+     [
+        my_conditions
+     ],
+     ...
+  );
+
+B<NOTE:> If no match found the command will return the condition code C<SQL_SIMPLE_RC_EMPTY>,
+however, using the C<notfound> option will force to C<SQL_SIMPLE_RC_OK> if no matchs.
+
+=over
+
+=item *
+
+B<Example1:> Forcing remove all rows.
+
+  SQL::SimpleOps->Delete
+  (
+     table => "my_table",
+     force => 1,
+  );
+
+=item *
+
+B<Example2:> Forcing no matchs removals completed successful
+
+  SQL::SimpleOps->Delete
+  (
+     table => "my_table",
+     where =>
+     [
+        id => my_id,
+     ],
+     notfound => 1,
+  );
+
+B<NOTE:> This command force the return code to C<SQL_SIMPLE_RC_OK> if ther is no match, where without it the C<notfound> option must be C<SQL_SIMPLE_RC_EMPTY>.
+
+=back
+
+=head2 Insert
+X<Insert>
+
+This method insert the selected rows from a table.
+
+  SQL::SimpleOps->Insert			# (insert by fields based hash)
+  (
+     table => "my_table",
+     fields =>
+     {
+        col_1 => value,
+        col_2 => value,
+     },
+     conflict =>
+     {
+        col_1 => value,
+        col_2 => value,
+     },
+     conflict_key => col_name
+     ...
+  );
+  or
+  SQL::SimpleOps->				# (insert be fields/values array)
+  (
+     table => "my_table",
+     fields => [ col_1, col_2, ... ],
+     values => [ val_1, val_2, ... ],
+     ...
+  );
+  or
+  SQL::SimpleOps->Insert			# (insert by fields on array)
+  (
+     table => "my_table",
+     fields => [ col_1, col_2, col_3,, ... ],
+     values =>
+     [
+        [ val_1_1, val_1_2, val_1_3, ... ],
+        [ val_2_1, val_2_2, val_2_3, ... ],
+        ...
+     ],
+     ...
+  );
+  or
+  SQL::SimpleOps->Insert			# (insert unique field)
+  (
+     table => "my_table",
+     fields => [ col_1 ],
+     values => [ val_1_1, val_2_1, ... ],
+     ...
+  );
+
+B<NOTE:> The addition options are valid for all formats.
+
+=over
+
+=item *
+
+B<Example1:> Inserting rows without C<conflict> option.
+
+  SQL::SimpleOps->Insert
+  (
+     table => "my_table",
+     fields =>
+     {
+        key => 1,			# (it is a key)
+        value_1 => value,		# (it is a value)
+     },
+  );
+
+B<NOTE:> If the key already the return code is C<not zero>. See L<DBI>.
+
+=item *
+
+B<Example2:> Inserting rows with C<conflict> option. If the key already only updates will be done.
+
+  SQL::SimpleOps->Insert
+  (
+     table => "my_table",
+     fields =>
+     {
+        key => 1,			# (it is mais key)
+        value_1 => value,		# (it is a value)
+     },
+     conflict =>
+     {
+        my_update => CURRENT_TIMESTAMP,	# (make systime update if already)
+     }
+  );
+
+B<NOTE:> The C<conflict_key> option is not required for I<MySQL> and I<MariaDB> databases.
+
+=item *
+
+B<Example3:> Inserting rows with C<conflict> and C<conflict_key> options. If the key already only updates will be done.
+
+  SQL::SimpleOps->Insert
+  (
+     table => "my_table",
+     fields =>
+     {
+        key => 1,			# (it is mais key)
+        value_1 => value,		# (it is a value)
+     },
+     conflict =>
+     {
+        update => CURRENT_TIMESTAMP,	# (make systime update if already)
+     }
+     conflict_key => "key",
+  );
+
+B<NOTE:> The C<conflict_key> option is required for I<Postgres> and I<SQLite> databases.
+
+=item *
+
+B<Example4:> Inserting classic format
+
+  SQL::SimpleOps->Insert
+  (
+     table => "my_table",
+     fields => [ "key", "value_1" ],
+     values => [ 1, value ],
+  );
+
+=back
+
+=head2 Select
+
+X<Select>
+
+This method extract the selected rows from a tables based the conditions in the C<where> clause.
+
+  SQL::SimpleOps->Select
+  (
+     table => my_table_list,			# mandatory
+     fields => { my_list_of_fields },		# optional for single table, defaul: all columns
+                                                # mandatory for multiple tables list
+     where => [ my_where_conditions ],		# mandatory for 'where' rules
+     order_by => [ my_order_list ],		# mandatory for 'order by' rules
+     group_by => [ my_group_list ],		# mandatory for 'group by' rules
+     buffer => my_buffer_ref,			# mandatory for extract the data
+     flush => 1 | 0,				# options, reset buffer before load
+						# default: buffer will be reseted
+  );
+
+=over
+
+=item *
+
+B<Example1:> Extract all fields from the table without C<notfound> option.
+
+  SQL::SimpleOps->Select
+  (
+     table => table_1
+     where =>
+     [
+        my_conditions
+     ],
+     buffer => \@my_buffer,
+  );
+
+B<NOTE:> If no match found the command will return the condition code C<SQL_SIMPLE_RC_EMPTY>,
+however, using the C<notfound> option will force to C<SQL_SIMPLE_RC_OK> if no matchs.
+
+=item *
+
+B<Example2:> Extract all fields from the table using C<notfound> option.
+
+  SQL::SimpleOps->Select
+  (
+     table => table_1
+     where =>
+     [
+        my_conditions
+     ],
+     buffer => \@my_buffer,
+     notfound => 1,
+  );
+
+B<NOTE:> You must check the number of lines on C<my_buffer> array or validate by C<getRows> method to identify the I<not found condition>.
+
+=item *
+
+B<Example3:> Extract and Order
+
+  SQL::SimpleOps->Select
+  (
+     order_by => [ col1 => SQL_SIMPLE_ORDER_ASC, col2 => SQL_SIMPLE_ORDER_DESC ],
+     ...
+  );
+
+=item *
+
+B<Example4:> Extract and Order using defaults (ascending)
+
+  SQL::SimpleOps->Select
+  (
+     order_by => [ "col1", "col2" ],
+     ...
+  );
+
+B<NOTE:> Both columns (col1 and col2) will use ascending ordered.
+
+=item *
+
+B<Example5:> Extract with distinct columns
+
+  SQL::SimpleOps->Select
+  (
+     fields => [ "distinct", "col1" ],
+     or
+     fields => [ "distinct" => "col1" ],
+     ...
+  );
+
+B<NOTE:> Distinct by "col1".
+
+=item *
+
+B<Example5:> Extract with functions
+
+  SQL::SimpleOps->Select
+  (
+     fields => [ "count(*)" ],
+     ...
+  );
+
+B<NOTE:> The column must be single field.
+
+B<Example5:> Extract with functions
+
+  SQL::SimpleOps->Select
+  (
+     fields => [ "max(col1)", "min(col1)", "count(col1)", "substr(col1,1,8)" ],
+     ...
+  );
+
+B<NOTE:> The column must be single field.
+
+B<Example6:> Escaping field, no validation will be.
+
+  SQL::SimpleOps->Select
+  (
+     fields => [ "\\my_expression" ],
+     ...
+  );
+
+B<NOTE:> The '\' (backslash) will escape all validations.
+
+=back
+
+=head2 SelectCursor
+X<SelectCursor>
+
+This method is the "Select Method" and was created to scan tables based on key and cursor on.
+For this case, some options must be specified and controls returned, items to create pagination concepts.
+
+  SQL::SimpleOps->SelectCursor
+  (
+     ...
+     cursor_command => SQL_SIMPLE_CURSOR_TOP | SQL_SIMPLE_CURSOR_LAST |
+                       SQL_SIMPLE_CURSOR_NEXT | SQL_SIMPLE_CURSOR_BACK |
+                       SQL_SIMPLE_CURSOR_RELOAD,
+     cursor => current_cursor_value,
+     cursor_key => col_1,
+     cursor_info => %cursor_info | @cursor_info | $cursor_info,
+     ...
+     limit => no_lines,
+  );
+
+B<NOTE:> The C<notfound> option is not required.
+
+=over
+
+=item *
+
+B<cursor_command:> Sets the type of command to be executed in the search, must be:
+
+=over
+
+=item *
+
+B<SQL_SIMPLE_CURSOR_TOP:> Go to the first page of the search.
+No C<cursor_info> will be used.
+
+=item *
+
+B<SQL_SIMPLE_CURSOR_LAST:> Go to the last page search.
+No C<cursor_info> will be used.
+
+=item *
+
+B<SQL_SIMPLE_CURSOR_NEXT:> Go to the next search page.
+Will use the 'first' info on C<cursor_info> option.
+If 'cursor' is missing (or undef) the module will search as 'SQL_SIMPLE_CURSOR_TOP' command.
+
+=item *
+
+B<SQL_SIMPLE_CURSOR_BACK:> Go to the pervious search page.
+Will use the 'first' info on C<cursor_info> option.
+If 'cursor' is missing (or undef) the module will search as 'SQL_SIMPLE_CURSOR_LAST' command.
+
+=item *
+
+B<SQL_SIMPLE_CURSOR_RELOAD:> Reload current cursor.
+Will use the 'first' info on C<cursor_info> option.
+
+=back
+
+Defaults: C<SQL_SIMPLE_CURSOR_TOP>
+
+=item *
+
+B<cursor:> Sets an specific starter cursor value for the search.
+This options is not mandatory.
+
+The method use the C<cursor_info> option as base to scan the pages,
+however, the C<cursor> option have preference if presented.
+
+=item *
+
+B<cursor_key:> Sets the key that will use to search.
+You must use only one key, multiple keys are not supported.
+
+Defaults: no defaults
+
+=item *
+
+B<cursor_info:> Sets the return buffer to getting the page controls.
+This informantion should be used in the paging process.
+
+We highly recommend using this option to help the pagination process.
+At the end of each retrieve, the cursor of page will be saved in C<cursor_info> option.
+
+Defaults: no defaults, if omitted this information must be obtained by the C<getLastCursor> method.
+
+The buffer reference can be C<hash_ref>, C<array_ref> or C<scalar_ref>, for each case we will have:
+
+=over
+
+=item *
+
+B<hash_ref:>
+
+  hash_ref => { lines => no_lines, first => first_key, last => last_key, rc => rc };
+
+=item *
+
+B<array_ref:>
+
+  array_ref => [ rc, no_lines, first_key, last_key ];
+
+=item *
+
+B<scalar_ref:>
+
+  scalar_ref => "[rc] [no_lines] [first_key] [last_key]"
+
+=back
+
+The C<rc>, C<no_lines>, C<first_key> and C<last_key> values has present for all formats.
+
+=over
+
+=item *
+
+B<rc:> Consists the return code of SQL Command.
+
+=item *
+
+B<no_lines:> Consists the number of extracted lines.
+
+=item *
+
+B<first:> Consists the first key value.
+
+=item *
+
+B<last:> Consists the last key value.
+
+=back
+
+B<BEWARE:> For keys that use I<space values> do not use the I<scalar_ref> format to capture the C<first_key> and C<last_key>.
+
+=item *
+
+B<limit:> Sets the maximum number of lines to retrieve.
+The option must be specified.
+Use '0' (zero) for unlimited lines.
+
+=item *
+
+B<Example1:> This example we have four stage of retrieve.
+The 1st go to the first page on the table.
+The 2nd read the second page.
+The 3rd go to last page on the table.
+The 4th read the penultimate page.
+
+B<NOTE:> The number of page is limited by C<limit> option.
+
+  # at end of each retrieve the 'cursor_info' option is up to date.
+
+  my %cursor_info;
+
+  SQL::SimpleOps->SelectCursor
+  (
+     table => "my_table",
+     where => [ ... ],
+     ...
+     cursor_command => SQL_SIMPLE_CURSOR_TOP,
+     cursor_info => \%cursor_info,
+     buffer => array_ref,
+     ...
+     limit => no_lines,
+  );
+  # the scan will retrieve 'no_lines' lines into the 'buffer' options,
+
+  ...
+
+  SQL::SimpleOps->SelectCursor
+  (
+     table => "my_table",
+     where => [ ... ],
+     ...
+     cursor_command => SQL_SIMPLE_CURSOR_NEXT,
+     cursor_info => \%cursor_info,
+     buffer => array_ref,
+     ...
+     limit => no_lines,
+  );
+  # the scan will retrieve the next 'no_lines' lines based in saved
+
+  ...
+
+  SQL::SimpleOps->SelectCursor
+  (
+     table => "my_table",
+     where => [ ... ],
+     ...
+     cursor_command => SQL_SIMPLE_CURSOR_LAST,
+     cursor_info => \%cursor_info,
+     ...
+     buffer => array_ref,
+     limit => no_lines,
+  );
+
+  ...
+
+  SQL::SimpleOps->SelectCursor
+  (
+     table => "my_table",
+     where => [ ... ],
+     ...
+     cursor_command => SQL_SIMPLE_CURSOR_BACK,
+     cursor_info => \%cursor_info,
+     ...
+     buffer => array_ref,
+     limit => no_lines,
+  );
+  # the scan jump at end of table and retrieve the next 'no_lines'
+
+=back
+
+=head2 Update
+X<Update>
+
+This method updates the selected rows from a table based the conditions in the C<where> clause.
+
+For security rasons the command does not perform updates if C<where> clause is omitted or empty, in this case, you must add the C<force> option to do.
+
+  SQL::SimpleOps->Update
+  (
+     table => "my_table",
+     fields =>
+     {
+        col_1 => value,
+        col_2 => value,
+     },
+     where =>
+     [
+        my_conditions
+     ],
+     ...
+  );
+
+B<NOTE:> If no match found the command will return the condition code C<SQL_SIMPLE_RC_EMPTY>,
+however, using the C<notfound> option will force to C<SQL_SIMPLE_RC_OK> if no matchs.
+
+=head2 Call
+X<Call>
+
+This is the method that execute SQL Commands.
+It is implicitly called to execute all commands created by this module (Insert, Update, Delete, Select and Commit).
+It is owner of the process to preparation, execution and written the data on the buffer.
+
+  SQL::SimpleOps->Call
+  (
+     command => string,
+     buffer => hash_ref | array_ref | scalar_ref | callbacks,
+     flush => 1 | 0,
+  );
+
+=over
+
+=item *
+
+B<command:> Consists of the SQL Command to be executed (fully formatted)
+
+=item *
+
+B<buffer:> Consists of the Return Buffer Area, where the method will written the columns and rows, can be:
+
+  hash_ref	Address of HASH;
+  array_ref	Address of ARRAY;
+  scalar_ref	Address of SCALAR;
+  callback_ref	Address of Your Subroutine.
+
+B<flush:> Force the clean up in the return buffer area. The default value is enabled, all buffer area will be initialized.
+
+=back
+
+=head2 getAliasCols
+X<getAliasCols>
+
+Consists of the method to get the realname for columns mapped on L<Aliases Table>.
+
+The method return the Column Arguments Value if the table or column argument does not exists.
+
+B<NOTE:> This method can be used on L<PLUGINS> to help to translate the aliases names.
+
+=head2 getAliasTable
+
+Consists of the method to get the realname for table mapped on L<Aliases Table>.
+
+The method return the Table Arguments Value if the table argument does not exists.
+
+B<NOTE:> This method can be used on L<PLUGINS> to help to translate the aliases names.
+
+=head2 getDBH
+X<getDBH>
+
+Consists of the method to get the interface entry point address of the database.
+
+For I<interface=dbi>, this is the entry point for the C<DBI-E<gt>new()> method.
+
+  $dbh = SQL::SimpleOps->getDBH();
+
+=head2 getLastCursor
+X<getLastCursor>
+
+Consists of the method to get the last cursor information
+
+  $hash_ref = SQL::SimpleOps->getLastCursor();
+
+The method return a HASH struct with the values:
+
+  $hash_ref =>
+  {
+     rc => retun_code,
+     lines => number_of_lines,
+     first => first_key_value,
+     last => last_key_value,
+  };
+
+=head2 getLastSave
+X<getLastSave>
+
+Consists of the method to get the last SQL Log File saved on the disk.
+
+  $last_saved_logfile = SQL::SimpleOps->getLastSave();
+
+=head2 getLastSQL
+X<getLastSQL>
+
+Consists of the method to get the last executed SQL command.
+
+  $last_sql_command = SQL::SimpleOps->getLastSQL();
+
+=head2 getMessage
+X<getMessage>
+
+Consists of the method to get the last message.
+
+  $message = SQL::SimpleOps->getMessage();
+
+=head2 getRC
+X<getRC>
+
+Consists of the method to get the last return code.
+
+  $rc = SQL::SimpleOps->getRC();
+
+=head2 getRows
+X<getRows>
+
+Consists of the method to get the number of extracted rows from the last SQL Command.
+
+  $rows = SQL::SimpleOps->getRows();
+
+=head2 getWhere
+X<getWhere>
+
+Consists of the method for testing the C<Where Clause>.
+It is not performing any functions associated with SQL Commands.
+It was created as support tool to certify and test the syntax of the 'Where Clause' format.
+
+  $rc = SQL::SimpleOps->getWhere
+  (
+      table => table1
+      or
+      table => [ table1, table2, ... ],
+
+      buffer => scalar_ref,
+
+      where => [ condition1, ... ],		# see Where Clause
+  );
+
+B<Example1:>
+
+  use SQL::SimpleOps;
+
+  my %contents =
+  (
+     table1 =>
+     {
+        name => "real_name",
+        cols =>
+        {
+           _number => "my_number",
+           _text => "my_text",
+        }
+     }
+  );
+  my $mymod = SQL::SimpleOps->new
+  (
+     db=> "dummy",
+     server=> "dummy",
+     driver => "mysql",
+     connect => 0,
+     tables => \%contents
+  );
+
+  my $buffer;
+
+  $mymod->getWhere
+  (
+     table => "table1",
+     buffer => \$buffer,
+     where => [ [ _no => 1, "or",  _no => [ 2, 3 ] ], _text => "myname" ],
+  );
+  print "My #1 Where is [",$buffer," ]\n";
+
+  $mymod->getWhere
+  (
+     table => "table1",
+     buffer => \$buffer,
+     where => [ _no => [ 1, "..", 3 ], "and", _text => "myname" ]
+  );
+  print "My #2 Where is [",$buffer," ]\n";
+
+Results:
+
+  My #1 Where is [ (_no = 1 or _no IN (2,3)) and _text = 'myname' ]
+  My #2 Where is [ _no BETWEEN (1,3) and _text = 'myname' ]
+    
+=head1 CONSTANTS
+X<CONSTANS>
+
+The constants was created to identify the values and actions for some options.
+
+=over
+
+=item I<sql_save> option
+
+The parameters can be used to enable the I<Save SQL Command Process>.
+This process write on local disks the SQL Command when you can use for Debuging or Recover Database.
+
+  SQL_SIMPLE_CMD_OFF		# Save Command is disabled (default)
+  SQL_SIMPLE_CMD_ON		# Save Command is enabled for update
+  SQL_SIMPLE_CMD_ALL		# Save Command is enabled for update/read
+
+  my $mymod = SQL::SimpleOps->new( sql_save => SQL_SIMPLE_CMD_OFF | SQL_SIMPLE_CMD_ON | SQL_SIMPLE_CMD_ALL, ... );
+
+Default: C<SQL_SIMPLE_CMD_OFF>
+
+B<NOTE:> You can override (temporary) this option on each SQL execution (valid for all commands).
+
+  SQL::SimpleOps->Select( sql_save => 1, ... );		# (if global disabled)
+  or
+  SQL::SimpleOps->Select( sql_save => 0, ... );		# (if global enabled)
+
+=item I<message_log> option
+
+The parameters can be used to enable the I<Log Process>.
+This process send the conditional message on C<STDERR> and/or I<Syslog Service>.
+The send messages does not abort the module.
+
+We recommended using the I<Syslog Service> for complexed applications.
+
+  SQL_SIMPLE_LOG_OFF		# Log is disabled (default)
+  SQL_SIMPLE_LOG_SYS		# Log is enabled for syslog service
+  SQL_SIMPLE_LOG_STD		# Log is enabled for STDERR
+  SQL_SIMPLE_LOG_ALL		# Log is enabled for STDERR/Syslog
+
+  my $mymod = SQL::SimpleOps->new
+  (
+     message_log => SQL_SIMPLE_LOG_OFF | SQL_SIMPLE_LOG_SYS |
+                    SQL_SIMPLE_LOG_STD | SQL_SIMPLE_LOG_ALL,
+     ...
+  );
+
+The C<SQL_SIMPLE_LOG_OFF> is recomended for high intensive transactional, like webservices.
+The C<SQL_SIMPLE_LOG_SYS> is recomended for application services, like daemons.
+The C<SQL_SIMPLE_LOG_STD> is recomended for iteractive Command Line Interfaces.
+However, you can do anything.
+
+Default: C<SQL_SIMPLE_LOG_STD>
+
+B<NOTE:> You can override (temporary) this option on each SQL execution (valid for all command).
+
+  SQL::SimpleOps->Select( sql_save => 1, ... );		# (if global disabled)
+  or
+  SQL::SimpleOps->Select( sql_save => 0, ... );		# (if global enabled)
+
+=item I<cursor_command> option
+
+The parameters can be used to establish the operations on extract list.
+
+  SQL_SIMPLE_CURSOR_TOP		# Cursor Command Top of List (ascending order)
+  SQL_SIMPLE_CURSOR_BACK	# Cursor Command Backward (descending order)
+  SQL_SIMPLE_CURSOR_NEXT	# Cursor Command Forward (ascending order)
+  SQL_SIMPLE_CURSOR_LAST	# Cursor Command Bottom of List (descending order)
+
+Default: no defaults
+
+=item I<order_by> option
+
+The parameters can be used to determine the sort ordered on columns.
+
+  SQL_SIMPLE_ORDER_OFF		# Order is disbled (for SelectCursor only)
+  SQL_SIMPLE_ORDER_ASC		# Order is Ascending
+  SQL_SIMPLE_ORDER_DESC		# Order is Descending
+
+Default: C<SQL_SIMPLE_ORDER_ASC>
+
+B<NOTE:> The value C<SQL_SIMPLE_ORDER_OFF> is onle valid for the SelectCursor Command.
+This value disables the sorting process.
+The command, by default, does the sorting using the C<cursor_key> option.
+
+=item I<Return Codes> (all methods)
+
+This values estabilish the termination code after the method has been done.
+
+  SQL_SIMPLE_RC_SYNTAX		# Return Code Syntax Error
+  SQL_SIMPLE_RC_OK		# Return Code Execution SQL Successful
+  SQL_SIMPLE_RC_ERROR		# Return Code Execution SQL with errors
+  SQL_SIMPLE_RC_EMPTY		# Return Code Execution SQL Successful with no Rows
+
+B<NOTE:> If you run queries with no results (no rows found), the termination code will be C<SQL_SIMPLE_RC_EMPTY>.
+However, you can use the C<notfound> option to force this query to be C<SQL_SIMPLE_RC_OK>.
+
+  SQL::SimpleOps->Select( ...,  where [ id => 'i not exists' ], notfound => 1, ... );
+
+B<BEWARE:> In this case, you must validade the I<Number of Rows> (C<getRows> method) or I<Number of Extracted Data in Buffer> to verify whether exists data to be processed.
+
+  ...
+  if (SQL::SimpleOps->Select( ..., notfound => 1, buffer => \@mybuffer, ... ))
+  {
+     ## here your code to process sql condition error.
+  }
+  elsif (!SQL::SimpleOps->Rows() || !@mybyffer)
+  {
+     ## here your code to process no data on query.
+  }
+  else
+  {
+     ## here your code for process the data.
+  }
+  ...
+
+=back
+
+=head1 PLUGINS
+X<PLUGINS>
+
+B<BEWARE:> Use Wisely
+
+The plugins consists in addon to customize the process and/or to create data and/or adjusts the arguments on the Methods.
+They are not mandatory, however is available to use. It is can apply over:
+
+  Call Method
+  Delete Method
+  Insert Method
+  Open Method
+  Select Method
+  SelectCursor Method
+  Update Method
+
+Create in your plugin Methods using same name above. The module will check it before trying to run.
+
+All modules receive as an argument the C<hash_ref> address as unique data.
+You can run the public methods and/or make changes or adjustements in the data before the module execute the operation.
+
+The plugin must return the following termination code:
+
+  rc < 0	Syntax error and abort the action;
+  rc = 0	Successful and continue the action;
+  rc = 1	Error and abort the action;
+  rc = 2	Successful but skip the action.
+
+B<BEWARE:> Do not make changes on currents plugins.
+
+=head2 Plugin Constructor Method
+
+The Plugin Constructor will receive the address of control data.
+This address can be changed or used to call the methods.
+
+The constructor must be:
+
+  # called by: SQL::SimpleOps::[interface]::[driver]->new ( sql_simple => $self );
+
+  sub new()
+  {
+     my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::[interface]::[driver]';
+     my $self = {};
+     $self->{argv} = {@_};	# <-- sql_simple as argument
+     bless($self,$class);
+  }
+
+=head2 MySQL/MariaDB
+X<Plugin MySQL/MariaDB>
+
+This plugins embeded and establish the C<dsname> data, C<argument #1> from C<DBI-E<gt>connect()>
+
+  SQL::SimpleOps::DBI::MySQL
+
+  sub Open()
+  {
+     my $self = shift;
+     my $argv = shift;
+     my @options;
+     push(@options,"database=".$self->{argv}{sql_simple}->{argv}{db}) if (defined($self->{argv}{sql_simple}->{argv}{db}) && $self->{argv}{sql_simple}->{argv}{db}ne "");
+     push(@options,"host=".$self->{argv}{sql_simple}->{argv}{server}) if (defined($self->{argv}{sql_simple}->{argv}{server}) && $self->{argv}{sql_simple}->{argv}{server} ne "");
+     push(@options,$self->{argv}{sql_simple}->{argv}{port}) if (defined($self->{argv}{sql_simple}->{argv}{port}) && $self->{argv}{sql_simple}->{argv}{port} ne "");
+     $self->{argv}{sql_simple}->{argv}{dsname} = "DBI:mysql:".join(';',@options);
+     return 0;
+  }
+
+B<NOTE:> No more changes need.
+
+=head2 Postgress
+X<Plugin Postgress>
+
+This plugins embeded and establish the C<dsname> data, C<argument #1> from C<DBI-E<gt>connect()>
+
+  SQL::SimpleOps::DBI::PG
+
+  sub Open()
+  {
+     my $self = shift;
+     my $argv = shift;
+     my @options;
+     push(@options,"dbname=".$self->{argv}{sql_simple}->{argv}{db}) if (defined($self->{argv}{sql_simple}->{argv}{db}) && $self->{argv}{sql_simple}->{argv}{db} ne "");
+     push(@options,"host=".$self->{argv}{sql_simple}->{argv}{server}) if (defined($self->{argv}{sql_simple}->{argv}{server}) && $self->{argv}{sql_simple}->{argv}{server} ne "");
+     push(@options,$self->{argv}{sql_simple}->{argv}{port}) if (defined($self->{argv}{sql_simple}->{argv}{port}) && $self->{argv}{sql_simple}->{argv}{port} ne "");
+     $self->{argv}{sql_simple}->{argv}{dsname} = "DBI:Pg:".join(';',@options);
+     return 0;
+  }
+
+B<NOTE:> No more changes need.
+
+=head2 SQLite
+X<Plugin SQLite>
+
+This plugins embeded and establish the C<dsname> data, C<argument #1> from C<DBI-E<gt>connect()>
+
+  SQL::SimpleOps::DBI::SQLite
+
+  sub Open()
+  {
+     my $self = shift;
+     my $argv = shift;
+     $self->{argv}{sql_simple}->{argv}{dbfile} = $self->{argv}{sql_simple}->{argv}{db}.".db" if (!defined($self->{argv}{sql_simple}->{argv}{dbfile}) || $self->{argv}{sql_simple}->{argv}{dbfile} eq "");
+     $self->{argv}{sql_simple}->{argv}{dsname} = "DBI:SQLite:dbname=$self->{argv}{sql_simple}->{argv}{dbfile}";
+     return 0;
+  }
+
+B<NOTE:> No more changes need.
+
+=head2 Custom
+X<Plugin Custom>
+
+This sample show a simple struct to be create to support your addon.
+
+  ## The "Open" method must initialize the "dsname" environment.
+  #
+  ## The "dsname" will be used as the first argument on the "DBI->connect"
+  #
+  ## rc < 0 - syntax error and abort
+  ## rc = 0 - successfull and continue
+  ## rc = 1 - errors and abort
+  ## rc = 2 - successfull but do not make nothing
+
+  package SQL::SimpleOps::[interface]::[driver];
+
+  use 5.006001;
+  use strict;
+  use Exporter;
+
+  our @ISA = qw ( Exporter );
+  our @EXPORT = qw( Open $VERSION );
+  our @EXPORT_OK = @EXPORT;
+  our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
+  1;
+
+  sub new()
+  {
+     my $class = shift; $class = ref($class) || $class || 'SQL::SimpleOps::[interface]::[driver]';
+     my $self = {};
+
+     $self->{argv} = {@_};
+
+     bless($self,$class);
+  }
+  # the dsname must initialize here.
+  # rc=0 keep running
+  # rc<0 abort
+  sub Open()
+  {
+     my $self = shift;
+     my $argv = shift;
+     ...
+     return 0;			# rc=0 to continue
+  }
+  # this procedure must initialize the "dsname" enviroment.
+  # rc=0 keep running
+  # rc<0 abort
+  sub Delete()
+  {
+     my $self = shift;
+     my $argv = shift;
+     ...
+     return 0;			# rc=0 to continue
+  }
+  # rc=0 keep running
+  # rc<0 abort
+  sub Select()
+  {
+     my $self = shift;
+     my $argv = shift;
+     ...
+     return 0;			# rc=0 to continue
+  }
+  # rc=0 keep running
+  # rc<0 abort
+  sub SelectCursor()
+  {
+     my $self = shift;
+     my $argv = shift;
+     ...
+     return 0;			# rc=0 to continue
+  }
+  # rc=0 keep running
+  # rc<0 abort
+  sub Insert()
+  {
+     my $self = shift;
+     my $argv = shift;
+     ...
+     return 0;			# rc=0 to continue
+  }
+  # rc=0 keep running
+  # rc<0 abort
+  sub Update()
+  {
+     my $self = shift;
+     my $argv = shift;
+     ...
+     return 0;			# rc=0 to continue
+  }
+  # rc=0 keep running
+  # rc<0 abort
+  sub Call()
+  {
+     my $self = shift;
+     my $argv = shift;
+     ...
+     return 0;			# rc=0 to continue
+  }
+  ##Ended
+
+=head1 MESSAGES
+X<MESSAGES>
+
+The module messages can be extracted from the C<SQL::SimpleOps:errstr> or L<getMessage()> method.
+
+=head2 001E [I<command>] Database is missing
+X<001E>
+
+=over
+
+=item *
+
+B<Error:> The database name value omitted or empty.
+
+=item *
+
+B<Action:> Check the Constructor Command and validate the C<db> option.
+
+  my $mymod = SQL::SimpleOps->new( db => dsname, ... );
+
+=item *
+
+B<Command:> Constructor (method new)
+
+=back
+
+=head2 002E [I<command>] Server is missing
+X<002E>
+
+=over
+
+=item *
+
+B<Error:> The server name value omitted or empty.
+
+=item *
+
+B<Action:> Check the Constructor Command and validate the C<server> option.
+
+  my $mymod = SQL::SimpleOps->new( server => servername, ... );
+
+=item *
+
+B<Command:> Constructor (method new)
+
+=back
+
+=head2 003E [I<command>] Interface invalid
+X<003E>
+
+=over
+
+=item *
+
+B<Error:> The inteface driver name omitted or invalid.
+
+=item *
+
+B<Action:> Check the Constructor Command and validate the C<interface> option.
+The current module support only C<dbi> interface.
+The Open Command must be use the option:
+
+  my $mymod = SQL::SimpleOps->new( interface => "dbi", ... );
+
+=item *
+
+B<Command:> Constructor (method new)
+
+=back
+
+=head2 004E [I<command>] The Database driver is omitted or empty
+X<004E>
+
+=over
+
+=item *
+
+B<Error:> The database driver name omitted or invalid for the interface driver.
+
+=item *
+
+B<Action:> Check the Open Command and validate the C<driver> option.
+For I<interface=dbi> use:
+
+  my $mymod = SQL::SimpleOps->new( driver=> 'mysql' or 'mariadb' or 'postgres' or 'sqlite3' , ... );
+
+=item *
+
+B<Command:> Constructor (method new)
+
+=back
+
+=head2 005E [I<command>] Table is missing
+X<005E>
+
+=over
+
+=item *
+
+B<Error:> The table alias name omitted or empty.
+
+=item *
+
+B<Action:> Check the Command and validate the C<table> option.
+Remember: the you must specify the aliases table name assigned on contents table.
+
+  SQL::SimpleOps->Select( table => aliases_table_name, ... );		# single select
+  or
+  SQL::SimpleOps->Select( table => [ table1, table2, ... ], ... );		# merged selected
+
+=item *
+
+B<Command:> Select, Delete, Insert and Update
+
+=back
+
+=head2 006E [I<command>] Table invalid, must be single-value or array
+X<006E>
+
+=over
+
+=item *
+
+B<Error:> The table alias name is not a single value or array value.
+
+=item *
+
+B<Action:> Check the Select Command and validate the C<table> option.
+
+  SQL::SimpleOps->Select( table => single_value_name, ... );		# single select
+  or
+  SQL::SimpleOps->Select( table => [ table1, table2, ... ], ... );		# merged select
+
+=item *
+
+B<Command:> Select and SelectCursor or getWhere Method
+
+=back
+
+=head2 007E [I<command>] Fields invalid, must be array
+X<007E>
+
+=over
+
+=item *
+
+B<Error:> The list of fields is not array.
+
+=item *
+
+B<Action:> Check the Select Command and validate the C<fields> option.
+
+  SQL::SimpleOps->Select( fields => [ field1, field2, ... ], ... );
+
+=item *
+
+B<Command:> Select and SelectCursor
+
+=back
+
+=head2 008E [I<command>] Group_by invalid, must be single-value or array
+X<008E>
+
+=over
+
+=item *
+
+B<Error:> The option C<group_by> is not a single value or array value.
+
+=item *
+
+B<Action:> Check the Select Command and validente the C<group_by> option. Example:
+
+  SQL::SimpleOps->Select( group_by => col_name, ... );
+  or
+  SQL::SimpleOps->Select( group_by => [ col1_name, col2_name, ... ], ... );
+
+=item *
+
+B<Command:> Select and SelectCursor
+
+=back
+
+=head2 009E [I<command>] Order_by invalid, must be single-value or array-pairs
+X<009E>
+
+=over
+
+=item *
+
+B<Error:> The option C<order_by> is not a single value or array value.
+
+=item *
+
+B<Action:> Check the Select Command and validente the C<order_by> option. Example:
+
+  SQL::SimpleOps->Select( order_by => col_name, ... );
+  or
+  SQL::SimpleOps->Select(
+     order_by => [ col1_name => order1, col2_name => order2, ... ],
+     ...
+  );
+
+=item *
+
+B<Command:> Select and SelectCursor
+
+=back
+
+=head2 010E [I<command>] Table/Field Index invalid
+X<010E>
+
+=over
+
+=item *
+
+B<Error:> The indexed field is using a non-valid table/field identifier.
+
+=item *
+
+B<Action:> The table must specified on the C<table> option. The C<fields> is omitted, have multiples tables on the C<table> option and one or more tables does not exists on the L<Aliases Table>. Check the aliases of the table names specified in the fields in use of the C<where> option.
+
+  SQL::SimpleOps->Select(
+     table => [ t1, t2 ],
+     where => [ t1.id => t2.id, t3.name => "dummy" ],
+     ...
+  );
+
+  # The 't3' is not mapped on the Select Command. To fix you must:
+  # a) Use be 't1' or 't2' as aliases on the field 'name' or;
+  # b) Specify the 't3' on the 'table' option.
+
+=item *
+
+B<Command:> Select and SelectCursor
+
+=back
+
+=head2 012I [I<command>] Key not found
+X<012I>
+
+=over
+
+=item *
+
+B<Error:> The SQL Command was successful executed without extracted lines (results).
+
+=item *
+
+B<Action:> Validade the conditions on the C<where> option or use C<notfound> option to force I<SQL_SIMPLE_RC_OK> return code.
+
+  SQL::SimpleOps->Select( notfound => 1, ... );
+
+=item *
+
+B<Command:> Select, Delete, Insert, Update
+
+=back
+
+=head2 013E [I<command>] Cursor is missing or invalid
+X<013E>
+
+=over
+
+=item *
+
+B<Error:> The Cursor information is omitted or empty.
+
+=item *
+
+B<Action:> Check the cursor and validate the C<cursor> option on the SelectCursor Command.
+
+  SQL::SimpleOps->SelectCursor( cursor => value, ... );
+
+=item *
+
+B<Command:> SelectCursor
+
+=back
+
+=head2 014E [I<command>] Cursor-key is missing or invalid
+X<014E>
+
+=over
+
+=item *
+
+B<Error:> The Cursor Key information is omitted or empty.
+
+=item *
+
+B<Action:> Check the cursor key and validate the C<cursor_key> option, on the SelectCursor Command.
+
+  SQL::SimpleOps->SelectCursor( cursor_key => value, ... );
+
+=item *
+
+B<Command:> SelectCursor
+
+=back
+
+=head2 015E [I<command>] Cursor Command invalid
+X<015E>
+
+=over
+
+=item *
+
+B<Error:> The Cursor Command information is not invalid.
+
+=item *
+
+B<Action:> Check the cursor command and validade the C<cursor_command> option. The option must be:
+
+  SQL_SIMPLE_CURSOR_TOP			# goto first page
+  SQL_SIMPLE_CURSOR_NEXT		# goto next page, based current cursor
+  SQL_SIMPLE_CURSOR_BACK		# goto backward page, based current cursor
+  SQL_SIMPLE_CURSOR_LAST		# goto last page
+
+  SQL::SimpleOps->SelectCursor( cursor_command => command, ... );
+
+=item *
+
+B<Command:> SelectCursor
+
+=back
+
+=head2 016W [I<command>] Key is missing, option 'force' is required
+X<016W>
+
+=over
+
+=item *
+
+B<Warning:> One Write Command (Delete or Update) was execute without C<where> option.
+For secure rasons, full updates must use C<force> options.
+
+=item *
+
+B<Beware:> For secure rasons, full updates must use C<force> option.
+
+  # rejected command
+  SQL::SimpleOps->Delete( table => t1 );
+
+  # correct command
+  SQL::SimpleOps->Delete( table => t1, force => 1 );
+
+=item *
+
+B<Command:> Delete and Update
+
+=back
+
+=head2 017E [I<command>] Fields is missing
+X<017E>
+
+=over
+
+=item *
+
+B<Error:> The List of Fields is omitted or empty.
+
+=item *
+
+B<Action:> Check the list of fields and validate the C<fields> option.
+
+  # rejected command
+  SQL::SimpleOps->Insert( fields => col1, ... );
+  or
+  SQL::SimpleOps->Insert( fields => { col1 }, ... );
+
+  # correct command
+  SQL::SimpleOps->Insert( fields => { col1 => value, ... }, ... );
+
+=item *
+
+B<Command:> Insert and Update
+
+=back
+
+=head2 018E [I<command>] Fields Format error, must be hash-pairs or arrayref
+X<018E>
+
+=over
+
+=item *
+
+B<Error:> The List of Fields is malformed. One field must have assigned value.
+The arrayref format is valid only for 'insert' command.
+
+=item *
+
+B<Action:> Check the list of fliends and validate the C<fields> option and/or C<conflict> option.
+
+  # rejected command
+  SQL::SimpleOps->Update( fields => col1, ... );
+  or
+  SQL::SimpleOps->Update( fields => { col1 }, ... );
+
+  # correct command
+  SQL::SimpleOps->Update( fields => { col1 => value, ... }, ... );
+
+=item *
+
+B<Command:> Insert and Update
+
+=back
+
+=head2 019E [I<command>] Interface '[interface]::[driver]' missing
+
+=over
+
+=item *
+
+B<Error:> The Interface and/or Driver does not exists.
+
+=item *
+
+B<Action:> Check the interface and driver options and libraries on Perl Installation.
+
+List of folder to check:
+
+ # perl -E 'print join("\n",@INC),"\n";'
+
+How to check:
+
+ # ls [inc_folder]/[interface]/[plugin_name].pm
+
+=back
+
+=head2 020E [I<command>] Where Clause invalid
+X<020E>
+
+=over
+
+=item *
+
+B<Error:> The I<where> option or one subitem in the C<where> option is empty.
+
+=item *
+
+B<Action:> Check the C<where> option on the Command. see L<Where Clause>.
+
+  # invalid where
+  SQL::SimpleOps->Select( where => [], ... );
+  or
+  SQL::SimpleOps->Select( where => [ a => 1, b => [] ], ... );
+
+  # correct where
+  SQL::SimpleOps->Select( where => [ mycondition => myvalue ], ... );
+  or
+  SQL::SimpleOps->Select(
+     where => [ a => 1, b => [ myvalue, ... ], ],
+     ...
+   );
+
+=item *
+
+B<Command:> Select, Delete, Insert and Update
+
+=back
+
+=head2 021E [I<command>] Field invalid, must be single-value or array
+X<021E>
+
+=over
+
+=item *
+
+B<Error:> The C<where> option or one subitem in the C<where> option is not single value or array value.
+
+=item *
+
+B<Action:> Check the C<where> option on the Command. see L<Where Clause>.
+
+  # invalid where
+  SQL::SimpleOps->Select( where => { a => 1 }, ... );
+
+  # correct where
+  SQL::SimpleOps->Select( where => [ a => 1 ], ... );
+
+=item *
+
+B<Command:> Select, Delete, Insert and Update
+
+=back
+
+=head2 022E [I<command>] Database is not open
+X<022E>
+
+=over
+
+=item *
+
+B<Error:> These was a database access before a successful Open Command.
+
+=item *
+
+B<Action:> Check the Open Command process to grant the opened status to the database.
+
+=item *
+
+B<Command:> Select, Delete, Insert, Update and Call
+
+=back
+
+=head2 023E [I<command>] SQL Command is missing
+X<023E>
+
+=over
+
+=item *
+
+B<Error:> The SQL Command is omitted or empty.
+
+=item *
+
+B<Action:> Check the SQL Command and validate the C<command> option on the Call Command.
+
+  SQL::SimpleOps->Call( command => my-sql-command, ... );
+ 
+=item *
+
+B<Command:> Call
+
+=back
+
+=head2 024E [I<command>] Buffer Type invalid, must be hashref, arrayref, scalaref or callback_ref
+X<024E>
+
+=over
+
+=item *
+
+B<Error:> The Call Command was been executed using a non-valid struct as return buffer.
+
+=item *
+
+B<Action:> Check and validate the C<buffer> option on the Command. The buffer must be:
+
+  # returning on hash_ref
+  SQL::SimpleOps->Call( buffer => \%myHash, ... );
+
+  # returning on array_ref
+  SQL::SimpleOps->Call( buffer => \@myArray, ... );
+
+  # returning on scalar_ref
+  SQL::SimpleOps->Call( buffer => \$myScalar, ... );
+
+  # returning by callback_ref
+  SQL::SimpleOps->Call( buffer => \@mySubRot, ... );
+  ...
+  sub mySubRot() { my $ref = shift; ... ; return 0; }
+
+=item *
+
+B<Command:> Select, Delete, Insert, Update and Call
+
+=back
+
+=head2 025S [I<command>] Make Folder error, I<system-message>
+X<025S>
+
+=over
+
+=item *
+
+B<System:> The Save Option was been aborted with system error during make folder to write.
+
+=item *
+
+B<Action:> Check the C<system-message> to fix. Common errors:
+
+  a) C<Permission denied>: Check the folder ACL;
+  b) C<No left space>: Check the folder free space or quota;
+  c) C<Invalid filename>: Check the filename and use supported characters for your system.
+
+=item *
+
+B<Command:> Select, Delete, Insert, Update and Call
+
+=back
+
+=head2 026S [I<command>] Open File error, I<system-message>
+X<026S>
+
+=over
+
+=item *
+
+B<System:> The Save Option was been aborted with system errors during open file to write.
+
+=item *
+
+B<Action:> Check the C<system-message> to fix. Common errors:
+
+  a) C<Permission denied>: Check the Folder ACL;
+  b) C<Permission denied>: Check if filer already using an onther ACL;
+  c) C<No left space>: Check the folder free space or quota;
+  d) C<Invalid filename>: Check the filename and use supported characters for your system.
+
+B<Command:> Select, Delete, Insert, Update and Call
+
+=back
+
+=head2 028E [I<command>] Table/Field Value invalid, must be single-value or array
+X<028E>
+
+=over
+
+=item *
+
+B<Error:> The assigned value for one field is not single value or array value.
+
+=item *
+
+B<Action:> Check the subitem in the C<where> option.
+
+  # invalid
+  SQL::SimpleOps->Select( where => [ a => \&callback ], ... );
+  or
+  SQL::SimpleOps->Select( where => [ b => { c, 1 }, ... );
+
+  # correct
+  SQL::SimpleOps->Select( where => [ a => value, ], ... );
+  or
+  SQL::SimpleOps->Select( where => [ b => [ c, 1 ], ... );
+
+=item *
+
+B<Command:> Select, Delete, Insert, and Update
+
+=back
+
+=head2 029E [I<command>] The TCP Port invalid, must be numeric and between 1-65535
+X<029E>
+
+=over
+
+=item *
+
+B<Error:> The TCP Port value exced the range 1-65535.
+
+=item *
+
+B<Action:> Check and validate the C<port> option on the Constructor.
+
+  my $mymod = SQL::SimpleOps->new( port => 1..65535, ... );
+
+  # NOTE: The 'port' option is not required for standard installation.
+
+=item *
+
+B<Command:> Constructor (method new)
+
+=back
+
+=head2 030E [I<command>] Aliases Table is not hashref
+X<030E>
+
+=over
+
+=item *
+
+B<Error:> The Aliases Table was defined but is not a hashref.
+
+=item *
+
+B<Action:> Check the struct and validate the C<tables> option on the Constructor. See L<Aliases Table>
+
+=item *
+
+B<Command:> Constructor (method new)
+
+=back
+
+=head2 031E [I<command>] Aliases 'I<table>' invalid, table_cols must be hashref
+X<031E>
+
+=over
+
+=item *
+
+B<Error:> The C<cols> option in the Aliases Table must be hash_ref.
+
+=item *
+
+B<Action:> Check the struct and validate the C<tables> option on the Constructor. See L<Aliases Table>
+
+=item *
+
+B<Command:> Constructor (method new)
+
+=back
+
+=head2 032E [I<command>] Aliases 'I<table>' invalid, table_cols invalid format
+X<032E>
+
+=over
+
+=item *
+
+B<Error:> The C<cols> option in the Aliases Table is empty.
+
+=item *
+
+B<Action:> Check the struct validate the C<tables> option on the Constructor. See L<Aliases Table>
+
+=item *
+
+B<Command:> Constructor (method new)
+
+=back
+
+=head2 033E  [I<command>] Table 'I<table>' already, there can be only one
+X<033E>
+
+=over
+
+=item *
+
+B<Error:> One table in the C<Aliases Table> already defined.
+
+=item *
+
+B<Action:> Check the struct validate the C<tables> option on the Constructor. See L<Aliases Table>
+
+  # invalid
+  SQL::SimpleOps->Select( table => [ t1, t2, t1 ], ... );
+
+  # correct
+  SQL::SimpleOps->Select( table => [ t1, t2 ], ... );
+
+=item *
+
+B<Command:> Select and SelectCursor
+
+=back
+
+=head2 034E [I<command>] Aliases 'I<table>' invalid, table_name is missing
+X<034E>
+
+=over
+
+=item *
+
+B<Error:> The L<Aliases Table> with missed fields, no table_name mapped.
+
+=item *
+
+B<Action:> Check the list of aliases table and add assign the real table name. L<Aliases Table>
+
+=item *
+
+B<Command:> Constructor (method new)
+
+=back
+
+
+=head2 035S [I<command>] Interface Load error 'I<interface>::I<plugin>', I<system-message>
+X<035S>
+
+=over
+
+=item *
+
+B<Plugin:> Plugin loader error
+
+=item *
+
+B<Action:> The require load process fail for C<interface> and C<drive> options.
+
+=back
+
+=head2 036S [I<command>] Interface 'I<plugin>' load error
+X<036S>
+
+=over
+
+=item *
+
+B<Plugin:> The 'new' method in plugin finished with errors.
+
+=item *
+
+B<Action:> Check the options for the plugin or review your code into plugin
+
+=back
+
+=head2 037S [I<command>] Interface 'I<plugin>' error, I<plugin-message>
+X<037S>
+
+=over
+
+=item *
+
+B<Plugin:> Plugin aborted with errors
+
+=item *
+
+B<Action:> Check the message for Plugin on C<drive> option
+
+=back
+
+=head2 038E [I<command>] Syslog Facility invalid, must be 'local0' to 'local7'
+X<038E>
+
+=over
+
+=item *
+
+B<Error:> The C<facility> option must be C<local0> to C<local7>.
+
+=item *
+
+B<Action:> Check the C<facility> option on Constructor method.
+
+=item *
+
+B<Command:> Constructor (new)
+
+=back
+
+=head2 039E [I<command>] Syslog Service invalid, must contains 'alphanumeric' characters
+X<039E>
+
+=over
+
+=item *
+
+B<Error:> The C<Service> option must be C<alphanumeric> characters.
+
+=item *
+
+B<Action:> Check the C<service> option on Constructor method.
+
+=item *
+
+B<Command:> Constructor (new)
+
+=back
+
+=head2 040E [I<command>] Log File invalid, must contains 'alphanumeric' characters
+X<040E>
+
+=over
+
+=item *
+
+B<Error:> The C<logfile> option must be C<alphanumeric> characters.
+
+=item *
+
+B<Action:> Check the C<logfile> option on Constructor method.
+
+=item *
+
+B<Command:> Constructor (new)
+
+=back
+
+=head2 041E [I<command>] Values Format error, must be arrayref
+X<041E>
+
+=over
+
+=item *
+
+B<Error:> The C<values> option must be an arrayref.
+
+=item *
+
+B<Action:> Check the C<values> option an insert command.
+
+=item *
+
+B<Command:> Insert
+
+=back
+
+=head2 042E [I<command>] Conflict/Duplicate Format error, must be hashref
+X<042E>
+
+=over
+
+=item *
+
+B<Error:> The C<conflict> option must be an hashref.
+
+=item *
+
+B<Action:> Check the C<conflict> option an insert command.
+
+=item *
+
+B<Command:> Insert
+
+=back
+
+=head2 043E [I<command>] Limit is missing
+X<043E>
+
+=over
+
+=item *
+
+B<Error:> The C<limit> options must be an numeric value.
+
+=item *
+
+B<Action:> Check the C<limit> option an insert command.
+
+=item *
+
+B<Command:> SelectCursor
+
+=back
+
+=head2 099S [I<command>] I<dbh-interface-message>
+X<099S>
+
+=over
+
+=item *
+
+B<System:> The interface or driver abort with errors.
+
+=item *
+
+B<Action:> Check the interface and driver reference guide.
+
+=item *
+
+B<Command:> Open, Close, Connect, Select, Delete, Insert, Update and Call.
+
+=back
+
+=head2 999S [message] invalid code 'I<message-code>'
+X<999S>
+
+=over
+
+=item *
+
+B<Error:> The message code not found on the Table os Messages. 
+
+=item *
+
+B<Action:> Internal Module Error, open a issue.
+
+=back
+
+=head1 EXAMPLES
+X<EXAMPLES>
+
+NOTE: For more examples see test modules (I<t/testSQL.t>, I<t/testWhere.t> and I<t/testDB.t>) in source code.
+
+The following example allow simple test between the SQLite, MySQL/MariaDB and Postgres Databases.
+
+To test you need:
+
+ (a) Create a temporary database, as described below (SQLite, MySQL, MariaDB or Postgres);
+ (b) Copy/Past the Source Code and;
+ (c) Make the test.
+
+=head2 Create SQLite Database
+
+ # sqlite3 -batch -echo /tmp/test_db.db <<EOF
+
+ CREATE TABLE master (
+   i_m_id integer primary key autoincrement,
+   s_m_code text,
+   s_m_name text,
+   s_m_desc text
+ );
+ 
+ CREATE TABLE slave (
+   i_s_id integer primary key autoincrement,
+   s_m_code text,
+   s_s_code text,
+   s_s_name text,
+   s_s_desc text
+ );
+
+ EOF
+ 
+=head2 Create MySQL/MariaDB Database
+
+ # mysql -v <<EOF
+
+ CREATE SCHEMA IF NOT EXISTS test_db DEFAULT CHARACTER SET 'UTF8' ;
+ 
+ USE test_db ;
+ 
+ CREATE TABLE IF NOT EXISTS test_db.master
+ (
+   i_m_id int auto_increment unique,
+   s_m_code varchar(32),
+   s_m_name varchar(255),
+   s_m_desc varchar(255)
+ ) ENGINE = InnoDB;
+ 
+ CREATE TABLE IF NOT EXISTS test_db.slave
+ (
+   i_s_id int auto_increment unique,
+   s_m_code varchar(32),
+   s_s_code varchar(32),
+   s_s_name varchar(255),
+   s_s_desc varchar(255)
+ ) ENGINE = InnoDB;
+ 
+ CREATE USER 'user_read'@'localhost' IDENTIFIED BY 'password_read';
+ CREATE USER 'user_update'@'localhost' IDENTIFIED BY 'password_update';
+ 
+ GRANT SELECT ON test_db.* TO 'user_read'@'localhost';
+ GRANT SELECT,INSERT,UPDATE,DELETE ON test_db.* TO 'user_update'@'localhost';
+
+ EOF
+ 
+=head2 Create Postgres Database
+
+ # psql -U postgres <<EOF
+ CREATE DATABASE test_db ENCODING 'UTF8';
+ EOF
+
+ # psql -U postgres -b test_db <<EOF
+
+ CREATE SCHEMA IF NOT EXISTS test_schema ;
+ 
+ CREATE TABLE IF NOT EXISTS test_schema.master
+ (
+   i_m_id smallserial unique,
+   s_m_code varchar(32),
+   s_m_name varchar(255),
+   s_m_desc varchar(255)
+ );
+ 
+ CREATE TABLE IF NOT EXISTS test_schema.slave
+ (
+   i_s_id smallserial unique,
+   s_m_code varchar(32),
+   s_s_code varchar(32),
+   s_s_name varchar(255),
+   s_s_desc varchar(255)
+ );
+ 
+ CREATE ROLE user_read LOGIN PASSWORD 'password_read';
+ CREATE ROLE user_update LOGIN PASSWORD 'password_update';
+ 
+ GRANT SELECT ON TABLE
+   test_schema.master, test_schema.slave TO user_read;
+ GRANT SELECT,INSERT,UPDATE,DELETE ON TABLE
+   test_schema.master, test_schema.slave TO user_update;
+
+ EOF
+ 
+=head2 Source Code
+
+  #!/usr/bin/perl
+  #
+  ## file /tmp/my_first_program.pl
+  #
+  ## CoryRight (C) 2022 - Carlos Celso
+  #
+
+  ## load external libs
+
+  use Getopt::Long;
+  use SQL::SimpleOps;
+  use Pod::Usage;
+  use Test::More;
+
+  ## show my usage format
+
+  pod2usage("$0 -drive=[driver] -db=[db] -schema=[sch] -server=[host] -port=[port] -user=[user] -password=[pwd]") if (!@ARGV);
+
+  ## defaults values
+
+  my $PARM_DB = "test_db";
+  my $PARM_DBFILE = "/tmp/test_db.db";	# for database im memory use: ":memory:" 
+  my $PARM_SCHEMA = "test_schema";
+  my $PARM_SERVER = "localhost";
+  my $PARM_USER = "user_update";
+  my $PARM_PASSWORD = "password_update";
+
+  ## parsing options
+
+  my $get = new Getopt::Long::Parser;
+  $get->configure("pass_through");
+  $get->getoptions
+  (
+     'driver=s' => \$PARM_DRIVER,
+     'db=s' => \$PARM_DB,
+     'dbfile=s' => \$PARM_DBFILE,
+     'schema=s' => \$PARM_SCHEMA,
+     'server=s' => \$PARM_SERVER,
+     'port=s' => \$PARM_PORT,
+     'user=s' => \$PARM_USER,
+     'password=s' => \$PARM_PASSWORD,
+  );
+
+  ## loading SQL::SimpleOps module
+  ## remember: the defauls values por RaiseError and PrintError is ZERO
+
+  my $mymod = new SQL::SimpleOps
+  (
+     driver => $PARM_DRIVER,
+     db => $PARM_DB,
+     dbfile => $PARM_DBFILE,
+     schema => $PARM_SCHEMA,
+     server => $PARM_SERVER,
+     port => $PARM_PORT,
+     login => $PARM_USER,
+     password => $PARM_PASSWORD,
+     tables =>
+     {
+        my_master =>	## sets aliases entries for master table
+        {
+           name => "master",
+           cols =>
+           {
+              my_i_m_id   => 'i_m_id',
+              my_s_m_code => 's_m_code',
+              my_s_m_name => 's_m_name',
+              my_s_m_desc => 's_m_desc',
+           },
+        },
+        my_slave =>	## sets aliases entries for slave table
+        {
+           name => "slave",
+           cols =>
+           {
+              my_i_s_id   => 'i_s_id',
+              my_s_m_code => 's_m_code',
+              my_s_s_code => 's_s_code',
+              my_s_s_name => 's_s_name',
+              my_s_s_desc => 's_s_desc',
+           },
+        },
+     }
+  );
+  exit if (!defined($mymod));
+
+  ## my test
+
+  &my_upload();		# initialize the tables
+  &my_get_master();	# test master table
+  &my_get_slave();	# test slave table
+  &my_get_merge();	# test merge between master and slave
+
+  ## finishing test
+
+  $mymod->Close();	# do not forgot me
+  done_testing();	# test done
+  exit;
+
+  ## my upload data
+  ## remove previous data
+  ## creating dynamic data into the master and slave table
+
+  sub my_upload()
+  {
+      ## remove previous data
+
+      $mymod->Delete ( table => "my_master", force => 1 );
+      $mymod->Delete ( table => "my_slave", force => 1 );
+
+      ## initializing master/slave table
+
+      foreach my $code(0..9)
+      {
+          my $er=0;
+          my $ok=0;
+
+          ## inserting data into master
+
+          $code = sprintf("%04i",$code);
+          $mymod->Insert
+          (
+             table => "my_master",
+             fields =>
+             {
+                my_s_m_code => "master_".$code,
+                my_s_m_name => "name_".$code,
+                my_s_m_desc => "description_".$code,
+             }
+          );
+
+          ($mymod->getRC()) ? $er++ : $ok++;
+
+          ## inserting data into slave based master data
+
+          foreach my $subcode(10..19)
+          {
+             $subcode = sprintf("%04i",$subcode);
+             $mymod->Insert
+             (
+                table => "my_slave",
+                fields =>
+                {
+                   my_s_m_code => "master_".$code,
+                   my_s_s_code => "slave_".$subcode,
+                   my_s_s_name => "name_".$subcode,
+                   my_s_s_desc => "description_".$subcode,
+                }
+             );
+
+             ($mymod->getRC()) ? $er++ : $ok++;
+          }
+
+          ## shown counters
+
+          fail("Number of ".$er." errors (master+slave), Code ".$code) if ($er);
+          pass("Number of ".$ok." successful (master+slave), Code ".$code) if ($ok);
+      }
+  }
+
+  ## simple test of load master data
+  ## load all master data into buffer
+
+  sub my_get_master()
+  {
+      my @buffer;
+      $mymod->Select
+      (
+         table => "my_master",
+         buffer => \@buffer,
+         order_by => "my_i_m_id",
+      );
+
+      ## test number of loaded rows
+
+      ok($mymod->getRows()==10,"Master select, rows ".$mymod->getRows());
+  }
+
+  ## simple test of load slave data
+  ## load all slave data into buffer
+
+  sub my_get_slave()
+  {
+      my @buffer;
+      $mymod->Select
+      (
+         table => "my_slave",
+         buffer => \@buffer,
+         order_by => "my_i_s_id",
+      );
+
+      ## test number of loaded rows
+
+      ok($mymod->getRows()==100,"Slave select, rows ".$mymod->getRows());
+  }
+
+  ## simple test of merge between master and slave tables
+
+  sub my_get_merge()
+  {
+      my @buffer;
+
+      $mymod->Select
+      (
+         table => [ "my_master","my_slave" ],
+         buffer => \@buffer,
+         fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
+      );
+
+      ## test number of loaded rows
+
+      ok($mymod->getRows()==1000,"Master/Slave merge-1, rows ".$mymod->getRows());
+
+      $mymod->Select
+      (
+         table => [ "my_master","my_slave" ],
+         buffer => \@buffer,
+         fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
+         where =>
+         [
+            "my_master.my_s_m_code" => "my_slave.my_s_m_code"
+         ]
+      );
+
+      ## test number of loaded rows
+
+      ok($mymod->getRows()==100,"Master/Slave merge-2, rows ".$mymod->getRows());
+
+      $mymod->Select
+      (
+         table => [ "my_master","my_slave" ],
+         buffer => \@buffer,
+         fields => [ "my_master.my_s_m_code", "my_slave.my_s_s_code" ],
+         where =>
+         [
+            "my_master.my_s_m_code" => [ "!", "my_slave.my_s_m_code" ],
+         ]
+      );
+
+      ## test number of loaded rows
+
+      ok($mymod->getRows()==900,"Master/Slave merge-3, rows ".$mymod->getRows());
+  }
+
+  __END__
+
+=head2 Results
+
+ # perl /tmp/my_first_program.pl -driver=sqlite
+ ok 1 - Number of 11 successful (master+slave), Code 0000
+ ok 2 - Number of 11 successful (master+slave), Code 0001
+ ok 3 - Number of 11 successful (master+slave), Code 0002
+ ok 4 - Number of 11 successful (master+slave), Code 0003
+ ok 5 - Number of 11 successful (master+slave), Code 0004
+ ok 6 - Number of 11 successful (master+slave), Code 0005
+ ok 7 - Number of 11 successful (master+slave), Code 0006
+ ok 8 - Number of 11 successful (master+slave), Code 0007
+ ok 9 - Number of 11 successful (master+slave), Code 0008
+ ok 10 - Number of 11 successful (master+slave), Code 0009
+ ok 11 - Master select, rows 10
+ ok 12 - Slave select, rows 100
+ ok 13 - Master/Slave merge-1, rows 1000
+ ok 14 - Master/Slave merge-2, rows 100
+ ok 15 - Master/Slave merge-3, rows 900
+ 1..15
+
+=head1 SEE ALSO
+
+L<DBD::mysql>, L<DBD::Pg>, L<DBD::SQLite>, L<DBI>, L<Date::Calc>, L<File::Path>, L<File::Spec>, L<JSON>, L<Sys::Syslog>
+
+=head1 EXTERNAL REFERENCES
+X<EXTERNAL REFERENCES>
+
+L<MySQL|https://www.mysql.com/>,
+L<MariaDB|https://www.mariadb.org/>,
+L<Postgres|https://www.postgresql.org>,
+L<SQLite|https://www.sqlite.org/>,
+L<Wiki|https://en.wikipedia.org/wiki/SQL>,
+L<W3C|https://www.w3schools.com/sql/>
+
+=head1 AUTHOR
+X<AUTHOR>
+
+Carlos Celso, E<lt>ccelso@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+X<COPYRIGHT>
+
+Copyright (C) 2008-2022 by Carlos Celso
+
+=head1 LICENSE
+X<LICENSE>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut
+

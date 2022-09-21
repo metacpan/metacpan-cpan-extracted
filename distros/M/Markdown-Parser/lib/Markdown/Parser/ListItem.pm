@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/ListItem.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,11 +16,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
     use constant TAB_SPACES => '    ';
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -37,7 +40,7 @@ sub as_markdown
     my $self = shift( @_ );
     my $str = $self->children->map(sub{ $_->as_markdown })->join( '' );
     my $order_list = $self->order;
-    ## Set some default value since key information has not been set yet
+    # Set some default value since key information has not been set yet
     unless( $self->type->length )
     {
         if( $order_list )
@@ -54,7 +57,7 @@ sub as_markdown
     my $indent = '    ' x $self->indent;
     my $lines = $self->new_array( [split( /\n/, $str )] );
     substr( $lines->[0], 0, 0 ) = "${marker} ";
-    ## If the list has indentation, indent each lines of the string in this list item
+    # If the list has indentation, indent each lines of the string in this list item
     if( $self->indent > 0 )
     {
         $lines->for(sub
@@ -64,6 +67,28 @@ sub as_markdown
         });
     }
     return( $lines->join( "\n" )->scalar );
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    my $str = $self->children->map(sub{ $_->as_pod })->join( '' );
+    my $order_list = $self->order;
+    # Set some default value since key information has not been set yet
+    unless( $self->type->length )
+    {
+        if( $order_list )
+        {
+            $self->type( '1.' );
+        }
+        else
+        {
+            $self->type( '*' );
+        }
+    }
+    my $marker = $self->type;
+    $marker .= '.' if( $marker =~ /^\d+$/ );
+    return( "=item ${marker} ${str}" );
 }
 
 sub as_string
@@ -124,7 +149,7 @@ sub type
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -141,7 +166,7 @@ Markdown::Parser::ListItem - Markdown ListItem Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -152,6 +177,12 @@ This class represents a list item. It is used by L<Markdown::Parser> and inherit
 =head2 as_markdown
 
 Returns a string representation of the list item formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the list item formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

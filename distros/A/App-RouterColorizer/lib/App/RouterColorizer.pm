@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.222220';
+$App::RouterColorizer::VERSION = '1.222630';
 use Moose;
 
 use feature 'signatures';
@@ -51,8 +51,10 @@ our @BGCOLORS = (
 our $NUM      = qr/$RE{num}{real}/;
 our $INT      = qr/$RE{num}{int}{-sign => ''}/;
 our $POSINT   = qr/(?!0)$INT/;
-our $LOWLIGHT = qr/ (?: -[3-9][0-9]\. [0-9]{1,2} ) | (?: -2 [5-9] \. [0-9]{1,2} ) /xx;
-our $LIGHT    = qr/ (?: $NUM ) | (?: N\/A ) /xx;
+our $LOWLIGHT = qr/ (?: -[3-9][0-9]\. [0-9]{1,2} )
+                  | (?: - \s Inf)
+                  | (?: -2 [5-9] \. [0-9]{1,2} )/xx;
+our $LIGHT = qr/ (?: $NUM ) | (?: N\/A ) /xx;
 
 our $IPV4CIDR = qr/ $RE{net}{IPv4}
                    (?: \/
@@ -302,17 +304,22 @@ s/^ ( \QPhysical interface: \E \S+                                     ) $/$self
     $line =~ s/^ ( \Q  Active defects : None\E ) $/$self->_colorize($1, $GREEN)/exx;
     $line =~ s/^ ( \Q  Active defects : \E \N+ ) $/$self->_colorize($1, $RED)/exx;
 
-    my $AE    = qr/ (?: ae [0-9\.]+       ) /xx;
-    my $BME   = qr/ (?: bme [0-9\.]+      ) /xx;
-    my $ETH   = qr/ (?: [gx] e- [0-9\/\.]+) /xx;
-    my $JSRV  = qr/ (?: jsrv [0-9\.]*     ) /xx;
-    my $LO    = qr/ (?: lo [0-9\.]+       ) /xx;
-    my $ME    = qr/ (?: me [0-9\.]+       ) /xx;
-    my $VCP   = qr/ (?: vcp- [0-9\/\.]+   ) /xx;
-    my $VLAN  = qr/ (?: vlan\. [0-9]+     ) /xx;
-    my $OTHER = qr/ dsc | gre | ipip | jsrv | lsi | mtun | pimd | pime | tap | vlan | vme /xx;
+    my $AE   = qr/ (?: ae [0-9\.]+          ) /xx;
+    my $BME  = qr/ (?: bme [0-9\.]+         ) /xx;
+    my $CBP  = qr/ (?: cbp [0-9\.]+         ) /xx;
+    my $ETH  = qr/ (?: [gx] e- [0-9\/\.]+   ) /xx;
+    my $IRB  = qr/ (?: irb [0-9\/\.]*       ) /xx;
+    my $JSRV = qr/ (?: jsrv [0-9\.]*        ) /xx;
+    my $LO   = qr/ (?: lo [0-9\.]+          ) /xx;
+    my $ME   = qr/ (?: me [0-9\.]+          ) /xx;
+    my $PFE  = qr/ (?: pf [eh] - [0-9\/\.]+ ) /xx;
+    my $PIP  = qr/ (?: pip [0-9\/\.]+       ) /xx;
+    my $VCP  = qr/ (?: vcp- [0-9\/\.]+      ) /xx;
+    my $VLAN = qr/ (?: vlan\. [0-9]+        ) /xx;
+    my $OTHER =
+      qr/ dsc | esi | gre | ipip | jsrv | lsi | mtun | pimd | pime | tap | vlan | vme | vtep /xx;
 
-    my $IFACES = qr/$AE|$BME|$ETH|$LO|$ME|$JSRV|$VCP|$VLAN|$OTHER/xx;
+    my $IFACES = qr/$AE|$BME|$CBP|$ETH|$IRB|$LO|$ME|$JSRV|$PFE|$PIP|$VCP|$VLAN|$OTHER/xx;
 
     $line =~ s/^ ( (?: $IFACES) \s+ up \s+ up \N*   ) $/$self->_colorize($1, $GREEN)/exx;
     $line =~ s/^ (     $ETH     \s+ VCP             ) $/$self->_colorize($1, $GREEN)/exx;
@@ -332,9 +339,13 @@ s/^ ( \QPhysical interface: \E \S+                                     ) $/$self
     # show interfaces diagnostics optics
     $line =~ s/^ ( \Q    Laser output power \E \s+ : \s $NUM \N+ ) $/$self->_colorize($1, $RED)/exx;
     $line =~
-s/^ ( \Q    Laser output power \E \s+ : \s+ $NUM \Q mW \/ \E $LOWLIGHT \s dBm ) $/$self->_colorize($1, $RED)/exx;
+s/^ ( \Q    Laser output power \E   \s+ : \s+ $NUM \Q mW \/ \E $LOWLIGHT \s dBm ) $/$self->_colorize($1, $RED)/exx;
     $line =~
-s/^ ( \Q    Laser output power \E \s+ : \s+ $NUM \Q mW \/ \E $LIGHT    \s dBm ) $/$self->_colorize($1, $INFO)/exx;
+s/^ ( \Q    Laser output power \E   \s+ : \s+ $NUM \Q mW \/ \E $LIGHT    \s dBm ) $/$self->_colorize($1, $INFO)/exx;
+    $line =~
+s/^ ( \Q    Laser receiver power \E \s+ : \s+ $NUM \Q mW \/ \E $LOWLIGHT \s dBm ) $/$self->_colorize($1, $RED)/exx;
+    $line =~
+s/^ ( \Q    Laser receiver power \E \s+ : \s+ $NUM \Q mW \/ \E $LIGHT    \s dBm ) $/$self->_colorize($1, $INFO)/exx;
     $line =~
 s/^ ( \Q    Receiver signal average optical power \E \s+ : \s+ $NUM \Q mW \/ \E $LOWLIGHT \s dBm ) $/$self->_colorize($1, $RED)/exx;
     $line =~
@@ -454,7 +465,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.222220
+version 1.222630
 
 =head1 DESCRIPTION
 

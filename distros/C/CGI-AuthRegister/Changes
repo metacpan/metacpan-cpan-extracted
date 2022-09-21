@@ -1,5 +1,12 @@
 Revision history for Perl extension CGI::Authenticate
 
+1.404 Mon Sep 19 17:55:19 ADT 2022
+ - documentation improvements
+ - fixing bug with accepting userid of the form \userid in LDAP,
+   userid cleanup
+ - added options -logout_title and -logout_redirect to the function
+   require_login, which are currently used only if -cas is used
+
 1.403 Thu May 27 22:24:16 ADT 2021
  - better error report if userid is not in users.db
  - added implementation for registration of new users

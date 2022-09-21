@@ -10,7 +10,7 @@ use File::Spec;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-08-21'; # DATE
 our $DIST = 'Dist-Util'; # DIST
-our $VERSION = '0.070'; # VERSION
+our $VERSION = '0.071'; # VERSION
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -120,7 +120,7 @@ Dist::Util - Dist-related utilities
 
 =head1 VERSION
 
-This document describes version 0.070 of Dist::Util (from Perl distribution Dist-Util), released on 2022-08-21.
+This document describes version 0.071 of Dist::Util (from Perl distribution Dist-Util), released on 2022-08-21.
 
 =head1 SYNOPSIS
 
@@ -159,6 +159,8 @@ paths, because C<.packlist> files are put in:
  $INC/$Config{archname}/auto/Foo/Bar/.packlist
 
 Caveat: many Linux distributions strip C<.packlist> files.
+
+TODO: Instead of via L<.packlist>, also try querying the OS package manager.
 
 Known options:
 

@@ -78,5 +78,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Module-Generic/issues
   repository: https://gitlab.com/jackdeguest/Module-Generic
-version: v0.28.1
+version: v0.28.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

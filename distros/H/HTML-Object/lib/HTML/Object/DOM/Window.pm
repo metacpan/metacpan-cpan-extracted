@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Window.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/31
-## Modified 2021/12/31
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,10 +17,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::EventTarget );
+    use vars qw( @LVALUE_METHODS $VERSION );
     # perl -nE 'print if( s,^sub (\w+) : lvalue.*?$,$1, )' ./lib/HTML/Object/DOM/Window.pm | tr "\n" " "
     our @LVALUE_METHODS = qw( closed document event frames fullScreen innerHeight innerWidth isSecureContext location name onappinstalled onbeforeinstallprompt ondevicemotion ondeviceorientation ondeviceorientationabsolute ondeviceproximity onerror ongamepadconnected ongamepaddisconnected onlanguagechange onorientationchange onrejectionhandled onresize onstorage onuserproximity onvrdisplayactivate onvrdisplayblur onvrdisplayconnect onvrdisplaydeactivate onvrdisplaydisconnect onvrdisplayfocus onvrdisplaypresentchange outerHeight outerWidth parent screen scrollX scrollY self status top visualViewport );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -355,7 +359,7 @@ sub window { return( shift( @_ ) ); }
 sub is_property { return( scalar( grep( /^$_[1]$/i, @LVALUE_METHODS ) ) ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -372,7 +376,7 @@ HTML::Object::DOM::Window - HTML Object DOM Window Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

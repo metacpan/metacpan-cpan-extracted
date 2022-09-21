@@ -27,7 +27,7 @@ no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 sub import {
     my ( $class, %args ) = @_;
@@ -121,7 +121,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 

@@ -25,14 +25,6 @@ void do_pyinit() {
 #ifdef EXPOSE_PERL
     PyObject *main_dict;
     PyObject *perl_obj;
-
-#if PY_MAJOR_VERSION >= 3
-    PyObject *dummy1 = PyBytes_FromString(""),
-             *dummy2 = PyBytes_FromString("main");
-#else
-    PyObject *dummy1 = PyString_FromString(""),
-             *dummy2 = PyString_FromString("main");
-#endif
 #endif
     /* sometimes Python needs to know about argc and argv to be happy */
     int _python_argc = 1;
@@ -48,6 +40,14 @@ void do_pyinit() {
     PySys_SetArgv(_python_argc, _python_argv);  /* Tk needs this */
 
 #ifdef EXPOSE_PERL
+#if PY_MAJOR_VERSION >= 3
+    PyObject *dummy1 = PyBytes_FromString(""),
+             *dummy2 = PyBytes_FromString("main");
+#else
+    PyObject *dummy1 = PyString_FromString(""),
+             *dummy2 = PyString_FromString("main");
+#endif
+
     /* create the perl module and add functions */
     initperl();
 
@@ -430,6 +430,7 @@ py_call_method(_inst, mname, ...)
     PyObject *tuple;     /* the parameters */
     PyObject *py_retval; /* the return value */
     int i;
+    int is_string;
     SV *ret;
 
   PPCODE:
@@ -446,13 +447,9 @@ py_call_method(_inst, mname, ...)
 
     Printf(("inst {%p} successfully passed the PVMG test\n", inst));
 
+    is_string = PY_IS_STRING(inst);
 
-    if (!(
-#if PY_MAJOR_VERSION < 3
-        PyInstance_Check(inst) ||
-#endif
-        inst->ob_type->tp_flags & Py_TPFLAGS_HEAPTYPE)
-    ) {
+    if (!PY_IS_OBJECT(inst)) {
         croak("Attempted to call method '%s' on a non-instance", mname);
         XSRETURN_EMPTY;
     }

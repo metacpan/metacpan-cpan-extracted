@@ -2,7 +2,7 @@ NAME
     Variable::Magic - Associate user-defined magic to variables from Perl.
 
 VERSION
-    Version 0.62
+    Version 0.63
 
 SYNOPSIS
         use Variable::Magic qw<wizard cast VMG_OP_INFO_NAME>;
@@ -628,7 +628,7 @@ SEE ALSO
     perltie and overload for other ways of enhancing objects.
 
 AUTHOR
-    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+    Vincent Pit "<vpit at cpan.org>".
 
     You can contact me by mail or on "irc.perl.org" (vincent).
 
@@ -645,8 +645,8 @@ SUPPORT
         perldoc Variable::Magic
 
 COPYRIGHT & LICENSE
-    Copyright 2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Vincent
-    Pit, all rights reserved.
+    Copyright 2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2022
+    Vincent Pit, all rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

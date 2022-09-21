@@ -205,7 +205,11 @@ Starting from version I<2.00>, any backward incompatible changes will only be in
 
 =head2 Current deprecations
 
-None at this time.
+=head3 Form::Tiny::Filter has been moved to Form::Tiny::Plugin::Filtered::Filter
+
+I<Deprecated in 2.14>
+
+Due to new internal structure, Filter has been moved to Plugin directory.
 
 =head1 SEE ALSO
 

@@ -7,7 +7,7 @@ use autodie;
 use open ':std', ':encoding(utf8)';
 use Carp qw(croak);
 use Data::Dumper;
-use String::Interpolate::Named;
+use String::Interpolate::Named qw(interpolate);
 use File::Temp;
 use File::Basename;
 use File::Compare;
@@ -306,20 +306,20 @@ foreach my $file ( sort keys %{ $test_data->{files} } ) {
 
     # run tests specified in YAML
     foreach my $test_item ( @{ $test_data->{files}{$file} } ) {
-        my $int = String::Interpolate::Named->new(
-            {
-                args => {
-                    file  => $file,
-                    index => $test_index,
-                    %$test_item,
-                }
+
+        # set up control structure for interpolate() from String::Interpolate::Named
+        my $interp_ctl = {
+            args => {
+                file  => $file,
+                index => $test_index,
+                %$test_item,
             }
-        );
+        };
     SKIP: {
             my ( $skip_reason, $op_func );
             my $op = $test_item->{op};
 
-            my $name = ( exists $test_item->{name} ) ? $int->interpolate( $test_item->{name} ) : "unnamed test";
+            my $name = ( exists $test_item->{name} ) ? interpolate( $interp_ctl, $test_item->{name} ) : "unnamed test";
             if ( not defined $op ) {
                 $skip_reason = "test operation not specified: $name ($test_index)";
             } elsif ( exists $test_item->{skip} ) {

@@ -1,7 +1,7 @@
 package UTF8::R2;
 ######################################################################
 #
-# UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
+# UTF8::R2 - makes UTF-8 scripting easy for enterprise use
 #
 # http://search.cpan.org/dist/UTF8-R2/
 #
@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.21';
+$VERSION = '0.22';
 $VERSION = $VERSION;
 
 use strict;
@@ -258,7 +258,6 @@ sub UTF8::R2::index ($$;$) {
 #---------------------------------------------------------------------
 # JPerl like index() for UTF-8 codepoint string
 sub UTF8::R2::index_byte ($$;$) {
-    my $index = 0;
     if (@_ == 3) {
         return CORE::index $_[0], $_[1], CORE::length(UTF8::R2::substr($_[0], 0, $_[2]));
     }
@@ -710,7 +709,6 @@ sub UTF8::R2::rindex ($$;$) {
 #---------------------------------------------------------------------
 # JPerl like rindex() for UTF-8 codepoint string
 sub UTF8::R2::rindex_byte ($$;$) {
-    my $rindex = 0;
     if (@_ == 3) {
         return CORE::rindex $_[0], $_[1], CORE::length(UTF8::R2::substr($_[0], 0, $_[2]));
     }
@@ -1046,7 +1044,7 @@ __END__
 
 =head1 NAME
 
-UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
+UTF8::R2 - makes UTF-8 scripting easy for enterprise use
 
 =head1 SYNOPSIS
 
@@ -1059,62 +1057,266 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
   use UTF8::R2 qw( WTF8.ja_JP );    # optimized WTF-8 for ja_JP
   use UTF8::R2 qw( %mb );           # multibyte regex by %mb
 
-    $result = UTF8::R2::chop(@_)
-    $result = UTF8::R2::chr($utf8octet_not_unicode)
-    $result = UTF8::R2::do($_)
-    $result = UTF8::R2::eval($_)
-    $result = UTF8::R2::getc(FILEHANDLE)
-    $result = UTF8::R2::index($_, 'ABC', 5)
-    $result = UTF8::R2::index_byte($_, 'ABC', 5)
-    $result = UTF8::R2::lc($_)
-    $result = UTF8::R2::lcfirst($_)
-    $result = UTF8::R2::length($_)
-    $result = UTF8::R2::ord($_)
-    $result = UTF8::R2::qr(qr/$utf8regex/imsxo) # no /gc
-    $result = UTF8::R2::require($_)
-    @result = UTF8::R2::reverse(@_)
-    $result = scalar UTF8::R2::reverse(@_)
-    $result = scalar UTF8::R2::reverse()
-    $result = UTF8::R2::rindex($_, 'ABC', 5)
-    $result = UTF8::R2::rindex_byte($_, 'ABC', 5)
-    @result = UTF8::R2::split(qr/$utf8regex/, $_, 3)
-    $result = UTF8::R2::substr($_, 0, 5)
-    $result = UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')
-    $result = UTF8::R2::uc($_)
-    $result = UTF8::R2::ucfirst($_)
+  UTF8::R2::length($_)
+  UTF8::R2::qr(qr/ utf8_regex_here . \D \H \N \R \S \V \W \b \d \h \s \v \w \x{UTF8hex} [ \D \H \S \V \W \b \d \h \s \v \w \x{UTF8hex} \x{UTF8hex}-\x{UTF8hex} [:POSIX:] [:^POSIX:] ] ? + * {n} {n,} {n,m} /imsxo) # no /gc
+  UTF8::R2::split(qr/$utf8regex/imsxo, $_, 3)
+  UTF8::R2::substr($_, 0, 5)
+  UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')
+  use UTF8::R2 qw(%mb);
+    $_ =~ $mb{qr/$utf8regex/imsxo} # no /gc
+    $_ =~ m<\G$mb{qr/$utf8regex/imsxo}>gc
+    $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
-    use UTF8::R2 qw(%mb);
-    $result = $_ =~ $mb{qr/$utf8regex/imsxo}
-    $result = $_ =~ m<\G$mb{qr/$utf8regex/imsxo}>gc
-    $result = $_ =~ s<$mb{qr/before/imsxo}><after>egr
+  supported encodings:
+    UTF-8(RFC3629), UTF-8(RFC2279), WTF8, RFC3629.ja_JP, and WTF8.ja_JP
 
-=head1 Octet-Semantics Functions vs. Codepoint-Semantics Subroutines
+  supported operating systems:
+    Apple Inc. OS X,
+    Hewlett-Packard Development Company, L.P. HP-UX,
+    International Business Machines Corporation AIX,
+    Microsoft Corporation Windows,
+    Oracle Corporation Solaris,
+    and Other Systems
 
-This software adds the ability to handle UTF-8 code points to bare Perl; it does
-not provide the ability to handle characters and graphene with UTF-8.
-(Time is on our side, so let's all be excited for the day when code points
-represent graphene.)
-Because this module override nothing, the functions of bare Perl provide octet
-semantics continue. UTF-8 codepoint semantics is provided by the new subroutine
-name.
+  supported perl versions:
+    perl version 5.005_03 to newest perl
+
+=head1 INSTALLATION BY MAKE-COMMAND
+
+To install this software by make, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+=head1 INSTALLATION WITHOUT MAKE-COMMAND (for DOS-like system)
+
+To install this software without make, type the following:
+
+   pmake.bat test
+   pmake.bat install
+
+=head1 DESCRIPTION
+
+It may sound a little ambitious, but UTF8::R2 module is aiming to replace utf8 pragma.
+
+Perl is said to have been able to handle Unicode since version 5.8.
+However, unlike JPerl, "Easy jobs must be easy" has been lost.
+
+This software has the following features
+
+=over 2
+
+=item * supports UTF-8 literals of Perl scripts
+
+=item * supports UTF-8(RFC3629), UTF-8(RFC2279), WTF8, RFC3629.ja_JP, and WTF8.ja_JP
+
+=item * does not use the UTF8 flag to avoid MOJIBAKE
+
+=item * handles raw encoding to support GAIJI
+
+=item * supports codepoint classes in regular expressions to work as UTF-8 codepoint
+
+=item * does not change features of octet-oriented built-in functions
+
+=item * You have using UTF8::R2::* subroutines if you want codepoint semantics
+
+=item * UTF8::R2::lc(), UTF8::R2::lcfirst(), UTF8::R2::uc(), and UTF8::R2::ucfirst() convert US-ASCII only
+
+=item * codepoint range by hyphen of UTF8::R2::tr() supports US-ASCII only
+
+=back
+
+=head1 UTF-8 like Encodings supported by this software
+
+The encodings supported by this software and their range of octets are as follows.
+
+  ------------------------------------------------------------------------------
+  UTF-8 (RFC2279)
+             1st       2nd       3rd       4th
+             C2..DF    80..BF
+             E0..EF    80..BF    80..BF
+             F0..F4    80..BF    80..BF    80..BF
+             00..7F
+             https://www.ietf.org/rfc/rfc2279.txt
+             * needs no multibyte anchoring
+             * needs no escaping meta char of 2nd-4th octets
+             * safe US-ASCII casefolding of 2nd-4th octet
+             * allows encoding surrogate codepoints even if it is not pair
+  ------------------------------------------------------------------------------
+  UTF-8 (RFC3629)
+             1st       2nd       3rd       4th
+             C2..DF    80..BF
+             E0..E0    A0..BF    80..BF
+             E1..EC    80..BF    80..BF
+             ED..ED    80..9F    80..BF
+             EE..EF    80..BF    80..BF
+             F0..F0    90..BF    80..BF    80..BF
+             F1..F3    80..BF    80..BF    80..BF
+             F4..F4    80..8F    80..BF    80..BF
+             00..7F
+             https://en.wikipedia.org/wiki/UTF-8
+             * needs no multibyte anchoring
+             * needs no escaping meta char of 2nd-4th octets
+             * safe US-ASCII casefolding of 2nd-4th octet
+             * enforces surrogate codepoints must be paired
+  ------------------------------------------------------------------------------
+  WTF-8
+             1st       2nd       3rd       4th
+             C2..DF    80..BF
+             E0..E0    A0..BF    80..BF
+             E1..EF    80..BF    80..BF
+             F0..F0    90..BF    80..BF    80..BF
+             F1..F3    80..BF    80..BF    80..BF
+             F4..F4    80..8F    80..BF    80..BF
+             00..7F
+             http://simonsapin.github.io/wtf-8/
+             * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
+             * needs no multibyte anchoring
+             * needs no escaping meta char of 2nd-4th octets
+             * safe US-ASCII casefolding of 2nd-4th octet
+  ------------------------------------------------------------------------------
+  UTF-8 (RFC3629.ja_JP)
+             1st       2nd       3rd       4th
+             E1..EC    80..BF    80..BF
+             C2..DF    80..BF
+             EE..EF    80..BF    80..BF
+             F0..F0    90..BF    80..BF    80..BF
+             E0..E0    A0..BF    80..BF
+             ED..ED    80..9F    80..BF
+             F1..F3    80..BF    80..BF    80..BF
+             F4..F4    80..8F    80..BF    80..BF
+             00..7F
+             https://en.wikipedia.org/wiki/UTF-8
+             * needs no multibyte anchoring
+             * needs no escaping meta char of 2nd-4th octets
+             * safe US-ASCII casefolding of 2nd-4th octet
+             * enforces surrogate codepoints must be paired
+             * optimized for ja_JP
+  ------------------------------------------------------------------------------
+  WTF-8.ja_JP
+             1st       2nd       3rd       4th
+             E1..EF    80..BF    80..BF
+             C2..DF    80..BF
+             E0..E0    A0..BF    80..BF
+             F0..F0    90..BF    80..BF    80..BF
+             F1..F3    80..BF    80..BF    80..BF
+             F4..F4    80..8F    80..BF    80..BF
+             00..7F
+             http://simonsapin.github.io/wtf-8/
+             * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
+             * needs no multibyte anchoring
+             * needs no escaping meta char of 2nd-4th octets
+             * safe US-ASCII casefolding of 2nd-4th octet
+             * optimized for ja_JP
+  ------------------------------------------------------------------------------
+
+=head1 UTF-8 subroutines provided by this software
+
+This software provides traditional feature "as was."
+The new UTF-8 features are provided by subroutines with new names.
+If you like utf8 pragma, UTF8::R2::* subroutines will help you.
+On other hand, If you love JPerl, those subroutines will not help you very much.
+Traditional functions of Perl are useful still now in octet-oriented semantics.
+
+  elder <<<---                                   age                                   --->>> younger
+  ---------------------------------------------------------------------------------------------------
+  bare Perl4       JPerl4           use utf8;        UTF8::R2                mb.pm
+  bare Perl5       JPerl5           pragma           module                  modulino
+  ---------------------------------------------------------------------------------------------------
+  chop             ---              ---              chop                    chop
+  chr              chr              bytes::chr       chr                     chr
+  getc             getc             ---              getc                    getc
+  index            ---              bytes::index     index                   index
+  lc               ---              ---              lc                      CORE::lc (acts as tr/\x41-\x5A/\x61-\x7A/)
+  lcfirst          ---              ---              lcfirst                 CORE::lcfirst (acts as tr/\x41-\x5A/\x61-\x7A/)
+  length           length           bytes::length    length                  length
+  ord              ord              bytes::ord       ord                     ord
+  reverse          reverse          ---              reverse                 reverse
+  rindex           ---              bytes::rindex    rindex                  rindex
+  substr           substr           bytes::substr    substr                  substr
+  uc               ---              ---              uc                      CORE::uc (acts as tr/\x61-\x7A/\x41-\x5A/)
+  ucfirst          ---              ---              ucfirst                 CORE::ucfirst (acts as tr/\x61-\x7A/\x41-\x5A/)
+  ---              chop             chop             UTF8::R2::chop          mb::chop
+  ---              ---              chr              UTF8::R2::chr           mb::chr
+  ---              ---              getc             UTF8::R2::getc          mb::getc
+  ---              index            ---              UTF8::R2::index_byte    mb::index_byte
+  ---              ---              index            UTF8::R2::index         mb::index
+  ---              lc               ---              lc                      lc (also mb::lc)
+  ---              lcfirst          ---              lcfirst                 lcfirst (also mb::lcfirst)
+  ---              ---              length           UTF8::R2::length        mb::length
+  ---              ---              ord              UTF8::R2::ord           mb::ord
+  ---              ---              reverse          UTF8::R2::reverse       mb::reverse
+  ---              rindex           ---              UTF8::R2::rindex_byte   mb::rindex_byte
+  ---              ---              rindex           UTF8::R2::rindex        mb::rindex
+  ---              ---              substr           UTF8::R2::substr        mb::substr
+  ---              uc               ---              uc                      uc (also mb::uc)
+  ---              ucfirst          ---              ucfirst                 ucfirst (also mb::ucfirst)
+  ---              ---              lc               (mb::Casing::lc)        (mb::Casing::lc)
+  ---              ---              lcfirst          (mb::Casing::lcfirst)   (mb::Casing::lcfirst)
+  ---              ---              uc               (mb::Casing::uc)        (mb::Casing::uc)
+  ---              ---              ucfirst          (mb::Casing::ucfirst)   (mb::Casing::ucfirst)
+  ---------------------------------------------------------------------------------------------------
+  do 'file'        ---              do 'file'        do 'file'               do 'file'
+  eval 'string'    ---              eval 'string'    eval 'string'           eval 'string'
+  require 'file'   ---              require 'file'   require 'file'          require 'file'
+  use Module       ---              use Module       use Module              use Module
+  no Module        ---              no Module        no Module               no Module
+  ---              do 'file'        do 'file'        do 'file'               mb::do 'file'
+  ---              eval 'string'    eval 'string'    eval 'string'           mb::eval 'string'
+  ---              require 'file'   require 'file'   require 'file'          mb::require 'file'
+  ---              use Module       use Module       use Module              mb::use Module
+  ---              no Module        no Module        no Module               mb::no Module
+  $^X              ---              $^X              $^X                     $^X
+  ---              $^X              $^X              $^X                     $mb::PERL
+  $0               $0               $0               $0                      $mb::ORIG_PROGRAM_NAME
+  ---              ---              ---              ---                     $0
+  ---------------------------------------------------------------------------------------------------
+
+index brothers
+
+  ------------------------------------------------------------------------------------------
+  functions or subs       works as        returns as      considered
+  ------------------------------------------------------------------------------------------
+  index                   octet           octet           useful, bare Perl like
+  rindex                  octet           octet           useful, bare Perl like
+  UTF8::R2::index         codepoint       codepoint       not so useful, utf8 pragma like
+  UTF8::R2::rindex        codepoint       codepoint       not so useful, utf8 pragma like
+  UTF8::R2::index_byte    codepoint       octet           useful, JPerl like
+  UTF8::R2::rindex_byte   codepoint       octet           useful, JPerl like
+  ------------------------------------------------------------------------------------------
+
+The most useful of the above are UTF8::R2::index_byte() and UTF8::R2::rindex_byte(), but it's more convenient to use regular expressions than those.
+So you can forget about these subroutines.
+
+=head1 mb.pm Modulino Compatible Routines, and Variables
+
+The following subroutines and variables exist for compatibility with the mb.pm module.
+
+  -------------------------------------------------------------------
+  mb.pm Modulino            Compatible Routines, and Variables
+  -------------------------------------------------------------------
+  mb::do                    UTF8::R2::do($_)
+  mb::dosglob($_)           UTF8::R2::dosglob($_)
+  mb::eval                  UTF8::R2::eval($_)
+  mb::index_byte            UTF8::R2::index_byte($_, 'ABC', 5)
+  mb::require               UTF8::R2::require($_)
+  mb::rindex_byte           UTF8::R2::rindex_byte($_, 'ABC', 5)
+  $mb::PERL                 $UTF8::R2::PERL
+  $mb::ORIG_PROGRAM_NAME    $UTF8::R2::ORIG_PROGRAM_NAME
+  -------------------------------------------------------------------
+
+=head1 Codepoint-Semantics Regular Expression
+
+This software adds the ability to handle UTF-8 code points to bare Perl; it does not provide the ability to handle characters and graphene.
+Because this module override nothing, the functions of bare Perl provide octet semantics continue.
+UTF-8 codepoint semantics of regular expression is provided by new sintax.
+"tr///" has nothing to do with regular expressions, but we listed here for convenience.
 
   ------------------------------------------------------------------------------------------------------------------------------------------
   Octet-semantics         UTF-8 Codepoint-semantics
-  by traditional name     by new name                                Note and Limitations
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  chop                    UTF8::R2::chop(@_)                         usually chomp() is useful
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  chr                     UTF8::R2::chr($_)                          returns UTF-8 codepoint octets by UTF-8 hex number (not by Unicode number)
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  getc                    UTF8::R2::getc(FILEHANDLE)                 get UTF-8 codepoint octets
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  index                   UTF8::R2::index($_, 'ABC', 5)              index() is compatible and usually useful
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  lc                      UTF8::R2::lc($_)                           works as tr/A-Z/a-z/, universally
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  lcfirst                 UTF8::R2::lcfirst($_)                      see UTF8::R2::lc()
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  length                  UTF8::R2::length($_)                       length() is compatible and usually useful
+  by traditional sintax   by new sintax                              Note and Limitations
   ------------------------------------------------------------------------------------------------------------------------------------------
   // or m// or qr//       UTF8::R2::qr(qr/$utf8regex/imsxo)          not supports metasymbol \X that match grapheme
                           m<@{[UTF8::R2::qr(qr/$utf8regex/imsxo)]}>gc
@@ -1139,16 +1341,6 @@ name.
                           $mb{qr/ \N /}                              since perl 5.012
                           (max \x{UTF8hex} is \x{7FFFFFFF}, so cannot 4 octet codepoints, pardon me please!)
   ------------------------------------------------------------------------------------------------------------------------------------------
-  ?? or m??                 (nothing)
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  ord                     UTF8::R2::ord($_)                          returns UTF-8 number (not Unicode number) by UTF-8 codepoint octets
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  pos                       (nothing)
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  reverse                 UTF8::R2::reverse(@_)
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  rindex                  UTF8::R2::rindex($_, 'ABC', 5)             rindex() is compatible and usually useful
-  ------------------------------------------------------------------------------------------------------------------------------------------
   s/before/after/imsxoegr s<@{[UTF8::R2::qr(qr/before/imsxo)]}><after>egr
                             or
                           use UTF8::R2 qw(%mb);
@@ -1156,54 +1348,93 @@ name.
   ------------------------------------------------------------------------------------------------------------------------------------------
   split//                 UTF8::R2::split(qr/$utf8regex/imsxo, $_, 3)  *CAUTION* UTF8::R2::split(/re/,$_,3) means UTF8::R2::split($_ =~ /re/,$_,3)
   ------------------------------------------------------------------------------------------------------------------------------------------
-  sprintf                   (nothing)
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  substr                  UTF8::R2::substr($_, 0, 5)                 substr() is compatible and usually useful
-                                                                     :lvalue feature needs perl 5.014 or later
-  ------------------------------------------------------------------------------------------------------------------------------------------
   tr/// or y///           UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')     range of codepoint by hyphen supports ASCII only
   ------------------------------------------------------------------------------------------------------------------------------------------
-  uc                      UTF8::R2::uc($_)                           works as tr/a-z/A-Z/, universally
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  ucfirst                 UTF8::R2::ucfirst($_)                      see UTF8::R2::uc()
-  ------------------------------------------------------------------------------------------------------------------------------------------
-  write                     (nothing)
-  ------------------------------------------------------------------------------------------------------------------------------------------
 
-=head1 mb.pm Modulino Compatible Routines, and Variables
+=head1 Porting from script in bare Perl4, and bare Perl5
 
-The following subroutines exist for compatibility with the mb.pm module.
+=head2 If you want to write US-ASCII scripts from now on, or port existing US-ASCII scripts to UTF8::R2 environment
 
-  -------------------------------------------------------------------
-  mb.pm Modulino            Compatible Routines, and Variables
-  -------------------------------------------------------------------
-  mb::do                    UTF8::R2::do($_)
-  mb::dosglob($_)           UTF8::R2::dosglob($_)
-  mb::eval                  UTF8::R2::eval($_)
-  mb::index_byte            UTF8::R2::index_byte($_, 'ABC', 5)
-  mb::require               UTF8::R2::require($_)
-  mb::rindex_byte           UTF8::R2::rindex_byte($_, 'ABC', 5)
-  $mb::PERL                 $UTF8::R2::PERL
-  $mb::ORIG_PROGRAM_NAME    $UTF8::R2::ORIG_PROGRAM_NAME
-  -------------------------------------------------------------------
+Write scripts the usual way.
+Running an US-ASCII script using UTF8::R2 allows you to treat UTF-8 codepoints as I/O data.
 
-=head1 UTF8 Flag Considered Harmful, and Our Goals
+=head1 Porting from script in JPerl4, and JPerl5
+
+=head2 If you want to port existing JPerl scripts to UTF8::R2 environment
+
+There are only a few places that need to be rewritten.
+If you write the functionality of "index()" and "rindex()" in regular expressions, the only difference left is "chop()".
+If you want "chop()" that like JPerl, you need to write "UTF8::R2::chop()" when UTF8::R2 environment.
+
+  -----------------------------------------------------------------
+  original script in        script with
+  JPerl4, JPerl5            UTF8::R2 module
+  -----------------------------------------------------------------
+  chop                      UTF8::R2::chop
+  index                     UTF8::R2::index_byte
+  rindex                    UTF8::R2::rindex_byte
+  -----------------------------------------------------------------
+
+However substantially is ...
+
+  -----------------------------------------------------------------
+  original script in        script with
+  JPerl4, JPerl5            UTF8::R2 module
+  -----------------------------------------------------------------
+  chop                      95% to chomp, 4% to UTF8::R2::chop, 1% to chop
+  index                     (already written in regular expression)
+  rindex                    (already written in regular expression)
+  -----------------------------------------------------------------
+
+Substantially put, JPerl users can write programs the same way they used to.
+
+=head1 Porting from script with utf8 pragma
+
+=head2 If you want to port existing scripts that has utf8 pragma to UTF8::R2 environment
+
+Like traditional style, Perl's built-in functions without package names provide octet-oriented functionality.
+Thus, "length()" and "substr()" work on an octet basis, universally.
+When you need multibyte functionally, you need to use subroutines in the "UTF8::R2" package, on every time.
+
+  -----------------------------------------------------------------
+  original script with      script with
+  utf8 pragma               UTF8::R2 module
+  -----------------------------------------------------------------
+  chop                      UTF8::R2::chop
+  chr                       UTF8::R2::chr
+  getc                      UTF8::R2::getc
+  index                     UTF8::R2::index
+  lc                        ---
+  lcfirst                   ---
+  length                    UTF8::R2::length
+  ord                       UTF8::R2::ord
+  reverse                   UTF8::R2::reverse
+  rindex                    UTF8::R2::rindex
+  substr                    UTF8::R2::substr
+  uc                        ---
+  ucfirst                   ---
+  -----------------------------------------------------------------
+
+=head1 DEPENDENCIES
+
+This UTF8::R2 module requires perl5.00503 or later to use. Also requires 'strict' module.
+It requires the 'warnings' module, too if perl 5.6 or later.
+
+=head1 Our Goals (and UTF8 Flag Considered Harmful)
 
 P.401 See chapter 15: Unicode
 of ISBN 0-596-00027-8 Programming Perl Third Edition.
 
-Before the introduction of Unicode support in perl, The eq operator
-just compared the byte-strings represented by two scalars. Beginning
-with perl 5.8, eq compares two byte-strings with simultaneous
-consideration of the UTF8 flag.
+Before the introduction of Unicode support in perl, The eq operator just compared the byte-strings represented by two scalars.
+Beginning with perl 5.8, eq compares two byte-strings with simultaneous consideration of the UTF8 flag.
 
 -- we have been taught so for a long time.
 
-Perl is a powerful language for everyone, but UTF8 flag is a barrier
-for common beginners. Because everyone can only one task on one time.
-So calling Encode::encode() and Encode::decode() in application program
-is not better way. Making two scripts for information processing and
-encoding conversion may be better. Please trust me.
+Perl is a powerful language for everyone, but UTF8 flag is a barrier for common beginners.
+Calling Encode::encode() and Encode::decode() in application program is not good way.
+Making one script for information processing, and other one for encoding conversion are better.
+
+"That's a small bit for someone, but the giant  bug on the Perl for mankind."
 
  /*
   * You are not expected to understand this.
@@ -1221,8 +1452,7 @@ encoding conversion may be better. Please trust me.
     +--------------------------------------------+
     http://perl-users.jp/articles/advent-calendar/2010/casual/4
 
-  Confusion of Perl string model is made from double meanings of
-  "Binary string."
+  Confusion of Perl string model is made from double meanings of "Binary string."
   Meanings of "Binary string" are
   1. Non-Text string
   2. Digital octet string
@@ -1240,14 +1470,11 @@ encoding conversion may be better. Please trust me.
     |            Digital octet string            |
     +--------------------------------------------+
 
-There are people who don't agree to change in the character string
-processing model of Perl 5.8. It is impossible to get to agree it to
-majority of Perl user who hardly ever use Perl.
-How to solve it by returning to an original method, let's drag out
-page 402 of the Programming Perl, 3rd ed. again.
+Perl 5.8's string model will not be accepted by common people.
 
-  Information processing model beginning with perl3 or this software
-  of UNIX/C-ism.
+Information processing model of UNIX/C-ism, 
+Information processing model of perl3 or later, and
+Information processing model of this software.
 
     +--------------------------------------------+
     |    Text string as Digital octet string     |
@@ -1256,9 +1483,35 @@ page 402 of the Programming Perl, 3rd ed. again.
     |       Not UTF8 Flagged, No MOJIBAKE        |
     +--------------------------------------------+
 
-  In UNIX Everything is a File
-  - In UNIX everything is a stream of bytes
-  - In UNIX the filesystem is used as a universal name space
+In UNIX Everything is a File
+
+=over 2
+
+=item * In UNIX everything is a stream of bytes
+
+=item * In UNIX the filesystem is used as a universal name space
+
+=back
+
+Native Encoding Scripting is ...
+
+=over 2
+
+=item * native encoding of file contents
+
+=item * native encoding of file name on filesystem
+
+=item * native encoding of command line
+
+=item * native encoding of environment variable
+
+=item * native encoding of API
+
+=item * native encoding of network packet
+
+=item * native encoding of database
+
+=back
 
 Ideally, We'd like to achieve these five Goals:
 
@@ -1266,82 +1519,221 @@ Ideally, We'd like to achieve these five Goals:
 
 =item * Goal #1:
 
-Old byte-oriented programs should not spontaneously break on the old
-byte-oriented data they used to work on.
+Old byte-oriented programs should not spontaneously break on the old byte-oriented data they used to work on.
 
-This goal has been achieved by that this software is additional code
-for perl like utf8 pragma. Perl should work same as past Perl if added
-nothing.
+This software attempts to achieve this goal by embedded functions work as traditional and stably.
 
 =item * Goal #2:
 
-Old byte-oriented programs should magically start working on the new
-character-oriented data when appropriate.
+Old byte-oriented programs should magically start working on the new character-oriented data when appropriate.
 
-Not "magically."
-You must decide and write octet semantics or UTF-8 codepoint semantics yourself
-in case by case. Perhaps almost all regular expressions should have UTF-8
-codepoint semantics. And other all should have octet semantics.
+This software is not a magician, so cannot see your mind and run it.
+
+You must decide and write octet semantics or codepoint semantics yourself in case by case.
+
+figure of Goal #1 and Goal #2.
+
+                               Goal #1 Goal #2
+                        (a)     (b)     (c)     (d)     (e)
+      +--------------+-------+-------+-------+-------+-------+
+      | data         |  Old  |  Old  |  New  |  Old  |  New  |
+      +--------------+-------+-------+-------+-------+-------+
+      | script       |  Old  |      Old      |      New      |
+      +--------------+-------+---------------+---------------+
+      | interpreter  |  Old  |              New              |
+      +--------------+-------+-------------------------------+
+      Old --- Old byte-oriented
+      New --- New codepoint-oriented
+
+There is a combination from (a) to (e) in data, script, and interpreter of old and new. Let's add JPerl, utf8 pragma, and this software.
+
+                        (a)     (b)     (c)     (d)     (e)
+                                      JPerl
+                                      UTF8::R2         utf8
+      +--------------+-------+-------+-------+-------+-------+
+      | data         |  Old  |  Old  |  New  |  Old  |  New  |
+      +--------------+-------+-------+-------+-------+-------+
+      | script       |  Old  |      Old      |      New      |
+      +--------------+-------+---------------+---------------+
+      | interpreter  |  Old  |              New              |
+      +--------------+-------+-------------------------------+
+      Old --- Old byte-oriented
+      New --- New codepoint-oriented
+
+The reason why JPerl is very excellent is that it is at the position of (c).
+That is, it is almost not necessary to write a special code to process new codepoint oriented script.
 
 =item * Goal #3:
 
-Programs should run just as fast in the new character-oriented mode
-as in the old byte-oriented mode.
+Programs should run just as fast in the new character-oriented mode as in the old byte-oriented mode.
 
-It is almost possible.
-Because UTF-8 encoding doesn't need multibyte anchoring in regular expression.
+It is impossible. Because the following time is necessary.
+
+(1) Time of processing class of codepoint in regular expression
 
 =item * Goal #4:
 
-Perl should remain one language, rather than forking into a
-byte-oriented Perl and a character-oriented Perl.
+Perl should remain one language, rather than forking into a byte-oriented Perl and a character-oriented Perl.
 
-UTF8::R2 module remains one language and one interpreter by providing
-codepoint semantics subroutines.
+JPerl remains one Perl "language" by forking to two "interpreters."
+However, the Perl core team did not desire fork of the "interpreter."
+As a result, Perl "language" forked contrary to goal #4.
+
+A codepoint oriented perl is not necessary to make it specially, because a byte-oriented perl can already treat the binary data.
+This software is only Perl module of byte-oriented Perl.
+
+And you will get support from the Perl community, when you solve the problem by the Perl script.
+
+UTF8::R2 module remains one "language" and one "interpreter."
 
 =item * Goal #5:
 
-UTF8::R2 module users will be able to maintain it by Perl.
+UTF8::R2 users will be able to maintain UTF8::R2 by Perl.
 
 May the UTF8::R2 be with you, always.
 
 =back
 
-Back when Programming Perl, 3rd ed. was written, UTF8 flag was not born
-and Perl is designed to make the easy jobs easy. This software provides
-programming environment like at that time.
+Back when Programming Perl, 3rd edition was written, UTF8 flag was not born and Perl is designed to make the easy jobs do easy.
+This software provides programming environment like at that time.
 
 =head1 Perl's Motto
 
-   Some computer scientists (the reductionists, in particular) would
-  like to deny it, but people have funny-shaped minds. Mental geography
-  is not linear, and cannot be mapped onto a flat surface without
-  severe distortion. But for the last score years or so, computer
-  reductionists have been first bowing down at the Temple of Orthogonality,
-  then rising up to preach their ideas of ascetic rectitude to any who
-  would listen.
- 
-   Their fervent but misguided desire was simply to squash your mind to
-  fit their mindset, to smush your patterns of thought into some sort of
-  Hyperdimensional Flatland. It's a joyless existence, being smushed.
-  --- Learning Perl on Win32 Systems
+Some computer scientists (the reductionists, in particular) would like to deny it, but people have funny-shaped minds.
+Mental geography is not linear, and cannot be mapped onto a flat surface without severe distortion.
+But for the last score years or so, computer reductionists have been first bowing down at the Temple of Orthogonality, then rising up to preach their ideas of ascetic rectitude to any who would listen.
 
-  If you think this is a big headache, you're right. No one likes
-  this situation, but Perl does the best it can with the input and
-  encodings it has to deal with. If only we could reset history and
-  not make so many mistakes next time.
-  --- Learning Perl 6th Edition
+Their fervent but misguided desire was simply to squash your mind to fit their mindset, to smush your patterns of thought into some sort of Hyperdimensional Flatland.
+It's a joyless existence, being smushed.
 
-   The most important thing for most people to know about handling
-  Unicode data in Perl, however, is that if you don't ever use any Uni-
-  code data -- if none of your files are marked as UTF-8 and you don't
-  use UTF-8 locales -- then you can happily pretend that you're back in
-  Perl 5.005_03 land; the Unicode features will in no way interfere with
-  your code unless you're explicitly using them. Sometimes the twin
-  goals of embracing Unicode but not disturbing old-style byte-oriented
-  scripts has led to compromise and confusion, but it's the Perl way to
-  silently do the right thing, which is what Perl ends up doing.
-  --- Advanced Perl Programming, 2nd Edition
+--- Learning Perl on Win32 Systems
+
+If you think this is a big headache, you're right.
+No one likes this situation, but Perl does the best it can with the input and encodings it has to deal with.
+If only we could reset history and not make so many mistakes next time.
+
+--- Learning Perl 6th Edition
+
+The most important thing for most people to know about handling Unicode data in Perl, however, is that if you don't ever use any Unicode data -- if none of your files are marked as UTF-8 and you don't use UTF-8 locales
+-- then you can happily pretend that you're back in Perl 5.005_03 land;
+the Unicode features will in no way interfere with your code unless you're explicitly using them.
+Sometimes the twin goals of embracing Unicode but not disturbing old-style byte-oriented scripts has led to compromise and confusion, but it's the Perl way to silently do the right thing, which is what Perl ends up doing.
+
+--- Advanced Perl Programming, 2nd Edition
+
+However, the ability to have any character in a string means you can create, scan, and manipulate raw binary data as string
+-- something with which many other utilities would have great difficulty.
+
+--- Learning Perl 8th Edition
+
+=head1 Combinations of UTF8::R2 Module and Other Modules
+
+The following is a description of all the situations in this software is used in Japan.
+
+  +-------------+--------------+---------------------------------------------------------------------+
+  | OS encoding | I/O encoding |                           script encoding                           |
+  |             |              |----------------------------------+----------------------------------+
+  |             |              |              Sjis                |              UTF-8               |
+  +-------------+--------------+----------------------------------+----------------------------------+
+  |             |              |  > perl mb.pm script.pl          |                                  |
+  |             |    Sjis      |                                  |                                  |
+  |             |              |                                  |                                  |
+  |    Sjis     +--------------+----------------------------------+----------------------------------+
+  |             |              |                                  | use UTF8::R2;                    |
+  |             |    UTF-8     |                                  |                                  |
+  |             |              |                                  | use mb::Encode;  # file-path     |
+  +-------------+--------------+----------------------------------+----------------------------------+
+  |             |              |  $ perl mb.pm -e sjis script.pl  |                                  |
+  |             |    Sjis      |                                  |                                  |
+  |             |              |  use mb::Encode; # file-path     |                                  |
+  |    UTF-8    +--------------+----------------------------------+----------------------------------+
+  |             |              |                                  | use UTF8::R2;                    |
+  |             |    UTF-8     |                                  |                                  |
+  |             |              |                                  |                                  |
+  +-------------+--------------+----------------------------------+----------------------------------+
+
+Description of combinations
+
+  ----------------------------------------------------------------------
+  encoding
+  O-I-S     description
+  ----------------------------------------------------------------------
+  S-S-S     Best choice when I/O is Sjis  encoding
+  S-S-U     
+  S-U-S     
+  S-U-U     Better choice when I/O is UTF-8 encoding, since not so slow
+  U-S-S     Better choice when I/O is Sjis  encoding, since not so slow
+  U-S-U     
+  U-U-S     
+  U-U-U     Best choice when I/O is UTF-8 encoding
+  ----------------------------------------------------------------------
+
+Using Encode::decode and Encode::encode for file contents, *you* and operators lose two precious things.
+One is the time.
+Other one is the original data.
+Generally speaking, data conversion lose information -- unless perfectly convert one to one.
+Moreover, if you have made script's bug, you will know its bug on too late.
+If you convert encoding of file path -- not file contents, you will know its bug on the time when you test it.
+
+=head1 Using mb.pm Modulino vs. Using UTF8::R2 Module
+
+CPAN shows us there are mb.pm modulino and UTF8::R2 module.
+mb.pm modulino is a source code filter for MBCS encoding, and UTF8::R2 module is a utility for UTF-8 support.
+We can use each advantages using following hints.
+
+=head2 Advantages Of mb.pm Modulino
+
+=over 2
+
+=item * supports many MBCS encodings, Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, and WTF-8
+
+=item * JPerl-like syntax that supports "easy jobs must be easy"
+
+=item * regexp ("m//", "qr//", and "s///") works as codepoint
+
+=item * "split()" works as codepoint
+
+=item * "tr///" works as codepoint
+
+=back
+
+=head2 Disadvantages Of mb.pm Modulino
+
+=over 2
+
+=item * have to type "perl mb.pm your_script.pl ..." on command line everytime
+
+=item * have obtrusive files(your_script.oo.pl)
+
+=back
+
+=head2 Advantages Of UTF8::R2 Module
+
+=over 2
+
+=item * type only "perl your_script.pl ..." on command line
+
+=item * no obtrusive files(your_script.oo.pl)
+
+=back
+
+=head2 Disadvantages Of UTF8::R2 Module
+
+=over 2
+
+=item * supports only UTF-8 encoding
+
+=item * have to write "$mb{qr/regexp/imsxo}" to do "m/regexp/imsxo" that works as codepoint
+
+=item * have to write "m<\G$mb{qr/regexp/imsxo}>gc" to do "m/regexp/imsxogc" that works as codepoint
+
+=item * have to write "s<$mb{qr/before/imsxo}><after>egr" to do "s/before/after/imsxoegr" that works as codepoint
+
+=item * have to write "UTF8::R2::split(qr/regexp/, $_, 3)" to do "split(/regexp/, $_, 3)" that works as codepoint
+
+=item * have to write "UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/cdsr" that works as codepoint
+
+=back
 
 =head1 AUTHOR
 
@@ -1349,14 +1741,480 @@ INABA Hitoshi E<lt>ina@cpan.orgE<gt>
 
 This project was originated by INABA Hitoshi.
 
-=head1 LICENSE and COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
-This software is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See the LICENSE
-file for details.
+This software is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+See the LICENSE file for details.
 
-This software is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=head1 SEE ALSO
+
+ perlunicode, perlunifaq, perluniintro, perlunitut, utf8, bytes,
+
+ PERL PUROGURAMINGU
+ Larry Wall, Randal L.Schwartz, Yoshiyuki Kondo
+ December 1997
+ ISBN 4-89052-384-7
+ http://www.context.co.jp/~cond/books/old-books.html
+
+ Programming Perl, Second Edition
+ By Larry Wall, Tom Christiansen, Randal L. Schwartz
+ October 1996
+ Pages: 670
+ ISBN 10: 1-56592-149-6 | ISBN 13: 9781565921498
+ http://shop.oreilly.com/product/9781565921498.do
+
+ Programming Perl, Third Edition
+ By Larry Wall, Tom Christiansen, Jon Orwant
+ Third Edition  July 2000
+ Pages: 1104
+ ISBN 10: 0-596-00027-8 | ISBN 13: 9780596000271
+ http://shop.oreilly.com/product/9780596000271.do
+
+ The Perl Language Reference Manual (for Perl version 5.12.1)
+ by Larry Wall and others
+ Paperback (6"x9"), 724 pages
+ Retail Price: $39.95 (pound 29.95 in UK)
+ ISBN-13: 978-1-906966-02-7
+ https://dl.acm.org/doi/book/10.5555/1893028
+
+ Perl Pocket Reference, 5th Edition
+ By Johan Vromans
+ Publisher: O'Reilly Media
+ Released: July 2011
+ Pages: 102
+ http://shop.oreilly.com/product/0636920018476.do
+
+ Programming Perl, 4th Edition
+ By: Tom Christiansen, brian d foy, Larry Wall, Jon Orwant
+ Publisher: O'Reilly Media
+ Formats: Print, Ebook, Safari Books Online
+ Released: March 2012
+ Pages: 1130
+ Print ISBN: 978-0-596-00492-7 | ISBN 10: 0-596-00492-3
+ Ebook ISBN: 978-1-4493-9890-3 | ISBN 10: 1-4493-9890-1
+ http://shop.oreilly.com/product/9780596004927.do
+
+ Perl Cookbook
+ By Tom Christiansen, Nathan Torkington
+ August 1998
+ Pages: 800
+ ISBN 10: 1-56592-243-3 | ISBN 13: 978-1-56592-243-3
+ http://shop.oreilly.com/product/9781565922433.do
+
+ Perl Cookbook, Second Edition
+ By Tom Christiansen, Nathan Torkington
+ Second Edition  August 2003
+ Pages: 964
+ ISBN 10: 0-596-00313-7 | ISBN 13: 9780596003135
+ http://shop.oreilly.com/product/9780596003135.do
+
+ Perl in a Nutshell, Second Edition
+ By Stephen Spainhour, Ellen Siever, Nathan Patwardhan
+ Second Edition  June 2002
+ Pages: 760
+ Series: In a Nutshell
+ ISBN 10: 0-596-00241-6 | ISBN 13: 9780596002411
+ http://shop.oreilly.com/product/9780596002411.do
+
+ Learning Perl on Win32 Systems
+ By Randal L. Schwartz, Erik Olson, Tom Christiansen
+ August 1997
+ Pages: 306
+ ISBN 10: 1-56592-324-3 | ISBN 13: 9781565923249
+ http://shop.oreilly.com/product/9781565923249.do
+
+ Learning Perl, Fifth Edition
+ By Randal L. Schwartz, Tom Phoenix, brian d foy
+ June 2008
+ Pages: 352
+ Print ISBN:978-0-596-52010-6 | ISBN 10: 0-596-52010-7
+ Ebook ISBN:978-0-596-10316-3 | ISBN 10: 0-596-10316-6
+ http://shop.oreilly.com/product/9780596520113.do
+
+ Learning Perl, 6th Edition
+ By Randal L. Schwartz, brian d foy, Tom Phoenix
+ June 2011
+ Pages: 390
+ ISBN-10: 1449303587 | ISBN-13: 978-1449303587
+ http://shop.oreilly.com/product/0636920018452.do
+
+ Learning Perl, 8th Edition
+ by Randal L. Schwartz, brian d foy, Tom Phoenix
+ Released August 2021
+ Publisher(s): O'Reilly Media, Inc.
+ ISBN: 9781492094951
+ https://www.oreilly.com/library/view/learning-perl-8th/9781492094944/
+
+ Advanced Perl Programming, 2nd Edition
+ By Simon Cozens
+ June 2005
+ Pages: 300
+ ISBN-10: 0-596-00456-7 | ISBN-13: 978-0-596-00456-9
+ http://shop.oreilly.com/product/9780596004569.do
+
+ Perl RESOURCE KIT UNIX EDITION
+ Futato, Irving, Jepson, Patwardhan, Siever
+ ISBN 10: 1-56592-370-7
+ http://shop.oreilly.com/product/9781565923706.do
+
+ Perl Resource Kit -- Win32 Edition
+ Erik Olson, Brian Jepson, David Futato, Dick Hardt
+ ISBN 10:1-56592-409-6
+ http://shop.oreilly.com/product/9781565924093.do
+
+ MODAN Perl NYUMON
+ By Daisuke Maki
+ 2009/2/10
+ Pages: 344
+ ISBN 10: 4798119172 | ISBN 13: 978-4798119175
+ https://www.seshop.com/product/detail/10250
+
+ Understanding Japanese Information Processing
+ By Ken Lunde
+ January 1900
+ Pages: 470
+ ISBN 10: 1-56592-043-0 | ISBN 13: 9781565920439
+ http://shop.oreilly.com/product/9781565920439.do
+
+ CJKV Information Processing Chinese, Japanese, Korean & Vietnamese Computing
+ By Ken Lunde
+ O'Reilly Media
+ Print: January 1999
+ Ebook: June 2009
+ Pages: 1128
+ Print ISBN:978-1-56592-224-2 | ISBN 10:1-56592-224-7
+ Ebook ISBN:978-0-596-55969-4 | ISBN 10:0-596-55969-0
+ http://shop.oreilly.com/product/9781565922242.do
+
+ CJKV Information Processing, 2nd Edition
+ By Ken Lunde
+ O'Reilly Media
+ Print: December 2008
+ Ebook: June 2009
+ Pages: 912
+ Print ISBN: 978-0-596-51447-1 | ISBN 10:0-596-51447-6
+ Ebook ISBN: 978-0-596-15782-1 | ISBN 10:0-596-15782-7
+ http://shop.oreilly.com/product/9780596514471.do
+
+ DB2 GIJUTSU ZENSHO
+ By BM Japan Systems Engineering Co.,Ltd. and IBM Japan, Ltd.
+ 2004/05
+ Pages: 887
+ ISBN-10: 4756144659 | ISBN-13: 978-4756144652
+ https://iss.ndl.go.jp/books/R100000002-I000007400836-00
+
+ Mastering Regular Expressions, Second Edition
+ By Jeffrey E. F. Friedl
+ Second Edition  July 2002
+ Pages: 484
+ ISBN 10: 0-596-00289-0 | ISBN 13: 9780596002893
+ http://shop.oreilly.com/product/9780596002893.do
+
+ Mastering Regular Expressions, Third Edition
+ By Jeffrey E. F. Friedl
+ Third Edition  August 2006
+ Pages: 542
+ ISBN 10: 0-596-52812-4 | ISBN 13:9780596528126
+ http://shop.oreilly.com/product/9780596528126.do
+
+ Regular Expressions Cookbook
+ By Jan Goyvaerts, Steven Levithan
+ May 2009
+ Pages: 512
+ ISBN 10:0-596-52068-9 | ISBN 13: 978-0-596-52068-7
+ http://shop.oreilly.com/product/9780596520694.do
+
+ Regular Expressions Cookbook, 2nd Edition
+ By Steven Levithan, Jan Goyvaerts
+ Released August 2012
+ Pages: 612
+ ISBN: 9781449327453
+ https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/
+
+ JIS KANJI JITEN
+ By Kouji Shibano
+ Pages: 1456
+ ISBN 4-542-20129-5
+ https://www.e-hon.ne.jp/bec/SA/Detail?refISBN=4542201295
+
+ UNIX MAGAZINE
+ 1993 Aug
+ Pages: 172
+ T1008901080816 ZASSHI 08901-8
+
+ Shell Script Magazine vol.41
+ 2016 September
+ Pages: 64
+ https://shell-mag.com/
+
+ LINUX NIHONGO KANKYO
+ By YAMAGATA Hiroo, Stephen J. Turnbull, Craig Oda, Robert J. Bickel
+ June, 2000
+ Pages: 376
+ ISBN 4-87311-016-5
+ https://www.oreilly.co.jp/books/4873110165/
+
+ Windows NT Shell Scripting
+ By Timothy Hill
+ April 27, 1998
+ Pages: 400
+ ISBN 10: 1578700477 | ISBN 13: 9781578700479
+ https://www.abebooks.com/9781578700479/Windows-NT-Scripting-Circle-Hill-1578700477/plp
+
+ Windows(R) Command-Line Administrators Pocket Consultant, 2nd Edition
+ By William R. Stanek
+ February 2009
+ Pages: 594
+ ISBN 10: 0-7356-2262-0 | ISBN 13: 978-0-7356-2262-3
+ https://www.abebooks.com/9780735622623/Windows-Command-Line-Administrators-Pocket-Consultant-0735622620/plp
+
+ CPAN Directory INABA Hitoshi
+ https://metacpan.org/author/INA
+ http://backpan.cpantesters.org/authors/id/I/IN/INA/
+ https://metacpan.org/release/Jacode4e-RoundTrip
+ https://metacpan.org/release/Jacode4e
+ https://metacpan.org/release/Jacode
+
+ Recent Perl packages by "INABA Hitoshi"
+ http://code.activestate.com/ppm/author:INABA-Hitoshi/
+
+ Tokyo-pm archive
+ https://mail.pm.org/pipermail/tokyo-pm/
+ https://mail.pm.org/pipermail/tokyo-pm/1999-September/001844.html
+ https://mail.pm.org/pipermail/tokyo-pm/1999-September/001854.html
+
+ Error: Runtime exception on jperl 5.005_03
+ http://www.rakunet.org/tsnet/TSperl/12/374.html
+ http://www.rakunet.org/tsnet/TSperl/12/375.html
+ http://www.rakunet.org/tsnet/TSperl/12/376.html
+ http://www.rakunet.org/tsnet/TSperl/12/377.html
+ http://www.rakunet.org/tsnet/TSperl/12/378.html
+ http://www.rakunet.org/tsnet/TSperl/12/379.html
+ http://www.rakunet.org/tsnet/TSperl/12/380.html
+ http://www.rakunet.org/tsnet/TSperl/12/382.html
+
+ TSNETWiki
+ https://rakunet.org/wik/index.php
+ https://rakunet.org/wik/index.php?TSperl
+ https://rakunet.org/wik/index.php?Perl
+
+ ruby-list
+ http://blade.nagaokaut.ac.jp/ruby/ruby-list/index.shtml
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/2440
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/2446
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/2569
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/9427
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/9431
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/10500
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/10501
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/10502
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/12385
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/12392
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/12393
+ http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/19156
+
+ Announcing Perl 7
+ https://www.perl.com/article/announcing-perl-7/
+
+ Perl 7 is coming
+ https://www.effectiveperlprogramming.com/2020/06/perl-7-is-coming/
+
+ A vision for Perl 7 and beyond
+ https://xdg.me/a-vision-for-perl-7-and-beyond/
+
+ On Perl 7 and the Perl Steering Committee
+ https://lwn.net/Articles/828384/
+  
+ Perl7 and the future of Perl
+ http://www.softpanorama.org/Scripting/Language_wars/perl7_and_the_future_of_perl.shtml
+
+ Perl 7: A Risk-Benefit Analysis
+ http://blogs.perl.org/users/grinnz/2020/07/perl-7-a-risk-benefit-analysis.html
+
+ Perl 7 By Default
+ http://blogs.perl.org/users/grinnz/2020/08/perl-7-by-default.html
+
+ Perl 7: A Modest Proposal
+ https://dev.to/grinnz/perl-7-a-modest-proposal-434m
+
+ Perl 7 FAQ
+ https://gist.github.com/Grinnz/be5db6b1d54b22d8e21c975d68d7a54f
+
+ Perl 7, not quite getting better yet
+ http://blogs.perl.org/users/leon_timmermans/2020/06/not-quite-getting-better-yet.html
+
+ Re: Announcing Perl 7
+ https://www.nntp.perl.org/group/perl.perl5.porters/2020/06/msg257566.html
+ https://www.nntp.perl.org/group/perl.perl5.porters/2020/06/msg257568.html
+ https://www.nntp.perl.org/group/perl.perl5.porters/2020/06/msg257572.html
+
+ Changed defaults - Are they best for newbies?
+ https://www.nntp.perl.org/group/perl.perl5.porters/2020/08/msg258221.html
+
+ A vision for Perl 7 and beyond
+ https://web.archive.org/web/20200927044106/https://xdg.me/archive/2020-a-vision-for-perl-7-and-beyond/
+
+ Sys::Binmode - A fix for Perl's system call character encoding
+ https://metacpan.org/pod/Sys::Binmode
+
+ File::Glob::Windows - glob routine for Windows environment.
+ https://metacpan.org/pod/File::Glob::Windows
+
+ winja - dirty patch for handling pathname on MSWin32::Ja_JP.cp932
+ https://metacpan.org/release/winja
+
+ Win32::Symlink - Symlink support on Windows
+ https://metacpan.org/pod/Win32::Symlink
+
+ Win32::NTFS::Symlink - Support for NTFS symlinks and junctions on Microsoft Windows
+ https://metacpan.org/pod/Win32::NTFS::Symlink
+
+ Win32::Symlinks - A maintained, working implementation of Perl symlink built in features for Windows.
+ https://metacpan.org/pod/Win32::Symlinks
+
+ TANABATA - The Star Festival - common legend of east asia
+ https://ja.wikipedia.org/wiki/%E4%B8%83%E5%A4%95
+ https://ko.wikipedia.org/wiki/%EC%B9%A0%EC%84%9D
+ https://zh-classical.wikipedia.org/wiki/%E4%B8%83%E5%A4%95
+ https://zh-yue.wikipedia.org/wiki/%E4%B8%83%E5%A7%90%E8%AA%95
+ https://zh.wikipedia.org/wiki/%E4%B8%83%E5%A4%95
+
+=head1 ACKNOWLEDGEMENTS
+
+This software was made referring to software and the document that the
+following hackers or persons had made. 
+I am thankful to all persons.
+
+ Larry Wall, Perl
+ http://www.perl.org/
+
+ Jesse Vincent, Compatibility is a virtue
+ https://www.nntp.perl.org/group/perl.perl5.porters/2010/05/msg159825.html
+
+ Kazumasa Utashiro, jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
+ https://metacpan.org/author/UTASHIRO
+ ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
+ http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
+ ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
+ http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
+ https://twitter.com/uta46/status/11578906320
+
+ Jeffrey E. F. Friedl, Mastering Regular Expressions
+ http://regex.info/
+
+ SADAHIRO Tomoyuki, Handling of Shift-JIS text correctly using bare Perl
+ http://nomenclator.la.coocan.jp/perl/shiftjis.htm
+ https://metacpan.org/author/SADAHIRO
+
+ Yukihiro "Matz" Matsumoto, YAPC::Asia2006 Ruby on Perl(s)
+ https://archive.org/details/YAPCAsia2006TokyoRubyonPerls
+
+ jscripter, For jperl users
+ http://text.world.coocan.jp/jperl.html
+
+ Bruce., Unicode in Perl
+ http://www.rakunet.org/tsnet/TSabc/18/546.html
+
+ Hiroaki Izumi, Cannot use Perl5.8/5.10 on Windows ?
+ https://sites.google.com/site/hiroa63iz/perlwin
+
+ Yuki Kimoto, Is it true that cannot use Perl5.8/5.10 on Windows ?
+ https://philosophy.perlzemi.com/blog/20200122080040.html
+
+ chaichanPaPa, Matching Shift_JIS file name
+ http://chaipa.hateblo.jp/entry/20080802/1217660826
+
+ SUZUKI Norio, Jperl
+ http://www.dennougedougakkai-ndd.org/alte/3tte/jperl-5.005_03@ap522/homepage2.nifty.com..kipp..perl..jperl..index.html
+
+ WATANABE Hirofumi, Jperl
+ https://www.cpan.org/src/5.0/jperl/
+ https://metacpan.org/author/WATANABE
+ ftp://ftp.oreilly.co.jp/pcjp98/watanabe/jperlconf.ppt
+
+ Chuck Houpt, Michiko Nozu, MacJPerl
+ https://habilis.net/macjperl/index.j.html
+
+ Kenichi Ishigaki, 31st about encoding; To JPerl users as old men
+ https://gihyo.jp/dev/serial/01/modern-perl/0031
+
+ Fuji, Goro (gfx), Perl Hackers Hub No.16
+ http://gihyo.jp/dev/serial/01/perl-hackers-hub/001602
+
+ Dan Kogai, Encode module
+ https://metacpan.org/release/Encode
+ https://archive.org/details/YAPCAsia2006TokyoPerl58andUnicodeMythsFactsandChanges
+ http://yapc.g.hatena.ne.jp/jkondo/
+
+ Takahashi Masatuyo, JPerl Wiki
+ https://jperl.fandom.com/ja/wiki/JPerl_Wiki
+
+ Juerd, Perl Unicode Advice
+ https://juerd.nl/site.plp/perluniadvice
+
+ daily dayflower, 2008-06-25 perluniadvice
+ https://dayflower.hatenablog.com/entry/20080625/1214374293
+
+ Unicode issues in Perl
+ https://www.i-programmer.info/programming/other-languages/1973-unicode-issues-in-perl.html
+
+ numa's Diary: CSI and UCS Normalization
+ https://srad.jp/~numa/journal/580177/
+
+ Unicode Processing on Windows with Perl
+ http://blog.livedoor.jp/numa2666/archives/52344850.html
+ http://blog.livedoor.jp/numa2666/archives/52344851.html
+ http://blog.livedoor.jp/numa2666/archives/52344852.html
+ http://blog.livedoor.jp/numa2666/archives/52344853.html
+ http://blog.livedoor.jp/numa2666/archives/52344854.html
+ http://blog.livedoor.jp/numa2666/archives/52344855.html
+ http://blog.livedoor.jp/numa2666/archives/52344856.html
+
+ Kaoru Maeda, Perl's history Perl 1,2,3,4
+ https://www.slideshare.net/KaoruMaeda/perl-perl-1234
+
+ nurse, What is "string"
+ https://naruse.hateblo.jp/entries/2014/11/07#1415355181
+
+ NISHIO Hirokazu, What's meant "string as a sequence of characters"?
+ https://nishiohirokazu.hatenadiary.org/entry/20141107/1415286729
+
+ Rick Yamashita, Shift_JIS
+ https://shino.tumblr.com/post/116166805/%E5%B1%B1%E4%B8%8B%E8%89%AF%E8%94%B5%E3%81%A8%E7%94%B3%E3%81%97%E3%81%BE%E3%81%99-%E7%A7%81%E3%81%AF1981%E5%B9%B4%E5%BD%93%E6%99%82us%E3%81%AE%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%82%BD%E3%83%95%E3%83%88%E3%81%A7%E3%82%B7%E3%83%95%E3%83%88jis%E3%81%AE%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%82%92%E6%8B%85%E5%BD%93
+ http://www.wdic.org/w/WDIC/%E3%82%B7%E3%83%95%E3%83%88JIS
+
+ nurse, History of Japanese EUC 22:00
+ https://naruse.hateblo.jp/entries/2009/03/08
+
+ Mike Whitaker, Perl And Unicode
+ https://www.slideshare.net/Penfold/perl-and-unicode
+
+ Ricardo Signes, Perl 5.14 for Pragmatists
+ https://www.slideshare.net/rjbs/perl-514-8809465
+
+ Ricardo Signes, What's New in Perl? v5.10 - v5.16 #'
+ https://www.slideshare.net/rjbs/whats-new-in-perl-v510-v516
+
+ YAP(achimon)C::Asia Hachioji 2016 mid in Shinagawa
+ Kenichi Ishigaki (@charsbar) July 3, 2016 YAP(achimon)C::Asia Hachioji 2016mid
+ https://www.slideshare.net/charsbar/cpan-63708689
+
+ Causes and countermeasures for garbled Japanese characters in perl
+ https://prozorec.hatenablog.com/entry/2018/03/19/080000
+
+ Perl regular expression bug?
+ http://moriyoshi.hatenablog.com/entry/20090315/1237103809
+ http://moriyoshi.hatenablog.com/entry/20090320/1237562075
+
+ Impressions of talking of Larry Wall at LL Future
+ https://hnw.hatenablog.com/entry/20080903
+
+ About Windows and Japanese text
+ https://blogs.windows.com/japan/2020/02/20/about-windows-and-japanese-text/
+
+ About Windows diagnostic data
+ https://blogs.windows.com/japan/2019/12/05/about-windows-diagnostic-data/
 
 =cut

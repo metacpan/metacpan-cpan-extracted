@@ -9,9 +9,9 @@ use Function::Fallback::CoreOrPP qw(clone);
 require App::lcpan::Cmd::dists_by_dep_count;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2022-09-19'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.070'; # VERSION
+our $VERSION = '1.071'; # VERSION
 
 our %SPEC;
 
@@ -38,7 +38,7 @@ App::lcpan::Cmd::heaviest_dists - Alias for 'dists-by-dep-count', with default n
 
 =head1 VERSION
 
-This document describes version 1.070 of App::lcpan::Cmd::heaviest_dists (from Perl distribution App-lcpan), released on 2022-03-27.
+This document describes version 1.071 of App::lcpan::Cmd::heaviest_dists (from Perl distribution App-lcpan), released on 2022-09-19.
 
 =head1 FUNCTIONS
 
@@ -83,6 +83,24 @@ Return at most this number of results.
 =item * B<phase> => I<str>
 
 =item * B<rel> => I<str>
+
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -130,9 +148,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

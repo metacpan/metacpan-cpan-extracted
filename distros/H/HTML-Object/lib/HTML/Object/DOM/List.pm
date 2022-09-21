@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/List.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/28
-## Modified 2021/12/28
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,10 +17,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::EventTarget );
+    use vars qw( $VERSION );
     use HTML::Object::Event;
     use Want;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -59,7 +63,7 @@ sub addEventListener
     # Before we enable the event listener we must make sure we are listening on events on relevant array or scalar
     if( CORE::exists( $def->{ $type } ) )
     {
-        my $ref = $def->{ $event };
+        my $ref = $def->{ $type };
         # add or remove
         OP: foreach my $op ( keys( %$ref ) )
         {
@@ -96,7 +100,7 @@ sub addEventListener
             $data->callback( $this->{type} => sub
             {
                 my $hash = shift( @_ );
-                my $event = $self->_make_event( $event );
+                my $event = $self->_make_event( $type );
                 if( CORE::exists( $this->{callback} ) && ref( $this->{callback} ) eq 'CODE' )
                 {
                     $this->{callback}->( $self, { event => $event, added => $hash->{added}, removed => $hash->{removed}, type => $hash->{type} });
@@ -139,7 +143,7 @@ sub AUTOLOAD
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -158,7 +162,7 @@ HTML::Object::DOM::List - HTML Object DOM List Abstract Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

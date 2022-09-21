@@ -59,8 +59,6 @@ my $p = HTML::Object::DOM->new;
 my $doc = $p->parse_data( $html ) || BAIL_OUT( $p->error );
 my $sel = $doc->getElementsByTagName( 'select' )->first;
 isa_ok( $sel => 'HTML::Object::DOM::Element::Select' );
-# XXX
-# $sel->debug(4);
 is( $sel->options->length, 3, 'select->options->length' );
 is( $sel->selectedOptions->length, 1, 'select->selectedOptions->length' );
 is( $sel->selectedIndex, 1, 'select->selectedIndex' );

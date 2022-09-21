@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/TableRow.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,10 +16,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -38,7 +41,6 @@ sub as_css_grid
     ## There is no "row" in css grid. We just get the cells as divs and pass them along
     my $cells = $self->children->map(sub{ $_->as_css_grid });
     $self->{_as_css_grid} = $cells->join( "\n" );
-    $self->message( 3, "Returning row '$self->{_as_css_grid}'" );
     return( $self->{_as_css_grid} );
 }
 
@@ -52,19 +54,17 @@ sub as_markdown
     {
         my $cell = shift( @_ );
         my $data = $cell->formatted_lines;
-        $self->message( 3, "Cell formatted line is: ", sub{ $self->dump( $data ) });
         $cell_data->push( $data );
         $cells->push( $cell );
-        ## Get the height of the row by takin the highest cell
+        # Get the height of the row by taking the highest cell
         $self->height( $data->length ) if( $data->length > $self->height );
     });
     my $row_height = $self->height;
-    $self->message( 3, "Row height is '$row_height'." );
     # $row_height->debug( 3 );
     my $row_data = $self->new_array;
     for( my $i = 0; $i < $row_height; $i++ )
     {
-        ## Pipes at start of row
+        # Pipes at start of row
         if( $i == 0 )
         {
             $row_data->push( '|' );
@@ -76,20 +76,19 @@ sub as_markdown
         $cell_data->for(sub
         {
             my( $j, $data ) = @_;
-            $self->message( 3, "Array $cell_data: Getting cell obejct at cell offset $j" );
             my $cell = $cells->get( $j );
-            ## This cell is bigger or equal to the current height position, push its data
+            # This cell is bigger or equal to the current height position, push its data
             if( $data->size >= $i )
             {
                 $row_data->push( $data->get( $i ) );
             }
-            ## We are processing more new lines than there is in this cell, so we put blanks instead
+            # We are processing more new lines than there is in this cell, so we put blanks instead
             else
             {
                 $row_data->push( ' ' x $cell->width );
             }
             
-            ## Pipes after this cell, possibly multiple pipes for cells spanning multiple cells
+            # Pipes after this cell, possibly multiple pipes for cells spanning multiple cells
             if( $i == 0 )
             {
                 $row_data->push( '|' x $cell->colspan );
@@ -102,8 +101,66 @@ sub as_markdown
         $row_data->push( "\n" ) if( $row_height > 1 && $i < ( $row_height - 1 ) );
     }
     $self->{_as_markdown} = $row_data->join( '' );
-    $self->message( 3, "Returning row '$self->{_as_markdown}'" );
     return( $self->{_as_markdown} );
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    return( $self->{_as_pod} ) if( $self->{_as_pod} );
+    my $cell_data = $self->new_array;
+    my $cells = $self->new_array;
+    $self->children->foreach(sub
+    {
+        my $cell = shift( @_ );
+        my $data = $cell->formatted_lines( type => 'pod' );
+        $cell_data->push( $data );
+        $cells->push( $cell );
+        # Get the height of the row by taking the highest cell
+        $self->height( $data->length ) if( $data->length > $self->height );
+    });
+    my $row_height = $self->height;
+    my $row_data = $self->new_array;
+    for( my $i = 0; $i < $row_height; $i++ )
+    {
+        # Pipes at start of row
+        if( $i == 0 )
+        {
+            $row_data->push( '|' );
+        }
+        else
+        {
+            $row_data->push( ':' );
+        }
+        $cell_data->for(sub
+        {
+            my( $j, $data ) = @_;
+            my $cell = $cells->get( $j );
+            # This cell is bigger or equal to the current height position, push its data
+            if( $data->size >= $i )
+            {
+                $row_data->push( $data->get( $i ) );
+            }
+            # We are processing more new lines than there is in this cell, so we put blanks instead
+            else
+            {
+                $row_data->push( ' ' x $cell->width );
+            }
+            
+            # Pipes after this cell, possibly multiple pipes for cells spanning multiple cells
+            if( $i == 0 )
+            {
+                $row_data->push( '|' x $cell->colspan );
+            }
+            else
+            {
+                $row_data->push( ':' x $cell->colspan );
+            }
+        });
+        $row_data->push( "\n" ) if( $row_height > 1 && $i < ( $row_height - 1 ) );
+    }
+    $self->{_as_pod} = $row_data->join( '' );
+    return( $self->{_as_pod} );
 }
 
 sub as_string
@@ -133,7 +190,7 @@ sub as_string
 sub height { return( shift->_set_get_number( 'height', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -149,7 +206,7 @@ Markdown::Parser::TableRow - Markdown Table Row Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -170,6 +227,14 @@ See L<Markdown::Parser::Table/as_css_grid>
 Returns a string representation of the table row formatted in markdown.
 
 This method will call each cell L<Markdown::Parser::TableCell> object and get their respective markdown string representation.
+
+It returns a plain string.
+
+=head2 as_pod
+
+This performs the same as L</as_markdown>, but for pod.
+
+Returns a string representation of the table row formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

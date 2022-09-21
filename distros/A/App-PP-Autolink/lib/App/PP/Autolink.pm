@@ -24,7 +24,7 @@ use Config;
 use Getopt::ArgvFile default=>1;
 use Getopt::Long qw / GetOptionsFromArray :config pass_through /;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use constant CASE_INSENSITIVE_OS => ($^O eq 'MSWin32');
 
@@ -304,24 +304,32 @@ sub get_autolink_list_ldd {
     my @bundle_list = $self->get_dep_dlls;
     my @libs_to_pack;
     my %seen;
+    
+    my $RE_skip = $self->get_ldd_skipper_regexp;
 
     my @target_libs = (
         @$argv_linkers,
         @bundle_list,
     );
     while (my $lib = shift @target_libs) {
+        if ($lib =~ $RE_skip) {
+            say "skipping $lib";
+            next;
+        }
+        
         say "ldd $lib";
         my $out = qx /ldd $lib/;
         warn qq["ldd $lib" failed\n]
           if not $? == 0;
-          
+        
         #  much of this logic is from PAR::Packer
         #  https://github.com/rschupp/PAR-Packer/blob/04a133b034448adeb5444af1941a5d7947d8cafb/myldr/find_files_to_embed/ldd.pl#L47
         my %dlls = $out =~ /^ \s* (\S+) \s* => \s* ( \/ \S+ ) /gmx;
 
       DLL:
         foreach my $name (keys %dlls) {
-            if ($seen{$name}) {
+            #say "$name, $dlls{$name}";
+            if ($seen{$name} or $name =~ $RE_skip) {
                 delete $dlls{$name};
                 next DLL;
             }
@@ -337,19 +345,20 @@ sub get_autolink_list_ldd {
                 delete $dlls{$name};
             }
             elsif (
-                 $path =~ m{^(?:/usr)?/lib(?:32|64)?/}  #  system lib
+                 #$path =~ m{^(?:/usr)?/lib(?:32|64)?/}  #  system lib
+                 $path =~ $RE_skip
               or $path =~ m{\Qdarwin-thread-multi-2level/auto/share/dist/Alien\E}  #  alien in share
               or $name =~ m{^lib(?:c|gcc_s|stdc\+\+)\.}  #  should already be packed?
               ) {
-                #warn "skipping $name => $path";
+                #say "skipping $name => $path";
                 #warn "re1" if $path =~ m{^(?:/usr)?/lib(?:32|64)/};
                 #warn "re2" if $path =~ m{\Qdarwin-thread-multi-2level/auto/share/dist/Alien\E};
                 #warn "re3" if $name =~ m{^lib(?:gcc_s|stdc\+\+)\.};
                 delete $dlls{$name};
             }
         }
-        push @target_libs, values %dlls;
-        push @libs_to_pack, values %dlls;
+        push @target_libs, sort values %dlls;
+        push @libs_to_pack, sort values %dlls;
     }
 
     @libs_to_pack = sort @libs_to_pack;
@@ -370,6 +379,14 @@ sub find_so_files {
     return wantarray ? @files : \@files;
 }
 
+sub get_ldd_skipper_regexp {
+    my ($self) = @_;
+    my @skip = qw /libm libc libpthread libdl/;
+    my $sk = join '|', @skip;
+    my $qr_skip = qr {\b(?:$sk)\.$Config::Config{so}};
+    
+    return $qr_skip;
+}
 
 sub get_dll_skipper_regexp {
     my ($self) = @_;
@@ -436,6 +453,10 @@ sub get_dep_dlls {
         if ($details->{key} =~ m{^Alien/.+\.pm$}) {
             push @aliens, $package;
         }
+
+        push @uses, $package
+          if $details->{file} =~ $RE_DLL_EXT;
+
         next if !@uses;
         
         foreach my $dll (grep {$_ =~ $RE_DLL_EXT} @uses) {

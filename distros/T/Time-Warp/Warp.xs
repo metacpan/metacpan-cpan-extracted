@@ -30,13 +30,11 @@ static NV (*realNVtime)();
 static void   (*realU2time)(U32 *);
 
 static double Lost;    /** time relative to now */
-static double Zero;    /** apply Scale from when? */
 static double Scale;   /** speed of time (.5 == half speed) */
 
 static void reset_warp()
 {
     Lost=0;
-    Zero=(*realNVtime)();
     Scale=1;
 }
 
@@ -44,10 +42,7 @@ static void reset_warp()
 
 static NV warped_NVtime()
 {
-    double now = (*realNVtime)() - Lost;
-    double delta = now - Zero;
-    delta *= Scale;
-    return Zero + delta;
+    return (*realNVtime)() * Scale + Lost;
 }
 
 static void warped_U2time(U32 *ret)
@@ -106,27 +101,29 @@ to(when)
      double when
      CODE:
 {
-    Lost += (warped_NVtime() - when) / Scale;
+    Lost = when - (*realNVtime)() * Scale;
 }
 
 void
 scale(...)
+     PREINIT:
+	double new_Scale;
      PPCODE:
 {
     if (items == 0) {
 	XPUSHs(sv_2mortal(newSVnv(Scale)));
     } else {
-	Zero = warped_NVtime();
-	Lost = 0;
-	Scale = SvNV(ST(0));
-	if (Scale < 0) {
+	new_Scale = SvNV(ST(0));
+	if (new_Scale < 0) {
 	    warn("Sorry, Time::Warp cannot go backwards");
-	    Scale = 1;
+	    new_Scale = 1;
 	}
-	else if (Scale < .001) {
+	else if (new_Scale < .001) {
 	    warn("Sorry, Time::Warp cannot stop time");
-	    Scale = .001;
+	    new_Scale = .001;
 	}
+	Lost += (*realNVtime)() * (Scale - new_Scale);
+	Scale = new_Scale;
     }
 }
 

@@ -1,0 +1,101 @@
+# Tue Sep 20 19:20:49 -03 2022
+
+# export SQL_SIMPLE_DB_CREATE_ALLOWED=""
+# export SQL_SIMPLE_DB_SHOW_CONTENTS=""
+# export SQL_SIMPLE_DB_SKIP_CREATE="1"
+
+# export SQL_SIMPLE_SQLITE="1"
+
+# perl t/testDB.t
+ok 1 - use SQL::SimpleOps;
+# Disabled the Create/Drop Database, Schema, Tables
+# 
+# SQLite3 tests
+# 
+ok 2 - 7 Commands loaded
+ok 3 - Module is /usr/bin/sqlite3
+# Creating database file and tables
+ok 4 - done
+# DBD000 Database get contents
+# DBD010 Database open contents
+# INI000 Removing previous data
+# STD000 Insert Standard
+ok 5 - Insert-1, my_standard_indexed
+ok 6 - Insert-2, my_standard_indexed
+ok 7 - Insert-4, my_standard_indexed
+ok 8 - Insert-1, my_standard_notnull
+ok 9 - Insert-2, my_standard_notnull
+ok 10 - Insert-4, my_standard_notnull
+ok 11 - Insert-1, my_standard_null
+ok 12 - Insert-2, my_standard_null
+ok 13 - Insert-4, my_standard_null
+ok 14 - Insert-1, my_standard_single
+ok 15 - Insert-2, my_standard_single
+ok 16 - Insert-3, my_standard_single
+# AUT000 Insert Autoincrement
+ok 17 - 100 inserted successful
+# IMS000 Insert Master/Slave
+ok 18 - Number of 11 successful (master+slave), Code 0000
+ok 19 - Number of 11 successful (master+slave), Code 0001
+ok 20 - Number of 11 successful (master+slave), Code 0002
+ok 21 - Number of 11 successful (master+slave), Code 0003
+ok 22 - Number of 11 successful (master+slave), Code 0004
+ok 23 - Number of 11 successful (master+slave), Code 0005
+ok 24 - Number of 11 successful (master+slave), Code 0006
+ok 25 - Number of 11 successful (master+slave), Code 0007
+ok 26 - Number of 11 successful (master+slave), Code 0008
+ok 27 - Number of 11 successful (master+slave), Code 0009
+# IMS100 Insert Master with duplicate state
+ok 28 - insert with conflict/duplicate for 0000
+ok 29 - insert with conflict/duplicate for 0001
+ok 30 - insert with conflict/duplicate for 0002
+ok 31 - insert with conflict/duplicate for 0003
+ok 32 - insert with conflict/duplicate for 0004
+ok 33 - insert with conflict/duplicate for 0005
+ok 34 - insert with conflict/duplicate for 0006
+ok 35 - insert with conflict/duplicate for 0007
+ok 36 - insert with conflict/duplicate for 0008
+ok 37 - insert with conflict/duplicate for 0009
+# SEL000 Select
+ok 38 - table my_standard_indexed, 1 step1 sucessful
+ok 39 - table my_standard_indexed, 6 step2 sucessful
+ok 40 - table my_standard_notnull, 1 step1 sucessful
+ok 41 - table my_standard_notnull, 15 step2 sucessful
+ok 42 - table my_standard_null, 1 step1 sucessful
+ok 43 - table my_standard_null, 15 step2 sucessful
+ok 44 - table my_standard_single, 1 step1 sucessful
+ok 45 - table my_standard_single, 4 step2 sucessful
+# CUR000 SelectCursor
+ok 46 - SelectCursor first-page, expected first(1) last(10) lines(10), first(1) last(10) lines(10)
+ok 47 - SelectCursor goto-page2, expected first(11) last(20) lines(10), first(11) last(20) lines(10)
+ok 48 - SelectCursor return-first, expected first(1) last(10) lines(10), first(1) last(10) lines(10)
+ok 49 - SelectCursor return-page2, expected first(11) last(20) lines(10), first(11) last(20) lines(10)
+ok 50 - SelectCursor goto-page3, expected first(21) last(30) lines(10), first(21) last(30) lines(10)
+ok 51 - SelectCursor goto-last-page, expected first(100) last(91) lines(10), first(100) last(91) lines(10)
+# UPD000 Update
+ok 52 - Update expected 10, found 10
+# DEL000 Delete
+ok 53 - Delete expected 10, found 10
+# MSS010 Merge
+ok 54 - Master select, expected 10, found 10
+ok 55 - Slave select, expected 100, found 100
+ok 56 - Master/Slave merge-1, expected 1000, found 1000
+ok 57 - Master/Slave merge-2, expected 100, found 100
+ok 58 - Master/Slave merge-3, expected 900, found 900
+# MSS100 Grouped
+ok 59 - Slave grouped-1, expected 10 masters, found 10
+ok 60 - Slave grouped-2, expected 10 slaves, found 10
+ok 61 - Slave grouped-2, expected 10 slaves, found 10
+ok 62 - Slave grouped-2, expected 10 slaves, found 10
+ok 63 - Slave grouped-2, expected 10 slaves, found 10
+ok 64 - Slave grouped-2, expected 10 slaves, found 10
+ok 65 - Slave grouped-2, expected 10 slaves, found 10
+ok 66 - Slave grouped-2, expected 10 slaves, found 10
+ok 67 - Slave grouped-2, expected 10 slaves, found 10
+ok 68 - Slave grouped-2, expected 10 slaves, found 10
+ok 69 - Slave grouped-2, expected 10 slaves, found 10
+# Cleanup database files and tables
+# SQLite3 done
+
+============
+SAMPLE-ENDED

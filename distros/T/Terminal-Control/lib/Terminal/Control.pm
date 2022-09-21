@@ -50,7 +50,7 @@ our @EXPORT_OK = qw(
 our @ISA = qw(Exporter);
 
 # Set the package version. 
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 
 # Load the neccessary Perl modules.
 use bytes;
@@ -419,6 +419,18 @@ sub set_cursor_position {
 #------------------------------------------------------------------------------# 
 use IO::Handle;
 sub ctlseqs_request {
+    sub flags_on {
+        my $flags = "cbreak -echo -echonl -echoke -echoe -isig";
+        my $args = "</dev/tty >/dev/tty 2>&1";
+        my $cmd = "stty $flags $args";
+        system($cmd);
+    };
+    sub flags_off {
+        my $flags = "-cbreak echo echonl echoke echoe isig";
+        my $args = "</dev/tty >/dev/tty 2>&1";
+        my $cmd = "stty $flags $args";
+        system($cmd);
+    };
     # Assign the subroutine arguments to the local variables.
     my ($Ps, $user_timeout) = @_;
     # Get id from request.
@@ -438,7 +450,7 @@ sub ctlseqs_request {
     my $match;
     my @nums;
     # Change the settings of the terminal window.
-    system "stty cbreak -echo -echonl -echoke -echoe -isig </dev/tty >/dev/tty 2>&1";
+    flags_on();
     # Print the escape sequence to STDOUT.
     print STDOUT "${CSI}${Ps}t";
     # Non blocking reading from STDIN.
@@ -461,7 +473,7 @@ sub ctlseqs_request {
              die;
          } catch {
              # Clean up settings.  
-             system "stty -cbreak echo echonl echoke echoe isig </dev/tty >/dev/tty 2>&1";
+             flags_off();
              # Set output to error code -3. 
              ($height, $width) = (-3, -3);
          };
@@ -487,7 +499,7 @@ sub ctlseqs_request {
             };
     };
     # Restore the settings of the terminal window.
-    system "stty -cbreak echo echonl echoke echoe isig </dev/tty >/dev/tty 2>&1";
+    flags_off();
     # Return width and height.
     return ($height, $width);
     };
@@ -759,11 +771,11 @@ Terminal::Control - Perl extension with methods for the control of the terminal 
 
 =head1 SYNOPSIS
 
-Use of standard methods:
+The usage of 
 
   use Terminal::Control;
 
-or
+or the usage of
 
   use Terminal::Control qw(:DEFAULT);
 
@@ -806,28 +818,24 @@ allows the import of the standard methods.
 
   which_terminal();   
 
-C<qw(:DEFAULT)> imports all methods declared in C<@EXPORT> in the module.
+C<qw(:DEFAULT)> imports all methods which are declared in C<@EXPORT> in the module.
 
-Use of optional methods:
-
-  use Terminal::Control qw(
-     :DEFAULT
-     window_size_chars window_size_pixels
-     screen_size_chars screen_size_pixels
-     TermColor TermType TermName TermPath
-     WinSize
-  );
-
-or
+The usage of
 
   use Terminal::Control qw(
-     window_size_chars window_size_pixels
-     screen_size_chars screen_size_pixels
-     TermColor TermType TermName TermPath
-     WinSize
+     :DEFAULT TermColor TermType TermName TermPath WinSize
+     window_size_chars window_size_pixels screen_size_chars screen_size_pixels
   );
 
-allows the import of the optional and the standard methods. Without C<:DEFAULT>
+or the usage of
+
+  use Terminal::Control qw(
+     TermColor TermType TermName TermPath WinSize
+     window_size_chars window_size_pixels screen_size_chars screen_size_pixels
+  );
+
+allows the import of the optional methods which are declared in C<@EXPORT_OK>
+in the module and the import of standard methods. Without entry C<:DEFAULT>
 only optional methods are imported.
 
   # Get the terminal window size using Xterm control sequences. 
@@ -847,8 +855,6 @@ only optional methods are imported.
   TermType();  
   TermName();  
   TermPath();
-
-The former methods are declared in C<@EXPORT_OK> in the module.
 
 Variables in square brackets in the method call are optional. They are in the
 related method predefined.

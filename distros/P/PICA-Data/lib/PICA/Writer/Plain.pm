@@ -1,7 +1,7 @@
 package PICA::Writer::Plain;
 use v5.14.1;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 use charnames qw(:full);
 use Term::ANSIColor;
@@ -29,16 +29,13 @@ sub write_subfield {
     $self->{fh}->print($value);
 }
 
-sub write_annotation {
+sub write_start_field {
     my ($self, $field) = @_;
 
-    if (@$field % 2) {
-        $self->{fh}->print($field->[$#$field] . " ")
-            unless defined $self->{annotate} && !$self->{annotate};
-    }
-    elsif ($self->{annotate}) {
-        $self->{fh}->print("  ");
-    }
+    my $annotation = $self->annotation($field);
+    $self->{fh}->print("$annotation ") if defined $annotation;
+    $self->write_identifier($field);
+    $self->{fh}->print(' ');
 }
 
 1;

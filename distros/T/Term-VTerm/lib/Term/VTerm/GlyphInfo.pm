@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Term::VTerm::GlyphInfo 0.07;
+package Term::VTerm::GlyphInfo 0.08;
 
 use v5.14;
 use warnings;

@@ -1,7 +1,7 @@
 package Mojar::Message;
 use Mojo::Base -strict;
 
-our $VERSION = 1.102;
+our $VERSION = 1.211;
 
 1;
 __END__
@@ -14,9 +14,9 @@ Mojar::Message - Interfaces for messaging
 
 Interfaces for composing/sending/collecting messages.
 
-=head1 DISTRIBUTIONS
+=head1 PACKAGES
 
-=over 4
+=over 2
 
 =item Mojar::Message::BulkSms
 
@@ -27,21 +27,21 @@ services.
 
 A minimal SMTP sender aimed at simple automated text emails.
 
+=item Mojar::Message::Telegram
+
+Includes simple interface for sending messages via Telegram.
+
 =back
 
 =head1 SUPPORT
 
-=head2 IRC
+See
 
-C<nic> at C<#mojo> on C<irc.perl.org>
-
-=head2 Wiki
-
-L<https://github.com/niczero/mojar-message/wiki>
+L<https://github.com/niczero/mojar>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2012--2017, Nic Sandfield.
+Copyright (C) 2012--2022, Nic Sandfield.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

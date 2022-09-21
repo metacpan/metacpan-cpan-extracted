@@ -7,3 +7,4 @@ README
 adsb.pl
 dist.ini
 lib/WebService/ADSBExchange.pm
+t/test_obj_creation.t

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/TableCell.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,10 +16,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
+    use POSIX;
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -75,6 +79,8 @@ sub as_css_grid
 
 sub as_markdown { return( shift->formatted_lines->join( "\n" ) ); }
 
+sub as_pod { return( shift->formatted_lines( type => 'pod' )->join( "\n" ) ); }
+
 sub as_string
 {
     my $self = shift( @_ );
@@ -100,18 +106,27 @@ sub class { return( shift->_set_get_array_as_object( 'class', @_ ) ); }
 
 sub colspan { return( shift->_set_get_number( 'colspan', @_ ) ); }
 
-## For Markdown formatting
+# For Markdown formatting
 sub formatted_lines
 {
     my $self = shift( @_ );
-    my $content = $self->children->map(sub{ $_->as_markdown })->join( "\n" )->split( "\n" );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{type} //= 'markdown';
+    my $content;
+    if( $opts->{type} eq 'pod' )
+    {
+        $content = $self->children->map(sub{ $_->as_pod })->join( "\n" )->split( "\n" );
+    }
+    else
+    {
+        $content = $self->children->map(sub{ $_->as_markdown })->join( "\n" )->split( "\n" );
+    }
     my $align = $self->align || 'left';
     my $width = $self->width;
     my $colspan = $self->colspan;
-    ## We need to make room for the additional pipes for colspan
-    ## Those space in width were added upon parsing, so now, we need to give it back
+    # We need to make room for the additional pipes for colspan
+    # Those space in width were added upon parsing, so now, we need to give it back
     $width -= ( $colspan > 1 ? ( $colspan - 1 ) : 0 );
-    $self->message( 3, "Cell has a width of '$width' characters, an alignment of '$align' and content of '", $content->join( "\n" ), "'." );
     my $cell_data = $self->new_array;
     $content->foreach(sub
     {
@@ -143,8 +158,7 @@ sub formatted_lines
 sub width { return( shift->_set_get_number( 'width', @_ ) ); }
 
 1;
-
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -160,7 +174,7 @@ Markdown::Parser::TableCell - Markdown Table Cell Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -182,13 +196,19 @@ See L<Markdown::Parser::Table/as_css_grid>
 
 =head2 as_markdown
 
-Returns a string representation of the table formatted in markdown.
+Returns a string representation of the table cell formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the table cell formatted in L<pod|perlpod>.
 
 It returns a plain string.
 
 =head2 as_string
 
-Returns an html representation of the table body. It calls each of its children to get their respective html representation.
+Returns an html representation of the table cell. It calls each of its children to get their respective html representation.
 
 It returns a plain string.
 

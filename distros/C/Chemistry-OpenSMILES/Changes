@@ -1,3 +1,11 @@
+0.8.2 2022-09-20
+
+    - Adding Chemistry::OpenSMILES::Aromaticity and
+      Chemistry::OpenSMILES::Stereo from smiles-scripts project v0.2.0.
+    - Fixing prototypes of recently added functions.
+    - Introducing Chemistry::OpenSMILES::is_double_bond().
+    - Introducing Chemistry::OpenSMILES::is_ring_bond().
+
 0.8.1 2022-05-11
 
     - Fixing a bug with incomplete cis/trans markers on ring bonds.

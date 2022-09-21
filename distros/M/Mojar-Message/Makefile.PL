@@ -23,10 +23,12 @@ WriteMakefile(
   BUILD_REQUIRES => {'Test::More' => 0},
   CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.3},
   PREREQ_PM => {
-    Mojolicious    => 7.15,
-    Mojar          => 2.05,
-    'Mojar::Cron'  => 0.2,
-    'MIME::Entity' => 5.5
+    'IO::Socket::SSL' => 2.009,
+    Mojolicious       => 9.15,
+    Mojar             => 2.10,
+    'Mojar::Cron'     => 0.20,
+    'MIME::Entity'    => 5.50,
+    'Net::SMTP'       => 1.28
   },
   EXE_FILES => [],
   test => {TESTS => 'test/*.t'}

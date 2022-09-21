@@ -1,6 +1,6 @@
-#!perl
+# -*- mode: perl; -*-
 
-use strict;                     # Import test functions
+use strict;
 use warnings;
 
 use Test::More tests => 51;

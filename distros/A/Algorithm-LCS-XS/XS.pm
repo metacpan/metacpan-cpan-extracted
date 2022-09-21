@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 use version;
-our $VERSION = qv(2.0.1);
+our $VERSION = qv(2.0.2);
 use base 'Exporter';
 our @EXPORT_OK = qw/&ADLCS &LCSidx/;
 require XSLoader;
@@ -130,7 +130,7 @@ LCS() call.
 
 Send @lines to a hashref containing elements of the form
 
-       value => [(increasing) list of matching indices]
+       @lines entry => [(increasing) list of matching indices]
 
 =item callback(@lines)
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'fast, immutable enumeration classes'
+abstract: 'immutable enumeration classes'
 author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
@@ -24,7 +24,7 @@ name: Data-Enum
 provides:
   Data::Enum:
     file: lib/Data/Enum.pm
-    version: v0.2.3
+    version: v0.2.5
 recommends:
   Package::Stash::XS: '0'
 requires:
@@ -38,7 +38,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Data-Enum/issues
   repository: git://github.com/robrwo/perl-Data-Enum.git
-version: v0.2.3
+version: v0.2.5
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

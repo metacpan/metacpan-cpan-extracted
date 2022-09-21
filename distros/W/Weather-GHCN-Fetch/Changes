@@ -1,6 +1,11 @@
 Revision history for Perl module libary Windows-GHCN-Fetch
 
-
+v0.0.003       2022-09-16
+  - fixes for bugs preventing tests from succeeding on Linux and Win32-x86
+  - 00_initialize_test_env.t now clears the cache files on MSWin32-x8
+  - fixed handling and testing of the presence/absence of a default cache file
+  - switched to fuzzy comparison for testing anomaly values to avoid spurious test failures
+  
 v0.0.002       2022-09-16
   - cleanup done, apps now included
   - should be ready for public use now

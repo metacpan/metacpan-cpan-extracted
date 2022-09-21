@@ -6,6 +6,7 @@ use v5.18;
 
 use Test::More tests => 1;
 
+use Config;
 use FindBin;
 use File::Path  qw( remove_tree );
 
@@ -15,10 +16,13 @@ my $opt = shift @ARGV // '';
 
 my $errors_aref;
 
-# clean out the cache if this script is run with command line argument 
-# 'clean' or if we are not running on Windows, since the cache doesn't
-# seem to be readable elsewhere
-if ( $^O ne 'MSWin32' or $opt =~ m{ [-]?clean }xmsi ) {
+my $is_Win32_x64 = $Config{archname} =~ m{ \A MSWin32-x64 }xms;
+
+# Clean out the cache if this script is run with command line argument 
+# 'clean' or if we are not running on Windows x64, since the cache files
+# are created on Win32_x64 and aren't portable to other platforms.
+# TODO: provide a portable caching solution
+if ( !$is_Win32_x64 or $opt =~ m{ [-]?clean }xmsi ) {
     if (-e $cachedir) {
         remove_tree( $cachedir, 
             {   safe => 1, 

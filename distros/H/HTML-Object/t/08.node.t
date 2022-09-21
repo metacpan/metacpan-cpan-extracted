@@ -115,15 +115,10 @@ subtest 'compareDocumentPosition' => sub
             skip( "unable to find the other div with id 'hello'", 8 );
         }
         my $bit;
-        # XXX
-        # $div->debug( $DEBUG );
         $bit = $div->compareDocumentPosition( $div );
         is( $bit, DOCUMENT_POSITION_IDENTICAL, 'compareDocumentPosition -> 0 (same node)' );
         $bit = $div->compareDocumentPosition( $div2 );
         is( $bit & DOCUMENT_POSITION_DISCONNECTED, DOCUMENT_POSITION_DISCONNECTED, 'compareDocumentPosition -> 1 (not same document)' );
-        # XXX
-        # $body->debug( $DEBUG );
-        # $head->debug( $DEBUG );
         $bit = $body->compareDocumentPosition( $head );
         diag( "comparing body with head results in bit '$bit'" ) if( $DEBUG );
         is( $bit & DOCUMENT_POSITION_PRECEDING, DOCUMENT_POSITION_PRECEDING, 'compareDocumentPosition -> 2 (preceding)' );
@@ -150,7 +145,7 @@ subtest 'compareDocumentPosition' => sub
         is( $rels->length, 2, 'number of links' );
         my $link = $rels->first;
         isa_ok( $link => 'HTML::Object::DOM::Element', 'link found is an element' );
-        # XXX Set the correct number of tests to skip
+        # TODO Set the correct number of tests to skip
         if( !defined( $link ) )
         {
             skip( 'no link found', 1 );

@@ -7,9 +7,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-09-11'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.480'; # VERSION
+our $VERSION = '0.481'; # VERSION
 
 our %SPEC;
 
@@ -498,11 +498,11 @@ validate-with-sah - Validate data with Sah schema
 
 =head1 VERSION
 
-This document describes version 0.480 of validate-with-sah (from Perl distribution App-SahUtils), released on 2022-07-16.
+This document describes version 0.481 of validate-with-sah (from Perl distribution App-SahUtils), released on 2022-09-11.
 
 =head1 SYNOPSIS
 
-% B<validate-with-sah> [B<--compiler>=I<str>|B<-C>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--core>] [B<--core-or-pp>] [B<--data-file-type>=I<str>] [B<--data-file>=I<str>] [B<--data-with-result>|B<-d>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-file>=I<str>] [B<--multiple-data>=I<any>|B<--multiple-data-json>=I<json>] [B<--(no)naked-res>] [B<--no-env>] [B<--no-modules>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pp>] [B<--return-type>=I<str>|B<--bool>|B<--bool-val>|B<--full>|B<-r>=I<str>|B<--str-val>] [B<--schema-file-type>=I<str>|B<-t>=I<str>] [B<--schema-file>=I<str>|B<-f>=I<str>] [B<--schema-module>=I<str>|B<-m>=I<str>] [B<--show-code>|B<-c>] [B<--show-raw-compile>|B<-R>] [B<--show-schema>|B<-s>] [B<--with-debug>] -- [I<schema>] [I<data>]
+B<validate-with-sah> [B<--compiler>=I<str>|B<-C>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--core>] [B<--core-or-pp>] [B<--data-file-type>=I<str>] [B<--data-file>=I<str>] [B<--data-with-result>|B<-d>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-file>=I<str>] [B<--multiple-data>=I<any>|B<--multiple-data-json>=I<json>] [B<--(no)naked-res>] [B<--no-env>] [B<--no-modules>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pp>] [B<--return-type>=I<str>|B<--bool>|B<--bool-val>|B<--full>|B<-r>=I<str>|B<--str-val>] [B<--schema-file-type>=I<str>|B<-t>=I<str>] [B<--schema-file>=I<str>|B<-f>=I<str>] [B<--schema-module>=I<str>|B<-m>=I<str>] [B<--show-code>|B<-c>] [B<--show-raw-compile>|B<-R>] [B<--show-schema>|B<-s>] [B<--with-debug>] -- [I<schema>] [I<data>]
 
 
 
@@ -662,7 +662,7 @@ importance, from least important to most): C<trace>, C<debug>, C<info>,
 C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
 C<warn>, which means that log statements with level C<info> and less important
 levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
-C<fatal>.
+C<trace>.
 
 For more details on log level and logging, as well as how new logging levels can
 be defined or existing ones modified, see L<Log::ger>.
@@ -1159,9 +1159,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

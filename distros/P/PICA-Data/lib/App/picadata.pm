@@ -1,7 +1,7 @@
 package App::picadata;
 use v5.14.1;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 use Getopt::Long qw(GetOptionsFromArray :config bundling);
 use Pod::Usage;
@@ -79,8 +79,8 @@ sub new {
         \@argv,       $opt,           'from|f=s', 'to|t:s',
         'schema|s=s', 'annotate|A|a', 'abbrev|B', 'build|b',
         'unknown|u!', 'count|c',      'order|o',  'path|p=s',
-        'number|n:i', 'color|C',      'mono|M',   'help|h|?',
-        'version|V',
+        'level|l:i',  'number|n:i',   'color|C',  'mono|M',
+        'help|h|?',   'version|V',
     ) or pod2usage(2);
 
     $opt->{number}   = $number;
@@ -293,6 +293,7 @@ sub run {
 
     # additional options
     my $number  = $self->{number};
+    my $level   = $self->{level};
     my $stats   = {records => 0, holdings => 0, items => 0, fields => 0};
     my $invalid = 0;
 
@@ -413,7 +414,8 @@ sub run {
     RECORD: foreach my $in (@{$self->{input}}) {
             my $parser = $self->parser_from_input($in);
             while (my $next = $parser->next) {
-                for ($command eq 'levels' ? $next->split : $next) {
+                my $split = $command eq 'levels' || $level >= 0;
+                for ($split ? $next->split($level) : $next) {
                     $process->($_);
                     last RECORD if $number and $stats->{records} >= $number;
                 }

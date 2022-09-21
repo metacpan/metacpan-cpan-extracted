@@ -4,13 +4,13 @@
       "Nic Sandfield <niczero@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojar-Message",
    "no_index" : {
@@ -34,10 +34,12 @@
       },
       "runtime" : {
          "requires" : {
+            "IO::Socket::SSL" : "2.009",
             "MIME::Entity" : "5.5",
-            "Mojar" : "2.05",
+            "Mojar" : "2.1",
             "Mojar::Cron" : "0.2",
-            "Mojolicious" : "7.15",
+            "Mojolicious" : "9.15",
+            "Net::SMTP" : "1.28",
             "perl" : "5.014001"
          }
       }
@@ -55,6 +57,6 @@
          "url" : "http://github.com/niczero/mojar-message"
       }
    },
-   "version" : 1.102,
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : 1.211,
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

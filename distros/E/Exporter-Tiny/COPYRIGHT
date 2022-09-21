@@ -3,17 +3,6 @@ Upstream-Name: Exporter-Tiny
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Exporter-Tiny
 
-Files: NEWS
- TODO
- inc/Test/Fatal.pm
- inc/Test/Requires.pm
- inc/Try/Tiny.pm
- inc/archaic/Test/Builder/Module.pm
- inc/archaic/Test/Builder/Tester.pm
- inc/archaic/Test/Builder/Tester/Color.pm
-Copyright: Unknown
-License: Unknown
-
 Files: lib/Exporter/Tiny/Manual/Etc.pod
  lib/Exporter/Tiny/Manual/Exporting.pod
  lib/Exporter/Tiny/Manual/Importing.pod
@@ -24,6 +13,17 @@ Files: lib/Exporter/Tiny/Manual/Etc.pod
  t/04into.t
 Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: NEWS
+ TODO
+ inc/Test/Fatal.pm
+ inc/Test/Requires.pm
+ inc/Try/Tiny.pm
+ inc/archaic/Test/Builder/Module.pm
+ inc/archaic/Test/Builder/Tester.pm
+ inc/archaic/Test/Builder/Tester/Color.pm
+Copyright: Unknown
+License: Unknown
 
 Files: lib/Exporter/Shiny.pm
  t/05shiny.t
@@ -61,11 +61,6 @@ Files: t/14lexical.t
 Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: README
- lib/Exporter/Tiny.pm
-Copyright: This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: inc/archaic/Test/More.pm
  inc/archaic/Test/Simple.pm
 Copyright: Copyright 2001-2008 by Michael G Schwern <schwern@pobox.com>.
@@ -76,13 +71,18 @@ Files: dist.ini
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: inc/archaic/Test/Builder.pm
-Copyright: Copyright 2002-2008 by chromatic <chromatic@wgz.org> and.
+Files: README
+ lib/Exporter/Tiny.pm
+Copyright: This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: SIGNATURE
 Copyright: None
 License: public-domain
+
+Files: inc/archaic/Test/Builder.pm
+Copyright: Copyright 2002-2008 by chromatic <chromatic@wgz.org> and.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/archaic/Test/Builder/IO/Scalar.pm
 Copyright: Copyright (c) 1996 by Eryq.  All rights reserved.

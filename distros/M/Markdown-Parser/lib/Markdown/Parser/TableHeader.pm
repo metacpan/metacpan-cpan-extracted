@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/TableHeader.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,10 +16,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -52,7 +55,7 @@ sub as_markdown
     my $self = shift( @_ );
     return( $self->{_as_markdown} ) if( $self->{_as_markdown} );
     my $row_data = $self->new_array;
-    ## Check each row
+    # Check each row
     $self->children->for(sub
     {
         my( $i, $row ) = @_;
@@ -63,7 +66,7 @@ sub as_markdown
             my $cell = shift( @_ );
             $sep->push( ( '-' x $cell->width ) . '+' );
         });
-        ## Push top horizontal line if this is the first upper line
+        # Push top horizontal line if this is the first upper line
         $row_data->push( $sep->join( '' )->scalar ) if( $i == 0 );
         my $row_str = $row->as_markdown;
         $row_data->push( $row_str->scalar );
@@ -71,6 +74,32 @@ sub as_markdown
     });
     $self->{_as_markdown} = $row_data->join( "\n" )->scalar;
     return( $self->{_as_markdown} );
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    return( $self->{_as_pod} ) if( $self->{_as_pod} );
+    my $row_data = $self->new_array;
+    # Check each row
+    $self->children->for(sub
+    {
+        my( $i, $row ) = @_;
+        my $sep = $self->new_array;
+        $sep->push( '+' );
+        $row->children->foreach(sub
+        {
+            my $cell = shift( @_ );
+            $sep->push( ( '-' x $cell->width ) . '+' );
+        });
+        # Push top horizontal line if this is the first upper line
+        $row_data->push( $sep->join( '' )->scalar ) if( $i == 0 );
+        my $row_str = $row->as_pod;
+        $row_data->push( $row_str->scalar );
+        $row_data->push( $sep->join( '' )->scalar );
+    });
+    $self->{_as_pod} = $row_data->join( "\n" )->scalar;
+    return( $self->{_as_pod} );
 }
 
 sub as_string
@@ -107,7 +136,7 @@ sub reset
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -123,7 +152,7 @@ Markdown::Parser::TableHeader - Markdown Table Header Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -147,9 +176,17 @@ This method will call each row L<Markdown::Parser::TableRow> object and get thei
 
 It will place a horizontal line separator between each row and returns a plain string.
 
+=head2 as_pod
+
+This performs the same as L</as_markdown>, but for pod.
+
+Returns a string representation of the table header formatted in L<pod|perlpod>.
+
+It returns a plain string.
+
 =head2 as_string
 
-Returns an html representation of the header. It calls each of its children that should be L<Markdown::Parser::TableRow> objects to get their respective html representation.
+Returns an html representation of the table header. It calls each of its children that should be L<Markdown::Parser::TableRow> objects to get their respective html representation.
 
 It returns a plain string.
 

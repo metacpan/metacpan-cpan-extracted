@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Text.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2021/12/13
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,8 +17,12 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::Text HTML::Object::DOM::CharacterData );
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION );
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -103,7 +107,6 @@ sub replaceWholeText
         return( $self );
     }
     my $siblings = $parent->children;
-    $self->message( 4, "Parent has the following children: '", $siblings->join( "', '" ), "'" );
     my $pos = $siblings->pos( $self );
     return( $self->error({
         message => "I could not find this text node among its parent's children.",
@@ -129,15 +132,11 @@ sub replaceWholeText
         }
         $last++;
     });
-    $self->message( 4, "Our position is '$pos', start is '$start' and last is '$last'" );
-    $self->message( 4, "Removing previous siblings from $start to $last for ", ( ( $last - $start ) + 1 ), " elements." );
     my $removed = $siblings->splice( $start, ( ( $last - $start ) + 1 ), $self );
     $_->parent( undef ) for( @$removed );
     $self->parent( $parent );
-    $self->message( 4, "Setting content to '$content' for text element $self" );
     $self->value( "$content" );
     $self->reset(1);
-    $self->message( 4, "Parent '$parent' with tag '", $parent->tag, "' has now ", $parent->children->length, " children: '", $siblings->join( "', '" ), "' -> '", $parent->as_string, "' and our text element has value '", $self->value, "'" );
     return( $self );
 }
 
@@ -151,7 +150,6 @@ sub splitText
     }) ) if( !$self->_is_integer( $offset ) );
     my $value = $self->value;
     my $size = $value->length;
-    # $self->message( 4, "Offset is '$offset', text value is '$value' and size is '$size'" );
     return( $self->error({
         message => "Offset value provided ($offset) is higher than the size of the string (" . $value->length . ")",
         class => 'HTML::Object::IndexSizeError',
@@ -168,23 +166,18 @@ sub splitText
     my $part1 = $value->substr( 0, $offset );
     my $part2 = $value->substr( $offset );
     my $new = $self->new( value => $part2 );
-    # $self->message( 4, "Part 1 is '$part1' and part 2 is '$part2' and new is '$new'" );
     my $parent = $self->parent;
-    # $self->message( 4, "Parent is '$parent' with tag '", $parent->tag, "'" );
     if( $parent )
     {
         $new->parent( $parent );
         my $siblings = $parent->children;
         my $pos = $siblings->pos( $self );
-        # $self->message( 4, "Found our text element at position '$pos' among our parent's children (", $siblings->length, ")." );
         return( $self->error({
             message => "Unable to find our text element among our parent's children.",
             class => 'HTML::Object::HierarchyRequestError',
         }) ) if( !defined( $pos ) );
         $siblings->splice( $pos + 1, 0, $new );
         $self->reset(1);
-        # $self->message( 4, "Parent now is: '", $self->as_string, "' with ", $siblings->length, " elements: '", $siblings->join( "', '" ), "'" );
-        # $self->message( 4, "New text object is '$new' -> '", $new->value, "'" );
     }
     $self->value( $part1 );
     return( $new );
@@ -201,7 +194,6 @@ sub _get_adjacent_nodes
     my $self = shift( @_ );
     my $prev = $self->left;
     my $next = $self->right;
-    $self->messagef( 4, "%d previous siblings and %d next siblings.", $prev->length, $next->length );
     my $res = $self->new_array( $self );
     $prev->reverse->foreach(sub
     {
@@ -225,7 +217,7 @@ sub _get_adjacent_nodes
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -242,7 +234,7 @@ HTML::Object::DOM::Text - HTML Object DOM Text Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

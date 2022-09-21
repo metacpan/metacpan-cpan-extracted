@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Footnote.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,10 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -35,7 +38,7 @@ sub init
     return( $self->SUPER::init( @_ ) );
 }
 
-## Add an Markdown::Parser::FootnoteReference object to our stack of footnote references and set its id for backlinks if necessary
+# Add an Markdown::Parser::FootnoteReference object to our stack of footnote references and set its id for backlinks if necessary
 sub add_reference
 {
     my $self = shift( @_ );
@@ -58,6 +61,12 @@ sub as_markdown
     return( sprintf( '*[%s]: %s', $self->name, $self->value ) );
 }
 
+sub as_pod
+{
+    my $self = shift( @_ );
+    return( sprintf( '[C<%s>]: %s', $self->name, $self->value ) );
+}
+
 # <li id="fn:1" role="doc-endnote">
 #   <p>This is the first footnote.&nbsp;<a href="#fnref:1" class="reversefootnote" role="doc-backlink">↩</a></p>
 # </li>
@@ -67,7 +76,6 @@ sub as_string
     my $arr = $self->new_array;
     my $id  = $self->id;
     use utf8;
-    $self->message( 3, "Returning footnote for id '$id'." );
     $arr->push( sprintf( '<li id="fn:%s" role="doc-endnote">', $id ) );
     $arr->push( $self->children->map(sub{ $_->as_string })->join( '' )->scalar );
     ## There could be multiple backlinks for one footnote, given it is possible that there are multiple reference to one footnote.
@@ -79,7 +87,6 @@ sub as_string
     $arr->push( '</li>' );
     my $str = $arr->join( '' )->scalar;
     $str =~ s/\s\!{2}FN\!{2}/ $backref/;
-    $self->message( 3, "Returning foonote string: '$str'." );
     return( $str );
 }
 
@@ -116,7 +123,7 @@ sub text
 sub unparsed { return( shift->_set_get_scalar_as_object( 'unparsed', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -133,7 +140,7 @@ Markdown::Parser::Footnote - Markdown Footnote Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -206,6 +213,12 @@ See L</references>
 =head2 as_markdown
 
 Returns a string representation of the footnote formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the footnote formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

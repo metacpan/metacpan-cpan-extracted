@@ -7,16 +7,16 @@ use Geo::Functions qw{rad_deg};
 use GD qw{gdSmallFont};
 use List::Util qw{first};
 
-our $VERSION="0.17";
+our $VERSION = '0.19';
 
 =head1 NAME
 
-GD::Graph::Polar - Make polar graph using GD package
+GD::Graph::Polar - Perl package to create polar graphs using GD package
 
 =head1 SYNOPSIS
 
   use GD::Graph::Polar;
-  my $obj=GD::Graph::Polar->new(size=>480, radius=>100);
+  my $obj = GD::Graph::Polar->new(size=>480, radius=>100);
   $obj->addPoint        (50=>25);
   $obj->addPoint_rad    (50=>3.1415);
   $obj->addGeoPoint     (75=>25);
@@ -40,7 +40,7 @@ GD::Graph::Polar - Make polar graph using GD package
 
 =head1 DESCRIPTION
 
-This package is a wrapper arround GD to produce polar graphs with an easy interface.  I use this package to display GPS satellites on a graph with data from the L<Net::GPSD3> package.
+This package is a wrapper around GD to produce polar graphs with an easy interface.  I use this package to plot antenna patterns on a graph with data from the L<RF::Antenna::Planet::MSI::Format> package.
 
 =head1 CONSTRUCTOR
 
@@ -82,11 +82,11 @@ Method to add a point to the graph.
 =cut
 
 sub addPoint_rad {
-  my $self = shift;
-  my $r    = shift;
-  my $t    = shift;
-  my ($x, $y)=$self->_imgxy_rt_rad($r,$t);
-  my $icon=7;
+  my $self    = shift;
+  my $r       = shift;
+  my $t       = shift;
+  my ($x, $y) = $self->_imgxy_rt_rad($r,$t);
+  my $icon    = 7;
   return $self->gdimage->arc($x,$y,$icon,$icon,0,360,$self->color);
 }
 
@@ -146,13 +146,13 @@ Method to add a line to the graph.
 =cut
 
 sub addLine_rad {
-  my $self = shift;
-  my $r0   = shift;
-  my $t0   = shift;
-  my $r1   = shift;
-  my $t1   = shift;
-  my ($x0=>$y0)=$self->_imgxy_rt_rad($r0=>$t0);
-  my ($x1=>$y1)=$self->_imgxy_rt_rad($r1=>$t1);
+  my $self      = shift;
+  my $r0        = shift;
+  my $t0        = shift;
+  my $r1        = shift;
+  my $t1        = shift;
+  my ($x0=>$y0) = $self->_imgxy_rt_rad($r0=>$t0);
+  my ($x1=>$y1) = $self->_imgxy_rt_rad($r1=>$t1);
   return $self->gdimage->line($x0, $y0, $x1, $y1, $self->color);
 }
 
@@ -225,13 +225,13 @@ sub addArc_rad {
   my $inc   = 0.02; #is this good?
   my $steps = int(($t1-$t0) / $inc);
   my @array = ();
-  foreach (0..$steps) {
-    my $t=$_ / $steps * ($t1-$t0) + $t0;
-    my $r=$r0 + $m * ($t-$t0);
+  foreach (0 .. $steps) {
+    my $t = $_ / $steps * ($t1-$t0) + $t0;
+    my $r = $r0 + $m * ($t-$t0);
     push @array, [$r=>$t];
   } 
-  my @return=();
-  foreach (1..$steps) {
+  my @return = ();
+  foreach (1 .. $steps) {
     push @return, $self->addLine_rad(@{$array[$_-1]}, @{$array[$_]});
   }
   return \@return;
@@ -292,11 +292,11 @@ Method to add a string to the graph.
 =cut
 
 sub addString_rad {
-  my $self   = shift;
-  my $r      = shift;
-  my $t      = shift;
-  my $string = shift;
-  my ($x=>$y)=$self->_imgxy_rt_rad($r=>$t);
+  my $self    = shift;
+  my $r       = shift;
+  my $t       = shift;
+  my $string  = shift;
+  my ($x=>$y) = $self->_imgxy_rt_rad($r=>$t);
   return $self->gdimage->string($self->font, $x, $y, $string, $self->color);
 }
 
@@ -337,10 +337,10 @@ Returns a L<GD> object
 =cut
 
 sub gdimage {
-  my $self=shift;
-  $self->{'gdimage'}=shift if @_; #set a base chart or watermark
+  my $self           = shift;
+  $self->{'gdimage'} = shift if @_; #set a base chart or watermark
   unless ($self->{'gdimage'}) {
-    $self->{'gdimage'}=GD::Image->new($self->size, $self->size);
+    $self->{'gdimage'} = GD::Image->new($self->size, $self->size);
 
     # make the background transparent and interlaced
     $self->gdimage->transparent($self->color([255,255,255]));
@@ -352,8 +352,8 @@ sub gdimage {
     if ($self->ticks > 0) {
       $self->color([192,192,192]);
       foreach (0 .. $self->ticks) {
-        my $c=$self->size / 2;
-        my $r=$self->_width * $_ / $self->ticks;
+        my $c = $self->size / 2;
+        my $r = $self->_width * $_ / $self->ticks;
         $self->gdimage->arc($c,$c,$r,$r,0,360,$self->color);
       }
     }
@@ -378,19 +378,19 @@ sub gdimage {
 
 =head2 gcnames
 
-Returns a L<Graphics::ColorNames> object
+Returns a L<Graphics::ColorNames> object.
 
 =cut
 
 sub gcnames {
-  my $self=shift;
+  my $self = shift;
   unless (defined $self->{'gcnames'}) {
     eval 'use Graphics::ColorNames';
     if ($@) {
-      die("Error: Cannot load Graphics::ColorNames");
+      die('Error: Cannot load Graphics::ColorNames');
     } else {
-      my $file=$self->rgbfile; #stringify for object support
-      $self->{'gcnames'}=Graphics::ColorNames->new("$file");
+      my $file           = $self->rgbfile; #stringify for object support
+      $self->{'gcnames'} = Graphics::ColorNames->new("$file");
     }
   }
   return $self->{'gcnames'};
@@ -402,26 +402,28 @@ sub gcnames {
 
 Method to set or return the current drawing color
 
-  my $colorobj=$obj->color("blue");     #if Graphics::ColorNames available
-  my $colorobj=$obj->color([77,82,68]); #rgb=>[decimal,decimal,decimal]
-  my $colorobj=$obj->color;
+  my $colorobj = $obj->color("blue");     #if Graphics::ColorNames available
+  my $colorobj = $obj->color([77,82,68]); #rgb=>[decimal,decimal,decimal]
+  my $colorobj = $obj->color;
+
+Default: [0,0,0] (i.e., black)
 
 =cut
 
 sub color {
-  my $self=shift;
+  my $self = shift;
   if (@_) {
-    my $color=shift;
+    my $color = shift;
     if (ref($color) eq 'ARRAY') {
-      my ($r, $g, $b)= @$color;
-      $self->{'color'}=$self->{'colors'}->{$r}->{$g}->{$b}||=$self->gdimage->colorAllocate(@$color);
+      my ($r, $g, $b) = @$color;
+      $self->{'color'} = $self->{'colors'}->{$r}->{$g}->{$b}||=$self->gdimage->colorAllocate(@$color);
     } else {
       if ($self->gcnames) {
-        my @rgb=$self->gcnames->rgb($color);
-        @rgb=(0,0,0) unless scalar(@rgb) == 3;
-        $self->{'color'}=$self->color(\@rgb);
+        my @rgb          = $self->gcnames->rgb($color);
+        @rgb             = (0,0,0) unless scalar(@rgb) == 3;
+        $self->{'color'} = $self->color(\@rgb);
       } else {
-        $self->{'color'}=$self->color([0,0,0]);
+        $self->{'color'} = $self->color([0,0,0]);
       }
     }
   }
@@ -436,60 +438,74 @@ Method to set or return the current drawing font (only needed by the very few)
   $obj->font(gdSmallFont); #the default
   $obj->font;
 
+Default: gdSmallFont
+
 =cut
 
 sub font {
-  my $self=shift;
-  $self->{'font'}=shift if @_;
-  $self->{'font'}=gdSmallFont unless $self->{'font'};
+  my $self        = shift;
+  $self->{'font'} = shift if @_;
+  $self->{'font'} = gdSmallFont unless $self->{'font'};
   return $self->{'font'};
 }
 
 =head2 size
 
-Sets or returns the width and height of the graph in pixels.
+Sets or returns the width and height of the image in pixels.
+
+Default: 480
 
 =cut
 
 sub size {
-  my $self=shift;
-  $self->{'size'}=shift if @_;
-  $self->{'size'}=480 unless $self->{'size'};
+  my $self        = shift;
+  $self->{'size'} = shift if @_;
+  $self->{'size'} = 480 unless $self->{'size'};
   return $self->{'size'};
 }
 
 =head2 radius
 
-Sets or returns the radius of the Graph
+Sets or returns the radius of the graph which sets the scale of the maximum value of the graph.
+
+Default: 1
 
 =cut
 
 sub radius {
-  my $self=shift;
-  $self->{'radius'}=shift if @_;
-  $self->{'radius'}=1 unless $self->{'radius'};
+  my $self          = shift;
+  $self->{'radius'} = shift if @_;
+  $self->{'radius'} = 1 unless $self->{'radius'};
   return $self->{'radius'};
 }
 
 =head2 border
 
+Sets and returns the number of pixels that border the graph on the image.
+
+Default: 2
+
 =cut
 
 sub border {
-  my $self=shift;
-  $self->{'border'}=shift if @_;
-  $self->{'border'}=2 unless defined($self->{'border'});
+  my $self          = shift;
+  $self->{'border'} = shift if @_;
+  $self->{'border'} = 2 unless defined($self->{'border'});
   return $self->{'border'};
 }
 
 =head2 ticks
 
+Sets and returns the number of ticks on the graph.
+
+Default: 10
+
 =cut
 
 sub ticks {
-  my $self=shift;
-  $self->{'ticks'}=shift if @_;
-  $self->{'ticks'}=10
+  my $self         = shift;
+  $self->{'ticks'} = shift if @_;
+  $self->{'ticks'} = 10
     unless defined($self->{'ticks'});
   return $self->{'ticks'};
 }
@@ -503,12 +519,12 @@ Note: This method will search in a few locations for a file.
 =cut
 
 sub rgbfile {
-  my $self=shift;
-  $self->{'rgbfile'}=shift if @_;
+  my $self             = shift;
+  $self->{'rgbfile'}   = shift if @_;
   unless (defined $self->{'rgbfile'}) {
-    $self->{'rgbfile'}="rgb.txt";
-    my $rgb=first {-r} (qw{/etc/X11/rgb.txt /usr/share/X11/rgb.txt /usr/X11R6/lib/X11/rgb.txt ../rgb.txt});
-    $self->{'rgbfile'}=$rgb if $rgb;
+    $self->{'rgbfile'} = 'rgb.txt';
+    my $rgb            = first {-r} (qw{/etc/X11/rgb.txt /usr/share/X11/rgb.txt /usr/X11R6/lib/X11/rgb.txt ../rgb.txt});
+    $self->{'rgbfile'} = $rgb if $rgb;
   }
   return $self->{'rgbfile'};
 }
@@ -517,12 +533,12 @@ sub rgbfile {
 
 Method returns a PNG binary blob.
 
-  my $png_binary=$obj->draw;
+  my $png_binary = $obj->draw;
 
 =cut
 
 sub draw {
-  my $self=shift;
+  my $self = shift;
   return $self->gdimage->png;
 }
 
@@ -545,7 +561,7 @@ sub _scale {
 #=cut
 
 sub _width {
-  my $self=shift;
+  my $self = shift;
   return $self->size - $self->border * 2;
 }
 
@@ -589,30 +605,18 @@ sub _xy_rt_rad {
 #=cut
 
 sub _imgxy_rt_rad {
-  my $self = shift;
-  my $r    = shift;
-  my $t    = shift;
-  my ($x,$y)=$self->_xy_rt_rad($self->_scale($r), $t);
+  my $self   = shift;
+  my $r      = shift;
+  my $t      = shift;
+  my ($x,$y) = $self->_xy_rt_rad($self->_scale($r), $t);
   return $self->_imgxy_xy($x, $y);
 }
 
-=head1 BUGS
-
-Please log on RT and send to the author.
-
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications including this package.
-
-=head1 AUTHOR
-
-Michael R. Davis qw/perl michaelrdavis com/
-
 =head1 LICENSE
 
-Copyright (c) 2011 Michael R. Davis (mrdvt92)
+MIT License
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+Copyright (c) 2022 Michael R. Davis
 
 =head1 SEE ALSO
 

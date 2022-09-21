@@ -1,6 +1,6 @@
 package Data::Enum;
 
-# ABSTRACT: fast, immutable enumeration classes
+# ABSTRACT: immutable enumeration classes
 
 use v5.10;
 
@@ -8,18 +8,16 @@ use strict;
 use warnings;
 
 use Package::Stash;
-use List::Util 1.45 qw/ uniqstr /;
+use List::Util 1.45 qw/ any uniqstr /;
 use Scalar::Util qw/ blessed refaddr /;
 
 # RECOMMEND PREREQ: Package::Stash::XS
 
 use overload ();
 
-our $VERSION = 'v0.2.3';
+our $VERSION = 'v0.2.5';
 
 
-my %Cache;
-my $Counter;
 
 sub new {
     my $this = shift;
@@ -28,9 +26,13 @@ sub new {
 
     die "has no values" unless @values;
 
-    die "values must be alphanumeric" if !!grep { /\W/ } @values;
+    die "values must be alphanumeric" if any{ /\W/ } @values;
 
     my $key = join chr(28), @values;
+
+    state %Cache;
+    state $Counter = 1;
+
 
     if ( my $name = $Cache{$key} ) {
         return $name;
@@ -88,11 +90,11 @@ sub new {
 
     for my $value (@values) {
         my $predicate = $_make_predicate->($value);
-        $base->add_symbol( '&' . $predicate, sub { '' } );
+        $base->add_symbol( '&' . $predicate, sub() { '' } );
         my $elem    = "${name}::${value}";
         my $subtype = Package::Stash->new($elem);
         $subtype->add_symbol( '@ISA',  [$name] );
-        $subtype->add_symbol( '&' . $predicate, sub { 1 } );
+        $subtype->add_symbol( '&' . $predicate, sub() { 1 } );
     }
 
     return $Cache{$key} = $name;
@@ -109,11 +111,11 @@ __END__
 
 =head1 NAME
 
-Data::Enum - fast, immutable enumeration classes
+Data::Enum - immutable enumeration classes
 
 =head1 VERSION
 
-version v0.2.3
+version v0.2.5
 
 =head1 SYNOPSIS
 
@@ -218,6 +220,11 @@ A hash of predicates to values is roughly
   my %handlers = mesh [ $class->values ], [ $class->predicates ];
 
 This was added in v0.2.1.
+
+=head1 CAVEATS
+
+The overheard of creating a new class instance and resolving methods may actually take more time than comparing simple
+strings.  When using this in production code, you may want to benchmark performance.
 
 =head1 SEE ALSO
 

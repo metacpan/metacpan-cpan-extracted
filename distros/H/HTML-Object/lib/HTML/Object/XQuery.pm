@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XQuery.pm
-## Version v0.1.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/01
-## Modified 2022/01/22
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,21 +17,27 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM );
+    use vars qw( @EXPORT $DEBUG $VERSION );
     our @EXPORT = qw( xq );
-    our $VERSION = 'v0.1.1';
+    our $DEBUG = 0;
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 {
     no warnings 'once';
     *xq = \&HTML::Object::DOM::Element::xq;
 }
 
-# XXX HTML::Object::DOM::Element class
+# NOTE: HTML::Object::DOM::Element class
 package HTML::Object::DOM::Element;
 BEGIN
 {
     use strict;
     use warnings;
+    use vars qw( $XP $LOOK_LIKE_HTML $VERSION );
     use CSS::Object;
     use HTML::Object::Collection;
     use HTML::Object::DOM::Attribute;
@@ -76,7 +82,6 @@ sub add
     # if( $self->isa_element && !$self->isa_collection )
     if( $self->isa_collection )
     {
-        $self->messagef( 4, "Adding our current %d elements to the new collection.", $self->children->length );
         $collection->children( $self->children );
     }
     elsif( $self->isa_element )
@@ -115,7 +120,6 @@ sub add
             {
                 my $selector = "$this";
                 $this = $HTML::Object::DOM::GLOBAL_DOM->find( "$selector" ) || return( $self->pass_error( $HTML::Object::DOM::GLOBAL_DOM->error ) );
-                $self->message( 4, "Selector '$selector' yielded ", $this->children->length, " elements -> ", sub{ $this->children->map(sub{ $_->tag })->join( ", " )->scalar });
             }
             else
             {
@@ -133,9 +137,7 @@ sub add
     # We return a new collection either way
     if( $self->isa_collection( $this ) )
     {
-        $self->message( 4, "Merging our collection of ", $collection->children->length, " elements with the newly found ", $this->children->length, " elements." );
         $collection->children->merge( $this->children->unique );
-        $self->messagef( 4, "Collection now has %d elements.", $collection->children->length );
     }
     elsif( $this->isa( 'HTML::Object::DOM::Element' ) )
     {
@@ -154,11 +156,11 @@ sub addClass
     my( $self, $class ) = @_;
     return( $self->error( "I received a reference to add as a class, but was expecting a string or a code reference." ) ) if( ref( $class ) && ref( $class ) ne 'CODE' && !( overload::Overloaded( $class ) && overload::Method( $class, '""' ) ) );
     $class = "${class}" unless( ref( $class ) CORE::eq 'CODE' );
-    local $set_attr = sub
+    my $set_attr;
+    $set_attr = sub
     {
         my( $i, $e ) = @_;
         my $v = $e->attr( 'class' ) // '';
-        $self->message( 4, "Checking class '$class' at position '$i', for element '$e' and curent attribute class value '$v'" );
         local $_ = $e;
         my $classes = ref( $class ) CORE::eq 'CODE'
             ? $class->({ element => $e, pos => $i, value => $v })
@@ -174,13 +176,11 @@ sub addClass
         if( CORE::length( "${v}" ) )
         {
             $curr = $self->_is_a( $v, 'Module::Generic::Array' ) ? $v : $self->new_array( [split( /[[:blank:]\h]+/, $v )] );
-            $self->message( 4, "Current classes are: '", $curr->join( "', '" ), "'." );
             my $new = $self->new_array;
             $cl_ref->foreach(sub
             {
                 # <http://www.w3.org/TR/CSS21/grammar.html#scanner>
                 # <https://stackoverflow.com/questions/448981/which-characters-are-valid-in-css-class-names-selectors#449000>
-                $self->message( 4, "Checking if '$_' already exists." );
                 $new->push( $_ ) if( !$curr->exists( $_ ) );
             });
             $curr->push( $new->list ) if( $new->length );
@@ -230,7 +230,8 @@ sub attr
     {
         my $ref = {};
         %$ref = @classes;
-        local $set_attributes = sub
+        my $set_attributes;
+        $set_attributes = sub
         {
             my $e = shift( @_ );
             while( my( $a, $v ) = each( %$ref ) )
@@ -327,7 +328,8 @@ sub closest
     {
         $xpath = $self->_xpath_value( $this );
     }
-    local $process = sub
+    my $process;
+    $process = sub
     {
         my $elem = shift( @_ );
         # We reach the limit of our upward search
@@ -373,26 +375,22 @@ sub css
     return( $self->error( "Method css() must be called on an HTML::Object::DOM::Element." ) ) if( ( !$self->isa_element && !$self->isa_collection ) || $self->tag->substr( 0, 1 ) CORE::eq '_' );
     my( $name, $more ) = @_;
     return( $self->error( "No css property was provided." ) ) if( !defined( $name ) || !CORE::length( $name ) );
-    $self->message( 4, "Called with name '$name' and more '", ( $more // '' ), "'." );
     
-    local $process = sub
+    my $process;
+    $process = sub
     {
         my $elem = shift( @_ );
         my $style = $elem->attributes->get( 'style' );
-        $self->message( 4, "Current style attribute for '", $elem->tag, "' is '", ( $style // '' ), "'." );
         # return if( !defined( $style ) );
         my $css = CSS::Object->new( format => 'CSS::Object::Format::Inline', debug => $self->debug );
         my $cached;
-        $self->message( 4, "Checking css object cache for element '", $elem->tag, "'." );
         $cached = $elem->css_cache_check( $style ) if( defined( $style ) );
         if( $cached )
         {
             $css = $cached;
-            $self->message( 4, "Found cached css object for element '", $elem->tag, "'." );
         }
         elsif( defined( $style ) )
         {
-            $self->message( 4, "No css object cache found, parsing css string instead '$style'" );
             # 'inline' here is just a fake selector to serve as a container rule for the inline properties, 
             # because CSS::Object requires properties to be within a rule
             $css->read_string( 'inline {' . $style . ' }' ) ||
@@ -400,7 +398,6 @@ sub css
         }
         else
         {
-            $self->message( 4, "No cached css object and no pre-existing style set in html for this element." );
         }
         my $main = $css->rules->first;
         # my $rule = defined( $main ) ? $css->builder->select( $main ) : $css->builder->select( 'inline' );
@@ -461,15 +458,12 @@ sub css
                 });
                 if( $rule->elements->length > 0 )
                 {
-                    # $self->message( 3, "Rule formatter is '", $rule->format->class, "'." );
                     my $style = $rule->as_string;
-                    $self->message( 4, "Storing css object cache for element '", $elem->tag, "'." );
                     $elem->css_cache_store( $style, $css ) || return( $self->pass_error( $elem->error ) );
                     $elem->attributes->set( style => $style );
                 }
                 else
                 {
-                    $self->message( 3, "No rule found to add back to the element style attribute" );
                 }
                 return( $self );
             }
@@ -486,9 +480,7 @@ sub css
             if( defined( $more ) )
             {
                 return( $self->error( "More than 2 arguments were provided. I was expecting a property and its value or a function." ) ) if( scalar( @_ ) > 2 );
-                $self->message( 4, "Is there already a main inline css ? '$main'" );
                 $rule = defined( $main ) ? $css->builder->select( $main ) : $css->builder->select( 'inline' );
-                $self->message( 4, "Using rule object '", overload::StrVal( $rule ), "'" );
                 # $e->css( $property_name, $code_reference );
                 if( ref( $more ) CORE::eq 'CODE' )
                 {
@@ -520,31 +512,25 @@ sub css
                     return( $self->error( "I was expecting a value as a string, but instead got '$more'." ) ) if( ref( $more ) && !( overload::Overloaded( $more ) && overload::Method( $more, '""' ) ) );
                     $name =~ tr/_/-/;
                     my $obj = $rule->get_property_by_name( $name );
-                    $self->message( 4, "Found existing property for '$name' ? '$obj'" );
                     if( defined( $obj ) )
                     {
                         $obj->value( "$more" );
                     }
                     else
                     {
-                        $self->message( 4, "Setting css property '$name' with value '$more'" );
                         $rule->$name( "$more" );
-                        $self->message( 4, "Rule now is -> '$rule'" );
                     }
                 }
             }
         
             if( defined( $rule ) && $rule->elements->length > 0 )
             {
-                $self->message( 3, "Rule formatter is '", $rule->format->class, "'." );
                 my $style = $rule->as_string;
-                $self->message( 4, "Storing css object cache for element '", $elem->tag, "'." );
                 $elem->css_cache_store( $style, $css ) || return( $self->pass_error( $elem->error ) );
                 $elem->attributes->set( style => $style );
             }
             else
             {
-                $self->message( 3, "No rule found to add back to the element style attribute" );
             }
             return( $elem );
         }
@@ -552,7 +538,6 @@ sub css
     
     if( $self->isa_collection )
     {
-        $self->message( 4, "Element is a collection, processing css for ", $self->children->length, " children." );
         $self->children->foreach(sub
         {
             $_->reset(1);
@@ -562,7 +547,6 @@ sub css
     }
     else
     {
-        $self->message( 4, "Element is NOT a collection, processing css." );
         $self->reset(1);
         return( $process->( $self ) );
     }
@@ -574,22 +558,17 @@ sub css_cache_check
     # my $data = shift( @_ );
     # return if( !defined( $data ) );
     return( $self->error( "css_cache_check() must be called on an HTML element, not a collection." ) ) if( $self->isa_collection );
-    $self->message( 4, "Checking for cached css object for element '", $self->tag, "'." );
     my $internal = $self->internal;
-    $self->messagef( 4, "internal hash contains %d keys: '%s'", $internal->keys->length, $internal->keys->sort->join( "', '" ) );
     $internal->{css_cache} //= {};
     if( exists( $internal->{css_cache} ) )
     {
         my $css = $internal->{css_cache}->{object} ||
             return( $self->error( "CSS object could not be found in cache!" ) );
-        $self->message( 4, "Found css object in cache '$css'" );
         # return( $css->clone );
         # my $clone = $css->clone;
-        # $self->message( 4, "Returning clone css object '$clone'" );
         # return( $clone );
         return( $css );
     }
-    $self->message( 4, "No css object cached was found, returning empty." );
     return( '' );
 }
 
@@ -602,7 +581,6 @@ sub css_cache_store
     my $css  = shift( @_ );
     return( $self->error( "No css object provided to store in the element cache." ) ) if( !$self->_is_object( $css ) );
     my $trace = $self->_get_stack_trace;
-    $self->message( 4, "Storing cached css object '$css' for element '", $self->tag, "' (eid='", $self->eid, "') with stack trace: $trace" );
     my $internal = $self->internal;
     $internal->{css_cache} =
     {
@@ -610,7 +588,6 @@ sub css_cache_store
     # object    => $css->clone,
     object    => $css,
     };
-    $self->message( 4, "Stored css object in cache now is '", $internal->{css_cache}->{object}, "'" );
     return( $self );
 }
 
@@ -675,7 +652,7 @@ sub data
     }
 }
 
-# XXX Instead of adding this method, maybe we should change the one in HTML::Object::DOM::Element to have it return $self instead of $parent, because otherwise there is no difference
+# TODO: Instead of adding this method, maybe we should change the one in HTML::Object::DOM::Element to have it return $self instead of $parent, because otherwise there is no difference
 sub detach
 {
     my $self = shift( @_ );
@@ -852,14 +829,14 @@ sub filter
 sub find
 {
     my( $self, $this ) = @_;
-    $self->message( 4, "Searching for '$this'" );
     my $collection = $self->new_collection;
     return( $collection ) if( !defined( $this ) );
     
     if( ref( $this ) && $self->_is_object( $this ) && $this->isa( 'HTML::Object::DOM::Element' ) )
     {
         my $a = $self->new_array( $self->isa_collection( $this ) ? $this->children : [ $this ] );
-        local $lookup = sub
+        my $lookup;
+        $lookup = sub
         {
             my $kids = shift( @_ );
             $kids->foreach(sub
@@ -896,17 +873,14 @@ sub find
             return( $self->error( "I was expecting an xpath string, but instead I got '$this'." ) );
         }
         my $xpath = $self->_xpath_value( $this ) || return( $self->pass_error );
-        $self->messagef( 4, "Searching using xpath value '$xpath' in %d children of '$self' (%s)", $self->children->length, $self->tag );
 #         $self->children->foreach(sub
 #         {
 #             my $child = shift( @_ );
-#             # XXX Propagate debug value
+#             # Propagate debug value
 #             $child->debug( $self->debug );
 #             try
 #             {
-#                 $self->message( 4, "Checking xpath '$xpath' against child node '$_' whose tag is '", $_->tag, "' and has ", $child->children->length, " children of its own -> '", sub{ $child->as_string }, "'" );
 #                 my @nodes = $child->findnodes( $xpath );
-#                 $self->messagef( 4, "%d nodes found under child element '$_' whose tag is '%s'.", scalar( @nodes ), $_->tag );
 #                 $collection->children->push( @nodes );
 #             }
 #             catch( $e )
@@ -916,9 +890,7 @@ sub find
 #         });
         try
         {
-            $self->message( 4, "Checking xpath '$xpath' against child node '$self' whose tag is '", $self->tag, "' and has ", $self->children->length, " children of its own -> '", sub{ $self->as_string }, "'" );
             my @nodes = $self->findnodes( $xpath );
-            $self->messagef( 4, "%d nodes found under child element '$_' whose tag is '%s'.", scalar( @nodes ), $self->tag );
             $collection->children->push( @nodes );
         }
         catch( $e )
@@ -991,7 +963,8 @@ sub has
     return( $collection ) if( !defined( $this ) );
     if( ref( $this ) && $self->_is_object( $this ) && $self->isa( 'HTML::Object::DOM::Element' ) )
     {
-        local $lookup = sub
+        my $lookup;
+        $lookup = sub
         {
             my $kids = shift( @_ );
             my $found;
@@ -1038,7 +1011,8 @@ sub has
         }
         my $xpath = $self->_xpath_value( "$this" ) || return;
         
-        local $lookup = sub
+        my $lookup;
+        $lookup = sub
         {
             my $kids = shift( @_ );
             my $found;
@@ -1108,7 +1082,8 @@ sub hide
     my $self = shift( @_ );
     my( $this, $code ) = @_;
     $code = $this if( ref( $this ) eq 'CODE' && !defined( $code ) );
-    local $process = sub
+    my $process;
+    $process = sub
     {
         my $e = shift( @_ );
         my $internal = $e->internal;
@@ -1273,15 +1248,12 @@ sub id
     else
     {
         my $e = $self;
-        $self->message( 4, "Getting property id for '$e'" );
         if( $self->isa_collection )
         {
             my $first = $self->children->first;
-            $self->message( 4, "First children of collection is '$first'" );
             return if( !$first || !$self->isa_element( $first ) );
             $e = $first;
         }
-        $self->message( 4, "Returning id for element '$e' -> ", $e->attr( 'id' ) );
         my $id = $e->attributes->get( 'id' );
         return( $e->new_scalar( $id ) );
     }
@@ -1556,7 +1528,6 @@ sub load
     
     # No need to go further if there is nothing in our collection
     my $children = $self->isa_collection ? $self->children : $self->new_array( $self );
-    $self->messagef( 4, "Our object '$self' contains %d children -> %s.", $children->length, sub{ $self->as_string( all => 1 ) } );
     return( $self ) if( !$children->length );
 #     if( !$children->length )
 #     {
@@ -1605,7 +1576,6 @@ sub load
             agent   => "HTML::Object/$VERSION",
             timeout => $opts->{timeout},
         );
-        $self->message( 4, "Making an http query to uri '$uri'" );
         my $resp;
         # "The POST method is used if data is provided as an object; otherwise, GET is assumed."
         # <https://api.jquery.com/load/#load-url-data-complete>
@@ -1618,7 +1588,6 @@ sub load
             $resp = $ua->get( $uri, ( ref( $opts->{headers} ) eq 'HASH' && scalar( keys( %{$opts->{headers}} ) ) ) ? %{$opts->{headers}} : () );
         }
         
-        $self->message( 4, "http query yields returned code '", $resp->code, "' with message '", $resp->message, "'" );
         if( $resp->header( 'Client-Warning' ) || !$resp->is_success )
         {
             $complete->( $resp->decoded_content, 'error', $resp );
@@ -1636,22 +1605,18 @@ sub load
         if( defined( $target ) )
         {
             my $elem = $doc->find( $target ) || return( $self->pass_error( $doc->error ) );
-            $self->messagef( 4, "Found %d children: %s", $elem->children->length, $elem->as_string( all => 1 ) );
             # $new = $self->new_array( $elem );
             $new = $elem->children;
         }
         
         # "If a "complete" callback is provided, it is executed after post-processing and HTML insertion has been performed. The callback is fired once for each element in the collection, and $_ is set to each DOM element in turn."
-        $self->messagef( 4, "Adding %d children to our own %d children.", $new->length, $children->length );
         $children->foreach(sub
         {
             my $child = shift( @_ );
             # Make a deep copy for each child element and set each child element's children
             my $clone = $new->map(sub{ $_->clone });
-            $self->messagef( 4, "Clone contains %d children.", $clone->length->scalar );
             $child->children( $clone );
             $child->reset(1);
-            $self->messagef( 4, "Our child '$child' now contains %d elements", $child->children->length );
             my $status = 'error';
             if( $resp->code >= 200 && $resp->code < 300 )
             {
@@ -1742,7 +1707,8 @@ sub not
     $this = shift( @_ ) if( scalar( @_ ) );
     my $collection = $self->new_collection( end => $self );
     # Process array of elements
-    local $process = sub
+    my $process;
+    $process = sub
     {
         my( $kids, $to_exclude ) = @_;
         my $exclude = $self->new_array;
@@ -2073,7 +2039,7 @@ sub promise
 sub rank { return( shift->_set_get_number_as_object( 'rank', @_ ) ); }
 
 # <https://api.jquery.com/remove/>
-# XXX Need to check again and do some test to ensure this api is compliant
+# TODO: Need to check again and do some test to ensure this api is compliant
 sub remove
 {
     my $self = shift( @_ );
@@ -2140,7 +2106,8 @@ sub removeClass
         return( $self ) if( $failed );
     }
     
-    local $process = sub
+    my $process;
+    $process = sub
     {
         my $e = shift( @_ );
         return( $e ) unless( $e->attributes->exists( 'class' ) );
@@ -2337,7 +2304,8 @@ sub show
     my $self = shift( @_ );
     my( $this, $code ) = @_;
     $code = $this if( ref( $this ) eq 'CODE' && !defined( $code ) );
-    local $process = sub
+    my $process;
+    $process = sub
     {
         my $e = shift( @_ );
         my $internal = $e->internal;
@@ -2485,7 +2453,8 @@ sub toggleClass
         $a->unique(1);
     }
     
-    local $process = sub
+    my $process;
+    $process = sub
     {
         my( $i, $e ) = @_;
         my $ref = $e->internal->{class};
@@ -2607,7 +2576,6 @@ sub xq
         # $doc is a HTML::Object::DOM::Document, which is not suitable, so we change it to a
         # collection object
         my $collection = $doc->new_collection;
-        # XXX
         print( STDERR __PACKAGE__, "::xq: Pushing ", $doc->children->length, " elements found into our new collection.\n" ) if( $HTML::Object::XQuery::DEBUG >= 4 );
         $collection->children( $doc->children );
         if( $doc->children->length == 1 )
@@ -2622,7 +2590,6 @@ sub xq
                 $e->debug( $debug );
                 $collection->debug( $debug );
             }
-            $p->messagef( 3, "Element $this has %d children", $e->children->length );
             # We correct a situation where the user called for example $('<div />', { class => 'hello', id => 'pouec' });
             # And this would lead the parser to flag it to be empty, respecting the user decision,
             # but in this case, this is merely a short-hand notation to create a tag, and is not a
@@ -2639,7 +2606,6 @@ sub xq
     }
     elsif( !ref( $this ) || ( overload::Overloaded( $this ) && overload::Method( $this, '""' ) ) )
     {
-        # XXX
         print( STDERR __PACKAGE__, "::xq: Argument provided '$this' looks like a selector, searching for it.\n" ) if( $HTML::Object::XQuery::DEBUG >= 4 );
         # e.g. $('div')
         if( !defined( $more ) )
@@ -2662,7 +2628,6 @@ sub xq
         }
         my $collection = $more->find( $this ) || return( HTML::Object::DOM->pass_error( $more->error ) );
         $collection->debug( $more->debug );
-        $more->message( 5, "Collection found from find( '$this' ) is -> ", sub{ $collection->as_string( all => 1 ) } );
         return( $collection );
     }
     else
@@ -2827,7 +2792,7 @@ sub _append_prepend_to
             $a = $self->new_array( [ $this ] );
         }
         # otherwise this has to be a selector
-        # XXX Need to correct this and adjust the object used as a base for the find
+        # TODO: Need to correct this and adjust the object used as a base for the find
         # since $self could very well be a dynamically created dom object
         else
         {
@@ -2950,14 +2915,11 @@ sub _before_after
     my $a;
     if( !ref( $this ) )
     {
-        $self->message( 4, "Provided with some html data. Parsing it: '$this'" );
         my $p = $self->new_parser;
         $this = $p->parse_data( $this ) || return( $self->pass_error( $p->error ) );
-        $self->message( 4, "Result from parsing: ", $this->as_string );
         # $a = $self->new_array( [ $this ] );
         # $this is a HTML::Document; we take its children
         $a = $this->children;
-        $self->messagef( 4, "Extracting %d children", $a->length );
     }
     elsif( $self->_is_array( $this ) )
     {
@@ -2978,13 +2940,10 @@ sub _before_after
     {
         my $failed = 0;
         # Going through each object in the collection
-        $self->messagef( 4, "Adding $opts->{action} each of our %d elements in the collection.", $self->children->length );
-        $self->message( 5, "Collection as a string is -> ", sub{ $self->as_string( all => 1 ) });
         $self->children->for(sub
         {
             my( $i, $e ) = @_;
             $e->reset(1);
-            $self->message( 4, "Checking from the collection, the element '$e': ", $e->as_string );
             # will silently fail just like jQuery does
             my $parent = $e->parent;
             return( 1 ) if( !$parent );
@@ -2995,7 +2954,6 @@ sub _before_after
             }
             elsif( $opts->{action} CORE::eq 'after' )
             {
-                # $self->message( 4, "Has element a closing tag ? ", $e->close_tag, " (", ( $e->close_tag ? $e->close_tag->as_string : '' ), ")" );
                 # $pos = $parent->children->pos( $e->close_tag ? $e->close_tag : $e );
                 $pos = $parent->children->pos( $e );
             }
@@ -3023,7 +2981,6 @@ sub _before_after
             $a->foreach(sub
             {
                 my $elem = $_->clone;
-                $self->message( 4, "Cloning '$elem' (", $elem->as_string, ") and adding it '", $opts->{action}, "' ", $e->as_string, " at position '$pos' -> ", $parent->children->index( $pos )->as_string );
                 $elem->parent( $e );
                 if( $opts->{action} CORE::eq 'before' )
                 {
@@ -3088,13 +3045,6 @@ sub _same_as
     my $self = shift( @_ );
     my $this = shift( @_ );
     return(0) if( !defined( $this ) || !$self->_is_object( $this ) || !$this->isa( 'HTML::Object::DOM::Element' ) );
-    # XXX To remove
-#     if( $self->debug )
-#     {
-#         my $trace = $self->_get_stack_trace;
-#         $self->message( 4, "Called with stack trace: ", $trace->as_string );
-#     }
-    
     if( $this->isa_collection )
     {
         # We are not a collection, but the other is
@@ -3115,7 +3065,6 @@ sub _same_as
     }
     else
     {
-        $self->message( 4, "Checking if this tag '", $self->{tag}, "' matches this other tag '", $this->{tag}, "' -> eid ", sub{ $self->eid CORE::eq $this->eid ? 'matches' : 'does NOT match' } );
         return(0) if( $self->tag CORE::ne $this->tag );
         return( $self->eid CORE::eq $this->eid ? 1: 0 );
     }
@@ -3192,7 +3141,7 @@ sub _insert_before_after
             $a = $self->new_array( [ $this ] );
         }
         # otherwise this has to be a selector
-        # XXX Need to correct this and adjust the object used as a base for the find
+        # TODO: Need to correct this and adjust the object used as a base for the find
         # since $self could very well be a dynamically created dom object
         else
         {
@@ -3301,5 +3250,5 @@ sub _is_same_node { shift( @_ ); return( shift->eid CORE::eq shift->eid ); }
 sub _xpath_value { shift( @_ ); return( ref( $_[0] ) ? ${$_[0]} : HTML::Selector::XPath::selector_to_xpath( $_[0] ) ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__

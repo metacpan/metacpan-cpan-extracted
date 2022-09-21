@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/Table.pm
-## Version v0.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
-## Modified 2021/12/23
+## Modified 2022/09/20
 ## All rights reserved
 ## 
 ## 
@@ -17,17 +17,21 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::Element );
+    use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :table );
     use Want;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.1';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
     my $self = shift( @_ );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
-    $self->{tag} = 'table' if( !CORE::length( "$self->{tag}" ) );
+    $self->{tag} = 'table' if( !defined( $self->{tag} ) || !CORE::length( "$self->{tag}" ) );
     $self->{_table_reset_caption} = 1;
     $self->{_table_reset_tbody} = 1;
     $self->{_table_reset_tfoot} = 1;
@@ -177,7 +181,6 @@ sub insertRow
         $pos = ( $rows->length + $pos ) if( $pos < 0 );
     }
     # "If a table has multiple <tbody> elements, by default, the new row is inserted into the last <tbody>."
-    # $self->messagef( 4, "%d tbody found.", $self->tbodies->length );
     my $body = $self->tbodies->last;
     # If there is no tbody and no rows yet, we create a tbody
     if( !$rows->length && !$body )
@@ -243,7 +246,7 @@ sub insertRow
         $row = HTML::Object::DOM::Element::TableRow->new( @_ ) ||
             return( $self->pass_error( HTML::Object::DOM::Element::TableRow->error ) );
         $row->close;
-        $children->push( $row );
+        $self->children->push( $row );
         $row->parent( $self );
         $self->reset(1);
     }
@@ -327,11 +330,9 @@ sub _create_tsection
     $elem->close;
     $elem->parent( $self );
     my $list = $children->grep(sub{ $self->_is_a( $_ => 'HTML::Object::DOM::Element::TableSection' ) && $_->tag eq $tag });
-    $self->messagef( 4, "Search for $tag among table children resulted in %d elements.", $list->length );
     if( $tag eq 'tbody' )
     {
         my $last_elem = $list->last;
-        $self->message( 4, "Last tbody element is '$last_elem'" );
         if( $last_elem )
         {
             $last_elem->after( $elem );
@@ -427,7 +428,6 @@ sub _get_tsection_collection
         # if( $_->tag eq $tag && !$self->_is_a( $_ => 'HTML::Object::DOM::Closing' ) )
         if( $_->tag eq $tag )
         {
-            $self->message( 4, "Found tag '$tag' -> '", $_->as_string, "'" );
             $results->push( $_ );
         }
     });
@@ -528,7 +528,7 @@ sub _set_get_section : lvalue
                 return( $dummy );
             }
             return( $self->error({ message => $error, class => 'HTML::Object::HierarchyRequestError' }) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error({ message => $error, class => 'HTML::Object::HierarchyRequestError' }) );
+            Want::rreturn( $self->error({ message => $error, class => 'HTML::Object::HierarchyRequestError' }) );
         }
         $new->detach;
         my( $old, $pos );
@@ -577,7 +577,7 @@ sub _set_get_section : lvalue
             my $dummy = '';
             return( $dummy ) if( $has_arg eq 'assign' );
             return( $old ) if( want( 'LVALUE' ) );
-            rreturn( $old );
+            Want::rreturn( $old );
         }
         else
         {
@@ -585,7 +585,7 @@ sub _set_get_section : lvalue
             my $dummy = '';
             return( $dummy ) if( $has_arg eq 'assign' );
             return if( want( 'LVALUE' ) );
-            rreturn;
+            Want::rreturn;
         }
     }
     else
@@ -596,7 +596,7 @@ sub _set_get_section : lvalue
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -613,7 +613,7 @@ HTML::Object::DOM::Element::Table - HTML Object DOM Table Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

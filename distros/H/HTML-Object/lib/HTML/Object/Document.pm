@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Document.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/19
-## Modified 2021/08/23
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -17,9 +18,13 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( HTML::Object::Element );
+    use vars qw( $VERSION );
     use Scalar::Util ();
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -30,7 +35,7 @@ sub init
     $self->{referrer} = undef;
     $self->{uri} = undef;
     $self->{_init_strict_use_sub} = 1;
-    $this->{_exception_class} = 'HTML::Object::Exception';
+    $self->{_exception_class} = 'HTML::Object::Exception';
     $self->{_last_modified}   = undef;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     return( $self );
@@ -69,7 +74,6 @@ sub append
 sub as_string
 {
     my $self = shift( @_ );
-    $self->message( 4, "as_string called" );
 #     if( $self->isa( 'HTML::Object::Collection' ) )
 #     {
 #         return( '' ) if( !$self->children->length );
@@ -109,7 +113,7 @@ sub uri { return( shift->_set_get_uri( 'uri', @_ ) ); }
 sub _last_modified { return( shift->_set_get_datetime( '_last_modified', @_ ) ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -126,7 +130,7 @@ HTML::Object::Document - HTML Object Document Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

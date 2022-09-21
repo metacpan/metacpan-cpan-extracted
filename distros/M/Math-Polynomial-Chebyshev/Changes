@@ -1,3 +1,13 @@
+0.02 2022-09-16
+
+ * Fix error in the code in the SYNOPSIS section.
+
+ * Fix miscellaneous errors and typos in the POD.
+
+ * Add markdown file README.md to the distribution.
+
+ * Reorganize test files and make other changes not affecting end user.
+
 0.01 2020-03-07
 
  * Initial release.

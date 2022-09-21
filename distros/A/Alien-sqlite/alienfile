@@ -53,9 +53,9 @@ share {
   my $with_cpp11 = '';
 
   #  need to work out how to get latest without updating next lines
-  start_url 'https://www.sqlite.org/2020/sqlite-autoconf-3310100.tar.gz';
+  start_url 'https://www.sqlite.org/2022/sqlite-autoconf-3390300.tar.gz';
   plugin Download => (
-    version => '3.31.1',
+    version => '3.39.3',
   );
 
   
@@ -109,6 +109,14 @@ share {
   }
   
   meta->around_hook( build => \&remove_gitfw_from_path );
+  meta->around_hook(
+    build => sub {
+      my ($orig, $build, @args) = @_;
+      $build->log("Setting CCACHE_BASEDIR to " . getcwd());
+      local $ENV{CCACHE_BASEDIR} = getcwd();
+      $orig->($build, @args);
+    }
+  );
 
   build [
     "%{configure} $with_local $with_cpp11 $build_static",
@@ -138,6 +146,7 @@ sub remove_gitfw_from_path {
 
   @PATH
     = grep {path($_)->stringify =~ m|/usr/bin$| && path($_) ne $msys_path ? () : $_}
+      grep {defined $_}  #  undef paths cause issues with Path::Tiny 
       @PATH;
 
   my $removed = $count - @PATH;

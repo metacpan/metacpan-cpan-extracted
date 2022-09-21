@@ -136,23 +136,12 @@ The example below illustrates how a form class could be used to validate data.
 
 You can use C<form_field> function to declare form fields, just like you would use C<has> to declare class properties in Moo/se.
 
-Each of field definitions will be coerced into an object of the L<Form::Tiny::FieldDefinition> class.
-
-	# this are static fields
 	form_field 'some_name';
 	form_field 'another_name' => (
 		required => 'soft',
 	);
 
-	# this is a dynamic field, which has access to form instance
-	form_field sub {
-		my ($self) = @_;
-
-		return {
-			name => $self->extra_field_name,
-			required => 1,
-		};
-	};
+Form fields end up as instances of L<Form::Tiny::FieldDefinition> or its descendants. Also see full keyword docs at L<Form::Tiny/form_field>.
 
 The only required element in hashes defining the fields is the key C<name>, which contains the string with name of the field in the form input. In the most basic style of C<form_field>, the name B<should not> be given explicitly, as it will be automatically overwritten by the first argument to that function. Other possible elements are:
 
@@ -446,7 +435,7 @@ B<Important note>: Strict mode will cause the system to crawl your entire input 
 
 =head3 Filters
 
-Turned on with the C<-filtered> flag in L<Form::Tiny>.
+Turned on by L<Form::Tiny::Plugin::Filtered> plugin or with the C<-filtered> flag in L<Form::Tiny>.
 
 Enables initial filtering for the input fields. This behavior is added to the form as a C<before_mangle> hook.
 
@@ -485,13 +474,27 @@ Added behavior is entirely up to the plugin. See L<Form::Tiny::Plugin> for detai
 The module enables a way to create a form without the need of a dedicated package. This is done with the L<Form::Tiny::Inline> class. This requires the user to pass all the data to the constructor, as shown in the example:
 
 	my $form = Form::Tiny::Inline          #     An inline form ...
-	           ->is(qw/strict filtered/)   # ... with the strict mode and filters enabled ...
+	           ->is(qw/strict filtered/)   # ... with Strict and Filtered plugins ...
 	           ->new(                      # ... will be created with properties:
-		field_defs => [{name => "my_field"}],
+		fields => {my_field => { ... }},
 		cleaner => sub { ... },
 	);
 
-The possible constructor arguments are C<field_defs> (aref of hashrefs), C<filters> (aref of arefs, only when C<filtered>) and C<cleaner> (coderef). The same syntax as for regular helpers will work.
+The possible constructor arguments:
+
+=over
+
+=item * C<fields> (hashref of hashrefs)
+
+=item * C<field_defs> (aref of hashrefs) (legacy)
+
+=item * C<filters> (aref of arefs, only when C<filtered>)
+
+=item * C<cleaner> (coderef)
+
+=back
+
+The same syntax as for regular helpers will work.
 
 There's no way to define custom hooks (other than a single C<cleaner>) in inline forms. Additionally, a special case exists for the C<filtered> inline forms, as they will act as if you declared C<form_trim_strings> in their classes.
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Element.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,11 +17,15 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     use Nice::Try;
     use CSS::Object;
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -51,7 +55,6 @@ sub init
     $self->{raw}        = '' unless( CORE::exists( $self->{raw} ) );
     $self->{tag_name}   = '' unless( CORE::exists( $self->{tag_name} ) );
     $self->{_init_strict_use_sub} = 1;
-    ## $self->message( 3, "Calling SUPER::init with: ", sub{ $self->dump( $opts ) } );
     ## print( STDERR ref( $self ), "::new: Calling SUPER::init with: ", $self->dump( $opts ) );
     return( $self->SUPER::init( $opts ) );
     ## $self->SUPER::init( $opts );
@@ -65,7 +68,6 @@ sub add_attributes
     ## A string something like {#id1} or {.cl} or {#id.cl.class}
     my $def  = shift( @_ );
     return if( !length( $def ) );
-    # $self->message( 3, "Parsing attribute definition: '$def'." );
     my( @ids, @classes, @attributes );
     while( $def =~ s/
                     [[:blank:]\h]*
@@ -81,31 +83,24 @@ sub add_attributes
                     )
                     //xs )
     {
-        $self->message( 3, "Found attribute '$+{attr_name}' with value '$+{attr_value}'" );
         push( @attributes, [ $+{attr_name} => $+{attr_value} ] );
     }
     while( $def =~ s/[[:blank:]\h]*\#(?<id>[^[:space:]\h\.\#]+)//s )
     {
-        # $self->message( 3, "Found id '$+{id}' and adding it to the list for this header. Definition attribute is now '$def'" );
         push( @ids, $+{id} );
     }
-    # $self->message( 3, "Processing classes with definition attribute '$def'" );
     while( $def =~ s/[[:blank:]\h]*\.(?<class>[^[:space:]\h\.\#]+)//s )
     {
-        # $self->message( 3, "Found class '$+{class}' and adding it to the list for this header. Definition attribute is now '$def'" );
         push( @classes, $+{class} );
     }
-    # $self->message( 3, "Definition attribute is left with '$def', regex last capture is '$+{class}'" );
     $self->id->push( @ids );
     $self->class->push( @classes ) if( scalar( @classes ) );
     if( scalar( @attributes ) )
     {
         foreach my $ref ( @attributes )
         {
-            $self->message( 3, "Adding attribute '$ref->[0]' with value '$ref->[1]'" );
             ## If the user had defined it twice, it might very well override previous data set
             $self->attributes->set( $ref->[0] => $ref->[1] );
-            $self->messagef( 3, "Now there are %d attributes.", $self->attributes->length );
         }
     }
     return( $self );
@@ -138,6 +133,13 @@ sub as_markdown
     return;
 }
 
+sub as_pod
+{
+    my $self = shift( @_ );
+    warn( "as_pod method not implemented for ", ref( $self ), "\n" );
+    return;
+}
+
 sub as_string
 {
     my $self = shift( @_ );
@@ -162,25 +164,25 @@ sub children { return( shift->_set_get_array_as_object( 'children', @_ ) ); }
 
 sub class { return( shift->_set_get_array_as_object( 'class', @_ ) ); }
 
-## Returns the closest non-ne line element or the one specified
+# Returns the closest non-new line element or the one specified
 sub closest
 {
     my $self = shift( @_ );
     my $target;
     $target = shift( @_ ) if( @_ );
     my $elem;
-    ## Starting from the latest to the oldest
+    # Starting from the latest to the oldest
     $self->children->reverse->foreach(sub
     {
-        return( 1 ) if( $_->tag_name eq 'nl' );
-        ## We exit (return false) after the first element we found if there is no target specified
+        return(1) if( $_->tag_name eq 'nl' );
+        # We exit (return false) after the first element we found if there is no target specified
         if( !defined( $target ) ||
             ( defined( $target ) && $_->tag_name eq $target ) )
         {
             $elem = $_;
             return;
         }
-        return( 1 );
+        return(1);
     });
     return( $elem );
 }
@@ -315,11 +317,31 @@ sub encode_html
     return( $$data );
 }
 
+sub extract_links
+{
+    my $self = shift( @_ );
+#     my $links = $self->new_array;
+#     $self->children->for(sub
+#     {
+#         my( $i, $link ) = @_;
+#         if( $self->_is_a( $link => 'Markdown::Parser::Link' ) )
+#         {
+#             $links->push( $link );
+#         }
+#         if( $link->children->length > 0 )
+#         {
+#             my $more_links = $link->extract_links;
+#             $links->push( $more_links->list ) if( $more_links->length );
+#         }
+#     });
+    my $links = $self->look_down( tag => 'link' );
+    return( $links );
+}
+
 sub format_attributes
 {
     my $self = shift( @_ );
     my $attr = $self->attributes;
-    $self->messagef( 3, "%d attributes found.", $attr->length );
     ## Return an empty array if there is nothing
     return( $self->new_array ) if( !$attr->length );
     return( $attr->map_array(sub{ sprintf( '%s="%s"', $_, $attr->{ $_ } ) }) );
@@ -377,6 +399,92 @@ sub insert_before
     return( $elem );
 }
 
+sub look
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{direction} //= 'down';
+    unless( $opts->{direction} eq 'down' ||
+            $opts->{direction} eq 'up' )
+    {
+        return( $self->error( "Unknown direction provided '$opts->{direction}'" ) );
+    }
+    my $a = $self->new_array;
+    my( $check_elem, $crawl_down );
+    $check_elem = sub
+    {
+        my $e = shift( @_ );
+        my $def = shift( @_ );
+        $def->{level} //= 0;
+        # Assume not ok, then check otherwise
+        my $ok = 0;
+        if( defined( $opts->{tag} ) && length( $opts->{tag} ) )
+        {
+            if( ref( $opts->{tag} ) eq 'Regexp' )
+            {
+                $ok = 1 if( $e->tag_name =~ /$opts->{tag}/ );
+            }
+            else
+            {
+                $ok = 1 if( $e->tag_name eq $opts->{tag} );
+            }
+        }
+        if( defined( $opts->{class} ) && length( $opts->{class} ) )
+        {
+            $ok = $self->_is_a( $e => $opts->{class} ) ? 1 : 0;
+        }
+        
+        # We passed all checks, no checking our children
+        $a->push( $e ) if( $ok );
+        # Stop here since we reached the maximum number of matches
+        return if( CORE::exists( $opts->{max_match} ) && $a->length >= $opts->{max_match} );
+        # Don't go down or up further if we reached the maximum level
+        return(1) if( CORE::exists( $opts->{max_level} ) && ( $def->{level} + 1 ) > $opts->{max_level} );
+        $def->{level}++;
+        if( $opts->{direction} eq 'down' )
+        {
+            $crawl_down->( $e->children, $def ) if( $e->children->length > 0 );
+        }
+        elsif( $opts->{direction} eq 'up' )
+        {
+            $check_elem->( $e->parent ) if( $e->parent );
+        }
+        $def->{level}--;
+        return(1);
+    };
+    
+    $crawl_down = sub
+    {
+        my $kids = shift( @_ );
+        my $def = shift( @_ );
+        $kids->foreach(sub
+        {
+            $check_elem->( $_, $def );
+        });
+    };
+    
+    my $def = { level => 0 };
+    $check_elem->( $self, $def );
+    # return( $a->length > 0 ? $a : '' );
+    return( $a );
+}
+
+sub look_down
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{direction} = 'down';
+    return( $self->look( $opts ) );
+}
+
+sub look_up
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{direction} = 'up';
+    return( $self->look( $opts ) );
+}
+
 sub make_html_parser
 {
     my $self = shift( @_ );
@@ -418,7 +526,6 @@ sub parse_html
     {
         return( $self->error( "An error occurred while parsing html: $e" ) );
     }
-    $self->message( 3, "Returning html object '$p'." );
     return( $p );
 }
 
@@ -457,20 +564,14 @@ sub wrap
     my $elem = shift( @_ );
     my $base_class = $self->base_class;
     return( $self->error( "Element provided to wrap children is not a ${base_class}::Element object." ) ) if( !$self->_is_a( $elem, "${base_class}::Element" ) );
-    ## $self->message( 3, "Wrapping our children in a '", $elem->tag_name, "' element." );
     ## Copy our children to the element provided and set the parent property accordingly
-    ## $self->messagef( 3, "Adding %d of our children to this '%s' element.", $self->children->length, $elem->tag_name );
     $self->children->foreach(sub
     {
         $elem->add_element( $_ );
     });
-    ## $self->message( 3, "Removing our own children." );
     $self->remove_children;
-    ## $self->messagef( 3, "We now have %d children.", $self->children->length );
     ## Set this element as our only child and set the parent property accordingly
-    ## $self->message( 3, "Adding element '$elem' as our child." );
     $self->add_element( $elem );
-    ## $self->messagef( 3, "We now have %d children.", $self->children->length );
     return( $self );
 }
 
@@ -526,8 +627,7 @@ sub _create_element
 }
 
 1;
-
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -544,7 +644,7 @@ Markdown::Parser::Element - Markdown Element Object Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -584,6 +684,12 @@ Provided with an element object, and this will add it to the children stack.
 =head2 as_markdown
 
 Returns a string representation of the code formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the code formatted in L<pod|perlpod>.
 
 It returns a plain string.
 
@@ -781,6 +887,10 @@ Provided with an array reference of characters to encode and a string of text or
 
 Returns the text encoded.
 
+=head2 extract_links
+
+Returns an L<array object|Module::Generic::Array> of L<link objects|Markdown::Parser::Link>
+
 =head2 format_attributes
 
 Provided with attributes object (L<Module::Generic::Hash>) such as set by L</attr> and this will retur a new L<Module::Generic::Array> object of attribute name-attribute value pairs.
@@ -814,6 +924,10 @@ Returns the element object being added for chaining.
 Provided with an element and this will add it to the stack of elements, right before the current object.
 
 Returns the element object being added for chaining.
+
+=head2 links
+
+Returns an L<array object|Module::Generic::Array> of L<Markdown::Parser::Link> objects.
 
 =head2 make_html_parser
 

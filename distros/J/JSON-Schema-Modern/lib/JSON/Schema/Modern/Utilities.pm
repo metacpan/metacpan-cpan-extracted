@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.555';
+our $VERSION = '0.556';
 
 use 5.020;
 use strictures 2;
@@ -93,10 +93,10 @@ sub is_type ($type, $value) {
 }
 
 sub get_type ($value) {
-  return 'null' if not defined $value;
   return 'object' if is_plain_hashref($value);
-  return 'array' if is_plain_arrayref($value);
   return 'boolean' if is_bool($value);
+  return 'null' if not defined $value;
+  return 'array' if is_plain_arrayref($value);
 
   return ref($value) =~ /^Math::Big(?:Int|Float)$/ ? ($value->is_int ? 'integer' : 'number')
       : (blessed($value) ? '' : 'reference to ').ref($value)
@@ -167,6 +167,8 @@ sub is_elements_unique ($array, $equal_indices = undef) {
 }
 
 # shorthand for creating and appending json pointers
+# the first argument is a a json pointer; remaining arguments are path segments to be encoded and
+# appended
 sub jsonp {
   return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, map +(is_plain_arrayref($_) ? @$_ : $_), grep defined, @_);
 }
@@ -183,11 +185,14 @@ sub local_annotations ($state) {
 }
 
 # shorthand for finding the canonical uri of the present schema location
+# last argument can be an arrayref, usually coming from $state->{_schema_path_suffix}
 sub canonical_uri ($state, @extra_path) {
+  return $state->{initial_schema_uri} if not length($state->{schema_path}) and not @extra_path;
   splice(@extra_path, -1, 1, $extra_path[-1]->@*) if @extra_path and is_plain_arrayref($extra_path[-1]);
   my $uri = $state->{initial_schema_uri}->clone;
-  $uri->fragment(($uri->fragment//'').jsonp($state->{schema_path}, @extra_path));
-  $uri->fragment(undef) if not length($uri->fragment);
+  my $fragment = ($uri->fragment//'').(@extra_path ? jsonp($state->{schema_path}, @extra_path) : $state->{schema_path});
+  undef $fragment if not length($fragment);
+  $uri->fragment($fragment);
   $uri;
 }
 
@@ -359,7 +364,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.555
+version 0.556
 
 =head1 SYNOPSIS
 

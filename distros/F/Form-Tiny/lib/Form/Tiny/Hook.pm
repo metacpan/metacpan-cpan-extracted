@@ -1,12 +1,10 @@
 package Form::Tiny::Hook;
-$Form::Tiny::Hook::VERSION = '2.13';
+$Form::Tiny::Hook::VERSION = '2.14';
 use v5.10;
 use strict;
 use warnings;
 use Moo;
 use Types::Standard qw(Enum CodeRef Bool);
-
-use namespace::clean;
 
 use constant {
 	HOOK_REFORMAT => 'reformat',
@@ -70,7 +68,7 @@ Form::Tiny::Hook - a representation of a hook
 
 	# in your form class
 
-	# the following will be coerced into Form::Tiny::Filter
+	# the following will be coerced into Form::Tiny::Hook
 	form_hook before_validation => $coderef;
 
 =head1 DESCRIPTION

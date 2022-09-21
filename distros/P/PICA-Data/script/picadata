@@ -95,6 +95,10 @@ Stop parsing after C<n> records. Can be abbreviated as C<-1>, C<-2>...
 
 Sort record fields by field identifier and by occurrence at level 2.
 
+=head2 --level, -l
+
+Split record into selected level, includes higher level identifiers.
+
 =head2 --annotate, -a, -A
 
 Enforce annotated PICA as output format or prevent with C<-A>. Combined with

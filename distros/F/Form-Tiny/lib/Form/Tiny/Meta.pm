@@ -1,5 +1,5 @@
 package Form::Tiny::Meta;
-$Form::Tiny::Meta::VERSION = '2.13';
+$Form::Tiny::Meta::VERSION = '2.14';
 use v5.10;
 use strict;
 use warnings;
@@ -12,10 +12,8 @@ use Sub::Util qw(set_subname);
 use Form::Tiny::FieldDefinitionBuilder;
 use Form::Tiny::Hook;
 use Form::Tiny::Error;
-use Form::Tiny::Utils qw(try uniq get_package_form_meta);
+use Form::Tiny::Utils qw(try uniq get_package_form_meta has_form_meta);
 require Moo::Role;
-
-use namespace::clean;
 
 # more clear error messages in some crucial cases
 our @CARP_NOT = qw(Form::Tiny Form::Tiny::Form);
@@ -177,7 +175,7 @@ sub bootstrap
 			@{"${package_name}::ISA"};
 		};
 
-		my @real_parents = grep { $_->can('form_meta') && $_->form_meta->isa(__PACKAGE__) } @parents;
+		my @real_parents = grep { has_form_meta($_) } @parents;
 
 		croak 'Form::Tiny does not support multiple inheritance'
 			if @real_parents > 1;
@@ -187,6 +185,10 @@ sub bootstrap
 		# this is required so that proper hooks on inherit_from can be fired
 		$self->inherit_roles_from($parent ? $parent->form_meta : undef);
 		$self->inherit_from($parent->form_meta) if $parent;
+	}
+	else {
+		# no package means no inheritance, but run this to properly consume meta roles
+		$self->inherit_roles_from;
 	}
 
 	$self->setup;
@@ -346,8 +348,23 @@ sub inherit_from
 
 sub _build_blueprint
 {
-	my ($self, $context) = @_;
+	my ($self, $context, %params) = @_;
 	my %result;
+
+	my $recurse = $params{recurse} // 1;
+	my $transform_base = sub {
+		my ($def) = @_;
+
+		if ($def->is_subform && $recurse) {
+			my $meta = get_package_form_meta(ref $def->type);
+			return $meta->blueprint($def->type, %params);
+		}
+
+		return $def;
+	};
+
+	my $transform = $params{transform} // $transform_base;
+
 
 	# croak, since we don't know anything about dynamic fields in static context
 	croak "Can't create a blueprint of a dynamic form"
@@ -358,12 +375,6 @@ sub _build_blueprint
 	my $fields = $context ? $context->field_defs : $self->fields;
 
 	for my $def (@$fields) {
-		my $value = $def;
-		if ($def->is_subform) {
-			my $meta = get_package_form_meta(ref $def->type);
-			$value = $meta->blueprint($def->type);
-		}
-
 		my @meta = @{$def->get_name_path->meta};
 		my @path = @{$def->get_name_path->path};
 
@@ -375,7 +386,7 @@ sub _build_blueprint
 			$def, [
 				{
 					path => \@path,
-					value => $value
+					value => scalar $transform->($def, $transform_base),
 				}
 			]
 		);
@@ -386,10 +397,13 @@ sub _build_blueprint
 
 sub blueprint
 {
-	my ($self, $context) = @_;
+	my ($self, @args) = @_;
+	my $context;
+	$context = shift @args
+		if @args && has_form_meta($args[0]);
 
-	if ($self->is_dynamic) {
-		return $self->_build_blueprint($context);
+	if ($self->is_dynamic || @args) {
+		return $self->_build_blueprint($context, @args);
 	}
 	else {
 		# $context can be skipped if the form is not dynamic

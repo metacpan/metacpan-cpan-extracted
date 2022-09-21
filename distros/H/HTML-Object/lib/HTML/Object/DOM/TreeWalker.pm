@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/TreeWalker.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/02
-## Modified 2022/01/02
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,11 +17,15 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::NodeIteratorShared );
+    use vars qw( $VERSION );
     # To import its constants
     use HTML::Object::DOM::Node;
     use HTML::Object::DOM::NodeFilter qw( :all );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 # Note: method init is inherited
 
@@ -190,7 +194,7 @@ sub previousSibling
 # Note: property whatToShow read-only is inherited
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -240,7 +244,7 @@ Choose L<HTML::Object::DOM::NodeIterator> when you only need a simple iterator t
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

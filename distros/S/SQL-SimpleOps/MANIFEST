@@ -1,0 +1,26 @@
+AUTHORS					List of Authors
+Changes					ChangeLog
+MANIFEST				this file
+Makefile.PL				Makefile Writer
+README					ReadMe First
+SAMPLE-01-PRECREATE-DB			mySample of pre creating db
+SAMPLE-02-MYTEST-SQLITE			mySample of test sqlite db
+SAMPLE-03-MYTEST-MYSQL			mySample of test mysql db
+SAMPLE-04-MYTEST-POSTGRES		mySample of test postgres db
+lib/SQL/SimpleOps.pm			Master lib
+lib/SQL/SimpleOps.pod			POD file
+lib/SQL/SimpleOps/DBI/MyPlugin.pm	Sample of Plugin
+lib/SQL/SimpleOps/DBI/MySQL.pm		Plugin for MySQL
+lib/SQL/SimpleOps/DBI/PG.pm		Plugin for PG
+lib/SQL/SimpleOps/DBI/SQLite.pm		Plugin for SQLite
+t/testDB.t				test database master
+t/testDB_mysql.pm			test database lib for mysql
+t/testDB_mysql.sql			test database sql for mysql
+t/testDB_postgres.pm			test database lib for postgres
+t/testDB_postgres.sql			test database sql for postgres
+t/testDB_sqlite.pm			test database lib for sqlite
+t/testDB_sqlite.sql			test database sql for sqlite
+t/testSQL.t				test sql formater
+t/testWhere.t				test where clause formater
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

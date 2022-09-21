@@ -18,7 +18,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch;
-$WebFetch::VERSION = '0.15.1';
+$WebFetch::VERSION = '0.15.3';
 
 use Carp qw(croak);
 use Getopt::Long;
@@ -133,7 +133,9 @@ use Exception::Class (
 
     'WebFetch::Exception::NetworkGet' => {
         isa         => 'WebFetch::Exception',
-        description => "Failed to access RSS feed",
+        alias       => 'throw_network_get',
+        fields      => [qw( client )],
+        description => "Failed to access feed source",
     },
 
     'WebFetch::Exception::ModLoadFailure' => {
@@ -1835,7 +1837,7 @@ WebFetch - Perl module to download/fetch and save information from the Web
 
 =head1 VERSION
 
-version 0.15.1
+version 0.15.3
 
 =head1 SYNOPSIS
 

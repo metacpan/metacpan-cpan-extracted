@@ -1,5 +1,5 @@
 package Form::Tiny::Form;
-$Form::Tiny::Form::VERSION = '2.13';
+$Form::Tiny::Form::VERSION = '2.14';
 use v5.10;
 use strict;
 use warnings;
@@ -321,10 +321,6 @@ B<predicate:> I<has_errors>
 =head2 METHODS
 
 This section describes standalone methods available in the module - they are not directly connected to any of the attributes.
-
-=head3 form_meta
-
-Returns the form metaobject, an instance of L<Form::Tiny::Meta>.
 
 =head3 new
 

@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XPath/Step.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
-## Modified 2021/12/05
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,6 +17,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $BASE_CLASS $DEBUG $VERSION );
     use constant {
         # Full name
         TEST_QNAME       => 0,
@@ -40,8 +42,11 @@ BEGIN
     };
     our $BASE_CLASS = 'HTML::Object::XPath';
     our $DEBUG = 0;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -54,8 +59,8 @@ sub init
     $self->{predicates} = [];
     $self->{axis_method} = 'axis_' . $self->{axis};
     $self->{axis_method} =~ tr/-/_/;
-    my( $pp, $axis, $test, $literal) = @_;
-    my $axis_method = "axis_$axis";
+    # my( $pp, $axis, $test, $literal) = @_;
+    my $axis_method = "axis_$self->{axis}";
     $axis_method =~ tr/-/_/;
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
@@ -231,10 +236,8 @@ sub axis_child
     if( $self->debug )
     {
         my( $p, $f, $l ) = caller;
-        $self->message( 4, "axis_child() called with context '", overload::StrVal( $context ), "' and results '$results' from package $p at line $l" );
     }
     my $children = $context->getChildNodes;
-    $self->message( 4, scalar( @$children ), " child nodes found: '", join( "', '", @$children ), "'" );
     
     foreach my $node ( @{$context->getChildNodes} )
     {
@@ -249,23 +252,18 @@ sub axis_descendant
 {
     my $self = shift( @_ );
     my( $context, $results ) = @_;
-    $self->message( 3, "Getting axis descendant with context '$context' and results '$results'" );
 
     my @stack = $context->getChildNodes;
-    $self->message( 3, "child nodes found with getChildNodes are: '", join( "', '", @stack ), "'" );
 
     while( @stack )
     {
         my $node = shift( @stack );
-        $self->message( 3, "Checking node '", $node->getName, "' ($node)." );
         if( $self->node_test( $node ) )
         {
-            $self->message( 3, "Node passed the test." );
             $results->push( $node );
         }
         else
         {
-            $self->message( 3, "Node failed the test." );
         }
         unshift( @stack, $node->getChildNodes );
     }
@@ -281,7 +279,6 @@ sub axis_descendant_or_self
     while( @stack )
     {
         my $node = shift( @stack );
-        $self->message( 4, "Testing with node_test for '$node' (", $node->getName, ")" );
         if( $self->node_test( $node ) )
         {
             $results->push( $node );
@@ -419,15 +416,12 @@ sub evaluate
     # each of the predicates in turn.
     
     # Make each node in the nodeset be the context node, one by one
-    $self->message( 4, "NodeSet provided to ", ref( $self ), "::evaluate contains ", $from->size, " elements." );
     for( my $i = 1; $i <= $from->size; $i++ )
     {
         $self->{pp}->_set_context_pos( $i );
         if( $self->debug )
         {
             my $this_node = $from->get_node( $i );
-            $self->message( 4, "Calling ", overload::StrVal( $from ), "->get_node( $i ). Resulting in -> ", $this_node );
-            # $self->message( 5, "Node as string is '", ( $this_node->can( 'as_string' ) ? $this_node->as_string : 'Cannot do as_string' ), "'" );
         }
         $initial_nodeset->append( $self->evaluate_node( $from->get_node( $i ) ) );
     }
@@ -436,7 +430,6 @@ sub evaluate
     
     $self->{pp}->_set_context_set( $saved_context );
     $self->{pp}->_set_context_pos( $saved_pos );
-    $self->message( 4, "Returning nodeset '", overload::StrVal( $initial_nodeset ), "'" );
     return( $initial_nodeset );
 }
 
@@ -448,7 +441,6 @@ sub evaluate_node
     # warn "Evaluate node: $self->{axis}\n";
     # warn "Node: ", $context->[node_name], "\n";
     my $method = $self->{axis_method};
-    $self->message( 4, "evaluate_node() evaluating node for context '", overload::StrVal( $context ), "' for method '$method'" );
     
     my $results = $self->new_nodeset();
     no strict 'refs';
@@ -532,8 +524,6 @@ sub node_test
     
     # if node passes test, return true
     my $test = $self->{test};
-    # $self->message( 3, "Testing with test '", $test_types->[ $test ], "' with node '$node' (", $node->as_string, "). property literal is '", $self->{literal}, "'" );
-    $self->message( 3, "Testing with test '", $test_types->[ $test ], "' with node '$node'. property literal is '", $self->{literal}, "'" );
 
     return(1) if( $test == TEST_NT_NODE );
 
@@ -644,7 +634,8 @@ sub _class_for
     my( $self, $mod ) = @_;
     eval( "require ${BASE_CLASS}\::${mod};" );
     die( $@ ) if( $@ );
-    ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    # ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    eval( "\$${BASE_CLASS}\::${mod}\::DEBUG = " . ( $DEBUG // 0 ) );
     return( "${BASE_CLASS}::${mod}" );
 }
 
@@ -699,7 +690,7 @@ sub _name2prefix_and_local_name
 sub _next_sibling_of_an_ancestor_of
 {
     my $elt = shift( @_ );
-    # XXX return 0 instead of undef ?
+    # NOTE: return 0 instead of undef ?
     $elt = $elt->getParentNode || return;
     my $next_elt;
     while( !( $next_elt= $elt->getNextSibling ) )
@@ -713,7 +704,7 @@ sub _next_sibling_of_an_ancestor_of
 sub _previous_sibling_of_an_ancestor_of
 {
     my $elt = shift( @_ );
-    # XXX Should we return 0 instead of undef ?
+    # NOTE: Should we return 0 instead of undef ?
     $elt = $elt->getParentNode || return;
     my $next_elt;
     while( !( $next_elt = $elt->getPreviousSibling ) )
@@ -726,7 +717,7 @@ sub _previous_sibling_of_an_ancestor_of
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -742,7 +733,7 @@ HTML::Object::XPath::Step - HTML Object XPath Step
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

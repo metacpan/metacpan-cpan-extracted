@@ -1,0 +1,345 @@
+---
+'0.9':
+- &1
+  - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''
+- &2
+  - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''
+- &3
+  - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''
+- &4
+  - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''
+- &5
+  - ''
+  - Giving the world a pluggable Gnutella
+  - http://writetheweb.com/read.php?item=24
+  - ''
+  - WorldOS is a framework on which to build programs that work like Freenet or Gnutella
+    -allowing distributed applications using peer-to-peer routing.
+  - ''
+  - ''
+- &6
+  - ''
+  - Syndication discussions hot up
+  - http://writetheweb.com/read.php?item=23
+  - ''
+  - After a period of dormancy, the Syndication mailing list has become active again,
+    with contributions from leaders in traditional media and Web syndication.
+  - ''
+  - ''
+- &7
+  - ''
+  - Personal web server integrates file sharing and messaging
+  - http://writetheweb.com/read.php?item=22
+  - ''
+  - The Magi Project is an innovative project to create a combined personal web server
+    and messaging system that enables the sharing and synchronization of information
+    across desktop, laptop and palmtop devices.
+  - ''
+  - ''
+- &8
+  - ''
+  - Syndication and Metadata
+  - http://writetheweb.com/read.php?item=21
+  - ''
+  - RSS is probably the best known metadata format around. RDF is probably one of
+    the least understood. In this essay, published on my O'Reilly Network weblog,
+    I argue that the next generation of RSS should be based on RDF.
+  - ''
+  - ''
+- &9
+  - ''
+  - UK bloggers get organised
+  - http://writetheweb.com/read.php?item=20
+  - ''
+  - Looks like the weblogs scene is gathering pace beyond the shores of the US. There's
+    now a UK-specific page on weblogs.com, and a mailing list at egroups.
+  - ''
+  - ''
+- &10
+  - ''
+  - Yournamehere.com more important than anything
+  - http://writetheweb.com/read.php?item=19
+  - ''
+  - Whatever you're publishing on the web, your site name is the most valuable asset
+    you have, according to Carl Steadman.
+  - ''
+  - ''
+- &11
+  - ''
+  - Giving the world a pluggable Gnutella
+  - http://writetheweb.com/read.php?item=24
+  - ''
+  - WorldOS is a framework on which to build programs that work like Freenet or Gnutella
+    -allowing distributed applications using peer-to-peer routing.
+  - ''
+  - ''
+- &12
+  - ''
+  - Syndication discussions hot up
+  - http://writetheweb.com/read.php?item=23
+  - ''
+  - After a period of dormancy, the Syndication mailing list has become active again,
+    with contributions from leaders in traditional media and Web syndication.
+  - ''
+  - ''
+- &13
+  - ''
+  - Personal web server integrates file sharing and messaging
+  - http://writetheweb.com/read.php?item=22
+  - ''
+  - The Magi Project is an innovative project to create a combined personal web server
+    and messaging system that enables the sharing and synchronization of information
+    across desktop, laptop and palmtop devices.
+  - ''
+  - ''
+- &14
+  - ''
+  - Syndication and Metadata
+  - http://writetheweb.com/read.php?item=21
+  - ''
+  - RSS is probably the best known metadata format around. RDF is probably one of
+    the least understood. In this essay, published on my O'Reilly Network weblog,
+    I argue that the next generation of RSS should be based on RDF.
+  - ''
+  - ''
+- &15
+  - ''
+  - UK bloggers get organised
+  - http://writetheweb.com/read.php?item=20
+  - ''
+  - Looks like the weblogs scene is gathering pace beyond the shores of the US. There's
+    now a UK-specific page on weblogs.com, and a mailing list at egroups.
+  - ''
+  - ''
+- &16
+  - ''
+  - Yournamehere.com more important than anything
+  - http://writetheweb.com/read.php?item=19
+  - ''
+  - Whatever you're publishing on the web, your site name is the most valuable asset
+    you have, according to Carl Steadman.
+  - ''
+  - ''
+- &17
+  - ''
+  - Giving the world a pluggable Gnutella
+  - http://writetheweb.com/read.php?item=24
+  - ''
+  - WorldOS is a framework on which to build programs that work like Freenet or Gnutella
+    -allowing distributed applications using peer-to-peer routing.
+  - ''
+  - ''
+- &18
+  - ''
+  - Syndication discussions hot up
+  - http://writetheweb.com/read.php?item=23
+  - ''
+  - After a period of dormancy, the Syndication mailing list has become active again,
+    with contributions from leaders in traditional media and Web syndication.
+  - ''
+  - ''
+- &19
+  - ''
+  - Personal web server integrates file sharing and messaging
+  - http://writetheweb.com/read.php?item=22
+  - ''
+  - The Magi Project is an innovative project to create a combined personal web server
+    and messaging system that enables the sharing and synchronization of information
+    across desktop, laptop and palmtop devices.
+  - ''
+  - ''
+- &20
+  - ''
+  - Syndication and Metadata
+  - http://writetheweb.com/read.php?item=21
+  - ''
+  - RSS is probably the best known metadata format around. RDF is probably one of
+    the least understood. In this essay, published on my O'Reilly Network weblog,
+    I argue that the next generation of RSS should be based on RDF.
+  - ''
+  - ''
+- &21
+  - ''
+  - UK bloggers get organised
+  - http://writetheweb.com/read.php?item=20
+  - ''
+  - Looks like the weblogs scene is gathering pace beyond the shores of the US. There's
+    now a UK-specific page on weblogs.com, and a mailing list at egroups.
+  - ''
+  - ''
+- &22
+  - ''
+  - Yournamehere.com more important than anything
+  - http://writetheweb.com/read.php?item=19
+  - ''
+  - Whatever you're publishing on the web, your site name is the most valuable asset
+    you have, according to Carl Steadman.
+  - ''
+  - ''
+- &23
+  - ''
+  - Giving the world a pluggable Gnutella
+  - http://writetheweb.com/read.php?item=24
+  - ''
+  - WorldOS is a framework on which to build programs that work like Freenet or Gnutella
+    -allowing distributed applications using peer-to-peer routing.
+  - ''
+  - ''
+- &24
+  - ''
+  - Syndication discussions hot up
+  - http://writetheweb.com/read.php?item=23
+  - ''
+  - After a period of dormancy, the Syndication mailing list has become active again,
+    with contributions from leaders in traditional media and Web syndication.
+  - ''
+  - ''
+- &25
+  - ''
+  - Personal web server integrates file sharing and messaging
+  - http://writetheweb.com/read.php?item=22
+  - ''
+  - The Magi Project is an innovative project to create a combined personal web server
+    and messaging system that enables the sharing and synchronization of information
+    across desktop, laptop and palmtop devices.
+  - ''
+  - ''
+- &26
+  - ''
+  - Syndication and Metadata
+  - http://writetheweb.com/read.php?item=21
+  - ''
+  - RSS is probably the best known metadata format around. RDF is probably one of
+    the least understood. In this essay, published on my O'Reilly Network weblog,
+    I argue that the next generation of RSS should be based on RDF.
+  - ''
+  - ''
+- &27
+  - ''
+  - UK bloggers get organised
+  - http://writetheweb.com/read.php?item=20
+  - ''
+  - Looks like the weblogs scene is gathering pace beyond the shores of the US. There's
+    now a UK-specific page on weblogs.com, and a mailing list at egroups.
+  - ''
+  - ''
+- &28
+  - ''
+  - Yournamehere.com more important than anything
+  - http://writetheweb.com/read.php?item=19
+  - ''
+  - Whatever you're publishing on the web, your site name is the most valuable asset
+    you have, according to Carl Steadman.
+  - ''
+  - ''
+'0.91':
+- *1
+- *2
+- *3
+- *4
+- *5
+- *6
+- *7
+- *8
+- *9
+- *10
+- *11
+- *12
+- *13
+- *14
+- *15
+- *16
+- *17
+- *18
+- *19
+- *20
+- *21
+- *22
+- *23
+- *24
+- *25
+- *26
+- *27
+- *28
+'1.0':
+- *1
+- *2
+- *3
+- *4
+- *5
+- *6
+- *7
+- *8
+- *9
+- *10
+- *11
+- *12
+- *13
+- *14
+- *15
+- *16
+- *17
+- *18
+- *19
+- *20
+- *21
+- *22
+- *23
+- *24
+- *25
+- *26
+- *27
+- *28
+'2.0':
+- *1
+- *2
+- *3
+- *4
+- *5
+- *6
+- *7
+- *8
+- *9
+- *10
+- *11
+- *12
+- *13
+- *14
+- *15
+- *16
+- *17
+- *18
+- *19
+- *20
+- *21
+- *22
+- *23
+- *24
+- *25
+- *26
+- *27
+- *28

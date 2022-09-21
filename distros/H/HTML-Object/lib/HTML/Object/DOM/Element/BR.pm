@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/BR.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
-## Modified 2021/12/23
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,8 +17,12 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::Element );
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION );
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -32,7 +36,7 @@ sub init
 sub clear : lvalue { return( shift->_set_get_property( 'clear', @_ ) ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -49,7 +53,7 @@ HTML::Object::DOM::Element::BR - HTML Object DOM Line Break Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

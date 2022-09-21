@@ -20,7 +20,7 @@ Perinci::Manual::HowTo::FunctionMetadata::Examples - How-to guides related to fu
 
 =head1 VERSION
 
-This document describes version 0.009 of Perinci::Manual::HowTo::FunctionMetadata::Examples (from Perl distribution Perinci-Manual), released on 2022-07-01.
+This document describes version 0.010 of Perinci::Manual::HowTo::FunctionMetadata::Examples (from Perl distribution Perinci-Manual), released on 2022-07-22.
 
 =head1 HOMEPAGE
 

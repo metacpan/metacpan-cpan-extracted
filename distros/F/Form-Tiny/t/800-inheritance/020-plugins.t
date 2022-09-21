@@ -41,7 +41,7 @@ subtest 'test grandchild plugin class' => sub {
 		'meta role plugin ok'
 	);
 	ok(
-		PluginInheritanceGrandchildForm->form_meta->DOES('Form::Tiny::Meta::Filtered'),
+		PluginInheritanceGrandchildForm->form_meta->DOES('Form::Tiny::Plugin::Filtered'),
 		'filtered meta role plugin ok'
 	);
 	ok(PluginInheritanceGrandchildForm->DOES('Form::Tiny::Plugin::MyRolePlugin'), 'role plugin ok');

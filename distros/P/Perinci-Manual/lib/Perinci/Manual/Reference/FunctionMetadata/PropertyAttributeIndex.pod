@@ -20,7 +20,7 @@ Perinci::Manual::Reference::FunctionMetadata::PropertyAttributeIndex - Alphabeti
 
 =head1 VERSION
 
-This document describes version 0.009 of Perinci::Manual::Reference::FunctionMetadata::PropertyAttributeIndex (from Perl distribution Perinci-Manual), released on 2022-07-01.
+This document describes version 0.010 of Perinci::Manual::Reference::FunctionMetadata::PropertyAttributeIndex (from Perl distribution Perinci-Manual), released on 2022-07-22.
 
 =head1 INDEX
 
@@ -178,6 +178,10 @@ Example:
  _
      },
  }
+
+=head2 x.doc.faq
+
+String (Markdown format).
 
 =head2 x.inline_generator_modules
 

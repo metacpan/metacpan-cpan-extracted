@@ -1,6 +1,13 @@
 Revision history for Perl module HTML::Object
 
-v0.1.4 2022-04-16T09:19:07+0900
+v0.2.1 2022-09-20T17:27:23+0900
+    - Corrected some obscure issue with the module Want somehow not exporting its key subroutines
+
+v0.2.0 2022-09-18T14:42:31Z +0900
+    - Improved all modules; moved to stricter coding
+    - Corrected a few typos
+
+v0.1.4 2022-04-16T09:19:07Z +0900
     - Correction of a minor bug in method detach() in HTML::Object::Element
     - Corrected a minor bug in HTML::Object::DOM parse() method
 

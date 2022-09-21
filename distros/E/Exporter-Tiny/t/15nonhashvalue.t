@@ -21,7 +21,7 @@ the same terms as the Perl 5 programming language system itself.
 
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 3;
 
 BEGIN {
 	package Local::XYZ;
@@ -62,4 +62,3 @@ BEGIN {
 	) or ::diag( ::explain( mytest() ) );
 }
 
-done_testing;

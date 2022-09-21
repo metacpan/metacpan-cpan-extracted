@@ -14,9 +14,9 @@ Commits:
 * the first line of the commit message should be a short description and
   should skip the full stop
 * the body should provide a meaningful commit message, which:
-	* uses the imperative, present tense: "change", not "changed" or "changes".
-	* includes motivation for the change, and contrasts its implementation with
-	  previous behaviour
+    * uses the imperative, present tense: "change", not "changed" or "changes".
+    * includes motivation for the change, and contrasts its implementation with
+      previous behaviour
 * if you want your work included in the main repository, add a "Signed-off-by:
   Your Name <you@example.com>" line to the commit message (or just use the
   option "-s" when committing) to confirm that you agree to the Developer's
@@ -153,7 +153,7 @@ pretty simple: if you can certify the below:
 
 then you just add a line saying
 
-	Signed-off-by: Random J Developer <random@developer.example.org>
+    Signed-off-by: Random J Developer <random@developer.example.org>
 
 This line can be automatically added by git if you run the git-commit
 command with the -s option.

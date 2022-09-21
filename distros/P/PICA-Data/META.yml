@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.15, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,78 +33,78 @@ no_index:
 provides:
   App::picadata:
     file: lib/App/picadata.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Data:
     file: lib/PICA/Data.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Error:
     file: lib/PICA/Error.pm
   PICA::Parser::Base:
     file: lib/PICA/Parser/Base.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Parser::Binary:
     file: lib/PICA/Parser/Binary.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Parser::JSON:
     file: lib/PICA/Parser/JSON.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Parser::PIXML:
     file: lib/PICA/Parser/PIXML.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Parser::PPXML:
     file: lib/PICA/Parser/PPXML.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Parser::Plain:
     file: lib/PICA/Parser/Plain.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Parser::Plus:
     file: lib/PICA/Parser/Plus.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Parser::XML:
     file: lib/PICA/Parser/XML.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Patch:
     file: lib/PICA/Patch.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Path:
     file: lib/PICA/Path.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Schema:
     file: lib/PICA/Schema.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Schema::Builder:
     file: lib/PICA/Schema/Builder.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Writer::Base:
     file: lib/PICA/Writer/Base.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Writer::Binary:
     file: lib/PICA/Writer/Binary.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Writer::Generic:
     file: lib/PICA/Writer/Generic.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Writer::Import:
     file: lib/PICA/Writer/Import.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Writer::JSON:
     file: lib/PICA/Writer/JSON.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Writer::PIXML:
     file: lib/PICA/Writer/PIXML.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Writer::PPXML:
     file: lib/PICA/Writer/PPXML.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Writer::Plain:
     file: lib/PICA/Writer/Plain.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Writer::Plus:
     file: lib/PICA/Writer/Plus.pm
-    version: '2.03'
+    version: '2.04'
   PICA::Writer::XML:
     file: lib/PICA/Writer/XML.pm
-    version: '2.03'
+    version: '2.04'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -120,8 +120,8 @@ requires:
 resources:
   bugtracker: https://github.com/gbv/PICA-Data/issues
   homepage: https://github.com/gbv/PICA-Data
-  repository: git://github.com/gbv/PICA-Data.git
-version: '2.03'
+  repository: https://github.com/gbv/PICA-Data.git
+version: '2.04'
 x_contributors:
   - 'Carsten Klee <klee@cpan.org>'
   - 'Jakob Voß <jakob.voss@gbv.de>'

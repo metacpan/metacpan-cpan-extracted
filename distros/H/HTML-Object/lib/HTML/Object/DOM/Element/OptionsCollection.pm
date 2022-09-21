@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/OptionsCollection.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/05
-## Modified 2022/01/05
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,11 +17,12 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::Collection );
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION );
+    our $VERSION = 'v0.2.0';
 };
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -38,7 +39,7 @@ HTML::Object::DOM::Element::OptionsCollection - HTML Object DOM Options Collecti
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

@@ -5,26 +5,38 @@ package Catalyst::TraitFor::Request::Methods;
 use v5.14;
 
 use Moose::Role;
-
-use Data::Enum;
+use List::Util 1.33 qw/ none /;
 
 use namespace::autoclean;
 
 requires 'method';
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.5.0';
 
 
-my @METHODS = qw/ get head post put delete connect options trace patch unrecognized_method /;
+my @METHODS = qw/ get head post put delete connect options trace patch /;
 
-has _method_enum => (
+for my $method (@METHODS) {
+    has my $name = "is_" . $method => (
+        is => 'ro',
+        lazy => 1,
+        default => sub {
+            my ($self) = @_;
+            my $this = lc $self->method =~ s/\W/_/gr;
+            return $this eq $method;
+        },
+    );
+}
+
+
+has is_unrecognized_method => (
     is => 'ro',
     lazy => 1,
     default => sub {
-        state $enum = Data::Enum->new(@METHODS);
-        return eval { $enum->new(lc $_[0]->method =~ s/\W/_/gr) } // $enum->new('unrecognized_method');
+        my ($self) = @_;
+        my $this = lc $self->method =~ s/\W/_/gr;
+        return none { $this eq $_ } @METHODS;
     },
-    handles => [ map { "is_" . $_ } @METHODS ],
 );
 
 
@@ -42,7 +54,7 @@ Catalyst::TraitFor::Request::Methods - Add enumerated methods for HTTP requests
 
 =head1 VERSION
 
-version v0.4.0
+version v0.5.0
 
 =head1 SYNOPSIS
 

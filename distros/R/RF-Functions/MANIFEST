@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+CONTRIBUTING.md 
+README.md
+LICENSE
+t/001_load.t
+lib/RF/Functions.pm
+perl-RF-Functions.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

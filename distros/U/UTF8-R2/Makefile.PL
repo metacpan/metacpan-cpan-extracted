@@ -4,8 +4,8 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{UTF8::R2},
-    'VERSION'   => q{0.21},
-    'ABSTRACT'  => q{makes UTF-8 scripting easy for enterprise use or LTS},
+    'VERSION'   => q{0.22},
+    'ABSTRACT'  => q{makes UTF-8 scripting easy for enterprise use},
     'PREREQ_PM' => {
         'Cwd' => '0',
         'ExtUtils::MakeMaker' => '5.4302',

@@ -4,15 +4,16 @@ use strict;
 use DateTime;
 use DateTime::Set;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 RT->AddStyleSheets('calendar.css');
 
 sub FirstDay {
-    my ($year, $month, $matchday) = @_;
-    my $set = DateTime::Set->from_recurrence(
-	next => sub { $_[0]->truncate( to => 'day' )->subtract( days => 1 ) }
-    );
+    my ( $year, $month, $matchday ) = @_;
+    my $set
+        = DateTime::Set->from_recurrence(
+        next => sub { $_[0]->truncate( to => 'day' )->subtract( days => 1 ) }
+        );
 
     my $day = DateTime->new( year => $year, month => $month );
 
@@ -22,10 +23,9 @@ sub FirstDay {
 }
 
 sub LastDay {
-    my ($year, $month, $matchday) = @_;
+    my ( $year, $month, $matchday ) = @_;
     my $set = DateTime::Set->from_recurrence(
-	next => sub { $_[0]->truncate( to => 'day' )->add( days => 1 ) }
-    );
+        next => sub { $_[0]->truncate( to => 'day' )->add( days => 1 ) } );
 
     my $day = DateTime->last_day_of_month( year => $year, month => $month );
 
@@ -36,30 +36,30 @@ sub LastDay {
 # we can't use RT::Date::Date because it uses gmtime
 # and we need localtime
 sub LocalDate {
-  my $ts = shift;
-  my ($d,$m,$y) = (localtime($ts))[3..5];
-  sprintf "%4d-%02d-%02d", ($y + 1900), ++$m, $d;
+    my $ts = shift;
+    my ( $d, $m, $y ) = ( localtime($ts) )[ 3 .. 5 ];
+    sprintf "%4d-%02d-%02d", ( $y + 1900 ), ++$m, $d;
 }
 
 sub DatesClauses {
-    my ($Dates, $begin, $end) = @_;
+    my ( $Dates, $begin, $end ) = @_;
 
     my $clauses = "";
 
     my @DateClauses = map {
-	"($_ >= '" . $begin . " 00:00:00' AND $_ <= '" . $end . " 23:59:59')"
+        "($_ >= '" . $begin . " 00:00:00' AND $_ <= '" . $end . " 23:59:59')"
     } @$Dates;
-    $clauses  .= " AND " . " ( " . join(" OR ", @DateClauses) . " ) "
-	if @DateClauses;
+    $clauses .= " AND " . " ( " . join( " OR ", @DateClauses ) . " ) "
+        if @DateClauses;
 
-    return $clauses
+    return $clauses;
 }
 
 sub FindTickets {
-    my ($CurrentUser, $Query, $Dates, $begin, $end) = @_;
+    my ( $CurrentUser, $Query, $Dates, $begin, $end ) = @_;
 
-    $Query .= DatesClauses($Dates, $begin, $end)
-	if $begin and $end;
+    $Query .= DatesClauses( $Dates, $begin, $end )
+        if $begin and $end;
 
     my $Tickets = RT::Tickets->new($CurrentUser);
     $Tickets->FromSQL($Query);
@@ -67,16 +67,20 @@ sub FindTickets {
     my %Tickets;
     my %AlreadySeen;
 
-    while ( my $Ticket = $Tickets->Next()) {
+    while ( my $Ticket = $Tickets->Next() ) {
 
-	# How to find the LastContacted date ?
-	for my $Date (@$Dates) {
-	    my $DateObj = $Date . "Obj";
-	    push @{ $Tickets{ LocalDate($Ticket->$DateObj->Unix) } }, $Ticket
-		# if reminder, check it's refering to a ticket
-		unless ($Ticket->Type eq 'reminder' and not $Ticket->RefersTo->First)
-		    or $AlreadySeen{  LocalDate($Ticket->$DateObj->Unix) }{ $Ticket }++;
-	}
+        # How to find the LastContacted date ?
+        for my $Date (@$Dates) {
+            my $DateObj = $Date . "Obj";
+            push @{ $Tickets{ LocalDate( $Ticket->$DateObj->Unix ) } },
+                $Ticket
+
+                # if reminder, check it's refering to a ticket
+                unless ( $Ticket->Type eq 'reminder'
+                and not $Ticket->RefersTo->First )
+                or $AlreadySeen{ LocalDate( $Ticket->$DateObj->Unix ) }
+                {$Ticket}++;
+        }
     }
     return %Tickets;
 }
@@ -88,18 +92,42 @@ sub SearchDefaultCalendar {
     my $CurrentUser = shift;
     my $Description = "calendar";
 
-    # I'm quite sure the loop isn't usefull but...
-    my @Objects = $CurrentUser->UserObj;
-    for my $object (@Objects) {
-	next unless ref($object) eq 'RT::User' && $object->id == $CurrentUser->Id;
-	my @searches = $object->Attributes->Named('SavedSearch');
-	for my $search (@searches) {
-	    next if ($search->SubValue('SearchType')
-			 && $search->SubValue('SearchType') ne 'Ticket');
+    my $UserObj  = $CurrentUser->UserObj;
+    my @searches = $UserObj->Attributes->Named('SavedSearch');
+    for my $search (@searches) {
+        next
+            if ( $search->SubValue('SearchType')
+            && $search->SubValue('SearchType') ne 'Ticket' );
 
-	    return $search
-		if "calendar" eq $search->Description;
-	}
+        return $search
+            if "calendar" eq $search->Description;
+    }
+
+    # search through user's groups as well
+    my $Groups = RT::Groups->new($CurrentUser);
+    $Groups->LimitToUserDefinedGroups;
+    $Groups->WithCurrentUser;
+    while ( my $group = $Groups->Next ) {
+        @searches = $group->Attributes->Named('SavedSearch');
+        for my $search (@searches) {
+            next
+                if ( $search->SubValue('SearchType')
+                && $search->SubValue('SearchType') ne 'Ticket' );
+
+            return $search
+                if "calendar" eq $search->Description;
+        }
+    }
+
+    # search thru system saved searches
+    @searches = $RT::System->Attributes->Named('SavedSearch');
+    for my $search (@searches) {
+        next
+            if ( $search->SubValue('SearchType')
+            && $search->SubValue('SearchType') ne 'Ticket' );
+
+        return $search
+            if "calendar" eq $search->Description;
     }
 }
 
@@ -204,7 +232,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2010-2020 by Best Practical Solutions
+This software is Copyright (c) 2010-2022 by Best Practical Solutions
 
 Copyright 2007-2009 by Nicolas Chuche
 

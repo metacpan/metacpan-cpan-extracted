@@ -729,7 +729,7 @@ B<example 2>
 
   my $result = "$search, $search";
 
-  # "hello world"
+  # "hello world, hello world"
 
 =back
 

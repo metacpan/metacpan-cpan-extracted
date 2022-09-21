@@ -8,7 +8,9 @@ META.yml
 README
 dist.ini
 lib/Chemistry/OpenSMILES.pm
+lib/Chemistry/OpenSMILES/Aromaticity.pm
 lib/Chemistry/OpenSMILES/Parser.yp
+lib/Chemistry/OpenSMILES/Stereo.pm
 lib/Chemistry/OpenSMILES/Writer.pm
 t/01_atoms.t
 t/02_chains.t
@@ -29,3 +31,5 @@ t/16_unsupported_chirality.t
 t/17_max_hydrogen_count_digits.t
 t/18_chirality_reference.t
 t/19_lone_pairs.t
+t/20_aromaticity.t
+t/21_stereo.t

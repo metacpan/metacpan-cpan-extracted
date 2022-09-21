@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '1.40';
+our $VERSION = '1.50';
 
 # AUTHORITY
 
@@ -23,6 +23,7 @@ sub import {
   no strict 'refs';
 
   my %exports = (
+    cast => 1,
     catch => 1,
     error => 1,
     false => 1,
@@ -41,6 +42,16 @@ sub import {
 }
 
 # FUNCTIONS
+
+sub cast (;$$) {
+  my ($data, $into) = (@_ ? (@_) : ($_));
+
+  require Venus::Type;
+
+  my $type = Venus::Type->new($data);
+
+  return $into ? $type->cast($into) : $type->deduce;
+}
 
 sub catch (&) {
   my ($data) = @_;
@@ -109,7 +120,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-1.40
+1.50
 
 =cut
 
@@ -161,6 +172,74 @@ requires Perl C<5.18+>.
 =head1 FUNCTIONS
 
 This package provides the following functions:
+
+=cut
+
+=head2 cast
+
+  cast(Any $data, Str $type) (Object)
+
+The cast function returns the argument provided as an object, promoting native
+Perl data types to data type objects. The optional second argument can be the
+name of the type for the object to cast to explicitly.
+
+I<Since C<1.40>>
+
+=over 4
+
+=item cast example 1
+
+  package main;
+
+  use Venus 'cast';
+
+  my $undef = cast;
+
+  # bless({value => undef}, "Venus::Undef")
+
+=back
+
+=over 4
+
+=item cast example 2
+
+  package main;
+
+  use Venus 'cast';
+
+  my @booleans = map cast, true, false;
+
+  # (bless({value => 1}, "Venus::Boolean"), bless({value => 0}, "Venus::Boolean"))
+
+=back
+
+=over 4
+
+=item cast example 3
+
+  package main;
+
+  use Venus 'cast';
+
+  my $example = cast bless({}, "Example");
+
+  # bless({value => 1}, "Example")
+
+=back
+
+=over 4
+
+=item cast example 4
+
+  package main;
+
+  use Venus 'cast';
+
+  my $float = cast 1.23;
+
+  # bless({value => "1.23"}, "Venus::Float")
+
+=back
 
 =cut
 

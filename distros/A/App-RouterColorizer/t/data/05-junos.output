@@ -1645,3 +1645,96 @@ jmaslak@swXX> show interfaces diagnostics optics
 {master:1}
 jmaslak@swXX> exit 
 
+--- JUNOS 20.2R3.9 Kernel 32-bit  JNPR-11.0-20[4m210[24m212.420a184_buil
+{master:0}
+foobar@xxxx.xxxxxx> show interfaces terse 
+Interface               Admin Link Proto    Local                 Remote
+[1;31mge-0/0/0                up    down[0m
+[1;31mge-0/0/0.0              up    down eth-switch[0m
+[32mpfe-0/0/0               up    up[0m
+[32mpfe-0/0/0.16383         up    up   inet    [0m
+                                   inet6   
+[32mpfh-0/0/0               up    up[0m
+[32mpfh-0/0/0.16383         up    up   inet    [0m
+[32mpfh-0/0/0.16384         up    up   inet    [0m
+[1;31mge-0/0/1                up    down[0m
+[1;31mge-0/0/1.0              up    down eth-switch[0m
+[32mge-0/0/2                up    up[0m
+[32mge-0/0/2.0              up    up   eth-switch[0m
+[32mge-0/0/3                up    up[0m
+[32mge-0/0/3.0              up    up   eth-switch[0m
+[32mge-0/0/4                up    up[0m
+[32mge-0/0/4.0              up    up   eth-switch[0m
+[32mge-0/0/5                up    up[0m
+[32mge-0/0/5.0              up    up   eth-switch[0m
+[32mge-0/0/6                up    up[0m
+[32mge-0/0/6.0              up    up   eth-switch[0m
+[32mge-0/0/7                up    up[0m
+[32mge-0/0/7.0              up    up   eth-switch[0m
+[32mge-0/0/8                up    up[0m
+[32mge-0/0/8.0              up    up   eth-switch[0m
+[32mge-0/0/9                up    up[0m
+[32mge-0/0/9.0              up    up   eth-switch[0m
+[32mge-0/0/10               up    up[0m
+[32mge-0/0/10.0             up    up   eth-switch[0m
+[32mge-0/0/11               up    up[0m
+[32mge-0/0/11.0             up    up   eth-switch[0m
+[32mge-0/0/12               up    up[0m
+[32mge-0/0/12.0             up    up   eth-switch[0m
+[32mge-0/0/13               up    up[0m
+[32mge-0/0/13.0             up    up   eth-switch[0m
+---(more)---                                        [1;31mge-0/0/14               up    down[0m
+[1;31mge-0/0/14.0             up    down eth-switch[0m
+[1;31mge-0/0/15               up    down[0m
+[1;31mge-0/0/15.0             up    down eth-switch[0m
+[1;31mge-0/0/16               up    down[0m
+[1;31mge-0/0/16.0             up    down eth-switch[0m
+[1;31mge-0/0/17               up    down[0m
+[1;31mge-0/0/17.0             up    down eth-switch[0m
+[1;31mge-0/0/18               up    down[0m
+[1;31mge-0/0/18.0             up    down eth-switch[0m
+[1;31mge-0/0/19               up    down[0m
+[1;31mge-0/0/19.0             up    down eth-switch[0m
+[1;31mge-0/0/20               up    down[0m
+[1;31mge-0/0/20.0             up    down eth-switch[0m
+[1;31mge-0/0/21               up    down[0m
+[1;31mge-0/0/21.0             up    down eth-switch[0m
+[1;31mge-0/0/22               up    down[0m
+[1;31mge-0/0/22.0             up    down eth-switch[0m
+[1;31mge-0/0/23               up    down[0m
+[1;31mge-0/0/23.0             up    down eth-switch[0m
+[32mge-0/1/0                up    up[0m
+[32mge-0/1/0.0              up    up   eth-switch[0m
+[32mbme0                    up    up[0m
+[32mbme0.0                  up    up   inet     [30m[47m128.0.0.1/2[0m     [0m
+                                            [30m[45m128.0.0.4/2[0m     
+                                            [37m[44m128.0.0.16/2[0m    
+                                            [30m[43m128.0.0.63/2[0m    
+[32mcbp0                    up    up[0m
+[32mdsc                     up    up[0m
+[32mesi                     up    up[0m
+[32mgre                     up    up[0m
+[32mipip                    up    up[0m
+[32mirb                     up    up[0m
+[32mirb.80                  up    up   inet     [30m[45m10.1.2.3/25[0m  [0m
+[32mjsrv                    up    up[0m
+---(more 84%)---                                        [32mjsrv.1                  up    up   inet     [30m[47m128.0.0.127/2[0m   [0m
+[32mlo0                     up    up[0m
+[32mlo0.16385               up    up   inet    [0m
+[32mlsi                     up    up[0m
+[1;31mme0                     up    down[0m
+[1;31mme0.0                   up    down eth-switch[0m
+[32mmtun                    up    up[0m
+[32mpimd                    up    up[0m
+[32mpime                    up    up[0m
+[32mpip0                    up    up[0m
+[32mtap                     up    up[0m
+[1;31mvme                     up    down[0m
+[32mvtep                    up    up[0m
+
+{master:0}
+foobar@xxxx.xxxxxx> exit 
+
+[1;31m    Laser receiver power                      :  0.0000 mW / - Inf dBm[0m
+[36m    Laser receiver power                      :  0.2520 mW / -5.99 dBm[0m
+

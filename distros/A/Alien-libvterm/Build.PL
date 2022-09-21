@@ -7,9 +7,9 @@ use Alien::make::Module::Build;
 
 my $build = Alien::make::Module::Build->new(
    module_name => 'Alien::libvterm',
-   tarball => 'libvterm-0.2.tar.gz',
+   tarball => 'libvterm-0.3.tar.gz',
    pkgconfig_module => "vterm",
-   pkgconfig_version => "0.2",
+   pkgconfig_version => "0.3",
    use_bundled => ( scalar grep { $_ eq "--use-bundled" } @ARGV ),
 
    build_requires => {

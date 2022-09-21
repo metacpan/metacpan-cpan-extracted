@@ -24,6 +24,9 @@ is scalar @{pica_items($holdings->[0])}, 1, "items (1)";
 is scalar @{pica_items($holdings->[4])}, 2, "items (2)";
 
 is @{[pica_split $record]}, 410, "split";
+is @{[pica_split($record,0)]}, 1, "split(0)";
+is @{[pica_split($record,1)]}, 56, "split(1)";
+is @{[pica_split($record,2)]}, 353, "split(2)";
 
 is_deeply [], pica_holdings([]), "zero holdings";
 is_deeply [], pica_items([]),    "zero items";

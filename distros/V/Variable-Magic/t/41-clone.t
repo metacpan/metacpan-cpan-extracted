@@ -32,12 +32,15 @@ sub spawn_wiz {
     my $op = $_[-1];
     my $tid = threads->tid();
 
+     my $assign_op    = ("$]" < 5.037_003) ? 'sassign': 'padsv_store';
+     my $assign_op_cl = ("$]" < 5.037_003) ? 'B::BINOP': 'B::UNOP';
+
     if ($op_info == VMG_OP_INFO_OBJECT) {
      is_deeply { class => ref($op),   name => $op->name },
-               { class => 'B::BINOP', name => 'sassign' },
+               { class => $assign_op_cl, name => $assign_op },
                "op object in thread $tid is correct";
     } else {
-     is $op, 'sassign', "op name in thread $tid is correct";
+     is $op, $assign_op, "op name in thread $tid is correct";
     }
 
     return 0

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
 
-package Term::VTerm::Screen 0.07;
+package Term::VTerm::Screen 0.08;
 
 use v5.14;
 use warnings;
@@ -25,6 +25,13 @@ C<Term::VTerm::Screen> - provides access to the screen layer of F<libvterm>
 Controls whether the altscreen buffer is enabled. Doing so allows the DEC
 altscreen mode to switch between regular and alternate screen buffers, but
 consumes more memory.
+
+=head2 enable_reflow
+
+   $screen->enable_reflow( $enabled )
+
+Controls whether buffer reflow on resize is enabled. This feature is currently
+experimental and may be less than stable in some situations.
 
 =head2 flush_damage
 
@@ -143,12 +150,18 @@ character, or the special value of -1 on the "second" cell of such a character.
 
 =head2 $strike = $cell->strike
 
+=head2 $small = $cell->small
+
 Simple rendering attributes. All are boolean values, except C<underline> which
 is an integer between 0 and 2 (to support double-underline).
 
 =head2 $font = $cell->font
 
 Font selection; an integer between 0 and 10.
+
+=head2 $base = $cell->baseline
+
+Baseline adjustment; zero or one of the C<VTERM_BASELINE_*> constants.
 
 =head2 $fg = $cell->fg
 

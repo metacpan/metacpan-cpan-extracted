@@ -1,3 +1,44 @@
+1.071   2022-09-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Disable saving old file/module/script records for now, because of
+          current lack of handling of duplicates.
+
+        - Add subcommands: author-mods-by-rdep-count (which is just a shortcut
+          for mods-by-rdep-count, author-mods-by-other-author-rdep-count,
+          delete-old-data, related-authors, .
+
+        - [ux] Provide summaries for most completion answers.
+
+        - [doc][subcommand related-mods] Add note about the downside of the
+          approach used.
+
+        - Add common option: --no-update-db-schema.
+
+        - [subcommand mods-by-rdep-count] Replace --author arg to
+          --module-author, --module-author-isnt, --dist-author,
+          --dist-author-isnt.
+
+
+1.070_001  2022-05-07  Released-By: PERLANCAR; Urgency: medium
+
+           - [experimental] Retain historical records for tables file, module,
+             script (in old_file, old_module, old_script respectively). This
+             will be used to give more correct results with things like
+             'whatsnew'. Usually when a file is deleted, i.e. no longer
+             mentioned in the index, e.g. Foo-Bar-0.001.tar.gz which contains
+             module 'Foo::Bar' and script 'foo', some records like the 'foo'
+             script belonging to the file record are deleted along with it. Then
+             when a new file for the same distribution is added in the index,
+             e.g. Foo-Bar-0.002.tar.gz (which still contains the same 'Foo::Bar'
+             module and 'foo' script), the script record and some other records
+             are re-added to the lcpan index. This means lcpan sees the script
+             as new, when it's actually not. We now store old module record as
+             well as file and script records to old_* tables so we will be able
+             to know whether a distribution, module, or script is actually new
+             or just updated. But note that the last part has not been coded in
+             yet.
+
+
 1.070   2022-03-27  Released-By: PERLANCAR; Urgency: medium
 
         - Add subcommand: dists-by-mod-count.

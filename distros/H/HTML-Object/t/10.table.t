@@ -74,8 +74,6 @@ my $row = $table->insertRow;
 isa_ok( $row => 'HTML::Object::DOM::Element::TableRow', 'insertRow' );
 is( $table->rows->length, 6, 'insertRow (2)' );
 is( $table->tbodies->[0]->rows->length, 4, 'tbodies->[0]->rows->length' );
-# XXX
-# $table->debug(4);
 my $body2 = $table->createTBody;
 isa_ok( $body2 => 'HTML::Object::DOM::Element::TableSection', 'createTBody' );
 is( $table->tbodies->length, 2, 'tbodies after change' );

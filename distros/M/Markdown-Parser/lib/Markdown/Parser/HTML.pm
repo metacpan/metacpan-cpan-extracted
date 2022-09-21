@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/HTML.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,10 +16,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -37,15 +40,21 @@ sub as_markdown
     return( $self->raw->scalar );
 }
 
+sub as_pod
+{
+    my $self = shift( @_ );
+    # Hmmm, could be embedded within something else, so we cannot actually say that
+    # return( "=begin html\n\n" . $self->raw->scalar . "\n\n=end html\n" );
+    return( $self->raw->scalar );
+}
+
 sub as_string
 {
     my $self = shift( @_ );
     my $html = $self->raw;
-    $self->message( 3, "Getting html tree object for '", $html->scalar, "'." );
     my $tree;
     if( $html->length > 0 && ( $tree = $self->object ) )
     {
-        $self->message( 3, "Tree object received is: '", overload::StrVal( $tree ), "'." );
         my @elem = $tree->look_down( _tag => 'div', class => qr/\bmermaid\b/ );
         if( scalar( @elem ) )
         {
@@ -70,7 +79,7 @@ sub object
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -87,7 +96,7 @@ Markdown::Parser::HTML - Markdown HTML Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -97,13 +106,19 @@ This class represents a html chunk of data. It is used by L<Markdown::Parser> an
 
 =head2 as_markdown
 
-Returns a string representation of the code formatted in markdown.
+Returns a string representation of the HTML formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the HTML formatted in L<pod|perlpod>.
 
 It returns a plain string.
 
 =head2 as_string
 
-Returns an html representation of the code.
+Returns an html representation of the HTML.
 
 It returns a plain string.
 

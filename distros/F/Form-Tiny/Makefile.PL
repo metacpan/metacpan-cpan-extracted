@@ -20,13 +20,12 @@ my %WriteMakefileArgs = (
     "Import::Into" => 0,
     "Moo" => "2.000000",
     "Sub::Util" => 0,
-    "Type::Tiny" => "1.004000",
-    "namespace::clean" => 0
+    "Type::Tiny" => "1.004000"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0
   },
-  "VERSION" => "2.13",
+  "VERSION" => "2.14",
   "test" => {
     "TESTS" => "t/*.t t/800-inheritance/*.t t/900-plugins/*.t t/990-examples/*.t t/999-bugfixes/*.t"
   }
@@ -38,8 +37,7 @@ my %FallbackPrereqs = (
   "Moo" => "2.000000",
   "Sub::Util" => 0,
   "Test::Exception" => 0,
-  "Type::Tiny" => "1.004000",
-  "namespace::clean" => 0
+  "Type::Tiny" => "1.004000"
 );
 
 

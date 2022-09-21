@@ -1,0 +1,15 @@
+Revision history for Perl extension RF::Antenna::Planet::MSI::Format.
+
+0.01 2022-09-16
+  - Replaced header order capability with Tie::IxHash
+  - Added example script scripts/perl-RF-Antenna-Planet-MSI-Format-printer.pl
+  - Fixed issue in read method on leading spaces in horizonal and vertical data sets
+  - Added scalar ref support to write method
+  - Added scalar ref support to read method
+  - Added capability for empty string headers fields
+  - Fixed frequency_mhz and gain_dbd logic
+  - Added electrical_tilt and comment helper methods
+
+0.00 2022-09-14
+  - original version; created by h2xs 1.23 with options
+  - new, read and write method are operational

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "Plack-App-ServiceStatus",
-  "dist_version" => "0.906",
+  "dist_version" => "0.908",
   "license" => "perl",
   "module_name" => "Plack::App::ServiceStatus",
   "recursive_test_files" => 1,
@@ -28,6 +28,7 @@ my %module_build_args = (
     "Log::Any" => 0,
     "Module::Runtime" => 0,
     "Plack::Response" => 0,
+    "Sys::Hostname" => 0,
     "Try::Tiny" => 0,
     "base" => 0,
     "perl" => "5.018"

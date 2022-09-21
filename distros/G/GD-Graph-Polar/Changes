@@ -1,5 +1,14 @@
 Changes for package GD-Graph-Polar
 
+0.19 2022-09-20
+  - Fixed tests logic for CPAN testers
+  - Updated Documentation
+
+0.18 2022-09-20
+  - Changed license to MIT
+  - Added GitHub repo information
+  - Cleaned up code a little
+
 0.17 2012-05-16
   - Lazy load all of the stuff in the initialize method
 
@@ -13,7 +22,7 @@ Changes for package GD-Graph-Polar
   - Dropped MANIFEST.SKIP as I no longer use make manifest
   - Dropped META.yml as CPAN now auto generates it
 
-0.15-2 2010-06-10
+0.15_2 2010-06-10
   - Updated tests
   - Dropped use vars
 

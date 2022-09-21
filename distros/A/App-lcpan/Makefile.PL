@@ -67,7 +67,7 @@ my %WriteMakefileArgs = (
     "File::Which" => 0,
     "Function::Fallback::CoreOrPP" => "0.07",
     "HTTP::Response" => 0,
-    "Hash::Subset" => "0.006",
+    "Hash::Subset" => "0.007",
     "IO::Compress::Gzip" => 0,
     "IO::Prompt::I18N" => 0,
     "IPC::System::Options" => "0.339",
@@ -123,7 +123,7 @@ my %WriteMakefileArgs = (
     "Test::SQL::Schema::Versioned" => "0.15",
     "Test::WithDB::SQLite" => "0.08"
   },
-  "VERSION" => "1.070",
+  "VERSION" => "1.071",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -178,7 +178,7 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "Function::Fallback::CoreOrPP" => "0.07",
   "HTTP::Response" => 0,
-  "Hash::Subset" => "0.006",
+  "Hash::Subset" => "0.007",
   "IO::Compress::Gzip" => 0,
   "IO::Handle" => 0,
   "IO::Prompt::I18N" => 0,

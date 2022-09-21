@@ -1,0 +1,28 @@
+Revision history for Perl extension SQL::SimpleOps.
+
+2022.263.2 Tue Sep 20 21:27:15 2022
+	- tester t/testDB.t fix; by CCELSO
+
+2022.263.1 Tue Sep 20 21:27:15 2022
+	- POD fix; by CCELSO
+
+2022.212.1 Sun Jul 31 18:18:34 2022
+	- standardization for CPAN Module Project; by CCELSO
+
+2022.046.1 Tue Feb 15 00:00:00 2022
+	- news: postgres support added; by CCELSO
+	- news: sqlite3 support added; by CCELSO
+	- news: sqlite2 support removed; by CCELSO
+
+2019.352.1 Wed Dec 18 00:00:00 2019
+	- news: aliases_table support addd
+	- fix: syslog null line; by CCELSO
+
+2009.314.1 Tue Nov 10 00:00:00 2009
+	- sqlite2 support added; by CCELSO
+
+2008.109.1 Fri Apr 18 00:00:00 2022
+	- initial version; created by CCELSO
+	- mysql support only
+
+ENDED

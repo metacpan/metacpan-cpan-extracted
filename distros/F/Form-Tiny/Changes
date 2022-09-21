@@ -1,5 +1,13 @@
 Revision history for Perl extension Form::Tiny.
 
+2.14 Sun Sep 18 2022
+	- Form::Tiny import functionality is now implemented as core plugins
+	- added setters to many attributes in Form::Tiny::FieldDefinition
+	- inline forms now accepts hashref 'fields' (instead of 'field_defs' arrayref)
+	- form blueprints output can now be controlled with 'recurse' and 'transform' options
+	- Form::Tiny::Filter has been moved to Form::Tiny::Plugin::Filtered::Filter: see Manual::Compatibility
+	- drop namespace::clean dependency
+
 2.13 Tue Aug 2 2022
 	- fix plugin array being modified by import routines
 	- switch to Dist::Zilla

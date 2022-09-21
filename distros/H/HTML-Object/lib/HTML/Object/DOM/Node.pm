@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Node.pm
-## Version v0.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2021/12/19
+## Modified 2022/09/20
 ## All rights reserved
 ## 
 ## 
@@ -17,6 +17,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::EventTarget );
+    use vars qw( @EXPORT $XP $VERSION );
     use Nice::Try;
     use Want;
     use constant {
@@ -72,8 +73,11 @@ BEGIN
         'eq'    => \&isSameNode,
     );
     our $XP;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.1';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -232,7 +236,6 @@ sub compareDocumentPosition
     my $self = shift( @_ );
     my $elem = shift( @_ ) || return( $self->error( "No element was provided to append." ) );
     return( $self->error( "Element provided (", overload::StrVal( $elem ), ") is actually not an HTML element." ) ) if( !$self->_is_a( $elem => 'HTML::Object::Element' ) );
-    $self->message( 4, "Comparing our element (", overload::StrVal( $self ), ") with tag '", $self->tag, "' with other (", overload::StrVal( $elem ), ") with tag '", $elem->tag, "'" );
     # 0 - Elements are identical.
     #     -> DOCUMENT_POSITION_IDENTICAL
     # 1 - No relationship, both nodes are in different documents or different trees in the same document.
@@ -252,36 +255,30 @@ sub compareDocumentPosition
     
     # "If the two nodes being compared are the same node, then no flags are set on the return."
     # <https://www.w3.org/TR/DOM-Level-3-Core/core.html#DocumentPosition>
-    $self->message( 4, "is our node same as other? ", ( Scalar::Util::refaddr( $self ) eq Scalar::Util::refaddr( $elem ) ? 'yes' : 'no' ) );
     return(0) if( Scalar::Util::refaddr( $self ) eq Scalar::Util::refaddr( $elem ) );
     # Current object and other element are both attributes of the same element (ownerElement)
     # "If neither of the two determining node is a child node and nodeType is the same for both determining nodes, then an implementation-dependent order between the determining nodes is returned."
     # <https://www.w3.org/TR/DOM-Level-3-Core/core.html#DocumentPosition>
     if( $self->nodeType == ATTRIBUTE_NODE && $elem->nodeType == ATTRIBUTE_NODE )
     {
-        $self->message( 4, "Is our node and other both attribute of the same element? ", ( ( $self->ownerElement && $self->ownerElement eq $elem->ownerElement ) ? 'yes' : 'no' ) );
         # 2 attributes of the same node
         return(32) if( $self->ownerElement && $self->ownerElement eq $elem->ownerElement );
     }
     
     my $parent = $self->parent;
     my $parent2 = $elem->parent;
-    $self->message( 4, "Our parent is '", overload::StrVal( $parent ), "' with tag '", ( $parent ? $parent->tag : '' ), "' and other parent is '", overload::StrVal( $parent2 ), "' with tag '", ( $parent2 ? $parent2->tag : '' ), "'" );
     # "If neither of the two determining node is a child node and one determining node has a greater value of nodeType than the other, then the corresponding node precedes the other."
     # <https://www.w3.org/TR/DOM-Level-3-Core/core.html#DocumentPosition>
     if( !$parent && !$parent2 )
     {
-        $self->message( 4, "Neither us our other has a parent. Our node type is '", $self->nodeType, "' and other node type is '", $elem->nodeType, "' and thus other is '", ( $self->nodeType < $elem->nodeType ? 'following' : 'preceding' ) );
         return( $self->nodeType < $elem->nodeType ? DOCUMENT_POSITION_FOLLOWING : DOCUMENT_POSITION_PRECEDING );
     }
     
     my $root = $self->root;
     my $root2 = $elem->root;
-    $self->message( 4, "Our root is '", overload::StrVal( $root ), "' with tag '", ( $root ? $root->tag : '' ), "' and other root is '", overload::StrVal( $root2 ), "' with tag '", ( $root2 ? $root2->tag : '' ), "'. Same? -> ", ( Scalar::Util::refaddr( $root ) eq Scalar::Util::refaddr( $root2 ) ? 'yes' : 'no' ) );
     # Both elements are in different documents
     if( $root ne $root2 )
     {
-        $self->message( 4, "Neither us or other share the same root element. Returning DOCUMENT_POSITION_DISCONNECTED (", DOCUMENT_POSITION_DISCONNECTED, ")" );
         return( DOCUMENT_POSITION_DISCONNECTED );
     }
     
@@ -290,9 +287,9 @@ sub compareDocumentPosition
     my $lineage2 = $elem->lineage;
     my $prev_siblings = $self->left;
     my $next_siblings = $self->right;
-    $self->message( 4, "Our lineage has ", $lineage->length, " nodes and other lineage has ", $lineage2->length, " nodes. Our lineage is '", $lineage->map(sub{ $_->tag })->join( "' -> '" )->scalar, "' and other lineage is '", $lineage2->map(sub{ $_->tag })->join( "' -> '" )->scalar, "'" );
     my $seen  = {};
-    local $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $kid = shift( @_ );
         my $addr = Scalar::Util::refaddr( $kid );
@@ -300,7 +297,10 @@ sub compareDocumentPosition
         my $children = $kid->children;
         foreach( @$children )
         {
-            if( $_->eid eq $elem->eid )
+            if( $_->can( 'eid' ) && 
+                defined( $_->eid ) && 
+                defined( $elem->eid ) &&
+                $_->eid eq $elem->eid )
             {
                 return( $_ );
             }
@@ -316,52 +316,41 @@ sub compareDocumentPosition
     my $parent_pos = $lineage2->pos( $parent );
     # Check if the other element's parent is among our parents
     my $parent2_pos = $lineage->pos( $parent2 );
-    $self->message( 4, "Our parent position in other's lineage is '$parent_pos' and other's parent in our lineage is '$parent2_pos'." );
     # Then check their position, if found
     if( defined( $parent_pos ) && defined( $parent2_pos ) )
     {
-        $self->message( 4, "Both nodes' parents are in each other lineage." );
         if( $parent_pos > $parent2_pos )
         {
-            $self->message( 4, "Our parent position ($parent_pos) is higher than the other's parent position ($parent2_pos)" );
             $bit |= DOCUMENT_POSITION_FOLLOWING;
         }
         elsif( $parent2_pos > $parent_pos )
         {
-            $self->message( 4, "The other's parent position ($parent2_pos) is higher than our parent position ($parent_pos)" );
             $bit |= DOCUMENT_POSITION_PRECEDING;
         }
         else
         {
-            $self->message( 4, "Both nodes share the same parent, so both nodes are siblings." );
         }
     }
     elsif( defined( $parent_pos ) )
     {
-        $self->message( 4, "Our parent is in other's lineage (position is '$parent_pos'), but not the other way around." );
         $bit |= DOCUMENT_POSITION_FOLLOWING;
     }
     elsif( defined( $parent2_pos ) )
     {
-        $self->message( 4, "Other's parent is in our lineage (position is '$parent2_pos'), but not the other way around." );
         $bit |= DOCUMENT_POSITION_PRECEDING;
     }
     # Otherwise neither our parent or the other's parent is in either lineage
     else
     {
-        $self->message( 4, "Neither our parent, nor the other's parent is in either lineage." );
     }
     
-    $self->message( 4, "Checking if both lineage intersect." );
     if( $lineage->intersection( $lineage2 )->is_empty &&
         $lineage2->intersection( $lineage )->is_empty )
     {
-        $self->message( 4, "Our lineage and the other's lineage do not intersect." );
         $bit |= DOCUMENT_POSITION_DISCONNECTED;
     }
     else
     {
-        $self->message( 4, "Yes, our lineage or the other or both lineages intersect. Our lineage intersect is '", $lineage->intersection( $lineage2 )->map(sub{$_->tag})->join( "', '" )->scalar, "'. Other lineage intersect is '", $lineage2->intersection( $lineage )->map(sub{$_->tag})->join( "', '" )->scalar, "'" );
     }
     # Check for the other node in:
     # 1) ancestor
@@ -371,40 +360,32 @@ sub compareDocumentPosition
     
     # "If one of the nodes being compared contains the other node, then the container precedes the contained node, and reversely the contained node follows the container."
     # <https://www.w3.org/TR/DOM-Level-3-Core/core.html#DocumentPosition>
-    $self->message( 4, "Checking if other is among our lineage, or among our previous siblings ('", $prev_siblings->map(sub{ $_->tag })->join( "', '" )->scalar, "')." );
     if( $lineage->has( $elem ) )
     {
-        $self->message( 4, "The other is one of our parents." );
         $bit |= DOCUMENT_POSITION_PRECEDING;
         $bit |= DOCUMENT_POSITION_CONTAINS;
     }
     # check previous sibling
     elsif( $prev_siblings->has( $elem ) )
     {
-        $self->message( 4, "The other is among of our previous siblings." );
         $bit |= DOCUMENT_POSITION_PRECEDING;
     }
     else
     {
-        $self->message( 4, "Other is not in our lineage, and not among our previous siblings." );
         # check for descendant of previous sibling
         $seen  = {};
-        $self->message( 4, "Checking in the hierarchy of our previous siblings." );
         foreach( @$prev_siblings )
         {
             if( my $e = $crawl->( $_ ) )
             {
-                $self->message( 4, "\tFound other among our previous siblings children." );
                 $bit |= DOCUMENT_POSITION_PRECEDING;
                 last;
             }
         }
 
-        $self->message( 4, "Have we already found other as a preceding node? -> ", ( ( $bit & DOCUMENT_POSITION_PRECEDING ) ? 'yes' : 'no' ) );
         # no luck so far. Checking previous sibling of an ancestor
         if( !( $bit & DOCUMENT_POSITION_PRECEDING ) )
         {
-            $self->message( 4, "Checking among our ancestors previous siblings." );
             # Go through each ancestor
             foreach( @$lineage )
             {
@@ -413,7 +394,6 @@ sub compareDocumentPosition
                 # and check if the other element is one of them
                 if( $ancestor_siblings && $ancestor_siblings->has( $elem ) )
                 {
-                    $self->message( 4, "\tFound other among our ancestors previous siblings." );
                     $bit |= DOCUMENT_POSITION_PRECEDING;
                     last;
                 }
@@ -430,16 +410,13 @@ sub compareDocumentPosition
     # e.g. a child or an attribute of our element:
     # "when comparing an element against its own attribute or child, the element node precedes its attribute node and its child node, which both follow it."
     # <https://www.w3.org/TR/DOM-Level-3-Core/core.html#DocumentPosition>
-    $self->message( 4, "Checking if we are in other's lineage, or if other is among our hierarchy or is among our following siblings ('", $next_siblings->map(sub{ $_->tag })->join( "', '" )->scalar, "')." );
     if( $lineage2->has( $self ) )
     {
-        $self->message( 4, "Found ourself among the lineage of other." );
         $bit |= ( DOCUMENT_POSITION_CONTAINED_BY | DOCUMENT_POSITION_FOLLOWING )
     }
     # Now check for following siblings
     elsif( $next_siblings->has( $elem ) )
     {
-        $self->message( 4, "Found other among our following siblings." );
         $bit |= DOCUMENT_POSITION_FOLLOWING;
     }
     # "If one of the nodes being compared contains the other node, then the container precedes the contained node, and reversely the contained node follows the container."
@@ -447,20 +424,16 @@ sub compareDocumentPosition
     # We look deeper than our direct child
     elsif( my $e = $crawl->( $self ) )
     {
-        $self->message( 4, "Found other among our hierarchy." );
         $bit |= ( DOCUMENT_POSITION_CONTAINED_BY | DOCUMENT_POSITION_FOLLOWING )
     }
     # check for a descendant of a following sibling
     else
     {
-        $self->message( 4, "We are not in other's lineage, and other is not among our following siblings nor withing our hierarchy of children." );
         $seen = {};
-        $self->message( 4, "Checking among our following siblings." );
         foreach( @$next_siblings )
         {
             if( my $e = $crawl->( $_ ) )
             {
-                $self->message( 4, "\tFound other among our following siblings." );
                 $bit |= DOCUMENT_POSITION_FOLLOWING;
                 last;
             }
@@ -470,7 +443,6 @@ sub compareDocumentPosition
         if( !( $bit & DOCUMENT_POSITION_FOLLOWING ) )
         {
             # Go through each ancestor
-            $self->message( 4, "Checking among our ancestors' following siblings." );
             foreach( @$lineage )
             {
                 # then get its following siblings
@@ -478,14 +450,12 @@ sub compareDocumentPosition
                 # and check if the other element is one of them
                 if( $ancestor_siblings && $ancestor_siblings->has( $elem ) )
                 {
-                    $self->message( 4, "\tFound other among our ancestors' following siblings." );
                     $bit |= DOCUMENT_POSITION_PRECEDING;
                     last;
                 }
             }
         }
     }
-    $self->message( 4, "Returning bit '$bit'" );
     return( $bit );
 }
 
@@ -498,7 +468,8 @@ sub contains
     return(1) if( Scalar::Util::refaddr( $self ) eq Scalar::Util::refaddr( $elem ) );
     my $found = 0;
     my $seen = {};
-    local $traverse = sub
+    my $traverse;
+    $traverse = sub
     {
         my $e = shift( @_ );
         return if( !defined( $e ) || !CORE::length( $e ) );
@@ -526,13 +497,13 @@ sub find
     my $self = shift( @_ );
     my $this = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    $self->message( 4, "Searching for '$this'" );
     my $results = $self->new_array;
     
     if( ref( $this ) && $self->_is_object( $this ) && $this->isa( 'HTML::Object::DOM::Element' ) )
     {
         my $a = $self->new_array( [ $this ] );
-        local $lookup = sub
+        my $lookup;
+        $lookup = sub
         {
             my $kids = shift( @_ );
             $kids->foreach(sub
@@ -569,19 +540,16 @@ sub find
             return( $self->error( "I was expecting an xpath string, but instead I got '$this'." ) );
         }
         my $xpath = $self->_xpath_value( $this, $opts ) || return( $self->pass_error );
-        $self->messagef( 4, "Searching using xpath value '$xpath' in %d children", $self->children->length );
 #         $self->children->foreach(sub
 #         {
 #             my $child = shift( @_ );
 #             return(1) if( !$child->isElementNode );
-#             # XXX Propagate debug value
+#             # Propagate debug value
 #             $child->debug( $self->debug );
 #             try
 #             {
-#                 $self->message( 4, "Checking xpath '$xpath' against child node '$child' whose tag is '", $child->tag, "' and has ", $child->children->length, " children of its own -> '", sub{ $child->as_string }, "'" );
 #                 my @nodes = $child->findnodes( $xpath );
 #                 # $self->messagef( 4, "%d nodes found under child element '$child' whose tag is '%s' -> '%s'", scalar( @nodes ), $child->tag, join( "', '", map( overload::StrVal( $_ ), @nodes ) ) );
-#                 $self->messagef( 4, "%d nodes found under child element '$child' whose tag is '%s' -> '%s'", scalar( @nodes ), $child->tag, join( "', '", map( $_->as_string, @nodes ) ) );
 #                 $results->push( @nodes );
 #             }
 #             catch( $e )
@@ -591,14 +559,13 @@ sub find
 #         });
         try
         {
-            $self->message( 4, "Checking xpath '$xpath' against child node '$self' whose tag is '", $self->tag, "' and has ", $self->children->length, " children of its own -> '", sub{ $self->as_string }, "'" );
             my @nodes = $self->findnodes( $xpath );
-            $self->messagef( 4, "%d nodes found under child element '$self' whose tag is '%s'.", scalar( @nodes ), $self->tag );
             $results->push( @nodes );
         }
         catch( $e )
         {
-            warn( "Error while calling findnodes on element id \"", $self->id, "\" and tag \"", $self->tag, "\": $e\n" );
+            # warn( "Error while calling findnodes on element id \"", ( $self->id // '' ), "\" and tag \"", ( $self->tag // '' ), "\": $e\n" );
+            warn( "Error while calling findnodes on element with tag \"", ( $self->tag // '' ), "\": $e\n" );
         }
     }
     return( $results );
@@ -838,7 +805,16 @@ sub isPINode        { return(0); }
 
 sub isProcessingInstructionNode { return(0); }
 
-sub isSameNode { return( Scalar::Util::refaddr( $_[0] ) eq Scalar::Util::refaddr( $_[1] ) ); }
+sub isSameNode
+{
+    return(0) if( !defined( $_[1] ) );
+    if( !$_[0]->_is_a( $_[1] => 'HTML::Object::DOM::Node' ) )
+    {
+        warn( "Value provided ($_[1]) is not a reference.\n" ) if( $_[0]->_warnings_is_enabled );
+        return(0);
+    }
+    return( Scalar::Util::refaddr( $_[0] ) eq Scalar::Util::refaddr( $_[1] ) );
+}
 
 sub isTextNode      { return(0); }
 
@@ -971,7 +947,8 @@ sub nodeValue { return; }
 sub normalize
 {
     my $self = shift( @_ );
-    local $process = sub
+    my $process;
+    $process = sub
     {
         my $e = shift( @_ );
         my $new = $self->new_array;
@@ -1048,7 +1025,6 @@ sub removeChild
     }) ) if( !$self->_is_a( $elem => 'HTML::Object::Element' ) );
     my $nodes = $self->nodes;
     my $pos = $nodes->pos( $elem );
-    $self->message( 4, "Position for '$elem' is '$pos'" );
     return( $self->error({
         message => "Node to remove was not found among the current object's children.",
         class => 'HTML::Object::NotFoundError',
@@ -1261,7 +1237,7 @@ sub textContent : lvalue
         }
         my $str = $self->as_text;
         return( $str ) if( want( 'LVALUE' ) );
-        rreturn( $str );
+        Want::rreturn( $str );
     }
 }
 
@@ -1277,7 +1253,6 @@ sub trigger
         message => "Event type provided \"$type\" contains illegal characters. Only alphanuneric, underscore (\"_\") and dash (\"-\") are allowed",
         class => 'HTML::Object::TypeError',
     }) ) if( $type !~ /^\w[\w\-]*$/ );
-    $self->message( 4, "Got here for event type '$type'" );
     require HTML::Object::Event;
     my $evt = HTML::Object::Event->new( $type, @_ ) || 
         return( $self->pass_error( HTML::Object::Event->error ) );
@@ -1383,7 +1358,7 @@ sub _xpath_value
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -1400,7 +1375,7 @@ HTML::Object::DOM::Node - HTML Object DOM Node Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

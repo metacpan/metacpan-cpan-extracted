@@ -15,7 +15,7 @@ MooseX::Extended::Manual::Includes - An overview of MooseX::Extended optional fe
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 C<includes>
 

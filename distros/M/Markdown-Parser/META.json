@@ -4,7 +4,7 @@
       "Jacques Deguest (jack@deguest.jp)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,14 +35,15 @@
             "CSS::Object" : "v0.1.5",
             "Devel::Confess" : "0.009004",
             "HTML::TreeBuilder" : "5.07",
-            "Module::Generic" : "v0.18.4",
-            "Nice::Try" : "v1.1.2",
+            "Module::Generic" : "v0.28.2",
+            "Nice::Try" : "v1.3.1",
             "POSIX" : "1.53_01",
             "Regexp::Common::Markdown" : "v0.1.5",
             "URI" : "5.10",
             "parent" : "0.238",
             "perl" : "5.026001",
             "strict" : "0",
+            "vars" : "0",
             "warnings" : "0"
          }
       },
@@ -57,13 +58,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://git.deguest.jp/jack/Markdown-Parser/issues"
+         "web" : "https://gitlab.com/jackdeguest/Markdown-Parser/issues"
       },
       "repository" : {
          "type" : "git",
-         "web" : "https://git.deguest.jp/jack/Markdown-Parser"
+         "web" : "https://gitlab.com/jackdeguest/Markdown-Parser"
       }
    },
-   "version" : "v0.1.1",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.2.1",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

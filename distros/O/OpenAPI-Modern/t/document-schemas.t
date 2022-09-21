@@ -60,7 +60,7 @@ subtest 'bad subschemas' => sub {
   );
 
   is(
-    index($serialized, "at '/components/schemas/alpha_schema/not/minimum': got string, not number\n"), 0,
+    index($serialized, "'/components/schemas/alpha_schema/not/minimum': got string, not number\n"), 0,
     'errors serialize using the instance locations within the document',
   );
 };

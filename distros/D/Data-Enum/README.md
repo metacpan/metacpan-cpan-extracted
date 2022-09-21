@@ -1,10 +1,10 @@
 # NAME
 
-Data::Enum - fast, immutable enumeration classes
+Data::Enum - immutable enumeration classes
 
 # VERSION
 
-version v0.2.3
+version v0.2.5
 
 # SYNOPSIS
 
@@ -115,6 +115,11 @@ my %handlers = mesh [ $class->values ], [ $class->predicates ];
 ```
 
 This was added in v0.2.1.
+
+# CAVEATS
+
+The overheard of creating a new class instance and resolving methods may actually take more time than comparing simple
+strings.  When using this in production code, you may want to benchmark performance.
 
 # SEE ALSO
 

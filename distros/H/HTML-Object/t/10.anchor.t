@@ -41,8 +41,6 @@ isa_ok( $link => 'HTML::Object::DOM::Element::Anchor', 'createElement( "a" ) -> 
 ok( $link->is_closed, 'new link element is closed by default' );
 
 my $a = HTML::Object::DOM::Element::Anchor->new;
-# XXX
-# $a->debug( $DEBUG ) if( $DEBUG );
 $a->download = 'my_file.txt';
 is( $a->download, 'my_file.txt', 'download' );
 is( $a->as_string, q{<a download="my_file.txt">}, 'download' );

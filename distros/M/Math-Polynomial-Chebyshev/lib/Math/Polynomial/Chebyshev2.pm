@@ -10,7 +10,7 @@ use warnings;
 use Carp qw< croak >;
 use Math::Polynomial;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @ISA = qw< Math::Polynomial >;
 
 =pod
@@ -29,18 +29,18 @@ Math::Polynomial::Chebyshev2 - Chebyshev polynomials of the second kind
     my $p = Math::Polynomial::Chebyshev2 -> chebyshev2(7);
 
     # get the location of all roots
-    my $x = $p -> roots();
+    my @xn = $p -> roots();
 
     # use higher accuracy
     use Math::BigFloat;
     Math::BigFloat -> accuracy(60);
-    my $n = Math::BigFloat -> new(7);
-    $x = Math::Polynomial::Chebyshev2 -> chebyshev2($n);
+    my $n_mbf = Math::BigFloat -> new(7);
+    my $p_mbf = Math::Polynomial::Chebyshev2 -> chebyshev2($n_mbf);
 
 =head1 DESCRIPTION
 
 This package extends Math::Polynomial, so each instance polynomial created by
-this modules is a subclass of Math::Polynomial.
+this module is a subclass of Math::Polynomial.
 
 The Chebyshev polynomials of the second kind are orthogonal with respect to the
 weight function sqrt(1-x^2).
@@ -128,7 +128,7 @@ sub chebyshev2 {
 
 =item I<roots()>
 
-C<$p-E<gt>roots> returns the location of all root of C<$p>. All roots are
+C<$p-E<gt>roots()> returns the location of all root of C<$p>. All roots are
 located in the open interval (-1,1).
 
     # get the roots of a polynomial
@@ -179,7 +179,7 @@ sub roots {
 =head1 BUGS
 
 Please report any bugs through the web interface at
-L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-Polynomial-Chebyshev2>
+L<https://rt.cpan.org/Ticket/Create.html?Queue=Math-Polynomial-Chebyshev>
 (requires login). We will be notified, and then you'll automatically be
 notified of progress on your bug as I make changes.
 
@@ -187,7 +187,7 @@ notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Math::Polynomial::Chebyshev2
+    perldoc Math::Polynomial::Chebyshev
 
 You can also look for information at:
 
@@ -195,23 +195,23 @@ You can also look for information at:
 
 =item * GitHub Source Repository
 
-L<https://github.com/pjacklam/p5-Math-Polynomial-Chebyshev2>
+L<https://github.com/pjacklam/p5-Math-Polynomial-Chebyshev>
 
 =item * RT: CPAN's request tracker
 
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Polynomial-Chebyshev2>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Polynomial-Chebyshev>
 
 =item * CPAN Ratings
 
-L<https://cpanratings.perl.org/dist/Math-Polynomial-Chebyshev2>
+L<https://cpanratings.perl.org/dist/Math-Polynomial-Chebyshev>
 
 =item * MetaCPAN
 
-L<https://metacpan.org/release/Math-Polynomial-Chebyshev2>
+L<https://metacpan.org/release/Math-Polynomial-Chebyshev>
 
 =item * CPAN Testers Matrix
 
-L<http://matrix.cpantesters.org/?dist=Math-Polynomial-Chebyshev2>
+L<http://matrix.cpantesters.org/?dist=Math-Polynomial-Chebyshev>
 
 =back
 

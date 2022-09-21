@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Line.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,11 +16,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
     use constant TAB_SPACES => '    ';
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -36,6 +39,13 @@ sub as_markdown
     return( '* * *' );
 }
 
+sub as_pod
+{
+    my $self = shift( @_ );
+    return( $self->raw->scalar ) if( $self->raw->length );
+    return( '-' x 12 );
+}
+
 sub as_string
 {
     my $self = shift( @_ );
@@ -44,7 +54,7 @@ sub as_string
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -61,7 +71,7 @@ Markdown::Parser::Line - Markdown Line Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -72,6 +82,12 @@ This class represents a horizontal line. It is used by L<Markdown::Parser> and i
 =head2 as_markdown
 
 Returns a string representation of the horizontal line formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the horizontal line formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

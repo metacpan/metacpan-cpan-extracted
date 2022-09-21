@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/Title.pm
-## Version v0.1.0
+## Version v0.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/09
-## Modified 2022/01/09
+## Modified 2022/09/20
 ## All rights reserved
 ## 
 ## 
@@ -17,9 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::Element );
+    use vars qw( $VERSION );
     use Want;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.1';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -54,10 +58,8 @@ sub text : lvalue
     if( $has_arg )
     {
         my $nodes = $self->_get_from_list_of_elements_or_html( $arg );
-#         $self->messagef( 4, "'$arg' translated into %d elements.", $nodes->length );
 #         for( my $i = 0; $i < scalar( @$nodes ); $i++ )
 #         {
-#             $self->message( 4, "$i: ", ref( $nodes->[$i] ), " -> '", $nodes->[$i]->as_string, "'" );
 #         }
         
         if( !defined( $nodes ) )
@@ -68,7 +70,7 @@ sub text : lvalue
                 return( $dummy );
             }
             return( $self->pass_error ) if( want( 'LVALUE' ) );
-            rreturn( $self->pass_error );
+            Want::rreturn( $self->pass_error );
         }
         my $ok = 1;
         for( @$nodes )
@@ -82,18 +84,14 @@ sub text : lvalue
         if( !$ok )
         {
             my $error = 'Values provided for title text contains data other tan text or space. You can provide text, space including HTML::Object::DOM::Text and HTML::Object::DOM::Space objects';
-            $self->message( 4, "Error: $error" );
-            $self->message( 4, "Called in ASSIGN context." ) if( want( 'ASSIGN' ) );
-            $self->message( 4, "Called in LVALUE context." ) if( want( 'LVALUE' ) );
             if( $has_arg eq 'assign' )
             {
-                $self->message( 4, "Called in assign context." );
                 my $dummy = '';
                 $self->error( $error );
                 return( $dummy );
             }
             return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
+            Want::rreturn( $self->error( $error ) );
         }
         $_->parent( $self ) for( @$nodes );
         my $children = $self->children;
@@ -111,20 +109,16 @@ sub text : lvalue
             my $children = $self->children;
             my $val;
             $val = $self->as_text;
-            $self->message( 4, "Checking initial title text for HTML tags -> $val" );
             if( $self->looks_like_it_has_html( "$val" ) )
             {
-                $self->message( 4, "Title looks like it contains HTML, parsing it." );
                 my $p = $self->new_parser;
                 my $doc = $p->parse_data( $val );
                 my $kids = $doc->children;
-                $self->messagef( 4, "%d children found from '$val'.", $kids->length );
                 $_->parent( $self ) for( @$kids );
                 $children->set( $kids );
             }
             else
             {
-                $self->message( 4, "Title text does not look like it contains HTML." );
             }
             CORE::delete( $self->{_initial_text} );
         }
@@ -146,11 +140,11 @@ sub text : lvalue
     }
     my $text = $self->{_title_text};
     return( $text ) if( want( 'LVALUE' ) );
-    rreturn( $text );
+    Want::rreturn( $text );
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -167,7 +161,7 @@ HTML::Object::DOM::Element::Title - HTML Object DOM Title Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -236,4 +230,3 @@ All rights reserved
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
-

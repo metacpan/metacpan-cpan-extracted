@@ -9,9 +9,9 @@ use Function::Fallback::CoreOrPP qw(clone_list);
 require App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2022-09-19'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.070'; # VERSION
+our $VERSION = '1.071'; # VERSION
 
 our %SPEC;
 
@@ -20,13 +20,14 @@ $SPEC{'handle_cmd'} = {
     summary => 'List "most depended modules" (modules ranked by number of reverse dependencies)',
     args => {
         %App::lcpan::common_args,
-        %App::lcpan::fauthor_args,
         clone_list(%App::lcpan::deps_phase_args),
         clone_list(%App::lcpan::deps_rel_args),
         n => {
             summary => 'Return at most this number of results',
             schema => 'posint*',
         },
+        %App::lcpan::argspecsopt_module_authors,
+        %App::lcpan::argspecsopt_dist_authors,
     },
 };
 delete $SPEC{'handle_cmd'}{args}{phase}{default};
@@ -39,9 +40,17 @@ sub handle_cmd {
 
     my @where;
     my @binds;
-    if ($args{author}) {
-        push @where, "(author=?)";
-        push @binds, uc($args{author});
+    if ($args{module_authors} && @{ $args{module_authors} }) {
+        push @where, "(author IN (".join(", ", map {$dbh->quote($_)} @{ $args{module_authors} })."))";
+    }
+    if ($args{module_authors_arent} && @{ $args{module_authors_arent} }) {
+        push @where, "(author NOT IN (".join(", ", map {$dbh->quote($_)} @{ $args{module_authors_arent} })."))";
+    }
+    if ($args{dist_authors} && @{ $args{dist_authors} }) {
+        push @where, "(f.cpanid IN (".join(", ", map {$dbh->quote($_)} @{ $args{dist_authors} })."))";
+    }
+    if ($args{dist_authors_arent} && @{ $args{dist_authors_arent} }) {
+        push @where, "(f.cpanid NOT IN (".join(", ", map {$dbh->quote($_)} @{ $args{dist_authors_arent} })."))";
     }
     if ($args{phase} && $args{phase} ne 'ALL') {
         push @where, "(phase=?)";
@@ -58,7 +67,8 @@ sub handle_cmd {
   m.cpanid author,
   COUNT(*) AS rdep_count
 FROM module m
-JOIN dep dp ON dp.module_id=m.id
+JOIN dep dp ON m.id=dp.module_id
+LEFT JOIN file f ON dp.file_id=f.id
 WHERE ".join(" AND ", @where)."
 GROUP BY m.name
 ORDER BY rdep_count DESC
@@ -94,7 +104,7 @@ App::lcpan::Cmd::mods_by_rdep_count - List "most depended modules" (modules rank
 
 =head1 VERSION
 
-This document describes version 1.070 of App::lcpan::Cmd::mods_by_rdep_count (from Perl distribution App-lcpan), released on 2022-03-27.
+This document describes version 1.071 of App::lcpan::Cmd::mods_by_rdep_count (from Perl distribution App-lcpan), released on 2022-09-19.
 
 =head1 FUNCTIONS
 
@@ -113,15 +123,19 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<author> => I<str>
-
-Filter by author.
-
 =item * B<cpan> => I<dirname>
 
 Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
+
+=item * B<dist_authors> => I<array[str]>
+
+Only select dependent distributions published by specified author(s).
+
+=item * B<dist_authors_arent> => I<array[str]>
+
+Do not select dependent distributions published by specified author(s).
 
 =item * B<index_name> => I<filename> (default: "index.db")
 
@@ -132,6 +146,14 @@ be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
 
+=item * B<module_authors> => I<array[str]>
+
+Only list depended modules published by specified author(s).
+
+=item * B<module_authors_arent> => I<array[str]>
+
+Do not list depended modules published by specified author(s).
+
 =item * B<n> => I<posint>
 
 Return at most this number of results.
@@ -139,6 +161,24 @@ Return at most this number of results.
 =item * B<phase> => I<str>
 
 =item * B<rel> => I<str>
+
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -186,9 +226,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

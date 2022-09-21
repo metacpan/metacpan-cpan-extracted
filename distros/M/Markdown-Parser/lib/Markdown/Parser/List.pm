@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/List.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,11 +16,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
     use constant TAB_SPACES => '    ';
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -40,8 +43,8 @@ sub as_markdown
     $self->children->foreach(sub
     {
         my $li = shift( @_ );
-        ## Skip unless this child it a list item
-        return( 1 ) unless( $li->isa( "${base_class}::ListItem" ) );
+        # Skip unless this child it a list item
+        return(1) unless( $li->isa( "${base_class}::ListItem" ) );
         $n++;
         if( $order_list )
         {
@@ -53,6 +56,33 @@ sub as_markdown
         }
     });
     return( $self->children->map(sub{ $_->as_markdown })->join( "\n" )->scalar );
+}
+
+# Basically same as markdown
+sub as_pod
+{
+    my $self = shift( @_ );
+    my $base_class = $self->base_class;
+    my $order_list = $self->order;
+    my $n = 0;
+    $self->children->foreach(sub
+    {
+        my $li = shift( @_ );
+        # Skip unless this child it a list item
+        return(1) unless( $li->isa( "${base_class}::ListItem" ) );
+        $n++;
+        if( $order_list )
+        {
+            $li->type( "${n}." );
+        }
+        elsif( !$li->type->length )
+        {
+            $li->type( '*' );
+        }
+    });
+    my $indent = $self->indent;
+    $indent = 4 unless( $indent > 0 );
+    return( "=over ${indent}\n\n" . $self->children->map(sub{ $_->as_pod })->join( "\n" )->scalar . "\n\n=back" );
 }
 
 sub as_string
@@ -71,16 +101,12 @@ sub as_string
     $tmp->push( '>' );
     
     $arr->push( ( TAB_SPACES x $self->indent ) . $tmp->join( '' )->scalar );
-    # $self->message( 3, "List children contains the following elements:\n", $self->children->map(sub{ $_->class })->join( ', ' )->scalar );
-    # $self->message( 3, "Building list $tag content:" );
     # my $ct = $self->new_array;
     $arr->push( $self->children->map(sub
     {
-        # $self->message( 3, "Adding tag of type '", $_->tag_name, "' with value '", $_->as_string, "'." );
         $_->as_string;
     })->list );
     $arr->push( ( TAB_SPACES x $self->indent ) . "</$tag>" );
-    ## $self->message( 3, $self->dump( $arr ) );
     return( $arr->join( "\n" )->scalar );
 }
 
@@ -89,7 +115,7 @@ sub indent { return( shift->_set_get_number_as_object( 'indent', @_ ) ); }
 sub order { return( shift->_set_get_boolean( 'order', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -106,7 +132,7 @@ Markdown::Parser::List - Markdown List Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -116,7 +142,13 @@ This class represents a list. It is used by L<Markdown::Parser> and inherits fro
 
 =head2 as_markdown
 
-Returns a string representation of the list in markdown.
+Returns a string representation of the list formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the list formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

@@ -1,13 +1,11 @@
 package Mojar::Message::BulkSms;
 use Mojo::Base -base;
 
-our $VERSION = 1.001;
+our $VERSION = 1.002;
 
-use Carp 'croak';
 use Mojar::Log;
 use Mojo::Parameters;
 use Mojo::UserAgent;
-use Mojo::Util qw(encode url_escape);
 
 # Attributes
 
@@ -60,6 +58,7 @@ sub send {
   $self->{recipient} =~ s/^0/$prefix/;  # national
   $self->log->debug(sprintf 'Preparing to send SMS to %s (%s)',
       $original_recipient, $self->{recipient});
+
   # Clean up message
   $self->trim_message;
 
@@ -181,7 +180,7 @@ The full URL constructed from the parts above.
   say $sms->username;
   $sms->username('us3r');
 
-Username for the account;
+Username for the account.
 
 =item * password
 

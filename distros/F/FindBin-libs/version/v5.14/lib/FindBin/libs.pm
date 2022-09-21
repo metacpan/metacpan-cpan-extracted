@@ -268,10 +268,23 @@ my $handle_args
     }
 
     local $defaultz{ Bin }
-    = exists $argz{ realbin }
-    ? $FindBin::RealBin
-    : $FindBin::Bin
-    ;
+    = do
+    {
+        if( my $bin = $argz{ Bin } )
+        {
+            -d $bin
+            ? $bin
+            : -f $bin
+            ? dirname $bin
+            : die "Botched Bin: '$bin' neither file nor dir.\n";
+        }
+        else
+        {
+            exists $argz{ realbin }
+            ? $FindBin::RealBin
+            : $FindBin::Bin
+        }
+    };
 
     # now apply the defaults, then sanity check the result.
     # base is a special case since it always has to exist.
@@ -457,6 +470,14 @@ directories based on $FindBin::Bin.
     # move starting point from $FindBin::Bin to '/tmp'
 
     use FindBin::libs qw( Bin=/tmp base=altlib );
+
+    # if Bin is a file then it's dirname will be used.
+    # useful for ./t files living above files being 
+    # tested. __FILE__ is a token, doesn't work with
+    # qw().
+
+    use FindBin::libs ( 'Bin=' . __FILE__ );
+    use FindBin::libs ( 'Bin=' . __FILE__, 'base=config' );
 
     # skip "use lib", export "@altlib" instead.
 

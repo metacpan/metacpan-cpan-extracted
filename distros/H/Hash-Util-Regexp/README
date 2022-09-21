@@ -1,0 +1,94 @@
+NAME
+    Hash::Util::Regexp - Hash utility routines related to regular expression
+
+VERSION
+    This document describes version 0.001 of Hash::Util::Regexp (from Perl
+    distribution Hash-Util-Regexp), released on 2022-07-25.
+
+DESCRIPTION
+FUNCTIONS
+    All the functions are exportable but not exported by default.
+
+  has_key_matching
+    Usage:
+
+     my $bool = has_key_matching(\%hash, qr/some_regex/);
+
+    This is a shortcut/alias for something like:
+
+     my $bool = any { /some_regex/ } keys %hash;
+
+  first_key_matching
+    Usage:
+
+     my $key = first_key_matching(\%hash, qr/some_regex/ [ , $sort ]);
+
+    This is a shortcut/alias for something like:
+
+     my $key = first { /some_regex/ } keys %hash;
+
+    The optional $sort argument can be set to true (e.g. 1) or a coderef to
+    sort the keys first.
+
+  keys_matching
+    Usage:
+
+     my @keys = keys_matching(\%hash, qr/some_regex/ [ , $sort ]);
+
+    This is a shortcut/alias for something like:
+
+     my @keys = grep { /some_regex/ } keys %hash;
+
+    The optional $sort argument can be set to true (e.g. 1) or a coderef to
+    sort the keys first.
+
+  has_key_not_matching
+    The counterpart for "has_key_matching".
+
+  first_key_not_matching
+    The counterpart for "first_key_matching".
+
+  keys_not_matching
+    The counterpart for "keys_matching".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Hash-Util-Regexp>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Hash-Util-Regexp>.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Util-Regexp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

@@ -15,6 +15,10 @@ EXPORTED CONSTANTS
 
     Attribute constants for pen attributes.
 
+ BASELINE_* (:baselines)
+
+    Pen attribute value constants for the baseline attribute.
+
  PROP_* (:props)
 
     Property constants for terminal properties.

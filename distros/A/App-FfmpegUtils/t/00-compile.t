@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FfmpegUtils.pm'
@@ -14,7 +14,9 @@ my @module_files = (
 
 my @scripts = (
     'script/reencode-video-with-libx264',
-    'script/split-video-by-duration'
+    'script/split-video-by-duration',
+    'script/vreencode',
+    'script/vsplit'
 );
 
 # no fake home requested

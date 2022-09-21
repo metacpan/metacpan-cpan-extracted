@@ -1,9 +1,11 @@
 #!/usr/bin/perl
+use 5.008;
 use strict;
 use warnings;
-use Pod::Spell;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.23';
+
+use Pod::Spell;
 
 if ($] ge '5.008001') {
   # Try to get the encoding from the locale
@@ -27,9 +29,6 @@ if(@ARGV) {  # iterate over files, sending to STDOUT
   Pod::Spell->new->parse_from_filehandle();
 }
 
-# ABSTRACT: pod spell checking command line interface
-# PODNAME: podspell
-
 __END__
 
 =pod
@@ -44,11 +43,21 @@ podspell - pod spell checking command line interface
 
 =head1 VERSION
 
-version 1.20
+version 1.23
 
 =head1 SYNOPSIS
 
-	% podspell Thing.pm | ispell
+    % podspell Thing.pm | ispell
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Spell> or by email
+to L<bug-Pod-Spell@rt.cpan.org|mailto:bug-Pod-Spell@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHORS
 
@@ -66,7 +75,7 @@ Caleb Cushing <xenoterracide@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Olivier Mengué.
+This software is Copyright (c) 2022 by Olivier Mengué.
 
 This is free software, licensed under:
 

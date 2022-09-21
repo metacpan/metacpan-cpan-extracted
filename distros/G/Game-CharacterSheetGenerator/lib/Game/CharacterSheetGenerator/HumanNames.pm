@@ -78,7 +78,7 @@ Carice F Carina F Carla F Carlotta F Carolina F Caroline F Cassandra F Castille
 F Cataleya F Caterina F Catherine F Céleste F Celia F Celina F Celine F Ceylin F
 Chana F Chanel F Chantal F Charielle F Charleen F Charlie ? Charlize F Charlott
 F Charlotte F Charly F Chavi F Chaya F Chiara F Chiara-Maé F Chinyere F Chléa F
-Chloe F Chloé F Chrisbely F Christiana F Christina F Ciara F Cilgia F Claire F
+Chloe F Chloé F Ciara F Cilgia F Claire F
 Clara F Claudia F Clea F Cleo F Cleofe F Clodagh F Cloé F Coco F Colette F Coral
 F Coralie F Cyrielle F Daliah F Dalila F Dalilah F Dalina F Damiana F Damla F
 Dana F Daniela F Daria F Darija F Dean ? Deborah F Déborah-Isabel F Defne F
@@ -202,8 +202,8 @@ M Berend M Berktan M Bertal M Besir M Bilal M Bilgehan M Birk M Bjarne M Bleart
 M Blend M Blendi M Bo M Bogdan M Bolaji M Bora M Boris M Brady M Brandon M
 Breyling M Brice M Bruce M Bruno M Bryan M Butrint M Caleb M Camil M Can M Cário
 M Carl M Carlo M Carlos M Carmelo M Cas M Caspar M Cedric M Cédric M Célestin M
-Celestino M Cemil-Lee M César M Chaim M Chandor M Charles M Chilo M Chris M
-Christian M Christopher M Christos M Ciaran M Cillian M Cla M Claudio M Colin M
+Celestino M Cemil-Lee M César M Chaim M Chandor M Charles M Chilo M
+Ciaran M Cillian M Cla M Claudio M Colin M
 Collin M Connor M Conrad M Constantin M Corey M Cosmo M Cristian M Curdin M
 Custavo M Cynphael M Cyprian M Cyrill M Daan M Dagemawi M Daha M Dalmar M Damian
 M Damián M Damien M Damjan M Daniel M Daniele M Danilo M Danny M Dareios M Darel
@@ -264,13 +264,13 @@ M Marwin M Mason M Massimo M Matay M Matej M Mateja M Mateo M Matheo M Mathéo M
 Matheus M Mathias M Mathieu M Mathis M Matia M Matija M Matisjohu M Mats M
 Matteo M Matthew M Matthias M Matthieu M Matti M Mattia M Mattis M Maurice M
 Mauricio M Maurin M Maurizio M Mauro M Maurus M Max M Maxence M Maxim M Maxime M
-Maximilian M Maximiliano M Maximilien M Maxmilan M Maylon M Median M Mehmet M
+Maximilian M Maximiliano M Maximilien M Maxmilan M Maylon M Median M
 Melis M Melvin M Memet M Memet-Deniz M Menachem M Meo M Meris M Merlin M Mert M
 Mete M Methma M Mias M Micah M Michael M Michele M Miguel M Mihailo M Mihajlo M
 Mika M Mike M Mikias M Mikka M Mikko M Milad M Milan M Milo M Milos M Minyou M
-Mio M Miran M Miraxh M Miro M Miron M Mishkin M Mithil M Mohamed M Mohammed M
+Mio M Miran M Miraxh M Miro M Miron M Mishkin M Mithil M
 Moische M Momodou M Mordechai M Moreno M Moritz M Morris M Moses M Mubaarak M
-Muhamet M Muhammad M Muhammed M Muhannad M Muneer M Munzur M Mustafa M Nadir M
+Muhannad M Muneer M Munzur M Mustafa M Nadir M
 Nahuel M Naïm M Nando M Nasran M Nathan M Nathanael M Natnael M Nelio M Nelson M
 Nenad M Neo M Néo M Nepomuk M Nevan M Nevin M Nevio M Nic M Nick M Nick-Nolan M
 Niclas M Nicolas M Nicolás M Niilo M Nik M Nikhil M Niklas M Nikola M Nikolai M

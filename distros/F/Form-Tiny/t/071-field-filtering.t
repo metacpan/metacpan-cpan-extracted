@@ -9,6 +9,9 @@ use Test::More;
 	use Form::Tiny -filtered;
 	use Types::Standard qw(Str Int);
 
+	use Form::Tiny::Filter;
+	use Form::Tiny::Plugin::Filtered::Filter;
+
 	form_field 'f1';
 	field_filter Str, sub { pop() . '+' };
 	field_filter Str, sub { pop() . '-' };
@@ -16,12 +19,28 @@ use Test::More;
 	form_field 'f2';
 
 	form_filter Int, sub { pop() . '!' };
+
+	form_field 'f3';
+
+	# use classes (deprecated)
+	field_filter (Form::Tiny::Filter->new(
+		type => Str,
+		code => sub { pop() . '+' }
+	));
+
+	# use classes (current)
+	field_filter (Form::Tiny::Plugin::Filtered::Filter->new(
+		type => Str,
+		code => sub { pop() . '-' }
+	));
 }
 
 my @data = (
 	[{f1 => 5}, {f1 => '5!+-'}],
 	[{f1 => 'aa'}, {f1 => 'aa+-'}],
 	[{f2 => 5}, {f2 => '5!'}],
+	[{f3 => 5}, {f3 => '5!+-'}],
+	[{f3 => 'aa'}, {f3 => 'aa+-'}],
 );
 
 my $form = TestForm->new;
@@ -32,3 +51,4 @@ for my $aref (@data) {
 }
 
 done_testing();
+

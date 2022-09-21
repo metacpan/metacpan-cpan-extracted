@@ -26,6 +26,7 @@
             "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::Build::Plugin::PkgConfig::PPWrapper" : "0",
+            "Alien::cmake3" : "0.02",
             "Alien::geos::af" : "1.010",
             "Alien::libtiff" : "0",
             "Alien::patch" : "0",
@@ -39,8 +40,11 @@
             "FFI::CheckLib" : "0.23",
             "File::Find::Rule" : "0",
             "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
+            "List::Util" : "0",
             "Mojo::DOM58" : "1.00",
+            "Net::SSLeay" : "1.49",
             "PkgConfig" : "0.19026",
             "Sort::Versions" : "0",
             "URI" : "0",
@@ -52,6 +56,7 @@
          "requires" : {
             "Alien::Build" : "2.25",
             "Alien::Build::MM" : "1.74",
+            "Alien::Build::Plugin::Build::CMake" : "0.99",
             "Alien::Build::Plugin::Build::SearchDep" : "0.53",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::Build::Plugin::PkgConfig::PPWrapper" : "0",
@@ -65,6 +70,7 @@
             "FFI::CheckLib" : "0.23",
             "File::Find::Rule" : "0",
             "HTTP::Tiny" : "0.044",
+            "List::Util" : "0",
             "PkgConfig" : "0",
             "Sort::Versions" : "0",
             "parent" : "0"
@@ -94,11 +100,12 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-gdal"
       }
    },
-   "version" : "1.32",
+   "version" : "1.34",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.59",
       "requires" : {
          "share" : {
+            "Alien::cmake3" : "0.02",
             "Alien::geos::af" : "0",
             "Alien::libtiff" : "0",
             "Alien::proj" : "0",
@@ -107,8 +114,10 @@
             "Config" : "0",
             "Env::ShellWords" : "0.01",
             "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
             "Mojo::DOM58" : "1.00",
+            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"

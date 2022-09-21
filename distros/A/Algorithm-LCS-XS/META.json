@@ -33,13 +33,13 @@
       "runtime" : {
          "requires" : {
             "Algorithm::Diff" : "0",
-            "LCS::BV" : "0",
+            "LCS::BV" : "0.10",
             "LCS::XS" : "0",
             "perl" : "5.008000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v2.0.1",
+   "version" : "v2.0.2",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

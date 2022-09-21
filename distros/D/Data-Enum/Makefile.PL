@@ -7,7 +7,7 @@ use 5.010000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "fast, immutable enumeration classes",
+  "ABSTRACT" => "immutable enumeration classes",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "v0.2.3",
+  "VERSION" => "v0.2.5",
   "test" => {
     "TESTS" => "t/*.t"
   }

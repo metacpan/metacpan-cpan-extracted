@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinition;
-$Form::Tiny::FieldDefinition::VERSION = '2.13';
+$Form::Tiny::FieldDefinition::VERSION = '2.14';
 use v5.10;
 use strict;
 use warnings;
@@ -13,8 +13,6 @@ use Scalar::Util qw(blessed);
 use Form::Tiny::Utils qw(try has_form_meta);
 use Form::Tiny::Error;
 use Form::Tiny::Path;
-
-use namespace::clean;
 
 has 'name' => (
 	is => 'ro',
@@ -34,12 +32,14 @@ has 'name_path' => (
 has 'required' => (
 	is => 'ro',
 	isa => Enum [0, 1, 'soft', 'hard'],
+	writer => 'set_required',
 	default => sub { 0 },
 );
 
 has 'type' => (
 	is => 'ro',
 	isa => HasMethods ['validate', 'check'],
+	writer => 'set_type',
 	predicate => 'has_type',
 );
 
@@ -52,6 +52,7 @@ has 'addons' => (
 has 'coerce' => (
 	is => 'ro',
 	isa => Bool | CodeRef,
+	writer => 'set_coercion',
 	default => sub { 0 },
 );
 
@@ -65,12 +66,14 @@ has 'adjust' => (
 has 'default' => (
 	is => 'ro',
 	isa => CodeRef,
+	writer => 'set_default',
 	predicate => 'has_default',
 );
 
 has 'message' => (
 	is => 'ro',
 	isa => StringLike,
+	writer => 'set_message',
 	predicate => 'has_message',
 );
 
@@ -289,9 +292,13 @@ Soft required field produce errors only if it is undefined or not present in the
 
 Hard required field also checks if the field is not an empty string.
 
+B<writer:> I<set_required>
+
 =head2 type
 
 The type attribute is where you can plug in a Type::Tiny type object. It has to be an instance of a class that provider I<validate> and I<check> methods, just like Type::Tiny. This can also be a Form::Tiny form instance.
+
+B<writer:> I<set_type>
 
 B<predicate:> I<has_type>
 
@@ -305,13 +312,15 @@ Coercions take place just before the validation. By default, values are not coer
 
 It can also be a code reference which will be called to coerce the value, passing in a field value as its only argument.
 
+B<writer:> I<set_coercion>
+
 =head2 adjust
 
 Adjustments take place just after the validation. By default, values are not adjusted. You can specify a code reference which will be called to adjust the value (change the value after the validation).
 
-B<predicate:> I<is_adjusted>
-
 B<writer:> I<set_adjustment>
+
+B<predicate:> I<is_adjusted>
 
 =head2 default
 
@@ -319,13 +328,15 @@ A coderef returning the default value for the field. Will be used when the field
 
 This coderef will be passed form instance as the only argument and is expected to return a scalar value.
 
-B<predicate>: I<has_default>
-
 B<writer>: I<set_default>
+
+B<predicate>: I<has_default>
 
 =head2 message
 
 If type class error messages are not helpful enough, you can specify your own message string which will be inserted into form errors if the validation for the field fails.
+
+B<writer:> I<set_message>
 
 B<predicate:> I<has_message>
 

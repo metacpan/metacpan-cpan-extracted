@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Element.pm
-## Version v0.1.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/25
-## Modified 2022/04/16
+## Modified 2022/09/20
 ## All rights reserved
 ## 
 ## 
@@ -20,6 +20,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $LOOK_LIKE_HTML $LOOK_LIKE_IT_HAS_HTML $ATTRIBUTE_NAME_RE $VERSION );
     use Data::UUID;
     use Digest::MD5 ();
     use Encode ();
@@ -34,8 +35,11 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
     our $LOOK_LIKE_IT_HAS_HTML = qr/\<\w+.*?\>/;
     our $ATTRIBUTE_NAME_RE = qr/\w[\w\-]*/;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.2.1';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -46,7 +50,6 @@ sub init
         delete( $opts->{ $_ } ) if( !defined( $opts->{ $_ } ) );
     }
     my $parent = delete( $opts->{parent} );
-    # $self->message( 4, "Called with arguments: ", sub{ $self->SUPER::dump( $opts ) });
     $opts->{parent}     = $parent;
     $self->{attr}       = {} unless( exists( $self->{attr} ) );
     $self->{attr_seq}   = [] unless( exists( $self->{attr_seq} ) );
@@ -67,10 +70,8 @@ sub init
     $self->{_exception_class} = 'HTML::Object::Exception';
     $self->SUPER::init( $opts ) || return( $self->pass_error );
     $self->{children} = [];
-    $self->message( 4, "Generating uuid." );
     # uuid
     $self->{eid} = $self->_generate_uuid();
-    $self->message( 4, "Generated uuid for tag $self->{tag} is $self->{eid}" );
     # The user is always right, so we check if the tag has a forward slash as attribute
     # If there is one, this means this tag is an empty (void) tag.
     # We issue a warning if our dictionary-derived value 'is_empty' says different
@@ -160,7 +161,6 @@ sub as_string
     my $hash2 = $self->set_checksum;
     if( $self->original->defined && $hash1 eq $hash2 )
     {
-        # $self->message( 4, "md5 hash '$hash1' is same as '$hash2', setting the array to the original value '", $self->original->scalar, "'" );
         $a->set( [ $self->original->scalar ] );
     }
     else
@@ -180,8 +180,6 @@ sub as_string
             $a->push( $attr->join( ' ' )->scalar );
         }
     }
-    $self->message( 4, "Element '$tag' is empty? ", $self->is_empty ? 'yes' : 'no' );
-    $self->messagef( 4, "Element '$tag' has %d children found.", $self->children->length );
     if( !$self->children->is_empty )
     {
         if( $self->is_empty )
@@ -194,7 +192,6 @@ sub as_string
         $self->children->foreach(sub
         {
             my $e = shift( @_ );
-            $self->message( 4, "|_Stringifcation of child element '", $e->tag, "'." );
             my $v;
             if( $opts->{as_xml} )
             {
@@ -212,7 +209,7 @@ sub as_string
         if( my $close = $self->close_tag )
         {
             my $parent = $self->parent;
-            unless( $parent && defined( $pos = $parent->children->pos( $close ) ) )
+            unless( $parent && defined( my $pos = $parent->children->pos( $close ) ) )
             {
                 $res->push( $close->as_string );
             }
@@ -234,11 +231,10 @@ sub as_string
             # If this element is an element created with a find, such as $('body'), it has no
             # parent.
             # $res->push( "</${tag}>" ) if( !$self->parent && !$self->is_empty );
-            # $self->message( 4, "Does it have a close tag ? '", $self->close_tag, "'. Are we inside a collection? ", ( $opts->{inside_collection} ? 'yes' : 'no' ), " and is this recursive? ", ( $opts->{recursive} ? 'yes' : 'no' ) );
             if( my $close = $self->close_tag )
             {
                 my $parent = $self->parent;
-                unless( $parent && defined( $pos = $parent->children->pos( $close ) ) )
+                unless( $parent && defined( my $pos = $parent->children->pos( $close ) ) )
                 {
                     $res->push( $close->as_string );
                 }
@@ -246,7 +242,6 @@ sub as_string
         }
     }
     my $elem = $res->join( '' );
-    # $self->message( 4, "Resulting string is '$elem'" );
     $self->{_cache_value} = $elem;
     CORE::delete( $self->{_reset} );
     return( $elem );
@@ -260,14 +255,13 @@ sub as_text
     my $opts = $self->_get_args_as_hash( @_ );
     my $a = $self->new_array;
     my $seen = {};
-    local $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $elem = shift( @_ );
-        $self->messagef( 4, "Checking the %d children of element tag '%s'", $elem->children->length, $elem->tag );
         $elem->children->foreach(sub
         {
             my $e = shift( @_ );
-            $self->message( 4, "Checking child tag '", $e->tag, "' with class '", $e->class, "'" );
             my $addr = Scalar::Util::refaddr( $e );
             return(1) if( CORE::exists( $seen->{ $addr } ) );
             $seen->{ $addr }++;
@@ -279,7 +273,6 @@ sub as_text
                     # If value returned is not true, we skip this element
                     $opts->{callback}->( $e ) || return(1);
                 }
-                $self->message( 4, "Adding '", $e->as_string->scalar, "'" );
                 $a->push( $e->as_string->scalar );
             }
             
@@ -290,7 +283,6 @@ sub as_text
             }
         });
     };
-    $self->message( 4, "Getting the element tag '", $self->tag, "' (", overload::StrVal( $self ), ") as_text" );
     if( $self->isa( 'HTML::Object::Text' ) ||
         $self->isa( 'HTML::Object::Space' ) )
     {
@@ -355,13 +347,11 @@ sub attr
         # This is typically used for HTML::Object::TokenList by HTML::Object::DOM::Element and HTML::Object::DOM::AnchorElement
         my $callbacks = $self->{_internal_attribute_callbacks};
         $callbacks = {} if( ref( $callbacks ) ne 'HASH' );
-        # $self->message( 4, "Following callbacks exists -> '", join( "', '", sort( keys( %$callbacks ) ) ), "'. Callback for atribute '$attr' is '", $callbacks->{ $attr }, "'" );
         if( CORE::exists( $callbacks->{ $attr } ) && ref( $callbacks->{ $attr } ) eq 'CODE' )
         {
             my $cb = $callbacks->{ $attr };
             try
             {
-                # $self->message( 4, "Executing code '$cb' for callback for atribute '$attr' and value '$v'" );
                 $cb->( $self, $v );
             }
             catch( $e )
@@ -404,12 +394,9 @@ sub class { return( ref( $_[0] ) ); }
 sub clone
 {
     my $self = shift( @_ );
-    # $self->message( 4, "Got here cloning our object and our children too" );
     my $new = $self->SUPER::clone();
     $new->{eid} = $self->_generate_uuid();
-    # $self->message( 4, "close object is '", $new->close_tag, "' -> ", ( $new->close_tag ? $new->close_tag->as_string : '' ) );
     my $children = $self->clone_list;
-    # $self->messagef( 4, "%d children cloned.", $children->length );
     $new->children( $children );
     $children->foreach(sub
     {
@@ -628,11 +615,12 @@ sub extract_links
     {
         $_ = lc( $_ );
     }
-    my $want = {};
+    my $wants = {};
     @$wants{ @tags } = (1) x scalar( @tags );
     my $has_expectation = scalar( keys( %$wants ) );
     my $a = $self->new_array;
-    local $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $kids = shift( @_ );
         $kids->foreach(sub
@@ -673,13 +661,14 @@ sub find_by_attribute
     return( $self->error( "No attribute was provided." ) ) if( !length( $att ) );
     my $a = $self->new_array;
     $a->push( $self ) if( $self->attributes->exists( $att ) && $self->attributes->get( $att ) eq $val );
-    my $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $elems = shift( @_ );
         $elems->foreach(sub
         {
             my $e = shift( @_ );
-            return( 1 ) if( $e->class ne 'HTML::Object::Element' );
+            return(1) if( $e->class ne 'HTML::Object::Element' );
             $a->push( $e ) if( $e->attributes->exists( $att ) && $e->attributes->get( $att ) eq $val );
             $crawl->( $e->children ) if( $e->children->length > 0 );
         });
@@ -700,7 +689,8 @@ sub find_by_tag_name
     @$tags{ @tags } = (1) x scalar( @tags );
     my $a = $self->new_array;
     $a->push( $self ) if( exists( $tags->{ $self->tag } ) );
-    my $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $elems = shift( @_ );
         $elems->foreach(sub
@@ -809,7 +799,8 @@ sub look
         }
     }
     my $a = $self->new_array;
-    local $check_elem = sub
+    my( $check_elem, $crawl_down );
+    $check_elem = sub
     {
         my $e = shift( @_ );
         my $def = shift( @_ );
@@ -826,18 +817,14 @@ sub look
             }
             else
             {
-                # $self->message( 4, "Criteria is '$this->{key}'." );
                 if( $this->{key} eq '_tag' )
                 {
-                    # $self->message( 4, "\tChecking if this tag '", $e->tag, "' matches our requirement '$this->{val}'." );
                     if( ref( $this->{val} ) eq 'Regexp' )
                     {
                         $ok = 0, last if( $e->tag !~ /$this->{val}/ );
                     }
                     else
                     {
-                        # $self->message( 4, "Found tag '", $e->tag, "'" ) if( $e->tag->lc eq 'details' );
-                        # $self->message( 4, "Found tag '", $e->tag, "'" );
                         $ok = 0, last if( $e->tag ne $this->{val} );
                     }
                 }
@@ -855,11 +842,9 @@ sub look
                 }
                 else
                 {
-                    # $self->message( 4, "\tChecking for attribute '$this->{key}' with value '$this->{val}' (", overload::StrVal( $this->{val} ), ")." );
                     my $val = $attr->get( $this->{key} );
                     if( defined( $val ) )
                     {
-                        # $self->message( 4, "\tFound an attribute '$this->{key}'" );
                         if( ref( $this->{val} ) eq 'Regexp' )
                         {
                             $ok = 0, last if( $val !~ /$this->{val}/ );
@@ -884,7 +869,6 @@ sub look
             }
         }
         
-        # $self->message( 4, "Adding element ", overload::StrVal( $e ) ) if( $ok );
         # We passed all checks, no checking our children
         $a->push( $e ) if( $ok );
         # Stop here since we reached the maximum number of matches
@@ -904,7 +888,7 @@ sub look
         return(1);
     };
     
-    local $crawl_down = sub
+    $crawl_down = sub
     {
         my $kids = shift( @_ );
         my $def = shift( @_ );
@@ -945,7 +929,6 @@ sub looks_like_html { return( $_[1] =~ /$LOOK_LIKE_HTML/ ? 1 : 0 ); }
 sub looks_like_it_has_html
 {
     my $self = shift( @_ );
-    $self->message( 4, "Checking text '", $_[0], "' against regexp '$LOOK_LIKE_IT_HAS_HTML'." );
     return( $_[0] =~ /$LOOK_LIKE_IT_HAS_HTML/ ? 1 : 0 );
 }
 
@@ -996,7 +979,8 @@ sub new_from_lol
     my $self = shift( @_ );
     my $a = $self->new_array;
     my @args = @_;
-    local $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $ref = shift( @_ );
         my $parent;
@@ -1263,11 +1247,9 @@ sub right
     my $kids = $parent->children;
     my $pos  = $self->pos;
     my $offset = @_ ? int( shift( @_ ) ) : $kids->size;
-    # $self->messagef( 4, "%d children found and our position is %d and required offset is %d", $kids->length, $pos, $offset );
     return( $self->new_array ) if( !defined( $pos ) || $offset < $pos );
     return( $self->new_array ) if( $kids->length == 1 );
     # my $results = $kids->offset( $pos + 1, ( $offset - $pos ) );
-    # $self->messagef( 4, "Results contain %d objects.", $results->length );
     # return( $results );
     return( $kids->offset( $pos + 1, ( $offset - $pos ) ) );
 }
@@ -1352,7 +1334,8 @@ sub traverse
     my $code = shift( @_ ) || return( $self->error( "No code provided to traverse the html tree." ) );
     return( $self->error( "The argument provided (", overload::StrVal( $code ), ") is not an anonymous subroutine." ) ) if( ref( $code ) ne 'CODE' );
     my $seen = {};
-    local $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $e = shift( @_ );
         my $addr = Scalar::Util::refaddr( $e );
@@ -1419,7 +1402,9 @@ sub _get_elements_list
     my $seen = {};
     my $prev;
     my $self_addr = Scalar::Util::refaddr( $self );
-    my $parent_addr = Scalar::Util::refaddr( $parent );
+    my $parent_addr;
+    my $parent = $self->parent;
+    $parent_addr = Scalar::Util::refaddr( $parent ) if( defined( $parent ) );
     for( @_ )
     {
         return( $self->error( "Replacement element is not an HTML::Object::Element" ) ) if( !$self->_is_a( $_ => 'HTML::Object::Element' ) );
@@ -1430,7 +1415,7 @@ sub _get_elements_list
             next;
         }
         return( $self->error( "Replacement list contains a copy of target!" ) ) if( $self_addr eq $addr );
-        return( $self->error( "Cannot replace an item with its parent!" ) ) if( $addr eq $parent_addr );
+        return( $self->error( "Cannot replace an item with its parent!" ) ) if( defined( $parent_addr ) && $addr eq $parent_addr );
         if( ( $_->isa( 'HTML::Object::Text' ) && defined( $prev ) && $prev->isa( 'HTML::Object::Text' ) ) ||
             ( $_->isa( 'HTML::Object::Space' ) && defined( $prev ) && $prev->isa( 'HTML::Object::Space' ) ) )
         {
@@ -1507,7 +1492,6 @@ sub _get_from_list_of_elements_or_html
                 }
                 else
                 {
-                    $self->message( 4, "Adding argument '$this' as text object." );
                     my $e = $self->new_text({ value => "$this" });
                     $list->push( $e );
                     $prev = $e;
@@ -1572,7 +1556,7 @@ sub _set_get_id : lvalue
                 $dummy = \1;
             }
             return( $dummy ) if( want( 'LVALUE' ) );
-            rreturn( $dummy );
+            Want::rreturn( $dummy );
         }
         else
         {
@@ -1580,14 +1564,14 @@ sub _set_get_id : lvalue
             $self->reset(1);
             my $dummy = \1;
             return( $dummy ) if( want( 'LVALUE' ) );
-            rreturn( $dummy );
+            Want::rreturn( $dummy );
         }
     }
     else
     {
         my $id = $self->new_scalar( $self->attributes->get( 'id' ) );
         return( $id ) if( want( 'LVALUE' ) );
-        rreturn( $id );
+        Want::rreturn( $id );
     }
 }
 
@@ -1596,7 +1580,6 @@ sub _same_as
     my $self = shift( @_ );
     my $this = shift( @_ );
     return(0) if( !defined( $this ) || ( defined( $this ) && !$self->_is_a( $this, 'HTML::Object::Element' ) ) );
-    # $self->message( 4, "Comparing $self to $this" );
     return( $self->eid CORE::eq $this->eid ? 1 : 0 );
 }
 
@@ -1624,55 +1607,8 @@ sub _set_get_internal_attribute_callback
     return;
 }
 
-# Note: Do we really needs this _xml_escape? Because if not, let's get rid of this.
-# HTML::Element encode characters no matter what blindly following a w3 spec. This is really misbehaving
-# It should obey user's instructions
-# So, here we recreate the function and return the string unmodified
-sub _xml_escape
-{
-    my $self = shift( @_ );
-    # DESTRUCTIVE (a.k.a. "in-place")
-    # Five required escapes: http://www.w3.org/TR/2006/REC-xml11-20060816/#syntax
-    # We allow & if it's part of a valid escape already: http://www.w3.org/TR/2006/REC-xml11-20060816/#sec-references
-    # my( $pkg, $file, $line ) = caller;
-    if( $encoded_content )
-    {
-        # print( STDERR "HTML::Element::_xml_escape() Won't escape because \$encoded_content is already set. Called in package $pkg in file $file at line $line\n" );
-        return;
-    }
-    my $START_CHAR = qr/(?:\:|[A-Z]|_|[a-z]|[\x{C0}-\x{D6}]|[\x{D8}-\x{F6}]|[\x{F8}-\x{2FF}]|[\x{370}-\x{37D}]|[\x{37F}-\x{1FFF}]|[\x{200C}-\x{200D}]|[\x{2070}-\x{218F}]|[\x{2C00}-\x{2FEF}]|[\x{3001}-\x{D7FF}]|[\x{F900}-\x{FDCF}]|[\x{FDF0}-\x{FFFD}]|[\x{10000}-\x{EFFFF}])/;
-
-    # http://www.w3.org/TR/2006/REC-xml11-20060816/#NT-NameChar
-    my $NAME_CHAR = qr/(?:$START_CHAR|-|\.|[0-9]|\x{B7}|[\x{0300}-\x{036F}]|[\x{203F}-\x{2040}])/;
-    foreach my $x ( @_ )
-    {
-        # print( STDERR "HTML::Element::_xml_escape() called in package $pkg in file $file at line $line for text '$x'\n" );
-        # In strings with no encoded entities all & should be encoded.
-        if( $encoded_content )
-        {
-            $x
-                =~ s/&(?!                 # An ampersand that is not followed by...
-                (\#\d+; |                 # A hash mark, digits and semicolon, or
-                \#x[\da-f]+; |            # A hash mark, "x", hex digits and semicolon, or
-                $START_CHAR$NAME_CHAR+; ) # A valid unicode entity name and semicolon
-           )/&amp;/gx;    # Needs to be escaped to amp
-        }
-        else
-        {
-            $x =~ s/&/&amp;/g;
-        }
-
-        # simple character escapes
-        $x =~ s/</&lt;/g;
-        $x =~ s/>/&gt;/g;
-        $x =~ s/"/&quot;/g;
-        $x =~ s/'/&apos;/g;
-    }
-    return;
-}
-
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -1688,7 +1624,7 @@ HTML::Object::Element - HTML Element Object
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.1
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,10 @@
 Revision history for Alien::sqlite
 
+1.07 2022-09-19
+    - Share builds:
+      - Install sqlite 3.39.3
+      - Avoid calling Path::Tiny::path on undef entries on Windows (GH#4)
+
 1.06 2020-05-24
     - Add probe for sqlite3 binary.
     - Share installs on Windows: Remove any /usr/bin from path

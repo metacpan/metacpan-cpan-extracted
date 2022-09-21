@@ -2,19 +2,34 @@
 abstract: 'Pack PAR executables, finding dynamic libs automatically'
 author:
   - 'Shawn Laffan <shawnlaffan@gmail.com>'
-build_requires: {}
+build_requires:
+  File::Which: '0'
+  Test::More: '0'
+configure_requires: {}
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-PP-Autolink
 no_index:
   directory:
     - t
     - inc
+requires:
+  Capture::Tiny: '0.48'
+  Env: '0'
+  File::Find::Rule: '0'
+  File::Which: '0'
+  Getopt::ArgvFile: '0'
+  List::Util: '1.45'
+  Module::ScanDeps: '1.27'
+  PAR::Packer: '1.049'
+  Path::Tiny: '0.108'
+  rlib: '0.02'
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-pp-autolink/issues/
   repository: https://github.com/shawnlaffan/perl-pp-autolink
-version: 2.04
+version: '2.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

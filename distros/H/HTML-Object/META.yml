@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ no_index:
     - t
     - inc
 requires:
-  CSS::Object: v0.1.4
+  CSS::Object: v0.1.5
   Config: '0'
   Data::UUID: '1.226'
   DateTime::Format::Strptime: '1.79'
@@ -38,10 +38,10 @@ requires:
   HTML::Selector::XPath: '0.26'
   JSON: '4.05'
   List::Util: '1.56'
-  Module::Generic: v0.21.11
-  Nice::Try: v1.1.2
+  Module::Generic: v0.28.2
+  Nice::Try: v1.3.1
   POSIX: '0'
-  Promise::Me: v0.1.1
+  Promise::Me: v0.4.0
   Scalar::Util: '1.60'
   Time::HiRes: '1.9764'
   URI: '5.10'
@@ -52,10 +52,11 @@ requires:
   parent: '0'
   perl: '5.026001'
   strict: '0'
+  vars: '0'
   warnings: '0'
   warnings::register: '0'
 resources:
   bugtracker: https://gitlab.com/jackdeguest/HTML-Object/issues
   repository: https://gitlab.com/jackdeguest/HTML-Object
-version: v0.1.4
+version: v0.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

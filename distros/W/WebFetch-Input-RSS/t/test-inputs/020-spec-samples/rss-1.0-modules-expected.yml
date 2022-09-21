@@ -1,0 +1,1602 @@
+---
+'0.9':
+- &1
+  - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''
+- &2
+  - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''
+- &3
+  - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''
+- &4
+  - ''
+  - stuff
+  - http://bar
+  - ''
+  - This is an article about some stuff
+  - ''
+  - ''
+- &5
+  - ''
+  - Giving the world a pluggable Gnutella
+  - http://writetheweb.com/read.php?item=24
+  - ''
+  - WorldOS is a framework on which to build programs that work like Freenet or Gnutella
+    -allowing distributed applications using peer-to-peer routing.
+  - ''
+  - ''
+- &6
+  - ''
+  - Syndication discussions hot up
+  - http://writetheweb.com/read.php?item=23
+  - ''
+  - After a period of dormancy, the Syndication mailing list has become active again,
+    with contributions from leaders in traditional media and Web syndication.
+  - ''
+  - ''
+- &7
+  - ''
+  - Personal web server integrates file sharing and messaging
+  - http://writetheweb.com/read.php?item=22
+  - ''
+  - The Magi Project is an innovative project to create a combined personal web server
+    and messaging system that enables the sharing and synchronization of information
+    across desktop, laptop and palmtop devices.
+  - ''
+  - ''
+- &8
+  - ''
+  - Syndication and Metadata
+  - http://writetheweb.com/read.php?item=21
+  - ''
+  - RSS is probably the best known metadata format around. RDF is probably one of
+    the least understood. In this essay, published on my O'Reilly Network weblog,
+    I argue that the next generation of RSS should be based on RDF.
+  - ''
+  - ''
+- &9
+  - ''
+  - UK bloggers get organised
+  - http://writetheweb.com/read.php?item=20
+  - ''
+  - Looks like the weblogs scene is gathering pace beyond the shores of the US. There's
+    now a UK-specific page on weblogs.com, and a mailing list at egroups.
+  - ''
+  - ''
+- &10
+  - ''
+  - Yournamehere.com more important than anything
+  - http://writetheweb.com/read.php?item=19
+  - ''
+  - Whatever you're publishing on the web, your site name is the most valuable asset
+    you have, according to Carl Steadman.
+  - ''
+  - ''
+- &11
+  - ''
+  - Giving the world a pluggable Gnutella
+  - http://writetheweb.com/read.php?item=24
+  - ''
+  - WorldOS is a framework on which to build programs that work like Freenet or Gnutella
+    -allowing distributed applications using peer-to-peer routing.
+  - ''
+  - ''
+- &12
+  - ''
+  - Syndication discussions hot up
+  - http://writetheweb.com/read.php?item=23
+  - ''
+  - After a period of dormancy, the Syndication mailing list has become active again,
+    with contributions from leaders in traditional media and Web syndication.
+  - ''
+  - ''
+- &13
+  - ''
+  - Personal web server integrates file sharing and messaging
+  - http://writetheweb.com/read.php?item=22
+  - ''
+  - The Magi Project is an innovative project to create a combined personal web server
+    and messaging system that enables the sharing and synchronization of information
+    across desktop, laptop and palmtop devices.
+  - ''
+  - ''
+- &14
+  - ''
+  - Syndication and Metadata
+  - http://writetheweb.com/read.php?item=21
+  - ''
+  - RSS is probably the best known metadata format around. RDF is probably one of
+    the least understood. In this essay, published on my O'Reilly Network weblog,
+    I argue that the next generation of RSS should be based on RDF.
+  - ''
+  - ''
+- &15
+  - ''
+  - UK bloggers get organised
+  - http://writetheweb.com/read.php?item=20
+  - ''
+  - Looks like the weblogs scene is gathering pace beyond the shores of the US. There's
+    now a UK-specific page on weblogs.com, and a mailing list at egroups.
+  - ''
+  - ''
+- &16
+  - ''
+  - Yournamehere.com more important than anything
+  - http://writetheweb.com/read.php?item=19
+  - ''
+  - Whatever you're publishing on the web, your site name is the most valuable asset
+    you have, according to Carl Steadman.
+  - ''
+  - ''
+- &17
+  - ''
+  - Giving the world a pluggable Gnutella
+  - http://writetheweb.com/read.php?item=24
+  - ''
+  - WorldOS is a framework on which to build programs that work like Freenet or Gnutella
+    -allowing distributed applications using peer-to-peer routing.
+  - ''
+  - ''
+- &18
+  - ''
+  - Syndication discussions hot up
+  - http://writetheweb.com/read.php?item=23
+  - ''
+  - After a period of dormancy, the Syndication mailing list has become active again,
+    with contributions from leaders in traditional media and Web syndication.
+  - ''
+  - ''
+- &19
+  - ''
+  - Personal web server integrates file sharing and messaging
+  - http://writetheweb.com/read.php?item=22
+  - ''
+  - The Magi Project is an innovative project to create a combined personal web server
+    and messaging system that enables the sharing and synchronization of information
+    across desktop, laptop and palmtop devices.
+  - ''
+  - ''
+- &20
+  - ''
+  - Syndication and Metadata
+  - http://writetheweb.com/read.php?item=21
+  - ''
+  - RSS is probably the best known metadata format around. RDF is probably one of
+    the least understood. In this essay, published on my O'Reilly Network weblog,
+    I argue that the next generation of RSS should be based on RDF.
+  - ''
+  - ''
+- &21
+  - ''
+  - UK bloggers get organised
+  - http://writetheweb.com/read.php?item=20
+  - ''
+  - Looks like the weblogs scene is gathering pace beyond the shores of the US. There's
+    now a UK-specific page on weblogs.com, and a mailing list at egroups.
+  - ''
+  - ''
+- &22
+  - ''
+  - Yournamehere.com more important than anything
+  - http://writetheweb.com/read.php?item=19
+  - ''
+  - Whatever you're publishing on the web, your site name is the most valuable asset
+    you have, according to Carl Steadman.
+  - ''
+  - ''
+- &23
+  - ''
+  - Giving the world a pluggable Gnutella
+  - http://writetheweb.com/read.php?item=24
+  - ''
+  - WorldOS is a framework on which to build programs that work like Freenet or Gnutella
+    -allowing distributed applications using peer-to-peer routing.
+  - ''
+  - ''
+- &24
+  - ''
+  - Syndication discussions hot up
+  - http://writetheweb.com/read.php?item=23
+  - ''
+  - After a period of dormancy, the Syndication mailing list has become active again,
+    with contributions from leaders in traditional media and Web syndication.
+  - ''
+  - ''
+- &25
+  - ''
+  - Personal web server integrates file sharing and messaging
+  - http://writetheweb.com/read.php?item=22
+  - ''
+  - The Magi Project is an innovative project to create a combined personal web server
+    and messaging system that enables the sharing and synchronization of information
+    across desktop, laptop and palmtop devices.
+  - ''
+  - ''
+- &26
+  - ''
+  - Syndication and Metadata
+  - http://writetheweb.com/read.php?item=21
+  - ''
+  - RSS is probably the best known metadata format around. RDF is probably one of
+    the least understood. In this essay, published on my O'Reilly Network weblog,
+    I argue that the next generation of RSS should be based on RDF.
+  - ''
+  - ''
+- &27
+  - ''
+  - UK bloggers get organised
+  - http://writetheweb.com/read.php?item=20
+  - ''
+  - Looks like the weblogs scene is gathering pace beyond the shores of the US. There's
+    now a UK-specific page on weblogs.com, and a mailing list at egroups.
+  - ''
+  - ''
+- &28
+  - ''
+  - Yournamehere.com more important than anything
+  - http://writetheweb.com/read.php?item=19
+  - ''
+  - Whatever you're publishing on the web, your site name is the most valuable asset
+    you have, according to Carl Steadman.
+  - ''
+  - ''
+- &29
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'It''s been a few days since I added a song to the Grateful Dead channel. Now
+    that there are all these new Radio users, many of whom are tuned into this channel
+    (it''s #16 on the hotlist of upstreaming Radio users, there''s no way of knowing
+    how many non-upstreaming users are subscribing, have to do something about this..).
+    Anyway, tonight''s song is a live version of Weather Report Suite from Dick''s
+    Picks Volume 7. It''s wistful music. Of course a beautiful song, oft-quoted here
+    on Scripting News. <i>A little change, the wind and rain.</i>'
+  - ''
+  - ''
+- &30
+  - ''
+  - ''
+  - ''
+  - ''
+  - Kevin Drennan started a <a href="http://deadend.editthispage.com/">Grateful Dead
+    Weblog</a>. Hey it's cool, he even has a <a href="http://deadend.editthispage.com/directory/61">directory</a>.
+    <i>A Frontier 7 feature.</i>
+  - ''
+  - ''
+- &31
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://arts.ucsc.edu/GDead/AGDL/other1.html">The Other One</a>, live
+    instrumental, One From The Vault. Very rhythmic very spacy, you can listen to
+    it many times, and enjoy something new every time.
+  - ''
+  - ''
+- &32
+  - ''
+  - ''
+  - ''
+  - ''
+  - This is a test of a change I just made. Still diggin..
+  - ''
+  - ''
+- &33
+  - ''
+  - ''
+  - ''
+  - ''
+  - The HTML rendering almost <a href="http://validator.w3.org/check/referer">validates</a>.
+    Close. Hey I wonder if anyone has ever published a style guide for ALT attributes
+    on images? What are you supposed to say in the ALT attribute? I sure don't know.
+    If you're blind send me an email if u cn rd ths.
+  - ''
+  - ''
+- &34
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/Franklin's_Tower.txt">Franklin's
+    Tower</a>, a live version from One From The Vault.
+  - ''
+  - ''
+- &35
+  - ''
+  - ''
+  - ''
+  - ''
+  - Moshe Weitzman says Shakedown Street is what I'm lookin for for tonight. I'm listening
+    right now. It's one of my favorites. "Don't tell me this town ain't got no heart."
+    Too bright. I like the jazziness of Weather Report Suite. Dreamy and soft. How
+    about The Other One? "Spanish lady come to me.."
+  - ''
+  - ''
+- &36
+  - ''
+  - ''
+  - ''
+  - ''
+  - |-
+    <a href="http://www.scripting.com/mp3s/youWinAgain.mp3">The news is out</a>, all over town..<p>
+    You've been seen, out runnin round. <p>
+    The lyrics are <a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/You_Win_Again.txt">here</a>, short and sweet. <p>
+    <i>You win again!</i>
+  - ''
+  - ''
+- &37
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://www.getlyrics.com/lyrics/grateful-dead/wake-of-the-flood/07.htm">Weather
+    Report Suite</a>: "Winter rain, now tell me why, summers fade, and roses die?
+    The answer came. The wind and rain. Golden hills, now veiled in grey, summer leaves
+    have blown away. Now what remains? The wind and rain."'
+  - ''
+  - ''
+- &38
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://arts.ucsc.edu/gdead/agdl/darkstar.html">Dark Star</a> crashes,
+    pouring its light into ashes.
+  - ''
+  - ''
+- &39
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'DaveNet: <a href="http://davenet.userland.com/2001/01/21/theUsBlues">The U.S.
+    Blues</a>.'
+  - ''
+  - ''
+- &40
+  - ''
+  - ''
+  - ''
+  - ''
+  - Still listening to the US Blues. <i>"Wave that flag, wave it wide and high.."</i>
+    Mistake made in the 60s. We gave our country to the assholes. Ah ah. Let's take
+    it back. Hey I'm still a hippie. <i>"You could call this song The United States
+    Blues."</i>
+  - ''
+  - ''
+- &41
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.sixties.com/html/garcia_stack_0.html"><img src="http://www.scripting.com/images/captainTripsSmall.gif"
+    height="51" width="42" border="0" hspace="10" vspace="10" align="right"></a>In
+    celebration of today's inauguration, after hearing all those great patriotic songs,
+    America the Beautiful, even The Star Spangled Banner made my eyes mist up. It
+    made my choice of Grateful Dead song of the night realllly easy. Here are the
+    <a href="http://searchlyrics2.homestead.com/gd_usblues.html">lyrics</a>. Click
+    on the audio icon to the left to give it a listen. "Red and white, blue suede
+    shoes, I'm Uncle Sam, how do you do?" It's a different kind of patriotic music,
+    but man I love my country and I love Jerry and the band. <i>I truly do!</i>
+  - ''
+  - ''
+- &42
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Grateful Dead: "Tennessee, Tennessee, ain''t no place I''d rather be."'
+  - ''
+  - ''
+- &43
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Ed Cone: "Had a nice Deadhead experience with my wife, who never was one but
+    gets the vibe and knows and likes a lot of the music. Somehow she made it to the
+    age of 40 without ever hearing Wharf Rat. We drove to Jersey and back over Christmas
+    with the live album commonly known as Skull and Roses in the CD player much of
+    the way, and it was cool to see her discover one the band''s finest moments. That
+    song is unique and underappreciated. Fun to hear that disc again after a few years
+    off -- you get Jerry as blues-guitar hero on Big Railroad Blues and a nice version
+    of Bertha."'
+  - ''
+  - ''
+- &44
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://arts.ucsc.edu/GDead/AGDL/fotd.html">Tonight''s Song</a>: "If
+    I get home before daylight I just might get some sleep tonight."'
+  - ''
+  - ''
+- &45
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://arts.ucsc.edu/GDead/AGDL/uncle.html">Tonight''s song</a>: "Come
+    hear Uncle John''s Band by the river side. Got some things to talk about here
+    beside the rising tide."'
+  - ''
+  - ''
+- &46
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/Me_and_My_Uncle.txt">Me
+    and My Uncle</a>: "I loved my uncle, God rest his soul, taught me good, Lord,
+    taught me all I know. Taught me so well, I grabbed that gold and I left his dead
+    ass there by the side of the road."'
+  - ''
+  - ''
+- &47
+  - ''
+  - ''
+  - ''
+  - ''
+  - Truckin, like the doo-dah man, once told me gotta play your hand. Sometimes the
+    cards ain't worth a dime, if you don't lay em down.
+  - ''
+  - ''
+- &48
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Two-Way-Web: <a href="http://www.thetwowayweb.com/payloadsForRss">Payloads for
+    RSS</a>. "When I started talking with Adam late last year, he wanted me to think
+    about high quality video on the Internet, and I totally didn''t want to hear about
+    it."'
+  - ''
+  - ''
+- &49
+  - ''
+  - ''
+  - ''
+  - ''
+  - A touch of gray, kinda suits you anyway..
+  - ''
+  - ''
+- &50
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.sixties.com/html/garcia_stack_0.html"><img src="http://www.scripting.com/images/captainTripsSmall.gif"
+    height="51" width="42" border="0" hspace="10" vspace="10" align="right"></a>In
+    celebration of today's inauguration, after hearing all those great patriotic songs,
+    America the Beautiful, even The Star Spangled Banner made my eyes mist up. It
+    made my choice of Grateful Dead song of the night realllly easy. Here are the
+    <a href="http://searchlyrics2.homestead.com/gd_usblues.html">lyrics</a>. Click
+    on the audio icon to the left to give it a listen. "Red and white, blue suede
+    shoes, I'm Uncle Sam, how do you do?" It's a different kind of patriotic music,
+    but man I love my country and I love Jerry and the band. <i>I truly do!</i>
+  - ''
+  - ''
+- &51
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'It''s been a few days since I added a song to the Grateful Dead channel. Now
+    that there are all these new Radio users, many of whom are tuned into this channel
+    (it''s #16 on the hotlist of upstreaming Radio users, there''s no way of knowing
+    how many non-upstreaming users are subscribing, have to do something about this..).
+    Anyway, tonight''s song is a live version of Weather Report Suite from Dick''s
+    Picks Volume 7. It''s wistful music. Of course a beautiful song, oft-quoted here
+    on Scripting News. <i>A little change, the wind and rain.</i>'
+  - ''
+  - ''
+- &52
+  - ''
+  - ''
+  - ''
+  - ''
+  - Kevin Drennan started a <a href="http://deadend.editthispage.com/">Grateful Dead
+    Weblog</a>. Hey it's cool, he even has a <a href="http://deadend.editthispage.com/directory/61">directory</a>.
+    <i>A Frontier 7 feature.</i>
+  - ''
+  - ''
+- &53
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://arts.ucsc.edu/GDead/AGDL/other1.html">The Other One</a>, live
+    instrumental, One From The Vault. Very rhythmic very spacy, you can listen to
+    it many times, and enjoy something new every time.
+  - ''
+  - ''
+- &54
+  - ''
+  - ''
+  - ''
+  - ''
+  - This is a test of a change I just made. Still diggin..
+  - ''
+  - ''
+- &55
+  - ''
+  - ''
+  - ''
+  - ''
+  - The HTML rendering almost <a href="http://validator.w3.org/check/referer">validates</a>.
+    Close. Hey I wonder if anyone has ever published a style guide for ALT attributes
+    on images? What are you supposed to say in the ALT attribute? I sure don't know.
+    If you're blind send me an email if u cn rd ths.
+  - ''
+  - ''
+- &56
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/Franklin's_Tower.txt">Franklin's
+    Tower</a>, a live version from One From The Vault.
+  - ''
+  - ''
+- &57
+  - ''
+  - ''
+  - ''
+  - ''
+  - Moshe Weitzman says Shakedown Street is what I'm lookin for for tonight. I'm listening
+    right now. It's one of my favorites. "Don't tell me this town ain't got no heart."
+    Too bright. I like the jazziness of Weather Report Suite. Dreamy and soft. How
+    about The Other One? "Spanish lady come to me.."
+  - ''
+  - ''
+- &58
+  - ''
+  - ''
+  - ''
+  - ''
+  - |-
+    <a href="http://www.scripting.com/mp3s/youWinAgain.mp3">The news is out</a>, all over town..<p>
+    You've been seen, out runnin round. <p>
+    The lyrics are <a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/You_Win_Again.txt">here</a>, short and sweet. <p>
+    <i>You win again!</i>
+  - ''
+  - ''
+- &59
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://www.getlyrics.com/lyrics/grateful-dead/wake-of-the-flood/07.htm">Weather
+    Report Suite</a>: "Winter rain, now tell me why, summers fade, and roses die?
+    The answer came. The wind and rain. Golden hills, now veiled in grey, summer leaves
+    have blown away. Now what remains? The wind and rain."'
+  - ''
+  - ''
+- &60
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://arts.ucsc.edu/gdead/agdl/darkstar.html">Dark Star</a> crashes,
+    pouring its light into ashes.
+  - ''
+  - ''
+- &61
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'DaveNet: <a href="http://davenet.userland.com/2001/01/21/theUsBlues">The U.S.
+    Blues</a>.'
+  - ''
+  - ''
+- &62
+  - ''
+  - ''
+  - ''
+  - ''
+  - Still listening to the US Blues. <i>"Wave that flag, wave it wide and high.."</i>
+    Mistake made in the 60s. We gave our country to the assholes. Ah ah. Let's take
+    it back. Hey I'm still a hippie. <i>"You could call this song The United States
+    Blues."</i>
+  - ''
+  - ''
+- &63
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.sixties.com/html/garcia_stack_0.html"><img src="http://www.scripting.com/images/captainTripsSmall.gif"
+    height="51" width="42" border="0" hspace="10" vspace="10" align="right"></a>In
+    celebration of today's inauguration, after hearing all those great patriotic songs,
+    America the Beautiful, even The Star Spangled Banner made my eyes mist up. It
+    made my choice of Grateful Dead song of the night realllly easy. Here are the
+    <a href="http://searchlyrics2.homestead.com/gd_usblues.html">lyrics</a>. Click
+    on the audio icon to the left to give it a listen. "Red and white, blue suede
+    shoes, I'm Uncle Sam, how do you do?" It's a different kind of patriotic music,
+    but man I love my country and I love Jerry and the band. <i>I truly do!</i>
+  - ''
+  - ''
+- &64
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Grateful Dead: "Tennessee, Tennessee, ain''t no place I''d rather be."'
+  - ''
+  - ''
+- &65
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Ed Cone: "Had a nice Deadhead experience with my wife, who never was one but
+    gets the vibe and knows and likes a lot of the music. Somehow she made it to the
+    age of 40 without ever hearing Wharf Rat. We drove to Jersey and back over Christmas
+    with the live album commonly known as Skull and Roses in the CD player much of
+    the way, and it was cool to see her discover one the band''s finest moments. That
+    song is unique and underappreciated. Fun to hear that disc again after a few years
+    off -- you get Jerry as blues-guitar hero on Big Railroad Blues and a nice version
+    of Bertha."'
+  - ''
+  - ''
+- &66
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://arts.ucsc.edu/GDead/AGDL/fotd.html">Tonight''s Song</a>: "If
+    I get home before daylight I just might get some sleep tonight."'
+  - ''
+  - ''
+- &67
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://arts.ucsc.edu/GDead/AGDL/uncle.html">Tonight''s song</a>: "Come
+    hear Uncle John''s Band by the river side. Got some things to talk about here
+    beside the rising tide."'
+  - ''
+  - ''
+- &68
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/Me_and_My_Uncle.txt">Me
+    and My Uncle</a>: "I loved my uncle, God rest his soul, taught me good, Lord,
+    taught me all I know. Taught me so well, I grabbed that gold and I left his dead
+    ass there by the side of the road."'
+  - ''
+  - ''
+- &69
+  - ''
+  - ''
+  - ''
+  - ''
+  - Truckin, like the doo-dah man, once told me gotta play your hand. Sometimes the
+    cards ain't worth a dime, if you don't lay em down.
+  - ''
+  - ''
+- &70
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Two-Way-Web: <a href="http://www.thetwowayweb.com/payloadsForRss">Payloads for
+    RSS</a>. "When I started talking with Adam late last year, he wanted me to think
+    about high quality video on the Internet, and I totally didn''t want to hear about
+    it."'
+  - ''
+  - ''
+- &71
+  - ''
+  - ''
+  - ''
+  - ''
+  - A touch of gray, kinda suits you anyway..
+  - ''
+  - ''
+- &72
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.sixties.com/html/garcia_stack_0.html"><img src="http://www.scripting.com/images/captainTripsSmall.gif"
+    height="51" width="42" border="0" hspace="10" vspace="10" align="right"></a>In
+    celebration of today's inauguration, after hearing all those great patriotic songs,
+    America the Beautiful, even The Star Spangled Banner made my eyes mist up. It
+    made my choice of Grateful Dead song of the night realllly easy. Here are the
+    <a href="http://searchlyrics2.homestead.com/gd_usblues.html">lyrics</a>. Click
+    on the audio icon to the left to give it a listen. "Red and white, blue suede
+    shoes, I'm Uncle Sam, how do you do?" It's a different kind of patriotic music,
+    but man I love my country and I love Jerry and the band. <i>I truly do!</i>
+  - ''
+  - ''
+- &73
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'It''s been a few days since I added a song to the Grateful Dead channel. Now
+    that there are all these new Radio users, many of whom are tuned into this channel
+    (it''s #16 on the hotlist of upstreaming Radio users, there''s no way of knowing
+    how many non-upstreaming users are subscribing, have to do something about this..).
+    Anyway, tonight''s song is a live version of Weather Report Suite from Dick''s
+    Picks Volume 7. It''s wistful music. Of course a beautiful song, oft-quoted here
+    on Scripting News. <i>A little change, the wind and rain.</i>'
+  - ''
+  - ''
+- &74
+  - ''
+  - ''
+  - ''
+  - ''
+  - Kevin Drennan started a <a href="http://deadend.editthispage.com/">Grateful Dead
+    Weblog</a>. Hey it's cool, he even has a <a href="http://deadend.editthispage.com/directory/61">directory</a>.
+    <i>A Frontier 7 feature.</i>
+  - ''
+  - ''
+- &75
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://arts.ucsc.edu/GDead/AGDL/other1.html">The Other One</a>, live
+    instrumental, One From The Vault. Very rhythmic very spacy, you can listen to
+    it many times, and enjoy something new every time.
+  - ''
+  - ''
+- &76
+  - ''
+  - ''
+  - ''
+  - ''
+  - This is a test of a change I just made. Still diggin..
+  - ''
+  - ''
+- &77
+  - ''
+  - ''
+  - ''
+  - ''
+  - The HTML rendering almost <a href="http://validator.w3.org/check/referer">validates</a>.
+    Close. Hey I wonder if anyone has ever published a style guide for ALT attributes
+    on images? What are you supposed to say in the ALT attribute? I sure don't know.
+    If you're blind send me an email if u cn rd ths.
+  - ''
+  - ''
+- &78
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/Franklin's_Tower.txt">Franklin's
+    Tower</a>, a live version from One From The Vault.
+  - ''
+  - ''
+- &79
+  - ''
+  - ''
+  - ''
+  - ''
+  - Moshe Weitzman says Shakedown Street is what I'm lookin for for tonight. I'm listening
+    right now. It's one of my favorites. "Don't tell me this town ain't got no heart."
+    Too bright. I like the jazziness of Weather Report Suite. Dreamy and soft. How
+    about The Other One? "Spanish lady come to me.."
+  - ''
+  - ''
+- &80
+  - ''
+  - ''
+  - ''
+  - ''
+  - |-
+    <a href="http://www.scripting.com/mp3s/youWinAgain.mp3">The news is out</a>, all over town..<p>
+    You've been seen, out runnin round. <p>
+    The lyrics are <a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/You_Win_Again.txt">here</a>, short and sweet. <p>
+    <i>You win again!</i>
+  - ''
+  - ''
+- &81
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://www.getlyrics.com/lyrics/grateful-dead/wake-of-the-flood/07.htm">Weather
+    Report Suite</a>: "Winter rain, now tell me why, summers fade, and roses die?
+    The answer came. The wind and rain. Golden hills, now veiled in grey, summer leaves
+    have blown away. Now what remains? The wind and rain."'
+  - ''
+  - ''
+- &82
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://arts.ucsc.edu/gdead/agdl/darkstar.html">Dark Star</a> crashes,
+    pouring its light into ashes.
+  - ''
+  - ''
+- &83
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'DaveNet: <a href="http://davenet.userland.com/2001/01/21/theUsBlues">The U.S.
+    Blues</a>.'
+  - ''
+  - ''
+- &84
+  - ''
+  - ''
+  - ''
+  - ''
+  - Still listening to the US Blues. <i>"Wave that flag, wave it wide and high.."</i>
+    Mistake made in the 60s. We gave our country to the assholes. Ah ah. Let's take
+    it back. Hey I'm still a hippie. <i>"You could call this song The United States
+    Blues."</i>
+  - ''
+  - ''
+- &85
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.sixties.com/html/garcia_stack_0.html"><img src="http://www.scripting.com/images/captainTripsSmall.gif"
+    height="51" width="42" border="0" hspace="10" vspace="10" align="right"></a>In
+    celebration of today's inauguration, after hearing all those great patriotic songs,
+    America the Beautiful, even The Star Spangled Banner made my eyes mist up. It
+    made my choice of Grateful Dead song of the night realllly easy. Here are the
+    <a href="http://searchlyrics2.homestead.com/gd_usblues.html">lyrics</a>. Click
+    on the audio icon to the left to give it a listen. "Red and white, blue suede
+    shoes, I'm Uncle Sam, how do you do?" It's a different kind of patriotic music,
+    but man I love my country and I love Jerry and the band. <i>I truly do!</i>
+  - ''
+  - ''
+- &86
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Grateful Dead: "Tennessee, Tennessee, ain''t no place I''d rather be."'
+  - ''
+  - ''
+- &87
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Ed Cone: "Had a nice Deadhead experience with my wife, who never was one but
+    gets the vibe and knows and likes a lot of the music. Somehow she made it to the
+    age of 40 without ever hearing Wharf Rat. We drove to Jersey and back over Christmas
+    with the live album commonly known as Skull and Roses in the CD player much of
+    the way, and it was cool to see her discover one the band''s finest moments. That
+    song is unique and underappreciated. Fun to hear that disc again after a few years
+    off -- you get Jerry as blues-guitar hero on Big Railroad Blues and a nice version
+    of Bertha."'
+  - ''
+  - ''
+- &88
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://arts.ucsc.edu/GDead/AGDL/fotd.html">Tonight''s Song</a>: "If
+    I get home before daylight I just might get some sleep tonight."'
+  - ''
+  - ''
+- &89
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://arts.ucsc.edu/GDead/AGDL/uncle.html">Tonight''s song</a>: "Come
+    hear Uncle John''s Band by the river side. Got some things to talk about here
+    beside the rising tide."'
+  - ''
+  - ''
+- &90
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/Me_and_My_Uncle.txt">Me
+    and My Uncle</a>: "I loved my uncle, God rest his soul, taught me good, Lord,
+    taught me all I know. Taught me so well, I grabbed that gold and I left his dead
+    ass there by the side of the road."'
+  - ''
+  - ''
+- &91
+  - ''
+  - ''
+  - ''
+  - ''
+  - Truckin, like the doo-dah man, once told me gotta play your hand. Sometimes the
+    cards ain't worth a dime, if you don't lay em down.
+  - ''
+  - ''
+- &92
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Two-Way-Web: <a href="http://www.thetwowayweb.com/payloadsForRss">Payloads for
+    RSS</a>. "When I started talking with Adam late last year, he wanted me to think
+    about high quality video on the Internet, and I totally didn''t want to hear about
+    it."'
+  - ''
+  - ''
+- &93
+  - ''
+  - ''
+  - ''
+  - ''
+  - A touch of gray, kinda suits you anyway..
+  - ''
+  - ''
+- &94
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.sixties.com/html/garcia_stack_0.html"><img src="http://www.scripting.com/images/captainTripsSmall.gif"
+    height="51" width="42" border="0" hspace="10" vspace="10" align="right"></a>In
+    celebration of today's inauguration, after hearing all those great patriotic songs,
+    America the Beautiful, even The Star Spangled Banner made my eyes mist up. It
+    made my choice of Grateful Dead song of the night realllly easy. Here are the
+    <a href="http://searchlyrics2.homestead.com/gd_usblues.html">lyrics</a>. Click
+    on the audio icon to the left to give it a listen. "Red and white, blue suede
+    shoes, I'm Uncle Sam, how do you do?" It's a different kind of patriotic music,
+    but man I love my country and I love Jerry and the band. <i>I truly do!</i>
+  - ''
+  - ''
+- &95
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'It''s been a few days since I added a song to the Grateful Dead channel. Now
+    that there are all these new Radio users, many of whom are tuned into this channel
+    (it''s #16 on the hotlist of upstreaming Radio users, there''s no way of knowing
+    how many non-upstreaming users are subscribing, have to do something about this..).
+    Anyway, tonight''s song is a live version of Weather Report Suite from Dick''s
+    Picks Volume 7. It''s wistful music. Of course a beautiful song, oft-quoted here
+    on Scripting News. <i>A little change, the wind and rain.</i>'
+  - ''
+  - ''
+- &96
+  - ''
+  - ''
+  - ''
+  - ''
+  - Kevin Drennan started a <a href="http://deadend.editthispage.com/">Grateful Dead
+    Weblog</a>. Hey it's cool, he even has a <a href="http://deadend.editthispage.com/directory/61">directory</a>.
+    <i>A Frontier 7 feature.</i>
+  - ''
+  - ''
+- &97
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://arts.ucsc.edu/GDead/AGDL/other1.html">The Other One</a>, live
+    instrumental, One From The Vault. Very rhythmic very spacy, you can listen to
+    it many times, and enjoy something new every time.
+  - ''
+  - ''
+- &98
+  - ''
+  - ''
+  - ''
+  - ''
+  - This is a test of a change I just made. Still diggin..
+  - ''
+  - ''
+- &99
+  - ''
+  - ''
+  - ''
+  - ''
+  - The HTML rendering almost <a href="http://validator.w3.org/check/referer">validates</a>.
+    Close. Hey I wonder if anyone has ever published a style guide for ALT attributes
+    on images? What are you supposed to say in the ALT attribute? I sure don't know.
+    If you're blind send me an email if u cn rd ths.
+  - ''
+  - ''
+- &100
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/Franklin's_Tower.txt">Franklin's
+    Tower</a>, a live version from One From The Vault.
+  - ''
+  - ''
+- &101
+  - ''
+  - ''
+  - ''
+  - ''
+  - Moshe Weitzman says Shakedown Street is what I'm lookin for for tonight. I'm listening
+    right now. It's one of my favorites. "Don't tell me this town ain't got no heart."
+    Too bright. I like the jazziness of Weather Report Suite. Dreamy and soft. How
+    about The Other One? "Spanish lady come to me.."
+  - ''
+  - ''
+- &102
+  - ''
+  - ''
+  - ''
+  - ''
+  - |-
+    <a href="http://www.scripting.com/mp3s/youWinAgain.mp3">The news is out</a>, all over town..<p>
+    You've been seen, out runnin round. <p>
+    The lyrics are <a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/You_Win_Again.txt">here</a>, short and sweet. <p>
+    <i>You win again!</i>
+  - ''
+  - ''
+- &103
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://www.getlyrics.com/lyrics/grateful-dead/wake-of-the-flood/07.htm">Weather
+    Report Suite</a>: "Winter rain, now tell me why, summers fade, and roses die?
+    The answer came. The wind and rain. Golden hills, now veiled in grey, summer leaves
+    have blown away. Now what remains? The wind and rain."'
+  - ''
+  - ''
+- &104
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://arts.ucsc.edu/gdead/agdl/darkstar.html">Dark Star</a> crashes,
+    pouring its light into ashes.
+  - ''
+  - ''
+- &105
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'DaveNet: <a href="http://davenet.userland.com/2001/01/21/theUsBlues">The U.S.
+    Blues</a>.'
+  - ''
+  - ''
+- &106
+  - ''
+  - ''
+  - ''
+  - ''
+  - Still listening to the US Blues. <i>"Wave that flag, wave it wide and high.."</i>
+    Mistake made in the 60s. We gave our country to the assholes. Ah ah. Let's take
+    it back. Hey I'm still a hippie. <i>"You could call this song The United States
+    Blues."</i>
+  - ''
+  - ''
+- &107
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.sixties.com/html/garcia_stack_0.html"><img src="http://www.scripting.com/images/captainTripsSmall.gif"
+    height="51" width="42" border="0" hspace="10" vspace="10" align="right"></a>In
+    celebration of today's inauguration, after hearing all those great patriotic songs,
+    America the Beautiful, even The Star Spangled Banner made my eyes mist up. It
+    made my choice of Grateful Dead song of the night realllly easy. Here are the
+    <a href="http://searchlyrics2.homestead.com/gd_usblues.html">lyrics</a>. Click
+    on the audio icon to the left to give it a listen. "Red and white, blue suede
+    shoes, I'm Uncle Sam, how do you do?" It's a different kind of patriotic music,
+    but man I love my country and I love Jerry and the band. <i>I truly do!</i>
+  - ''
+  - ''
+- &108
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Grateful Dead: "Tennessee, Tennessee, ain''t no place I''d rather be."'
+  - ''
+  - ''
+- &109
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Ed Cone: "Had a nice Deadhead experience with my wife, who never was one but
+    gets the vibe and knows and likes a lot of the music. Somehow she made it to the
+    age of 40 without ever hearing Wharf Rat. We drove to Jersey and back over Christmas
+    with the live album commonly known as Skull and Roses in the CD player much of
+    the way, and it was cool to see her discover one the band''s finest moments. That
+    song is unique and underappreciated. Fun to hear that disc again after a few years
+    off -- you get Jerry as blues-guitar hero on Big Railroad Blues and a nice version
+    of Bertha."'
+  - ''
+  - ''
+- &110
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://arts.ucsc.edu/GDead/AGDL/fotd.html">Tonight''s Song</a>: "If
+    I get home before daylight I just might get some sleep tonight."'
+  - ''
+  - ''
+- &111
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://arts.ucsc.edu/GDead/AGDL/uncle.html">Tonight''s song</a>: "Come
+    hear Uncle John''s Band by the river side. Got some things to talk about here
+    beside the rising tide."'
+  - ''
+  - ''
+- &112
+  - ''
+  - ''
+  - ''
+  - ''
+  - '<a href="http://www.cs.cmu.edu/~mleone/gdead/dead-lyrics/Me_and_My_Uncle.txt">Me
+    and My Uncle</a>: "I loved my uncle, God rest his soul, taught me good, Lord,
+    taught me all I know. Taught me so well, I grabbed that gold and I left his dead
+    ass there by the side of the road."'
+  - ''
+  - ''
+- &113
+  - ''
+  - ''
+  - ''
+  - ''
+  - Truckin, like the doo-dah man, once told me gotta play your hand. Sometimes the
+    cards ain't worth a dime, if you don't lay em down.
+  - ''
+  - ''
+- &114
+  - ''
+  - ''
+  - ''
+  - ''
+  - 'Two-Way-Web: <a href="http://www.thetwowayweb.com/payloadsForRss">Payloads for
+    RSS</a>. "When I started talking with Adam late last year, he wanted me to think
+    about high quality video on the Internet, and I totally didn''t want to hear about
+    it."'
+  - ''
+  - ''
+- &115
+  - ''
+  - ''
+  - ''
+  - ''
+  - A touch of gray, kinda suits you anyway..
+  - ''
+  - ''
+- &116
+  - ''
+  - ''
+  - ''
+  - ''
+  - <a href="http://www.sixties.com/html/garcia_stack_0.html"><img src="http://www.scripting.com/images/captainTripsSmall.gif"
+    height="51" width="42" border="0" hspace="10" vspace="10" align="right"></a>In
+    celebration of today's inauguration, after hearing all those great patriotic songs,
+    America the Beautiful, even The Star Spangled Banner made my eyes mist up. It
+    made my choice of Grateful Dead song of the night realllly easy. Here are the
+    <a href="http://searchlyrics2.homestead.com/gd_usblues.html">lyrics</a>. Click
+    on the audio icon to the left to give it a listen. "Red and white, blue suede
+    shoes, I'm Uncle Sam, how do you do?" It's a different kind of patriotic music,
+    but man I love my country and I love Jerry and the band. <i>I truly do!</i>
+  - ''
+  - ''
+- &117
+  - ''
+  - 'XML: A Disruptive Technology'
+  - http://c.moreover.com/click/here.pl?r123
+  - ''
+  - "\n      XML is placing increasingly heavy loads on the existing technical\n      infrastructure
+    of the Internet.\n    "
+  - Simon St.Laurent (mailto:simonstl@simonstl.com)
+  - ''
+'0.91':
+- *1
+- *2
+- *3
+- *4
+- *5
+- *6
+- *7
+- *8
+- *9
+- *10
+- *11
+- *12
+- *13
+- *14
+- *15
+- *16
+- *17
+- *18
+- *19
+- *20
+- *21
+- *22
+- *23
+- *24
+- *25
+- *26
+- *27
+- *28
+- *29
+- *30
+- *31
+- *32
+- *33
+- *34
+- *35
+- *36
+- *37
+- *38
+- *39
+- *40
+- *41
+- *42
+- *43
+- *44
+- *45
+- *46
+- *47
+- *48
+- *49
+- *50
+- *51
+- *52
+- *53
+- *54
+- *55
+- *56
+- *57
+- *58
+- *59
+- *60
+- *61
+- *62
+- *63
+- *64
+- *65
+- *66
+- *67
+- *68
+- *69
+- *70
+- *71
+- *72
+- *73
+- *74
+- *75
+- *76
+- *77
+- *78
+- *79
+- *80
+- *81
+- *82
+- *83
+- *84
+- *85
+- *86
+- *87
+- *88
+- *89
+- *90
+- *91
+- *92
+- *93
+- *94
+- *95
+- *96
+- *97
+- *98
+- *99
+- *100
+- *101
+- *102
+- *103
+- *104
+- *105
+- *106
+- *107
+- *108
+- *109
+- *110
+- *111
+- *112
+- *113
+- *114
+- *115
+- *116
+- *117
+- &118
+  - ''
+  - 'XML: A Disruptive Technology'
+  - http://c.moreover.com/click/here.pl?r123
+  - ''
+  - "\n      XML is placing increasingly heavy loads on the existing technical\n      infrastructure
+    of the Internet.\n    "
+  - Simon St.Laurent (mailto:simonstl@simonstl.com)
+  - ''
+'1.0':
+- *1
+- *2
+- *3
+- *4
+- *5
+- *6
+- *7
+- *8
+- *9
+- *10
+- *11
+- *12
+- *13
+- *14
+- *15
+- *16
+- *17
+- *18
+- *19
+- *20
+- *21
+- *22
+- *23
+- *24
+- *25
+- *26
+- *27
+- *28
+- *29
+- *30
+- *31
+- *32
+- *33
+- *34
+- *35
+- *36
+- *37
+- *38
+- *39
+- *40
+- *41
+- *42
+- *43
+- *44
+- *45
+- *46
+- *47
+- *48
+- *49
+- *50
+- *51
+- *52
+- *53
+- *54
+- *55
+- *56
+- *57
+- *58
+- *59
+- *60
+- *61
+- *62
+- *63
+- *64
+- *65
+- *66
+- *67
+- *68
+- *69
+- *70
+- *71
+- *72
+- *73
+- *74
+- *75
+- *76
+- *77
+- *78
+- *79
+- *80
+- *81
+- *82
+- *83
+- *84
+- *85
+- *86
+- *87
+- *88
+- *89
+- *90
+- *91
+- *92
+- *93
+- *94
+- *95
+- *96
+- *97
+- *98
+- *99
+- *100
+- *101
+- *102
+- *103
+- *104
+- *105
+- *106
+- *107
+- *108
+- *109
+- *110
+- *111
+- *112
+- *113
+- *114
+- *115
+- *116
+- *117
+- *118
+- &119
+  - ''
+  - 'XML: A Disruptive Technology'
+  - http://c.moreover.com/click/here.pl?r123
+  - ''
+  - "\n      XML is placing increasingly heavy loads on the existing technical\n      infrastructure
+    of the Internet.\n    "
+  - Simon St.Laurent (mailto:simonstl@simonstl.com)
+  - ''
+'2.0':
+- *1
+- *2
+- *3
+- *4
+- *5
+- *6
+- *7
+- *8
+- *9
+- *10
+- *11
+- *12
+- *13
+- *14
+- *15
+- *16
+- *17
+- *18
+- *19
+- *20
+- *21
+- *22
+- *23
+- *24
+- *25
+- *26
+- *27
+- *28
+- *29
+- *30
+- *31
+- *32
+- *33
+- *34
+- *35
+- *36
+- *37
+- *38
+- *39
+- *40
+- *41
+- *42
+- *43
+- *44
+- *45
+- *46
+- *47
+- *48
+- *49
+- *50
+- *51
+- *52
+- *53
+- *54
+- *55
+- *56
+- *57
+- *58
+- *59
+- *60
+- *61
+- *62
+- *63
+- *64
+- *65
+- *66
+- *67
+- *68
+- *69
+- *70
+- *71
+- *72
+- *73
+- *74
+- *75
+- *76
+- *77
+- *78
+- *79
+- *80
+- *81
+- *82
+- *83
+- *84
+- *85
+- *86
+- *87
+- *88
+- *89
+- *90
+- *91
+- *92
+- *93
+- *94
+- *95
+- *96
+- *97
+- *98
+- *99
+- *100
+- *101
+- *102
+- *103
+- *104
+- *105
+- *106
+- *107
+- *108
+- *109
+- *110
+- *111
+- *112
+- *113
+- *114
+- *115
+- *116
+- *117
+- *118
+- *119
+- - ''
+  - 'XML: A Disruptive Technology'
+  - http://c.moreover.com/click/here.pl?r123
+  - ''
+  - "\n      XML is placing increasingly heavy loads on the existing technical\n      infrastructure
+    of the Internet.\n    "
+  - Simon St.Laurent (mailto:simonstl@simonstl.com)
+  - ''

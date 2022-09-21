@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/VideoTrackList.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/28
-## Modified 2021/12/28
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,8 +17,12 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::List );
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION );
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -33,7 +37,7 @@ sub addEventListener { return( shift->SUPER::addEventListener({
         addtrack    => { 
             add     => { property => 'children', type => 'add', event => 'addtrack', callback => sub
                 {
-                    my( $self, $ref ) = @_;
+                    my( $event, $ref ) = @_;
                     $event->track( $ref->{added} ) if( $ref->{added} );
                 }},
         },
@@ -44,7 +48,7 @@ sub addEventListener { return( shift->SUPER::addEventListener({
         removetrack => {
             remove  => { property => 'children', type => 'remove', event => 'removetrack', callback => sub
                 {
-                    my( $self, $ref ) = @_;
+                    my( $event, $ref ) = @_;
                     $event->track( $ref->{removed} ) if( $ref->{removed} );
                 }},
         },
@@ -110,13 +114,13 @@ sub _update_selected
 {
     my $self = shift( @_ );
     my $track = shift( @_ );
-    my $pos = $self->children->index( $pos );
+    my $pos = $self->children->index( $track );
     $self->selectedIndex( $pos ) if( defined( $pos ) );
     return( $self );
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -133,7 +137,7 @@ HTML::Object::DOM::VideoTrackList - HTML Object DOM VideoTrackList Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

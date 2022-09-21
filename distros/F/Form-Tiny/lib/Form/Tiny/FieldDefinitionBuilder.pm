@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinitionBuilder;
-$Form::Tiny::FieldDefinitionBuilder::VERSION = '2.13';
+$Form::Tiny::FieldDefinitionBuilder::VERSION = '2.14';
 use v5.10;
 use strict;
 use warnings;
@@ -10,8 +10,6 @@ use Types::Standard qw(HashRef);
 
 use Form::Tiny::FieldDefinition;
 use Form::Tiny::Utils qw(has_form_meta);
-
-use namespace::clean;
 
 has 'data' => (
 	is => 'ro',

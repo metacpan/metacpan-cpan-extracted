@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/EventTarget.pm
-## Version v0.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/11
-## Modified 2021/12/11
+## Modified 2022/09/20
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -19,14 +20,18 @@ BEGIN
     # HTML::Object::DOM::TextTrack that inherits from EventTarget to also have the parent method provided
     # by the core module HTML::Object::Element
     use parent qw( HTML::Object::Element );
+    use vars qw( $PACK_SUB_RE $SIGNALS $VERSION );
     use HTML::Object::EventListener;
     use Scalar::Util ();
     use Want;
     our $PACK_SUB_RE = qr/^(((?<pack>[a-zA-Z\_]\w*(?:\:\:\w+)*)\:\:)?(?<sub>\w+))$/;
     # Hash reference of signal to array of object to remove their listeners
     our $SIGNALS = {};
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.1';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -92,7 +97,6 @@ sub addEventListener
     $repo->{ $type } = {} if( !CORE::exists( $repo->{ $type } ) );
     $repo->{ $type }->{sequence} = $self->new_array if( !CORE::exists( $repo->{ $type }->{sequence} ) );
     $repo->{ $type }->{ $key } = $eh;
-    $self->message( 4, "Storing event listener '$eh' for type '$type' -> '", $repo->{ $type }->{ $key }, "' and with key '$key'" );
     if( $repo->{ $type }->{sequence}->has( $key ) )
     {
         $repo->{ $type }->{sequence}->remove( $key );
@@ -105,7 +109,6 @@ sub addEventListener
     {
         $post_processing->( $eh );
     }
-    $self->messagef( 4, "Event listener repository has now %d handlers (%d).", scalar( @{$repo->{ $type }->{sequence}} ), $repo->{ $type }->{sequence}->length );
     return( $eh );
 }
 
@@ -119,40 +122,32 @@ sub dispatchEvent
     my $type = $event->type || return( $self->error( "The event has no type associated with it!" ) );
     $type = lc( $type );
     my $can_cancel = $event->cancelable;
-    $self->message( 4, "Called to dispatch an event ($event) of type '$type' that is cancelable ? ", ( $can_cancel ? 'yes' : 'no' ), " and has it been cancelled already? -> ", ( $event->cancelled ? 'yes' : 'no' ) );
     return( $self ) if( $can_cancel && $event->cancelled );
     # from current element to top one
     my $path = $event->composedPath;
-    $self->message( 4, "Nodes path is: '", $path->map(sub{ $_->tag })->join( "' -> '" )->scalar, "'" );
     $event->eventPhase( $event->CAPTURING_PHASE );
     # Go from top to our element, i.e. reverse
-    $self->message( 4, "Start the capture phase." );
     $path->reverse->foreach(sub
     {
         my $node = shift( @_ );
-        $self->message( 4, "Capture phase: checking node with tag '", $node->tag, "'" );
         $event->currentTarget( $node );
         $node->handleEvent( $event ) || do
         {
-            $self->message( 4, "Error handling event: ", $node->error );
         };
         if( $can_cancel && $event->cancelled )
         {
-            $self->message( 4, "Event has been cancelled, stopping the capture phase." );
             return;
         }
         # Make sure to return true to keep looping
         return(1);
     });
     return( $self ) if( $can_cancel && $event->cancelled >= $event->CANCEL_IMMEDIATE_PROPAGATION );
-    $self->message( 4, "Start the 'at target' phase." );
     $event->eventPhase( $event->AT_TARGET );
     $event->currentTarget( $self );
     $self->handleEvent( $event );
     return( $self ) if( $can_cancel && $event->cancelled >= $event->CANCEL_PROPAGATION );
     # This event does not bubble, so we do nothing more
     return( $self ) if( !$event->bubbles );
-    $self->message( 4, "Start the bubble phase." );
     $event->eventPhase( $event->BUBBLING_PHASE );
     # Now, go from our element to the top one
     $path->for(sub
@@ -160,15 +155,12 @@ sub dispatchEvent
         my( $i, $node ) = @_;
         # Skip the first one which is us.
         return(1) if( $i == 0 );
-        $self->message( 4, "Bubble phase: checking node with tag '", $node->tag, "'" );
         $event->currentTarget( $node );
         $node->handleEvent( $event ) || do
         {
-            $self->message( 4, "Error handling event: ", $node->error );
         };
         if( $can_cancel && $event->cancelled )
         {
-            $self->message( 4, "Event has been cancelled, stopping the capture phase." );
             return;
         }
         # Make sure to return true to keep looping
@@ -217,7 +209,6 @@ sub handleEvent
         message => "No event type was provided.",
         class => 'HTML::Object::SyntaxError',
     }) );
-    $self->message( 4, "Repo for type '$type' is '", $repo->{ $type }, "'" );
     return( $self ) if( !CORE::exists( $repo->{ $type } ) );
     return( $self->error({
         message => "Repository of event listener of type '$type' is not an hash reference!",
@@ -235,7 +226,6 @@ sub handleEvent
 
     $evt->currentTarget( $self );
     my $eventPhase = $evt->eventPhase;
-    $self->messagef( 4, "%d listeners found -> '%s'", $repo->{ $type }->{sequence}->length, $repo->{ $type }->{sequence}->join( "', '" )->scalar );
     foreach my $key ( @{$repo->{ $type }->{sequence}} )
     {
         return( $self->error({
@@ -263,7 +253,6 @@ sub handleEvent
             ( $eventPhase eq $evt->CAPTURING_PHASE && !$listener->capture ) ||
             ( $eventPhase eq $evt->BUBBLING_PHASE && $listener->capture ) )
         {
-            $self->message( 4, "The event target maybe is not our element, and our event listener phase (", $listener->capture, ") is not for this phase ($eventPhase)" );
             next;
         }
         
@@ -295,8 +284,8 @@ sub hasEventListener
     if( defined( $type ) && CORE::length( $type ) )
     {
         $repo->{ $type } = {} if( !CORE::exists( $repo->{ $type } ) );
-        $n-- if( CORE::exists( $repo->{ $type }->{sequence} ) );
         my $n = scalar( keys( %{$repo->{ $type }} ) );
+        $n-- if( CORE::exists( $repo->{ $type }->{sequence} ) );
         return( $self->new_number( $n ) );
     }
     my $n = 0;
@@ -418,7 +407,6 @@ sub removeEventListener
     {
         $opts->{capture} = $eh->options->{capture};
     }
-    $self->message( 4, "Options received are: ", sub{ $self->Module::Generic::dump( $opts ) } );
     my @ok_params = qw( capture );
     my $params = {};
     @$params{ @ok_params } = CORE::delete( @$opts{ @ok_params } );
@@ -428,7 +416,6 @@ sub removeEventListener
     }
     $params->{capture} //= 0;
     my $key = join( ';', $type, Scalar::Util::refaddr( $callback ), $params->{capture} );
-    $self->message( 4, "Checking to remove event listener with for type '$type' and with key '$key'." );
     $self->{event_listeners} = {} if( !CORE::exists( $self->{event_listeners} ) );
     my $repo = $self->{event_listeners};
     $repo->{ $type } = {} if( !CORE::exists( $repo->{ $type } ) );
@@ -477,7 +464,7 @@ sub _trigger_event_for
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -523,7 +510,7 @@ HTML::Object::EventTarget - HTML Object Event Target Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

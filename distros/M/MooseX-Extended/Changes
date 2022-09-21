@@ -1,5 +1,8 @@
 Revision history for MooseX-Extended
 
+0.31      2022-09-16 18:19:09 CEST
+          - Lock down our version of Future.pm to avoid buggy 0.48_001.
+
 0.30      2022-09-15 09:54:00 CEST
 
           - Add support for a `method` keyword via Function::Parameters.

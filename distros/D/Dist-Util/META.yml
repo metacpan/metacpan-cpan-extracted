@@ -19,7 +19,7 @@ name: Dist-Util
 provides:
   Dist::Util:
     file: lib/Dist/Util.pm
-    version: '0.070'
+    version: '0.071'
 requires:
   Config: '0'
   Exporter: '5.57'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Util
   homepage: https://metacpan.org/release/Dist-Util
   repository: git://github.com/perlancar/perl-Dist-Util.git
-version: '0.070'
+version: '0.071'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

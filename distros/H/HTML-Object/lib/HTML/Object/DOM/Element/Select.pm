@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/Select.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
-## Modified 2021/12/23
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,9 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::Element );
+    use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :select );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -163,7 +167,6 @@ sub options
     my $self = shift( @_ );
     return( $self->{_select_options} ) if( $self->{_select_options} && !$self->_is_select_reset );
     my $list = $self->children->grep(sub{ $self->_is_a( $_ => 'HTML::Object::DOM::Element::Option' ) });
-    $self->messagef( 3, "List $list returned %d elements from %d children.", $list->length, $self->children->length );
     # The content of the collection is refreshed, but the collection object itself does not change, so the user can poll it
     unless( $self->{_select_options} )
     {
@@ -268,11 +271,9 @@ sub selectedOptions
     my $self = shift( @_ );
     return( $self->{_selected_options} ) if( $self->{_selected_options} && !$self->_is_select_reset );
     my $list = $self->options->filter(sub{ $_->defaultSelected });
-    $self->messagef( 3, "List $list returned %d elements from %d children.", $list->length, $self->children->length );
     $self->children->for(sub
     {
         my( $i, $elem ) = @_;
-        $self->message( 4, "Child at position $i is '$elem' with tag '", $elem->tag, "'." );
         
     });
     # The content of the collection is refreshed, but the collection object itself does not change, so the user can poll it
@@ -316,7 +317,7 @@ sub _reset_select
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -333,7 +334,7 @@ HTML::Object::DOM::Element::Select - HTML Object DOM Select Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

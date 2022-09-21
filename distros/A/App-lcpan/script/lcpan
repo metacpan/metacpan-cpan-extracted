@@ -10,9 +10,9 @@ use Perinci::CmdLine::Any;
 use Perinci::CmdLineX::CommonOptions::SelfUpgrade;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2022-09-19'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.070'; # VERSION
+our $VERSION = '1.071'; # VERSION
 
 my $prefix = '/App/lcpan/';
 my $mods = do {
@@ -67,7 +67,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.070 of lcpan (from Perl distribution App-lcpan), released on 2022-03-27.
+This document describes version 1.071 of lcpan (from Perl distribution App-lcpan), released on 2022-09-19.
 
 =head1 SYNOPSIS
 
@@ -355,6 +355,14 @@ List distributions of an author.
 
 List modules of an author.
 
+=head2 B<author-mods-by-other-author-rdep-count>
+
+List modules of an author sorted by their number of reverse dependencies from other authors.
+
+=head2 B<author-mods-by-rdep-count>
+
+List modules of an author sorted by their number of reverse dependencies.
+
 =head2 B<author-rdeps>
 
 Find distributions that use one of author's modules.
@@ -445,6 +453,13 @@ Copy a script's latest release file to current directory.
 Return database path that is used.
 
 This is a convenience subcommand for use in, e.g. command-line oneliners.
+
+
+=head2 B<delete-old-data>
+
+Delete old data (contents of old_* tables).
+
+Will delete records in C<old_*> tables.
 
 
 =head2 B<delete-rel>
@@ -793,6 +808,21 @@ so not really accurate.
 
 Alias for 'release'.
 
+=head2 B<related-authors>
+
+List other authors related to author(s).
+
+This subcommand lists other authors that might be related to the author(s) you
+specify. This is done in one of the ways below which you can choose.
+
+=over
+
+=item 1. (the default) by finding authors whose modules tend to be mentioned together
+in POD documentation.
+
+=back
+
+
 =head2 B<related-mods>
 
 List other modules related to module(s).
@@ -973,9 +1003,29 @@ C<*> marks required options.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
 
 =item B<--cpan>=I<s>
 
@@ -996,6 +1046,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--help>, B<-h>, B<-?>
 
 Display help message and exit.
@@ -1008,10 +1064,10 @@ Default value:
 
  "index.db"
 
-If `index_name` is a filename without any path, e.g. `index.db` then index will
-be located in the top-level of `cpan`. If `index_name` contains a path, e.g.
-`./index.db` or `/home/ujang/lcpan.db` then the index will be located solely
-using the `index_name`.
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
 
 
 =item B<--json>
@@ -1022,13 +1078,32 @@ Set output format to json.
 
 Set log level.
 
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
 =item B<--no-env>
 
 Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
 
 =item B<--no-naked-res>
 
@@ -1036,15 +1111,34 @@ When outputing as JSON, add result envelope.
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
+
+
+=item B<--no-update-db-schema>
+
+Do not update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
 
 
 =item B<--no-use-bootstrap>
@@ -1056,6 +1150,10 @@ off.
 =item B<--page-result>
 
 Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
 
 =item B<--quiet>
 
@@ -1084,6 +1182,11 @@ Display program's version and exit.
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -1168,32 +1271,32 @@ Instead of showing tree-like information, flatten it.
 When recursing, the default is to show the final result in a tree-like table,
 i.e. indented according to levels, e.g.:
 
-    % lcpan deps -R MyModule
-    | module            | author  | version |
-    |-------------------|---------|---------|
-    | Foo               | AUTHOR1 | 0.01    |
-    |   Bar             | AUTHOR2 | 0.23    |
-    |   Baz             | AUTHOR3 | 1.15    |
-    | Qux               | AUTHOR2 | 0       |
+ % lcpan deps -R MyModule
+ | module            | author  | version |
+ |-------------------|---------|---------|
+ | Foo               | AUTHOR1 | 0.01    |
+ |   Bar             | AUTHOR2 | 0.23    |
+ |   Baz             | AUTHOR3 | 1.15    |
+ | Qux               | AUTHOR2 | 0       |
 
-To be brief, if `Qux` happens to also depends on `Bar`, it will not be shown in
-the result. Thus we don't know the actual `Bar` version that is needed by the
-dependency tree of `MyModule`. For example, if `Qux` happens to depends on `Bar`
-version 0.45 then `MyModule` indirectly requires `Bar` 0.45.
+To be brief, if C<Qux> happens to also depends on C<Bar>, it will not be shown in
+the result. Thus we don't know the actual C<Bar> version that is needed by the
+dependency tree of C<MyModule>. For example, if C<Qux> happens to depends on C<Bar>
+version 0.45 then C<MyModule> indirectly requires C<Bar> 0.45.
 
 To list all the direct and indirect dependencies on a single flat list, with
-versions already resolved to the largest version required, use the `flatten`
+versions already resolved to the largest version required, use the C<flatten>
 option:
 
-    % lcpan deps -R --flatten MyModule
-    | module            | author  | version |
-    |-------------------|---------|---------|
-    | Foo               | AUTHOR1 | 0.01    |
-    | Bar               | AUTHOR2 | 0.45    |
-    | Baz               | AUTHOR3 | 1.15    |
-    | Qux               | AUTHOR2 | 0       |
+ % lcpan deps -R --flatten MyModule
+ | module            | author  | version |
+ |-------------------|---------|---------|
+ | Foo               | AUTHOR1 | 0.01    |
+ | Bar               | AUTHOR2 | 0.45    |
+ | Baz               | AUTHOR3 | 1.15    |
+ | Qux               | AUTHOR2 | 0       |
 
-Note that `Bar`'s required version is already 0.45 in the above example.
+Note that C<Bar>'s required version is already 0.45 in the above example.
 
 
 =item B<--level>=I<s>, B<-l>
@@ -1363,6 +1466,30 @@ Can also be specified as the 1st command-line argument.
 =back
 
 =head2 Options for subcommand author-mods
+
+=over
+
+=item B<--author>=I<s>*
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--detail>, B<-l>
+
+=back
+
+=head2 Options for subcommand author-mods-by-other-author-rdep-count
+
+=over
+
+=item B<--author>=I<s>*
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--detail>, B<-l>
+
+=back
+
+=head2 Options for subcommand author-mods-by-rdep-count
 
 =over
 
@@ -1827,32 +1954,32 @@ Instead of showing tree-like information, flatten it.
 When recursing, the default is to show the final result in a tree-like table,
 i.e. indented according to levels, e.g.:
 
-    % lcpan deps -R MyModule
-    | module            | author  | version |
-    |-------------------|---------|---------|
-    | Foo               | AUTHOR1 | 0.01    |
-    |   Bar             | AUTHOR2 | 0.23    |
-    |   Baz             | AUTHOR3 | 1.15    |
-    | Qux               | AUTHOR2 | 0       |
+ % lcpan deps -R MyModule
+ | module            | author  | version |
+ |-------------------|---------|---------|
+ | Foo               | AUTHOR1 | 0.01    |
+ |   Bar             | AUTHOR2 | 0.23    |
+ |   Baz             | AUTHOR3 | 1.15    |
+ | Qux               | AUTHOR2 | 0       |
 
-To be brief, if `Qux` happens to also depends on `Bar`, it will not be shown in
-the result. Thus we don't know the actual `Bar` version that is needed by the
-dependency tree of `MyModule`. For example, if `Qux` happens to depends on `Bar`
-version 0.45 then `MyModule` indirectly requires `Bar` 0.45.
+To be brief, if C<Qux> happens to also depends on C<Bar>, it will not be shown in
+the result. Thus we don't know the actual C<Bar> version that is needed by the
+dependency tree of C<MyModule>. For example, if C<Qux> happens to depends on C<Bar>
+version 0.45 then C<MyModule> indirectly requires C<Bar> 0.45.
 
 To list all the direct and indirect dependencies on a single flat list, with
-versions already resolved to the largest version required, use the `flatten`
+versions already resolved to the largest version required, use the C<flatten>
 option:
 
-    % lcpan deps -R --flatten MyModule
-    | module            | author  | version |
-    |-------------------|---------|---------|
-    | Foo               | AUTHOR1 | 0.01    |
-    | Bar               | AUTHOR2 | 0.45    |
-    | Baz               | AUTHOR3 | 1.15    |
-    | Qux               | AUTHOR2 | 0       |
+ % lcpan deps -R --flatten MyModule
+ | module            | author  | version |
+ |-------------------|---------|---------|
+ | Foo               | AUTHOR1 | 0.01    |
+ | Bar               | AUTHOR2 | 0.45    |
+ | Baz               | AUTHOR3 | 1.15    |
+ | Qux               | AUTHOR2 | 0       |
 
-Note that `Bar`'s required version is already 0.45 in the above example.
+Note that C<Bar>'s required version is already 0.45 in the above example.
 
 
 =item B<--level>=I<s>, B<-l>
@@ -2368,7 +2495,7 @@ See C<--format-arg>.
 Module or script name.
 
 If the name matches both module name and script name, the module will be chosen.
-To choose the script, use `--script` (`-s`).
+To choose the script, use C<--script> (C<-s>).
 
 
 Can also be specified as the 1st command-line argument.
@@ -3917,7 +4044,7 @@ Allow showing multiple modules for different dists.
 
 Instead of showing tree-like information, flatten it.
 
-See deps' *flatten* argument for more details.
+See deps' I<flatten> argument for more details.
 
 
 =item B<--level>=I<s>, B<-l>
@@ -4036,6 +4163,48 @@ Can also be specified as the 1st command-line argument.
 
 =back
 
+=head2 Options for subcommand related-authors
+
+=over
+
+=item B<--author>=I<s@>*
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--authors-json>=I<s>
+
+See C<--author>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--limit>=I<s>
+
+Maximum number of authors to return.
+
+Default value:
+
+ 20
+
+=item B<--sort-json>=I<s>
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Default value:
+
+ ["-score","-num_module_mentions"]
+
+Can be specified multiple times.
+
+=item B<--with-scores>
+
+Return score-related fields.
+
+=back
+
 =head2 Options for subcommand related-mods
 
 =over
@@ -4092,12 +4261,12 @@ Can be specified multiple times.
 
 Whether to include submodules.
 
-If set to true, will only show related submodules, e.g. `lcpan related-modules
-Foo::Bar` will only show `Foo::Bar::Baz`, `Foo::Bar::Quz`, and so on.
+If set to true, will only show related submodules, e.g. C<lcpan related-modules
+Foo::Bar> will only show C<Foo::Bar::Baz>, C<Foo::Bar::Quz>, and so on.
 
 If set to false, will only show related modules that are not submodules, e.g.
-`lcpan related-modules Foo::Bar` will show `Baz`, `Foo::Baz`, but not
-`Foo::Bar::Baz`.
+C<lcpan related-modules Foo::Bar> will show C<Baz>, C<Foo::Baz>, but not
+C<Foo::Bar::Baz>.
 
 
 =item B<--with-content-paths>
@@ -4599,7 +4768,7 @@ Can also be specified as the 1st command-line argument and onwards.
 Module or script name.
 
 If the name matches both module name and script name, the module will be chosen.
-To choose the script, use `--script` (`-s`).
+To choose the script, use C<--script> (C<-s>).
 
 
 Can also be specified as the 1st command-line argument.
@@ -4731,7 +4900,7 @@ If set, skip downloading files larger than this.
 =item B<--no-skip-sub-indexing>
 
 Since sub indexing is still experimental, it is not enabled by default. To
-enable it, pass the `--no-skip-sub-indexing` option.
+enable it, pass the C<--no-skip-sub-indexing> option.
 
 
 =item B<--no-update-files>
@@ -4961,7 +5130,7 @@ repository created by L<OrePAN> (or similar tools).
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/dWhtu8vuuY.conf>, F</home/u1/dWhtu8vuuY.conf>, or F</etc/dWhtu8vuuY.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/lcpan.conf>, F</home/u1/lcpan.conf>, or F</etc/lcpan.conf>.
 
 All found files will be read and merged.
 
@@ -4999,6 +5168,7 @@ List of available configuration parameters:
  index_name (see --index-name)
  log_level (see --log-level)
  naked_res (see --naked-res)
+ update_db_schema (see --no-update-db-schema)
  use_bootstrap (see --no-use-bootstrap)
 
 =head2 Configuration for subcommand author
@@ -5051,6 +5221,16 @@ List of available configuration parameters:
  latest (see --latest)
 
 =head2 Configuration for subcommand author-mods
+
+ author (see --author)
+ detail (see --detail)
+
+=head2 Configuration for subcommand author-mods-by-other-author-rdep-count
+
+ author (see --author)
+ detail (see --detail)
+
+=head2 Configuration for subcommand author-mods-by-rdep-count
 
  author (see --author)
  detail (see --detail)
@@ -5155,6 +5335,9 @@ List of available configuration parameters:
  script (see --script)
 
 =head2 Configuration for subcommand db-path
+
+
+=head2 Configuration for subcommand delete-old-data
 
 
 =head2 Configuration for subcommand delete-rel
@@ -5612,6 +5795,13 @@ List of available configuration parameters:
 
  release (see --release)
 
+=head2 Configuration for subcommand related-authors
+
+ authors (see --author)
+ limit (see --limit)
+ sort (see --sort)
+ with_scores (see --with-scores)
+
 =head2 Configuration for subcommand related-mods
 
  limit (see --limit)
@@ -5790,94 +5980,100 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 DWHTU8VUUY_OPT => str
+=head2 LCPAN_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F</home/u1/.config/dWhtu8vuuY.conf>
+=head2 /home/u1/.config/lcpan.conf
 
-F</home/u1/dWhtu8vuuY.conf>
+=head2 /home/u1/lcpan.conf
 
-F</etc/dWhtu8vuuY.conf>
+=head2 /etc/lcpan.conf
 
 =head1 EXAMPLES
 
-List all authors:
+=head2 List all authors
 
  % lcpan authors
 
-Find CPAN IDs which start with something:
+=head2 Find CPAN IDs which start with something
 
  % lcpan authors MICHAEL%
  ERROR MICHAEL: MICHAELW
 
-Use module name:
+=head2 Use module name
 
  % lcpan changes Data::CSel::Parser
 
-List what modules Module-List requires:
+=head2 List what modules Module-List requires
 
  % lcpan deps Module-List
 
-List modules Module-List requires (module name will be converted to distro name):
+=head2 List modules Module-List requires (module name will be converted to distro name)
 
  % lcpan deps Module::List
 
-List what distribution that contains Sah::Schema::filename requires:
+=head2 List what distribution that contains Sah::Schema::filename requires
 
  % lcpan deps --module Sah::Schema::filename
 
-List non-core modules Module-List requires:
+Sah::Schema::filename is included in Sah-Schemas-Path distribution, so this
+command is equivalent to "lcpan deps Sah-Schemas-Path". You can't do "lcpan deps
+Sah::Schema::filename" because C<lcpan> will assume that you ask "lcpan deps
+Sah-Schema-filename" and there is no Sah-Schema-filename distribution.
+
+
+=head2 List non-core modules Module-List requires
 
  % lcpan deps Module-List --exclude-core
 
-List dependencies of a specific distribution release:
+=head2 List dependencies of a specific distribution release
 
  % lcpan deps Module-List@0.004
 
-List all distributions:
+=head2 List all distributions
 
  % lcpan dists --cpan /cpan
 
-List all distributions (latest version only):
+=head2 List all distributions (latest version only)
 
  % lcpan dists --cpan /cpan --latest
 
-Grep by distribution name, return detailed record:
+=head2 Grep by distribution name, return detailed record
 
  % lcpan dists --cpan /cpan data-table
 
-Filter by author, return JSON:
+=head2 Filter by author, return JSON
 
  % lcpan dists --cpan /cpan --author perlancar --json
 
-Seach module/POD/script named Rinci:
+=head2 Seach module/POD/script named Rinci
 
  % lcpan doc Rinci
 
-Specifically choose .pm file:
+=head2 Specifically choose .pm file
 
  % lcpan doc Rinci.pm
 
-Specifically choose .pod file:
+=head2 Specifically choose .pod file
 
  % lcpan doc Rinci.pod
 
-Look for script first named strict:
+=head2 Look for script first named strict
 
  % lcpan doc -s strict
 
-Dump the raw POD instead of rendering it:
+=head2 Dump the raw POD instead of rendering it
 
  % lcpan doc --raw Text::Table::Tiny
 
-List what distributions depend on Sah::Schema::filename:
+=head2 List what distributions depend on Sah::Schema::filename
 
  % lcpan rdeps Sah::Schema::filename
 
-List what distributions depend on one of the modules in Sah-Schemas-Path:
+=head2 List what distributions depend on one of the modules in Sah-Schemas-Path
 
  % lcpan rdeps --dist Sah-Schemas-Path
 
@@ -5916,9 +6112,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

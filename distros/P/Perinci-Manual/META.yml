@@ -19,12 +19,12 @@ name: Perinci-Manual
 provides:
   Perinci::Manual:
     file: lib/Perinci/Manual.pm
-    version: '0.009'
+    version: '0.010'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Manual
   homepage: https://metacpan.org/release/Perinci-Manual
   repository: git://github.com/perlancar/perl-Perinci-Manual.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

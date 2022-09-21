@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Emphasis.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,10 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -37,6 +40,13 @@ sub as_markdown
     my $type = $self->type // '*';
     $type = '*' if( $type ne '*' && $type ne '_' );
     return( "${type}${str}${type}" );
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    my $str = $self->children->map(sub{ $_->as_pod })->join( '' );
+    return( "I<${str}>" );
 }
 
 sub as_string
@@ -61,7 +71,7 @@ sub as_string
 sub type { return( shift->_set_get_scalar_as_object( 'type', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -78,7 +88,7 @@ Markdown::Parser::Emphasis - Markdown Emphasis Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -88,13 +98,19 @@ This class represents an emphasis formatting. It is used by L<Markdown::Parser> 
 
 =head2 as_markdown
 
-Returns a string representation of the code formatted in markdown.
+Returns a string representation of the emphasis formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the emphasis formatted in L<pod|perlpod>.
 
 It returns a plain string.
 
 =head2 as_string
 
-Returns an html representation of the code.
+Returns an html representation of the emphasis.
 
 It returns a plain string.
 

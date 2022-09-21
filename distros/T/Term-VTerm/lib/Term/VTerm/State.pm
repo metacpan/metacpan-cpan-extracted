@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
 
-package Term::VTerm::State 0.07;
+package Term::VTerm::State 0.08;
 
 use v5.14;
 use warnings;

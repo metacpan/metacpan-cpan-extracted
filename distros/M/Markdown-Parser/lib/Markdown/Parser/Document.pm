@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Document.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,19 +16,23 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
+    use vars qw( $VERSION );
     use Nice::Try;
     use URI;
     use Scalar::Util ();
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
     use constant MERMAID_RSRC_URI => 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js';
     use constant MERMAID_INIT     => "mermaid.initialize({startOnLoad:true});";
-    ## https://katex.org/
+    # https://katex.org/
     use constant KATEX_CSS_URI => 'https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css';
     use constant KATEX_JS_URI => 'https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js';
     use constant KATEX_AUTO_RENDERER => 'https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js';
     use constant KATEX_FONT_URI => 'https://cdn.jsdelivr.net/npm/webfontloader/webfontloader.js';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -89,10 +93,8 @@ sub add_js_data
 {
     my $self = shift( @_ );
     my $js = shift( @_ );
-    $self->message( 3, "Adding js data \"$js\"." );
 #     unless( $self->js_data->exists( $js ) )
 #     {
-#         $self->message( 3, "Js data \"$js\" does not yet exists." );
 #         $self->js_data->push( $js );
 #     }
     my $found;
@@ -169,6 +171,24 @@ sub as_markdown
         $str .= "\n\n";
         $str .= $self->footnotes->map_array(sub{ $_[1]->as_markdown })->join( "\n" );
     }
+    return( $str );
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    my $str = $self->children->map(sub{ $_->as_pod })->join( '' );
+    if( $self->dict->length )
+    {
+        $str .= "\n\n";
+        $str .= $self->dict->map_array(sub{ $_[1]->as_pod })->join( "\n" );
+    }
+    if( $self->footnotes->length )
+    {
+        $str .= "\n\n";
+        $str .= $self->footnotes->map_array(sub{ $_[1]->as_pod })->join( "\n" );
+    }
+    return( $str );
 }
 
 sub as_string
@@ -188,7 +208,6 @@ sub as_string
         <meta charset="utf-8" />
         <title></title>
 EOT
-    $self->messagef( 3, "%d css links to be added.", $self->css_links->length );
     $self->css_links->foreach(sub
     {
         my $ref = shift( @_ );
@@ -211,7 +230,6 @@ ${css_style}
         </style>
 EOT
     }
-    $self->messagef( 3, "%d js links to be added.", $self->js_links->length );
     $self->js_links->foreach(sub
     {
         my $ref = shift( @_ );
@@ -242,14 +260,12 @@ EOT
     $arr->push( $temp_buffer->list );
     if( $self->footnotes->length )
     {
-        $self->messagef( 3, "Generating foonotes for %d elements.", $self->footnotes->length );
         my $fn = $self->new_array;
         $fn->push( '<div class="footnotes" role="doc-endnotes">' );
         $fn->push( '<hr />' );
         $fn->push( '<ol>' );
         # $fn->push( $self->footnotes->map_array(sub{ $_[1]->as_string })->join( "\n" )->scalar );
         my $fn_str = $self->footnotes->map(sub{ $_->as_string })->join( "\n" )->scalar;
-        $self->message( 3, "Footnotes string: '$fn_str'." );
         $fn->push( $fn_str );
         $fn->push( '</ol>' );
         $arr->push( $fn->join( "\n" )->scalar );
@@ -324,10 +340,7 @@ sub get_abbreviation
     my $name = shift( @_ );
     return if( !length( $name ) );
     $name = lc( $name ) unless( $self->abbreviation_case_sensitive );
-    $self->messagef( 3, "Checking id term '$name' exists (%s) in our dictionary of %d abbreviations.", $self->dict->exists( $name ) ? 'yes' : 'no', $self->dict->length );
-    $self->message( 3, "Dictionary keys are: '", $self->dict->keys->join( "', '" ), "'" );
     return if( !$self->dict->exists( $name ) );
-    $self->message( 3, "Returning element found for abbreviation '$name'" );
     my $elem = $self->dict->{ $name };
     return( $elem );
 }
@@ -525,8 +538,7 @@ sub setup_mermaid
 }
 
 1;
-
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -544,7 +556,7 @@ Markdown::Parser::Document - Markdown Document Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -593,6 +605,10 @@ Provided with a L<Markdown::Parser::Element> object and this will add it to its 
 =head2 as_markdown
 
 Returns the document as markdown
+
+=head2 as_pod
+
+Returns the document as L<pod|perlpod>
 
 =head2 as_string
 

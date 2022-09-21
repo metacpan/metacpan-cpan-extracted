@@ -4,8 +4,6 @@ use Test::More;
 
 local $| = 1;
 
-use rlib;
-
 use English qw ( -no_match_vars );
 
 # Ensure a recent version of Test::Pod::Coverage
@@ -24,5 +22,4 @@ if ($EVAL_ERROR) {
     plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage";
 }
 
-
-all_pod_coverage_ok();
+pod_coverage_ok('Alien::gdal');

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Collection.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/24
-## Modified 2021/12/24
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,6 +17,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic::Array );
+    use vars qw( $AUTOLOAD $VERSION );
     use Module::Generic::Null;
     use Scalar::Util ();
     use Want;
@@ -27,8 +28,11 @@ BEGIN
         fallback => 1,
     );
     our $AUTOLOAD;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub item { return( shift->index( @_ ) ); }
 
@@ -41,7 +45,6 @@ sub namedItem
         return( $_ ) if( $self->_can( $_ => 'id' ) && $_->id eq $name );
         return( $_ ) if( $self->_can( $_ => 'name' ) && $_->name eq $name );
     }
-    # $self->message( 3, "Caller wants $what." );
     if( Want::want( 'OBJECT' ) )
     {
         return( Module::Generic::Null->new( @_ ) );
@@ -79,7 +82,7 @@ sub _can
     return( $_[0]->can( $_[1] ) );
 }
 
-# XXX AUTOLOAD
+# NOTE: AUTOLOAD
 sub AUTOLOAD
 {
     my( $meth ) = our $AUTOLOAD =~ /([^:]+)$/;
@@ -92,7 +95,7 @@ sub AUTOLOAD
 sub DESTROY {};
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -142,7 +145,7 @@ HTML::Object::DOM::Collection - HTML Object DOM Collection
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-09-11'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.480'; # VERSION
+our $VERSION = '0.481'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/SahUtils/is_sah_ref_builtin_type",
@@ -38,11 +38,11 @@ is-sah-ref-builtin-type - Check that a string or array schema is a Sah ref built
 
 =head1 VERSION
 
-This document describes version 0.480 of is-sah-ref-builtin-type (from Perl distribution App-SahUtils), released on 2022-07-16.
+This document describes version 0.481 of is-sah-ref-builtin-type (from Perl distribution App-SahUtils), released on 2022-09-11.
 
 =head1 SYNOPSIS
 
-% B<is-sah-ref-builtin-type> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<schema>E<gt>
+B<is-sah-ref-builtin-type> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<schema>E<gt>
 
 =head1 DESCRIPTION
 
@@ -204,9 +204,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

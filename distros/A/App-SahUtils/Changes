@@ -1,3 +1,8 @@
+0.481   2022-09-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli coerce-with-sah] [bugfix] Fix variable interpolation.
+
+
 0.480   2022-07-16  Released-By: PERLANCAR; Urgency: medium
 
         - Add CLIs: list-sah-pschema-modules, list-sah-pschemas-modules.

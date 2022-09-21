@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Text.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,10 +16,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -33,12 +36,14 @@ sub append { return( shift->text->append( @_ ) ); }
 
 sub as_markdown { return( shift->text->scalar ); }
 
+sub as_pod { return( shift->text->scalar ); }
+
 sub as_string { return( shift->text->scalar ); }
 
 sub text { return( shift->_set_get_scalar_as_object( 'text', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -55,7 +60,7 @@ Markdown::Parser::Text - Markdown Text Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -70,6 +75,12 @@ Provided with a string, and this will add it at the end of the current text data
 =head2 as_markdown
 
 Returns a string representation of the text formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the text formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

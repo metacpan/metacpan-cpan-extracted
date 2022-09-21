@@ -2,6 +2,7 @@ Changes
 lib/Mojar/Message.pm
 lib/Mojar/Message/BulkSms.pm
 lib/Mojar/Message/Smtp.pm
+lib/Mojar/Message/Telegram.pm
 LICENSE
 Makefile.PL
 MANIFEST
@@ -13,6 +14,7 @@ test/21-bulksms-real.t
 test/23-smtp-real.t
 test/manifest.t
 test/pod.t
+test/telegram.t
 test/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

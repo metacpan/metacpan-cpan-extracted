@@ -3,9 +3,9 @@
 package Perinci::Manual;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-01'; # DATE
+our $DATE = '2022-07-22'; # DATE
 our $DIST = 'Perinci-Manual'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 1;
 # ABSTRACT: Extra documentation for Perinci
@@ -22,7 +22,7 @@ Perinci::Manual - Extra documentation for Perinci
 
 =head1 VERSION
 
-This document describes version 0.009 of Perinci::Manual (from Perl distribution Perinci-Manual), released on 2022-07-01.
+This document describes version 0.010 of Perinci::Manual (from Perl distribution Perinci-Manual), released on 2022-07-22.
 
 =head1 DESCRIPTION
 

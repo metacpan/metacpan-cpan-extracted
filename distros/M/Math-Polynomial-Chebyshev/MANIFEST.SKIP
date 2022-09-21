@@ -1,4 +1,5 @@
-#!start included /usr/local/share/perl5/site_perl/5.26/ExtUtils/MANIFEST.SKIP
+# Start included MANIFEST.SKIP template from ExtUtils::Manifest 1.73
+
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -6,6 +7,7 @@
 ,v$
 \B\.svn\b
 \B\.git\b
+^\.github\b
 \B\.gitignore\b
 \b_darcs\b
 \B\.cvsignore$
@@ -44,6 +46,7 @@
 \.bak$
 \.tmp$
 \.#
+\.rej$
 \..*\.sw.?$
 
 # Avoid OS-specific files/dirs
@@ -51,6 +54,8 @@
 \B\.DS_Store
 # Mac OSX SMB mount metadata files
 \B\._
+# Placeholder files created when iCloud will "optimize Mac storage"
+\.i[cC]loud$
 
 # Avoid Devel::Cover and Devel::CoverX::Covered files.
 \bcover_db\b
@@ -62,19 +67,22 @@
 # Avoid MYMETA files
 ^MYMETA\.
 
-# Avoid travis-ci.org file
-^\.travis.yml
+# Temp files for new META
+^META_new\.(?:json|yml)
 
-# Avoid appveyor.com file
-^\.appveyor.yml
-#!end included /usr/local/share/perl5/site_perl/5.26/ExtUtils/MANIFEST.SKIP
+# Avoid travis-ci.org file
+^\.travis\.yml
+
+# Avoid AppVeyor file
+^\.?appveyor.yml
+
+# End included /usr/local/lib/perl5/ExtUtils/MANIFEST.SKIP
 
 # Avoid more git stuff.
 \B\.gitattributes\b
 
-# Avoid patch-related files.
+# Avoid patch files.
 \.patch$
-\.rej$
 \.diff$
 
 # Avoid archives.
@@ -100,4 +108,4 @@
 \.lzh$
 
 # Avoid distribution-specific stuff.
-^Math-Polynomial-Orthogonal-[0-9]
+^Math-Polynomial-Chebyshev-[0-9]

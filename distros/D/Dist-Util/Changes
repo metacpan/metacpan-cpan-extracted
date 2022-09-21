@@ -1,3 +1,10 @@
+0.071   2022-08-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [internal] Add todo note.
+
+
 0.070   2022-08-21  Released-By: PERLANCAR; Urgency: medium
 
         - Add option 'detail' to list_dists().

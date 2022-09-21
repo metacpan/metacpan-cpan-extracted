@@ -1,23 +1,20 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Deep;
 use Pod::Wordlist;
 
 my $p = new_ok 'Pod::Wordlist';
 
 $p->learn_stopwords( 'foo bar baz' );
 
-cmp_deeply [ keys( %{ $p->wordlist } ) ],
-	superbagof(qw(foo bar baz )),
-	'stopwords added'
-	;
+ok exists $p->wordlist->{foo}, 'stopword added: foo';
+ok exists $p->wordlist->{bar}, 'stopword added: bar';
+ok exists $p->wordlist->{baz}, 'stopword added: baz';
 
 $p->learn_stopwords( '!foo' );
 
-cmp_deeply [ keys( %{ $p->wordlist } ) ], superbagof(qw( bar baz )),
-	'stopwords still exist';
-
-ok ! exists $p->wordlist->{foo}, 'foo was removed';
+ok ! exists $p->wordlist->{foo}, 'stopword removed: foo';
+ok exists $p->wordlist->{bar}, 'stopword still exists: bar';
+ok exists $p->wordlist->{baz}, 'stopword still exists: baz';
 
 done_testing;

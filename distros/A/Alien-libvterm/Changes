@@ -1,5 +1,9 @@
 Revision history for Alien-libvterm
 
+0.03    2022-09-17
+        [CHANGES]
+         * Bundle libvterm 0.3
+
 0.01_002 2021-09-21
         [CHANGES]
          * Bundle libvterm 0.2-RC2

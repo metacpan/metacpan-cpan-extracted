@@ -25,289 +25,301 @@ name: App-lcpan
 provides:
   App::lcpan:
     file: lib/App/lcpan.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::author:
     file: lib/App/lcpan/Cmd/author.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::author_deps:
     file: lib/App/lcpan/Cmd/author_deps.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::author_deps_by_dependent_count:
     file: lib/App/lcpan/Cmd/author_deps_by_dependent_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::author_dists:
     file: lib/App/lcpan/Cmd/author_dists.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::author_mods:
     file: lib/App/lcpan/Cmd/author_mods.pm
-    version: '1.070'
+    version: '1.071'
+  App::lcpan::Cmd::author_mods_by_other_author_rdep_count:
+    file: lib/App/lcpan/Cmd/author_mods_by_other_author_rdep_count.pm
+    version: '1.071'
+  App::lcpan::Cmd::author_mods_by_rdep_count:
+    file: lib/App/lcpan/Cmd/author_mods_by_rdep_count.pm
+    version: '1.071'
   App::lcpan::Cmd::author_rdeps:
     file: lib/App/lcpan/Cmd/author_rdeps.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::author_rels:
     file: lib/App/lcpan/Cmd/author_rels.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::author_scripts:
     file: lib/App/lcpan/Cmd/author_scripts.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::authors:
     file: lib/App/lcpan/Cmd/authors.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::authors_by_dist_count:
     file: lib/App/lcpan/Cmd/authors_by_dist_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::authors_by_filesize:
     file: lib/App/lcpan/Cmd/authors_by_filesize.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::authors_by_mod_count:
     file: lib/App/lcpan/Cmd/authors_by_mod_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::authors_by_mod_mention_count:
     file: lib/App/lcpan/Cmd/authors_by_mod_mention_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::authors_by_rdep_count:
     file: lib/App/lcpan/Cmd/authors_by_rdep_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::authors_by_rel_count:
     file: lib/App/lcpan/Cmd/authors_by_rel_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::authors_by_script_count:
     file: lib/App/lcpan/Cmd/authors_by_script_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::changes:
     file: lib/App/lcpan/Cmd/changes.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::contents:
     file: lib/App/lcpan/Cmd/contents.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::copy_mod:
     file: lib/App/lcpan/Cmd/copy_mod.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::copy_rel:
     file: lib/App/lcpan/Cmd/copy_rel.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::copy_script:
     file: lib/App/lcpan/Cmd/copy_script.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::db_path:
     file: lib/App/lcpan/Cmd/db_path.pm
-    version: '1.070'
+    version: '1.071'
+  App::lcpan::Cmd::delete_old_data:
+    file: lib/App/lcpan/Cmd/delete_old_data.pm
+    version: '1.071'
   App::lcpan::Cmd::delete_rel:
     file: lib/App/lcpan/Cmd/delete_rel.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::deps:
     file: lib/App/lcpan/Cmd/deps.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::deps_by_dependent_count:
     file: lib/App/lcpan/Cmd/deps_by_dependent_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dist:
     file: lib/App/lcpan/Cmd/dist.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dist2author:
     file: lib/App/lcpan/Cmd/dist2author.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dist2rel:
     file: lib/App/lcpan/Cmd/dist2rel.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dist_contents:
     file: lib/App/lcpan/Cmd/dist_contents.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dist_meta:
     file: lib/App/lcpan/Cmd/dist_meta.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dist_mods:
     file: lib/App/lcpan/Cmd/dist_mods.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dist_rdeps:
     file: lib/App/lcpan/Cmd/dist_rdeps.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dist_scripts:
     file: lib/App/lcpan/Cmd/dist_scripts.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dists:
     file: lib/App/lcpan/Cmd/dists.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dists_by_dep_count:
     file: lib/App/lcpan/Cmd/dists_by_dep_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dists_by_mod_count:
     file: lib/App/lcpan/Cmd/dists_by_mod_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::dists_by_script_count:
     file: lib/App/lcpan/Cmd/dists_by_script_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::doc:
     file: lib/App/lcpan/Cmd/doc.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::extract_dist:
     file: lib/App/lcpan/Cmd/extract_dist.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::extract_mod:
     file: lib/App/lcpan/Cmd/extract_mod.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::extract_rel:
     file: lib/App/lcpan/Cmd/extract_rel.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::extract_script:
     file: lib/App/lcpan/Cmd/extract_script.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::heaviest_dists:
     file: lib/App/lcpan/Cmd/heaviest_dists.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::inject:
     file: lib/App/lcpan/Cmd/inject.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::log:
     file: lib/App/lcpan/Cmd/log.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mentions:
     file: lib/App/lcpan/Cmd/mentions.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mentions_by_mod:
     file: lib/App/lcpan/Cmd/mentions_by_mod.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mentions_by_script:
     file: lib/App/lcpan/Cmd/mentions_by_script.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mentions_for_all_mods:
     file: lib/App/lcpan/Cmd/mentions_for_all_mods.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mentions_for_mod:
     file: lib/App/lcpan/Cmd/mentions_for_mod.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mentions_for_script:
     file: lib/App/lcpan/Cmd/mentions_for_script.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mod:
     file: lib/App/lcpan/Cmd/mod.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mod2author:
     file: lib/App/lcpan/Cmd/mod2author.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mod2dist:
     file: lib/App/lcpan/Cmd/mod2dist.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mod2rel:
     file: lib/App/lcpan/Cmd/mod2rel.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mod_contents:
     file: lib/App/lcpan/Cmd/mod_contents.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mods:
     file: lib/App/lcpan/Cmd/mods.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mods_by_mention_count:
     file: lib/App/lcpan/Cmd/mods_by_mention_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mods_by_rdep_author_count:
     file: lib/App/lcpan/Cmd/mods_by_rdep_author_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mods_by_rdep_count:
     file: lib/App/lcpan/Cmd/mods_by_rdep_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::mods_from_same_dist:
     file: lib/App/lcpan/Cmd/mods_from_same_dist.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::module:
     file: lib/App/lcpan/Cmd/module.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::modules:
     file: lib/App/lcpan/Cmd/modules.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::most_depended_mods:
     file: lib/App/lcpan/Cmd/most_depended_mods.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::most_mentioned_mods:
     file: lib/App/lcpan/Cmd/most_mentioned_mods.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::most_mentioned_scripts:
     file: lib/App/lcpan/Cmd/most_mentioned_scripts.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::namespaces:
     file: lib/App/lcpan/Cmd/namespaces.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::rdeps:
     file: lib/App/lcpan/Cmd/rdeps.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::rdeps_scripts:
     file: lib/App/lcpan/Cmd/rdeps_scripts.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::rel:
     file: lib/App/lcpan/Cmd/rel.pm
-    version: '1.070'
+    version: '1.071'
+  App::lcpan::Cmd::related_authors:
+    file: lib/App/lcpan/Cmd/related_authors.pm
+    version: '1.071'
   App::lcpan::Cmd::related_mods:
     file: lib/App/lcpan/Cmd/related_mods.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::release:
     file: lib/App/lcpan/Cmd/release.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::releases:
     file: lib/App/lcpan/Cmd/releases.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::rels:
     file: lib/App/lcpan/Cmd/rels.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::reset:
     file: lib/App/lcpan/Cmd/reset.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::script:
     file: lib/App/lcpan/Cmd/script.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::script2author:
     file: lib/App/lcpan/Cmd/script2author.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::script2dist:
     file: lib/App/lcpan/Cmd/script2dist.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::script2mod:
     file: lib/App/lcpan/Cmd/script2mod.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::script2rel:
     file: lib/App/lcpan/Cmd/script2rel.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::scripts:
     file: lib/App/lcpan/Cmd/scripts.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::scripts_by_mention_count:
     file: lib/App/lcpan/Cmd/scripts_by_mention_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::scripts_from_same_dist:
     file: lib/App/lcpan/Cmd/scripts_from_same_dist.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::src:
     file: lib/App/lcpan/Cmd/src.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::stats:
     file: lib/App/lcpan/Cmd/stats.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::stats_last_index_time:
     file: lib/App/lcpan/Cmd/stats_last_index_time.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::subnames_by_count:
     file: lib/App/lcpan/Cmd/subnames_by_count.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::subs:
     file: lib/App/lcpan/Cmd/subs.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::update:
     file: lib/App/lcpan/Cmd/update.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::whatsnew:
     file: lib/App/lcpan/Cmd/whatsnew.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::Cmd::x_mentions_for_mod:
     file: lib/App/lcpan/Cmd/x_mentions_for_mod.pm
-    version: '1.070'
+    version: '1.071'
   App::lcpan::PodParser:
     file: lib/App/lcpan/PodParser.pm
-    version: '1.070'
+    version: '1.071'
   End::PrintBytesIn:
     file: lib/End/PrintBytesIn.pm
-    version: '1.070'
+    version: '1.071'
   LWP::UserAgent::Plugin::FilterLcpan:
     file: lib/LWP/UserAgent/Plugin/FilterLcpan.pm
-    version: '1.070'
+    version: '1.071'
 recommends:
   App::lcpan::Bootstrap: '0'
 requires:
@@ -355,7 +367,7 @@ requires:
   File::Which: '0'
   Function::Fallback::CoreOrPP: '0.07'
   HTTP::Response: '0'
-  Hash::Subset: '0.006'
+  Hash::Subset: '0.007'
   IO::Compress::Gzip: '0'
   IO::Prompt::I18N: '0'
   IPC::System::Options: '0.339'
@@ -403,7 +415,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan
   homepage: https://metacpan.org/release/App-lcpan
   repository: git://github.com/perlancar/perl-App-lcpan.git
-version: '1.070'
+version: '1.071'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -681,7 +693,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -689,7 +701,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

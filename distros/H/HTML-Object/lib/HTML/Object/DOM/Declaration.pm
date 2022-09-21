@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Declaration.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2021/12/13
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,8 +17,12 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::Declaration HTML::Object::DOM::Node );
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION );
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -26,7 +30,6 @@ sub init
     $self->{name} = 'html';
     $self->{_init_strict_use_sub} = 1;
     $self->HTML::Object::Declaration::init( @_ ) || return( $self->pass_error );
-    $self->message( 4, "Returning the declaration object '", overload::StrVal( $self ), "'" );
     return( $self );
 }
 
@@ -129,7 +132,7 @@ sub systemId
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -146,7 +149,7 @@ HTML::Object::DOM::Declaration - HTML Object DOM DTD
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

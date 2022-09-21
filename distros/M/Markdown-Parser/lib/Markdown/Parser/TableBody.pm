@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/TableBody.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,10 +16,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -49,7 +52,7 @@ sub as_markdown
     my $self = shift( @_ );
     return( $self->{_as_markdown} ) if( $self->{_as_markdown} );
     my $row_data = $self->new_array;
-    ## Check each row
+    # Check each row
     $self->children->for(sub
     {
         my( $i, $row ) = @_;
@@ -58,6 +61,22 @@ sub as_markdown
     });
     $self->{_as_markdown} = $row_data->join( "\n" )->scalar;
     return( $self->{_as_markdown} );
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    return( $self->{_as_pod} ) if( $self->{_as_pod} );
+    my $row_data = $self->new_array;
+    # Check each row
+    $self->children->for(sub
+    {
+        my( $i, $row ) = @_;
+        my $row_str = $row->as_pod;
+        $row_data->push( $row_str->scalar );
+    });
+    $self->{_as_pod} = $row_data->join( "\n" )->scalar;
+    return( $self->{_as_pod} );
 }
 
 sub as_string
@@ -94,7 +113,7 @@ sub reset
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -110,7 +129,7 @@ Markdown::Parser::TableBody - Markdown Table Body Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -131,6 +150,12 @@ See L<Markdown::Parser::Table/as_css_grid>
 Returns a string representation of the table body formatted in markdown.
 
 This method will call each row L<Markdown::Parser::TableRow> object and get their respective markdown string representation.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the table body formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

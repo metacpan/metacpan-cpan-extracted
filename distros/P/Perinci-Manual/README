@@ -2,8 +2,8 @@ NAME
     Perinci::Manual - Extra documentation for Perinci
 
 VERSION
-    This document describes version 0.009 of Perinci::Manual (from Perl
-    distribution Perinci-Manual), released on 2022-07-01.
+    This document describes version 0.010 of Perinci::Manual (from Perl
+    distribution Perinci-Manual), released on 2022-07-22.
 
 DESCRIPTION
     The "Perinci" namespace contains several separate frameworks (for

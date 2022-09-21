@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2021/12/13
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,6 +17,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object );
+    use vars qw( @EXPORT_OK %EXPORT_TAGS $SCREEN $WINDOW $TAG_TO_CLASS $GLOBAL_DOM $VERSION );
     use HTML::Object::DOM::Closing;
     use HTML::Object::DOM::Comment;
     use HTML::Object::DOM::Declaration;
@@ -229,8 +230,11 @@ BEGIN
     # An hash reference map to lowercase HTML tag name to perl class, for those who have special classes, otherwise the fallback is HTML::Object::Element.
     our $TAG_TO_CLASS = {};
     our $GLOBAL_DOM;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 {
     # "If name is applet, bgsound, blink, isindex, keygen, multicol, nextid, or spacer, then return HTMLUnknownElement."
@@ -505,7 +509,7 @@ sub window
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -521,7 +525,7 @@ HTML::Object::DOM - HTML Object DOM Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

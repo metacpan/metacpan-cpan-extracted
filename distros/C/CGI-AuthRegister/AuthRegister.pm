@@ -1,7 +1,7 @@
 # file: AuthRegister.pm
 # CGI::AuthRegister - AuthRegister Module for Simple CGI Authentication and
 #   Registration in Perl
-# (c) 2012-21 Vlado Keselj http://vlado.ca
+# (c) 2012-22 Vlado Keselj http://vlado.ca
 
 package CGI::AuthRegister;
 use strict;
@@ -9,7 +9,7 @@ use vars qw($NAME $ABSTRACT $VERSION);
 $NAME     = 'AuthRegister';
 $ABSTRACT = 'AuthRegister Module for Simple CGI Authentication and '.
   'Registration in Perl';
-$VERSION  = '1.403'; # Last update: 2021-04-19
+$VERSION  = '1.404'; # Last update: 2022-09-19
 
 use CGI qw(:standard);
 # Useful diagnostics:
@@ -243,7 +243,8 @@ sub run_cas {
   if ($Request_type eq 'Login') {
     my $username = param('username'); my $password = param('password');
     $username =~ s/\(.*\)//g; $username =~ s/\s+$//; $username =~ s/^\s+//;
-
+    $username =~ s/[^a-zA-Z0-9_-]//g; $username = lc($username);
+    
     if (! &login($username, $password) ) {
       my $page = &gen_cas_page;
       my $t = "<b>Unsuccessful login!</b><br>\n";
@@ -389,7 +390,19 @@ sub _require_login_using_cas {
   if ($SessionId ne '' && param('keywords') eq 'logout') {
     logout(); print header_delete_cookie();
     if ($retStatus) { return 'logged out' }
-    print $HTMLstart, "<p>You are logged out.\n", $LoginMsg; exit; }
+    print "<HTML><HEAD>";
+    my $redirect;
+    if ($args{-logout_redirect}) {
+      $redirect = encodeuri($args{-logout_redirect});
+      print "<meta http-equiv=\"Refresh\" content=\"2; URL=".
+	"$redirect\">\n"; }
+    my $t = $title; $t = $args{-logout_title} if $args{-logout_title};
+    print "<TITLE>$t</TITLE><BODY>\n<H1>$t</H1>\n";
+    print "<p>You are logged out.\n";
+    if ($redirect) {
+      print "<p>You are redirected to <a href=\"$redirect\">$redirect</a>.\n";
+    } else { print $LoginMsg; }
+    exit; }
 
   if ($SessionId ne '') {
     my $header = header();
@@ -1276,7 +1289,7 @@ sub unlock_mkdir {
     if (!-e $lockd) { $Error.="400-ERR:No lock on ($fname)\n"; return '' }
     if (-d $lockd) {  return rmdir($lockd) }
     if (-f $lockd or -l $lockd) { unlink($lockd) }
-    $Error.="403-ERR:Unknown error"; return '';
+    $Error.="AuthERR-1279:Unknown error"; return '';
 }
 
 ########################################################################
@@ -2335,6 +2348,26 @@ if it exists.
 
 Checks whether the connection is HTTPS.  If it is not, prints redirection
 HTTP headers to the HTTPS version of the same URL and exits the program.
+
+=head2 require_login()
+
+Used in an CGI to check login status.  An example of usage:
+
+  &import_dir_and_config;
+  &require_https;  # Require HTTPS connection
+
+  # Require CAS login
+  my $status =
+    &require_login(-cas=>"https://cas.server.com/",
+      -logout_title=>'Logout from My Site',
+      -logout_redirect=>'https://my.site.com/mainpage');
+  #status: logged out, 1, not logged in, login failed
+
+  if ($status != 1) {
+    print "<html><body>Not logged in.\n";
+    exit;
+  }
+
 
 =head2 require_session(-redirect=>LoginScript, -back=>BackScript)
 

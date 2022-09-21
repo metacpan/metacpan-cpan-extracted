@@ -1,0 +1,28 @@
+---
+abstract: 'Makes mojolicious log file rotation easy'
+author:
+  - 'Nicolas Georges <xlat@cpan.org>'
+build_requires:
+  File::Slurp: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Log-Rotate
+requires:
+  File::Copy: '0'
+  Mojo::Base: '0'
+resources:
+  bugtracker: https://github.com/xlat/mojox-log-rotate/issues
+  repository: git://github.com/xlat/mojox-log-rotate.git
+version: '1.222630'
+x_generated_by_perl: v5.26.0
+x_serialization_backend: 'YAML::Tiny version 1.70'

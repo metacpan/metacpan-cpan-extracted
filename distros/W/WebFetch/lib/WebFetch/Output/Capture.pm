@@ -15,7 +15,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Output::Capture;
-$WebFetch::Output::Capture::VERSION = '0.15.1';
+$WebFetch::Output::Capture::VERSION = '0.15.3';
 use base "WebFetch";
 use Data::Dumper;
 
@@ -43,6 +43,7 @@ sub fmt_handler_capture
     my ($self) = @_;
 
     WebFetch::debug "fetch: " . Dumper( $self->{data} );
+    $self->no_savables_ok();    # rather than let WebFetch save the data, we'll take it here
     if ( exists $self->{data}{records} ) {
         if ( defined $grep_func and ref $grep_func eq "CODE" ) {
             push @data_records, grep { $grep_func->($_) } @{ $self->{data}{records} };
@@ -73,7 +74,7 @@ WebFetch::Output::Capture - capture WebFetch data without generating an output f
 
 =head1 VERSION
 
-version 0.15.1
+version 0.15.3
 
 =head1 SYNOPSIS
 

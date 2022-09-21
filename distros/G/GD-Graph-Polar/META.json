@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl package to create polar graphs using GD package",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GD-Graph-Polar",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GD" : "0",
+            "Geo::Constants" : "0.04",
+            "Geo::Functions" : "0.03",
+            "List::Util" : "0",
+            "Package::New" : "0",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-GD-Graph-Polar/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-GD-Graph-Polar",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-GD-Graph-Polar.git"
+      }
+   },
+   "version" : "0.19"
+}

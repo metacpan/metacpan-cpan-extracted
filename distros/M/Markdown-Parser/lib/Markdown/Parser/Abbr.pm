@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Abbr.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,10 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -32,6 +35,12 @@ sub init
 }
 
 sub as_markdown
+{
+    my $self = shift( @_ );
+    return( sprintf( 'C<%s>: %s', $self->name, $self->value ) );
+}
+
+sub as_pod
 {
     my $self = shift( @_ );
     return( sprintf( '*[%s]: %s', $self->name, $self->value ) );
@@ -50,7 +59,7 @@ sub as_string
     $arr->push( sprintf( 'title="%s"', $val ) );
     my $attributes = $self->format_attributes;
     $arr->push( $attributes->join( ' ' )->scalar ) if( $attributes->length );
-    ## e.g. <abbr title="Hyper Text Markup Language">HTML</abbr>
+    # e.g. <abbr title="Hyper Text Markup Language">HTML</abbr>
     return( sprintf( '%s>%s</abbr>', $arr->join( ' ' )->scalar, $self->name->scalar ) );
 }
 
@@ -59,7 +68,7 @@ sub name { return( shift->_set_get_scalar_as_object( 'name', @_ ) ); }
 sub value { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -76,7 +85,7 @@ Markdown::Parser::Abbr - Markdown Abbreviation Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -101,6 +110,12 @@ And this would produce the following html:
 =head2 as_markdown
 
 Returns a string representation of the abbreviation formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the abbreviation formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

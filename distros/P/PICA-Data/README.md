@@ -201,9 +201,10 @@ Level2 fields are included in sorted order. The ILN (if given) is available as
 Returns a list (as array reference) of item records. The EPN (if given) is
 available as `_id` Also available as accessor `items`.
 
-## pica\_split( $record)
+## pica\_split( $record \[, $level \])
 
-Returns the record splitted into individual records for each level.
+Returns the record splitted into individual records for each level. Optionally
+limits result to given level, including identifiers (PPN/ILN) of higher levels.
 
 ## pica\_sort( $record )
 

@@ -44,3 +44,4 @@ t/910.coverage.t
 t/999.kwalitee.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

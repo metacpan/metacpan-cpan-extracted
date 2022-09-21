@@ -1,0 +1,28 @@
+---
+abstract: 'RF Antenna Pattern File Reader and Writer in Planet MSI Format'
+author:
+  - 'Michael R. Davis'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RF-Antenna-Planet-MSI-Format
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Path::Class: '0.12'
+  Scalar::Util: '0'
+  Tie::IxHash: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-RF-Antenna-Planet-MSI-Format/issues
+  homepage: https://github.com/mrdvt92/perl-RF-Antenna-Planet-MSI-Format
+  repository: https://github.com/mrdvt92/perl-RF-Antenna-Planet-MSI-Format.git
+version: '0.01'

@@ -1,3 +1,10 @@
+-   3.0.2 Fri Sep 16 07:45:00 PM EDT 2022
+
+    Bin=X uses dirname( X ) if X is a file, otherwise if X is
+    a dir it uses X, otherwise it dies. This mainly simplifies
+    testing where libs or config dirs are below the ./t in the
+    path. 
+
 -   3.0.1 Thu Feb 24 04:39:00 PM EST 2022
 
     Remove extraneous breakpoints

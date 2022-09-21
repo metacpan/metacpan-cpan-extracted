@@ -3,6 +3,8 @@
 ^data
 ^debian
 ^dep
+^local
+^log
 
 # No temp files
 ~$

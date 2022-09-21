@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XPath/NodeSet.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
-## Modified 2021/12/05
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -17,6 +18,7 @@ BEGIN
     use warnings;
     # use parent qw( Module::Generic );
     use parent qw( Module::Generic::Array );
+    use vars qw( $TRUE $FALSE $BASE_CLASS $DEBUG $VERSION );
     use HTML::Object::XPath::Boolean;
     use overload (
         '""'   => \&to_literal,
@@ -26,8 +28,11 @@ BEGIN
     our $FALSE = HTML::Object::XPath::Boolean->False;
     our $BASE_CLASS = 'HTML::Object::XPath';
     our $DEBUG = 0;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub new
 {
@@ -47,7 +52,6 @@ sub get_node
 {
     my $self = CORE::shift( @_ );
     my( $pos ) = @_;
-    # $self->message( 3, "Returning value at $pos - 1 -> '", $self->[$pos-1], "' (", overload::StrVal( $self->[$pos-1] ), ")" ) if( $XML::XPathEngine::DEBUG );
     return( $self->[ $pos - 1 ] );
 }
 
@@ -184,12 +188,13 @@ sub _class_for
     my( $self, $mod ) = @_;
     eval( "require ${BASE_CLASS}\::${mod};" );
     die( $@ ) if( $@ );
-    ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    # ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    eval( "\$${BASE_CLASS}\::${mod}\::DEBUG = " . ( $DEBUG // '' ) );
     return( "${BASE_CLASS}::${mod}" );
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -219,7 +224,7 @@ HTML::Object::XPath::NodeSet - HTML Object XPath Node Set
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

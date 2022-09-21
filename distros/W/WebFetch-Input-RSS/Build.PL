@@ -18,7 +18,7 @@ my %module_build_args = (
     "Ian Kluft <https://github.com/ikluft>"
   ],
   "dist_name" => "WebFetch-Input-RSS",
-  "dist_version" => "0.1.0",
+  "dist_version" => "0.2.0",
   "license" => "gpl",
   "module_name" => "WebFetch::Input::RSS",
   "recursive_test_files" => 1,
@@ -27,8 +27,10 @@ my %module_build_args = (
     "Date::Calc" => 0,
     "Exception::Class" => 0,
     "LWP::UserAgent" => 0,
+    "Readonly" => 0,
     "Scalar::Util" => 0,
-    "WebFetch" => 0,
+    "Try::Tiny" => 0,
+    "WebFetch" => "v0.15.0",
     "XML::RSS" => 0,
     "base" => 0,
     "strict" => 0,
@@ -36,16 +38,34 @@ my %module_build_args = (
     "warnings" => 0
   },
   "test_requires" => {
+    "Data::Dumper" => 0,
+    "DateTime::Format::ISO8601" => 0,
+    "File::Basename" => 0,
+    "File::Compare" => 0,
+    "File::Temp" => 0,
+    "FindBin" => 0,
+    "Getopt::Long" => 0,
     "Test::More" => 0,
-    "Try::Tiny" => 0
+    "YAML::XS" => 0,
+    "autodie" => 0,
+    "feature" => 0
   }
 );
 
 
 my %fallback_build_requires = (
+  "Data::Dumper" => 0,
+  "DateTime::Format::ISO8601" => 0,
+  "File::Basename" => 0,
+  "File::Compare" => 0,
+  "File::Temp" => 0,
+  "FindBin" => 0,
+  "Getopt::Long" => 0,
   "Module::Build" => "0.28",
   "Test::More" => 0,
-  "Try::Tiny" => 0
+  "YAML::XS" => 0,
+  "autodie" => 0,
+  "feature" => 0
 );
 
 

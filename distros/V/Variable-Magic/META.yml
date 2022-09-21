@@ -1,7 +1,7 @@
 ---
 abstract: 'Associate user-defined magic to variables from Perl.'
 author:
-  - 'Vincent Pit <perl@profvince.com>'
+  - 'Vincent Pit <vpit@cpan.org>'
 build_requires:
   Carp: '0'
   Config: '0'
@@ -17,10 +17,9 @@ build_requires:
   base: '0'
   lib: '0'
 configure_requires:
-  Config: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,6 +39,6 @@ resources:
   bugtracker: http://rt.cpan.org/Dist/Display.html?Name=Variable-Magic
   homepage: http://search.cpan.org/dist/Variable-Magic/
   license: http://dev.perl.org/licenses/
-  repository: http://git.profvince.com/?p=perl%2Fmodules%2FVariable-Magic.git
-version: '0.62'
+  repository: http://git.vpit.fr/perl/modules/Variable-Magic.git/
+version: '0.63'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

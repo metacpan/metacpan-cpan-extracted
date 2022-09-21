@@ -1,5 +1,9 @@
 Revision history for Time::Warp
 
+0.55  2022.09.18 MANWAR
+      Test warnings and edge cases #5 by @choroba
+      Fix code and tests to Time::HiRes implicitly loaded by Test::More #8 by @ppisar
+
 0.54  2018.10.08 MANWAR
       - Merged PR #4 (Pod Spelling), thanks @gregoa.
 

@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Number.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/22
-## Modified 2021/08/23
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,10 +17,12 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic::Number );
-    use HTML::Object::Boolean;
-    use HTML::Object::Literal;
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION );
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub as_xml
 {
@@ -47,16 +50,24 @@ sub isEqualNode
 
 sub string_value { return( $_[0]->value ); }
 
-sub to_boolean { return( shift->as_string ? HTML::Object::Boolean->True : HTML::Object::Boolean->False ); }
+sub to_boolean
+{
+    require HTML::Object::Boolean;
+    return( shift->as_string ? HTML::Object::Boolean->True : HTML::Object::Boolean->False );
+}
 
 sub to_number { return( $_[0] ); }
 
-sub to_literal { return( HTML::Object::Literal->new( shift->as_string ) ); }
+sub to_literal
+{
+    require HTML::Object::Literal;
+    return( HTML::Object::Literal->new( shift->as_string ) );
+}
 
 sub value { return( shift->as_string ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -73,7 +84,7 @@ HTML::Object::Number - Simple numeric values
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.1.4
+## Version v0.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2022/04/16
+## Modified 2022/09/20
 ## All rights reserved
 ## 
 ## 
@@ -18,6 +18,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $DICT $LINK_ELEMENTS $FATAL_ERROR $GLOBAL_DOM $VERSION );
     use curry;
     use Devel::Confess;
     use Encode ();
@@ -34,13 +35,15 @@ BEGIN
     use Module::Generic::File qw( file );
     use Nice::Try;
     use Scalar::Util ();
-    our $VERSION = 'v0.1.4';
+    our $VERSION = 'v0.2.1';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
 };
 
-INIT
+use strict;
+use warnings;
+
 {
     my $me = file( __FILE__ );
     my $path = $me->parent;
@@ -58,9 +61,9 @@ INIT
             $DICT = $hash->{dict};
             for( keys( %$DICT ) )
             {
-                if( exists( $_->{link_in} ) )
+                if( exists( $DICT->{ $_ }->{link_in} ) )
                 {
-                    $LINK_ELEMENTS->{ $_ } = $_->{link_in};
+                    $LINK_ELEMENTS->{ $_ } = $DICT->{ $_ }->{link_in};
                 }
             }
         }
@@ -73,7 +76,7 @@ INIT
     {
         die( "Missing core file \"$dict_json\"\n" );
     }
-};
+}
 
 sub import
 {
@@ -134,7 +137,6 @@ sub filter
     {
         Filter::Util::Call::filter_del();
         $status = 1;
-        $self->message( 3, "Skipping filtering." );
         return( $status );
     }
     while( $status = Filter::Util::Call::filter_read() )
@@ -169,7 +171,7 @@ sub init
 {
     my $self = shift( @_ );
     $self->{_init_strict_use_sub} = 1;
-    $this->{_exception_class} = 'HTML::Object::Exception' unless( CORE::exists( $self->{_exception_class} ) );
+    $self->{_exception_class} = 'HTML::Object::Exception' unless( CORE::exists( $self->{_exception_class} ) );
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     my $p = HTML::Parser->new(
         api_version => 3,
@@ -199,7 +201,6 @@ sub add_comment
     my @p = qw( p raw col line offset offset_end );
     @$opts{ @p } = @args;
     my $parent = $self->current_parent;
-    $self->message( 4, "Adding comment: '$opts->{raw}' at line $opts->{line} and column $opts->{col} with parent '$parent'" );
     my $val = $opts->{raw};
     $val =~ s,^\<\!\-\-|\-\-\>$,,gs;
     my $e = $self->new_comment({
@@ -222,7 +223,6 @@ sub add_declaration
     my $opts = {};
     my @p = qw( p raw col line offset offset_end );
     @$opts{ @p } = @args;
-    $self->message( 4, "Adding declaration: '$opts->{raw}' at line $opts->{line} and column $opts->{col}" );
     my $parent = $self->current_parent;
     return if( !$self->_is_a( $parent => 'HTML::Object::DOM::Document' ) );
     my $e = $self->new_declaration({
@@ -246,8 +246,6 @@ sub add_default
     my $opts = {};
     my @p = qw( p tag attr seq raw col line offset offset_end );
     @$opts{ @p } = @args;
-    $self->message( 4, "Received arguments: ", sub{ $self->SUPER::dump( \@args ) });
-    $self->message( 3, "Processing tag '", ( $opts->{tag} // '' ), "': '", ( $opts->{raw} // '' ), "' at line ", ( $opts->{line} // '' ), " and column ", ( $opts->{col} // '' ) );
     return if( !CORE::length( $opts->{raw} ) && !defined( $opts->{tag} ) );
     # Unknown tag, so we check if there is a "/>" to determine if this is an empty (void) tag or not
     my $attr = $opts->{attr};
@@ -263,14 +261,13 @@ sub add_default
     # implicitly close it now, by setting that tag's parent as the current parent
     # This is what Mozilla does:
     # Ref: <https://bugzilla.mozilla.org/show_bug.cgi?id=820926>
-    # XXX This needs to be done in post processing not during initial parsing, because at this point in the process we have not yet seen the closing tag, and we might see it later, so making guesses here is ill-advised.
+    # NOTE This needs to be done in post processing not during initial parsing, because at this point in the process we have not yet seen the closing tag, and we might see it later, so making guesses here is ill-advised.
 #     if( !$parent->is_closed && 
 #         !$def->{is_empty} && 
 #         $parent && 
 #         !$parent->isa( 'HTML::Object::Document' ) &&
 #         $parent->tag ne 'html' )
 #     {
-#         $self->message( 3, "Implicitly closing current parent tag \"", $parent->tag, "\": ", $parent->original );
 #         $parent = $parent->parent;
 #     }
     my $e = $self->new_element({
@@ -288,7 +285,6 @@ sub add_default
     $parent->children->push( $e );
     if( !$def->{is_empty} )
     {
-        $self->message( 4, "Setting current tag \"", $e->tag, "\" as current parent from now on." );
         $self->current_parent( $e );
     }
     return( $e );
@@ -301,7 +297,6 @@ sub add_end
     my $opts = {};
     my @p = qw( p tag attr seq raw col line offset offset_end );
     @$opts{ @p } = @args;
-    $self->message( 4, "Adding closing tag for tag '$opts->{tag}': '$opts->{raw}' at line $opts->{line} and column $opts->{col}" );
     my $me = $self->current_parent;
     my $parent = $me->parent;
     if( $opts->{tag} ne $me->tag )
@@ -324,7 +319,6 @@ sub add_end
         $me->close_tag( $e );
         # $parent->children->push( $e );
         $self->current_parent( $parent );
-        $self->message( 4, "Parent is set back to '$parent' (", $parent->tag, ")" );
     }
 }
 
@@ -333,7 +327,6 @@ sub add_space
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $parent = $self->current_parent;
-    $self->message( 4, "Adding space '$opts->{original}' at line $opts->{line} and column $opts->{column} with parent '$parent'" );
     my $e = $self->new_space( $opts ) || return;
     $parent->children->push( $e );
     return( $e );
@@ -351,9 +344,7 @@ sub add_start
     {
         $opts->{attr}->{'/'} = '/';
     }
-    $self->message( 4, "Adding opening tag for '$opts->{tag}': '$opts->{raw}' at line $opts->{line} and column $opts->{col} with parent '$parent' and attributes -> ", sub{ $self->dump( $opts->{attr} ) } );
     my $def = $self->get_definition( $opts->{tag} );
-    $self->message( 4, "Found dictionary definition for tag '$opts->{tag}: ", sub{ $self->SUPER::dump( $def )} );
     # Make some easy guess
     if( !scalar( keys( %$def ) ) )
     {
@@ -368,17 +359,15 @@ sub add_start
     # implicitly close it now, by setting that tag's parent as the current parent
     # This is what Mozilla does:
     # Ref: <https://bugzilla.mozilla.org/show_bug.cgi?id=820926>
-    # XXX This needs to be done in post processing not during initial parsing, because at this point in the process we have not yet seen the closing tag, and we might see it later, so making guesses here is ill-advised.
+    # NOTE This needs to be done in post processing not during initial parsing, because at this point in the process we have not yet seen the closing tag, and we might see it later, so making guesses here is ill-advised.
 #     if( !$parent->is_closed && 
 #         !$def->{is_empty} && 
 #         $parent && 
 #         !$parent->isa( 'HTML::Object::Document' ) &&
 #         $parent->tag ne 'html' )
 #     {
-#         $self->message( 3, "Implicitly closing current parent tag \"", $parent->tag, "\": ", $parent->original );
 #         $parent = $parent->parent;
 #     }
-    $self->message( 4, "Adding new element for tag '$opts->{tag}' with is_empty? ", $def->{is_empty} ? 'yes' : 'no' );
     $def->{class} //= '';
     my $e;
     my $params = 
@@ -405,12 +394,10 @@ sub add_start
     {
         $e = $self->new_element( $params ) || return;
     }
-    $self->message( 5, "Pushing new element to parent's children stack." );
     $parent->children->push( $e );
     # If this element is an element that, by nature, can contain other elements we mark it as the last element seen so it can be used as a parent. When we close it, we switch the parent to its parent .
     if( !$def->{is_empty} )
     {
-        $self->message( 4, "Setting current tag \"", $e->tag, "\" as current parent from now on." );
         $self->current_parent( $e );
     }
     return( $e );
@@ -423,7 +410,6 @@ sub add_text
     my $opts = {};
     my @p = qw( p raw col line offset offset_end );
     @$opts{ @p } = @args;
-    $self->message( 4, "Called with raw '\Q$opts->{raw}\E' at line $opts->{line} with parent '", $self->current_parent, "'" );
     my $parent = $self->current_parent ||
         return( $self->error( "You must create a document first using the new_document() method first before adding text." ) );
     my $e;
@@ -431,7 +417,6 @@ sub add_text
     # HTML::Parser does not make the difference, but we do
     if( $opts->{raw} =~ /^[[:blank:]\h\v]*$/ )
     {
-        $self->message( 4, "Adding space element with parent '$parent'." );
         $e = $self->add_space(
             original => $opts->{raw},
             column   => $opts->{col},
@@ -446,7 +431,6 @@ sub add_text
     }
     else
     {
-        $self->message( 4, "Adding text: '$opts->{raw}' at line $opts->{line} and column $opts->{col}" );
         $e = $self->new_text({
             column   => $opts->{col},
             line     => $opts->{line},
@@ -601,7 +585,6 @@ sub parse_data
             }
         }
     }
-    $self->message( 4, "Setting current parent to '$e'" );
     my $doc = $self->document;
     my $p = $self->parser;
     $self->_set_state( 'loading' => $doc );
@@ -696,9 +679,7 @@ sub parse_url
             agent   => "HTML::Object/$VERSION",
             timeout => $opts->{timeout},
         );
-        $self->message( 4, "Making a GET query to uri '$uri'" );
         my $resp = $ua->get( $uri, ( CORE::exists( $opts->{headers} ) && defined( $opts->{headers} ) && ref( $opts->{headers} ) eq 'HASH' && scalar( keys( %{$opts->{headers}} ) ) ) ? %{$opts->{headers}} : () );
-        $self->message( 4, "http query yields returned code '", $resp->code, "' with message '", $resp->message, "'" );
         if( $resp->header( 'Client-Warning' ) || !$resp->is_success )
         {
             return( $self->error({
@@ -733,22 +714,18 @@ sub post_process
         return(1) if( $e->isa( 'HTML::Object::Closing' ) || $e->tag->substr( 0, 1 ) eq '_' );
         if( $e->is_empty && $e->children->length )
         {
-            $self->messagef( 3, "Tag \"%s\" should be empty (void), but it has %d children.", $e->tag, $e->children->length );
         }
         elsif( $e->is_empty && !$e->attributes->exists( '/' ) )
         {
-            $self->messagef( 3, "Tag \"%s\" at line %d at row %d is an empty (void) tag, but it did not end with />", $e->tag, $e->line, $e->column );
         }
         elsif( !$e->is_empty && !$e->is_closed )
         {
             my $def = $self->get_definition( $e->tag );
             if( !$def->{is_empty} )
             {
-                $self->messagef( 3, "Tag \"%s\" at line %d at row %d is an enclosing tag, but it has not been closed.", $e->tag, $e->line, $e->column );
             }
             else
             {
-                $self->messagef( 3, "Tag \"%s\" at line %d at row %d is an empty (void) tag, but it did not end with />", $e->tag, $e->line, $e->column );
             }
         }
         $self->post_process( $e ) if( !$e->is_empty );
@@ -848,7 +825,7 @@ sub _set_state
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -885,7 +862,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.1.4
+    v0.2.1
 
 =head1 DESCRIPTION
 

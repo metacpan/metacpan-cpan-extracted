@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Code.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,17 +16,20 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
     use constant MERMAID_RSRC_URI => 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js';
     use constant MERMAID_INIT     => "mermaid.initialize({startOnLoad:true});";
-    ## https://katex.org/
+    # https://katex.org/
     use constant KATEX_CSS_URI => 'https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css';
     use constant KATEX_JS_URI => 'https://cdn.jsdelivr.net/npm/katex/dist/katex.min.js';
     use constant KATEX_AUTO_RENDERER => 'https://cdn.jsdelivr.net/npm/katex/dist/contrib/auto-render.min.js';
     use constant KATEX_FONT_URI => 'https://cdn.jsdelivr.net/npm/webfontloader/webfontloader.js';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -50,13 +53,47 @@ sub as_markdown
     {
         return( "```\n${str}\n```\n" );
     }
-    elsif( $self->iinline )
+    elsif( $self->inline )
     {
         return( "`${str}`" );
     }
     else
     {
         my $lines = $str->split( "\n" );
+        $lines->for(sub
+        {
+            my( $i, $val ) = @_;
+            substr( $lines->[ $i ], 0, 0 ) = '    ';
+        });
+        return( $lines->join( "\n" )->scalar );
+    }
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    my $str = $self->children->map(sub{ $_->as_pod })->join( '' );
+    if( $self->fenced )
+    {
+        my $lines = $str->split( qr/\n/ );
+        return( '    ' . $lines->join( "\n    " )->scalar );
+    }
+    elsif( $self->inline )
+    {
+        if( $str->index( '>' ) != -1 ||
+            $str->index( '<' ) != -1 )
+        {
+            return( "C<< ${str} >>" );
+        }
+        else
+        {
+            return( "C<${str}>" );
+        }
+    }
+    # Essentially same as 'fenced'. Might need to improve the code
+    else
+    {
+        my $lines = $str->split( qr/\n/ );
         $lines->for(sub
         {
             my( $i, $val ) = @_;
@@ -77,7 +114,6 @@ sub as_string
     }
     if( $self->class->length )
     {
-        $self->message( 3, "Code has class." );
         $tag_open .= ' class="' . $self->class->join( ' ' )->scalar . '"';
         ## This does not apply to inline code
         if( !$self->inline )
@@ -92,7 +128,6 @@ sub as_string
             }
             else
             {
-                $self->messagef( 3, "Adding %d css links and %d js links.", $self->css_rsrc->length, $self->js_rsrc->length );
                 $self->css_rsrc->foreach(sub
                 {
                     $self->document->add_css_link( $_ ) if( length( $_ ) );
@@ -149,15 +184,12 @@ sub add_element
     my $self = shift( @_ );
     my $elem = shift( @_ );
     my $base = $self->base_class;
-    ## $self->message( 3, "Adding element '$elem' to code for base class $base" );
-    ## $self->message( 3, "Is $elem a $base::Element? ", $elem->isa( "${base}::Element" ) ? 'yes' : 'no' );
     return( $self->error( "Element provided \"$elem\" is not an ${base}::Element object." ) ) if( !$self->_is_a( $elem, "${base}::Element" ) );
     return( $self->error( "Code accepts only ${base}::Text elements." ) ) if( !$self->_is_a( $elem, "${base}::Text" ) );
     my $text = $elem->text;
     if( $text )
     {
         $self->encode_html( [qw( < > & )] => $text ) || warn( $self->error );
-        ## $self->message( 3, "Text is now '$text'." );
         if( $self->inline )
         {
             $elem->text( $text );
@@ -195,7 +227,7 @@ sub js_data { return( shift->_set_get_scalar_as_object( 'js_data', @_ ) ); }
 sub js_rsrc { return( shift->_set_get_array_as_object( 'js_rsrc', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -212,7 +244,7 @@ Markdown::Parser::Code - Markdown Code Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -223,6 +255,12 @@ This class represents a code formatting. It is used by L<Markdown::Parser> and i
 =head2 as_markdown
 
 Returns a string representation of the code formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the code formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

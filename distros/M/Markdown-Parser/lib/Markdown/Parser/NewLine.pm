@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/NewLine.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,11 +16,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Want;
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -32,6 +35,14 @@ sub init
     ## Repeating counts the number of occurence of new lines without having multiple new line objects
     $self->{repeating}  = 1;
     return( $self->SUPER::init( @_ ) );
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    my $arr = $self->new_array;
+    $arr->push( $self->new_line->scalar );
+    return( $arr->join( '' )->scalar );
 }
 
 sub as_string
@@ -60,7 +71,7 @@ sub repeating : lvalue
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -77,7 +88,7 @@ Markdown::Parser::NewLine - Markdown New Line Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -88,6 +99,12 @@ This class represents a new line. It is used by L<Markdown::Parser> and inherits
 =head2 as_markdown
 
 Returns a string representation of the new line formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the new line formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

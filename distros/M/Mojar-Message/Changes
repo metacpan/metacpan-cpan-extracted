@@ -1,3 +1,7 @@
+1.211 2022-09-20
+  - Add support for basic messaging (Telegram).
+  - Add support for silent messaging (Telegram).
+
 1.102 2017-05-14
   - Support HTML email bodies (Smtp).
   - Upgrade for Mojolicious v7.15.

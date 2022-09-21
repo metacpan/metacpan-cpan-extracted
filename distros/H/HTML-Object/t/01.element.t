@@ -105,8 +105,6 @@ SKIP:
     {
         skip( 'cannot find body', 3 );
     }
-    # XXX
-    $body->debug(4);
     my $divs = $body->look_down( _tag => 'div', { max_level => 1 });
     diag( "Error looking down: ", $body->error ) if( !defined( $divs ) );
     is( $divs->length, 2, 'total divs found directly under body' );

@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/TokenList.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/09
-## Modified 2021/12/09
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,8 +17,12 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION );
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -41,7 +46,6 @@ sub add
 {
     my $self = shift( @_ );
     my $a    = $self->_string2array( @_ );
-    $self->message( 4, "Adding tokens '", $a->join( "', '" )->scalar, "'" );
     $self->items->push( $a->list );
     $self->items->unique(1);
     $self->_reset;
@@ -94,7 +98,6 @@ sub items
         if( $attr && $elem )
         {
             my $elem_tokens = $elem->attr( $attr );
-            $self->message( 4, "Element's tokens are '$elem_tokens' and our tokens are '", $self->tokens, "'" );
             if( $elem_tokens eq $self->tokens )
             {
                 return( $self->_set_get_array_as_object( 'items' ) );
@@ -171,7 +174,6 @@ sub update
         else
         {
             my $items = $self->_string2array( @_ );
-            # $self->message( 4, "Updating tokens list with '", $items->join( "', '" )->scalar, "'" );
             $self->tokens( $items->join( ' ' )->scalar );
             $self->{items} = $items;
         }
@@ -190,10 +192,8 @@ sub _reset
     my $elem = $self->element;
     my $tokens = $self->as_string;
     $self->tokens( $tokens );
-    $self->message( 4, "Pushing change for element '", ( ref( $elem ) ? $elem->tag : '' ), " (", overload::StrVal( $elem ), ") with attribute '", ( $self->attribute ? $self->attribute : '' ), "'" );
     return( $self ) if( !ref( $elem ) );
     my $attr = $self->attribute || return( $self );
-    $self->message( 4, "Setting element attribute '$attr' to '$tokens'" );
     $elem->attr( $attr => $tokens );
     $elem->reset(1);
     return( $self );
@@ -227,7 +227,7 @@ sub _trim
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -267,7 +267,7 @@ Or
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

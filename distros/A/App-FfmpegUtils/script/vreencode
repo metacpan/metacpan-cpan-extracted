@@ -1,0 +1,540 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/FfmpegUtils/reencode_video_with_libx264
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-21'; # DATE
+our $DIST = 'App-FfmpegUtils'; # DIST
+our $VERSION = '0.011'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/FfmpegUtils/reencode_video_with_libx264",
+    program_name => "vreencode",
+    log => 1,
+    log_level => "info",
+    config_filename => "reencode-video-with-libx264.conf",
+);
+
+$cmdline->run;
+
+# ABSTRACT: Shorter alias for reencode-video-with-libx264
+# PODNAME: vreencode
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+vreencode - Shorter alias for reencode-video-with-libx264
+
+=head1 VERSION
+
+This document describes version 0.011 of vreencode (from Perl distribution App-FfmpegUtils), released on 2022-09-21.
+
+=head1 SYNOPSIS
+
+B<vreencode> [B<--audio-sample-rate>=I<uint>|B<--sample-rate>=I<uint>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--crf>=I<int>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--dry-run>|B<-n>] [B<--ffmpeg-path>=I<filename>] [(B<--file>=I<filename>)+|B<--files-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--frame-rate>=I<ufloat>|B<-r>=I<ufloat>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--preset>=I<str>|B<--fast>|B<--faster>|B<--medium>|B<--slow>|B<--slower>|B<--superfast>|B<--ultrafast>|B<--veryfast>|B<--veryslow>] [B<--scale>=I<str>|B<--dont-scale>|B<--no-scale>] -- E<lt>I<file>E<gt> ...
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+This utility runs I<ffmpeg> to re-encode your video files using the libx264
+codec. It is a wrapper to simplify invocation of ffmpeg. It selects the
+appropriate ffmpeg options for you, allows you to specify multiple files, and
+picks appropriate output filenames. It also sports a C<--dry-run> option to let
+you see ffmpeg options to be used without actually running ffmpeg.
+
+This utility is usually used to reduce the file size (and optionally video
+width/height) of videos so they are smaller, while minimizing quality loss.
+Smartphone-produced videos are often high bitrate (e.g. >10-20Mbit) and not yet
+well compressed, so they make a good input for this utility. The default setting
+is roughly similar to how Google Photos encodes videos (max 1080p).
+
+The default settings are:
+
+ -v:c libx264
+ -preset veryslow (to get the best compression rate, but with the slowest encoding time)
+ -crf 28 (0-51, subjectively sane is 18-28, 18 ~ visually lossless, 28 ~ visually acceptable)
+
+when a downsizing is requested (using the C<--downsize-to> option), this utility
+first checks each input video if it is indeed larger than the requested final
+size. If it is, then the C<-vf scale> option is added. This utility also
+calculates a valid size for ffmpeg, since using C<-vf scale=-1:720> sometimes
+results in failure due to odd number.
+
+Audio streams are copied, not re-encoded.
+
+Output filenames are:
+
+ ORIGINAL_NAME.crf28.mp4
+
+or (if downsizing is done):
+
+ ORIGINAL_NAME.480p-crf28.mp4
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--audio-sample-rate>=I<s>, B<--sample-rate>
+
+Set audio sample rate, in Hz.
+
+=item B<--crf>=I<s>
+
+=item B<--dont-scale>
+
+Alias for --scale ''.
+
+See C<--scale>.
+
+=item B<--fast>
+
+Shortcut for --preset=fast.
+
+See C<--preset>.
+
+=item B<--faster>
+
+Shortcut for --preset=faster.
+
+See C<--preset>.
+
+=item B<--ffmpeg-path>=I<s>
+
+=item B<--file>=I<s@>*
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+See C<--file>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--frame-rate>=I<s>, B<-r>
+
+Set frame rate, in fps.
+
+=item B<--medium>
+
+Shortcut for --preset=medium.
+
+See C<--preset>.
+
+=item B<--no-scale>
+
+Alias for --scale ''.
+
+See C<--scale>.
+
+=item B<--preset>=I<s>
+
+Default value:
+
+ "veryslow"
+
+Valid values:
+
+ ["ultrafast","superfast","veryfast","faster","fast","medium","slow","slower","veryslow"]
+
+=item B<--scale>=I<s>
+
+Default value:
+
+ "1080^>"
+
+Scale video to specified size. See L<Math::Image::CalcResized> or
+L<calc-image-resized-size> for more details on scale specification. Some
+examples include:
+
+The default is C<< 1080^E<gt> >> which means to shrink to 1080p if video size is larger
+than 1080p.
+
+To disable scaling, set C<--scale> to '' (empty string), or specify
+C<--dont-scale> on the CLI.
+
+
+=item B<--slow>
+
+Shortcut for --preset=slow.
+
+See C<--preset>.
+
+=item B<--slower>
+
+Shortcut for --preset=slower.
+
+See C<--preset>.
+
+=item B<--superfast>
+
+Shortcut for --preset=superfast.
+
+See C<--preset>.
+
+=item B<--ultrafast>
+
+Shortcut for --preset=ultrafast.
+
+See C<--preset>.
+
+=item B<--veryfast>
+
+Shortcut for --preset=veryfast.
+
+See C<--preset>.
+
+=item B<--veryslow>
+
+Shortcut for --preset=veryslow.
+
+See C<--preset>.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--dry-run>, B<-n>
+
+Run in simulation mode (also via DRY_RUN=1).
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C vreencode vreencode
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete vreencode 'p/*/`vreencode`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/reencode-video-with-libx264.conf>, F</home/u1/reencode-video-with-libx264.conf>, or F</etc/reencode-video-with-libx264.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+ audio_sample_rate (see --audio-sample-rate)
+ crf (see --crf)
+ ffmpeg_path (see --ffmpeg-path)
+ files (see --file)
+ format (see --format)
+ frame_rate (see --frame-rate)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ preset (see --preset)
+ scale (see --scale)
+
+=head1 ENVIRONMENT
+
+=head2 VREENCODE_OPT
+
+String. Specify additional command-line options.
+
+=head1 FILES
+
+=head2 /home/u1/.config/reencode-video-with-libx264.conf
+
+=head2 /home/u1/reencode-video-with-libx264.conf
+
+=head2 /etc/reencode-video-with-libx264.conf
+
+=head1 EXAMPLES
+
+=head2 The default setting is to shrink to 1080p if video is larger than 1080p
+
+ % vreencode *
+
+=head2 Do not scale/shrink
+
+ % vreencode --dont-scale *
+
+=head2 Shrink to 480p if video is larger than 480p, but make the reencoding "visually lossless"
+
+ % vreencode --scale '480^>' --crf 18 *
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-FfmpegUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-FfmpegUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FfmpegUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

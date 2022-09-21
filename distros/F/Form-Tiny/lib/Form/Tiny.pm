@@ -1,28 +1,23 @@
 package Form::Tiny;
-$Form::Tiny::VERSION = '2.13';
+$Form::Tiny::VERSION = '2.14';
 use v5.10;
 use strict;
 use warnings;
-use Carp qw(croak carp);
-use Types::Standard qw(Str);
+use Carp qw(croak);
 use Import::Into;
-use Scalar::Util qw(blessed);
 
 use Form::Tiny::Form;
-use Form::Tiny::Utils qw(trim :meta_handlers);
-require Moo;
+use Form::Tiny::Utils qw(:meta_handlers);
 
 sub import
 {
 	my ($package, $caller) = (shift, scalar caller);
 
-	my @wanted = @_;
-
-	# special case - we want to always have -base flag, but just once
-	@wanted = (-base, grep { $_ ne -base } @wanted);
+	my @wanted = (-base, @_);
 
 	# very special case - do something UNLESS -nomoo was passed
 	unless ($package->_get_flag(\@wanted, -nomoo)) {
+		require Moo;
 		Moo->import::into($caller);
 	}
 
@@ -34,33 +29,13 @@ sub ft_install
 {
 	my ($self, $caller, @import_flags) = @_;
 
-	my $context;
-	my $wanted = {
-		subs => {},
-		roles => [],
-		meta_roles => [],
-	};
-
 	my $plugins_flag = $self->_get_flag(\@import_flags, 'plugins', 1);
-	my @plugins = @{$plugins_flag // []};
+	my @plugins = ($self->_get_plugins(\@import_flags), @{$plugins_flag // []});
 
-	$self->_select_behaviors(
-		$wanted, \@import_flags,
-		$self->_get_behaviors($self->_generate_helpers($caller, \$context))
-	);
+	# field context for form building
+	my $context;
 
-	foreach my $plugin (@plugins) {
-		$plugin = "Form::Tiny::Plugin::$plugin";
-		$plugin =~ s/^.+\+//;
-		my $success = eval "use $plugin; 1";
-
-		croak "could not load plugin $plugin: $@"
-			unless $success;
-		croak "$plugin is not a Form::Tiny::Plugin"
-			unless $plugin->isa('Form::Tiny::Plugin');
-
-		$self->_select_behaviors($wanted, [$plugin], {$plugin => $plugin->plugin($caller, \$context)});
-	}
+	my $wanted = $self->ft_run_plugins($caller, \$context, @plugins);
 
 	# create metapackage with roles
 	my $meta = create_form_meta($caller, @{$wanted->{meta_roles}});
@@ -78,100 +53,66 @@ sub ft_install
 	return \$context;
 }
 
-sub _generate_helpers
+sub ft_run_plugins
 {
-	my ($self, $caller, $field_context) = @_;
+	my ($self, $caller, $context_ref, @plugins) = @_;
 
-	my $use_context = sub {
-		croak 'context using DSL keyword called without context'
-			unless defined $$field_context;
-		unshift @_, $$field_context;
-		return @_;
+	my $wanted = {
+		subs => {},
+		roles => [],
+		meta_roles => [],
 	};
 
-	return {
-		form_field => sub {
-			$$field_context = $caller->form_meta->add_field(@_);
-		},
-		form_cleaner => sub {
-			$$field_context = undef;
-			$caller->form_meta->add_hook(cleanup => @_);
-		},
-		form_hook => sub {
-			$$field_context = undef;
-			$caller->form_meta->add_hook(@_);
-		},
-		form_filter => sub {
-			$$field_context = undef;
-			$caller->form_meta->add_filter(@_);
-		},
-		field_filter => sub {
-			$caller->form_meta->add_field_filter($use_context->(@_));
-		},
-		field_validator => sub {
-			$caller->form_meta->add_field_validator($use_context->(@_));
-		},
-		form_trim_strings => sub {
-			$$field_context = undef;
-			$caller->form_meta->add_filter(Str, sub { trim $_[1] });
-		},
-		form_message => sub {
-			$$field_context = undef;
-			my %params = @_;
-			for my $key (keys %params) {
-				$caller->form_meta->add_message($key, $params{$key});
-			}
-		},
-	};
+	my %seen;
+	foreach my $plugin (@plugins) {
+		$plugin = "Form::Tiny::Plugin::$plugin";
+		$plugin =~ s/^.+\+//;
+		next if $seen{$plugin}++;
+
+		my $success = eval "use $plugin; 1";
+
+		croak "could not load plugin $plugin: $@"
+			unless $success;
+		croak "$plugin is not a Form::Tiny::Plugin"
+			unless $plugin->isa('Form::Tiny::Plugin');
+
+		$self->_merge_behaviors($wanted, $plugin->plugin($caller, $context_ref));
+	}
+
+	return $wanted;
 }
 
-sub _get_behaviors
+sub _get_plugins
 {
-	my ($self, $subs) = @_;
+	my ($self, $flags) = @_;
 
-	return {
-		-base => {
-			subs => {
-				map { $_ => $subs->{$_} }
-					qw(
-					form_field field_validator
-					form_cleaner form_hook
-					form_message
-					)
-			},
-			roles => ['Form::Tiny::Form'],
-		},
-		-strict => {
-			meta_roles => [qw(Form::Tiny::Meta::Strict)],
-		},
-		-filtered => {
-			subs => {
-				map { $_ => $subs->{$_} }
-					qw(
-					form_filter field_filter
-					form_trim_strings
-					)
-			},
-			meta_roles => [qw(Form::Tiny::Meta::Filtered)],
-		},
+	my %known_flags = (
+		-base => ['Base'],
+		-strict => ['Strict'],
+		-filtered => ['Filtered'],
 
 		# legacy no-op flags
-		-consistent => {},
-	};
+		-consistent => [],
+	);
+
+	my @plugins;
+	foreach my $flag (@$flags) {
+		croak "no Form::Tiny import behavior for: $flag"
+			unless exists $known_flags{$flag};
+
+		push @plugins, @{$known_flags{$flag}};
+	}
+
+	return @plugins;
 }
 
-sub _select_behaviors
+sub _merge_behaviors
 {
-	my ($self, $wanted, $types, $behaviors) = @_;
+	my ($self, $wanted, $behaviors) = @_;
 
-	foreach my $type (@$types) {
-		croak "no Form::Tiny import behavior for: $type"
-			unless exists $behaviors->{$type};
-
-		%{$wanted->{subs}} = (%{$wanted->{subs}}, %{$behaviors->{$type}{subs} // {}});
-		push @{$wanted->{roles}}, @{$behaviors->{$type}{roles} // []};
-		push @{$wanted->{meta_roles}}, @{$behaviors->{$type}{meta_roles} // []};
-	}
+	%{$wanted->{subs}} = (%{$wanted->{subs}}, %{$behaviors->{subs} // {}});
+	push @{$wanted->{roles}}, @{$behaviors->{roles} // []};
+	push @{$wanted->{meta_roles}}, @{$behaviors->{meta_roles} // []};
 }
 
 sub _get_flag
@@ -246,8 +187,6 @@ Form::Tiny is a customizable hashref validator with DSL for form building.
 
 =item * L<Form::Tiny::Hook> - Hook class specification
 
-=item * L<Form::Tiny::Filter> - Filter class specification
-
 =item * L<Form::Tiny::Plugin> - How to write your own plugin?
 
 =back
@@ -301,13 +240,13 @@ Load plugins into Form::Tiny. Plugins may introduce additional keywords, mix in 
 
 	form_field $name => %arguments;
 	form_field $coderef;
-	form_field $object;
+	form_field($object); # watch out for indirect method call!
 
-This helper declares a new field for your form. Each style of calling this function should contain keys that meet the specification of L<Form::Tiny::FieldDefinition>, or an object of this class directly.
+This helper declares a new field for your form. Each style of calling this function should contain keys that meet the specification of L<Form::Tiny::FieldDefinition>, or an object of this class.
 
-In the first (hash) version, C<%arguments> need to be a plain hash (not a hashref) and should B<not> include the name in the hash, as it will be overriden by the first argument C<$name>. This form also sets the context for the form being built: see L<Form::Tiny::Manual/"Context"> for details.
+In the first (hash) version, C<%arguments> need to be a plain hash (not a hashref) and should B<not> include the C<name> in the hash, since it will be overriden by the first argument C<$name>. This form also sets the context for the form being built: see L<Form::Tiny::Manual/"Context"> for details.
 
-In the second (coderef) version, C<$coderef> gets passed the form instance as its only argument and should return a hashref or a constructed object of L<Form::Tiny::FieldDefinition>. A hashref must contain a C<name>. Note that this creates I<dynamic field>, which will be resolved before each form validation. Generally, you should avoid using dynamic fields and only use them when there is something special that you are trying to achieve.
+In the second (coderef) version, C<$coderef> gets passed the form instance as its only argument and should return a hash reference or a constructed object of L<Form::Tiny::FieldDefinition>. Unlike the first call style, hashref B<must> contain a C<name>. Note that this creates I<dynamic field>, which will be resolved later, before each form validation. Generally, you should avoid using dynamic fields and only use them when there is something special that you are trying to achieve.
 
 If you need a subclass of the default implementation, and you don't need a dynamic field, you can use the third style of the call, which takes a constructed object of L<Form::Tiny::FieldDefinition> or its subclass.
 
@@ -352,7 +291,6 @@ See L<Form::Tiny::Manual/"Filters"> for details on filters.
 
 	# uses current context
 	field_filter $type, $coderef;
-	field_filter Form::Tiny::Filter->new(...);
 
 Same as C<form_filter>, but is narrowed down to a single form field.
 

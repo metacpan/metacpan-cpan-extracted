@@ -88,7 +88,7 @@ my $stn_href;
 my $Opt;
 
 # get config options from the test options file instead of from
-# the default, which is ~/ghcn_fetch.yaml
+# the default, which is $HOME/.ghcn_fetch.yaml
 my $cache_for_testing = {
     cache => {
       root => $FindBin::Bin . '/ghcn_cache',
@@ -664,9 +664,12 @@ subtest 'station-level data (-report id)' => sub {
     );
 
     foreach my $ymd (sort keys %data) {
-        is $data{$ymd}{A_TMAX}+0, $expected{$ymd}->[0]+0, "$ymd A_TMAX correct anomaly calc";
-        is $data{$ymd}{A_TMIN}+0, $expected{$ymd}->[1]+0, "$ymd A_TMIN correct anomaly calc";
-        is $data{$ymd}{A_Tavg}+0, $expected{$ymd}->[2]+0, "$ymd A_Tavg correct anomaly calc";
+        # do a fuzzy comparison between calues in the table above and
+        # and those obtained from the data because an equality comparison
+        # between floats fails occasionally (especially on Unix)
+        ok abs( ($data{$ymd}{A_TMAX}+0) - ($expected{$ymd}->[0]+0) ) < 0.01, "$ymd A_TMAX correct anomaly calc";
+        ok abs( ($data{$ymd}{A_TMIN}+0) - ($expected{$ymd}->[1]+0) ) < 0.01, "$ymd A_TMIN correct anomaly calc";
+        ok abs( ($data{$ymd}{A_Tavg}+0) - ($expected{$ymd}->[2]+0) ) < 0.01, "$ymd A_Tavg correct anomaly calc";
     }
 };
 

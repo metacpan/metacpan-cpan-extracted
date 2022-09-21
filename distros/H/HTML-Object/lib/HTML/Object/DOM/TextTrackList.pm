@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/TextTrackList.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/26
-## Modified 2021/12/26
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,9 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::List );
+    use vars qw( $VERSION );
     use Scalar::Util ();
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub addEventListener { return( shift->SUPER::addEventListener({
         addtrack    => { 
@@ -101,7 +105,7 @@ sub _on_children_remove
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -134,7 +138,7 @@ Monitoring track count changes:
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

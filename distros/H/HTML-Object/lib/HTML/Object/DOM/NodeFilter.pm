@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/NodeFilter.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/01
-## Modified 2022/01/01
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,6 +17,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( @EXPORT_OK %EXPORT_TAGS $VERSION );
     use HTML::Object::Exception;
     use constant {
         # Shows all nodes.
@@ -59,8 +60,11 @@ BEGIN
         FILTER_ACCEPT FILTER_REJECT FILTER_SKIP
     );
     our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -73,7 +77,7 @@ sub init
 sub acceptNode { return( FILTER_ACCEPT ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -90,7 +94,7 @@ HTML::Object::DOM::NodeFilter - HTML Object DOM Node Filter
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

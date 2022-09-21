@@ -8,7 +8,7 @@ Weather::GHCN::Options - create and manage option lists/objects used by GHCN mod
 
 =head1 VERSION
 
-version v0.0.002
+version v0.0.003
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::Options;
 class   Weather::GHCN::Options;
 
-our $VERSION = 'v0.0.002';
+our $VERSION = 'v0.0.003';
 
 use Carp                qw(carp croak);
 use Const::Fast;

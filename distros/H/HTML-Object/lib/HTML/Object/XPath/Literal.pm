@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XPath/Literal.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
-## Modified 2021/12/05
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,6 +17,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $TRUE $FALSE $BASE_CLASS $DEBUG $VERSION );
     use HTML::Object::XPath::Boolean;
     our $TRUE  = HTML::Object::XPath::Boolean->True;
     our $FALSE = HTML::Object::XPath::Boolean->False;
@@ -25,8 +27,11 @@ BEGIN
         '""'  => \&value,
         'cmp' => \&cmp
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub new
 {
@@ -101,12 +106,13 @@ sub _class_for
     my( $self, $mod ) = @_;
     eval( "require ${BASE_CLASS}\::${mod};" );
     die( $@ ) if( $@ );
-    ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    # ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    eval( "\$${BASE_CLASS}\::${mod}\::DEBUG = " . ( $DEBUG // 0 ) );
     return( "${BASE_CLASS}::${mod}" );
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -123,7 +129,7 @@ HTML::Object::XPath::Literal - HTML Object XPath Literal
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

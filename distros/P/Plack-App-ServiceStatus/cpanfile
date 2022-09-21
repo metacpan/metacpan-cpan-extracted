@@ -6,6 +6,7 @@ requires "JSON::MaybeXS" => "0";
 requires "Log::Any" => "0";
 requires "Module::Runtime" => "0";
 requires "Plack::Response" => "0";
+requires "Sys::Hostname" => "0";
 requires "Try::Tiny" => "0";
 requires "base" => "0";
 requires "perl" => "5.018";

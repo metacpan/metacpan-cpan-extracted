@@ -14,7 +14,7 @@ use version;
 use B::Generate ();
 use B::Deparse  ();
 
-our $VERSION                    = qv(4.1.7);
+our $VERSION                    = qv(4.1.8);
 our $DEBUG;
 
 my %valid_attrs                 = (sealed => 1);
@@ -23,8 +23,8 @@ my $p_obj                       = B::svref_2object(sub {&tweak});
 # B::PADOP (w/ ithreads) or B::SVOP
 my $gv_op                       = $p_obj->START->next->next;
 
-sub tweak ($\@\@\@$) {
-  my ($op, $lexical_varnames, $pads, $op_stack, $cv_obj) = @_;
+sub tweak ($\@\@\@$\%) {
+  my ($op, $lexical_varnames, $pads, $op_stack, $cv_obj, $processed_op) = @_;
   my $tweaked                   = 0;
 
   if (${$op->next} and $op->next->name eq "padsv") {
@@ -35,6 +35,7 @@ sub tweak ($\@\@\@$) {
     while (${$op->next} and $op->next->name ne "entersub") {
 
       if ($op->next->name eq "pushmark") {
+        return $op->next, $tweaked if $$processed_op{+${$op->next}}++;
 	# we need to process this arg stack recursively
 	splice @_, 0, 1, $op->next;
         ($op, my $t)            = &tweak;
@@ -77,6 +78,7 @@ sub tweak ($\@\@\@$) {
         $op->next($gv);
 	# $op->sibparent($gv);
 	# $methop->refcnt_dec if $methop->can("refcnt_dec");
+        $$processed_op{$$_}++ for $op, $gv, $methop;
 
         if (ref($gv) eq "B::PADOP") {
           # answer the prayer, by reusing the $targ from the (passed) target pads
@@ -119,7 +121,7 @@ sub MODIFY_CODE_ATTRIBUTES {
       $op->dump if defined $DEBUG and $DEBUG eq 'dump';
 
       if ($op->name eq "pushmark") {
-	$tweaked               += eval {tweak $op, @lexical_varnames, @pads, @op_stack, $cv_obj};
+	$tweaked               += eval {tweak $op, @lexical_varnames, @pads, @op_stack, $cv_obj, %processed_op};
         warn __PACKAGE__ . ": tweak() aborted: $@" if $@;
       }
       elsif ($op->can("pmreplroot")) {

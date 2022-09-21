@@ -16,10 +16,19 @@ my $is_5130_release = ("$]" == 5.013 && !$Config{git_describe}) ? 1 : 0;
 my $aelem     = "$]" <= 5.008_003 ? 'aelem'
                                   : ("$]" < 5.013 or $is_5130_release)
                                                    ? 'aelemfast'
-                                                   : 'sassign';
-my $aelemf    = ("$]" < 5.013 or $is_5130_release) ? 'aelemfast' : 'sassign';
-my $aelemf_op = ($aelemf eq 'sassign')
-                   ? 'B::BINOP' : $Config{useithreads} ? 'B::PADOP' : 'B::SVOP';
+                                  : ("$]" < 5.037_003)
+                                                   ? 'sassign'
+                                                   : 'padsv_store';
+my $aelemf    = ("$]" < 5.013 or $is_5130_release) ? 'aelemfast'
+                                  : ("$]" < 5.037_003) ? 'sassign'
+                                                       : 'padsv_store';
+
+my $assign_op    = ("$]" < 5.037_003) ? 'sassign': 'padsv_store';
+my $assign_op_cl = ("$]" < 5.037_003) ? 'B::BINOP': 'B::UNOP';
+
+my $aelemf_op = ($aelemf eq 'sassign')     ? 'B::BINOP'
+              : ($aelemf eq 'padsv_store') ? 'B::UNOP'
+              : $Config{useithreads} ? 'B::PADOP' : 'B::SVOP';
 my $meth_op   = ("$]" < 5.021_005) ? 'B::SVOP' : 'B::METHOP';
 my $trutf_op  = ($Config{useithreads} && "$]" >= 5.008_009)
                    ? 'B::PADOP' : 'B::SVOP';
@@ -36,7 +45,7 @@ my @tests = (
                                                    [ $deref,    $deref_op   ] ],
  [ 'get', '$c',    'my $c = 1',  '++$c',           [ 'preinc',  'B::UNOP'   ] ],
  [ 'get', '$c',    'my $c = 1',  '$c ** 2',        [ 'pow',     'B::BINOP'  ] ],
- [ 'get', '$c',    'my $c = 1',  'my $x = $c',     [ 'sassign', 'B::BINOP'  ] ],
+ [ 'get', '$c',    'my $c = 1',  'my $x = $c',     [ $assign_op, $assign_op_cl ] ],
  [ 'get', '$c',    'my $c = 1',  '1 if $c',        [ 'and',     'B::LOGOP'  ] ],
  [ 'get', '$c',    'my $c = []', 'ref $c',         [ 'ref',     'B::UNOP'   ] ],
  [ 'get', '$c',    'my $c = $0', '-f $c',          [ 'ftfile',  'B::UNOP'   ] ],

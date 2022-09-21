@@ -1,0 +1,30 @@
+---
+abstract: 'Perl Exporter for Radio Frequency (RF) Functions'
+author:
+  - 'Michael R. Davis <mdavis@localdomain>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RF-Functions
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  Math::Round: '0'
+  POSIX: '0'
+  Test::Number::Delta: '0'
+  Test::Simple: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-RF-Functions/issues
+  homepage: https://github.com/mrdvt92/perl-RF-Functions
+  repository: https://github.com/mrdvt92/perl-RF-Functions.git
+version: '0.03'

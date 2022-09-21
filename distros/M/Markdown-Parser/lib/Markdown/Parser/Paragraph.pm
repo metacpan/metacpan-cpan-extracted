@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Paragraph.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,10 +16,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -32,7 +35,16 @@ sub as_markdown
 {
     my $self = shift( @_ );
     my $str = $self->children->map(sub{ $_->as_markdown })->join( '' );
-    ## Add an additional new line
+    # Add an additional new line
+    return( "$str\n" );
+}
+
+# Basically, same as markdown
+sub as_pod
+{
+    my $self = shift( @_ );
+    my $str = $self->children->map(sub{ $_->as_pod })->join( '' );
+    # Add an additional new line
     return( "$str\n" );
 }
 
@@ -59,7 +71,7 @@ sub as_string
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -76,7 +88,7 @@ Markdown::Parser::Paragraph - Markdown Paragraph Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -87,6 +99,12 @@ This class represents a paragraph. It is used by L<Markdown::Parser> and inherit
 =head2 as_markdown
 
 Returns a string representation of the paragraph formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the paragraph formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

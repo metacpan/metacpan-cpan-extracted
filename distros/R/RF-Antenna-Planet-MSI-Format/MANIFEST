@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README.md
+LICENSE
+CONTRIBUTING.md
+t/001_load.t
+t/002_new.t
+t/003_read.t
+t/004_load.t
+t/005_gain_freq.t
+t/006_read_scalar.t
+t/anonymous.msi
+lib/RF/Antenna/Planet/MSI/Format.pm
+scripts/perl-RF-Antenna-Planet-MSI-Format-printer.pl
+perl-RF-Antenna-Planet-MSI-Format.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

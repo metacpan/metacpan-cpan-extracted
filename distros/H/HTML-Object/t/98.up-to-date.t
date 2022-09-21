@@ -18,6 +18,7 @@ BEGIN
     use Data::Dump;
     use DateTime;
     use DateTime::Format::Strptime;
+    use DateTime::TimeZone;
     use Devel::Confess;
     use HTML::Entities ();
     use HTML::Object::DOM;
@@ -86,7 +87,6 @@ $links->foreach(sub
 
 done_testing();
 
-# XXX
 # $tags->push({ tag => 'canvas', uri => URI->new( 'https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas' ) });
 exit(0) unless( !$tags->is_empty );
 diag( sprintf( "Procssing %d missing tag.", $tags->length ) );
@@ -267,8 +267,6 @@ sub fetch_class
     }
     else
     {
-        # XXX
-        # $prop_title->debug(4);
         my $prop_div = $prop_title->nextElementSibling;
         die( "Unable to get a next sibling to id 'properties'\n" ) if( !$prop_div );
         die( "Element found to contain properties is not a div: '", $prop_div->getName, "' (", overload::StrVal( $prop_div ), ")\n" ) if( $prop_div->getName ne 'div' );
@@ -712,7 +710,7 @@ EOT
     
     $mod_file->print( <<EOT );
 1;
-# XXX POD
+# NOTE POD
 \__END__
 
 =encoding utf-8
@@ -1036,10 +1034,7 @@ sub _get_detail_page_info
     my $doc = $p->parse_data( $html );
     my $art = $doc->look_down( _tag => 'article', class => 'main-page-content' )->first;
     die( "Unable to find the article section\n" ) if( !ref( $art ) );
-    # XXX
-    $art->debug(4);
     my $codes = $art->getElementsByClassName( 'code-example' );
-    $art->debug(0);
     &logf( "%d code examples found for $link\n", $codes->length );
     my $ref = $p->new_array;
     $codes->foreach(sub
@@ -1184,9 +1179,24 @@ sub _check_cache_http
     diag( sprintf( "Retrieved %d bytes of html data.", length( $data ) ) );
     my $parser = HTML::Object::DOM->new;
     diag( "Last-Modified header value found: '$last_mod'" );
+    my $tz;
+    # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+    # "Cannot determine local time zone"
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+        warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+    }
     if( $last_mod )
     {
-        $last_mod = $parser->new->_parse_timestamp( $last_mod )->set_time_zone( 'local' );
+        my $p = $parser->new;
+        my $dt = $p->_parse_timestamp( "$last_mod" ) ||
+            die( $p->error );
+        $last_mod = $dt->set_time_zone( $tz );
     }
     else
     {

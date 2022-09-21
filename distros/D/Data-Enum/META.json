@@ -1,5 +1,5 @@
 {
-   "abstract" : "fast, immutable enumeration classes",
+   "abstract" : "immutable enumeration classes",
    "author" : [
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
@@ -71,7 +71,7 @@
    "provides" : {
       "Data::Enum" : {
          "file" : "lib/Data/Enum.pm",
-         "version" : "v0.2.3"
+         "version" : "v0.2.5"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/robrwo/perl-Data-Enum"
       }
    },
-   "version" : "v0.2.3",
+   "version" : "v0.2.5",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.31",

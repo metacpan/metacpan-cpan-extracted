@@ -6,7 +6,7 @@ Weather::GHCN::App::Fetch - Fetch station and weather data from the NOAA GHCN re
 
 =head1 VERSION
 
-version v0.0.002
+version v0.0.003
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::App::Fetch;
 
-our $VERSION = 'v0.0.002';
+our $VERSION = 'v0.0.003';
 
 use feature 'signatures';
 no warnings 'experimental::signatures';

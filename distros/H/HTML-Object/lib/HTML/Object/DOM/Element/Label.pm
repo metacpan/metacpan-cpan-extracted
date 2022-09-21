@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/Label.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
-## Modified 2021/12/23
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,9 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::Element );
+    use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :label );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -63,12 +67,15 @@ sub control
 }
 
 # Note: property form is NOT inherited, because this is the 'form' value of the associated control, if any.
-sub form
 {
-    my $self = shift( @_ );
-    my $elem = $self->control;
-    return if( !$self->_is_a( $elem => 'HTML::Object::DOM::Element' ) );
-    return( $elem->form );
+    no warnings 'redefine';
+    sub form
+    {
+        my $self = shift( @_ );
+        my $elem = $self->control;
+        return if( !$self->_is_a( $elem => 'HTML::Object::DOM::Element' ) );
+        return( $elem->form );
+    }
 }
 
 # Note: property
@@ -78,7 +85,7 @@ sub form
 sub htmlFor : lvalue { return( shift->_set_get_property( 'for', @_ ) ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -95,7 +102,7 @@ HTML::Object::DOM::Element::Label - HTML Object DOM Label Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

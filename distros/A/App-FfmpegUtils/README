@@ -2,14 +2,57 @@ NAME
     App::FfmpegUtils - Utilities related to ffmpeg
 
 VERSION
-    This document describes version 0.009 of App::FfmpegUtils (from Perl
-    distribution App-FfmpegUtils), released on 2020-12-12.
+    This document describes version 0.011 of App::FfmpegUtils (from Perl
+    distribution App-FfmpegUtils), released on 2022-09-21.
 
 FUNCTIONS
+  cut_video_by_duration
+    Usage:
+
+     cut_video_by_duration(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get a portion (time range) of a video.
+
+    This utility uses *ffmpeg* (particularly the "-t" and "-ss") option to
+    get a portion (time range) of a video. It is a convenient wrapper of
+    ffmpeg for this particular task. You can specify start time and end
+    time, or start time and duration. It automatically chooses a filename if
+    you don't specify one.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   file* => *filename*
+
+    *   start* => *duration*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   reencode_video_with_libx264
     Usage:
 
-     reencode_video_with_libx264(%args) -> [status, msg, payload, meta]
+     reencode_video_with_libx264(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Re-encode video (using ffmpeg and libx264).
 
@@ -91,19 +134,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   split_video_by_duration
     Usage:
 
-     split_video_by_duration(%args) -> [status, msg, payload, meta]
+     split_video_by_duration(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Split video by duration into parts.
 
@@ -114,19 +160,20 @@ FUNCTIONS
     "long.1of5.mp4" (15min), "long.2of5.mp4" (15min), "long.3of5.mp4"
     (15min), "long.4of5.mp4" (15min), and "long.5of5.mp4" (12min).
 
-    Currently this utility uses "-c copy" ffmpeg option, so there might be a
-    few of seconds of glitches around the cut points. An option to use other
-    codec will be provided in the future.
-
     This function is not exported.
 
     This function supports dry-run operation.
 
     Arguments ('*' denotes required arguments):
 
+    *   copy => *bool*
+
+        Whether to use the "copy" codec (fast but produces inaccurate
+        timings).
+
     *   every* => *duration*
 
-    *   file* => *filename*
+    *   files* => *array[filename]*
 
     Special arguments:
 
@@ -136,12 +183,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -153,19 +203,36 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-FfmpegUtils>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-FfmpegUtils/issues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2020 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-FfmpegUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

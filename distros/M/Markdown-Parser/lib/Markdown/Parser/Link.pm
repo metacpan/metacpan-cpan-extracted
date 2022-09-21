@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/Link.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,10 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -45,11 +48,11 @@ sub as_markdown
     {
         $arr->push( sprintf( '[%s]', $self->link_id ) );
     }
-    elsif( $self->uri || $self->title )
+    elsif( $self->url || $self->title )
     {
         $arr->push( '(' );
-        $arr->push( sprintf( '%s', $self->uri ) ) if( $self->uri );
-        $arr->push( ' ' ) if( $self->uri && $self->title );
+        $arr->push( sprintf( '%s', $self->url ) ) if( $self->url );
+        $arr->push( ' ' ) if( $self->url && $self->title );
         $arr->push( sprintf( '"%s"', $self->title ) );
         $arr->push( ')' );
     }
@@ -59,6 +62,21 @@ sub as_markdown
         $def->push( $self->id->map(sub{ "\#${_}" })->list );
         $def->push( $self->class->map(sub{ ".$_" })->list );
         $arr->push( '{' . $def->join( ' ' )->scalar . '}' );
+    }
+    return( $arr->join( '' )->scalar );
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    my $arr = $self->new_array;
+    if( $self->url && $self->title )
+    {
+        $arr->push( sprintf( 'L<%s|%s>', $self->title, $self->url ) );
+    }
+    elsif( $self->url )
+    {
+        $arr->push( sprintf( 'L<%s>', $self->url ) );
     }
     return( $arr->join( '' )->scalar );
 }
@@ -75,7 +93,6 @@ sub as_string
     my $encrypt = $self->encrypt;
     my $scheme = '';
     $scheme = $url->scheme if( ref( $url ) );
-    $self->message( 3, "Obfuscation method is '$encrypt' for uri '$url_str'." );
     $arr->push( "<${tag_open}" );
     my $attr = $self->new_array;
     $attr->push( $self->format_id ) if( $self->id->length );
@@ -88,11 +105,11 @@ sub as_string
         if( $encrypt eq 'obfuscate' )
         {
             $self->document->setup_email_obfuscation;
-            ## We use the original e-mail address as it as provided in the text, because URI alters it by url-encoding it
+            # We use the original e-mail address as it as provided in the text, because URI alters it by url-encoding it
             my $email = $orig;
             my $user = substr( $email, 0, rindex( $email, '@' ) );
             my $host = substr( $email, rindex( $email, '@' ) + 1 );
-            ## Use of a decoy email address
+            # Use of a decoy email address
             if( $self->document->default_email->length > 0 )
             {
                 $arr->push( sprintf( ' href="%s"', $self->document->default_email->scalar ) );
@@ -103,8 +120,8 @@ sub as_string
             }
             my $data_user = $self->document->email_obfuscate_data_user->scalar || 'user';
             my $data_host = $self->document->email_obfuscate_data_host->scalar || 'host';
-            $arr->push( sprintf( ' data-%s="%s"', $data_user, $self->encode_html( [qw(" & ? #)], join( '', reverse( split( //, $user ) ) ) ) ) );
-            $arr->push( sprintf( ' data-%s="%s"', $data_host, $self->encode_html( [qw(" & ? #)], join( '', reverse( split( //, $host ) ) ) ) ) );
+            $arr->push( sprintf( ' data-%s="%s"', $data_user, $self->encode_html( ['"', '&', '?', '#'], join( '', reverse( split( //, $user ) ) ) ) ) );
+            $arr->push( sprintf( ' data-%s="%s"', $data_host, $self->encode_html( ['"', '&', '?', '#'], join( '', reverse( split( //, $host ) ) ) ) ) );
             $self->class->push( $self->document->email_obfuscate_class ) if( !$self->class->has( $self->document->email_obfuscate_class->scalar ) );
             $arr->push( sprintf( ' class="%s"', $self->class->join( ', ' )->scalar ) );
         }
@@ -124,7 +141,6 @@ sub as_string
     }
     if( $self->title->length )
     {
-        $self->message( 3, "Encoding title '", $self->title, "'." );
         $arr->push( sprintf( ' title="%s"', $self->encode_html( 'all', $self->title ) ) );
     }
     $arr->push( ">" );
@@ -159,7 +175,6 @@ sub encode_email_address
 {
     my $self = shift( @_ );
     my $addr = shift( @_ );
-    $self->message( 3, "Encoding e-mail address '$addr'" );
     return( '' ) if( !length( $addr ) );
     ## Borrowed from Markdown original author John Gruber
 	srand();
@@ -172,7 +187,6 @@ sub encode_email_address
 		sub{                             shift           },
 	);
 	my @chars = split( //, $addr );
-	$self->messagef( 3, "Processing %d characters.", scalar( @chars ) );
 	for my $i ( 0..$#chars )
 	{
 		if( $chars[$i] eq '@' )
@@ -218,7 +232,7 @@ sub title { return( shift->_set_get_scalar_as_object( 'title', @_ ) ); }
 sub url { return( shift->_set_get_uri( 'url', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -235,7 +249,7 @@ Markdown::Parser::Link - Markdown Link Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -245,7 +259,13 @@ This class represents a link. It is used by L<Markdown::Parser> and inherits fro
 
 =head2 as_markdown
 
-Returns a string representation of the link in markdown.
+Returns a string representation of the link formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the link formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

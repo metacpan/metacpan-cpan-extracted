@@ -1,0 +1,25 @@
+---
+abstract: 'Module with methods for the control of the terminal window'
+author:
+  - 'Dr. Peter Netz <ztenretep@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Terminal-Identify
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Inline::C: '0.82'
+  Time::HiRes: '1.9764'
+  Try::Catch: v1.1.0
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

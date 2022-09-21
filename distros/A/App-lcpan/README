@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.070 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2022-03-27.
+    This document describes version 1.071 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2022-09-19.
 
 SYNOPSIS
     See lcpan script.
@@ -86,6 +86,25 @@ FUNCTIONS
     *   sort => *array[str]* (default: ["id"])
 
         Sort the result.
+
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
 
     *   use_bootstrap => *bool* (default: 1)
 
@@ -281,6 +300,25 @@ FUNCTIONS
 
     *   rel => *str* (default: "requires")
 
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
+
     *   updated_since => *date*
 
         Include only records that are updated since certain date.
@@ -431,6 +469,25 @@ FUNCTIONS
 
         Sort the result.
 
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
+
     *   updated_since => *date*
 
         Include only records that are updated since certain date.
@@ -493,6 +550,25 @@ FUNCTIONS
         index will be located in the top-level of "cpan". If "index_name"
         contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
         the index will be located solely using the "index_name".
+
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
 
     *   use_bootstrap => *bool* (default: 1)
 
@@ -621,6 +697,25 @@ FUNCTIONS
 
         Sort the result.
 
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
+
     *   updated_since => *date*
 
         Include only records that are updated since certain date.
@@ -729,6 +824,25 @@ FUNCTIONS
     *   sort => *str* (default: "name")
 
     *   to_level => *int*
+
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
 
     *   updated_since => *date*
 
@@ -870,6 +984,25 @@ FUNCTIONS
 
         Sort the result.
 
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
+
     *   updated_since => *date*
 
         Include only records that are updated since certain date.
@@ -1007,6 +1140,25 @@ FUNCTIONS
     *   phase => *str* (default: "ALL")
 
     *   rel => *str* (default: "ALL")
+
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
 
     *   updated_since => *date*
 
@@ -1146,6 +1298,25 @@ FUNCTIONS
 
     *   sort => *array[str]* (default: ["name"])
 
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
+
     *   updated_since => *date*
 
         Include only records that are updated since certain date.
@@ -1213,6 +1384,25 @@ FUNCTIONS
         contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
         the index will be located solely using the "index_name".
 
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
+
     *   use_bootstrap => *bool* (default: 1)
 
         Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -1259,6 +1449,25 @@ FUNCTIONS
         index will be located in the top-level of "cpan". If "index_name"
         contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
         the index will be located solely using the "index_name".
+
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
 
     *   use_bootstrap => *bool* (default: 1)
 
@@ -1365,6 +1574,25 @@ FUNCTIONS
 
         Skip one or more files from being parsed for subs.
 
+    *   update_db_schema => *bool* (default: 1)
+
+        Whether to update database schema to the latest.
+
+        By default, when the application starts and reads the index
+        database, it updates the database schema to the latest if the
+        database happens to be last updated by an older version of the
+        application and has the old database schema (since database schema
+        is updated from time to time, for example at 1.070 the database
+        schema is at version 15).
+
+        When you disable this option, the application will not update the
+        database schema. This option is for testing only, because it will
+        probably cause the application to run abnormally and then die with a
+        SQL error when reading/writing to the database.
+
+        Note that in certain modes e.g. doing tab completion, the
+        application also will not update the database schema.
+
     *   update_files => *bool* (default: 1)
 
         Update the files.
@@ -1442,10 +1670,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016,

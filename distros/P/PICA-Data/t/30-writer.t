@@ -281,6 +281,9 @@ PLUS
 
     is pica_string([["123A",undef,"x","y"," "]], "plain", annotate => 0),
       "123A \$xy\n\n", "ignore annotation";
+
+    is pica_string([["123A",undef,"x","y","?"]], "plus"),
+      "123A?\x1Fxy\x1E\n", "plus with annotation";
 }
 
 is pica_string([]), '', 'empty record';

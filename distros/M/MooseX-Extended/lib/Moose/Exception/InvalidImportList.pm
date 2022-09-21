@@ -5,7 +5,7 @@ package Moose::Exception::InvalidImportList;
 use Moose;
 extends 'Moose::Exception';
 use MooseX::Extended::Types qw(NonEmptyStr PositiveInt);
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 with 'Moose::Exception::Role::Class';
 
 has 'moosex_extended_type' => (
@@ -37,7 +37,7 @@ Moose::Exception::InvalidImportList - MooseX::Extended exception for import argu
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 WHY NOT MOOSEX?
 

@@ -11,9 +11,9 @@ use Exporter;
 use List::Util qw(first);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2022-09-19'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.070'; # VERSION
+our $VERSION = '1.071'; # VERSION
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -64,12 +64,13 @@ our %common_args = (
 Defaults to C<~/cpan>.
 
 _
+        # default will be set in _set_args_default
         tags => ['common'],
     },
     index_name => {
         summary => 'Filename of index',
         schema  => 'filename*',
-        default => 'index.db',
+        default => 'index.db', # will also be checked/set in _set_args_default
         tags => ['common'],
         description => <<'_',
 
@@ -112,11 +113,35 @@ _
     use_bootstrap => {
         summary => 'Whether to use bootstrap database from App-lcpan-Bootstrap',
         schema => 'bool*',
-        default => 1,
+        default => 1, # will also be checked/set in _set_args_default
         description => <<'_',
 
 If you are indexing your private CPAN-like repository, you want to turn this
 off.
+
+_
+        tags => ['common'],
+    },
+    update_db_schema => {
+        summary => 'Whether to update database schema to the latest',
+        'summary.alt.bool.not' => 'Do not update database schema to the latest',
+        schema => 'bool*',
+        default => 1, # will also be checked/set in _set_args_default
+        description => <<'_',
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
 
 _
         tags => ['common'],
@@ -520,6 +545,42 @@ our %authors_args = (
     },
 );
 
+our %argspecsopt_module_authors = (
+    module_authors => {
+        summary => 'Only list depended modules published by specified author(s)',
+        'x.name.is_plural' => 1,
+        schema => ['array*', of=>'str*'],
+        element_completion => \&App::lcpan::_complete_cpanid,
+        tags => ['category:filtering'],
+    },
+    module_authors_arent => {
+        summary => 'Do not list depended modules published by specified author(s)',
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'module_author_isnt',
+        schema => ['array*', of=>'str*'],
+        element_completion => \&App::lcpan::_complete_cpanid,
+        tags => ['category:filtering'],
+    },
+);
+
+our %argspecsopt_dist_authors = (
+    dist_authors => {
+        summary => 'Only select dependent distributions published by specified author(s)',
+        'x.name.is_plural' => 1,
+        schema => ['array*', of=>'str*'],
+        element_completion => \&App::lcpan::_complete_cpanid,
+        tags => ['category:filtering'],
+    },
+    dist_authors_arent => {
+        summary => 'Do not select dependent distributions published by specified author(s)',
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'dist_author_isnt',
+        schema => ['array*', of=>'str*'],
+        element_completion => \&App::lcpan::_complete_cpanid,
+        tags => ['category:filtering'],
+    },
+);
+
 our %dist_args = (
     dist => {
         schema => 'perl::distname*',
@@ -626,6 +687,8 @@ sub _set_args_default {
     if (!defined($args->{num_backups})) {
         $args->{num_backups} = 7;
     }
+    $args->{use_bootstrap} //= 1;
+    $args->{update_db_schema} //= 1;
 }
 
 # set {added_,updated_,added_or_udpated_}since from
@@ -817,7 +880,7 @@ sub _set_namespace {
 }
 
 our $db_schema_spec = {
-    latest_v => 15,
+    latest_v => 16,
 
     install => [
         'CREATE TABLE author (
@@ -830,7 +893,7 @@ our $db_schema_spec = {
         'CREATE INDEX ix_author__rec_ctime ON author(rec_ctime)',
         'CREATE INDEX ix_author__rec_mtime ON author(rec_mtime)',
 
-        'CREATE TABLE file (
+        'CREATE TABLE file ( -- remember to keep schema in-sync with old_file
              id INTEGER NOT NULL PRIMARY KEY,
              name TEXT NOT NULL,
              cpanid VARCHAR(20) NOT NULL REFERENCES author(cpanid),
@@ -883,6 +946,44 @@ our $db_schema_spec = {
         'CREATE INDEX ix_file__rec_mtime ON file(rec_mtime)',
         'CREATE INDEX ix_file__dist_name ON file(dist_name)',
 
+        'CREATE TABLE old_file ( -- remember to keep schema in-sync with file
+             id INTEGER NOT NULL PRIMARY KEY,
+             name TEXT NOT NULL,
+             cpanid VARCHAR(20) NOT NULL, -- REFERENCES author(cpanid),
+
+             mtime INT,
+             size INT,
+
+             file_status TEXT,
+             file_error TEXT,
+
+             meta_status TEXT,
+             meta_error TEXT,
+
+             dist_name TEXT,
+             dist_abstract TEXT,
+             dist_version VARCHAR(20),
+             dist_version_numified VARCHAR(20),
+             is_latest_dist BOOLEAN,
+
+             pod_status TEXT,
+
+             sub_status TEXT,
+
+             has_metajson INTEGER,
+             has_metayml INTEGER,
+             has_makefilepl INTEGER,
+             has_buildpl INTEGER,
+
+             rec_ctime INT,
+             rec_mtime INT
+        )',
+        'CREATE UNIQUE INDEX ix_old_file__id ON old_file(id)',
+        'CREATE UNIQUE INDEX ix_old_file__cpanid__name ON old_file(cpanid,name)',
+        'CREATE INDEX ix_old_file__rec_ctime ON old_file(rec_ctime)',
+        'CREATE INDEX ix_old_file__rec_mtime ON old_file(rec_mtime)',
+        'CREATE INDEX ix_old_file__dist_name ON old_file(dist_name)',
+
         # files inside the release archive file
         'CREATE TABLE content (
              id INTEGER NOT NULL PRIMARY KEY,
@@ -900,7 +1001,7 @@ our $db_schema_spec = {
         'CREATE INDEX ix_content__rec_ctime ON content(rec_ctime)',
         'CREATE INDEX ix_content__rec_mtime ON content(rec_mtime)',
 
-        'CREATE TABLE module (
+        'CREATE TABLE module ( -- remember to keep schema in-sync with old_module
              id INTEGER NOT NULL PRIMARY KEY,
              name VARCHAR(255) NOT NULL,
              cpanid VARCHAR(20) NOT NULL REFERENCES author(cpanid), -- [cache]
@@ -919,7 +1020,26 @@ our $db_schema_spec = {
         'CREATE INDEX ix_module__rec_ctime ON module(rec_ctime)',
         'CREATE INDEX ix_module__rec_mtime ON module(rec_mtime)',
 
-        'CREATE TABLE script (
+        'CREATE TABLE old_module ( -- remember to keep schema in-sync with module
+             id INTEGER NOT NULL PRIMARY KEY,
+             name VARCHAR(255) NOT NULL,
+             cpanid VARCHAR(20) NOT NULL, -- REFERENCES author(cpanid), -- [cache]
+             file_id INTEGER NOT NULL,
+             version VARCHAR(20),
+             version_numified DECIMAL,
+             content_id INTEGER, -- REFERENCES content(id),
+             abstract TEXT,
+             rec_ctime INT,
+             rec_mtime INT
+         )',
+        'CREATE INDEX ix_old_module__id ON old_module(id)',
+        'CREATE INDEX ix_old_module__name ON old_module(name)',
+        'CREATE INDEX ix_old_module__file_id ON old_module(file_id)',
+        'CREATE INDEX ix_old_module__cpanid ON old_module(cpanid)',
+        'CREATE INDEX ix_old_module__rec_ctime ON old_module(rec_ctime)',
+        'CREATE INDEX ix_old_module__rec_mtime ON old_module(rec_mtime)',
+
+        'CREATE TABLE script ( -- remember to keep schema in-sync with old_script
              id INTEGER NOT NULL PRIMARY KEY,
              file_id INTEGER NOT NULL REFERENCES file(id), -- [cache]
              cpanid VARCHAR(20) NOT NULL REFERENCES author(cpanid), -- [cache]
@@ -934,6 +1054,22 @@ our $db_schema_spec = {
         'CREATE INDEX ix_script__name ON script(name)',
         'CREATE INDEX ix_script__rec_ctime ON script(rec_ctime)',
         'CREATE INDEX ix_script__rec_mtime ON script(rec_mtime)',
+
+        'CREATE TABLE old_script ( -- remember to keep schema in-sync with script
+             id INTEGER NOT NULL PRIMARY KEY,
+             file_id INTEGER NOT NULL, -- REFERENCES file(id), -- [cache]
+             cpanid VARCHAR(20) NOT NULL, -- REFERENCES author(cpanid), -- [cache]
+             name TEXT NOT NULL,
+             content_id INT, -- REFERENCES content(id),
+             abstract TEXT,
+             rec_ctime INT,
+             rec_mtime INT
+        )',
+        'CREATE UNIQUE INDEX ix_old_script__id ON old_script(id)',
+        'CREATE UNIQUE INDEX ix_old_script__file_id__name ON old_script(file_id, name)',
+        'CREATE INDEX ix_old_script__name ON old_script(name)',
+        'CREATE INDEX ix_old_script__rec_ctime ON old_script(rec_ctime)',
+        'CREATE INDEX ix_old_script__rec_mtime ON old_script(rec_mtime)',
 
         'CREATE TABLE mention (
              id INTEGER NOT NULL PRIMARY KEY,
@@ -1344,6 +1480,84 @@ our $db_schema_spec = {
         },
     ],
 
+    upgrade_to_v16 => [
+        # add table old_file
+        'CREATE TABLE old_file ( -- remember to keep schema in-sync with file
+             id INTEGER NOT NULL PRIMARY KEY,
+             name TEXT NOT NULL,
+             cpanid VARCHAR(20) NOT NULL, -- REFERENCES author(cpanid),
+
+             mtime INT,
+             size INT,
+
+             file_status TEXT,
+             file_error TEXT,
+
+             meta_status TEXT,
+             meta_error TEXT,
+
+             dist_name TEXT,
+             dist_abstract TEXT,
+             dist_version VARCHAR(20),
+             dist_version_numified VARCHAR(20),
+             is_latest_dist BOOLEAN,
+
+             pod_status TEXT,
+
+             sub_status TEXT,
+
+             has_metajson INTEGER,
+             has_metayml INTEGER,
+             has_makefilepl INTEGER,
+             has_buildpl INTEGER,
+
+             rec_ctime INT,
+             rec_mtime INT
+        )',
+        'CREATE UNIQUE INDEX ix_old_file__id ON old_file(id)',
+        'CREATE UNIQUE INDEX ix_old_file__cpanid__name ON old_file(cpanid,name)',
+        'CREATE INDEX ix_old_file__rec_ctime ON old_file(rec_ctime)',
+        'CREATE INDEX ix_old_file__rec_mtime ON old_file(rec_mtime)',
+        'CREATE INDEX ix_old_file__dist_name ON old_file(dist_name)',
+
+        # add table old_module
+        'CREATE TABLE old_module ( -- remember to keep schema in-sync with module
+             id INTEGER NOT NULL PRIMARY KEY,
+             name VARCHAR(255) NOT NULL,
+             cpanid VARCHAR(20) NOT NULL, -- REFERENCES author(cpanid), -- [cache]
+             file_id INTEGER NOT NULL,
+             version VARCHAR(20),
+             version_numified DECIMAL,
+             content_id INTEGER, -- REFERENCES content(id),
+             abstract TEXT,
+             rec_ctime INT,
+             rec_mtime INT
+         )',
+        'CREATE INDEX ix_old_module__id ON old_module(id)',
+        'CREATE INDEX ix_old_module__name ON old_module(name)',
+        'CREATE INDEX ix_old_module__file_id ON old_module(file_id)',
+        'CREATE INDEX ix_old_module__cpanid ON old_module(cpanid)',
+        'CREATE INDEX ix_old_module__rec_ctime ON old_module(rec_ctime)',
+        'CREATE INDEX ix_old_module__rec_mtime ON old_module(rec_mtime)',
+
+        # add table old_script
+        'CREATE TABLE old_script ( -- remember to keep schema in-sync with script
+             id INTEGER NOT NULL PRIMARY KEY,
+             file_id INTEGER NOT NULL, -- REFERENCES file(id), -- [cache]
+             cpanid VARCHAR(20) NOT NULL, -- REFERENCES author(cpanid), -- [cache]
+             name TEXT NOT NULL,
+             content_id INT, -- REFERENCES content(id),
+             abstract TEXT,
+             rec_ctime INT,
+             rec_mtime INT
+        )',
+        'CREATE UNIQUE INDEX ix_old_script__id ON old_script(id)',
+        'CREATE UNIQUE INDEX ix_old_script__file_id__name ON old_script(file_id, name)',
+        'CREATE INDEX ix_old_script__name ON old_script(name)',
+        'CREATE INDEX ix_old_script__rec_ctime ON old_script(rec_ctime)',
+        'CREATE INDEX ix_old_script__rec_mtime ON old_script(rec_mtime)',
+    ],
+
     # for testing
     install_v1 => [
         'CREATE TABLE author (
@@ -1447,7 +1661,7 @@ sub _use_db_bootstrap {
 sub _connect_db {
     require DBI;
 
-    my ($mode, $cpan, $index_name, $use_bootstrap) = @_;
+    my ($mode, $cpan, $index_name, $use_bootstrap, $update_db_schema) = @_;
 
     my $db_path = _db_path($cpan, $index_name);
     _use_db_bootstrap($db_path) if $use_bootstrap;
@@ -1460,7 +1674,7 @@ sub _connect_db {
     my $dbh = DBI->connect("dbi:SQLite:dbname=$db_path", undef, undef,
                            {RaiseError=>1});
     $dbh->do("PRAGMA cache_size = 400000"); # 400M
-    _create_schema($dbh);
+    _create_schema($dbh) if $update_db_schema;
     $dbh;
 }
 
@@ -1474,7 +1688,7 @@ sub _init {
     unless ($App::lcpan::state) {
         _set_args_default($args);
         my $state = {
-            dbh => _connect_db($mode, $args->{cpan}, $args->{index_name}, $args->{use_bootstrap}),
+            dbh => _connect_db($mode, $args->{cpan}, $args->{index_name}, $args->{use_bootstrap}, $args->{update_db_schema}),
             cpan => $args->{cpan},
             index_name => $args->{index_name},
         };
@@ -1715,7 +1929,7 @@ sub _update_files {
         @cmd,
     );
 
-    my $dbh = _connect_db('rw', $cpan, $index_name, $args{use_bootstrap});
+    my $dbh = _connect_db('rw', $cpan, $index_name, $args{use_bootstrap}, $args{update_db_schema});
     $dbh->do("INSERT OR REPLACE INTO meta (name,value) VALUES (?,?)",
              {}, 'last_mirror_time', time());
 
@@ -1745,12 +1959,18 @@ sub _delete_releases_records {
         }
         $dbh->do("DELETE FROM namespace WHERE num_modules <= 0");
 
+        #log_trace("  Copying module records to old_module");
+        #$dbh->do("INSERT INTO old_module SELECT * FROM module WHERE file_id IN (".join(",",@file_ids).")");
+
         log_trace("  Deleting module records");
         $dbh->do("DELETE FROM module WHERE file_id IN (".join(",",@file_ids).")");
     }
 
     log_trace("  Deleting mention records");
     $dbh->do("DELETE FROM mention WHERE source_file_id IN (".join(",",@file_ids).")");
+
+    #log_trace("  Copying script records to old_script");
+    #$dbh->do("INSERT INTO old_script SELECT * FROM script WHERE file_id IN (".join(",",@file_ids).")");
 
     log_trace("  Deleting script records");
     $dbh->do("DELETE FROM script WHERE file_id IN (".join(",",@file_ids).")");
@@ -1761,6 +1981,10 @@ sub _delete_releases_records {
     log_trace("  Deleting content records");
     $dbh->do("DELETE FROM content WHERE file_id IN (".join(",",@file_ids).")");
 
+    #log_trace("  Copying file records to old_file");
+    #$dbh->do("INSERT INTO old_file SELECT * FROM file WHERE id IN (".join(",",@file_ids).")");
+
+    log_trace("  Deleting file records");
     $dbh->do("DELETE FROM file WHERE id IN (".join(",",@file_ids).")");
 }
 
@@ -1889,7 +2113,7 @@ sub _update_index {
               or return [500, "Copy $db_path.1 -> $db_path failed: $!"];
     }
 
-    my $dbh  = _connect_db('rw', $cpan, $index_name, $args{use_bootstrap});
+    my $dbh  = _connect_db('rw', $cpan, $index_name, $args{use_bootstrap}, $args{update_db_schema});
 
     # check whether we need to reindex if a sufficiently old (and possibly
     # incorrect) version of us did the reindexing
@@ -2752,11 +2976,14 @@ sub _reset {
     $dbh->do("DELETE FROM namespace");
     $dbh->do("DELETE FROM mention")   if _table_exists($dbh, "main", "mention");
     $dbh->do("DELETE FROM module");
+    $dbh->do("DELETE FROM old_module")if _table_exists($dbh, "main", "old_module");
     $dbh->do("DELETE FROM script")    if _table_exists($dbh, "main", "script");
+    $dbh->do("DELETE FROM old_script")if _table_exists($dbh, "main", "old_script");
     $dbh->do("DELETE FROM sub")       if _table_exists($dbh, "main", "sub");
     $dbh->do("DELETE FROM dist")      if _table_exists($dbh, "main", "dist");
     $dbh->do("DELETE FROM content")   if _table_exists($dbh, "main", "content");
     $dbh->do("DELETE FROM file");
+    $dbh->do("DELETE FROM old_file")  if _table_exists($dbh, "main", "old_file");
     $dbh->do("DELETE FROM author");
     $dbh->do("DELETE FROM log")       if _table_exists($dbh, "main", "log") && !$soft;
 
@@ -2908,7 +3135,7 @@ sub _complete_mod {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -2917,24 +3144,24 @@ sub _complete_mod {
     }
 
     my $sth = $dbh->prepare(
-        "SELECT name FROM module WHERE name LIKE ? ORDER BY name");
+        "SELECT DISTINCT name,abstract FROM module WHERE name LIKE ? ORDER BY name");
     $sth->execute($word . '%');
 
     # XXX follow Complete::Common::OPT_CI
 
     my @res;
-    while (my ($mod) = $sth->fetchrow_array) {
+    while (my ($mod,$abstract) = $sth->fetchrow_array) {
         # only complete one level deeper at a time
         if ($mod =~ /:\z/) {
             next unless $mod =~ /\A\Q$word\E:*\w+\z/i;
         } else {
             next unless $mod =~ /\A\Q$word\E\w*(::\w+)?\z/i;
         }
-        push @res, $mod;
+        push @res, {word=>$mod, summary=>$abstract};
     }
 
     # convert back to slash if user originally typed with slash
-    if ($uses_slash) { for (@res) { s!::!/!g } }
+    if ($uses_slash) { for (@res) { $_->{word} =~ s!::!/!g } }
 
     \@res;
 };
@@ -2962,7 +3189,7 @@ sub _complete_mod_or_dist {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -2976,17 +3203,17 @@ sub _complete_mod_or_dist {
     if ($word =~ /-/) {
         $is_dist++;
         $sth = $dbh->prepare(
-            "SELECT DISTINCT dist_name FROM file WHERE dist_name LIKE ? ORDER BY dist_name");
+            "SELECT DISTINCT dist_name,dist_abstract FROM file WHERE dist_name LIKE ? ORDER BY dist_name");
     } else {
         $sth = $dbh->prepare(
-            "SELECT name FROM module WHERE name LIKE ? ORDER BY name");
+            "SELECT name,abstract FROM module WHERE name LIKE ? ORDER BY name");
     }
     $sth->execute($word . '%');
 
     # XXX follow Complete::Common::OPT_CI
 
     my @res;
-    while (my ($e) = $sth->fetchrow_array) {
+    while (my ($e,$summary) = $sth->fetchrow_array) {
         # only complete one level deeper at a time
         if ($is_dist) {
             if ($e =~ /-\z/) {
@@ -3001,11 +3228,11 @@ sub _complete_mod_or_dist {
                 next unless $e =~ /\A\Q$word\E\w*(::\w+)?\z/i;
             }
         }
-        push @res, $e;
+        push @res, {word=>$e, summary=>$summary};
     }
 
     # convert back to slash if user originally typed with slash
-    if ($uses_slash) { for (@res) { s!::!/!g } }
+    if ($uses_slash) { for (@res) { $_->{word} =~ s!::!/!g } }
 
     \@res;
 };
@@ -3033,7 +3260,7 @@ sub _complete_mod_or_dist_or_script {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -3047,17 +3274,17 @@ sub _complete_mod_or_dist_or_script {
     if ($word =~ /-/) {
         $is_dist++;
         $sth = $dbh->prepare(
-            "SELECT DISTINCT dist_name FROM file WHERE dist_name LIKE ? ORDER BY dist_name");
+            "SELECT DISTINCT dist_name,dist_abstract FROM file WHERE dist_name LIKE ? ORDER BY dist_name");
     } else {
         $sth = $dbh->prepare(
-            "SELECT name FROM module WHERE name LIKE ? ORDER BY name");
+            "SELECT name FROM module,abstract WHERE name LIKE ? ORDER BY name");
     }
     $sth->execute($word . '%');
 
     # XXX follow Complete::Common::OPT_CI
 
     my @res;
-    while (my ($e) = $sth->fetchrow_array) {
+    while (my ($e,$summary) = $sth->fetchrow_array) {
         # only complete one level deeper at a time
         if ($is_dist) {
             if ($e =~ /-\z/) {
@@ -3072,21 +3299,21 @@ sub _complete_mod_or_dist_or_script {
                 next unless $e =~ /\A\Q$word\E\w*(::\w+)?\z/i;
             }
         }
-        push @res, $e;
+        push @res, {word=>$e, summary=>$summary};
     }
 
     # also get candidates from script name
     unless ($word =~ /::/) {
         $sth = $dbh->prepare(
-            "SELECT DISTINCT name FROM script WHERE name LIKE ? ORDER BY name");
+            "SELECT DISTINCT name,abstract FROM script WHERE name LIKE ? ORDER BY name");
         $sth->execute($word . '%');
-        while (my ($e) = $sth->fetchrow_array) {
-            push @res, $e;
+        while (my ($e,$abstract) = $sth->fetchrow_array) {
+            push @res, {word=>$e, summary=>$abstract};
         }
     }
 
     # convert back to slash if user originally typed with slash
-    if ($uses_slash) { for (@res) { s!::!/!g } }
+    if ($uses_slash) { for (@res) { $_->{word} =~ s!::!/!g } }
 
     \@res;
 };
@@ -3111,7 +3338,7 @@ sub _complete_ns {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -3159,7 +3386,7 @@ sub _complete_script {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -3168,14 +3395,14 @@ sub _complete_script {
     }
 
     my $sth = $dbh->prepare(
-        "SELECT DISTINCT name FROM script WHERE name LIKE ? ORDER BY name");
+        "SELECT DISTINCT name,abstract FROM script WHERE name LIKE ? ORDER BY name");
     $sth->execute($word . '%');
 
     # XXX follow Complete::Common::OPT_CI
 
     my @res;
-    while (my ($script) = $sth->fetchrow_array) {
-        push @res, $script;
+    while (my ($script, $abstract) = $sth->fetchrow_array) {
+        push @res, {word=>$script, summary=>$abstract};
     }
 
     \@res;
@@ -3201,7 +3428,7 @@ sub _complete_dist {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -3210,20 +3437,20 @@ sub _complete_dist {
     }
 
     my $sth = $dbh->prepare(
-        "SELECT DISTINCT dist_name FROM file WHERE dist_name LIKE ? ORDER BY dist_name");
+        "SELECT DISTINCT dist_name,dist_abstract FROM file WHERE dist_name LIKE ? ORDER BY dist_name");
     $sth->execute($word . '%');
 
     # XXX follow Complete::Common::OPT_CI
 
     my @res;
-    while (my ($dist) = $sth->fetchrow_array) {
+    while (my ($dist,$abstract) = $sth->fetchrow_array) {
         # only complete one level deeper at a time
         if ($dist =~ /-\z/) {
             next unless $dist =~ /\A\Q$word\E-*\w+\z/i;
         } else {
             next unless $dist =~ /\A\Q$word\E\w*(-\w+)?\z/i;
         }
-        push @res, $dist;
+        push @res, {word=>$dist, summary=>$abstract};
     }
 
     \@res;
@@ -3249,7 +3476,7 @@ sub _complete_cpanid {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -3291,7 +3518,7 @@ sub _complete_rel {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -3300,14 +3527,14 @@ sub _complete_rel {
     }
 
     my $sth = $dbh->prepare(
-        "SELECT name FROM file WHERE name LIKE ? ORDER BY name");
+        "SELECT name,dist_abstract FROM file WHERE name LIKE ? ORDER BY name");
     $sth->execute($word . '%');
 
     # XXX follow Complete::Common::OPT_CI
 
     my @res;
-    while (my ($rel) = $sth->fetchrow_array) { #
-        push @res, $rel;
+    while (my ($rel,$abstract) = $sth->fetchrow_array) { #
+        push @res, {word=>$rel, summary=>$abstract};
     }
 
     \@res;
@@ -3333,7 +3560,7 @@ sub _complete_content_package_or_script {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -4963,7 +5190,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.070 of App::lcpan (from Perl distribution App-lcpan), released on 2022-03-27.
+This document describes version 1.071 of App::lcpan (from Perl distribution App-lcpan), released on 2022-09-19.
 
 =head1 SYNOPSIS
 
@@ -5054,6 +5281,24 @@ Only return starting from the n'th record.
 =item * B<sort> => I<array[str]> (default: ["id"])
 
 Sort the result.
+
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -5250,6 +5495,24 @@ Set base Perl version for determining core modules.
 
 =item * B<rel> => I<str> (default: "requires")
 
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
+
 =item * B<updated_since> => I<date>
 
 Include only records that are updated since certain date.
@@ -5406,6 +5669,24 @@ Only return starting from the n'th record.
 
 Sort the result.
 
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
+
 =item * B<updated_since> => I<date>
 
 Include only records that are updated since certain date.
@@ -5473,6 +5754,24 @@ If C<index_name> is a filename without any path, e.g. C<index.db> then index wil
 be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
+
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -5604,6 +5903,24 @@ Only return starting from the n'th record.
 
 Sort the result.
 
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
+
 =item * B<updated_since> => I<date>
 
 Include only records that are updated since certain date.
@@ -5715,6 +6032,24 @@ Search query.
 =item * B<sort> => I<str> (default: "name")
 
 =item * B<to_level> => I<int>
+
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
 
 =item * B<updated_since> => I<date>
 
@@ -5857,6 +6192,24 @@ Only return starting from the n'th record.
 =item * B<sort> => I<array[str]> (default: ["module"])
 
 Sort the result.
+
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
 
 =item * B<updated_since> => I<date>
 
@@ -6002,6 +6355,24 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<rel> => I<str> (default: "ALL")
 
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
+
 =item * B<updated_since> => I<date>
 
 Include only records that are updated since certain date.
@@ -6141,6 +6512,24 @@ Only return starting from the n'th record.
 
 =item * B<sort> => I<array[str]> (default: ["name"])
 
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
+
 =item * B<updated_since> => I<date>
 
 Include only records that are updated since certain date.
@@ -6212,6 +6601,24 @@ be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
 
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
+
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
 Whether to use bootstrap database from App-lcpan-Bootstrap.
@@ -6263,6 +6670,24 @@ If C<index_name> is a filename without any path, e.g. C<index.db> then index wil
 be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
+
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -6374,6 +6799,24 @@ Skip one or more file patterns from being parsed for subs.
 
 Skip one or more files from being parsed for subs.
 
+=item * B<update_db_schema> => I<bool> (default: 1)
+
+Whether to update database schema to the latest.
+
+By default, when the application starts and reads the index database, it updates
+the database schema to the latest if the database happens to be last updated by
+an older version of the application and has the old database schema (since
+database schema is updated from time to time, for example at 1.070 the database
+schema is at version 15).
+
+When you disable this option, the application will not update the database
+schema. This option is for testing only, because it will probably cause the
+application to run abnormally and then die with a SQL error when reading/writing
+to the database.
+
+Note that in certain modes e.g. doing tab completion, the application also will
+not update the database schema.
+
 =item * B<update_files> => I<bool> (default: 1)
 
 Update the files.
@@ -6467,9 +6910,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

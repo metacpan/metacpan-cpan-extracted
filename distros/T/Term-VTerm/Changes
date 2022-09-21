@@ -1,5 +1,12 @@
 Revision history for Term-VTerm
 
+0.08    2022-09-17
+        [CHANGES]
+         * Updates for libvterm 0.3
+            + Cell size / baseline attributes
+            + Method to enable screen reflow
+         * Updates for Devel::MAT::Dumper v0.44 API
+
 0.07    2021-09-08
         [CHANGES]
          * Updates for libvterm 0.2

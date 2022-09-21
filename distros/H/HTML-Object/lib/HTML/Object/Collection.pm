@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Collection.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/28
-## Modified 2021/08/23
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -17,8 +18,12 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( HTML::Object::DOM::Element );
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION );
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 # Purpose of this class is to serve as a distinctive class for search result from find()
 sub init
@@ -27,7 +32,7 @@ sub init
     $self->{end} = '';
     $self->{tag} = '_collection';
     $self->{_init_strict_use_sub} = 1;
-    $this->{_exception_class} = 'HTML::Object::Exception';
+    $self->{_exception_class} = 'HTML::Object::Exception';
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     my $class = ref( $self );
     # To make collection exception also available as $HTML::Object::ERROR
@@ -35,6 +40,7 @@ sub init
     {
         my $ex = shift( @_ );
         # ${"${class}\::ERROR"} = $ex;
+        no warnings 'once';
         $HTML::Object::ERROR = $ex;
         warnings::warn( $ex ) if( warnings::enabled( 'HTML::Object' ) );
     };
@@ -45,10 +51,8 @@ sub as_string
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    $self->message( 4, "options provided are: ", sub{ $self->dumper( $opts ) });
     $opts->{all} = 0 if( !CORE::exists( $opts->{all} ) );
     $opts->{all} //= 0;
-    $self->message( 4, "all option is '$opts->{all}' for ", $self->children->length, " children." );
     # In conformity with jQuery, we return the stringified version of the first object in our set
     # unless the 'all' option is provided and true. This is a divergence
     if( $opts->{all} )
@@ -57,7 +61,6 @@ sub as_string
         $self->children->foreach(sub
         {
             my $child = shift( @_ );
-            $self->message( 4, "Calling as_string on '", $child->tag, "'." );
             # This will instruct the HTML::Object::Element to automatically close
             my $str = $_->as_string( inside_collection => 1 );
             $res->push( $str );
@@ -82,7 +85,7 @@ sub end { return( shift->_set_get_object( 'end', 'HTML::Object::Element', @_ ) )
 sub nodeValue { return; }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -99,7 +102,7 @@ HTML::Object::Collection - HTML Object XQuery Collection Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

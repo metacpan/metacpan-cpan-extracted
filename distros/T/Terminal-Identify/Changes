@@ -1,0 +1,12 @@
+Revision history for Perl extension Terminal::Identify.
+
+0.03  2022-09-17
+        - Bug fixing.
+
+0.02  2022-09-16
+        - Bug fixing.
+
+0.01  2022-09-15
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Terminal::Identify
+

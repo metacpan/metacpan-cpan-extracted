@@ -1,5 +1,17 @@
 Revision history for Data-Enum:
 
+v0.2.5    2022-09-21 16:19:29+01:00 Europe/London
+ [Enhancements]
+  - Minor code improvements.
+
+  - Use () prototype for predicate methods.
+
+v0.2.4    2022-09-20 18:27:04+01:00 Europe/London
+ [Documentation]
+ - Added CAVEAT about performance.
+
+ - Removed "fast" from the ABSTRACT, since it's not necessarily fast.
+
 v0.2.3    2022-09-04 16:07:55+01:00 Europe/London
  [Documentation]
  - Bumped copyright year.

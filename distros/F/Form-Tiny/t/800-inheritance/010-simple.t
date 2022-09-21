@@ -9,8 +9,8 @@ use ChildForm;
 
 my @wanted_roles = (
 	qw(
-		Form::Tiny::Meta::Strict
-		Form::Tiny::Meta::Filtered
+		Form::Tiny::Plugin::Strict
+		Form::Tiny::Plugin::Filtered
 	)
 );
 
@@ -43,3 +43,4 @@ subtest 'test child class' => sub {
 };
 
 done_testing;
+

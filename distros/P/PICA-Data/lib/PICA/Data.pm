@@ -1,7 +1,7 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 use Exporter 'import';
 our @EXPORT_OK
@@ -46,7 +46,7 @@ sub pica_match {
     my ($record, $path, %args) = @_;
 
     $path = eval {PICA::Path->new($path)} unless ref $path;
-    return unless ref $path;
+    return                                unless ref $path;
 
     return $path->match_record($record, %args);
 }
@@ -55,7 +55,7 @@ sub pica_values {
     my ($record, $path) = @_;
 
     $path = eval {PICA::Path->new($path)} unless ref $path;
-    return unless ref $path;
+    return                                unless ref $path;
 
     return $path->record_subfields($record);
 }
@@ -334,17 +334,35 @@ sub pica_holdings {
 }
 
 sub pica_split {
-    my $record = shift;
+    my ($record, $level) = @_;
 
-    my @records = pica_title($record);
+    my @records;
+    @records = pica_title($record) unless $level > 0;
+    return @records if $level eq '0';
+
+    my @ppn = @{pica_fields($record, '003@')};
+
     for my $hold (@{pica_holdings($record)}) {
-        my $items = pica_items($hold);
-
-        # limit holding record to level1 fields
-        $hold->{record}
-            = [grep {substr($_->[0], 0, 1) eq 1} @{$hold->{record}}];
-        push @records, $hold;
-        push @records, @$items;
+        if ($level eq '1') {
+            unshift @{$hold->{record}}, @ppn;
+            push @records, $hold;
+        }
+        else {
+            my $items = pica_items($hold);
+            if ($level eq '2') {
+                my @iln = @{pica_fields($hold, '101@')};
+                for my $item (@$items) {
+                    unshift @{$item->{record}}, @ppn, @iln;
+                    push @records, $item;
+                }
+            }
+            else {
+                # limit holding record to level1 fields
+                $hold->{record}
+                    = [grep {substr($_->[0], 0, 1) eq 1} @{$hold->{record}}];
+                push @records, $hold, @$items;
+            }
+        }
     }
 
     return grep {@{pica_fields($_)} > 0} @records;
@@ -404,7 +422,7 @@ sub pica_annotation {
 *string    = *pica_string;
 *id        = *pica_id;
 *empty     = *pica_empty;
-*diff      = *pica_diff = *PICA::Patch::pica_diff;
+*diff      = *pica_diff  = *PICA::Patch::pica_diff;
 *patch     = *pica_patch = *PICA::Patch::pica_patch;
 *append    = *pica_append;
 *remove    = *pica_remove;
@@ -799,9 +817,10 @@ C<_id>. Also available as accessor C<holdings>.
 Returns a list (as array reference) of item records. The EPN (if given) is
 available as C<_id> Also available as accessor C<items>.
 
-=head2 pica_split( $record)
+=head2 pica_split( $record [, $level ])
 
-Returns the record splitted into individual records for each level.
+Returns the record splitted into individual records for each level. Optionally
+limits result to given level, including identifiers (PPN/ILN) of higher levels.
 
 =head2 pica_sort( $record )
 

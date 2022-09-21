@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Catalyst::TraitFor::Request::Methods",
   "PREREQ_PM" => {
     "Catalyst" => "5.90090",
-    "Data::Enum" => 0,
+    "List::Util" => "1.33",
     "Moose::Role" => 0,
     "namespace::autoclean" => 0
   },
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.4.0",
+  "VERSION" => "v0.5.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,10 +46,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Catalyst" => "5.90090",
   "Catalyst::Test" => 0,
-  "Data::Enum" => 0,
   "File::Spec" => 0,
   "HTTP::Request" => 0,
   "HTTP::Request::Common" => 0,
+  "List::Util" => "1.33",
   "Module::Metadata" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,

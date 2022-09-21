@@ -103,8 +103,6 @@ EOT
 subtest 'before after' => sub
 {
     my $div = $( '<div />', { id => "div_1", class => "hello" });
-    # XXX
-    $div->debug( $DEBUG );
     ok( $div->after( '<p>Test</p>' ), '<p>Test</p> added after div' );
     # Provide some context, just like jQuery does
     my $p = $('p', $div);

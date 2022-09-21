@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/LinkDefinition.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,10 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -33,7 +36,7 @@ sub init
     return( $self->SUPER::init( @_ ) );
 }
 
-## [foo]: http://example.com/  "Optional Title Here"
+# [foo]: http://example.com/  "Optional Title Here"
 sub as_markdown
 {
     my $self = shift( @_ );
@@ -46,6 +49,21 @@ sub as_markdown
         $def->push( $self->id->map(sub{ "\#${_}" })->list );
         $def->push( $self->class->map(sub{ ".$_" })->list );
         $arr->push( '{' . $def->join( ' ' )->scalar . '}' );
+    }
+    return( $arr->join( '' )->scalar );
+}
+
+sub as_pod
+{
+    my $self = shift( @_ );
+    my $arr = $self->new_array;
+    if( $self->url && $self->title )
+    {
+        $arr->push( sprintf( '[%d]: L<%s|%s>', $self->link_id, $self->url, $self->title ) );
+    }
+    elsif( $self->url )
+    {
+        $arr->push( sprintf( '[%d]: L<%s>', $self->link_id, $self->url ) );
     }
     return( $arr->join( '' )->scalar );
 }
@@ -91,7 +109,7 @@ sub title { return( shift->_set_get_scalar_as_object( 'title', @_ ) ); }
 sub url { return( shift->_set_get_uri( 'url', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -108,7 +126,7 @@ Markdown::Parser::LinkDefinition - Markdown Link Definition Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -122,7 +140,13 @@ In markdown, a link definition would look like this:
 
 =head2 as_markdown
 
-Returns a string representation of the link definition in markdown.
+Returns a string representation of the link definition formatted in markdown.
+
+It returns a plain string.
+
+=head2 as_pod
+
+Returns a string representation of the link definition formatted in L<pod|perlpod>.
 
 It returns a plain string.
 

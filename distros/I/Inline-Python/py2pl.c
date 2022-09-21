@@ -24,11 +24,7 @@ SV* py_false;
  ****************************/
 SV *Py2Pl(PyObject * const obj) {
     /* elw: see what python says things are */
-#if PY_MAJOR_VERSION >= 3
-    int const is_string = PyBytes_Check(obj) || PyUnicode_Check(obj);
-#else
-    int const is_string = PyString_Check(obj) || PyUnicode_Check(obj);
-#endif
+    int const is_string = PY_IS_STRING(obj);
 #ifdef I_PY_DEBUG
     PyObject *this_type = PyObject_Type(obj); /* new reference */
     PyObject *t_string = PyObject_Str(this_type); /* new reference */
@@ -118,12 +114,7 @@ SV *Py2Pl(PyObject * const obj) {
 
     /* wrap an instance of a Python class */
     /* elw: here we need to make these look like instances: */
-    if ((obj->ob_type->tp_flags & Py_TPFLAGS_HEAPTYPE)
-#if PY_MAJOR_VERSION < 3
-        || PyInstance_Check(obj)
-#endif
-    ) {
-
+    if (PY_IS_OBJECT(obj)) {
         /* This is a Python class instance -- bless it into an
          * Inline::Python::Object. If we're being called from an
          * Inline::Python class, it will be re-blessed into whatever
@@ -176,9 +167,8 @@ SV *Py2Pl(PyObject * const obj) {
         return newRV_noinc((SV *) retval);
     }
 
-    /* a dictionary or fake Mapping object */
-    /* elw: PyMapping_Check() now returns true for strings */
-    else if (! is_string && PyMapping_Check(obj)) {
+    /* a real plain dictionary  */
+    else if (obj->ob_type == &PyDict_Type) {
         HV * const retval = newHV();
         int i;
         int const sz = PyMapping_Length(obj);
@@ -437,7 +427,7 @@ PyObject *Pl2Py(SV * const obj) {
         Printf(("string = "));
         Printf(("%s\n", str));
 #if PY_MAJOR_VERSION >= 3
-        if (SvUTF8(obj))
+        if (SvUTF8(obj) || is_ascii_string((U8*) str, len))
             o = PyUnicode_DecodeUTF8(str, len, "replace");
         else
             o = PyBytes_FromStringAndSize(str, len);
@@ -511,7 +501,7 @@ PyObject *Pl2Py(SV * const obj) {
             char * const key_str = SvPV(key, len);
             PyObject *py_key;
 #if PY_MAJOR_VERSION >= 3
-            if (SvUTF8(key))
+            if (SvUTF8(key) || is_ascii_string((U8*) key_str, len))
                 py_key = PyUnicode_DecodeUTF8(key_str, len, "replace");
             else
                 py_key = PyBytes_FromStringAndSize(key_str, len);

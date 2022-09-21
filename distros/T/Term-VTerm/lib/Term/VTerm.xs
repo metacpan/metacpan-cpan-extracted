@@ -15,6 +15,7 @@
 #include <string.h>
 
 #ifdef HAVE_DMD_HELPER
+#  define WANT_DMD_API_044
 #  include "DMD_helper.h"
 #endif
 
@@ -100,7 +101,7 @@ typedef struct Term__VTerm__Screen {
 } *Term__VTerm__Screen;
 
 #ifdef HAVE_DMD_HELPER
-static int dmd_helper_vterm(pTHX_ const SV *sv)
+static int dmd_helper_vterm(pTHX_ DMDContext *ctx, const SV *sv)
 {
   Term__VTerm self = INT2PTR(Term__VTerm, SvIV((SV *)sv));
   int ret = 0;
@@ -126,7 +127,7 @@ static int dmd_helper_vterm(pTHX_ const SV *sv)
   return ret;
 }
 
-static int dmd_helper_vterm_state(pTHX_ const SV *sv)
+static int dmd_helper_vterm_state(pTHX_ DMDContext *ctx, const SV *sv)
 {
   Term__VTerm__State self = INT2PTR(Term__VTerm__State, SvIV((SV *)sv));
   int ret = 0;
@@ -160,7 +161,7 @@ static int dmd_helper_vterm_state(pTHX_ const SV *sv)
   return ret;
 }
 
-static int dmd_helper_vterm_screen(pTHX_ const SV *sv)
+static int dmd_helper_vterm_screen(pTHX_ DMDContext *ctx, const SV *sv)
 {
   Term__VTerm__Screen self = INT2PTR(Term__VTerm__Screen, SvIV((SV *)sv));
   int ret = 0;
@@ -1128,6 +1129,12 @@ static void S_setup_constants(pTHX)
   DO_CONSTANT(VTERM_ATTR_FONT);
   DO_CONSTANT(VTERM_ATTR_FOREGROUND);
   DO_CONSTANT(VTERM_ATTR_BACKGROUND);
+  DO_CONSTANT(VTERM_ATTR_SMALL);
+  DO_CONSTANT(VTERM_ATTR_BASELINE);
+
+  DO_CONSTANT(VTERM_BASELINE_NORMAL);
+  DO_CONSTANT(VTERM_BASELINE_RAISE);
+  DO_CONSTANT(VTERM_BASELINE_LOWER);
 
   DO_CONSTANT(VTERM_PROP_CURSORVISIBLE);
   DO_CONSTANT(VTERM_PROP_CURSORBLINK);
@@ -1707,6 +1714,13 @@ enable_altscreen(self,enabled)
     vterm_screen_enable_altscreen(self->screen, enabled);
 
 void
+enable_reflow(self,enabled)
+  Term::VTerm::Screen self
+  bool                enabled
+  CODE:
+    vterm_screen_enable_reflow(self->screen, enabled);
+
+void
 flush_damage(self)
   Term::VTerm::Screen self
   CODE:
@@ -1853,11 +1867,13 @@ width(self)
     width     = 0
     underline = 1
     font      = 2
+    baseline  = 3
   CODE:
     switch(ix) {
       case 0: RETVAL = self->width;           break;
       case 1: RETVAL = self->attrs.underline; break;
       case 2: RETVAL = self->attrs.font;      break;
+      case 3: RETVAL = self->attrs.baseline;  break;
     }
   OUTPUT:
     RETVAL
@@ -1871,6 +1887,7 @@ bold(self)
     blink   = 2
     reverse = 3
     strike  = 4
+    small   = 5
   CODE:
     switch(ix) {
       case 0: RETVAL = self->attrs.bold;    break;
@@ -1878,6 +1895,7 @@ bold(self)
       case 2: RETVAL = self->attrs.blink;   break;
       case 3: RETVAL = self->attrs.reverse; break;
       case 4: RETVAL = self->attrs.strike;  break;
+      case 5: RETVAL = self->attrs.small;   break;
     }
   OUTPUT:
     RETVAL

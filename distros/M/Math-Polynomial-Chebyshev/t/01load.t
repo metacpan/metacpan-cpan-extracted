@@ -1,7 +1,7 @@
-#!perl
+# -*- mode: perl; -*-
 
-use strict;             # restrict unsafe constructs
-use warnings;           # enable optional warnings
+use strict;
+use warnings;
 
 use Test::More tests => 2;
 

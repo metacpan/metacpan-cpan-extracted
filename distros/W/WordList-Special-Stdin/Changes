@@ -1,3 +1,10 @@
+0.003   2022-07-23  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention WordList::FromFile::Line.
+
+
 0.002   2021-12-01  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix accessing wordlist parameter.

@@ -3,7 +3,7 @@ NAME
     Climatology Network repository
 
 VERSION
-    version v0.0.002
+    version v0.0.003
 
 DESCRIPTION
     The Weather::GHCN module library provides classes that can be used to
@@ -114,10 +114,10 @@ EXAMPLES
 
     "ghcn_fetch id -cou US -st NY -location "New York JFK" | ghcn_extremes"
 
-    Find the 3-day coldwaves at the JFK airport station:
+    Find the 3-day coldwaves (<= 15C) at the JFK airport station:
 
     "ghcn_fetch id -cou US -st NY -location "New York JFK" | ghcn_extremes
-    -cold -ndays 3"
+    -cold -ndays 3 -limit -15"
 
     For each year between 1900 and 1950, count the number of active weather
     stations in NY state:

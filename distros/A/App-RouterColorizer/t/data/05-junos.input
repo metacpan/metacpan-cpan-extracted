@@ -1645,3 +1645,96 @@ Physical interface: ge-1/1/1
 {master:1}
 jmaslak@swXX> exit 
 
+--- JUNOS 20.2R3.9 Kernel 32-bit  JNPR-11.0-20210212.420a184_buil
+{master:0}
+foobar@xxxx.xxxxxx> show interfaces terse 
+Interface               Admin Link Proto    Local                 Remote
+ge-0/0/0                up    down
+ge-0/0/0.0              up    down eth-switch
+pfe-0/0/0               up    up
+pfe-0/0/0.16383         up    up   inet    
+                                   inet6   
+pfh-0/0/0               up    up
+pfh-0/0/0.16383         up    up   inet    
+pfh-0/0/0.16384         up    up   inet    
+ge-0/0/1                up    down
+ge-0/0/1.0              up    down eth-switch
+ge-0/0/2                up    up
+ge-0/0/2.0              up    up   eth-switch
+ge-0/0/3                up    up
+ge-0/0/3.0              up    up   eth-switch
+ge-0/0/4                up    up
+ge-0/0/4.0              up    up   eth-switch
+ge-0/0/5                up    up
+ge-0/0/5.0              up    up   eth-switch
+ge-0/0/6                up    up
+ge-0/0/6.0              up    up   eth-switch
+ge-0/0/7                up    up
+ge-0/0/7.0              up    up   eth-switch
+ge-0/0/8                up    up
+ge-0/0/8.0              up    up   eth-switch
+ge-0/0/9                up    up
+ge-0/0/9.0              up    up   eth-switch
+ge-0/0/10               up    up
+ge-0/0/10.0             up    up   eth-switch
+ge-0/0/11               up    up
+ge-0/0/11.0             up    up   eth-switch
+ge-0/0/12               up    up
+ge-0/0/12.0             up    up   eth-switch
+ge-0/0/13               up    up
+ge-0/0/13.0             up    up   eth-switch
+---(more)---                                        ge-0/0/14               up    down
+ge-0/0/14.0             up    down eth-switch
+ge-0/0/15               up    down
+ge-0/0/15.0             up    down eth-switch
+ge-0/0/16               up    down
+ge-0/0/16.0             up    down eth-switch
+ge-0/0/17               up    down
+ge-0/0/17.0             up    down eth-switch
+ge-0/0/18               up    down
+ge-0/0/18.0             up    down eth-switch
+ge-0/0/19               up    down
+ge-0/0/19.0             up    down eth-switch
+ge-0/0/20               up    down
+ge-0/0/20.0             up    down eth-switch
+ge-0/0/21               up    down
+ge-0/0/21.0             up    down eth-switch
+ge-0/0/22               up    down
+ge-0/0/22.0             up    down eth-switch
+ge-0/0/23               up    down
+ge-0/0/23.0             up    down eth-switch
+ge-0/1/0                up    up
+ge-0/1/0.0              up    up   eth-switch
+bme0                    up    up
+bme0.0                  up    up   inet     128.0.0.1/2     
+                                            128.0.0.4/2     
+                                            128.0.0.16/2    
+                                            128.0.0.63/2    
+cbp0                    up    up
+dsc                     up    up
+esi                     up    up
+gre                     up    up
+ipip                    up    up
+irb                     up    up
+irb.80                  up    up   inet     10.1.2.3/25  
+jsrv                    up    up
+---(more 84%)---                                        jsrv.1                  up    up   inet     128.0.0.127/2   
+lo0                     up    up
+lo0.16385               up    up   inet    
+lsi                     up    up
+me0                     up    down
+me0.0                   up    down eth-switch
+mtun                    up    up
+pimd                    up    up
+pime                    up    up
+pip0                    up    up
+tap                     up    up
+vme                     up    down
+vtep                    up    up
+
+{master:0}
+foobar@xxxx.xxxxxx> exit 
+
+    Laser receiver power                      :  0.0000 mW / - Inf dBm
+    Laser receiver power                      :  0.2520 mW / -5.99 dBm
+

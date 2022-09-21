@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Space.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/19
-## Modified 2021/08/23
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -17,8 +18,12 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( HTML::Object::Element );
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION );
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -27,7 +32,7 @@ sub init
     $self->{tag} = '_space';
     $self->{value} = undef;
     $self->{_init_strict_use_sub} = 1;
-    $this->{_exception_class} = 'HTML::Object::Exception';
+    $self->{_exception_class} = 'HTML::Object::Exception';
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     return( $self );
 }
@@ -61,7 +66,7 @@ sub value : lvalue { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); 
 # }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -78,7 +83,7 @@ HTML::Object::Space - HTML Object
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

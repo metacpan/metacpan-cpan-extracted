@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/TableRow.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/07
-## Modified 2022/01/07
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,16 +17,20 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::Element );
+    use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :tablerow );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
     my $self = shift( @_ );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
-    $self->{tag} = 'tr' if( !CORE::length( "$self->{tag}" ) );
+    $self->{tag} = 'tr' if( !defined( $self->{tag} ) || !CORE::length( "$self->{tag}" ) );
     $self->{_row_reset} = 1;
     my $callback = sub
     {
@@ -58,7 +62,6 @@ sub cells
     my $self = shift( @_ );
     return( $self->{_row_cells} ) if( $self->{_row_cells} && !$self->_is_row_reset );
     my $list = $self->children->grep(sub{ $self->_is_a( $_ => 'HTML::Object::DOM::Element::TableCell' ) });
-    $self->messagef( 3, "List $list returned %d elements with %d children.", $list->length, $self->children->length );
     # The content of the collection is refreshed, but the collection object itself does not change, so the user can poll it
     unless( $self->{_row_cells} )
     {
@@ -230,7 +233,7 @@ sub _reset_row
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -247,7 +250,7 @@ HTML::Object::DOM::Element::TableRow - HTML Object DOM TableRow Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -444,4 +447,3 @@ All rights reserved
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
-

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 99 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 103 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/lcpan.pm',
@@ -15,6 +15,8 @@ my @module_files = (
     'App/lcpan/Cmd/author_deps_by_dependent_count.pm',
     'App/lcpan/Cmd/author_dists.pm',
     'App/lcpan/Cmd/author_mods.pm',
+    'App/lcpan/Cmd/author_mods_by_other_author_rdep_count.pm',
+    'App/lcpan/Cmd/author_mods_by_rdep_count.pm',
     'App/lcpan/Cmd/author_rdeps.pm',
     'App/lcpan/Cmd/author_rels.pm',
     'App/lcpan/Cmd/author_scripts.pm',
@@ -32,6 +34,7 @@ my @module_files = (
     'App/lcpan/Cmd/copy_rel.pm',
     'App/lcpan/Cmd/copy_script.pm',
     'App/lcpan/Cmd/db_path.pm',
+    'App/lcpan/Cmd/delete_old_data.pm',
     'App/lcpan/Cmd/delete_rel.pm',
     'App/lcpan/Cmd/deps.pm',
     'App/lcpan/Cmd/deps_by_dependent_count.pm',
@@ -80,6 +83,7 @@ my @module_files = (
     'App/lcpan/Cmd/rdeps.pm',
     'App/lcpan/Cmd/rdeps_scripts.pm',
     'App/lcpan/Cmd/rel.pm',
+    'App/lcpan/Cmd/related_authors.pm',
     'App/lcpan/Cmd/related_mods.pm',
     'App/lcpan/Cmd/release.pm',
     'App/lcpan/Cmd/releases.pm',

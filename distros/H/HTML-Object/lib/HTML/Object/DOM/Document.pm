@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Document.pm
-## Version v0.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2021/12/13
+## Modified 2022/09/20
 ## All rights reserved
 ## 
 ## 
@@ -17,11 +17,15 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::Document HTML::Object::DOM::Element );
+    use vars qw( $VERSION );
     use HTML::Object::ErrorEvent;
     use Scalar::Util ();
     use Want;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.1';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -155,7 +159,6 @@ sub characterSet : lvalue
     require Module::Generic::HeaderValue;
     foreach my $e ( $results->list )
     {
-        $self->message( 4, "Checking meta element '", $e->as_string, "'" );
         if( $e->attributes->has( 'http-equiv' ) &&
             $e->attributes->get( 'http-equiv' ) eq 'Content-Type' &&
             $e->attributes->has( 'content' ) )
@@ -164,7 +167,6 @@ sub characterSet : lvalue
             next if( !defined( $type ) || !CORE::length( $type ) );
             my $hv = Module::Generic::HeaderValue->new_from_header( $type );
             my $charset = $hv->param( 'charset' );
-            $self->message( 4, "Found charset '$charset'" );
             return( $charset // '' );
         }
         elsif( $e->attributes->has( 'charset' ) )
@@ -210,7 +212,6 @@ sub contentType
     my $default = 'text/html';
     foreach my $e ( $results->list )
     {
-        $self->message( 4, "Checking meta element '", $e->as_string, "'" );
         if( $e->attributes->has( 'http-equiv' ) &&
             $e->attributes->get( 'http-equiv' ) eq 'Content-Type' &&
             $e->attributes->has( 'content' ) )
@@ -218,7 +219,6 @@ sub contentType
             my $type = $e->attributes->get( 'content' );
             next if( !defined( $type ) || !CORE::length( $type ) );
             my $hv = Module::Generic::HeaderValue->new_from_header( $type );
-            $self->message( 4, "Found charset '", $hv->value->first, "'" );
             return( $hv->value->first // $default );
         }
     }
@@ -476,9 +476,9 @@ sub getElementById
     my $self = shift( @_ );
     my $id   = shift( @_ );
     return if( !defined( $id ) || !CORE::length( $id ) );
-    $self->message( 4, "Searching for element with id '$id'" );
     my $seen = {};
-    local $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $elem = shift( @_ );
         my $addr = Scalar::Util::refaddr( $elem );
@@ -486,22 +486,18 @@ sub getElementById
         # Not a true element, such as text, comment
         return if( $elem->tag->substr( 0, 1 ) eq '_' && !$self->_is_a( $elem => 'HTML::Object::Document' ) );
         $seen->{ $addr }++;
-        $self->message( 4, "Checking if element '", $elem->tag, "' has an id '$id'" );
         if( $elem->attributes->has( 'id' ) && 
             $elem->attributes->get( 'id' ) eq $id )
         {
             return( $elem );
         }
-        $self->messagef( 4, "No id '$id' for this element. Searching in %d children.", $elem->children->length );
         my $e;
         $elem->children->foreach(sub
         {
             my $this = shift( @_ );
-            $self->message( 4, "Crawling for '$this'" );
             if( my $found = $crawl->( $this ) )
             {
                 $e = $found;
-                $self->message( 4, "$found is a match." );
                 return;
             }
             return(1);
@@ -844,7 +840,7 @@ sub title : lvalue
                     return( $dummy );
                 }
                 return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                rreturn( $self->error( $error ) );
+                Want::rreturn( $self->error( $error ) );
             }
             my $head = $head_results->first;
             $e = $self->createElement( 'title' );
@@ -864,7 +860,7 @@ sub title : lvalue
             return( $dummy );
         }
         return( $e->text( $arg ) ) if( want( 'LVALUE' ) );
-        rreturn;
+        Want::rreturn;
     }
     else
     {
@@ -876,7 +872,7 @@ sub title : lvalue
                 return( $dummy );
             }
             return( '' ) if( want( 'LVALUE' ) );
-            rreturn;
+            Want::rreturn;
         }
         return( $results->first->text );
     }
@@ -1004,7 +1000,7 @@ sub _set_get_on_signal : lvalue
                 return( $dummy );
             }
             return( $self->error({ message => $error, class => 'HTML::Object::TypeError' }) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error({ message => $error, class => 'HTML::Object::TypeError' }) );
+            Want::rreturn( $self->error({ message => $error, class => 'HTML::Object::TypeError' }) );
         }
         foreach my $sig ( @$sigs )
         {
@@ -1026,11 +1022,11 @@ sub _set_get_on_signal : lvalue
     }
     my $dummy = 1;
     return( $dummy ) if( want( 'LVALUE' ) );
-    rreturn( $dummy );
+    Want::rreturn( $dummy );
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -1047,7 +1043,7 @@ HTML::Object::DOM::Document - HTML Object DOM Document Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,9 @@
 Revision history for Perl module Module::Generic
 
-v0.28.1 2022-08-30T06:16:26+0900
+v0.28.2 2022-09-18T21:18:30+0900
+    - Corrected missing module in _parse_timestamp and parameters to DateTime::Format::Strptime
+
+v0.28.1 2022-08-30T06:16:26Z +0900
     - Corrected missing POSIX module use (#4 thanks to Nicholas R.)
 
 v0.28.0 2022-08-29T17:13:47Z +0900

@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 use base qw(Exporter);
 
-our $VERSION = '1.004003';
+our $VERSION = '1.004004';
 $VERSION =~ tr/_//d;
 
 sub _choose_json_module {
@@ -57,9 +57,9 @@ sub is_bool {
   die 'is_bool is not a method' if $_[1];
 
   Scalar::Util::blessed($_[0])
-    and ($_[0]->isa('JSON::XS::Boolean')
+    and ($_[0]->isa('JSON::PP::Boolean')
       or $_[0]->isa('Cpanel::JSON::XS::Boolean')
-      or $_[0]->isa('JSON::PP::Boolean'));
+      or $_[0]->isa('JSON::XS::Boolean'));
 }
 
 # (mostly) CopyPasta from JSON.pm version 2.90

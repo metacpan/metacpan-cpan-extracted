@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/Input.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
-## Modified 2021/12/23
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,11 +17,15 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::Element );
+    use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :input );
     use Nice::Try;
     use POSIX ();
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -177,7 +181,6 @@ sub _set_up_down
     $incr = POSIX::floor( "$incr" );
     my $dir = $opts->{direction} // 'down';
     my $val = $self->value;
-    $self->message( 4, ( $dir eq 'up' ? 'Increasing' : 'Decreasing' ), " input value by $incr with current value being '", ( $val // '' ), "'." );
     $self->_load_class( 'DateTime' ) || return( $self->pass_error );
     $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
     $self->_load_class( 'DateTime::Duration' ) || return( $self->pass_error );
@@ -199,7 +202,6 @@ sub _set_up_down
         message => "This input type \"$type\" is unsupported for " . ( $dir eq 'up' ? 'stepUp' : 'stepDown' ),
         class => 'HTML::Object::InvalidStateError',
     }) );
-    $self->message( 4, "Dictionary for type '$type' is: ", sub{ $self->dumper( $def ) } );
     my $min = $self->attr( 'min' );
     my $max = $self->attr( 'max' );
     my $step = $self->attr( 'step' );
@@ -209,10 +211,10 @@ sub _set_up_down
         class => 'HTML::Object::SyntaxError',
     }) ) if( !$self->_is_number( "$step" ) );
     
-    local $parse = sub
+    my $parse;
+    $parse = sub
     {
         my $this = shift( @_ );
-        $self->message( 4, "Parsing '$this'" );
         return( $this ) if( $type eq 'week' || $type eq 'number' || $type eq 'range' );
         my( $fmt, $dt );
         if( ref( $def->{pattern} ) eq 'ARRAY' )
@@ -245,15 +247,12 @@ sub _set_up_down
         {
             $dt->set_formatter( $fmt );
         }
-        $self->message( 4, "Returning '$dt'" );
         return( $dt );
     };
     
     $max //= '';
-    $self->message( 4, "Minimum value is '", ( $min // '' ), "' and max is '", ( $max // '' ), "' and step is '", ( $step // '' ), "'" );
     if( !defined( $val ) || !CORE::length( "$val" ) )
     {
-        $self->message( 4, "No value defined yet." );
         # If min is provided and we are told to go up, min is our starting value and we return immediately.
         # However, the reverse is not true, i.e. if we go down and max is defined, we do not start at max value. We would start at 00:00
         if( $dir eq 'up' && defined( $min ) && CORE::length( "$min" ) )
@@ -261,14 +260,15 @@ sub _set_up_down
             if( exists( $type2unit->{ $type } ) )
             {
                 my $this = $parse->( $min );
-                return( $self->error({
-                    message => "Unable to parse $type minimum value \"$min\"': " . $fmt->errmsg,
-                    class => 'HTML::Object::InvalidStateError',
-                }) ) if( !defined( $this ) );
+#                 return( $self->error({
+#                     message => "Unable to parse $type minimum value \"$min\"': " . $fmt->errmsg,
+#                     class => 'HTML::Object::InvalidStateError',
+#                 }) ) if( !defined( $this ) );
+                return( $self->pass_error ) if( !defined( $this ) );
                 $min = $this;
             }
-            $self->value = $min;
-            $self->message( 4, "stepUp() called, setting value to '$min'" );
+            # $self->value = $min;
+            $self->value( $min );
             return( $self );
         }
         elsif( $dir eq 'down' && defined( $max ) && CORE::length( "$max" )  )
@@ -276,14 +276,15 @@ sub _set_up_down
             if( exists( $type2unit->{ $type } ) )
             {
                 my $this = $parse->( $max );
-                return( $self->error({
-                    message => "Unable to parse $type maximum value \"$max\"': " . $fmt->errmsg,
-                    class => 'HTML::Object::InvalidStateError',
-                }) ) if( !defined( $this ) );
+#                 return( $self->error({
+#                     message => "Unable to parse $type maximum value \"$max\"': " . $fmt->errmsg,
+#                     class => 'HTML::Object::InvalidStateError',
+#                 }) ) if( !defined( $this ) );
+                return( $self->pass_error ) if( !defined( $this ) );
                 $max = $this;
             }
-            $self->value = $max;
-            $self->message( 4, "stepDown() called, setting value to '$max'" );
+            # $self->value = $max;
+            $self->value( $max );
             return( $self );
         }
         else
@@ -303,10 +304,8 @@ sub _set_up_down
             if( ( defined( $max ) && CORE::length( "$max" ) && $dir eq 'up' && $new > $max ) ||
                 ( defined( $min ) && CORE::length( "$min" ) && $dir eq 'down' && $new < $min ) )
             {
-                $self->message( 4, "New computed value '$new' is below minimum (", ( $min // '' ), ") or higher than maximum (", ( $max // '' ), "). Silently rejecting change." );
                 return( $self );
             }
-            $self->message( 4, "input type is a '$type', setting new value to '$new'" );
         }
         # We manage it ourself, i.e. without using DateTime::Format::Strptime, beecause 
         # the parser does not seem capable of recognising format like 2021-W23 even with 
@@ -316,7 +315,6 @@ sub _set_up_down
             if( $val =~ /^(\d{1,})-W(\d{1,2})$/ )
             {
                 my( $y, $w ) = ( $1, $2 );
-                $self->message( 4, "Found year '$y' and week '$w'." );
                 return( $self->error({
                     message => "Week number found \"$w\" is higher than the maximum possible 52",
                     class => 'HTML::Object::InvalidStateError',
@@ -328,16 +326,13 @@ sub _set_up_down
                 my $dt = DateTime->from_day_of_year( year => $y, day_of_year => ( $w * 7 ) );
                 my $fmt = DateTime::Format::Strptime->new( pattern => $def->{pattern} );
                 $dt->set_formatter( $fmt );
-                $self->message( 4, "Current DateTime value is '$dt'" );
                 
                 if( $dir eq 'up' )
                 {
-                    $self->message( 4, "Increasing by ", ( $step * $incr ), " weeks." );
                     $dt->add( weeks => ( $step * $incr ) );
                 }
                 else
                 {
-                    $self->message( 4, "Decreasing by ", ( $step * $incr ), " weeks." );
                     $dt->subtract( weeks => ( $step * $incr ) );
                 }
                 
@@ -360,7 +355,6 @@ sub _set_up_down
                         if( $dt < $dt_min )
                         {
                             # Silently refuse to comply, as browsers do
-                            $self->message( 4, "Computed week value '$dt' is lower than the minimum allowed '$dt_min'. Silently rejecting change." );
                             return( $self );
                         }
                     }
@@ -391,7 +385,6 @@ sub _set_up_down
                         if( $dt > $dt_max )
                         {
                             # Silently refuse to comply, as browsers do
-                            $self->message( 4, "Computed week value '$dt' is higher than the maximum allowed '$dt_max'. Silently rejecting change." );
                             return( $self );
                         }
                     }
@@ -415,12 +408,10 @@ sub _set_up_down
         }
         else
         {
-            $self->message( 4, "input type is a '$type', computing using DateTime using pattern '$def->{pattern}'" );
             my $dt = $parse->( $val );
             return( $self->pass_error ) if( !defined( $dt ) );
             # We can pass negative number to duration
             my $interval = DateTime::Duration->new( "$def->{unit}s" => ( $step * $incr ) );
-            $self->message( 4, "Created interval object '$interval' with unit '$def->{unit}' and value '", ( $step * $incr ), "'" );
             if( $dir eq 'up' )
             {
                 $dt->add_duration( $interval );
@@ -436,16 +427,16 @@ sub _set_up_down
                 my $dt_min = $parse->( "$min" );
                 if( !defined( $dt_min ) )
                 {
-                    return( $self->error({
-                        message => "Unable to parse $type minimum value \"$min\"': " . $fmt->errmsg,
-                        class => 'HTML::Object::InvalidStateError',
-                    }) );
+#                     return( $self->error({
+#                         message => "Unable to parse $type minimum value \"$min\"': " . $fmt->errmsg,
+#                         class => 'HTML::Object::InvalidStateError',
+#                     }) );
+                    return( $self->pass_error );
                 }
                 # $dt_min->set_formatter( $fmt );
                 if( $dt < $dt_min )
                 {
                     # Silently refuse to comply, as browsers do
-                    $self->message( 4, "Computed $type value '$dt' is lower than the minimum allowed '$dt_min'. Silently rejecting change." );
                     return( $self );
                 }
             }
@@ -454,28 +445,27 @@ sub _set_up_down
                 my $dt_max = $parse->( "$max" );
                 if( !defined( $dt_max ) )
                 {
-                    return( $self->error({
-                        message => "Unable to parse $type maximum value \"$max\"': " . $fmt->errmsg,
-                        class => 'HTML::Object::InvalidStateError',
-                    }) );
+#                     return( $self->error({
+#                         message => "Unable to parse $type maximum value \"$max\"': " . $fmt->errmsg,
+#                         class => 'HTML::Object::InvalidStateError',
+#                     }) );
+                    return( $self->pass_error );
                 }
                 # $dt_max->set_formatter( $fmt );
                 if( $dt > $dt_max )
                 {
                     # Silently refuse to comply, as browsers do
-                    $self->message( 4, "Computed $type value '$dt' is higher than the maximum allowed '$dt_max'. Silently rejecting change." );
                     return( $self );
                 }
             }
             $new = "$dt";
-            $self->message( 4, "Setting new value to '$new'" );
         }
-        $self->value = $new;
+        # $self->value = $new;
+        $self->value( $new );
         return( $self );
     }
     catch( $e )
     {
-        $self->message( 4, "Error occurred while computing new value with DateTime or field type '$type': $e" );
         return( $self->error({
             message => "Error " . ( $opts->{direction} ? 'increasing' : 'decreasing' ) . " the input value: $e",
             class => 'HTML::Object::InvalidStateError',
@@ -484,7 +474,7 @@ sub _set_up_down
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -501,7 +491,7 @@ HTML::Object::DOM::Element::Input - HTML Object DOM Input Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

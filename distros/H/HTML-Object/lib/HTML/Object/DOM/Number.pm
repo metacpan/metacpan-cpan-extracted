@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Number.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2021/12/13
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,6 +17,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic::Number );
+    use vars qw( $EPSILON $VERSION );
     use Config;
     # use Machine::Epsilon ();
     use POSIX qw( Inf NaN );
@@ -32,8 +33,11 @@ BEGIN
         POSITIVE_INFINITY   => Inf,
     };
     our $EPSILON;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -84,7 +88,7 @@ sub parseFloat { return( shift->new( shift( @_ ) ) ); }
 sub parseInt { return( shift->new( shift( @_ ) ) ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -101,7 +105,7 @@ HTML::Object::DOM::Number - HTML Object DOM Number
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

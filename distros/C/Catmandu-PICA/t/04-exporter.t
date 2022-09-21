@@ -31,10 +31,8 @@ my $exporter = Catmandu::Exporter::PICA->new(
     fh => $fh,
     type => 'plain',
 );
-
 $exporter->add_many(\@pica_records);
 $exporter->commit();
-
 close($fh);
 
 is slurp($filename), <<'PLAIN';
@@ -48,12 +46,29 @@ PLAIN
 ( $fh, $filename ) = tempfile();
 $exporter = Catmandu::Exporter::PICA->new(
     fh => $fh,
+    type => 'plain',
+    annotate => 1,
+);
+$exporter->add_many(\@pica_records);
+$exporter->commit();
+close($fh);
+
+is slurp($filename), <<'PLAIN';
+  003@ $01041318383
+  021A $aHello $$¥!
+
+  028C/01 $dEmma$aGoldman
+
+PLAIN
+
+( $fh, $filename ) = tempfile();
+$exporter = Catmandu::Exporter::PICA->new(
+    fh => $fh,
     type => 'plus',
 );
 
 $exporter->add_many(\@pica_records);
 $exporter->commit();
-
 close($fh);
 
 is slurp($filename), <<'PLUS';

@@ -15,7 +15,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Data::Record;
-$WebFetch::Data::Record::VERSION = '0.15.1';
+$WebFetch::Data::Record::VERSION = '0.15.3';
 use strict;
 use warnings;
 use base qw( WebFetch );
@@ -172,7 +172,7 @@ WebFetch::Data::Record - WebFetch Embedding API data record
 
 =head1 VERSION
 
-version 0.15.1
+version 0.15.3
 
 =head1 SYNOPSIS
 

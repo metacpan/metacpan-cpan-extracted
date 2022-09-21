@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/Meter.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/10
-## Modified 2022/01/10
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,9 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::Element );
+    use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :meter );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -48,7 +52,7 @@ sub optimum : lvalue { return( shift->_set_get_property( 'optimum', @_ ) ); }
 # Note: property value is inherited
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -65,7 +69,7 @@ HTML::Object::DOM::Element::Meter - HTML Object DOM Meter Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -165,4 +169,3 @@ All rights reserved
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
-

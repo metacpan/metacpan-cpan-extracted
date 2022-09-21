@@ -2,18 +2,19 @@ package Plack::App::ServiceStatus;
 
 # ABSTRACT: Check and report status of various services needed by your app
 
-our $VERSION = '0.906'; # VERSION
+our $VERSION = '0.908'; # VERSION
 
 use 5.018;
 use strict;
 use warnings;
 
 use base 'Class::Accessor::Fast';
-__PACKAGE__->mk_accessors(qw(app version checks));
+__PACKAGE__->mk_accessors(qw(app version checks show_hostname));
 
 use Try::Tiny;
 use Plack::Response;
 use JSON::MaybeXS;
+use Sys::Hostname qw(hostname);
 use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 
@@ -21,9 +22,10 @@ my $startup = time();
 
 sub new {
     my ( $class, %args ) = @_;
-    my $app = delete $args{app};
-    my $version = delete $args{version};
-    my @checks;
+
+    my %attr = map { $_ => delete $args{$_}} qw(app version show_hostname);
+    $attr{checks} = [];
+
     while ( my ( $key, $value ) = each %args ) {
         my $module;
         if ( $key =~ /^\+/ ) {
@@ -36,7 +38,7 @@ sub new {
         try {
             use_module($module);
             push(
-                @checks,
+                $attr{checks}->@*,
                 {   class => $module,
                     name  => $key,
                     args  => $value
@@ -49,11 +51,7 @@ sub new {
         };
     }
 
-    return bless {
-        app    => $app,
-        version => $version,
-        checks => \@checks
-    }, $class;
+    return bless \%attr, $class;
 }
 
 sub to_app {
@@ -67,7 +65,8 @@ sub to_app {
             started_at => $startup,
             uptime     => time() - $startup,
         };
-        $json->{version} = $self->version,
+        $json->{version} = $self->version;
+        $json->{hostname} = hostname() if $self->show_hostname;
 
         my @results = (
             {   name   => $self->app,
@@ -113,7 +112,7 @@ Plack::App::ServiceStatus - Check and report status of various services needed b
 
 =head1 VERSION
 
-version 0.906
+version 0.908
 
 =head1 SYNOPSIS
 
@@ -180,6 +179,20 @@ it.
 
 You can then use some monitoring software to periodically check if
 your app is running and has access to all needed services.
+
+=head2 Options to new
+
+=over
+
+=item * version
+
+Set the version of your app.
+
+=item * show_hostname
+
+If set to a true value, show the hostname.
+
+=back
 
 =head2 Checks
 

@@ -22,13 +22,13 @@ my $build = Module::Build::Using::PkgConfig->new(
 );
 
 $build->use_pkgconfig( "vterm",
-   atleast_version => '0.2',
+   atleast_version => '0.3',
    alien         => "Alien::libvterm",
-   alien_version => "0.01_001",  # bundles libvterm 0.2-RC1
+   alien_version => "0.03",
 );
 
 if( eval { require Devel::MAT::Dumper::Helper and
-            Devel::MAT::Dumper::Helper->VERSION( '0.41' ) } ) {
+            Devel::MAT::Dumper::Helper->VERSION( '0.44' ) } ) {
    Devel::MAT::Dumper::Helper->extend_module_build( $build );
 }
 

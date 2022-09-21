@@ -16,7 +16,8 @@ use lib 't/lib';
 
 ok(My::Form->DOES('Form::Tiny::Plugin::MyRolePlugin'), 'role composed');
 ok(My::Form->form_meta->DOES('Form::Tiny::Plugin::MyMetaRolePlugin'), 'meta role composed');
-ok(My::Form->form_meta->DOES('Form::Tiny::Meta::Strict'), 'strict meta role still composed');
+ok(My::Form->form_meta->DOES('Form::Tiny::Plugin::Strict'), 'strict meta role still composed');
 ok(My::Form->form_meta->can('some_method'), 'meta method composed');
 
 done_testing;
+

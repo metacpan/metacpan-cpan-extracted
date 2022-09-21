@@ -1,5 +1,10 @@
 Revision history for App::PP::Autolink
 
+2.05 20220919
+  - Unices: Pack system libs, except for libm, libc, libpthread and libdl
+      The previous approach overdid things.
+      Thanks @sciurius for the report.  
+
 2.04 20200622
   - Properly exclude system libs in /lib/ when using ldd.
 

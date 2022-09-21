@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser/FootnoteReference.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2021/08/23
+## Modified 2022/09/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,10 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Markdown::Parser::Element );
-    use Nice::Try;
+    use vars qw( $VERSION );
     use Devel::Confess;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -38,15 +41,22 @@ sub as_markdown
     return( sprintf( '*[%s]: %s', $self->name, $self->value ) );
 }
 
+sub as_pod
+{
+    my $self = shift( @_ );
+    return( sprintf( '[C<%s>]: %s', $self->name, $self->value ) );
+}
+
 # <li id="fn:1" role="doc-endnote">
 #   <p>This is the first footnote.&nbsp;<a href="#fnref:1" class="reversefootnote" role="doc-backlink">↩</a></p>
 # </li>
 sub as_string
 {
     my $self = shift( @_ );
+    my $val = $self->sequence->scalar;
     $self->encode_html( [qw( < > & " ' )], \$val );
-    ## e.g. <abbr title="Hyper Text Markup Language">HTML</abbr>
-    return( sprintf( '<sup id="fnref:%s"><a href="#fn:%s">%s</a></sup>', $self->id, $self->footnote->id, $self->sequence->scalar ) );
+    # e.g. <abbr title="Hyper Text Markup Language">HTML</abbr>
+    return( sprintf( '<sup id="fnref:%s"><a href="#fn:%s">%s</a></sup>', $self->id, $self->footnote->id, $val ) );
 }
 
 ## The footnote object
@@ -58,7 +68,7 @@ sub id { return( shift->_set_get_scalar_as_object( 'name', @_ ) ); }
 sub sequence { return( shift->_set_get_scalar_as_object( 'sequence', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -75,7 +85,7 @@ Markdown::Parser::Footnote - Markdown Footnote Element
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -145,6 +155,12 @@ Returns a string representation of the footnote formatted in markdown.
 
 It returns a plain string.
 
+=head2 as_pod
+
+Returns a string representation of the footnote formatted in L<pod|perlpod>.
+
+It returns a plain string.
+
 =head2 as_string
 
 Returns an html representation of the footnote.
@@ -175,7 +191,7 @@ L<Markdown::Parser/footnote_ref_sequence> keeps track of the sequence and alloca
 
 =head2 sequence
 
-This incremental number set for each occurence of a footnote reference. For example:
+This incremental number set for each occurence of a footnote reference.
 
 =head1 SEE ALSO
 

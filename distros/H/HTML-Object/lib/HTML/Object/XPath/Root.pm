@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XPath/Root.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/04
-## Modified 2021/12/04
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,10 +17,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $BASE_CLASS $DEBUG $VERSION );
     our $BASE_CLASS = 'HTML::Object::XPath';
     our $DEBUG = 0;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub new
 {
@@ -42,17 +47,11 @@ sub evaluate
     # return( $self->error( "Can't go to root on > 1 node!" ) ) unless( $nodeset->size == 1 );
     
     my $newset = $self->new_nodeset;
-    $self->message( 3, "Calling ", overload::StrVal( $nodeset ), "->get_node(1)->getRootNode()" );
     # $newset->push($nodeset->get_node(1)->getRootNode());
     my $node = $nodeset->get_node(1);
-    $self->message( 3, "Node retrieved is '$node' (", $node->as_string, "), calliing getRootNode() with it." );
-    # $self->message( 3, "Node retrieved is '$node', calliing getRootNode() with it." );
     # $node->debug(4);
-    $self->message( 3, "Does $node have a getRootNode method? ", $node->can( 'getRootNode' ) ? 'yes' : 'no' );
     my $rootNode = $node->getRootNode();
-    $self->message( 3, "Root node is '$rootNode' (", $rootNode->as_string, ")" );
     $newset->push( $rootNode );
-    $self->message( 3, "Returning new set '$newset' (", overload::StrVal( $newset ), ")" );
     return( $newset );
 }
 
@@ -63,12 +62,13 @@ sub _class_for
     my( $self, $mod ) = @_;
     eval( "require ${BASE_CLASS}\::${mod};" );
     die( $@ ) if( $@ );
-    ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    # ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    eval( "\$${BASE_CLASS}\::${mod}\::DEBUG = " . ( $DEBUG // 0 ) );
     return( "${BASE_CLASS}::${mod}" );
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -85,7 +85,7 @@ HTML::Object::XPath::Root - HTML Object
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

@@ -19,7 +19,7 @@ Form building is done just by calling methods on the meta object. Each helper of
 
 The actual form object only stores data that is relevant to form state, not to form layout. Thanks to this model, the layout needs not to be rebuilt each time a new form object is constructed, which speeds up construction.
 
-Additional behavior like filtering is implemented by composing new roles to the meta object and declaring new hooks in C<setup> method. Refer to the code of L<Form::Tiny::Meta::Filtered> to see how meta roles may define additional behavior.
+Additional behavior like filtering is implemented by composing new roles to the meta object and declaring new hooks in C<setup> method. Refer to the code of L<Form::Tiny::Plugin::Filtered> to see how meta roles may define additional behavior.
 
 =head3 Why use meta object model at all?
 
@@ -65,16 +65,29 @@ To get the blueprint of a form, call:
 
 	# for dynamic forms or when
 	# it is not known whether the form in dynamic
-	$blueprint = $form_object->form_meta->blueprint($form_object);
+	$blueprint = $form_object->form_meta->blueprint($form_object, %options);
 
 	# for static forms - all calls are valid
-	$blueprint = $form_object->form_meta->blueprint;
-	$blueprint = $form_object->form_meta->static_blueprint;
+	$blueprint = $form_object->form_meta->blueprint(%options);
+	$blueprint = FormPackage->form_meta->blueprint(%options);
 
-	$blueprint = FormPackage->form_meta->blueprint;
-	$blueprint = FormPackage->form_meta->static_blueprint;
+For static forms without extra options, the blueprint will be cached and reused on the next call. Otherwise, it has to be generated each time, which will impose a performance hit if it is called frequently.
 
-For static forms, the blueprint will be cached and reused on the next call. For dynamic forms, it has to be generated each time, which will impose a performance hit if it is called frequently.
+Additionally, the C<blueprint> method can accept a hash of options. Currently supported options are:
+
+=over
+
+=item * recurse => Bool
+
+If passed C<0>, subforms will not be turned into their own blueprints, but will end up as a L<Form::Tiny::FieldDefinition> object instead. C<1> by default.
+
+=item * transform => sub ($field_definition, $default_handler)
+
+This option enables a way to specify a custom handler which will be used to turn C<$field_definition> into a blueprint value. This subroutine reference is expected to return a scalar value - a new blueprint value.
+
+In case you want to turn back into the default handler, call C<< $default_handler->($field_definition) >>.
+
+=back
 
 =head2 Finalizing the meta
 

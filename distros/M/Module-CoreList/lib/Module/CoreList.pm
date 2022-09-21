@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20220820';
+our $VERSION = '5.20220920';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -396,6 +396,7 @@ sub changes_between {
     5.037001 => '2022-06-20',
     5.037002 => '2022-07-20',
     5.037003 => '2022-08-20',
+    5.037004 => '2022-09-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -19702,6 +19703,64 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'Memoize::ExpireTest'   => 1,
         }
     },
+    5.037004 => {
+        delta_from => 5.037003,
+        changed => {
+            'B::Deparse'            => '1.69',
+            'B::Op_private'         => '5.037004',
+            'Carp'                  => '1.54',
+            'Carp::Heavy'           => '1.54',
+            'Class::Struct'         => '0.67',
+            'Config'                => '5.037004',
+            'Config::Perl::V'       => '0.34',
+            'Errno'                 => '1.37',
+            'ExtUtils::ParseXS'     => '3.46',
+            'ExtUtils::ParseXS::Constants'=> '3.46',
+            'ExtUtils::ParseXS::CountLines'=> '3.46',
+            'ExtUtils::ParseXS::Eval'=> '3.46',
+            'ExtUtils::ParseXS::Utilities'=> '3.46',
+            'ExtUtils::Typemaps'    => '3.46',
+            'ExtUtils::Typemaps::Cmd'=> '3.46',
+            'ExtUtils::Typemaps::InputMap'=> '3.46',
+            'ExtUtils::Typemaps::OutputMap'=> '3.46',
+            'ExtUtils::Typemaps::Type'=> '3.46',
+            'File::Basename'        => '2.86',
+            'File::Copy'            => '2.40',
+            'File::Spec'            => '3.87',
+            'File::stat'            => '1.13',
+            'FileHandle'            => '2.05',
+            'Hash::Util'            => '0.30',
+            'I18N::Langinfo'        => '0.22',
+            'IO'                    => '1.51',
+            'IO::Dir'               => '1.51',
+            'IO::File'              => '1.51',
+            'IO::Handle'            => '1.51',
+            'IO::Pipe'              => '1.51',
+            'IO::Poll'              => '1.51',
+            'IO::Seekable'          => '1.51',
+            'IO::Select'            => '1.51',
+            'IO::Socket'            => '1.51',
+            'IO::Socket::INET'      => '1.51',
+            'IO::Socket::UNIX'      => '1.51',
+            'Locale::Maketext'      => '1.32',
+            'Module::CoreList'      => '5.20220920',
+            'Module::CoreList::Utils'=> '5.20220920',
+            'Net::protoent'         => '1.02',
+            'Net::servent'          => '1.03',
+            'Opcode'                => '1.61',
+            'POSIX'                 => '2.06',
+            'Safe'                  => '2.44',
+            'Sys::Hostname'         => '1.25',
+            'Time::HiRes'           => '1.9771',
+            'User::grent'           => '1.04',
+            'User::pwent'           => '1.02',
+            'XS::APItest'           => '1.26',
+            'XSLoader'              => '0.32',
+            'feature'               => '1.76',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -21028,6 +21087,13 @@ sub is_core
     },
     5.037003 => {
         delta_from => 5.037002,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.037004 => {
+        delta_from => 5.037003,
         changed => {
         },
         removed => {

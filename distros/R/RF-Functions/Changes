@@ -1,0 +1,11 @@
+Revision history for Perl extension RF::Functions.
+
+0.03 2022-09-20
+  - Added function fsl_mhz_mi
+
+0.02 2022-09-20
+  - Replaced rounding function with Math::Round::nearest - GitHub issue #1 - Slaven Rezić
+  - Added functions fsl_hz_m and fsl_ghz_km
+
+0.01 2022-09-19
+  - original version; created by h2xs 1.23

@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use utf8;
 use Test::More;
-use Test::Deep;
 use File::Temp;
 
 use Pod::Spell;
@@ -68,7 +67,7 @@ for my $c ( @cases ) {
 
     is scalar @words, scalar @expected, "$c->{label}: word count";
 
-    cmp_deeply \@words, bag( @expected ), "$c->{label}: words match"
+    is_deeply [ sort @words ], [ sort @expected ], "$c->{label}: words match"
         or diag "@words";
 }
 

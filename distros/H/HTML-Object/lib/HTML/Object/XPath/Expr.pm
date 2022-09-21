@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XPath/Expr.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
-## Modified 2021/12/05
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,13 +17,17 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $TRUE $FALSE $BASE_CLASS $DEBUG $VERSION );
     use HTML::Object::XPath::Boolean;
     our $TRUE  = HTML::Object::XPath::Boolean->True;
     our $FALSE = HTML::Object::XPath::Boolean->False;
     our $BASE_CLASS = 'HTML::Object::XPath';
     our $DEBUG = 0;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -78,8 +83,6 @@ sub evaluate
     my $self = shift( @_ );
     # HTML::Object::XPath::NodeSet
     my $node = shift( @_ );
-    $self->message( 3, "Evaluating node '$node' (", overload::StrVal( $node ), ") with operator '$self->{op}'" );
-    # $self->message( 3, "Evaluating node '$node'" );
     
     # If there's an op, result is result of that op.
     # If no op, just resolve Expr
@@ -91,13 +94,11 @@ sub evaluate
     if( $self->{op} )
     {
         die( "No RHS of ", $self->as_string ) unless( $self->{rhs} );
-        $self->message( 3, "rhs->op_eval node '$node' using $self->{rhs}." );
         $results = $self->op_eval( $node );
     }
     else
     {
         # HTML::Object::XPath::LocationPath
-        $self->message( 3, "lhs->evaluate node '$node' using $self->{lhs}." );
         $results = $self->{lhs}->evaluate( $node );
     }
     
@@ -114,7 +115,6 @@ sub evaluate
             $results = $self->filter_by_predicate( $results, $predicate );
         }
     }
-    $self->message( 3, "Returning results '$results' (", overload::StrVal( $results ), ")" );
     return( $results );
 }
 
@@ -740,12 +740,13 @@ sub _class_for
     my( $self, $mod ) = @_;
     eval( "require ${BASE_CLASS}\::${mod};" );
     die( $@ ) if( $@ );
-    ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    # ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    eval( "\$${BASE_CLASS}\::${mod}\::DEBUG = " . ( $DEBUG // 0 ) );
     return( "${BASE_CLASS}::${mod}" );
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -761,7 +762,7 @@ HTML::Object::XPath::Expr - HTML Object XPath Expression
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

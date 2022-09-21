@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/TableCol.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/01/08
-## Modified 2022/01/08
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## 
@@ -17,15 +17,19 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( HTML::Object::DOM::Element );
+    use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :tablecol );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
     my $self = shift( @_ );
     # Can either be col or colgroup
-    $self->{tag} = 'colgroup' if( !CORE::length( "$self->{tag}" ) );
+    $self->{tag} = 'colgroup' if( !defined( $self->{tag} ) || !CORE::length( "$self->{tag}" ) );
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     return( $self );
@@ -52,7 +56,7 @@ sub valign : lvalue { return( shift->vAlign( @_ ) ); }
 # Note: deprecated property width is inherited
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -69,7 +73,7 @@ HTML::Object::DOM::Element::TableCol - HTML Object DOM TableCol Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -180,4 +184,3 @@ All rights reserved
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
-

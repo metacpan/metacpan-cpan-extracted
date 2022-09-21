@@ -1,3 +1,23 @@
+0.011   2022-09-21  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli split-video-by-duration] Accept multiple files.
+
+        - [doc] [cli split-video-by-duration] Delete old description about using
+          '-c copy' by default.
+
+        - [ux] [cli split-video-by-duration] Do not need to read config &
+          env.
+
+        - [ux] Add shorter aliases vreencode (for reencode-video-with-libx264),
+          vsplit (for split-video-by-duration).
+
+
+0.010   2022-09-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli split-video-by-duration] Do not use '-c copy' option by
+          default, but uses it on --copy.
+
+
 0.009   2020-12-12  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

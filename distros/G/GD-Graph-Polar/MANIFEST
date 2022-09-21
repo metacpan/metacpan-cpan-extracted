@@ -2,9 +2,10 @@ Changes
 Todo
 lib/GD/Graph/Polar.pm
 LICENSE
+CONTRIBUTING.md
 Makefile.PL
 MANIFEST
-README
+README.md
 rgb.txt
 t/001_base.t
 scripts/example-locate.pl
@@ -17,4 +18,5 @@ scripts/example-plot.png
 scripts/example-text.pl
 scripts/example-text.png
 perl-GD-Graph-Polar.spec
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

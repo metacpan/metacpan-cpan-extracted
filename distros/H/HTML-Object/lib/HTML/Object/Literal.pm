@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Literal.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/22
-## Modified 2021/08/23
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,10 +17,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic::Scalar );
-    use HTML::Object::Boolean;
-    use HTML::Object::Number;
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION );
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
+
+sub as_number { return( shift->to_number( @_ ) ); }
 
 sub as_string
 {
@@ -47,18 +52,28 @@ sub getParentNode { return( shift->error( 'Cannot get parent node of a literal' 
 
 sub string_value { return( shift->value ); }
 
-sub to_boolean { return( shift->as_boolean ); }
+# sub to_boolean { return( shift->as_boolean ); }
+sub to_boolean
+{
+    require HTML::Object::Boolean;
+    return( shift->as_string ? HTML::Object::Boolean->True : HTML::Object::Boolean->False );
+}
 
 sub to_literal { return( shift( @_ ) ); }
 
-sub to_number { return( shift->as_number ); }
+# sub to_number { return( shift->as_number ); }
+sub to_number
+{
+    require HTML::Object::Number;
+    return( HTML::Object::Number->new( shift->value ) );
+}
 
 sub value { return( shift->SUPER::as_string ); }
 
 sub value_as_number { return( shift->as_number ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -74,7 +89,7 @@ HTML::Object::Literal - Simple string values
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

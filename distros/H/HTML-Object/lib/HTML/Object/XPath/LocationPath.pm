@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XPath/LocationPath.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
-## Modified 2021/12/05
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,10 +17,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $BASE_CLASS $DEBUG $VERSION );
     our $BASE_CLASS = 'HTML::Object::XPath';
     our $DEBUG = 0;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub new
 {
@@ -61,26 +66,21 @@ sub evaluate
     if( $self->debug )
     {
         my( $p, $f, $l ) = caller;
-        $self->message( 4, "Evaluating context '$context'. Called from package $p at line $l" );
-        $self->message( 4, ref( $self ), " internal array contains ", scalar( @$self ), " steps -> '", join( "', '", @$self ), "'" );
     }
     
     # I _think_ this is how it should work :)
     my $nodeset = $self->new_nodeset();
     $nodeset->push( $context );
-    # $self->message( 3, "Added context '$context' to nodeset '$nodeset'" );
     
     foreach my $step ( @$self )
     {
         # For each step
         # evaluate the step with the nodeset
         my $pos = 1;
-        $self->message( 3, "Evaluating with step '$step' and passing it '$nodeset' (", overload::StrVal( $nodeset ), ")" );
         # die( "Looping !\n" ) if( ref( $step ) eq ref( $self ) );
         die( "Looping !\n" ) if( $step eq $self );
         $nodeset = $step->evaluate( $nodeset );
     }
-    $self->message( 4, "Returning node set '", overload::StrVal( $nodeset ), "' to caller ", [caller]->[0], "::", [caller(1)]->[3] );
     return( $nodeset );
 }
 
@@ -95,7 +95,6 @@ sub push
     if( $self->debug )
     {
         my( $p, $f, $l ) = caller;
-        $self->message( 4, "push() called from package $p at line $l to add '", join( "', '", @_ ), "'" );
         for( @_ )
         {
             if( ref( $_ ) eq ref( $self ) )
@@ -118,12 +117,13 @@ sub _class_for
     my( $self, $mod ) = @_;
     eval( "require ${BASE_CLASS}\::${mod};" );
     die( $@ ) if( $@ );
-    ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    # ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    eval( "\$${BASE_CLASS}\::${mod}\::DEBUG = " . ( $DEBUG // 0 ) );
     return( "${BASE_CLASS}::${mod}" );
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -140,7 +140,7 @@ HTML::Object::XPath::LocationPath - HTML Object XPath Location Path
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

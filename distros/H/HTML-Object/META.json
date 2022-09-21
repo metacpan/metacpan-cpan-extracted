@@ -4,7 +4,7 @@
       "Jacques Deguest (jack@deguest.jp)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "CSS::Object" : "v0.1.4",
+            "CSS::Object" : "v0.1.5",
             "Config" : "0",
             "Data::UUID" : "1.226",
             "DateTime::Format::Strptime" : "1.79",
@@ -45,10 +45,10 @@
             "HTML::Selector::XPath" : "0.26",
             "JSON" : "4.05",
             "List::Util" : "1.56",
-            "Module::Generic" : "v0.21.11",
-            "Nice::Try" : "v1.1.2",
+            "Module::Generic" : "v0.28.2",
+            "Nice::Try" : "v1.3.1",
             "POSIX" : "0",
-            "Promise::Me" : "v0.1.1",
+            "Promise::Me" : "v0.4.0",
             "Scalar::Util" : "1.60",
             "Time::HiRes" : "1.9764",
             "URI" : "5.10",
@@ -59,6 +59,7 @@
             "parent" : "0",
             "perl" : "5.026001",
             "strict" : "0",
+            "vars" : "0",
             "warnings" : "0",
             "warnings::register" : "0"
          }
@@ -85,6 +86,6 @@
          "web" : "https://gitlab.com/jackdeguest/HTML-Object"
       }
    },
-   "version" : "v0.1.4",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.2.1",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

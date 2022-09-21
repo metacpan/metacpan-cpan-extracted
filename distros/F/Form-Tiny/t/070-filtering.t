@@ -6,7 +6,7 @@ use Types::Standard qw(Int);
 use Form::Tiny::Inline;
 
 BEGIN {
-	use_ok('Form::Tiny::Meta::Filtered');
+	use_ok('Form::Tiny::Plugin::Filtered');
 }
 
 my $form = Form::Tiny::Inline->is(qw(Filtered))->new(
@@ -31,3 +31,4 @@ for my $aref (@data) {
 }
 
 done_testing();
+

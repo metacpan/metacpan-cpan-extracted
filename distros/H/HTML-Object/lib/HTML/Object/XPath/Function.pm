@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XPath/Function.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
-## Modified 2021/12/05
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,13 +17,17 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $TRUE $FALSE $BASE_CLASS $DEBUG $VERSION );
     use HTML::Object::XPath::Boolean;
     our $TRUE  = HTML::Object::XPath::Boolean->True;
     our $FALSE = HTML::Object::XPath::Boolean->False;
     our $BASE_CLASS = 'HTML::Object::XPath';
     our $DEBUG = 0;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -92,7 +97,7 @@ sub concat
     my $self = shift( @_ );
     my( $node, @params ) = @_;
     die( "concat: Too few parameters\n" ) if( @params < 2 );
-    # XXX Check for improvement
+    # TODO: Check for improvement
     my $string = join( '', map{ $_->string_value } @params );
     return( $self->new_literal( $string ) );
 }
@@ -129,12 +134,9 @@ sub evaluate
     my @params;
     foreach my $param ( @{$self->{params}} )
     {
-        $self->message( 3, "Evaluating node '$node' (", $node->as_string, ") using '$param'" );
         my $results = $param->evaluate( $node );
-        $self->message( 3, "Adding results '$results' from $param->evaluate( $node ) to \@params" );
         push( @params, $results );
     }
-    $self->message( 3, "Calling $self->_execute with name '$self->{name}, node '$node' and params '", join( "', '", @params ), "'" );
     return( $self->_execute( $self->{name}, $node, @params ) );
 }
 
@@ -479,7 +481,8 @@ sub _class_for
     my( $self, $mod ) = @_;
     eval( "require ${BASE_CLASS}\::${mod};" );
     die( $@ ) if( $@ );
-    ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    # ${"${BASE_CLASS}\::${mod}\::DEBUG"} = $DEBUG;
+    eval( "\$${BASE_CLASS}\::${mod}\::DEBUG = " . ( $DEBUG // 0 ) );
     return( "${BASE_CLASS}::${mod}" );
 }
 
@@ -489,12 +492,11 @@ sub _execute
     my( $name, $node, @params ) = @_;
     $name =~ s/-/_/g;
     no strict 'refs';
-    $self->message( 3, "Calling method '$self-\>$name' with node '$node' and params '", join( "', '", @params ), "'" );
     return( $self->$name( $node, @params ) );
 }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -511,7 +513,7 @@ HTML::Object::XPath::Function - HTML Object XPath Functions
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

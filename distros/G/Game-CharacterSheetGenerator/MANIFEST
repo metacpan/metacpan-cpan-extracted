@@ -27,7 +27,6 @@ share/Purisa.ttf
 share/README
 t/characters.t
 t/charsheet.t
-t/code.t
 t/legacy.t
 t/random-de.t
 t/random-en.t

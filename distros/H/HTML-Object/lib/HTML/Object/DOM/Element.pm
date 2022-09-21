@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element.pm
-## Version v0.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2021/12/13
+## Modified 2022/09/20
 ## All rights reserved
 ## 
 ## 
@@ -16,15 +16,24 @@ BEGIN
 {
     use strict;
     use warnings;
+    use HTML::Object::DOM::Node qw( TEXT_NODE COMMENT_NODE );
     use parent qw( HTML::Object::DOM::Node );
+    use vars qw( @EXPORT_OK $VERSION );
     use HTML::Object::Exception;
     use Nice::Try;
     use Scalar::Util ();
     use URI;
     use Want;
-    our @EXPORT_OK = qw( DOCUMENT_POSITION_IDENTICAL DOCUMENT_POSITION_DISCONNECTED DOCUMENT_POSITION_PRECEDING DOCUMENT_POSITION_FOLLOWING DOCUMENT_POSITION_CONTAINS DOCUMENT_POSITION_CONTAINED_BY DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC );
-    our $VERSION = 'v0.1.0';
+    our @EXPORT_OK = qw(
+        DOCUMENT_POSITION_IDENTICAL DOCUMENT_POSITION_DISCONNECTED 
+        DOCUMENT_POSITION_PRECEDING DOCUMENT_POSITION_FOLLOWING DOCUMENT_POSITION_CONTAINS 
+        DOCUMENT_POSITION_CONTAINED_BY DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
+    );
+    our $VERSION = 'v0.2.1';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -152,15 +161,14 @@ sub className : lvalue
         # very value we will have passed in assignment !
         if( $has_arg eq 'assign' )
         {
-            $self->error( $error );
             my $dummy = 'dummy';
             return( $dummy );
         }
         return( $self->new_scalar( $arg ) ) if( want( 'LVALUE' ) );
-        rreturn( $self->new_scalar( $arg ) );
+        Want::rreturn( $self->new_scalar( $arg ) );
     }
     return( $self->new_scalar( $self->attr( 'class' ) ) ) if( want( 'LVALUE' ) );
-    rreturn( $self->new_scalar( $self->attr( 'class' ) ) );
+    Want::rreturn( $self->new_scalar( $self->attr( 'class' ) ) );
 }
 
 sub clientHeight { return; }
@@ -202,7 +210,6 @@ sub cmp
     my $a_pile = $a->lineage->unshift( $a );
     my $b_pile = $b->lineage->unshift( $b );
     # $a->debug(4);
-    # $a->message( 4, "\$a_pile is '$a_pile', \$b_pile is '$b_pile'" );
     
     # the 2 elements are not in the same twig
     unless( $a_pile->last == $b_pile->last ) 
@@ -215,14 +222,12 @@ sub cmp
     # find the first non common ancestors (they are siblings)
     my $a_anc = $a_pile->pop;
     my $b_anc = $b_pile->pop;
-    # $a->message( 4, "\$a_anc is '$a_anc', \$b_anc is '$b_anc'" );
 
     while( $a_anc == $b_anc )
     {
         $a_anc = $a_pile->pop;
         $b_anc = $b_pile->pop;
     }
-    # $a->message( 4, "After the 'while\( \$a_anc == \$b_anc \)' loop \$a_anc is '$a_anc', \$b_anc is '$b_anc'" );
 
     if( defined( $a_anc->rank ) && defined( $b_anc->rank ) )
     {
@@ -327,12 +332,12 @@ sub getElementsByClassName
     my $results = $self->new_array;
     my $test = $self->new_array( \@args )->unique(1);
     my $totalClassRequired = $test->length->scalar;
-    # $self->message( 4, "Searching for '", $test->join( "', '" )->scalar, "' and starting from element with tag '", $self->tag, "'" );
     # Nothing to do somehow
     return( $results ) if( !$totalClassRequired );
     
     my $seen = {};
-    local $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $kid = shift( @_ );
         $kid->children->foreach(sub
@@ -349,7 +354,6 @@ sub getElementsByClassName
                 if( !$val->is_empty )
                 {
                     my $classes = $val->split( qr/[[:blank:]\h]+/ );
-                    # $self->message( 4, "Checking element '", $e->tag, "' with class '$val'" );
                     my $found = 0;
                     $test->foreach(sub
                     {
@@ -376,7 +380,8 @@ sub getElementsByTagName
     return( $self->error( "No name was provided for getElementsByTagName()" ) ) if( !defined( $name ) || !CORE::length( "$name" ) );
     
     my $seen = {};
-    local $crawl = sub
+    my $crawl;
+    $crawl = sub
     {
         my $kid = shift( @_ );
         $kid->children->foreach(sub
@@ -426,7 +431,7 @@ sub getElementsByTagNames
     }
     
     my $tags = $self->new_array( $this );
-    $tag->foreach(sub
+    $tags->foreach(sub
     {
         my $elems = $self->getElementsByTagName( $_ );
         $results->push( $elems->list ) if( !$elems->is_empty );
@@ -435,38 +440,10 @@ sub getElementsByTagNames
     return( $results );
 }
 
-# XXX Cleanup required
-# sub getFirstChild
-# {
-#     my $self = shift( @_ );
-#     if( $self->children->length > 0 )
-#     {
-#         return( $self->_child_as_object( $self->children->first, 0 ) );
-#     }
-#     else
-#     {
-#         return;
-#     }
-# }
-
 # sub getFirstChild { return( shift->children->first ); }
 # Note: method getFirstChild is inherited
 
-# XXX Cleanup required
-# sub getLastChild
-# {
-#     my $self = shift( @_ );
-#     if( $self->children->length > 0 )
-#     {
-#         return( $self->_child_as_object( $self->children->last, $self->children->size ) );
-#     }
-#     else
-#     {
-#         return;
-#     }
-# }
-
-# Note: getLastChild is inherited
+# Note: method getLastChild is inherited
 
 sub getLocalName
 {
@@ -476,14 +453,6 @@ sub getLocalName
 }
 
 sub getName { return( shift->tag ); }
-
-# XXX Cleanup required
-# sub getNextSibling
-# {
-#     my $self = shift( @_ );
-#     my $parent = $self->parent || return;
-#     return( $parent->_child_as_object( $self->right->first, ( $self->rank || 0 ) + 1 ) );
-# }
 
 # sub getNextSibling { return( shift->right->first ); }
 # Note: method getNextSibling is inherited
@@ -538,15 +507,6 @@ sub getParentNode
     return( $self->parent || $self->new_root( root => $self ) );
 }
 
-# XXX Cleanup required
-# sub getPreviousSibling
-# {
-#     my $self = shift( @_ ); 
-#     my $parent = $self->parent || return;
-#     return unless( $self->rank );
-#     return( $parent->_child_as_object( $self->left->first, $self->rank - 1 ) );
-# }
-
 # Note: getPreviousSibling is inherited
 
 sub getValue 
@@ -599,7 +559,7 @@ sub innerHTML : lvalue
                     return( $dummy );
                 }
                 return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                rreturn( $self->error( $error ) );
+                Want::rreturn( $self->error( $error ) );
             };
             $children = $res->children;
         }
@@ -629,7 +589,7 @@ sub innerHTML : lvalue
                 return( $dummy );
             }
             return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
+            Want::rreturn( $self->error( $error ) );
         }
         
         $children->foreach(sub
@@ -790,7 +750,7 @@ sub insertAdjacentHTML
             $elem->parent( $self );
             $self->children->splice( ++$offset, 0, $elem );
         });
-        $self->children->unshift( $elem );
+        # $self->children->unshift( $elem );
     }
     elsif( $pos eq 'afterend' )
     {
@@ -1145,7 +1105,7 @@ sub outerHTML : lvalue
                     $dummy = 0;
                 }
                 return( $dummy ) if( want( 'LVALUE' ) );
-                rreturn( $dummy );
+                Want::rreturn( $dummy );
             }
             else
             {
@@ -1174,7 +1134,7 @@ sub outerHTML : lvalue
                     $dummy = 0;
                 }
                 return( $dummy ) if( want( 'LVALUE' ) );
-                rreturn( $dummy );
+                Want::rreturn( $dummy );
             }
         }
         # We are provided with an element, so we set it as our inner html
@@ -1218,7 +1178,8 @@ sub outerHTML : lvalue
                     # Add the closing tag if any
                     if( my $close = $child->close_tag )
                     {
-                        $parent->children->splice( $ops + 2, 0, $close );
+                        $parent->children->splice( $pos + 1, 0, $close );
+                        # $parent->children->splice( 2, 0, $close );
                     }
                     $child->parent( $parent );
                     # The element itself is being replace, so we remove out own parent
@@ -1238,7 +1199,7 @@ sub outerHTML : lvalue
                 }
             }
             return( $dummy ) if( want( 'LVALUE' ) );
-            rreturn( $dummy );
+            Want::rreturn( $dummy );
         }
         else
         {
@@ -1250,7 +1211,7 @@ sub outerHTML : lvalue
                 return( $dummy );
             }
             return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
+            Want::rreturn( $self->error( $error ) );
         }
     }
     else
@@ -1449,11 +1410,11 @@ sub replaceWith
     my $new = $self->_list_to_nodes( @_ ) || return( $self->pass_error({ class => 'HTML::Object::SyntaxError' }) );
     my $pos = $parent->children->pos( $self );
     $parent->children->splice( $pos, 1, $new->list );
-    $list->foreach(sub
+    $new->foreach(sub
     {
         $_->parent( $parent );
     });
-    return( $list );
+    return( $new );
 }
 
 sub scrollHeight { return; }
@@ -1550,7 +1511,7 @@ sub setHTML : lvalue
                 return( $dummy );
             }
             return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
+            Want::rreturn( $self->error( $error ) );
         }
         
         my $children;
@@ -1585,7 +1546,7 @@ sub setHTML : lvalue
                     return( $dummy );
                 }
                 return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                rreturn( $self->error( $error ) );
+                Want::rreturn( $self->error( $error ) );
             }
             my $p = $self->new_parser;
             my $res = $p->parse_data( "$this" ) || do
@@ -1598,7 +1559,7 @@ sub setHTML : lvalue
                     return( $dummy );
                 }
                 return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                rreturn( $self->error( $error ) );
+                Want::rreturn( $self->error( $error ) );
             };
             $children = $res->children;
         }
@@ -1721,7 +1682,7 @@ sub _set_get_form_attribute : lvalue
     {
         return if( want( 'LVALUE' ) );
         my $dummy = 'dummy';
-        rreturn( $dummy );
+        Want::rreturn( $dummy );
     }
     my $code = $form->can( $attr );
     if( !defined( $code ) )
@@ -1734,21 +1695,22 @@ sub _set_get_form_attribute : lvalue
             return( $dummy );
         }
         return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-        rreturn( $self->error( $error ) );
+        Want::rreturn( $self->error( $error ) );
     }
     
     if( $has_arg )
     {
         $code->( $form, $arg );
-        lnoreturn if( $has_arg eq 'assign' );
+        Want::lnoreturn if( $has_arg eq 'assign' );
         return( $self );
     }
     else
     {
         my $rv = $code->( $form );
         return( $rv ) if( want( 'LVALUE' ) );
-        rreturn( $rv );
+        Want::rreturn( $rv );
     }
+    return;
 }
 
 # _set_get_property has been moved up in HTML::Object::Element
@@ -1820,7 +1782,7 @@ sub _set_get_property : lvalue
                     return( $dummy );
                 }
                 return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                rreturn( $self->error( $error ) );
+                Want::rreturn( $self->error( $error ) );
             }
         }
         # Used for <option>
@@ -1835,7 +1797,7 @@ sub _set_get_property : lvalue
         $self->reset(1);
         my $dummy = $arg;
         return( $arg ) if( want( 'LVALUE' ) );
-        rreturn( $arg );
+        Want::rreturn( $arg );
     }
     else
     {
@@ -1885,7 +1847,7 @@ sub _set_get_property : lvalue
             return( $def->{callback}->( $self, $attr ) );
         }
         return( $self->attr( $attr ) ) if( want( 'LVALUE' ) );
-        rreturn( $self->attr( $attr ) )
+        Want::rreturn( $self->attr( $attr ) )
     }
 }
 
@@ -1926,7 +1888,6 @@ sub _set_get_uri_property : lvalue
     if( $has_arg )
     {
         $self->{ $prop } = $arg;
-        $self->message( 4, "Setting uri property \"$prop\", which has URI method \"", ( $map->{ $prop } // '' ), "\" for value \"$arg\" and do we have an URI object yet? -> ", ( ref( $uri ) ? 'yes' : 'no' ), " (", overload::StrVal( $uri ), ")." );
         if( ref( $uri ) )
         {
             my $uri_class = ref( $uri ); # URI::https or maybe URI::_generic ?
@@ -1934,6 +1895,7 @@ sub _set_get_uri_property : lvalue
             {
                 if( $prop eq 'username' || $prop eq 'password' )
                 {
+                    no warnings 'uninitialized';
                     $arg = join( ':', @$self{ qw( username password ) } );
                 }
                 elsif( $prop eq 'protocol' )
@@ -1960,7 +1922,7 @@ sub _set_get_uri_property : lvalue
                     {
                         my $dummy = $self->{ $prop };
                         return( $dummy ) if( want( 'LVALUE' ) );
-                        rreturn( $dummy );
+                        Want::rreturn( $dummy );
                     }
                     else
                     {
@@ -1986,12 +1948,11 @@ sub _set_get_uri_property : lvalue
                         $uri->userinfo( join( ':', @$self{qw( username password )} ) );
                     }
                 }
-                $self->message( 4, "Setting attribute 'href' to ", overload::StrVal( $uri ) );
                 $self->attr( href => $uri );
             }
             catch( $e )
             {
-                my $error = "Unable to set value \"$arg\" for URI method \"$meth\": $e";
+                my $error = "Unable to set value \"${arg}\" for URI method \"${prop}\": $e";
                 if( $has_arg eq 'assign' )
                 {
                     $self->error( $error );
@@ -1999,16 +1960,15 @@ sub _set_get_uri_property : lvalue
                     return( $dummy );
                 }
                 return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                rreturn( $self->error( $error ) );
+                Want::rreturn( $self->error( $error ) );
             }
         }
         $self->reset(1);
         $self->{ $prop } = $arg;
-        $self->message( 4, "Setting href attribute to '$uri' (", overload::StrVal( $uri ), ")." );
         $self->attr( href => $uri );
         my $dummy = $arg;
         return( $dummy ) if( want( 'LVALUE' ) );
-        rreturn( $dummy );
+        Want::rreturn( $dummy );
     }
     else
     {
@@ -2029,7 +1989,7 @@ sub _set_get_uri_property : lvalue
                     {
                         my $dummy = $self->{ $prop };
                         return( $dummy ) if( want( 'LVALUE' ) );
-                        rreturn( $dummy );
+                        Want::rreturn( $dummy );
                     }
                     else
                     {
@@ -2069,7 +2029,7 @@ sub _set_get_uri_property : lvalue
             }
             catch( $e )
             {
-                my $error = "Unable to get value for URI method \"$meth\": $e";
+                my $error = "Unable to get value for URI method \"${prop}\": $e";
                 if( $has_arg eq 'assign' )
                 {
                     $self->error( $error );
@@ -2077,16 +2037,16 @@ sub _set_get_uri_property : lvalue
                     return( $dummy );
                 }
                 return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                rreturn( $self->error( $error ) );
+                Want::rreturn( $self->error( $error ) );
             }
         }
     }
     return( $self->{ $prop } ) if( want( 'LVALUE' ) );
-    rreturn( $self->{ $prop } );
+    Want::rreturn( $self->{ $prop } );
 }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -2103,7 +2063,7 @@ HTML::Object::DOM::Element - HTML Object
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

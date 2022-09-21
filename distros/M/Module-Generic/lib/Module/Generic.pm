@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.28.1
+## Version v0.28.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/08/30
+## Modified 2022/09/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -43,7 +43,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.28.1';
+    our $VERSION     = 'v0.28.2';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -5600,11 +5600,13 @@ sub _parse_timestamp
     $str = "$str";
     my $this = $self->_obj2h;
     my $class = ref( $self ) || $self;
+    require DateTime::Format::Strptime;
     my $tz;
     # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
     # "Cannot determine local time zone"
     try
     {
+        require DateTime::TimeZone;
         $tz = DateTime::TimeZone->new( name => 'local' );
     }
     catch( $e )
@@ -5628,9 +5630,8 @@ sub _parse_timestamp
     my $opt = 
     {
     pattern   => '%Y-%m-%d %T',
-    locale    => 'en_GB',
     time_zone => $tz->name,
-    on_error => sub{ $error++ },
+    on_error => 'croak',
     };
     
     my $fmt =
@@ -6677,7 +6678,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.28.1
+    v0.28.2
 
 =head1 DESCRIPTION
 

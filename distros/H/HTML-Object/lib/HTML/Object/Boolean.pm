@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Boolean.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/22
-## Modified 2021/08/23
+## Modified 2022/09/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,10 +17,12 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic::Boolean );
-    use HTML::Object::Number;
-    use HTML::Object::Literal;
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION );
+    our $VERSION = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub getChildNodes { return( shift->new_array ); }
 
@@ -31,16 +34,24 @@ sub string_value { return( shift->to_literal->value ); }
 
 sub to_boolean { return( $_[0] ); }
 
-sub to_literal { return( HTML::Object::Literal->new( shift->value ? 'true' : 'false' ) ); }
+sub to_literal
+{
+    require HTML::Object::Literal;
+    return( HTML::Object::Literal->new( shift->value ? 'true' : 'false' ) );
+}
 
-sub to_number { return( HTML::Object::Number->new( shift->value ) ); }
+sub to_number
+{
+    require HTML::Object::Number;
+    return( HTML::Object::Number->new( shift->value ) );
+}
 
 sub True { return( shift->true ); }
 
 sub value { return( ${$_[0]} ); }
 
 1;
-# XXX POD
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -53,7 +64,7 @@ HTML::Object::Boolean - HTML Object Boolean Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 

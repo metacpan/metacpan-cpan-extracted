@@ -9,9 +9,9 @@ use Log::ger;
 use HTTP::Response;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2022-09-19'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.070'; # VERSION
+our $VERSION = '1.071'; # VERSION
 
 sub before_mirror {
     my ($self, $r) = @_;
@@ -75,7 +75,7 @@ LWP::UserAgent::Plugin::FilterLcpan - Filter mirror() based on some criteria
 
 =head1 VERSION
 
-This document describes version 1.070 of LWP::UserAgent::Plugin::FilterLcpan (from Perl distribution App-lcpan), released on 2022-03-27.
+This document describes version 1.071 of LWP::UserAgent::Plugin::FilterLcpan (from Perl distribution App-lcpan), released on 2022-09-19.
 
 =head1 SYNOPSIS
 
@@ -134,9 +134,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

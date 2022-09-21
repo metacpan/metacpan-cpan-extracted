@@ -1,18 +1,31 @@
---- #YAML:1.0
-name:                GD-Graph-Polar
-version:             0.17
-abstract:            Make polar graph using GD package
-license:             ~
-author:              ~
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    GD:                            0
-    Geo::Constants:                0.04
-    Geo::Functions:                0.03
-    List::Util:                    0
-    Package::New:                  0
-    Test::Simple:                  0.44
+---
+abstract: 'Perl package to create polar graphs using GD package'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: unknown
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GD-Graph-Polar
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  GD: '0'
+  Geo::Constants: '0.04'
+  Geo::Functions: '0.03'
+  List::Util: '0'
+  Package::New: '0'
+  Test::Simple: '0.44'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-GD-Graph-Polar/issues
+  homepage: https://github.com/mrdvt92/perl-GD-Graph-Polar
+  repository: https://github.com/mrdvt92/perl-GD-Graph-Polar.git
+version: '0.19'

@@ -156,8 +156,16 @@ sub do_call {
 	  HTTP::Request->new( 'GET', $full_api_url . "/v2/$callrequest/", $header );
 	my $obj_response = $obj_user_agent->request($obj_request);
 
-	$self->json_response( $obj_response->content );
-	return parse_json( $obj_response->content );
+	if ( $obj_response->is_error ) {
+		warn "HTTP request error: "
+		  . $obj_response->error_as_HTML
+		  . " on API Call $callrequest";
+
+	}
+	else {
+		$self->json_response( $obj_response->content );
+		return parse_json( $obj_response->content );
+	}
 }
 
 sub get_json_response {
@@ -194,6 +202,7 @@ sub aircraft_by_callsign {
 	my $callsign = shift;
 	return $self->do_call("callsign/$callsign");
 }
+
 sub aircraft_by_squawk {
 	my $self   = shift;
 	my $squawk = shift;
