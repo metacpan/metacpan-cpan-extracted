@@ -57,7 +57,7 @@ Revision history for LyricFinder
         songs that do not provide an image, an empty string is returned.
         - LyricFinder::Letras - Verify that lyrics page returned matches the 
         artist / title being searched for and fail (return no lyrics) if not.
-        (Letras has been khown to try to "guess" the song if they do not have 
+        (Letras has been known to try to "guess" the song if they do not have 
         the exact one you're asking for)!
 1.21    2021/12/01
         LyricFinder::Letras - Fix - Was broken due to slight change in their 
@@ -65,3 +65,6 @@ Revision history for LyricFinder
 1.22    2022/07/29
         LyricFinder::Genius - Remove spam from end of lyrics text recently 
         added by Genius. :/
+1.23    2022/09/23
+        LyricFinder::Genius - It's Baaaaack!  Remove more spam from end of 
+        lyrics text added by Genius, so we had to rejigger our filter.

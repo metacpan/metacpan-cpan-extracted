@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.29
+    version 0.30
 
 SYNOPSIS
 
@@ -141,6 +141,15 @@ FUNCTIONS
       Alien doesn't look like a module name or if it does not provide a
       dynamic_libs method (which is implemented by all Alien::Base
       subclasses).
+
+      [version 0.30] [breaking change]
+
+      Starting with version 0.30, libraries provided by Aliens is preferred
+      over the system libraries. The original thinking was that you want to
+      prefer the system libraries because they are more likely to get
+      patched with regular system updates. Unfortunately, the reason a
+      module needs to install an Alien is likely because the system library
+      is not new enough, so we now prefer the Aliens instead.
 
  assert_lib
 
@@ -314,7 +323,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2014-2018 by Graham Ollis.
+    This software is copyright (c) 2014-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

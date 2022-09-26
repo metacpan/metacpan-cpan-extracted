@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.21";
+our $VERSION = "1.22";
 
 use v5.14;
 use warnings;
@@ -287,7 +287,7 @@ sub column_out {
 	    if ($obj->fillrows) {
 		map { [ splice @index, 0, $obj->panes ] } 1 .. $obj->height;
 	    } else {
-		zip map { [ splice @index, 0, $obj->height ] } 1 .. $obj->panes;
+		xpose map { [ splice @index, 0, $obj->height ] } 1 .. $obj->panes;
 	    }
 	};
 	for my $i (0 .. $#lines) {
@@ -317,7 +317,7 @@ sub table_out {
     };
     my @lines  = map { [ split $split, $_, $obj->table_columns_limit ] } @_;
     my @length = map { [ map { ansi_width $_ } @$_ ] } @lines;
-    my @max    = map { max @$_ } zip @length;
+    my @max    = map { max @$_ } xpose @length;
     my @align  = newlist(count => 0+@max, default => '-',
 			 [ map --$_, split /,/, $obj->table_right ] => '');
     my @format = map { '%' . $align[$_] . $max[$_] . 's' } 0 .. $#max;

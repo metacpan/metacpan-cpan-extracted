@@ -11,7 +11,7 @@ use Text::ParseWords qw/shellwords/;
 use Alien::Util;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '2.68'; # VERSION
+our $VERSION = '2.70'; # VERSION
 
 
 sub import {
@@ -605,7 +605,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 2.68
+version 2.70
 
 =head1 SYNOPSIS
 

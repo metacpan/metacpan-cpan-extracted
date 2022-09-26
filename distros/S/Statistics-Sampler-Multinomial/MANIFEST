@@ -1,7 +1,6 @@
 Changes
 etc/bench.pl
-etc/bench_int_division.pl
-etc/bench_single_draw.pl
+etc/bench_clone.pl
 etc/draw1_distribution.pl
 lib/Statistics/Sampler/Multinomial.pm
 lib/Statistics/Sampler/Multinomial/AliasMethod.pm
@@ -10,13 +9,13 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+stats-sampler-multinomial.komodoproject
 t/00-aa_prng.t
 t/00-Multinomial.t
 t/01-Multinomial-alias-method.t
 t/02-Indexed.t
 xt/07-notabs.t
 xt/boilerplate.t
-xt/changes.t
 xt/expectations.pl
 xt/perlcritic.t
 xt/pod-coverage.t

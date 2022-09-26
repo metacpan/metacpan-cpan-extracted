@@ -13,7 +13,7 @@ package App::af::frooble {
   use Moose;
   with 'App::af';
   with 'App::af::role::alienfile';
-  
+
   sub main {}
 
 };
@@ -21,14 +21,14 @@ package App::af::frooble {
 subtest 'default' => sub {
 
   local $CWD = tempdir( CLEANUP => 1 );
-  
+
   alienfile q{
     use alienfile;
     meta_prop->{one} = 'default';
   };
-  
+
   my $build = App::af::frooble->new->build;
-  
+
   is($build->meta_prop->{one}, 'default');
 
 };
@@ -36,14 +36,14 @@ subtest 'default' => sub {
 subtest '-f path' => sub {
 
   local $CWD = tempdir( CLEANUP => 1 );
-  
+
   alienfile q{
     use alienfile;
     meta_prop->{one} = 'with -f path';
   }, 'foo.alienfile';
-  
+
   my $build = App::af::frooble->new(-f => 'foo.alienfile')->build;
-  
+
   is($build->meta_prop->{one}, 'with -f path');
 
 };
@@ -51,21 +51,21 @@ subtest '-f path' => sub {
 subtest '--file path' => sub {
 
   local $CWD = tempdir( CLEANUP => 1 );
-  
+
   alienfile q{
     use alienfile;
     meta_prop->{one} = 'with --file path';
   }, 'foo.alienfile';
-  
+
   my $build = App::af::frooble->new('--file' => 'foo.alienfile')->build;
-  
+
   is($build->meta_prop->{one}, 'with --file path');
 
 };
 
 subtest '-c Alien::foo' => sub {
   local $CWD = tempdir( CLEANUP => 1 );
-  
+
   my $build = App::af::frooble->new(-c => 'Alien::foo')->build;
 
   is($build->meta_prop->{one}, 'from class');
@@ -73,7 +73,7 @@ subtest '-c Alien::foo' => sub {
 
 subtest '--class Alien::foo' => sub {
   local $CWD = tempdir( CLEANUP => 1 );
-  
+
   my $build = App::af::frooble->new('--class' => 'Alien::foo')->build;
 
   is($build->meta_prop->{one}, 'from class');
@@ -81,7 +81,7 @@ subtest '--class Alien::foo' => sub {
 
 subtest '-c foo' => sub {
   local $CWD = tempdir( CLEANUP => 1 );
-  
+
   my $build = App::af::frooble->new(-c => 'foo')->build;
 
   is($build->meta_prop->{one}, 'from class');
@@ -89,7 +89,7 @@ subtest '-c foo' => sub {
 
 subtest '--class foo' => sub {
   local $CWD = tempdir( CLEANUP => 1 );
-  
+
   my $build = App::af::frooble->new('--class' => 'foo')->build;
 
   is($build->meta_prop->{one}, 'from class');

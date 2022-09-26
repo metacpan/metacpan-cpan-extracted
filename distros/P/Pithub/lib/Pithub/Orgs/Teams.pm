@@ -4,7 +4,7 @@ our $AUTHORITY = 'cpan:PLU';
 
 use Moo;
 
-our $VERSION = '0.01039';
+our $VERSION = '0.01040';
 
 use Carp qw( carp croak );
 
@@ -208,7 +208,7 @@ Pithub::Orgs::Teams - Github v3 Org Teams API
 
 =head1 VERSION
 
-version 0.01039
+version 0.01040
 
 =head1 METHODS
 
@@ -241,7 +241,7 @@ Examples:
 
 =over
 
-If the user is already a member of the team’s organization, this
+If the user is already a member of the team's organization, this
 endpoint will add the user to the team. In order to add a membership
 between an organization member and a team, the authenticated user
 must be an organization owner or a maintainer of the team.

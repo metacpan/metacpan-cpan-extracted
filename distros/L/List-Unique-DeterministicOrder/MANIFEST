@@ -1,5 +1,6 @@
 Changes
 etc/bench/bench.pl
+etc/bench/bench_clone.pl
 etc/bench/profile.pl
 ignore.txt
 lib/List/Unique/DeterministicOrder.pm

@@ -1,5 +1,10 @@
 Revision history for WebFetch::Input::RSS
 
+0.2.1 2022-09-21T11:41:58-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - bump WebFetch prerequisite to 0.15.3 to fix test problems observed by
+   CPAN Testers
+
 0.2.0 2022-09-19T21:38:44-07:00 America/Los_Angeles
  [MINOR]
  - submodules now use Config store to add CLI/API options & usage to

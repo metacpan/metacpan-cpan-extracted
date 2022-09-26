@@ -300,12 +300,10 @@ lib/DateTime/TimeZone/Europe/Sofia.pm
 lib/DateTime/TimeZone/Europe/Tallinn.pm
 lib/DateTime/TimeZone/Europe/Tirane.pm
 lib/DateTime/TimeZone/Europe/Ulyanovsk.pm
-lib/DateTime/TimeZone/Europe/Uzhgorod.pm
 lib/DateTime/TimeZone/Europe/Vienna.pm
 lib/DateTime/TimeZone/Europe/Vilnius.pm
 lib/DateTime/TimeZone/Europe/Volgograd.pm
 lib/DateTime/TimeZone/Europe/Warsaw.pm
-lib/DateTime/TimeZone/Europe/Zaporozhye.pm
 lib/DateTime/TimeZone/Europe/Zurich.pm
 lib/DateTime/TimeZone/Floating.pm
 lib/DateTime/TimeZone/HST.pm

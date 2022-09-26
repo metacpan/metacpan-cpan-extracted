@@ -1,14 +1,15 @@
 package Date::Format::ISO8601;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-22'; # DATE
-our $DIST = 'Date-Format-ISO8601'; # DIST
-our $VERSION = '0.010'; # VERSION
-
 use strict;
 use warnings;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-07-23'; # DATE
+our $DIST = 'Date-Format-ISO8601'; # DIST
+our $VERSION = '0.012'; # VERSION
+
 our @EXPORT_OK = qw(
      gmtime_to_iso8601_date
      gmtime_to_iso8601_time
@@ -77,7 +78,7 @@ sub localtime_to_iso8601_time     { _format('local', 'time'    , @_) }
 sub localtime_to_iso8601_datetime { _format('local', 'datetime', @_) }
 
 1;
-# ABSTRACT: Format date (Unix timestamp/epoch) as ISO8601 date/time string
+# ABSTRACT: Format date (Unix timestamp) as ISO8601 datetime/date/time string
 
 __END__
 
@@ -87,11 +88,11 @@ __END__
 
 =head1 NAME
 
-Date::Format::ISO8601 - Format date (Unix timestamp/epoch) as ISO8601 date/time string
+Date::Format::ISO8601 - Format date (Unix timestamp) as ISO8601 datetime/date/time string
 
 =head1 VERSION
 
-This document describes version 0.010 of Date::Format::ISO8601 (from Perl distribution Date-Format-ISO8601), released on 2020-10-22.
+This document describes version 0.012 of Date::Format::ISO8601 (from Perl distribution Date-Format-ISO8601), released on 2022-07-23.
 
 =head1 SYNOPSIS
 
@@ -141,6 +142,8 @@ Formatting date+time:
 This module formats Unix timestamps (epochs) as ISO8601 date/time strings. It is
 a lightweight alternative to L<DateTime::Format::ISO8601::Format> and
 L<DateTime::Format::ISO8601>.
+
+Keywords: epoch, Unix time
 
 =head1 FUNCTIONS
 
@@ -201,6 +204,43 @@ Please visit the project's homepage at L<https://metacpan.org/release/Date-Forma
 
 Source repository is at L<https://github.com/perlancar/perl-Date-Format-ISO8601>.
 
+=head1 SEE ALSO
+
+L<DateTime::Format::ISO8601::Format>
+
+L<DateTime::Format::ISO8601>
+
+L<Time::Piece> (which is a core module) has a C<datetime()> method that can
+output ISO8601 datetime string.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Format-ISO8601>
@@ -208,22 +248,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-L<DateTime::Format::ISO8601::Format>
-
-L<DateTime::Format::ISO8601>
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

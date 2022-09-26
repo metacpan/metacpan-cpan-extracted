@@ -5,7 +5,7 @@ use Scalar::Util qw(blessed reftype);
 use Data::Dumper ();
 use Mu::Tiny;
 
-our $VERSION = '0.005002';
+our $VERSION = '0.006000';
 $VERSION =~ tr/_//d;
 
 sub import {
@@ -87,14 +87,28 @@ sub dump_cb {
 }
 
 sub expand {
-  my ($self, $data) = @_;
+  my ($self, $data, $p) = @_;
+  local $self->{expand_seen} = {} unless $self->{expand_seen};
+  my $this_path = [
+     ($self->{expand_path} ? @{$self->{expand_path}} : ()),
+     (defined($p) ? ($p) : ())
+  ];
+  if (ref($data)) {
+    if (my $seen_path = $self->{expand_seen}{$data}) {
+      return [ ref => $seen_path ];
+    } else {
+      $self->{expand_seen}{$data} = $this_path;
+    }
+  }
+  local $self->{expand_path} = $this_path;
   if (ref($data) eq 'HASH') {
     return [ hash => [
       [ sort keys %$data ],
-      { map +($_ => $self->expand($data->{$_})), keys %$data }
+      { map +($_ => $self->expand($data->{$_}, [ key => $_ ])), sort keys %$data }
     ] ];
   } elsif (ref($data) eq 'ARRAY') {
-    return [ array => [ map $self->expand($_), @$data ] ];
+    my $idx = 0;
+    return [ array => [ map $self->expand($_, [ idx => $idx++ ]), @$data ] ];
   } elsif (blessed($data) and my $ret = $self->_expand_blessed($data)) {
     return $ret;
   }
@@ -131,7 +145,7 @@ sub _transform {
       $payload->[0],
       { map +(
           $_ => $self->_transform($h{$_}, [ @$path, $_ ])
-        ), keys %h
+        ), sort keys %h
       },
     ];
   } elsif ($type eq 'array') {
@@ -315,6 +329,7 @@ sub _format_hash {
   my ($self, $payload) = @_;
   my ($keys, $hash) = @$payload;
   return '{}' unless @$keys;
+  @$keys = sort @$keys;
   my %k = (map +(
     $_ => $self->_format_hashkey($_)), @$keys
   );
@@ -387,6 +402,26 @@ sub _format_blessed {
   my ($self, $payload) = @_;
   my ($content, $class) = @$payload;
   return 'bless( '.$self->_format($content).qq{, "${class}"}.' )';
+}
+
+sub _format_ref {
+  my ($self, $payload) = @_;
+  return '$_->'.join('',
+    map {
+      if ($_->[0] eq 'key') {
+        my $quoted = quotemeta($_->[1]);
+        if ($_->[1] eq $quoted) {
+          '{'.$quoted.'}'
+        } else {
+          '{"'.$quoted.'"}'
+        }
+      } elsif ($_->[0] eq 'idx') {
+        '['.$_->[1].']'
+      } else {
+        die "Invalid ref element type ".$_->[0];
+      }
+    } @$payload
+  );
 }
 
 1;

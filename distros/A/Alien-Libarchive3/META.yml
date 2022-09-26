@@ -6,7 +6,7 @@ build_requires:
   Alien::Build: '0.71'
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   Test::Alien: '0'
   perl: '5.006'
 configure_requires:
@@ -18,7 +18,7 @@ configure_requires:
   FFI::CheckLib: '0.28'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,9 +32,9 @@ resources:
   bugtracker: https://github.com/uperl/Alien-Libarchive3/issues
   homepage: https://metacpan.org/pod/Alien::Libarchive3
   repository: git://github.com/uperl/Alien-Libarchive3.git
-version: '0.32'
+version: '0.33'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
@@ -47,13 +47,16 @@ x_alienfile:
       Config: '0'
       Env::ShellWords: '0.01'
       HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_generated_by_perl: v5.34.0
+x_generated_by_perl: v5.37.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

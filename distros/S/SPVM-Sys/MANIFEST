@@ -1,3 +1,4 @@
+.gitattributes
 .github/workflows/linux-ubuntu-latest-32bit.yml
 .github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
 .github/workflows/linux-ubuntu-latest.yml
@@ -124,6 +125,7 @@ lib/SPVM/Sys/User/Passwd.c
 lib/SPVM/Sys/User/Passwd.config
 lib/SPVM/Sys/User/Passwd.pm
 lib/SPVM/Sys/User/Passwd.spvm
+lib/SPVM/Sys/Util.spvm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -134,11 +136,14 @@ t/ftest/file_empty.txt
 t/ftest/file_new_lines.txt
 t/lib/SPVM/TestCase/Sys/FileTest.spvm
 t/lib/SPVM/TestCase/Sys/IO.spvm
+t/lib/SPVM/TestCase/Sys/Process.spvm
 t/lib/SPVM/TestCase/Sys/Socket.spvm
 t/lib/SPVM/TestCase/Sys/User.spvm
+t/print_hello.pl
 t/Sys.t
 t/Sys_FileTest.t
 t/Sys_IO.t
+t/Sys_Process.t
 t/Sys_Socket.t
 t/Sys_User.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

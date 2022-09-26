@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Sub-SymMethod",
    "no_index" : {
@@ -37,10 +37,10 @@
       },
       "runtime" : {
          "recommends" : {
-            "Type::Params" : "1.003000"
+            "Type::Params" : "2.000000"
          },
          "requires" : {
-            "Exporter::Shiny" : "1.000000",
+            "Exporter::Shiny" : "1.004000",
             "Role::Hooks" : "0",
             "perl" : "5.008008"
          }
@@ -49,8 +49,8 @@
          "requires" : {
             "Role::Tiny" : "0",
             "Test::More" : "0.96",
-            "Type::Params" : "1.003000",
-            "Types::Standard" : "0",
+            "Type::Params" : "2.000000",
+            "Types::Standard" : "2.000000",
             "parent" : "0"
          }
       }
@@ -58,13 +58,13 @@
    "provides" : {
       "Sub::SymMethod" : {
          "file" : "lib/Sub/SymMethod.pm",
-         "version" : "0.005"
+         "version" : "1.000"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Sub-SymMethod"
+         "web" : "https://github.com/tobyink/p5-sub-symmethod/issues"
       },
       "homepage" : "https://metacpan.org/release/Sub-SymMethod",
       "license" : [
@@ -77,6 +77,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/project"
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.000",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

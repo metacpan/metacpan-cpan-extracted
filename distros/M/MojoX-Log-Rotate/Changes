@@ -1,5 +1,11 @@
 Revision history for MojoX-Log-Rotate
 
-1.222630  2022-09-20 19:36:34+01:00 Africa/Casablanca
+1.222670  2022-09-24 17:51:16+01:00 Africa/Casablanca
+  * limit threads.t scope
 
+1.222660  2022-09-23 17:30:09+02:00 Europe/Paris
+  * add thread support
+  * rewrite rotate.t with Test::MockTime
+
+1.222630  2022-09-20 20:17:01+02:00 Europe/Paris
   * initial release

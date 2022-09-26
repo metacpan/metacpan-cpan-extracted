@@ -1,3 +1,6 @@
+0.12 2022-09-23T11:41:43+02:00
+ - Add check_code().
+
 0.11 2022-08-25T17:56:53+02:00
  - Regen README file.
  - Rename files in examples/ directory to better names.

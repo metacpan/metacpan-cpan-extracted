@@ -1,5 +1,12 @@
 Revision history for Future-XS
 
+0.05    2022-09-23
+        [BUGFIXES]
+         * Always invoke the real ->new method for prototype cloning
+         * Only inflate real Future::Exception instances, not any object
+         * Implement compaction logic for on_cancel AVs
+         * Don't crash on attempts to revoke cancellation from lost futures
+
 0.04    2022-09-13
         [CHANGES]
          * Implement remaining bits of API and behaviour in order to make the

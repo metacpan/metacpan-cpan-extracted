@@ -8,18 +8,18 @@ use warnings;
 
 use Test::More;
 
-use Error qw(:try);
+use Try::Tiny;
 use IO::Socket;
 use RT::Client::REST;
 
 # apply the same rule as for 80-timeout.t
-plan( skip_all => "LWP::UserAgent 6.04 does not know how to time out, ".
-                  "see RT #81799" ) if $LWP::UserAgent::VERSION eq '6.04';
-
+plan( skip_all => "LWP::UserAgent 6.04 does not know how to time out, "
+      . "see RT #81799" )
+  if $LWP::UserAgent::VERSION eq '6.04';
 
 my $server = IO::Socket::INET->new(
-    Type => SOCK_STREAM,
-    Reuse => 1,
+    Type   => SOCK_STREAM,
+    Reuse  => 1,
     Listen => 10,
 ) or die "Could not set up TCP server: $@";
 
@@ -28,20 +28,33 @@ my $port = $server->sockport;
 my $pid = fork;
 die "cannot fork: $!" unless defined $pid;
 
-if (0 == $pid) {                                            # Child
+if ( 0 == $pid ) {    # Child
     my $rt = RT::Client::REST->new(
-            server => "http://127.0.0.1:$port",
-            # This ensures that we die soon.  When the client dies, the
-            # while (<$client>) above stops looping.
-            timeout => 2,
+        server => "http://127.0.0.1:$port",
+
+        # This ensures that we die soon.  When the client dies, the
+        # while (<$client>) above stops looping.
+        timeout => 2,
     );
     try {
-        $rt->_submit("ticket/1", "aaaa", {
+        $rt->_submit(
+            "ticket/1",
+            "aaaa",
+            {
                 user => 'a',
                 pass => 'b',
-        });
-    } catch RT::Client::REST::RequestTimedOutException with {
-        # This is what we expect, so we ignore this exception
+            }
+        );
+    }
+    catch {
+        die $_ unless blessed $_ && $_->can('rethrow');
+        if ( $_->isa('RT::Client::REST::RequestTimedOutException') ) {
+
+            # This is what we expect, so we ignore this exception
+        }
+        else {
+            $_->rethrow;
+        }
     };
     exit 0;
 }
@@ -53,12 +66,12 @@ my $data;
 while (<$client>) {
     $data .= $_;
 }
-unlike($data, qr/ARRAY\(/, "Avoid stringify objects when sending a request");
+unlike( $data, qr/ARRAY\(/, "Avoid stringify objects when sending a request" );
 SKIP: {
     skip "Self-tests only for release testing", 2
-        unless $ENV{RELEASE_TESTING};
+      unless $ENV{RELEASE_TESTING};
     my $kid = waitpid $pid, 0;
-    is($kid, $pid, "self-test: we reaped process correctly");
-    is($?, 0, "self-test: child process ran successfully");
-};
+    is( $kid, $pid, "self-test: we reaped process correctly" );
+    is( $?,   0,    "self-test: child process ran successfully" );
+}
 

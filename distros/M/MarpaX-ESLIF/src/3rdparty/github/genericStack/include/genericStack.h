@@ -593,7 +593,7 @@ static GENERICSTACK_INLINE short _GENERICSTACK_SET_NA(genericStack_t *stackp, in
 /* ====================================================================== */
 /* Interface.                                                             */
 /* ====================================================================== */
-#define GENERICSTACK_ERROR(stackp)               (stackp)->errori
+#define GENERICSTACK_ERROR(stackp)               ((stackp == NULL) || (stackp)->errori != 0)
 #define GENERICSTACK_ERROR_RESET(stackp)         (stackp)->errori = 0
 #define GENERICSTACK_INITIAL_LENGTH(stackp)      (stackp)->initialLengthi
 #define GENERICSTACK_HEAP_LENGTH(stackp)         (stackp)->heapi

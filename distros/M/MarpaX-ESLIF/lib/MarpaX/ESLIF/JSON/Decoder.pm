@@ -27,7 +27,7 @@ sub _EQ {
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.26'; # VERSION
+our $VERSION = '6.0.27'; # VERSION
 
 
 
@@ -53,7 +53,7 @@ MarpaX::ESLIF::JSON::Decoder - ESLIF's JSON decoder interface
 
 =head1 VERSION
 
-version 6.0.26
+version 6.0.27
 
 =head1 DESCRIPTION
 

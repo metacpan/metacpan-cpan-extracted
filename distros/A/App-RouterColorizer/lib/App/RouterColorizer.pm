@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.222630';
+$App::RouterColorizer::VERSION = '1.222681';
 use Moose;
 
 use feature 'signatures';
@@ -54,7 +54,8 @@ our $POSINT   = qr/(?!0)$INT/;
 our $LOWLIGHT = qr/ (?: -[3-9][0-9]\. [0-9]{1,2} )
                   | (?: - \s Inf)
                   | (?: -2 [5-9] \. [0-9]{1,2} )/xx;
-our $LIGHT = qr/ (?: $NUM ) | (?: N\/A ) /xx;
+our $VERYLL = qr/ (?: -[4-9][0-9]\. [0-9]{1,2} )/xx;
+our $LIGHT  = qr/ (?: $NUM ) | (?: N\/A ) /xx;
 
 our $IPV4CIDR = qr/ $RE{net}{IPv4}
                    (?: \/
@@ -76,6 +77,9 @@ our $IPV6CIDR = qr/ $RE{net}{IPv6}
                         )
                     )?
                 /xx;
+
+our $BIGALARMS    = qr/critical|major|minor|warning/;
+our $LITTLEALARMS = qr/info/;
 
 our @INTERFACE_IGNORES = ( "bytes", "packets input", "packets output", "multicast" );
 our @INTERFACE_INFOS   = ( "PAUSE input", "PAUSE output", "pause input" );
@@ -126,6 +130,7 @@ sub _parse_line ( $self, $text ) {
     $line = $self->_parse_line_arista($line);
     $line = $self->_parse_line_vyos($line);
     $line = $self->_parse_line_junos($line);
+    $line = $self->_parse_line_ciena($line);
 
     # IPv4
     $line =~ s/($IPV4CIDR)/$self->_ipv4ify($1)/egxx;
@@ -357,7 +362,7 @@ s/^ ( \Q    Receiver signal average optical power \E \s+ : \s+ $NUM \Q mW \/ \E 
 sub _parse_line_vyos ( $self, $line ) {
 
     #
-    # VyOS (Stuff the Arista/Cisco commands did not do
+    # VyOS (Stuff the Arista/Cisco commands did not do)
     #
 
     # BGP
@@ -373,6 +378,133 @@ s/^ ( \Q  Route map for \E (?: incoming|outgoing ) \Q advertisements is \E \N* )
 
     $line =~ s/^ ( \QLocal host: \E   \N+ ) $/$self->_colorize($1, $INFO)/exx;
     $line =~ s/^ ( \QForeign host: \E \N+ ) $/$self->_colorize($1, $INFO)/exx;
+
+    return $line;
+}
+
+sub _parse_line_ciena ( $self, $line ) {
+
+    #
+    # Ciena
+    #
+
+    # xcvr show xcvr N/N
+    $line =~
+s/^ ( \Q| Admin State \E \s+ \| ) ( \Q Enabled \E )  ( \N+ ) $/$1.$self->_colorize($2, $GREEN).$3/exx;
+    $line =~
+s/^ ( \Q| Admin State \E \s+ \| ) ( \Q Disabled \E ) ( \N+ ) $/$1.$self->_colorize($2, $ORANGE).$3/exx;
+    $line =~
+s/^ ( \Q| Admin State \E \s+ \| ) ( [^|]+ )          ( \N+ ) $/$1.$self->_colorize($2, $RED).$3/exx;
+
+    $line =~
+s/^ ( \Q| Operational State \E \s+ \| ) ( \Q Up \E ) ( \N+ ) $/$1.$self->_colorize($2, $GREEN).$3/exx;
+    $line =~
+s/^ ( \Q| Operational State \E \s+ \| ) ( [^|]+ )    ( \N+ ) $/$1.$self->_colorize($2, $RED).$3/exx;
+
+    $line =~ s/ ^ ( \| ) ( \Q Tx Power (dBm)\E \s* ) ( \| ) ( \s+ $VERYLL \s+ ) ( \N+ ) $/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $RED).$5/exx;
+    $line =~ s/ ^ ( \| ) ( \Q Tx Power (dBm)\E \s* ) ( \| ) ( \s+ $LIGHT \s+ ) ( \N+ ) $/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $INFO).$5/exx;
+
+    $line =~ s/ ^ ( \| ) ( \Q Rx Power (dBm)\E \s* ) ( \| ) ( \s+ $VERYLL \s+ ) ( \N+ ) $/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $RED).$5/exx;
+    $line =~ s/ ^ ( \| ) ( \Q Rx Power (dBm)\E \s* ) ( \| ) ( \s+ $LIGHT \s+ ) ( \N+ ) $/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $INFO).$5/exx;
+
+    # xcvr show xcvr status
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Tx Power (dBm)\E \s* ) ( \| ) ( \s+ $VERYLL \s+ ) ( \N+ ) $/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $RED).$5/exx;
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Tx Power (dBm)\E \s* ) ( \| ) ( \s+ $LIGHT \s+  ) ( \N+ ) $/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $INFO).$5/exx;
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Rx Power (dBm)\E \s* ) ( \| ) ( \s+ $VERYLL \s+ ) ( \N+ ) $/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $RED).$5/exx;
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Rx Power (dBm)\E \s* ) ( \| ) ( \s+ $LIGHT \s+  ) ( \N+ ) $/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $INFO).$5/exx;
+
+    # ptp show ptp x/x [status]
+    $line =~
+s/^ ( \| (?: \s Transmitter)? \Q State \E \s+ \| ) ( \Q Enabled \E \s+  ) ( \| ) ( \Q Up \E|\Q Enabled \E )( \N+ ) $/
+        $1.$self->_colorize($2, $GREEN).$3.$self->_colorize($4, $GREEN).$5/exx;
+    $line =~
+s/^ ( \| (?: \s Transmitter)? \Q State \E \s+ \| ) ( \Q Enabled \E \s+  ) ( \| ) ( [^|]+                  )( \N+ ) $/
+        $1.$self->_colorize($2, $GREEN).$3.$self->_colorize($4, $RED).$5/exx;
+    $line =~
+s/^ ( \| (?: \s Transmitter)? \Q State \E \s+ \| ) ( \Q Disabled \E \s+ ) ( \| ) ( [^|]+                  )( \N+ ) $/
+        $1.$self->_colorize($2, $ORANGE).$3.$self->_colorize($4, $ORANGE).$5/exx;
+
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Actual Power (dBm)\E \s* ) ( \| ) ( \s+ $VERYLL \s+ ) ( \| ) ( \s+ $VERYLL \s+ ) ( \N+ )$/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $RED).$5.$self->_colorize($6, $RED).$7/exx;
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Actual Power (dBm)\E \s* ) ( \| ) ( \s+ $VERYLL \s+ ) ( \| ) ( \s+ $LIGHT  \s+ ) ( \N+ )$/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $RED).$5.$self->_colorize($6, $INFO).$7/exx;
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Actual Power (dBm)\E \s* ) ( \| ) ( \s+ $LIGHT \s+  ) ( \| ) ( \s+ $VERYLL \s+ ) ( \N+ )$/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $INFO).$5.$self->_colorize($6, $RED).$7/exx;
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Actual Power (dBm)\E \s* ) ( \| ) ( \s+ $LIGHT \s+  ) ( \| ) ( \s+ $LIGHT  \s+ ) ( \N+ )$/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $INFO).$5.$self->_colorize($6, $INFO).$7/exx;
+
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Actual Aggregate Power (dBm)\E \s* ) ( \| ) ( \s+ $VERYLL \s+ ) ( \| ) ( \s+ $VERYLL \s+ ) ( \N+ )$/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $RED).$5.$self->_colorize($6, $RED).$7/exx;
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Actual Aggregate Power (dBm)\E \s* ) ( \| ) ( \s+ $VERYLL \s+ ) ( \| ) ( \s+ $LIGHT  \s+ ) ( \N+ )$/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $RED).$5.$self->_colorize($6, $INFO).$7/exx;
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Actual Aggregate Power (dBm)\E \s* ) ( \| ) ( \s+ $LIGHT \s+  ) ( \| ) ( \s+ $VERYLL \s+ ) ( \N+ )$/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $INFO).$5.$self->_colorize($6, $RED).$7/exx;
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Actual Aggregate Power (dBm)\E \s* ) ( \| ) ( \s+ $LIGHT \s+  ) ( \| ) ( \s+ $LIGHT  \s+ ) ( \N+ )$/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $INFO).$5.$self->_colorize($6, $INFO).$7/exx;
+
+    $line =~
+s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Span Loss (dB)\E \s* ) ( \| ) ( \s+ $NUM \s+ ) ( \| ) ( \s+ $NUM \s+ ) ( \| )$/
+        $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $INFO).$5.$self->_colorize($6, $INFO).$7/exx;
+
+    # alarm show
+    $line =~ s/ ^ ( \| ) ( \s+ [0-9]* ) ( \| ) ( \s+ ) ( \| ) ( [^|]+ ) ( \| ) ( \s+ [0-9]+ )
+                  ( \| ) ( \s* $BIGALARMS|$LITTLEALARMS \s* ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) $/
+        $1.$self->_colorize($2, $RED).
+        $3.$self->_colorize($4, $RED).
+        $5.$self->_colorize($6, $RED).
+        $7.$self->_colorize($8, $RED).
+        $9.$self->_colorize($10, $RED).
+        $11.$self->_colorize($12, $RED).
+        $13.$self->_colorize($14, $RED).
+        $15.$self->_colorize($16, $RED).
+        $17/exx;
+    $line =~
+      s/ ^ ( \| ) ( \s+ [0-9]* ) ( \| ) ( \s+ \QY\E \s* ) ( \| ) ( [^|]+ ) ( \| ) ( \s+ [0-9]+ )
+                  ( \| ) ( \s* $BIGALARMS \s* ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) $/
+        $1.$self->_colorize($2, $ORANGE).
+        $3.$self->_colorize($4, $ORANGE).
+        $5.$self->_colorize($6, $ORANGE).
+        $7.$self->_colorize($8, $ORANGE).
+        $9.$self->_colorize($10, $ORANGE).
+        $11.$self->_colorize($12, $ORANGE).
+        $13.$self->_colorize($14, $ORANGE).
+        $15.$self->_colorize($16, $ORANGE).
+        $17/exx;
+    $line =~
+      s/ ^ ( \| ) ( \s+ [0-9]* ) ( \| ) ( \s+ \QY\E \s* ) ( \| ) ( [^|]+ ) ( \| ) ( \s+ [0-9]+ )
+                  ( \| ) ( \s* $LITTLEALARMS \s* ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) $/
+        $1.$self->_colorize($2, $INFO).
+        $3.$self->_colorize($4, $INFO).
+        $5.$self->_colorize($6, $INFO).
+        $7.$self->_colorize($8, $INFO).
+        $9.$self->_colorize($10, $INFO).
+        $11.$self->_colorize($12, $INFO).
+        $13.$self->_colorize($14, $INFO).
+        $15.$self->_colorize($16, $INFO).
+        $17/exx;
+
+    # Errors
+    $line =~ s/ ^ ( \QSHELL \E \S+ \Q FAILURE\E \N+ ) $/$self->_colorize($1, $RED)/exx;
 
     return $line;
 }
@@ -465,15 +597,16 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.222630
+version 1.222681
 
 =head1 DESCRIPTION
 
 This module colorizes the output of router output, using.
 
 The output will be colorized based on detection of key strings as they
-might be sent from Arista, Juniper, and VyOS routers.  It may also work
-on other router outputs, but these have not been used for development.
+might be sent from Arista, Cisco, Juniper, and VyOS routers/switches and
+Ciena WDM devices.  It may also work on other router outputs, but these
+have not been used for development.
 
 =head1 METHODS
 

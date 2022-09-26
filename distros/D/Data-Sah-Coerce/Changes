@@ -1,3 +1,13 @@
+0.053   2022-09-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Add perl coerce rule for duration: From_str::hms.
+
+        - [testing] Replace default JS engine from nodejs to JavaScript::QuickJS
+          to speed up tests. Not all tests use QuickJS yet though.
+
+        - [doc] Tweak error message.
+
+
 0.052   2021-11-28  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Allow access to %gen_coercer_args.

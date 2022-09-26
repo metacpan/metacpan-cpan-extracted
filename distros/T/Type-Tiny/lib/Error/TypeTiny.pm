@@ -1,12 +1,12 @@
 package Error::TypeTiny;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	$Error::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::VERSION   = '1.016010';
+	$Error::TypeTiny::VERSION   = '2.000000';
 }
 
 $Error::TypeTiny::VERSION =~ tr/_//d;
@@ -16,6 +16,9 @@ __PACKAGE__->Type::Tiny::_install_overloads(
 	q[""]   => sub { $_[0]->to_string },
 	q[bool] => sub { 1 },
 );
+
+require Carp;
+*CarpInternal = \%Carp::CarpInternal;
 
 our %CarpInternal;
 $CarpInternal{$_}++ for qw(
@@ -268,9 +271,10 @@ Stringification is overloaded to call C<to_string>.
 
 =over
 
-=item C<< %Error::TypeTiny::CarpInternal >>
+=item C<< %Carp::CarpInternal >>
 
-Serves a similar purpose to C<< %Carp::CarpInternal >>.
+Error::TypeTiny honours this package variable from L<Carp>.
+(C< %Error::TypeTiny::CarpInternal> is an alias for it.)
 
 =item C<< $Error::TypeTiny::StackTrace >>
 

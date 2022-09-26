@@ -61,10 +61,6 @@ my $stuff =
     "tar.bz2" => "J/JE/JESSE/perl-5.11.3.tar.bz2",
     "tar.gz" => "J/JE/JESSE/perl-5.11.3.tar.gz",
   },
-  "5.11.4" => {
-    "tar.bz2" => "R/RJ/RJBS/perl-5.11.4.tar.bz2",
-    "tar.gz" => "R/RJ/RJBS/perl-5.11.4.tar.gz",
-  },
   "5.11.5" => {
     "tar.bz2" => "S/SH/SHAY/perl-5.11.5.tar.bz2",
     "tar.gz" => "S/SH/SHAY/perl-5.11.5.tar.gz",
@@ -96,10 +92,6 @@ my $stuff =
   "5.13.0" => {
     "tar.bz2" => "L/LB/LBROCARD/perl-5.13.0.tar.bz2",
     "tar.gz" => "L/LB/LBROCARD/perl-5.13.0.tar.gz",
-  },
-  "5.13.1" => {
-    "tar.bz2" => "R/RJ/RJBS/perl-5.13.1.tar.bz2",
-    "tar.gz" => "R/RJ/RJBS/perl-5.13.1.tar.gz",
   },
   "5.13.10" => {
     "tar.bz2" => "A/AV/AVAR/perl-5.13.10.tar.bz2",
@@ -177,10 +169,6 @@ my $stuff =
     "tar.bz2" => "Z/ZE/ZEFRAM/perl-5.15.1.tar.bz2",
     "tar.gz" => "Z/ZE/ZEFRAM/perl-5.15.1.tar.gz",
   },
-  "5.15.2" => {
-    "tar.bz2" => "R/RJ/RJBS/perl-5.15.2.tar.bz2",
-    "tar.gz" => "R/RJ/RJBS/perl-5.15.2.tar.gz",
-  },
   "5.15.3" => {
     "tar.bz2" => "S/ST/STEVAN/perl-5.15.3.tar.bz2",
     "tar.gz" => "S/ST/STEVAN/perl-5.15.3.tar.gz",
@@ -200,10 +188,6 @@ my $stuff =
   "5.15.7" => {
     "tar.bz2" => "B/BI/BINGOS/perl-5.15.7.tar.bz2",
     "tar.gz" => "B/BI/BINGOS/perl-5.15.7.tar.gz",
-  },
-  "5.15.8" => {
-    "tar.bz2" => "C/CO/CORION/perl-5.15.8.tar.bz2",
-    "tar.gz" => "C/CO/CORION/perl-5.15.8.tar.gz",
   },
   "5.15.9" => {
     "tar.bz2" => "A/AB/ABIGAIL/perl-5.15.9.tar.bz2",
@@ -249,10 +233,6 @@ my $stuff =
     "tar.bz2" => "F/FL/FLORA/perl-5.17.5.tar.bz2",
     "tar.gz" => "F/FL/FLORA/perl-5.17.5.tar.gz",
   },
-  "5.17.6" => {
-    "tar.bz2" => "R/RJ/RJBS/perl-5.17.6.tar.bz2",
-    "tar.gz" => "R/RJ/RJBS/perl-5.17.6.tar.gz",
-  },
   "5.17.7" => {
     "tar.bz2" => "D/DR/DROLSKY/perl-5.17.7.tar.bz2",
     "tar.gz" => "D/DR/DROLSKY/perl-5.17.7.tar.gz",
@@ -265,14 +245,6 @@ my $stuff =
     "tar.bz2" => "B/BI/BINGOS/perl-5.17.9.tar.bz2",
     "tar.gz" => "B/BI/BINGOS/perl-5.17.9.tar.gz",
   },
-  "5.17.10" => {
-    "tar.bz2" => "C/CO/CORION/perl-5.17.10.tar.bz2",
-    "tar.gz" => "C/CO/CORION/perl-5.17.10.tar.gz",
-  },
-  "5.17.11" => {
-    "tar.bz2" => "R/RJ/RJBS/perl-5.17.11.tar.bz2",
-    "tar.gz" => "R/RJ/RJBS/perl-5.17.11.tar.gz",
-  },
   "5.18.0" => {
     "tar.bz2" => "R/RJ/RJBS/perl-5.18.0.tar.bz2",
     "tar.gz" => "R/RJ/RJBS/perl-5.18.0.tar.gz",
@@ -281,17 +253,9 @@ my $stuff =
     "tar.bz2" => "R/RJ/RJBS/perl-5.18.1.tar.bz2",
     "tar.gz" => "R/RJ/RJBS/perl-5.18.1.tar.gz",
   },
-  "5.19.0" => {
-    "tar.bz2" => "R/RJ/RJBS/perl-5.19.0.tar.bz2",
-    "tar.gz" => "R/RJ/RJBS/perl-5.19.0.tar.gz",
-  },
   "5.19.1" => {
     "tar.bz2" => "D/DA/DAGOLDEN/perl-5.19.1.tar.bz2",
     "tar.gz" => "D/DA/DAGOLDEN/perl-5.19.1.tar.gz",
-  },
-  "5.19.2" => {
-    "tar.bz2" => "A/AR/ARISTOTLE/perl-5.19.2.tar.bz2",
-    "tar.gz" => "A/AR/ARISTOTLE/perl-5.19.2.tar.gz",
   },
   "5.19.3" => {
     "tar.bz2" => "S/SH/SHAY/perl-5.19.3.tar.bz2",

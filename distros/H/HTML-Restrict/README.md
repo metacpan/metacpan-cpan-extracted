@@ -4,7 +4,7 @@ HTML::Restrict - Strip unwanted HTML tags and attributes
 
 # VERSION
 
-version v3.0.0
+version v3.0.1
 
 # SYNOPSIS
 
@@ -32,7 +32,7 @@ version v3.0.0
 
 # DESCRIPTION
 
-This module uses [HTML::Parser](https://metacpan.org/pod/HTML::Parser) to strip HTML from text in a restrictive
+This module uses [HTML::Parser](https://metacpan.org/pod/HTML%3A%3AParser) to strip HTML from text in a restrictive
 manner.  By default all HTML is restricted.  You may alter the default
 behaviour by supplying your own tag rules.
 
@@ -103,7 +103,7 @@ HTML::Restrict recognizes:
         );
         my $hr = HTML::Restrict->new( rules => \%rules );
 
-    Since [HTML::Parser](https://metacpan.org/pod/HTML::Parser) treats a closing slash as an attribute, you'll need to
+    Since [HTML::Parser](https://metacpan.org/pod/HTML%3A%3AParser) treats a closing slash as an attribute, you'll need to
     add "/" to your list of allowed attributes if you'd like your tags to retain
     closing slashes.  For example:
 
@@ -281,6 +281,24 @@ HTML::Restrict recognizes:
     enclosed content you'd like to remove.  This feature strips script and style
     tags by default.
 
+- `filter_text => [0|1|CodeRef]`
+
+    By default all text will be filtered to fix any encoding problems which may
+    cause security issues. You may override the encoding behaviour by providing
+    your own anonymous sub to `filter_text`. This first and only argument to the
+    sub is the text which needs to be filtered. The sub should return a scalar
+    containing the transformed text.
+
+        filter_text => sub {
+            my $text = shift;
+            ... # transform text
+            return $text;
+        },
+
+    You may also this value to 0 in order to disable this behaviour entirely.
+    Please be advised this is a security risk. Use caution when disabling this
+    parameter or providing your own filter function.
+
 # SUBROUTINES/METHODS
 
 ## process( $html )
@@ -327,35 +345,15 @@ The idea is to be up and running quickly.
 
 # SEE ALSO
 
-[HTML::TagFilter](https://metacpan.org/pod/HTML::TagFilter), [HTML::Defang](https://metacpan.org/pod/HTML::Defang), [MojoMojo::Declaw](https://metacpan.org/pod/MojoMojo::Declaw), [HTML::StripScripts](https://metacpan.org/pod/HTML::StripScripts),
-[HTML::Detoxifier](https://metacpan.org/pod/HTML::Detoxifier), HTML::Sanitizer, [HTML::Scrubber](https://metacpan.org/pod/HTML::Scrubber)
+[HTML::TagFilter](https://metacpan.org/pod/HTML%3A%3ATagFilter), [HTML::Defang](https://metacpan.org/pod/HTML%3A%3ADefang), [MojoMojo::Declaw](https://metacpan.org/pod/MojoMojo%3A%3ADeclaw), [HTML::StripScripts](https://metacpan.org/pod/HTML%3A%3AStripScripts),
+[HTML::Detoxifier](https://metacpan.org/pod/HTML%3A%3ADetoxifier), HTML::Sanitizer, [HTML::Scrubber](https://metacpan.org/pod/HTML%3A%3AScrubber)
 
 # ACKNOWLEDGEMENTS
 
 Thanks to Raybec Communications [http://www.raybec.com](http://www.raybec.com) for funding my
 work on this module and for releasing it to the world.
 
-Thanks also to the following for patches, bug reports and assistance:
-
-Mark Jubenville (ioncache)
-
-Duncan Forsyth
-
-Rick Moore
-
-Arthur Axel 'fREW' Schmidt
-
-perlpong
-
-David Golden
-
-Graham TerMarsch
-
-Dagfinn Ilmari Mannsåker
-
-Graham Knop
-
-Carwyn Ellis
+Thanks also to the many other contributors. [https://github.com/oalders/html-restrict/graphs/contributors](https://github.com/oalders/html-restrict/graphs/contributors)
 
 # AUTHOR
 
@@ -363,7 +361,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013-2017 by Olaf Alders.
+This software is copyright (c) 2009 by Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

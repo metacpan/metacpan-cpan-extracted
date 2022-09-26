@@ -16,8 +16,8 @@ something clickable.  A visual scan is required.
 use strict;
 use warnings;
 
-use Browser::Open qw( open_browser );
-use Data::BLNS qw( get_naughty_strings );
+use Browser::Open  qw( open_browser );
+use Data::BLNS     qw( get_naughty_strings );
 use HTML::Restrict ();
 use Path::Tiny     ();
 

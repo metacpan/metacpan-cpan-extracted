@@ -81,7 +81,8 @@ goto_entersub (pTHX) {
                 if (!sym)
                     DIE(aTHX_ PL_no_usym, "a subroutine");
                 if (PL_op->op_private & HINT_STRICT_REFS)
-                    DIE(aTHX_ PL_no_symref, sym, "a subroutine");
+                    DIE(aTHX_ "Can't use string (\"%.32s\") as %s ref while \"strict refs\" in use",
+                        sym, "a subroutine");
                 cv = get_cv(sym, GV_ADD|SvUTF8(sv));
                 break;
             }
@@ -141,7 +142,11 @@ try_autoload:
      * entersub. We set it up so that defgv is pointing at the pushed args as
      * set up by the entersub call, this will let pp_goto work unmodified */
 
+#if PERL_VERSION_GE(5,23,8)
+    av = MUTABLE_AV(PAD_SVl(0));
+#else
     av = cx->blk_sub.argarray;
+#endif
 
     /* abandon @_ if it got reified */
     if (AvREAL(av)) {
@@ -149,7 +154,9 @@ try_autoload:
         av = newAV();
         AvREIFY_only(av);
 
+#if PERL_VERSION_LT(5,23,8)
         cx->blk_sub.argarray = av;
+#endif
         PAD_SVl(0) = (SV *)av;
     }
 
@@ -214,12 +221,12 @@ try_autoload:
 STATIC OP *
 convert_to_tailcall (pTHX_ OP *o, CV *cv, void *user_data) {
     /* find the nested entersub */
-    UNOP *entersub = (UNOP *)((LISTOP *)cUNOPo->op_first)->op_first->op_sibling;
+    UNOP *entersub = (UNOP *)OpSIBLING(((LISTOP *)cUNOPo->op_first)->op_first);
 
     if ( entersub->op_type != OP_ENTERSUB )
         croak("The tail call modifier must be applied to a subroutine or method invocation");
 
-    if ( entersub->op_sibling != NULL && entersub->op_sibling->op_sibling != NULL )
+    if ( OpHAS_SIBLING(entersub) && OpHAS_SIBLING(OpSIBLING(entersub)) )
         croak("The tail call modifier must not be given additional arguments");
 
     if ( entersub->op_ppaddr == error_op )
@@ -229,8 +236,8 @@ convert_to_tailcall (pTHX_ OP *o, CV *cv, void *user_data) {
         croak("The tail call modifier can only be applied to normal subroutine calls");
 
     if ( !(entersub->op_flags & OPf_STACKED) ) {
-        ((LISTOP *)cUNOPo->op_first)->op_first->op_sibling = entersub->op_sibling;
-        entersub->op_sibling = NULL;
+        OpMORESIB_set( ((LISTOP *)cUNOPo->op_first)->op_first, OpSIBLING(entersub) );
+        OpMAYBESIB_set( entersub, NULL, NULL );
         op_free(o);
         entersub->op_private &= ~(OPpENTERSUB_INARGS|OPpENTERSUB_NOPAREN);
         return newLOOPEX(OP_GOTO, (OP*)entersub);

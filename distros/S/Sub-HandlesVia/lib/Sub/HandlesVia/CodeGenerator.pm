@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::CodeGenerator;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.036';
+our $VERSION   = '0.037';
 
 use Sub::HandlesVia::Mite -all;
 
@@ -155,6 +155,18 @@ has generator_for_type_assertion => (
 	default_is_trusted => true,
 );
 
+has generator_for_error => (
+	is => ro,
+	isa => 'CodeRef',
+	builder => sub {
+		return sub {
+			my ( $gen, $error ) = @_;
+			sprintf 'do { require Carp; Carp::croak(%s) }', $error;
+		};
+	},
+	default_is_trusted => true,
+);
+
 has method_installer => (
 	is => rw,
 	isa => 'CodeRef',
@@ -199,7 +211,8 @@ my $REASONABLE_SCALAR = qr/^
 	$/x;
 
 my @generatable_things = qw(
-	slot get set default arg args argc currying usage_string self type_assertion
+	slot get set default arg args argc currying usage_string self
+	type_assertion error
 );
 
 for my $thing ( @generatable_things ) {
@@ -466,10 +479,10 @@ sub _handle_sigcheck {
 		
 		# What usage message do we want to print if wrong arity?
 		#
-		my $usg = sprintf(
-			'do { require Carp; Carp::croak("Wrong number of parameters; usage: ".%s) }',
+		my $usg = $self->generate_error( sprintf(
+			' "Wrong number of parameters; usage: " . %s ',
 			B::perlstring( $self->generate_usage_string( $method_name, $handler->usage ) ),
-		);
+		) );
 		
 		# Insert the check into the code.
 		#
@@ -694,6 +707,7 @@ sub _handle_template {
 	$template =~ s/\$ARG/$self->generate_arg(1)/eg;
 	$template =~ s/\#ARG/$self->generate_argc()/eg;
 	$template =~ s/\@ARG/$self->generate_args()/eg;
+	$template =~ s/⸨(.+?)⸩/$self->generate_error($1)/eg;
 	$template =~ s/«(.+?)»/$self->generate_set($1)/eg;
 	$template =~ s/\$DEFAULT/$self->generate_default($handler)/eg;
 	$template =~ s/\$SELF/$self->generate_self()/eg;
@@ -871,6 +885,11 @@ The default is this coderef:
 Called as a method and passed a hashref compilation environment, a type
 constraint, and a variable name. Generates code to assert that the variable
 value meets the type constraint, with coercion if appropriate.
+
+=head2 C<generator_for_error> B<< CodeRef >>
+
+Called as a method and passed a Perl string which is an expression evaluating
+to an error message. Generates code to throw the error.
 
 =head2 C<get_is_lvalue> B<Bool>
 

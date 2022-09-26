@@ -1,17 +1,18 @@
+# INTERNAL MODULE: OO backend for Type::Params signatures.
+
 package Type::Params::Signature;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
-	if ( $] < 5.008 ) { require Devel::TypeTiny::Perl56Compat }
 	if ( $] < 5.010 ) { require Devel::TypeTiny::Perl58Compat }
 }
 
 BEGIN {
 	$Type::Params::Signature::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Params::Signature::VERSION    = '1.016010';
+	$Type::Params::Signature::VERSION    = '2.000000';
 }
 
 $Type::Params::Signature::VERSION =~ tr/_//d;
@@ -23,8 +24,8 @@ use Types::TypeTiny qw( -is -types to_TypeTiny );
 use Type::Params::Parameter;
 
 sub _croak {
-	require Carp;
-	Carp::croak( pop );
+	require Error::TypeTiny;
+	return Error::TypeTiny::croak( pop );
 }
 
 sub _new_parameter {
@@ -53,11 +54,27 @@ sub new {
 	sub BUILD {
 		my $self = shift;
 
+		if ( $self->{named_to_list} and not ref $self->{named_to_list} ) {
+			$self->{named_to_list} = [ map $_->name, @{ $self->{parameters} } ];
+		}
+
 		if ( delete $self->{rationalize_slurpies} ) {
 			$self->_rationalize_slurpies;
 		}
 
-		if ( defined $self->{bless} and $self->{bless} eq 1 ) {
+		if ( $self->{method} ) {
+			my $type = $self->{method};
+			$type =
+				is_Int($type) ? Defined :
+				is_Str($type) ? do { require Type::Utils; Type::Utils::dwim_type( $type, $self->{package} ? ( for => $self->{package} ) : () ) } :
+				to_TypeTiny( $type );
+			unshift @{ $self->{head} ||= [] }, $self->_new_parameter(
+				name    => 'invocant',
+				type    => $type,
+			);
+		}
+
+		if ( defined $self->{bless} and $self->{bless} eq 1 and not $self->{named_to_list} ) {
 			my $klass_key     = $self->_klass_key;
 			$self->{bless}    = ( $klass_cache{$klass_key} ||= sprintf( '%s%d', $self->{class_prefix}, ++$klass_id ) );
 			$self->{oo_trace} = 1 unless exists $self->{oo_trace};
@@ -93,7 +110,7 @@ sub _rationalize_slurpies {
 
 	if ( $self->is_named ) {
 		my ( @slurpy, @rest );
-		
+
 		for my $parameter ( @$parameters ) {
 			if ( $parameter->type->is_strictly_a_type_of( Slurpy ) ) {
 				push @slurpy, $parameter;
@@ -108,8 +125,14 @@ sub _rationalize_slurpies {
 		}
 
 		if ( @slurpy == 1 ) {
-			$self->{slurpy} = $slurpy[0];
-			@$parameters = @rest;
+			my $constraint = $slurpy[0]->type;
+			if ( $constraint->type_parameter && $constraint->type_parameter->{uniq} == Any->{uniq} or $constraint->my_slurp_into eq 'HASH' ) {
+				$self->{slurpy} = $slurpy[0];
+				@$parameters = @rest;
+			}
+			else {
+				$self->_croak( 'Signatures with named parameters can only have slurpy parameters which are a subtype of HashRef' );
+			}
 		}
 		elsif ( @slurpy ) {
 			$self->_croak( 'Found multiple slurpy parameters! There can be only one' );
@@ -130,15 +153,13 @@ sub _rationalize_slurpies {
 			}
 		}
 	}
-}
 
-sub _looks_like_Slurpy {
-	my $thing = shift;
-	return ( $thing =~ /^Slurpy\b/ )
-		if is_Str( $thing );
-	return to_TypeTiny( $thing )->is_strictly_a_type_of( Slurpy )
-		if is_Object( $thing );
-	return !!0;
+	if ( $self->{slurpy} and $self->{slurpy}->has_default ) {
+		require Carp;
+		our @CARP_NOT = ( __PACKAGE__, 'Type::Params' );
+		Carp::carp( "Warning: the default for the slurpy parameter will be ignored, continuing anyway" );
+		delete $self->{slurpy}{default};
+	}
 }
 
 sub _parameters_from_list {
@@ -147,13 +168,22 @@ sub _parameters_from_list {
 	my $is_named = ( $style eq 'named' );
 
 	while ( @$list ) {
-		my %param_opts;
+		my ( $type, %param_opts );
 		if ( $is_named ) {
 			$param_opts{name} = assert_Str( shift( @$list ) );
 		}
-		my $type = shift( @$list );
+		if ( is_HashRef $list->[0] and exists $list->[0]{slurpy} and not is_Bool $list->[0]{slurpy} ) {
+			my %new_opts = %{ shift( @$list ) };
+			$type = delete $new_opts{slurpy};
+			%param_opts = ( %param_opts, %new_opts, slurpy => 1 );
+		}
+		else {
+			$type = shift( @$list );
+		}
 		if ( is_HashRef( $list->[0] ) ) {
-			%param_opts = ( %param_opts, %{ +shift( @$list ) } );
+			unless ( exists $list->[0]{slurpy} and not is_Bool $list->[0]{slurpy} ) {
+				%param_opts = ( %param_opts, %{ +shift( @$list ) } );
+			}
 		}
 		$param_opts{type} =
 			is_Int($type) ? ( $type ? Any : do { $param_opts{optional} = !!1; Any; } ) :
@@ -172,7 +202,7 @@ sub new_from_compile {
 	my $is_named = ( $style eq 'named' );
 
 	my %opts  = ();
-	while ( is_HashRef $_[0] ) {
+	while ( is_HashRef $_[0] and not exists $_[0]{slurpy} ) {
 		%opts = ( %opts, %{ +shift } );
 	}
 
@@ -192,9 +222,43 @@ sub new_from_compile {
 	return $self;
 }
 
+sub new_from_v2api {
+	my ( $class, $opts ) = @_;
+
+	my $positional = delete( $opts->{positional} ) || delete( $opts->{pos} );
+	my $named      = delete( $opts->{named} );
+	my $multiple   = delete( $opts->{multiple} ) || delete( $opts->{multi} );
+
+	$class->_croak( "Signature must be positional, named, or multiple" )
+		unless $positional || $named || $multiple;
+
+	if ( $multiple ) {
+		$multiple = [] unless is_ArrayRef $multiple;
+		unshift @$multiple, { positional => $positional } if $positional;
+		unshift @$multiple, { named      => $named      } if $named;
+		require Type::Params::Alternatives;
+		return 'Type::Params::Alternatives'->new(
+			base_options => $opts,
+			alternatives => $multiple,
+			sig_class    => $class,
+		);
+	}
+
+	my ( $sig_kind, $args ) = ( pos => $positional );
+	if ( $named ) {
+		$opts->{bless} = 1 unless exists $opts->{bless};
+		( $sig_kind, $args ) = ( named => $named );
+		$class->_croak( "Signature cannot have both positional and named arguments" )
+			if $positional;
+	}
+
+	return $class->new_from_compile( $sig_kind, $opts, @$args );
+}
+
 sub package       { $_[0]{package} }
 sub subname       { $_[0]{subname} }
 sub description   { $_[0]{description} }     sub has_description   { exists $_[0]{description} }
+sub method        { $_[0]{method} }
 sub head          { $_[0]{head} }            sub has_head          { exists $_[0]{head} }
 sub tail          { $_[0]{tail} }            sub has_tail          { exists $_[0]{tail} }
 sub parameters    { $_[0]{parameters} }      sub has_parameters    { exists $_[0]{parameters} }
@@ -208,6 +272,8 @@ sub class         { $_[0]{class} }
 sub constructor   { $_[0]{constructor} }
 sub named_to_list { $_[0]{named_to_list} }
 sub oo_trace      { $_[0]{oo_trace} }
+
+sub method_invocant { $_[0]{method_invocant} = defined( $_[0]{method_invocant} ) ? $_[0]{method_invocant} : 'undef' }
 
 sub can_shortcut {
 	return $_[0]{can_shortcut}
@@ -226,7 +292,7 @@ sub _build_coderef {
 	my $self = shift;
 	my $coderef = $self->_new_code_accumulator(
 		description => $self->description
-			|| sprintf( 'parameter validation for "%s::%s"', $self->package || '', $self->subname || '__ANON__' )
+			|| sprintf( q{parameter validation for '%s::%s'}, $self->package || '', $self->subname || '__ANON__' )
 	);
 
 	$self->_coderef_start( $coderef );
@@ -258,6 +324,13 @@ sub _coderef_start {
 			$coderef->add_line( 'my $__NEXT__ = shift;' );
 			$coderef->add_gap;
 		}
+	}
+
+	if ( $self->method ) {
+		# Passed to parameter defaults
+		$self->{method_invocant} = '$__INVOCANT__';
+		$coderef->add_line( sprintf 'my %s = $_[0];', $self->method_invocant );
+		$coderef->add_gap;
 	}
 
 	$self->_coderef_start_extra( $coderef );
@@ -543,7 +616,7 @@ sub _coderef_slurpy {
 	elsif ( $real_type and $real_type->{uniq} == Any->{uniq} ) {
 
 		$coderef->add_line( sprintf(
-			'my $SLURPY = { @_[ %d .. $#_ ] };',
+			'my $SLURPY = [ @_[ %d .. $#_ ] ];',
 			scalar( @{ $self->parameters } ),
 		) );
 	}
@@ -551,7 +624,8 @@ sub _coderef_slurpy {
 
 		my $index = scalar( @{ $self->parameters } );
 		$coderef->add_line( sprintf(
-			'my $SLURPY = ( %s ) ? { %%{ $_[%d] } } : ( ( $#_ - %d ) %% 2 ) ? { @_[ %d .. $#_ ] } : %s;',
+			'my $SLURPY = ( $#_ == %d and ( %s ) ) ? { %%{ $_[%d] } } : ( ( $#_ - %d ) %% 2 ) ? { @_[ %d .. $#_ ] } : %s;',
+			$index,
 			HashRef->inline_check("\$_[$index]"),
 			$index,
 			$index,
@@ -565,15 +639,12 @@ sub _coderef_slurpy {
 			),
 		) );
 	}
-	elsif ( $slurp_into eq 'ARRAY' ) {
+	else {
 	
 		$coderef->add_line( sprintf(
 			'my $SLURPY = [ @_[ %d .. $#_ ] ];',
 			scalar( @{ $self->parameters } ),
 		) );
-	}
-	else {
-		$self->_croak( "Slurpy parameter not of type HashRef or ArrayRef" );
 	}
 
 	$coderef->add_gap;
@@ -645,16 +716,10 @@ sub _make_return_list {
 	if ( not $self->is_named ) {
 		push @return_list, $self->can_shortcut ? '@_' : '@out';
 	}
-	elsif ( is_ArrayRef( $self->named_to_list ) ) {
+	elsif ( $self->named_to_list ) {
 		push @return_list, map(
 			sprintf( '$out{%s}', B::perlstring( $_ ) ),
 			@{ $self->named_to_list },
-		);
-	}
-	elsif ( $self->named_to_list ) {
-		push @return_list, map(
-			sprintf( '$out{%s}', B::perlstring( $_->name ) ),
-			@{ $self->parameters },
 		);
 	}
 	elsif ( $self->class ) {
@@ -684,8 +749,9 @@ sub _make_return_list {
 sub _make_return_expression {
 	my ( $self, %args ) = @_;
 
+	my $list = join q{, }, $self->_make_return_list;
+
 	if ( $self->goto_next ) {
-		my $list = join( q{, }, $self->_make_return_list );
 		if ( $list eq '@_' ) {
 			return sprintf 'goto( $__NEXT__ )';
 		}
@@ -695,12 +761,10 @@ sub _make_return_expression {
 		}
 	}
 	elsif ( $args{is_early} or not exists $args{is_early} ) {
-		return sprintf 'return( %s )',
-			join( q{, }, $self->_make_return_list );
+		return sprintf 'return( %s )', $list;
 	}
 	else {
-		return sprintf '( %s )',
-			join( q{, }, $self->_make_return_list );
+		return sprintf '( %s )', $list;
 	}
 }
 
@@ -796,7 +860,7 @@ sub make_class {
 	my $self = shift;
 	
 	my $env = uc( $ENV{PERL_TYPE_PARAMS_XS} || 'XS' );
-	if ( $env eq 'PP' ) {
+	if ( $env eq 'PP' or $ENV{PERL_ONLY} ) {
 		$self->make_class_pp;
 	}
 
@@ -833,6 +897,9 @@ sub make_class_pp {
 
 sub make_class_pp_code {
 	my $self = shift;
+
+	return ''
+		unless $self->is_named && $self->bless && !$self->named_to_list;
 
 	my $coderef = $self->_new_code_accumulator;
 	my $attr    = $self->class_attributes;
@@ -875,14 +942,18 @@ sub return_wanted {
 	if ( $self->{want_source} ) {
 		return $coderef->code;
 	}
+	elsif ( $self->{want_object} ) { # undocumented for now
+		return $self;
+	}
 	elsif ( $self->{want_details} ) {
 		return {
-			min_args    => $self->{min_args},
-			max_args    => $self->{max_args},
-			environment => $coderef->{env},
-			source      => $coderef->code,
-			closure     => $coderef->compile,
-			named       => $self->is_named,
+			min_args         => $self->{min_args},
+			max_args         => $self->{max_args},
+			environment      => $coderef->{env},
+			source           => $coderef->code,
+			closure          => $coderef->compile,
+			named            => $self->is_named,
+			class_definition => $self->make_class_pp_code,
 		};
 	}
 

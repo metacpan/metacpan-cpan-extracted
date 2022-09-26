@@ -7,9 +7,6 @@ use Test::More 0.98;
 use Test::Needs;
 
 use Data::Sah::CoerceJS qw(gen_coercer);
-use Nodejs::Util qw(get_nodejs_path);
-
-plan skip_all => 'node.js is not available' unless get_nodejs_path();
 
 subtest "coerce_to=boolean" => sub {
     my $c = gen_coercer(type=>"bool");

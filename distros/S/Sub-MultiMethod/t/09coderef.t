@@ -10,37 +10,37 @@ use Types::Standard -types;
 my ($stringify, $stringify_str);
 
 multimethod \$stringify => (
-	method => 0,
-	signature => [ Undef ],
-	code      => sub {
+	method     => 0,
+	positional => [ Undef ],
+	code       => sub {
 		my ($undef) = (@_);
 		'null';
 	},
 );
 
 multimethod \$stringify => (
-	method => 0,
-	signature => [ ScalarRef[Bool] ],
-	code      => sub {
+	method     => 0,
+	positional => [ ScalarRef[Bool] ],
+	code       => sub {
 		my ($bool) = (@_);
 		$$bool ? 'true' : 'false';
 	},
 );
 
 multimethod \$stringify => (
-	method => 0,
-	alias     => \$stringify_str,
-	signature => [ Str ],
-	code      => sub {
+	method     => 0,
+	alias      => \$stringify_str,
+	positional => [ Str ],
+	code       => sub {
 		my ($str) = (@_);
 		sprintf(q<"%s">, quotemeta($str));
 	},
 );
 
 multimethod \$stringify => (
-	method => 0,
-	signature => [ Num ],
-	code      => sub {
+	method     => 0,
+	positional => [ Num ],
+	code       => sub {
 		my ($n) = (@_);
 		$n;
 	},
@@ -49,9 +49,9 @@ multimethod \$stringify => (
 { package Local::Xyzzy;
 use Sub::MultiMethod 'multimethod';
 multimethod \$stringify => (
-	method => 0,
-	signature => [ ::ArrayRef ],
-	code      => sub {
+	method     => 0,
+	positional => [ ::ArrayRef ],
+	code       => sub {
 		my ($arr) = (@_);
 		sprintf(
 			q<[%s]>,
@@ -62,9 +62,9 @@ multimethod \$stringify => (
 }
 
 multimethod \$stringify => (
-	method => 0,
-	signature => [ HashRef ],
-	code      => sub {
+	method     => 0,
+	positional => [ HashRef ],
+	code       => sub {
 		my ($hash) = (@_);
 		sprintf(
 			q<{%s}>,

@@ -1,5 +1,5 @@
 package CPAN::Perl::Releases;
-$CPAN::Perl::Releases::VERSION = '5.20220920';
+$CPAN::Perl::Releases::VERSION = '5.20220922';
 #ABSTRACT: Mapping Perl releases on CPAN to the location of the tarballs
 
 use strict;
@@ -58,7 +58,6 @@ our $data =
 "5.11.1" => { id => 'JESSE' },
 "5.11.2" => { id => 'LBROCARD' },
 "5.11.3" => { id => 'JESSE' },
-"5.11.4" => { id => 'RJBS' },
 "5.11.5" => { id => 'SHAY' },
 "5.12.0" => { id => 'JESSE' },
 "5.12.1" => { id => 'JESSE' },
@@ -67,7 +66,6 @@ our $data =
 "5.12.4" => { id => 'LBROCARD' },
 "5.12.5" => { id => 'DOM' },
 "5.13.0" => { id => 'LBROCARD' },
-"5.13.1" => { id => 'RJBS' },
 "5.13.2" => { id => 'MSTROUT' },
 "5.13.3" => { id => 'DAGOLDEN' },
 "5.13.4" => { id => 'FLORA' },
@@ -88,13 +86,11 @@ our $data =
 "5.14.4" => { id => 'DAPM' },
 "5.15.0" => { id => 'DAGOLDEN' },
 "5.15.1" => { id => 'ZEFRAM' },
-"5.15.2" => { id => 'RJBS' },
 "5.15.3" => { id => 'STEVAN' },
 "5.15.4" => { id => 'FLORA' },
 "5.15.5" => { id => 'SHAY' },
 "5.15.6" => { id => 'DROLSKY' },
 "5.15.7" => { id => 'BINGOS' },
-"5.15.8" => { id => 'CORION' },
 "5.15.9" => { id => 'ABIGAIL' },
 "5.16.0" => { id => 'RJBS' },
 "5.16.1" => { id => 'RJBS' },
@@ -106,29 +102,22 @@ our $data =
 "5.17.3" => { id => 'SHAY' },
 "5.17.4" => { id => 'FLORA' },
 "5.17.5" => { id => 'FLORA' },
-"5.17.6" => { id => 'RJBS' },
 "5.17.7" => { id => 'DROLSKY' },
 "5.17.8" => { id => 'ARC' },
 "5.17.9" => { id => 'BINGOS' },
-"5.17.10" => { id => 'CORION' },
-"5.17.11" => { id => 'RJBS' },
 "5.18.0" => { id => 'RJBS' },
 "5.18.1" => { id => 'RJBS' },
-"5.19.0" => { id => 'RJBS' },
 "5.19.1" => { id => 'DAGOLDEN' },
-"5.19.2" => { id => 'ARISTOTLE' },
 "5.19.3" => { id => 'SHAY' },
 "5.19.4" => { id => 'SHAY' },
 "5.19.5" => { id => 'SHAY' },
 "5.19.6" => { id => 'BINGOS' },
 "5.19.7" => { id => 'ABIGAIL' },
 "5.18.2" => { id => 'RJBS' },
-"5.19.8" => { id => 'RJBS' },
 "5.19.9" => { id => 'TONYC' },
 "5.19.10" => { id => 'ARC' },
 "5.19.11" => { id => 'SHAY' },
 "5.20.0" => { id => 'RJBS' },
-"5.21.0" => { id => 'RJBS' },
 "5.21.1" => { id => 'WOLFSAGE' },
 "5.21.2" => { id => 'ABIGAIL' },
 "5.21.3" => { id => 'PCM' },
@@ -140,14 +129,12 @@ our $data =
 "5.18.4" => { id => 'RJBS' },
 "5.21.5" => { id => 'ABIGAIL' },
 "5.21.6" => { id => 'BINGOS' },
-"5.21.7" => { id => 'CORION' },
 "5.21.8" => { id => 'WOLFSAGE' },
 "5.20.2-RC1" => { id => 'SHAY' },
 "5.20.2" => { id => 'SHAY' },
 "5.21.10" => { id => 'SHAY' },
 "5.21.11" => { id => 'SHAY' },
 "5.22.0" => { id => 'RJBS' },
-"5.23.0" => { id => 'RJBS' },
 "5.23.1" => { id => 'WOLFSAGE' },
 "5.23.2" => { id => 'WOLFSAGE' },
 "5.20.3-RC1" => { id => 'SHAY' },
@@ -165,14 +152,8 @@ our $data =
 "5.23.7" => { id => 'STEVAN' },
 "5.23.9" => { id => 'ABIGAIL' },
 "5.22.2-RC1" => { id => 'SHAY' },
-"5.24.0-RC1" => { id => 'RJBS' },
-"5.24.0-RC2" => { id => 'RJBS' },
-"5.24.0-RC3" => { id => 'RJBS' },
 "5.22.2" => { id => 'SHAY' },
-"5.24.0-RC4" => { id => 'RJBS' },
-"5.24.0-RC5" => { id => 'RJBS' },
 "5.24.0" => { id => 'RJBS' },
-"5.25.0" => { id => 'RJBS' },
 "5.25.2" => { id => 'WOLFSAGE' },
 "5.22.3-RC1" => { id => 'SHAY' },
 "5.24.1-RC1" => { id => 'SHAY' },
@@ -243,7 +224,6 @@ our $data =
 "5.31.0" => { id => 'XSAWYERX' },
 "5.31.1" => { id => 'ETHER' },
 "5.31.2" => { id => 'SHAY' },
-"5.31.3" => { id => 'TOMHUKINS' },
 "5.31.4" => { id => 'CORION' },
 "5.31.5" => { id => 'SHAY' },
 "5.30.1-RC1" => { id => 'SHAY' },
@@ -267,7 +247,6 @@ our $data =
 "5.33.1" => { id => 'ETHER' },
 "5.33.2" => { id => 'XSAWYERX' },
 "5.33.3" => { id => 'SHAY' },
-"5.33.4" => { id => 'TOMHUKINS' },
 "5.33.5" => { id => 'CORION' },
 "5.32.1-RC1" => { id => 'SHAY' },
 "5.33.6" => { id => 'HYDAHY' },
@@ -369,7 +348,7 @@ CPAN::Perl::Releases - Mapping Perl releases on CPAN to the location of the tarb
 
 =head1 VERSION
 
-version 5.20220920
+version 5.20220922
 
 =head1 SYNOPSIS
 

@@ -21,7 +21,7 @@ subtest 'basic' => sub {
 
   run 'missing';
   is last_exit, 0;
-  
+
   foreach my $phase (qw( configure any share system ))
   {
     run 'missing', -p => $phase;

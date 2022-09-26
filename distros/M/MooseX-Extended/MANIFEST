@@ -34,6 +34,8 @@ t/custom.t
 t/exceptions.t
 t/excludes_field_param.t
 t/field_init_arg.t
+t/import-lists.t
+t/inheritance.t
 t/inline.t
 t/lib/InlinePackages.pm
 t/lib/MooseX/Extended/Tests.pm
@@ -47,8 +49,8 @@ t/multimethods.t
 t/roles.t
 t/rwp.t
 t/stringy-eval.t
-t/test-compile.t
 t/try.t
+t/types.t
 t/warnings.t
 xt/author/00-compile.t
 xt/author/perlcritic.t

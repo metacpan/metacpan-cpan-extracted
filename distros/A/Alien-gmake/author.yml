@@ -12,13 +12,7 @@ pod_coverage:
   # format is "Class#method" or "Class", regex allowed
   # for either Class or method.
   private:
-    - #alien_helper
-
-unused_vars:
-  skip: 0
-  global:
-    ignore_vars: []
-  module: {}
+    - Alien::gmake#alien_helper
 
 version:
   dir: lib

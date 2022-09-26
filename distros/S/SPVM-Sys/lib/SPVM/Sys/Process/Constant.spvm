@@ -8,4 +8,10 @@ class Sys::Process::Constant {
   native static method WUNTRACED : int ();
 
   native static method WCONTINUED : int ();
+
+  native static method PRIO_PROCESS : int ();
+
+  native static method PRIO_PGRP : int ();
+
+  native static method PRIO_USER : int ();
 }

@@ -1,5 +1,11 @@
 Revision history for Alien-Libarchive3
 
+0.33      2022-09-25 18:31:45 -0600
+  - Download via https for better security (gh#13)
+  - Added ALIEN_LIBARCHIVE_DEPS, which is a comma separated
+    list of dependencies that Alien::Libarchive3 will use
+    when doing a share install (gh#12)
+
 0.32      2021-05-26 21:04:50 -0600
   - Bump required libarchive to 3.2.0 (gh#9)
     This allows downstream modules to use the

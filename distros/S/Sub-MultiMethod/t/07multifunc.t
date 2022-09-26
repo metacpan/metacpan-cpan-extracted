@@ -9,16 +9,16 @@ use Test::Fatal;
 	use Sub::MultiMethod 'multifunction';
 	
 	multifunction sum => (
-		signature => [ Num, Num ],
-		code      => sub {
+		positional => [ Num, Num ],
+		code       => sub {
 			my ($x, $y) = @_;
 			$x + $y;
 		},
 	);
 	
 	multifunction sum => (
-		signature => [ ArrayRef ],
-		code      => sub {
+		positional => [ ArrayRef ],
+		code       => sub {
 			my ($arr) = @_;
 			my $sum = 0;
 			$sum += $_ for @$arr;
@@ -36,18 +36,18 @@ is(Local::sum([1..4]), 10);
 	use Sub::MultiMethod 'multimethod';
 	
 	multimethod sum => (
-		method    => 2,
-		signature => [ Num, Num ],
-		code      => sub {
+		method     => 2,
+		positional => [ Num, Num ],
+		code       => sub {
 			my ($self, $context, $x, $y) = @_;
 			$x + $y;
 		},
 	);
 	
 	multimethod sum => (
-		method    => 2,
-		signature => [ ArrayRef ],
-		code      => sub {
+		method     => 2,
+		positional => [ ArrayRef ],
+		code       => sub {
 			my ($self, $context, $arr) = @_;
 			my $sum = 0;
 			$sum += $_ for @$arr;

@@ -59,6 +59,7 @@ my %module = (
         'DBI'                => 0,
         'DBIx::RunSQL'       => 0,
         'DBD::SQLite'        => 1.56,
+        'MooX::Role::DBIConnection'        => 0,
         'File::ShareDir'     => 0, # for finding our SQL snippet
         'POSIX'              => 0,
         'Time::Piece'        => 0,

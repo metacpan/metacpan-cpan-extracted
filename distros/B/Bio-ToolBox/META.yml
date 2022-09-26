@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,24 +16,24 @@ name: Bio-ToolBox
 provides:
   Bio::ToolBox:
     file: lib/Bio/ToolBox.pm
-    version: '1.68'
+    version: '1.69'
   Bio::ToolBox::Data:
     file: lib/Bio/ToolBox/Data.pm
-    version: '1.68'
+    version: '1.69'
   Bio::ToolBox::Data::Feature:
     file: lib/Bio/ToolBox/Data/Feature.pm
-    version: '1.68'
+    version: '1.69'
   Bio::ToolBox::Data::Iterator:
     file: lib/Bio/ToolBox/Data.pm
   Bio::ToolBox::Data::Stream:
     file: lib/Bio/ToolBox/Data/Stream.pm
-    version: '1.66'
+    version: '1.69'
   Bio::ToolBox::Data::core:
     file: lib/Bio/ToolBox/Data/core.pm
-    version: '1.66'
+    version: '1.69'
   Bio::ToolBox::Data::file:
     file: lib/Bio/ToolBox/Data/file.pm
-    version: '1.68'
+    version: '1.69'
   Bio::ToolBox::GeneTools:
     file: lib/Bio/ToolBox/GeneTools.pm
     version: '1.67'
@@ -45,7 +45,7 @@ provides:
     version: '1.68'
   Bio::ToolBox::db_helper:
     file: lib/Bio/ToolBox/db_helper.pm
-    version: '1.68'
+    version: '1.69'
   Bio::ToolBox::db_helper::alignment_callbacks:
     file: lib/Bio/ToolBox/db_helper/alignment_callbacks.pm
     version: '1.62'
@@ -54,7 +54,7 @@ provides:
     version: '1.62'
   Bio::ToolBox::db_helper::big:
     file: lib/Bio/ToolBox/db_helper/big.pm
-    version: '1.66'
+    version: '1.69'
   Bio::ToolBox::db_helper::big::BedIteratorWrapper:
     file: lib/Bio/ToolBox/db_helper/big.pm
   Bio::ToolBox::db_helper::big::BigWigSet:
@@ -84,18 +84,18 @@ provides:
     version: '1.51'
   Bio::ToolBox::parser::bed:
     file: lib/Bio/ToolBox/parser/bed.pm
-    version: '1.64'
+    version: '1.69'
   Bio::ToolBox::parser::gff:
     file: lib/Bio/ToolBox/parser/gff.pm
     version: '1.66'
   Bio::ToolBox::parser::ucsc:
     file: lib/Bio/ToolBox/parser/ucsc.pm
-    version: '1.65'
+    version: '1.69'
   Bio::ToolBox::parser::ucsc::builder:
     file: lib/Bio/ToolBox/parser/ucsc.pm
   Bio::ToolBox::utility:
     file: lib/Bio/ToolBox/utility.pm
-    version: '1.68'
+    version: '1.69'
 recommends:
   Bio::DB::USeq: '0.23'
   Net::FTP: '0'
@@ -104,9 +104,7 @@ recommends:
   Set::IntervalTree: '0.1'
 requires:
   Bio::DB::Big: '1'
-  Bio::DB::BigFile: '1.07'
   Bio::DB::HTS: '2.1'
-  Bio::DB::Sam: '1.36'
   Bio::Root::Root: '0'
   Config::Simple: '4.58'
   File::Which: '0'
@@ -119,5 +117,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/tjparnell/biotoolbox
-version: '1.68'
+version: '1.69'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

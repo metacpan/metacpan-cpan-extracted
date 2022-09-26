@@ -85,7 +85,14 @@ sub truncateCommand {
 #------------------------------------------------------------------------------
 sub _errorCodes {
   my $self  = shift;
-  my $codes = ['ERROR\:( \%)? ', '(Open device \S+ failed|Error opening \S+:)',];
+  my $codes = [
+    '^Error:', '^% Incomplete ',
+    'syntax error', '^% Type', '^% Unknown', '^% Invalid', '^% Ambiguous',
+    '(?:%|command)? authorization failed',
+    '% license not supported on this device',
+    'Line has invalid autocommand',
+    'unable to retrieve license info'
+  ];
   return $codes;
 }
 
@@ -95,13 +102,13 @@ sub _errorCodes {
 sub _bufferCodes {
   my $self    = shift;
   my %mapping = (
-    more     => '( )*--More--\s*',
+    more     => '^\s*--More--\s*$',
     interact => {
       'Address or name of remote host \['               => "\r",
-      'Destination filename \[s'                        => "\n",
-      'the product\? \[Y\]es, \[N\]o, \[A\]sk later\: ' => "\n",
+      '^Destination filename'                           => "\n",
+      'the product\? \[Y\]es, \[N\]o, \[A\]sk later\: ' => "N\n",
       'overwrite\?\s*\[Y\/N\]'                          => "Y\r",
-      'Source filename \[running-config\]\? '           => "\r"
+      '^Source filename'                                => "\n"
     }
   );
 

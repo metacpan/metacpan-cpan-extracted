@@ -10,7 +10,7 @@ use Weather::MOSMIX::Writer;
 my $w = Weather::MOSMIX::Writer->new;
 
 my $dbh = $w->create_db(
-    dsn => 'dbi:SQLite:dbname=:memory:'
+        dsn => 'dbi:SQLite:dbname=:memory:'
 );
 
 my $r = Weather::MOSMIX::Reader->new(

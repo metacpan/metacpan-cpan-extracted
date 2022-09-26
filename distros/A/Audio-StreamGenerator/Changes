@@ -1,0 +1,8 @@
+Revision history for Perl extension Audio::StreamGenerator.
+
+1.01 Wed Sep 21 2022
+	- Fix version numbering to always have the same length
+
+1.00 Wed Sep 21 2022
+	- First stable version
+

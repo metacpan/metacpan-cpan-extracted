@@ -52,7 +52,7 @@ package App::wsgetmail;
 
 use Moo;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -73,6 +73,7 @@ where C<wsgetmail.json> looks like:
     "global_access": 1,
     "username": "rt-comment@example.com",
     "folder": "Inbox",
+    "stripcr": 0,
     "command": "/opt/rt5/bin/rt-mailgate",
     "command_args": "--url=http://rt.example.com/ --queue=General --action=comment",
     "command_timeout": 30,
@@ -411,6 +412,18 @@ configuration file.
 
 Set this to the name string of a mail folder to read.
 
+=item stripcr
+
+Set this to 1 to make wsgetmail convert the messages from the CRLF
+line-ending encoding to the LF line-ending encoding.
+
+This emulates the fetchmail option of the same name, which enabled
+the stripcr option if an MDA was declared. The feature is similar,
+but you need to enable it explicitly in your configuration.
+
+This option is helpful if you are forwarding email to a Linux
+utility that doesn't work with CRLF line-endings.
+
 =item command
 
 Set this to an executable command. You can specify an absolute path,
@@ -428,7 +441,7 @@ double quotes.
 =item command_timeout
 
 Set this to the number of seconds the C<command> has to return before
-timeout is reached.  The default value is 30.
+timeout is reached.  The default value is 30.  Use "inf" for no timeout.
 
 =item action_on_fetched
 
@@ -439,6 +452,12 @@ command succeeds, it will take this action on the message.
 If you set this to C<"mark_as_read">, wsgetmail will only retrieve and
 deliver messages that are marked unread in the configured folder, so it does
 not try to deliver the same email multiple times.
+
+=item dump_messages
+
+Set this to 1 to preserve the temporary files after processing.
+
+When C<"debug"> is also set the filenames will be reported on STDERR.
 
 =back
 
@@ -455,6 +474,20 @@ runs successfully.
 
 Once your configuration is stable, you can configure wsgetmail to run
 periodically through cron or a systemd service on a timer.
+
+=head1 ERRORS AND DIAGNOSTIC MESSAGES
+
+wsgetmail sends warning, error, and debug messages to STDERR, while purely
+informational messages are sent to STDOUT.  Operators may want to capture both
+output streams as a merged stream for diagnostic purposes.  For example:
+
+    wsgetmail --debug --dry-run --config=wsgetmail.json > wsgetmail.debug 2>&1
+
+When the mail processing command exits with an error (non-zero) status the
+action_on_fetched is not performed on that message so that it will be processed
+on the next run.
+
+Full output of the processing command is produced with C<--debug>.
 
 =head1 LIMITATIONS
 
@@ -506,7 +539,7 @@ Best Practical Solutions, LLC <modules@bestpractical.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2015-2020 by Best Practical Solutions, LLC.
+This software is Copyright (c) 2015-2022 by Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

@@ -3,6 +3,22 @@ Upstream-Name: Type-API
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Type-API
 
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ t/nano/api.t
+ t/nano/builtin-types.t
+ t/nano/class_type.t
+ t/nano/duck_type.t
+ t/nano/enum.t
+ t/nano/inheritance.t
+ t/nano/intersection.t
+ t/nano/role_type.t
+ t/nano/union.t
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: README
  lib/Type/API.pm
  lib/Type/API/Constraint.pod
@@ -13,13 +29,13 @@ Files: README
 Copyright: This software is copyright (c) 2013 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Changes
- META.json
- META.yml
- dist.ini
- doap.ttl
-Copyright: Copyright 2014 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
+Files: INSTALL
+ LICENSE
+ inc/Test/Fatal.pm
+ inc/Test/Requires.pm
+ inc/Try/Tiny.pm
+Copyright: Unknown
+License: Unknown
 
 Files: COPYRIGHT
  CREDITS
@@ -27,25 +43,27 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: CONTRIBUTING
- INSTALL
- LICENSE
-Copyright: Unknown
-License: Unknown
-
 Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Type/Nano.pm
+Copyright: This software is copyright (c) 2018-2019, 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

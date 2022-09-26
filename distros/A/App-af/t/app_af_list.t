@@ -8,7 +8,7 @@ do './bin/af';
 subtest 'basic' => sub {
 
   run 'list';
-  
+
   is last_exit, 0;
 
 };
@@ -16,7 +16,7 @@ subtest 'basic' => sub {
 subtest 'detailed' => sub {
 
   run 'list', '--long';
-  
+
   is last_exit, 0;
 
 };

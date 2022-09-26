@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.05
+    version 0.07
 
 SYNOPSIS
 
@@ -709,7 +709,8 @@ HISTORY
     Need to Write XS talk and he pointed me to a feature in XS that would
     make FFI calls much faster than what was possible in FFI::Raw. Using
     the any_ptr it is possible to remove method calls from an FFI
-    interface, which, due to their dynamic nature.
+    interface, which, due to their dynamic nature are slower that
+    non-method subroutine calls.
 
     I was loosing faith in FFI::Raw being tenable or performant for large
     APIs, so I I gathered up my ideas of what would make a better FFI
@@ -782,11 +783,6 @@ SEE ALSO
       Decompresses / unwraps files that have been compressed or wrapped in
       any of the filter formats supported by libarchive
 
-    Dist::Zilla::Plugin::Libarchive
-
-      Build Dist::Zilla based dist tarballs with libarchive instead of the
-      built in Archive::Tar.
-
     Archive::Libarchive::API
 
       This contains the full and complete API for all of the
@@ -829,6 +825,11 @@ SEE ALSO
     Archive::Libarchive::Match
 
       This class exposes the libarchive match API.
+
+    Dist::Zilla::Plugin::Libarchive
+
+      Build Dist::Zilla based dist tarballs with libarchive instead of the
+      built in Archive::Tar.
 
     Alien::Libarchive3
 

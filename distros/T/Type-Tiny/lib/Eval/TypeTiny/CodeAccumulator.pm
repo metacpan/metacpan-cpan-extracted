@@ -1,17 +1,16 @@
 package Eval::TypeTiny::CodeAccumulator;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
-	if ( $] < 5.008 ) { require Devel::TypeTiny::Perl56Compat }
 	if ( $] < 5.010 ) { require Devel::TypeTiny::Perl58Compat }
 }
 
 BEGIN {
 	$Eval::TypeTiny::CodeAccumulator::AUTHORITY  = 'cpan:TOBYINK';
-	$Eval::TypeTiny::CodeAccumulator::VERSION    = '1.016010';
+	$Eval::TypeTiny::CodeAccumulator::VERSION    = '2.000000';
 }
 
 $Eval::TypeTiny::CodeAccumulator::VERSION =~ tr/_//d;
@@ -105,15 +104,16 @@ sub finalize {
 }
 
 sub compile {
-	my $self = shift;
+	my ( $self, %opts ) = ( shift, @_ );
 
 	$self->{finalized}++ or $self->finalize();
 
 	require Eval::TypeTiny;
 	return Eval::TypeTiny::eval_closure(
+		description  => $self->description,
+		%opts,
 		source       => $self->code,
 		environment  => $self->env,
-		description  => $self->description,
 	);
 }
 
@@ -222,9 +222,14 @@ Goes back to a previously inserted placeholder and replaces it with code.
 As an alternative, C<add_placeholder> returns a coderef, which you can call
 like C<< $callback->( @lines_of_code ) >>.
 
-=item C<< compile() >>
+=item C<< compile( %opts ) >>
 
 Compiles the code and returns it as a coderef.
+
+Options are passed on to C<< eval_closure >> from L<Eval::TypeTiny>,
+but cannot include C<code> or C<environment>. C<< alias => 1 >>
+is probably the option most likely to be useful, but in general
+you won't need to provide any options.
 
 =item C<< finalize() >>
 

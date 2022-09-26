@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 343;
+plan tests => 341;
 
 my @module_files = (
     'DateTime/TimeZone.pm',
@@ -293,12 +293,10 @@ my @module_files = (
     'DateTime/TimeZone/Europe/Tallinn.pm',
     'DateTime/TimeZone/Europe/Tirane.pm',
     'DateTime/TimeZone/Europe/Ulyanovsk.pm',
-    'DateTime/TimeZone/Europe/Uzhgorod.pm',
     'DateTime/TimeZone/Europe/Vienna.pm',
     'DateTime/TimeZone/Europe/Vilnius.pm',
     'DateTime/TimeZone/Europe/Volgograd.pm',
     'DateTime/TimeZone/Europe/Warsaw.pm',
-    'DateTime/TimeZone/Europe/Zaporozhye.pm',
     'DateTime/TimeZone/Europe/Zurich.pm',
     'DateTime/TimeZone/Floating.pm',
     'DateTime/TimeZone/HST.pm',

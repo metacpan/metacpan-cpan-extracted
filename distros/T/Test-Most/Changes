@@ -1,5 +1,9 @@
 Revision history for Test::Most
 
+0.38    2022-09-24
+        - Stop permanently altering Test::More's export list (RT#73299)
+          (thanks to 2shortplanks for this)
+
 0.37    2020-04-04
         - Don't call parent DESTROY method if it does not exist (thanks,
           Karen)

@@ -8,9 +8,9 @@ WriteMakefile(
                     'Geo::Constants'    => 0.04,
                     'Geo::Functions'    => 0.03,
                     'Test::Simple'      => 0.44, #test req
-                    'List::Util'        => 0,
                     'Package::New'      => 0,
-                   #'Graphics::ColorNames'=>0, #no longer required but nice to have
+                    'Cwd'               => 0,    #for Cwd::getcwd which is in PathTools
+                   #'Graphics::ColorNames'=>0,   #no longer required but nice to have
                    },
   'META_MERGE' => {
                    'resources' => {

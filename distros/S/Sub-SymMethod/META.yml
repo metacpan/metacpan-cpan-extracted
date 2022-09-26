@@ -5,8 +5,8 @@ author:
 build_requires:
   Role::Tiny: '0'
   Test::More: '0.96'
-  Type::Params: '1.003000'
-  Types::Standard: '0'
+  Type::Params: '2.000000'
+  Types::Standard: '2.000000'
   parent: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
@@ -29,18 +29,18 @@ optional_features: {}
 provides:
   Sub::SymMethod:
     file: lib/Sub/SymMethod.pm
-    version: '0.005'
+    version: '1.000'
 recommends:
-  Type::Params: '1.003000'
+  Type::Params: '2.000000'
 requires:
-  Exporter::Shiny: '1.000000'
+  Exporter::Shiny: '1.004000'
   Role::Hooks: '0'
   perl: '5.008008'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/project
-  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Sub-SymMethod
+  bugtracker: https://github.com/tobyink/p5-sub-symmethod/issues
   homepage: https://metacpan.org/release/Sub-SymMethod
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-sub-symmethod.git
-version: '0.005'
+version: '1.000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

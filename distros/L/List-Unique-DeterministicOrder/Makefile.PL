@@ -17,6 +17,7 @@ WriteMakefile(
     BUILD_REQUIRES => {
         'Test::More' => '0',
         'rlib' => 0,
+        'List::Util' => 0,
     },
     PREREQ_PM => {
         'List::Util' => 1.45,

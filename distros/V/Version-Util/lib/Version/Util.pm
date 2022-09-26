@@ -1,12 +1,14 @@
 package Version::Util;
 
-our $DATE = '2018-06-10'; # DATE
-our $VERSION = '0.731'; # VERSION
-
 use 5.010001;
 use strict;
 use version 0.77;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-22'; # DATE
+our $DIST = 'Version-Util'; # DIST
+our $VERSION = '0.732'; # VERSION
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(
@@ -21,47 +23,55 @@ our @EXPORT_OK = qw(
                );
 
 sub cmp_version {
-    version->parse($_[0]) <=> version->parse($_[1]);
+    my $res; eval { $res = version->parse($_[0]) <=> version->parse($_[1]) }; die "Can't cmp_version $_[0] & $_[1]: $@" if $@; $res;
 }
 
 sub version_eq {
-    version->parse($_[0]) == version->parse($_[1]);
+    my $res; eval { $res = version->parse($_[0]) == version->parse($_[1]) }; die "Can't version_eq $_[0] & $_[1]: $@" if $@; $res;
 }
 
 sub version_ne {
-    version->parse($_[0]) != version->parse($_[1]);
+    my $res; eval { $res = version->parse($_[0]) != version->parse($_[1]) }; die "Can't version_ne $_[0] & $_[1]: $@" if $@; $res;
 }
 
 sub version_lt {
-    version->parse($_[0]) <  version->parse($_[1]);
+    my $res; eval { $res = version->parse($_[0]) <  version->parse($_[1]) }; die "Can't version_lt $_[0] & $_[1]: $@" if $@; $res;
 }
 
 sub version_le {
-    version->parse($_[0]) <= version->parse($_[1]);
+    my $res; eval { $res = version->parse($_[0]) <= version->parse($_[1]) }; die "Can't version_le $_[0] & $_[1]: $@" if $@; $res;
 }
 
 sub version_gt {
-    version->parse($_[0]) >  version->parse($_[1]);
+    my $res; eval { $res = version->parse($_[0]) >  version->parse($_[1]) }; die "Can't version_gt $_[0] & $_[1]: $@" if $@; $res;
 }
 
 sub version_ge {
-    version->parse($_[0]) >= version->parse($_[1]);
+    my $res; eval { $res = version->parse($_[0]) >= version->parse($_[1]) }; die "Can't version_ge $_[0] & $_[1]: $@" if $@; $res;
 }
 
 sub version_between {
-    my $v = version->parse(shift);
+    my $v0 = shift;
+    my $v; eval { $v = version->parse($v0) };
+    die "Can't version_between for $v0: $@" if $@;
     while (@_) {
         my $v1 = shift;
         my $v2 = shift;
-        return 1 if $v >= version->parse($v1) && $v <= version->parse($v2);
+        my $return; eval { $return++ if $v >= version->parse($v1) && $v <= version->parse($v2) };
+        return 1 if $return;
+        die "Can't version_between $v1 <= $v0 <= $v2: $@" if $@;
     }
     0;
 }
 
 sub version_in {
-    my $v = version->parse(shift);
+    my $v0 = shift;
+    my $v; eval { $v = version->parse($v0) };
+    die "Can't version_in for $v0: $@" if $@;
     for (@_) {
-        return 1 if $v == version->parse($_);
+        my $return; eval { $return++ if $v == version->parse($_) };
+        return 1 if $return;
+        die "Can't version_in: $v0 == $_: $@" if $@;
     }
     0;
 }
@@ -71,12 +81,20 @@ sub _max2 {
 }
 
 sub min_version {
-    my @v = sort { version->parse($a) <=> version->parse($b) } @_;
+    my @v = sort {
+        my $res; eval { $res = version->parse($a) <=> version->parse($b) };
+        die "Can't min_version: Can't sort $a vs $b: $@" if $@;
+        $res;
+    } @_;
     @v ? $v[0] : undef;
 }
 
 sub max_version {
-    my @v = sort { version->parse($a) <=> version->parse($b) } @_;
+    my @v = sort {
+        my $res; eval { $res = version->parse($a) <=> version->parse($b) };
+        die "Can't max_version: Can't sort $a vs $b: $@" if $@;
+        $res;
+    } @_;
     @v ? $v[-1] : undef;
 }
 
@@ -167,7 +185,7 @@ Version::Util - Version-number utilities
 
 =head1 VERSION
 
-This document describes version 0.731 of Version::Util (from Perl distribution Version-Util), released on 2018-06-10.
+This document describes version 0.732 of Version::Util (from Perl distribution Version-Util), released on 2022-09-22.
 
 =head1 DESCRIPTION
 
@@ -233,14 +251,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Version-Ut
 
 Source repository is at L<https://github.com/perlancar/perl-Version-Util>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Version-Util>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<version>
@@ -249,11 +259,43 @@ L<version>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2018, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Version-Util>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

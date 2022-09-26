@@ -9,9 +9,10 @@ use Readonly;
 use Scalar::Util qw(blessed);
 
 Readonly::Array our @EXPORT_OK => qw(check_array check_array_object check_bool
-	check_isa check_length check_number check_number_of_items check_required);
+	check_code check_isa check_length check_number check_number_of_items
+	check_required);
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 sub check_array {
 	my ($self, $key) = @_;
@@ -53,6 +54,22 @@ sub check_bool {
 
 	if ($self->{$key} !~ m/^\d+$/ms || ($self->{$key} != 0 && $self->{$key} != 1)) {
 		err "Parameter '$key' must be a bool (0/1).",
+			'Value', $self->{$key},
+		;
+	}
+
+	return;
+}
+
+sub check_code {
+	my ($self, $key) = @_;
+
+	if (! defined $self->{$key}) {
+		return;
+	}
+
+	if (ref $self->{$key} ne 'CODE') {
+		err "Parameter '$key' must be a code.",
 			'Value', $self->{$key},
 		;
 	}
@@ -171,11 +188,12 @@ Mo::utils - Mo utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils qw(check_array check_array_object check_bool check_isa check_length check_number check_number_of_items check_required);
+ use Mo::utils qw(check_array check_array_object check_bool check_code check_isa check_length check_number check_number_of_items check_required);
 
  check_array($self, $key);
  check_array_object($self, $key, $class, $class_name);
  check_bool($self, $key);
+ check_code($self, $key);
  check_isa($self, $key, $class);
  check_length($self, $key, $max_length);
  check_number($self, $key);
@@ -214,6 +232,16 @@ Returns undef.
  check_bool($self, $key);
 
 Check parameter defined by C<$key> if value is bool or not.
+
+Put error if check isn't ok.
+
+Returns undef.
+
+=head2 C<check_code>
+
+ check_code($self, $key);
+
+Check parameter defined by C<$key> which is code reference or no.
 
 Put error if check isn't ok.
 
@@ -285,6 +313,10 @@ Returns undef.
 
  check_bool():
          Parameter '%s' must be a bool (0/1).
+                 Value: %s
+
+ check_code():
+         Parameter '%s' must be a code.
                  Value: %s
 
  check_isa():
@@ -443,6 +475,50 @@ Returns undef.
 
 =head1 EXAMPLE7
 
+=for comment filename=check_code_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils qw(check_code);
+ use Test::MockObject;
+
+ my $self = {
+         'key' => sub {},
+ };
+ check_code($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE8
+
+=for comment filename=check_code_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils qw(check_code);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'bad',
+ };
+ check_code($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [..utils.pm:?] Parameter 'key' must be a code.
+
+=head1 EXAMPLE9
+
 =for comment filename=check_isa_ok.pl
 
  use strict;
@@ -462,7 +538,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE8
+=head1 EXAMPLE10
 
 =for comment filename=check_isa_fail.pl
 
@@ -484,7 +560,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must be a 'Test::MockObject' object.
 
-=head1 EXAMPLE9
+=head1 EXAMPLE11
 
 =for comment filename=check_length_ok.pl
 
@@ -506,7 +582,7 @@ Returns undef.
  # Output like:
  # ok
 
-=head1 EXAMPLE10
+=head1 EXAMPLE12
 
 =for comment filename=check_length_fail.pl
 
@@ -528,7 +604,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' has length greater than '2'.
 
-=head1 EXAMPLE11
+=head1 EXAMPLE13
 
 =for comment filename=check_number_ok.pl
 
@@ -548,7 +624,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE12
+=head1 EXAMPLE14
 
 =for comment filename=check_number_fail.pl
 
@@ -570,7 +646,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must be a number.
 
-=head1 EXAMPLE13
+=head1 EXAMPLE15
 
 =for comment filename=check_number_of_items_ok.pl
 
@@ -615,7 +691,7 @@ Returns undef.
  # Output like:
  # ok
 
-=head1 EXAMPLE14
+=head1 EXAMPLE16
 
 =for comment filename=check_number_of_items_fail.pl
 
@@ -660,7 +736,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Test for Item 'value1' has multiple values.
 
-=head1 EXAMPLE15
+=head1 EXAMPLE17
 
 =for comment filename=check_required_ok.pl
 
@@ -680,7 +756,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE16
+=head1 EXAMPLE18
 
 =for comment filename=check_required_fail.pl
 
@@ -737,6 +813,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut

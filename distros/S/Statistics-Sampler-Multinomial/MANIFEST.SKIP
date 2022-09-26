@@ -20,3 +20,5 @@ tar.gz$
 ^Makefile.old
 
 ^cover_db
+
+^nyt

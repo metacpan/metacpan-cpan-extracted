@@ -1,9 +1,7 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
 
 use ok 'Sub::Call::Tail' => qw(:all);
 

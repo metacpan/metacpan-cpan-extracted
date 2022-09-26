@@ -9,7 +9,7 @@ use experimental qw( signatures );
 use parent qw( Archive::Libarchive::ArchiveWrite );
 
 # ABSTRACT: Libarchive disk write class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 my $ffi = Archive::Libarchive::Lib->ffi;
 
@@ -45,7 +45,7 @@ Archive::Libarchive::DiskWrite - Libarchive disk write class
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ Create a new disk write object.
 =head1 METHODS
 
 This is a subset of total list of methods available to all archive classes.
-For the full list see L<Archive::Libarchive::API/Archive::Libarchive::ArchiveRead>.
+For the full list see L<Archive::Libarchive::API/Archive::Libarchive::DiskWrite>.
 
 =head2 write_data_block
 
@@ -152,6 +152,10 @@ This class exposes the C<libarchive> link resolver API.
 =item L<Archive::Libarchive::Match>
 
 This class exposes the C<libarchive> match API.
+
+=item L<Dist::Zilla::Plugin::Libarchive>
+
+Build L<Dist::Zilla> based dist tarballs with libarchive instead of the built in L<Archive::Tar>.
 
 =item L<Alien::Libarchive3>
 

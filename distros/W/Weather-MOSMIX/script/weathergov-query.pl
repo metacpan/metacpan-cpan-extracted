@@ -3,7 +3,7 @@ use strict;
 use Weather::WeatherGov;
 use Data::Dumper;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $w = Weather::WeatherGov->new(
 );

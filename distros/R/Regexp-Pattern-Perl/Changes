@@ -1,15 +1,29 @@
+0.007   2022-07-30  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.005 and 0.005.2.
+
+
 0.006   2021-07-27  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] Rename pat perl_release_tarball_filename ->
 	  perl_release_archive_filename.
 
 
-0.005   2021-07-27  Released-By: PERLANCAR; Urgency: medium
+0.005.2 2021-07-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Add module: Regexp::Pattern::Perl::Release.
 
+        - UPDATE: rename release from 0.005 to 0.005.2 due to conflict.
 
-0.004   2020-10-02  Released-By: PERLANCAR; Urgency: medium
+
+0.005   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [module Regexp::Pattern::Perl::Module] Add pattern
+          perl_modname_pm.
+
+
+
+0.004   2020-10-02  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] Do not anchor the patterns, to make it more
 	  reusable.

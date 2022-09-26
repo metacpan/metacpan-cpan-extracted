@@ -17,6 +17,7 @@ where `wsgetmail.json` looks like:
     "global_access": 1,
     "username": "rt-comment@example.com",
     "folder": "Inbox",
+    "stripcr": 0,
     "command": "/opt/rt5/bin/rt-mailgate",
     "command_args": "--url=http://rt.example.com/ --queue=General --action=comment",
     "command_timeout": 30,
@@ -59,7 +60,7 @@ A hash ref that is passed to construct the `mda` and `client` (see below).
 
 ## mda
 
-An instance of [App::wsgetmail::MDA](https://metacpan.org/pod/App::wsgetmail::MDA) created from our `config` object.
+An instance of [App::wsgetmail::MDA](https://metacpan.org/pod/App%3A%3Awsgetmail%3A%3AMDA) created from our `config` object.
 
 ## client\_class
 
@@ -202,6 +203,18 @@ configuration file.
 
     Set this to the name string of a mail folder to read.
 
+- stripcr
+
+    Set this to 1 to make wsgetmail convert the messages from the CRLF
+    line-ending encoding to the LF line-ending encoding.
+
+    This emulates the fetchmail option of the same name, which enabled
+    the stripcr option if an MDA was declared. The feature is similar,
+    but you need to enable it explicitly in your configuration.
+
+    This option is helpful if you are forwarding email to a Linux
+    utility that doesn't work with CRLF line-endings.
+
 - command
 
     Set this to an executable command. You can specify an absolute path,
@@ -219,7 +232,7 @@ configuration file.
 - command\_timeout
 
     Set this to the number of seconds the `command` has to return before
-    timeout is reached.  The default value is 30.
+    timeout is reached.  The default value is 30.  Use "inf" for no timeout.
 
 - action\_on\_fetched
 
@@ -230,6 +243,12 @@ configuration file.
     If you set this to `"mark_as_read"`, wsgetmail will only retrieve and
     deliver messages that are marked unread in the configured folder, so it does
     not try to deliver the same email multiple times.
+
+- dump\_messages
+
+    Set this to 1 to preserve the temporary files after processing.
+
+    When `"debug"` is also set the filenames will be reported on STDERR.
 
 # TESTING AND DEPLOYMENT
 
@@ -244,6 +263,20 @@ runs successfully.
 
 Once your configuration is stable, you can configure wsgetmail to run
 periodically through cron or a systemd service on a timer.
+
+# ERRORS AND DIAGNOSTIC MESSAGES
+
+wsgetmail sends warning, error, and debug messages to STDERR, while purely
+informational messages are sent to STDOUT.  Operators may want to capture both
+output streams as a merged stream for diagnostic purposes.  For example:
+
+    wsgetmail --debug --dry-run --config=wsgetmail.json > wsgetmail.debug 2>&1
+
+When the mail processing command exits with an error (non-zero) status the
+action\_on\_fetched is not performed on that message so that it will be processed
+on the next run.
+
+Full output of the processing command is produced with `--debug`.
 
 # LIMITATIONS
 
@@ -278,9 +311,9 @@ of time.
 # SEE ALSO
 
 - [wsgetmail](https://metacpan.org/pod/wsgetmail)
-- [App::wsgetmail::MDA](https://metacpan.org/pod/App::wsgetmail::MDA)
-- [App::wsgetmail::MS365](https://metacpan.org/pod/App::wsgetmail::MS365)
-- [App::wsgetmail::MS365::Message](https://metacpan.org/pod/App::wsgetmail::MS365::Message)
+- [App::wsgetmail::MDA](https://metacpan.org/pod/App%3A%3Awsgetmail%3A%3AMDA)
+- [App::wsgetmail::MS365](https://metacpan.org/pod/App%3A%3Awsgetmail%3A%3AMS365)
+- [App::wsgetmail::MS365::Message](https://metacpan.org/pod/App%3A%3Awsgetmail%3A%3AMS365%3A%3AMessage)
 
 # AUTHOR
 
@@ -288,7 +321,7 @@ Best Practical Solutions, LLC <modules@bestpractical.com>
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2015-2020 by Best Practical Solutions, LLC.
+This software is Copyright (c) 2015-2022 by Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

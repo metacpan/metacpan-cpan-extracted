@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.010005";
+    our $MITE_VERSION = "0.010008";
 
     # Mite keywords
     BEGIN {
@@ -914,6 +914,11 @@
         our %DOES;
         return $DOES{$role} if exists $DOES{$role};
         return 1            if $role eq __PACKAGE__;
+        if ( $INC{'Moose/Util.pm'}
+            and my $meta = Moose::Util::find_meta( ref $self or $self ) )
+        {
+            $meta->can('does_role') and $meta->does_role($role) and return 1;
+        }
         return $self->SUPER::DOES($role);
     }
 
@@ -933,7 +938,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.010005";
+    our $MITE_VERSION = "0.010008";
 
     # Mite keywords
     BEGIN {
@@ -1459,6 +1464,11 @@
         our %DOES;
         return $DOES{$role} if exists $DOES{$role};
         return 1            if $role eq __PACKAGE__;
+        if ( $INC{'Moose/Util.pm'}
+            and my $meta = Moose::Util::find_meta( ref $self or $self ) )
+        {
+            $meta->can('does_role') and $meta->does_role($role) and return 1;
+        }
         return $self->SUPER::DOES($role);
     }
 
@@ -1478,7 +1488,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.010005";
+    our $MITE_VERSION = "0.010008";
 
     # Mite keywords
     BEGIN {
@@ -2020,6 +2030,11 @@
         our %DOES;
         return $DOES{$role} if exists $DOES{$role};
         return 1            if $role eq __PACKAGE__;
+        if ( $INC{'Moose/Util.pm'}
+            and my $meta = Moose::Util::find_meta( ref $self or $self ) )
+        {
+            $meta->can('does_role') and $meta->does_role($role) and return 1;
+        }
         return $self->SUPER::DOES($role);
     }
 

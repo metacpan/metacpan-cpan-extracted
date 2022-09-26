@@ -53,7 +53,7 @@ resources:
   bugtracker: https://github.com/plu/Pithub/issues
   homepage: https://github.com/plu/Pithub
   repository: https://github.com/plu/Pithub.git
-version: '0.01039'
+version: '0.01040'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -154,6 +154,60 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::OALDERS/ExecDir'
       version: '6.025'
+    -
+      class: Dist::Zilla::Plugin::Test::PodSpelling
+      config:
+        Dist::Zilla::Plugin::Test::PodSpelling:
+          directories:
+            - bin
+            - lib
+          spell_cmd: ''
+          stopwords:
+            - Alders
+            - "Alders'"
+            - Alessandro
+            - Andreas
+            - Ghedini
+            - Html
+            - JSONP
+            - LRU
+            - Marienborg
+            - Merijn
+            - OAuth
+            - SHAs
+            - Schwern
+            - Stevan
+            - Unfollow
+            - Unstar
+            - api
+            - asc
+            - assignees
+            - desc
+            - etag
+            - getLength
+            - getNext
+            - gfm
+            - gists
+            - gollum
+            - html
+            - ie
+            - losslessly
+            - md
+            - orgs
+            - params
+            - perlancar
+            - ratelimit
+            - readme
+            - repos
+            - sha
+            - submodule
+            - ua
+            - unfollow
+            - unstar
+            - zipball
+          wordlist: Pod::Wordlist
+      name: '@Author::OALDERS/Test::PodSpelling'
+      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
       name: '@Author::OALDERS/MojibakeTests'
@@ -342,7 +396,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.1
+          git_version: 2.37.3
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.048'
@@ -350,7 +404,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.37.1
+          git_version: 2.37.3
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -442,7 +496,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.1
+          git_version: 2.37.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -455,11 +509,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.01039
+          tag: v0.01040
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.1
+          git_version: 2.37.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -497,7 +551,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.1
+          git_version: 2.37.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -511,7 +565,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.1
+          git_version: 2.37.3
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.048'

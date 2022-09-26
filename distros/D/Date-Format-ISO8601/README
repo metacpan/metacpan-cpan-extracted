@@ -1,10 +1,10 @@
 NAME
-    Date::Format::ISO8601 - Format date (Unix timestamp/epoch) as ISO8601
-    date/time string
+    Date::Format::ISO8601 - Format date (Unix timestamp) as ISO8601
+    datetime/date/time string
 
 VERSION
-    This document describes version 0.010 of Date::Format::ISO8601 (from
-    Perl distribution Date-Format-ISO8601), released on 2020-10-22.
+    This document describes version 0.012 of Date::Format::ISO8601 (from
+    Perl distribution Date-Format-ISO8601), released on 2022-07-23.
 
 SYNOPSIS
      use Date::Format::ISO8601 qw(
@@ -52,6 +52,8 @@ DESCRIPTION
     This module formats Unix timestamps (epochs) as ISO8601 date/time
     strings. It is a lightweight alternative to
     DateTime::Format::ISO8601::Format and DateTime::Format::ISO8601.
+
+    Keywords: epoch, Unix time
 
 FUNCTIONS
   gmtime_to_iso8601_date
@@ -101,24 +103,44 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Date-Format-ISO8601>.
 
+SEE ALSO
+    DateTime::Format::ISO8601::Format
+
+    DateTime::Format::ISO8601
+
+    Time::Piece (which is a core module) has a "datetime()" method that can
+    output ISO8601 datetime string.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2020 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Format-ISO8601>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-    DateTime::Format::ISO8601::Format
-
-    DateTime::Format::ISO8601
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

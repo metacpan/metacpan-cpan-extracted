@@ -23,7 +23,7 @@ eval {
 	$parallel = 1;
 };
 
-my $VERSION = '1.68';
+my $VERSION = '1.69';
 
 
 print "\n A program to collect data for a list of features\n\n";
@@ -65,6 +65,9 @@ my (
 	$format,
 	$win,
 	$step,
+	$exclusion_file,
+	$chrskip,
+	$prefix_text,
 	$set_strand,
 	$discard,
 	$gz,
@@ -101,6 +104,9 @@ GetOptions(
 	'r|format=i'       => \$format, # decimal formatting
 	'win=i'            => \$win, # indicate the size of genomic intervals
 	'step=i'           => \$step, # step size for genomic intervals
+	'blacklist=s'      => \$exclusion_file, # exclusion intervals for genomic intervals
+	'chrskip=s'        => \$chrskip, # chromosome exclusion regex for genomic intervals
+	'prefix=s'         => \$prefix_text, # prefix text for naming genomic intervals
 	'force_strand|set_strand' => \$set_strand, # enforce a specific strand
 				# force_strand is preferred option, but respect the old option
 	'discard=f'        => \$discard, # discard feature below threshold
@@ -188,7 +194,18 @@ elsif ($new) {
 		feature => $feature,
 		win     => $win,
 		step    => $step,
+		chrskip => $chrskip,
+		exclude => $exclusion_file
 	) or die " unable to generate new feature list\n";
+	
+	# add a genomic interval name
+	if ($feature eq 'genome' and $prefix_text) {
+		my $i = $Data->add_column('Name');
+		$Data->iterate( sub {
+			my $row = shift;
+			$row->value($i, sprintf("%s%d", $prefix_text, $row->row_index));
+		});
+	}
 }
 
 # update program name
@@ -352,14 +369,14 @@ sub set_defaults {
 		# database for new files checked below
 	}
 	if (defined $start_adj or defined $stop_adj) {
-		unless (defined $start_adj and defined $stop_adj) {
-			die " You must define both start and stop coordinate adjustments!\n";
-		}
+		# set other to zero if not defined
+		$start_adj ||= 0;
+		$stop_adj  ||= 0;
 	}
 	if (defined $fstart or defined $fstop) {
-		unless (defined $fstart and defined $fstop) {
-			die " You must define both fstart and fstop coordinate adjustments!\n";
-		}
+		# set defaults in case one is not defined
+		$fstart ||= 0;
+		$fstop  ||= 1;
 	}
 	
 	# check parallel support
@@ -424,10 +441,12 @@ sub set_defaults {
 	# check the relative position
 	if (defined $position) {
 		# check the position value
-		unless ($position =~ m/^(?:5|4|3|m)$/i) {
+		unless ($position =~ m/^(?:5|4|53|3|m|p)$/) {
 			die " Unknown relative position '$position'!\n";
 		}
-		$position =~ s/m/4/i # change to match internal usage
+		# change to match internal usage as necessary
+		$position = 4 if $position eq 'm'; 
+		$position = 9 if $position eq 'p';
 	}
 	else {
 		# default position to use the 5' end
@@ -441,7 +460,7 @@ sub set_defaults {
 			# set a minimum size limit on sub fractionating a feature
 			$limit = 10;
 		}
-		if ($position == 4) {
+		if ($position == 4 or $position == 9) {
 			die " set position to 5 or 3 only when using fractional start and stop\n";
 		}
 	}
@@ -640,35 +659,60 @@ sub get_adjusted_dataset {
 	$Data->iterate( sub {
 		my $row = shift;
 		
-		# make sure we work with the represented seqfeature if present
-		my $feature = $row->seqfeature || $row;
-		
 		# adjust coordinates as requested
 		# depends on feature strand and relative position
 		my ($start, $stop);
-		if ($position == 5 and $feature->strand >= 0) { 
-			# 5' end of forward strand
-			$start = $feature->start + $start_adj;
-			$stop  = $feature->start + $stop_adj;
+		if ($position == 5) { 
+			if ($row->strand >= 0) { 
+				# 5' end of forward strand
+				$start = $row->start + $start_adj;
+				$stop  = $row->start + $stop_adj;
+			}
+			else { 
+				# 5' end of reverse strand
+				$start = $row->end - $stop_adj;
+				$stop  = $row->end - $start_adj;
+			}
 		}
-		elsif ($position == 5 and $feature->strand < 0) { 
-			# 5' end of reverse strand
-			$start = $feature->end - $stop_adj;
-			$stop  = $feature->end - $start_adj;
-		}
-		elsif ($position == 3 and $feature->strand >= 0) { 
-			# 3' end of forward strand
-			$start = $feature->end + $start_adj;
-			$stop  = $feature->end + $stop_adj;
-		}
-		elsif ($position == 3 and $feature->strand < 0) {
-			# 3' end of reverse strand
-			$start = $feature->start - $stop_adj;
-			$stop  = $feature->start - $start_adj;
+		elsif ($position == 3) { 
+			if ($row->strand >= 0) { 
+				# 3' end of forward strand
+				$start = $row->end + $start_adj;
+				$stop  = $row->end + $stop_adj;
+			}
+			else {
+				# 3' end of reverse strand
+				$start = $row->start - $stop_adj;
+				$stop  = $row->start - $start_adj;
+			}
 		}
 		elsif ($position == 4) {
 			# middle position
-			my $middle = int( ($feature->start + $feature->end) / 2);
+			my $middle = int( ($row->start + $row->end) / 2);
+			if ($row->strand >= 0) {
+				$start = $middle + $start_adj;
+				$stop  = $middle + $stop_adj;
+			}
+			else {
+				$start = $middle - $stop_adj;
+				$stop  = $middle - $start_adj;
+			}
+		}
+		elsif ($position == 53) {
+			if ($row->strand >= 0) { 
+				# forward strand
+				$start = $row->start + $start_adj;
+				$stop  = $row->end + $stop_adj;
+			}
+			else {
+				# reverse strand
+				$start = $row->start - $start_adj;
+				$stop  = $row->end - $stop_adj;
+			}
+		}
+		elsif ($position == 9) {
+			# peak summit position
+			my $middle = $row->peak;
 			if ($row->strand >= 0) {
 				$start = $middle + $start_adj;
 				$stop  = $middle + $stop_adj;
@@ -789,11 +833,17 @@ sub add_new_dataset {
 	$Data->metadata($index, 'decimal_format', $format) if defined $format;
 	$Data->metadata($index, 'total_reads', $dataset2sum{$dataset}) if 
 		exists $dataset2sum{$dataset};
+	if ($position == 5) {
+		$Data->metadata($index, 'relative_position', "5'end");	
+	}
 	if ($position == 3) {
 		$Data->metadata($index, 'relative_position', "3'end");	
 	}
 	elsif ($position == 4) {
 		$Data->metadata($index, 'relative_position', 'middle');
+	}
+	elsif ($position == 9) {
+		$Data->metadata($index, 'relative_position', 'summit');
 	}
 
 	# add database name if different
@@ -999,7 +1049,10 @@ get_datasets.pl [--options...] --in <filename> <data1> <data2...>
   
   Options for feature "genome":
   --win <integer>                     size of windows across genome (500 bp)
-  --step <integer>                    step size of windows across genome 
+  --step <integer>                    step size of windows across genome
+  --chrskip <regex>                   regular expression to skip chromosomes
+  --blacklist <filename>              file of intervals to skip (bed, gff, txt)
+  --prefix <text>                     prefix text for naming windows
   
   Options for data collection:
   -D --ddb <name|file>                data or BigWigSet database
@@ -1014,13 +1067,13 @@ get_datasets.pl [--options...] --in <filename> <data1> <data2...>
   --fpkm [region|genome]              calculate FPKM using which total count
   --tpm                               calculate TPM values
   -r --format <integer>               number of decimal places for numbers
-  --discard <number>                  discard features where sum below threshold
+  --discard <number>                  discard features whose sum below threshold
   
   Adjustments to features:
   -x --extend <integer>               extend the feature in both directions
   -b --begin --start <integer>        adjust relative start coordinate
   -e --end --stop <integer>           adjust relative stop coordinate
-  -p --pos [5|m|3]                    define the relative position to adjust
+  -p --pos [5|m|3|53|p]               relative position to adjust (default 5')
   --fstart=<decimal>                  adjust fractional start
   --fstop=<decimal>                   adjust fractional stop
   --limit <integer>                   minimum size to take fractional window
@@ -1099,6 +1152,28 @@ optionally specify the window size.
 
 Optionally indicate the step size when generating a new list of intervals 
 across the genome. The default is equal to the window size.
+
+=item --chrskip E<lt>regexE<gt>
+
+Provide a regular expression to skip certain chromosomes. Perl-based 
+regular expressions are employed. Expressions should be quoted or 
+properly escaped on the command line. Examples might be 
+    
+    'chrM'
+    'scaffold.+'
+    'chr.+alt|chrUn.+|chr.+_random'
+
+=item --blacklist E<lt>fileE<gt>
+
+Provide a file of genomic intervals to avoid. Examples might include 
+multi-copy repetitive elements, ribosomal RNA, or heterochromatic regions.
+The file should be any text file interpretable by L<Bio::ToolBox::Data> 
+with chromosome, start, and stop coordinates, including BED and GFF formats.
+
+=item --prefix <text>
+
+Provide a text string to prefix the name of generated genomic windows. 
+Names will be appended with an incrementing, unformatted digit. 
 
 =back
 
@@ -1283,17 +1358,19 @@ Optionally specify adjustment values to adjust the region to collect values
 relative to the feature position defined by the C<--pos> option (default is 
 the 5' position). A negative value is shifted upstream (5' direction), 
 and a positive value is shifted downstream. Adjustments are always made 
-relative to the feature's strand. Both options must be applied; one is 
-not allowed.
+relative to the feature's strand. Default value is 0 (no change).
 
-=item --pos [5|m|3]
+=item --pos [5|m|3|53|p]
 
 Indicate the relative position of the feature with which the 
 data is collected when combined with the "start" and "stop" or "fstart" 
-and "fstop" options. Three values are accepted: "5" indicates the 
-5' prime end is used, "3" indicates the 3' end is used, and "m" 
-indicates the middle of the feature is used. The default is to 
-use the 5' end, or the start position of unstranded features. 
+and "fstop" options. Five values are accepted: `5` indicates the 
+5' prime end is used, `3` indicates the 3' end is used, `m` 
+indicates the middle of the feature is used, `p` indicates a peak 
+summit position is used (narrowPeak input only), and `53` indicates that 
+both ends are modified, i.e. start modifies start and end modifies end 
+(strand relative). The default is to use the 5' end, or the start 
+position of unstranded features. 
 
 =item --fstart=<number>
 
@@ -1303,8 +1380,8 @@ Optionally specify the fractional start and stop position of the region to
 collect values as a function of the feature's length and relative to the 
 specified feature position defined by the C<--pos> option (default is 5'). The 
 fraction should be presented as a decimal number, e.g. 0.25. Prefix a 
-negative sign to specify an upstream position. Both options must be 
-applied; one is not allowed. 
+negative sign to specify an upstream position. Default values are 0 (fstart)
+and 1 (fstop), or no change. 
 
 =item --limit E<lt>integerE<gt>
 
@@ -1384,31 +1461,43 @@ These are some examples of some common scenarios for collecting data.
 You want to collect the mean score from a bigWig file for each feature 
 in a BED file of intervals.
 
-  get_datasets.pl --data scores.bw --in input.bed
+  get_datasets.pl --in input.bed --data scores.bw
 
 =item Collect normalized counts
 
-You want to collect normalized read counts from a Bam file of alignments 
-for each feature in a BED file.
+You want to collect normalized read counts from multiple Bam files 
+for each feature in a BED file. This will count alignment names (safe for 
+paired-end alignments) over the intervals, and transform to Fragments (Reads) 
+Per Million, a depth-normalizing function based on the total number of 
+fragments counted in each dataset. 
 
-  get_datasets.pl --data alignments.bam --method rpm --in input.bed
+  get_datasets.pl --in input.bed --method ncount --fpkm region *.bam 
 
 =item Collect stranded RNASeq data
 
 You have stranded RNASeq data, and you would like to determine the 
-expression level for all genes in an annotation database.
+expression level for all genes from an annotation file. Use the 
+C<ncount> method to count alignment names to avoid double counting 
+alignments split over multiple exons.
   
-  get_datasets.pl --db annotation --feature gene --data rnaseq.bam \
-  --strand sense --exons --method rpkm --out expression.txt
+  get_datasets.pl --in annotation.gtf --feature transcript --subfeature exon \
+  --strand sense --method ncount --out expression.txt *.bam
 
 =item Restrict to specific region
 
 You have ChIPSeq enrichment scores in a bigWig file and you now want 
-to score just the transcription start site of known transcripts in an 
-annotation database. Here you will restrict to 500 bp flanking the TSS.
+to score just the transcription start site of known transcripts in a 
+L<Bio::DB::SeqFeature::Store> annotation database. Here you will 
+restrict to 500 bp flanking the TSS.
   
-  get_datasets.pl --db annotation --feature mRNA --start=-500 \
+  get_datasets.pl --db annotation.sqlite --feature mRNA --start=-500 \
   --stop=500 --pos 5 --data scores.bw --out tss_scores.txt
+
+=item Avoid first and last 1 Kb of each interval
+
+  get_datasets.pl --in file.bed --start=1000 \
+  --stop=-1000 --pos 53 --data scores.bw --out file_scores.txt
+
 
 =item Count intervals
 
@@ -1416,27 +1505,29 @@ You have identified all possible transcription factor binding sites in
 the genome and put them in a bigBed file. Now you want to count how 
 many exist in each upstream region of each gene.
   
-  get_datasets.pl --db annotation --feature gene --start=-5000 \
+  get_datasets.pl --db annotation.gtf --feature gene --start=-5000 \
   --stop=0 --data tfbs.bb --method count --out tfbs_sums.txt
 
 =item Many datasets at once
 
-You can place multiple bigWig files in a single directory and treat it 
-as a data database, known as a BigWigSet. Each file becomes a database 
-feature, and you can interactively choose one or more from which to 
-collect. Each dataset is appended to the input file as new column.
+While you can provide multiple data source files as a space-delimited 
+list at the end of the command, you can also treat a folder or directory 
+of bigWig files as a special database, known as a BigWigSet. Each file 
+becomes a database feature, and you can interactively choose one or more 
+from which to collect. Each dataset is appended to the input file as a new 
+column. Provide the folder as a data database C<--ddb> option.
   
-  get_datasets.pl --ddb /path/to/bigwigset --in input.txt
+  get_datasets.pl --in input.txt --ddb /path/to/bigwigset
 
 =item Stranded BigWig data
 
 You can generate stranded RNASeq coverage from a Bam file using the 
 BioToolBox script bam2wig.pl, which yields rnaseq_f.bw and rnaseq_r.bw 
 files. These are automatically interpreted as stranded datasets in a 
-BigWigSet context.
+BigWigSet folder context; see above.
   
-  get_datasets.pl --ddb /path/to/rnaseq/bigwigset --strand sense \
-  --in input.txt
+  get_datasets.pl --in input.txt --strand sense \
+  --ddb /path/to/rnaseq/bigwigset 
 
 =item Binned coverage across the genome
 
@@ -1451,8 +1542,9 @@ depleted regions. You count reads in 1 kb intervals across the genome.
 You are interested in the maximum score in the central 50% of each 
 feature.
   
-  get_datasets.pl --fstart=0.25 --fstop=0.75 --data scores.bw --in \
-  input.txt
+  get_datasets.pl --in input.txt --fstart=0.25 --fstop=0.75 \
+  --data scores.bw 
+  
 
 =back
 

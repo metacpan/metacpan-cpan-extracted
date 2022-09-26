@@ -9,7 +9,7 @@ package My::RoleA; {
 	use Types::Standard -types;
 	
 	multimethod foo => (
-		signature  => [ HashRef ],
+		positional => [ HashRef ],
 		code       => sub { return "A" },
 		alias      => "foo_a",
 	);
@@ -21,7 +21,7 @@ package My::RoleB; {
 	use Types::Standard -types;
 	
 	multimethod foo => (
-		signature  => [ ArrayRef ],
+		positional => [ ArrayRef ],
 		code       => sub { return "B" },
 	);
 }
@@ -35,7 +35,7 @@ package My::Class; {
 	with qw( My::RoleA My::RoleB );
 	
 	multimethod foo => (
-		signature  => [ HashRef ],
+		positional => [ HashRef ],
 		code       => sub { return "C" },
 	);
 }

@@ -3,9 +3,9 @@ package Sah::Schemas::Str;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-09'; # DATE
+our $DATE = '2022-09-22'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 1;
 # ABSTRACT: Various string schemas
@@ -22,7 +22,7 @@ Sah::Schemas::Str - Various string schemas
 
 =head1 VERSION
 
-This document describes version 0.011 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2022-07-09.
+This document describes version 0.012 of Sah::Schemas::Str (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
 
 =head1 SAH SCHEMAS
 
@@ -45,6 +45,15 @@ String containing only zero or more Latin lettersE<sol>digits, i.e. A-Za-z0-9.
 =item * L<latin_letter|Sah::Schema::latin_letter>
 
 Latin letter, i.e. A-Z or a-z.
+
+=item * L<percent_str|Sah::Schema::percent_str>
+
+A number in percent form.
+
+This schema accepts floating number followed by percent sign. Unlike the
+C<percent> schema from L<Sah::Schemas::Float>, The percent sign will not be
+removed nor the number be converted to decimal (e.g. 50% to 0.5).
+
 
 =item * L<str_or_aos|Sah::Schema::str_or_aos>
 
@@ -103,9 +112,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

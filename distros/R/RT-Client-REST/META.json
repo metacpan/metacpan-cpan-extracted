@@ -1,10 +1,10 @@
 {
    "abstract" : "Client for RT using REST API",
    "author" : [
-      "Dmitri Tikhonov"
+      "Dean Hamstead <dean@fragfest.com.au>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -56,17 +56,17 @@
             "DateTime" : "0",
             "DateTime::Format::DateParse" : "0",
             "Encode" : "0",
-            "Error" : "0",
             "Exception::Class" : "0",
             "Exporter" : "0",
             "HTTP::Cookies" : "0",
             "HTTP::Request::Common" : "0",
             "LWP" : "0",
             "Params::Validate" : "0",
+            "Try::Tiny" : "0",
             "URI" : "0",
-            "base" : "0",
             "constant" : "0",
-            "perl" : "5.004",
+            "parent" : "0",
+            "perl" : "5.008",
             "strict" : "0",
             "vars" : "0",
             "warnings" : "0"
@@ -87,6 +87,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/RT-Client-REST/RT-Client-REST/issues"
+      },
       "homepage" : "https://github.com/RT-Client-REST/RT-Client-REST",
       "repository" : {
          "type" : "git",
@@ -94,7 +97,7 @@
          "web" : "https://github.com/RT-Client-REST/RT-Client-REST"
       }
    },
-   "version" : "0.60",
+   "version" : "0.70",
    "x_contributors" : [
       "Abhijit Menon-Sen <ams@wiw.org>",
       "belg4mit <belg4mit>",
@@ -110,7 +113,8 @@
       "S\u00f8ren Lund <soren@lund.org>",
       "Tom Harrison <tomh@apnic.net>"
    ],
-   "x_generated_by_perl" : "v5.26.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

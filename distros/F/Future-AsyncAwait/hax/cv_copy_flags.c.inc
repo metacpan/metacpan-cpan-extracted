@@ -145,7 +145,7 @@ static CV *MY_cv_copy_flags(pTHX_ CV *orig, U32 flags)
           SAVEINT(CvDEPTH(origproto));
           CvDEPTH(origproto) = 1;
 
-          CV *newproto = cv_copy_flags(origproto);
+          CV *newproto = cv_copy_flags(origproto, flags);
           CvPADLIST_set(newproto, CvPADLIST(origproto));
           CvSTART(newproto) = CvSTART(origproto);
 

@@ -2,12 +2,12 @@ package GD::Graph::Polar;
 use strict;
 use warnings;
 use base qw{Package::New};
+use Cwd qw{};
 use Geo::Constants qw{PI};
 use Geo::Functions qw{rad_deg};
 use GD qw{gdSmallFont};
-use List::Util qw{first};
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 =head1 NAME
 
@@ -390,7 +390,7 @@ sub gcnames {
       die('Error: Cannot load Graphics::ColorNames');
     } else {
       my $file           = $self->rgbfile; #stringify for object support
-      $self->{'gcnames'} = Graphics::ColorNames->new("$file");
+      $self->{'gcnames'} = Graphics::ColorNames->new("$file"); #file path must be true per File::Spec::Unix::file_name_is_absolute
     }
   }
   return $self->{'gcnames'};
@@ -519,12 +519,15 @@ Note: This method will search in a few locations for a file.
 =cut
 
 sub rgbfile {
-  my $self             = shift;
-  $self->{'rgbfile'}   = shift if @_;
+  my $self           = shift;
+  $self->{'rgbfile'} = shift if @_;
   unless (defined $self->{'rgbfile'}) {
-    $self->{'rgbfile'} = 'rgb.txt';
-    my $rgb            = first {-r} (qw{/etc/X11/rgb.txt /usr/share/X11/rgb.txt /usr/X11R6/lib/X11/rgb.txt ../rgb.txt});
-    $self->{'rgbfile'} = $rgb if $rgb;
+    my $cwd = Cwd::getcwd();
+    foreach ('/etc/X11/rgb.txt', '/usr/share/X11/rgb.txt', '/usr/X11R6/lib/X11/rgb.txt', "$cwd/rgb.txt", "$cwd/../rgb.txt") {
+      next unless -r;
+      $self->{'rgbfile'} = $_;
+      last;
+    }
   }
   return $self->{'rgbfile'};
 }

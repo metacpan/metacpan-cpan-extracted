@@ -10,7 +10,6 @@ use Test::Needs;
 use Data::Sah::Coerce;
 use Data::Sah::CoerceCommon;
 use Data::Sah::CoerceJS;
-use Nodejs::Util qw(get_nodejs_path);
 
 sub test_no_dupes {
     my $rules = shift;
@@ -116,8 +115,6 @@ subtest "opt:return_type=bool_coerced+val" => sub {
     };
 
     subtest "js" => sub {
-        plan skip_all => "node.js not available" unless get_nodejs_path();
-
         my $c_js = Data::Sah::CoerceJS::gen_coercer(type=>"duration", coerce_to=>"float(secs)", return_type=>"bool_coerced+val");
         my $res;
 
@@ -154,9 +151,10 @@ subtest "opt:return_type=bool_coerced+str_errmsg+val" => sub {
     };
 
     subtest "js" => sub {
-        plan skip_all => "node.js not available" unless get_nodejs_path();
-
-        my $c_js = Data::Sah::CoerceJS::gen_coercer(type=>"date", return_type=>"bool_coerced+str_errmsg+val");
+        # JavaScript::QuickJS does not support Date object yet?
+        my $c_js = Data::Sah::CoerceJS::gen_coercer(
+            engine=>'nodejs',
+            type=>"date", return_type=>"bool_coerced+str_errmsg+val");
         my $res;
 
         $res = $c_js->(1527889633);

@@ -36,10 +36,9 @@ plugin 'Probe::CommandLine' => (
 );
 
 share {
-  plugin Download => (
-    url => 'https://github.com/CastXML/CastXML/releases',
-    filter => qr/.*\.tar\.gz$/,
-    version => qr/([0-9\.]+)/,
+  plugin 'Download::GitHub' => (
+    github_user => 'castxml',
+    github_repo => 'castxml',
   );
   plugin Extract => 'tar.gz';
   plugin 'Build::CMake';

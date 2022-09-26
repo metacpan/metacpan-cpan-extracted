@@ -4,7 +4,7 @@ use 5.014;
 use warnings;
 use strict;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Carp;
 use Ref::Util qw /is_arrayref/;
@@ -24,6 +24,17 @@ sub new {
     $self->build_index;
     
     return $self;
+}
+
+sub _clone_inner {
+    my $self = shift;
+    #  parent class handles most details
+    my $clone = $self->SUPER::_clone_inner;
+    
+    #  generate a dup of the index array-of-arrays
+    $clone->{index} = [map {[@$_]} @{$self->{index}}];
+
+    return $clone;
 }
 
 

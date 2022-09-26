@@ -1,6 +1,7 @@
 @prefix dc:    <http://purl.org/dc/terms/> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
@@ -11,6 +12,15 @@
 <http://purl.org/NET/cpan-uri/dist/Type-API/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-suggestion [
+		doap-deps:on "Dist::Inkt::Profile::TOBYINK"^^doap-deps:CpanId;
+		rdfs:comment "This is used for building the release tarball."@en;
+	];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.004"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [
+		doap-deps:on "Test::More 0.96"^^doap-deps:CpanId;
+		rdfs:comment "I don't have the patience to maintain a test suite that runs on ancient versions of Test::More."@en;
+	];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Type-API>;
 	doap:created         "2013-06-22"^^xsd:date;
 	doap:download-page   <https://metacpan.org/release/Type-API>;
@@ -19,7 +29,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Type-API";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-API/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-API/v_0-002>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-API/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-API/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-API/v_1-000>, <http://purl.org/NET/cpan-uri/dist/Type-API/v_1-001>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/docs-type-api>;
@@ -48,6 +58,34 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-API-0.002.tar.gz>;
 	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-API/v_1-000>
+	a                    doap:Version;
+	dc:identifier        "Type-API-1.000"^^xsd:string;
+	dc:issued            "2022-09-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Bundle Type::Nano.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-API-1.000.tar.gz>;
+	doap:revision        "1.000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-API/v_1-001>
+	a                    doap:Version;
+	dc:identifier        "Type-API-1.001"^^xsd:string;
+	dc:issued            "2022-09-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Improved test suite for Type::Nano.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-API-1.001.tar.gz>;
+	doap:revision        "1.001"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

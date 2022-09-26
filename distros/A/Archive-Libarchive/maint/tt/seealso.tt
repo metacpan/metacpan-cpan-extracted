@@ -83,6 +83,10 @@ This class exposes the C<libarchive> link resolver API.
 This class exposes the C<libarchive> match API.
 
 [% END -%]
+=item L<Dist::Zilla::Plugin::Libarchive>
+
+Build L<Dist::Zilla> based dist tarballs with libarchive instead of the built in L<Archive::Tar>.
+
 =item L<Alien::Libarchive3>
 
 If a suitable system C<libarchive> can't be found, then this

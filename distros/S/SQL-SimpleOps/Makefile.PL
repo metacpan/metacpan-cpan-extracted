@@ -20,6 +20,7 @@
 		{
 			Date::Calc => 0,
 			DBI => 0,
+			DBD::SQLite => 0,
 			File::Path => 0,
 			File::Spec => 0,
 			IO::File => 0,

@@ -1,5 +1,10 @@
 Revision history for FFI-CheckLib
 
+0.30      2022-09-22 04:24:26 -0600
+  - [ BREAKING CHANGE ]
+    If the alien option is provided, the libraries provided by aliens will be
+    preferred over the system libraries (gh#47, gh#48)
+
 0.29      2022-09-10 01:46:05 -0600
   - Handle Windows DLLs using underscores instead of dashes in version
     numbers (gh#44, gh#45, shawnlaffan++)

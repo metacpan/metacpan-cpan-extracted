@@ -25,11 +25,12 @@ allow_import_of = utf8
 # I do not agree with these at all, so never load them
 
 [-Subroutines::RequireFinalReturn]
-[-Subroutines::ProhibitBuiltinHomonyms]
-# perlcritic thinks signatures are prototypes
-[-Subroutines::ProhibitSubroutinePrototypes] 
 [-Modules::ProhibitMultiplePackages]
 [-Subroutines::RequireArgUnpacking]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+# perlcritic thinks signatures are prototypes
+[-Subroutines::ProhibitSubroutinePrototypes] 
 
 # MooseX::Extended provides these, so skip 'em
 [-Moose::RequireMakeImmutable]

@@ -4,9 +4,11 @@ NAME
 
 VERSION
 
-    version 0.21
+    version 0.24
 
 SYNOPSIS
+
+    From your Perl script:
 
      use Alien::gmake ();
      use Env qw( @PATH );
@@ -16,7 +18,17 @@ SYNOPSIS
      system $gmake, 'all';
      system $gmake, 'install';
 
-    Or with Alien::Build::ModuleBuild:
+    Or alienfile:
+
+     use alienfile;
+    
+     share {
+       ...
+       requires 'Alien::gmake' => '0.09';
+       build [ '%{gmake}', '%{gmake} install' ];
+     };
+
+    Or Build.PL with Alien::Build::ModuleBuild:
 
      use Alien::Base::ModuleBuild;
      Alien::Base::ModuleBuild->new(
@@ -99,7 +111,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2014 by Graham Ollis.
+    This software is copyright (c) 2014-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

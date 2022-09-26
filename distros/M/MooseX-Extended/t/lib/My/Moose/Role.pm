@@ -4,7 +4,7 @@ package My::Moose::Role {
     sub import {
         my ( $class, %args ) = @_;
         MooseX::Extended::Role::Custom->create(
-            excludes => [qw/ WarnOnConflict /],
+            excludes => 'WarnOnConflict',
             %args    # you need this to allow customization of your customization
         );
     }

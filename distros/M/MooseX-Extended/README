@@ -2,7 +2,7 @@ NAME
     MooseX::Extended - Extend Moose with safe defaults and useful features
 
 VERSION
-    version 0.31
+    version 0.33
 
 SYNOPSIS
         package My::Names {
@@ -62,7 +62,7 @@ DESCRIPTION
             use v5.20.0;
             use Moose;
             use MooseX::StrictConstructor;
-            use feature qw( signatures postderef postderef_qq);
+            use feature qw( signatures postderef postderef_qq );
             no warnings qw( experimental::signatures experimental::postderef );
             use namespace::autoclean;
             use Carp;
@@ -80,14 +80,14 @@ DESCRIPTION
     A "param" is a required parameter (defaults may be used). A "field" is
     not intended to be passed to the constructor.
 
-    Note that the "has" function is still available, even if it's not
-    needed.
+    Note: the "has" function is still available, even if it's not needed.
+    Unlike "param" and "field", it still requires an "is" option.
 
     Also, while your author likes the postfix block syntax, it's not
     required. You can even safely inline multiple packages in the same file:
 
         package My::Point;
-        use MooseX::Extended types => [qw/Num/];
+        use MooseX::Extended types => 'Num';
 
         param [ 'x', 'y' ] => ( isa => Num );
 
@@ -129,53 +129,60 @@ CONFIGURATION
   "excludes"
     You may find some features to be annoying, or even cause potential bugs
     (e.g., if you have a "croak" method, our importing of "Carp::croak" will
-    be a problem. You can exclude the following:
+    be a problem.
+
+    A single argument to "excludes" can be a string. Multiple "excludes"
+    require an array reference:
+
+            use MooseX::Extended excludes => [qw/StrictConstructor autoclean/];
+
+    You can exclude the following:
 
     *   "StrictConstructor"
 
-            use MooseX::Extended excludes => ['StrictConstructor'];
+            use MooseX::Extended excludes => 'StrictConstructor';
 
         Excluding this will no longer import "MooseX::StrictConstructor".
 
     *   "autoclean"
 
-            use MooseX::Extended excludes => ['autoclean'];
+            use MooseX::Extended excludes => 'autoclean';
 
         Excluding this will no longer import "namespace::autoclean".
 
     *   "c3"
 
-            use MooseX::Extended excludes => ['c3'];
+            use MooseX::Extended excludes => 'c3';
 
         Excluding this will no longer apply the C3 mro.
 
     *   "carp"
 
-            use MooseX::Extended excludes => ['carp'];
+            use MooseX::Extended excludes => 'carp';
 
         Excluding this will no longer import "Carp::croak" and "Carp::carp".
 
     *   "immutable"
 
-            use MooseX::Extended excludes => ['immutable'];
+            use MooseX::Extended excludes => 'immutable';
 
         Excluding this will no longer make your class immutable.
 
     *   "true"
 
-            use MooseX::Extended excludes => ['true'];
+            use MooseX::Extended excludes => 'true';
 
         Excluding this will require your module to end in a true value.
 
     *   "param"
 
-            use MooseX::Extended excludes => ['param'];
+            use MooseX::Extended excludes => 'param';
 
         Excluding this will make the "param" function unavailable.
 
     *   "field"
 
-            use MooseX::Extended excludes => ['field'];
+            use MooseX::Extended excludes => 'field';
 
         Excluding this will make the "field" function unavailable.
 
@@ -185,14 +192,20 @@ CONFIGURATION
 
             use MooseX::Extended includes => [ 'method', 'try' ];
 
+    A single argument to "includes" can be a string. Multiple "includes"
+    require an array reference:
+
+            use MooseX::Extended includes => [qw/method try/];
+
     See MooseX::Extended::Manual::Includes for more information.
 
 REDUCING BOILERPLATE
     Let's say you've settled on the following feature set:
 
         use MooseX::Extended
-            excludes => [qw/StrictConstructor carp/],
-            includes => [qw/method/];
+          excludes => [qw/StrictConstructor carp/],
+          includes => 'method',
+          types    => ':Standard';
 
     And you keep typing that over and over. We've removed a lot of
     boilerplate, but we've added different boilerplate. Instead, just create
@@ -339,6 +352,8 @@ MANUAL
     *   MooseX::Extended::Manual::Overview
 
     *   MooseX::Extended::Manual::Construction
+
+    *   MooseX::Extended::Manual::Includes
 
     *   MooseX::Extended::Manual::Shortcuts
 

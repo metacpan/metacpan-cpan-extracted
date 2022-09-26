@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.07
+    version 0.09
 
 SYNOPSIS
 
@@ -41,6 +41,8 @@ PROPERTIES
     The GitHub repository name. This property is required.
 
  include_assets
+
+    [deprecated: use the asset* properties instead]
 
     Defaulting to false, this option designates whether to include the
     assets of releases in the list of candidates for download. This should
@@ -95,6 +97,39 @@ PROPERTIES
       reasonable for at least some GitHub repositories. This is the
       default.
 
+ asset
+
+    Download from assets instead of via tag. This option is incompatible
+    with tags_only.
+
+ asset_name
+
+    Regular expression which the asset name should match. The default is
+    qr/\.tar\.gz$/.
+
+ asset_format
+
+    The format of the asset. This is passed to
+    Alien::Build::Plugin::Extract::Negotiate so any format supported by
+    that is valid.
+
+ asset_convert_version
+
+    This is an optional code reference which can be used to modify the
+    version. For example, if the release version is prefixed with a v You
+    could do this:
+
+     plugin 'Download::GitHub' => (
+       github_user => 'PerlAlien',
+       github_repo => 'dontpanic',
+       asset => 1,
+       asset_convert_version => sub {
+         my $version = shift;
+         $version =~ s/^v//;
+         $version;
+       },
+     );
+
 ENVIRONMENT
 
     ALIEN_BUILD_GITHUB_TOKEN GITHUB_TOKEN GITHUB_PAT
@@ -108,7 +143,15 @@ ENVIRONMENT
       headers so this will make sure that your PAT is not displayed in the
       log.
 
+    ALIEN_BUILD_PLUGIN_DOWNLOAD_GITHUB_DEBUG
+
+      Setting this to a true value will send additional diagnostics to the
+      log during the indexing phase of the fetch.
+
 CAVEATS
+
+    This plugin does not support, and will not work if ALIEN_DOWNLOAD_RULE
+    is set to either digest_and_encrypt or digest.
 
     The GitHub API is rate limited. Once you've reach that limit, this
     plugin will be inoperative for a period of time until the limits reset.
@@ -156,7 +199,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2019 by Graham Ollis.
+    This software is copyright (c) 2019-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

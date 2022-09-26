@@ -50,7 +50,7 @@
   print dd_repro($obj); # $obj in scientific notation (in decimal).
 
   # Verify that the string returned by dd_repro($obj) is correct:
-  print "ok" if dd_repro_test(dd_repro($obj), $obj) == 7;
+  print "ok" if dd_repro_test(dd_repro($obj), $obj) == 15;
 
   print dd_dec($obj); # Exact representation of the value held by $obj,
                       # in scientific notation .
@@ -120,13 +120,28 @@
 =head1 EXPONENTIATION FUNCTIONS
 
   $obj = dd_exp($arg);
+  $obj = dd_exp2($arg);
+  $obj = dd_exp10($arg);
 
-   Return a Math::FakeDD object that contains e ** $arg.
+   Return a Math::FakeDD object that contains respectively
+   e ** $arg, 2 ** $arg, 10 ** $arg.
 
   $obj = dd_log($arg);
+  $obj = dd_log2($arg);
+  $obj = dd_log10($arg);
 
-   Return a Math::FakeDD object that contains the natural
-   logarithm of $arg.
+   Return a Math::FakeDD object that contains respectively
+   the natural log of $arg, the base 2 log of $arg, the
+   base 10 log of $arg.
+
+=head1 TRANSCENDENTAL FUNCTIONS
+
+  $obj = dd_pi();
+  $obj = dd_euler();
+  $obj = dd_catalan();
+
+  Return (respectively) pi (3.141...), Euler's constant (0.577...)
+  and Catalan's constant (0.577...) .
 
 =head1 TRIGONOMETRY FUNCTIONS
 
@@ -228,23 +243,27 @@
    The function assigns its first arg, dd_repro($obj), to a
    string - let's call it $str.
 
-   3 tests are conducted:
+   4 tests are conducted:
 
    1) that Math::FakeDD->new($str) == $obj.
-      $iv & 1 will be true if and only if this first test passes.
+      $iv & 1 will be true if and only if this test passes.
 
    2) that if we were to round $str *down* to 1 less significant decimal
       digit then Math::FakeDD->new($str) < $obj.
-      $iv & 2 will be true if and only if this second test passes.
+      $iv & 2 will be true if and only if this test passes.
 
    3) that if we were round $str *up* to 1 less significant decimal
       digit then Math::FakeDD->new($str) > $obj.
-      $iv & 4 will be true if and only if this second test passes.
+      $iv & 4 will be true if and only if this test passes.
 
-   If all three tests pass (in which case the returned $iv == 7) then
+   4) that there are no errant trailing zeroes in the mantissa portion
+      of $str.
+      $iv & 8 will be true if and only if this test passes.
+
+   If all four tests pass (in which case the returned $iv == 15) then
    we know that dd_repro($obj) has functioned correctly and as intended.
    Else, dd_repro() has not functioned correctly and we can determine
-   which test(s) failed by examining the 3 lowest bits of $iv.
+   which test(s) failed by examining the 4 lowest bits of $iv.
 
   $str = dd_stringify($obj);
 

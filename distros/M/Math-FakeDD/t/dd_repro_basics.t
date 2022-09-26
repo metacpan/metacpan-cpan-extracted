@@ -15,15 +15,15 @@ for(-1075..1024) { # -348 is the largest failing exponent in this range
   my $vn = Math::FakeDD->new(-(2 ** $_));
 
   my $rp = dd_repro($vp);
+#  ok(Math::FakeDD::tz_test($rp) == 1, sprintx($vp));
+
   my $rn = dd_repro($vn);
+#  ok(Math::FakeDD::tz_test($rn) == 1, sprintx($vn));
 
   ok(chop_inc_test($rp, $vp));
   ok(chop_inc_test($rn, $vn));
 
   if(NV_IS_DOUBLEDOUBLE) {
-    # These tests are tautologically true unless $ENV{DD_AVOID_NVTOA}
-    # was set to a true value before this script was run.
-
     ok($rp eq Math::MPFR::nvtoa($vp), "+(2 ** $_) agrees with nvtoa()");
     ok($rn eq Math::MPFR::nvtoa($vn), "-(2 ** $_) agrees with nvtoa()");
   }
@@ -41,15 +41,15 @@ for(-1075..1024) { # -348 is the largest failing exponent in this range
   my $dd2 = Math::FakeDD->new($v2);
 
   my $r1 = dd_repro($dd1);
+#  ok(Math::FakeDD::tz_test($r1) == 1, sprintx($dd1));
+
   my $r2 = dd_repro($dd2);
+#  ok(Math::FakeDD::tz_test($r2) == 1, sprintx($dd2));
 
   ok(chop_inc_test($r1, $dd1));
   ok(chop_inc_test($r2, $dd2));
 
   if(NV_IS_DOUBLEDOUBLE) {
-    # These tests are tautologically true unless $ENV{DD_AVOID_NVTOA}
-    # was set to a true value before this script was run.
-
     ok($r1 eq Math::MPFR::nvtoa($v1), "2 ** $_ + ..... agrees with nvtoa()");
     ok($r2 eq Math::MPFR::nvtoa($v2), "2 ** $_ + 2 ** ($_ + 1) agrees with nvtoa()");
   }
@@ -66,7 +66,7 @@ sub chop_inc_test {
    else {
      $res = dd_repro_test($repro, $op);
    }
-   ok($res == 7) or dd_diag($res, $op);
+   ok($res == 15) or dd_diag($res, $op);
 }
 
 sub dd_diag {
@@ -77,4 +77,6 @@ sub dd_diag {
     unless  $_[0] & 2;
   print STDERR "Failed increment test for " . sprintx($_[1]) . " (Prec = $p)\n"
     unless $_[0] & 4;
+  print STDERR "Failed trailing zero test for " . sprintx($_[1]) . " (Prec = $p)\n"
+    unless $_[0] & 8;
 }

@@ -3,9 +3,9 @@ package Sah::Schema::latin_letter;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-09'; # DATE
+our $DATE = '2022-09-22'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our $schema = [str => {
     summary => 'Latin letter, i.e. A-Z or a-z',
@@ -37,7 +37,7 @@ Sah::Schema::latin_letter - Latin letter, i.e. A-Z or a-z
 
 =head1 VERSION
 
-This document describes version 0.011 of Sah::Schema::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2022-07-09.
+This document describes version 0.012 of Sah::Schema::latin_letter (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = ";";
+ $data = 1;
  my $errmsg = $validator->($data); # => "Must match regex pattern qr(\\A[A-Za-z]\\z)"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -88,8 +88,8 @@ prefiltered) value:
  my $res = $validator->($data); # => ["","A"]
  
  # a sample invalid data
- $data = ";";
- my $res = $validator->($data); # => ["Must match regex pattern qr(\\A[A-Za-z]\\z)",";"]
+ $data = 1;
+ my $res = $validator->($data); # => ["Must match regex pattern qr(\\A[A-Za-z]\\z)",1]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -177,9 +177,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

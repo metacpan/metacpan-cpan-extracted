@@ -46,6 +46,12 @@ TODO: allow import of fds as aio_wd
 TODO: close_range
 TODO: move_mount, open_tree, fsmount, fspick, fsconfig, fsopen https://lwn.net/Articles/759499/
 
+4.79 Sun 25 Sep 2022 18:25:53 CEST
+	- the autoconf result of the mount check was not used, so it failed to
+          compile on most systems (reported by crackoff@tutanota.com).
+	- work around fedora not having a working C compiler setup by design
+          (reported by Paul Howarth).
+
 4.78 Tue 06 Sep 2022 12:54:43 CEST
 	- add IO::AIO::mount and IO::AIO::umount.
 	- add a bunch of symbols from sys/mount.h.

@@ -10,7 +10,7 @@ do './bin/af';
 subtest 'file' => sub {
 
   local $CWD = tempdir( CLEANUP => 1 );
-  
+
   alienfile q{
     use alienfile;
     use Path::Tiny qw( path );
@@ -26,9 +26,9 @@ subtest 'file' => sub {
   ok(-f "foo-1.00.tar.gz", "file was copied");
   is(path("foo-1.00.tar.gz")->slurp, "some test data", 'correct data');
   unlink 'foo-1.00.tar.gz';
-  
+
   mkdir 'roger';
-  
+
   is(run('download', '--local' => 'roger'), 0);
   ok(-f "roger/foo-1.00.tar.gz", "file was copied");
   ok(! -f "foo-1.00.tar.gz", "file was not copied");
@@ -39,7 +39,7 @@ subtest 'file' => sub {
 subtest 'directory' => sub {
 
   local $CWD = tempdir( CLEANUP => 1 );
-  
+
   alienfile q{
     use alienfile;
     use Path::Tiny qw( path );
@@ -52,7 +52,7 @@ subtest 'directory' => sub {
       };
     };
   };
-  
+
   is(run('download'), 0);
   ok(-f 'dir1/file1');
   ok(-f 'dir1/file2');
@@ -64,7 +64,7 @@ subtest 'directory' => sub {
 subtest 'nada' => sub {
 
   local $CWD = tempdir( CLEANUP => 1 );
-  
+
   alienfile q{
     use alienfile;
     use Path::Tiny qw( path );
@@ -74,7 +74,7 @@ subtest 'nada' => sub {
       };
     };
   };
-  
+
   is(run('download'), 2);
 
 };

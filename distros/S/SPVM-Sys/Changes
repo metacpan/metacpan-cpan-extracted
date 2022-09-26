@@ -1,3 +1,25 @@
+0.05 2022-09-26
+  [Document Fix To Fix Typo]
+    * Remove native attribute from the definitions of the methods.
+  [Test Improvement]
+    * Add many tests.
+  [Bug Fix]
+    * Fix the bug that the execv method in the Sys::Process doesn't work well.
+  [Incompatible Changes]
+    * The name and definition of the setpgrp method in the Sys::Process.
+      [Before]
+      static method setpgrp : int ();
+      
+      [After]
+      static method setpgid : int ($pid : int, $pgid : int);
+      
+    * The name and definition of the getpgrp method in the Sys::Process.
+      [Before]
+      static method getpgrp : int ();
+      
+      [After]
+      static method getpgid : int ($pid : int);
+    
 0.04 2022-09-16
   [Test Improvement]
     * Add many tests.

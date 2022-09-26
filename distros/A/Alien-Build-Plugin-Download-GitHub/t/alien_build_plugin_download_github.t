@@ -12,6 +12,7 @@ subtest 'basic load' => sub {
   my %mock_response = (
     type     => 'file',
     filename => 'releases',
+    protocol => 'https',
   );
 
   my $mock1 = mock 'Alien::Build::Plugin::Download::Negotiate' => (
@@ -108,6 +109,7 @@ subtest 'basic load' => sub {
       $build->fetch,
       {
         type => 'list',
+        protocol => 'https',
         list => [
           { filename => 'v1.01', url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01', version => '1.01' },
           { filename => '1.00',  url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/1.00',  version => '1.00' },
@@ -187,6 +189,7 @@ subtest 'basic load' => sub {
       $build->fetch,
       {
         type => 'list',
+        protocol => 'https',
         list => [
           { filename => 'v1.01', url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01', version => '1.01' },
           { filename => '1.00',  url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/1.00',  version => '1.00' },
@@ -287,6 +290,7 @@ subtest 'basic load' => sub {
     is $build->fetch,
       {
         type => 'list',
+        protocol => 'https',
         list => [
         { filename => 'v1.01', url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01', version => '1.01' },
         {
@@ -320,6 +324,7 @@ subtest 'basic load' => sub {
     is $build->fetch,
       {
         type => 'list',
+        protocol => 'https',
         list => [
         { filename => 'v1.01', url => 'https://api.github.com/repos/PerlAlien/dontpanic/tarball/v1.01', version => '1.01' },
         {
@@ -372,6 +377,7 @@ subtest 'basic load' => sub {
     alienfile_skip_if_missing_prereqs;
 
     is $build->fetch, {
+      protocol => 'https',
       list => [
         {
           filename => 'v1.01',
@@ -419,6 +425,15 @@ subtest 'live tests' => sub {
     probe sub { 'share' };
 
     share {
+      if(__PACKAGE__->can('digest'))
+      {
+        plugin 'Test::Mock',
+          check_digest => 1;
+        meta->prop->{check_digest} = 1;
+        meta->prop->{digest} = {
+          '*' => [ FAKE => 'deadbeaf' ],
+        };
+      }
       plugin 'Download::GitHub' => (
         github_user => 'PerlAlien',
         github_repo => 'dontpanic',
@@ -447,6 +462,12 @@ subtest 'live tests' => sub {
     $default,
     hash {
       field type => 'list';
+
+      ## NOTE: depending on the version of AB this may or may
+      ## not be set.  When the version of AB is bumped sufficently,
+      ## we should make this check.
+      #field protocol => 'https';
+
       field list => bag {
         item hash sub {
           field filename => '1.02';
@@ -470,6 +491,8 @@ subtest 'live tests' => sub {
         };
         etc;
       };
+
+      etc;
     },
     'see that we have 0.90, 1.00, 1.01 and 1.02 at least',
   ;

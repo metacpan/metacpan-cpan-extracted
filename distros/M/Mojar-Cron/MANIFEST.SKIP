@@ -1,7 +1,8 @@
 # No private files
 ^\.
 ^debian
-^dep
+^local
+^log
 
 # No temp files
 ~$

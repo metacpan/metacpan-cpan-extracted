@@ -6,8 +6,8 @@ use strict;
 use warnings;
 
 package RT::Client::REST::HTTPClient;
-$RT::Client::REST::HTTPClient::VERSION = '0.60';
-use base 'LWP::UserAgent';
+$RT::Client::REST::HTTPClient::VERSION = '0.70';
+use parent 'LWP::UserAgent';
 
 
 sub get_basic_credentials {
@@ -47,7 +47,7 @@ RT::Client::REST::HTTPClient - Subclass LWP::UserAgent in order to support basic
 
 =head1 VERSION
 
-version 0.60
+version 0.70
 
 =head1 METHODS
 
@@ -65,11 +65,11 @@ Gets/sets basic authentication callback
 
 =head1 AUTHOR
 
-Dmitri Tikhonov
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

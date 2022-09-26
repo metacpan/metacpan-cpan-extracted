@@ -23,11 +23,12 @@ my $user;
 
 lives_ok {
     $user = RT::Client::REST::Queue->new;
-} 'Queue can get successfully created';
+}
+'Queue can get successfully created';
 
 for my $method (METHODS) {
-    can_ok($user, $method);
+    can_ok( $user, $method );
 }
 
-ok('queue' eq $user->rt_type);
+ok( 'queue' eq $user->rt_type );
 

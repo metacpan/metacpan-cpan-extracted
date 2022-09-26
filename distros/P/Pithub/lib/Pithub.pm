@@ -4,7 +4,7 @@ our $AUTHORITY = 'cpan:PLU';
 
 use Moo;
 
-our $VERSION = '0.01039';
+our $VERSION = '0.01040';
 
 use Carp                 qw( croak );
 use Pithub::Events       ();
@@ -115,7 +115,7 @@ Pithub - Github v3 API
 
 =head1 VERSION
 
-version 0.01039
+version 0.01040
 
 =head1 SYNOPSIS
 
@@ -265,7 +265,7 @@ the HTTP requests that are created by the method calls, without
 actually sending them. The second one is sending real requests to
 the Github API. If you want to contribute to this project, I highly
 recommend to run the live tests on a test account, because it will
-generate a lof of activity.
+generate a lot of activity.
 
 =head1 MODULES
 

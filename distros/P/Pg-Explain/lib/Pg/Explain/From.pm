@@ -27,11 +27,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 2.1
+Version 2.2
 
 =cut
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 =head1 SYNOPSIS
 
@@ -184,6 +184,14 @@ sub make_node_from {
         $new_node->scan_on(
             {
                 'subquery_name' => $struct->{ 'Alias' },
+            }
+        );
+    }
+    elsif ( $struct->{ 'Node Type' } eq 'WorkTable Scan' ) {
+        $new_node->scan_on(
+            {
+                'worktable_name'  => $struct->{ 'CTE Name' },
+                'worktable_alias' => $struct->{ 'Alias' },
             }
         );
     }

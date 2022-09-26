@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Forms;
-$RT::Client::REST::Forms::VERSION = '0.60';
+$RT::Client::REST::Forms::VERSION = '0.70';
 use Exporter;
 
 use vars qw(@EXPORT @ISA);
@@ -16,6 +16,8 @@ use vars qw(@EXPORT @ISA);
 
 my $CF_name = q%[#\s\w:()?/-]+%;
 my $field   = qr/[a-z][\w-]*|C(?:ustom)?F(?:ield)?-$CF_name|CF\.\{$CF_name}/i;
+# always 9 https://rt-wiki.bestpractical.com/wiki/REST#Ticket_Attachments
+my $spaces = ' ' x 9;
 
 
 sub expand_list {
@@ -34,7 +36,7 @@ sub expand_list {
 
 
 sub form_parse {
-    my @lines = split /\n/, shift;
+    my @lines = split /(?<=\n)/, shift;
     my $state = 0;
     my @forms = ();
     my ($c, $o, $k, $e) = ('', [], {}, '');
@@ -43,9 +45,9 @@ sub form_parse {
     while (@lines) {
         my $line = shift @lines;
 
-        next LINE if $line eq '';
+        next LINE if $line eq "\n";
 
-        if ($line eq '--') {
+        if ($line eq "--\n") {
             # We reached the end of one form. We'll ignore it if it was
             # empty, and store it otherwise, errors and all.
             if ($e || $c || @$o) {
@@ -53,44 +55,64 @@ sub form_parse {
                 $c = ''; $o = []; $k = {}; $e = '';
             }
             $state = 0;
+            next LINE
         }
-        elsif ($state != -1) {
+
+        if ($state != -1) {
+
             if ($state == 0 && $line =~ m/^#/) {
                 # Read an optional block of comments (only) at the start
                 # of the form.
                 $state = 1;
                 $c = $line;
                 while (@lines && $lines[0] =~ m/^#/) {
-                    $c .= "\n" . shift @lines;
+                    $c .= shift @lines;
                 }
-                $c .= "\n";
+                next LINE
             }
-            elsif ($state <= 1 && $line =~ m/^($field:\s?)(.*)?$/) {
+
+            if ($state <= 1 && $line =~ m/^($field: )(.*)?$/s) {
                 # Read a field: value specification.
                 my $f     = $1;
                 my $value = $2;
-                my $spaces = ' ' x length($f);
-                $f =~ s/:\s?$//;
+                $f =~ s/: ?$//;
 
                 # Read continuation lines, if any.
-                while (@lines && ($lines[0] eq '' || $lines[0] =~ m/^\s+/)) {
+                while (@lines && ($lines[0] eq "\n" || $lines[0] =~ m/^ +/)) {
                     my $l = shift @lines;
                     $l =~ s/^$spaces//;
-                    $value .= "\n" . $l
+                    $value .= $l
+                }
+
+                # `Content` is always supposed to be followed by three new lines
+                # ... but this doesnt behave as documented
+                # https://rt-wiki.bestpractical.com/wiki/REST#Ticket_Attachments
+                if ($f eq 'Content') {
+                    $value =~ s/\n\n\n?$//g
+                }
+                # Chomp everything else
+                else {
+                    chomp $value
                 }
 
                 push(@$o, $f) unless exists $k->{$f};
                 vpush($k, $f, $value);
 
                 $state = 1;
+
+                next LINE
             }
-            elsif ($line !~ m/^#/) {
+
+            if ($line !~ m/^#/) {
                 # We've found a syntax error, so we'll reconstruct the
                 # form parsed thus far, and add an error marker. (>>)
                 $state = -1;
                 $e = form_compose([[ '', $o, $k, '' ]]);
                 $e.= $line =~ m/^>>/ ? "$line\n" : ">> $line\n";
+                next LINE
             }
+
+            # line will be ignored
         }
         else {
             # We saw a syntax error earlier, so we'll accumulate the
@@ -227,7 +249,7 @@ RT::Client::REST::Forms - This package provides functions from RT::Interface::RE
 
 =head1 VERSION
 
-version 0.60
+version 0.70
 
 =head2 METHODS
 
@@ -261,11 +283,11 @@ Add a value to a (possibly multi-valued) hash key.
 
 =head1 AUTHOR
 
-Dmitri Tikhonov
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -16,7 +16,7 @@ with 'PDK::Device::Role';
 #------------------------------------------------------------------------------
 sub _prompt {
   my $self   = shift;
-  my $prompt = '.*?\((?:M|B)\)[>#]';
+  my $prompt = '.*?(\((?:M|B)\))?[>#]\s$';
   return $prompt;
 }
 
@@ -66,12 +66,7 @@ sub truncateCommand {
 #------------------------------------------------------------------------------
 sub _errorCodes {
   my $self  = shift;
-  my $codes = [
-    'syntax error, expecting',
-    'missing argument',
-    'unknown command',
-    '^\s+\^-----', 'error: cli version does not match Managment Daemon', '^Error:',
-  ];
+  my $codes = ['^\s+\^-----', '^Error:', 'syntax error, expecting', 'missing argument', 'unknown command'];
   return $codes;
 }
 
@@ -80,16 +75,7 @@ sub _errorCodes {
 #------------------------------------------------------------------------------
 sub _bufferCodes {
   my $self    = shift;
-  my %mapping = (
-    more     => '^ --More-- ',
-    interact => {
-      '^Backup (all )?start config' => 'Y',
-      '^Save configuration'         => 'Y',
-      'press the enter key\)'       => ' ',
-      'overwrite\?\s*\[Y\/N\]'      => 'Y',
-      'are you sure\?'              => 'Y',
-    }
-  );
+  my %mapping = (more => '^ --More-- ', interact => {'are you sure' => "y"});
 
   # 返回数据字典
   return \%mapping;

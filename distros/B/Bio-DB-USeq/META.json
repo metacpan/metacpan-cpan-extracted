@@ -4,7 +4,7 @@
       "Timothy Parnell <parnell.tj@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Archive::Zip" : "1.30",
+            "Archive::Zip" : "1.67",
             "Bio::Root::Version" : "1.0069001",
             "Set::IntervalTree" : "0.10",
             "perl" : "v5.10.0"
@@ -31,7 +31,7 @@
    "provides" : {
       "Bio::DB::USeq" : {
          "file" : "lib/Bio/DB/USeq.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Bio::DB::USeq::Feature" : {
          "file" : "lib/Bio/DB/USeq.pm"
@@ -58,5 +58,6 @@
          "url" : "https://github.com/tjparnell/Bio-DB-USeq"
       }
    },
-   "version" : "0.25"
+   "version" : "0.26",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

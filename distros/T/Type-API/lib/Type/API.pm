@@ -1,7 +1,11 @@
 package Type::API;
 
-our $AUTHORITY = "cpan:TOBYINK";
-our $VERSION   = "0.002";
+use strict;
+use warnings;
+use vars qw( $AUTHORITY $VERSION );
+
+$AUTHORITY = "cpan:TOBYINK";
+$VERSION   = "1.001";
 
 1;
 

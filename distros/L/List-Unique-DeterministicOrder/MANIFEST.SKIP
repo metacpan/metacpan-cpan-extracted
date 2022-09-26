@@ -12,3 +12,5 @@ MYMETA
 
 appveyor\.yml
 \.travis\.yml
+
+komodoproject$

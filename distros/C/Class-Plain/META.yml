@@ -1,0 +1,34 @@
+---
+abstract: 'a class syntax for the hash-based Perl OO.'
+author:
+  - 'Yuki Kimoto E<lt>kimoto.yuki@gmail.comE<gt>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+  XS::Parse::Keyword::Builder: '0.22'
+  XS::Parse::Sublike::Builder: '0.15'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Plain
+provides:
+  Class::Plain:
+    file: lib/Class/Plain.pm
+    version: '0.04'
+  Class::Plain::Base:
+    file: lib/Class/Plain/Base.pm
+  Class::Plain::Document::Cookbook:
+    file: lib/Class/Plain/Document/Cookbook.pm
+requires:
+  XS::Parse::Keyword: '0.22'
+  XS::Parse::Sublike: '0.15'
+  perl: '5.016'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

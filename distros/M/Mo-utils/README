@@ -2,11 +2,12 @@ NAME
     Mo::utils - Mo utilities.
 
 SYNOPSIS
-     use Mo::utils qw(check_array check_array_object check_bool check_isa check_length check_number check_number_of_items check_required);
+     use Mo::utils qw(check_array check_array_object check_bool check_code check_isa check_length check_number check_number_of_items check_required);
 
      check_array($self, $key);
      check_array_object($self, $key, $class, $class_name);
      check_bool($self, $key);
+     check_code($self, $key);
      check_isa($self, $key, $class);
      check_length($self, $key, $max_length);
      check_number($self, $key);
@@ -41,6 +42,15 @@ SUBROUTINES
      check_bool($self, $key);
 
     Check parameter defined by $key if value is bool or not.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_code"
+     check_code($self, $key);
+
+    Check parameter defined by $key which is code reference or no.
 
     Put error if check isn't ok.
 
@@ -107,6 +117,10 @@ ERRORS
 
      check_bool():
              Parameter '%s' must be a bool (0/1).
+                     Value: %s
+
+     check_code():
+             Parameter '%s' must be a code.
                      Value: %s
 
      check_isa():
@@ -249,6 +263,44 @@ EXAMPLE7
      use strict;
      use warnings;
 
+     use Mo::utils qw(check_code);
+     use Test::MockObject;
+
+     my $self = {
+             'key' => sub {},
+     };
+     check_code($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE8
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils qw(check_code);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'bad',
+     };
+     check_code($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Parameter 'key' must be a code.
+
+EXAMPLE9
+     use strict;
+     use warnings;
+
      use Mo::utils qw(check_isa);
      use Test::MockObject;
 
@@ -263,7 +315,7 @@ EXAMPLE7
      # Output:
      # ok
 
-EXAMPLE8
+EXAMPLE10
      use strict;
      use warnings;
 
@@ -282,7 +334,7 @@ EXAMPLE8
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' must be a 'Test::MockObject' object.
 
-EXAMPLE9
+EXAMPLE11
      use strict;
      use warnings;
 
@@ -301,7 +353,7 @@ EXAMPLE9
      # Output like:
      # ok
 
-EXAMPLE10
+EXAMPLE12
      use strict;
      use warnings;
 
@@ -320,7 +372,7 @@ EXAMPLE10
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' has length greater than '2'.
 
-EXAMPLE11
+EXAMPLE13
      use strict;
      use warnings;
 
@@ -337,7 +389,7 @@ EXAMPLE11
      # Output:
      # ok
 
-EXAMPLE12
+EXAMPLE14
      use strict;
      use warnings;
 
@@ -356,7 +408,7 @@ EXAMPLE12
      # Output like:
      # #Error [...utils.pm:?] Parameter 'key' must be a number.
 
-EXAMPLE13
+EXAMPLE15
      use strict;
      use warnings;
 
@@ -398,7 +450,7 @@ EXAMPLE13
      # Output like:
      # ok
 
-EXAMPLE14
+EXAMPLE16
      use strict;
      use warnings;
 
@@ -440,7 +492,7 @@ EXAMPLE14
      # Output like:
      # #Error [...utils.pm:?] Test for Item 'value1' has multiple values.
 
-EXAMPLE15
+EXAMPLE17
      use strict;
      use warnings;
 
@@ -457,7 +509,7 @@ EXAMPLE15
      # Output:
      # ok
 
-EXAMPLE16
+EXAMPLE18
      use strict;
      use warnings;
 
@@ -497,5 +549,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.11
+    0.12
 

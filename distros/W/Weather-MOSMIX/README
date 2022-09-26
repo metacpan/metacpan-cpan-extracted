@@ -48,6 +48,8 @@ L<https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_S/all_stations/kml/
 
 Other Weather APIs
 
+L<Weather::YR> - API of the L<https://yr.no> weather service
+
 L<https://openweathermap.org/api> - international, signup required
 
 L<https://www.weatherbit.io/api> - international, signup required

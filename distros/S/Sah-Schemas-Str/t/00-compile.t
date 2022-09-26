@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 18 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Filter/perl/Str/maybe_convert_to_re.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'Sah/Schema/latin_alpha.pm',
     'Sah/Schema/latin_alphanum.pm',
     'Sah/Schema/latin_letter.pm',
+    'Sah/Schema/percent_str.pm',
     'Sah/Schema/str_or_aos.pm',
     'Sah/Schema/str_or_aos1.pm',
     'Sah/Schema/str_or_re.pm',
@@ -21,6 +22,7 @@ my @module_files = (
     'Sah/SchemaR/latin_alpha.pm',
     'Sah/SchemaR/latin_alphanum.pm',
     'Sah/SchemaR/latin_letter.pm',
+    'Sah/SchemaR/percent_str.pm',
     'Sah/SchemaR/str_or_aos.pm',
     'Sah/SchemaR/str_or_aos1.pm',
     'Sah/SchemaR/str_or_re.pm',

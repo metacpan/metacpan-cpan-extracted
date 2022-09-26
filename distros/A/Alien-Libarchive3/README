@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.32
+    version 0.33
 
 SYNOPSIS
 
@@ -63,7 +63,17 @@ DESCRIPTION
     downloaded from the internet and it will be installed in a private
     share location for the use of other modules.
 
-    The intention is for this to eventually replace Alien::Libarchive
+    The older Alien::Libarchive exists as a compatibility layer over this
+    module.
+
+CAVEATS
+
+    On some older operating systems some of the dependencies may not build,
+    Alien::Nettle does not build correctly with older versions of OpenSSL.
+    If you do not need the encryption features provided by Alien::Nettle
+    and nettle, then you can skip it when you install this module:
+
+     $ env ALIEN_LIBARCHIVE_DEPS=Alien::xz,Alien::LZO,Alien::Libbz2,Alien::Libxml2 cpanm Alien::Libarchive3
 
 SEE ALSO
 
@@ -75,7 +85,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Graham Ollis.
+    This software is copyright (c) 2017-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -2,8 +2,8 @@ NAME
     App::orgadb - An opinionated Org addressbook toolset
 
 VERSION
-    This document describes version 0.006 of App::orgadb (from Perl
-    distribution App-orgadb), released on 2022-09-09.
+    This document describes version 0.008 of App::orgadb (from Perl
+    distribution App-orgadb), released on 2022-09-26.
 
 SYNOPSIS
 FUNCTIONS

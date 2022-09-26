@@ -1,12 +1,12 @@
 package Type::Tiny::Union;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	$Type::Tiny::Union::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Union::VERSION   = '1.016010';
+	$Type::Tiny::Union::VERSION   = '2.000000';
 }
 
 $Type::Tiny::Union::VERSION =~ tr/_//d;
@@ -21,7 +21,25 @@ our @ISA = 'Type::Tiny';
 
 __PACKAGE__->_install_overloads(
 	q[@{}] => sub { $_[0]{type_constraints} ||= [] } );
-	
+
+sub new_by_overload {
+	my $proto = shift;
+	my %opts  = ( @_ == 1 ) ? %{ $_[0] } : @_;
+
+	my @types = @{ $opts{type_constraints} };
+	if ( my @makers = map scalar( blessed($_) && $_->can( 'new_union' ) ), @types ) {
+		my $first_maker = shift @makers;
+		if ( ref $first_maker ) {
+			my $all_same = not grep $_ ne $first_maker, @makers;
+			if ( $all_same ) {
+				return ref( $types[0] )->$first_maker( %opts );
+			}
+		}
+	}
+
+	return $proto->new( \%opts );
+}
+
 sub new {
 	my $proto = shift;
 	
@@ -357,6 +375,22 @@ Union type constraints.
 
 This package inherits from L<Type::Tiny>; see that for most documentation.
 Major differences are listed below:
+
+=head2 Constructor
+
+The C<new> constructor from L<Type::Tiny> still works, of course. But there
+is also:
+
+=over
+
+=item C<< new_by_overload(%attributes) >>
+
+Like the C<new> constructor, but will sometimes return another type
+constraint which is not strictly an instance of L<Type::Tiny::Union>, but
+still encapsulates the same meaning. This constructor is used by
+Type::Tiny's overloading of the C<< | >> operator.
+
+=back
 
 =head2 Attributes
 

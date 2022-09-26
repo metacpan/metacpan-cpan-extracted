@@ -5,7 +5,6 @@ package MooseX::Extended::Role;
 use strict;
 use warnings;
 use Moose::Exporter;
-use MooseX::Extended::Types ':all';
 use MooseX::Extended::Core qw(
   field
   param
@@ -25,7 +24,7 @@ use true;
 use feature _enabled_features();
 no warnings _disabled_warnings();
 
-our $VERSION = '0.31';
+our $VERSION = '0.33';
 
 # Should this be in the metaclass? It feels like it should, but
 # the MOP really doesn't support these edge cases.
@@ -88,7 +87,7 @@ MooseX::Extended::Role - MooseX::Extended roles
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 

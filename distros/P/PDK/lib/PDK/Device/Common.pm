@@ -29,7 +29,7 @@ sub getRunConfig {
 
   # 动态加载设备连接插件
   $vendor = ucfirst lc $vendor;
-  my $class = "Firewall::Device::$vendor";
+  my $class = "PDK::Device::$vendor";
 
   # 实例化设备连机对象
   my $result;

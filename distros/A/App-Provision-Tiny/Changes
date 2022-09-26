@@ -1,5 +1,9 @@
 Revision history for App-Provision-Tiny
 
+0.0404 2022-09-24 17:01:16
+    - Modernize tests.
+    - Update the OSX homebrew install command.
+
 0.0403 2020-03-01 15:29:10
     - Update distribution.
     - Remove undesired example module.

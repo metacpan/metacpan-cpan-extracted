@@ -4,12 +4,12 @@ NAME
 
 VERSION
 
-    version 0.17
+    version 0.18
 
 SYNOPSIS
 
-     af download   --help
      af probe      --help
+     af download   --help
      af install    --help
      af requires   --help
      af missing    --help
@@ -112,7 +112,7 @@ SUBCOMMANDS
      af install
        [ ( -f | --file )  alienfile |  ( -c | --class ) class ]
        [ --prefix directory | --dry-run ] [ --stage directory ]
-       [ --type ( share | system ) ] [ --root directory ] 
+       [ --type ( share | system ) ] [ --root directory ]
        [ --before hook command ] [ --after hook command ]
        [ -I lib ] [ --blib ]
 
@@ -285,8 +285,8 @@ SUBCOMMANDS
 
   Usage
 
-     af prop 
-       ( -c | --class ) class [ --cflags ] [ --libs ] [ --static ] 
+     af prop
+       ( -c | --class ) class [ --cflags ] [ --libs ] [ --static ]
        [ --modversion ] [ --bin-dir ]
 
   prop
@@ -351,7 +351,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Graham Ollis.
+    This software is copyright (c) 2017-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #ifdef _WIN32
 
@@ -43,8 +44,6 @@ int32_t SPVM__Sys__Process__fork(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
   (void)stack;
   
-  int32_t seconds = stack[0].ival;
-  
   int32_t status = fork();
   
   if (status == -1) {
@@ -52,7 +51,7 @@ int32_t SPVM__Sys__Process__fork(SPVM_ENV* env, SPVM_VALUE* stack) {
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
-  stack[0].ival = status ;
+  stack[0].ival = status;
   
   return 0;
 #endif
@@ -252,24 +251,29 @@ int32_t SPVM__Sys__Process__pipe(SPVM_ENV* env, SPVM_VALUE* stack) {
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
+  pipefds[0] = pipefds_int[0];
+  pipefds[1] = pipefds_int[1];
+  
   stack[0].ival = status;
   
   return 0;
 #endif
 }
 
-int32_t SPVM__Sys__Process__getpgrp(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__Process__getpgid(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "getpgrp is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "getpgid is not supported on this system", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
   (void)stack;
+
+  int32_t pid = stack[0].ival;
   
-  int32_t process_group_id = getpgrp();
+  int32_t process_group_id = getpgid(pid);
   
   if (process_group_id == -1) {
-    env->die(env, stack, "[System Error]getpgrp failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]getpgid failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -279,18 +283,21 @@ int32_t SPVM__Sys__Process__getpgrp(SPVM_ENV* env, SPVM_VALUE* stack) {
 #endif
 }
 
-int32_t SPVM__Sys__Process__setpgrp(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__Process__setpgid(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "setpgrp is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "setpgid is not supported on this system", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
   (void)stack;
   
-  int32_t status = setpgrp();
+  int32_t pid = stack[0].ival;
+  int32_t pgid = stack[1].ival;
+  
+  int32_t status = setpgid(pid, pgid);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]setpgrp failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]setpgid failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -313,7 +320,7 @@ int32_t SPVM__Sys__Process__getpid(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Process__getppid(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "setpgrp is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "getppid is not supported on this system", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -340,9 +347,10 @@ int32_t SPVM__Sys__Process__execv(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_args = stack[1].oval;
   char** argv;
+  int32_t args_length = 0;
   if (obj_args) {
-    int32_t args_length = env->length(env, stack, obj_args);
-    char** argv = env->new_memory_stack(env, stack, sizeof(char*) * args_length + 1);
+    args_length = env->length(env, stack, obj_args);
+    argv = env->new_memory_stack(env, stack, sizeof(char*) * (args_length + 1));
     for (int32_t i = 0; i < args_length; i++) {
       void* obj_arg = env->get_elem_object(env, stack, obj_args, i);
       char* arg = (char*)env->get_chars(env, stack, obj_arg);
@@ -352,6 +360,7 @@ int32_t SPVM__Sys__Process__execv(SPVM_ENV* env, SPVM_VALUE* stack) {
   else {
     argv = env->new_memory_stack(env, stack, sizeof(char*) * 1);
   }
+  assert(argv[args_length] == NULL);
   
   int32_t status = execv(path, argv);
   
@@ -369,7 +378,7 @@ int32_t SPVM__Sys__Process__execv(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Process__times(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "setpgrp is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "times is not supported on this system", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   void* obj_st_tms = stack[0].oval;

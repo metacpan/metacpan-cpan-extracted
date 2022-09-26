@@ -1,0 +1,29 @@
+---
+abstract: 'L<Dqlite|https://dqlite.io> in Perl'
+author:
+  - 'Felipe Gasper (FELIPE)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Deep: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Protocol-Dqlite
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/FGasper/p5-Protocol-Dqlite/issues
+  repository: git://github.com/FGasper/p5-Protocol-Dqlite.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

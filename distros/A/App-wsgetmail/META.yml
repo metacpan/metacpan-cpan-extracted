@@ -3,9 +3,9 @@ abstract: 'Fetch mail from the cloud using webservices'
 author:
   - 'Best Practical Solutions, LLC <modules@bestpractical.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
+  ExtUtils::MakeMaker: 6.59
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
+  ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
 generated_by: 'Module::Install version 1.19'
@@ -32,13 +32,13 @@ requires:
   Module::Load: 0
   Moo: 0
   Pod::Usage: 0
-  perl: '5.010'
   Test::LWP::UserAgent: 0
   Test::More: 0
   URI: 0
   URI::Escape: 0
+  perl: 5.10.0
   strict: 0
   warnings: 0
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: '0.06'
+version: '0.08'

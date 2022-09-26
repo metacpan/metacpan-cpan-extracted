@@ -19,11 +19,11 @@ Optimization::NSGAII - non dominant sorting genetic algorithm for multi-objectiv
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 =head1 SYNOPSIS
 
@@ -36,6 +36,8 @@ our $VERSION = "0.02";
 	sub f_to_optimize {        
 	    
 	    my $x = shift;              # load input parameters (genes constituting a single individual)
+	    
+	    my $id = shift              # load id of this particular individual of the population
 
 	    # ...                       # do your things using these inputs $x->[0], $x->[1] ... 
 	                                # and produce the outputs to be minimized $f1, $f2 ...
@@ -43,12 +45,14 @@ our $VERSION = "0.02";
 	                                # examples of things you can do include:
 	                                # - mathematical formulas in perl to define $f1, $f2, ...
 	                                # - computations with commercial software and so: 
+	                                #       - create a directory using $id in the name
 	                                #       - write input file using $x->[0] ...
 	                                #       - run the computation, for example with perl system() function
 	                                #            - locally or
 	                                #            - on a server for example with 'qsub... '
 	                                #       - wait simulation to end 
 	                                #       - postprocess its output and define $f1, $f2 ...
+	                                #       - delete directory and contents
 	                                # - ...
 	    
 	    my $out = [$f1,$f2,$f3];    # and finally return the set of these outputs for
@@ -531,11 +535,11 @@ sub f_ineq2maxerr {
 	
 	my @ineq = @{$ref_ineq}; 
 		
-	my $err = 0;	
+	my $err = 0;
 	foreach my $el(@ineq){
 		$err = max( $err, -$el);
 	}
-	return $err;	
+	return $err;
 }
 
 
@@ -610,7 +614,7 @@ sub f_dominates {
 	# constraints errors
 	my $err1 = shift;
 	my $err2 = shift;
-	
+
 
 	# number of objective (dimensions)
 	my $M = scalar(@{$P1});
@@ -897,7 +901,7 @@ sub f_Optim_NSGAII {
 	
 	# optional paramters:
 	
-	my $f_ineq = $par{'f_ineq'} // sub {return [0]};	
+	my $f_ineq = $par{'f_ineq'} // sub {return [0]};
 
 	my $verboseFinal = $par{'verboseFinal'} // 1;
 
@@ -975,8 +979,8 @@ sub f_Optim_NSGAII {
 			open my $fileoP, '>>', $nameFileP or croak "E R R O R : problem in writing the file ".$nameFileP.' -> "filesDir" path not reachable? -- ';
 			open my $fileoQ, '>>', $nameFileQ or croak "E R R O R : problem in writing the file ".$nameFileQ.' -> "filesDir" path not reachable? -- ';
 			for ($id_from .. $id_to){
-				my $Pt_ = &{$fun}($VPt->[$_]);
-				my $Qt_ = &{$fun}($VQt->[$_]);
+				my $Pt_ = &{$fun}($VPt->[$_],$_);
+				my $Qt_ = &{$fun}($VQt->[$_],$_);
 				say $fileoP join ',',@{$Pt_};
 				say $fileoQ join ',',@{$Qt_};
 			}
@@ -1086,7 +1090,7 @@ sub f_Optim_NSGAII {
 		# new output
 		my $Qtp1;
 		for (0..$nPop-1){
-			$Qtp1->[$_]=&{$fun}($VQtp1->[$_]);
+			$Qtp1->[$_]=&{$fun}($VQtp1->[$_],$_);
 			}
 			
 		# new became old

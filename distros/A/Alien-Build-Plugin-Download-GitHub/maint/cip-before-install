@@ -3,3 +3,5 @@
 set -ex
 
 cip exec cpanm -n Mojo::DOM58
+cip exec mkdir -p /home/cip/tmp
+cip exec ./maint/cip-before-install-inside

@@ -41,20 +41,20 @@ sub last_exit
 sub run
 {
   my($subcommand, @args) = @_;
-  
+
   my $class = "App::af::$subcommand";
-  
+
   note "[command]\naf $subcommand @args";
-  
+
   $out = '';
   $err = '';
   ($out, $err, $ret) = capture {
     $class->new(@args)->main;
   };
-  
+
   note "[stdout]\n$out" if defined $out && $out ne '';
   note "[stderr]\n$err" if defined $err && $err ne '';
-  
+
   $ret;
 }
 

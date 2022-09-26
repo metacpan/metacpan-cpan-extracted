@@ -14,8 +14,8 @@ class Sys::Process {
   native static method system : int ($command : string);
   native static method exit : int ($status : int);
   native static method pipe : int ($pipe_fds : int[]);
-  native static method getpgrp : int ();
-  native static method setpgrp : int ();
+  native static method getpgid : int ($pid : int);
+  native static method setpgid : int ($pid : int, $pgid : int);
   native static method getpid : int ();
   native static method getppid : int ();
   native static method execv : int ($path : string, $args : string[]);

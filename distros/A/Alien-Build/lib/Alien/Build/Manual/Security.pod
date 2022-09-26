@@ -14,7 +14,7 @@ Alien::Build::Manual::Security - General alien author documentation
 
 =head1 VERSION
 
-version 2.68
+version 2.70
 
 =head1 SYNOPSIS
 
@@ -71,8 +71,6 @@ security you need to audit all of your Perl modules, not just the L<Alien>
 ones.
 
 =head2 Restricting L<Alien::Build> by environment
-
-=head2 ALIEN_INSTALL_NETWORK
 
 Okay, granted you need to audit software for security regardless of
 if it is L<Alien>, you still don't like the idea of downloading external

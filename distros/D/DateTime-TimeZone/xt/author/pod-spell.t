@@ -499,7 +499,6 @@ Unix
 Urumqi
 Ushuaia
 Ust_Nera
-Uzhgorod
 VC
 VE
 VMS
@@ -533,7 +532,6 @@ Yerevan
 ZA
 ZM
 ZW
-Zaporozhye
 Zealand
 Zone
 Zurich

@@ -10,7 +10,7 @@ our @EXPORT    = qw( msys msys_run );
 our @EXPORT_OK = qw( msys msys_run msys_path );
 
 # ABSTRACT: Tools required for GNU style configure scripts on Windows
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 sub msys (&)
@@ -68,7 +68,7 @@ Alien::MSYS - Tools required for GNU style configure scripts on Windows
 
 =head1 VERSION
 
-version 0.15
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -136,7 +136,7 @@ C<MSYS> in this distribution's share directory.
 =head2 msys
 
  # get the uname from MSYS
- my $uname = msys { `uanem` };
+ my $uname = msys { `uname` };
  
  # run with GNU make from MSYS instead of
  # dmake from Strawberry Perl
@@ -226,6 +226,10 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 Contributors:
 
 Shawn Laffan (SLAFFAN, shawnlaffan)
+
+bekuno
+
+Zaki Mughal (zmughal)
 
 =head1 COPYRIGHT AND LICENSE
 

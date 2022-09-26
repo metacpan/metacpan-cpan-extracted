@@ -16,7 +16,7 @@ This module is not a statement parser, contrariwise, it consists of an SQL comma
 This documment do not will provide concepts about SQL Commands and Relational Database Services.
 We understand that the developer has adequate knowledge of these parameters and commands.
 
-Before any implementation, we recommend seeing the section L<DESCRIPTION> for considerations and restrictions.
+Before any implementation, we recommend seeing the section B<DESCRIPTION> for considerations and restrictions.
 
 I wish it to be useful in the development of your applications.
 
@@ -364,7 +364,7 @@ X<General Methods>
     );
 
 =head1 DESCRIPTION
-X<DESCRIPTION>
+X<CARLOS CELSO>
 
 This module was created to execute basic SQL commands in a database engine,
 where it proposes the most common and basic operations with low parameter complexity.
@@ -379,7 +379,7 @@ where each one has its restrictions and rules.
 We understand that the table in use have same format and data type and supported by all engines.
 
 By default, evey command invoked will be effectively executed in database,
-however this process can be suppressed if requested and the SQL command can retrieve (if neeeded, see: L<make_only> option).
+however this process can be suppressed if requested and the SQL command can retrieve (if neeeded, see: C<make_only> option).
 
 All parameters set in the Constructor (method new) are defined as Global Parameters, and some options can be enable/disable by the Methods, for more information see L<Global Options>.
 
@@ -437,7 +437,7 @@ You must load the constructor and use the object address created by it to run th
   ...
 
 However, in this document have references and examples using the format "SQL::SimpleOps->[method]" just for simple illustration,
-but this format is not supported in encoding. (see L<EXAMPLES>)
+but this format is not supported in encoding. (see B<EXAMPLES>)
 
 The controls can initialized by the Options Arguments and/or L<Configuration File>.
 The module will load the arguments and at end will apply the L<Configuration File> changes,
@@ -500,15 +500,11 @@ B<REMEMBER:> The JSON format does not allow comma at the end of last field in br
 X<Loading Data into Applicatons>
 
 Exists two different process to manipulate the application data with the module.
-The first put data into the database (L<Insert> and L<Update>) and the second get data from the database (L<Select> and L<SelectCursor>).
+The first put data into the database (C<Insert> and C<Update>) and the second get data from the database (C<Select> and C<SelectCursor>).
 
 The first process the data will be sent by arguments, where the module will convert to SQL command and run it.
 
 The second process the data will be load into variable sent by arguments, where the module will store the data.
-
-=over
-
-=item *
 
 B<Example1:> Putting the data into the database.
 
@@ -532,9 +528,7 @@ B<Example1:> Putting the data into the database.
 
 B<NOTE:> The return code must be C<SQL_SIMPLE_RC_OK> for successful or C<SQL_SIMPLE_RC_ERROR> if any errors.
 
-=item *
-
-B<Example2> Getting the data into the database using the C<buffer> option.
+B<Example2:> Getting the data into the database using the C<buffer> option.
 
   SQL::SimpleOps->Select
   (
@@ -546,15 +540,11 @@ B<Example2> Getting the data into the database using the C<buffer> option.
 
 B<NOTE:> The return code must be C<SQL_SIMPLE_RC_OK> for successful or C<SQL_SIMPLE_RC_ERROR> if any errors.
 
-=back
-
 We have four different types of return values for the C<buffer> option, can be:
 
 =over
 
-=item *
-
-B<Extracting Single Row>
+=item B<Extracting Single Row>
 
 The Single Extraction consists in queries that return only one row.
 The best type of C<buffer> is the C<hash_ref>, where each column will be the index key in the hash.
@@ -570,9 +560,7 @@ B<Example3:>
 
 B<BEWARE:> Only the last row will be returned for queries with multiple rows.
 
-=item *
-
-B<Extracting Multiple Rows>
+=item B<Extracting Multiple Rows>
 
 The Multiple Extraction consists in queries that return tow or more rows.
 The best type of C<buffer> is the C<array_ref>, where each line will be a hash_ref for each extracted row.
@@ -591,9 +579,7 @@ B<Example4:>
      $line++;
   } 
 
-=item *
-
-B<Extracting Specfic Column in Single Row>
+=item B<Extracting Specfic Column in Single Row>
 
 The Single Extraction for specific Column in queries that return only one row/column. 
 The best type of C<buffer> is the C<scalar_ref>, where the column will be stored.
@@ -604,9 +590,7 @@ B<Example5:>
 
   print "id=".$my_scalar."\n":
 
-=item *
-
-B<Complex Extractions>
+=item B<Complex Extractions>
 
 The most case you need provide a lot number of process before select the rows.
 The C<callback> will be executed for each extracted rows and depending on the return code, the lines will buffered or ignored (no stored).
@@ -658,21 +642,13 @@ X<Aliases Table>
 
 The can be used to abstract the real names on the tables and the columns, reducing the recoding.
 
-The Aliases Table is not mandatory, use it you necessary. See L<EXAMPLES>
+The Aliases Table is not mandatory, use it you necessary. See B<EXAMPLES>
 
 When mapped the B<Aliases Column> these aliases will be the keys in the C<hashref buffers>
 
 B<Why should I?> Some companies disallow tables using generic names (out of the norms), in this case, you can use aliases to abstract the real name in your the databases.
 
 B<REMEMBER:> Do not use I<reserved words>, like function names (etc), as aliases. This keywords are reserved and is not allowed to assign as aliases (SQL will be fail).
-
-=over 
-
-=item *
-
-B<Defaults:> no Defaults.
-
-=item *
 
 B<Format:>
 
@@ -695,9 +671,7 @@ B<Format:>
      ...
   );
 
-=item *
-
-B<Examples:>
+B<Example1:>
 
   my %contents =
   (
@@ -725,18 +699,16 @@ Results:
 
 B<NOTE:> This last will not assign the alias names in the SQL Command.
 
-=back
-
 =head2 Escape or Backslash
 
-The L<escape> operand (or L<backslash>) is the format used to force the methods to ignore the translating data as arguments.
+The C<escape> operand (or C<backslash>) is the format used to force the methods to ignore the translating data as arguments.
 The data with escape information will passed to SQL command without check or decode.
 
 To escape the data, you must use as prefix the backslash caracter ('\').
 
 B<REMEMBER:> The backslash is a control character in the Perl. To use you must insert double backslash.
 
-You can L<escape> the following options:
+You can C<escape> the following options:
 
  SQL::SimpleOps->Select ( ... , fields => [ '\\my_by_pass_as_fields', ... ], ... );
 
@@ -746,9 +718,9 @@ You can L<escape> the following options:
 
  SQL::SimpleOps->getWhere ( ... , where => [ '\\my_bypass_as_col_name' => '\\my_bypass_as_value', ... ], ... );
 
-B<NOTE:> The escape is valid in the 'where' clause of L<Select>, L<SelectCursor>, L<Delete> and L<Update> command.
+B<NOTE:> The escape is valid in the 'where' clause of C<Select>, C<SelectCursor>, C<Delete> and C<Update> command.
 
-B<Example1:> L<Select> or L<SelectCursor>
+B<Example1:> C<Select> or C<SelectCursor>
 
  SQL::SimpleOps->Select ( ... fields => [ '\\concat(col1,col2,col3)' ], table => tb1, ... );
 
@@ -756,7 +728,7 @@ Result:
 
  SELECT ... concat(col1,col2,col3) FROM tb1 ... ;
 
-B<Example2:> L<Insert>
+B<Example2:> C<Insert>
 
  SQL::SimpleOps->Insret ( ... table => tb1, conflict => { last_update => '\\concat(substr(col1_date,1,4),"-01-01")' ], ... );
 
@@ -764,9 +736,9 @@ Result:
 
  INSERT INTO tb1 ... ON DUPLICATE last_update = concat(substr(col1_date,1,4),"-01-01") ... ;
 
-B<NOTE:> The L<'on duplicate'> is I<MySQL/MariaDB> database engine, for I<SQLite> and I<Postgres> will be L<'on conflict'>.
+B<NOTE:> The C<on duplicate> is I<MySQL/MariaDB> database engine, for I<SQLite> and I<Postgres> will be C<on conflict>.
 
-B<Example3:> L<Update>
+B<Example3:> C<Update>
 
  SQL::SimpleOps->Update ( ... table => tb1, fields => { last_update => '\\concat(substr(col1_date,1,4),"-01-01")' ], ... );
 
@@ -774,7 +746,7 @@ Result:
 
  UPDATE tb1 ... SET last_update = concat(substr(col1_date,1,4),"-01-01") ... ;
 
-B<Example4:> L<getWhere>
+B<Example4:> C<getWhere>
 
  SQL::SimpleOps->getWhere ( ... where => [ col1 => '\\my_expression', '\\my_col_expression' => my_value ], ... );
 
@@ -796,10 +768,6 @@ using this point of view the best way is this type of struct.
 
 If you any item (or sub-item) specifies C<hash_ref>, the process is aborted with C<SQL_SIMPLE_RC_SYNTAX> as the return code.
  
-=over 
-
-=item *
-
 B<Operators:> The follow operators was been builtin:
 
   Operator	Description
@@ -824,9 +792,7 @@ B<Operators:> The follow operators was been builtin:
   !^^		"not like [value]"	# no '%' will be added
   \		"escape value"		# no quote will be applied
 
-=item *
-
-B<Format:>
+B<Example1:>
 
   SQL::SimpleOps->Select
   (
@@ -875,8 +841,6 @@ B<IMPORTANT:> Do not use aliases column name on the right side. The translation 
 
 B<BEWARE:> The operators (if used) must be the first field on the C<array_ref>.
 
-=back
-
 =head1 METHODS
 X<METHODS>
 
@@ -909,48 +873,34 @@ All parameters set in the Constructor (method new) are defined as Global Paramet
 
 =over
 
-=item *
-
-B<commit:> Enable/disable commit after updates.
+=item B<commit:> Enable/disable commit after updates.
 Do not to be confused with the I<commit> available in the options for B<interface driver> (see L<DBI>), it has an other escope.
 
 Defaults: The default value is disabled.
 
-=item *
-
-B<db:> The name of database name. The value depend of type of interface and driver option. see L<DBI> module.
+=item B<db:> The name of database name. The value depend of type of interface and driver option. see L<DBI> module.
 
 Defaults: no defaults
 
-=item *
-
-B<driver:> Sets the name of database engine. see L<DBI> module.
+=item B<driver:> Sets the name of database engine. see L<DBI> module.
 
 Defaults: no defaults
 
-=item *
-
-B<interface:> Sets the interface module to use.
+=item B<interface:> Sets the interface module to use.
 The current version support only C<interface=dbi>.
 
 Defaults: The defaul value is C<dbi>.
 
-=item *
-
-B<interface_options:> See options for L<DBI> module.
+=item B<interface_options:> See options for L<DBI> module.
 
 Defaults: The default values for C<interface=dbi> are: C<RaiseError=0> and C<PrintError=0>.
 
-=item *
-
-B<login:> Sets the user/profile login for authenticated connection.
+=item B<login:> Sets the user/profile login for authenticated connection.
 For security reasons and best practices, the module expects that all connections will be authenticated. 
 
 Defaults: no defaults
 
-=item *
-
-B<message_log:> Sets message log mode, can be:
+=item B<message_log:> Sets message log mode, can be:
 
   SQL_SIMPLE_LOG_OFF:	No message will be shown. Use getMessage required to get the messages;
   SQL_SIMPLE_LOG_SYS:	Write messages on System Syslog Services;
@@ -961,30 +911,21 @@ Defaults: The default value is C<SQL_SIMPLE_LOG_STD>.
 
 B<NOTE:> You can enable Syslog and C<STDERR> simultanely. Use the C<SQL_SIMPLE_LOG_ALL>.
 
-=item *
-
-B<message_syslog_service:> Sets an identifier string on the System Syslog Messages.
+=item B<message_syslog_service:> Sets an identifier string on the System Syslog Messages.
 see: L<Sys::Syslg>
 
 Defaults: The default value is C<message_syslog_service=SQL-SimpleOps>
 
-=item *
-B<message_syslog_facility:> Sets the Syslog Facility for the messages on the System Syslog Messages, must be: C<local0> to C<local7>.
+=item B<message_syslog_facility:> Sets the Syslog Facility for the messages on the System Syslog Messages, must be: C<local0> to C<local7>.
 see: L<Sys::Syslg>
 
 Defaults: The default value is C<local0>.
 
-=item *
-
-B<password:> The password/profile for authentication process.
+=item B<password:> The password/profile for authentication process.
 
 Defaults: no defaults
 
-B<NOTE:> For C<driver=sqlite> this item is ignored.
-
-=item *
-
-B<port:> This option consists the TCP Port to use for connection.
+=item B<port:> This option consists the TCP Port to use for connection.
 The option is not mandatory because it is common to use the default database port,
 however some installations may modify the default port. The following defaul pors are known:
 
@@ -997,21 +938,15 @@ however some installations may modify the default port. The following defaul por
 
 Defaults: The default value depend of database engine.
 
-=item *
-
-B<quote:> Sets the quote caracter on string commands (see C<setQuote> method), must be: apostrophe or quote.
+=item B<quote:> Sets the quote caracter on string commands (see C<setQuote> method), must be: apostrophe or quote.
 
 Defaults: apostrophe.
 
-=item *
-
-B<server:> Sets the hostname or ip address of hosted database server.
+=item B<server:> Sets the hostname or ip address of hosted database server.
 
 Defaults: no defaults.
 
-=item *
-
-B<sql_save:> Sets the SQL log file mode, can be:
+=item B<sql_save:> Sets the SQL log file mode, can be:
 
   SQL_SIMPLE_CMD_OFF:	No log file will be written;
   SQL_SIMPLE_CMD_ON:	Write only update commands;
@@ -1023,70 +958,50 @@ Examples: Archive Logs, Backup Mode, and Others.
 
 Defaults: The default value is C<SQL_SIMPLE_CMD_OFF>.
  
-=item *
-
-B<sql_save_bydate:> Sets enable/disable writing log files into distinct folders.
+=item B<sql_save_bydate:> Sets enable/disable writing log files into distinct folders.
 The folder will be create as:
 
 F<[sql_save_dir]/C<YYYY/YYYYmm/YYYYmmdd>/[logfile]>
 
 Defaults: The option is disabled. See C<sql_save_dir> option.
 
-=item *
-
-B<sql_save_dir:> Sets the folder for writes log file process.
+=item B<sql_save_dir:> Sets the folder for writes log file process.
 
 Defaults: (unix/linux) F</var/spool/sql/> or (windows) F<c:\windows\temp>
 
-=item *
+B<NOTE:> You must create the F</var/spool/sql/> as I<mode drwxrwxrwt>.
 
-B<sql_save_name:> Sets the filename string  for writes log file process.
+=item B<sql_save_name:> Sets the filename string  for writes log file process.
 
 Defaults: The default value is C<sql>.
 
-=item *
-
-B<sql_save_ignore:> Sets enable/disable option to abort if there are errors wrtten to the Log File.
+=item B<sql_save_ignore:> Sets enable/disable option to abort if there are errors wrtten to the Log File.
 
 Defaults: The default value is disabled. If errors the return code will be C<SQL_SIMPLE_RC_ERROR>.
 
-=item *
-
-B<tables:> Sets the list of aliases rules for the tables and fields. See L<Aliases Table>.
+=item B<tables:> Sets the list of aliases rules for the tables and fields. See L<Aliases Table>.
 
 Defaults: no defaults.
 
 =back
 
-The follow options can be temporarily modified:
+The follow options can be temporarily modified by the methods:
 
 =over
 
-=item *
+=item B<commit:> Enable/Disable the commit after a specific update command.
 
-B<commit:> Enable/Disable the commit after a specific update command.
+=item B<message_log:> Enable/Disable the written on System Syslog Services.
 
-=item *
+=item B<quote:> Change the quote character.
 
-B<message_log:> Enable/Disable the written on System Syslog Services.
+=item B<sql_save:> Enable/Disable the written for SQL Log Files.
 
-=item *
-
-B<quote:> Change the quote character.
-
-=item *
-
-B<sql_save:> Enable/Disable the written for SQL Log Files.
-
-=back
-
-B<NOTE:> This Options can be modified with each SQL Command execution.
+This Options can be modified with each SQL Command execution.
 These changes will be valid only in this process,
 where the global values will be restored after each execution.
 
-=over
-
-=item *
+=back
 
 B<Example1:> The database "my_db" using "interface_options". see L<DBI>
 
@@ -1106,8 +1021,6 @@ B<Example1:> The database "my_db" using "interface_options". see L<DBI>
 
 B<NOTE:> Do not use this example as template for your implementations, you must see L<DBI> do understand about each options.
 
-=item *
-
 B<Example2:> The database "my_db" writing on System Syslog Service. see L<Sys::Syslog>
 
   my $mymod = SQL::SimpleOps->new
@@ -1126,8 +1039,6 @@ Notifications will be sent to the system messages file (in Linux the file F</var
 We recommended to use the "System Syslog Services" as standard in your applications and create rules to write in separeted log files. 
 For more information see the documentation related to the "Syslog Service" on your System.
  
-=item *
-
 B<Example3:> The database "my_db" writing SQL Log Files.
 
   my $mymod = SQL::SimpleOps->new
@@ -1149,30 +1060,18 @@ Where:
 
 =over
 
-=item *
+=item B<sql_save_name:> Consists in the C<sql_save_name> option value.
 
-B<sql_save_name:> Consists in the C<sql_save_name> option value.
+=item B<database_name:> Consists in the C<my_db> database value.
 
-=item *
+=item B<today:> Current day formated as C<YYYYmmdd> (year+month+day).
 
-B<database_name:> Consists in the C<my_db> database value.
+=item B<pid:> Current Pid (system process identifier) in execution.
 
-=item *
-
-B<today:> Current day formated as C<YYYYmmdd> (year+month+day).
-
-=item *
-
-B<pid:> Current Pid (system process identifier) in execution.
-
-=item *
-
-B<counter:> Indexer for each SQL Command executed by the Current Pid.
+=item B<counter:> Indexer for each SQL Command executed by the Current Pid.
 A Pid that runs multiple commands will have the multiple SQL Log Files.
 
 =back
-
-=item *
 
 B<Example4:> The database "my_db" writing SQL Log Files splited by date.
 
@@ -1194,8 +1093,6 @@ The folder will be create as:
 
 F</var/tmp/sql/YYYY/YYYYmm/YYYYmmdd/[sql_save_name].[database_name].[today].[pid].[counter]>
 
-=item *
-
 B<Example5:> The database "my_db" forcing commit for each update command.
 
   my $mymod = SQL::SimpleOps->new
@@ -1211,8 +1108,8 @@ The C<commit> option for each update command can cause degradation in the proces
 Use this option wisely.
 
 B<When can i use it?>
-The C<commit> option (or command) can be used at the end of a long process of updates,
-and that at a certain point you need to create relational consistency to reduce B<rollback> process.
+The C<commit> option can be used at the end of a long process of updates,
+and that at a certain point you need to create relational consistency to reduce I<rollback> process.
 
 In this case, you can either execute the Commit SQL Command or execute the last update command of the cycle using C<commit> option.
 
@@ -1225,14 +1122,8 @@ In this case, you can either execute the Commit SQL Command or execute the last 
      commit => 1,				# (default is OFF)
   );
 
-=back
-
-=head3 Interface MySQL/MariaDB
+=head3 Openning Interface MySQL/MariaDB
 X<Interface MySQL/MariaDB>
-
-=over
-
-=item *
 
 B<Format:> see L<DBI>
 
@@ -1247,8 +1138,6 @@ B<Format:> see L<DBI>
      ...
   );
 
-=item *
-
 B<Example1:> The database as "my_info", loging "my_user", password "my_auth":
 
   my $mymod = SQL::SimpleOps->new
@@ -1260,14 +1149,8 @@ B<Example1:> The database as "my_info", loging "my_user", password "my_auth":
      interface_options => { mysql_auto_reconnect => 0 },
   );
 
-=back
-
-=head3 Interface SQLite
+=head3 Openning Interface SQLite
 X<Interface SQLite>
-
-=over
-
-=item *
 
 B<Format:> see L<DBI>
 
@@ -1281,8 +1164,6 @@ B<Format:> see L<DBI>
      ...
   );
 
-=item *
-
 B<Example1:> The database as "my_info" and fileset as "my_info.db":
 
   my $mymod = SQL::SimpleOps->new
@@ -1290,8 +1171,6 @@ B<Example1:> The database as "my_info" and fileset as "my_info.db":
      driver => "sqlite",
      db => "my_info",
   );
-
-=item *
 
 B<Example2:> The database as "my_db" and fileset as "my_file.db":
 
@@ -1307,12 +1186,8 @@ B<Example2:> The database as "my_db" and fileset as "my_file.db":
      },
   );
 
-=back
-
-=head3 Interface Postgres
+=head3 Openning Interface Postgres
 X<Interface Postgres>
-
-=over
 
 B<Format:> see L<DBI>
 
@@ -1327,8 +1202,6 @@ B<Format:> see L<DBI>
      },
   );
 
-=item *
-
 B<Example1>: Using default database, public schema, as "my_user" and "my_auth" password:
 
   my $mymod = SQL::SimpleOps->new
@@ -1337,8 +1210,6 @@ B<Example1>: Using default database, public schema, as "my_user" and "my_auth" p
      login => "my_user",
      password => "my_auth",
   );
-
-=item *
 
 B<Example2>: Using default database, "my_schema" schema, as "my_user" and "my_auth" password:
 
@@ -1350,8 +1221,6 @@ B<Example2>: Using default database, "my_schema" schema, as "my_user" and "my_au
      password => "my_auth",
   );
 
-=item *
-
 B<Example3>: Using "my_database" database, public schema, as "my_user" and "my_auth" password:
 
   my $mymod = SQL::SimpleOps->new
@@ -1361,8 +1230,6 @@ B<Example3>: Using "my_database" database, public schema, as "my_user" and "my_a
      login => "my_user",
      password => "my_auth",
   );
-
-=item *
 
 B<Example4>: Using "my_database" database, "my_schema" schema, as "my_user" and "my_auth" password:
 
@@ -1374,8 +1241,6 @@ B<Example4>: Using "my_database" database, "my_schema" schema, as "my_user" and 
      login => "my_user",
      password => "my_auth",
   );
-
-=back
 
 =head2 Delete
 X<Delete>
@@ -1397,10 +1262,6 @@ For security rasons the command does not perform removals if C<where> clause is 
 B<NOTE:> If no match found the command will return the condition code C<SQL_SIMPLE_RC_EMPTY>,
 however, using the C<notfound> option will force to C<SQL_SIMPLE_RC_OK> if no matchs.
 
-=over
-
-=item *
-
 B<Example1:> Forcing remove all rows.
 
   SQL::SimpleOps->Delete
@@ -1408,8 +1269,6 @@ B<Example1:> Forcing remove all rows.
      table => "my_table",
      force => 1,
   );
-
-=item *
 
 B<Example2:> Forcing no matchs removals completed successful
 
@@ -1424,8 +1283,6 @@ B<Example2:> Forcing no matchs removals completed successful
   );
 
 B<NOTE:> This command force the return code to C<SQL_SIMPLE_RC_OK> if ther is no match, where without it the C<notfound> option must be C<SQL_SIMPLE_RC_EMPTY>.
-
-=back
 
 =head2 Insert
 X<Insert>
@@ -1480,10 +1337,6 @@ This method insert the selected rows from a table.
 
 B<NOTE:> The addition options are valid for all formats.
 
-=over
-
-=item *
-
 B<Example1:> Inserting rows without C<conflict> option.
 
   SQL::SimpleOps->Insert
@@ -1498,9 +1351,9 @@ B<Example1:> Inserting rows without C<conflict> option.
 
 B<NOTE:> If the key already the return code is C<not zero>. See L<DBI>.
 
-=item *
-
 B<Example2:> Inserting rows with C<conflict> option. If the key already only updates will be done.
+
+  my $my_time = time();
 
   SQL::SimpleOps->Insert
   (
@@ -1512,15 +1365,15 @@ B<Example2:> Inserting rows with C<conflict> option. If the key already only upd
      },
      conflict =>
      {
-        my_update => CURRENT_TIMESTAMP,	# (make systime update if already)
+        my_update => $my_time,		# (make systime update if already)
      }
   );
 
 B<NOTE:> The C<conflict_key> option is not required for I<MySQL> and I<MariaDB> databases.
 
-=item *
-
 B<Example3:> Inserting rows with C<conflict> and C<conflict_key> options. If the key already only updates will be done.
+
+  my $my_time = time();
 
   SQL::SimpleOps->Insert
   (
@@ -1532,14 +1385,12 @@ B<Example3:> Inserting rows with C<conflict> and C<conflict_key> options. If the
      },
      conflict =>
      {
-        update => CURRENT_TIMESTAMP,	# (make systime update if already)
+        my_update => $my_time,		# (make systime update if already)
      }
      conflict_key => "key",
   );
 
 B<NOTE:> The C<conflict_key> option is required for I<Postgres> and I<SQLite> databases.
-
-=item *
 
 B<Example4:> Inserting classic format
 
@@ -1549,8 +1400,6 @@ B<Example4:> Inserting classic format
      fields => [ "key", "value_1" ],
      values => [ 1, value ],
   );
-
-=back
 
 =head2 Select
 
@@ -1571,10 +1420,6 @@ This method extract the selected rows from a tables based the conditions in the 
 						# default: buffer will be reseted
   );
 
-=over
-
-=item *
-
 B<Example1:> Extract all fields from the table without C<notfound> option.
 
   SQL::SimpleOps->Select
@@ -1589,8 +1434,6 @@ B<Example1:> Extract all fields from the table without C<notfound> option.
 
 B<NOTE:> If no match found the command will return the condition code C<SQL_SIMPLE_RC_EMPTY>,
 however, using the C<notfound> option will force to C<SQL_SIMPLE_RC_OK> if no matchs.
-
-=item *
 
 B<Example2:> Extract all fields from the table using C<notfound> option.
 
@@ -1607,8 +1450,6 @@ B<Example2:> Extract all fields from the table using C<notfound> option.
 
 B<NOTE:> You must check the number of lines on C<my_buffer> array or validate by C<getRows> method to identify the I<not found condition>.
 
-=item *
-
 B<Example3:> Extract and Order
 
   SQL::SimpleOps->Select
@@ -1616,8 +1457,6 @@ B<Example3:> Extract and Order
      order_by => [ col1 => SQL_SIMPLE_ORDER_ASC, col2 => SQL_SIMPLE_ORDER_DESC ],
      ...
   );
-
-=item *
 
 B<Example4:> Extract and Order using defaults (ascending)
 
@@ -1628,8 +1467,6 @@ B<Example4:> Extract and Order using defaults (ascending)
   );
 
 B<NOTE:> Both columns (col1 and col2) will use ascending ordered.
-
-=item *
 
 B<Example5:> Extract with distinct columns
 
@@ -1642,8 +1479,6 @@ B<Example5:> Extract with distinct columns
   );
 
 B<NOTE:> Distinct by "col1".
-
-=item *
 
 B<Example5:> Extract with functions
 
@@ -1675,8 +1510,6 @@ B<Example6:> Escaping field, no validation will be.
 
 B<NOTE:> The '\' (backslash) will escape all validations.
 
-=back
-
 =head2 SelectCursor
 X<SelectCursor>
 
@@ -1700,61 +1533,43 @@ B<NOTE:> The C<notfound> option is not required.
 
 =over
 
-=item *
-
-B<cursor_command:> Sets the type of command to be executed in the search, must be:
+=item B<cursor_command:> Sets the type of command to be executed in the search, must be:
 
 =over
 
-=item *
-
-B<SQL_SIMPLE_CURSOR_TOP:> Go to the first page of the search.
+=item B<SQL_SIMPLE_CURSOR_TOP:> Go to the first page of the search.
 No C<cursor_info> will be used.
 
-=item *
-
-B<SQL_SIMPLE_CURSOR_LAST:> Go to the last page search.
+=item B<SQL_SIMPLE_CURSOR_LAST:> Go to the last page search.
 No C<cursor_info> will be used.
 
-=item *
-
-B<SQL_SIMPLE_CURSOR_NEXT:> Go to the next search page.
+=item B<SQL_SIMPLE_CURSOR_NEXT:> Go to the next search page.
 Will use the 'first' info on C<cursor_info> option.
 If 'cursor' is missing (or undef) the module will search as 'SQL_SIMPLE_CURSOR_TOP' command.
 
-=item *
-
-B<SQL_SIMPLE_CURSOR_BACK:> Go to the pervious search page.
+=item B<SQL_SIMPLE_CURSOR_BACK:> Go to the pervious search page.
 Will use the 'first' info on C<cursor_info> option.
 If 'cursor' is missing (or undef) the module will search as 'SQL_SIMPLE_CURSOR_LAST' command.
 
-=item *
-
-B<SQL_SIMPLE_CURSOR_RELOAD:> Reload current cursor.
+=item B<SQL_SIMPLE_CURSOR_RELOAD:> Reload current cursor.
 Will use the 'first' info on C<cursor_info> option.
 
 =back
 
 Defaults: C<SQL_SIMPLE_CURSOR_TOP>
 
-=item *
-
-B<cursor:> Sets an specific starter cursor value for the search.
+=item B<cursor:> Sets an specific starter cursor value for the search.
 This options is not mandatory.
 
 The method use the C<cursor_info> option as base to scan the pages,
 however, the C<cursor> option have preference if presented.
 
-=item *
-
-B<cursor_key:> Sets the key that will use to search.
+=item B<cursor_key:> Sets the key that will use to search.
 You must use only one key, multiple keys are not supported.
 
 Defaults: no defaults
 
-=item *
-
-B<cursor_info:> Sets the return buffer to getting the page controls.
+=item B<cursor_info:> Sets the return buffer to getting the page controls.
 This informantion should be used in the paging process.
 
 We highly recommend using this option to help the pagination process.
@@ -1766,21 +1581,15 @@ The buffer reference can be C<hash_ref>, C<array_ref> or C<scalar_ref>, for each
 
 =over
 
-=item *
-
-B<hash_ref:>
+=item B<hash_ref:>
 
   hash_ref => { lines => no_lines, first => first_key, last => last_key, rc => rc };
 
-=item *
-
-B<array_ref:>
+=item B<array_ref:>
 
   array_ref => [ rc, no_lines, first_key, last_key ];
 
-=item *
-
-B<scalar_ref:>
+=item B<scalar_ref:>
 
   scalar_ref => "[rc] [no_lines] [first_key] [last_key]"
 
@@ -1790,33 +1599,23 @@ The C<rc>, C<no_lines>, C<first_key> and C<last_key> values has present for all 
 
 =over
 
-=item *
+=item B<rc:> Consists the return code of SQL Command.
 
-B<rc:> Consists the return code of SQL Command.
+=item B<no_lines:> Consists the number of extracted lines.
 
-=item *
+=item B<first:> Consists the first key value.
 
-B<no_lines:> Consists the number of extracted lines.
-
-=item *
-
-B<first:> Consists the first key value.
-
-=item *
-
-B<last:> Consists the last key value.
+=item B<last:> Consists the last key value.
 
 =back
 
 B<BEWARE:> For keys that use I<space values> do not use the I<scalar_ref> format to capture the C<first_key> and C<last_key>.
 
-=item *
-
-B<limit:> Sets the maximum number of lines to retrieve.
+=item B<limit:> Sets the maximum number of lines to retrieve.
 The option must be specified.
 Use '0' (zero) for unlimited lines.
 
-=item *
+=back
 
 B<Example1:> This example we have four stage of retrieve.
 The 1st go to the first page on the table.
@@ -1887,8 +1686,6 @@ B<NOTE:> The number of page is limited by C<limit> option.
   );
   # the scan jump at end of table and retrieve the next 'no_lines'
 
-=back
-
 =head2 Update
 X<Update>
 
@@ -1930,13 +1727,9 @@ It is owner of the process to preparation, execution and written the data on the
 
 =over
 
-=item *
+=item B<command:> Consists of the SQL Command to be executed (fully formatted)
 
-B<command:> Consists of the SQL Command to be executed (fully formatted)
-
-=item *
-
-B<buffer:> Consists of the Return Buffer Area, where the method will written the columns and rows, can be:
+=item B<buffer:> Consists of the Return Buffer Area, where the method will written the columns and rows, can be:
 
   hash_ref	Address of HASH;
   array_ref	Address of ARRAY;
@@ -1954,7 +1747,7 @@ Consists of the method to get the realname for columns mapped on L<Aliases Table
 
 The method return the Column Arguments Value if the table or column argument does not exists.
 
-B<NOTE:> This method can be used on L<PLUGINS> to help to translate the aliases names.
+B<NOTE:> This method can be used on B<PLUGINS> to help to translate the aliases names.
 
 =head2 getAliasTable
 
@@ -1962,7 +1755,7 @@ Consists of the method to get the realname for table mapped on L<Aliases Table>.
 
 The method return the Table Arguments Value if the table argument does not exists.
 
-B<NOTE:> This method can be used on L<PLUGINS> to help to translate the aliases names.
+B<NOTE:> This method can be used on B<PLUGINS> to help to translate the aliases names.
 
 =head2 getDBH
 X<getDBH>
@@ -2165,7 +1958,7 @@ Default: no defaults
 
 The parameters can be used to determine the sort ordered on columns.
 
-  SQL_SIMPLE_ORDER_OFF		# Order is disbled (for SelectCursor only)
+  SQL_SIMPLE_ORDER_OFF		# Order is disabled (for SelectCursor only)
   SQL_SIMPLE_ORDER_ASC		# Order is Ascending
   SQL_SIMPLE_ORDER_DESC		# Order is Descending
 
@@ -2420,7 +2213,7 @@ This sample show a simple struct to be create to support your addon.
 =head1 MESSAGES
 X<MESSAGES>
 
-The module messages can be extracted from the C<SQL::SimpleOps:errstr> or L<getMessage()> method.
+The module messages can be extracted from the C<SQL::SimpleOps:errstr> or C<getMessage> method.
 
 =head2 001E [I<command>] Database is missing
 X<001E>
@@ -3740,6 +3533,42 @@ To test you need:
  ok 15 - Master/Slave merge-3, rows 900
  1..15
 
+ # perl /tmp/my_first_program.pl -driver=mysql
+ ok 1 - Number of 11 successful (master+slave), Code 0000
+ ok 2 - Number of 11 successful (master+slave), Code 0001
+ ok 3 - Number of 11 successful (master+slave), Code 0002
+ ok 4 - Number of 11 successful (master+slave), Code 0003
+ ok 5 - Number of 11 successful (master+slave), Code 0004
+ ok 6 - Number of 11 successful (master+slave), Code 0005
+ ok 7 - Number of 11 successful (master+slave), Code 0006
+ ok 8 - Number of 11 successful (master+slave), Code 0007
+ ok 9 - Number of 11 successful (master+slave), Code 0008
+ ok 10 - Number of 11 successful (master+slave), Code 0009
+ ok 11 - Master select, rows 10
+ ok 12 - Slave select, rows 100
+ ok 13 - Master/Slave merge-1, rows 1000
+ ok 14 - Master/Slave merge-2, rows 100
+ ok 15 - Master/Slave merge-3, rows 900
+ 1..15
+
+ # perl /tmp/my_first_program.pl -driver=postgres
+ ok 1 - Number of 11 successful (master+slave), Code 0000
+ ok 2 - Number of 11 successful (master+slave), Code 0001
+ ok 3 - Number of 11 successful (master+slave), Code 0002
+ ok 4 - Number of 11 successful (master+slave), Code 0003
+ ok 5 - Number of 11 successful (master+slave), Code 0004
+ ok 6 - Number of 11 successful (master+slave), Code 0005
+ ok 7 - Number of 11 successful (master+slave), Code 0006
+ ok 8 - Number of 11 successful (master+slave), Code 0007
+ ok 9 - Number of 11 successful (master+slave), Code 0008
+ ok 10 - Number of 11 successful (master+slave), Code 0009
+ ok 11 - Master select, rows 10
+ ok 12 - Slave select, rows 100
+ ok 13 - Master/Slave merge-1, rows 1000
+ ok 14 - Master/Slave merge-2, rows 100
+ ok 15 - Master/Slave merge-3, rows 900
+ 1..15
+
 =head1 SEE ALSO
 
 L<DBD::mysql>, L<DBD::Pg>, L<DBD::SQLite>, L<DBI>, L<Date::Calc>, L<File::Path>, L<File::Spec>, L<JSON>, L<Sys::Syslog>
@@ -3751,7 +3580,7 @@ L<MySQL|https://www.mysql.com/>,
 L<MariaDB|https://www.mariadb.org/>,
 L<Postgres|https://www.postgresql.org>,
 L<SQLite|https://www.sqlite.org/>,
-L<Wiki|https://en.wikipedia.org/wiki/SQL>,
+L<SQL Wiki|https://en.wikipedia.org/wiki/SQL>,
 L<W3C|https://www.w3schools.com/sql/>
 
 =head1 AUTHOR

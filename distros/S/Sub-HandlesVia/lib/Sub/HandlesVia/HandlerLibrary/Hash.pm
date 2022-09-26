@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Hash;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.036';
+our $VERSION   = '0.037';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -325,19 +325,19 @@ sub set {
 		prefer_shift_self => 1,
 		template  => (
 			'my (@shv_params) = @ARG; ' .
-			'scalar(@shv_params) % 2 and do { require Carp; Carp::croak("Wrong number of parameters; expected even-sized list of keys and values") };' .
+			'scalar(@shv_params) % 2 and ⸨"Wrong number of parameters; expected even-sized list of keys and values"⸩;' .
 			'my (@shv_keys_idx) = grep(!($_ % 2), 0..$#shv_params); ' .
 			'my (@shv_values_idx) = grep(($_ % 2), 0..$#shv_params); ' .
-			'grep(!defined, @shv_params[@shv_keys_idx]) and do { require Carp; Carp::croak("Undef did not pass type constraint; keys must be defined") };'.
+			'grep(!defined, @shv_params[@shv_keys_idx]) and ⸨"Undef did not pass type constraint; keys must be defined"⸩;'.
 			'"____VALIDATION_HERE____"; '.
 			'my %shv_tmp = %{$GET}; @shv_tmp{@shv_params[@shv_keys_idx]} = @shv_params[@shv_values_idx]; «\\%shv_tmp»;' .
 			'wantarray ? @shv_tmp{@shv_params[@shv_keys_idx]} : $shv_tmp{$shv_params[$shv_keys_idx[0]]}' ),
 		lvalue_template  => (
 			'my (@shv_params) = @ARG; ' .
-			'scalar(@shv_params) % 2 and do { require Carp; Carp::croak("Wrong number of parameters; expected even-sized list of keys and values") };' .
+			'scalar(@shv_params) % 2 and ⸨"Wrong number of parameters; expected even-sized list of keys and values"⸩;' .
 			'my (@shv_keys_idx) = grep(!($_ % 2), 0..$#shv_params); ' .
 			'my (@shv_values_idx) = grep(($_ % 2), 0..$#shv_params); ' .
-			'grep(!defined, @shv_params[@shv_keys_idx]) and do { require Carp; Carp::croak("Undef did not pass type constraint; keys must be defined") };'.
+			'grep(!defined, @shv_params[@shv_keys_idx]) and ⸨"Undef did not pass type constraint; keys must be defined"⸩;'.
 			'"____VALIDATION_HERE____"; '.
 			'@{$GET}{@shv_params[@shv_keys_idx]} = @shv_params[@shv_values_idx];' .
 			'wantarray ? @{$GET}{@shv_params[@shv_keys_idx]} : ($GET)->{$shv_params[$shv_keys_idx[0]]}' ),

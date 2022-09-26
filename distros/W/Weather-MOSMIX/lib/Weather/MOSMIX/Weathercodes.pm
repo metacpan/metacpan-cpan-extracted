@@ -8,7 +8,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = 'mosmix_weathercode';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our $as_emoji = "\x{fe0f}";
 
@@ -29,14 +29,23 @@ our %weathercodes = (
     '49' => { emoji => "\N{FOG}",                        svg => 'fog.svg' },
     '61' => { emoji => "\N{CLOUD WITH RAIN}",            svg => 'rain.svg', text => 'slight rain, not freezing, continuous' },
     '63' => { emoji => "\N{CLOUD WITH RAIN}",            svg => 'rain.svg' },
+    '68' => { emoji => "\N{CLOUD WITH SNOW}",            svg => 'snow.svg', text => 'slight rain and snow' },
     '80' => { emoji => "\N{CLOUD WITH RAIN}",            svg => 'day-light-rain.svg',
               text  => 'light rain'    }, # light rain
     '81' => { emoji => "\N{RAIN}",                       svg => 'day-rain.svg'       }, # medium rain
     '82' => { emoji => "\N{RAIN}",                       svg => 'day-showers.svg'    }, # strong rain
-    '95' => { emoji => "\N{RAIN}",                       svg => 'thundershowers.svg',
+    '83' => { emoji => "\N{CLOUD WITH SNOW}",            svg => 'snow.svg', text => 'showers of rain and snow mixed, slight' },
+    '95' => { emoji => "\N{CLOUD WITH LIGHTNING}",       svg => 'thundershowers.svg',
               text  => 'slight or moderate thunderstorm with rain or snow'
             },
 );
+
+# alternatives
+# 🌣 U1f323 \N{WHITE SUN}
+# 🌤 U1f324 \N{WHITE SUN WITH SMALL CLOUD}
+# 🌥 U1f325 \N{WHITE SUN BEHIND CLOUD}
+# 🌦 U1f326 \N{WHITE SUN BEHIND CLOUD WITH RAIN}
+# 🌪 U1f32a \N{CLOUD WITH TORNADO}
 
 sub mosmix_weathercode($code, $type = undef) {
     $code = sprintf '%02d', $code || 0;

@@ -28,7 +28,7 @@ C<get_hook> and C<set_hook> options.
     use Class::InsideOut qw( public );
     use Types::Standard qw( Str Int );
     use Types::Common::Numeric qw( PositiveInt );
-    use Type::Params qw( compile );
+    use Type::Params qw( signature );
     
     # Type checks are really easy.
     # Just supply the type as a set hook.
@@ -47,10 +47,9 @@ C<get_hook> and C<set_hook> options.
     
     # Parameter checking for methods is as expected.
     sub get_older {
-      state $check = compile( $Years );
-      my $self = shift;
-      my ($years) = $check->(@_);
-      $self->_set_age($self->age + $years);
+      state $check = signature( method => 1, positional => [ $Years ] );
+      my ( $self, $years ) = $check->( @_ );
+      $self->_set_age( $self->age + $years );
     }
   }
 
@@ -121,6 +120,64 @@ in production as it slows down C<UNIVERSAL::isa> globally.
 
   $bob->name("Robert");   # okay
   $bob->name([]);         # dies
+
+=head2 Class::Plain
+
+There is not currently a high level of integration, but here's a quick
+example of type checking attributes in the constructor.
+
+If any of your accessors are C<< :rw >> then you would also need to
+add type checks to those.
+
+  use Class::Plain;
+  
+  class Point {
+    use Types::Common -types, -sigs;
+    
+    field x :reader;
+    field y :reader;
+    
+    signature_for new => (
+      method => !!1,
+      bless  => !!0,
+      named  => [
+        x => Int,
+        y => Int,
+      ],
+    );
+    
+    method as_arrayref () {
+      return [ $self->x, $self->y ];
+    }
+  }
+
+The following signature may also be of interest:
+
+  signature_for new => (
+    method   => !!1,
+    multiple => [
+      {
+        named => [
+          x => Int,
+          y => Int,
+        ],
+        bless => !!0,
+      },
+      {
+        positional => [ Int, Int ],
+        goto_next  => sub {
+          my ( $class, $x, $y ) = @_;
+          return ( $class, { x => $x, y => $y } ),
+        },
+      },
+    ],
+  );
+
+This would allow your class to be instantiated using any of the following:
+
+  my $point11 = Point->new( { x => 1, y => 1 } );
+  my $point22 = Point->new(   x => 2, y => 2   );
+  my $point33 = Point->new( 3, 3 );
 
 =head1 NEXT STEPS
 

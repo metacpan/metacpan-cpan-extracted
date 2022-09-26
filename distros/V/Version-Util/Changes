@@ -1,19 +1,26 @@
-0.731   2018-06-10 (PERLANCAR)
+0.732   2022-09-22  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Wrap exception thrown by version->parse() so that user can
+          see the invalid version number that causes the exception, without
+          having to do a stack trace.
+
+
+0.731   2018-06-10  Released-By: PERLANCAR
 
 	- Add functions: min_version, max_version.
 
 
-0.730   2018-01-09 (PERLANCAR)
+0.730   2018-01-09  Released-By: PERLANCAR
 
 	- Relax version regex pattern.
 
 
-0.72    2016-03-02 (PERLANCAR)
+0.72    2016-03-02  Released-By: PERLANCAR
 
 	- Add functions: add_version(), subtract_version().
 
 
-0.71    2014-04-17 (SHARYANTO)
+0.71    2014-04-17  Released-By: SHARYANTO
 
         - First release. Extracted from SHARYANTO-Utils (renamed module from
           SHARYANTO::Version::Util).

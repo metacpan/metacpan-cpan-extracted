@@ -16,13 +16,6 @@ use constant NV_IS_DOUBLE       => $Config{nvsize} == 8        ? 1 : 0;
 use constant NV_IS_DOUBLEDOUBLE => $Config{nvsize} != 8 &&
                                    ($Config{longdblkind} >=5 && $Config{longdblkind} <= 8) ? 1 : 0;
 
-# On a DoubleDouble build we might want dd_repro() to NOT
-# use Math::MPFR::nvtoa() - eg for testing. In that case
-# we simply set $ENV{DD_AVOID_NVTOA} to a true value before
-# loading Math::FakeDD.
-
-use constant DD_AVOID_NVTOA      => $ENV{DD_AVOID_NVTOA} ? 1 : 0;
-
 use constant NV_IS_QUAD => $Config{nvtype} eq '__float128' ||
                            ($Config{nvtype} eq 'long double' && $Config{longdblkind} > 0
                               && $Config{longdblkind} < 3)                                 ? 1 : 0;
@@ -67,20 +60,23 @@ use overload
 require Exporter;
 *import = \&Exporter::import;
 
-@Math::FakeDD::EXPORT_OK = qw(
-  NV_IS_DOUBLE NV_IS_DOUBLEDOUBLE NV_IS_QUAD NV_IS_80BIT_LD MPFR_LIB_VERSION DD_AVOID_NVTOA
-  dd_abs dd_add dd_add_eq dd_assign dd_atan2 dd_cmp dd_cos dd_dec dd_div dd_div_eq dd_eq dd_exp
-  dd_gt dd_gte dd_hex dd_inf dd_is_inf dd_is_nan dd_int dd_log dd_lt dd_lte
-  dd_mul dd_mul_eq dd_nan dd_neq dd_numify dd_pow dd_pow_eq dd_repro dd_repro_test
+my @tags = qw(
+  NV_IS_DOUBLE NV_IS_DOUBLEDOUBLE NV_IS_QUAD NV_IS_80BIT_LD MPFR_LIB_VERSION
+  dd_abs dd_add dd_add_eq dd_assign dd_atan2 dd_catalan dd_cmp dd_cos dd_dec dd_div dd_div_eq
+  dd_eq dd_euler dd_exp dd_exp2 dd_exp10
+  dd_gt dd_gte dd_hex dd_inf dd_is_inf dd_is_nan dd_int dd_log dd_log2 dd_log10 dd_lt dd_lte
+  dd_mul dd_mul_eq dd_nan dd_neq dd_numify dd_pi dd_pow dd_pow_eq dd_repro dd_repro_test
   dd_sin dd_spaceship dd_sqrt dd_streq dd_stringify dd_strne
   dd_sub dd_sub_eq
   dd2mpfr mpfr2dd mpfr_any_prec2dd mpfr2098
   printx sprintx unpackx
 );
 
-%Math::FakeDD::EXPORT_TAGS = (all =>[@Math::FakeDD::EXPORT_OK]);
+@Math::FakeDD::EXPORT_OK = (@tags);
 
-$Math::FakeDD::VERSION =  '0.04';
+%Math::FakeDD::EXPORT_TAGS = (all => [@tags]);
+
+$Math::FakeDD::VERSION =  '0.05';
 
 # Whenever dd_repro($obj) returns its string representation of
 # the value of $obj, $Math::FakeDD::REPRO_PREC is set to the
@@ -134,7 +130,7 @@ sub dd_repro {
     return '0.0';
   }
 
-  if(NV_IS_DOUBLEDOUBLE && !DD_AVOID_NVTOA) {
+  if(NV_IS_DOUBLEDOUBLE) {
     $Math::FakeDD::REPRO_PREC = undef; # nvtoa() doesn't tell us the precision.
     return nvtoa($arg->{msd} + $arg->{lsd});
   }
@@ -146,9 +142,6 @@ sub dd_repro {
     Rmpfr_neg($mpfr, $mpfr, MPFR_RNDN);
     $neg = 1;
   }
-
-  my $different_signs = 0; # will be set to 1 if one double < 0,
-                           # and the other double > 0.
 
   my $exp = Rmpfr_get_exp($mpfr);
 
@@ -183,6 +176,9 @@ sub dd_repro {
   Rmpfr_set_d($m_msd, $arg->{msd}, MPFR_RNDN);
   Rmpfr_set_d($m_lsd, $arg->{lsd}, MPFR_RNDN);
 
+  my $different_signs = 0; # will be set to 1 if one double < 0,
+                           # and the other double > 0.
+
   if(abs($arg->{lsd}) >= 2 ** -1022) {
     # lsd is not subnormal.
     $prec = Rmpfr_get_exp($m_msd) - Rmpfr_get_exp($m_lsd) + 53;
@@ -197,16 +193,16 @@ sub dd_repro {
     my $trial_dd = Math::FakeDD->new($trial_repro);
     if($trial_dd == $arg || ($neg == 1 && $trial_dd == abs($arg)) ) {
       $Math::FakeDD::REPRO_PREC = $prec;
-      return '-' . mpfrtoa($mpfr_copy) if $neg;
-      return mpfrtoa($mpfr_copy);
+      return '-' . $trial_repro if $neg;
+      return $trial_repro;
     }
 
     $prec++;
     # Might need to be incremented again if the 2 doubles have different sign.
   }
   else {
-    $prec = Rmpfr_get_exp($m_msd) + 1073; # $prec could be 0
-    $prec++ if $prec == 0;                # Ensure $prec > 0
+    $prec = Rmpfr_get_exp($m_msd) + 1073; # $prec should be > 0
+    #$prec++ if $prec == 0;                # Ensure $prec > 0
 
     my $mpfr_copy = Rmpfr_init2(2098);
     Rmpfr_set($mpfr_copy, $mpfr, MPFR_RNDN);
@@ -215,8 +211,8 @@ sub dd_repro {
     my $trial_dd = Math::FakeDD->new($trial_repro);
     if($trial_dd == $arg || ($neg == 1 && $trial_dd == abs($arg)) ) {
       $Math::FakeDD::REPRO_PREC = $prec;
-      return '-' . mpfrtoa($mpfr_copy) if $neg;
-      return mpfrtoa($mpfr_copy);
+      return '-' . $trial_repro if $neg;
+      return $trial_repro;
     }
 
     $prec++;
@@ -274,24 +270,22 @@ sub dd_repro {
 
   } # close different signs
 
-  else {
-    # We need to detect the (rare) case that a chopped and
-    # then incremented mantissa passes the round trip.
+  # msd and lsd are either both >0, or both <0.
+  # We need to detect the (rare) case that a chopped and
+  # then incremented mantissa passes the round trip.
 
-    my $candidate = mpfrtoa($mpfr, 53);
-    my $ret = _chop_test($candidate, $arg, 1);
+  my $can = mpfrtoa($mpfr, 53);
+  my $ret = _chop_test($can, $arg, 1);
 
-    if($ret eq 'ok') {
-      $Math::FakeDD::REPRO_PREC = $prec;
-      return '-' . $candidate if $neg;
-      return $candidate;
-    }
+  if($ret eq 'ok') {
+    $Math::FakeDD::REPRO_PREC = $prec;
+    return '-' . $can if $neg;
+    return $can;
+  }
 
-    $Math::FakeDD::REPRO_PREC = "> $prec";
-    return '-' . $ret if $neg;
-    return $ret;
-
-  } # close same signs
+  $Math::FakeDD::REPRO_PREC = "> $prec";
+  return '-' . $ret if $neg;
+  return $ret;
 
 }
 
@@ -301,7 +295,10 @@ sub _decrement {
 
   # Remove all trailing zeroes from $r[0];
 
-  chop($r[0]) while $r[0] =~ /0$/;
+  if($r[0] =~ /\./) {
+    chop($r[0]) while $r[0] =~ /0$/;
+  }
+
   $r[0] =~ s/\.$//;
   $r[1] = defined $r[1] ? $r[1] : 0;
   while($r[0] =~ /0$/) {
@@ -332,7 +329,7 @@ sub _chop_test {
   my $do_increment = defined($_[0]) ? shift
                                     : 0;
 
-  # We remove from $repro any trailing mantissa zeroes, and then
+  # We remove from $r[0] any trailing mantissa zeroes, and then
   # replace the least significant digit with zero.
   # IOW, we effectively chop off the least siginificant digit, thereby
   # rounding it down to the next lowest decimal precision.)
@@ -349,26 +346,50 @@ sub _chop_test {
 
   return 'ok' if length($r[0]) < 2; # chop test inapplicable.
 
-  chop $r[0];
-  my $chopped = $r[1] ? $r[0] . 'e' . $r[1]
-                      : $r[0];
+  substr($r[0], -1, 1, '');
+
+  $r[1]++ unless $r[0] =~ /\./;
+  $r[0] =~ s/\.$/.0/
+    unless $r[1];
+  $r[0] =~ s/\.$//;
 
   if(!$do_increment) {
     # We are interested only in the chop test
+
+    my $chopped = $r[1] ? $r[0] . 'e' . $r[1]
+                        : $r[0];
+
     return 'ok' if Math::FakeDD->new($chopped) < abs($op); # chop test ok.
     return $chopped;
   }
 
-  my $substitute = substr($r[0], -1, 1);
-  if($substitute < 9) {
-    $substitute++;
-    substr($r[0], -1, 1, "$substitute");
-    my $incremented = $r[1] ? $r[0] . 'e' . $r[1]
-                            : $r[0];
+  # We are not interested in the chop test - the "chop" was
+  # done only as the first step in the incrementation, and
+  # it's the result of the following  incrementation that
+  # interests us. Now we want, in effect, to do:
+  #  ++$r[0];
+  # This value should then assign to a  DoubleDouble value
+  # that is greater than the given $op.
 
-    return $incremented if Math::FakeDD->new($incremented) == abs($op);
+  if($r[0] =~ /\./) {
+    # We must remove the '.', do the string increment,
+    # and then reinsert the '.' in the appropriate place.
+    my @mantissa = split /\./, $r[0];
+    my $point_pos = -(length($mantissa[1]));
+    my $t = $mantissa[0] . $mantissa[1];
+    $t++;
+    substr($t, $point_pos, 0, '.');
+    $r[0] = $t;
+  }
+  else {
+    $r[0]++;
+    $r[1]++ while $r[0] =~ s/0$//;
   }
 
+  my $incremented = $r[1] ? $r[0] . 'e' . $r[1]
+                          : $r[0];
+
+  return $incremented if Math::FakeDD->new($incremented) == abs($op);
   return 'ok';
 }
 
@@ -383,18 +404,18 @@ sub dd_repro_test {
 
   # Handle Infs, Nan, and Zero.
   if(dd_is_nan($op)) {
-    return 7 if $repro =~ /^nan$/i;
+    return 15 if $repro eq 'NaN';
     return 0;
   }
 
   if(dd_is_inf($op)) {
-    return 7 if ($op > 0 && $repro =~ /^inf$/i);
-    return 7 if ($op < 0 && $repro =~ /^\-inf$/i);
+    return 15 if ($op > 0 && $repro eq 'Inf');
+    return 15 if ($op < 0 && $repro eq '-Inf');
     return 0;
   }
 
   if($op == 0) {
-    return 7 if $repro eq '0.0';
+    return 15 if ($repro eq '0.0' || $repro eq '-0.0');
     return 0;
   }
 
@@ -411,6 +432,17 @@ sub dd_repro_test {
     else { print " no exponent\n" }
   }
 
+  # Increment $ret by 8 if and only if there are no errant trailing
+  # zeroes in $r[0] .
+
+  if(!defined($r[1])) {
+    $ret += 8 if ($r[0] =~ /\.0$/ || $r[0] !~ /0$/);
+    $r[1] = 0;       # define $r[1] by setting it to zero.
+  }
+  else {
+   $ret += 8 unless $r[0] =~ /0$/;
+  }
+
   # We remove from $repro any trailing mantissa zeroes, and then
   # replace the least significant digit with zero.
   # IOW, we effectively chop off the least siginificant digit, thereby
@@ -420,7 +452,6 @@ sub dd_repro_test {
 
   chop($r[0]) while $r[0] =~ /0$/;
   $r[0] =~ s/\.$//;
-  $r[1] = defined $r[1] ? $r[1] : 0;
   while($r[0] =~ /0$/) {
     chop $r[0];
     $r[1]++;
@@ -631,6 +662,12 @@ sub dd_atan2 {
   return mpfr2dd($rop1);
 }
 
+sub dd_catalan {
+  my $rop = Rmpfr_init2(2098);
+  Rmpfr_const_catalan($rop, MPFR_RNDN);
+  return mpfr2dd($rop);
+}
+
 
 sub dd_cmp {
 
@@ -792,6 +829,12 @@ sub dd_eq {
   return 1;                          # equal
 }
 
+sub dd_euler {
+  my $rop = Rmpfr_init2(2098);
+  Rmpfr_const_euler($rop, MPFR_RNDN);
+  return mpfr2dd($rop);
+}
+
 sub dd_exp {
   my $obj;
   if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
@@ -801,6 +844,36 @@ sub dd_exp {
   my $ret = Math::FakeDD->new();
   my $mpfr = Rmpfr_init2(2098);
   Rmpfr_exp($mpfr, dd2mpfr($obj), MPFR_RNDN);
+  $obj = mpfr2dd($mpfr);
+  $ret->{msd} = $obj->{msd};
+  $ret->{lsd} = $obj->{lsd};
+  return $ret;
+}
+
+sub dd_exp2 {
+  my $obj;
+  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
+  else {
+    $obj = Math::FakeDD->new(shift);
+  }
+  my $ret = Math::FakeDD->new();
+  my $mpfr = Rmpfr_init2(2098);
+  Rmpfr_exp2($mpfr, dd2mpfr($obj), MPFR_RNDN);
+  $obj = mpfr2dd($mpfr);
+  $ret->{msd} = $obj->{msd};
+  $ret->{lsd} = $obj->{lsd};
+  return $ret;
+}
+
+sub dd_exp10 {
+  my $obj;
+  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
+  else {
+    $obj = Math::FakeDD->new(shift);
+  }
+  my $ret = Math::FakeDD->new();
+  my $mpfr = Rmpfr_init2(2098);
+  Rmpfr_exp10($mpfr, dd2mpfr($obj), MPFR_RNDN);
   $obj = mpfr2dd($mpfr);
   $ret->{msd} = $obj->{msd};
   $ret->{lsd} = $obj->{lsd};
@@ -887,6 +960,36 @@ sub dd_log {
   my $ret = Math::FakeDD->new();
   my $mpfr = Rmpfr_init2(2098);
   Rmpfr_log($mpfr, dd2mpfr($obj), MPFR_RNDN);
+  $obj = mpfr2dd($mpfr);
+  $ret->{msd} = $obj->{msd};
+  $ret->{lsd} = $obj->{lsd};
+  return $ret;
+}
+
+sub dd_log2 {
+  my $obj;
+  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
+  else {
+    $obj = Math::FakeDD->new(shift);
+  }
+  my $ret = Math::FakeDD->new();
+  my $mpfr = Rmpfr_init2(2098);
+  Rmpfr_log2($mpfr, dd2mpfr($obj), MPFR_RNDN);
+  $obj = mpfr2dd($mpfr);
+  $ret->{msd} = $obj->{msd};
+  $ret->{lsd} = $obj->{lsd};
+  return $ret;
+}
+
+sub dd_log10 {
+  my $obj;
+  if(ref($_[0]) eq 'Math::FakeDD') { $obj = shift }
+  else {
+    $obj = Math::FakeDD->new(shift);
+  }
+  my $ret = Math::FakeDD->new();
+  my $mpfr = Rmpfr_init2(2098);
+  Rmpfr_log10($mpfr, dd2mpfr($obj), MPFR_RNDN);
   $obj = mpfr2dd($mpfr);
   $ret->{msd} = $obj->{msd};
   $ret->{lsd} = $obj->{lsd};
@@ -1030,6 +1133,12 @@ sub dd_numify {
   my $arg = shift;
   return $arg->{msd} + $arg->{lsd}; # Information might be lost if
                                     # NV type is not DoubleDouble.
+}
+
+sub dd_pi {
+  my $rop = Rmpfr_init2(2098);
+  Rmpfr_const_pi($rop, MPFR_RNDN);
+  return mpfr2dd($rop);
 }
 
 sub dd_pow {
@@ -1487,5 +1596,22 @@ sub unpackx {
   }
   die "Wrong arg given to unpackx()";
 }
+
+#sub tz_test {
+#  # Detect any unwanted trailing zeroes
+#  # in values returned by nvtoa().
+#
+#  my $s = shift;
+#  my @r = split /e/i, $s;
+#
+#  if(!defined($r[1])) {
+#    return 1 if $r[0] =~ /\.0$/; # pass
+#    return 0 if $r[0] =~ /0$/;   # fail
+#  }
+#
+#  return 0 if $r[0] =~ /0$/;     # fail (for our formatting convention)
+#  return 1;                      # pass
+#}
+
 
 1;

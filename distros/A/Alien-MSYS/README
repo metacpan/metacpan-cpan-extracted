@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.15
+    version 0.17
 
 SYNOPSIS
 
@@ -73,7 +73,7 @@ FUNCTIONS
  msys
 
      # get the uname from MSYS
-     my $uname = msys { `uanem` };
+     my $uname = msys { `uname` };
      
      # run with GNU make from MSYS instead of
      # dmake from Strawberry Perl
@@ -164,6 +164,10 @@ AUTHOR
     Contributors:
 
     Shawn Laffan (SLAFFAN, shawnlaffan)
+
+    bekuno
+
+    Zaki Mughal (zmughal)
 
 COPYRIGHT AND LICENSE
 

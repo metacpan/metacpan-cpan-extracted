@@ -11,7 +11,7 @@ use Unicode::UTF8 qw(decode_utf8);
 
 Readonly::Scalar our $NUMBER_OF_BOXES => 7;
 
-our $VERSION = 0.01;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -48,6 +48,10 @@ sub new {
 
 	# Process params.
 	set_params($self, @{$object_params_ar});
+
+	if (! defined $self->{'css_pager'}) {
+		err "Parameter 'css_pager' is required.";
+	}
 
 	if (! defined $self->{'url_page_cb'}) {
 		err "Missing 'url_page_cb' parameter.";
@@ -287,13 +291,7 @@ sub _process_css {
 sub _css_class {
 	my ($self, $suffix) = @_;
 
-	my $class = '';
-	if (defined $self->{'css_pager'}) {
-		$class .= $self->{'css_pager'}.'-';
-	}
-	$class .= $suffix;
-
-	return $class;
+	return $self->{'css_pager'}.'-'.$suffix;
 }
 
 sub _css_colors_optional {
@@ -359,6 +357,8 @@ Default value is:
 
 Main CSS class of this block.
 
+It's required.
+
 Default value is 'pager'.
 
 =item * C<flag_prev_next>
@@ -410,6 +410,7 @@ Returns undef.
  new():
          Both paginator styles disabled.
          Missing 'url_page_cb' parameter.
+         Parameter 'css_pager' is required.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
          From Tags::HTML::new():
@@ -534,6 +535,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.03
 
 =cut

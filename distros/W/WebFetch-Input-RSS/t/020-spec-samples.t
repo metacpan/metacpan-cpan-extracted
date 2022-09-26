@@ -28,7 +28,7 @@ Readonly::Scalar my $input_dir       => $base_dir . "/t/test-inputs/020-spec-sam
 Readonly::Scalar my $tmpdir_template => "WebFetch-XXXXXXXXXX";
 Readonly::Array my @rss_versions     => qw(0.9 0.91 1.0 2.0);
 Readonly::Array my @test_files       => qw(
-    00-notfound-skip.xml rss-0.90-sample.xml rss-0.91-complete.xml rss-0.91-from-2.0-spec.xml rss-0.91-simple.xml
+    00-notfound-skip.xml rss-0.91-complete.xml rss-0.91-from-2.0-spec.xml rss-0.91-simple.xml
     rss-0.92-from-2.0-spec.xml rss-1.0-modules.xml rss-1.0-simple.xml rss-2.0-sample.xml
 );
 

@@ -1,12 +1,12 @@
 package Error::TypeTiny::WrongNumberOfParameters;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	$Error::TypeTiny::WrongNumberOfParameters::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::WrongNumberOfParameters::VERSION   = '1.016010';
+	$Error::TypeTiny::WrongNumberOfParameters::VERSION   = '2.000000';
 }
 
 $Error::TypeTiny::WrongNumberOfParameters::VERSION =~ tr/_//d;

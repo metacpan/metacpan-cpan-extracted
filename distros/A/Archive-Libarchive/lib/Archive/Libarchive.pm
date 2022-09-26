@@ -15,7 +15,7 @@ use Archive::Libarchive::EntryLinkResolver;
 use parent qw( Exporter );
 
 # ABSTRACT: Modern Perl bindings to libarchive
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 my $ffi = Archive::Libarchive::Lib->ffi;
@@ -87,7 +87,7 @@ Archive::Libarchive - Modern Perl bindings to libarchive
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -767,7 +767,7 @@ experience writing FFI bindings in Perl.
 BULK88 was in the audience for a DC / Baltimore version of my I<Never Need to Write XS> talk and he pointed
 me to a feature in XS that would make FFI calls much faster than what was possible in L<FFI::Raw>.  Using
 the C<any_ptr> it is possible to remove method calls from an FFI interface, which, due to their dynamic
-nature.
+nature are slower that non-method subroutine calls.
 
 I was loosing faith in L<FFI::Raw> being tenable or performant for large APIs, so I I gathered up my ideas
 of what would make a better FFI experience in Perl and the C<any_ptr> feature that Bulk had shown me and
@@ -830,10 +830,6 @@ Provides an interface for extracting arbitrary archives of any format/filter sup
 
 Decompresses / unwraps files that have been compressed or wrapped in any of the filter formats supported by C<libarchive>
 
-=item L<Dist::Zilla::Plugin::Libarchive>
-
-Build L<Dist::Zilla> based dist tarballs with libarchive instead of the built in L<Archive::Tar>.
-
 =item L<Archive::Libarchive::API>
 
 This contains the full and complete API for all of the L<Archive::Libarchive>
@@ -874,6 +870,10 @@ This class exposes the C<libarchive> link resolver API.
 =item L<Archive::Libarchive::Match>
 
 This class exposes the C<libarchive> match API.
+
+=item L<Dist::Zilla::Plugin::Libarchive>
+
+Build L<Dist::Zilla> based dist tarballs with libarchive instead of the built in L<Archive::Tar>.
 
 =item L<Alien::Libarchive3>
 

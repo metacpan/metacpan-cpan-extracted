@@ -1,5 +1,6 @@
 use 5.010;
 use rlib;
+use Scalar::Util qw /refaddr/;
 
 use Test::More;
 use List::Unique::DeterministicOrder;
@@ -108,5 +109,12 @@ $one_item->push ('shazza');
 $one_item->push ('gazza');
 ok ($one_item, 'true boolean');
 
+
+#  clone
+my $orig = List::Unique::DeterministicOrder->new(data => ['a' .. 'z']);
+my $cloned = $orig->clone;
+is_deeply $cloned, $orig, "Clone matches original";
+isnt refaddr $cloned->[0], refaddr $orig->[0], "Cloned and original refs differ";
+is blessed $cloned, blessed $orig, "Same package";
 
 done_testing();

@@ -4,7 +4,7 @@ use 5.014;
 use warnings;
 use strict;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Carp;
 use Ref::Util qw /is_arrayref/;
@@ -46,6 +46,16 @@ sub new {
     return $self;
 }
 
+sub _clone_inner {
+    my $self = shift;
+    my $clone = bless {}, blessed $self;
+    $clone->{data} = [@{$self->{data}}];
+    $clone->{sum}  = $self->{sum} if exists $self->{sum};
+    $clone->{data_sum_to_one} = $self->{data_sum_to_one}
+      if exists $self->{data_sum_to_one};
+    return $clone;
+}
+
 sub clone {
     my $self = shift;
     my $clone;
@@ -53,12 +63,13 @@ sub clone {
     if ($self->{prng}->can('clone')) {
         $clone = do {
             delete local $self->{prng};
-            Clone::clone ($self);
+            $self->_clone_inner;
         };
         $clone->{prng} = $self->{prng}->clone;
     }
     else {
-        $clone = Clone::clone ($self);
+        $clone = $self->_clone_inner;
+        $clone->{prng} = Clone::clone ($self->{prng});
     }
     return $clone;
 }

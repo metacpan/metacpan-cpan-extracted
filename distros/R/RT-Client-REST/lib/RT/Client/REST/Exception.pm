@@ -6,13 +6,11 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Exception;
-$RT::Client::REST::Exception::VERSION = '0.60';
-use base qw(Exception::Class);
+$RT::Client::REST::Exception::VERSION = '0.70';
+use parent qw(Exception::Class);
 
 use vars qw($VERSION);
 $VERSION = '0.19';
-
-use Error;
 
 use Exception::Class (
     'RT::Client::REST::OddNumberOfArgumentsException'   => {
@@ -194,9 +192,8 @@ sub _rt_content_to_exception {
 {
     no strict 'refs'; ## no critic (ProhibitNoStrict)
     push @{__PACKAGE__ . '::ISA'}, 'Exception::Class::Base';
-    push @Exception::Class::Base::ISA, 'Error'
-        unless Exception::Class::Base->isa('Error');
 }
+
 
 1;
 
@@ -210,7 +207,7 @@ RT::Client::REST::Exception - Exceptions thrown by RT::Client::REST
 
 =head1 VERSION
 
-version 0.60
+version 0.70
 
 =head1 DESCRIPTION
 
@@ -358,11 +355,11 @@ L<RT::Client::REST>.
 
 =head1 AUTHOR
 
-Dmitri Tikhonov
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

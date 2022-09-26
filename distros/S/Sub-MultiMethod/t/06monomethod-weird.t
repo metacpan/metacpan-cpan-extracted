@@ -13,16 +13,16 @@ my $e;
 	# monomethod is really just multimethod(undef)+alias
 	# but with a nicer error message for conflicts
 	multimethod undef, => (
-		alias     => 'add',
-		signature => [ Int, Int ],
-		code      => sub { my ($self, $x, $y) = (shift, @_); $x + $y },
+		alias      => 'add',
+		positional => [ Int, Int ],
+		code       => sub { my ($self, $x, $y) = (shift, @_); $x + $y },
 	);
 	
 	$e = ::exception {
 		multimethod undef, => (
-			alias     => 'add',
-			signature => [ Num, Num ],
-			code      => sub { my ($self, $x, $y) = (shift, @_); $x + $y },
+			alias      => 'add',
+			positional => [ Num, Num ],
+			code       => sub { my ($self, $x, $y) = (shift, @_); $x + $y },
 		);
 	};
 }
@@ -45,8 +45,8 @@ my $e2 = exception {
 	use Sub::MultiMethod qw( multimethod );
 	
 	multimethod add => (
-		signature => [ ArrayRef[Int] ],
-		code      => sub {
+		positional => [ ArrayRef[Int] ],
+		code       => sub {
 			my ($self, $arr) = (shift, @_);
 			my $sum = 0;
 			$sum += $_ for @$arr;

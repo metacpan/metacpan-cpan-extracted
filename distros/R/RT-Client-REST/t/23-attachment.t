@@ -13,7 +13,7 @@ use constant METHODS => (
     # attrubutes:
     'id', 'creator_id', 'subject', 'created', 'message_id', 'parent_id',
     'content_type', 'file_name', 'transaction_id', 'content', 'headers',
-    'parent', 'content_encoding',
+    'parent',       'content_encoding',
 );
 
 BEGIN {
@@ -21,25 +21,28 @@ BEGIN {
 }
 
 for my $method (METHODS) {
-    can_ok('RT::Client::REST::Attachment', $method);
+    can_ok( 'RT::Client::REST::Attachment', $method );
 }
 
 my $ticket;
 
 lives_ok {
     $ticket = RT::Client::REST::Attachment->new;
-} 'Ticket can get successfully created';
+}
+'Ticket can get successfully created';
 
 for my $method (qw(store search count)) {
     throws_ok {
         $ticket->$method;
-    } 'RT::Client::REST::Exception'; # make sure exception inheritance works
+    }
+    'RT::Client::REST::Exception';    # make sure exception inheritance works
 
     throws_ok {
         $ticket->$method;
-    } 'RT::Client::REST::Object::IllegalMethodException',
-        "method '$method' should throw an exception";
+    }
+    'RT::Client::REST::Object::IllegalMethodException',
+      "method '$method' should throw an exception";
 }
 
-ok('attachment' eq $ticket->rt_type);
+ok( 'attachment' eq $ticket->rt_type );
 

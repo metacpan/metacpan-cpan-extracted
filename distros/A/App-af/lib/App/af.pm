@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.014;
 
-package App::af 0.17 {
+package App::af 0.18 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -21,10 +21,10 @@ package App::af 0.17 {
   sub BUILDARGS
   {
     my($class, @args) = @_;
-    
+
     my($subcommand) = $class =~ /App::af::(.*)/;
     my %args = ( args => \@args );
-    
+
     my @options = (
       'help'    => sub {
         pod2usage({
@@ -37,7 +37,7 @@ package App::af 0.17 {
         exit;
       },
     );
-    
+
     foreach my $attr ($class->meta->get_all_attributes)
     {
       next unless $attr->does("App::af::opt");
@@ -56,14 +56,14 @@ package App::af 0.17 {
         push @options, $name => \$args{$attr->name};
       }
     }
-    
+
     GetOptionsFromArray(\@args, @options)
       || pod2usage({
-           -exitval => 1, 
-           -verbose => 99, 
+           -exitval => 1,
+           -verbose => 99,
            -sections => $subcommand eq 'default' ? 'SYNOPSIS' : "SUBCOMMANDS/$subcommand/Usage",
          });
-    
+
     delete $args{$_} for grep { ! defined $args{$_} } keys %args;
 
     \%args,
@@ -75,11 +75,11 @@ package App::af 0.17 {
       ? 'App::af::' . shift @ARGV
       : 'App::af::default';
   }
-  
-  requires 'main';  
+
+  requires 'main';
 }
 
-package App::af::default 0.17 {
+package App::af::default 0.18 {
 
   use Moose;
   with 'App::af';
@@ -94,14 +94,14 @@ package App::af::default 0.17 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::role::alienfile 0.17 {
+package App::af::role::alienfile 0.18 {
 
   use Moose::Role;
   use namespace::autoclean;
   use MooseX::Types::Path::Tiny qw( AbsPath );
   use Path::Tiny qw( path );
   use File::Temp qw( tempdir );
-  
+
   has file => (
     is       => 'ro',
     isa      => AbsPath,
@@ -111,7 +111,7 @@ package App::af::role::alienfile 0.17 {
     default  => 'alienfile',
     coerce   => 1,
   );
-  
+
   has class => (
     is       => 'ro',
     isa      => 'Str',
@@ -119,17 +119,17 @@ package App::af::role::alienfile 0.17 {
     short    => 'c',
     opt_type => 's',
   );
-  
+
   sub build
   {
     my($self, %args) = @_;
-    
+
     my $alienfile;
-    
+
     my $prefix;
-    
+
     $args{root} ||= tempdir( CLEANUP => 1);
-    
+
     if($self->class)
     {
       my $class = $self->class =~ /::/ ? $self->class : "Alien::" . $self->class;
@@ -160,7 +160,7 @@ package App::af::role::alienfile 0.17 {
       say STDERR "unable to read $alienfile";
       exit 2;
     }
-    
+
     if(my $patch = $alienfile->parent->child('patch'))
     {
       if(-d $patch)
@@ -168,20 +168,20 @@ package App::af::role::alienfile 0.17 {
         $args{patch} = "$patch";
       }
     }
-  
+
     require Alien::Build;
     my $build = Alien::Build->load("$alienfile", %args);
-    
-    wantarray ? ($build, $prefix) : $build;
 
-  }  
+    wantarray ? ($build, $prefix) : $build;  ## no critic (Community::Wantarray)
+
+  }
 }
 
-package App::af::role::phase 0.17 {
+package App::af::role::phase 0.18 {
 
   use Moose::Role;
   use namespace::autoclean;
-  
+
   has phase => (
     is       => 'ro',
     isa      => 'Str',
@@ -190,21 +190,21 @@ package App::af::role::phase 0.17 {
     opt_type => 's',
     short    => 'p',
   );
-  
+
   sub check_phase
   {
     my($self) = @_;
-    
+
     if($self->phase !~ /^(configure|any|all|share|system)$/)
     {
       say STDERR "unknown phase: @{[ $self->phase ]}";
       exit 2;
     }
   }
-  
+
 }
 
-package App::af::role::libandblib 0.17 {
+package App::af::role::libandblib 0.18 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -217,13 +217,13 @@ package App::af::role::libandblib 0.17 {
     opt_type => 's',
     is_array => 1,
   );
-  
+
   has blib => (
     is       => 'ro',
     isa      => 'Int',
     traits   => ['App::af::opt'],
   );
-  
+
   around main => sub {
     my $orig = shift;
     my $self = shift;
@@ -236,7 +236,7 @@ package App::af::role::libandblib 0.17 {
       require lib;
       lib->import($inc);
     }
-    
+
     if($self->blib)
     {
       require blib;
@@ -246,30 +246,30 @@ package App::af::role::libandblib 0.17 {
     # make sure @INC entries are absolute, since $build
     # may do a lot of directory changes
     @INC = map { ref $_ ? $_ : path($_)->absolute->stringify } @INC;
-    
+
     $orig->($self, @args);
-    
+
   };
 
 }
 
-package App::af::opt 0.17 {
+package App::af::opt 0.18 {
 
   use Moose::Role;
   use namespace::autoclean;
-  
+
   has short => (
     is      => 'rw',
     isa     => 'Str',
     default => '',
   );
-  
+
   has opt_type => (
     is      => 'rw',
     isa     => 'Str',
     default => '',
   );
-  
+
   has is_array => (
     is      => 'rw',
     isa     => 'Int',
@@ -296,7 +296,7 @@ App::af - Command line tool for alienfile
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -320,7 +320,7 @@ Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

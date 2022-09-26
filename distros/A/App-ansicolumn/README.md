@@ -47,7 +47,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.21
+Version 1.22
 
 # DESCRIPTION
 
@@ -226,8 +226,10 @@ default, from the standard input.
     ascii-box,
     c-box,
     box,           heavy-box,        fat-box,   very-fat-box,
+    dash-box,      heavy-dash-box,
     round-box,     heavy-round-box,
     frame,         heavy-frame,      fat-frame, very-fat-frame,
+    dash-frame,    heavy-dash-frame,
     page-frame,    heavy-page-frame,
     shadow,
     shadow-box,    heavy-shadow-box,

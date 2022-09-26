@@ -33,6 +33,8 @@ METHODS
 
             Main CSS class of this block.
 
+            It's required.
+
             Default value is 'pager'.
 
     *       "flag_prev_next"
@@ -79,6 +81,7 @@ ERRORS
      new():
              Both paginator styles disabled.
              Missing 'url_page_cb' parameter.
+             Parameter 'css_pager' is required.
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
              From Tags::HTML::new():
@@ -193,5 +196,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.03
 

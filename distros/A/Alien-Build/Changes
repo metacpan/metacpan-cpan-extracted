@@ -1,5 +1,13 @@
 Revision history for Alien-Build
 
+2.70      2022-09-23 06:27:39 -0600
+
+2.69_01   2022-09-20 18:00:17 -0600
+  - Documentation improvements (gh#370)
+  - Added meta.platform.cpu.count and meta.platform.cpu.arch.name
+    properties (gh#371 zmughal++)
+
+
 2.68      2022-09-05 09:05:18 -0600
   - Documentation improvements (gh#367)
   - alien_diag from Test::Alien::Diag now can optionaly take a

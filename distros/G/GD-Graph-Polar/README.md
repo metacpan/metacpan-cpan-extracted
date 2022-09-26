@@ -29,7 +29,7 @@ GD::Graph::Polar - Perl package to create polar graphs using GD package
 
 # DESCRIPTION
 
-This package is a wrapper around GD to produce polar graphs with an easy interface.  I use this package to display GPS satellites on a graph with data from the [Net::GPSD3](https://metacpan.org/pod/Net::GPSD3) package.
+This package is a wrapper around GD to produce polar graphs with an easy interface.  I use this package to plot antenna patterns on a graph with data from the [RF::Antenna::Planet::MSI::Format](https://metacpan.org/pod/RF::Antenna::Planet::MSI::Format) package.
 
 # CONSTRUCTOR
 
@@ -143,7 +143,7 @@ Returns a [GD](https://metacpan.org/pod/GD) object
 
 ## gcnames
 
-Returns a [Graphics::ColorNames](https://metacpan.org/pod/Graphics::ColorNames) object
+Returns a [Graphics::ColorNames](https://metacpan.org/pod/Graphics::ColorNames) object.
 
 # Properties
 
@@ -155,6 +155,8 @@ Method to set or return the current drawing color
     my $colorobj = $obj->color([77,82,68]); #rgb=>[decimal,decimal,decimal]
     my $colorobj = $obj->color;
 
+Default: \[0,0,0\] (i.e., black)
+
 ## font
 
 Method to set or return the current drawing font (only needed by the very few)
@@ -163,17 +165,31 @@ Method to set or return the current drawing font (only needed by the very few)
     $obj->font(gdSmallFont); #the default
     $obj->font;
 
+Default: gdSmallFont
+
 ## size
 
-Sets or returns the width and height of the graph in pixels.
+Sets or returns the width and height of the image in pixels.
+
+Default: 480
 
 ## radius
 
-Sets or returns the radius of the Graph
+Sets or returns the radius of the graph which sets the scale of the maximum value of the graph.
+
+Default: 1
 
 ## border
 
+Sets and returns the number of pixels that border the graph on the image.
+
+Default: 2
+
 ## ticks
+
+Sets and returns the number of ticks on the graph.
+
+Default: 10
 
 ## rgbfile
 

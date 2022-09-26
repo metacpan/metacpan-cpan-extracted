@@ -1,5 +1,5 @@
 package App::Provision::Homebrew;
-$App::Provision::Homebrew::VERSION = '0.0403';
+$App::Provision::Homebrew::VERSION = '0.0404';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use File::Which;
 
 sub deps
 {
-    return qw( ruby curl );
+    return qw( curl );
 }
 
 
@@ -35,7 +35,7 @@ sub meet
     if ($self->{system} eq 'osx' )
     {
         $self->recipe(
-            [ 'ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"' ],
+            [ '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"' ],
             [ 'brew', 'doctor' ],
         );
     }
@@ -65,7 +65,7 @@ App::Provision::Homebrew
 
 =head1 VERSION
 
-version 0.0403
+version 0.0404
 
 =head1 FUNCTIONS
 
@@ -81,7 +81,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

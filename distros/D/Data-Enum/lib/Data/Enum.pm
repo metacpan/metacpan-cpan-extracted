@@ -15,7 +15,10 @@ use Scalar::Util qw/ blessed refaddr /;
 
 use overload ();
 
-our $VERSION = 'v0.2.5';
+use constant TRUE  => 1;
+use constant FALSE => 0;
+
+our $VERSION = 'v0.2.6';
 
 
 
@@ -72,14 +75,18 @@ sub new {
 
     $base->add_symbol( '&predicates', sub { return map { $_make_predicate->($_) } @values } );
 
+    my $match = sub {
+        my ( $self, $arg ) = @_;
+        return blessed($arg)
+            ? refaddr($arg) == refaddr($self)
+            : $arg eq $$self;
+    };
+
+    $base->add_symbol( '&MATCH', $match );
+
     $name->overload::OVERLOAD(
         q{""} => sub { my ($self) = @_; return $$self; },
-        q{eq} => sub {
-            my ( $self, $arg ) = @_;
-            return blessed($arg)
-              ? refaddr($arg) == refaddr($self)
-              : $arg eq $$self;
-        },
+        q{eq} => $match,
         q{ne} => sub {
             my ( $self, $arg ) = @_;
             return blessed($arg)
@@ -90,11 +97,11 @@ sub new {
 
     for my $value (@values) {
         my $predicate = $_make_predicate->($value);
-        $base->add_symbol( '&' . $predicate, sub() { '' } );
+        $base->add_symbol( '&' . $predicate, \&FALSE );
         my $elem    = "${name}::${value}";
         my $subtype = Package::Stash->new($elem);
         $subtype->add_symbol( '@ISA',  [$name] );
-        $subtype->add_symbol( '&' . $predicate, sub() { 1 } );
+        $subtype->add_symbol( '&' . $predicate, \&TRUE );
     }
 
     return $Cache{$key} = $name;
@@ -115,7 +122,7 @@ Data::Enum - immutable enumeration classes
 
 =head1 VERSION
 
-version v0.2.5
+version v0.2.6
 
 =head1 SYNOPSIS
 
@@ -220,6 +227,14 @@ A hash of predicates to values is roughly
   my %handlers = mesh [ $class->values ], [ $class->predicates ];
 
 This was added in v0.2.1.
+
+=head2 MATCH
+
+This method adds support for L<match::simple>.
+
+=for Pod::Coverage TRUE
+
+=for Pod::Coverage FALSE
 
 =head1 CAVEATS
 

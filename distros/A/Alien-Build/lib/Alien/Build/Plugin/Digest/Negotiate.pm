@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin negotiator for cryptographic signatures
-our $VERSION = '2.68'; # VERSION
+our $VERSION = '2.70'; # VERSION
 
 
 has '+sig' => sub { {} };
@@ -92,7 +92,7 @@ Alien::Build::Plugin::Digest::Negotiate - Plugin negotiator for cryptographic si
 
 =head1 VERSION
 
-version 2.68
+version 2.70
 
 =head1 SYNOPSIS
 

@@ -3,12 +3,13 @@ abstract: 'Store and access  a list of keys using a deterministic order based on
 author:
   - 'SLAFFAN <shawnlaffan@gmail.com>'
 build_requires:
+  List::Util: '0'
   Test::More: '0'
   rlib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-List-Unique-DeterministicOrder/issues/
   repository: https://github.com/shawnlaffan/perl-List-Unique-DeterministicOrder
-version: 0.001
+version: 0.003
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

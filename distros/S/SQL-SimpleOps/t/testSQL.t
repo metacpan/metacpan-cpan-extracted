@@ -31,12 +31,14 @@
 
 	## create dbh entry point (is required)
 
+	my $savedir = "/tmp" if (!($^O =~ /win/i));
 	our $mymod = new SQL::SimpleOps
 	(
-		db => "teste",		# you can use any database name
-		driver => "sqlite",	# you can use any database engine
-		dbfile => ":memory:",	# use ram memory
-		connect => 0,		# do not open database
+		db => "teste",			# you can use any database name
+		driver => "sqlite",		# you can use any database engine
+		dbfile => ":memory:",		# use ram memory
+		connect => 0,			# do not open database
+		sql_save_dir => $savedir,	# savedir test
 	);
 
 	diag("");

@@ -2,8 +2,8 @@ NAME
     App::FfmpegUtils - Utilities related to ffmpeg
 
 VERSION
-    This document describes version 0.011 of App::FfmpegUtils (from Perl
-    distribution App-FfmpegUtils), released on 2022-09-21.
+    This document describes version 0.012 of App::FfmpegUtils (from Perl
+    distribution App-FfmpegUtils), released on 2022-09-22.
 
 FUNCTIONS
   cut_video_by_duration
@@ -13,11 +13,45 @@ FUNCTIONS
 
     Get a portion (time range) of a video.
 
+    Examples:
+
+    *   Specify start only, the result is 100s.cut_40_to_100.mp4:
+
+         cut_video_by_duration(files => ["100s.mp4"], start => "40s");
+
+    *   Specify duration only (using percentage) of two files, the results
+        are 100s.cut_0_to_30.mp4 & 50s.cut_0_to_15.mp4:
+
+         cut_video_by_duration(files => ["100s.mp4", "50s.mp4"], duration => "30%");
+
+    *   Specify end only (using h:m:s notation), the result is
+        100s.cut_0_to_63.mp4:
+
+         cut_video_by_duration(files => ["100s.mp4"], end => "00:01:03");
+
+    *   Specify start & end only (using h:m:s notation), the result is
+        100s.cut_50_to_63.mp4:
+
+         cut_video_by_duration(files => ["100s.mp4"], end => "00:01:03", start => "00:00:50");
+
+    *   Specify start & duration only (using seconds), the result is
+        100s.cut_50_to_63.mp4:
+
+         cut_video_by_duration(files => ["100s.mp4"], duration => 13, start => 50);
+
+    *   Specify end & duration only (using human & ISO 8601 notation), the
+        result is 100s.cut_50_to_63.mp4:
+
+         cut_video_by_duration(files => ["100s.mp4"], duration => "13s", end => "PT63S");
+
     This utility uses *ffmpeg* (particularly the "-t" and "-ss") option to
-    get a portion (time range) of a video. It is a convenient wrapper of
-    ffmpeg for this particular task. You can specify start time and end
-    time, or start time and duration. It automatically chooses a filename if
-    you don't specify one.
+    get a portion (time range) of a video.
+
+    Compared to using "ffmpeg" directly, this wrapper offers convenience of
+    more flexibility in specifying times and duration (e.g. '15s' as well as
+    '00:10' as well as 'PT1M30S'), specifying only 'end' and 'duration',
+    handling multiple files, automatically choosing output filename, and tab
+    completion.
 
     This function is not exported.
 
@@ -25,9 +59,18 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   file* => *filename*
+    *   copy => *bool*
 
-    *   start* => *duration*
+        Whether to use the "copy" codec (fast but produces inaccurate
+        timings).
+
+    *   duration => *duration|percent_str*
+
+    *   end => *duration|percent_str*
+
+    *   files* => *array[filename]*
+
+    *   start => *duration|percent_str*
 
     Special arguments:
 
@@ -153,12 +196,16 @@ FUNCTIONS
 
     Split video by duration into parts.
 
-    This utility uses *ffmpeg* (particularly the "-t" and "-ss") option to
+    This utility uses ffmpeg (particularly the "-t" and "-ss") option to
     split a longer video into shorter videos. For example, if you have
     "long.mp4" with duration of 1h12m and you run it through this utility
     with "--every 15min" then you will have 5 new video files:
     "long.1of5.mp4" (15min), "long.2of5.mp4" (15min), "long.3of5.mp4"
     (15min), "long.4of5.mp4" (15min), and "long.5of5.mp4" (12min).
+
+    Compared to using "ffmpeg" directly, this wrapper offers convenience of
+    calculating the times ("-ss") option for you, handling multiple files,
+    automatically choosing output filename, and tab completion.
 
     This function is not exported.
 
@@ -171,9 +218,11 @@ FUNCTIONS
         Whether to use the "copy" codec (fast but produces inaccurate
         timings).
 
-    *   every* => *duration*
+    *   every => *duration|percent_str*
 
     *   files* => *array[filename]*
+
+    *   parts => *posint*
 
     Special arguments:
 

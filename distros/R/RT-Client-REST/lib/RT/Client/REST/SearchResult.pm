@@ -1,4 +1,5 @@
 #!perl
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 # PODNAME: RT::Client::REST::SearchResult
 # ABSTRACT: search results object.
 
@@ -6,7 +7,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::SearchResult;
-$RT::Client::REST::SearchResult::VERSION = '0.60';
+$RT::Client::REST::SearchResult::VERSION = '0.70';
 sub new {
     my $class = shift;
 
@@ -16,17 +17,17 @@ sub new {
 
     # FIXME: add validation.
     $self->{_object} = $opts{object};
-    $self->{_ids} = $opts{ids} || [];
+    $self->{_ids}    = $opts{ids} || [];
 
     return $self;
 }
 
-sub count { scalar(@{shift->{_ids}}) }
+sub count { scalar( @{ shift->{_ids} } ) }
 
 sub _retrieve {
-    my ($self, $obj) = @_;
+    my ( $self, $obj ) = @_;
 
-    unless ($obj->autoget) {
+    unless ( $obj->autoget ) {
         $obj->retrieve;
     }
 
@@ -34,8 +35,8 @@ sub _retrieve {
 }
 
 sub get_iterator {
-    my $self = shift;
-    my @ids = @{$self->{_ids}};
+    my $self   = shift;
+    my @ids    = @{ $self->{_ids} };
     my $object = $self->{_object};
 
     return sub {
@@ -43,11 +44,13 @@ sub get_iterator {
             my @tomap = @ids;
             @ids = ();
 
-            return map { $self->_retrieve($object->($_)) } @tomap;
-        } elsif (@ids) {
-            return $self->_retrieve($object->(shift(@ids)));
-        } else {
-            return;     # This signifies the end of the iterations
+            return map { $self->_retrieve( $object->($_) ) } @tomap;
+        }
+        elsif (@ids) {
+            return $self->_retrieve( $object->( shift(@ids) ) );
+        }
+        else {
+            return;    # This signifies the end of the iterations
         }
     };
 }
@@ -66,7 +69,7 @@ RT::Client::REST::SearchResult - search results object.
 
 =head1 VERSION
 
-version 0.60
+version 0.70
 
 =head1 SYNOPSIS
 
@@ -145,11 +148,11 @@ L<RT::Client::REST::Object>, L<RT::Client::REST>.
 
 =head1 AUTHOR
 
-Dmitri Tikhonov
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

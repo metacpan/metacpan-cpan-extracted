@@ -1,18 +1,17 @@
 package Types::Standard;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	eval { require re };
-	if ( $] < 5.008 ) { require Devel::TypeTiny::Perl56Compat }
 	if ( $] < 5.010 ) { require Devel::TypeTiny::Perl58Compat }
 }
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.016010';
+	$Types::Standard::VERSION   = '2.000000';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -21,7 +20,8 @@ use Type::Library -base;
 
 our @EXPORT_OK = qw( slurpy );
 
-use Scalar::Util qw( blessed looks_like_number );
+use Eval::TypeTiny  qw( set_subname );
+use Scalar::Util    qw( blessed looks_like_number );
 use Type::Tiny      ();
 use Types::TypeTiny ();
 
@@ -159,8 +159,6 @@ my $meta = __PACKAGE__->meta;
 	}
 	Types::Standard::_Stringable->Type::Tiny::_install_overloads(
 		q[""] => sub { $_[0]{text} ||= $_[0]{code}->() } );
-		
-	my $subname;
 	
 	sub LazyLoad ($$) {
 		bless \@_, 'Types::Standard::LazyLoad';
@@ -180,15 +178,10 @@ my $meta = __PACKAGE__->meta;
 			}
 			my $mm = $type->{my_methods} || {};
 			for my $key ( keys %$mm ) {
-				$subname =
-					eval   { require Sub::Util } ? \&Sub::Util::set_subname
-					: eval { require Sub::Name } ? \&Sub::Name::subname
-					: 0
-					if not defined $subname;
 				next unless ref( $mm->{$key} ) eq 'Types::Standard::LazyLoad';
 				my $f = $mm->{$key}[1];
 				$mm->{$key} = $class->can( "__$f" );
-				$subname and $subname->(
+				set_subname(
 					sprintf( "%s::my_%s", $type->qualified_name, $key ),
 					$mm->{$key},
 				);
@@ -212,6 +205,7 @@ my $_any = $meta->$add_core_type(
 		name            => "Any",
 		inlined         => sub { "!!1" },
 		complement_name => 'None',
+		type_default    => sub { return undef; },
 	}
 );
 
@@ -233,6 +227,7 @@ my $_bool = $meta->$add_core_type(
 		inlined => sub {
 			"!ref $_[1] and (!defined $_[1] or $_[1] eq q() or $_[1] eq '0' or $_[1] eq '1')";
 		},
+		type_default => sub { return !!0; },
 	}
 );
 
@@ -244,6 +239,7 @@ my $_undef = $meta->$add_core_type(
 		parent     => $_item,
 		constraint => sub { !defined $_ },
 		inlined    => sub { "!defined($_[1])" },
+		type_default => sub { return undef; },
 	}
 );
 
@@ -276,10 +272,11 @@ my $_str = $meta->$add_core_type(
 		constraint => sub {
 			ref( \$_ ) eq 'SCALAR' or ref( \( my $val = $_ ) ) eq 'SCALAR';
 		},
-		inlined => sub {
+		inlined    => sub {
 			"defined($_[1]) and do { ref(\\$_[1]) eq 'SCALAR' or ref(\\(my \$val = $_[1])) eq 'SCALAR' }";
 		},
-		sorter => sub { $_[0] cmp $_[1] }
+		sorter     => sub { $_[0] cmp $_[1] },
+		type_default => sub { return ''; },
 	}
 );
 
@@ -296,7 +293,8 @@ my $_laxnum = $meta->add_type(
 				: "defined($_[1]) && !ref($_[1]) && Scalar::Util::looks_like_number($_[1]) && ref(\\($_[1])) ne 'GLOB'"
 			);
 		},
-		sorter => sub { $_[0] <=> $_[1] }
+		sorter     => sub { $_[0] <=> $_[1] },
+		type_default => sub { return 0; },
 	}
 );
 
@@ -316,7 +314,7 @@ my $_strictnum = $meta->add_type(
 					\z/x
 				);
 		},
-		inlined => sub {
+		inlined    => sub {
 			'my $val = '
 				. $_[1] . ';'
 				. Value()->inline_check( '$val' )
@@ -328,7 +326,8 @@ my $_strictnum = $meta->add_type(
 			(?:[Ee](?:[+-]?[0-9]+))?          # matches E1 or e1 or e-1 or e+1 etc
 		\z/x ); '
 		},
-		sorter => sub { $_[0] <=> $_[1] }
+		sorter     => sub { $_[0] <=> $_[1] },
+		type_default => sub { return 0; },
 	}
 );
 
@@ -347,6 +346,7 @@ $meta->$add_core_type(
 		inlined    => sub {
 			"do { my \$tmp = $_[1]; defined(\$tmp) and !ref(\$tmp) and \$tmp =~ /\\A-?[0-9]+\\z/ }";
 		},
+		type_default => sub { return 0; },
 	}
 );
 
@@ -436,6 +436,7 @@ $meta->$add_core_type(
 				? "Ref::Util::XS::is_plain_coderef($_[1])"
 				: "ref($_[1]) eq 'CODE'";
 		},
+		type_default => sub { return sub {}; },
 	}
 );
 
@@ -446,13 +447,14 @@ my $_regexp = $meta->$add_core_type(
 		constraint => sub {
 			ref( $_ ) && !!re::is_regexp( $_ ) or blessed( $_ ) && $_->isa( 'Regexp' );
 		},
-		inlined => sub {
+		inlined    => sub {
 			my $v = $_[1];
 			$maybe_load_modules->(
 				qw/ Scalar::Util re /,
 				"ref($v) && !!re::is_regexp($v) or Scalar::Util::blessed($v) && $v\->isa('Regexp')"
 			);
 		},
+		type_default => sub { return qr//; },
 	}
 );
 
@@ -501,6 +503,11 @@ my $_arr = $meta->$add_core_type(
 		inline_generator     => LazyLoad( ArrayRef => 'inline_generator' ),
 		deep_explanation     => LazyLoad( ArrayRef => 'deep_explanation' ),
 		coercion_generator   => LazyLoad( ArrayRef => 'coercion_generator' ),
+		type_default         => sub { return []; },
+		type_default_generator => sub {
+			return $Type::Tiny::parameterize_type->type_default if @_ < 2;
+			return undef;
+		},
 	}
 );
 
@@ -518,6 +525,11 @@ my $_hash = $meta->$add_core_type(
 		inline_generator     => LazyLoad( HashRef => 'inline_generator' ),
 		deep_explanation     => LazyLoad( HashRef => 'deep_explanation' ),
 		coercion_generator   => LazyLoad( HashRef => 'coercion_generator' ),
+		type_default         => sub { return {}; },
+		type_default_generator => sub {
+			return $Type::Tiny::parameterize_type->type_default if @_ < 2;
+			return undef;
+		},
 		my_methods           => {
 			hashref_allows_key   => LazyLoad( HashRef => 'hashref_allows_key' ),
 			hashref_allows_value => LazyLoad( HashRef => 'hashref_allows_value' ),
@@ -535,6 +547,7 @@ $meta->$add_core_type(
 		inline_generator     => LazyLoad( ScalarRef => 'inline_generator' ),
 		deep_explanation     => LazyLoad( ScalarRef => 'deep_explanation' ),
 		coercion_generator   => LazyLoad( ScalarRef => 'coercion_generator' ),
+		type_default         => sub { my $x; return \$x; },
 	}
 );
 
@@ -624,6 +637,10 @@ $meta->$add_core_type(
 			return unless $param->has_coercion;
 			return $param->coercion;
 		},
+		type_default       => sub { return undef; },
+		type_default_generator => sub {
+			$_[0]->type_default || $Type::Tiny::parameterize_type->type_default ;
+		},
 	}
 );
 
@@ -638,6 +655,9 @@ my $_map = $meta->$add_core_type(
 		my_methods           => {
 			hashref_allows_key   => LazyLoad( Map => 'hashref_allows_key' ),
 			hashref_allows_value => LazyLoad( Map => 'hashref_allows_value' ),
+		},
+		type_default_generator => sub {
+			return $Type::Tiny::parameterize_type->type_default;
 		},
 	}
 );
@@ -679,6 +699,9 @@ my $_Optional = $meta->add_type(
 			return unless $param->has_coercion;
 			return $param->coercion;
 		},
+		type_default_generator => sub {
+			return $_[0]->type_default;
+		},
 	}
 );
 
@@ -700,6 +723,7 @@ $_slurpy = $meta->add_type(
 				display_name    => $self->name_generator->( $self, $param ),
 				parameters      => [ $param ],
 				constraint      => sub { $param->check( $_[0] ) },
+				type_default    => $param->type_default,
 				_build_coercion => sub {
 					my $coercion = shift;
 					$coercion->add_type_coercions( @{ $param->coercion->type_coercion_map } )
@@ -895,6 +919,7 @@ $meta->add_type(
 			push @code, '$ok }';
 			return ( undef, join( q( ), @code ) );
 		},
+		type_default => sub { return [] },
 	}
 );
 
@@ -1032,6 +1057,7 @@ $meta->add_type(
 				$coercion ? ( coercion => $coercion ) : (),
 			);
 		},
+		type_default => undef,
 	}
 );
 
@@ -1128,11 +1154,13 @@ Types::Standard - bundled set of built-in types for Type::Tiny
    );
    
    sub add_child {
-     state $check = compile( Object, Object );  # method signature
+     state $check = signature(
+       method     => Object,
+       positional => [ Object ],
+     );                                         # method signature
+     my ( $self, $child ) = $check->( @_ );     # unpack @_
      
-     my ($self, $child) = $check->(@_);         # unpack @_
      push @{ $self->children }, $child;
-     
      return $self;
    }
  }

@@ -1,4 +1,5 @@
 #!perl
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 # PODNAME: RT::Client::REST::Object
 # ABSTRACT: base class for RT objects
 
@@ -6,12 +7,12 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Object;
-$RT::Client::REST::Object::VERSION = '0.60';
+$RT::Client::REST::Object::VERSION = '0.70';
 
-use Error qw(:try);
+use Try::Tiny;
 use Params::Validate;
-use RT::Client::REST::Object::Exception 0.04;
-use RT::Client::REST::SearchResult 0.02;
+use RT::Client::REST::Object::Exception;
+use RT::Client::REST::SearchResult;
 use DateTime;
 use DateTime::Format::DateParse;
 
@@ -340,7 +341,8 @@ sub store {
             id      => $self->id,
             set     => $self->to_form,
         );
-    } else {
+    }
+    else {
         my $id = $rt->create(
             type    => $self->rt_type,
             set     => $self->to_form,
@@ -372,9 +374,17 @@ sub search {
         my $kw;
         try {
             $kw = $self->_attr2keyword($limit->{attribute});
-        } catch RT::Clite::REST::Object::InvalidAttributeException with {
-            RT::Client::REST::Object::InvalidSearchParametersException
-                ->throw(shift->message);
+        }
+        catch {
+            die $_ unless blessed $_ && $_->can('rethrow');
+
+            if ($_->isa('RT::Clite::REST::Object::InvalidAttributeException')) {
+                RT::Client::REST::Object::InvalidSearchParametersException
+                    ->throw(shift->message);
+            }
+            else {
+                $_->rethrow
+            }
         };
         my $op = $limit->{operator};
         my $val = $limit->{value};
@@ -393,10 +403,18 @@ sub search {
         # implementation may change!
         $orderby = (delete($opts{reverseorder}) ? '-' : '+') .
             ($self->_attr2keyword(delete($opts{orderby}) || 'id'));
-    } catch RT::Clite::REST::Object::InvalidAttributeException with {
-        RT::Client::REST::Object::InvalidSearchParametersException->throw(
-            shift->message,
-        );
+    }
+    catch {
+        die $_ unless blessed $_ && $_->can('rethrow');
+
+        if ($_->isa('RT::Client::REST::Object::InvalidAttributeException')) {
+            RT::Client::REST::Object::InvalidSearchParametersException->throw(
+                shift->message,
+            )
+        }
+        else {
+            $_->rethrow;
+        }
     };
 
     my $rt = $self->rt;
@@ -407,8 +425,16 @@ sub search {
             query => $query,
             orderby => $orderby,
         );
-    } catch RT::Client::REST::InvalidQueryException with {
-        RT::Client::REST::Object::InvalidSearchParametersException->throw;
+    }
+    catch {
+        die $_ unless blessed $_ && $_->can('rethrow');
+
+        if ($_->isa('RT::Client::REST::InvalidQueryException')) {
+            RT::Client::REST::Object::InvalidSearchParametersException->throw;
+        }
+        else {
+            $_->rethrow;
+        }
     };
 
     return RT::Client::REST::SearchResult->new(
@@ -601,14 +627,14 @@ RT::Client::REST::Object - base class for RT objects
 
 =head1 VERSION
 
-version 0.60
+version 0.70
 
 =head1 SYNOPSIS
 
   # Create a new type
   package RT::Client::REST::MyType;
 
-  use base qw(RT::Client::REST::Object);
+  use parent qw(RT::Client::REST::Object);
 
   sub _attributes {{
     myattribute => {
@@ -941,11 +967,11 @@ L<RT::Client::REST::SearchResult>.
 
 =head1 AUTHOR
 
-Dmitri Tikhonov
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

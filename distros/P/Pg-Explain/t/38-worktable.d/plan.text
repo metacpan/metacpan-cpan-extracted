@@ -1,0 +1,9 @@
+CTE Scan on foo  (cost=2.64..3.26 rows=31 width=4) (actual time=0.002..0.020 rows=10 loops=1)
+  CTE foo
+    ->  Recursive Union  (cost=0.00..2.64 rows=31 width=4) (actual time=0.001..0.018 rows=10 loops=1)
+          ->  Result  (cost=0.00..0.01 rows=1 width=4) (actual time=0.001..0.001 rows=1 loops=1)
+          ->  WorkTable Scan on foo foo_1  (cost=0.00..0.23 rows=3 width=4) (actual time=0.000..0.000 rows=1 loops=10)
+                Filter: (a < 10)
+                Rows Removed by Filter: 0
+Planning Time: 0.070 ms
+Execution Time: 0.053 ms

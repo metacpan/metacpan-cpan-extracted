@@ -7,6 +7,9 @@ package PDK::Device::Role;
 use Moose::Role;
 use namespace::autoclean;
 use Expect;
+use utf8;
+
+our $VERSION = '0.005';
 
 #------------------------------------------------------------------------------
 # 注册 Expect 为 Moose 对象类型
@@ -209,7 +212,7 @@ sub connect {
     $self->timeout,
     [
       qr/Are you sure you want to continue connecting/i => sub {
-        $self->send("yes");
+        $self->send("yes\n");
         exp_continue;
       }
     ],
@@ -220,19 +223,19 @@ sub connect {
     ],
     [
       qr/assword:.*/i => sub {
-        $self->send($self->password);
+        $self->send($self->password . "\n");
         exp_continue;
       }
     ],
     [
-      qr/Enter passphrase for key \'\/.*?\/\.ssh\/.*?\':/i => sub {
-        $self->send($self->passphrase);
+      qr/Enter passphrase for key/i => sub {
+        $self->send($self->passphrase . "\n");
         exp_continue;
       }
     ],
     [
       qr/(ogin|name):\s*$/i => sub {
-        $self->send($self->username);
+        $self->send($self->username . "\n");
         exp_continue;
       }
     ],
@@ -254,7 +257,10 @@ sub connect {
   }
 
   # 确定是否 enable 模式
-  unless ($expect->match =~ /$enPrompt/i) {
+  if ($expect->match =~ /$enPrompt/i) {
+    $self->{enabled} = 1;
+  }
+  else {
     if ($self->enable) {
       $self->{enabled} = 1;
     }
@@ -282,7 +288,7 @@ sub enable {
   die "Should login host $self->{host} during enable mode\n" unless !!$expect;
 
   # 进入使能配置模式
-  $self->send($self->enCommand);
+  $self->send($self->enCommand . "\n");
   my @ret = $expect->expect(
     15,
     [
@@ -292,13 +298,13 @@ sub enable {
     ],
     [
       qr/assword:\s*/i => sub {
-        $self->send($self->enPassword);
+        $self->send($self->enPassword . "\n");
         exp_continue;
       }
     ],
     [
       qr/(login|name)/i => sub {
-        $self->send($self->username);
+        $self->send($self->username . "\n");
         exp_continue;
       }
     ],
@@ -321,14 +327,11 @@ sub enable {
 sub send {
   my ($self, $command, $flag) = @_;
   if (defined $flag) {
-    $command .= $flag;
+    $self->expect->send($command . $flag);
   }
   else {
-    unless ($command =~ /(?:(\r|\n)$|(^ $))/) {
-      $command .= "\n";
-    }
+    $self->expect->send($command);
   }
-  $self->expect->send($command);
 }
 
 #------------------------------------------------------------------------------
@@ -347,15 +350,6 @@ sub waitfor {
   my $mapping  = $self->bufferCodes;
   my $codeARef = [];
 
-  # 执行等待
-  push @{$codeARef}, [
-    qr/$mapping->{more}/mi => sub {
-      $buff .= $expect->before;
-      $self->send(" ");
-      exp_continue;
-    }
-  ] if $mapping->{more};
-
   # 过滤部分输出
   if ($mapping->{ignore}) {
     foreach my $element (@{$mapping->{ignore}}) {
@@ -366,6 +360,15 @@ sub waitfor {
       ];
     }
   }
+
+  # 执行等待
+  push @{$codeARef}, [
+    qr/$mapping->{more}/mi => sub {
+      $buff .= $expect->before;
+      $self->send(" ");
+      exp_continue;
+    }
+  ] if $mapping->{more};
 
   # 交互式脚本执行
   while (my ($wait, $action) = each %{$mapping->{interact}}) {
@@ -379,14 +382,14 @@ sub waitfor {
   }
 
   # 执行成功捕捉输出符
-  push $codeARef->@*, [
+  push @{$codeARef}, [
     qr/$prompt/mi => sub {
       $buff .= $expect->before . $expect->match . $expect->after;
     }
   ];
 
   # 交互式执行数据观察
-  my @ret = $expect->expect($self->timeout, $codeARef->@*);
+  my @ret = $expect->expect($self->timeout, @{$codeARef});
 
   # 异常拦截和早期字串裁剪
   if (defined $ret[1]) {
@@ -457,7 +460,7 @@ sub execCommands {
     # 执行脚本并等待输出，判断是否符合预期
     my $buff;
     eval {
-      $self->send($cmd);
+      $self->send("$cmd\n");
       $buff = $self->waitfor;
     };
     if ($@ or not $self->{isMatched}) {

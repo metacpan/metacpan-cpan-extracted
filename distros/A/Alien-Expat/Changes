@@ -1,5 +1,9 @@
 Revision history for Alien-Expat
 
+0.03      2022-09-23 20:12:54 -0600
+  - Use the Download::GitHub plugin, as Download  plugin is no
+    longer works with GitHub release page (gh#7)
+
 0.02      2020-12-11 04:45:01 -0700
   - Fix regex in test to recognize some legal versions that
     were being excluded (gh#1)

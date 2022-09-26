@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.010005";
+    our $MITE_VERSION = "0.010008";
 
     # Mite keywords
     BEGIN {
@@ -390,8 +390,28 @@
             $self->{"generator_for_type_assertion"} = $value;
         };
 
+        # Attribute generator_for_error (type: CodeRef)
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 167
+        do {
+            my $value = exists( $args->{"generator_for_error"} )
+              ? (
+                (
+                    do {
+
+                        package Sub::HandlesVia::Mite;
+                        ref( $args->{"generator_for_error"} ) eq 'CODE';
+                    }
+                ) ? $args->{"generator_for_error"} : croak(
+                    "Type check failed in constructor: %s should be %s",
+                    "generator_for_error", "CodeRef"
+                )
+              )
+              : $self->_build_generator_for_error;
+            $self->{"generator_for_error"} = $value;
+        };
+
         # Attribute method_installer (type: CodeRef)
-        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 158
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 170
         if ( exists $args->{"method_installer"} ) {
             do {
 
@@ -404,26 +424,26 @@
         }
 
         # Attribute is_method
-        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 168
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 180
         $self->{"is_method"} =
           ( exists( $args->{"is_method"} ) ? $args->{"is_method"} : "1" );
 
         # Attribute get_is_lvalue
-        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 173
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 185
         $self->{"get_is_lvalue"} = (
             exists( $args->{"get_is_lvalue"} )
             ? $args->{"get_is_lvalue"}
             : "" );
 
         # Attribute set_checks_isa
-        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 178
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 190
         $self->{"set_checks_isa"} = (
             exists( $args->{"set_checks_isa"} )
             ? $args->{"set_checks_isa"}
             : "" );
 
         # Attribute set_strictly
-        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 183
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 195
         $self->{"set_strictly"} =
           ( exists( $args->{"set_strictly"} ) ? $args->{"set_strictly"} : "1" );
 
@@ -432,7 +452,7 @@
 
         # Unrecognized parameters
         my @unknown = grep not(
-/\A(?:attribute(?:_spec)?|coerce|env|ge(?:nerator_for_(?:arg[cs]?|currying|default|get|s(?:e(?:lf|t)|lot)|type_assertion|usage_string)|t_is_lvalue)|is(?:_method|a)|method_installer|s(?:andboxing_package|et_(?:checks_isa|strictly))|t(?:arget|oolkit))\z/
+/\A(?:attribute(?:_spec)?|coerce|env|ge(?:nerator_for_(?:arg[cs]?|currying|default|error|get|s(?:e(?:lf|t)|lot)|type_assertion|usage_string)|t_is_lvalue)|is(?:_method|a)|method_installer|s(?:andboxing_package|et_(?:checks_isa|strictly))|t(?:arget|oolkit))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -473,7 +493,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for _override
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 163
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 175
     if ($__XS) {
         Class::XSAccessor->import(
             chained     => 1,
@@ -640,6 +660,24 @@
         };
     }
 
+    # Accessors for generator_for_error
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 167
+    if ($__XS) {
+        Class::XSAccessor->import(
+            chained   => 1,
+            "getters" => { "generator_for_error" => "generator_for_error" },
+        );
+    }
+    else {
+        *generator_for_error = sub {
+            @_ == 1
+              or croak(
+'Reader "generator_for_error" usage: $self->generator_for_error()'
+              );
+            $_[0]{"generator_for_error"};
+        };
+    }
+
     # Accessors for generator_for_get
     # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 52
     if ($__XS) {
@@ -750,7 +788,7 @@
     }
 
     # Accessors for get_is_lvalue
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 173
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 185
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -766,7 +804,7 @@
     }
 
     # Accessors for is_method
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 168
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 180
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -796,7 +834,7 @@
     }
 
     # Accessors for method_installer
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 158
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 170
     sub method_installer {
         @_ > 1
           ? do {
@@ -828,7 +866,7 @@
     }
 
     # Accessors for set_checks_isa
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 178
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 190
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -845,7 +883,7 @@
     }
 
     # Accessors for set_strictly
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 183
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 195
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -896,6 +934,11 @@
         our %DOES;
         return $DOES{$role} if exists $DOES{$role};
         return 1            if $role eq __PACKAGE__;
+        if ( $INC{'Moose/Util.pm'}
+            and my $meta = Moose::Util::find_meta( ref $self or $self ) )
+        {
+            $meta->can('does_role') and $meta->does_role($role) and return 1;
+        }
         return $self->SUPER::DOES($role);
     }
 

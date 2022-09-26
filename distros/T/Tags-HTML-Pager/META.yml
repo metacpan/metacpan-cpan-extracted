@@ -9,8 +9,10 @@ build_requires:
   ExtUtils::MakeMaker: 6.36
   File::Object: 0.03
   Tags::Output::Raw: 0
+  Tags::Output::Structure: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Unicode::UTF8: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
@@ -30,6 +32,8 @@ no_index:
 requires:
   Class::Utils: 0.02
   Error::Pure: 0.07
+  Readonly: 0
+  Tags::HTML: 0
   Unicode::UTF8: 0
   perl: 5.8.0
 resources:
@@ -37,4 +41,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Pager
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Pager
-version: '0.01'
+version: '0.03'

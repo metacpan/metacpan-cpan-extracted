@@ -4,48 +4,45 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
+
+    In your Makefile.PL:
+
+     use ExtUtils::MakeMaker;
+     use Alien::Base::Wrapper ();
+    
+     WriteMakefile(
+       Alien::Base::Wrapper->new('Alien::LZO')->mm_args2(
+         # MakeMaker args
+         NAME => 'My::XS',
+         ...
+       ),
+     );
 
     In your Build.PL:
 
      use Module::Build;
-     use Alien::LZO;
+     use Alien::Base::Wrapper qw( Alien::LZO !export );
+    
      my $builder = Module::Build->new(
        ...
        configure_requires => {
          'Alien::LZO' => '0',
          ...
        },
-       extra_compiler_flags => Alien::LZO->cflags,
-       extra_linker_flags   => Alien::LZO->libs,
+       Alien::Base::Wrapper->mb_args,
        ...
      );
-     
+    
      $build->create_build_script;
-
-    In your Makefile.PL:
-
-     use ExtUtils::MakeMaker;
-     use Config;
-     use Alien::LZO;
-     
-     WriteMakefile(
-       ...
-       CONFIGURE_REQUIRES => {
-         'Alien::LZO' => '0',
-       },
-       CCFLAGS => Alien::LZO->cflags . " $Config{ccflags}",
-       LIBS    => [ Alien::LZO->libs ],
-       ...
-     );
 
     In your FFI::Platypus script or module:
 
      use FFI::Platypus;
      use Alien::LZO;
-     
+    
      my $ffi = FFI::Platypus->new(
        lib => [ Alien::LZO->dynamic_libs ],
      );
@@ -69,7 +66,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Graham Ollis.
+    This software is copyright (c) 2017-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

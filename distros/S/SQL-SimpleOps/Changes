@@ -1,5 +1,12 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2022.266.1 Fri Sep 23 22:53:40 2022
+	- tester t/testDB.t fix for SQLite (required); by CCELSO
+	- tester t/testSQL.t fix; force /tmp as workdir to test; by CCELSO
+
+2022.264.1 Wed Sep 21 17:05:13 2022
+	- POD fix; by CCELSO
+
 2022.263.2 Tue Sep 20 21:27:15 2022
 	- tester t/testDB.t fix; by CCELSO
 

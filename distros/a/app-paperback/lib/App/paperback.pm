@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 # use warnings;
 $^W = 0;
-our $VERSION = "1.34";
+our $VERSION = "1.35";
 
 my ($GinFile, $GpageObjNr, $GrootNr, $Gpos, $GobjNr, $Gstream, $GoWid, $GoHei);
 my (@Gkids, @Gcounts, @GmediaBox, @Gobject, @Gparents, @Gto_be_created);
@@ -42,26 +42,25 @@ my $IW =  $FW; # [I] US Legal Quarter (W)
 my $KH = 1224; # [K] US Tabloid (H)
 my $KW =  $DH; # [K] US Tabloid (W)
 
+# Paper surfaces in square pts (expressed as HxW in pts):
+%Gpaper = (
+  QuarterLetter => $FH * $FW, # =   121_176
+  A6            => $CH * $CW, # ~   124_867
+  QuarterLegal  => $IH * $IW, # =   154_224
+  HalfLetter    => $EH * $EW, # =   242_352
+  A5            => $BH * $BW, # ~   249_735
+  HalfLegal     => $HH * $HW, # =   308_448
+  Letter        => $DH * $DW, # =   484_704
+  A4            => $AH * $AW, # ~   501_156
+  Legal         => $GH * $GW, # =   616_896
+  Tabloid       => $KH * $KW, # =   969_408
+  A3            => $JH * $JW, # ~ 1_002_312
+);
 
 ##########################################################
 sub main {
 ##########################################################
   my $input = $ARGV[0];
-
-  # Paper surfaces in square pts (expressed as HxW in points):
-  %Gpaper = (
-    QuarterLetter => $FH * $FW, # =   121_176
-    A6            => $CH * $CW, # ~   124_867
-    QuarterLegal  => $IH * $IW, # =   154_224
-    HalfLetter    => $EH * $EW, # =   242_352
-    A5            => $BH * $BW, # ~   249_735
-    HalfLegal     => $HH * $HW, # =   308_448
-    Letter        => $DH * $DW, # =   484_704
-    A4            => $AH * $AW, # ~   501_156
-    Legal         => $GH * $GW, # =   616_896
-    Tabloid       => $KH * $KW, # =   969_408
-    A3            => $JH * $JW, # ~ 1_002_312
-  );
 
   # Page reordering and position offset schemas for "4 up":
   my @P_4UP_13PLUS = (16,1,13,4,2,15,3,14,12,5,9,8,6,11,7,10);
@@ -306,10 +305,8 @@ sub writePageResources {
 ##########################################################
 sub writePage {
 ##########################################################
-  if ( !$Gparents[0] ) {
-    ++$GobjNr;
-    $Gparents[0] = $GobjNr;
-  }
+  $Gparents[0] = ++$GobjNr if ! $Gparents[0];
+
   my $parent = $Gparents[0];
   my $resourceObjectNr = writePageResourceDict(&createPageResourceDict);
   &writePageStream;
@@ -357,10 +354,7 @@ sub writePageNodes {
 
   while ( $qtyChildren < $#{ $Gkids[$i] } ) {
     # Imprimir padre actual y pasar al siguiente nivel:
-    if ( !$Gparents[$j] ) {
-      ++$GobjNr;
-      $Gparents[$j] = $GobjNr;
-    }
+    $Gparents[$j] = ++$GobjNr if ! $Gparents[$j] ;
 
     $nodeObj =
       "${Gparents[$i]} 0 obj<</Type/Pages/Parent ${Gparents[$j]} 0 R\n/Kids [";
@@ -425,15 +419,16 @@ sub calcRotateMatrix {
   my $str = "1 0 0 1 ${_[0]} ${_[1]} cm\n";
   my $rotate = $_[2];
 
-  if ($rotate) {
-    my $upperX = 0; my $upperY = 0;
-    my $radian = sprintf( "%.6f", $rotate / 57.2957795 );  # approx.
-    my $Cos    = sprintf( "%.6f", cos($radian) );
-    my $Sin    = sprintf( "%.6f", sin($radian) );
-    my $negSin = $Sin * -1;
-    $str .= "${Cos} ${Sin} ${negSin} ${Cos} ${upperX} ${upperY} cm\n";
-  }
-  return $str;
+  return $str if ! $rotate;
+
+  my $upperX = 0; my $upperY = 0;
+  my $radian = sprintf( "%.6f", $rotate / 57.2957795 );  # approx.
+  my $Cos    = sprintf( "%.6f", cos($radian) );
+  my $Sin    = sprintf( "%.6f", sin($radian) );
+  my $negSin = $Sin * -1;
+  $str .= "${Cos} ${Sin} ${negSin} ${Cos} ${upperX} ${upperY} cm\n";
+
+  #~ return $str;
 }
 
 
@@ -723,11 +718,9 @@ sub parseAsResourcesAndContentRef {
   my $objContent = $_[0];
   my ($resources, $formCont);
 
-  if ( $objContent =~ m'/Contents\s+(\d+)' ) {
-    $formCont = $1;
-  } elsif ( $objContent =~ m'/Contents\s*\[\s*(\d+)\s+\d+\s+R\s*\]' ) {
-    $formCont = $1;
-  }
+  $formCont = $1 if $objContent =~ m'/Contents\s+(\d+)' 
+    or $objContent =~ m'/Contents\s*\[\s*(\d+)\s+\d+\s+R\s*\]';
+
   $resources = getResourcesFromObj($objContent);
   return ($resources, $formCont);
 }

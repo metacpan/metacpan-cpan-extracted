@@ -41,7 +41,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>Version 0.02</p>
+<p>Version 0.03</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -54,6 +54,8 @@
         sub f_to_optimize {        
             
             my $x = shift;              # load input parameters (genes constituting a single individual)
+            
+            my $id = shift              # load id of this particular individual of the population
 
             # ...                       # do your things using these inputs $x-&gt;[0], $x-&gt;[1] ... 
                                         # and produce the outputs to be minimized $f1, $f2 ...
@@ -61,12 +63,14 @@
                                         # examples of things you can do include:
                                         # - mathematical formulas in perl to define $f1, $f2, ...
                                         # - computations with commercial software and so: 
+                                        #       - create a directory using $id in the name
                                         #       - write input file using $x-&gt;[0] ...
                                         #       - run the computation, for example with perl system() function
                                         #            - locally or
                                         #            - on a server for example with &#39;qsub... &#39;
                                         #       - wait simulation to end 
                                         #       - postprocess its output and define $f1, $f2 ...
+                                        #       - delete directory and contents
                                         # - ...
             
             my $out = [$f1,$f2,$f3];    # and finally return the set of these outputs for

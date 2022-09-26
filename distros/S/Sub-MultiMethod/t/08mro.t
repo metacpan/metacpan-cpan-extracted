@@ -11,9 +11,9 @@ use Test::Requires '5.010';
 	use Sub::MultiMethod -all;
 	
 	multimethod foo => (
-		_id       => __PACKAGE__,
-		signature => [ Int ],
-		code      => sub { return __PACKAGE__ },
+		_id        => __PACKAGE__,
+		positional => [ Int ],
+		code       => sub { return __PACKAGE__ },
 	);
 }
 
@@ -31,9 +31,9 @@ use Test::Requires '5.010';
 	use Sub::MultiMethod -all;
 	
 	multimethod foo => (
-		_id       => __PACKAGE__,
-		signature => [ Int ],
-		code      => sub { return __PACKAGE__ },
+		_id        => __PACKAGE__,
+		positional => [ Int ],
+		code       => sub { return __PACKAGE__ },
 	);
 }
 
@@ -55,9 +55,9 @@ is( Class::DFS::D->can('foo')->(undef, 1), 'Class::DFS::A', 'depth-first search;
 	use Sub::MultiMethod -all;
 	
 	multimethod foo => (
-		_id       => __PACKAGE__,
-		signature => [ Int ],
-		code      => sub { return __PACKAGE__ },
+		_id        => __PACKAGE__,
+		positional => [ Int ],
+		code       => sub { return __PACKAGE__ },
 	);
 }
 
@@ -77,9 +77,9 @@ is( Class::DFS::D->can('foo')->(undef, 1), 'Class::DFS::A', 'depth-first search;
 	use Sub::MultiMethod -all;
 	
 	multimethod foo => (
-		_id       => __PACKAGE__,
-		signature => [ Int ],
-		code      => sub { return __PACKAGE__ },
+		_id        => __PACKAGE__,
+		positional => [ Int ],
+		code       => sub { return __PACKAGE__ },
 	);
 }
 

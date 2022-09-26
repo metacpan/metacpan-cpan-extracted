@@ -1,6 +1,6 @@
 package Pithub::Repos::Commits;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01039';
+our $VERSION = '0.01040';
 # ABSTRACT: Github v3 Repo Commits API
 
 use Moo;
@@ -125,7 +125,7 @@ Pithub::Repos::Commits - Github v3 Repo Commits API
 
 =head1 VERSION
 
-version 0.01039
+version 0.01040
 
 =head1 METHODS
 

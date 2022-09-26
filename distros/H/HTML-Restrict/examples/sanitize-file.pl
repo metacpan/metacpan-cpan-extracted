@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use HTML::Restrict ();
-use Path::Tiny qw( path );
+use Path::Tiny     qw( path );
 
 my $filename = shift @ARGV;
 die "usage: perl $0 path/to/file > path/to/new/file" if !$filename;

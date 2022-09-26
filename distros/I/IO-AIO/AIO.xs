@@ -1110,7 +1110,7 @@ static char **
 extract_stringvec (SV *sv, const char *croakmsg)
 {
   if (!SvROK (sv) || SvTYPE (SvRV (sv)) != SVt_PVAV)
-    croak (croakmsg);
+    croak ("%s", croakmsg);
 
   AV *av = (AV *)SvRV (sv);
   int i, nelem = av_len (av) + 1;
@@ -2925,6 +2925,12 @@ fexecve (SV *fh, SV *args, SV *envs = &PL_sv_undef)
 
 int
 mount (octet_string special, octet_string path, octet_string fstype, UV flags = 0, octet_string_ornull data = 0)
+	CODE:
+#if HAVE_MOUNT
+          RETVAL = mount (special, path, fstype, flags, data);
+#else
+          RETVAL = (errno = ENOSYS, -1);
+#endif
         OUTPUT: RETVAL
 
 int
@@ -2937,7 +2943,11 @@ umount (octet_string path, int flags = 0)
           RETVAL = (errno = ENOSYS, -1);
 #endif
         else
+#if HAVE_MOUNT
           RETVAL = umount (path);
+#else
+          RETVAL = (errno = ENOSYS, -1);
+#endif
         OUTPUT: RETVAL
 
 UV

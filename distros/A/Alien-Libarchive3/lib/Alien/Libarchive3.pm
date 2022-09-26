@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or install libarchive version 3.x or better
-our $VERSION = '0.32'; # VERSION
+our $VERSION = '0.33'; # VERSION
 
 
 
@@ -29,7 +29,7 @@ Alien::Libarchive3 - Find or install libarchive version 3.x or better
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,16 @@ will use that.  If it cannot be found, the source code will be downloaded
 from the internet and it will be installed in a private share location
 for the use of other modules.
 
-The intention is for this to eventually replace L<Alien::Libarchive>
+The older L<Alien::Libarchive> exists as a compatibility layer over this module.
+
+=head1 CAVEATS
+
+On some older operating systems some of the dependencies may not build, L<Alien::Nettle>
+does not build correctly with older versions of OpenSSL.  If you do not need the encryption
+features provided by L<Alien::Nettle> and C<nettle>, then you can skip it when you install
+this module:
+
+ $ env ALIEN_LIBARCHIVE_DEPS=Alien::xz,Alien::LZO,Alien::Libbz2,Alien::Libxml2 cpanm Alien::Libarchive3
 
 =head1 SEE ALSO
 
@@ -100,7 +109,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

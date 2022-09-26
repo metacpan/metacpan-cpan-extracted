@@ -6,7 +6,6 @@ use 5.20.0;
 use warnings;
 
 use Moose::Exporter;
-use MooseX::Extended::Types ':all';
 use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
@@ -27,7 +26,7 @@ no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-our $VERSION = '0.31';
+our $VERSION = '0.33';
 
 sub import {
     my ( $class, %args ) = @_;
@@ -121,7 +120,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -183,7 +182,7 @@ Is sort of the equivalent to:
         use v5.20.0;
         use Moose;
         use MooseX::StrictConstructor;
-        use feature qw( signatures postderef postderef_qq);
+        use feature qw( signatures postderef postderef_qq );
         no warnings qw( experimental::signatures experimental::postderef );
         use namespace::autoclean;
         use Carp;
@@ -201,13 +200,14 @@ C<field>.
 A C<param> is a required parameter (defaults may be used). A C<field> is not
 intended to be passed to the constructor.
 
-Note that the C<has> function is still available, even if it's not needed.
+B<Note>: the C<has> function is still available, even if it's not needed.
+Unlike C<param> and C<field>, it still requires an C<is> option.
 
 Also, while your author likes the postfix block syntax, it's not required. You
 can even safely inline multiple packages in the same file:
 
     package My::Point;
-    use MooseX::Extended types => [qw/Num/];
+    use MooseX::Extended types => 'Num';
 
     param [ 'x', 'y' ] => ( isa => Num );
 
@@ -252,55 +252,62 @@ Is identical to this:
 
 You may find some features to be annoying, or even cause potential bugs (e.g.,
 if you have a C<croak> method, our importing of C<Carp::croak> will be a
-problem. You can exclude the following:
+problem.
+
+A single argument to C<excludes> can be a string. Multiple C<excludes> require
+an array reference:
+
+        use MooseX::Extended excludes => [qw/StrictConstructor autoclean/];
+
+You can exclude the following:
 
 =over 4
 
 =item * C<StrictConstructor>
 
-    use MooseX::Extended excludes => ['StrictConstructor'];
+    use MooseX::Extended excludes => 'StrictConstructor';
 
 Excluding this will no longer import C<MooseX::StrictConstructor>.
 
 =item * C<autoclean>
 
-    use MooseX::Extended excludes => ['autoclean'];
+    use MooseX::Extended excludes => 'autoclean';
 
 Excluding this will no longer import C<namespace::autoclean>.
 
 =item * C<c3>
 
-    use MooseX::Extended excludes => ['c3'];
+    use MooseX::Extended excludes => 'c3';
 
 Excluding this will no longer apply the C3 mro.
 
 =item * C<carp>
 
-    use MooseX::Extended excludes => ['carp'];
+    use MooseX::Extended excludes => 'carp';
 
 Excluding this will no longer import C<Carp::croak> and C<Carp::carp>.
 
 =item * C<immutable>
 
-    use MooseX::Extended excludes => ['immutable'];
+    use MooseX::Extended excludes => 'immutable';
 
 Excluding this will no longer make your class immutable.
 
 =item * C<true>
 
-    use MooseX::Extended excludes => ['true'];
+    use MooseX::Extended excludes => 'true';
 
 Excluding this will require your module to end in a true value.
 
 =item * C<param>
 
-    use MooseX::Extended excludes => ['param'];
+    use MooseX::Extended excludes => 'param';
 
 Excluding this will make the C<param> function unavailable.
 
 =item * C<field>
 
-    use MooseX::Extended excludes => ['field'];
+    use MooseX::Extended excludes => 'field';
 
 Excluding this will make the C<field> function unavailable.
 
@@ -313,6 +320,11 @@ powerful. For example, to include try/catch and a C<method> keyword:
 
         use MooseX::Extended includes => [ 'method', 'try' ];
 
+A single argument to C<includes> can be a string. Multiple C<includes> require
+an array reference:
+
+        use MooseX::Extended includes => [qw/method try/];
+
 See L<MooseX::Extended::Manual::Includes> for more information.
 
 =head1 REDUCING BOILERPLATE
@@ -320,8 +332,9 @@ See L<MooseX::Extended::Manual::Includes> for more information.
 Let's say you've settled on the following feature set:
 
     use MooseX::Extended
-        excludes => [qw/StrictConstructor carp/],
-        includes => [qw/method/];
+      excludes => [qw/StrictConstructor carp/],
+      includes => 'method',
+      types    => ':Standard';
 
 And you keep typing that over and over. We've removed a lot of boilerplate,
 but we've added different boilerplate. Instead, just create
@@ -479,6 +492,8 @@ See also:
 =item * L<MooseX::Extended::Manual::Overview>
 
 =item * L<MooseX::Extended::Manual::Construction>
+
+=item * L<MooseX::Extended::Manual::Includes>
 
 =item * L<MooseX::Extended::Manual::Shortcuts>
 

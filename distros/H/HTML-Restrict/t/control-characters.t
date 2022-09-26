@@ -15,7 +15,7 @@ my $expected = '<a>click me</a>';
 for my $i ( 0 .. 31 ) {
     subtest "control char $i" => sub {
         my $dec = "&#$i;";
-        my $hex = sprintf( "&#x%X;", $i );
+        my $hex = sprintf( '&#x%X;', $i );
 
         for my $prefix ( $dec, $hex ) {
             my $type = $prefix =~ m{x} ? 'hex' : 'decimal';
@@ -36,11 +36,11 @@ for my $i ( 0 .. 31 ) {
 }
 
 is(
-    $hr->process( make_link("&#000;") ), $expected,
+    $hr->process( make_link('&#000;') ), $expected,
     'null byte (decimal) with more padding'
 );
 is(
-    $hr->process( make_link("&#x000;") ), $expected,
+    $hr->process( make_link('&#x000;') ), $expected,
     'null byte (hex) with more padding'
 );
 

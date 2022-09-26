@@ -3,12 +3,12 @@ package Archive::Libarchive::Lib;
 use strict;
 use warnings;
 use 5.020;
-use FFI::CheckLib 0.28 qw( find_lib_or_die );
+use FFI::CheckLib 0.30 qw( find_lib_or_die );
 use Encode qw( decode );
 use experimental qw( signatures );
 
 # ABSTRACT: Private class for Archive::Libarchive
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub lib
@@ -97,7 +97,7 @@ Archive::Libarchive::Lib - Private class for Archive::Libarchive
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -172,6 +172,10 @@ This class exposes the C<libarchive> link resolver API.
 =item L<Archive::Libarchive::Match>
 
 This class exposes the C<libarchive> match API.
+
+=item L<Dist::Zilla::Plugin::Libarchive>
+
+Build L<Dist::Zilla> based dist tarballs with libarchive instead of the built in L<Archive::Tar>.
 
 =item L<Alien::Libarchive3>
 

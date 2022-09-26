@@ -6,12 +6,14 @@ use strict;
 use warnings;
 use Type::Library -base;
 use Type::Utils -all;
-use Type::Params;    # this gets us compile and compile_named
+use Type::Params ':all';
+
+# EXPORT_OK, but not :all
 use Types::Standard qw(
   slurpy
 );
 
-our $VERSION = '0.31';
+our $VERSION = '0.33';
 our @EXPORT_OK;
 
 BEGIN {
@@ -21,11 +23,16 @@ BEGIN {
       Types::Common::String
     );
     push @EXPORT_OK => (
-        'compile',          # from Type::Params
-        'compile_named',    # from Type::Params
-        'slurpy',
+        @Type::Params::EXPORT,
+        @Type::Params::EXPORT_OK,
+        @Types::Standard::EXPORT_OK,
     );
-    our %EXPORT_TAGS = ( all => \@EXPORT_OK );
+    our %EXPORT_TAGS = (
+        all      => \@EXPORT_OK,
+        Standard => [ Types::Standard->type_names ],
+        Numeric  => [ qw/Num Int Bool/, Types::Common::Numeric->type_names ],
+        String   => [ qw/Str/,          Types::Common::String->type_names ],
+    );
 }
 
 1;
@@ -42,7 +49,7 @@ MooseX::Extended::Types - Keep our type tools organized
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -71,6 +78,12 @@ As a convenience, if you're using L<MooseX::Extended>, you can do this:
       compile
     )];
 
+If you're brave:
+
+    use MooseX::Extended types => ':all';
+
+But that exports I<everything> and it's easy to have surprising conflicts.
+
 =head1 DESCRIPTION
 
 A basic set of useful types for C<MooseX::Extended>, as provided by
@@ -91,29 +104,87 @@ We automatically include the types from the following:
 
 =item * L<Types::Standard>
 
+You can import them individually or with the C<:Standard> tag:
+
+    use MooseX::Extended::Types types => 'Str';
+    use MooseX::Extended::Types types => [ 'Str', 'ArrayRef' ];
+    use MooseX::Extended::Types types => ':Standard';
+
+Using the C<:Standard> tag is equivalent to:
+
+    use Types::Standard;
+
+No import list is supplied directly to the module, so non-default type
+functions must be asked for by name.
+
 =item * L<Types::Common::Numeric>
 
+You can import them individually or with the C<:Numeric> tag:
+
+    use MooseX::Extended::Types types => 'Int';
+    use MooseX::Extended::Types types => [ 'Int', 'NegativeOrZeroNum' ];
+    use MooseX::Extended::Types types => ':Numeric';
+
+Using the C<:Numeric> tag is equivalent to:
+
+    use Types::Common::Numeric;
+
+No import list is supplied directly to the module, so non-default type
+functions must be asked for by name.
+
 =item * L<Types::Common::String>
+
+You can import them individually or with the C<:String> tag:
+
+    use MooseX::Extended::Types types => 'NonEmptyStr';
+    use MooseX::Extended::Types types => [ 'NonEmptyStr', 'UpperCaseStr' ];
+    use MooseX::Extended::Types types => ':String';
+
+Using the C<:String> tag is equivalent to:
+
+    use Types::Common::String;
+
+No import list is supplied directly to the module, so non-default type
+functions must be asked for by name.
 
 =back
 
 =head1 EXTRAS
 
-The following extra functions are exported on demand or if use the C<:all> export tag.
+The following extra functions are exported on demand or if using the C<:all>
+export tag (but you probably don't want to use that tag).
+
+=head2 L<Type::Params>
 
 =over
 
 =item * C<compile>
 
-See L<Type::Params>
-
 =item * C<compile_named>
 
-See L<Type::Params>
+=item * C<multisig>
+
+=item * C<validate>
+
+=item * C<validate_named>
+
+=item * C<compile_named_oo>
+
+=item * C<Invocant>
+
+=item * C<wrap_subs>
+
+=item * C<wrap_methods>
+
+=item * C<ArgsObject>
+
+=back
+
+=head2 L<Types::Standard>
+
+=over 4
 
 =item * C<slurpy>
-
-See L<Types::Standard>
 
 =back
 

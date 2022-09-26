@@ -3,41 +3,40 @@
 use strict;
 use warnings;
 
-use HTML::Restrict;
-use Scalar::Util;
+use HTML::Restrict ();
 use Test::More;
 
 my @texts = (
     {
-        label => "<img ... />",
+        label => '<img ... />',
         html  => q{<img alt="foo bar" src="http://example.com/foo.jpg" />},
     },
     {
-        label => "<img ... ></img>",
+        label => '<img ... ></img>',
         html => q{<img alt="foo bar" src="http://example.com/foo.jpg"></img>},
     },
 );
 
 my @cases = (
     {
-        label  => "default args",
+        label  => 'default args',
         args   => {},
         expect => undef,
     },
     {
-        label  => "replace_img => 0",
+        label  => 'replace_img => 0',
         args   => { replace_img => 0 },
         expect => undef,
     },
     {
-        label  => "replace_img => 1",
+        label  => 'replace_img => 1',
         args   => { replace_img => 1 },
-        expect => q{[IMAGE: foo bar]},
+        expect => '[IMAGE: foo bar]',
     },
     {
-        label  => "replace_img => CODE",
+        label  => 'replace_img => CODE',
         args   => { replace_img => \&replacer },
-        expect => q{[IMAGE REMOVED: foo bar]},
+        expect => '[IMAGE REMOVED: foo bar]',
     },
 );
 

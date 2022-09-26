@@ -24,8 +24,8 @@ my $meta = {
                                          "Exporter::Shiny" => 0,
                                          "perl" => 5.008001,
                                          "Role::Hooks" => 0,
-                                         "Type::Params" => 1.008003,
-                                         "Types::Standard" => 1.008003,
+                                         "Type::Params" => "2.000000",
+                                         "Types::Standard" => "2.000000",
                                        },
                                      },
                         test      => {
@@ -40,7 +40,7 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Sub::MultiMethod" => { file => "lib/Sub/MultiMethod.pm", version => 0.909 },
+                        "Sub::MultiMethod" => { file => "lib/Sub/MultiMethod.pm", version => "1.000" },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -54,7 +54,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/project",
                       },
-  "version"        => 0.909,
+  "version"        => "1.000",
 };
 
 my %dynamic_config;
@@ -80,7 +80,7 @@ my %WriteMakefileArgs = (
 	VERSION    => $meta->{version},
 	EXE_FILES  => [ map $_->{file}, values %{ $meta->{x_provides_scripts} || {} } ],
 	NAME       => do { my $n = $meta->{name}; $n =~ s/-/::/g; $n },
-	test       => { TESTS => "t/*.t" },
+	test       => { TESTS => "t/*.t t/legacy/*.t" },
 	%dynamic_config,
 );
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use HTML::Restrict;
+use HTML::Restrict ();
 
 my $hr = HTML::Restrict->new(
     rules => {
@@ -18,28 +18,28 @@ my $hr = HTML::Restrict->new(
 
 cmp_ok(
     $hr->process(
-        '<iframe width="560" height="315" frameborder="0" src="http://www.youtube.com/embed/9gKeRZM2Iyc"></iframe>'
+        q{<iframe width="560" height="315" frameborder="0" src="http://www.youtube.com/embed/9gKeRZM2Iyc"></iframe>}
     ),
     'eq',
-    '<iframe width="560" height="315" frameborder="0" src="http://www.youtube.com/embed/9gKeRZM2Iyc"></iframe>',
+    q{<iframe width="560" height="315" frameborder="0" src="http://www.youtube.com/embed/9gKeRZM2Iyc"></iframe>},
     'all constraints pass',
 );
 
 cmp_ok(
     $hr->process(
-        '<iframe width="560" height="315" src="http://www.hostile.com/" frameborder="0"></iframe>'
+        q{<iframe width="560" height="315" src="http://www.hostile.com/" frameborder="0"></iframe>}
     ),
     'eq',
-    '<iframe width="560" height="315" frameborder="0"></iframe>',
+    q{<iframe width="560" height="315" frameborder="0"></iframe>},
     'one constraint fails',
 );
 
 cmp_ok(
     $hr->process(
-        '<iframe width="560" height="315" src="http://www.hostile.com/" frameborder="A"></iframe>'
+        q{<iframe width="560" height="315" src="http://www.hostile.com/" frameborder="A"></iframe>}
     ),
     'eq',
-    '<iframe width="560" height="315"></iframe>',
+    q{<iframe width="560" height="315"></iframe>},
     'two constraints fail',
 );
 
@@ -56,19 +56,19 @@ $hr = HTML::Restrict->new(
 
 cmp_ok(
     $hr->process(
-        '<iframe width="560" height="315" frameborder="0" src="http://www.youtube.com/embed/9gKeRZM2Iyc"></iframe>'
+        q{<iframe width="560" height="315" frameborder="0" src="http://www.youtube.com/embed/9gKeRZM2Iyc"></iframe>}
     ),
     'eq',
-    '<iframe src="http://www.youtube.com/embed/9gKeRZM2Iyc" frameborder="0" height="315" width="560"></iframe>',
+    q{<iframe src="http://www.youtube.com/embed/9gKeRZM2Iyc" frameborder="0" height="315" width="560"></iframe>},
     'possible to maintain order',
 );
 
 cmp_ok(
     $hr->process(
-        q[<iframe src="http://www.youtube.com/&quot; onclick=&quot;alert('hi')"></iframe>]
+        q{<iframe src="http://www.youtube.com/&quot; onclick=&quot;alert('hi')"></iframe>}
     ),
     'eq',
-    q[<iframe src="http://www.youtube.com/&quot; onclick=&quot;alert(&#39;hi&#39;)"></iframe>],
+    q{<iframe src="http://www.youtube.com/&quot; onclick=&quot;alert(&#39;hi&#39;)"></iframe>},
     'entities are re-encoded when regex match passes',
 );
 
@@ -102,10 +102,10 @@ $hr = HTML::Restrict->new(
 
 cmp_ok(
     $hr->process(
-        '<span class="fish" style="margin: 2px; padding: 7px;border: 2px;">content</span>',
+        q{<span class="fish" style="margin: 2px; padding: 7px;border: 2px;">content</span>},
     ),
     'eq',
-    '<span style="margin: 2px; padding: 7px">content</span>',
+    q{<span style="margin: 2px; padding: 7px">content</span>},
     'filter attributes by coderef',
 );
 

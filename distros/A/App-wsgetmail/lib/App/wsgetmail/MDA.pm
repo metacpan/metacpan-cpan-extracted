@@ -199,7 +199,7 @@ sub _run_command {
         return 1;
     }
 
-    my $ok = run ([ $self->command, _split_command_args($self->command_args, 1)], $fh, \$output, \$error, timeout( $self->command_timeout + 5 ) );
+    my $ok = run ([ $self->command, _split_command_args($self->command_args, 1)], $fh, \$output, \$error, timeout( $self->command_timeout ) );
     unless ($ok) {
         warn sprintf('failed to run command "%s %s" for file %s : %s',
                      $self->command,

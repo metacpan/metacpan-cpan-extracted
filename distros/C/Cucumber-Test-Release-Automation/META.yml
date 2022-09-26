@@ -12,7 +12,7 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Cucumber-Test-Release-Automation
-version: v0.0.39
+version: v0.0.41
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

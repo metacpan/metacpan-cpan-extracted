@@ -28,3 +28,14 @@ t/07multifunc.t
 t/08mro.t
 t/09coderef.t
 t/10headtail.t
+t/legacy/01basic.t
+t/legacy/02singleclass.t
+t/legacy/03inheritance.t
+t/legacy/04roles.t
+t/legacy/05rolesdonotinstalldispatchers.t
+t/legacy/06monomethod-weird.t
+t/legacy/06monomethod.t
+t/legacy/07multifunc.t
+t/legacy/08mro.t
+t/legacy/09coderef.t
+t/legacy/10headtail.t

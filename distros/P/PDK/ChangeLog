@@ -1,5 +1,9 @@
-0.003 2022-09-09 WENWU YAN <968826@gmail.com>
+0.005 2022-09-25 WENWU YAN <968826@gmail.com>
  [DOCUMENTATION]
- - Add PDK::Device component
- - Clarify documentation of PDK::Device modules
- - Clarify PDK::Device module tests script
+ - 支持中文解析和回显
+
+ 0.003 2022-09-09 WENWU YAN <968826@gmail.com>
+  [DOCUMENTATION]
+  - Add PDK::Device component
+  - Clarify documentation of PDK::Device modules
+  - Clarify PDK::Device module tests script

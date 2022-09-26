@@ -1,6 +1,11 @@
 Revision history for Perl module Promise::Me
 
-v0.4.3 2022-08-12T13:28:34+0900
+v0.4.4 2022-08-24T16:31:19Z +0900
+    - Added new instance argument 'medium' and related method
+    - Better handling of error upon writing to shared memory
+    - Updated documentation for result() method
+
+v0.4.3 2022-08-12T13:28:34Z +0900
     - Minor improvement for sleep in test units
 
 v0.4.2 2022-08-07T17:26:03Z +0900

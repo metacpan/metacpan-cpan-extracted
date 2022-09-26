@@ -12,7 +12,7 @@ use File::chdir;
 # VERSION
 
 
-package App::af::download 0.17 {
+package App::af::download 0.18 {
   use Moose;
   use namespace::autoclean;
   use MooseX::Types::Path::Tiny qw( AbsPath );
@@ -35,14 +35,14 @@ package App::af::download 0.17 {
   sub main
   {
     my($self) = @_;
-    
+
     unless(-d $self->local)
     {
       say STDERR "no such directory: @{[ $self->local ]}";
       return 2;
     }
 
-    local $ENV{ALIEN_INSTALL_TYPE} = 'share';    
+    local $ENV{ALIEN_INSTALL_TYPE} = 'share';
     my $build = $self->build;
     $build->load_requires('configure');
     $build->load_requires('share');
@@ -55,9 +55,9 @@ package App::af::download 0.17 {
       say STDERR "Recipe did not seem to download a file or directory";
       return 2;
     }
-    
+
     my $download = path($build->install_prop->{download});
-    
+
     if(-f $download)
     {
       my $to = $self->local->child($download->basename);
@@ -76,19 +76,19 @@ package App::af::download 0.17 {
       say STDERR "Recipe did not seem to download a file or directory";
       return 2;
     }
-    
+
     0;
   }
 
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::probe 0.17 {
+package App::af::probe 0.18 {
   use Moose;
   use namespace::autoclean;
   use MooseX::Types::Path::Tiny qw( AbsPath );
   use File::Temp qw( tempdir );
-  
+
   with 'App::af';
   with 'App::af::role::alienfile';
   with 'App::af::role::libandblib';
@@ -105,7 +105,7 @@ package App::af::probe 0.17 {
       shift->_tmp->child('root');
     },
   );
-  
+
   has _tmp => (
     is      => 'ro',
     isa     => AbsPath,
@@ -116,37 +116,37 @@ package App::af::probe 0.17 {
       $dir;
     },
   );
-  
+
   sub main
   {
     my($self) = @_;
-    
+
     my $build = $self->build( root => $self->root->stringify );
 
     $build->set_stage($self->_tmp->child('stage')->stringify);
     $build->set_prefix($self->_tmp->child('prefix')->stringify);
     $build->load_requires('configure');
     my $type = $build->install_type;
-    
+
     say "install type: $type";
 
     0;
   }
 }
 
-package App::af::install 0.17 {
+package App::af::install 0.18 {
   use Moose;
   use namespace::autoclean;
   use File::Temp qw( tempdir );
   use MooseX::Types::Path::Tiny qw( AbsPath );
   use YAML qw( Dump );
   use Path::Tiny qw( path );
-  
+
   with 'App::af';
   with 'App::af::role::alienfile';
   with 'App::af::role::libandblib';
-  
-  
+
+
   has stage => (
     is       => 'ro',
     isa      => AbsPath,
@@ -158,7 +158,7 @@ package App::af::install 0.17 {
       tempdir( CLEANUP => 1);
     },
   );
-  
+
   has prefix => (
     is     => 'rw',
     isa    => AbsPath,
@@ -166,20 +166,20 @@ package App::af::install 0.17 {
     opt_type => 's',
     coerce => 1,
   );
-  
+
   has type => (
     is       => 'ro',
     isa      => 'Str',
     traits   => ['App::af::opt'],
     opt_type => 's',
   );
-  
+
   has dry_run => (
     is     => 'ro',
     isa    => 'Int',
     traits => ['App::af::opt'],
   );
-  
+
   has root => (
     is       => 'ro',
     isa      => AbsPath,
@@ -191,7 +191,7 @@ package App::af::install 0.17 {
       tempdir( CLEANUP => 1);
     },
   );
-  
+
   has before => (
     is       => 'ro',
     isa      => 'ArrayRef[Str]',
@@ -205,13 +205,13 @@ package App::af::install 0.17 {
     traits   => ['App::af::opt'],
     opt_type => 's{2}',
   );
-  
+
   sub main
   {
     my($self) = @_;
-  
+
     local $ENV{ALIEN_INSTALL_TYPE} = $ENV{ALIEN_INSTALL_TYPE};
-    
+
     if(defined $self->type)
     {
       unless($self->type =~ /^(share|system)$/)
@@ -221,21 +221,21 @@ package App::af::install 0.17 {
       }
       $ENV{ALIEN_INSTALL_TYPE} = $self->type;
     }
-    
+
     if(-d $self->stage && $self->stage->children)
     {
       say "stage directory is not empty";
       exit 2;
     }
-    
+
     my($build, $prefix) = $self->build( root => $self->root->stringify );
     $self->prefix($prefix) if defined($prefix) && ! $self->prefix;
-    
+
     my @all_hooks = qw(
       probe download fetch decode prefer extract patch
       build stage gather_share gather_system
     );
-    
+
     my $repl = sub {
       no warnings 'once';
       require Shell::Perl;
@@ -246,16 +246,16 @@ package App::af::install 0.17 {
       eval { $pirl->run };
       warn $@ if $@;
     };
-    
+
     while(@{ $self->before })
     {
       my $hook    = shift @{ $self->before };
       my $command = shift @{ $self->before };
-      
-      my @hook = $hook =~ /^(\%|\*)$/ 
+
+      my @hook = $hook =~ /^(\%|\*)$/
         ? @all_hooks
         : ($hook);
-      
+
       $build->meta->before_hook(
         $_ => sub {
           my($build) = @_;
@@ -267,16 +267,16 @@ package App::af::install 0.17 {
         }
       ) for @hook;
     }
-    
+
     while(@{ $self->after })
     {
       my $hook    = shift @{ $self->after };
       my $command = shift @{ $self->after };
 
-      my @hook = $hook =~ /^(\%|\*)$/ 
+      my @hook = $hook =~ /^(\%|\*)$/
         ? @all_hooks
         : ($hook);
-      
+
       $build->meta->around_hook(
         $_ => sub {
           my $orig = shift;
@@ -292,19 +292,19 @@ package App::af::install 0.17 {
         },
       ) for @hook
     }
-    
-    
+
+
     if($self->dry_run && ! defined $self->prefix)
     {
       $self->prefix(tempdir( CLEANUP => 1 ));
     }
-    
+
     unless(defined $self->prefix)
     {
       say STDERR "You must specify a prefix with --prefix or use --dry-run";
       return 2;
     }
-    
+
     if(-d $self->prefix->child('_alien'))
     {
       my $test = $self->prefix->child('_alien/test');
@@ -316,18 +316,18 @@ package App::af::install 0.17 {
       }
       $test->remove;
     }
-    
+
     $build->set_stage($self->stage->stringify);
     $build->set_prefix($self->prefix->stringify);
     $build->load_requires('configure');
     $build->load_requires($build->install_type);
     $build->download;
     $build->build;
-    
+
     unless($self->dry_run)
     {
       require File::Copy::Recursive;
-    
+
       if(-d $self->prefix)
       {
         # this is slightly dangerous.
@@ -337,19 +337,19 @@ package App::af::install 0.17 {
           $_->remove_tree({ safe => 0 }) for $self->prefix->children;
         }
       }
-    
+
       File::Copy::Recursive::dircopy($self->stage, $self->prefix) || die "unable to copy @{[ $self->stage ]} => @{[ $self->prefix ]} $!";
       say "copied staged install into @{[ $self->prefix ]}";
     };
-    
+
     print Dump($build->runtime_prop);
-    
+
     0;
   }
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::requires 0.17 {
+package App::af::requires 0.18 {
   use Moose;
   use namespace::autoclean;
   use YAML qw( Dump );
@@ -358,15 +358,15 @@ package App::af::requires 0.17 {
   with 'App::af';
   with 'App::af::role::alienfile';
   with 'App::af::role::phase';
-  
+
   sub main
   {
     my($self) = @_;
-    
+
     $self->check_phase;
-    
+
     my $build = $self->build;
-    
+
     if($self->phase eq 'all')
     {
       print Dump({
@@ -377,29 +377,29 @@ package App::af::requires 0.17 {
     {
       print Dump($build->requires($self->phase));
     }
-    
+
     0;
   }
-  
+
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::missing 0.17 {
+package App::af::missing 0.18 {
   use Moose;
   use namespace::autoclean;
   use Capture::Tiny qw( capture );
-  
+
   with 'App::af';
   with 'App::af::role::alienfile';
   with 'App::af::role::phase';
-  
-  
+
+
   has plugin => (
     is     => 'ro',
     isa    => 'Int',
     traits => ['App::af::opt'],
   );
-  
+
   has precompile => (
     is     => 'ro',
     isa    => 'Int',
@@ -409,16 +409,16 @@ package App::af::missing 0.17 {
   sub main
   {
     my($self) = @_;
-    
+
     $self->check_phase;
 
     if($self->plugin)
     {
       require Alien::Build;
       require Test2::Mock;
-      
+
       my %need;
-      
+
       my $mock = Test2::Mock->new(class => 'Alien::Build::Meta');
       $mock->around('apply_plugin' => sub {
         my($orig, $self, @args) = @_;
@@ -436,11 +436,11 @@ package App::af::missing 0.17 {
       print "$_\n" for sort keys %need;
       return 0;
     }
-    
+
     if($self->precompile)
     {
       my %need;
-    
+
       foreach my $line ($self->file->lines)
       {
         chomp $line;
@@ -454,12 +454,12 @@ package App::af::missing 0.17 {
       print "$_\n" for sort keys %need;
       exit 0;
     }
-    
+
     my(undef,undef, $build) = capture { $self->build };
-    
+
     my @reqs;
     my %need;
-    
+
     if($self->phase eq 'all')
     {
       $build->load_requires('configure');
@@ -474,7 +474,7 @@ package App::af::missing 0.17 {
     {
       @reqs = ( $build->requires($self->phase) );
     }
-        
+
     foreach my $reqs (@reqs)
     {
       foreach my $module (sort keys %$reqs)
@@ -489,20 +489,20 @@ package App::af::missing 0.17 {
         $need{$module} = 1 if $@
       }
     }
-    
+
     say $_ for sort keys %need;
-  
+
     0;
   }
-  
+
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::prop 0.17 {
+package App::af::prop 0.18 {
   use Moose;
   use namespace::autoclean;
 
-  
+
   with 'App::af';
 
   has class => (
@@ -512,7 +512,7 @@ package App::af::prop 0.17 {
     short    => 'c',
     opt_type => 's',
   );
-  
+
   has $_ => (
     is       => 'ro',
     isa      => 'Int',
@@ -521,13 +521,13 @@ package App::af::prop 0.17 {
 
   sub main {
     my($self) = @_;
-    
+
     unless($self->class)
     {
       say STDERR "You must specify a class.\n";
       return 2;
     }
-    
+
     my $class = $self->class =~ /::/ ? $self->class : 'Alien::' . $self->class;
 
     {
@@ -540,17 +540,17 @@ package App::af::prop 0.17 {
       say STDERR "$class was not installed with Alien::Build";
       return 2;
     }
-    
+
     my $prop = $class->runtime_prop;
-    
+
     unless($prop)
     {
       say STDERR "$class was not installed with Alien::Build";
       return 2;
     }
-    
+
     my $found = 0;
-    
+
     if($self->cflags)
     {
       if($self->static)
@@ -563,7 +563,7 @@ package App::af::prop 0.17 {
       }
       $found = 1;
     }
-    
+
     if($self->libs)
     {
       if($self->static)
@@ -576,37 +576,37 @@ package App::af::prop 0.17 {
       }
       $found = 1;
     }
-    
+
     if($self->bin_dir)
     {
       say $_ for $class->bin_dir;
       $found = 1;
     }
-    
+
     if($self->modversion)
     {
       say $class->version // 'undef';
       $found = 1;
     }
-    
+
     unless($found)
     {
       require YAML;
       print YAML::Dump($prop);
     }
-    
+
     0;
   }
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::list 0.17 {
+package App::af::list 0.18 {
   use Moose;
   use namespace::autoclean;
   use Path::Tiny qw( path );
   use Text::Table;
-  
-  
+
+
   with 'App::af';
 
   has long => (
@@ -615,33 +615,33 @@ package App::af::list 0.17 {
     traits   => ['App::af::opt'],
     short    => 'l',
   );
-  
+
   sub main
   {
     my($self) = @_;
-    
+
     my $table;
     $table = Text::Table->new('name', 'install type', 'alien version', 'package version')
       if $self->long;
-    
+
     foreach my $inc (map { path($_)->absolute } @INC)
     {
       my $dist_root = $inc->child('auto/share/dist');
       next unless -d $dist_root;
-      
+
       foreach my $dist_dir ($dist_root->children)
       {
         next unless -f $dist_dir->child('_alien/alien.json');
         my $dist = $dist_dir->basename;
         my $class = $dist;
         $class =~ s/-/::/g;
-        
+
         unless($table)
         {
           say $class;
           next;
         }
-        
+
         eval {
           my $pm = $class . '.pm';
           $pm =~ s/::/\//g;
@@ -661,11 +661,11 @@ package App::af::list 0.17 {
       }
 
     }
-    
+
     print $table if defined $table;
     0;
   }
-  
+
   __PACKAGE__->meta->make_immutable;
 }
 
@@ -695,12 +695,12 @@ af - Command line tool for alienfile
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
- af download   --help
  af probe      --help
+ af download   --help
  af install    --help
  af requires   --help
  af missing    --help
@@ -744,14 +744,14 @@ option, or the current working directory if not specified.
 
 =head4 -f | --file
 
-The L<alienfile>.  If neither this option, nor C<-c> is specified, then 
+The L<alienfile>.  If neither this option, nor C<-c> is specified, then
 C<alienfile> in the current directory will be assumed.
 
 =head4 -c | --class
 
 Get the L<alienfile> from the already installed Alien module.    You may
 omit the C<Alien::> prefix, so for example L<Alien::curl> may be specified
-as simply C<curl>.  
+as simply C<curl>.
 
 =head4 -l | --local
 
@@ -774,7 +774,7 @@ Probe system for existing library or tool using the given L<alienfile>.
 
 =head4 -f | --file
 
-The L<alienfile>.  If neither this option, nor C<-c> is specified, then 
+The L<alienfile>.  If neither this option, nor C<-c> is specified, then
 C<alienfile> in the current directory will be assumed.
 
 =head4 -c | --class
@@ -803,7 +803,7 @@ Use the blib from the current directory.
  af install
    [ ( -f | --file )  alienfile |  ( -c | --class ) class ]
    [ --prefix directory | --dry-run ] [ --stage directory ]
-   [ --type ( share | system ) ] [ --root directory ] 
+   [ --type ( share | system ) ] [ --root directory ]
    [ --before hook command ] [ --after hook command ]
    [ -I lib ] [ --blib ]
 
@@ -816,7 +816,7 @@ L<Alien>.
 
 =head4 -f | --file
 
-The L<alienfile>.  If neither this option, nor C<-c> is specified, then 
+The L<alienfile>.  If neither this option, nor C<-c> is specified, then
 C<alienfile> in the current directory will be assumed.
 
 =head4 -c | --class
@@ -850,14 +850,14 @@ Build in root
 
 =head4 --before
 
-Execute the given command before the given hook.  Note that the same 
-hook my execute several times for a given recipe.  Example, to open up 
-an interactive shell before the build has started, right after the 
+Execute the given command before the given hook.  Note that the same
+hook my execute several times for a given recipe.  Example, to open up
+an interactive shell before the build has started, right after the
 extraction:
 
  % af install --before build bash
 
-The build configuration is check pointed, so you can read the install 
+The build configuration is check pointed, so you can read the install
 and runtime properties in the C<state.json> file in the build root.
 Use * or % as the hook to run the command before all hooks.  You can
 use C<:repl> as the command to open up a Perl REPL (Read-Eval-Print-Loop)
@@ -865,13 +865,13 @@ to inspect the C<$build> and C<$meta> objects.
 
 =head4 --after
 
-Execute the given command after the given hook.  Note that the same hook 
-my execute several times for a given recipe.  Example, to open up an 
+Execute the given command after the given hook.  Note that the same hook
+my execute several times for a given recipe.  Example, to open up an
 interactive shell after the build has completed:
 
  % af install --after build bash
 
-The build configuration is check pointed, so you can read the install 
+The build configuration is check pointed, so you can read the install
 and runtime properties in the C<state.json> file in the build root.
 Use * or % as the hook to run the command before all hooks.  You can
 use C<:repl> as the command to open up a Perl REPL (Read-Eval-Print-Loop)
@@ -903,7 +903,7 @@ in L<YAML> format.
 
 =head4 -f | --file
 
-The L<alienfile>.  If neither this option, nor C<-c> is specified, then 
+The L<alienfile>.  If neither this option, nor C<-c> is specified, then
 C<alienfile> in the current directory will be assumed.
 
 =head4 -c | --class
@@ -935,16 +935,16 @@ to install any missing requirements:
  % af missing -p configure | cpanm
  % af missing              | cpanm
 
-If no phase is specified, then missing prereqs for configure, and either 
-share or system will be printed depending on what type of install is 
-detected (for this to work you may need to install the configure 
+If no phase is specified, then missing prereqs for configure, and either
+share or system will be printed depending on what type of install is
+detected (for this to work you may need to install the configure
 prereqs, since the probe may use configure required modules).
 
 =head3 options
 
 =head4 -f | --file
 
-The L<alienfile>.  If neither this option, nor C<-c> is specified, then 
+The L<alienfile>.  If neither this option, nor C<-c> is specified, then
 C<alienfile> in the current directory will be assumed.
 
 =head4 -c | --class
@@ -955,7 +955,7 @@ as simply C<curl>.
 
 =head4 -p | --phase
 
-The phase of the requirement.  Please refer to the L<Alien::Build> 
+The phase of the requirement.  Please refer to the L<Alien::Build>
 documentation for the meaning of the various phases.
 
 =head4 --plugin
@@ -976,8 +976,8 @@ by this option.
 
 =head3 Usage
 
- af prop 
-   ( -c | --class ) class [ --cflags ] [ --libs ] [ --static ] 
+ af prop
+   ( -c | --class ) class [ --cflags ] [ --libs ] [ --static ]
    [ --modversion ] [ --bin-dir ]
 
 =head3 prop
@@ -1042,7 +1042,7 @@ Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

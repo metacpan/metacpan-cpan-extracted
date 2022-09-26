@@ -1,5 +1,6 @@
 #!perl
 package MyObject;
+
 # vim:ft=perl:
 
 # For testing purposes -- Object with 'id' attribute.
@@ -16,9 +17,9 @@ sub id {
 
 sub rt_type { 'myobject' }
 
-sub _attributes {{
-    id => {},
-}}
+sub _attributes {
+    { id => {}, }
+}
 
 package main;
 
@@ -29,10 +30,16 @@ use Test::More tests => 38;
 use Test::Exception;
 
 use constant METHODS => (
-    'new', 'to_form', 'from_form', '_generate_methods', 'store', 'retrieve',
-    'param', 'rt', 'cf', 'search', 'count', 'use_single_rt',
-    'use_autostore', 'use_autoget', 'use_autosync', 'be_transparent',
-    'autostore', 'autosync', 'autoget',
+    'new',           'to_form',
+    'from_form',     '_generate_methods',
+    'store',         'retrieve',
+    'param',         'rt',
+    'cf',            'search',
+    'count',         'use_single_rt',
+    'use_autostore', 'use_autoget',
+    'use_autosync',  'be_transparent',
+    'autostore',     'autosync',
+    'autoget',
 );
 
 BEGIN {
@@ -43,10 +50,11 @@ my $obj;
 
 lives_ok {
     $obj = RT::Client::REST::Object->new;
-} 'Object can get successfully created';
+}
+'Object can get successfully created';
 
 for my $method (METHODS) {
-    can_ok($obj, $method);
+    can_ok( $obj, $method );
 }
 
 use RT::Client::REST;
@@ -57,26 +65,31 @@ for my $method (qw(retrieve)) {
 
     throws_ok {
         $obj->$method;
-    } 'RT::Client::REST::Object::RequiredAttributeUnsetException',
-        "won't go on without 'rt' set";
+    }
+    'RT::Client::REST::Object::RequiredAttributeUnsetException',
+      "won't go on without 'rt' set";
 
     lives_ok {
         $obj->rt($rt)
-    } "Successfully set 'rt'";
+    }
+    "Successfully set 'rt'";
 
     throws_ok {
         $obj->$method;
-    } 'RT::Client::REST::Object::RequiredAttributeUnsetException',
-        "won't go on without 'id' set";
+    }
+    'RT::Client::REST::Object::RequiredAttributeUnsetException',
+      "won't go on without 'id' set";
 
     lives_ok {
         $obj->id(1);
-    } "Successfully set 'id' to 1";
+    }
+    "Successfully set 'id' to 1";
 
     throws_ok {
         $obj->$method;
-    } 'RT::Client::REST::RequiredAttributeUnsetException',
-        "rt object is not correctly initialized";
+    }
+    'RT::Client::REST::RequiredAttributeUnsetException',
+      "rt object is not correctly initialized";
 }
 
 for my $method (qw(store count search)) {
@@ -84,20 +97,24 @@ for my $method (qw(store count search)) {
 
     throws_ok {
         $obj->$method;
-    } 'RT::Client::REST::Object::RequiredAttributeUnsetException',
-        "won't go on without 'rt' set";
+    }
+    'RT::Client::REST::Object::RequiredAttributeUnsetException',
+      "won't go on without 'rt' set";
 
     lives_ok {
         $obj->rt($rt)
-    } "Successfully set 'rt'";
+    }
+    "Successfully set 'rt'";
 
     lives_ok {
         $obj->id(1);
-    } "Successfully set 'id' to 1";
+    }
+    "Successfully set 'id' to 1";
 
     throws_ok {
         $obj->$method;
-    } 'RT::Client::REST::RequiredAttributeUnsetException',
-        "rt object is not correctly initialized";
+    }
+    'RT::Client::REST::RequiredAttributeUnsetException',
+      "rt object is not correctly initialized";
 }
 

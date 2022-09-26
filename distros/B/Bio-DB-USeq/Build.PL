@@ -21,7 +21,7 @@ my $build = Module::Build->new(
 	requires          => {
 		'perl'                => '5.10.0',
 		'Bio::Root::Version'  => '1.0069001',
-		'Archive::Zip'        => '1.30',
+		'Archive::Zip'        => '1.67',
 		'Set::IntervalTree'   => '0.10',
 	},
 	script_files      => [ 'scripts/USeqInfo.pl' ],

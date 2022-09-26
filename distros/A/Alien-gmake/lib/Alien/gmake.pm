@@ -7,7 +7,7 @@ use Env qw( @PATH );
 use File::Spec;
 
 # ABSTRACT: Find or build GNU Make
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.24'; # VERSION
 
 
 sub exe
@@ -43,9 +43,11 @@ Alien::gmake - Find or build GNU Make
 
 =head1 VERSION
 
-version 0.21
+version 0.24
 
 =head1 SYNOPSIS
+
+From your Perl script:
 
  use Alien::gmake ();
  use Env qw( @PATH );
@@ -55,7 +57,17 @@ version 0.21
  system $gmake, 'all';
  system $gmake, 'install';
 
-Or with L<Alien::Build::ModuleBuild>:
+Or L<alienfile>:
+
+ use alienfile;
+
+ share {
+   ...
+   requires 'Alien::gmake' => '0.09';
+   build [ '%{gmake}', '%{gmake} install' ];
+ };
+
+Or Build.PL with L<Alien::Build::ModuleBuild>:
 
  use Alien::Base::ModuleBuild;
  Alien::Base::ModuleBuild->new(
@@ -78,7 +90,7 @@ Some packages insist on using GNU Make.  Some platforms refuse to come with GNU 
 Sometimes you just want to be able to build packages that require GNU Make without
 having to check the version of Make each time.  This module is for that.  It uses the
 system provided GNU Make if it can be found.  Otherwise it will download and install
-it into a directory not normally in your path so that it can be used when you 
+it into a directory not normally in your path so that it can be used when you
 C<use Alien::gmake>.  This way you can use it when you need it, but not muck up your
 environment when you don't.
 
@@ -127,7 +139,7 @@ the empty list.  For example:
 
  %{gmake}
 
-Returns either make or gmake depending on how GNU make is called on your 
+Returns either make or gmake depending on how GNU make is called on your
 system.
 
 =head1 AUTHOR
@@ -136,7 +148,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Graham Ollis.
+This software is copyright (c) 2014-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

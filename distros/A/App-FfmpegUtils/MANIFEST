@@ -8,8 +8,10 @@ Makefile.PL
 README
 dist.ini
 lib/App/FfmpegUtils.pm
+script/cut-video-by-duration
 script/reencode-video-with-libx264
 script/split-video-by-duration
+script/vcut
 script/vreencode
 script/vsplit
 t/00-compile.t

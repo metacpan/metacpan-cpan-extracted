@@ -1,2 +1,10 @@
+0.03 2022-09-26T13:12:12+02:00
+ - Fix runtime dependencies.
+ - Regen README file.
+
+0.02 2022-09-26T10:11:47+02:00
+ - Change 'css_pager' parameter to required.
+ - Fix test dependencies.
+
 0.01 2022-09-19T19:03:10+02:00
  - First version.

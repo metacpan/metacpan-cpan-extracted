@@ -8,13 +8,15 @@ use Carp ();
 use Ref::Util qw( is_plain_coderef is_blessed_ref );
 use FFI::Platypus::Buffer qw( window scalar_to_buffer );
 use FFI::Platypus::Memory qw( strdup free );
+use Scalar::Util qw( refaddr );
 use experimental qw( signatures );
 use parent qw( Archive::Libarchive::Archive );
 
 # ABSTRACT: Libarchive write archive class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 my $ffi = Archive::Libarchive::Lib->ffi;
+my %keep;
 
 
 $ffi->mangler(sub ($name) { "archive_write_$name"  });
@@ -31,6 +33,7 @@ $ffi->attach( [ free => 'DESTROY' ] => ['archive_write'] => 'int' => sub {
   return if $self->{cb}                  # inside a callback, we don't own the archive pointer
     || ${^GLOBAL_PHASE} eq 'DESTRUCT';   # during global shutdown, the xsub might go away
   my $ret = $xsub->($self);
+  delete $keep{refaddr $self};
   warn "destroying archive pointer did not return ARCHIVE_OK" unless $ret == 0;
 });
 
@@ -60,7 +63,7 @@ $ffi->attach( open => ['archive_write', 'opaque', 'archive_open_callback', 'arch
       $w = bless { ptr => $w, cb => 1 }, __PACKAGE__;
       $orig->($w);
     });
-    push @{ $self->{keep} }, $opener;
+    push @{ $keep{refaddr $self} }, $opener;
   }
 
   if($writer)
@@ -72,7 +75,7 @@ $ffi->attach( open => ['archive_write', 'opaque', 'archive_open_callback', 'arch
       window $buffer, $ptr, $size;
       $orig->($w, \$buffer);
     });
-    push @{ $self->{keep} }, $writer;
+    push @{ $keep{refaddr $self} }, $writer;
   }
 
   if($closer)
@@ -82,7 +85,7 @@ $ffi->attach( open => ['archive_write', 'opaque', 'archive_open_callback', 'arch
       $w = bless { ptr => $w, cb => 1 }, __PACKAGE__;
       $orig->($w);
     });
-    push @{ $self->{keep} }, $closer;
+    push @{ $keep{refaddr $self} }, $closer;
   }
 
   $xsub->($self, undef, $opener, $writer, $closer);
@@ -145,7 +148,7 @@ $ffi->attach( set_passphrase_callback => ['archive_write', 'opaque', 'archive_pa
     return $self->{passphrase} = $ptr;
   });
 
-  push @{ $self->{keep} }, $closure;
+  push @{ $keep{refaddr $self} }, $closure;
 
   $xsub->($self, undef, $closure);
 
@@ -169,7 +172,7 @@ Archive::Libarchive::ArchiveWrite - Libarchive write archive class
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -214,7 +217,7 @@ Create a new archive write object.
 =head1 METHODS
 
 This is a subset of total list of methods available to all archive classes.
-For the full list see L<Archive::Libarchive::API/Archive::Libarchive::ArchiveRead>.
+For the full list see L<Archive::Libarchive::API/Archive::Libarchive::ArchiveWrite>.
 
 =head2 open
 
@@ -382,6 +385,10 @@ This class exposes the C<libarchive> link resolver API.
 =item L<Archive::Libarchive::Match>
 
 This class exposes the C<libarchive> match API.
+
+=item L<Dist::Zilla::Plugin::Libarchive>
+
+Build L<Dist::Zilla> based dist tarballs with libarchive instead of the built in L<Archive::Tar>.
 
 =item L<Alien::Libarchive3>
 

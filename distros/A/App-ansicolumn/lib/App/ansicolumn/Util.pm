@@ -233,13 +233,9 @@ sub terminal_size {
     @size ? @size : @default;
 }
 
-sub zip {
-    my @zipped;
-    my @orig = map { [ @$_ ] } @_;
-    while (my @l = grep { @$_ > 0 } @orig) {
-	push @zipped, [ map { shift @$_ } @l ];
-    }
-    @zipped;
+sub xpose {
+    use List::Util 1.56 qw(zip);
+    map { [ grep { defined } @$_ ] } zip @_;
 }
 
 sub insert_space {

@@ -1,5 +1,10 @@
 Revision history for Sub-Call-Tail
 
+0.07      2022-09-25 01:58:23Z
+          - update bundled version of ExtUtils::HasCompiler, for new new Apple
+            include paths
+          - fixes for perls >= 5.23.8 (Graham Knop, PR#1)
+
 0.06      2015-07-03 23:15:54Z
           - fix breakage by v5.17.5-247-g049bd5f (RT#81860, Zefram)
           - warning added to docs, at the author's request

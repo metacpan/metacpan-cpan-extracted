@@ -4,7 +4,7 @@ use lib 't/lib';
 use MooseX::Extended::Tests;
 
 package My::Names {
-    use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)];
+    use MooseX::Extended types => ':all';
     use List::Util 'sum';
 
     param _name => ( isa => NonEmptyStr, init_arg => 'name' );

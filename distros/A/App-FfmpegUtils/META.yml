@@ -19,13 +19,15 @@ name: App-FfmpegUtils
 provides:
   App::FfmpegUtils:
     file: lib/App/FfmpegUtils.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   Data::Sah::Coerce::perl::To_duration::From_float::seconds: '0'
   Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration: '0'
+  Data::Sah::Coerce::perl::To_duration::From_str::hms: '0'
   Data::Sah::Coerce::perl::To_duration::From_str::human: '0'
   Data::Sah::Coerce::perl::To_duration::From_str::iso8601: '0'
   Data::Sah::Coerce::perl::To_float::From_str::percent: '0'
+  Data::Sah::Compiler::perl::TH::any: '0.911'
   Data::Sah::Compiler::perl::TH::array: '0.911'
   Data::Sah::Compiler::perl::TH::bool: '0.911'
   Data::Sah::Compiler::perl::TH::duration: '0.911'
@@ -46,6 +48,8 @@ requires:
   Perinci::Object: '0.311'
   Perinci::Sub::DepChecker: '0'
   Sah::Schema::filename: '0'
+  Sah::Schema::percent_str: '0'
+  Sah::Schema::posint: '0'
   Sah::Schema::ufloat: '0'
   Sah::Schema::uint: '0'
   perl: '5.010001'
@@ -55,7 +59,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FfmpegUtils
   homepage: https://metacpan.org/release/App-FfmpegUtils
   repository: git://github.com/perlancar/perl-App-FfmpegUtils.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -67,6 +71,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript split-video-by-duration'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript cut-video-by-duration'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript vcut'
       version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript

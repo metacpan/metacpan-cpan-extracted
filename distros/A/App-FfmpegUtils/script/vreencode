@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-21'; # DATE
+our $DATE = '2022-09-22'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FfmpegUtils/reencode_video_with_libx264",
@@ -40,7 +40,7 @@ vreencode - Shorter alias for reencode-video-with-libx264
 
 =head1 VERSION
 
-This document describes version 0.011 of vreencode (from Perl distribution App-FfmpegUtils), released on 2022-09-21.
+This document describes version 0.012 of vreencode (from Perl distribution App-FfmpegUtils), released on 2022-09-22.
 
 =head1 SYNOPSIS
 

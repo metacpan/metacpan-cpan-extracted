@@ -4,7 +4,7 @@ Data::Enum - immutable enumeration classes
 
 # VERSION
 
-version v0.2.5
+version v0.2.6
 
 # SYNOPSIS
 
@@ -115,6 +115,10 @@ my %handlers = mesh [ $class->values ], [ $class->predicates ];
 ```
 
 This was added in v0.2.1.
+
+## MATCH
+
+This method adds support for [match::simple](https://metacpan.org/pod/match%3A%3Asimple).
 
 # CAVEATS
 

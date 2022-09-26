@@ -4,9 +4,9 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -49,6 +49,6 @@
          "web" : "https://github.com/Ovid/test--most"
       }
    },
-   "version" : "0.37",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

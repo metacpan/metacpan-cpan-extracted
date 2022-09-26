@@ -73,7 +73,8 @@ sub fetch {
 
 	my $lyrics = $self->_web_fetch($artist_in, $song_in);
 	if ($lyrics) {
-		$lyrics =~ s/[\d ]*Embed Cancel How to Format Lyrics\:.+$/\n/s;  #REMOVE TRAILING GENIUS SPAM! :^/
+		$lyrics =~ s/[\d ]*Embed\s+Cancel\s+How to Format Lyrics\:.+$/\n/s;  #REMOVE TRAILING GENIUS SPAM! :^/
+		$lyrics =~ s/\s*\([\w\s]*\)\s*$/\n/s;                      #REMOVE MORE OF IT!
 		if ($haveLyricsCache && $self->{'-cache'} && $self->{'-cache'} !~ /^\</) {
 			$self->_debug("=== WILL CACHE LYRICS! ===");
 			# cache the fetched lyrics, if we can:

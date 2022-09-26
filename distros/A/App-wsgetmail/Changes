@@ -1,5 +1,22 @@
 Revision history for App-wsgetmail
 
+0.08    22/09/23
+        * Update strip_cr to stripcr for more obvious compatibility
+          with the fetchmail option of the same name.
+
+0.07    22/09/23
+        * Add documentation about error messages, warnings, and
+          diagnosing problems with processing.
+        * Count and report messages with errors in post-fetch processing
+        * Upgrade failure to fetch folder details to a fatal error
+          from a warning and successful exit code.
+        * Correct error message for issues with deleting messages
+        * Add documentation of the dump_messages option
+        * Add strip_cr option to convert CRLF -> LF
+        * Add locking based on the username/folder
+        * Remove '+ 5' adjustment to timeout in MDA.pm
+        * Remove interpreter substitution for wsgetmail
+
 0.06    22/04/22
         * Update 0.05 Changes to conform to spec
         * Sync module pod with recent changes in script

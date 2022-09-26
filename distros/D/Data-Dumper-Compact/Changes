@@ -1,5 +1,8 @@
 Revision history for Data-Dumper-Compact
 
+0.006000 - 2022-09-24
+  - Handle recursive data structures with $_ deref in perl and JSON Reference
+
 0.005002 - 2020-06-07
   - Fix JSON::Dumper::Compact
 

@@ -1,5 +1,15 @@
 Revision history for Future-AsyncAwait
 
+0.59    2022-09-23
+        [BUGFIXES]
+         * Fix broken Future->get method resolution on recent
+           Future + Future::XS experiments
+         * Fix hax/docatch.c.inc for "NULL OP IN RUN" messages
+         * Make t/31destroy.t less fragile in the case of non-HASH Future
+           instances
+         * Back-compat to perl 5.16 by passing `flags` arg to `cv_copy_flags`
+           (RT143742)
+
 0.58    2022-04-29
         [BUGFIXES]
          * Fix memory leak with long-running futures and on_cancel (RT142222)

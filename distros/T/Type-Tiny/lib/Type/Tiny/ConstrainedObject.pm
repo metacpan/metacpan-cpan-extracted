@@ -1,12 +1,12 @@
 package Type::Tiny::ConstrainedObject;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	$Type::Tiny::ConstrainedObject::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::ConstrainedObject::VERSION   = '1.016010';
+	$Type::Tiny::ConstrainedObject::VERSION   = '2.000000';
 }
 
 $Type::Tiny::ConstrainedObject::VERSION =~ tr/_//d;
@@ -193,8 +193,7 @@ The following might be useful:
 
 This is best explained with an example:
 
-   use Types::Standard qw(InstanceOf StrMatch);
-   use Types::Common::Numeric qw(IntRange);
+   use Types::Common qw( InstanceOf StrMatch IntRange );
    
    my $person = InstanceOf['Local::Human'];
    my $woman  = $person->with_attribute_values(

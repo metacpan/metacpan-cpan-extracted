@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "PDK",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "PDK",
   "PREREQ_PM" => {
     "DBIx::Custom" => 0,
@@ -25,19 +26,20 @@ my %WriteMakefileArgs = (
     "MIME::Base64" => 0,
     "Mail::Sender" => 0,
     "Mojo::UserAgent" => 0,
-    "Moo" => 0,
-    "Moo::Role" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
     "Moose::Util::TypeConstraints" => 0,
     "POSIX" => 0,
+    "Sub::Exporter" => 0,
+    "Time::Local" => 0,
     "Try::Tiny" => 0,
     "experimental" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => ""
   }
@@ -54,16 +56,17 @@ my %FallbackPrereqs = (
   "MIME::Base64" => 0,
   "Mail::Sender" => 0,
   "Mojo::UserAgent" => 0,
-  "Moo" => 0,
-  "Moo::Role" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
   "Moose::Util::TypeConstraints" => 0,
   "POSIX" => 0,
+  "Sub::Exporter" => 0,
+  "Time::Local" => 0,
   "Try::Tiny" => 0,
   "experimental" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

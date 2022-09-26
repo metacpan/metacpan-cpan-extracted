@@ -2,8 +2,8 @@ use strict;
 use warnings;
 
 use Test::More;
-use HTML::Restrict;
-use Scalar::Util qw(weaken);
+use HTML::Restrict ();
+use Scalar::Util   qw( weaken );
 
 # Ensure that we don't have any circular references between the HTML::Restrict
 # object and its parser.

@@ -1,6 +1,5 @@
 .gitignore
 Changes
-lib/MooX/Role/DBIConnection.pm
 lib/Weather/MOSMIX.pm
 lib/Weather/MOSMIX/Reader.pm
 lib/Weather/MOSMIX/Weathercodes.pm

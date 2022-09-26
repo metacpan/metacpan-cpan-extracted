@@ -4,10 +4,10 @@ use warnings;
 use Test::More;
 
 use DDP;
-use Firewall::DBI::Pg;
+use PDK::DBI::Pg;
 use PDK::Device;
 
-my $dbi = Firewall::DBI::Pg->new(
+my $dbi = PDK::DBI::Pg->new(
   host     => '127.0.0.1',
   port     => 5432,
   dbname   => 'firewall',

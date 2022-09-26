@@ -6,6 +6,7 @@ package PDK::DBI::Role;
 use Moose::Role;
 use namespace::autoclean;
 use DBIx::Custom;
+our $VERSION = '0.004';
 
 #------------------------------------------------------------------------------
 # 定义 PDK::DBI::Role 方法属性

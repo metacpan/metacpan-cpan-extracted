@@ -1,3 +1,8 @@
+0.03 2022-09-26
+    * remove downloaded files automatically
+      presented by "I disabled the /tmp cleanup cronjob"
+    * MooX::Role::DBIConnection is now a separate prerequisite
+
 0.02 2020-02-17
     * Module::ShareDir::Install is a configure-time prerequisite
 

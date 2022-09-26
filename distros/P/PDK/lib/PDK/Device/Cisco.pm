@@ -83,11 +83,21 @@ sub truncateCommand {
 sub _errorCodes {
   my $self  = shift;
   my $codes = [
-    'ERROR\:( \%)? ',
-    '(Open device \S+ failed|Error opening \S+:)',
-    '\% Incomplete command',
-    '\% Invalid input detected at',
-    '\% Ambiguous command:',
+    '^Error:',
+    '^% Incomplete ',
+    '% Permission denied',
+    'syntax error',
+    '^% Type',
+    '^% Unknown',
+    '^% Invalid',
+    '^% Ambiguous',
+    '(?:%|command)? authorization failed',
+    '% license not supported on this device',
+    'Line has invalid autocommand',
+    'command authorization failed',
+    '(Invalid input detected|Type help or )',
+    '.* command is not support',
+    'unable to retrieve license info'
   ];
   return $codes;
 }
@@ -102,7 +112,7 @@ sub _bufferCodes {
     interact => {
       'Address or name of remote host \['                            => "\r",
       'Destination filename \[s'                                     => "\n",
-      'the product\? \[Y\]es, \[N\]o, \[A\]sk later\: '              => "Y\n",
+      'the product\? \[Y\]es, \[N\]o, \[A\]sk later\: '              => "N\n",
       'overwrite\?\s*\[Y\/N\]'                                       => "Y\r",
       'Source filename \[running-config\]\? '                        => "\r",
       'Configuring from terminal, memory, or network \[terminal\]\?' => "\r",
@@ -120,7 +130,7 @@ sub runCommands {
   my ($self, @commands) = @_;
 
   # 配置下发前 | 切入配置模式
-  unshift(@commands, "terminal page 0", "conf t");
+  unshift(@commands, "terminal length 0", "conf t");
 
   # 完成配置后 | 报错具体配置
   push(@commands, "end", "write");

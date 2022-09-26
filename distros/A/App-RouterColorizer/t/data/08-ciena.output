@@ -1,0 +1,539 @@
+xxxxx.xxxxxx$ xcvr show xcvr 2/1
+
++------------------------ XCVR INFORMATION - Xcvr 2/1      --------------------+
+| Parameter                     | Value                                        |
++-------------------------------+----------------------------------------------+
+| Admin State                   |[1;31m[32m Enabled [1;31m                                     [0m|
+| Admin State                   |[1;31m[33m Disabled [1;31m                                    [0m|
+| Admin State                   |[1;31m Fault                                        [0m|
+| Operational State             |[1;31m[32m Up [1;31m                                          [0m|
+| Operational State             |[1;31m Down                                         [0m|
+| Mode                          | 56-400                                       |
++-------------------------------+----------------------------------------------+
+
++------------------------ XCVR VENDOR DATA - Xcvr 2/1      --------------------+
+| Parameter                     | Value                                        |
++-------------------------------+----------------------------------------------+
+| Ciena Item Number (CIN)       | WLAi Transceiver                             |
+| Description                   | WaveLogic Ai Transceiver                     |
++-------------------------------+----------------------------------------------+
+| Vendor Name                   | Ciena                                        |
+| Vendor PN                     | XXXXXXXXXXXXXXXX  XXXXX                      |
+| Vendor Revision               | 9                                            |
+| Vendor SN                     | XXXXXXXXXXXX                                 |
+| Date (year/week)              | [4m2[24m022/29                                      |
+|-------------------------------+----------------------------------------------|
+| Connector Type                | LC                                           |
+|-------------------------------+----------------------------------------------|
+| Transmitter Technology        |                                              |
+|  - Tunable                    | Yes                                          |
+|  - C-Band                     | Yes                                          |
+|  - L-Band                     | No                                           |
+|  - EDFA                       | Yes                                          |
+|-------------------------------+----------------------------------------------|
+| Bit Rate, Nominal             | OTUC4                                        |
+| Wavelength Min (nm)           | [4m1[24m528.71                                      |
+| Wavelength Max (nm)           | [4m1[24m566.78                                      |
+| Wavelength Tolerance          | N/A                                          |
+| Frequency Min (GHz)           | [4m191[24m342.5                                     |
+| Frequency Max (GHz)           | [4m196[24m107.5                                     |
+| Tx Dispersion Min (ps/nm)     | -[4m35[24m000                                       |
+| Tx Dispersion Max (ps/nm)     | [4m467[24m500                                       |
+|-------------------------------+----------------------------------------------|
+| Diagnostic Monitoring Type    |                                              |
+|  - Diagnostic Support         | Yes                                          |
+|  - Rx Power Measurement       | Yes                                          |
+|  - Tx Power Measurement       | Yes                                          |
+|  - Dispersion Measurement     | Yes                                          |
+|-------------------------------+----------------------------------------------|
+| Transmission Mode | Supported | Link Optimization Mode                       |
+|-------------------+-----------+----------------------------------------------|
+| 56-400            | Yes       | 1, 12                                        |
+| 56-350            | No        |                                              |
+| 56-300            | Yes       | 1, 12                                        |
+| 56-250            | No        |                                              |
+| 56-200            | Yes       | 1, 3, 12                                     |
+| 56-150            | No        |                                              |
+| 56-100            | Yes       | 1, 3, 8, 12                                  |
+| 35-250            | No        |                                              |
+| 35-200            | Yes       | 1, 6, 12                                     |
+| 35-150            | No        |                                              |
+| 35-100            | Yes       | 1, 3, 12                                     |
+|-------------------------------|----------------------------------------------|
+|                               | Link Optimization Modes:                     |
+|                               |  ( 1)   Standard                             |
+|                               |  ( 2)   SNR-Tolerant                         |
+|                               |  ( 3)   Fast-Tracking                        |
+|                               |  ( 4)   Spectral-Efficiency                  |
+|                               |  ( 5)   Latency                              |
+|                               |  ( 6)   Foreign                              |
+|                               |  ( 7)   Narrow                               |
+|                               |  ( 8)   Non-linear                           |
+|                               |  ( 9)   Reserved-1                           |
+|                               |  (10)   Reserved-2                           |
+|                               |  (11)   Reserved-3                           |
+|                               |  (12)   Custom                               |
++-------------------------------+----------------------------------------------+
++------------------------ XCVR DIAGNOSTICS - Port 2/1   -----------------------+
+|                                                                              |
+| Device Properties                                                            |
+| -----------------                                                            |
+|                     |          |         Alarm        |        Warning       |
+|       Monitor       | Value    | Threshold     | Flag | Threshold     | Flag |
++---------------------+----------+---------------+------+---------------+------+
+|       Temp   (degC) |   N/A    | HIGH  N/A     | 0    | HIGH  N/A     | 0    |
+|                     |          | LOW   N/A     | -    | LOW   N/A     | -    |
++---------------------+----------+---------------+------+---------------+------+
+|       VCC   (volts) |    Not Available                                       |
++---------------------+----------+---------------+------+---------------+------+
+|                                                                              |
+| Lane Properties       Number of Lanes = 1                                    |
+| ------------------                                                           |
+| Lane|               |          |         Alarm        |        Warning       |
+--More-- [K| Num | Monitor       | Value    | Threshold     | Flag | Threshold     | Flag |
++-----+---------------+----------+---------------+------+---------------+------+
+|  1  |[36m Tx Power (dBm)[0m|[36m     3.90 [0m| HIGH     4.00 | 0    | HIGH -        | -    |
+|  1  |[36m Tx Power (dBm)[0m|[1;31m   -45.00 [0m| HIGH     4.00 | 0    | HIGH -        | -    |
+|     |               |          |  LOW    -9.00 | 0    | LOW  -        | -    |
++---------------------+----------+---------------+------+---------------+------+
+|     |[36m Rx Power (dBm)[0m|[36m    -0.90 [0m| HIGH    10.50 | 0    | HIGH -        | -    |
+|     |[36m Rx Power (dBm)[0m|[1;31m   -45.00 [0m| HIGH    10.50 | 0    | HIGH -        | -    |
+|     |               |          |  LOW   -19.50 | 0    | LOW  -        | -    |
++---------------------+----------+---------------+------+---------------+------+
++---------------------------+--------+--------------+------------+------------------+
++---------------------------+--------+--------------+------------+------------------+
++---------------------------+--------+--------------+------------+------------------+
+xxxxx.xxxxxx$ xcvr show xcvr 2/1[1D [1D[1D [1D[1D [1D11/1
+[1;31mSHELL PARSER FAILURE: '11/1' - no matching entry found[0m
+xxxxx.xxxxxx$ xcvr show xcvr 11/1[1D [1D[1D [1D[1D [1D/11
+
++------------------------ XCVR INFORMATION - Xcvr 1/11     --------------------+
+| Parameter                     | Value                                        |
++-------------------------------+----------------------------------------------+
+| Admin State                   |[1;31m[32m Enabled [1;31m                                     [0m|
+| Operational State             |[1;31m[32m Up [1;31m                                          [0m|
+| Mode                          | OSC                                          |
++-------------------------------+----------------------------------------------+
+
++------------------------ XCVR VENDOR DATA - Xcvr 1/11     --------------------+
+| Parameter                | Value              | Decoded String Equivalent    |
++--------------------------+--------------------+------------------------------+
+| Ciena Item Number        | XXXXXXXXXXXXXXXX                                  |
+| Revision                 | 01                                                |
+| Description              | Trcvr, 1.25 Gbit/s 36 dB CWDM [4m1[24m511 nm SFP Module  |
++--------------------------+--------------------+------------------------------+
+| Vendor Name              | Ciena              |                              |
+| Vendor OUI               |                    |                              |
+| Vendor PN                | XXXXXXXXXXXXXXXX   |                              |
+| Vendor Revision          | 01                 |                              |
+| Vendor SN                | XXXXXXXXXXXXXXXX                                  |
+| Date (mm/dd/yy)          | 04/23/22           |                              |
++--------------------------+--------------------+------------------------------+
+| Identifier               | 0x3                | SFP                          |
+| Ext. Identifier          | 0x4                | SFP/GBIC                     |
+| Connector                | 0x7                | LC                           |
++--------------------------+--------------------+------------------------------+
+| Transceiver Codes        | 0x[4m0[24m101[4m108[24m000[4m000[24m000 |                              |
+|  - SONET Compliance      | 0x[4m0[24m000             |                              |
+|  - Ethernet Compliance   | 0x00               |                              |
+|  - Link Length           | 0x80               | Very long distance (V)       |
+|  - Transmitter Technology| 0x[4m1[24m080             | Electrical intra-enclosure (EL)|
+|  - Transmission Media    | 0x01               | Single Mode (SM)             |
+|  - Channel speed         | 0x01               | 100 MBytes/Sec               |
++--------------------------+--------------------+------------------------------+
+| Encoding                 | 0x01               | 8B10B                        |
+| BR, Nominal              | 1.3                | Gigabit                      |
+|--------------------------+--------------------+------------------------------|
+| Length(9um fiber) 1km    | 120                | 120km                        |
+| Length(9um fiber) 100m   | 255                | [4m25[24m500m                       |
+| Length(50um) 10m         | 0                  | 0m                           |
+| Length(62.5um) 10m       | 0                  | 0m                           |
+| Length(copper) 1m        | 0                  | 0m                           |
+|--------------------------+--------------------+------------------------------|
+| Wavelength               | [4m1[24m511               | [4m1[24m511.00 nm                   |
+|--------------------------+--------------------+------------------------------|
+| Options                  | 0x1a00             |                              |
+|--------------------------+--------------------+------------------------------|
+| BR, max                  | 0                  |                              |
+| BR, min                  | 0                  |                              |
+|--------------------------+--------------------+------------------------------|
+| Diag Monitor Type        | 0x68               |                              |
+|  - Rx power measurement  | Bit 3              | Avg                          |
+|--------------------------+--------------------+------------------------------|
+| SFF-[4m8[24m472 Compliance      | 0x2                | Rev 9.5                      |
++--------------------------+--------------------+------------------------------+
+
+
++-------------------- XCVR DIAGNOSTICS - Port 1/11     ------------------+
+|               |          |         Alarm        |        Warning       |
+| Output        | Value    | Threshold     | Flag | Threshold     | Flag |
++---------------+----------+---------------+------+---------------+------+
+| Temp    (degC)|   24.604 | HIGH   78.000 | 0    | HIGH   73.000 | 0    |
+|               |          | LOW   -10.000 | 0    | LOW    -5.000 | 0    |
++---------------+----------+---------------+------+---------------+------+
+| Vcc    (volts)|    3.310 | HIGH    3.565 | 0    |  HIGH   3.500 | 0    |
+|               |          | LOW     3.035 | 0    | LOW     3.100 | 0    |
++---------------+----------+---------------+------+---------------+------+
+| Bias      (mA)|   10.586 | HIGH   60.000 | 0    | HIGH   55.000 | 0    |
+|               |          | LOW     1.000 | 0    | LOW     1.500 | 0    |
++---------------+----------+---------------+------+---------------+------+
+| Tx Power  (mW)|     2.76 | HIGH     6.55 | 0    | HIGH     6.30 | 0    |
+|               |          | LOW      1.25 | 0    | LOW      1.58 | 0    |
++---------------+----------+---------------+------+---------------+------+
+|[36m Tx Power (dBm)[0m|[36m    +4.41 [0m| HIGH    +8.16 | 0    | HIGH    +8.00 | 0    |
+|[36m Tx Power (dBm)[0m|[1;31m   -45.00 [0m| HIGH    +8.16 | 0    | HIGH    +8.00 | 0    |
+|               |          | LOW     +1.00 | 0    | LOW     +2.00 | 0    |
++---------------+----------+---------------+------+---------------+------+
+| Rx Power  (mW)|     0.02 | HIGH     0.16 | 0    | HIGH     0.13 | 0    |
+|               |          | LOW      0.00 | 0    | LOW      0.00 | 0    |
++---------------+----------+---------------+------+---------------+------+
+|[36m Rx Power (dBm)[0m|[36m   -16.00 [0m| HIGH    -7.70 | 0    | HIGH    -8.70 | 0    |
+|[36m Rx Power (dBm)[0m|[1;31m   -45.00 [0m| HIGH    -7.70 | 0    | HIGH    -8.70 | 0    |
+|               |          | LOW    -35.23 | 0    | LOW    -33.98 | 0    |
++---------------+----------+---------------+------+---------------+------+
+
++-------------------------+-----------------------+----------------------+
+|                  Module Capabilites                                    |
++-------------------------+-----------------------+----------------------+
+| Laser First Freq (GHz)  | Laser Last Freq (GHz) | Grid Spacing (GHz)   |
+--More-- [K+-------------------------+-----------------------+----------------------+
+|          0              |               0       |             0        |
++-------------------------+-----------------------+----------------------+
+|                  Frequency Channel Control                             |
++---------------------------------+--------------------------------------+
+| Channel Number Set              | Frequency Error (GHz)                |
++---------------------------------+--------------------------------------+
+|          0                      |        0                             |
++---------------------------------+--------------------------------------+
++---------------------------+--------+--------------+------------+------------------+
++---------------------------+--------+--------------+------------+------------------+
++---------------------------+--------+--------------+------------+------------------+
+xxxxx.xxxxxx$ xcvr show xcvr 1/11[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1Dpt
+[1;31mSHELL AUTOCOMPLETION FAILURE: 'pt' - no matching entry found[0m
+
+xxxxx.xxxxxx$ xcvr show pt[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D
+xxxxx.xxxxxx$ ptp <TAB>
+    protection      disable         enable          set             show            unset           clear
+
+xxxxx.xxxxxx$ ptp show ptp 1/1
++------------------------------ PTP CONFIGURATION - PTP 1/1     -----------------------------+
+| Parameter                                  | Admin Configuration   |  Operational Status   |
++--------------------------------------------+-----------------------------------------------+
+| State                                      |[32m Enabled               [0m|[32m Up [0m                   |
+| PTP Type                                   | Optical Channel                               |
+| XCVR Mode                                  | OCH                   | OCH                   |
+| Number of Lanes                            | 1                                             |
+| Adjacency Configuration                    |                                               |
+|   Auto Provisioning                        | Enabled                                       |
+|   Far End Chassis                          | [30m[45mfe80::aaaa:bbbb:cccc:dddd[0m                     |
+|   Far End Slot                             | 2                                             |
+|   Far End Port                             | 1                                             |
+|   Adjacency Requested Tx Power (dBm)       |                       | 4.0                   |
+| Filter Configuration                       |                                               |
+|   Type                                     |                       | Fixed                 |
+|   Bandwidth (GHz)                          |                       | 100.0                 |
+|   Frequency (GHz)                          |                       | [4m194[24m800.0              |
++--------------------------------------------+-----------------------------------------------+
+xxxxx.xxxxxx$ ptp show ptp 1/1 status <TAB>
+    ranges
+    <cr>				   End of Command
+xxxxx.xxxxxx$ ptp show ptp 1/1 status 
+
++----------------------------------- PTP STATUS - 1/1     ------------------------------------------+
+| Parameter                                 | Value                                                 |
++-------------------------------------------+-------------------------------------------------------+
+| Admin State                               |[1;31m[32m Enabled [1;31m                                              [0m|
+| Operational State                         |[1;31m[32m Up [1;31m                                                   [0m|
++-------------------------------------------+-------------------------------------------------------+
+| PTP Type                                  | Optical Channel                                       |
+| XCVR Mode                                 | OCH                                                   |
+| Number of Lanes                           | 1                                                     |
++-------------------------------------------+-------------------------------------------------------+
+| Lane Status                                                                                       |
+| --------------                                                                                    |
+|  ##  |                                                                                            |
++------+------------------------------------+-------------------------------------------------------+
+|  1   |                                    |                                                       |
+|      |------------------------------------+-------------------------------------------------------+
+|      | Actual Frequency (GHz)             | [4m194[24m800.0                                              |
+|      |------------------------------------+-------------------------------------------------------|
+|      | Adjacency Requested Tx Power (dBm) | 4.0                                                   |
+|      |------------------------------------+---------------------------+---------------------------|
+|      |                                    |            Rx             |            Tx             |
+|      |------------------------------------+---------------------------+---------------------------|
+|      |[36m Actual Power (dBm)                 [0m|[36m 4.50                      [0m|[36m -1.20                     [0m|
+|      |[36m Actual Power (dBm)                 [0m|[1;31m -45.00                    [0m|[36m -1.20                     [0m|
+|      |[36m Actual Power (dBm)                 [0m|[36m 4.50                      [0m|[1;31m -45.00                    [0m|
+|      |[36m Actual Power (dBm)                 [0m|[1;31m -45.00                    [0m|[1;31m -45.00                    [0m|
+|      |    Maximum (dBm)                   | 4.50                      | -1.10                     |
+|      |    Time Recorded                   | Thu Sep 15 17:12:28 [4m2[24m022  | Thu Sep 15 17:13:53 [4m2[24m022  |
+|      |    Minimum (dBm)                   | 4.40                      | -4.90                     |
+|      |    Time Recorded                   | Thu Sep 15 17:26:26 [4m2[24m022  | Thu Sep 22 20:26:26 [4m2[24m022  |
+|      |------------------------------------+---------------------------+---------------------------|
+|      |    Loss of Signal                  |  No                       |                           |
++------+------------------------------------+---------------------------+---------------------------+
+xxxxx.xxxxxx$  [1D [1Dptp show ptp 1/1 status[23D                       [23Dptp show ptp 1/1[1D [1D[1D [1D[1D [1D2/1 
++------------------------------ PTP CONFIGURATION - PTP 2/1     -----------------------------+
+| Parameter                                  | Admin Configuration   |  Operational Status   |
++--------------------------------------------+-----------------------------------------------+
+| State                                      |[32m Enabled               [0m|[32m Up [0m                   |
+| State                                      |[32m Enabled               [0m|[1;31m Fault                 [0m|
+| State                                      |[32m Enabled               [0m|[1;31m Down                  [0m|
+| State                                      |[33m Disabled              [0m|[33m Down                  [0m|
+| PTP Type                                   | WaveLogic Ai                                  |
+| XCVR Mode                                  | 56-400                | 56-400                |
+| Number of Lanes                            | 1                                             |
+| Transmitter State                          |[32m Enabled               [0m|[32m Enabled [0m              |
+| Transmitter State                          |[32m Enabled               [0m|[1;31m Fault                 [0m|
+| Transmitter State                          |[33m Disabled              [0m|[33m Disabled              [0m|
+| Transmitter Wavelength (nm)                | [4m1[24m538.98               | [4m1[24m538.98               |
++--------------------------------------------+-----------------------------------------------+
+| Forward Error Correction                   | Enabled               | Enabled               |
++--------------------------------------------+-----------------------------------------------+
+| Pre-FEC SF Threshold (dBQ)                 | 0.00                                          |
+| Pre-FEC SF Threshold (BER)                 | 3.400 E-02                                    |
+| Pre-FEC SD Threshold (dBQ)                 | 0.50                                          |
+| Pre-FEC SD Threshold (BER)                 | 2.661 E-02                                    |
+| HCCS Threshold (dBQ)                       | 0.00                                          |
+| HCCS Threshold (BER)                       | 3.400 E-02                                    |
++--------------------------------------------+-----------------------------------------------+
+| Line System Configuration                  |                                               |
+|   SPLI Management                          | Enabled               | Mismatched            |
+|   Line System Type                         | Coloured                                      |
+|   Wavelength Spacing                       | FlexGrid                                      |
+|   Band Plan                                | None                                          |
+|   Transmitter Channel Number               | 0                                             |
+|   Transmitter Frequency (GHz)              | [4m194[24m800.0              | [4m194[24m800.0              |
+|   Transmitter Power Level (dBm)            |   4.00                |   4.00                |
+|   CMD Slot                                 | 0                                             |
+|   CMD Port In                              | 0                                             |
+|   CMD Port Out                             | 0                                             |
++--------------------------------------------+-----------------------------------------------+
+| Advanced Configuration                     |                                               |
+|   Class                                    | Terrestrial           | Terrestrial           |
+|   Reach Limit (km)                         | [4m1[24m000                  | 67                    |
+|   Link Optimization Mode                   | Standard              | Standard              |
+|   Laser Control                            |                                               |
+|     Tuning Mode                            | Normal                | Normal                |
+|     Centering Mode                         | Enabled               | Enabled               |
+|     Centering Range (GHz)                  | 2.5                   | 2.5                   |
+|     Shutdown Mode                          | Accelerated           | Accelerated           |
+|     Expected Restoration Time (seconds)    | 10                    | 10                    |
+|   Channel Contention Detect & Avoidance    | Disabled              | Disabled              |
+|   Tx Power Reduction State                 | Disabled              | Disabled              |
+|   Tx Dispersion Compensation Management    |                                               |
+|     Mode                                   | Automatic             | Automatic             |
+|     Pre-compensation value (ps/nm)         | 0                     | 0                     |
+|     Path Dispersion value (ps/nm)          | 0                     | 661                   |
+|   Search mode scan limits                  |                                               |
+|     Maximum (ps/nm)                        | [4m549[24m731                | [4m549[24m731                |
+|     Minimum (ps/nm)                        | -[4m42[24m883                | -[4m42[24m883                |
++--------------------------------------------+-----------------------------------------------+
+| Supported Mean Differential Group Delay    | 50.000  ps                                    |
++--------------------------------------------+-----------------------------------------------+
+xxxxx.xxxxxx$ ptp show ptp 2/11[1D [1D[1D [1D[1D [1D/1 status <TAB>
+    ranges
+    <cr>				   End of Command
+xxxxx.xxxxxx$ ptp show ptp 2/1 status 
+
++----------------------------------- PTP STATUS - 2/1     ------------------------------------------+
+| Parameter                                 | Value                                                 |
++-------------------------------------------+-------------------------------------------------------+
+| Admin State                               |[1;31m[32m Enabled [1;31m                                              [0m|
+| Operational State                         |[1;31m[32m Up [1;31m                                                   [0m|
++-------------------------------------------+-------------------------------------------------------+
+| PTP Type                                  | WaveLogic Ai                                          |
+| XCVR Mode                                 | 56-400                                                |
+| Bit Rate (Gbps)                           | 400                                                   |
+| Baud Rate (GBaud)                         | 56                                                    |
+| Number of Lanes                           | 1                                                     |
++-------------------------------------------+-------------------------------------------------------+
+| Transmitter State                         | Enabled                                               |
+| Tx Power Value (dBm)                      |   4.00                                                |
++-------------------------------------------+-------------------------------------------------------+
+| Band Plan Channel Number                  |                                                       |
+| Actual Wavelength (nm)                    | [4m1[24m538.98                                               |
+| Actual Frequency (GHz)                    | [4m194[24m800.0                                              |
++-------------------------------------------+-------------------------------------------------------+
+| Minimum Spectral Width (GHz)              | 59.00                                                 |
+| Supported 3 dBm Signal Bandwidth          | 57.75                                                 |
+| Supported 10 dBm Signal Bandwidth         | 59.98                                                 |
++-------------------------------------------+-------------------------------------------------------+
+| Est. Round Trip Delay (us)                | 731                                                   |
+| Est. Unidirectional Latency (us)          | 368                                                   |
+| Est. Fiber Length (km)                    | 67                                                    |
++-------------------------------------------+---------------------------+---------------------------+
+| Optical Channel Power                     |            Rx             |            Tx             |
++-------------------------------------------+---------------------------+---------------------------+
+| Actual Optical Channel Power (dBm)        | -0.90                     |                           |
+|    Maximum (dBm)                          | 0.00                      |                           |
+|    Time Recorded                          | Thu Jan  1 00:00:00 [4m1[24m970  |                           |
+|    Minimum (dBm)                          | 0.00                      |                           |
+|    Time Recorded                          | Thu Jan  1 00:00:00 [4m1[24m970  |                           |
+|    Loss of Opt. Channel                   | No                        |                           |
++-------------------------------------------+---------------------------+---------------------------+
+| Actual Link Dispersion (ps/nm)            | 652                       | 661                       |
+| Compensation Dispersion (ps/nm)           | 652                       | 0                         |
+| Est. Instance of DGD (ps)                 | 0.282                     |                           |
++-------------------------------------------+---------------------------+---------------------------+
+| Lane Status                                                                                       |
++------+------------------------------------+---------------------------+---------------------------+
+|  ##  |                                    |            Rx             |            Tx             |
++------+------------------------------------+---------------------------+---------------------------+
+|  1   |[36m Actual Power (dBm)                 [0m|[36m -0.90                     [0m|[36m 3.90                      [0m|
+|      |    Maximum (dBm)                   | -0.80                     | 4.00                      |
+|      |    Time Recorded                   | Thu Sep 22 01:31:55 [4m2[24m022  | Thu Sep 15 17:12:25 [4m2[24m022  |
+|      |    Minimum (dBm)                   | -0.90                     | 3.90                      |
+|      |    Time Recorded                   | Thu Sep 15 17:12:25 [4m2[24m022  | Thu Sep 15 17:12:30 [4m2[24m022  |
+|      |    High - Alarm   (Threshold)      | No  (10.50)               | No  (4.00)                |
+|      |    Low - Alarm    (Threshold)      | No  (-19.50)              | No  (-9.00)               |
+|      |    High - Warning (Threshold)      | No  (N/A)                 | No  (N/A)                 |
+|      |    Low - Warning  (Threshold)      | No  (N/A)                 | No  (N/A)                 |
+|      |    Loss of Signal                  | No  (N/A)                 |                           |
++-------------------------------------------+---------------------------+---------------------------+
+xxxxx.xxxxxx$ ptp show ptp 2/1 status[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D[1D [1D1/11 
++------------------------------ PTP CONFIGURATION - PTP 1/11    -----------------------------+
+| Parameter                                  | Admin Configuration   |  Operational Status   |
++--------------------------------------------+-----------------------------------------------+
+| State                                      |[32m Enabled               [0m|[32m Up [0m                   |
+| PTP Type                                   | Optical Supervisory Channel                   |
+| XCVR Mode                                  | OSC                   | OSC                   |
+| Number of Lanes                            | 1                                             |
+| Transmitter State                          |[32m Enabled               [0m|[32m Enabled [0m              |
++--------------------------------------------+-----------------------------------------------+
+xxxxx.xxxxxx$ ptp show ptp 1/11 status <TAB>
+    ranges
+    <cr>				   End of Command
+xxxxx.xxxxxx$ ptp show ptp 1/11 status 
+
++----------------------------------- PTP STATUS - 1/11    ------------------------------------------+
+| Parameter                                 | Value                                                 |
++-------------------------------------------+-------------------------------------------------------+
+| Admin State                               |[1;31m[32m Enabled [1;31m                                              [0m|
+| Operational State                         |[1;31m[32m Up [1;31m                                                   [0m|
++-------------------------------------------+-------------------------------------------------------+
+| PTP Type                                  | Optical Supervisory Channel                           |
+| XCVR Mode                                 | OSC                                                   |
+| Number of Lanes                           | 1                                                     |
++-------------------------------------------+-------------------------------------------------------+
+| Lane Status                                                                                       |
+| --------------                                                                                    |
+|  ##  |                                                                                            |
++------+------------------------------------+-------------------------------------------------------+
+|  1   |                                    |                                                       |
+|      |------------------------------------+-------------------------------------------------------+
+|      | Actual Frequency (GHz)             | [4m198[24m407.0                                              |
+|      |------------------------------------+---------------------------+---------------------------|
+|      |                                    |            Rx             |            Tx             |
+|      |------------------------------------+---------------------------+---------------------------|
+|      |[36m Actual Power (dBm)                 [0m|[36m -16.00                    [0m|[36m 4.40                      [0m|
+|      |    Maximum (dBm)                   | -15.90                    | 4.40                      |
+|      |    Time Recorded                   | Thu Sep 15 17:12:37 [4m2[24m022  | Thu Sep 15 17:12:37 [4m2[24m022  |
+|      |    Minimum (dBm)                   | -40.00                    | -40.00                    |
+|      |    Time Recorded                   | Thu Sep 15 17:12:28 [4m2[24m022  | Thu Sep 15 17:12:28 [4m2[24m022  |
+|      |------------------------------------+---------------------------+---------------------------|
+|      |    Loss of Signal                  |  No                       |                           |
++------+------------------------------------+---------------------------+---------------------------+
+xxxxx.xxxxxx$ ptp show ptp 1/11 status[24D                        [24Dptp show ptp 1/11[1D [1D3
++------------------------------ PTP CONFIGURATION - PTP 1/13    -----------------------------+
+| Parameter                                  | Admin Configuration   |  Operational Status   |
++--------------------------------------------+-----------------------------------------------+
+| State                                      |[32m Enabled               [0m|[32m Up [0m                   |
+| PTP Type                                   | Optical Multiplex                             |
+| XCVR Mode                                  | OTM                   | OTM                   |
+| Number of Lanes                            | 1                                             |
+| Tx EDFA                                    | Enabled                                       |
+| Rx EDFA                                    | Enabled                                       |
+| Automatic Span Loss Compensation           | Enabled                                       |
+| Automatic Span Loss Offset (dB)            | 0.0                                           |
+| Manual Span Loss (dB)                      | 0.0                                           |
+| OTDR Tx Event Range (meters)               | [4m20[24m000                                         |
+| OTDR Rx Event Range (meters)               | [4m20[24m000                                         |
++--------------------------------------------+-----------------------------------------------+
+xxxxx.xxxxxx$ ptp show ptp 1/13 status <TAB>
+    ranges
+    <cr>				   End of Command
+xxxxx.xxxxxx$ ptp show ptp 1/13 status 
+
++----------------------------------- PTP STATUS - 1/13    ------------------------------------------+
+| Parameter                                 | Value                                                 |
++-------------------------------------------+-------------------------------------------------------+
+| Admin State                               |[1;31m[32m Enabled [1;31m                                              [0m|
+| Operational State                         |[1;31m[32m Up [1;31m                                                   [0m|
++-------------------------------------------+-------------------------------------------------------+
+| PTP Type                                  | Optical Multiplex                                     |
+| XCVR Mode                                 | OTM                                                   |
+| Number of Lanes                           | 1                                                     |
++-------------------------------------------+-------------------------------------------------------+
+| Lane Status                                                                                       |
+| --------------                                                                                    |
+|  ##  |                                                                                            |
++------+------------------------------------+-------------------------------------------------------+
+|  1   |                                    |                                                       |
+|      |------------------------------------+---------------------------+---------------------------|
+|      |                                    |            Rx             |            Tx             |
+|      |------------------------------------+---------------------------+---------------------------|
+|      |[36m Span Loss (dB)                     [0m|[36m 19.30                     [0m|[36m 20.70                     [0m|
+|      |    Maximum (dB)                    | 19.40                     | 20.70                     |
+|      |    Time Recorded                   | Thu Sep 22 18:28:15 [4m2[24m022  | Mon Sep 19 06:28:47 [4m2[24m022  |
+|      |    Minimum (dB)                    | N/A                       | N/A                       |
+|      |    Time Recorded                   | Thu Sep 15 17:12:28 [4m2[24m022  | Thu Sep 15 17:12:28 [4m2[24m022  |
+|      |------------------------------------+---------------------------+---------------------------|
+|      |[36m Actual Power (dBm)                 [0m|[36m -15.80                    [0m|[36m 3.60                      [0m|
+|      |    Maximum (dBm)                   | -15.70                    | 3.60                      |
+|      |    Time Recorded                   | Thu Sep 22 09:33:12 [4m2[24m022  | Thu Sep 15 17:12:28 [4m2[24m022  |
+|      |    Minimum (dBm)                   | -19.50                    | 3.50                      |
+|      |    Time Recorded                   | Thu Sep 22 20:26:26 [4m2[24m022  | Thu Sep 15 17:12:42 [4m2[24m022  |
+|      |[36m Actual Aggregate Power (dBm)       [0m|[36m -12.90                    [0m|[36m 7.00                      [0m|
+|      |    Maximum (dBm)                   | -12.80                    | 7.00                      |
+|      |    Time Recorded                   | Thu Sep 15 17:13:53 [4m2[24m022  | Thu Sep 15 17:12:37 [4m2[24m022  |
+|      |    Minimum (dBm)                   | -15.80                    | 3.60                      |
+|      |    Time Recorded                   | Thu Sep 15 17:12:28 [4m2[24m022  | Thu Sep 15 17:12:28 [4m2[24m022  |
+|      |------------------------------------+---------------------------+---------------------------|
+|      | Optical Return Loss (dB)           | 34.20                                                 |
+|      |    Maximum (dB)                    | 39.50                                                 |
+|      |    Time Recorded                   | Thu Sep 22 20:26:26 [4m2[24m022                              |
+|      |    Minimum (dB)                    | 33.90                                                 |
+|      |    Time Recorded                   | Thu Sep 15 19:57:49 [4m2[24m022                              |
+|      |------------------------------------+---------------------------+---------------------------|
+|      |    Loss of Signal                  |  No                       |                           |
++------+------------------------------------+---------------------------+---------------------------+
+xxxxx.xxxxxx$ e[1D [1Dalarm show
+
++----------- ALARM STATUS ------------+
+| On | Dis | Description              |
++----+-----+--------------------------+
+|    |     | Warning                  |
+|    |     | Minor Visible            |
+|    |     | Major Visible            |
+|    |     | Critical Visible         |
++----+-----+--------------------------+
+
++------------------- ALARM STATISTICS ---------------------+
+| On | Dis | Count | Cumulative | Description              |
++----+-----+-------+------------+--------------------------+
+|    |     |     0 |          0 | Warning                  |
+|    |     |     0 |          0 | Minor Visible            |
+|    |     |     0 |         10 | Major Visible            |
+|    |     |     0 |          8 | Critical Visible         |
++----+-----+-------+------------+--------------------------+
+
++---------------------------------------------- ACTIVE ALARMS --------------------------------------------------------------+
+|IID  |Ack|Int|ATID |Severity| Date & Time (Local)      | Instance             | Description                                |
++-----+---+---+-----+--------+--------------------------+----------------------+--------------------------------------------+
+|[33m    2[0m|[33m Y [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m               PTP-1/2[0m|[33m Rx Loss of Signal                          [0m|
+|[33m    3[0m|[33m Y [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m               PTP-1/4[0m|[33m Rx Loss of Signal                          [0m|
+|[33m    4[0m|[33m Y [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m               PTP-1/5[0m|[33m Rx Loss of Signal                          [0m|
+|[1;31m    4[0m|[1;31m   [0m|[1;31m   [0m|[1;31m   51[0m|[1;31mcritical[0m|[1;31m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[1;31m               PTP-1/5[0m|[1;31m Rx Loss of Signal                          [0m|
+|[33m    5[0m|[33m Y [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m               PTP-1/6[0m|[33m Rx Loss of Signal                          [0m|
+|[33m    6[0m|[33m Y [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m               PTP-1/7[0m|[33m Rx Loss of Signal                          [0m|
+|[33m    7[0m|[33m Y [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m               PTP-1/8[0m|[33m Rx Loss of Signal                          [0m|
+|[33m    8[0m|[33m Y [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m               PTP-1/9[0m|[33m Rx Loss of Signal                          [0m|
+|[33m    9[0m|[33m Y [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m              PTP-1/10[0m|[33m Rx Loss of Signal                          [0m|
+|[36m    9[0m|[36m Y [0m|[36m   [0m|[36m   51[0m|[36m   info [0m|[36m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[36m              PTP-1/10[0m|[36m Rx Loss of Signal                          [0m|
++-----+---+---+-----+--------+--------------------------+----------------------+--------------------------------------------+
+| |              \---------> ATID : Alarm Table ID                                                                          |
+| \------------------------> IID  : Alarm Instance ID                                                                       |
++---------------------------------------------------------------------------------------------------------------------------+
+
+xxxxx.xxxxxx$ exit

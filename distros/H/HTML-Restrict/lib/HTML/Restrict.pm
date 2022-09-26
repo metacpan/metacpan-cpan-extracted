@@ -4,17 +4,17 @@ use 5.006;
 package HTML::Restrict;
 
 use version;
-our $VERSION = 'v3.0.0';
+our $VERSION = 'v3.0.1';
 
-use Carp qw( croak );
-use Data::Dump qw( dump );
-use HTML::Parser ();
-use HTML::Entities qw( encode_entities );
+use Carp                     qw( croak );
+use Data::Dump               qw( dump );
+use HTML::Parser             ();
+use HTML::Entities           qw( encode_entities );
 use Types::Standard 1.000001 qw[ Bool HashRef ArrayRef CodeRef ];
-use List::Util 1.33 qw( any none );
-use Scalar::Util qw( reftype weaken );
-use Sub::Quote 'quote_sub';
-use URI ();
+use List::Util 1.33          qw( any none );
+use Scalar::Util             qw( reftype weaken );
+use Sub::Quote               qw( quote_sub );
+use URI                      ();
 
 use Moo 1.002000;
 use namespace::clean;
@@ -47,7 +47,7 @@ has rules => (
     is       => 'rw',
     isa      => HashRef,
     required => 0,
-    default  => quote_sub(q{ {} }),
+    default  => quote_sub(' {} '),
     trigger  => \&_build_parser,
     reader   => 'get_rules',
     writer   => 'set_rules',
@@ -68,6 +68,12 @@ has replace_img => (
 has trim => (
     is      => 'rw',
     isa     => Bool,
+    default => 1,
+);
+
+has filter_text => (
+    is      => 'rw',
+    isa     => Bool | CodeRef,
     default => 1,
 );
 
@@ -106,7 +112,7 @@ sub _build_parser {
     if ($rules) {
         foreach my $tag_name ( keys %{$rules} ) {
             if ( lc $tag_name ne $tag_name ) {
-                croak "All tag names must be lower cased";
+                croak 'All tag names must be lower cased';
             }
             if ( reftype $rules->{$tag_name} eq 'ARRAY' ) {
                 my @attr_names;
@@ -116,7 +122,7 @@ sub _build_parser {
                         : push( @attr_names, $attr_item );
                 }
                 for (@attr_names) {
-                    croak "All attribute names must be lower cased"
+                    croak 'All attribute names must be lower cased'
                         if lc $_ ne $_;
                 }
             }
@@ -164,7 +170,8 @@ sub _build_parser {
                             if ( defined $url->scheme ) {
                                 delete $attr->{$source_type}
                                     if none { $_ eq $url->scheme }
-                                grep { defined } @{ $self->get_uri_schemes };
+                                    grep { defined }
+                                    @{ $self->get_uri_schemes };
                             }
                             else {    # relative URL
                                 delete $attr->{$source_type}
@@ -199,7 +206,7 @@ sub _build_parser {
                                     next;
                                 }
                                 $more .= qq[ $attr_name="]
-                                    . encode_entities($value) . q["];
+                                    . encode_entities($value) . q{"};
                             }
                         }
                         else {
@@ -208,13 +215,13 @@ sub _build_parser {
                                 my $value
                                     = encode_entities( $attr->{$attr_name} );
                                 $more .= qq[ $attr_name="$value" ]
-                                    unless $attr_name eq q{/};
+                                    unless $attr_name eq '/';
                             }
                         }
                     }
 
                     # closing slash should (naturally) close the tag
-                    if ( exists $attr->{q{/}} && $attr->{q{/}} eq q{/} ) {
+                    if ( exists $attr->{'/'} && $attr->{'/'} eq '/' ) {
                         $more .= ' /';
                     }
 
@@ -231,21 +238,21 @@ sub _build_parser {
                     }
                     else {
                         $alt
-                            = defined( $attr->{alt} ) ? ": $attr->{alt}" : "";
+                            = defined( $attr->{alt} )
+                            ? ": $attr->{alt}"
+                            : q{};
                         $alt = "[IMAGE$alt]";
                     }
                     $self->_processed( ( $self->_processed || q{} ) . $alt );
                 }
-                elsif (
-                    any { $_ eq $tagname }
-                    @{ $self->strip_enclosed_content }
-                ) {
+                elsif ( any { $_ eq $tagname }
+                    @{ $self->strip_enclosed_content } ) {
                     print "adding $tagname to strippers" if $self->debug;
                     push @{ $self->_stripper_stack }, $tagname;
                 }
 
             },
-            "self,tagname,attr,text"
+            'self,tagname,attr,text'
         ],
 
         end_h => [
@@ -260,19 +267,24 @@ sub _build_parser {
                 }
 
             },
-            "self,tagname,attr,text"
+            'self,tagname,attr,text'
         ],
 
         text_h => [
             sub {
                 my ( $p, $text ) = @_;
                 print "text: $text\n" if $self->debug;
-                $text = _fix_text_encoding($text);
+                if ( ref $self->filter_text ) {
+                    $text = $self->filter_text->($text);
+                }
+                elsif ( $self->filter_text ) {
+                    $text = _fix_text_encoding($text);
+                }
                 if ( !@{ $self->_stripper_stack } ) {
                     $self->_processed( ( $self->_processed || q{} ) . $text );
                 }
             },
-            "self,text"
+            'self,text'
         ],
 
         comment_h => [
@@ -283,7 +295,7 @@ sub _build_parser {
                     $self->_processed( ( $self->_processed || q{} ) . $text );
                 }
             },
-            "self,text"
+            'self,text'
         ],
 
         declaration_h => [
@@ -294,7 +306,7 @@ sub _build_parser {
                     $self->_processed( ( $self->_processed || q{} ) . $text );
                 }
             },
-            "self,text"
+            'self,text'
         ],
 
     );
@@ -304,7 +316,7 @@ sub process {
     my $self = shift;
 
     # returns undef if no value was passed
-    return if !@_;
+    return       if !@_;
     return $_[0] if !$_[0];
 
     my ($content) = @_;
@@ -402,7 +414,7 @@ HTML::Restrict - Strip unwanted HTML tags and attributes
 
 =head1 VERSION
 
-version v3.0.0
+version v3.0.1
 
 =head1 SYNOPSIS
 
@@ -681,6 +693,24 @@ are adding additional tags you'll need to include the entire list of tags whose
 enclosed content you'd like to remove.  This feature strips script and style
 tags by default.
 
+=item * C<< filter_text => [0|1|CodeRef] >>
+
+By default all text will be filtered to fix any encoding problems which may
+cause security issues. You may override the encoding behaviour by providing
+your own anonymous sub to C<filter_text>. This first and only argument to the
+sub is the text which needs to be filtered. The sub should return a scalar
+containing the transformed text.
+
+    filter_text => sub {
+        my $text = shift;
+        ... # transform text
+        return $text;
+    },
+
+You may also this value to 0 in order to disable this behaviour entirely.
+Please be advised this is a security risk. Use caution when disabling this
+parameter or providing your own filter function.
+
 =back
 
 =head1 SUBROUTINES/METHODS
@@ -737,27 +767,7 @@ L<HTML::Detoxifier>, HTML::Sanitizer, L<HTML::Scrubber>
 Thanks to Raybec Communications L<http://www.raybec.com> for funding my
 work on this module and for releasing it to the world.
 
-Thanks also to the following for patches, bug reports and assistance:
-
-Mark Jubenville (ioncache)
-
-Duncan Forsyth
-
-Rick Moore
-
-Arthur Axel 'fREW' Schmidt
-
-perlpong
-
-David Golden
-
-Graham TerMarsch
-
-Dagfinn Ilmari Mannsåker
-
-Graham Knop
-
-Carwyn Ellis
+Thanks also to the many other contributors. L<https://github.com/oalders/html-restrict/graphs/contributors>
 
 =head1 AUTHOR
 
@@ -765,7 +775,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013-2017 by Olaf Alders.
+This software is copyright (c) 2009 by Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

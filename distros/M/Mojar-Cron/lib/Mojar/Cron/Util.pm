@@ -105,7 +105,7 @@ sub tz_offset {
   my $now = shift // time;
   my ($lm, $lh, $ly, $ld) = (localtime $now)[1, 2, 5, 7];
   my ($um, $uh, $uy, $ud) = (gmtime $now)[1, 2, 5, 7];
-  my $min = $lm - $um + 60 * ($lh - $uh) + 60 * 24 * ($ly - $uy || $ld - $ud);
+  my $min = $lm - $um + 60 * ($lh - $uh) + 60 * 24 * ($ly - $uy or $ld - $ud);
   return _format_offset($min);
 }
 

@@ -1,3 +1,15 @@
+0.012   2022-09-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: cut-video-by-duration (alias: vcut)
+
+        - [ux] allow specifying times/durations as percentage
+
+        - [cli split-video-by-duration] Add option --parts as alternative to
+          --every.
+
+        - [doc] Justify the wrapper's benefits.
+
+
 0.011   2022-09-21  Released-By: PERLANCAR; Urgency: medium
 
         - [cli split-video-by-duration] Accept multiple files.

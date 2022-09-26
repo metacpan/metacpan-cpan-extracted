@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+cpanfile
+examples/to_dqlite_demo.pl
+lib/Protocol/Dqlite.pm
+t/feed.t
+t/request.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

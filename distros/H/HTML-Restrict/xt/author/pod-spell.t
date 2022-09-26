@@ -17,6 +17,8 @@ Axel
 Ben
 Bullock
 Carwyn
+Clayton
+Cottingham
 DOCTYPE
 Dagfinn
 David
@@ -42,6 +44,7 @@ XSS
 benkasminbullock
 bolded
 calyx238
+ccottingham
 dagolden
 ether
 fREW

@@ -12,7 +12,7 @@ The following is a list of type constraints bundled with Type::Tiny,
 with very brief descriptions. For more information, see the type
 library's documentation, and the test cases in C<< t/21-types/ >>.
 
-GitHib link:
+GitHub link:
 L<https://github.com/tobyink/p5-type-tiny/tree/master/t/21-types>.
 
 =over
@@ -76,6 +76,12 @@ An arrayref with a repeating pattern of constraints on its values.
 B<< Defined >> in L<Types::Standard>
 
 Any value other than undef.
+
+=item *
+
+B<< DelimitedStr >> I<< [parameterizable] >> in L<Types::Common::String>
+
+A comma-delimited or other delimited string.
 
 =item *
 
@@ -408,6 +414,8 @@ B<< Value >> in L<Types::Standard>
 Any non-reference value, including undef.
 
 =back
+
+The module L<Types::Common> incorporates all of the above.
 
 =head1 NEXT STEPS
 

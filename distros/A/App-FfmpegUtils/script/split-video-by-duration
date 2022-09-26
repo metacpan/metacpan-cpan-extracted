@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-21'; # DATE
+our $DATE = '2022-09-22'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FfmpegUtils/split_video_by_duration",
@@ -41,11 +41,11 @@ split-video-by-duration - Split video by duration into parts
 
 =head1 VERSION
 
-This document describes version 0.011 of split-video-by-duration (from Perl distribution App-FfmpegUtils), released on 2022-09-21.
+This document describes version 0.012 of split-video-by-duration (from Perl distribution App-FfmpegUtils), released on 2022-09-22.
 
 =head1 SYNOPSIS
 
-B<split-video-by-duration> [B<--copy>|B<--no-copy>|B<--nocopy>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--dry-run>|B<-n>] [B<--every>=I<duration>] [(B<--file>=I<filename>)+|B<--files-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<file>E<gt> ...
+B<split-video-by-duration> [B<--copy>|B<--no-copy>|B<--nocopy>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--dry-run>|B<-n>] [B<--every>=I<any>|B<--every-json>=I<json>] [(B<--file>=I<filename>)+|B<--files-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--parts>=I<posint>] -- E<lt>I<file>E<gt> ...
 
 
 
@@ -53,12 +53,16 @@ See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
-This utility uses I<ffmpeg> (particularly the C<-t> and C<-ss>) option to split a
+This utility uses B<ffmpeg> (particularly the C<-t> and C<-ss>) option to split a
 longer video into shorter videos. For example, if you have C<long.mp4> with
 duration of 1h12m and you run it through this utility with C<--every 15min> then
 you will have 5 new video files: C<long.1of5.mp4> (15min), C<long.2of5.mp4>
 (15min), C<long.3of5.mp4> (15min), C<long.4of5.mp4> (15min), and C<long.5of5.mp4>
 (12min).
+
+Compared to using C<ffmpeg> directly, this wrapper offers convenience of
+calculating the times (C<-ss>) option for you, handling multiple files,
+automatically choosing output filename, and tab completion.
 
 =head1 OPTIONS
 
@@ -72,7 +76,11 @@ C<*> marks required options.
 
 Whether to use the "copy" codec (fast but produces inaccurate timings).
 
-=item B<--every>=I<s>*
+=item B<--every-json>=I<s>
+
+See C<--every>.
+
+=item B<--every>=I<s>
 
 =item B<--file>=I<s@>*
 
@@ -85,6 +93,8 @@ Can be specified multiple times.
 See C<--file>.
 
 Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--parts>=I<s>
 
 =back
 
@@ -248,6 +258,14 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Split video per 30s for WhatsApp status
 
  % split-video-by-duration foo.mp4 30s
+
+=head2 Split video into 4 equiduration parts
+
+ % split-video-by-duration foo.mp4 --parts 4
+
+=head2 Another way to split into equiduration parts using percentage in --every
+
+ % split-video-by-duration foo.mp4 --every 25%
 
 =head1 HOMEPAGE
 

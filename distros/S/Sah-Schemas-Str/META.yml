@@ -19,53 +19,60 @@ name: Sah-Schemas-Str
 provides:
   Data::Sah::Filter::perl::Str::maybe_convert_to_re:
     file: lib/Data/Sah/Filter/perl/Str/maybe_convert_to_re.pm
-    version: '0.011'
+    version: '0.012'
   Sah::Schema::hexstr:
     file: lib/Sah/Schema/hexstr.pm
-    version: '0.011'
+    version: '0.012'
   Sah::Schema::latin_alpha:
     file: lib/Sah/Schema/latin_alpha.pm
-    version: '0.011'
+    version: '0.012'
   Sah::Schema::latin_alphanum:
     file: lib/Sah/Schema/latin_alphanum.pm
-    version: '0.011'
+    version: '0.012'
   Sah::Schema::latin_letter:
     file: lib/Sah/Schema/latin_letter.pm
-    version: '0.011'
+    version: '0.012'
+  Sah::Schema::percent_str:
+    file: lib/Sah/Schema/percent_str.pm
+    version: '0.012'
   Sah::Schema::str_or_aos:
     file: lib/Sah/Schema/str_or_aos.pm
-    version: '0.011'
+    version: '0.012'
   Sah::Schema::str_or_aos1:
     file: lib/Sah/Schema/str_or_aos1.pm
-    version: '0.011'
+    version: '0.012'
   Sah::Schema::str_or_re:
     file: lib/Sah/Schema/str_or_re.pm
-    version: '0.011'
+    version: '0.012'
   Sah::SchemaR::hexstr:
     file: lib/Sah/SchemaR/hexstr.pm
-    version: '0.011'
+    version: '0.012'
   Sah::SchemaR::latin_alpha:
     file: lib/Sah/SchemaR/latin_alpha.pm
-    version: '0.011'
+    version: '0.012'
   Sah::SchemaR::latin_alphanum:
     file: lib/Sah/SchemaR/latin_alphanum.pm
-    version: '0.011'
+    version: '0.012'
   Sah::SchemaR::latin_letter:
     file: lib/Sah/SchemaR/latin_letter.pm
-    version: '0.011'
+    version: '0.012'
+  Sah::SchemaR::percent_str:
+    file: lib/Sah/SchemaR/percent_str.pm
+    version: '0.012'
   Sah::SchemaR::str_or_aos:
     file: lib/Sah/SchemaR/str_or_aos.pm
-    version: '0.011'
+    version: '0.012'
   Sah::SchemaR::str_or_aos1:
     file: lib/Sah/SchemaR/str_or_aos1.pm
-    version: '0.011'
+    version: '0.012'
   Sah::SchemaR::str_or_re:
     file: lib/Sah/SchemaR/str_or_re.pm
-    version: '0.011'
+    version: '0.012'
   Sah::Schemas::Str:
     file: lib/Sah/Schemas/Str.pm
-    version: '0.011'
+    version: '0.012'
 requires:
+  Regexp::Pattern::Float: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -73,7 +80,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Str
   homepage: https://metacpan.org/release/Sah-Schemas-Str
   repository: git://github.com/perlancar/perl-Sah-Schemas-Str.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -359,7 +366,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -367,7 +374,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.783'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

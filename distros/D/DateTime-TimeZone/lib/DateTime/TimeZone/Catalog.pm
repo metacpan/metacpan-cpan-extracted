@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.53';
+our $VERSION = '2.54';
 
 our @ALL =
 qw(
@@ -297,12 +297,10 @@ qw(
   Europe/Tallinn
   Europe/Tirane
   Europe/Ulyanovsk
-  Europe/Uzhgorod
   Europe/Vienna
   Europe/Vilnius
   Europe/Volgograd
   Europe/Warsaw
-  Europe/Zaporozhye
   Europe/Zurich
   HST
   Indian/Chagos
@@ -651,12 +649,10 @@ Sofia
 Tallinn
 Tirane
 Ulyanovsk
-Uzhgorod
 Vienna
 Vilnius
 Volgograd
 Warsaw
-Zaporozhye
 Zurich
 ) ],
   'Indian' => [ qw(
@@ -1529,8 +1525,6 @@ Africa/Dar_es_Salaam
   'ua' => [ qw(
 Europe/Simferopol
 Europe/Kyiv
-Europe/Uzhgorod
-Europe/Zaporozhye
 ) ],
   'ug' => [ qw(
 Africa/Kampala
@@ -1796,9 +1790,11 @@ our %LINKS =
   'Europe/Skopje' => 'Europe/Belgrade',
   'Europe/Stockholm' => 'Europe/Berlin',
   'Europe/Tiraspol' => 'Europe/Chisinau',
+  'Europe/Uzhgorod' => 'Europe/Kyiv',
   'Europe/Vaduz' => 'Europe/Zurich',
   'Europe/Vatican' => 'Europe/Rome',
   'Europe/Zagreb' => 'Europe/Belgrade',
+  'Europe/Zaporozhye' => 'Europe/Kyiv',
   'GB' => 'Europe/London',
   'GB-Eire' => 'Europe/London',
   'GMT' => 'UTC',
@@ -1870,7 +1866,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2022b' }
+sub OlsonVersion { '2022d' }
 
 
 1;
@@ -2189,12 +2185,10 @@ so that applications can easily present a list of timezones.
   Europe/Tallinn
   Europe/Tirane
   Europe/Ulyanovsk
-  Europe/Uzhgorod
   Europe/Vienna
   Europe/Vilnius
   Europe/Volgograd
   Europe/Warsaw
-  Europe/Zaporozhye
   Europe/Zurich
 
 =head3 Indian
@@ -3306,8 +3300,6 @@ so that applications can easily present a list of timezones.
 
   Europe/Simferopol - Crimea
   Europe/Kyiv - Ukraine (most areas)
-  Europe/Uzhgorod - Transcarpathia
-  Europe/Zaporozhye - Zaporozhye and east Lugansk
 
 =head3 United Arab Emirates (AE)
 
@@ -3576,9 +3568,11 @@ A linked zone is an alias from one name to another.
   Europe/Skopje => Europe/Belgrade
   Europe/Stockholm => Europe/Berlin
   Europe/Tiraspol => Europe/Chisinau
+  Europe/Uzhgorod => Europe/Kyiv
   Europe/Vaduz => Europe/Zurich
   Europe/Vatican => Europe/Rome
   Europe/Zagreb => Europe/Belgrade
+  Europe/Zaporozhye => Europe/Kyiv
   GB => Europe/London
   GB-Eire => Europe/London
   GMT => UTC

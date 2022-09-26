@@ -31,6 +31,7 @@ Files: Changes
  lib/Sub/HandlesVia/Toolkit/Mouse.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Plain.pm
  lib/Sub/HandlesVia/Toolkit/Plain.pm.mite.pm
+ t/00begin.t
  t/02moo.t
  t/03moo_mxtt.t
  t/04moose.t
@@ -93,8 +94,7 @@ Files: Changes
 Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/00begin.t
- t/02moo/role.t
+Files: t/02moo/role.t
  t/02moo/trait_array.t
  t/02moo/trait_bool.t
  t/02moo/trait_code.t

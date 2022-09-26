@@ -6,8 +6,6 @@ use List::Util qw/max min/;
 
 use Optimization::NSGAII qw/ f_Optim_NSGAII /;
 
-# decomment only one case and then execute
-
 my $case = 'CONSTR';
 my $workdir = '/tmp';
 
@@ -99,8 +97,8 @@ f_Optim_NSGAII(
 		'nProc'			=> 1,
         # here a temp work directory has to be provided, to work in ram one can do 'sudo mount -o size=1% -t tmpfs none /mnt/tmpfs'
 		'filesDir'		=> $workdir,	
-        'verboseFinal'  => 1,	
-        'distrib'       => $a_Gaussian_distrib,
+		'verboseFinal'  => 1,	
+		'distrib'       => $a_Gaussian_distrib,
 		'scaleDistrib' => 0.01,
 		'percentMut'   => 5,
         'startPop'     => $startPop 

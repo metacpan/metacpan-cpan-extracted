@@ -6,3 +6,8 @@ Revision history for Perl extension Optimization::NSGAII.
 
 0.02  Thu Sep 8 16:33 2022
 	- added keywords 'startPop', to define the starting pupulation
+
+0.03  Sat Sep 24 19:12 2022
+	- added my '$id = shift' in the f_to_optimize, useful to be used in
+	  case the evaluation of f_to_optimize require the creation of a 
+	  folder to work in

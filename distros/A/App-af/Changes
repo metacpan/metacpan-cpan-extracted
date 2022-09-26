@@ -1,5 +1,8 @@
 Revision history for App-af
 
+0.18      2022-09-22 09:27:11 -0600
+  - Compatability with ALIEN_DOWNLOAD_RULE (gh#16)
+
 0.17      2021-03-27 10:48:09 -0600
   - Remove unused dependency on Test::Exit (gh#10)
 

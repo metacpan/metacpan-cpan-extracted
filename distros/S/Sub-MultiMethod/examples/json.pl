@@ -8,41 +8,41 @@ package My::JSON {
 	use Types::Standard -types;
 	
 	multimethod stringify => (
-		signature => [ Undef ],
-		code      => sub {
+		positional => [ Undef ],
+		code       => sub {
 			my ($self, $undef) = (shift, @_);
 			'null';
 		},
 	);
 	
 	multimethod stringify => (
-		signature => [ ScalarRef[Bool] ],
-		code      => sub {
+		positional => [ ScalarRef[Bool] ],
+		code       => sub {
 			my ($self, $bool) = (shift, @_);
 			$$bool ? 'true' : 'false';
 		},
 	);
 	
 	multimethod stringify => (
-		alias     => "stringify_str",
-		signature => [ Str ],
-		code      => sub {
+		alias      => "stringify_str",
+		positional => [ Str ],
+		code       => sub {
 			my ($self, $str) = (shift, @_);
 			sprintf(q<"%s">, quotemeta($str));
 		},
 	);
 	
 	multimethod stringify => (
-		signature => [ Num ],
-		code      => sub {
+		positional => [ Num ],
+		code       => sub {
 			my ($self, $n) = (shift, @_);
 			$n;
 		},
 	);
 	
 	multimethod stringify => (
-		signature => [ ArrayRef ],
-		code      => sub {
+		positional => [ ArrayRef ],
+		code       => sub {
 			my ($self, $arr) = (shift, @_);
 			sprintf(
 				q<[%s]>,
@@ -52,8 +52,8 @@ package My::JSON {
 	);
 	
 	multimethod stringify => (
-		signature => [ HashRef ],
-		code      => sub {
+		positional => [ HashRef ],
+		code       => sub {
 			my ($self, $hash) = (shift, @_);
 			sprintf(
 				q<{%s}>,

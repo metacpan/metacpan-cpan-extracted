@@ -1,5 +1,9 @@
 Revision history for AnyEvent-Finger
 
+0.14      2022-09-25 13:25:52 -0600
+  - Removed overload on AnyEvent::Finger::Transaction
+    which was unintentional and worse incomplete (gh#6, gh#8)
+
 0.12      2021-04-28 13:43:07 -0600
   - Fixed bug in overload in some of the classes (gh#3)
 

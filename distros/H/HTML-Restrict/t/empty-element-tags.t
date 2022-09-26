@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-use HTML::Restrict;
+use HTML::Restrict ();
 
 my $before = <<'EOF';
 two element open & close break<br></br>

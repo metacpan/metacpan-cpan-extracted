@@ -3,17 +3,17 @@
 use 5.010001;
 use strict;
 use warnings;
+use Test::More 0.98;
 
 use Data::Sah::CoerceJS qw(gen_coercer);
 use Nodejs::Util qw(get_nodejs_path);
-use Test::More 0.98;
 
 plan skip_all => 'node.js is not available' unless get_nodejs_path();
 
 local $ENV{TZ} = "UTC";
 
 subtest "coerce_to=Date" => sub {
-    my $c = gen_coercer(type=>"date");
+    my $c = gen_coercer(engine=>'nodejs', type=>"date");
 
     subtest "uncoerced" => sub {
         is_deeply($c->([]), [], "uncoerced");

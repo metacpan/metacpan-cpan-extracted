@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:PLU';
 use strict;
 use warnings;
 
-our $VERSION = '0.01039';
+our $VERSION = '0.01040';
 
 sub new {
     my ( $class, @array ) = @_;
@@ -59,7 +59,7 @@ Pithub::ResultSet - Iterate over the results
 
 =head1 VERSION
 
-version 0.01039
+version 0.01040
 
 =head1 SYNOPSIS
 

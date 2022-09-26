@@ -10,6 +10,7 @@ my %options = %{
   VERSION_FROM => 'FakeDD.pm',
   PREREQ_PM => {'Math::MPFR' => '4.24'},
   LICENSE  => 'perl',
+  macro => { INSTALLSITELIB => $Config::Config{installsitearch} },
   META_MERGE => {
    'meta-spec' => { version => 2 },
     resources => {

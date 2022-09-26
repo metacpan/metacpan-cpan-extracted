@@ -8,11 +8,17 @@ use Test::More tests => 28;
 use Test::Exception;
 
 use constant METHODS => (
-    'new', 'server', 'show', 'edit', 'login',
-    'create', 'comment', 'correspond', 'merge_tickets', 'link_tickets',
-    'unlink_tickets', 'search', 'get_attachment_ids', 'get_attachment',
-    'get_transaction_ids', 'get_transaction', 'take', 'untake', 'steal',
-    'timeout', 'basic_auth_cb',
+    'new',                 'server',
+    'show',                'edit',
+    'login',               'create',
+    'comment',             'correspond',
+    'merge_tickets',       'link_tickets',
+    'unlink_tickets',      'search',
+    'get_attachment_ids',  'get_attachment',
+    'get_transaction_ids', 'get_transaction',
+    'take',                'untake',
+    'steal',               'timeout',
+    'basic_auth_cb',
 );
 
 use RT::Client::REST;
@@ -21,30 +27,35 @@ my $rt;
 
 lives_ok {
     $rt = RT::Client::REST->new;
-} 'RT::Client::REST instance created';
+}
+'RT::Client::REST instance created';
 
 for my $method (METHODS) {
-    can_ok($rt, $method);
+    can_ok( $rt, $method );
 }
 
 throws_ok {
     $rt->login;
-} 'RT::Client::REST::InvalidParameterValueException',
-    "requires 'username' and 'password' parameters";
+}
+'RT::Client::REST::InvalidParameterValueException',
+  "requires 'username' and 'password' parameters";
 
 throws_ok {
     $rt->basic_auth_cb(1);
-} 'RT::Client::REST::InvalidParameterValueException';
+}
+'RT::Client::REST::InvalidParameterValueException';
 
 throws_ok {
-    $rt->basic_auth_cb({});
-} 'RT::Client::REST::InvalidParameterValueException';
+    $rt->basic_auth_cb( {} );
+}
+'RT::Client::REST::InvalidParameterValueException';
 
 lives_ok {
-    $rt->basic_auth_cb(sub {});
+    $rt->basic_auth_cb( sub { } );
 };
 
 {
+
     package BadLogger;
     sub new { bless \my $logger }
     for my $method (qw(debug me elmo)) {
@@ -57,11 +68,13 @@ lives_ok {
 }
 
 throws_ok {
-    RT::Client::REST->new(logger => BadLogger->new);
-} 'RT::Client::REST::InvalidParameterValueException',
-    'bad logger results in exception being thrown';
+    RT::Client::REST->new( logger => BadLogger->new );
+}
+'RT::Client::REST::InvalidParameterValueException',
+  'bad logger results in exception being thrown';
 
 {
+
     package GoodLogger;
     sub new { bless \my $logger }
     for my $method (qw(debug info warn error)) {
@@ -74,8 +87,9 @@ throws_ok {
 }
 
 lives_ok {
-    RT::Client::REST->new(logger => GoodLogger->new);
-} 'good logger, no exception thrown';
+    RT::Client::REST->new( logger => GoodLogger->new );
+}
+'good logger, no exception thrown';
 
 1;
 

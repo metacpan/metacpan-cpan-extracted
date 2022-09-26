@@ -1,0 +1,94 @@
+NAME
+
+    Alien::Build::Plugin::Download::GitLab - Alien::Build plugin to
+    download from GitLab
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+     use alienfile;
+     
+     plugin 'Download::GitLab' => (
+       gitlab_user    => 'plicease',
+       gitlab_project => 'dontpanic',
+     );
+
+DESCRIPTION
+
+    This plugin is designed for downloading assets from a GitLab instance.
+
+PROPERTIES
+
+ gitlab_host
+
+    The host to fetch from https://gitlab.com by default.
+
+ gitlab_user
+
+    The user to fetch from.
+
+ gitlab_project
+
+    The project to fetch from.
+
+ type
+
+    The asset type to fetch. This must be one of source or link.
+
+ format
+
+    The expected format of the asset. This should be one that
+    Alien::Build::Plugin::Extract::Negotiate understands. The default is
+    tar.gz.
+
+ version_from
+
+    Where to compute the version from. This should be one of tag_name or
+    name. The default is tag_name.
+
+ convert_version
+
+    This is an optional code reference, which can be used to modify the
+    version. For example, if tags have a v prefix you could remove it like
+    so:
+
+     plugin 'Download::GitLab' => (
+       gitlab_user     => 'plicease',
+       gitlab_project  => 'dontpanic',
+       convert_version => sub {
+         my $version = shift;
+         $version =~ s/^v//;
+         return $version;
+       },
+     );
+
+ link_name
+
+    For link types, this is a regular expression that filters the asset
+    filenames. For example, if there are multiple archive formats provided,
+    you can get just the gzip'd tarball by setting this to qr/\.tar\.gz$/.
+
+SEE ALSO
+
+    Alien
+
+    Alien::Build::Plugin::Download::GitHub
+
+    alienfile
+
+    Alien::Build
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2022 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

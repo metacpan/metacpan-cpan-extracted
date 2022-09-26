@@ -1,8 +1,16 @@
 Revision history for HTML-Restrict
 
+v3.0.1    2022-09-22 22:27:40Z
+        - Add a filter_text attribute. This can be used to disable text
+          encoding. (GH#44) (ccottingham-presinet)
+
 v3.0.0    2019-03-11 13:52:08Z
         - Better fix for handling malformed tags. Removes max_parser_loops(),
           which was introduced in 2.4.0 (GH#37) (Graham Knop)
+
+v2.5.0    2019-02-08 22:18:11Z
+        - Strip some control characters from links (GH#34) (Olaf Alders)
+        - Enable empty_element_tags in HTML::Parser (GH#35) (Olaf Alders)
 
 v2.4.1    2019-02-05 14:13:16Z
         - Bump version of Type::Tiny to 1.002001. (GH#33) (Olaf Alders).  Issue

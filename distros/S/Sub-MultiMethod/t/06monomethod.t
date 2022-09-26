@@ -11,14 +11,14 @@ my $e;
 	use Sub::MultiMethod qw( monomethod );
 	
 	monomethod add => (
-		signature => [ Int, Int ],
-		code      => sub { my ($self, $x, $y) = (shift, @_); $x + $y },
+		positional => [ Int, Int ],
+		code       => sub { my ($self, $x, $y) = (shift, @_); $x + $y },
 	);
 	
 	$e = ::exception {
 		monomethod add => (
-			signature => [ Num, Num ],
-			code      => sub { my ($self, $x, $y) = (shift, @_); $x + $y },
+			positional => [ Num, Num ],
+			code       => sub { my ($self, $x, $y) = (shift, @_); $x + $y },
 		);
 	};
 }
@@ -41,8 +41,8 @@ my $e2 = exception {
 	use Sub::MultiMethod qw( multimethod );
 	
 	multimethod add => (
-		signature => [ ArrayRef[Int] ],
-		code      => sub {
+		positional => [ ArrayRef[Int] ],
+		code       => sub {
 			my ($self, $arr) = (shift, @_);
 			my $sum = 0;
 			$sum += $_ for @$arr;

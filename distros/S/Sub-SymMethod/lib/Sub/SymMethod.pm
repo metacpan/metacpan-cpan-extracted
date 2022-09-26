@@ -5,11 +5,37 @@ use warnings;
 package Sub::SymMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005';
+our $VERSION   = '1.000';
 
 use Exporter::Shiny our @EXPORT = qw( symmethod );
 use Scalar::Util qw( blessed );
 use Role::Hooks;
+
+# Options other than these will be passed through to
+# Type::Params.
+#
+my %KNOWN_OPTIONS = (
+	code               => 1,
+	name               => 1,
+	named              => 'legacy',
+	no_dispatcher      => 1,
+	no_hook            => 1,
+	order              => 1,
+	origin             => 1,
+	signature          => 'legacy',
+	signature_spec     => 1,
+);
+
+# But not these!
+#
+my %BAD_OPTIONS = (
+	want_details       => 1,
+	want_object        => 1,
+	want_source        => 1,
+	goto_next          => 1,
+	on_die             => 1,
+	message            => 1,
+);
 
 BEGIN {
 	eval  { require mro }
@@ -17,12 +43,14 @@ BEGIN {
 	
 	eval {
 		require Types::Standard;
-		'Types::Standard'->import(qw/ is_CodeRef is_HashRef /);
+		'Types::Standard'->import(qw/ is_CodeRef is_HashRef is_ArrayRef is_Int /);
 		1;
 	}
 	or do {
-		*is_CodeRef = sub { no warnings; ref($_[0]) eq 'CODE' };
-		*is_HashRef = sub { no warnings; ref($_[0]) eq 'HASH' };
+		*is_CodeRef  = sub { no warnings; ref($_[0]) eq 'CODE'  };
+		*is_HashRef  = sub { no warnings; ref($_[0]) eq 'HASH'  };
+		*is_ArrayRef = sub { no warnings; ref($_[0]) eq 'ARRAY' };
+		*is_Int      = sub { defined($_[0]) and !ref($_[0]) and $_[0] =~ /\A-[0-9]+\z/ };
 	};
 	
 	no strict 'refs';
@@ -46,12 +74,60 @@ BEGIN {
 	}
 }
 
+sub _extract_type_params_spec {
+	my ( $me, $target, $sub_name, $spec ) = ( shift, @_ );
+	
+	my %tp = ( method => 1 );
+	$tp{method} = $spec->{method} if defined $spec->{method};
+	
+	if ( is_ArrayRef $spec->{signature} ) {
+		my $key = $spec->{named} ? 'named' : 'positional';
+		$tp{$key} = delete $spec->{signature};
+	}
+	else {
+		$tp{named} = $spec->{named} if ref $spec->{named};
+	}
+	
+	# Options which are not known by this module must be intended for
+	# Type::Params instead.
+	for my $key ( keys %$spec ) {
+		
+		next if ( $KNOWN_OPTIONS{$key} or $key =~ /^_/ );
+		
+		if ( $BAD_OPTIONS{$key} ) {
+			require Carp;
+			Carp::carp( "Unsupported option: $key" );
+			next;
+		}
+		
+		$tp{$key} = delete $spec->{$key};
+	}
+	
+	$tp{package} ||= $target;
+	$tp{subname} ||= ref( $sub_name ) ? '__ANON__' : $sub_name;
+	
+	# Historically we allowed method=2, etc
+	if ( is_Int $tp{method} ) {
+		if ( $tp{method} > 1 ) {
+			require Types::Standard;
+			my $excess = $tp{method} - 1;
+			$tp{method} = 1;
+			ref( $tp{head} ) ? push( @{ $tp{head} }, ( Types::Standard::Any() ) x $excess ) : ( $tp{head} += $excess );
+		}
+	}
+	
+	$spec->{signature_spec} = \%tp
+		if $tp{positional} || $tp{pos} || $tp{named} || $tp{multiple} || $tp{multi};
+}
+
 sub install_symmethod {
 	my ( $class, $target, $name, %args ) = ( shift, @_ );
 	$args{origin} = $target unless exists $args{origin};
 	$args{method} = 1       unless exists $args{method};
 	$args{name}   = $name;
 	$args{order}  = 0       unless exists $args{order};
+	
+	$class->_extract_type_params_spec( $target, $name, \%args );
 	
 	if ( not is_CodeRef $args{code} ) {
 		require Carp;
@@ -122,17 +198,16 @@ sub build_dispatcher {
 		my $specs = $class->get_all_symmethods( $_[0], $name );
 		my @results;
 		SPEC: for my $spec ( @$specs ) {
-			if ( $spec->{signature} ) {
+			if ( $spec->{signature} or $spec->{signature_spec} ) {
 				$class->compile_signature($spec) unless is_CodeRef $spec->{signature};
 				my @orig = @_;
-				my @inv  = splice( @orig, 0, $spec->{method} );
 				my @new;
 				{
 					local $@;
 					eval{ @new = $spec->{signature}(@orig); 1 }
 						or next SPEC;
 				}
-				push @results, scalar $spec->{code}( @inv, @new );
+				push @results, scalar $spec->{code}( @new );
 				next SPEC;
 			}
 			
@@ -221,18 +296,12 @@ sub dispatch {
 }
 
 sub compile_signature {
-	require Type::Params;
 	my ( $class, $spec ) = ( shift, @_ );
-	
-	my @sig = @{ delete $spec->{signature} };
-	my %opt = is_HashRef($sig[0]) ? %{ shift @sig } : ();
-	
-	$opt{subname} ||= sprintf( '%s::%s', $spec->{origin}, $spec->{name} );
-	
-	$spec->{signature} = $spec->{named}
-		? Type::Params::compile_named_oo( \%opt, @sig )
-		: Type::Params::compile( \%opt, @sig );
-	
+	require Type::Params;
+	$class->_extract_type_params_spec( $spec->{origin}, $spec->{name}, $spec )
+		unless $spec->{signature_spec};
+	$spec->{signature} = Type::Params::signature( %{ $spec->{signature_spec} } )
+		if keys %{ $spec->{signature_spec} || {} };
 	return $class;
 }
 
@@ -374,9 +443,10 @@ Creates a symmethod.
 
 Creates a symmethod.
 
-The specification hash must contain a C<code> key, and may contain
-C<signature>, C<named>, and C<method> keys, which work the same as in
-L<Sub::MultiMethod>. It may also include an C<order> key.
+The specification hash must contain a C<code> key, which must be a coderef.
+It may also include an C<order> key, which must be numeric. Any other
+keys are passed to C<signature> from L<Type::Params> to build a signature for
+the symmethod.
 
 =back
 
@@ -444,23 +514,23 @@ inherited from base/parent classes.
 
 =head2 Symmethods and Signatures
 
-When defining symmethods, you can define a signature:
+When defining symmethods, you can define a signature using the same
+options supported by C<signature> from L<Type::Params>.
 
   use Types::Standard 'Num';
   use Sub::SymMethod;
   
   symmethod foo => (
-    signature => [ Num ],
-    code      => sub {
+    positional => [ Num ],
+    code       => sub {
       my ( $self, $num ) = @_;
       print $num, "\n";
     },
   );
   
   symmethod foo => (
-    named     => 1,
-    signature => [ mynum => Num ],
-    code      => sub {
+    named => [ mynum => Num ],
+    code  => sub {
       my ( $self, $arg ) = @_;
       print $arg->mynum, "\n";
     },
@@ -475,15 +545,7 @@ signature.
 The coderef given in C<code> receives the list of arguments I<after> they've
 been passed through the signature, which may coerce them, etc.
 
-Instead of an arrayref (which will be treated as a signature using
-L<Type::Params> C<compile> or C<compile_named_oo>), you can provide a
-signature as a coderef. The coderef will be passed a list of argument to
-the symmethod to be checked. If the arguments are bad, it should throw an
-exception (which will be caught, and the symmethod will be safely skipped).
-If the arguments are good, it should return the list of arguments, possibly
-after some coercion or other processing.
-
-Using an arrayref signature requires L<Type::Params> to be installed.
+Using a signature requires L<Type::Params> to be installed.
 
 =head2 API
 
@@ -507,8 +569,9 @@ Installs a candidate method for a class or role.
 
 C<< $target >> is the class or role the candidate is being defined for.
 C<< $name >> is the name of the method. C<< %spec >> must include a
-C<code> key and optionally C<named>, C<signature>, C<method>, and
-C<order> keys.
+C<code> key and optionally an C<order> key. Any keys not directly supported
+by Sub::SymMethod will be passed through to Type::Params to provide a
+signature for the method.
 
 If C<< $target >> is a class, this will also install a dispatcher into
 the class. Passing C<< no_dispatcher => 1 >> in the spec will avoid this.
@@ -524,7 +587,7 @@ This will also perform any needed cache invalidation.
 Builds a coderef that could potentially be installed into
 C<< *{"$target\::$name"} >> to be used as a dispatcher.
 
-=item C<< installer_dispatcher( $target, $name ) >>
+=item C<< install_dispatcher( $target, $name ) >>
 
 Builds a coderef that could potentially be installed into
 C<< *{"$target\::$name"} >> to be used as a dispatcher, and
@@ -597,9 +660,7 @@ when dispatching.
 
 =item C<< compile_signature( \%spec ) >>
 
-When non-coderef signatures are found, this is called to compile them into
-a coderef. It is a small wrapper around L<Type::Params>. Modifies
-C<< %spec >> rather than returning a useful value.
+Does the job of finding keys within the spec to compile into a signature.
 
 =item C<< _generate_symmethod( $name, \%opts, \%globalopts ) >>
 
@@ -611,7 +672,7 @@ into the called as C<symmethod>.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Sub-SymMethod>.
+L<https://github.com/tobyink/p5-sub-symmethod/issues>.
 
 =head1 SEE ALSO
 
@@ -623,7 +684,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Toby Inkster.
+This software is copyright (c) 2020, 2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -633,4 +694,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

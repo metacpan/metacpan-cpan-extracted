@@ -4,7 +4,7 @@ our $AUTHORITY = 'cpan:PLU';
 
 use Moo;
 
-our $VERSION = '0.01039';
+our $VERSION = '0.01040';
 
 use Pithub::ResultSet ();
 use JSON::MaybeXS qw( JSON );
@@ -321,7 +321,7 @@ Pithub::Result - Github v3 result object
 
 =head1 VERSION
 
-version 0.01039
+version 0.01040
 
 =head1 DESCRIPTION
 

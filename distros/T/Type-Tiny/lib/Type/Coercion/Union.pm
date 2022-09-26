@@ -1,12 +1,12 @@
 package Type::Coercion::Union;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	$Type::Coercion::Union::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::Union::VERSION   = '1.016010';
+	$Type::Coercion::Union::VERSION   = '2.000000';
 }
 
 $Type::Coercion::Union::VERSION =~ tr/_//d;

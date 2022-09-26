@@ -29,8 +29,8 @@ package Game::Combos::Base {
 	use Sub::MultiMethod qw(multimethod);
 	
 	multimethod play => (
-		signature => [Any, Any],
-		code      => sub { 0 },
+		positional => [Any, Any],
+		code       => sub { 0 },
 	);
 }
 
@@ -42,16 +42,16 @@ package Game::Combos::Standard {
 	with qw( Game::Combos::Base );
 	
 	multimethod play => (
-		signature => [Paper, Rock],
-		code      => sub { 1 },
+		positional => [Paper, Rock],
+		code       => sub { 1 },
 	);
 	multimethod play => (
-		signature => [Scissors, Paper],
-		code      => sub { 1 },
+		positional => [Scissors, Paper],
+		code       => sub { 1 },
 	);
 	multimethod play => (
-		signature => [Rock, Scissors],
-		code      => sub { 1 },
+		positional => [Rock, Scissors],
+		code       => sub { 1 },
 	);
 }
 
@@ -63,32 +63,32 @@ package Game::Combos::Extra {
 	with qw( Game::Combos::Standard );
 
 	multimethod play => (
-		signature => [Paper, Spock],
-		code      => sub { 1 },
+		positional => [Paper, Spock],
+		code       => sub { 1 },
 	);
 	multimethod play => (
-		signature => [Scissors, Lizard],
-		code      => sub { 1 },
+		positional => [Scissors, Lizard],
+		code       => sub { 1 },
 	);
 	multimethod play => (
-		signature => [Rock, Lizard],
-		code      => sub { 1 },
+		positional => [Rock, Lizard],
+		code       => sub { 1 },
 	);
 	multimethod play => (
-		signature => [Lizard, Paper],
-		code      => sub { 1 },
+		positional => [Lizard, Paper],
+		code       => sub { 1 },
 	);
 	multimethod play => (
-		signature => [Lizard, Spock],
-		code      => sub { 1 },
+		positional => [Lizard, Spock],
+		code       => sub { 1 },
 	);
 	multimethod play => (
-		signature => [Spock, Rock],
-		code      => sub { 1 },
+		positional => [Spock, Rock],
+		code       => sub { 1 },
 	);
 	multimethod play => (
-		signature => [Spock, Scissors],
-		code      => sub { 1 },
+		positional => [Spock, Scissors],
+		code       => sub { 1 },
 	);
 }
 

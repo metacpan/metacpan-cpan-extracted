@@ -13,5 +13,5 @@ note "Alien::gmake->exe = @{[ Alien::gmake->exe ]}";
 
 helper_ok 'gmake';
 interpolate_template_is '%{gmake}', Alien::gmake->exe;
-  
+
 done_testing;

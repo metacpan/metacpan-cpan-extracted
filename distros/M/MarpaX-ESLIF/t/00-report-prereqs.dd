@@ -37,6 +37,7 @@ do { my $x = {
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::CPAN::Meta' => '0',
                                       'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::DistManifest' => '0',
                                       'Test::EOL' => '0',
                                       'Test::Kwalitee' => '1.21',
                                       'Test::MinimumVersion' => '0',

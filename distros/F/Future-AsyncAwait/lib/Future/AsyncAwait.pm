@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.58;
+package Future::AsyncAwait 0.59;
 
 use v5.14;
 use warnings;
@@ -17,7 +17,8 @@ require Future; Future->VERSION( '0.48' );
 
 if( !Future->can( "AWAIT_WAIT" ) ) {
    no strict 'refs';
-   *{"Future::AWAIT_WAIT"} = \&Future::get;
+   # Future 0.48 had this method; newer futures already provide AWAIT_WAIT
+   *{"Future::AWAIT_WAIT"} = Future->can( "get" );
 }
 
 =head1 NAME

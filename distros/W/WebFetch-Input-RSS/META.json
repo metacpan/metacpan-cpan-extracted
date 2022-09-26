@@ -40,7 +40,7 @@
             "Readonly" : "0",
             "Scalar::Util" : "0",
             "Try::Tiny" : "0",
-            "WebFetch" : "v0.15.0",
+            "WebFetch" : "v0.15.3",
             "XML::RSS" : "0",
             "base" : "0",
             "strict" : "0",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/ikluft/WebFetch"
       }
    },
-   "version" : "0.2.0",
+   "version" : "0.2.1",
    "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "GPL-3.0-only"

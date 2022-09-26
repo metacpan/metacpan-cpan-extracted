@@ -12,7 +12,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '2.68'; # VERSION
+our $VERSION = '2.70'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1401,7 +1401,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 2.68
+version 2.70
 
 =head1 SYNOPSIS
 
@@ -1683,6 +1683,55 @@ but others may be added in the future.
 
 Note that C<cygwin> and C<msys> are considered C<unix> even though they run
 on windows!
+
+=item platform.cpu.count
+
+Contains a non-negative integer of available (possibly virtual) CPUs on the
+system. This can be used by build plugins to build in parallel. The environment
+variable C<ALIEN_CPU_COUNT> can be set to override the CPU count.
+
+=item platform.cpu.arch.name
+
+Contains a normalized name for the architecture of the current Perl. This can
+be used by fetch plugins to determine which binary packages to download.
+The value may be one of the following, but this list will be expanded as
+needed.
+
+=over 4
+
+=item C<armel>
+
+32-bit ARM soft-float
+
+=item C<armhf>
+
+32-bit ARM hard-float
+
+=item C<aarch64>
+
+64-bit ARM
+
+=item C<ppc>
+
+32-bit PowerPC (big-endian)
+
+=item C<ppc64>
+
+64-bit PowerPC (big-endian)
+
+=item C<x86>
+
+32-bit Intel (i386, i486, i686)
+
+=item C<x86_64>
+
+64-bit Intel (AMD64)
+
+=item C<unknown>
+
+Unable to detect architecture. Please report this if needed.
+
+=back
 
 =back
 

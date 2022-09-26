@@ -24,6 +24,7 @@ t/04-arista.t
 t/05-junos.t
 t/06-vyos.t
 t/07-cisco.t
+t/08-ciena.t
 t/author-critic.t
 t/author-no-tabs.t
 t/author-pod-syntax.t
@@ -40,6 +41,8 @@ t/data/06-vyos.input
 t/data/06-vyos.output
 t/data/07-cisco.input
 t/data/07-cisco.output
+t/data/08-ciena.input
+t/data/08-ciena.output
 t/data/perlcriticrc
 t/release-changes_has_content.t
 t/release-kwalitee.t

@@ -5,9 +5,10 @@ author:
 build_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Download::GitHub: '0.09'
   ExtUtils::MakeMaker: '6.52'
   FFI::Platypus::Record: '0'
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   Test::Alien: '1.90'
   Test::Alien::Diag: '1.90'
   perl: '5.008001'
@@ -15,10 +16,11 @@ configure_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Build::Autoconf: '0.41'
+  Alien::Build::Plugin::Download::GitHub: '0.09'
   ExtUtils::MakeMaker: '6.52'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,26 +30,27 @@ requires:
   Alien::Base: '0.038'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/plicease/Alien-Expat/issues
+  bugtracker: https://github.com/uperl/Alien-Expat/issues
   homepage: https://metacpan.org/pod/Alien::Expat
-  repository: git://github.com/plicease/Alien-Expat.git
-version: '0.02'
+  repository: git://github.com/uperl/Alien-Expat.git
+version: '0.03'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
+      Alien::Build::Plugin::Download::Negotiate: '1.30'
       Archive::Tar: '0'
       Config: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
-      Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_generated_by_perl: v5.33.3
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

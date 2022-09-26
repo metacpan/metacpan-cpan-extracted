@@ -15,7 +15,7 @@ MooseX::Extended::Manual::Includes - An overview of MooseX::Extended optional fe
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 C<includes>
 
@@ -29,7 +29,7 @@ features you can use for this. They're turned by the C<includes> flag.
 
     package My::Names {
         use MooseX::Extended types => [qw(compile NonEmptyStr Str )],
-          includes                 => ['method'];
+          includes                 => 'method';
 
         param _name => ( isa => NonEmptyStr, init_arg => 'name' );
         param title => ( isa => Str, required => 0, predicate => 1 );
@@ -48,7 +48,8 @@ Note: this is equivalent to writing:
 
     use Function::Parameters 'method';
 
-The other features of L<Function::Parameters> are not available.
+The other features of L<Function::Parameters> are not available by default,
+but see "Fine-Tuning Your Includes" below.
 
 This feature does not work with the optional C<multi> keyword. Thus,  if you
 do this:
@@ -59,14 +60,19 @@ You cannot do C<multi method>. You'll have to fall back to C<multi sub>.
 
 =head2 C<multi>
 
-    use MooseX::Extended includes => [qw/multi/];
+    use MooseX::Extended includes => 'multi';
 
     multi sub foo ($self, $x)      { ... }
     multi sub foo ($self, $x, $y ) { ... }
 
+Note: this is equivalent to writing:
+
+    use Syntax::Keyword::MultiSub;
+
 Allows you to redeclare a method (or subroutine) and the dispatch will use the number
 of arguments to determine which subroutine to use. Note that "slurpy" arguments such as
-arrays or hashes will take precedence over scalars:
+arrays or hashes will take precedence over scalars I<if they are declared
+first>:
 
     multi sub foo ($self, @x) { ... }
     multi sub foo ($self, $x) { ... } # will never be called
@@ -74,7 +80,7 @@ arrays or hashes will take precedence over scalars:
 Thus, the following probably doesn't do what you want.
 
     package Foo {
-        use MooseX::Extended includes => [qw/multi/];
+        use MooseX::Extended includes => 'multi';
 
         multi sub foo ($self, @bar) { return '@bar' }
         multi sub foo ($self, $bar) { return '$bar' }
@@ -85,6 +91,13 @@ Thus, the following probably doesn't do what you want.
 
 Both of the above will print the string C<@bar>. The second definition of
 C<foo> is effectively lost.
+
+You must declare slurpy methods last for them to work correctly:
+
+        multi sub foo ($self, $bar) { return '$bar' }
+        multi sub foo ($self, @bar) { return '@bar' }
+
+See L<https://rt.cpan.org/Ticket/Display.html?id=144171> for more information.
 
 Only available on Perl v5.26.0 or higher. Requires L<Syntax::Keyword::MultiSub>.
 
@@ -99,8 +112,8 @@ You cannot do C<multi method>. You'll have to fall back to C<multi sub>.
 
     package My::Thing {
         use MooseX::Extended
-        types    => [qw/Str/],
-        includes => ['async'];
+            types    => 'Str',
+            includes => 'async';
         use IO::Async::Loop;
 
         field output => ( is => 'rw', isa => Str, default => '' );
@@ -115,6 +128,10 @@ You cannot do C<multi method>. You'll have to fall back to C<multi sub>.
         }
     }
 
+Note: this is equivalent to writing:
+
+    use Future::AsyncAwait;
+
 Allows you to write asynchronous code with C<async> and C<await>.
 
 Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
@@ -122,7 +139,7 @@ Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
 =head2 C<try>
 
     package My::Try {
-        use MooseX::Extended includes => [qw/try/];
+        use MooseX::Extended includes => 'try';
 
         sub reciprocal ( $self, $num ) {
             try {
@@ -134,9 +151,49 @@ Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
         }
     }
 
+Note: this is equivalent to writing:
+
+    use Syntax::Keyword::Try;
+
 Allows you to use try/catch blocks, via L<Syntax::Keyword::Try>.
 
 Only available on Perl v5.24.0 or higher. Requires L<Syntax::Keyword::Try>.
+
+If you have Perl v5.35.8 or above, L<Syntax::Keyword::Try> is I<not> loaded
+and instead we use the native C<try> syntax available in Perl.
+
+=head1 Fine-Tuning Your Includes
+
+Some of the features rely on modules that are customizable via import lists
+when you C<use> them. Instead of accepting our defaults, you can pass your own
+by passing a hashref to C<includes>. Each key must be the name of a feature
+you can include and each value must be C<undef> or an array reference that
+will be expaned to an import list for the module:
+
+    package My::Import::List {
+        use MooseX::Extended types => 'is_PositiveOrZeroInt',
+          includes                 => {
+              method => [qw/method fun/],
+              try    => undef,
+          };
+        use List::Util 'sum';
+
+        method fac($n) { return _fac($n) }
+
+        fun _fac($n) {
+            is_PositiveOrZeroInt($n) or die "Don't do that!";
+            return 1 if $n < 2;
+            return $n * _fac $n - 1;
+        }
+    }
+
+The above would be equivalentt to writing:
+
+    use Function::Parameters qw(method fun);
+    use Syntax::Keyword::Try;
+
+See the underlying module providing each feature to understand what arguments
+you can pass to the import lists.
 
 =head1 AUTHOR
 

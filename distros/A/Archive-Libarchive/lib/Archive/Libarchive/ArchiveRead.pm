@@ -8,15 +8,17 @@ use FFI::Platypus::Buffer qw( scalar_to_buffer scalar_to_pointer grow set_used_l
 use FFI::Platypus::Memory qw( strdup free );
 use Ref::Util qw( is_plain_scalarref is_plain_coderef is_blessed_ref is_plain_arrayref );
 use Carp ();
+use Scalar::Util qw( refaddr );
 use experimental qw( signatures );
 use parent qw( Archive::Libarchive::Archive );
 use constant;
 
 # ABSTRACT: Libarchive read archive class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 my $ffi = Archive::Libarchive::Lib->ffi;
 constant->import(_opaque_size => $ffi->sizeof('opaque'));
+my %keep;
 
 
 $ffi->mangler(sub ($name) { "archive_read_$name"  });
@@ -33,6 +35,7 @@ $ffi->attach( [ free => 'DESTROY' ] => ['archive_read'] => 'int' => sub {
   return if $self->{cb}                 # inside a callback, we don't own the archive pointer
     || ${^GLOBAL_PHASE} eq 'DESTRUCT';  # during global shutdown the xsub might go away
   my $ret = $xsub->($self);
+  delete $keep{refaddr $self};
   warn "destroying archive pointer did not return ARCHIVE_OK" unless $ret == 0;
 });
 
@@ -82,7 +85,7 @@ $ffi->attach( [ open1 => 'open' ] => [ 'archive_read'] => 'int' => sub {
       });
     }
 
-    push @{ $self->{keep} }, $closure;
+    push @{ $keep{refaddr $self} }, $closure;
 
     $set->($self, $closure);
   }
@@ -99,7 +102,7 @@ $ffi->attach( open_memory => ['archive_read','opaque','size_t'] => 'int' => sub 
   my($xsub, $self, $ref) = @_;
   Carp::croak("buffer must be a scalar reference")
     unless defined $ref && is_plain_scalarref $ref;
-  push @{ $self->{keep} }, \($$ref);
+  push @{ $keep{refaddr $self} }, \($$ref);
   my($ptr, $size) = scalar_to_buffer $$ref;
   $xsub->($self, $ptr, $size);
 });
@@ -176,7 +179,7 @@ $ffi->attach( set_passphrase_callback => ['archive_read', 'opaque', 'archive_pas
     return $self->{passphrase} = $ptr;
   });
 
-  push @{ $self->{keep} }, $closure;
+  push @{ $keep{refaddr $self} }, $closure;
 
   $xsub->($self, undef, $closure);
 
@@ -198,7 +201,7 @@ Archive::Libarchive::ArchiveRead - Libarchive read archive class
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -323,6 +326,13 @@ This takes either a L<FFI::C::File>, or an opaque pointer to a libc file pointer
  $r->open_perlfile(*FILE);
 
 This takes a perl file handle and reads the archive from there.
+
+=head2 open_filename
+
+ # archive_read_open_filename
+ my $int = $r->open_filename($string, $size_t);
+
+Open a single-file archive.  The C<$size_t> argument is the block size.
 
 =head2 open_filenames
 
@@ -455,6 +465,10 @@ This class exposes the C<libarchive> link resolver API.
 =item L<Archive::Libarchive::Match>
 
 This class exposes the C<libarchive> match API.
+
+=item L<Dist::Zilla::Plugin::Libarchive>
+
+Build L<Dist::Zilla> based dist tarballs with libarchive instead of the built in L<Archive::Tar>.
 
 =item L<Alien::Libarchive3>
 

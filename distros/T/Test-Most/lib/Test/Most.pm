@@ -19,7 +19,7 @@ BEGIN {
     else {
         # There's some strange fiddling around with import(), so this allows us to
         # be nicely backwards compatible to earlier versions of Test::More.
-        @Test::More::EXPORT = grep { $_ ne 'explain' } @Test::More::EXPORT;
+        local @Test::More::EXPORT = grep { $_ ne 'explain' } @Test::More::EXPORT;
         Test::More->import;
     }
 
@@ -33,7 +33,7 @@ BEGIN {
     $OK_FUNC = \&Test::Builder::ok;
 }
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 $VERSION = eval $VERSION;
 
 BEGIN {
@@ -319,7 +319,7 @@ Test::Most - Most commonly needed test functions and features.
 
 =head1 VERSION
 
-Version 0.34
+Version 0.38
 
 =head1 SYNOPSIS
 

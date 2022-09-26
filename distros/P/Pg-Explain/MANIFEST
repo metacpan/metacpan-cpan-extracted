@@ -1,7 +1,6 @@
 Build.PL
 Changes
 cpanfile
-dump.pl
 lib/Pg/Explain.pm
 lib/Pg/Explain/Analyzer.pm
 lib/Pg/Explain/Buffers.pm
@@ -20,8 +19,10 @@ MANIFEST.SKIP
 META.json
 META.yml
 README
-run.dev.sh
-run.perltidy
+scripts/dump.pl
+scripts/run.dev.sh
+scripts/run.perltidy
+scripts/run.prove
 t/00-load.t
 t/01-pod.t
 t/02-pod-coverage.t
@@ -146,6 +147,10 @@ t/37-plan-without-costs/1.expect
 t/37-plan-without-costs/1.plan
 t/37-plan-without-costs/2.expect
 t/37-plan-without-costs/2.plan
+t/38-worktable.d/plan.json
+t/38-worktable.d/plan.text
+t/38-worktable.d/plan.xml
+t/38-worktable.d/plan.yaml
 t/38-worktable.t
 t/39-long-line-json.t
 t/39-long-line-json/1.expect

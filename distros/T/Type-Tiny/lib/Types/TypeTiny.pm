@@ -1,10 +1,11 @@
 package Types::TypeTiny;
 
+use 5.008001;
 use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.016010';
+our $VERSION   = '2.000000';
 
 $VERSION =~ tr/_//d;
 
@@ -171,6 +172,7 @@ sub StringLike () {
 		inlined => sub {
 			qq/defined($_[1]) && !ref($_[1]) or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[""])/;
 		},
+		type_default => sub { return '' },
 	);
 	if ( __XS ) {
 		my $xsub     = Type::Tiny::XS::get_coderef_for( 'StringLike' );
@@ -207,6 +209,7 @@ sub HashLike (;@) {
 		inlined => sub {
 			qq/ref($_[1]) eq q[HASH] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\%{}])/;
 		},
+		type_default => sub { return {} },
 		constraint_generator => sub {
 			my $param = TypeTiny()->assert_coerce( shift );
 			my $check = $param->compiled_check;
@@ -288,6 +291,7 @@ sub ArrayLike (;@) {
 		inlined => sub {
 			qq/ref($_[1]) eq q[ARRAY] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\@{}])/;
 		},
+		type_default => sub { return [] },
 		constraint_generator => sub {
 			my $param = TypeTiny()->assert_coerce( shift );
 			my $check = $param->compiled_check;
@@ -372,6 +376,7 @@ sub CodeLike () {
 		inlined => sub {
 			qq/ref($_[1]) eq q[CODE] or Scalar::Util::blessed($_[1]) && ${\ +_get_check_overload_sub() }($_[1], q[\&{}])/;
 		},
+		type_default => sub { return sub {} },
 		library => __PACKAGE__,
 	);
 	if ( __XS ) {
@@ -406,6 +411,7 @@ sub TypeTiny () {
 			my $var = $_[1];
 			"Scalar::Util::blessed($var) && $var\->isa(q[Type::Tiny])";
 		},
+		type_default => sub { require Types::Standard; return Types::Standard::Any() },
 		library         => __PACKAGE__,
 		_build_coercion => sub {
 			my $c = shift;

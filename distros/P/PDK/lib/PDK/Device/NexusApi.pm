@@ -50,7 +50,7 @@ sub execCommands {
   my $ua  = Mojo::UserAgent->new;
   my $url = "http://$self->{host}/ins";
   $ua->inactivity_timeout(50);
-  my $tx = $ua->post($url => {'Content-Type' => 'xml/text', Authorization => "Basic $auth"} => $request);
+  my $tx = $ua->post($url => {'Context-Type' => 'xml/text', Authorization => "Basic $auth"} => $request);
 
   # 判定执行成功
   my @result;
@@ -100,7 +100,7 @@ sub getInfo {
   my $ua  = Mojo::UserAgent->new;
   my $url = "http://$self->{host}/ins";
   $ua->inactivity_timeout(50);
-  my $tx = $ua->post($url => {'Content-Type' => 'xml/text', Authorization => "Basic $auth"} => $request);
+  my $tx = $ua->post($url => {'Context-Type' => 'xml/text', Authorization => "Basic $auth"} => $request);
 
   # 判定执行成功
   my @result;
@@ -137,7 +137,7 @@ around BUILDARGS => sub {
   # 实例化 UA
   my $ua  = Mojo::UserAgent->new;
   my $url = "http://$param{host}/ins";
-  my $tx  = $ua->post($url => {'Content-Type' => 'xml/text', Authorization => "Basic $credit"} => $xmlData);
+  my $tx  = $ua->post($url => {'Context-Type' => 'xml/text', Authorization => "Basic $credit"} => $xmlData);
   if ($tx->success) {
     return $class->$orig(%param);
   }

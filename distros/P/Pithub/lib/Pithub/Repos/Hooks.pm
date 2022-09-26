@@ -1,6 +1,6 @@
 package Pithub::Repos::Hooks;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01039';
+our $VERSION = '0.01040';
 # ABSTRACT: Github v3 Repo Hooks API
 
 use Moo;
@@ -93,7 +93,7 @@ Pithub::Repos::Hooks - Github v3 Repo Hooks API
 
 =head1 VERSION
 
-version 0.01039
+version 0.01040
 
 =head1 METHODS
 
@@ -283,7 +283,7 @@ public - Any time a Repository changes from private to public.
 
 =item *
 
-pull_request - Any time a Pull Request is opend, closed, or
+pull_request - Any time a Pull Request is opened, closed, or
 synchronized (updated due to a new push in the branch that
 the pull request is tracking).
 

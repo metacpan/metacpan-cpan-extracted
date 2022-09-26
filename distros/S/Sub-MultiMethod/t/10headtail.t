@@ -23,8 +23,6 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
-use Test::Requires { 'Type::Params' => '1.012000' };
-
 
 my $got;
 
@@ -34,13 +32,11 @@ my $got;
 	use Types::Standard -types;
 	
 	mm test1 => (
-		named => 1,
 		method => 1,
-		signature => [
-			{ head => [ ArrayRef ], tail => [ HashRef, HashRef ] },
-			foo => Int,
-		],
-		code => sub {
+		named  => [ foo => Int ],
+		head   => [ ArrayRef ],
+		tail   => [ HashRef, HashRef ],
+		code   => sub {
 			my ( $self, $aref, $args, $href1, $href2 ) = @_;
 			$got = $args->foo;
 		},

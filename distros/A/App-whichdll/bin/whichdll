@@ -7,7 +7,7 @@ use App::whichdll;
 
 # PODNAME: whichdll
 # ABSTRACT: Find dynamic libraries in the appropriate path
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 exit App::whichdll::main('whichdll', @ARGV);
 
@@ -23,7 +23,7 @@ whichdll - Find dynamic libraries in the appropriate path
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,10 @@ You can use the wildcard C<*> to print all libraries.  This implies the C<-a> op
 
 Print all matches instead of just the first one.
 
+=head2 --alien Alien::Name
+
+Include Perl Alien in search, if available
+
 =head2 -s
 
 No output, just return 0 if any of the DLLs are found, or 1 if none are found.
@@ -78,7 +82,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# Unofficial Bash Strict Mode
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+# End of Unofficial Bash Strict Mode
+
+# make sure that current dir is project top dir
+this_script="${BASH_SOURCE[0]}"
+script_directory="$( dirname "${this_script}" )"
+work_dir="$( readlink -f "$( dirname "${script_directory}" )" )"
+cd "$work_dir"
+# make sure that current dir is project top dir
+
+readarray -d $'\n' -t files < <(
+    (
+        find lib/ -type f -name '*.pm'
+        find t/ -maxdepth 1 -type f -name '*.t'
+    ) | sort -uV
+)
+
+file_count="${#files[@]}"
+
+i=0
+while (( i < file_count ))
+do
+    use_file="${files[$i]}"
+    tidy_file="${use_file}.beforeTidy"
+
+    printf "Working on file %2d of %2d : %s.\n" "$(( i + 1 ))" "${file_count}" "${use_file}"
+    perltidy --profile=t/perltidyrc "${use_file}" || true
+
+    if [[ -f "${tidy_file}" ]]
+    then
+        diff -u "${tidy_file}" "${use_file}" || echo
+        rm -f "${tidy_file}"
+    fi
+
+    (( ++i ))
+done

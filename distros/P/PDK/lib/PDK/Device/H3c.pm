@@ -82,9 +82,10 @@ sub truncateCommand {
 # 具体实现 _errorCodes,设置命令下发错误码 -> 用于拦截配置下发
 #------------------------------------------------------------------------------
 sub _errorCodes {
-  my $self = shift;
-  my $codes
-    = ['Invalid input detected\s+.+\^', '% Ambiguous command found at', '% Incomplete command found at', '(^\s*\^|error:)',];
+  my $self  = shift;
+  my $codes = [
+    '(invalid|unrecognized)', '% Ambiguous ', '% Incomplete', '^\s*\^', '^error: ', '%Error ', 'failed to pass the authorization',
+  ];
   return $codes;
 }
 

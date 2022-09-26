@@ -1,5 +1,19 @@
 Revision history for Alien-Build-Plugin-Download-GitHub
 
+0.09      2022-09-23 13:31:18 -0600
+  - Added options asset, asset_format and asset_name (gh#20, gh#23)
+  - This plugin adds itself as a prereq when used by an alienfile
+    (gh#11, gh#23)
+  - The old include_assets property is deprecated (gh#24)
+  - Fixed bug where some ALIEN_DOWNLOAD_RULE configs would cause failure
+    in test (gh#24)
+
+0.08      2022-09-23 11:18:27 -0600
+  - This plugin now requires Alien::Build of at least 2.39 (gh#21)
+  - Compatability with ALIEN_DOWNLOAD_RULE overrides (gh#18)
+  - You can set ALIEN_BUILD_PLUGIN_DOWNLOAD_GITHUB_DEBUG to get additional
+    diagnostic messages (gh#18)
+
 0.07      2021-05-15 14:28:23 -0600
   - Optionally use GitHub Personall Access Token when specified as
     environment variable and using Alien::Build 2.39+ (gh#3, gh#13, gh#14)

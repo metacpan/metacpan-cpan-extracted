@@ -1,17 +1,13 @@
 package Types::Common::String;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 use utf8;
 
 BEGIN {
-	if ( $] < 5.008 ) { require Devel::TypeTiny::Perl56Compat }
-}
-
-BEGIN {
 	$Types::Common::String::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::String::VERSION   = '1.016010';
+	$Types::Common::String::VERSION   = '2.000000';
 }
 
 $Types::Common::String::VERSION =~ tr/_//d;
@@ -28,9 +24,11 @@ use Type::Library -base, -declare => qw(
 	LowerCaseStr
 	UpperCaseStr
 	StrLength
+	DelimitedStr
 );
 
 use Type::Tiny ();
+use Types::TypeTiny ();
 use Types::Standard qw( Str );
 
 my $meta = __PACKAGE__->meta;
@@ -41,6 +39,7 @@ $meta->add_type(
 	constraint => sub { length( $_ ) <= 255 and not /\n/ },
 	inlined    => sub { undef, qq(length($_) <= 255), qq($_ !~ /\\n/) },
 	message    => sub { "Must be a single line of no more than 255 chars" },
+	type_default => sub { return ''; },
 );
 
 $meta->add_type(
@@ -166,7 +165,7 @@ $meta->add_type(
 			|| Types::Standard::_croak(
 			"Parameters for StrLength[`min, `max] expected to be integers; got $_" )
 			for @_;
-			
+		
 		if ( defined $max ) {
 			return sub { length( $_[0] ) >= $min and length( $_[0] ) <= $max };
 		}
@@ -213,6 +212,82 @@ $meta->add_type(
 		);
 		return \@whines;
 	},
+);
+
+$meta->add_type(
+	name                 => DelimitedStr,
+	parent               => Str,
+	type_default         => undef,
+	constraint_generator => sub {
+		return $meta->get_type( 'DelimitedStr' ) unless @_;
+		my ( $delimiter, $part_constraint, $min_parts, $max_parts, $ws ) = @_;
+		
+		Types::Standard::assert_Str( $delimiter );
+		Types::TypeTiny::assert_TypeTiny( $part_constraint )
+			if defined $part_constraint;
+		$min_parts ||= 0;
+		my $q_delimiter = $ws
+			? sprintf( '\s*%s\s*', quotemeta( $delimiter ) )
+			: quotemeta( $delimiter );
+		
+		return sub {
+			my @split = $ws
+				? split( $q_delimiter, do { ( my $trimmed = $_[0] ) =~ s{\A\s+|\s+\z}{}g; $trimmed } )
+				: split( $q_delimiter, $_[0] );
+			return if @split < $min_parts;
+			return if defined($max_parts) && ( @split > $max_parts );
+			!$part_constraint or $part_constraint->all( @split );
+		};
+	},
+	inline_generator => sub {
+		my ( $delimiter, $part_constraint, $min_parts, $max_parts, $ws ) = @_;
+		$min_parts ||= 0;
+		my $q_delimiter = $ws
+			? sprintf( '\s*%s\s*', quotemeta( $delimiter ) )
+			: quotemeta( $delimiter );
+		
+		return sub {
+			my $v = $_[1];
+			my @cond;
+			push @cond, "\@\$split >= $min_parts" if $min_parts > 0;
+			push @cond, "\@\$split <= $max_parts" if defined $max_parts;
+			push @cond, Types::Standard::ArrayRef->of( $part_constraint )->inline_check( '$split' )
+				if $part_constraint && $part_constraint->{uniq} != Types::Standard::Any->{uniq};
+			return ( undef ) if ! @cond;
+			return (
+				undef,
+				sprintf(
+					'do { my $split = [ split %s, %s ]; %s }',
+					B::perlstring( $q_delimiter ),
+					$ws ? sprintf( 'do { ( my $trimmed = %s ) =~ s{\A\s+|\s+\z}{}g; $trimmed }', $v ) : $v,
+					join( q{ and }, @cond ),
+				),
+			);
+		};
+	},
+	coercion_generator => sub {
+		my ( $parent, $self, $delimiter, $part_constraint, $min_parts, $max_parts ) = @_;
+		return unless $delimiter;
+		$part_constraint ||= Types::Standard::Str;
+		$min_parts       ||= 0;
+		
+		require Type::Coercion;
+		my $c = 'Type::Coercion'->new( type_constraint => $self );
+		$c->add_type_coercions(
+			Types::Standard::ArrayRef->of(
+				$part_constraint,
+				$min_parts,
+				defined $max_parts ? $max_parts : (),
+			),
+			sprintf( 'join( %s, @$_ )', B::perlstring( $delimiter ) ),
+		);
+		return $c;
+	},
+);
+
+DelimitedStr->coercion->add_type_coercions(
+	Types::Standard::ArrayRef->of( Types::Standard::Str ),
+	'join( $", @$_ )',
 );
 
 __PACKAGE__->meta->make_immutable;
@@ -287,7 +362,7 @@ B<UpperCaseStr>
 
 =back
 
-This module also defines an extra type constraint not found in
+This module also defines some extra type constraints not found in
 L<MooseX::Types::Common::String>.
 
 =over
@@ -311,6 +386,27 @@ The max length can be omitted.
   StrLength[10]   # at least 10 characters
 
 Lengths are inclusive.
+
+=item *
+
+B<< DelimitedStr[`delimiter, `type, `min, `max, `ws] >>
+
+Parameterized constraint for delimited strings, such as comma-delimited.
+
+B<< DelimitedStr[",", Int, 1, 3] >> will allow between 1 and 3 integers,
+separated by commas. So C<< "1,42,-999" >> will pass the type constraint,
+but C<< "Hello,45" >> will fail.
+
+The ws parameter allows optional whitespace surrounding the delimiters,
+as well as optional leading and trailing whitespace.
+
+The type, min, max, and ws paramaters are optional.
+
+Parameterized B<DelimitedStr> type constraints will automatically have a
+coercion from B<< ArrayRef[`type] >> which uses C<< join >> to join by the
+delimiter. The plain unparameterized type constraint B<DelimitedStr> has
+a coercion from B<< ArrayRef[Str] >> which joins the strings using the
+list separator C<< $" >> (which is a space by default).
 
 =back
 

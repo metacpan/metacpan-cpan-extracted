@@ -1,4 +1,8 @@
-Revision history for Alien-castxml},
+Revision history for Alien-castxml
+
+0.02      2022-09-25 18:55:36 -0600
+  - Use Download::GitHub plugin because Download no longer
+    works with the GitHub release page (gh#7)
 
 0.01      2020-06-26 11:08:51 -0600
   - initial version

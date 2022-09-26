@@ -1,6 +1,14 @@
-TODO:
-    - Add some syntactic sugar to make timezone conversion easier
-    - Perform multiple conversions in one call (via [])
+0.091   2022 September 23
+    - Fixed issues with broken metadata in previous release and some
+      fixes to POD issues and documentation fixes.
+    - I removed all the complex pod weaver and dzil metadata plugins since
+      they seemed to be failing to build a correct distribution.  I never use
+      any of these plugins and can't get them to work.  Given this is a distribution
+      that sees very little release cycle I don't find it useful to make this two
+      file distribution so complicated.  
+
+0.090:
+    - Fixed test issues related to changes up the CPAN stream
 
 0.089:
     - Remove DateTime::Format::DateManip from dependencies due to instability in that package and its dependencies.

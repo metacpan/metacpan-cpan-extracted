@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 share {
 
   plugin Download => (
-    url     => 'http://www.oberhumer.com/opensource/lzo/download/',
+    url     => 'https://www.oberhumer.com/opensource/lzo/download/',
     version => qr/^lzo-([0-9\.]+)\.tar\.gz$/,
   );
 

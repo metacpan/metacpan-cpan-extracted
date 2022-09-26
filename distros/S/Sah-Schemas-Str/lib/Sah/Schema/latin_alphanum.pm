@@ -3,9 +3,9 @@ package Sah::Schema::latin_alphanum;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-09'; # DATE
+our $DATE = '2022-09-22'; # DATE
 our $DIST = 'Sah-Schemas-Str'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our $schema = [str => {
     summary => 'String containing only zero or more Latin letters/digits, i.e. A-Za-z0-9',
@@ -34,7 +34,7 @@ Sah::Schema::latin_alphanum - String containing only zero or more Latin letters/
 
 =head1 VERSION
 
-This document describes version 0.011 of Sah::Schema::latin_alphanum (from Perl distribution Sah-Schemas-Str), released on 2022-07-09.
+This document describes version 0.012 of Sah::Schema::latin_alphanum (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "";
+ $data = "A019";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -77,8 +77,8 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "";
- my $res = $validator->($data); # => ["",""]
+ $data = "A019";
+ my $res = $validator->($data); # => ["","A019"]
  
  # a sample invalid data
  $data = "foo bar";
@@ -170,9 +170,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

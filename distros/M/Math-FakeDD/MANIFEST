@@ -8,8 +8,10 @@ README
 t/add.t
 t/assign.t
 t/cmp.t
+t/constants.t
 t/dd_repro_basics.t
 t/div.t
+t/log_exp.t
 t/mul.t
 t/mpfr2dd.t
 t/new.t

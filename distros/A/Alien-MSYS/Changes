@@ -1,5 +1,14 @@
 Revision history for Alien-MSYS
 
+0.17      2022-09-25 18:08:16 -0600
+  - Documentation fixes and improvements (gh#21)
+  - Added msys-coreutils-ext and msys-mktemp as these are commonly
+    needed tools (gh#23 zmughal++)
+
+0.16      2022-09-22 06:29:15 -0600
+  - Documentation fixes and improvements (gh#19)
+  - Update tests to work with ALIEN_DOWNLOAD_RULE restrictions (gh#20)
+
 0.15      2022-08-11 09:51:17 -0600
   - Documentation fixes and improvements
 

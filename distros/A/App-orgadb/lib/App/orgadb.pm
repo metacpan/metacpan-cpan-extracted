@@ -8,9 +8,9 @@ use Log::ger;
 use App::orgadb::Common;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-09'; # DATE
+our $DATE = '2022-09-26'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our %SPEC;
 
@@ -71,7 +71,7 @@ sub _select_single {
                 $re_category = $args{category};
             } else {
                 $re_category = quotemeta($args{category});
-                $re_category = qr/$re_category/;
+                $re_category = qr/$re_category/i;
             }
             $expr .= " =~ " . Data::Dmp::dmp($re_category) . "]";
         }
@@ -83,7 +83,7 @@ sub _select_single {
                 $re_entry = $args{entry};
             } else {
                 $re_entry = quotemeta($args{entry});
-                $re_entry = qr/$re_entry/;
+                $re_entry = qr/$re_entry/i;
             }
             $expr .= " =~ " . Data::Dmp::dmp($re_entry) . "]";
         }
@@ -94,10 +94,10 @@ sub _select_single {
             for my $field_term (@{ $args{filter_entries_by_fields} }) {
                 my ($field_name, $field_value);
                 if ($field_term =~ /(.+?)\s*=\s*(.+)/) {
-                    $field_name = Regexp::From::String::str_to_re($1);
-                    $field_value = Regexp::From::String::str_to_re($2);
+                    $field_name = Regexp::From::String::str_to_re({case_insensitive=>1}, $1);
+                    $field_value = Regexp::From::String::str_to_re({case_insensitive=>1}, $2);
                 } else {
-                    $field_name = Regexp::From::String::str_to_re($field_term);
+                    $field_name = Regexp::From::String::str_to_re({case_insensitive=>1}, $field_term);
                 }
                 #$expr_field .= ($expr_field ? ' > List > ' : 'Headline[level=2] > List > ');
                 $expr_field .= ($expr_field ? ' > List > ' : 'List > ');
@@ -164,7 +164,7 @@ sub _select_single {
                             $re_field = $field_term;
                         } else {
                             $re_field = quotemeta($field_term);
-                            $re_field = qr/$re_field/;
+                            $re_field = qr/$re_field/i;
                         }
                         $expr_field .= " =~ " . Data::Dmp::dmp($re_field) . "]";
                         push @re_field, $re_field;
@@ -337,7 +337,7 @@ App::orgadb - An opinionated Org addressbook toolset
 
 =head1 VERSION
 
-This document describes version 0.006 of App::orgadb (from Perl distribution App-orgadb), released on 2022-09-09.
+This document describes version 0.008 of App::orgadb (from Perl distribution App-orgadb), released on 2022-09-26.
 
 =head1 SYNOPSIS
 

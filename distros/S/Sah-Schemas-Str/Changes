@@ -1,3 +1,10 @@
+0.012   2022-09-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: percent_str.
+
+        - [ux] [schema hexstr] Allow & remove whitespaces.
+
+
 0.011   2022-07-09  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

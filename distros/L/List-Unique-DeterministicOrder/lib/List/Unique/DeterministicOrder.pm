@@ -5,8 +5,9 @@ use Carp;
 use strict;
 use warnings;
 use List::Util 1.45 qw /uniq/;
+use Scalar::Util qw /blessed/;
 
-our $VERSION = 0.001;
+our $VERSION = 0.003;
 
 #no autovivification;
 
@@ -41,6 +42,14 @@ sub new {
     }
     
     return bless $self, $package;
+}
+
+sub clone {
+    my $self = shift;
+    my $cloned = bless [], blessed $self;
+    $cloned->[_ARRAY] = [@{$self->[_ARRAY]}];
+    $cloned->[_HASH]  = {%{$self->[_HASH]}};
+    return $cloned;
 }
 
 sub exists {
@@ -335,6 +344,14 @@ Removes and returns the last key in the list.
 
 Appends the specified key to the end of the list,
 unless it is already in the list.
+
+=cut
+
+=head2 clone
+
+    $foo->clone;
+
+Creates a clone of the object.
 
 =cut
 

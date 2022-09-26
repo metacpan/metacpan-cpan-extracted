@@ -9,7 +9,7 @@ use File::Temp 'tempfile';
 
 use Getopt::Long;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 GetOptions(
     'create'  => \my $create,
@@ -22,6 +22,8 @@ GetOptions(
 );
 
 $dsn ||= 'dbi:SQLite:dbname=mosmix-forecast.sqlite';
+my $delete;
+my @delete;
 
 sub status {
     if( $verbose ) {
@@ -38,6 +40,7 @@ if( @ARGV) {
 if( ! ($create || $import || $fetch )) {
     $fetch = 1;
     $import = 1;
+    $delete = 1;
 };
 $actions{ create } = $create;
 $actions{ import } = $import;
@@ -68,6 +71,7 @@ if( $actions{ fetch }) {
     status( join " ", "Fetched", -s($name), "bytes to $name" );
 
     push @files, $name;
+    push @delete, $name if  $delete
 };
 
 if( $actions{ import }) {
@@ -84,4 +88,5 @@ if( $actions{ import }) {
         status("Importing $file\n");
         $r->read_zip( $file );
     };
-};
+}
+unlink @delete;

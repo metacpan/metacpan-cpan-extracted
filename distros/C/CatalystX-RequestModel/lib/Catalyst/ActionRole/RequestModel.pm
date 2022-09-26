@@ -20,7 +20,10 @@ sub _get_request_model {
   my ($self, $controller, $ctx) = @_;
   return unless exists $self->attributes->{RequestModel};
 
-  my @models = @{$self->attributes->{RequestModel} || []};
+  my @models = map { $_=~s/^\s+|\s+$//g; $_ } # Allow RequestModel( Model ) and RequestModel (Model, Model2)
+     map {split ',', $_ }  # Allow RequestModel(Model1,Model2)
+    @{$self->attributes->{RequestModel} || []};
+
   my $request_content_type = $ctx->req->content_type;
 
   # Allow GET to hijack form encoded

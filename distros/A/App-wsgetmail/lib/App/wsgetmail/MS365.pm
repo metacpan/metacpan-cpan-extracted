@@ -186,6 +186,18 @@ has post_fetch_action => (
     required => 1
 );
 
+=head2 stripcr
+
+A boolean.  If true, the message content will have CRLF line terminators
+converted to LF line terminators.
+
+=cut
+
+has stripcr => (
+    is => 'ro',
+    required => 0,
+);
+
 =head2 debug
 
 A boolean. If true, the object will issue a warning with details about each
@@ -238,7 +250,7 @@ around BUILDARGS => sub {
         grep {
             defined $config->{$_}
         }
-        qw(client_id tenant_id username user_password global_access secret folder post_fetch_action debug)
+        qw(client_id tenant_id username user_password global_access secret folder post_fetch_action stripcr debug)
     };
 
     return $class->$orig($attributes);
@@ -296,7 +308,9 @@ sub get_message_mime_content {
 
     # can we just write straight to file from response?
     my $tmp = File::Temp->new( UNLINK => 0, SUFFIX => '.mime' );
-    print $tmp $response->content;
+    my $content = $response->content;
+    $content =~ s/\r$//mg if $self->stripcr;
+    print $tmp $content;
     return $tmp->filename;
 }
 
@@ -311,7 +325,7 @@ sub delete_message {
     my @path_parts = ($self->global_access) ? ('users', $self->username, 'messages', $message_id) : ('me', 'messages', $message_id);
     my $response = $self->_client->delete_request([@path_parts]);
     unless ($response->is_success) {
-        warn "failed to mark message as read " . $response->status_line;
+        warn "failed to delete message " . $response->status_line;
         warn "response from server : " . $response->content if $self->debug;
     }
 
@@ -401,8 +415,7 @@ sub _get_message_list {
 
     my $folder = $self->get_folder_details;
     unless ($folder) {
-        warn "unable to fetch messages, can't find folder " . $self->folder;
-        return { '@odata.count' => 0, value => [ ] };
+        die "unable to fetch messages, can't find folder " . $self->folder;
     }
 
     # don't request list if folder has no items

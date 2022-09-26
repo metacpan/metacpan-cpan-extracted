@@ -9,6 +9,8 @@ use Test::More;
 # debugging when tests fail
 use constant HAVE_TEST_REFCOUNT => eval { require Test::Refcount };
 
+use Scalar::Util qw( reftype );
+
 use Future;
 
 use Future::AsyncAwait;
@@ -27,7 +29,8 @@ use Future::AsyncAwait;
    # This code is probably going to be very fragile, so we'll silently skip it
    # if it fails to work
    my $generated_cv;
-   if( $f1->{callbacks} and @{ $f1->{callbacks} } and
+   if( reftype $f1 eq "HASH" and
+       $f1->{callbacks} and @{ $f1->{callbacks} } and
        $f1->{callbacks}[0] and
        ref $f1->{callbacks}[0][1] eq "CODE" ) {
       $generated_cv = $f1->{callbacks}[0][1];

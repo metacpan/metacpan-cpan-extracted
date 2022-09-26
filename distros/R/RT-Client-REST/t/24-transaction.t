@@ -11,8 +11,8 @@ use constant METHODS => (
     'new', 'to_form', 'from_form', 'rt_type',
 
     # attrubutes:
-    'id', 'creator', 'type', 'old_value', 'new_value', 'parent_id',
-    'attachments', 'time_taken', 'field', 'content', 'created',
+    'id',          'creator',    'type',  'old_value', 'new_value', 'parent_id',
+    'attachments', 'time_taken', 'field', 'content',   'created',
     'description', 'data',
 );
 
@@ -21,21 +21,23 @@ BEGIN {
 }
 
 for my $method (METHODS) {
-    can_ok('RT::Client::REST::Transaction', $method);
+    can_ok( 'RT::Client::REST::Transaction', $method );
 }
 
 my $tr;
 
 lives_ok {
     $tr = RT::Client::REST::Transaction->new;
-} 'Transaction can get successfully instantiated';
+}
+'Transaction can get successfully instantiated';
 
 for my $method (qw(store search count)) {
     throws_ok {
         $tr->$method;
-    } 'RT::Client::REST::Object::IllegalMethodException',
-        "method '$method' should throw an exception";
+    }
+    'RT::Client::REST::Object::IllegalMethodException',
+      "method '$method' should throw an exception";
 }
 
-ok('transaction' eq $tr->rt_type);
+ok( 'transaction' eq $tr->rt_type );
 

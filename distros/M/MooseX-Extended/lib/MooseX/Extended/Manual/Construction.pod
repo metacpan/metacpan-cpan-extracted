@@ -13,7 +13,7 @@ MooseX::Extended::Manual::Construction - Objected construction for MooseX::Exten
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 OBJECT CONSTRUCTION
 
@@ -76,8 +76,9 @@ accepts.
 
     field created => ( isa => PositiveInt, default => sub { time } );
 
-A similar function to Moose's C<has>. A C<field> is never allowed to be passed
-to the constructor, but you can still use C<default> or C<builder>, as normal.
+A similar function to Moose's C<has>. A C<field> is almost never allowed to be
+passed to the constructor, but you can still use C<default> or C<builder>, as
+normal.
 
 The above C<field> definition is equivalent to:
 
@@ -98,8 +99,20 @@ Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
 accepts.
 
 B<WARNING>: if you pass C<field> an C<init_arg> with a defined value, The code
-will C<croak>. A C<field> is just for instance data the class uses. It's not
-to be passed to the constructor. If you want that, just use C<param>.
+will C<croak> I<unless> that value begins with an underscore:
+
+    field created => (
+        isa      => PositiveInt,
+        default  => sub {time},
+        lazy     => 0,             # because it must fire at object creation
+        init_arg => '_created',    # but let them override this in tests
+    );
+
+The above allows you to pass C<< _created => 42 >> in the constructor. This is
+useful when you wish to easily control this value for tests.
+
+Otherwise, a C<field> is just for internal instance data the class uses. It's
+not to be passed to the constructor. If you want that, just use C<param>.
 
 =head3 Lazy Fields
 
@@ -111,7 +124,7 @@ have to take care:
 
     has created => ( isa => PositiveInt, lazy => 0, default => sub {time} );
 
-Every C<param> is not lazy by default, but you can add C<< lazy => 1 >> if you need to.
+No C<param> is lazy by default, but you can add C<< lazy => 1 >> if you need to.
 
 =head1 AUTHOR
 

@@ -10,18 +10,18 @@ use Test::Fatal;
 	use Sub::MultiMethod qw(multimethod);
 	
 	multimethod foo => (
-		signature  => [ HashRef ],
+		positional => [ HashRef ],
 		code       => sub { 'Class1:foo:HashRef' },
 		alias      => 'foolish',
 	);
 	
 	multimethod foo => (
-		signature  => [ ArrayRef ],
+		positional => [ ArrayRef ],
 		code       => sub { 'Class1:foo:ArrayRef' },
 	);
 	
 	multimethod bar => (
-		signature  => [ HashRef ],
+		positional => [ HashRef ],
 		code       => sub { 'Class1:bar:HashRef' },
 	);
 }
@@ -50,7 +50,7 @@ isnt(
 	use Sub::MultiMethod qw(multimethod);
 	
 	multimethod foo => (
-		signature  => [ HashRef->where(sub{1})->where(sub{2})->where(sub{3}) ],
+		positional => [ HashRef->where(sub{1})->where(sub{2})->where(sub{3}) ],
 		code       => sub { 'Class2:foo:HashRef+3' },
 	);
 	
@@ -75,22 +75,22 @@ is( $obj2->bar(), 'Class2:bar', 'monomethod overriding inherited multimethod' );
 	use Sub::MultiMethod qw(multimethod);
 	
 	multimethod foo => (
-		signature  => [ HashRef ],
+		positional => [ HashRef ],
 		code       => sub { 'Class3:foo:HashRef' },
 	);
 	
 	multimethod foo => (
-		signature  => [ Int ],
+		positional => [ Int ],
 		code       => sub { 'Class3:foo:Int' },
 	);
 
 	multimethod bar => (
-		signature  => [ Int ],
+		positional => [ Int ],
 		code       => sub { 'Class3:bar:Int' },
 	);
 	
 	multimethod bar => (
-		signature  => [ RegexpRef ],
+		positional => [ RegexpRef ],
 		code       => sub { 'Class3:bar:RegexpRef' },
 	);
 }
@@ -115,11 +115,11 @@ is( $obj3->bar({}), 'Class2:bar', 'even higher up candidates are hidden by inher
 	use Sub::MultiMethod qw(multimethod);
 
 	multimethod foo => (
-		signature  => [ Num ],
+		positional => [ Num ],
 		code       => sub { 'Class4:foo:Num' },
 	);
 	multimethod foo => (
-		signature  => [ Num ],
+		positional => [ Num ],
 		code       => sub { 'Class4:foo:Num(again)' },
 	);
 }

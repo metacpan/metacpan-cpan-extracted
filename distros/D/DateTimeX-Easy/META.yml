@@ -14,10 +14,6 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: DateTimeX-Easy
-provides:
-  DateTimeX::Easy:
-    file: lib/DateTimeX/Easy.pm
-    version: '0.090'
 requires:
   Carp: '0'
   Date::Parse: '0'
@@ -36,19 +32,11 @@ requires:
   strict: '0'
   vars: '0'
   warnings: '0'
-version: '0.090'
-x_contributors:
-  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
-  - 'John Napiorkowski <jjn1056@gmail.com>'
-  - 'John Napiorkowski <johnn@John-Napiorkowski-MacBook-Pro.local>'
-  - 'Leo Lapworth <leo@cuckoo.org>'
-  - 'RHPizzarro <rich@pennatech.com>'
-  - 'robertkrimen <robertkrimen@gmail.com>'
-  - 'rob <rob@740ff789-fa8c-dc11-8ac4-000c6e5764c0>'
-  - 'Stephen Thirlwall <sdt@dr.com>'
-  - 'Wesley Schwengle <waterkip@cpan.org>'
+resources:
+  bugtracker: https://github.com/jjn1056/datetimex-easy/issues
+  homepage: https://github.com/jjn1056/datetimex-easy
+  repository: https://github.com/jjn1056/datetimex-easy
+version: '0.091'
 x_generated_by_perl: v5.34.0
-x_maintainers:
-  - 'John Napiorkowski <jjnapiork@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

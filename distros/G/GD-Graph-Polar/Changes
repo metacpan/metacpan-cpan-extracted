@@ -1,7 +1,10 @@
 Changes for package GD-Graph-Polar
 
+0.20 2022-09-22
+  - Updated rbgfile method to fixed issue calling Graphics::ColorNames which requires files to be true according to File::Spec::Functions::file_name_is_absolute - GitHub #1 - Slaven Rezić
+
 0.19 2022-09-20
-  - Fixed tests logic for CPAN testers
+  - Fixed tests logic for CPAN testers - GitHub #1 - Slaven Rezić
   - Updated Documentation
 
 0.18 2022-09-20

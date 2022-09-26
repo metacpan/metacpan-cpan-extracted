@@ -6,15 +6,12 @@ use warnings;
 use Log::ger;
 
 use Data::Sah::CoerceCommon;
-use IPC::System::Options;
-use Nodejs::Util qw(get_nodejs_path);
-
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-28'; # DATE
+our $DATE = '2022-09-22'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.052'; # VERSION
+our $VERSION = '0.053'; # VERSION
 
 our @EXPORT_OK = qw(gen_coercer);
 
@@ -33,6 +30,10 @@ This is mostly for testing. Normally the coercion rules will be used from
 _
     args => {
         %Data::Sah::CoerceCommon::gen_coercer_args,
+        engine => {
+            schema => ['str*', in=>['quickjs', 'nodejs']],
+            default => 'quickjs',
+        },
     },
     result_naked => 1,
 };
@@ -118,30 +119,53 @@ sub gen_coercer {
 
     return $code if $args{source};
 
-    state $nodejs_path = get_nodejs_path();
-    die "Can't find node.js in PATH" unless $nodejs_path;
+    require JSON;
+    state $json = JSON->new->allow_nonref;
 
-    sub {
-        require File::Temp;
-        require JSON;
-        #require String::ShellQuote;
+    my $engine = $args{engine} // 'quickjs';
 
-        my $data = shift;
+    if ($engine eq 'quickjs') {
 
-        state $json = JSON->new->allow_nonref;
+        return sub {
+            require JavaScript::QuickJS;
 
-        # code to be sent to nodejs
-        my $src = "var coercer = $code;\n\n".
-            "console.log(JSON.stringify(coercer(".
+            my $data = shift;
+
+            my $src = "var coercer = $code; coercer(".$json->encode($data).")";
+            JavaScript::QuickJS->new->eval($src);
+        };
+
+    } elsif ($engine eq 'nodejs') {
+
+        return sub {
+            require File::Temp;
+            require IPC::System::Options;
+            require Nodejs::Util;
+            #require String::ShellQuote;
+
+            state $nodejs_path = Nodejs::Util::get_nodejs_path();
+            die "Can't find node.js in PATH" unless $nodejs_path;
+
+            my $data = shift;
+
+            # code to be sent to nodejs
+            my $src = "var coercer = $code; ".
+                "console.log(JSON.stringify(coercer(".
                 $json->encode($data).")))";
 
-        my ($jsh, $jsfn) = File::Temp::tempfile();
-        print $jsh $src;
-        close($jsh) or die "Can't write JS code to file $jsfn: $!";
+            my ($jsh, $jsfn) = File::Temp::tempfile();
+            print $jsh $src;
+            close($jsh) or die "Can't write JS code to file $jsfn: $!";
 
-        my $out = IPC::System::Options::readpipe($nodejs_path, $jsfn);
-        $json->decode($out);
-    };
+            my $out = IPC::System::Options::readpipe($nodejs_path, $jsfn);
+            return $json->decode($out);
+        };
+
+    } else {
+
+        die "Unknown engine '$engine'";
+
+    }
 }
 
 1;
@@ -159,7 +183,7 @@ Data::Sah::CoerceJS - Generate coercer code
 
 =head1 VERSION
 
-This document describes version 0.052 of Data::Sah::CoerceJS (from Perl distribution Data-Sah-Coerce), released on 2021-11-28.
+This document describes version 0.053 of Data::Sah::CoerceJS (from Perl distribution Data-Sah-Coerce), released on 2022-09-22.
 
 =head1 SYNOPSIS
 
@@ -233,6 +257,8 @@ object. Storing in DateTime can be convenient for date manipulation but requires
 an overhead of loading the module and storing in a bulky format. The choice is
 yours to make, via this setting.
 
+=item * B<engine> => I<str> (default: "quickjs")
+
 =item * B<return_type> => I<str> (default: "val")
 
 C<val> means the coercer will return the input (possibly) coerced or undef if
@@ -297,13 +323,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

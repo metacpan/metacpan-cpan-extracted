@@ -4,7 +4,7 @@
       "SLAFFAN <shawnlaffan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "List::Util" : "0",
             "Test::More" : "0",
             "rlib" : "0"
          }
@@ -49,6 +50,6 @@
          "url" : "https://github.com/shawnlaffan/perl-List-Unique-DeterministicOrder"
       }
    },
-   "version" : 0.001,
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : 0.003,
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

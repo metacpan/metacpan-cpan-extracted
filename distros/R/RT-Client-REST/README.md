@@ -42,7 +42,6 @@ See **CONTRIBUTORS** file
 License
 -------
 
-This module is licensed under the same terms as perl itself.
+This module is licensed under both the Aristic 1.0 and GPL 1.0, the same terms as Perl itself.
 
-[![Build Status](https://travis-ci.org/RT-Client-REST/RT-Client-REST.svg?branch=master)](https://travis-ci.org/RT-Client-REST/RT-Client-REST)
 [![CPAN version](https://badge.fury.io/pl/RT-Client-REST.svg)](https://metacpan.org/pod/RT::Client::REST)

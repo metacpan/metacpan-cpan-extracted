@@ -1,12 +1,12 @@
 package Type::Registry;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	$Type::Registry::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Registry::VERSION   = '1.016010';
+	$Type::Registry::VERSION   = '2.000000';
 }
 
 $Type::Registry::VERSION =~ tr/_//d;
@@ -249,12 +249,28 @@ sub make_union {
 	return "Type::Tiny::Union"->new( type_constraints => \@types );
 }
 
+sub _make_union_by_overload {
+	my $self = shift;
+	my ( @types ) = @_;
+	
+	require Type::Tiny::Union;
+	return "Type::Tiny::Union"->new_by_overload( type_constraints => \@types );
+}
+
 sub make_intersection {
 	my $self = shift;
 	my ( @types ) = @_;
 	
 	require Type::Tiny::Intersection;
 	return "Type::Tiny::Intersection"->new( type_constraints => \@types );
+}
+
+sub _make_intersection_by_overload {
+	my $self = shift;
+	my ( @types ) = @_;
+	
+	require Type::Tiny::Intersection;
+	return "Type::Tiny::Intersection"->new_by_overload( type_constraints => \@types );
 }
 
 sub make_class_type {

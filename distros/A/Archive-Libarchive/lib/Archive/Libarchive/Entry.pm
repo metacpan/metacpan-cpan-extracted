@@ -8,7 +8,7 @@ use FFI::Platypus::Buffer qw( buffer_to_scalar scalar_to_buffer );
 use experimental qw( signatures );
 
 # ABSTRACT: Libarchive entry class
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 my $ffi = Archive::Libarchive::Lib->ffi;
 
@@ -157,7 +157,7 @@ Archive::Libarchive::Entry - Libarchive entry class
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -337,6 +337,10 @@ This class exposes the C<libarchive> link resolver API.
 =item L<Archive::Libarchive::Match>
 
 This class exposes the C<libarchive> match API.
+
+=item L<Dist::Zilla::Plugin::Libarchive>
+
+Build L<Dist::Zilla> based dist tarballs with libarchive instead of the built in L<Archive::Tar>.
 
 =item L<Alien::Libarchive3>
 

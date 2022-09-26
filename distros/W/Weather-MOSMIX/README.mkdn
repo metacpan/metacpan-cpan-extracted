@@ -46,6 +46,8 @@ German Weather Service
 
 Other Weather APIs
 
+[Weather::YR](https://metacpan.org/pod/Weather%3A%3AYR) - API of the [https://yr.no](https://yr.no) weather service
+
 [https://openweathermap.org/api](https://openweathermap.org/api) - international, signup required
 
 [https://www.weatherbit.io/api](https://www.weatherbit.io/api) - international, signup required

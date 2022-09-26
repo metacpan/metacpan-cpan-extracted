@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,17 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::Author::Plicease::Core" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::CommentOut" : "0",
+            "Dist::Zilla::Plugin::SetScriptShebang" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.69",
+            "Software::License::Perl_5" : "0"
+         },
          "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
@@ -37,14 +47,14 @@
       },
       "runtime" : {
          "requires" : {
-            "FFI::CheckLib" : "0.05",
+            "FFI::CheckLib" : "0.28",
             "Path::Tiny" : "0",
             "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0.000060",
+            "Test2::V0" : "0.000121",
             "Test::Script" : "1.09",
             "perl" : "5.008001"
          }
@@ -53,19 +63,20 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Perl5-FFI/App-whichdll/issues"
+         "web" : "https://github.com/PerlFFI/App-whichdll/issues"
       },
       "homepage" : "https://metacpan.org/pod/App::whichdll",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Perl5-FFI/App-whichdll.git",
-         "web" : "https://github.com/Perl5-FFI/App-whichdll"
+         "url" : "git://github.com/PerlFFI/App-whichdll.git",
+         "web" : "https://github.com/PerlFFI/App-whichdll"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.03",
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "version" : "0.04",
+   "x_generated_by_perl" : "v5.37.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }
 

@@ -30,7 +30,7 @@ SYNOPSIS
      package Horse {
        use Moo;
        use Types::Standard qw( Str Int Enum ArrayRef InstanceOf );
-       use Type::Params qw( compile );
+       use Type::Params qw( signature );
        use namespace::autoclean;
    
        has name => (
@@ -53,10 +53,12 @@ SYNOPSIS
        );
    
        sub add_child {
-         # method signature
-         state $check = compile( InstanceOf['Horse'], InstanceOf['Horse'] );
+         state $check = signature(
+           method     => Object,
+           positional => [ InstanceOf['Horse'] ]
+         );
      
-         my ($self, $child) = $check->(@_);   # unpack @_
+         my ( $self, $child ) = $check->(@_);   # unpack @_
          push @{ $self->children }, $child;
      
          return $self;
@@ -89,7 +91,7 @@ SYNOPSIS
  
      # assert_Object will return $secretariat or die
      #
-     say assert_Object($secretariat)->name;
+     say assert_Object( $secretariat )->name;
 
 MANUAL
     Even if you are using Type::Tiny with other object-oriented programming

@@ -14,6 +14,7 @@ $modules{$_} = $_ for qw(
   Alien::Build
   Alien::Build::MM
   Alien::Build::Plugin::Build::SearchDep
+  Alien::Build::Plugin::Download::GitLab
   Alien::Build::Plugin::Prefer::BadVersion
   Alien::Build::Plugin::Probe::Vcpkg
   ExtUtils::CBuilder

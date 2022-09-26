@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use Tags::HTML::Pager;
 use Tags::Output::Raw;
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 
 # Test.
@@ -82,4 +82,18 @@ eval {
 };
 is($EVAL_ERROR, "Both paginator styles disabled.\n",
 	'Both paginator styles disabled.');
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Pager->new(
+		'css_pager' => undef,
+		'url_page_cb' => sub {
+			my $page = shift;
+			return 'http://example.com/?page='.$page;
+	},
+	);
+};
+is($EVAL_ERROR, "Parameter 'css_pager' is required.\n",
+	"Parameter 'css_pager' is required.");
 clean();

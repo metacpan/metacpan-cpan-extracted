@@ -2,9 +2,9 @@
 
 use lib 't/lib';
 use MooseX::Extended::Tests
-  name    => 'multimethods',
-  module  => 'Syntax::Keyword::MultiSub',
-  version => v5.26.0;
+  name     => 'multimethods',
+  requires => { 'Syntax::Keyword::MultiSub' => '0.02' },
+  version  => v5.26.0;
 
 package My::Point {
     use MooseX::Extended types => [qw/Num/];

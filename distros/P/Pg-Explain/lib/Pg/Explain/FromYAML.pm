@@ -18,7 +18,7 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 # UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
 
 use base qw( Pg::Explain::From );
-use YAML;
+use YAML::XS;
 use Carp;
 use Pg::Explain::JIT;
 use Pg::Explain::Buffers;
@@ -29,11 +29,11 @@ Pg::Explain::FromYAML - Parser for explains in YAML format
 
 =head1 VERSION
 
-Version 2.1
+Version 2.2
 
 =cut
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,8 @@ sub parse_source {
 
     $source =~ s{ ^ ( \s* | [^\s-] [^\n] * ) \n .* \z }{}xms;
 
+    # Make sure boolean variables will be properly marked if/for exporting to JSON
+    $YAML::XS::Boolean = "JSON::PP";
     my $struct = Load( $source )->[ 0 ];
 
     my $top_node = $self->make_node_from( $struct->{ 'Plan' } );

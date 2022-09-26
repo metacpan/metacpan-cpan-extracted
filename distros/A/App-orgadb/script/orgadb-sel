@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-09'; # DATE
+our $DATE = '2022-09-26'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -35,7 +35,7 @@ orgadb-sel - Select entries and fields from Org addressbook
 
 =head1 VERSION
 
-This document describes version 0.006 of orgadb-sel (from Perl distribution App-orgadb), released on 2022-09-09.
+This document describes version 0.008 of orgadb-sel (from Perl distribution App-orgadb), released on 2022-09-26.
 
 =head1 SYNOPSIS
 
@@ -277,6 +277,34 @@ CLI to list/select addressbook entries and fields.
 The addressbook must be written following a certain structure, as shown in the
 Synopsis. The first heading level is for putting categories. The second heading
 level is where you put all your entries. Fields are written in description list.
+
+=head1 TIPS AND TRICKS
+
+=head2 Aliasing orgadb-sel to a shorter command name
+
+If you are like me and you select from addressbook a lot, you might want to
+alias C<orgadb-sel> to a shorter name, e.g. C<sel>. To do this, create this
+script somewhere in your PATH:
+
+ #!/usr/bin/env perl
+ # FRAGMENT id=shcompgen-hint command=orgadb-sel
+ exec "orgadb-sel", @ARGV;
+
+The C<# FRAGMENT> line is optional (it's useful if you use L<shcompgen>). In
+your bash startup file, put something like:
+
+ complete -C orgadb-sel sel
+
+or if you L<shcompgen>, run C<shcompgen gen sel> instead.
+
+=head2 Tab completion
+
+The script provides tab completion for category, entry, and field, so you can
+type:
+
+ % orgadb-sel --category <tab>        ;# see what categories are available
+ % orgadb-sel lis<tab>                ;# complete with entries matching 'lis'
+ % orgadb-sel lisa <tab>              ;# complete with available fields or /lisa/ entries
 
 =head1 OPTIONS
 
@@ -742,7 +770,7 @@ by two colons, followed by another space) as the separator:
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/orgadb.conf>, F</home/s1/.config/orgadb-sel.conf>, F</home/s1/orgadb.conf>, F</home/s1/orgadb-sel.conf>, F</etc/orgadb.conf>, or F</etc/orgadb-sel.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/orgadb.conf>, F</home/u1/.config/orgadb-sel.conf>, F</home/u1/orgadb.conf>, F</home/u1/orgadb-sel.conf>, F</etc/orgadb.conf>, or F</etc/orgadb-sel.conf>.
 
 All found files will be read and merged.
 
@@ -809,13 +837,13 @@ variable.
 
 =head1 FILES
 
-=head2 /home/s1/.config/orgadb.conf
+=head2 /home/u1/.config/orgadb.conf
 
-=head2 /home/s1/.config/orgadb-sel.conf
+=head2 /home/u1/.config/orgadb-sel.conf
 
-=head2 /home/s1/orgadb.conf
+=head2 /home/u1/orgadb.conf
 
-=head2 /home/s1/orgadb-sel.conf
+=head2 /home/u1/orgadb-sel.conf
 
 =head2 /etc/orgadb.conf
 

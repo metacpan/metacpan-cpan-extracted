@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::str_or_aos1;
 
-our $DATE = '2022-07-09'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2022-09-22'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 our $rschema = do{my$var={base=>"any",clsets_after_base=>[{examples=>[{valid=>1,value=>""},{valid=>1,value=>"a"},{summary=>"Not string or array",valid=>0,value=>{}},{summary=>"Empty array",valid=>0,value=>[]},{valid=>1,value=>["a"]},{summary=>"Has undef element",valid=>0,value=>["a",undef]},{summary=>"Has non-string element",valid=>0,value=>["a",[]]}],of=>[["str",{}],["aos",{min_len=>1}]],summary=>"String or array (1+ length) of (defined) string"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["any"],type=>"any",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::str_or_aos1 - String or array (1+ length) of (defined) string
 
 =head1 VERSION
 
-This document describes version 0.011 of Sah::SchemaR::str_or_aos1 (from Perl distribution Sah-Schemas-Str), released on 2022-07-09.
+This document describes version 0.012 of Sah::SchemaR::str_or_aos1 (from Perl distribution Sah-Schemas-Str), released on 2022-09-22.
 
 =head1 DESCRIPTION
 
@@ -54,9 +54,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

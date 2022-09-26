@@ -14,15 +14,17 @@
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-recommendation [
-		doap-deps:on "Type::Params 1.003000"^^doap-deps:CpanId;
+		doap-deps:on "Type::Params 2.000000"^^doap-deps:CpanId;
 	];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008008"^^doap-deps:CpanId ], [
-		doap-deps:on "Exporter::Shiny 1.000000"^^doap-deps:CpanId;
+		doap-deps:on "Exporter::Shiny 1.004000"^^doap-deps:CpanId;
 	], [ doap-deps:on "Role::Hooks"^^doap-deps:CpanId ];
-	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "parent"^^doap-deps:CpanId ], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [
-		doap-deps:on "Type::Params 1.003000"^^doap-deps:CpanId;
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "parent"^^doap-deps:CpanId ], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [
+		doap-deps:on "Types::Standard 2.000000"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Type::Params 2.000000"^^doap-deps:CpanId;
 	];
-	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-SymMethod>;
+	doap:bug-database    <https://github.com/tobyink/p5-sub-symmethod/issues>;
 	doap:created         "2020-10-09"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:download-page   <https://metacpan.org/release/Sub-SymMethod>;
@@ -31,7 +33,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Sub-SymMethod";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-005>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_1-000>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-sub-symmethod>;
@@ -105,6 +107,23 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-SymMethod-0.005.tar.gz>;
 	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/v_1-000>
+	a                    doap:Version;
+	dc:identifier        "Sub-SymMethod-1.000"^^xsd:string;
+	dc:issued            "2022-09-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Change API to match Type::Params v2 more closely. (Older API is still supported, but no longer documented.)";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Require Type::Params v2.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-SymMethod-1.000.tar.gz>;
+	doap:revision        "1.000"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -151,7 +151,7 @@ sub chop_inc_test {
    else {
      $res = dd_repro_test($repro, $op);
    }
-   ok($res == 7) or dd_diag($res, $op);
+   ok($res == 15) or dd_diag($res, $op);
 }
 
 sub dd_diag {

@@ -1,33 +1,35 @@
 # Reference libarchive docker image
 
 Because `libarchive` contains a large number of functions (400+ as of this writing),
-and because maining individual function bindings is tedious and error-prone development
-for `Archive-Libarchive` uses code generation to generate bindings and documentation for
-most methods.  Only the methods that require Perl wrappers, or need type subtle type
-conversions are implemented manually.  Files that are generated automatically should
-have a comment indicating that they should not be updated directly.
+and because maintaining individual function bindings is tedious and error-prone;
+development for `Archive-Libarchive` uses code generation to generate bindings and
+documentation for most methods.  Only the methods that require Perl wrappers, or need
+type subtle type conversions are implemented manually.  Files that are generated
+automatically should have a comment indicating that they should not be updated directly.
 
 To keep things consistent and reliable, we maintain a reference build of the oldest
-supported version of `libarchive` and the most recent supported version in a docker
-image.  This means that we can keep track of which functions are "optional", that is
-are available in at least some versions that we support, but not the oldest version.
-We use `Const::Introspect::C` and `Clang::CastXML` to extract constants and function
-signatures (respectively) from `libarchive`.  You do not need to install those modules
-locally, because they are installed in the docker image.  The introspection also loads
-the `Archive-Libarchive` to keep track of which function bindings are implemented
-manaully, to ensure that automatic bindings are not created for manually maintained
-bindings.  CI also runs the test suite against the oldest and newest versions of
-`libarchive`, so the reference docker container should have all the prerequisites
+and most recently supported versions of `libarchive` in a docker image. This means that
+we can keep track of which functions are "optional", that is are available in at least
+some versions that we support, but not the oldest version. We use `Const::Introspect::C`
+and `Clang::CastXML` to extract constants and function signatures (respectively) from
+`libarchive`.  You do not need to install those modules locally, because they are
+installed in the docker image.  The introspection also loads the `Archive-Libarchive`
+to keep track of which function bindings are implemented manaully, to ensure that
+automatic bindings are not created for manually maintained bindings.  CI also runs
+the test suite against the oldest and newest versions of `libarchive`, so the
+reference docker container should have all the prerequisites (optional and required)
 for `Archive-Libarchive`.
 
 If you are just modifying manually maintained bindings or adding tests then you
-should not need to use the reference docker image.  If you are replacing automatically
-generated bindings, or making changes to the introspection code itself you will have
-to use the reference docker image.
+should not need to use the reference docker image (unless you want to test with one
+of the reference builds; though this is porbably only necessary if CI fails with one
+of these builds).  If you are replacing automatically generated bindings, or making
+changes to the introspection code itself you will have to use the reference docker
+image.
 
 Here are the steps:
 
- * If you need to modify the reference docerk image itself (adding prerequisites, or
+ * If you need to modify the reference docker image itself (adding prerequisites, or
    updating to a new version of Debian), run `./maint/ref-build` to build the new
    image locally.  (If you are also the `Archive-Libarchive` maintainer you will
    want to run `./maint/ref-push` to push the image to dockerhub, once you are sure

@@ -1,5 +1,16 @@
 Revision history for Archive-Libarchive,
 
+0.07      2022-09-22 06:08:16 -0600
+  - Documentation improvements (gh#44)
+
+0.06      2022-09-22 05:19:04 -0600
+  - Documentation improvements (gh#41)
+  - Removed two memory leaks that happen in some circumstances
+    for Archive::Libarchive::ArchiveRead (gh#36, gh#42)
+  - Archive::Libarchive will now prefer libraries provided
+    by Alien::Libarchive3 over the system provided
+    libraries (gh#40, gh#43)
+
 0.05      2022-03-17 11:24:19 -0600
   - Add support for libarchive 2.6.0 (gh#37)
     * Archive::Libarchive::ArchiveWrite

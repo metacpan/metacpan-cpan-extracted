@@ -4,13 +4,13 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Weather-MOSMIX",
    "no_index" : {
@@ -43,6 +43,7 @@
             "IO::Socket::SSL" : "1.42",
             "JSON" : "0",
             "Moo" : "2",
+            "MooX::Role::DBIConnection" : "0",
             "Net::SSLeay" : "1.49",
             "POSIX" : "0",
             "PerlIO::gzip" : "0.2",
@@ -68,7 +69,7 @@
          "web" : "https://github.com/Corion/Weather-MOSMIX"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

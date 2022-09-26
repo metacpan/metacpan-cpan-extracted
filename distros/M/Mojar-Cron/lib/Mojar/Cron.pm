@@ -1,7 +1,7 @@
 package Mojar::Cron;
 use Mojo::Base -base;
 
-our $VERSION = 0.401;
+our $VERSION = 0.501;
 
 use Carp 'croak';
 use Mojar::Cron::Datetime;
@@ -246,9 +246,9 @@ Mojar::Cron - Cron-style datetime patterns and algorithm
 
   use Mojar::Cron;
   my $c = Mojar::Cron->new(is_local => 1, pattern => '0 9 * * mon');
-  my $t = time;
-  $t = $c->next($t);  # next instance of 9am Monday
-  say "Need to wait another $t seconds."
+  my $now = time;
+  my $t = $c->next($now);  # next instance of 9am Monday
+  printf "Need to wait another %u seconds.\n", $t - $now;
 
 =head1 DESCRIPTION
 

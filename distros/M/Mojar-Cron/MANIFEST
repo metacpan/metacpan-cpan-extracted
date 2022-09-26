@@ -14,6 +14,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 test/00-load.t
+test/08-cron-date.t
 test/10-cron-datetime.t
 test/12-cron-util.t
 test/20-cron-expand.t

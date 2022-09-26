@@ -32,11 +32,11 @@ Pg::Explain::Buffers - Object to store buffers information about node in Postgre
 
 =head1 VERSION
 
-Version 2.1
+Version 2.2
 
 =cut
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 =head1 SYNOPSIS
 

@@ -64,8 +64,7 @@ share {
   requires 'Env::ShellWords' => '0.01';
 
   plugin Download => (
-    url     => 'http://libarchive.org',
-    #url     => 'file:///Users/ollisg/opt/libarchive/3.3.1/src/',
+    url     => 'https://libarchive.org',
     version => qr/^libarchive-([0-9\.]+)\.tar\.gz$/,
   );
 
@@ -73,8 +72,19 @@ share {
 
   # TODO: lz4 https://github.com/lz4/lz4/releases
   # TODO: http://zlib.net/
+
+  my @deps;
+  if(defined $ENV{ALIEN_LIBARCHIVE_DEPS})
+  {
+    @deps = split /,/, $ENV{ALIEN_LIBARCHIVE_DEPS};
+  }
+  else
+  {
+    @deps = qw( Alien::Nettle Alien::xz Alien::LZO Alien::Libbz2 Alien::Libxml2 );
+  }
+
   plugin 'Build::SearchDep' => (
-    aliens => [ qw( Alien::Nettle Alien::xz Alien::LZO Alien::Libbz2 Alien::Libxml2 ) ],
+    aliens => \@deps,
   );
 
   my $configure_flags = '--with-lzo2';

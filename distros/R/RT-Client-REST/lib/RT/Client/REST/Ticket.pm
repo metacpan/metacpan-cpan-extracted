@@ -1,4 +1,5 @@
 #!perl
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 # PODNAME: RT::Client::REST::Ticket
 # ABSTRACT: ticket object representation.
 
@@ -6,15 +7,15 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Ticket;
-$RT::Client::REST::Ticket::VERSION = '0.60';
-use base 'RT::Client::REST::Object';
+$RT::Client::REST::Ticket::VERSION = '0.70';
+use parent 'RT::Client::REST::Object';
 
-use Error qw(:try);
+use Try::Tiny;
 use Params::Validate qw(:types);
-use RT::Client::REST 0.18;
+use RT::Client::REST;
 use RT::Client::REST::Attachment;
-use RT::Client::REST::Object::Exception 0.04;
-use RT::Client::REST::SearchResult 0.02;
+use RT::Client::REST::Object::Exception;
+use RT::Client::REST::SearchResult;
 use RT::Client::REST::Transaction;
 
 
@@ -64,6 +65,7 @@ sub _attributes {{
             # custom statuses.
             type    => SCALAR,
         },
+        rest_name => 'Status',
     },
 
     priority => {
@@ -283,10 +285,18 @@ for my $method (qw(take untake steal)) {
 
         try {
             $self->rt->$method(id => $self->id);
-        } catch RT::Client::REST::AlreadyTicketOwnerException with {
-            # Rename the exception.
-            RT::Client::REST::Object::NoopOperationException
-                ->throw(shift->message);
+        }
+        catch {
+            die $_ unless blessed $_ && $_->can('rethrow');
+
+            if ($_->isa('RT::Client::REST::AlreadyTicketOwnerException')) {
+                # Rename the exception.
+                RT::Client::REST::Object::NoopOperationException
+                    ->throw(shift->message);
+            }
+            else {
+                $_->rethrow;
+            }
         };
 
         return;
@@ -313,7 +323,7 @@ RT::Client::REST::Ticket - ticket object representation.
 
 =head1 VERSION
 
-version 0.60
+version 0.70
 
 =head1 SYNOPSIS
 
@@ -592,11 +602,11 @@ L<RT::Client::REST::Transaction>.
 
 =head1 AUTHOR
 
-Dmitri Tikhonov
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -124,6 +124,19 @@ my %template = (
 		    "┘"   ],
 	bottom =>     "─",
     },
+    dash_box => {
+	top    =>     "╴",
+	left   => [  "╷╴"  ,
+		     "╷ "  ,
+		     "╶╶" ],
+	center => [ "╴╷╴"  ,
+		    "╵╷ "  ,
+		    "╵╶╶" ],
+	right  => [ "╴"    ,
+		    "╵"    ,
+		    "╵"   ],
+	bottom =>     "╶",
+    },
     round_box => {
 	top    =>     "─",
 	left   => [  "╭─"  ,
@@ -149,6 +162,19 @@ my %template = (
 	right  => [ "┐"   ,
 		    "│"   ,
 		    "┘"  ],
+    },
+    dash_frame => {
+	top    =>     "╴",
+	left   => [  "╷╴"  ,
+		     "╷ "  ,
+		     "╶╶" ],
+	center => [  "╷╴"  ,
+		     "╷ "  ,
+		     "╶╶" ],
+	right  => [ "╴"    ,
+		    "╵"    ,
+		    "╵"   ],
+	bottom =>   "╶",
     },
     page_frame => {
 	top    =>    "─",
@@ -176,7 +202,7 @@ my %template = (
 		    "▀▘" ],
 	bottom =>   "▀",
     },
-    shadow_box => {
+    thin_shadow_box => {
 	top    =>   "─",
 	left   => [ "┌─"  ,
 		    "│ "  ,
@@ -187,6 +213,19 @@ my %template = (
 	right  => [ "─┐" ,
 		    " ▐" ,
 		    "▄▟" ],
+	bottom =>   "▄",
+    },
+    shadow_box => {
+	top    =>   "─",
+	left   => [ "┌─"  ,
+		    "│ "  ,
+		    "└▄" ],
+	center => [ "─┐ ┌─"  ,
+		    " ▐▌│ "  ,
+		    "▄▟▌└▄" ],
+	right  => [ "─┐ " ,
+		    " ▐▌" ,
+		    "▄▟▌" ],
 	bottom =>   "▄",
     },
     fat_box => {
@@ -314,7 +353,7 @@ my %template = (
 
 use Clone qw(clone);
 
-for my $style (qw(line vbar box round_box shadow_box frame page_frame comb rake mesh
+for my $style (qw(line vbar box dash_box round_box shadow_box frame dash_frame page_frame comb rake mesh
 		  dumbbell ribbon)) {
     $template{$style} // next;
     my $new = $template{"heavy_$style"} = clone $template{$style};

@@ -29,6 +29,7 @@ do { my $x = {
                                       'List::Util' => '1.45',
                                       'Package::Stash' => '0',
                                       'Scalar::Util' => '0',
+                                      'constant' => '0',
                                       'overload' => '0',
                                       'perl' => 'v5.10.0',
                                       'strict' => '0',

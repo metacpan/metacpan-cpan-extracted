@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+2.2     2022/09/25
+        - Handle WorkTable Scans in non-text plans.
+          Per report from Jamey Courtney
+
 2.1     2022/03/07
         - Add hints for seq scans with multiple conditions joined with AND, if
           the conditions are equality checks

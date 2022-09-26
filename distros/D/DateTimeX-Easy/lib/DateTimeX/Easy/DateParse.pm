@@ -14,13 +14,20 @@ use strict;
 use vars qw($VERSION);
 $VERSION = '0.04';
 
-our $VERSION = '0.090'; # VERSION
+# VERSION
 
 use DateTime;
 use DateTime::TimeZone;
 use Date::Parse qw( strptime );
 use Time::Zone qw( tz_offset );
 
+=over
+
+=item parse_datetime
+
+=back
+
+=cut
 
 sub parse_datetime {
     my ($class, $date, $zone) = @_;
@@ -90,34 +97,3 @@ sub parse_datetime {
 1;
 
 __END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-DateTimeX::Easy::DateParse - DateParse fork for datetimex::easy
-
-=head1 VERSION
-
-version 0.090
-
-=over
-
-=item parse_datetime
-
-=back
-
-=head1 AUTHOR
-
-Robert Krimen <rokr@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2022 by Robert Krimen and others, see the git log.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

@@ -119,7 +119,7 @@ For now, here's the best way to think of the difference:
 =item * Type registry
 
 Curate a collection of types for me to use here in this class.
-This collection is an implementaion detail.
+This collection is an implementation detail.
 
 =item * Type library
 
@@ -146,7 +146,7 @@ This is a shortcut for checking a value meets a type constraint:
 
   use Types::Standard qw( is_Int );
   
-  if ( is_Int($value) ) {
+  if ( is_Int $value ) {
     ...;
   }
 
@@ -272,6 +272,18 @@ This trick only works for parameterized types that have a single
 parameter, like B<ArrayRef>, B<HashRef>, B<InstanceOf>, etc.
 (Sorry, C<Dict> and C<Tuple>!)
 
+=head2 Lexical imports
+
+Type::Tiny 2.0 combined with Perl 5.37.2+ allows lexically scoped imports.
+So:
+
+  my $is_ok = do {
+    use Types::Standard -lexical, qw( Str ArrayRef );
+    ArrayRef->of( Str )->check( \@things );
+  };
+  
+  # The Str and ArrayRef types aren't defined here.
+
 =head2 Do What I Mean!
 
   use Type::Utils qw( dwim_type );
@@ -296,6 +308,50 @@ The C<is> function will use C<dwim_type> if you pass it a string as a type.
   if ( is "ArrayRef[Int]", \@numbers ) {
     ...;
   }
+
+=head2 Types::Common
+
+Notice that in a lot of examples we're importing one or two functions
+each from a few different modules:
+
+  use Types::Common::Numeric qw( PositiveInt );
+  use Types::Common::String qw( NonEmptyStr );
+  use Types::Standard qw( ArrayRef Slurpy );
+  use Type::Params qw( signature );
+
+A module called L<Types::Common> exists which acts as a single place you
+can use for importing most of Type::Tiny's commonly used types and functions.
+
+  use Types::Common qw(
+    PositiveInt NonEmptyStr ArrayRef Slurpy
+    signature
+  );
+
+Types::Common provides:
+
+=over
+
+=item *
+
+All the types from L<Types::Standard>.
+
+=item *
+
+All the types from L<Types::Common::Numeric> and L<Types::Common::String>.
+
+=item *
+
+All the types from L<Types::TypeTiny>.
+
+=item *
+
+The C<< -sigs >> tag from L<Type::Params>.
+
+=item *
+
+The C<< t() >> function from L<Type::Registry>.
+
+=back
 
 =head1 NEXT STEPS
 

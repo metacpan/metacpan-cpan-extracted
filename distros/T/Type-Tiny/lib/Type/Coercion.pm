@@ -1,12 +1,12 @@
 package Type::Coercion;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	$Type::Coercion::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::VERSION   = '1.016010';
+	$Type::Coercion::VERSION   = '2.000000';
 }
 
 $Type::Coercion::VERSION =~ tr/_//d;

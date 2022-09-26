@@ -84,7 +84,7 @@
 		$err
 	);
 
-	our $VERSION = "2022.263.2";
+	our $VERSION = "2022.266.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -1391,8 +1391,9 @@ sub Save()
 
 	$self->{init}{sql_save_ix} = 0 if (!defined($self->{init}{sql_save_ix}));
 	$self->{init}{sql_save_name} = "sql" if (!defined($self->{init}{sql_save_name}));
-	$self->{init}{sql_save_dir} = ($^O ne 'MSWin32') ?
-		File::Spec->catdir("","var","spool","sql") :
+	$self->{init}{sql_save_dir} =
+		(defined($self->{argv}{sql_save_dir})) ? $self->{argv}{sql_save_dir} :
+		($^O ne 'MSWin32') ?  File::Spec->catdir("","var","spool","sql") :
 		File::Spec->catdir("","windows","temp") if (!defined($self->{init}{sql_save_dir}));
 
 	require Date::Calc;

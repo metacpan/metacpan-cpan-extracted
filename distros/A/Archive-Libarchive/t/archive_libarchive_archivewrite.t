@@ -8,12 +8,15 @@ use Archive::Tar;
 use File::chdir;
 use File::Temp qw( tempdir );
 use FFI::Platypus 1.00;
+use lib 't/lib';
+use Test2::Tools::MemoryCycle qw( memory_cycle_ok );
 
 subtest 'basic' => sub {
 
   my $w = Archive::Libarchive::ArchiveWrite->new;
   isa_ok $w, 'Archive::Libarchive::ArchiveWrite';
 
+  memory_cycle_ok $w;
 };
 
 subtest 'open / write' => sub {
@@ -24,6 +27,7 @@ subtest 'open / write' => sub {
 
     la_ok $w, 'open' => [ open => sub { return 0 }, write => sub { return 0; } ];
 
+    memory_cycle_ok $w;
   };
 
   subtest 'open warn' => sub {
@@ -32,6 +36,7 @@ subtest 'open / write' => sub {
 
     la_warn $w, 'open' => [ open => sub { return -20 }, write => sub { return 0; } ];
 
+    memory_cycle_ok $w;
   };
 
   subtest 'close' => sub {
@@ -48,6 +53,7 @@ subtest 'open / write' => sub {
 
     is $count, 1, 'called now!';
 
+    memory_cycle_ok $w;
   };
 
   subtest 'write' => sub {
@@ -65,7 +71,6 @@ subtest 'open / write' => sub {
 
     la_write_ok($w);
     la_readback_tar_ok($image);
-
   };
 
 };
@@ -159,6 +164,8 @@ subtest 'encrypted zip' => sub {
     la_readback_encrypted_zip_ok($image);
   };
 
+  memory_cycle_ok $w;
+
 };
 
 subtest 'encrypted callback' => sub {
@@ -188,6 +195,7 @@ subtest 'encrypted callback' => sub {
     la_readback_encrypted_zip_ok($image);
   };
 
+  memory_cycle_ok $w;
 };
 
 subtest 'filter / format' => sub {
@@ -205,6 +213,7 @@ subtest 'filter / format' => sub {
     is( $w->filter_code(0), 'uu');
     is( $w->filter_code(0), number Archive::Libarchive::ARCHIVE_FILTER_UU() );
 
+    memory_cycle_ok $w;
   };
 
   subtest 'string' => sub {
@@ -220,6 +229,7 @@ subtest 'filter / format' => sub {
     is( $w->filter_code(0), 'uu');
     is( $w->filter_code(0), number Archive::Libarchive::ARCHIVE_FILTER_UU() );
 
+    memory_cycle_ok $w;
   };
 
 };
@@ -240,6 +250,9 @@ sub la_write_ok ($w)
 
   my $data = path(__FILE__)->slurp_raw;
   is( $w->write_data(\$data), length($data), '$archive->data(...)');
+
+  memory_cycle_ok $w;
+
   la_ok $w, 'close';
 
   $ctx->release;

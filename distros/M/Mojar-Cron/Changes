@@ -1,5 +1,11 @@
-0.401 2017-05-04
+0.501 2022-09-24
+  - Add sleeps (Date).
+  - Upgrade for Mojolicious v9.15.
+  - Now requires Perl v5.16.
+
+0.402 2017-05-14
   - Upgrade for Mojolicious v7.15.
+  - Now requires Perl v5.14.
 
 0.341 2016-07-15
   - Fix tz_offset (Util).

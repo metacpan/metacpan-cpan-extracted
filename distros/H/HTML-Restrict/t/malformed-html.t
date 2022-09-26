@@ -1,10 +1,9 @@
 use strict;
 use warnings;
 
-use Test::Fatal qw( exception );
 use Test::More;
 
-use HTML::Restrict;
+use HTML::Restrict ();
 
 # Behaviour as of 2.3.0 is for
 # <<input>div onmouseover="alert(1);">hover over me<<input>/div>
@@ -17,14 +16,15 @@ use HTML::Restrict;
 # and the tags are not being stripped. This is a regression test for fixing the
 # issue noted above.
 
-my $html = '<<input>div onmouseover="alert(1);">hover over me<<input>/div>';
+my $html = q{<<input>div onmouseover="alert(1);">hover over me<<input>/div>};
 
 {
     my $hr = HTML::Restrict->new;
     is(
         $hr->process(
-            '<<input>div onmouseover="alert(1);">hover over me<<input>/div>'),
-        '&lt;div onmouseover="alert(1);"&gt;hover over me&lt;/div&gt;',
+            q{<<input>div onmouseover="alert(1);">hover over me<<input>/div>}
+        ),
+        q{&lt;div onmouseover="alert(1);"&gt;hover over me&lt;/div&gt;},
         'malformed HTML is correctly cleaned'
     );
 }

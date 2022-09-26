@@ -2,6 +2,7 @@ use alienfile;
 use Path::Tiny qw( path );
 use File::Glob qw( bsd_glob );
 use File::Which qw( which );
+use List::Util qw( all );
 
 #  no share install unless on windows
 delete $ENV{ALIEN_INSTALL_TYPE}
@@ -37,13 +38,14 @@ configure {
   requires 'File::Glob' => 0;
 };
 
+my @exes_to_check = qw( sh.exe perl.exe m4.exe mktemp.exe readlink.exe );
 sub msys_is_okay
 {
   my($dir) = @_;
      -d path($dir)
-  && -x path($dir)->child('sh.exe')
-  && -x path($dir)->child('m4.exe')
-  && -x path($dir)->child('perl.exe')
+  && (
+    all { -x path($dir)->child($_ ) } @exes_to_check
+  )
 }
 
 probe sub {
@@ -200,15 +202,17 @@ share {
   );
 
   build [
-    'mingw-get install msys',
-    'mingw-get install msys-m4',
-    'mingw-get install msys-perl',
+    'mingw-get install msys',                # sh.exe, etc.
+    'mingw-get install msys-m4',             # m4.exe
+    'mingw-get install msys-perl',           # perl.exe
+    'mingw-get install msys-coreutils-ext',  # readlink.exe, etc.
+    'mingw-get install msys-mktemp',         # mktemp.exe
     sub {
       my($build) = @_;
 
-      $build->log("checking for sh, perl and m4...");
+      $build->log("checking for @exes_to_check ...");
 
-      foreach my $exe (map { "msys/1.0/bin/$_" } qw( sh.exe perl.exe m4.exe ))
+      foreach my $exe (map { "msys/1.0/bin/$_" } @exes_to_check)
       {
         unless(-f $exe)
         {
@@ -240,9 +244,9 @@ share {
         die "huh?";
       }
 
-      $build->log("checking for sh, perl and m4...");
+      $build->log("checking for @exes_to_check ...");
 
-      foreach my $exe (map { "@{[ $build->install_prop->{stage} ]}/msys/1.0/bin/$_" } qw( sh.exe perl.exe m4.exe ))
+      foreach my $exe (map { "@{[ $build->install_prop->{stage} ]}/msys/1.0/bin/$_" } @exes_to_check)
       {
         unless(-f $exe)
         {

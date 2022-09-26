@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use HTML::Restrict;
+use HTML::Restrict ();
 use Test::More;
 
 my $hr = HTML::Restrict->new;

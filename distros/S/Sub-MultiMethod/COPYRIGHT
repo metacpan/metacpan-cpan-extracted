@@ -3,15 +3,24 @@ Upstream-Name: Sub-MultiMethod
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Sub-MultiMethod
 
-Files: dist.ini
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
  t/02singleclass.t
  t/03inheritance.t
  t/04roles.t
  t/05rolesdonotinstalldispatchers.t
  t/06monomethod-weird.t
  t/06monomethod.t
+ t/07multifunc.t
  t/08mro.t
-Copyright: Copyright 2020 Toby Inkster.
+ t/09coderef.t
+ t/legacy/02singleclass.t
+ t/legacy/07multifunc.t
+ t/legacy/08mro.t
+ t/legacy/09coderef.t
+Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
@@ -25,13 +34,13 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: Changes
- META.json
- META.yml
- doap.ttl
- t/07multifunc.t
- t/09coderef.t
-Copyright: Copyright 2022 Toby Inkster.
+Files: dist.ini
+ t/legacy/03inheritance.t
+ t/legacy/04roles.t
+ t/legacy/05rolesdonotinstalldispatchers.t
+ t/legacy/06monomethod-weird.t
+ t/legacy/06monomethod.t
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -40,16 +49,18 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: t/01basic.t
+ t/10headtail.t
+ t/legacy/10headtail.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: README
  lib/Sub/MultiMethod.pm
 Copyright: This software is copyright (c) 2020-2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/10headtail.t
-Copyright: This software is copyright (c) 2022 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/01basic.t
+Files: t/legacy/01basic.t
 Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

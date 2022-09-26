@@ -30,7 +30,7 @@ RUN  apt-get update                            \
 
 RUN mkdir -p /tmp/build                \
   && cd /tmp/build                     \
-  && curl -L https://dist.wdlabs.com/libarchive/libarchive-${oldest}.tar.gz | tar zxf - \
+  && curl -L http://libarchive.org/downloads/libarchive-${oldest}.tar.gz | tar zxf - \
   && cd libarchive-${oldest}           \
   && ./configure                       \
     --prefix=/opt/libarchive/${oldest} \
@@ -46,7 +46,7 @@ RUN mkdir -p /tmp/build                \
 
 RUN mkdir -p /tmp/build                \
   && cd /tmp/build                     \
-  && curl -L https://dist.wdlabs.com/libarchive/libarchive-${unsupported}.tar.gz | tar zxf - \
+  && curl -L http://libarchive.org/downloads/libarchive-${unsupported}.tar.gz | tar zxf - \
   && cd libarchive-${unsupported}           \
   && chmod +x ./configure                   \
   && ./configure                            \
@@ -63,7 +63,7 @@ RUN mkdir -p /tmp/build                \
 
 RUN mkdir -p /tmp/build                \
   && cd /tmp/build                     \
-  && curl -L https://dist.wdlabs.com/libarchive/libarchive-${latest}.tar.gz | tar zxf - \
+  && curl -L http://libarchive.org/downloads/libarchive-${latest}.tar.gz | tar zxf - \
   && cd libarchive-${latest}           \
   && ./configure                       \
     --prefix=/opt/libarchive/${latest} \
@@ -102,6 +102,9 @@ RUN cpanm -n \
   Sub::Identify                                    \
   PeekPoke::FFI                                    \
   FFI::C::Stat                                     \
+  Devel::Cycle                                     \
   https://dist.wdlabs.com/App-castyml-0.01.tar.gz  \
   Test::Archive::Libarchive                        \
   && rm -rf ~/cpanm
+
+RUN cpanm -n http://cpan.metacpan.org/authors/id/P/PL/PLICEASE/FFI-CheckLib-0.30.tar.gz && rm -rf ~/cpanm

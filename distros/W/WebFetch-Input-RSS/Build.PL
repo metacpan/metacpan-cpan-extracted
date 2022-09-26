@@ -18,7 +18,7 @@ my %module_build_args = (
     "Ian Kluft <https://github.com/ikluft>"
   ],
   "dist_name" => "WebFetch-Input-RSS",
-  "dist_version" => "0.2.0",
+  "dist_version" => "0.2.1",
   "license" => "gpl",
   "module_name" => "WebFetch::Input::RSS",
   "recursive_test_files" => 1,
@@ -30,7 +30,7 @@ my %module_build_args = (
     "Readonly" => 0,
     "Scalar::Util" => 0,
     "Try::Tiny" => 0,
-    "WebFetch" => "v0.15.0",
+    "WebFetch" => "v0.15.3",
     "XML::RSS" => 0,
     "base" => 0,
     "strict" => 0,

@@ -13,7 +13,7 @@ MooseX::Extended::Manual::Overview - Work-in-progress overview for MooseX::Exten
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 CONVERTING FROM MOOSE
 
@@ -271,7 +271,7 @@ When using C<field> or C<param>, we have some attribute shortcuts:
 These can also be used when you pass an array reference to the function:
 
     package Point {
-        use MooseX::Extended types => [qw/Int/];
+        use MooseX::Extended types => 'Int';
 
         param [ 'x', 'y' ] => (
             isa     => Int,

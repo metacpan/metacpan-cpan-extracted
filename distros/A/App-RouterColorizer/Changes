@@ -1,3 +1,12 @@
+1.222681  2022-09-25 21:51:48+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.ent>
+ * [bugfix] Ciena alarm colorization swapped colors for acked and
+   non-acked alarms, fixed.
+
+1.222680  2022-09-25 19:51:47+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.net>
+ * [feature] Initial Ciena support
+
 1.222630  2022-09-20 03:32:21+00:00 UTC
  Joelle Maslak <jmaslak@antelope.net>
  * [feature] Add additional JunOS "show interface" colorization

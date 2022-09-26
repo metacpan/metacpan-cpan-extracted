@@ -1,12 +1,12 @@
 package Type::Tiny::Duck;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	$Type::Tiny::Duck::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Duck::VERSION   = '1.016010';
+	$Type::Tiny::Duck::VERSION   = '2.000000';
 }
 
 $Type::Tiny::Duck::VERSION =~ tr/_//d;
@@ -15,9 +15,26 @@ use Scalar::Util qw< blessed >;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
+
+use Exporter::Tiny 1.004001 ();
 use Type::Tiny::ConstrainedObject ();
-our @ISA = 'Type::Tiny::ConstrainedObject';
+our @ISA = qw( Type::Tiny::ConstrainedObject Exporter::Tiny );
+
 sub _short_name { 'Duck' }
+
+sub _exporter_fail {
+	my ( $class, $type_name, $methods, $globals ) = @_;
+	my $caller = $globals->{into};
+	my $type = $class->new(
+		name      => $type_name,
+		methods   => [ @$methods ],
+	);
+	$INC{'Type/Registry.pm'}
+		? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
+		: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type )
+		unless( ref($caller) or $caller eq '-lexical' or $globals->{'lexical'} );
+	return map +( $_->{name} => $_->{code} ), @{ $type->exportables };
+}
 
 sub new {
 	my $proto = shift;
@@ -214,6 +231,33 @@ See L<Type::Tiny::ConstrainedObject>.
 See L<Type::Tiny::ConstrainedObject>.
 
 =back
+
+=head2 Exports
+
+Type::Tiny::Duck can be used as an exporter.
+
+  use Type::Tiny::Duck HttpClient => [ 'get', 'post' ];
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< HttpClient >>
+
+=item C<< is_HttpClient( $value ) >>
+
+=item C<< assert_HttpClient( $value ) >>
+
+=item C<< to_HttpClient( $value ) >>
+
+=back
+
+Multiple types can be exported at once:
+
+  use Type::Tiny::Duck (
+    HttpClient   => [ 'get', 'post' ],
+    FtpClient    => [ 'upload', 'download' ],
+  );
 
 =head1 BUGS
 

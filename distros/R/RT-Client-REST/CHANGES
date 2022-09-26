@@ -1,5 +1,16 @@
 ﻿Revision history for Perl module RT::Client::REST
 
+0.70 Sun Sep 25 2022 "Dean Hamstead" <dean@fragfest.com.au>
+  - GH#26 Swap from Error's try to Try::Tiny
+  - GH#26 Remove Error entirely
+  - Swap from base to parent
+  - Attempt to resolve issues with trailing endlines on attachments
+  - Allow queues to be disabled (or enabled)
+  - Add status as a method for Tickets
+  - GH#20 Allow HTML in comments
+  - Point MetaCPAN at Github for issues
+  - RT#120077 fetch ticket subjects with a single API call
+
 0.60 Wed May 6 2020 "Dean Hamstead" <dean@fragfest.com.au>
   - PR#25 GH#23 Fix get_attachments_metadata
   - PR#24 GH#22 Fix get_attachments_metadata

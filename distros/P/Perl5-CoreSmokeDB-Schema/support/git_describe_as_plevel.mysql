@@ -1,0 +1,39 @@
+DELIMITER //
+CREATE OR REPLACE FUNCTION git_describe_as_plevel(git_describe text)
+    RETURNS text DETERMINISTIC
+BEGIN
+    DECLARE pos    int;
+    DECLARE plevel text;
+    DECLARE clean  text;
+    DECLARE cnt    int DEFAULT 1;
+
+    SELECT regexp_replace(git_describe, '^v', '') INTO clean;
+    SELECT regexp_replace(clean, '-g\.\+$', '') INTO clean;
+
+    SELECT REGEXP_INSTR(clean, '[.-]') INTO pos;
+    SELECT CONCAT(SUBSTR(clean, 1, pos - 1), '.') INTO plevel;
+    SELECT SUBSTR(clean, pos + 1) INTO clean;
+
+    WHILE cnt <= 2 DO
+        SELECT REGEXP_INSTR(clean, '[.-]') INTO pos;
+        SELECT CONCAT(plevel, LPAD(SUBSTR(clean, 1, pos - 1), 3, '0')) INTO plevel;
+        SELECT SUBSTR(clean, pos + 1) INTO clean;
+        SELECT cnt + 1 INTO cnt;
+    END WHILE;
+
+    SELECT REGEXP_INSTR(clean, '[.-]') INTO pos;
+    IF pos = 0 then
+        SELECT CONCAT(clean, '-0') INTO clean;
+        SELECT REGEXP_INSTR(clean, '[.-]') INTO pos;
+    END IF;
+    IF SUBSTR(clean, 1, 2) = 'RC' THEN
+        SELECT CONCAT(plevel, SUBSTR(clean, 1, pos - 1)) INTO plevel;
+        SELECT substr(clean, pos + 1) INTO clean;
+    ELSE
+        SELECT CONCAT(plevel, 'zzz') INTO plevel;
+    END IF;
+
+    SELECT CONCAT(plevel, LPAD(SUBSTR(clean, 1, pos - 1), 3, '0')) INTO plevel;
+
+    RETURN plevel;
+END; //

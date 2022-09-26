@@ -11,7 +11,7 @@ subtest 'version' => sub {
   );
 
   script_stdout_like qr{whichdll running FFI::CheckLib};
-  
+
 };
 
 done_testing;

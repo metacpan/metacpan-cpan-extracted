@@ -13,6 +13,7 @@ WriteMakefile(
         'Test::Warn'        => '0.30'
     },
     'INSTALLDIRS' => 'site',
+    'LICENSE'     => 'perl',
     'EXE_FILES'   => [],
     'PL_FILES'    => {},
     META_MERGE    => {

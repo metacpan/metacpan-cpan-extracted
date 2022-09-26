@@ -17,14 +17,16 @@ subtest 'basic' => sub {
     # wget -O config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD'
     my $config_guess = path('corpus/config.guess')->absolute;
 
-    probe sub { 'share' };
+    plugin 'Test::Mock' => (
+      probe    => 'share',
+      download => 1,
+      extract  => 1,
+    );
 
     share {
 
       plugin 'Build::MSYS';
 
-      download sub { path('file1')->touch };
-      extract  sub { path('file2')->touch };
       build    [
         ($^O eq 'MSWin32' ? ('path') : ()),
         'touch file3',

@@ -1,0 +1,131 @@
+{
+   "v" : 1,
+   "sysinfo" : {
+      "git_describe" : "v5.37.2-448-g03840a1d3f",
+      "cpu_description" : "MacBook Pro (0)",
+      "smoke_version" : "1.77",
+      "hostname" : "idefix",
+      "smoke_branch" : "blead",
+      "smoke_revision" : "1.77",
+      "test_jobs" : null,
+      "reporter_version" : "0.054",
+      "smoke_date" : "2022-09-06 03:05:04 +0200",
+      "osversion" : "21.6.0 (Mac OS X - macOS 12.5.1 (21G83))",
+      "lc_all" : null,
+      "smoke_perl" : "5.34.0",
+      "duration" : 7686,
+      "smoker_version" : "0.046",
+      "username" : "abeltje",
+      "architecture" : "arm64",
+      "config_count" : 2,
+      "lang" : null,
+      "reporter" : "",
+      "perl_id" : "5.37.4",
+      "git_id" : "03840a1d3fe4ab4c1bb97279794abab6915b351e",
+      "cpu_count" : " [10 (8 performance and 2 efficiency) cores]",
+      "osname" : "darwin",
+      "user_note" : ""
+   },
+   "hostname" : "idefix",
+   "skipped_tests" : [],
+   "lfile" : "/Users/abeltje/ztreet/perl5coresmoke/etc/blead.log",
+   "outfile" : "mktest.out",
+   "harness3opts" : "",
+   "defaultenv" : 0,
+   "applied_patches" : [],
+   "harness_only" : 0,
+   "manifest_msgs" : [
+      "MANIFEST did not declare '.mailmap'"
+   ],
+   "nonfatal_msgs" : [],
+   "ddir" : "/Users/abeltje/ztreet/perl5coresmoke/perl-current",
+   "configs" : [
+      {
+         "duration" : 3728,
+         "debugging" : "N",
+         "arguments" : "",
+         "cc" : "cc",
+         "results" : [
+            {
+               "locale" : null,
+               "stat_tests" : "1174853",
+               "failures" : [],
+               "summary" : "O",
+               "stat_cpu_time" : 872.47,
+               "io_env" : "stdio",
+               "statistics" : "u=12.12  s=6.46  cu=757.43  cs=96.46  scripts=2499  tests=1174853"
+            },
+            {
+               "stat_cpu_time" : 734.91,
+               "io_env" : "perlio",
+               "statistics" : "u=7.36  s=6.60  cu=639.15  cs=81.80  scripts=2501  tests=1175022",
+               "locale" : null,
+               "stat_tests" : "1175022",
+               "failures" : [],
+               "summary" : "O"
+            },
+            {
+               "statistics" : "u=7.43  s=6.68  cu=632.81  cs=80.49  scripts=2501  tests=1174924",
+               "io_env" : "locale",
+               "stat_cpu_time" : 727.41,
+               "stat_tests" : "1174924",
+               "summary" : "O",
+               "failures" : [],
+               "locale" : "nl_NL.UTF8"
+            }
+         ],
+         "started" : "2022-09-06 03:05:05 +0200",
+         "ccversion" : "Apple LLVM 13.1.6 (clang-1316.0.21.2.5)"
+      },
+      {
+         "ccversion" : "Apple LLVM 13.1.6 (clang-1316.0.21.2.5)",
+         "cc" : "cc",
+         "results" : [
+            {
+               "locale" : null,
+               "summary" : "O",
+               "failures" : [],
+               "stat_tests" : "1174885",
+               "stat_cpu_time" : 867.64,
+               "statistics" : "u=12.89  s=6.26  cu=754.34  cs=94.15  scripts=2500  tests=1174885",
+               "io_env" : "stdio"
+            },
+            {
+               "stat_tests" : "1174903",
+               "summary" : "O",
+               "failures" : [],
+               "locale" : null,
+               "statistics" : "u=8.88  s=6.81  cu=696.95  cs=84.95  scripts=2502  tests=1174903",
+               "io_env" : "perlio",
+               "stat_cpu_time" : 797.59
+            },
+            {
+               "statistics" : "u=8.64  s=6.85  cu=691.59  cs=84.74  scripts=2502  tests=1174935",
+               "io_env" : "locale",
+               "stat_cpu_time" : 791.82,
+               "stat_tests" : "1174935",
+               "summary" : "O",
+               "failures" : [],
+               "locale" : "nl_NL.UTF8"
+            }
+         ],
+         "started" : "2022-09-06 04:07:13 +0200",
+         "debugging" : "D",
+         "arguments" : "",
+         "duration" : 3957
+      }
+   ],
+   "out_file" : null,
+   "locale" : "nl_NL.UTF8",
+   "skip_tests" : "",
+   "summary" : "PASS",
+   "rptfile" : "mktest.rpt",
+   "un_file" : "/Users/abeltje/ztreet/perl5coresmoke/etc/blead.usernote",
+   "compiler_msgs" : [],
+   "jsnfile" : "mktest.jsn",
+   "is56x" : 0,
+   "log_file" : null,
+   "cfg" : "/Users/abeltje/ztreet/perl5coresmoke/etc/blead.buildcfg",
+   "showcfg" : 0,
+   "un_position" : "bottom"
+}

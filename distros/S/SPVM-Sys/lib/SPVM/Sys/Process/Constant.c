@@ -2,6 +2,10 @@
 
 #include <stdlib.h>
 
+#ifndef _WIN32
+#  include <sys/resource.h>
+#endif
+
 static const char* FILE_NAME = "Sys/Process/Constant.c";
 
 int32_t SPVM__Sys__Process__Constant__EXIT_FAILURE(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -59,6 +63,42 @@ int32_t SPVM__Sys__Process__Constant__WCONTINUED(SPVM_ENV* env, SPVM_VALUE* stac
   return 0;
 #else
   env->die(env, stack, "WCONTINUED is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Process__Constant__PRIO_PROCESS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef PRIO_PROCESS
+  stack[0].ival = PRIO_PROCESS;
+  return 0;
+#else
+  env->die(env, stack, "PRIO_PROCESS is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Process__Constant__PRIO_USER(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef PRIO_USER
+  stack[0].ival = PRIO_USER;
+  return 0;
+#else
+  env->die(env, stack, "PRIO_USER is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Process__Constant__PRIO_PGRP(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef PRIO_PGRP
+  stack[0].ival = PRIO_PGRP;
+  return 0;
+#else
+  env->die(env, stack, "PRIO_PGRP is not defined on this system", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #endif
 

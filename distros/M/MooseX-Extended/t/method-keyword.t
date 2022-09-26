@@ -8,7 +8,7 @@ use MooseX::Extended::Tests
 
 package My::Names {
     use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)],
-      includes                 => ['method'];
+      includes                 => 'method';
     use List::Util 'sum';
 
     param _name => ( isa => NonEmptyStr, init_arg => 'name' );

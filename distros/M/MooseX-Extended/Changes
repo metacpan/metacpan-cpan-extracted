@@ -1,5 +1,23 @@
 Revision history for MooseX-Extended
 
+0.33      2022-09-25 14:33:53 CEST
+          - You can now specify custom imports for each included feature. See
+            MooseX::Extended::Manual::Includes for more information.
+          - If you have Perl v5.35.8 or above, including `try` will use Perl's
+            native `try` and not `Syntax::Keyword::Try`.
+            https://github.com/Ovid/moosex-extended/issues/55
+          - Internal changes to make tests a touch easier to write and to make
+            test output a bit clearer when optional modules are not loaded.
+
+0.32      2022-09-24 17:06:38 CEST
+
+          - Allow inherited attributes (has '+x' ...). Thanks to gmbow for
+            spotting this bug.
+          - :Standard :String and :Numeric tags are now available for types
+          - Make sure all Type::Params utility functions are available
+          - Single arguments to includes, excludes, or types may be simple
+            strings and no longer require an array reference.
+
 0.31      2022-09-16 18:19:09 CEST
           - Lock down our version of Future.pm to avoid buggy 0.48_001.
 

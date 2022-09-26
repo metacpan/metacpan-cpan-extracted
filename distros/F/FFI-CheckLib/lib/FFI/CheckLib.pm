@@ -23,7 +23,7 @@ our @EXPORT_OK = qw(
 );
 
 # ABSTRACT: Check that a library is available for FFI
-our $VERSION = '0.29'; # VERSION
+our $VERSION = '0.30'; # VERSION
 
 
 our $system_path = [];
@@ -162,7 +162,7 @@ sub find_lib
 
   delete $missing{'*'};
 
-  alien: foreach my $alien (@{ $args{alien} })
+  alien: foreach my $alien (reverse @{ $args{alien} })
   {
     unless($alien =~ /^([A-Za-z_][A-Za-z_0-9]*)(::[A-Za-z_][A-Za-z_0-9]*)*$/)
     {
@@ -182,7 +182,7 @@ sub find_lib
         croak "Alien $alien doesn't provide a dynamic_libs method";
       }
     }
-    push @path, [$alien->dynamic_libs];
+    unshift @path, [$alien->dynamic_libs];
   }
 
   foreach my $path (@path)
@@ -406,7 +406,7 @@ FFI::CheckLib - Check that a library is available for FFI
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -543,6 +543,16 @@ ignored and this module will search in system or specified directories
 only.  This module I<will> still throw an exception, if the L<Alien>
 doesn't look like a module name or if it does not provide a C<dynamic_libs>
 method (which is implemented by all L<Alien::Base> subclasses).
+
+[version 0.30]
+[breaking change]
+
+Starting with version 0.30, libraries provided by L<Alien>s is preferred
+over the system libraries.  The original thinking was that you want to
+prefer the system libraries because they are more likely to get patched
+with regular system updates.  Unfortunately, the reason a module needs to
+install an Alien is likely because the system library is not new enough,
+so we now prefer the L<Alien>s instead.
 
 =back
 
@@ -729,7 +739,7 @@ Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014-2018 by Graham Ollis.
+This software is copyright (c) 2014-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

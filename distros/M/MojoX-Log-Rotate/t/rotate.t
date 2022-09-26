@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Differences;
+use Test::MockTime 0.17 qw( :all );
 use File::Slurp qw(slurp);
 use MojoX::Log::Rotate;
 
@@ -10,6 +11,12 @@ sub suffix {
     sprintf("_%04d%02d%02d_%02d%02d%02d", $y+1900, $m+1, $d, $h, $mi, $s);
 }
 
+sub mock_sleep {
+    set_fixed_time( time + shift );
+}
+
+set_fixed_time('01/01/2022 12:00:00', '%m/%d/%Y %H:%M:%S');
+ 
 unlink 'test.log' if -f 'test.log';
 my $start = time;
 my $logger = MojoX::Log::Rotate->new(frequency => 2, path => 'test.log');
@@ -27,11 +34,11 @@ $logger->on(rotate => sub {
 
 $logger->info('first message');
 ok -f $logger->path, 'log file exist';
-sleep(1);
+mock_sleep(1);
 $logger->info('second message');
-sleep(2);
+mock_sleep(2);
 $logger->info('third message');
-sleep(3);
+mock_sleep(3);
 $logger->info('fourth message');
 
 $logger->handle->close; #let's unlink file

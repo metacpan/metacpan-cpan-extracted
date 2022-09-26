@@ -30,7 +30,6 @@ use Eval::TypeTiny;
 
 subtest "constants exist" => sub {
 	my @constants = qw(
-		HAS_LEXICAL_VARS
 		HAS_LEXICAL_SUBS
 		ALIAS_IMPLEMENTATION
 		IMPLEMENTATION_DEVEL_LEXALIAS
@@ -236,5 +235,9 @@ subtest "exception for wrong reference type" => sub {
 	}
 };
 
+subtest "_pick_alternative" => sub {
+	is Eval::TypeTiny::_pick_alternative( if => 1, 'foo' ) || 'bar', 'foo';
+	is Eval::TypeTiny::_pick_alternative( if => 0, 'foo' ) || 'bar', 'bar';
+};
 
 done_testing;

@@ -14,6 +14,7 @@ $modules{$_} = $_ for qw(
   Alien::Build
   Alien::Build::MM
   Alien::Build::Plugin::Build::CMake
+  Alien::Build::Plugin::Download::GitHub
   ExtUtils::MakeMaker
   File::Which
   Path::Tiny
@@ -63,7 +64,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (sort @modules)
 {

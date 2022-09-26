@@ -1,14 +1,20 @@
 use Test2::V0 -no_srand => 1;
 use 5.020;
+use Test2::API qw( context );
 use Path::Tiny qw( path );
 use Archive::Libarchive::ArchiveRead;
 use Test::Archive::Libarchive;
 use experimental qw( signatures );
 
+use lib 't/lib';
+use Test2::Tools::MemoryCycle qw( memory_cycle_ok );
+
 subtest 'basic' => sub {
 
   my $r = Archive::Libarchive::ArchiveRead->new;
   isa_ok $r, 'Archive::Libarchive::ArchiveRead';
+
+  memory_cycle_ok $r;
 
 };
 
@@ -44,6 +50,10 @@ subtest 'next_header' => sub {
   la_ok $r, 'read_data_skip';
 
   la_eof $r, 'next_header', [$e];
+
+  memory_cycle_ok $r;
+  memory_cycle_ok $e, 'no memory cycle for entry';
+
 };
 
 subtest 'open_memory' => sub {
@@ -52,7 +62,6 @@ subtest 'open_memory' => sub {
   la_ok $r, 'support_format_tar';
   la_ok $r, 'open_memory', [\path('examples/archive.tar')->slurp_raw];
   la_archive_ok($r);
-
 };
 
 subtest 'open_filename' => sub {
@@ -61,7 +70,6 @@ subtest 'open_filename' => sub {
   la_ok $r, 'support_format_tar';
   la_ok $r, 'open_filename', ['examples/archive.tar', 40];
   la_archive_ok($r);
-
 };
 
 subtest 'open_FILE' => sub {
@@ -76,7 +84,6 @@ subtest 'open_FILE' => sub {
     la_ok $r, 'support_format_tar';
     la_ok $r, 'open_FILE', [$fp];
     la_archive_ok($r);
-
   };
 
   subtest 'opaque pointer' => sub {
@@ -88,7 +95,6 @@ subtest 'open_FILE' => sub {
     la_ok $r, 'support_format_tar';
     la_ok $r, 'open_FILE', [$fp];
     la_archive_ok($r);
-
   };
 
 
@@ -102,7 +108,6 @@ subtest 'open_perlfile' => sub {
   la_ok $r, 'support_format_tar';
   la_ok $r, 'open_perlfile', [$fh];
   la_archive_ok($r);
-
 };
 
 
@@ -136,6 +141,7 @@ subtest 'read_data' => sub {
 
   is $image, "Hello World!\n", 'content matches!';
 
+  memory_cycle_ok $r;
 };
 
 subtest 'filter' => sub {
@@ -146,6 +152,7 @@ subtest 'filter' => sub {
     is( $r->filter_count, 1 );
     is( $r->filter_code(0), 'uu');
     is( $r->filter_code(0), number Archive::Libarchive::ARCHIVE_FILTER_UU() );
+    memory_cycle_ok $r;
   };
 
   subtest 'int' => sub {
@@ -154,6 +161,7 @@ subtest 'filter' => sub {
     is( $r->filter_count, 1 );
     is( $r->filter_code(0), 'uu');
     is( $r->filter_code(0), number Archive::Libarchive::ARCHIVE_FILTER_UU() );
+    memory_cycle_ok $r;
   };
 
 };
@@ -167,6 +175,7 @@ subtest 'format' => sub {
     la_ok $r, next_header => [Archive::Libarchive::Entry->new];
     is $r->format, 'tar_gnutar';
     is $r->format, number(Archive::Libarchive::ARCHIVE_FORMAT_TAR_GNUTAR());
+    memory_cycle_ok $r;
   };
 
   subtest 'int' => sub {
@@ -176,6 +185,7 @@ subtest 'format' => sub {
     la_ok $r, next_header => [Archive::Libarchive::Entry->new];
     is $r->format, 'tar_gnutar';
     is $r->format, number(Archive::Libarchive::ARCHIVE_FORMAT_TAR_GNUTAR());
+    memory_cycle_ok $r;
   };
 
 };
@@ -266,7 +276,12 @@ subtest '$e->digest' => sub {
 
   la_eof $r, next_header => [$e];
   is($r->file_count, 30);
+
+  memory_cycle_ok $r;
+  memory_cycle_ok $e, 'no memory cycle on entry';
+
   la_ok $r, 'close';
+
 };
 
 subtest 'open_filenames' => sub {
@@ -298,12 +313,15 @@ subtest 'open_filenames' => sub {
   is($e->pathname, "testemptydir");
 
   la_eof $r, next_header => [$e];
+
+  memory_cycle_ok $r;
+  memory_cycle_ok $e, 'no memory cycle on entry';
+
 };
 
 subtest 'add_passphrase' => sub {
 
   my $r = Archive::Libarchive::ArchiveRead->new;
-  my $e = Archive::Libarchive::Entry->new;
 
   la_ok $r, 'support_filter_all';
   la_ok $r, 'support_format_all';
@@ -311,13 +329,11 @@ subtest 'add_passphrase' => sub {
   la_ok $r, open_filename => ['corpus/archive.zip',512];
 
   la_archive_ok($r);
-
 };
 
 subtest 'set_passphrase_callback' => sub {
 
   my $r = Archive::Libarchive::ArchiveRead->new;
-  my $e = Archive::Libarchive::Entry->new;
 
   la_ok $r, 'support_filter_all';
   la_ok $r, 'support_format_all';
@@ -328,7 +344,6 @@ subtest 'set_passphrase_callback' => sub {
   la_ok $r, open_filename => ['corpus/archive.zip',512];
 
   la_archive_ok($r);
-
 };
 
 subtest 'read_data_block' => sub {
@@ -359,11 +374,16 @@ subtest 'read_data_block' => sub {
 
   is $total, 6;
 
+  memory_cycle_ok $r;
+  memory_cycle_ok $e, 'no memory cycle in entry';
+
   la_ok $r, 'close';
 };
 
 sub la_archive_ok ($r)
 {
+  my $context = context ();
+
   my $e = Archive::Libarchive::Entry->new;
   la_ok $r, 'next_header', [$e];
   is($e->pathname, 'archive/', '$entry->pathname');
@@ -380,7 +400,12 @@ sub la_archive_ok ($r)
     or diag $r->error_string;
   is $content, "hello\n", 'content matches';
 
+  memory_cycle_ok $r;
+  memory_cycle_ok $e, 'no memory cycle in entry';
+
   la_ok $r, 'close';
+
+  $context->release;
 }
 
 done_testing;

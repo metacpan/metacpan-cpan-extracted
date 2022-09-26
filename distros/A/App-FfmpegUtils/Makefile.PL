@@ -14,8 +14,10 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-FfmpegUtils",
   "EXE_FILES" => [
+    "script/cut-video-by-duration",
     "script/reencode-video-with-libx264",
     "script/split-video-by-duration",
+    "script/vcut",
     "script/vreencode",
     "script/vsplit"
   ],
@@ -25,9 +27,11 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Sah::Coerce::perl::To_duration::From_float::seconds" => 0,
     "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" => 0,
+    "Data::Sah::Coerce::perl::To_duration::From_str::hms" => 0,
     "Data::Sah::Coerce::perl::To_duration::From_str::human" => 0,
     "Data::Sah::Coerce::perl::To_duration::From_str::iso8601" => 0,
     "Data::Sah::Coerce::perl::To_float::From_str::percent" => 0,
+    "Data::Sah::Compiler::perl::TH::any" => "0.911",
     "Data::Sah::Compiler::perl::TH::array" => "0.911",
     "Data::Sah::Compiler::perl::TH::bool" => "0.911",
     "Data::Sah::Compiler::perl::TH::duration" => "0.911",
@@ -48,6 +52,8 @@ my %WriteMakefileArgs = (
     "Perinci::Object" => "0.311",
     "Perinci::Sub::DepChecker" => 0,
     "Sah::Schema::filename" => 0,
+    "Sah::Schema::percent_str" => 0,
+    "Sah::Schema::posint" => 0,
     "Sah::Schema::ufloat" => 0,
     "Sah::Schema::uint" => 0,
     "strict" => 0,
@@ -59,7 +65,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,9 +75,11 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Data::Sah::Coerce::perl::To_duration::From_float::seconds" => 0,
   "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" => 0,
+  "Data::Sah::Coerce::perl::To_duration::From_str::hms" => 0,
   "Data::Sah::Coerce::perl::To_duration::From_str::human" => 0,
   "Data::Sah::Coerce::perl::To_duration::From_str::iso8601" => 0,
   "Data::Sah::Coerce::perl::To_float::From_str::percent" => 0,
+  "Data::Sah::Compiler::perl::TH::any" => "0.911",
   "Data::Sah::Compiler::perl::TH::array" => "0.911",
   "Data::Sah::Compiler::perl::TH::bool" => "0.911",
   "Data::Sah::Compiler::perl::TH::duration" => "0.911",
@@ -95,6 +103,8 @@ my %FallbackPrereqs = (
   "Perinci::Object" => "0.311",
   "Perinci::Sub::DepChecker" => 0,
   "Sah::Schema::filename" => 0,
+  "Sah::Schema::percent_str" => 0,
+  "Sah::Schema::posint" => 0,
   "Sah::Schema::ufloat" => 0,
   "Sah::Schema::uint" => 0,
   "Test::More" => 0,

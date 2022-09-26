@@ -1,4 +1,3 @@
-CONTRIBUTING
 COPYRIGHT
 CREDITS
 Changes
@@ -12,9 +11,22 @@ README
 SIGNATURE
 dist.ini
 doap.ttl
+inc/Test/Fatal.pm
+inc/Test/Requires.pm
+inc/Try/Tiny.pm
 lib/Type/API.pm
 lib/Type/API/Constraint.pod
 lib/Type/API/Constraint/Coercible.pod
 lib/Type/API/Constraint/Constructor.pod
 lib/Type/API/Constraint/Inlinable.pod
+lib/Type/Nano.pm
 t/01basic.t
+t/nano/api.t
+t/nano/builtin-types.t
+t/nano/class_type.t
+t/nano/duck_type.t
+t/nano/enum.t
+t/nano/inheritance.t
+t/nano/intersection.t
+t/nano/role_type.t
+t/nano/union.t

@@ -1,0 +1,272 @@
+Name
+    "Class::Plain" - a class syntax for the hash-based Perl OO.
+
+Usage
+      use Class::Plain;
+  
+      class Point {
+        field x;
+        field y;
+    
+        method new : common {
+          my $self = $class->SUPER::new(@_);
+      
+          $self->{x} //= 0;
+          $self->{y} //= 0;
+      
+          return $self;
+        }
+    
+        method move {
+          my ($x, $y) = @_;
+      
+          $self->{x} += $x;
+          $self->{y} += $y;
+        }
+    
+        method describe {
+          print "A point at ($self->{x}, $self->{y})\n";
+        }
+      }
+  
+      my $point = Point->new(x => 5, y => 10);
+      $point->describe;
+
+    Inheritance:
+
+      class Point3D : isa(Point) {
+        field z;
+    
+        method new : common {
+          my $self = $class->SUPER::new(@_);
+      
+          $self->{z} //= 0;
+      
+          return $self;
+        }
+    
+        method move {
+          my ($x, $y, $z) = @_;
+      
+          $self->SUPER::move($x, $y);
+          $self->{z} += $z;
+        }
+    
+        method describe {
+          print "A point at ($self->{x}, $self->{y}, $self->{z})\n";
+        }
+      }
+  
+      my $point3d = Point3D->new(x => 5, y => 10, z => 15);
+      $point3d->describe;
+
+    See also Class Plain Cookbook.
+
+Description
+    This module provides a class syntax for the hash-based Perl OO.
+
+Keywords
+  class
+      class NAME { ... }
+
+      class NAME : ATTRS... {
+        ...
+      }
+
+      class NAME;
+
+      class NAME : ATTRS...;
+
+    Behaves similarly to the "package" keyword, but provides a package that
+    defines a new class.
+
+    As with "package", an optional block may be provided. If so, the
+    contents of that block define the new class and the preceding package
+    continues afterwards. If not, it sets the class as the package context
+    of following keywords and definitions.
+
+    The following class attributes are supported:
+
+   isa Attribute
+     # The single inheritance
+     : isa(SUPER_CLASS)
+ 
+     # The multiple inheritance
+     : isa(SUPER_CLASS1) isa(SUPER_CLASS2)
+ 
+     # The super class is nothing
+     : isa()
+
+    Define a supper classes that this class extends.
+
+    If the supper class is not specified by "isa" attribute, the class
+    inherits Class::Plain::Base.
+
+    The super class is added to the end of @ISA.
+
+    If the the super class name doesn't exists in the Perl's symbol table,
+    the super class is loaded.
+
+    Otherwise if the super class doesn't have the "new" method and doesn't
+    have the class names in @ISA, the super class is loaded.
+
+  field
+      field NAME;
+  
+      field NAME : ATTR ATTR...;
+
+    Define fields.
+
+    The following field attributes are supported:
+
+   reader Attribute
+      : reader
+  
+      : reader(METHOD_NAME)
+
+    Generates a reader method to return the current value of the field. If
+    no name is given, the name of the field is used.
+
+      field x : reader;
+
+      # This is the same as the following code.
+      method x {
+        $self->{x};
+      }
+
+    The different method name can be specified.
+
+      field x : reader(x_different_name);
+
+   writer Attribute
+      : writer
+
+      : writer(METHOD_NAME)
+
+    Generates a writer method to set a new value of the field from its
+    arguments. If no name is given, the name of the field is used prefixed
+    by "set_".
+
+      field x : writer;
+
+      # This is the same as the following code.
+      method set_x {
+        $self->{x} = shift;
+        return $self;
+      }
+
+    The different method name can be specified.
+
+      field x : writer(set_x_different_name);
+
+   rw Attribute
+      : rw
+
+      : rw(METHOD_NAME)
+
+    Generates a read-write method to set and get the value of the field. If
+    no name is given, the name of the field is used.
+
+      field x : rw;
+
+      # This is the same as the following code.
+      method x {
+        if (@_) {
+          $self->{x} = shift;
+          return $self;
+        }
+        $self->{x};
+      }
+
+    The different method name can be specified.
+
+      field x : rw(x_different_name);
+
+  method
+      method NAME {
+         ...
+      }
+
+      method NAME : ATTR ATTR ... {
+         ...
+      }
+
+    Define a new named method. This behaves similarly to the "sub" keyword.
+    In addition, the method body will have a lexical called $self which
+    contains the invocant object directly; it will already have been shifted
+    from the @_ array.
+
+    The following method attributes are supported.
+
+    Examples:
+
+      # An instance method
+      method to_string {
+    
+        my $string = "($self->{x},$self->{y})";
+    
+        return $string;
+      }
+
+   common Attribute
+      : common
+
+    Marks that this method is a class-common method, instead of a regular
+    instance method. A class-common method may be invoked on class names
+    instead of instances. Within the method body there is a lexical $class
+    available instead of $self. It will already have been shifted from the
+    @_ array.
+
+    Examples:
+
+      # A class method
+      method new : common {
+        my $self = $class->SUPER::new(@_);
+    
+        # ...
+    
+        return $self;
+      }
+
+Required Perl Version
+    Perl 5.16+.
+
+Cookbook
+    Exmples of "Class::Plain".
+
+    Class::Plain::Document::Cookbook
+
+See Also
+  Object::Pad
+    The implementation of the "Class::Plain" module is started from the copy
+    of the source code of Object::Pad.
+
+  Corinna
+    "Class::Plain" uses the keywords and attributes that are specified in
+    Corinna <https://github.com/Ovid/Corinna>.
+
+    The keywords: "class", "field", "method".
+
+    The attributes: "isa", "reader", "writer", "common".
+
+    Only the "rw" attribute is got from Raku <https://www.raku.org>, Moo,
+    Moose.
+
+  XS::Parse::Keyword
+    The "class" and "field" keywords are parsed by XS::Parse::Keyword.
+
+  XS::Parse::Sublike
+    The "method" keyword is parsed by XS::Parse::Sublike.
+
+Repository
+    Github <https://github.com/yuki-kimoto/Class-Plain>
+
+Author
+    Yuki Kimoto <kimoto.yuki@gmail.com>
+
+Copyright & LICENSE
+    Copyright 2022-2022 Yuki Kimoto, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

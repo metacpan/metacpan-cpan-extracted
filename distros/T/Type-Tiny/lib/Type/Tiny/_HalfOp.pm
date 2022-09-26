@@ -1,12 +1,12 @@
 package Type::Tiny::_HalfOp;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	$Type::Tiny::_HalfOp::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::_HalfOp::VERSION   = '1.016010';
+	$Type::Tiny::_HalfOp::VERSION   = '2.000000';
 }
 
 $Type::Tiny::_HalfOp::VERSION =~ tr/_//d;

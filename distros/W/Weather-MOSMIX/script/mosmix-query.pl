@@ -9,7 +9,7 @@ use Time::Piece;
 use Text::Table;
 use Getopt::Long;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 GetOptions(
     'latitude=s'  => \my $latitude,
@@ -33,7 +33,7 @@ $latitude //= 50.11;
 $longitude //= 8.68;
 
 my $f =
-    $w->forecast(latitude => $latitude, longitude => $longitude );
+    $w->forecast_dbh(latitude => $latitude, longitude => $longitude );
 my $out = $w->format_forecast_dbh( $f, 6 );
 
 my @output;

@@ -1,5 +1,8 @@
 Revision history for Statistics-Sampler-Multinomial
 
+1.02 20220924
+  - Use an internal clone method for the data.  This is much faster than Clone::clone.
+
 1.01 20201130
   - Add missing dependencies to Makefile.PL
 

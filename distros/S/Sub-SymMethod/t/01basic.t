@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Toby Inkster.
+This software is copyright (c) 2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -53,9 +53,8 @@ my @R;
 	symmethod foo => sub { push @R, __PACKAGE__. '//a' };
 	with 'Local::Role1B';
 	symmethod foo => (
-		signature => [ n => Int ],
-		named     => 1,
-		code      => sub {
+		named => [ n => Int ],
+		code  => sub {
 			my ($self, $arg) = @_;
 			push @R, __PACKAGE__ . '//b//' . $arg->n;
 		},

@@ -1,4 +1,5 @@
 #!perl
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
 # PODNAME: RT::Client::REST
 # ABSTRACT: Client for RT using REST API
 #
@@ -24,11 +25,11 @@ use strict;
 use warnings;
 
 package RT::Client::REST;
-$RT::Client::REST::VERSION = '0.60';
-use Error qw(:try);
+$RT::Client::REST::VERSION = '0.70';
+use Try::Tiny;
 use HTTP::Cookies;
 use HTTP::Request::Common;
-use RT::Client::REST::Exception 0.18;
+use RT::Client::REST::Exception;
 use RT::Client::REST::Forms;
 use RT::Client::REST::HTTPClient;
 
@@ -91,15 +92,22 @@ sub login {
     try {
         $self->_cookie(undef);  # Start a new session.
         $self->_submit('ticket/1', undef, \%opts);
-    } catch RT::Client::REST::AuthenticationFailureException with {
-        shift->rethrow;
-    } catch RT::Client::REST::MalformedRTResponseException with {
-        shift->rethrow;
-    } catch RT::Client::REST::RequestTimedOutException with {
-        shift->rethrow;
-    } catch RT::Client::REST::HTTPException with {
-        shift->rethrow;
-    } catch Exception::Class::Base with {
+    }
+    catch {
+        die $_ unless blessed $_ && $_->can('rethrow');
+
+        my $err = $_;
+        if (grep { $err->isa($_) } (
+                'RT::Client::REST::AuthenticationFailureException',
+                'RT::Client::REST::MalformedRTResponseException',
+                'RT::Client::REST::RequestTimedOutException',
+                'RT::Client::REST::HTTPException',
+            )) {
+            shift->rethrow
+        }
+        if (! $err->isa('Exception::Class::Base')) {
+            die $err
+        }
         # ignore others.
     };
 }
@@ -228,14 +236,14 @@ sub get_links {
     }
 
     # Turn the links into id lists
-    foreach my $key (keys(%$k)) {
+    for my $key (keys(%$k)) {
         try {
             $self->_valid_link_type($key);
             my @list = split(/\s*,\s*/,$k->{$key});
             #use Data::Dumper;
             #print STDERR Dumper(\@list);
             my @newlist = ();
-            foreach my $val (@list) {
+            for my $val (@list) {
                if ($val =~ /^fsck\.com-\w+\:\/\/(.*?)\/(.*?)\/(\d+)$/) {
                    # We just want the ids, not the URI
                    push(@newlist, {'type' => $2, 'instance' => $1, 'id' => $3 });
@@ -247,7 +255,13 @@ sub get_links {
             # Copy the newly created list
             $k->{$key} = ();
             $k->{$key} = \@newlist;
-        } catch RT::Client::REST::InvalidParameterValueException with {
+        }
+        catch {
+            die $_ unless blessed $_ && $_->can('rethrow');
+
+            if (! $_->isa('RT::Client::REST::InvalidParameterValueException')) {
+                $_->rethrow;
+            }
             # Skip it because the keys are not always valid e.g., 'id'
         }
     }
@@ -337,12 +351,26 @@ sub search {
     my $type = $self->_valid_type(delete($opts{type}));
     my $query = delete($opts{query});
     my $orderby = delete($opts{orderby});
+    my $format = delete($opts{format});
+    if (defined($format)) {
+        $format = undef if $format ne 's'
+    }
 
     my $r = $self->_submit("search/$type", {
         query => $query,
         (defined($orderby) ? (orderby => $orderby) : ()),
+        (defined($format) ? (format => $format) : ()),
     });
 
+    if (defined($format) and $format eq 's') {
+        my @results;
+        # while() never stops if the method is used in the regex
+        my $text = $r->decoded_content;
+        while ($text =~ m/^(\d+): (.*)/gm) {
+            push @results, [$1, $2]
+        }
+        return @results
+    }
     return $r->decoded_content =~ m/^(\d+):/gm;
 }
 
@@ -410,6 +438,14 @@ sub comment {
         Action      => $action,
         Text        => $msg,
     );
+
+    if (exists($opts{html})) {
+        if ($opts{html}) {
+            push @objects, 'Content-Type';
+            $values{'Content-Type'} = 'text/html';
+        }
+        delete($opts{html});
+    }
 
     if (exists($opts{cc})) {
         push @objects, 'Cc';
@@ -533,9 +569,9 @@ sub _submit {
         }
         elsif (ref $content eq 'HASH') {
             my @data;
-            foreach my $k (keys %$content) {
+            for my $k (keys %$content) {
                 if (ref $content->{$k} eq 'ARRAY') {
-                    foreach my $v (@{ $content->{$k} }) {
+                    for my $v (@{ $content->{$k} }) {
                         push @data, $k, $v;
                     }
                 }
@@ -891,7 +927,7 @@ sub _version { $RT::Client::REST::VERSION }
     # The problem with the second approach is that it creates unrelated
     # methods in RT::Client::REST namespace.
     package RT::Client::REST::NoopLogger;
-$RT::Client::REST::NoopLogger::VERSION = '0.60';
+$RT::Client::REST::NoopLogger::VERSION = '0.70';
 sub new { bless \(my $logger), __PACKAGE__ }
     for my $method (RT::Client::REST::LOGGER_METHODS) {
         no strict 'refs'; ## no critic (ProhibitNoStrict)
@@ -913,11 +949,11 @@ RT::Client::REST - Client for RT using REST API
 
 =head1 VERSION
 
-version 0.60
+version 0.70
 
 =head1 SYNOPSIS
 
-  use Error qw(:try);
+  use Try::Tiny;
   use RT::Client::REST;
 
   my $rt = RT::Client::REST->new(
@@ -927,17 +963,24 @@ version 0.60
 
   try {
     $rt->login(username => $user, password => $pass);
-  } catch Exception::Class::Base with {
-    die "problem logging in: ", shift->message;
+  }
+  catch {
+    if ($_->isa('Exception::Class::Base') {
+      die "problem logging in: ", shift->message;
+    }
   };
 
   try {
     # Get ticket #10
     $ticket = $rt->show(type => 'ticket', id => 10);
-  } catch RT::Client::REST::UnauthorizedActionException with {
-    print "You are not authorized to view ticket #10\n";
-  } catch RT::Client::REST::Exception with {
-    # something went wrong.
+  }
+  catch {
+    if ($_->isa('RT::Client::REST::UnauthorizedActionException')) {
+      print "You are not authorized to view ticket #10\n";
+    }
+    if ($_->isa('RT::Client::REST::Exception')) {
+      # something went wrong.
+    }
   };
 
 =head1 DESCRIPTION
@@ -1056,7 +1099,7 @@ text of the ticket.
 Returns numeric ID of the new object.  If numeric ID cannot be parsed from
 the response, B<RT::Client::REST::MalformedRTResponseException> is thrown.
 
-=item search (type => $type, query => $query, %opts)
+=item search (type => $type, query => $query, format => $format, %opts)
 
 Search for object of type C<$type> by using query C<$query>.  For
 example:
@@ -1088,7 +1131,7 @@ order (minus).  For example:
 
 =back
 
-C<search> returns the list of numeric IDs of objects that matched
+By default, C<search> returns the list of numeric IDs of objects that matched
 your query.  You can then use these to retrieve object information
 using C<show()> method:
 
@@ -1098,7 +1141,18 @@ using C<show()> method:
   );
   for my $id (@ids) {
     my ($ticket) = $rt->show(type => 'ticket', id => $id);
-    print "Subject: ", $ticket->{Subject}, "\n";
+    say "Subject: ", $ticket->{Subject}
+  }
+
+C<search> can return a list of lists of ID and Subject when asked for format 's'.
+
+  my @results = $rt->search(
+    type => 'ticket',
+    query => "Status = 'stalled'",
+    format => 's',
+  );
+  for my $result (@results) {
+    say "ID: $result[0], Subject: $result[1]"
   }
 
 =item comment (ticket_id => $id, message => $message, %opts)
@@ -1106,14 +1160,37 @@ using C<show()> method:
 =for stopwords bcc
 
 Comment on a ticket with ID B<$id>.
-Optionally takes arguments B<cc> and B<bcc> which are references to lists
-of e-mail addresses and B<attachments> which is a list of filenames to
-be attached to the ticket.
+
+Optionally takes arguments:
+
+=over 2
+
+=item B<cc> and B<bcc>
+
+References to lists of e-mail addresses
+
+=item B<attachments>
+
+A list of filenames to be attached to the ticket
+
+=for stopwords html
+
+=item B<html>
+
+When true, indicates to RT that the message is html
+
+=back
 
   $rt->comment(
     ticket_id   => 5,
     message     => "Wild thing, you make my heart sing",
     cc          => [qw(dmitri@localhost some@otherdude.com)],
+  );
+
+  $rt->comment(
+    ticket_id   => 5,
+    message     => "<b>Wild thing</b>, you make my <i>heart sing</i>",
+    html        => 1
   );
 
 =item correspond (ticket_id => $id, message => $message, %opts)
@@ -1287,9 +1364,8 @@ already the ticket owner.
 =head1 EXCEPTIONS
 
 When an error occurs, this module will throw exceptions.  I recommend
-using Error.pm's B<try{}> mechanism to catch them, but you may also use
-simple B<eval{}>.  The former will give you flexibility to catch just the
-exceptions you want.
+using L<Try::Tiny> or L<Syntax::Keyword::Try> B<try{}> mechanism to catch them,
+but you may also use simple B<eval{}>.
 
 Please see L<RT::Client::REST::Exception> for the full listing and
 description of all the exceptions.
@@ -1307,10 +1383,6 @@ use a loop.
 The following modules are required:
 
 =over 2
-
-=item
-
-Error
 
 =item
 
@@ -1348,11 +1420,11 @@ RT server, which is either good or bad, depending how you look at it.
 
 =head1 AUTHOR
 
-Dmitri Tikhonov
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

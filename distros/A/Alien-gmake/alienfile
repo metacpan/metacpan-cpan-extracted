@@ -27,14 +27,14 @@ if($^O eq 'MSWin32')
 share {
 
   plugin 'Download' => (
-    url     => 'http://ftp.gnu.org/gnu/make',
+    url     => 'https://ftp.gnu.org/gnu/make',
     version => qr/^make-([0-9\.]+)\.tar\.gz$/,
   );
 
   plugin 'Extract' => 'tar.gz';
 
   plugin 'Build::Autoconf' => ();
-  
+
   build [
     '%{configure} --program-prefix=g --disable-shared',
     '%{make}',
@@ -56,11 +56,11 @@ gather sub {
   {
     $build->runtime_prop->{command} = Path::Tiny->new(Alien::MSYS::msys_path())->child('make.exe')->stringify;
   }
-  
+
   my($stdout) = Capture::Tiny::capture(sub {
     system($build->runtime_prop->{command}, '--version');
   });
-  
+
   my($version) = $stdout =~ /GNU Make ([0-9\.]+)/;
-  $build->runtime_prop->{version} = $version || 'unknown';  
+  $build->runtime_prop->{version} = $version || 'unknown';
 }

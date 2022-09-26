@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::Schemas::Str",
   "PREREQ_PM" => {
+    "Regexp::Pattern::Float" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +38,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Regexp::Pattern::Float" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

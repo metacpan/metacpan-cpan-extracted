@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.4.3
+## Version v0.4.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2022/08/12
+## Modified 2022/08/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -125,7 +125,7 @@ BEGIN
     our $OBJECTS_REPO = [];
     our $EXCEPTION_CLASS = 'Module::Generic::Exception';
     our $SERIALISER = 'storable';
-    our $VERSION = 'v0.4.3';
+    our $VERSION = 'v0.4.4';
 };
 
 use strict;
@@ -271,6 +271,7 @@ sub init
     return( $self->error( "No code was provided to execute." ) ) if( !defined( $code ) || ref( $code ) ne 'CODE' );
     $self->{args}  = [];
     $self->{exception_class} = $EXCEPTION_CLASS;
+    $self->{medium} = $SHARE_MEDIUM;
     $self->{name}  = $name;
     $self->{result_shared_mem_size} = $RESULT_MEMORY_SIZE;
     $self->{serialiser} = $SERIALISER;
@@ -301,6 +302,14 @@ sub init
 #             );
 #         };
         $self->{_code} = $code;
+    }
+    if( $self->use_cache_file )
+    {
+        $self->{medium} = 'file';
+    }
+    elsif( $self->use_mmap )
+    {
+        $self->{medium} = 'mmap';
     }
     $self->{_handlers} = [];
     $self->{_no_more_chaining} = 0;
@@ -596,13 +605,16 @@ sub exec
                 $self->_set_exit_values( $? );
                 if( WIFEXITED($?) )
                 {
+                    # Child exited normally
                 }
                 else
                 {
+                    # Child exited with non-zero
                 }
             }
             else
             {
+                # Child has already exited
             }
         }
         else
@@ -760,6 +772,8 @@ sub lock
     return( $self ) if( $self );
 }
 
+sub medium { return( shift->_set_get_scalar( 'medium', @_ ) ); }
+
 sub no_more_chaining { return( shift->_set_get_boolean( '_no_more_chaining', @_ ) ); }
 
 sub pid { return( shift->_set_get_scalar( 'pid', @_ ) ); }
@@ -849,7 +863,7 @@ sub resolve
     try
     {
         my @rv = $code->( @$vals );
-        $self->result( @rv );
+        $self->result( @rv ) || return( $self->reject( Promise::Me::Exception->new( $self->error ) ) );
         # The code returned another promise
         if( scalar( @rv ) && 
             Scalar::Util::blessed( $rv[0] ) && 
@@ -903,6 +917,7 @@ sub result
             $shm->lock( LOCK_EX );
             $shm->write( $hash ) || return( $self->pass_error( $shm->error ) );
             $shm->unlock;
+            return( $hash );
         }
         else
         {
@@ -1351,8 +1366,9 @@ sub _share_vars
     $opts    = pop( @_ ) if( scalar( @_ ) && ref( $_[-1] ) eq 'HASH' );
     # Nothing to do
     return if( !scalar( @$vars ) );
-    $opts->{use_cache_file} = ( $SHARE_MEDIUM eq 'file' ? 1 : 0 );
-    $opts->{use_mmap} = ( $SHARE_MEDIUM eq 'mmap' ? 1 : 0 );
+    $opts->{medium} //= $SHARE_MEDIUM;
+    $opts->{use_cache_file} //= ( $opts->{medium} eq 'file' ? 1 : 0 );
+    $opts->{use_mmap} //= ( $opts->{medium} eq 'mmap' ? 1 : 0 );
     $opts->{fallback} = $SHARE_FALLBACK if( !CORE::exists( $opts->{fallback} ) || !CORE::length( $opts->{fallback} ) );
     
     my( $shm, $data );
@@ -1411,13 +1427,15 @@ sub _share_vars
         
         my $size = $SHARED_MEMORY_SIZE;
         $p->{size} = $size if( defined( $size ) && CORE::length( $size ) && int( $size ) > 0 );
-        if( $opts->{use_mmap} )
+        if( $opts->{use_mmap} || 
+            $opts->{medium} eq 'mmap' )
         {
             my $s = Module::Generic::File::Mmap->new( %$p ) || 
                 return( __PACKAGE__->pass_error( Module::Generic::File::Mmap->error ) );
             $shm = $s->open || return( __PACKAGE__->pass_error( $s->error ) );
         }
-        elsif( Module::Generic::SharedMemXS->supported && !$opts->{use_cache_file} )
+        elsif( ( Module::Generic::SharedMemXS->supported && !$opts->{use_cache_file} ) || 
+               $opts->{medium} eq 'memory' )
         {
             my $s = Module::Generic::SharedMemXS->new( %$p ) || return( __PACKAGE__->error( "Unable to create shared memory object: ", Module::Generic::SharedMemXS->error ) );
             $shm = $s->open;
@@ -1539,21 +1557,25 @@ sub _set_shared_space
     # If we are the child we do not destroy the shared memory, otherwise our parent 
     # would not have time to access the data we will have stored there. We just remove 
     # our semaphore
-    if( ( ( defined( $SHARE_MEDIUM ) && $SHARE_MEDIUM eq 'memory' ) ||
-          ( !$self->{use_cache_file} && !$self->{use_mmap} )
+    if( ( ( defined( $self->{medium} ) && $self->{medium} eq 'memory' ) ||
+          ( !$self->{use_cache_file} && 
+            !$self->{use_mmap} && 
+            $self->{medium} ne 'file' && 
+            $self->{medium} ne 'mmap' )
         ) && $self->is_child )
     {
         $p->{destroy_semaphore} = 0;
     }
     
     my $shm;
-    if( $self->{use_mmap} )
+    if( $self->{use_mmap} || $self->{medium} eq 'mmap' )
     {
         my $s = Module::Generic::File::Mmap->new( %$p ) || 
             return( $self->pass_error( Module::Generic::File::Mmap->error ) );
         $shm = $s->open || return( $self->pass_error( $s->error ) );
     }
-    elsif( Module::Generic::SharedMemXS->supported && !$self->{use_cache_file} )
+    elsif( ( Module::Generic::SharedMemXS->supported && !$self->{use_cache_file} && $self->{medium} ne 'file' ) ||
+           $self->{medium} eq 'memory' )
     {
         my $s = Module::Generic::SharedMemXS->new( %$p ) || return( $self->error( "Unable to create shared memory object: ", Module::Generic::SharedMemXS->error ) );
         $shm = $s->open;
@@ -1576,6 +1598,7 @@ sub _set_shared_space
             $shm->attach;
         }
     }
+    # File Cache
     else
     {
         my $s = Module::Generic::File::Cache->new( %$p ) || return( $self->error( "Unable to create shared cache file object: ", Module::Generic::File::Cache->error ) );
@@ -2438,7 +2461,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.4.3
+    v0.4.4
 
 =head1 DESCRIPTION
 
@@ -2569,7 +2592,7 @@ For a framework to do asynchronous tasks, you might also be interested in L<Coro
     my $p = Promise::Me->new(sub
     {
         # some code to run asynchronously
-    }, { debug => 4, result_shared_mem_size => 2097152, shared_vars_mem_size => 65536, timeout => 2 });
+    }, { debug => 4, result_shared_mem_size => 2097152, shared_vars_mem_size => 65536, timeout => 2, medium => 'mmap' });
 
 Instantiate a new C<Promise::Me> object.
 
@@ -2592,6 +2615,14 @@ Sets the debug level. This can be quite verbose and will slow down the process, 
 =item I<exception_class>
 
 The exception class you want to use, so that L<Promise::Me> can properly detect it when it is return from the main callback and call L</reject>, passing the exception object as it sole parameter.
+
+=item I<medium>
+
+This sets the medium type to use to share data between parent and child process. Possible values are: C<memory>, C<mmap> or C<file>
+
+It defaults to the class variable C<$SHARE_MEDIUM>
+
+See also the related method L</medium>
 
 =item I<result_shared_mem_size> integer
 
@@ -2638,6 +2669,12 @@ This takes a code reference as its unique argument and is added to the chain of 
 It will be called upon an exception being met or if L</reject> is called.
 
 The callback subroutine will be passed the error object as its unique argument.
+
+Be careful not to intentionally die in the C<catch> block unless you have another C<catch> block after, because if you die, it will trigger another catch, and you will not see that you died in the first place, because, well, it was caught... Instead you want to get the exception and log it, print it, do something with it.
+
+=head2 medium
+
+Sets or gets the medium type to be used to share data between parent and child process. Valid values are: C<memory>, C<mmap> and C<file>
 
 =head2 reject
 

@@ -16,7 +16,7 @@ with 'PDK::Device::Role';
 #------------------------------------------------------------------------------
 sub _prompt {
   my $self   = shift;
-  my $prompt = '.*?\((?:active|passive)\)[>#]';
+  my $prompt = '^.*?(\((?:active|passive)\))?[>#]\s*$';
   return $prompt;
 }
 

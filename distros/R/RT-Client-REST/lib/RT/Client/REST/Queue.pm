@@ -6,14 +6,14 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Queue;
-$RT::Client::REST::Queue::VERSION = '0.60';
+$RT::Client::REST::Queue::VERSION = '0.70';
 use Params::Validate qw(:types);
-use RT::Client::REST 0.20;
-use RT::Client::REST::Object 0.01;
-use RT::Client::REST::Object::Exception 0.01;
-use RT::Client::REST::SearchResult 0.02;
+use RT::Client::REST;
+use RT::Client::REST::Object;
+use RT::Client::REST::Object::Exception;
+use RT::Client::REST::SearchResult;
 use RT::Client::REST::Ticket;
-use base 'RT::Client::REST::Object';
+use parent 'RT::Client::REST::Object';
 
 
 sub _attributes {{
@@ -81,6 +81,7 @@ sub _attributes {{
         validation => {
             type   => SCALAR,
         },
+        rest_name => 'Disabled',
     },
 
     admin_cc_addresses => {
@@ -139,7 +140,7 @@ RT::Client::REST::Queue - queue object representation.
 
 =head1 VERSION
 
-version 0.60
+version 0.70
 
 =head1 SYNOPSIS
 
@@ -196,13 +197,23 @@ Final priority.
 
 Default due in.
 
-=item B<cc_addresses>
+=item B<disabled>
 
-CC Addresses (comma delimited).
+Queue is disabled
 
 =item B<admin_cc_addresses>
 
 Admin CC Addresses (comma delimited).
+
+=item B<cc_addresses>
+
+CC Addresses (comma delimited).
+
+=for stopwords SLA
+
+=item B<sla_disabled>
+
+Queue SLA is disabled
 
 =item B<cf>
 
@@ -212,7 +223,8 @@ you can read more details.
 Trivial example:
 
  my $queue = RT::Client::REST::Queue->new(
-   rt => $rt, id => $queue_id
+   rt => $rt,
+   id => $queue_id
  )->retrieve();
  my @customfields = $queue->cf();
  for my $f (@customfields) {
@@ -275,11 +287,11 @@ L<RT::Client::REST::Ticket>.
 
 =head1 AUTHOR
 
-Dmitri Tikhonov
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

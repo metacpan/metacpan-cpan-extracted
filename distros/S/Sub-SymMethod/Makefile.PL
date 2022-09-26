@@ -20,27 +20,25 @@ my $meta = {
                         configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                         develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                         runtime   => {
-                                       recommends => { "Type::Params" => "1.003000" },
-                                       requires   => { "Exporter::Shiny" => "1.000000", "perl" => 5.008008, "Role::Hooks" => 0 },
+                                       recommends => { "Type::Params" => "2.000000" },
+                                       requires   => { "Exporter::Shiny" => "1.004000", "perl" => 5.008008, "Role::Hooks" => 0 },
                                      },
                         test      => {
                                        requires => {
                                          "parent"          => 0,
                                          "Role::Tiny"      => 0,
                                          "Test::More"      => 0.96,
-                                         "Type::Params"    => "1.003000",
-                                         "Types::Standard" => 0,
+                                         "Type::Params"    => "2.000000",
+                                         "Types::Standard" => "2.000000",
                                        },
                                      },
                       },
   "provides"       => {
-                        "Sub::SymMethod" => { file => "lib/Sub/SymMethod.pm", version => 0.005 },
+                        "Sub::SymMethod" => { file => "lib/Sub/SymMethod.pm", version => "1.000" },
                       },
   "release_status" => "stable",
   "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Sub-SymMethod",
-                                        },
+                        bugtracker   => { web => "https://github.com/tobyink/p5-sub-symmethod/issues" },
                         homepage     => "https://metacpan.org/release/Sub-SymMethod",
                         license      => ["http://dev.perl.org/licenses/"],
                         repository   => {
@@ -50,7 +48,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-SymMethod/project",
                       },
-  "version"        => 0.005,
+  "version"        => "1.000",
 };
 
 my %dynamic_config;

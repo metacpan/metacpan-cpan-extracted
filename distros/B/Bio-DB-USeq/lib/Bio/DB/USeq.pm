@@ -1,6 +1,6 @@
 package Bio::DB::USeq;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 =head1 NAME
 
@@ -1036,15 +1036,53 @@ sub chr_stats {
 	# chromosome stats must be generated
 	my @slices = $self->_translate_coordinates_to_slices(
 		$seq_id, 1, $self->length($seq_id), 0);
-	$self->_clear_buffer(\@slices);
-	my $stat = $self->_stat_summary(1, $self->length($seq_id), \@slices);
+	
+	# the normal _stat_summary() function requires loading entire chromosome worth of 
+	# slices into memory and can become a huge memory hog, so we'll go one at time 
+	# instead in a slightly more efficient manner
+	my $count = 0;
+	my $sum;
+	my $sum_squares;
+	my $min;
+	my $max;
+	foreach my $slice (@slices) {
+		next unless $self->slice_type($slice) =~ /f/; 
+			# no sense going through if no score present
+		
+		# load and unpack the data
+		$self->_clear_buffer([$slice]);
+		$self->_load_slice($slice);
+		
+		# find the overlapping observations
+		my $results = $self->{'buffer'}{$slice}->fetch(
+			$self->slice_start($slice) - 1, $self->slice_end($slice));
+		foreach my $r (@$results) {
+			# each observation is [start, stop, score]
+			if (defined $r->[2]) {
+				$count++;
+				$sum += $r->[2];
+				$sum_squares += ($r->[2] * $r->[2]);
+				$min = $r->[2] if (!defined $min or $r->[2] < $min);
+				$max = $r->[2] if (!defined $max or $r->[2] > $max);
+			}
+		}
+	}
+	
+	# assemble stats
+	my %stat = (
+		'validCount'    => $count,
+		'sumData'       => $sum || 0,
+		'sumSquares'    => $sum_squares || 0,
+		'minVal'        => $min || 0,
+		'maxVal'        => $max || 0,
+	);
 	
 	# then associate with the metadata
-	$self->{'metadata'}{"chromStats_$seq_id"} = join(',', map { $stat->{$_} } 
+	$self->{'metadata'}{"chromStats_$seq_id"} = join(',', map { $stat{$_} } 
 		qw(validCount sumData sumSquares minVal maxVal) );
 	$self->_rewrite_metadata unless $delay_write;
 	
-	return $stat;
+	return \%stat;
 }
 
 sub chr_mean {
@@ -1090,7 +1128,7 @@ sub global_stats {
 		$sum         += $stats->{sumData};
 		$sum_squares += $stats->{sumSquares};
 		$min          = $stats->{minVal} if (!defined $min or $stats->{minVal} < $min);
-		$max          = $stats->{maxVal} if (!defined $max or $stats->{maxVal} < $max);
+		$max          = $stats->{maxVal} if (!defined $max or $stats->{maxVal} > $max);
 	}
 	
 	# assemble the statistical summary hash
@@ -1477,13 +1515,20 @@ sub _parse_members {
 		$strand = $strand eq '+' ? 1 : $strand eq '.' ? 0 : $strand eq '-' ? -1 : 0;
 		$start += 1;
 		
+		# check coordinates
+		# hack to cover a bug? Can't have zero or negative coordinates
+		if ($start >= $stop) {
+			$stop += 1;
+		}
+		
 		# store the member details for each member slice
 		$self->{'file2attribute'}{$member} = 
 			[$chromo, $start, $stop, $strand, $extension, $number];
 		
 		# store the member into a chromosome-strand-specific interval tree
+		# interval trees are stored as 0-based, half-open intervals
 		$self->{'coord2file'}{$chromo}{$strand} ||= Set::IntervalTree->new();
-		$self->{'coord2file'}{$chromo}{$strand}->insert($member, $start, $stop);
+		$self->{'coord2file'}{$chromo}{$strand}->insert($member, $start - 1, $stop);
 	}
 	
 	# check parsing
@@ -1547,14 +1592,14 @@ sub _translate_coordinates_to_slices {
 	if ($both) {
 		# need to collect from both strands
 		# plus strand first, then minus strand
-		my $results = $self->{'coord2file'}{$seq_id}{1}->fetch($start, $stop);
-		my $results2 = $self->{'coord2file'}{$seq_id}{-1}->fetch($start, $stop);
+		my $results = $self->{'coord2file'}{$seq_id}{1}->fetch($start - 1, $stop);
+		my $results2 = $self->{'coord2file'}{$seq_id}{-1}->fetch($start - 1, $stop);
 		push @slices, @$results, @$results2;
 	}
 	
 	# specific strand
 	else {
-		my $results = $self->{'coord2file'}{$seq_id}{$strand}->fetch($start, $stop);
+		my $results = $self->{'coord2file'}{$seq_id}{$strand}->fetch($start - 1, $stop);
 		push @slices, @$results;
 	}
 	

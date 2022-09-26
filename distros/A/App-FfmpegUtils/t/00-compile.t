@@ -6,15 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FfmpegUtils.pm'
 );
 
 my @scripts = (
+    'script/cut-video-by-duration',
     'script/reencode-video-with-libx264',
     'script/split-video-by-duration',
+    'script/vcut',
     'script/vreencode',
     'script/vsplit'
 );

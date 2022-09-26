@@ -1,4 +1,4 @@
-package Sub::Call::Tail; # git description: Sub-Call-Tail-0.05-7-gfee82bd
+package Sub::Call::Tail; # git description: v0.06-16-g0ca0d45
 # ABSTRACT: Tail calls for subroutines and methods
 
 use strict;
@@ -8,7 +8,7 @@ require 5.008001;
 use parent qw(Exporter DynaLoader);
 use B::Hooks::OP::Check::EntersubForCV;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our @EXPORT = our @EXPORT_OK = qw(tail);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
@@ -33,7 +33,7 @@ Sub::Call::Tail - Tail calls for subroutines and methods
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -65,13 +65,18 @@ L<B::Hooks::OP::Check::EntersubForCV>
 
 L<CPS>
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Call-Tail>
+(or L<bug-Sub-Call-Tail@rt.cpan.org|mailto:bug-Sub-Call-Tail@rt.cpan.org>).
+
 =head1 AUTHOR
 
 יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Florian Ragwitz Andrew Main (Zefram) Zefram
+=for stopwords Karen Etheridge Florian Ragwitz Graham Knop Andrew Main (Zefram)
 
 =over 4
 
@@ -85,15 +90,19 @@ Florian Ragwitz <rafl@debian.org>
 
 =item *
 
+Graham Knop <haarg@haarg.org>
+
+=item *
+
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =item *
 
-Zefram <zefram@fysh.org>
+Karen Etheridge <github@froods.org>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2009 by יובל קוג'מן (Yuval Kogman).
 

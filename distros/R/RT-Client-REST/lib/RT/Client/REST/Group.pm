@@ -6,13 +6,13 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Group;
-$RT::Client::REST::Group::VERSION = '0.60';
-use base 'RT::Client::REST::Object';
+$RT::Client::REST::Group::VERSION = '0.70';
+use parent 'RT::Client::REST::Object';
 
 use Params::Validate qw(:types);
-use RT::Client::REST 0.14;
-use RT::Client::REST::Object::Exception 0.01;
-use RT::Client::REST::SearchResult 0.02;
+use RT::Client::REST;
+use RT::Client::REST::Object::Exception;
+use RT::Client::REST::SearchResult;
 
 
 sub _attributes {{
@@ -72,7 +72,7 @@ RT::Client::REST::Group - group object representation.
 
 =head1 VERSION
 
-version 0.60
+version 0.70
 
 =head1 SYNOPSIS
 
@@ -152,11 +152,11 @@ L<RT::Client::REST::SearchResult>.
 
 =head1 AUTHOR
 
-Dmitri Tikhonov
+Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by Dmitri Tikhonov.
+This software is copyright (c) 2022, 2020 by Dmitri Tikhonov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -39,6 +39,11 @@ test
     stdin  => '> ' . ("0123456789" x 5),
     expect => join("\n", ("> 0123456789") x 5);
 
+test
+    option => "-w7 --prefix '> ' --boundary=word",
+    stdin  => '> 12345 1234567',
+    expect => "> 12345\n" . ">  1234\n" . "> 567";
+
 ##
 ## multiple width
 ##

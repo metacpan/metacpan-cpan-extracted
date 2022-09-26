@@ -16,37 +16,37 @@ SYNOPSIS
         use Types::Standard -types;
     
         multimethod stringify => (
-          signature => [ Undef ],
-          code      => sub ( $self, $undef ) {
+          positional => [ Undef ],
+          code       => sub ( $self, $undef ) {
             return 'null';
           },
         );
     
         multimethod stringify => (
-          signature => [ ScalarRef[Bool] ],
-          code      => sub ( $self, $bool ) {
+          positional => [ ScalarRef[Bool] ],
+          code       => sub ( $self, $bool ) {
             return $$bool ? 'true' : 'false';
           },
         );
     
         multimethod stringify => (
-          alias     => "stringify_str",
-          signature => [ Str ],
-          code      => sub ( $self, $str ) {
+          alias      => "stringify_str",
+          positional => [ Str ],
+          code       => sub ( $self, $str ) {
             return sprintf( q<"%s">, quotemeta($str) );
           },
         );
     
         multimethod stringify => (
-          signature => [ Num ],
-          code      => sub ( $self, $n ) {
+          positional => [ Num ],
+          code       => sub ( $self, $n ) {
             return $n;
           },
         );
     
         multimethod stringify => (
-          signature => [ ArrayRef ],
-          code      => sub ( $self, $arr ) {
+          positional => [ ArrayRef ],
+          code       => sub ( $self, $arr ) {
             return sprintf(
               q<[%s]>,
               join( q<,>, map( $self->stringify($_), @$arr ) )
@@ -55,8 +55,8 @@ SYNOPSIS
         );
     
         multimethod stringify => (
-          signature => [ HashRef ],
-          code      => sub ( $self, $hash ) {
+          positional => [ HashRef ],
+          code       => sub ( $self, $hash ) {
             return sprintf(
               q<{%s}>,
               join(
@@ -85,7 +85,7 @@ SYNOPSIS
     works on Perl 5.8.1 and above.
 
 DESCRIPTION
-    Sub::Multimethod focusses on implementing the dispatching of multimethods
+    Sub::MultiMethod focusses on implementing the dispatching of multimethods
     well and is less concerned with providing a nice syntax for setting them
     up. That said, the syntax provided is inspired by Moose's `has` keyword
     and hopefully not entirely horrible.
@@ -114,40 +114,11 @@ DESCRIPTION
     class, in which case, you don't need to import anything.
 
    `multimethod $name => %spec`
-    The following options are supported in the specification for the
-    multimethod.
-
-    `named` *(Bool)*
-        Optional, defaults to false.
-
-        Indicates whether this candidate uses named parameters. The default is
-        positional parameters.
-
-    `signature` *(ArrayRef|CodeRef)*
-        Required.
-
-        For positional parameters, an ordered list of type constraints
-        suitable for passing to `compile` from Type::Params.
-
-          signature => [ Str, RegexpRef, Optional[FileHandle] ],
-
-        For named parameters, a list suitable for passing to
-        `compile_named_oo`.
-
-          signature => [
-            prefix  => Str,
-            match   => RegexpRef,
-            output  => FileHandle, { default => sub { \*STDOUT } },
-          ],
-
-        Sub::MultiMethods is designed to handle multi *methods*, so $self at
-        the start of all signatures is implied.
-
-        `signature` *may* be a coderef instead, which should die if it gets
-        passed a @_ that it cannot handle, or return @_ (perhaps after some
-        processing) if it is successful. Using coderef signatures may make
-        deciding which candidate to dispatch to more difficult though, in
-        cases where more than one candidate matches the given parameters.
+    The specification supports the same options as Type::Params v2 to specify
+    a signature for the method, plus a few Sub::MultiMethod-specific options.
+    Any options not included in the list below are passed through to
+    Type::Params. (The options `goto_next`, `on_die`, `message`, and `want_*`
+    are not supported.)
 
     `code` *(CodeRef)*
         Required.
@@ -189,6 +160,17 @@ DESCRIPTION
             ...;
           },
 
+    `signature` *(CodeRef)*
+        Optional.
+
+        If `signature` is set, then Sub::MultiMethod won't use Type::Params to
+        build a signature for this multimethod candidate. It will treat the
+        coderef as an already-built signature.
+
+        A coderef signature is expected to take @_, throw an exception if the
+        arguments cannot be handled, and return @_ (possibly after some
+        manipulation).
+
     `alias` *(Str|ArrayRef[Str])*
         Optional.
 
@@ -196,7 +178,7 @@ DESCRIPTION
         (But not bypassing the checks, coercions, and defaults in the
         signature!)
 
-    `method` *(Int)*
+    `method` *(Bool)*
         Optional, defaults to 1.
 
         Indicates whether the multimethod should be treated as a method (i.e.
@@ -205,11 +187,6 @@ DESCRIPTION
 
         Multisubs where some candidates are methods and others are non-methods
         are not currently supported! (And probably never will be.)
-
-        (Yes, this is technically an integer rather than a boolean. This
-        allows for subs to have, say, two logical invocants. For example, in
-        Catalyst, you might want to treat the context object as a second
-        invocant.)
 
     `score` *(Int)*
         Optional.
@@ -229,17 +206,6 @@ DESCRIPTION
         and accept the default.
 
    `monomethod $name => %spec`
-    As a convenience, you can use Sub::MultiMethod to install normal methods.
-    Why do this instead of using Perl's plain old `sub` keyword? Well, it
-    gives you the same signature checking.
-
-    Supports the following options:
-
-    `named` *(Bool)*
-    `signature` *(ArrayRef|CodeRef)*
-    `code` *(CodeRef)*
-    `method` *(Int)*
-
     `monomethod($name, %spec)` is basically just a shortcut for
     `multimethod(undef, alias => $name, %spec)` though with error messages
     which don't mention it being an alias.
@@ -317,7 +283,7 @@ DESCRIPTION
         use Types::Standard -types;
     
         multimethod foo => (
-          signature  => [ HashRef ],
+          positional => [ HashRef ],
           code       => sub { return "A" },
           alias      => "foo_a",
         );
@@ -329,7 +295,7 @@ DESCRIPTION
         use Types::Standard -types;
     
         multimethod foo => (
-          signature  => [ ArrayRef ],
+          positional => [ ArrayRef ],
           code       => sub { return "B" },
         );
       }
@@ -342,7 +308,7 @@ DESCRIPTION
         with qw( My::RoleA My::RoleB );
     
         multimethod foo => (
-          signature  => [ HashRef ],
+          positional => [ HashRef ],
           code       => sub { return "C" },
         );
       }
@@ -364,16 +330,16 @@ DESCRIPTION
       my ($coderef, $otherref);
   
       multimethod \$coderef => (
-        method    => 0,
-        signature => [ ArrayRef ],
-        code      => sub { say "It's an arrayref!" },
+        method     => 0,
+        positional => [ ArrayRef ],
+        code       => sub { say "It's an arrayref!" },
       );
   
       multimethod \$coderef => (
-        method    => 0,
-        alias     => \$otherref,
-        signature => [ HashRef ],
-        code      => sub { say "It's a hashref!" },
+        method     => 0,
+        alias      => \$otherref,
+        positional => [ HashRef ],
+        code       => sub { say "It's a hashref!" },
       );
   
       $coderef->( [] );
@@ -457,25 +423,30 @@ DESCRIPTION
         Returns a boolean indicating whether the coderef is known to be a
         multimethod dispatcher.
 
-    `Sub::MultiMethod->pick_candidate(\@candidates, \@args, \@invocants)`
-        Returns a list of three items: first the winning candidate from an
-        array of specs, given the args and invocants, second the modified args
-        after coercion has been applied, and third the modified invocants.
+    `Sub::MultiMethod->pick_candidate(\@candidates, \@args)`
+        Returns a list of two items: first the winning candidate from an array
+        of specs, given the args and invocants, and second the modified args
+        after coercion has been applied.
 
         This is basically how the dispatcher for a method works:
 
-          my @invocants = splice( @_, 0, $ismethod );
-          my $pkg       = __PACKAGE__;
+          my $pkg = __PACKAGE__;
+          if ( $ismethod ) {
+            $pkg = Scalar::Util::blessed( $_[0] ) || $_[0];
+          }
   
-          my $smm = 'Sub::MultiMethod';
-          my @candidates =
-            $smm->get_all_multimethod_candidates( $pkg, $sub, $ismethod );
-          my ( $winner, $new_args, $new_invocants ) =
-            $smm->pick_candidate( \@candidates, \@_, \@invocants );
+          my ( $winner, $new_args ) = 'Sub::MultiMethod'->pick_candidate(
+            [
+              'Sub::MultiMethod'->get_all_multimethod_candidates(
+                $pkg,
+                $sub,
+                $ismethod,
+              )
+            ],
+            \@_,
+          );
   
-          my $coderef = $winner->{code};
-          @_ = ( @$new_invocants, @$new_args );
-          goto $coderef;
+          $winner->{code}->( @$new_args );
 
 BUGS
     Please report any bugs to

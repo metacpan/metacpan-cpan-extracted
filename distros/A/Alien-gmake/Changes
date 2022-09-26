@@ -1,5 +1,11 @@
 Revision history for Alien-gmake
 
+0.24      2022-09-23 20:33:41 -0600
+  - Re-released because 0.22 is missing from CPAN
+
+0.22      2020-02-21 00:53:14 -0500
+  - Switch to https instead of http for better security.
+
 0.21      2018-01-31 10:33:46 -0500
   - implicit modification of PATH is now removed
     (was deprecated in 0.17)

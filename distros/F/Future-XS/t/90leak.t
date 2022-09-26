@@ -90,4 +90,15 @@ no_growth {
    $f->set_udata( datum => [] );
 } 'Future::XS->set_label does not leak';
 
+# Test the compaction logic on revocation list
+{
+   my $f1 = Future::XS->new;
+
+   no_growth {
+      my $f2 = Future::XS->new;
+      $f1->on_cancel( $f2 );
+      $f2->cancel;
+   } 'Future::XS on_cancel chaining does not grow';
+}
+
 done_testing;

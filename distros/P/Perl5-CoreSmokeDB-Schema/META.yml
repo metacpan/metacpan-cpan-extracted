@@ -1,0 +1,35 @@
+---
+abstract: 'DBIC::Schema for the smoke reports database'
+author:
+  - 'Abe Timmerman <abeltje@cpan.org>'
+build_requires:
+  JSON: '4.09'
+  Test::DBIC::SQLite: '1.01'
+  Test::Fatal: '0.01'
+  Test::Simple: '0.88'
+  Test::Warnings: '0.028'
+configure_requires:
+  ExtUtils::MakeMaker: '6.5502'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl5-CoreSmokeDB-Schema
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::Pg: v3.14.0
+  DBIx::Class: '0.08271'
+  DBIx::Class::Schema::Loader: '0.07049'
+  DateTime::Format::Pg: '0.16013'
+  Exception::Class: '1.44'
+  perl: '5.010001'
+resources:
+  homepage: https://github.com/abeltje/Perl5-CoreSmokeDB-Schema.git
+  repository: https://github.com:abeltje/Perl5-CoreSmokeDB-Schema.git
+version: 1.07
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

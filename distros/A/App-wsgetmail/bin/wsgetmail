@@ -1,6 +1,4 @@
 #!/usr/bin/env perl
-### before: #!@PERL@
-#
 # BEGIN BPS TAGGED BLOCK {{{
 #
 # COPYRIGHT:
@@ -51,6 +49,7 @@
 
 use v5.10;
 use strict;
+use Fcntl ':flock';
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use JSON;
@@ -82,20 +81,39 @@ foreach my $option ( keys %$extra_options ) {
 $config->{dry_run} = $dry_run if (defined $dry_run);
 $config->{debug} = $debug if (defined $debug);
 
+my $foldername = $config->{folder};
+
+$foldername =~ s{/}{_}g;
+
+my $lock_file_name = '/tmp/' . join( '.', 'wsgetmail', $config->{username}, $foldername, 'lock' );
+
+open my $lock_file_fh, '>', $lock_file_name or die "unable to open lock file $lock_file_name ($!)";
+
+if ( !flock $lock_file_fh, LOCK_EX | LOCK_NB ) {
+    print "$0 is already running for $config->{username}/$config->{folder} ($!)\n";
+    exit;
+}
 
 my $getmail = App::wsgetmail->new({config => $config});
 
 print "\nfetching mail using configuration $config_file\n";
 
-my $count = 0;
+my $done_count = 0;
+my $error_count = 0;
 
 while (my $message = $getmail->get_next_message()) {
     my $ok = $getmail->process_message($message);
-    $count++ if ($ok);
+    if ($ok) {
+        $done_count++;
+    }
+    else {
+        $error_count++;
+    }
 }
 
-print "\nprocessed $count messages\n";
+print "\nprocessed $done_count messages\n";
 
+die "there were errors with $error_count messages\n" if $error_count;
 
 __END__
 

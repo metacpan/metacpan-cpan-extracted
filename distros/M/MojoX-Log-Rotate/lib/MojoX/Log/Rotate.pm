@@ -1,28 +1,42 @@
 package MojoX::Log::Rotate;
-$MojoX::Log::Rotate::VERSION = '1.222630';
+$MojoX::Log::Rotate::VERSION = '1.222670';
 # ABSTRACT: Makes mojolicious log file rotation easy
 use Mojo::Base 'Mojo::Log', -signatures;
+use Mojo::File;
 
 has 'need_rotate_cb';
 has 'rotate_cb';
 has last_rotate => sub ($s) { $s->path && -f $s->path ? (stat $s->path)[10] : time() };
 has frequency => 60 * 60 * 24; #every day
 
+#for threading supports
+has '_thread';
+has '_queue';
+
 sub new ($class, %params)  {
   my %p = map  { $_ => delete $params{$_} } 
           grep { exists $params{$_} } 
-          qw(frequency how when);
+          qw(frequency how when threaded on_rotate);
   my $self = $class->SUPER::new(%params);
 
   $self->frequency($p{frequency}) if exists $p{frequency};
   $self->rotate_cb($p{how} // \&default_rotation_cb);
   $self->need_rotate_cb($p{when} // \&default_need_rotation_cb);
+  $self->on(rotate => $p{on_rotate}) if exists $p{on_rotate};
 
-  #inject our message subscrition on the top
-  my $subscribers = $self->subscribers('message');
-  $self->unsubscribe('message');
-  $self->on(message => \&on_message_handler);
-  $self->on(message => $_) for @$subscribers;
+  if($p{threaded}) {
+    #force calculation of initial last_rotate;
+    $self->last_rotate;
+    $self->initialize_thread_support;
+  }
+  else{
+    #inject our message subscrition on the top
+    my $subscribers = $self->subscribers('message');
+    $self->unsubscribe('message');
+    $self->on(message => \&on_message_handler);
+    $self->on(message => $_) for @$subscribers;
+  }
+
 
   $self;
 }
@@ -42,7 +56,7 @@ sub on_message_handler ($self, $level, @args) {
 # must returns a false value when there is no need to rotate, or a true value.
 # the returns value will be passed to the rotate_cb so that you can share data between callback.
 sub default_need_rotation_cb ($self) {
-  return unless $self->path;
+  return unless $self->path;  
   if(time - $self->last_rotate > $self->frequency ) {
     my $last_rotate = $self->last_rotate;
     return { last_rotate => $last_rotate };
@@ -51,21 +65,45 @@ sub default_need_rotation_cb ($self) {
 }
 
 sub default_rotation_cb ($self, $when_res) {
-  require File::Copy;  
-  close $self->handle;
   my $res = { }; #nothing to rotate
-  if(-f $self->path) {
-    my ($y, $m, $d, $h, $mi, $s) =  (localtime)[5, 4, 3, 2, 1, 0];
-    my $suffix = sprintf("_%04d%02d%02d_%02d%02d%02d", $y+1900, $m+1, $d, $h, $mi, $s);
-    my $new_name = $self->path =~ s/(\.[^.]+)$/$suffix$1/r;
-    File::Copy::move $self->path => $new_name
-      or die "MojoX::Log::Rotation failed to move " . $self->path . " into $new_name : $!";
-    $res = { rotated_file => $new_name };
+  if(my $handle = $self->handle) {
+    if(-f $self->path) {
+      my ($y, $m, $d, $h, $mi, $s) =  (localtime)[5, 4, 3, 2, 1, 0];
+      my $suffix = sprintf("_%04d%02d%02d_%02d%02d%02d", $y+1900, $m+1, $d, $h, $mi, $s);
+      my $new_name = $self->path =~ s/(\.[^.]+)$/$suffix$1/r;
+      $handle->flush;
+      $handle->close;
+      Mojo::File->new($self->path)->move_to($new_name)
+        or die "MojoX::Log::Rotation failed to move " . $self->path . " into $new_name : $!";
+      $res = { rotated_file => $new_name };
+    }
   }
   $self->handle(Mojo::File->new($self->path)->open('>>'));
   return $res;
 }
 
+sub initialize_thread_support ($self) {#may not works well with multiple loggers...
+  eval 'use threads; use Thread::Queue; use Mojo::Util';
+  my $q = Thread::Queue->new;
+  my $appender = \&Mojo::Log::append;
+  my $thlog = threads->create(sub {
+      while(defined(my $job = $q->dequeue)) {
+        $appender->($self, $job->{msg});
+        on_message_handler($self, '', '');
+      }
+  });
+  Mojo::Util::monkey_patch('Mojo::Log', 'append', sub {
+      my ($self, $msg) = @_;
+      $q->enqueue({type => 'msg', msg => $msg});
+  });
+  $self->_queue($q);
+  $self->_thread($thlog);
+}
+
+sub stop ($self) {
+  $self->_queue->end;
+  $self->_thread->join;
+}
 1;
 
 __END__
@@ -80,7 +118,7 @@ MojoX::Log::Rotate - Makes mojolicious log file rotation easy
 
 =head1 VERSION
 
-version 1.222630
+version 1.222670
 
 =head1 SYNOPSIS
 
@@ -103,7 +141,7 @@ version 1.222630
 
   sub how_to ($log, $when_res) {
     # implement your custom log rotation here, or just let's use the default callback
-    # you don't even need to specify C<how> parameter in the L</"new"> constructor.
+    # you don't even need to specify "how" parameter in the "new"> constructor.
     $log->default_rotation_cb($when_res);
   }
 
@@ -188,14 +226,28 @@ The constructor inherits from L<Mojo::Log> constructor and accepts the following
 
   Set the L</"frequency"> attribute.
 
+=head3 threaded
+
+  Initialize a main thread to centralize mesage and patch L<Mojo::Log/"append"> to redirect
+messages into a L<Threaded::Queue> object.
+
+=head3 on_rotate
+
+  Allow to register the C<rotate> event just before create the thread that will process messages.
+
+=head2 stop
+
+  Stop the internal queue and call L<threads/"join"> the main thread.
+
 =head1 DEFAULT BEHAVIOUR
 
 The default behaviour is to rotate the log file based on the node creation time attribute (stat() 10th returned value)
-of the filename returned by L</"path">. It append the suffix pattern _YYYYMMDD_hhmmss just before the extension.
+of the filename returned by L<Mojo::Log/"path">. It append the suffix pattern _YYYYMMDD_hhmmss just before the extension.
 
 =head1 LIMITATION
 
-Does not works with call to L</"append"> method or any direct access to the underlying file handle.
+Does not works with call to L<Mojo::Log/"append"> method or any direct access to the underlying file handle.
+In C<threaded> mode you cannot register additonal message to the logger, that must be done just before cloning the logger objet in the thread that will process messages.
 
 =head1 SEE ALSO
 
@@ -203,7 +255,7 @@ L<Mojo::Log>, L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>
 
 =head1 AUTHOR
 
-Nicolas Georges xlat@cpan.org ( see fork http://github.com/xlat/excel-reader-xlsx)
+Nicolas Georges xlat@cpan.org ( see fork https://github.com/xlat/mojox-log-rotate)
 
 =head1 COPYRIGHT
 

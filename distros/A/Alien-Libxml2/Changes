@@ -1,5 +1,11 @@
 Revision history for Alien-Libxml2
 
+0.19      2022-09-25 08:54:48 -0600
+
+0.18_01   2022-09-23 21:05:53 -0600
+  - Use Download::GitLab plugin to fetch recent version of
+    libxml2
+
 0.17      2020-11-02 12:03:28 -0700
   - Bump required version of AB for bug fixes (gh#23, gh#24)
 

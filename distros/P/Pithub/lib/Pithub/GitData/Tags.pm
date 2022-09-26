@@ -1,6 +1,6 @@
 package Pithub::GitData::Tags;
 our $AUTHORITY = 'cpan:PLU';
-our $VERSION = '0.01039';
+our $VERSION = '0.01040';
 # ABSTRACT: Github v3 Git Data Tags API
 
 use Moo;
@@ -45,7 +45,7 @@ Pithub::GitData::Tags - Github v3 Git Data Tags API
 
 =head1 VERSION
 
-version 0.01039
+version 0.01040
 
 =head1 DESCRIPTION
 
@@ -99,7 +99,7 @@ B<message>: mandatory string of the tag message
 
 =item *
 
-B<object>: mandatory stringof the SHA of the git object this is tagging
+B<object>: mandatory string of the SHA of the git object this is tagging
 
 =item *
 

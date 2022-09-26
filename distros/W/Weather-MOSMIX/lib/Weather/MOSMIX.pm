@@ -12,7 +12,7 @@ use Storable 'dclone';
 use Time::Piece;
 use Encode 'encode', 'decode';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -263,7 +263,6 @@ sub format_forecast_dbh( $self, $dbh, $interval, $offset=0 ) {
     where row = 1
     order by timestamp
 SQL
-
     my $res = $dbh->selectall_arrayref($sql, { Slice => {} });
 
     # Now, add dummy data for slots we don't have
@@ -434,6 +433,8 @@ L<https://opendata.dwd.de/weather/>
 L<https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_S/all_stations/kml/>
 
 Other Weather APIs
+
+L<Weather::YR> - API of the L<https://yr.no> weather service
 
 L<https://openweathermap.org/api> - international, signup required
 

@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Mite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.036';
+our $VERSION   = '0.037';
 
 use Sub::HandlesVia::Mite -all;
 extends 'Sub::HandlesVia::Toolkit';

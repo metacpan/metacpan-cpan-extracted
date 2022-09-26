@@ -12,7 +12,7 @@ use Alien::Build::Plugin::Download::Negotiate;
 use Alien::Build::Plugin::Extract::Negotiate;
 
 # ABSTRACT: Alien::Build plugin to download from GitHub
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 has github_user => sub { croak("github_user is required") };
@@ -22,15 +22,28 @@ has version => qr/^v?(.*)$/;
 has prefer => 0;
 has tags_only => 0;
 
+
+has asset => 0;
+has asset_name => qr/\.tar\.gz$/;
+has asset_format => 'tar.gz';
+has asset_convert_version => 0;
+
 my $once = 1;
 
 sub init
 {
   my($self, $meta) = @_;
 
-  if(defined $meta->prop->{start_url})
+  croak("Don't set set a start_url with the Download::GitHub plugin") if defined $meta->prop->{start_url};
+  croak("cannot use both asset and tag_only") if $self->asset && $self->tags_only;
+
+  if($self->asset)
   {
-    croak("Don't set set a start_url with the Download::GitHub plugin");
+    $meta->add_requires('configure' => 'Alien::Build::Plugin::Download::GitHub' => '0.09' );
+  }
+  else
+  {
+    $meta->add_requires('configure' => 'Alien::Build::Plugin::Download::GitHub' => 0 );
   }
 
   my $endpoint = $self->tags_only ? 'tags' : 'releases' ;
@@ -40,9 +53,19 @@ sub init
     prefer  => $self->prefer,
     version => $self->version,
   );
-  $meta->apply_plugin('Extract',
-    format  => 'tar.gz',
-  );
+
+  if($self->asset && $self->asset_format)
+  {
+    $meta->apply_plugin('Extract',
+      format  => $self->asset_format,
+    );
+  }
+  else
+  {
+    $meta->apply_plugin('Extract',
+      format  => 'tar.gz',
+    );
+  }
 
   my %gh_fetch_options;
   my $secret;
@@ -51,24 +74,10 @@ sub init
   {
     if(defined $ENV{$name})
     {
-      if(eval { Alien::Build->VERSION("2.39") })
-      {
-        $secret = $ENV{$name};
-        push @{ $gh_fetch_options{http_headers} }, Authorization => "token $secret";
-        Alien::Build->log("using the GitHub Personal Access Token in $name") if $once;
-        $once = 0;
-      }
-      else
-      {
-        if($once)
-        {
-          Alien::Build->log("You seem to have a GitHub Personal Access Token stored in $name.");
-          Alien::Build->log("Unfortunately, the version of Alien::Build you have doesn't support");
-          Alien::Build->log("sending http headers so I can't use it.  Please upgrade to Alien::Build");
-          Alien::Build->log("2.39 or better.");
-          $once = 1;
-        }
-      }
+      $secret = $ENV{$name};
+      push @{ $gh_fetch_options{http_headers} }, Authorization => "token $secret";
+      Alien::Build->log("using the GitHub Personal Access Token in $name") if $once;
+      $once = 0;
       last;
     }
   }
@@ -116,33 +125,82 @@ sub init
         }
         my $version_key = $res->{filename} eq 'releases' ? 'tag_name' : 'name';
 
-        return {
-          type => 'list',
-          list => [
-            map {
-              my $release = $_;
-              my($version) = $release->{$version_key} =~ $self->version;
-              my @results = ({
-                filename => $release->{$version_key},
-                url      => $release->{tarball_url},
-                defined $version ? (version  => $version) : (),
-              });
+        if($ENV{ALIEN_BUILD_PLUGIN_DOWNLOAD_GITHUB_DEBUG})
+        {
+          require YAML;
+          my $url = $url || $meta->prop->{start_url};
+          $url = URI->new($url);
+          $build->log(YAML::Dump({
+            url => $url->path,
+            res => $rel,
+          }));
+        }
 
-              if (my $include = $self->include_assets) {
-                my $filter = ref($include) eq 'Regexp' ? 1 : 0;
-                for my $asset(@{$release->{assets} || []}) {
-                  push @results, {
-                    asset_url => $asset->{url},
-                    filename  => $asset->{name},
-                    url       => $asset->{browser_download_url},
-                    defined $version ? (version  => $version) : (),
-                  } if (0 == $filter or $asset->{name} =~ $include);
-                }
+        my $res2;
+
+        if($self->asset)
+        {
+          $res2 = {
+            type => 'list',
+            list => [],
+          };
+
+          foreach my $release (@$rel)
+          {
+            foreach my $asset (@{ $release->{assets} })
+            {
+              if($asset->{name} =~ $self->asset_name)
+              {
+                push @{ $res2->{list} }, {
+                  filename => $asset->{name},
+                  url      => $asset->{browser_download_url},
+                  version  => $self->asset_convert_version ? $self->asset_convert_version->($release->{name}) : $release->{name},
+                };
               }
-              @results;
-            } @$rel
-          ],
-        };
+            }
+          }
+        }
+        else
+        {
+          $res2 = {
+            type     => 'list',
+            list     => [
+              map {
+                my $release = $_;
+                my($version) = $release->{$version_key} =~ $self->version;
+                my @results = ({
+                  filename => $release->{$version_key},
+                  url      => $release->{tarball_url},
+                  defined $version ? (version  => $version) : (),
+                });
+
+                if (my $include = $self->include_assets) {
+                  my $filter = ref($include) eq 'Regexp' ? 1 : 0;
+                  for my $asset(@{$release->{assets} || []}) {
+                    push @results, {
+                      asset_url => $asset->{url},
+                      filename  => $asset->{name},
+                      url       => $asset->{browser_download_url},
+                      defined $version ? (version  => $version) : (),
+                    } if (0 == $filter or $asset->{name} =~ $include);
+                  }
+                }
+                @results;
+              } @$rel
+            ],
+          };
+        }
+
+        if($ENV{ALIEN_BUILD_PLUGIN_DOWNLOAD_GITHUB_DEBUG})
+        {
+          require YAML;
+          $build->log(YAML::Dump({
+            res2 => $res2,
+          }));
+        }
+
+        $res2->{protocol} = $res->{protocol} if exists $res->{protocol};
+        return $res2;
       }
       else
       {
@@ -177,7 +235,7 @@ Alien::Build::Plugin::Download::GitHub - Alien::Build plugin to download from Gi
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -211,6 +269,8 @@ The GitHub user or org that owns the repository.  This property is required.
 The GitHub repository name.  This property is required.
 
 =head2 include_assets
+
+[deprecated: use the asset* properties instead]
 
 Defaulting to false, this option designates whether to include the assets of
 releases in the list of candidates for download. This should be one of three
@@ -269,6 +329,36 @@ GitHub repositories.  This is the default.
 
 =back
 
+=head2 asset
+
+Download from assets instead of via tag.  This option is incompatible with
+C<tags_only>.
+
+=head2 asset_name
+
+Regular expression which the asset name should match.  The default is C<qr/\.tar\.gz$/>.
+
+=head2 asset_format
+
+The format of the asset.  This is passed to L<Alien::Build::Plugin::Extract::Negotiate>
+so any format supported by that is valid.
+
+=head2 asset_convert_version
+
+This is an optional code reference which can be used to modify the version.  For example,
+if the release version is prefixed with a C<v> You could do this:
+
+ plugin 'Download::GitHub' => (
+   github_user => 'PerlAlien',
+   github_repo => 'dontpanic',
+   asset => 1,
+   asset_convert_version => sub {
+     my $version = shift;
+     $version =~ s/^v//;
+     $version;
+   },
+ );
+
 =head1 ENVIRONMENT
 
 =over 4
@@ -282,9 +372,17 @@ For security reasons, the PAT will be removed from the log.  Some Fetch plugins
 (for example the C<curl> plugin) will log HTTP requests headers so this will
 make sure that your PAT is not displayed in the log.
 
+=item ALIEN_BUILD_PLUGIN_DOWNLOAD_GITHUB_DEBUG
+
+Setting this to a true value will send additional diagnostics to the log during
+the indexing phase of the fetch.
+
 =back
 
 =head1 CAVEATS
+
+This plugin does not support, and will not work if C<ALIEN_DOWNLOAD_RULE> is set to
+either C<digest_and_encrypt> or C<digest>.
 
 The GitHub API is rate limited.  Once you've reach that limit, this plugin will be 
 inoperative for a period of time until the limits reset.  When using the GitHub
@@ -332,7 +430,7 @@ Roy Storey (KIWIROY)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Graham Ollis.
+This software is copyright (c) 2019-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,13 +4,13 @@
       "Nic Sandfield <niczero@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojar-Cron",
    "no_index" : {
@@ -34,8 +34,8 @@
       "runtime" : {
          "requires" : {
             "Mojar" : "2.05",
-            "Mojolicious" : "7.15",
-            "perl" : "5.014001"
+            "Mojolicious" : "9.15",
+            "perl" : "5.016001"
          }
       }
    },
@@ -52,6 +52,6 @@
          "url" : "https://github.com/niczero/mojar-cron"
       }
    },
-   "version" : 0.401,
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : 0.501,
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

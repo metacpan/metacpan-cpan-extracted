@@ -63,11 +63,40 @@ if (ref {} eq ref setting('database')) {
 
     foreach my $c (@{setting('external_databases')}) {
         my $schema = delete $c->{tag} or next;
-        next if $schema eq 'netdisco';
+        next if exists setting('plugins')->{DBIC}->{$schema};
         setting('plugins')->{DBIC}->{$schema} = $c;
         setting('plugins')->{DBIC}->{$schema}->{schema_class}
           ||= 'App::Netdisco::GenericDB';
     }
+
+    foreach my $c (@{setting('tenant_databases')}) {
+        my $schema = $c->{tag} or next;
+        next if exists setting('plugins')->{DBIC}->{$schema};
+
+        my $name = $c->{name} || $c->{tag};
+        my $host = $c->{host};
+        my $user = $c->{user};
+        my $pass = $c->{pass};
+
+        my $dsn = "dbi:Pg:dbname=${name}";
+        $dsn .= ";host=${host}" if $host;
+
+        setting('plugins')->{DBIC}->{$schema} = {
+          dsn  => $dsn,
+          user => $user,
+          password => $pass,
+          options => {
+              AutoCommit => 1,
+              RaiseError => 1,
+              auto_savepoint => 1,
+              pg_enable_utf8 => 1,
+          },
+          schema_class => 'App::Netdisco::DB',
+        };
+    }
+
+    # and support tenancies by setting what the default schema points to
+    setting('plugins')->{DBIC}->{'default'}->{'alias'} = 'netdisco';
 }
 
 # always set this
@@ -200,9 +229,36 @@ if (ref {} eq ref setting('device_identity')) {
 else { config->{'device_identity'} ||= [] }
 
 if (ref {} eq ref setting('macsuck_no_deviceport')) {
-  config->{'macsuck_no_deviceport'} = [ setting('macsuck_no_deviceport') ];
+  config->{'macsuck_no_deviceports'} = [ setting('macsuck_no_deviceport') ];
 }
-else { config->{'macsuck_no_deviceport'} ||= [] }
+if (ref {} eq ref setting('macsuck_no_deviceports')) {
+  config->{'macsuck_no_deviceports'} = [ setting('macsuck_no_deviceports') ];
+}
+else { config->{'macsuck_no_deviceports'} ||= [] }
+
+if (ref {} eq ref setting('hide_deviceports')) {
+  config->{'hide_deviceports'} = [ setting('hide_deviceports') ];
+}
+else { config->{'hide_deviceports'} ||= [] }
+
+if (ref {} eq ref setting('ignore_deviceports')) {
+  config->{'ignore_deviceports'} = [ setting('ignore_deviceports') ];
+}
+else { config->{'ignore_deviceports'} ||= [] }
+
+# copy old ignore_* into new settings
+if (scalar @{ config->{'ignore_interfaces'} }) {
+  config->{'host_groups'}->{'__IGNORE_INTERFACES__'}
+    = config->{'ignore_interfaces'};
+}
+if (scalar @{ config->{'ignore_interface_types'} }) {
+  config->{'host_groups'}->{'__IGNORE_INTERFACE_TYPES__'}
+    = config->{'ignore_interface_types'};
+}
+if (scalar @{ config->{'ignore_notpresent_types'} }) {
+  config->{'host_groups'}->{'__NOTPRESENT_TYPES__'}
+    = config->{'ignore_notpresent_types'};
+}
 
 # copy devices_no and devices_only into others
 foreach my $name (qw/devices_no devices_only

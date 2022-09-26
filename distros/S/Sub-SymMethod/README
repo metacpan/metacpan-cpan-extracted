@@ -104,9 +104,10 @@ DESCRIPTION
     `symmethod $name => %spec`
         Creates a symmethod.
 
-        The specification hash must contain a `code` key, and may contain
-        `signature`, `named`, and `method` keys, which work the same as in
-        Sub::MultiMethod. It may also include an `order` key.
+        The specification hash must contain a `code` key, which must be a
+        coderef. It may also include an `order` key, which must be numeric.
+        Any other keys are passed to `signature` from Type::Params to build a
+        signature for the symmethod.
 
   Invoking Symmethods
     Given the following pseudocode:
@@ -168,23 +169,23 @@ DESCRIPTION
     after any inherited from base/parent classes.
 
   Symmethods and Signatures
-    When defining symmethods, you can define a signature:
+    When defining symmethods, you can define a signature using the same
+    options supported by `signature` from Type::Params.
 
       use Types::Standard 'Num';
       use Sub::SymMethod;
   
       symmethod foo => (
-        signature => [ Num ],
-        code      => sub {
+        positional => [ Num ],
+        code       => sub {
           my ( $self, $num ) = @_;
           print $num, "\n";
         },
       );
   
       symmethod foo => (
-        named     => 1,
-        signature => [ mynum => Num ],
-        code      => sub {
+        named => [ mynum => Num ],
+        code  => sub {
           my ( $self, $arg ) = @_;
           print $arg->mynum, "\n";
         },
@@ -199,15 +200,7 @@ DESCRIPTION
     The coderef given in `code` receives the list of arguments *after* they've
     been passed through the signature, which may coerce them, etc.
 
-    Instead of an arrayref (which will be treated as a signature using
-    Type::Params `compile` or `compile_named_oo`), you can provide a signature
-    as a coderef. The coderef will be passed a list of argument to the
-    symmethod to be checked. If the arguments are bad, it should throw an
-    exception (which will be caught, and the symmethod will be safely
-    skipped). If the arguments are good, it should return the list of
-    arguments, possibly after some coercion or other processing.
-
-    Using an arrayref signature requires Type::Params to be installed.
+    Using a signature requires Type::Params to be installed.
 
   API
     Sub::SymMethod has an object oriented API for metaprogramming.
@@ -227,7 +220,9 @@ DESCRIPTION
 
         $target is the class or role the candidate is being defined for. $name
         is the name of the method. %spec must include a `code` key and
-        optionally `named`, `signature`, `method`, and `order` keys.
+        optionally an `order` key. Any keys not directly supported by
+        Sub::SymMethod will be passed through to Type::Params to provide a
+        signature for the method.
 
         If $target is a class, this will also install a dispatcher into the
         class. Passing `no_dispatcher => 1` in the spec will avoid this.
@@ -242,7 +237,7 @@ DESCRIPTION
         Builds a coderef that could potentially be installed into
         `*{"$target\::$name"}` to be used as a dispatcher.
 
-    `installer_dispatcher( $target, $name )`
+    `install_dispatcher( $target, $name )`
         Builds a coderef that could potentially be installed into
         `*{"$target\::$name"}` to be used as a dispatcher, and actually
         installs it.
@@ -306,9 +301,8 @@ DESCRIPTION
         they will be called when dispatching.
 
     `compile_signature( \%spec )`
-        When non-coderef signatures are found, this is called to compile them
-        into a coderef. It is a small wrapper around Type::Params. Modifies
-        %spec rather than returning a useful value.
+        Does the job of finding keys within the spec to compile into a
+        signature.
 
     `_generate_symmethod( $name, \%opts, \%globalopts )`
         This method is used by `import` to generate a coderef that will be
@@ -316,7 +310,7 @@ DESCRIPTION
 
 BUGS
     Please report any bugs to
-    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-SymMethod>.
+    <https://github.com/tobyink/p5-sub-symmethod/issues>.
 
 SEE ALSO
     Sub::MultiMethod, Type::Params, NEXT.
@@ -325,7 +319,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2020 by Toby Inkster.
+    This software is copyright (c) 2020, 2022 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

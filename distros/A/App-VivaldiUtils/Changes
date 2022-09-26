@@ -1,3 +1,9 @@
+0.009   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to App::BrowserUtils 0.017 (updated Sah schema name, add
+          option --signal to terminate-vivaldi).
+
+
 0.008   2020-08-18  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.007 and 0.007.1.

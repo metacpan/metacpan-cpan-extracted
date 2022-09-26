@@ -5,23 +5,47 @@ use warnings;
 package Sub::MultiMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.909';
+our $VERSION   = '1.000';
 
 use B ();
+use Eval::TypeTiny qw( set_subname );
 use Exporter::Shiny qw(
 	multimethod   monomethod
 	multifunction monofunction
-	multimethods_from_roles
 );
 use Role::Hooks;
 use Scalar::Util qw( refaddr );
 use Type::Params ();
 use Types::Standard qw( -types -is );
 
-*_set_subname =
-	eval { require Sub::Util;  \&Sub::Util::set_subname } ||
-	eval { require Sub::Name;  \&Sub::Name::subname }     ||
-	do   { sub { pop } } ;
+# Options other than these will be passed through to
+# Type::Params.
+#
+my %KNOWN_OPTIONS = (
+	alias              => 1,
+	code               => 1,
+	compiled           => 1,
+	copied             => 1,
+	declaration_order  => 1,
+	height             => 1,
+	is_monomethod      => 1,
+	method             => 1,
+	named              => 'legacy',
+	no_dispatcher      => 1,
+	score              => 1,
+	signature          => 'legacy',
+);
+
+# But not these!
+#
+my %BAD_OPTIONS = (
+	want_details       => 1,
+	want_object        => 1,
+	want_source        => 1,
+	goto_next          => 1,
+	on_die             => 1,
+	message            => 1,
+);
 
 {
 	my %CANDIDATES;
@@ -71,6 +95,7 @@ sub has_multimethod_candidates {
 sub _add_multimethod_candidate {
 	my ($me, $target, $method_name, $spec) = @_;
 	my $mmc = $me->_get_multimethod_candidates_ref($target, $method_name);
+	no warnings 'uninitialized';
 	if ( @$mmc and $spec->{method} != $mmc->[0]{method} ) {
 		require Carp;
 		Carp::carp(sprintf(
@@ -162,14 +187,6 @@ sub get_all_multimethod_candidates {
 	}
 }
 
-sub _generate_multimethods_from_roles {
-	my ($me, $name, $args, $globals) = (shift, @_);
-	return sub {
-		require Carp;
-		Carp::carp( "Calling multimethods_from_roles is no longer needed and the function will be removed in a future release. Called" );
-	};
-}
-
 sub _generate_exported_function {
 	my ( $me, $name, $args, $globals ) = ( shift, @_ );
 	
@@ -191,6 +208,8 @@ sub _generate_exported_function {
 			$target,
 			$sub_name,
 			%defaults,
+			'package' => $target,
+			'subname' => ( ref($sub_name) ? '__ANON__' : $sub_name ),
 			%spec,
 		);
 	};
@@ -199,12 +218,14 @@ sub _generate_exported_function {
 sub _generate_multimethod {
 	my ( $me, $name, $args, $globals ) = ( shift, @_ );
 	$args->{defaults}{no_dispatcher} = 'auto';
+	$args->{defaults}{method} = 1;
 	return $me->_generate_exported_function( $name, $args, $globals );
 }
 
 sub _generate_monomethod {
 	my ( $me, $name, $args, $globals ) = ( shift, @_ );
 	$args->{defaults}{no_dispatcher} = 1;
+	$args->{defaults}{method} = 1;
 	$args->{api_call} = 'install_monomethod';
 	return $me->_generate_exported_function( $name, $args, $globals );
 }
@@ -224,13 +245,60 @@ sub _generate_monofunction {
 	return $me->_generate_exported_function( $name, $args, $globals );
 }
 
-my %keep_while_copying = qw(
-	method                  1
-	declaration_order       1
-	signature               1
-	code                    1
-	score                   1
-	named                   1
+sub _extract_type_params_spec {
+	my ( $me, $target, $sub_name, $spec ) = ( shift, @_ );
+	
+	my %tp = ( method => 1 );
+	$tp{method} = $spec->{method} if defined $spec->{method};
+	
+	if ( is_ArrayRef $spec->{signature} ) {
+		my $key = $spec->{named} ? 'named' : 'positional';
+		$tp{$key} = delete $spec->{signature};
+	}
+	else {
+		$tp{named} = $spec->{named} if ref $spec->{named};
+	}
+	
+	# Options which are not known by this module must be intended for
+	# Type::Params instead.
+	for my $key ( keys %$spec ) {
+		
+		next if ( $KNOWN_OPTIONS{$key} or $key =~ /^_/ );
+		
+		if ( $BAD_OPTIONS{$key} ) {
+			require Carp;
+			Carp::carp( "Unsupported option: $key" );
+			next;
+		}
+		
+		$tp{$key} = delete $spec->{$key};
+	}
+	
+	$tp{package} ||= $target;
+	$tp{subname} ||= ref( $sub_name ) ? '__ANON__' : $sub_name;
+	
+	# Historically we allowed method=2, etc
+	if ( is_Int $tp{method} ) {
+		if ( $tp{method} > 1 ) {
+			my $excess = $tp{method} - 1;
+			$tp{method} = 1;
+			ref( $tp{head} ) ? push( @{ $tp{head} }, Any ) : ( $tp{head} += $excess );
+		}
+		if ( $tp{method} == 1 ) {
+			$tp{method} = Any;
+		}
+	}
+	
+	$spec->{signature_spec} = \%tp;
+}
+
+my %delete_while_copying = (
+	_id            => '_id should be unique',
+	alias          => 'alias should only be installed into package where originally declared',
+	copied         => 'this will be set after copying',
+	height         => 'this should never be kept anyway',
+	is_monomethod  => 'if it has been copied, it is no longer mono!',
+	no_dispatcher  => 'after a candidate gets copied from a role to a class, there SHOULD be a dispatcher',
 );
 sub copy_package_candidates {
 	my $me = shift;
@@ -241,9 +309,9 @@ sub copy_package_candidates {
 		for my $method_name ($me->get_multimethods($source)) {
 			for my $candidate ($me->get_multimethod_candidates($source, $method_name)) {
 				my %new = map {
-					$keep_while_copying{$_}
-						? ( $_ => $candidate->{$_} )
-						: ()
+					$delete_while_copying{$_}
+						? ()
+						: ( $_ => $candidate->{$_} )
 				} keys %$candidate;
 				$new{copied} = 1;
 				$me->_add_multimethod_candidate($target, $method_name, \%new);
@@ -267,8 +335,7 @@ sub install_missing_dispatchers {
 }
 
 sub install_monomethod {
-	my $me = shift;
-	my ($target, $sub_name, %spec) = @_;
+	my ( $me, $target, $sub_name, %spec ) = ( shift, @_ );
 	
 	$spec{alias} ||= [];
 	$spec{alias} = [$spec{alias}] if !ref $spec{alias};
@@ -280,9 +347,8 @@ sub install_monomethod {
 my %hooked;
 my $DECLARATION_ORDER = 0;
 sub install_candidate {
-	my $me = shift;
-	my ($target, $sub_name, %spec) = @_;
-	$spec{method} = 1 unless defined $spec{method};
+	my ( $me, $target, $sub_name, %spec ) = ( shift, @_ );
+	$me->_extract_type_params_spec( $target, $sub_name, \%spec );
 
 	my $is_method = $spec{method};
 	
@@ -292,39 +358,28 @@ sub install_candidate {
 		if defined $sub_name;
 	
 	if ($spec{alias}) {
-		$spec{alias} = [$spec{alias}] unless is_ArrayRef $spec{alias};
-		my @aliases = @{$spec{alias}};
-		my $next    =   $spec{code} or die "NO CODE???";
+		my @aliases = is_ArrayRef( $spec{alias} )
+			? @{ $spec{alias} }
+			: $spec{alias};
 		
 		my ($check, @sig);
 		if (is_CodeRef $spec{signature}) {
 			$check = $spec{signature};
 		}
-		else {
-			@sig = @{$spec{signature}};
-			if (is_HashRef $sig[0] and not $sig[0]{slurpy}) {
-				my %new_opts = %{$sig[0]};
-				delete $new_opts{want_source};
-				delete $new_opts{want_details};
-				$sig[0] = \%new_opts;
-			}
-		}
 		
+		my %sig_spec = (
+			%{ $spec{signature_spec} },
+			goto_next => $spec{code} || die('NO CODE???'),
+		);
 		my $code = sprintf(
 			q{
 				package %s;
 				sub {
-					my @invocants = splice(@_, 0, %d);
-					$check ||= %s(@sig);
-					@_ = (@invocants, &$check);
-					goto $next;
+					$check ||= Type::Params::signature( %%sig_spec );
+					goto $check;
 				}
 			},
 			$target,
-			$spec{method},
-			$spec{named}
-				? 'Type::Params::compile_named_oo'
-				: 'Type::Params::compile',
 		);
 		my $coderef = do {
 			local $@;
@@ -370,7 +425,7 @@ sub install_candidate {
 		my ($target, $sub_name, $coderef) = @_;
 		if (is_ScalarRef $sub_name) {
 			if (is_Undef $$sub_name) {
-				_set_subname("$target\::__ANON__", $coderef);
+				set_subname("$target\::__ANON__", $coderef);
 				bless( $coderef, $me );
 				$CLEANUP{"$coderef"} = [ $target, refaddr($sub_name) ];
 				return( $$sub_name = $coderef );
@@ -391,7 +446,7 @@ sub install_candidate {
 		elsif (is_Str $sub_name) {
 			no strict 'refs';
 			my $qname = "$target\::$sub_name";
-			*$qname = _set_subname($qname, $coderef);
+			*$qname = set_subname($qname, $coderef);
 			return $coderef;
 		}
 		require Carp;
@@ -452,7 +507,7 @@ sub install_dispatcher {
 		ref($sub_name)               # $_[2]
 			? refaddr($sub_name)
 			: B::perlstring("$sub_name"),
-		$is_method,                  # $_[3]
+		$is_method || 0,             # $_[3]
 	);
 	
 	my $coderef = do {
@@ -469,42 +524,30 @@ sub dispatch {
 	my $me = shift;
 	my ($pkg, $method_name, $is_method, $argv) = @_;
 	
-	# Steal invocants because we don't want them to be considered
-	# as part of the signature.
-	my @invocants;
-	push @invocants, splice(@$argv, 0, $is_method);
-	
-	if ( $is_method and is_Object($invocants[0]) ) {
+	if ( $is_method and is_Object $argv->[0] ) {
 		# object method; reset package search from invocant class
-		$pkg = ref($invocants[0]);
+		$pkg = ref $argv->[0];
 	}
-	elsif ( $is_method and is_ClassName($invocants[0]) ) {
+	elsif ( $is_method and is_ClassName $argv->[0] ) {
 		# class method; reset package search from invocant class
-		$pkg = $invocants[0];
+		$pkg = $argv->[0];
 	}
 	
-	my ($winner, $new_argv, $new_invocants) = $me->pick_candidate(
+	my ($winner, $new_argv) = $me->pick_candidate(
 		[ $me->get_all_multimethod_candidates($pkg, $method_name, $is_method) ],
 		$argv,
-		\@invocants,
 	) or do {
 		require Carp;
 		Carp::croak('Multimethod could not find candidate to dispatch to, stopped');
 	};
 	
 	my $next = $winner->{code};
-	@_ = (@$new_invocants, @$new_argv);
+	@_ = @$new_argv;
 	goto $next;
 }
 
-# Type which when given \@_ determines if it could potentially
-# be named parameters.
-#
-my $Named = CycleTuple->of(Str, Any) | Tuple->of(HashRef);
-
 sub pick_candidate {
-	my $me = shift;
-	my ($candidates, $argv, $invocants) = @_;
+	my ( $me, $candidates, $argv ) = ( shift, @_ );
 	
 	my @remaining = @{ $candidates };
 	
@@ -513,25 +556,16 @@ sub pick_candidate {
 	
 	for my $candidate (@remaining) {
 		next if $candidate->{compiled};
-		if (is_CodeRef $candidate->{signature}) {
+		if ( is_CodeRef $candidate->{signature} ) {
 			$candidate->{compiled}{closure} = $candidate->{signature};
 			$candidate->{compiled}{min_args} = 0;
 			$candidate->{compiled}{max_args} = undef;
 		}
 		else {
-			my @sig = @{ $candidate->{signature} };
-			my $opt = (is_HashRef $sig[0] and not $sig[0]{slurpy})
-				? shift(@sig)
-				: {};
-			$opt->{want_details} = 1;
-			
-			$candidate->{compiled} = $candidate->{named}
-				? Type::Params::compile_named_oo($opt, @sig)
-				: Type::Params::compile($opt, @sig);
-			
-			$candidate->{compiled}{_pure_named} = $candidate->{named};
-			delete $candidate->{compiled}{_pure_named}
-				if $opt->{head} || $opt->{tail};
+			$candidate->{compiled} = Type::Params::signature(
+				%{ $candidate->{signature_spec} },
+				want_details => 1,
+			);
 		}
 	}
 	
@@ -540,14 +574,10 @@ sub pick_candidate {
 	#
 	
 	my $argc = @$argv;
-	my $argv_maybe_named = $Named->check($argv);
 	
 	@remaining = grep {
 		my $candidate = $_;
-		if ($candidate->{compiled}{_pure_named} && !$argv_maybe_named) {
-			0;
-		}
-		elsif (defined $candidate->{compiled}{min_args} and $candidate->{compiled}{min_args} > $argc) {
+		if (defined $candidate->{compiled}{min_args} and $candidate->{compiled}{min_args} > $argc) {
 			0;
 		}
 		elsif (defined $candidate->{compiled}{max_args} and $candidate->{compiled}{max_args} < $argc) {
@@ -557,7 +587,6 @@ sub pick_candidate {
 			1;
 		}
 	} @remaining;
-	
 	
 	# Weed out signatures that cannot match because
 	# they fail type checks, etc
@@ -582,12 +611,13 @@ sub pick_candidate {
 		for my $candidate (@remaining) {
 			next if defined $candidate->{score};
 			my $sum = 0;
-			if (is_ArrayRef $candidate->{signature}) {
-				foreach my $type (@{ $candidate->{signature} }) {
-					next unless is_Object $type;
-					my @real_parents = grep !$_->_is_null_constraint, $type, $type->parents;
-					$sum += @real_parents;
-				}
+			my @sig = map {
+				is_ArrayRef( $candidate->{signature_spec}{$_} ) ? @{ $candidate->{signature_spec}{$_} } : ();
+			} qw(positional pos named);
+			foreach my $type ( @sig ) {
+				next unless is_Object $type;
+				my @real_parents = grep !$_->_is_null_constraint, $type, $type->parents;
+				$sum += @real_parents;
 			}
 			$candidate->{score} = $sum;
 		}
@@ -629,17 +659,7 @@ sub pick_candidate {
 	return unless @remaining;
 	
 	my $sig_code  = $remaining[0]{compiled}{closure};
-	return ( $remaining[0], $returns{"$sig_code"}, $invocants||[] );
-}
-
-sub dump_sig {
-	no warnings qw(uninitialized numeric);
-	my $candidate = shift;
-	my $types_etc = join ",", map "$_", @{$candidate->{signature}};
-	my $r = sprintf('%s:%s', $candidate->{named} ? 'NAMED' : 'POSITIONAL', $types_etc);
-	$r .= sprintf('{score:%d+%d}', $candidate->{score}, $candidate->{height})
-		if defined($candidate->{score})||defined($candidate->{height});
-	return $r;
+	return ( $remaining[0], $returns{"$sig_code"} );
 }
 
 1;
@@ -670,37 +690,37 @@ multimethods:
     use Types::Standard -types;
     
     multimethod stringify => (
-      signature => [ Undef ],
-      code      => sub ( $self, $undef ) {
+      positional => [ Undef ],
+      code       => sub ( $self, $undef ) {
         return 'null';
       },
     );
     
     multimethod stringify => (
-      signature => [ ScalarRef[Bool] ],
-      code      => sub ( $self, $bool ) {
+      positional => [ ScalarRef[Bool] ],
+      code       => sub ( $self, $bool ) {
         return $$bool ? 'true' : 'false';
       },
     );
     
     multimethod stringify => (
-      alias     => "stringify_str",
-      signature => [ Str ],
-      code      => sub ( $self, $str ) {
+      alias      => "stringify_str",
+      positional => [ Str ],
+      code       => sub ( $self, $str ) {
         return sprintf( q<"%s">, quotemeta($str) );
       },
     );
     
     multimethod stringify => (
-      signature => [ Num ],
-      code      => sub ( $self, $n ) {
+      positional => [ Num ],
+      code       => sub ( $self, $n ) {
         return $n;
       },
     );
     
     multimethod stringify => (
-      signature => [ ArrayRef ],
-      code      => sub ( $self, $arr ) {
+      positional => [ ArrayRef ],
+      code       => sub ( $self, $arr ) {
         return sprintf(
           q<[%s]>,
           join( q<,>, map( $self->stringify($_), @$arr ) )
@@ -709,8 +729,8 @@ multimethods:
     );
     
     multimethod stringify => (
-      signature => [ HashRef ],
-      code      => sub ( $self, $hash ) {
+      positional => [ HashRef ],
+      code       => sub ( $self, $hash ) {
         return sprintf(
           q<{%s}>,
           join(
@@ -740,7 +760,7 @@ on Perl 5.8.1 and above.
 
 =head1 DESCRIPTION
 
-Sub::Multimethod focusses on implementing the dispatching of multimethods
+Sub::MultiMethod focusses on implementing the dispatching of multimethods
 well and is less concerned with providing a nice syntax for setting them
 up. That said, the syntax provided is inspired by Moose's C<has> keyword
 and hopefully not entirely horrible.
@@ -771,43 +791,13 @@ class, in which case, you don't need to import anything.
 
 =head3 C<< multimethod $name => %spec >>
 
-The following options are supported in the specification for the
-multimethod.
+The specification supports the same options as L<Type::Params> v2
+to specify a signature for the method, plus a few Sub::MultiMethod-specific
+options. Any options not included in the list below are passed through to
+Type::Params. (The options C<goto_next>, C<on_die>, C<message>, and
+C<want_*> are not supported.)
 
 =over
-
-=item C<< named >> I<< (Bool) >>
-
-Optional, defaults to false.
-
-Indicates whether this candidate uses named parameters. The default is
-positional parameters.
-
-=item C<< signature >> I<< (ArrayRef|CodeRef) >>
-
-Required.
-
-For positional parameters, an ordered list of type constraints suitable
-for passing to C<compile> from L<Type::Params>.
-
-  signature => [ Str, RegexpRef, Optional[FileHandle] ],
-
-For named parameters, a list suitable for passing to C<compile_named_oo>.
-
-  signature => [
-    prefix  => Str,
-    match   => RegexpRef,
-    output  => FileHandle, { default => sub { \*STDOUT } },
-  ],
-
-Sub::MultiMethods is designed to handle multi I<methods>, so  C<< $self >>
-at the start of all signatures is implied.
-
-C<signature> I<may> be a coderef instead, which should die if it gets
-passed a C<< @_ >> that it cannot handle, or return C<< @_ >> (perhaps
-after some processing) if it is successful. Using coderef signatures
-may make deciding which candidate to dispatch to more difficult though,
-in cases where more than one candidate matches the given parameters.
 
 =item C<< code >> I<< (CodeRef) >>
 
@@ -849,6 +839,18 @@ And:
     ...;
   },
 
+=item C<< signature >> I<< (CodeRef) >>
+
+Optional.
+
+If C<signature> is set, then Sub::MultiMethod won't use L<Type::Params>
+to build a signature for this multimethod candidate. It will treat the
+coderef as an already-built signature.
+
+A coderef signature is expected to take C<< @_ >>, throw an exception if
+the arguments cannot be handled, and return C<< @_ >> (possibly after some
+manipulation).
+
 =item C<< alias >> I<< (Str|ArrayRef[Str]) >>
 
 Optional.
@@ -856,7 +858,7 @@ Optional.
 Installs an alias for the candidate, bypassing multimethod dispatch. (But not
 bypassing the checks, coercions, and defaults in the signature!)
 
-=item C<< method >> I<< (Int) >>
+=item C<< method >> I<< (Bool) >>
 
 Optional, defaults to 1.
 
@@ -866,10 +868,6 @@ given if you want multifuncs with no invocant.
 
 Multisubs where some candidates are methods and others are non-methods are
 not currently supported! (And probably never will be.)
-
-(Yes, this is technically an integer rather than a boolean. This allows
-for subs to have, say, two logical invocants. For example, in Catalyst,
-you might want to treat the context object as a second invocant.)
 
 =item C<< score >> I<< (Int) >>
 
@@ -892,24 +890,6 @@ and accept the default.
 =back
 
 =head3 C<< monomethod $name => %spec >>
-
-As a convenience, you can use Sub::MultiMethod to install normal methods.
-Why do this instead of using Perl's plain old C<sub> keyword? Well, it gives
-you the same signature checking.
-
-Supports the following options:
-
-=over
-
-=item C<< named >> I<< (Bool) >>
-
-=item C<< signature >> I<< (ArrayRef|CodeRef) >>
-
-=item C<< code >> I<< (CodeRef) >>
-
-=item C<< method >> I<< (Int) >>
-
-=back
 
 C<< monomethod($name, %spec) >> is basically just a shortcut for
 C<< multimethod(undef, alias => $name, %spec) >> though with error
@@ -990,7 +970,7 @@ that allows multimethods imported from roles to integrate into a class.
     use Types::Standard -types;
     
     multimethod foo => (
-      signature  => [ HashRef ],
+      positional => [ HashRef ],
       code       => sub { return "A" },
       alias      => "foo_a",
     );
@@ -1002,7 +982,7 @@ that allows multimethods imported from roles to integrate into a class.
     use Types::Standard -types;
     
     multimethod foo => (
-      signature  => [ ArrayRef ],
+      positional => [ ArrayRef ],
       code       => sub { return "B" },
     );
   }
@@ -1015,7 +995,7 @@ that allows multimethods imported from roles to integrate into a class.
     with qw( My::RoleA My::RoleB );
     
     multimethod foo => (
-      signature  => [ HashRef ],
+      positional => [ HashRef ],
       code       => sub { return "C" },
     );
   }
@@ -1038,16 +1018,16 @@ scalar referred to. Example:
   my ($coderef, $otherref);
   
   multimethod \$coderef => (
-    method    => 0,
-    signature => [ ArrayRef ],
-    code      => sub { say "It's an arrayref!" },
+    method     => 0,
+    positional => [ ArrayRef ],
+    code       => sub { say "It's an arrayref!" },
   );
   
   multimethod \$coderef => (
-    method    => 0,
-    alias     => \$otherref,
-    signature => [ HashRef ],
-    code      => sub { say "It's a hashref!" },
+    method     => 0,
+    alias      => \$otherref,
+    positional => [ HashRef ],
+    code       => sub { say "It's a hashref!" },
   );
   
   $coderef->( [] );
@@ -1143,26 +1123,31 @@ shouldn't be inherited).
 Returns a boolean indicating whether the coderef is known to be a multimethod
 dispatcher.
 
-=item C<< Sub::MultiMethod->pick_candidate(\@candidates, \@args, \@invocants) >>
+=item C<< Sub::MultiMethod->pick_candidate(\@candidates, \@args) >>
 
-Returns a list of three items: first the winning candidate from an array of specs,
-given the args and invocants, second the modified args after coercion has been 
-applied, and third the modified invocants.
+Returns a list of two items: first the winning candidate from an array of specs,
+given the args and invocants, and second the modified args after coercion has
+been applied.
 
 This is basically how the dispatcher for a method works:
 
-  my @invocants = splice( @_, 0, $ismethod );
-  my $pkg       = __PACKAGE__;
+  my $pkg = __PACKAGE__;
+  if ( $ismethod ) {
+    $pkg = Scalar::Util::blessed( $_[0] ) || $_[0];
+  }
   
-  my $smm = 'Sub::MultiMethod';
-  my @candidates =
-    $smm->get_all_multimethod_candidates( $pkg, $sub, $ismethod );
-  my ( $winner, $new_args, $new_invocants ) =
-    $smm->pick_candidate( \@candidates, \@_, \@invocants );
+  my ( $winner, $new_args ) = 'Sub::MultiMethod'->pick_candidate(
+    [
+      'Sub::MultiMethod'->get_all_multimethod_candidates(
+        $pkg,
+        $sub,
+        $ismethod,
+      )
+    ],
+    \@_,
+  );
   
-  my $coderef = $winner->{code};
-  @_ = ( @$new_invocants, @$new_args );
-  goto $coderef;
+  $winner->{code}->( @$new_args );
 
 =back
 

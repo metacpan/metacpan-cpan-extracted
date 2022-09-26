@@ -4,7 +4,7 @@ use JSON::MaybeXS;
 use Mu::Tiny;
 use Class::Method::Modifiers;
 
-our $VERSION = '0.005002';
+our $VERSION = '0.006000';
 $VERSION =~ tr/_//d;
 
 extends 'Data::Dumper::Compact';
@@ -43,6 +43,16 @@ sub _format_blessed {
   $self->_format([ hash => [
     [ '__bless__' ],
     { '__bless__' => [ array => [ [ string => $class ], $content ] ] },
+  ] ]);
+}
+
+sub _format_ref {
+  my ($self, $payload) = @_;
+  my %subst = ('/' => '~1', '~' => '~0');
+  my @path = map { (my $x = $_->[1]) =~ s{[/~]}{$subst{$_}}eg; $x } @$payload;
+  return $self->format([ hash => [
+    [ '$ref' ],
+    { '$ref' => [ string => join('/', '#', @path) ] },
   ] ]);
 }
 

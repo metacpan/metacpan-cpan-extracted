@@ -317,3 +317,17 @@ sub test_draw_real_data {
     is_deeply $draws, $expected_draws, 'got expected draws for iNextPD data';
     is (sum (@$draws), scalar @$probs, 'got expected number of draws for iNextPD data')
 }
+
+sub test_clone {
+    
+    my $prng1   = Math::Random::MT::Auto->new (seed => 2345);
+    my $object1 = Statistics::Sampler::Multinomial::AliasMethod->new (
+        prng => $prng1,
+        data => [1, 2, 3, 4, 5],
+    );
+    my $clone = $object1->clone;
+    
+    is_deeply $object1, $clone, 'cloned object';
+
+}
+

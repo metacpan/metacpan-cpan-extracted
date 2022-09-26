@@ -1,0 +1,33 @@
+0.04 2022-09-23
+  [Test Improvement]
+    * Add keyword conflicting tests.
+0.03 2022-09-23
+  [Distribution Fix]
+    * Add cpanm to MANIFEST.SKIP,
+      Fix https://github.com/yuki-kimoto/Class-Plain/issues/1
+  [Document Improvement]
+    * Improve the example of Usage.
+    * Add the topic "Customizing Object Initialization" to Cookbook.
+  [Test Improvement]
+    * Add the test of the example of Usage.
+0.02 2022-09-22
+  [Document Improvement]
+    * Add author and repository and copyright.
+    * Add the headding "Subroutine Signatures Support".
+  [Bug Fix]
+    * Fix the bug that Class::Plain can't be compiled on Windows.
+  [Test Fix]
+    * Fix the testing bug that the method tests failed on Perl 5.16.
+      This was because Perl 5.16 doesn't have experimental.pm.
+    * Tests of subroutine signatures are enable only in Perl 5.26+.
+  [Test Improvemetn]
+    * Add tests using Github Action for Linux, Mac, Windows.
+  [Prerequirement Change]
+    * This module doesn't depend on Test::Refcount.
+  [Internal Changes]
+    * Remove the following options from Module::Build->new.
+      create_license => 1,
+      create_readme  => 1,
+
+0.01 2022-09-22
+  * First release.

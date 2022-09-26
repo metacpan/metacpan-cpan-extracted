@@ -31,7 +31,7 @@
             "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
-            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.47",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.72",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidGrep" : "0",
@@ -131,7 +131,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.29",
+   "version" : "0.30",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",
@@ -142,8 +142,8 @@
       "Michael R. Davis (MRDVT)",
       "Shawn Laffan (SLAFFAN)"
    ],
-   "x_generated_by_perl" : "v5.37.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "x_generated_by_perl" : "v5.37.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

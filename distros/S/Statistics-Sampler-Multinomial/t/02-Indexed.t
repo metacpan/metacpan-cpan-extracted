@@ -221,5 +221,21 @@ sub test_draw_n_samples_with_mask {
     
 }
 
+sub test_clone {
+    my $probs = [
+        1, 5, 2, 6, 3, 5, 10
+    ];
+    
+    my $prng   = Math::Random::MT::Auto->new (seed => 2345);
+    my $object = Statistics::Sampler::Multinomial::Indexed->new (
+        prng => $prng,
+        data => $probs,
+    );
+    
+    my $clone = $object->clone;
+    
+    is_deeply $clone, $object, 'clone matches original';
+}
+
 
 1;

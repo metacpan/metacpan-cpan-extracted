@@ -47,10 +47,9 @@ sub logHandler {
       $logParams->{init}();
       $basePath =~ s/(\%[a-zA-Z\%])/$logParams->{$1}()/ge;
 
-      my $nowPath = $basePath;
-      if (not defined $lastPath or $nowPath ne $lastPath) {
-        $lastPath = $nowPath;
-        $fileHandler->open(">> $nowPath") or die "ERROR: write log $nowPath failed: $!\n";
+      if (not defined $lastPath or $lastPath ne $basePath) {
+        $lastPath = $basePath;
+        $fileHandler->open(">> $basePath") or die "ERROR: write log $basePath failed: $!\n";
         $fileHandler->autoflush();
       }
 

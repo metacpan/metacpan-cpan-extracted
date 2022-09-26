@@ -39,8 +39,8 @@
          "requires" : {
             "Exporter::Shiny" : "0",
             "Role::Hooks" : "0",
-            "Type::Params" : "1.008003",
-            "Types::Standard" : "1.008003",
+            "Type::Params" : "2.000000",
+            "Types::Standard" : "2.000000",
             "perl" : "5.008001"
          }
       },
@@ -58,7 +58,7 @@
    "provides" : {
       "Sub::MultiMethod" : {
          "file" : "lib/Sub/MultiMethod.pm",
-         "version" : "0.909"
+         "version" : "1.000"
       }
    },
    "release_status" : "stable",
@@ -77,6 +77,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/project"
    },
-   "version" : "0.909",
+   "version" : "1.000",
    "x_serialization_backend" : "JSON::PP version 4.09"
 }

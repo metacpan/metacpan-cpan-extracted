@@ -48,6 +48,24 @@ Get the constant value of C<WUNTRACED>. If the system doesn't define this consta
 
 Get the constant value of C<WCONTINUED>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
+=head2 PRIO_PROCESS
+
+  static method PRIO_PROCESS : int ();
+
+Get the constant value of C<PRIO_PROCESS>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 PRIO_PGRP
+
+  static method PRIO_PGRP : int ();
+
+Get the constant value of C<PRIO_PGRP>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 PRIO_USER
+
+  static method PRIO_USER : int ();
+
+Get the constant value of C<PRIO_USER>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
 =head1 Copyright & License
 
 Copyright 2022-2022 Yuki Kimoto, all rights reserved.

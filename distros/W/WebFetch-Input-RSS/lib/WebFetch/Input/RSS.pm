@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Input::RSS;
-$WebFetch::Input::RSS::VERSION = '0.2.0';
+$WebFetch::Input::RSS::VERSION = '0.2.1';
 use base "WebFetch";
 
 use WebFetch "0.15.2";
@@ -222,7 +222,7 @@ WebFetch::Input::RSS - get headlines for WebFetch from RSS feed
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 

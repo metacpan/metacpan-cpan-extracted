@@ -90,6 +90,7 @@ struct FutureXS
   AV *callbacks;  // values are struct FutureXSCallback ptrs directly. TODO: custom ptr/fill/max
   AV *on_cancel;  // values are CVs directly
   AV *revoke_when_ready; // values are struct FutureXSRevocation ptrs directly.
+  int empty_revocation_slots;
 
   HV *udata;
 
@@ -161,6 +162,7 @@ SV *Future_new(pTHX_ const char *cls)
   self->callbacks = NULL;
   self->on_cancel = NULL;
   self->revoke_when_ready = NULL;
+  self->empty_revocation_slots = 0;
 
   self->udata = NULL;
 
@@ -178,7 +180,28 @@ SV *Future_new(pTHX_ const char *cls)
 SV *Future_new_proto(pTHX_ SV *f1)
 {
   assert(f1 && SvROK(f1) && SvRV(f1));
-  return future_new(HvNAME(SvSTASH(SvRV(f1))));
+  // TODO Shortcircuit in the common case that f1 is a Future instance
+  //   return future_new(HvNAME(SvSTASH(SvRV(f1))));
+
+  dSP;
+  ENTER;
+  SAVETMPS;
+
+  EXTEND(SP, 1);
+  PUSHMARK(SP);
+  PUSHs(sv_mortalcopy(f1));
+  PUTBACK;
+
+  call_method("new", G_SCALAR);
+
+  SPAGAIN;
+
+  SV *ret = SvREFCNT_inc(POPs);
+
+  FREETMPS;
+  LEAVE;
+
+  return ret;
 }
 
 #define destroy_callbacks(self)  S_destroy_callbacks(aTHX_ self)
@@ -545,7 +568,36 @@ static void S_revoke_on_cancel(pTHX_ struct FutureXSRevocation *rev)
     rev->toclear_sv_at = NULL;
   }
 
-  // TODO: Account for on_cancel compation if required
+  if(!SvOK(rev->precedent_f))
+    return;
+
+  struct FutureXS *self = get_future(rev->precedent_f);
+
+  self->empty_revocation_slots++;
+
+  AV *on_cancel = self->on_cancel;
+  if(self->empty_revocation_slots >= 8 && on_cancel &&
+      self->empty_revocation_slots >= AvFILL(on_cancel)/2) {
+
+    // Squash up the array to contain only defined values
+    SV **wrsv = AvARRAY(on_cancel),
+       **rdsv = AvARRAY(on_cancel),
+       **end  = AvARRAY(on_cancel) + AvFILL(on_cancel);
+
+    while(rdsv <= end) {
+      if(SvOK(*rdsv))
+        // Keep this one
+        *(wrsv++) = *rdsv;
+      else
+        // Free this one
+        SvREFCNT_dec(*rdsv);
+
+      rdsv++;
+    }
+    AvFILLp(on_cancel) = wrsv - AvARRAY(on_cancel) - 1;
+
+    self->empty_revocation_slots = 0;
+  }
 }
 
 #define mark_ready(self, selfsv, state)  S_mark_ready(aTHX_ self, selfsv, state)
@@ -670,7 +722,9 @@ void Future_failv(pTHX_ SV *f, SV **svp, size_t n)
   if(self->ready)
     croak("(SELF) is already (STATE) and cannot be ->fail'ed");
 
-  if(n == 1 && SvROK(svp[0]) && SvOBJECT(SvRV(svp[0])) /* TODO: and is Future::Exception */) {
+  if(n == 1 &&
+      SvROK(svp[0]) && SvOBJECT(SvRV(svp[0])) &&
+      sv_derived_from(svp[0], "Future::Exception")) {
     SV *exception = svp[0];
     AV *failure = self->failure = newAV();
 

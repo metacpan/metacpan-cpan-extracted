@@ -1,24 +1,40 @@
 package Type::Tiny::Enum;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	$Type::Tiny::Enum::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Enum::VERSION   = '1.016010';
+	$Type::Tiny::Enum::VERSION   = '2.000000';
 }
 
 $Type::Tiny::Enum::VERSION =~ tr/_//d;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
+use Exporter::Tiny 1.004001 ();
 use Type::Tiny ();
-our @ISA = 'Type::Tiny';
+our @ISA = qw( Type::Tiny Exporter::Tiny );
 
 __PACKAGE__->_install_overloads(
 	q[@{}] => sub { shift->values },
 );
+
+sub _exporter_fail {
+	my ( $class, $type_name, $values, $globals ) = @_;
+	my $caller = $globals->{into};
+	my $type = $class->new(
+		name      => $type_name,
+		values    => [ @$values ],
+		coercion  => 1,
+	);
+	$INC{'Type/Registry.pm'}
+		? 'Type::Registry'->for_class( $caller )->add_type( $type, $type_name )
+		: ( $Type::Registry::DELAYED{$caller}{$type_name} = $type )
+		unless( ref($caller) or $caller eq '-lexical' or $globals->{'lexical'} );
+	return map +( $_->{name} => $_->{code} ), @{ $type->exportables };
+}
 
 sub new {
 	my $proto = shift;
@@ -68,6 +84,23 @@ sub new {
 	return $proto->SUPER::new( %opts );
 } #/ sub new
 
+sub new_union {
+	my $proto  = shift;
+	my %opts   = ( @_ == 1 ) ? %{ $_[0] } : @_;
+	my @types  = @{ delete $opts{type_constraints} };
+	my @values = map @$_, @types;
+	$proto->new( %opts, values => \@values );
+}
+
+sub new_intersection {
+	my $proto  = shift;
+	my %opts   = ( @_ == 1 ) ? %{ $_[0] } : @_;
+	my @types  = @{ delete $opts{type_constraints} };
+	my %values; ++$values{$_} for map @$_, @types;
+	my @values = sort grep $values{$_}==@types, keys %values;
+	$proto->new( %opts, values => \@values );
+}
+
 sub values        { $_[0]{values} }
 sub unique_values { $_[0]{unique_values} }
 sub constraint    { $_[0]{constraint} ||= $_[0]->_build_constraint }
@@ -77,6 +110,37 @@ sub _is_null_constraint { 0 }
 sub _build_display_name {
 	my $self = shift;
 	sprintf( "Enum[%s]", join q[,], @{ $self->unique_values } );
+}
+
+sub is_word_safe {
+	my $self = shift;
+	return not grep /\W/, @{ $self->unique_values };
+}
+
+sub exportables {
+	my ( $self, $base_name ) = @_;
+	if ( not $self->is_anon ) {
+		$base_name ||= $self->name;
+	}
+	
+	my $exportables = $self->SUPER::exportables( $base_name );
+	
+	if ( $self->is_word_safe ) {
+		require Eval::TypeTiny;
+		require B;
+		for my $value ( @{ $self->unique_values } ) {
+			push @$exportables, {
+				name => uc( sprintf '%s_%s', $base_name, $value ),
+				tags => [ 'constants' ],
+				code => Eval::TypeTiny::eval_closure(
+					source      => sprintf( 'sub () { %s }', B::perlstring($value) ),
+					environment => {},
+				),
+			};
+		}
+	}
+	
+	return $exportables;
 }
 
 {
@@ -406,6 +470,25 @@ Enum type constraints.
 This package inherits from L<Type::Tiny>; see that for most documentation.
 Major differences are listed below:
 
+=head2 Constructors
+
+The C<new> constructor from L<Type::Tiny> still works, of course. But there
+is also:
+
+=over
+
+=item C<< new_union( type_constraints => \@enums, %opts ) >>
+
+Creates a new enum type constraint which is the union of existing enum
+type constraints.
+
+=item C<< new_intersection( type_constraints => \@enums, %opts ) >>
+
+Creates a new enum type constraint which is the intersection of existing enum
+type constraints.
+
+=back
+
 =head2 Attributes
 
 =over
@@ -490,7 +573,44 @@ and finally, if given an integer, will use that as an index.
   say $enum->closest_match(  2 );  # ==> baz
   say $enum->closest_match( -1 );  # ==> quux
 
+=item C<< is_word_safe >>
+
+Returns true if none of the values in the enumeration contain a non-word
+character. Word characters include letters, numbers, and underscores, but
+not most punctuation or whitespace.
+
 =back
+
+=head2 Exports
+
+Type::Tiny::Enum can be used as an exporter.
+
+  use Type::Tiny::Enum Status => [ 'dead', 'alive' ];
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< Status >>
+
+=item C<< is_Status( $value ) >>
+
+=item C<< assert_Status( $value ) >>
+
+=item C<< to_Status( $value ) >>
+
+=item C<< STATUS_DEAD >>
+
+=item C<< STATUS_ALIVE >>
+
+=back
+
+Multiple enumerations can be exported at once:
+
+  use Type::Tiny::Enum (
+    Status    => [ 'dead', 'alive' ],
+    TaxStatus => [ 'paid', 'pending' ],
+  );
 
 =head2 Overloading
 

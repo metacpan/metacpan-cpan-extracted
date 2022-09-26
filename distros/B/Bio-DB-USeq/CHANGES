@@ -1,5 +1,10 @@
 Bio::DB::USeq Change Log
 
+0.26	* Require recent versions of Archive::Zip to support Zip64 useq files
+        * Store interval trees as 0-based, half-open intervals
+        * Handle zero-length intervals
+        * Improve memory management for chromosomal stats
+
 0.25    * Add observations convenience method to Segments objects.
 
 0.24    * Implemented Interval Trees for much faster lookup of slices and 

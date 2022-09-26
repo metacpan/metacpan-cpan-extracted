@@ -1,12 +1,12 @@
 package Type::Tiny::Role;
 
-use 5.006001;
+use 5.008001;
 use strict;
 use warnings;
 
 BEGIN {
 	$Type::Tiny::Role::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Role::VERSION   = '1.016010';
+	$Type::Tiny::Role::VERSION   = '2.000000';
 }
 
 $Type::Tiny::Role::VERSION =~ tr/_//d;
@@ -15,9 +15,26 @@ use Scalar::Util qw< blessed weaken >;
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
+use Exporter::Tiny 1.004001 ();
 use Type::Tiny::ConstrainedObject ();
-our @ISA = 'Type::Tiny::ConstrainedObject';
+our @ISA = qw( Type::Tiny::ConstrainedObject Exporter::Tiny );
+
 sub _short_name { 'Role' }
+
+sub _exporter_fail {
+	my ( $class, $name, $opts, $globals ) = @_;
+	my $caller = $globals->{into};
+	
+	$opts->{name} = $name unless exists $opts->{name}; $opts->{name} =~ s/:://g;
+	$opts->{role} = $name unless exists $opts->{role};
+	my $type = $class->new($opts);
+	
+	$INC{'Type/Registry.pm'}
+		? 'Type::Registry'->for_class( $caller )->add_type( $type )
+		: ( $Type::Registry::DELAYED{$caller}{$type->name} = $type )
+		unless( ref($caller) or $caller eq '-lexical' or $globals->{'lexical'} );
+	return map +( $_->{name} => $_->{code} ), @{ $type->exportables };
+}
 
 my %cache;
 
@@ -161,6 +178,30 @@ See L<Type::Tiny::ConstrainedObject>.
 See L<Type::Tiny::ConstrainedObject>.
 
 =back
+
+=head2 Exports
+
+Type::Tiny::Role can be used as an exporter.
+
+  use Type::Tiny::Role 'MyApp::Printable';
+
+This will export the following functions into your namespace:
+
+=over
+
+=item C<< MyAppPrintable >>
+
+=item C<< is_MyAppPrintable( $value ) >>
+
+=item C<< assert_MyAppPrintable( $value ) >>
+
+=item C<< to_MyAppPrintable( $value ) >>
+
+=back
+
+Multiple types can be exported at once:
+
+  use Type::Tiny::Role qw( MyApp::Printable MyApp::Sendable );
 
 =head1 BUGS
 

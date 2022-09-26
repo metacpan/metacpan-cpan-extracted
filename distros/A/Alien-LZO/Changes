@@ -1,5 +1,8 @@
 Revision history for Alien-LZO
 
+0.03      2022-09-22 09:21:53 -0600
+  - Use https to fetch more securely (gh#5)
+
 0.02      2017-03-28 14:39:08 -0400
   - Documentation
 

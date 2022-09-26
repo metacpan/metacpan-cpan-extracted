@@ -1,5 +1,5 @@
 package App::ansifold;
-our $VERSION = "1.1501";
+our $VERSION = "1.1502";
 
 use v5.14;
 use warnings;
@@ -20,11 +20,13 @@ our $DEFAULT_COLRM    //= 0;
 
 use Getopt::EX::Hashed 'has'; {
 
+    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
+
     has width     => ' w =s@ ' , default => [];
     has boundary  => '   =s  ' , default => 'none';
     has padding   => '   :s  ' , action => sub {
-	$_->{padding} = 1;
-	$_->{padchar} = $_[1] if $_[1] ne '';
+	$_->padding = 1;
+	$_->padchar = $_[1] if $_[1] ne '';
     };
     has padchar   => '   =s  ' ;
     has prefix    => '   =s  ' ;
@@ -61,14 +63,14 @@ use Getopt::EX::Hashed 'has'; {
     };
 
     has '+nonewline' => sub {
-	$_->{separate} = "";
+	$_->separate = "";
     };
 
     has '+linebreak' =>
 	default => LINEBREAK_NONE,
 	action => sub {
 	    my($name, $value) = @_;
-	    $_->{$name} = do {
+	    $_->$name = do {
 		local $_ = $value;
 		my $v = LINEBREAK_NONE;
 		$v   |= LINEBREAK_ALL    if /all/i;
@@ -80,7 +82,7 @@ use Getopt::EX::Hashed 'has'; {
 
     has '+smart' => sub {
 	my $smart = $_->{$_[0]} = $_[1];
-	($_->{boundary}, $_->{linebreak}) = do {
+	($_->boundary, $_->linebreak) = do {
 	    if ($smart) {
 		('word', LINEBREAK_ALL);
 	    } else {
@@ -112,9 +114,9 @@ sub options {
     Configure "bundling";
     $app->getopt || pod2usage();
 
-    if ($app->{colrm}) {
-	$app->{separate} = '';
-	@{$app->{width}} = do {
+    if ($app->colrm) {
+	$app->separate = '';
+	@{$app->width} = do {
 	    unless (@ARGV > 0 and $ARGV[0] =~ /^\d+$/) {
 		"-1";
 	    } else {
@@ -129,8 +131,8 @@ sub options {
 	}
     }
 
-    if ($app->{expand} > 0) {
-	$app->{tabstop} = $app->{expand};
+    if ($app->expand > 0) {
+	$app->tabstop = $app->expand;
     }
 
     use charnames ':loose';
@@ -161,17 +163,17 @@ sub params {
 	    else { die "$_: width format error.\n" }
 	}
 	map { split /,/, $_, -1 }
-	@{$app->{width}};
+	@{$app->width};
     };
 
-    $app->{width} = do {
+    $app->width = do {
 	if    (@width == 0) { $DEFAULT_WIDTH }
 	elsif (@width == 1) { $width[0] }
 	else {
 	    my @map = [ (int(pop @width)) x 2 ];
 	    unshift @map, map { [ $_ < 0 ? (-$_, 0) : ($_, 1) ] } @width;
 	    @width = map { $_->[0] } @map;
-	    $app->{width_index} = [ grep { $map[$_][1] } 0 .. $#map ];
+	    $app->width_index = [ grep { $map[$_][1] } 0 .. $#map ];
 	    \@width;
 	}
     };
@@ -183,20 +185,20 @@ sub doit {
     my $app = shift;
 
     my $fold = Text::ANSI::Fold->new(
-	map  { $_ => $app->{$_} }
-	grep { defined $app->{$_} }
+	map  { $_ => $app->$_ }
+	grep { defined $app->$_ }
 	qw(width boundary padding padchar prefix ambiguous
 	   linebreak runin runout
 	   expand tabstyle tabstop tabhead tabspace discard)
 	);
 
     my $separator = do {
-	$app->{separate} =~ s{ ( \\ (.) ) }{
+	$app->separate =~ s{ ( \\ (.) ) }{
 	    { '\\' => '\\', n => "\n" }->{$2} // $1
 	}gexr;
     };
 
-    my @index = @{$app->{width_index}};
+    my @index = @{$app->width_index};
 
     while (<>) {
 	my $chomped = chomp;
@@ -204,7 +206,7 @@ sub doit {
 	@chops = grep { defined } @chops[@index] if @index > 0;
 	print join $separator, @chops;
 	print "\n" if $chomped;
-	print "\n" x $app->{paragraph} if $app->{paragraph} > 0;
+	print "\n" x $app->paragraph if $app->paragraph > 0;
     }
 
     return $app;

@@ -2,9 +2,9 @@
 
 use lib 't/lib';
 use MooseX::Extended::Tests
-  name    => 'try/catch',
-  module  => 'Syntax::Keyword::Try',
-  version => v5.24.0;
+  name     => 'try/catch',
+  requires => { 'Syntax::Keyword::Try' => '0.27' },
+  version  => v5.24.0;
 
 package My::Try {
     use MooseX::Extended includes => [qw/try/];

@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension CatalystX-RequestModel.
 
+0.009 - 26 September 2022
+  - Allow RequestModel(Model1, Model2) for more concise code when you have more than
+    one request model.
+
 0.008 - 31 August 2022
   - Properly support 'omit_empty' when user doesn't bother to set the 'predicate'
   Moo/se attribute option.
