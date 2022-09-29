@@ -1,5 +1,8 @@
 Revision history for Alien-curl
 
+0.10      2022-09-26 21:12:26 -0600
+  - Improved compatability with Alien::OpenSSL (gh#17)
+
 0.09      2021-10-09 20:07:07 -0600
   - Fix for macOS source build
 

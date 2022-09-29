@@ -19,9 +19,9 @@ name: App-FirefoxUtils
 provides:
   App::FirefoxUtils:
     file: lib/App/FirefoxUtils.pm
-    version: '0.017'
+    version: '0.018'
 requires:
-  App::BrowserUtils: '0.016'
+  App::BrowserUtils: '0.017'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
   Data::Sah::Coerce::perl::To_duration::From_float::seconds: '0'
   Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration: '0'
@@ -41,8 +41,8 @@ requires:
   Perinci::CmdLine::Lite: '1.915'
   Sah::Schema::firefox::profile_name: '0'
   Sah::Schema::true: '0'
-  Sah::Schema::unix::local_uid: '0'
   Sah::Schema::unix::signal: '0'
+  Sah::Schema::unix::uid::exists: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -50,7 +50,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FirefoxUtils
   homepage: https://metacpan.org/release/App-FirefoxUtils
   repository: git://github.com/perlancar/perl-App-FirefoxUtils.git
-version: '0.017'
+version: '0.018'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -392,7 +392,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

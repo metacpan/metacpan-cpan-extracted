@@ -26,14 +26,12 @@ struct mcdbxs_read {
     bool values;            /* flag for values() processing */
 };
 
+inline
 static SV *
 mcdbxs_svcp (const unsigned char * const restrict p, const STRLEN len)
 {
-    /* copy and append '\0'-termination */
-    SV * const restrict sv = newSVpvn((const char *)p, len+1);
-    SvCUR_set(sv, len);
-    (SvPVX(sv))[len] = '\0';
-    return sv;
+    /* newSVpvn() allocates len+1 and '\0'-terminates string in returned SV */
+    return newSVpvn((const char *)p, len);
 }
 
 static bool
@@ -78,6 +76,8 @@ mcdbxs_make_destroy (struct mcdb_make * const restrict mk)
     mcdb_makefn_cleanup(mk);
     Safefree(mk);
 }
+
+#define mcdbxs_madvise(this,advice)  mcdb_mmap_madvise((this)->m.map,(advice))
 
 
 MODULE = MCDB_File		PACKAGE = MCDB_File	PREFIX = mcdbxs_
@@ -234,6 +234,11 @@ mcdbxs_multi_get(this, k)
                     mcdbxs_svcp(mcdb_dataptr(&this->m),mcdb_datalen(&this->m)));
   OUTPUT:
     RETVAL
+
+void
+mcdbxs_madvise(this, advice)
+    struct mcdbxs_read * this;
+    int advice;
 
 
 MODULE = MCDB_File	PACKAGE = MCDB_File::Make	PREFIX = mcdbxs_make_

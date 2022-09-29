@@ -8,37 +8,61 @@ Benchmark::Featureset::ParamCheck benchmarking positional parameters.
 
 =head1 SAMPLE RESULTS
 
+11th Gen Intel Core i3-1115G4 @ 3.00 GHz (1 physical processor, 2 cores, 4 threads);
+12 GB RAM;
+Linux 5.15.0-46-generic;
+Ubuntu 22.04.1 LTS;
+Perl 5.34.0.
+
 =head2 Simple Input Data
 
- TP-TT -  1 wallclock secs ( 0.56 usr +  0.00 sys =  0.56 CPU) @ 35.71/s (n=20)
- PVC-TT -  1 wallclock secs ( 0.65 usr +  0.00 sys =  0.65 CPU) @ 30.77/s (n=20)
- RefUtilXS -  0 wallclock secs ( 0.75 usr +  0.00 sys =  0.75 CPU) @ 26.67/s (n=20)
- PurePerl -  1 wallclock secs ( 0.98 usr +  0.01 sys =  0.99 CPU) @ 20.20/s (n=20)
- PVC-Specio -  2 wallclock secs ( 2.53 usr +  0.01 sys =  2.54 CPU) @  7.87/s (n=20)
- PVC-Moose -  2 wallclock secs ( 2.56 usr +  0.00 sys =  2.56 CPU) @  7.81/s (n=20)
- PV-TT -  3 wallclock secs ( 3.26 usr +  0.00 sys =  3.26 CPU) @  6.13/s (n=20)
- PV -  6 wallclock secs ( 5.19 usr +  0.01 sys =  5.20 CPU) @  3.85/s (n=20)
- DV-Mouse - 11 wallclock secs (11.11 usr +  0.00 sys = 11.11 CPU) @  1.80/s (n=20)
- DV-TT - 11 wallclock secs (11.25 usr +  0.00 sys = 11.25 CPU) @  1.78/s (n=20)
- DV-Moose - 11 wallclock secs (11.30 usr +  0.01 sys = 11.31 CPU) @  1.77/s (n=20)
- MXPV-Moose - 13 wallclock secs (12.11 usr +  0.02 sys = 12.13 CPU) @  1.65/s (n=20)
- MXPV-TT - 12 wallclock secs (12.16 usr +  0.01 sys = 12.17 CPU) @  1.64/s (n=20)
+ TP2-TT -  0 wallclock secs ( 0.26 usr +  0.00 sys =  0.26 CPU) @ 192.31/s (n=50)
+ RefUtilXS -  1 wallclock secs ( 0.27 usr +  0.00 sys =  0.27 CPU) @ 185.19/s (n=50)
+ TP-TT -  1 wallclock secs ( 0.27 usr +  0.00 sys =  0.27 CPU) @ 185.19/s (n=50)
+ PVC-TT -  0 wallclock secs ( 0.27 usr +  0.00 sys =  0.27 CPU) @ 185.19/s (n=50)
+ PurePerl -  0 wallclock secs ( 0.32 usr +  0.00 sys =  0.32 CPU) @ 156.25/s (n=50)
+ TP2-Moose -  0 wallclock secs ( 0.37 usr +  0.00 sys =  0.37 CPU) @ 135.14/s (n=50)
+ TP-Moose -  1 wallclock secs ( 0.38 usr +  0.00 sys =  0.38 CPU) @ 131.58/s (n=50)
+ PVC-Specio -  1 wallclock secs ( 0.76 usr +  0.00 sys =  0.76 CPU) @ 65.79/s (n=50)
+ TP2-Mouse -  1 wallclock secs ( 0.78 usr +  0.00 sys =  0.78 CPU) @ 64.10/s (n=50)
+ PVC-Moose -  0 wallclock secs ( 0.79 usr +  0.00 sys =  0.79 CPU) @ 63.29/s (n=50)
+ TP-Mouse -  1 wallclock secs ( 0.81 usr +  0.01 sys =  0.82 CPU) @ 60.98/s (n=50)
+ TP-Specio -  1 wallclock secs ( 0.83 usr +  0.00 sys =  0.83 CPU) @ 60.24/s (n=50)
+ TP2-Specio -  0 wallclock secs ( 0.85 usr +  0.00 sys =  0.85 CPU) @ 58.82/s (n=50)
+ PV-TT -  1 wallclock secs ( 1.09 usr +  0.00 sys =  1.09 CPU) @ 45.87/s (n=50)
+ PV -  1 wallclock secs ( 1.43 usr +  0.00 sys =  1.43 CPU) @ 34.97/s (n=50)
+ DV-Moose -  3 wallclock secs ( 2.86 usr +  0.00 sys =  2.86 CPU) @ 17.48/s (n=50)
+ DV-Mouse -  3 wallclock secs ( 2.98 usr +  0.00 sys =  2.98 CPU) @ 16.78/s (n=50)
+ DV-TT -  3 wallclock secs ( 2.98 usr +  0.00 sys =  2.98 CPU) @ 16.78/s (n=50)
+ MXPV-Moose -  4 wallclock secs ( 4.01 usr +  0.00 sys =  4.01 CPU) @ 12.47/s (n=50)
+ MXPV-TT -  4 wallclock secs ( 4.17 usr +  0.00 sys =  4.17 CPU) @ 11.99/s (n=50)
+ TP-Nano -  5 wallclock secs ( 4.74 usr +  0.00 sys =  4.74 CPU) @ 10.55/s (n=50)
+ TP2-Nano -  4 wallclock secs ( 4.77 usr +  0.00 sys =  4.77 CPU) @ 10.48/s (n=50)
 
 =head2 Complex Input Data
 
- TP-TT -  1 wallclock secs ( 0.63 usr +  0.01 sys =  0.64 CPU) @ 31.25/s (n=20)
- PVC-TT -  1 wallclock secs ( 0.74 usr +  0.00 sys =  0.74 CPU) @ 27.03/s (n=20)
- RefUtilXS -  1 wallclock secs ( 1.07 usr +  0.00 sys =  1.07 CPU) @ 18.69/s (n=20)
- PurePerl -  1 wallclock secs ( 1.49 usr +  0.00 sys =  1.49 CPU) @ 13.42/s (n=20)
- PVC-Specio -  2 wallclock secs ( 2.83 usr +  0.00 sys =  2.83 CPU) @  7.07/s (n=20)
- PVC-Moose -  3 wallclock secs ( 3.08 usr +  0.00 sys =  3.08 CPU) @  6.49/s (n=20)
- PV-TT -  4 wallclock secs ( 3.43 usr +  0.00 sys =  3.43 CPU) @  5.83/s (n=20)
- PV -  6 wallclock secs ( 5.89 usr +  0.00 sys =  5.89 CPU) @  3.40/s (n=20)
- DV-TT - 12 wallclock secs (11.77 usr +  0.01 sys = 11.78 CPU) @  1.70/s (n=20)
- DV-Mouse - 12 wallclock secs (11.86 usr +  0.00 sys = 11.86 CPU) @  1.69/s (n=20)
- DV-Moose - 12 wallclock secs (11.96 usr +  0.01 sys = 11.97 CPU) @  1.67/s (n=20)
- MXPV-TT - 12 wallclock secs (12.27 usr +  0.00 sys = 12.27 CPU) @  1.63/s (n=20)
- MXPV-Moose - 13 wallclock secs (12.41 usr +  0.02 sys = 12.43 CPU) @  1.61/s (n=20)
+ TP-TT -  0 wallclock secs ( 0.29 usr +  0.00 sys =  0.29 CPU) @ 172.41/s (n=50)
+ TP2-TT -  1 wallclock secs ( 0.31 usr +  0.00 sys =  0.31 CPU) @ 161.29/s (n=50)
+ PVC-TT -  1 wallclock secs ( 0.32 usr +  0.00 sys =  0.32 CPU) @ 156.25/s (n=50)
+ RefUtilXS -  0 wallclock secs ( 0.37 usr +  0.00 sys =  0.37 CPU) @ 135.14/s (n=50)
+ PurePerl -  1 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 98.04/s (n=50)
+ TP-Moose -  0 wallclock secs ( 0.53 usr +  0.00 sys =  0.53 CPU) @ 94.34/s (n=50)
+ TP2-Moose -  0 wallclock secs ( 0.53 usr +  0.00 sys =  0.53 CPU) @ 94.34/s (n=50)
+ TP2-Mouse -  0 wallclock secs ( 0.81 usr +  0.00 sys =  0.81 CPU) @ 61.73/s (n=50)
+ PVC-Specio -  1 wallclock secs ( 0.85 usr +  0.00 sys =  0.85 CPU) @ 58.82/s (n=50)
+ TP-Mouse -  0 wallclock secs ( 0.86 usr +  0.00 sys =  0.86 CPU) @ 58.14/s (n=50)
+ PVC-Moose -  1 wallclock secs ( 0.91 usr +  0.00 sys =  0.91 CPU) @ 54.95/s (n=50)
+ TP-Specio -  1 wallclock secs ( 0.92 usr +  0.00 sys =  0.92 CPU) @ 54.35/s (n=50)
+ TP2-Specio -  1 wallclock secs ( 0.92 usr +  0.00 sys =  0.92 CPU) @ 54.35/s (n=50)
+ PV-TT -  1 wallclock secs ( 1.13 usr +  0.00 sys =  1.13 CPU) @ 44.25/s (n=50)
+ PV -  1 wallclock secs ( 1.55 usr +  0.00 sys =  1.55 CPU) @ 32.26/s (n=50)
+ DV-Moose -  3 wallclock secs ( 3.05 usr +  0.00 sys =  3.05 CPU) @ 16.39/s (n=50)
+ DV-Mouse -  4 wallclock secs ( 3.17 usr +  0.00 sys =  3.17 CPU) @ 15.77/s (n=50)
+ DV-TT -  3 wallclock secs ( 3.19 usr +  0.00 sys =  3.19 CPU) @ 15.67/s (n=50)
+ MXPV-TT -  5 wallclock secs ( 4.22 usr +  0.00 sys =  4.22 CPU) @ 11.85/s (n=50)
+ MXPV-Moose -  4 wallclock secs ( 4.33 usr +  0.00 sys =  4.33 CPU) @ 11.55/s (n=50)
+ TP-Nano - 16 wallclock secs (15.52 usr +  0.00 sys = 15.52 CPU) @  3.22/s (n=50)
+ TP2-Nano - 16 wallclock secs (15.80 usr +  0.01 sys = 15.81 CPU) @  3.16/s (n=50)
 
 =head1 AUTHOR
 
@@ -46,7 +70,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2017 by Toby Inkster.
+This software is copyright (c) 2017, 2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -83,7 +107,7 @@ my @complex = @{ 'Benchmark::Featureset::ParamCheck'->complex_positional_data };
 	@benchmark_data = @trivial;
 	is_fastest(
 		Benchmark::Featureset::ParamCheck::Implementation::TypeParams::TypeTiny->short_name,
-		20,
+		50,
 		\%benchmark,
 		"trivial data benchmark"
 	);
@@ -91,7 +115,7 @@ my @complex = @{ 'Benchmark::Featureset::ParamCheck'->complex_positional_data };
 	@benchmark_data = @complex;
 	is_fastest(
 		Benchmark::Featureset::ParamCheck::Implementation::TypeParams::TypeTiny->short_name,
-		20,
+		50,
 		\%benchmark,
 		"complex data benchmark"
 	);

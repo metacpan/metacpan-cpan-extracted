@@ -47,7 +47,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.22
+Version 1.23
 
 # DESCRIPTION
 
@@ -322,7 +322,7 @@ Next example select number of panes by dividing terminal width by 85:
 
 If you consider the case the terminal width is less than 85:
 
-    ansicolumn --pane 85/,DUP,1>,EXCH,1,IF
+    ansicolumn --pane 85/,DUP,1,GE,EXCH,1,IF
 
 # STARTUP
 

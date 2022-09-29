@@ -7,45 +7,41 @@ use utf8;
 
 BEGIN {
 	$Types::XSD::AUTHORITY = 'cpan:TOBYINK';
-	$Types::XSD::VERSION   = '0.007';
+	$Types::XSD::VERSION   = '0.008';
 }
 
 use B qw(perlstring);
 use Carp;
 use DateTimeX::Auto qw( dt dur );
 use DateTime::Incomplete ();
-use Type::Utils;
-use Type::Library -base, -declare => qw(
+use Types::XSD::Lite 0.007 -base, -utils, -declare => qw(
 	Name NmToken NmTokens NCName Id IdRef IdRefs Entity Entities
 	QName Notation Duration DateTime Time Date GYearMonth
 	GYear GMonthDay GDay GMonth
 	DateTimeStamp YearMonthDuration DayTimeDuration
 );
-use Types::Standard;
-use Types::XSD::Lite 0.003 ();
+use Types::Standard 2.000000 qw( StrMatch );
 use XML::RegExp;
 
-our @EXPORT_OK = qw( dt_cmp dur_cmp dt_parse dur_parse );
+push( our(@EXPORT_OK), qw( dt_cmp dur_cmp dt_parse dur_parse ) );
 
 BEGIN {
-	Type::Utils::extends('Types::XSD::Lite');
-	
 	*create_range_check = \&Types::XSD::Lite::create_range_check;
 	*quick_range_check  = \&Types::XSD::Lite::quick_range_check;
 	*hex_length         = \&Types::XSD::Lite::hex_length;
 	*b64_length         = \&Types::XSD::Lite::b64_length;
-	*facet              = \&Types::XSD::Lite::facet;
+	*with_facets        = \&Types::XSD::Lite::with_facets;
 };
 
 use constant MAGIC_DATES => map dt($_), qw( 1696-09-01 1697-02-01 1903-03-01 1903-07-01 );
 use constant MAGIC_TABLE => +{ "-1-1-1-1" => -1, "0000" => 0, "1111" => 1 };
-sub dur_cmp
-{
+
+sub dur_cmp {
 	my @durations = do {
 		local $SIG{__WARN__} = sub {};
 		map ref($_) ? $_ : dur($_), @_[0,1];
 	};
-	my $result    = join q[], map "DateTime::Duration"->compare(@durations, $_), MAGIC_DATES;
+	my $result = join q[], map "DateTime::Duration"->compare(@durations, $_), MAGIC_DATES;
 	return MAGIC_TABLE->{$result} if exists MAGIC_TABLE->{$result};
 	return undef;
 }
@@ -113,13 +109,13 @@ our @dtarr;
 my $i = -1;
 our $base_datetime = "DateTime"->new(year => 2000, month => 1, day => 1); # leap year, 31 day month
 our %dt_regexps;
-sub dt_maker
-{
-	my ($name, $regexp, @fields) = @_;
-	my $j = ++$i; $dtarr[$j] = $regexp;
+
+sub dt_maker {
+	my ( $name, $regexp, @fields ) = @_;
+	my $j = ++$i;
+	$dtarr[$j] = $regexp;
 	
-	my $inlined = sub
-	{
+	my $inlined = sub {
 		my $var = $_[1];
 		my @code;
 		push @code, "do { my \$ok = 1;";
@@ -136,25 +132,16 @@ sub dt_maker
 		push @code, "}";
 		"@code";
 	};
-	
-	my $type = "Type::Tiny"->new(
-		name       => $name,
-		library    => __PACKAGE__,
-		constraint => eval sprintf('sub { %s }', $inlined->(undef, '$_')),
-		inlined    => $inlined,
-	);
-	__PACKAGE__->add_type($type);
-	
-	facet(
-		qw( pattern whiteSpace enumeration maxInclusiveDT maxExclusiveDT minInclusiveDT minExclusiveDT explicitTimezone ),
-		$type,
-	);
-	
-	$dt_regexps{$type} = [$regexp, @fields];
+
+	my $type = declare $name,
+		with_facets [qw( pattern whiteSpace enumeration maxInclusiveDT maxExclusiveDT minInclusiveDT minExclusiveDT explicitTimezone )],
+		constraint => eval sprintf( 'sub { %s }', $inlined->(undef, '$_') ),
+		inlined    => $inlined;
+
+	$dt_regexps{$type} = [ $regexp, @fields ];
 }
 
-sub dt_parse
-{
+sub dt_parse {
 	my ($type, $a) = @_;
 	my ($re, @fields) = @{ $dt_regexps{$type} };
 	my %d;
@@ -163,23 +150,20 @@ sub dt_parse
 	"DateTime::Incomplete"->new(%d);
 }
 
-sub dur_parse
-{
+sub dur_parse {
 	goto \&DateTimeX::Auto::dur;
 }
 
 {
 	my %cache;
-	sub _detect_type
-	{
+	sub _detect_type {
 		my ($lib, $v) = @_;
 		for my $type (qw(DateTime Time Date GYearMonth GYear GMonthDay GDay GMonth)) {
 			return $type if $lib->get_type($type)->check($v);
 		}
 		return $lib->get_type('DateTime');
 	}
-	sub dt_cmp
-	{
+	sub dt_cmp {
 		my ($type, $a, $b) = @_;
 		$type = __PACKAGE__->_detect_type($a) unless $type;
 		$type = __PACKAGE__->get_type($type) unless ref $type;
@@ -189,60 +173,74 @@ sub dur_parse
 	}
 }
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare Name, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::Name)\z}sm];
+declare Name,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as StrMatch[qr{\A(?:$XML::RegExp::Name)\z}sm];
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare NmToken, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::NmToken)\z}sm];
+declare NmToken,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as StrMatch[qr{\A(?:$XML::RegExp::NmToken)\z}sm];
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare NmTokens, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::NmToken)(?:\s+$XML::RegExp::NmToken)*\z}sm];
+declare NmTokens,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as StrMatch[qr{\A(?:$XML::RegExp::NmToken)(?:\s+$XML::RegExp::NmToken)*\z}sm];
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare NCName, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::NCName)\z}sm];
+declare NCName,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as StrMatch[qr{\A(?:$XML::RegExp::NCName)\z}sm];
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare Id, as NCName;
+declare Id,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as NCName;
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare IdRef, as NCName;
+declare IdRef,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as NCName;
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare IdRefs, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::NCName)(?:\s+$XML::RegExp::NCName)*\z}sm];
+declare IdRefs,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as StrMatch[qr{\A(?:$XML::RegExp::NCName)(?:\s+$XML::RegExp::NCName)*\z}sm];
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare Entity, as NCName;
+declare Entity,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as NCName;
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare Entities, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::NCName)(?:\s+$XML::RegExp::NCName)*\z}sm];
+declare Entities,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as StrMatch[qr{\A(?:$XML::RegExp::NCName)(?:\s+$XML::RegExp::NCName)*\z}sm];
 
-facet qw( lengthQName minLengthQName maxLengthQName pattern enumeration whiteSpace ),
-declare QName, as Types::Standard::StrMatch[qr{\A(?:$XML::RegExp::QName)\z}sm];
+declare QName,
+	with_facets [qw( lengthQName minLengthQName maxLengthQName pattern enumeration whiteSpace )],
+	as StrMatch[qr{\A(?:$XML::RegExp::QName)\z}sm];
 
-facet qw( lengthQName minLengthQName maxLengthQName pattern enumeration whiteSpace ),
-declare Notation, as QName;
+declare Notation,
+	with_facets [qw( lengthQName minLengthQName maxLengthQName pattern enumeration whiteSpace )],
+	as QName;
 
-facet qw( pattern whiteSpace enumeration maxInclusiveDuration maxExclusiveDuration minInclusiveDuration minExclusiveDuration ),
-declare Duration, as Types::Standard::StrMatch[
-	qr{\A
-		-?
-		P
-		(?:[0-9]+Y)?
-		(?:[0-9]+M)?
-		(?:[0-9]+D)?
-		(?:T
-			(?:[0-9]+H)?
+declare Duration,
+	with_facets [qw( pattern whiteSpace enumeration maxInclusiveDuration maxExclusiveDuration minInclusiveDuration minExclusiveDuration )],
+	as StrMatch[
+		qr{\A
+			-?
+			P
+			(?:[0-9]+Y)?
 			(?:[0-9]+M)?
-			(?:[0-9]+(?:\.[0-9]+)?S)?
-		)?
-	\z}xism
-];
+			(?:[0-9]+D)?
+			(?:T
+				(?:[0-9]+H)?
+				(?:[0-9]+M)?
+				(?:[0-9]+(?:\.[0-9]+)?S)?
+			)?
+		\z}xism
+	];
 
-facet qw( pattern whiteSpace enumeration maxInclusiveDuration maxExclusiveDuration minInclusiveDuration minExclusiveDuration ),
-declare YearMonthDuration, as Duration->parameterize(pattern => qr{\A[^DT]*\z}i);
+declare YearMonthDuration,
+	with_facets [qw( pattern whiteSpace enumeration maxInclusiveDuration maxExclusiveDuration minInclusiveDuration minExclusiveDuration )],
+	as Duration->parameterize(pattern => qr{\A[^DT]*\z}i);
 
-facet qw( pattern whiteSpace enumeration maxInclusiveDuration maxExclusiveDuration minInclusiveDuration minExclusiveDuration ),
-declare DayTimeDuration, as Duration->parameterize(pattern => qr{\A[^YM]*[DT].*\z}i);
+declare DayTimeDuration,
+	with_facets [qw( pattern whiteSpace enumeration maxInclusiveDuration maxExclusiveDuration minInclusiveDuration minExclusiveDuration )],
+	as Duration->parameterize(pattern => qr{\A[^YM]*[DT].*\z}i);
 
 dt_maker(
 	DateTime => qr{\A
@@ -355,7 +353,7 @@ dt_maker(
 	qw( month time_zone ),
 );
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

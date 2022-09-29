@@ -56,21 +56,21 @@ DESCRIPTION
 
 BUGS
     Please report any bugs to
-    <http://rt.cpan.org/Dist/Display.html?Queue=Benchmark-Featureset-ParamChec
-    k>.
+    <https://github.com/tobyink/p5-benchmark-featureset-paramcheck/issues>.
 
 SEE ALSO
     Parameter validation libraries: Data::Validator, MooseX::Params::Validate,
-    Params::Check, Params::Validate, Params::ValidationCompiler,
-    Ref::Util::XS, Type::Params.
+    Params::Check, Params::Validate, Params::ValidationCompiler, Type::Params.
 
-    Type constraint libraries: Moose, Mouse, Specio, Type::Tiny.
+    Type constraint libraries: Moose, Mouse, Specio, Type::Tiny, Type::Nano.
+
+    Other tested libraries: Ref::Util::XS.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2017, 2018 by Toby Inkster.
+    This software is copyright (c) 2017, 2018, 2022 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

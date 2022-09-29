@@ -2,8 +2,8 @@ NAME
     App::FirefoxUtils - Utilities related to Firefox
 
 VERSION
-    This document describes version 0.017 of App::FirefoxUtils (from Perl
-    distribution App-FirefoxUtils), released on 2022-05-20.
+    This document describes version 0.018 of App::FirefoxUtils (from Perl
+    distribution App-FirefoxUtils), released on 2022-07-24.
 
 SYNOPSIS
 DESCRIPTION
@@ -49,7 +49,7 @@ FUNCTIONS
 
     *   quiet => *true*
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -83,7 +83,7 @@ FUNCTIONS
 
     *   quiet => *true*
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -119,7 +119,7 @@ FUNCTIONS
 
     *   quiet => *true*
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -182,7 +182,7 @@ FUNCTIONS
 
          300,10,120,30
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -220,7 +220,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -249,7 +249,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -354,7 +354,7 @@ FUNCTIONS
 
     *   signal => *unix::signal*
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -383,7 +383,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 

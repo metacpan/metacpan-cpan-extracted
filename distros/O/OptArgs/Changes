@@ -1,3 +1,14 @@
+0.1.21 (2022-09-29)
+
+    Documentation:
+        - Mark as depreciated and point to OptArgs2
+
+    Dependencies
+        - Add ExtUtils::MakeMaker::CPANfile
+
+    Packaging:
+        - Move to ExtUtils::MakeMaker away from Module::Install
+
 0.1.20 (2016-04-11)
 
     New Features:

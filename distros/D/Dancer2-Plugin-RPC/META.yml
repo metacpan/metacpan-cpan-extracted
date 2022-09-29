@@ -33,5 +33,5 @@ requires:
 resources:
   homepage: https://github.com/abeltje/Dancer2-Plugin-RPC
   repository: git://github.com/abeltje/Dancer2-Plugin-RPC.git
-version: '2.01'
+version: '2.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -21,7 +21,7 @@ recursive_author_tests('xt');
 requires 'Error::Pure' => 0;
 requires 'List::Util' => 1.33;
 requires 'Mo' => 0;
-requires 'Mo::utils' => 0;
+requires 'Mo::utils' => 0.14;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Data-HTML-Button/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Data-HTML-Button';
@@ -31,7 +31,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.04';
 
 # Run.
 WriteAll();

@@ -22,6 +22,8 @@ This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
 
   static method new : Sys::Socket::In_addr ();
 
+Creates a new C<Sys::Socket::In_addr> object.
+
 =head1 Instance Methods
 
 =head2 DESTROY
@@ -30,10 +32,21 @@ This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
 
 The destructor.
 
+=head2 s_addr
+
+  method s_addr : int ();
+
+Gets C<s_addr>.
+
+=head2 set_s_addr
+
+  method set_s_addr : void ();
+
+Sets C<s_addr>.
+
 =head1 Copyright & License
 
 Copyright 2022-2022 Yuki Kimoto, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-

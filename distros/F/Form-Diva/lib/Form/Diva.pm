@@ -4,7 +4,7 @@ no warnings 'uninitialized';
 
 package Form::Diva;
 
-our $VERSION='1.04';
+our $VERSION='1.05';
 
 # use Data::Printer;
 
@@ -38,6 +38,30 @@ sub _field_once {
         else { $hash{ $field->{name} } = 1; }
     }
     return 1;
+}
+
+sub _build_html_tag {
+    my $self = shift;
+    my $tag_name = shift;
+    my %options = @_;
+    my @attrs = grep { defined && length } @{ $options{attributes} // [] };
+
+    my $output = join ' ', $tag_name, @attrs;
+    $output = "<$output>";
+
+    if (exists $options{content}) {
+        $output .= join '', $options{content} // '', "</$tag_name>";
+    }
+
+    if (defined $options{prefix}) {
+        $output = $options{prefix} . $output;
+    }
+
+    if (defined $options{suffix}) {
+        $output .= $options{suffix};
+    }
+
+    return $output;
 }
 
 sub new {
@@ -192,8 +216,15 @@ sub _label {
         : $self->{label_class};
     my $label_tag
         = exists $field->{label} ? $field->{label} || '' : ucfirst( $field->{name} );
-    return qq|<LABEL for="$field->{id}" id="$field->{id}_label" class="$label_class">|
-        . qq|$label_tag</LABEL>|;
+
+    return $self->_build_html_tag('LABEL',
+        attributes => [
+            qq|for="$field->{id}"|,
+            qq|id="$field->{id}_label"|,
+            qq|class="$label_class"|,
+        ],
+        content => $label_tag
+    );
 }
 
 sub _input {
@@ -203,12 +234,29 @@ sub _input {
     my %B     = $self->_field_bits( $field, $data );
     my $input = '';
     if ( $B{textarea} ) {
-        $input = qq|<TEXTAREA $B{name} $B{id}
-        $B{input_class} $B{placeholder} $B{extra} >$B{rawvalue}</TEXTAREA>|;
+        $input = $self->_build_html_tag('TEXTAREA',
+            attributes => [
+                $B{name},
+                $B{id},
+                $B{input_class},
+                $B{placeholder},
+                $B{extra},
+            ],
+            content => $B{rawvalue}
+        );
     }
     else {
-        $input .= qq|<INPUT $B{type} $B{name} $B{id}
-        $B{input_class} $B{placeholder} $B{extra} $B{value} >|;
+        $input = $self->_build_html_tag('INPUT',
+            attributes => [
+                $B{type},
+                $B{name},
+                $B{id},
+                $B{input_class},
+                $B{placeholder},
+                $B{extra},
+                $B{value},
+            ],
+        );
     }
     return $input;
 }
@@ -220,10 +268,16 @@ sub _input_hidden {
     my %B     = $self->_field_bits( $field, $data );
 
     #hidden fields don't get a class or a placeholder
-    my $input .= qq|<INPUT type="hidden" $B{name} $B{id}
-        $B{extra} $B{value} >|;
-    $input =~ s/\s+/ /g;     # remove extra whitespace.
-    $input =~ s/\s+>/>/g;    # cleanup space before closing >
+    my $input = $self->_build_html_tag('INPUT',
+        attributes => [
+            qq|type="hidden"|,
+            $B{name},
+            $B{id},
+            $B{extra},
+            $B{value},
+        ],
+    );
+
     return $input;
 }
 
@@ -269,33 +323,64 @@ sub _option_input {    # field, input_class, data;
         ? @{$replace_fields}
         : @{ $field->{values} };
     if ( $field->{type} eq 'select' ) {
-        $output
-            = qq|<SELECT name="$field->{name}" id="$field->{id}" $extra $input_class>\n|;
+        my @options;
         foreach my $val (@values) {
             my ( $value, $v_lab ) = ( split( /\:/, $val ), $val );
             my $idf = $self->_option_id( $field->{id}, $value );
             my $selected = '';
-            if    ( $datavalue eq $value ) { $selected = 'selected ' }
-            elsif ( $default eq $value )   { $selected = 'selected ' }
-            $output
-                .= qq| <option value="$value" $idf $selected>$v_lab</option>\n|;
+            if    ( $datavalue eq $value ) { $selected = 'selected' }
+            elsif ( $default eq $value )   { $selected = 'selected' }
+
+            push @options, $self->_build_html_tag('option',
+                attributes => [
+                    qq|value="$value"|,
+                    $idf,
+                    $selected,
+                ],
+                content => $v_lab,
+                prefix => ' ',
+                suffix => "\n",
+            );
         }
-        $output .= '</SELECT>';
+
+        $output = $self->_build_html_tag('SELECT',
+            attributes => [
+                qq|name="$field->{name}"|,
+                qq|id="$field->{id}"|,
+                $extra,
+                $input_class
+            ],
+            # NOTE: add an empty line before first option
+            content => (join '', "\n", @options),
+        );
     }
     else {
+        my @options;
         foreach my $val (@values) {
             my ( $value, $v_lab ) = ( split( /\:/, $val ), $val );
             my $idf = $self->_option_id( $field->{id}, $value );
             my $checked = '';
             if ( $datavalue eq $value ) {
-                $checked = q !checked="checked" !;
+                $checked = q !checked="checked"!;
             }
             elsif ( $default eq $value ) {
-                $checked = q !checked="checked" !;
+                $checked = q !checked="checked"!;
             }
-            $output
-                .= qq!<input type="$field->{type}" $input_class $extra name="$field->{name}" $idf value="$value" $checked>$v_lab<br>\n!;
+            push @options, $self->_build_html_tag('input',
+                attributes => [
+                    qq|type="$field->{type}"|,
+                    $input_class,
+                    $extra,
+                    qq|name="$field->{name}"|,
+                    $idf,
+                    qq|value="$value"|,
+                    $checked
+                ],
+                suffix => "$v_lab<br>\n"
+            );
         }
+
+        $output = join '', @options;
     }
     return $output;
 }
@@ -330,8 +415,6 @@ sub generate {
         else {
             $input = $self->_input( $field, $data );
         }
-        $input =~ s/  +/ /g;     # remove extra whitespace.
-        $input =~ s/\s+>/>/g;    # cleanup space before closing >
         push @generated,
             {
             label   => $self->_label($field),
@@ -426,7 +509,7 @@ Form::Diva - Generate HTML5 form label and input fields
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 AUTHOR
 

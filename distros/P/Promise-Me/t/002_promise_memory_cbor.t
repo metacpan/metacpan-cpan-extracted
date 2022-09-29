@@ -10,6 +10,8 @@ BEGIN
     use Test::More;
     use Promise::Me qw( :all );
     use Test::Promise::Me;
+    use Module::Generic::File qw( file );
+    use Module::Generic::SharedMemXS v0.1.0 qw( :all );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     # our $DESTROY_SHARED_MEM = 0;
 };
@@ -27,9 +29,25 @@ plan( skip_all => "CBOR::XS 1.86 required for testing promise serialisation with
 
 my $medium     = 'memory';
 my $serialiser = 'cbor';
+my $s = Module::Generic::SharedMemXS->new(
+{
+    create  => 1,
+    key     => 'pm_' . $$ . $$,
+    mode    => 0666,
+    size    => 10240,
+}) || do
+{
+    plan( skip_all => 'This platform does not support shared memory or there is not enough of it.' );
+};
+my $mem = $s->open || do
+{
+    plan( skip_all => 'This platform does not support shared memory or there is not enough of it: ' . $s->error );
+};
+$mem->remove;
+my $tmpdir = file(__FILE__)->parent;
 subtest "Promise using $medium and $serialiser serialiser" => sub
 {
-    &Test::Promise::Me::runtest( $medium, $serialiser );
+    &Test::Promise::Me::runtest( $medium, $serialiser, { tmpdir => $tmpdir } );
 };
 
 done_testing();

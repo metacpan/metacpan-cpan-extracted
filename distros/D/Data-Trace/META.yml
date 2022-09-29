@@ -1,0 +1,28 @@
+---
+abstract: 'Trace when a data structure gets updated.'
+author:
+  - 'Tim Potapov <tim.potapov@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Trace
+provides:
+  Data::Tie::Watch:
+    file: lib/Data/Tie/Watch.pm
+    version: '1.302'
+  Data::Trace:
+    file: lib/Data/Trace.pm
+    version: '0.05'
+requires:
+  Data::DPath: '0.58'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

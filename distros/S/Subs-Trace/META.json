@@ -1,0 +1,42 @@
+{
+   "abstract" : "Trace all calls in a package.",
+   "author" : [
+      "Tim Potapov <tim.potapov@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Subs-Trace",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Subs::Trace" : {
+         "file" : "lib/Subs/Trace.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

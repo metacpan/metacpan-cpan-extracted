@@ -5,11 +5,11 @@ use warnings;
 package Template::Compiled;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.003';
 
-use Eval::TypeTiny qw( eval_closure );
-use Types::Standard qw( -types slurpy Join );
-use Type::Params 1.002000 qw( compile_named );
+use Eval::TypeTiny::CodeAccumulator;
+use Types::Standard qw( -types Join );
+use Type::Params 2.000000 qw( signature );
 use Carp qw( croak confess );
 use B qw( perlstring );
 
@@ -34,20 +34,20 @@ has template => (
 
 has signature => (
 	is        => 'ro',
-	isa       => Maybe[ArrayRef],
+	isa       => Maybe[ ArrayRef ],
 	predicate => !!1,
 	required  => !!0,
 );
 
 has delimiters => (
 	is        => 'lazy',
-	isa       => Tuple[Str, Str],
+	isa       => Tuple[ Str, Str ],
 	builder   => sub { [qw/ <? ?> /] },
 );
 
 has escape => (
 	is        => 'ro',
-	isa       => CodeRef->plus_coercions(Str, \&_lookup_escaping),
+	isa       => CodeRef->plus_coercions( Str, \&_lookup_escaping ),
 	required  => !!0,
 	predicate => !!1,
 	coerce    => !!1,
@@ -81,19 +81,12 @@ has utils_package => (
 has 'sub' => (
 	is        => 'lazy',
 	isa       => CodeRef,
-	builder   => sub {
-		my ($code, $env) = $_[0]->_build_code_and_env;
-		eval_closure(
-			source      => $code,
-			environment => $env,
-			description => 'template prelude',
-		);
-	},
+	builder   => !!1,
 );
 
 sub print {
 	my $self = shift;
-	my $fh   = FileHandle->check($_[0]) ? shift() : undef;
+	my $fh   = FileHandle->check( $_[0] ) ? shift() : undef;
 	
 	defined($fh)
 		? $fh->print( $self->render(@_) )
@@ -105,74 +98,89 @@ sub render {
 	$self->sub->(@_);
 }
 
-sub _build_code_and_env {
+sub _build_sub {
 	my $self = shift;
 	
-	my @code;
-	my %env;
+	my $code = 'Eval::TypeTiny::CodeAccumulator'->new(
+		description => 'template prelude',
+	);
 	
-	push @code, 'sub {';
-	push @code, sprintf('use %s;', $self->utils_package);
+	my $var_escape = $code->add_variable(
+		'$_ESCAPE',
+		\ ( $self->escape or sub { $_[0] } ),
+	);
 	
-	push @code, 'sub _ ($);';
-	push @code, '*_ = sub ($) { goto $_ESCAPE };';
-	$env{'$_ESCAPE'} = \ do { $self->escape or sub { $_[0] } };
+	$code->add_line( 'sub {' );
+	$code->increase_indent;
+	$code->add_line( sprintf( 'use %s;', $self->utils_package ) );
 	
-	push @code, 'local %_;';
-	push @code, 'my ($OUT, $INDENT) = (q(), q());';
-	push @code, 'our $_OUT_REF = \\$OUT;';
+	$code->add_line( 'sub _ ($);' );
+	$code->add_line( sprintf( '*_ = sub ($) { goto %s };', $var_escape ) );
 	
-	if (PERL_NATIVE_ALIASES) {
-		push @code, 'use feature qw( refaliasing );';
-		push @code, 'no warnings qw( experimental::refaliasing );';
+	$code->add_line( 'local %_;' );
+	$code->add_line( 'my ($OUT, $INDENT) = (q(), q());' );
+	$code->add_line( 'our $_OUT_REF = \\$OUT;' );
+	
+	if ( PERL_NATIVE_ALIASES ) {
+		$code->add_line( 'use feature qw( refaliasing );' );
+		$code->add_line( 'no warnings qw( experimental::refaliasing );' );
 	}
 	
-	if ($self->has_signature) {
-		push @code, '%_ = %{ $_SIGNATURE->(@_) };';
-		$env{'$_SIGNATURE'} = \ do { compile_named(@{ $self->signature }) };
+	my $compiled_signature;
+	if ( $self->has_signature ) {
+		$compiled_signature = signature(
+			want_object => 1,
+			named => $self->signature,
+			bless => 0,
+		);
+		my $var_signature = $code->add_variable(
+			'$_SIGNATURE',
+			\ do { $compiled_signature->coderef->compile },
+		);
+		$code->add_line( sprintf( '%%_ = %%{ %s->(@_) };', $var_signature ) );
 	}
 	else {
-		push @code, '%_ = (@_==1 and ref($_[0]) eq "HASH") ? %{$_[0]} : @_%2 ? Carp::croak("Expected even-sized list of arguments") : @_;';
+		$code->add_line( '%_ = (@_==1 and ref($_[0]) eq "HASH") ? %{$_[0]} : @_%2 ? Carp::croak("Expected even-sized list of arguments") : @_;' );
 	}
 	
-	if ($self->has_signature) {
-		my @sig = @{ $self->signature };
+	if ( $compiled_signature ) {
+		my @sig = (
+			@{ $compiled_signature->parameters },
+			$compiled_signature->has_slurpy ? $compiled_signature->slurpy : (),
+		);
 		while (@sig) {
-			shift @sig
-				while HashRef->check($sig[0]) && !$sig[0]{slurpy};
-			
-			my $name = shift @sig;
-			my $type = shift @sig;
+			my $param = shift @sig;
+			my $name  = $param->name;
+			my $type  = $param->type;
 			
 			next unless $name =~ /\A[A-Z][A-Z0-9_]*\z/i;
 			
-			if (Bool->check($type)) {
-				$type = $type ? Any : Optional[Any];
-			}
-			
-			unless (PERL_NATIVE_ALIASES) {
+			unless ( PERL_NATIVE_ALIASES ) {
 				require Data::Alias;
 			}
 			
-			push @code, PERL_NATIVE_ALIASES
-				? "\\my \$$name = \\\$_{$name};"
-				: "Data::Alias::alias( my \$$name = \$_{$name} );";
+			$code->add_line(
+				PERL_NATIVE_ALIASES
+					? "\\my \$$name = \\\$_{$name};"
+					: "Data::Alias::alias( my \$$name = \$_{$name} );"
+			);
 			
-			if ($type->is_a_type_of(HashRef)) {
-				push @code, PERL_NATIVE_ALIASES
+			$code->add_line(
+				PERL_NATIVE_ALIASES
 					? "\\my \%$name = \$$name;"
-					: "Data::Alias::alias( my \%$name = \%{ \$$name } );";
-			}
+					: "Data::Alias::alias( my \%$name = \%{ \$$name } );"
+			) if $type->is_a_type_of( HashRef );
 			
-			if ($type->is_a_type_of(ArrayRef)) {
-				push @code, PERL_NATIVE_ALIASES
+			$code->add_line(
+				PERL_NATIVE_ALIASES
 					? "\\my \@$name = \$$name;"
-					: "Data::Alias::alias( my \@$name = \@{ \$$name } );";
-			}
+					: "Data::Alias::alias( my \@$name = \@{ \$$name } );"
+			) if $type->is_a_type_of( ArrayRef );
 		}
 	}
 	
-	push @code, "#line 1 \"template\"\n";
+	# Break encapsulation!
+	push @{ $code->{code} }, "#line 1 \"template\"\n";
 	
 	my $template = $self->template;
 	if ($self->trim) {
@@ -195,58 +203,72 @@ sub _build_code_and_env {
 		my $next = shift @parts;
 		
 		if ($next eq $delims[0]) {
-			$mode = ($mode eq 'text') ? 'code' : confess("Impossible state");
+			$mode = ( $mode eq 'text' ) ? 'code' : confess( "Impossible state" );
 			next;
 		}
 		
 		if ($next eq $delims[1]) {
-			$mode = ($mode eq 'code') ? 'text' : confess("Impossible state");
+			$mode = ( $mode eq 'code' ) ? 'text' : confess( "Impossible state" );
 			next;
 		}
 
-		my $terminator = $delims[ ($mode eq 'text') ? 0 : 1 ];
-		while (@parts and $parts[0] ne $terminator) {
-			$next .= shift(@parts);
+		my $terminator = $delims[ 0 + ( $mode ne 'text' ) ];
+		while ( @parts and $parts[0] ne $terminator ) {
+			$next .= shift( @parts );
 		}
 
 		if ($mode eq 'text') {
-			$code[-1] .= sprintf('$OUT .= %s;', perlstring($next));
+			$code->{code}[-1] .= sprintf( '$OUT .= %s;', perlstring($next) );
 			if ($next =~ /\n/sm) {
 				my $count = $next;
-				$count = ($count =~ y/\n//);
-				$code[-1] .= "\n" x $count;
+				$count = ( $count =~ y/\n// );
+				$code->{code}[-1] .= "\n" x $count;
 			}
 		}
-		elsif ($next =~ /\A=/) {
-			my ($indent) = map /\A(\s*)/, grep /\S/, split /\n/, substr($next, 1);
-			$code[-1] .= sprintf(
-				$self->has_escape ? '$OUT .= $_ESCAPE->(do { %s %s });' : '$OUT .= do { %s %s };',
-				sprintf("\$INDENT = %s;", perlstring($indent)),
-				substr($next, 1),
-			);
+		elsif ( $next =~ /\A=/ ) {
+			my ( $indent ) = map /\A(\s*)/, grep /\S/, split /\n/, substr($next, 1);
+			$code->{code}[-1] .= $self->has_escape
+				? sprintf(
+					'$OUT .= %s->( do { $INDENT = %s; %s } );',
+					$var_escape,
+					perlstring($indent),
+					substr($next, 1),
+				)
+				: sprintf(
+					'$OUT .= do { $INDENT = %s; %s };',
+					perlstring($indent),
+					substr($next, 1),
+				);
 		}
 		else {
 			my ($indent) = map /\A(\s*)/, grep /\S/, split /\n/, $next;
-			$code[-1] .= sprintf("\$INDENT = %s; %s;", perlstring($indent), $next);
+			$code->{code}[-1] .= sprintf(
+				"\$INDENT = %s; %s;",
+				perlstring($indent),
+				$next,
+			);
 		}
 	}
 	
-	if ($self->trim) {
-		push @code, '$OUT =~ s/(?:\A\s*)|(?:\s*\z)//gsm;';
+	if ( $self->trim ) {
+		$code->add_line( '$OUT =~ s/(?:\A\s*)|(?:\s*\z)//gsm;' );
 	}
 	
-	if ($self->has_post_process) {
-		push @code, 'do { local *_ = \$OUT; $_POST->($OUT) };';
-		$env{'$_POST'} = \ do { $self->post_process };
+	if ( $self->has_post_process ) {
+		my $var_post = $code->add_variable(
+			'$_POST',
+			\ do { $self->post_process },
+		);
+		$code->add_line( sprintf 'do { local *_ = \$OUT; %s->($OUT) };', $var_post );
 	}
 	else {
-		push @code, '$OUT;';
+		$code->add_line( '$OUT;' );
 	}
 	
-	push @code, '}';
+	$code->decrease_indent;
+	$code->add_line( '}' );
 	
-	#warn join "\n", @code, "";
-	return (\@code, \%env);
+	return $code->compile;
 }
 
 sub _lookup_escaping {

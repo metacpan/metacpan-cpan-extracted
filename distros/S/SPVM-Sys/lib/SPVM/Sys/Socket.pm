@@ -18,6 +18,92 @@ C<Sys::Socket> is the class for system calls of socket.
 
 =head1 Class Methods
 
+=head2 htonl
+
+  static method htonl : int ($hostlong : int);
+
+The htonl() function converts the unsigned integer hostlong from host byte order to network byte order.
+
+See the detail of the L<htonl|https://linux.die.net/man/3/htonl> function in the case of Linux.
+
+=head2 htons
+
+  static method htons : short ($hostshort : short);
+
+The htons() function converts the unsigned short integer hostshort from host byte order to network byte order.
+
+See the detail of the L<htons|https://linux.die.net/man/3/htons> function in the case of Linux.
+
+=head2 ntohl
+
+  static method ntohl : int ($netlong : int);
+
+The ntohl() function converts the unsigned integer netlong from network byte order to host byte order.
+
+See the detail of the L<ntohl|https://linux.die.net/man/3/ntohl> function in the case of Linux.
+
+=head2 ntohs
+
+  static method ntohs : short ($netshort : short);
+
+The ntohs() function converts the unsigned short integer netshort from network byte order to host byte order.
+
+See the detail of the L<ntohs|https://linux.die.net/man/3/ntohs> function in the case of Linux.
+
+=head2 inet_aton
+
+  static method inet_aton : int ($cp : string, $inp : Sys::Socket::In_addr);
+
+inet_aton() converts the Internet host address cp from the IPv4 numbers-and-dots notation into binary form (in network byte order) and stores it in the structure that inp points to. inet_aton() returns nonzero if the address is valid, zero if not. The address supplied in cp can have one of the following forms:
+
+See the detail of the L<inet_aton|https://linux.die.net/man/3/inet_aton> function in the case of Linux.
+
+The input address(inp) is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+
+The input address(cp) must be defined. Otherwise an exception will be thrown.
+
+The output address(inp) must be defined. Otherwise an exception will be thrown.
+
+=head2 inet_ntoa
+
+  static method inet_ntoa : string ($in : Sys::Socket::In_addr);
+
+The inet_ntoa() function converts the Internet host address in, given in network byte order, to a string in IPv4 dotted-decimal notation. The string is returned in a statically allocated buffer, which subsequent calls will overwrite.
+
+See the detail of the L<inet_ntoa|https://linux.die.net/man/3/inet_ntoa> function in the case of Linux.
+
+The input address(in) is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+
+The input address must be defined. Otherwise an exception will be thrown.
+
+=head2 inet_pton
+
+  static method inet_pton : int ($af : int, $src : string, $dst : object of Sys::Socket::In_addr|Sys::Socket::In6_addr);
+
+This function converts the character string src into a network address structure in the af address family, then copies the network address structure to dst. The af argument must be either AF_INET or AF_INET6.
+
+See the detail of the L<inet_pton|https://linux.die.net/man/3/inet_pton> function in the case of Linux.
+
+The output address(dst) is assumed to be L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> or L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> corresponding to the address family(af).
+
+The input address(src) must be defined. Otherwise an exception will be thrown.
+
+The output address(dst) must be defined. Otherwise an exception will be thrown.
+
+=head2 inet_ntop
+
+  static method inet_ntop : string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
+
+This function converts the network address structure src in the af address family into a character string. The resulting string is copied to the buffer pointed to by dst, which must be a non-NULL pointer. The caller specifies the number of bytes available in this buffer in the argument size.
+
+See the detail of the L<inet_ntop|https://linux.die.net/man/3/inet_ntop> function in the case of Linux.
+
+The input address(src) is assumed to be L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> or L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> corresponding to the address family(af).
+
+The input address(src) must be defined. Otherwise an exception will be thrown.
+
+The output address(dst) must be defined. Otherwise an exception will be thrown.
+
 =head2 socket
 
   static method socket : int ($domain : int, $type : int, $protocol : int);
@@ -197,92 +283,6 @@ If the system call failed, an exception will be thrown with the error code set t
 
 The same as L</"getsockopt">, but the option value can be specifed by the C<int> type.
 
-=head2 inet_aton
-
-  static method inet_aton : int ($cp : string, $inp : Sys::Socket::In_addr);
-
-inet_aton() converts the Internet host address cp from the IPv4 numbers-and-dots notation into binary form (in network byte order) and stores it in the structure that inp points to. inet_aton() returns nonzero if the address is valid, zero if not. The address supplied in cp can have one of the following forms:
-
-See the detail of the L<inet_aton|https://linux.die.net/man/3/inet_aton> function in the case of Linux.
-
-The input address(inp) is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
-
-The input address(cp) must be defined. Otherwise an exception will be thrown.
-
-The output address(inp) must be defined. Otherwise an exception will be thrown.
-
-=head2 inet_ntoa
-
-  static method inet_ntoa : string ($in : Sys::Socket::In_addr);
-
-The inet_ntoa() function converts the Internet host address in, given in network byte order, to a string in IPv4 dotted-decimal notation. The string is returned in a statically allocated buffer, which subsequent calls will overwrite.
-
-See the detail of the L<inet_ntoa|https://linux.die.net/man/3/inet_ntoa> function in the case of Linux.
-
-The input address(in) is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
-
-The input address must be defined. Otherwise an exception will be thrown.
-
-=head2 inet_pton
-
-  static method inet_pton : int ($af : int, $src : string, $dst : object of Sys::Socket::In_addr|Sys::Socket::In6_addr);
-
-This function converts the character string src into a network address structure in the af address family, then copies the network address structure to dst. The af argument must be either AF_INET or AF_INET6.
-
-See the detail of the L<inet_pton|https://linux.die.net/man/3/inet_pton> function in the case of Linux.
-
-The output address(dst) is assumed to be L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> or L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> corresponding to the address family(af).
-
-The input address(src) must be defined. Otherwise an exception will be thrown.
-
-The output address(dst) must be defined. Otherwise an exception will be thrown.
-
-=head2 inet_ntop
-
-  static method inet_ntop : string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
-
-This function converts the network address structure src in the af address family into a character string. The resulting string is copied to the buffer pointed to by dst, which must be a non-NULL pointer. The caller specifies the number of bytes available in this buffer in the argument size.
-
-See the detail of the L<inet_ntop|https://linux.die.net/man/3/inet_ntop> function in the case of Linux.
-
-The input address(src) is assumed to be L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> or L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> corresponding to the address family(af).
-
-The input address(src) must be defined. Otherwise an exception will be thrown.
-
-The output address(dst) must be defined. Otherwise an exception will be thrown.
-
-=head2 htonl
-
-  static method htonl : int ($hostlong : int);
-
-The htonl() function converts the unsigned integer hostlong from host byte order to network byte order.
-
-See the detail of the L<htonl|https://linux.die.net/man/3/htonl> function in the case of Linux.
-
-=head2 htons
-
-  static method htons : short ($hostshort : short);
-
-The htons() function converts the unsigned short integer hostshort from host byte order to network byte order.
-
-See the detail of the L<htons|https://linux.die.net/man/3/htons> function in the case of Linux.
-
-=head2 ntohl
-
-  static method ntohl : int ($netlong : int);
-
-The ntohl() function converts the unsigned integer netlong from network byte order to host byte order.
-
-See the detail of the L<ntohl|https://linux.die.net/man/3/ntohl> function in the case of Linux.
-
-=head2 ntohs
-
-  static method ntohs : short ($netshort : short);
-
-The ntohs() function converts the unsigned short integer netshort from network byte order to host byte order.
-
-See the detail of the L<ntohs|https://linux.die.net/man/3/ntohs> function in the case of Linux.
-
 =head2 ioctlsocket
 
   static method ioctlsocket : int ($s : int, $cmd : int, $argp : int*);
@@ -315,6 +315,14 @@ The file descriptors(fds) is a L<Sys::IO::PollfdArray> object.
 
 If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
 
+=head2 getaddrinfo_raw
+
+  static method getaddrinfo_raw : int ($node : string, $service : string,
+                $hints : Sys::Socket::Addrinfo,
+                $res : Sys::Socket::Addrinfo[]);
+
+Same as the L</"getaddrinfo"> method, but doesn't throw exceptions related to system errors.
+
 =head2 getaddrinfo
 
   static method getaddrinfo : int ($node : string, $service : string,
@@ -333,6 +341,16 @@ The response must be defined. Otherwise an exception will be thrown.
 
 The length of the array of the response must be greater than or equal to 1. Otherwise an exception will be thrown.
 
+If a system error occur, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
+
+=head2 getnameinfo_raw
+
+  static method getnameinfo_raw : int ($sa : Sys::Socket::Sockaddr, $salen : int,
+                $host : mutable string, $hostlen : int,
+                $serv : mutable string, $servlen : int, $flags : int);
+
+Same as the L</"getnameinfo"> method, but doesn't throw exceptions related to system errors.
+
 =head2 getnameinfo
 
   static method getnameinfo : int ($sa : Sys::Socket::Sockaddr, $salen : int,
@@ -345,6 +363,8 @@ See the detail of the L<getnameinfo|https://linux.die.net/man/3/getaddrinfo> fun
 
 The socket address(sa) is a L<Sys::Socket::Addrinfo|SPVM::Sys::Socket::Addrinfo> object.
 
+If a system error occur, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
+
 =head2 gai_strerror
 
   static method gai_strerror : string($errcode : int);
@@ -353,22 +373,34 @@ The gai_strerror() function translates these error codes to a human readable str
 
 See the detail of the L<getnameinfo|https://linux.die.net/man/3/gai_strerror> function in the case of Linux.
 
-=head2 ioctl_int_portable
+=head2 ioctl_int
 
-  static method ioctl_int_portable : int ($fd : int, $request : int, $request_arg_ref : int*);
+  static method ioctl_int : int ($fd : int, $request : int, $request_arg_ref : int*);
 
 The same as L<ioctl_int in Sys::IO|SPVM::Sys::IO/"ioctl_int">, but portable in socket.
 
-=head2 poll_portable
+=head2 poll
 
-  static method poll_portable : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int);
+  static method poll : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int);
 
 The same as L<poll in Sys::IO|SPVM::Sys::IO/"poll">, but portable in socket.
 
 The file descriptors(fds) is a L<Sys::IO::PollfdArray> object.
 
-=head2 close_portable
+=head2 close
 
-  static method close_portable : int ($fd : int);
+  static method close : int ($fd : int);
 
 The same as L<close in Sys::IO|SPVM::Sys::IO/"close">, but portable in socket.
+
+=head2 socket_errno
+
+  static method socket_errno : int ();
+
+Portalbe C<errno> related to the errors of the socket.
+
+=head2 socket_strerror
+
+  static method socket_strerror : string ($errno : int, $length : int);
+
+Portalbe C<strerror> related to the errors of the socket.

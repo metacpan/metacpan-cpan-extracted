@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v1.5.1
+## Version v1.5.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/08/05
+## Modified 2022/09/25
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -33,7 +33,7 @@ BEGIN
     );
     $DEBUG  = 0;
     $RETURN = {};
-    our $VERSION = 'v1.5.1';
+    our $VERSION = 'v1.5.2';
 };
 
 use strict;
@@ -831,6 +831,14 @@ sub split { CORE::return( CORE::shift->_scalar( CORE::splice( @_, 1, 1 ) )->spli
 sub tenth { CORE::return( CORE::shift->get_null(9) ); }
 
 sub third { CORE::return( CORE::shift->get_null(2) ); }
+
+sub unchomp
+{
+    my $self = CORE::shift( @_ );
+    my $nl = CORE::scalar( @_ ) ? CORE::shift( @_ ) : $/;
+    $_ .= $nl for( @$self );
+    CORE::return( $self );
+}
 
 sub undef
 {

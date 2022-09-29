@@ -17,6 +17,9 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
@@ -63,11 +66,11 @@
    "provides" : {
       "Dist::Zilla::PERLSRVDE" : {
          "file" : "lib/Dist/Zilla/PERLSRVDE.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Dist::Zilla::PluginBundle::PERLSRVDE" : {
          "file" : "lib/Dist/Zilla/PluginBundle/PERLSRVDE.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -82,8 +85,9 @@
          "web" : "https://github.com/perlservices/Dist-Zilla-PERLSRVDE"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.0.1",
    "x_contributors" : [
+      "H\u00e5kon H\u00e6gland <hakon.hagland@gmail.com>",
       "reneeb <info@perl-services.de>"
    ],
    "x_generated_by_perl" : "v5.30.0",

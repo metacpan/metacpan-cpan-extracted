@@ -175,7 +175,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v1.5.1
+    v1.5.2
 
 =head1 DESCRIPTION
 
@@ -1124,6 +1124,14 @@ Returns the corresponding value at the offset position 2 in the array by calling
 It the caller expects an object in return, such as when chaining methods, and if the value is defined and not a reference of any sort (except scalar), i.e. a regular string, a scalar reference or a scalar object, it is returned as a L<Module::Generic::Scalar> object.
 
 If the value is not defined, or has a zero-length, it is returned as a L<Module::Generic::Null> in object context eseentially to prevent perl error of C<method called on undefined value>, but at the end of the method call chain, will return undef. Under other context, the value is returned as-is,
+
+=head2 unchomp
+
+This does the contrary of L</chomp>, i.e. it adds a new line for each entry in the array.
+
+The meaning of a new line can be set by providing an optional value to L</unchomp>, or by default resorting to the value of C<$/>
+
+It returns the current object.
 
 =head2 undef
 

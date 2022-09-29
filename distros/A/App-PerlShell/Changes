@@ -1,5 +1,14 @@
 Revision history for Perl Shell.
 
+1.09  Thu Sep 22 10:05:00 2022
+    - add `version` command
+    - add `env` command
+    - add -f option ($ENV{PERLSHELL_FEATURE}) to specify Perl `use feature :xxx`
+    - add -V option for output of initialization commands
+    - add $ENV{PERLSHELL_PERLDOC} to specify `perldoc` command
+    - update order so command line options override .plshrc commands
+    - add current directory .plshrc file option
+
 1.08  Tue Apr  7 10:05:00 2021
     - .plshrc file in $HOME
     - Semicolon not required with environment variable PERLSHELL_SEMIOFF=1

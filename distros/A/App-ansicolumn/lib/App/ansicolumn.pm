@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.22";
+our $VERSION = "1.23";
 
 use v5.14;
 use warnings;
@@ -20,6 +20,7 @@ use Text::ANSI::Fold::Util qw(ansi_width);
 use Text::ANSI::Printf qw(ansi_printf ansi_sprintf);
 use App::ansicolumn::Util;
 use App::ansicolumn::Border;
+use Getopt::EX::RPN qw(rpn_calc);
 
 use Getopt::EX::Hashed 1.05; {
 
@@ -39,7 +40,7 @@ use Getopt::EX::Hashed 1.05; {
     has up                  => ' :i U    ' ;
     has page                => ' :i P    ' , min => 0;
     has pane                => ' =s C    ' , default => 0 ;
-    has pane_width          => ' =s S pw ' , min => 1;
+    has pane_width          => ' =s S pw ' ;
     has widen               => ' !  W    ' ;
     has paragraph           => ' !  p    ' ;
     has height              => ' =s      ' , default => 0 ;

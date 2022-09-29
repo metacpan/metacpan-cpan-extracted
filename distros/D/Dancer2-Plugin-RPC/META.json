@@ -56,6 +56,6 @@
          "web" : "https://github.com/abeltje/Dancer2-Plugin-RPC"
       }
    },
-   "version" : "2.01",
+   "version" : "2.02",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

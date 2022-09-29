@@ -60,7 +60,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__sun_family(SPVM_ENV* env, SPVM_VALUE* s
   
   struct sockaddr_un* socket_address = env->get_pointer(env, stack, obj_self);
   
-  stack[0].ival = socket_address->sun_family;
+  stack[0].bval = socket_address->sun_family;
   
   return 0;
 #endif
@@ -76,7 +76,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__set_sun_family(SPVM_ENV* env, SPVM_VALU
   
   struct sockaddr_un* socket_address = env->get_pointer(env, stack, obj_self);
   
-  socket_address->sun_family = stack[1].ival;
+  socket_address->sun_family = stack[1].bval;
   
   return 0;
 #endif
@@ -123,6 +123,20 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__set_sun_path(SPVM_ENV* env, SPVM_VALUE*
   
   memset(socket_address->sun_path, 0, strlen(socket_address->sun_path));
   memcpy(socket_address->sun_path, path, path_length);
+  
+  return 0;
+#endif
+}
+
+int32_t SPVM__Sys__Socket__Sockaddr__Un__sizeof(SPVM_ENV* env, SPVM_VALUE* stack) {
+#ifdef _WIN32
+  env->die(env, stack, "The \"sizeof\" method in the class \"Sys::Socket::Sockaddr::Un\" is not supported on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#else
+  
+  void* obj_self = stack[0].oval;
+  
+  stack[0].ival = sizeof(struct sockaddr_un);
   
   return 0;
 #endif

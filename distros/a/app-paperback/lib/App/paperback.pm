@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 # use warnings;
 $^W = 0;
-our $VERSION = "1.35";
+our $VERSION = "1.36";
 
 my ($GinFile, $GpageObjNr, $GrootNr, $Gpos, $GobjNr, $Gstream, $GoWid, $GoHei);
 my (@Gkids, @Gcounts, @GmediaBox, @Gobject, @Gparents, @Gto_be_created);
@@ -198,7 +198,7 @@ END_MESSAGE
 ##########################################################
 sub newPageInOutputFile {
 ##########################################################
-  die "[!] No output file, you must call openOutputFile first.\n" if !$Gpos;
+  die "[!] No output file, you must call openOutputFile first.\n" if ! $Gpos;
   &writePage if $Gstream;
 
   ++$GobjNr;
@@ -212,7 +212,7 @@ sub newPageInOutputFile {
 ##########################################################
 sub copyPageFromInputToOutput {
 ##########################################################
-  die "[!] No output file, you have to call openOutputFile first.\n" if !$Gpos;
+  die "[!] No output file, you have to call openOutputFile first.\n" if ! $Gpos;
   my $param      = $_[0];
   my $pagenumber = $param->{'page'}   or 1;
   my $x          = $param->{'x'}      or 0;
@@ -255,7 +255,7 @@ sub createPageResourceDict {
   my $resourceDict = "/ProcSet[/PDF/Text]/XObject<<";
     $resourceDict .= "/${_} ${GpageXObject{${_}}} 0 R" for keys %GpageXObject;
     $resourceDict .= ">>/ExtGState<</Gs0 4 0 R>>";
-  return $resourceDict;
+  # return $resourceDict;
 }
 
 
@@ -425,10 +425,8 @@ sub calcRotateMatrix {
   my $radian = sprintf( "%.6f", $rotate / 57.2957795 );  # approx.
   my $Cos    = sprintf( "%.6f", cos($radian) );
   my $Sin    = sprintf( "%.6f", sin($radian) );
-  my $negSin = $Sin * -1;
-  $str .= "${Cos} ${Sin} ${negSin} ${Cos} ${upperX} ${upperY} cm\n";
-
-  #~ return $str;
+  $str .= "${Cos} ${Sin} -${Sin} ${Cos} ${upperX} ${upperY} cm\n";
+  # return $str;
 }
 
 
@@ -569,7 +567,7 @@ sub setOutputPageDimensionAndSchema {
   die "[!] File '${GinFile}' is not a valid v1.4 PDF.\n"
     unless &getPageSizeAndSetMediabox;
 
-  my $surface = $GmediaBox[2]*$GmediaBox[3];
+  my $surface = $GmediaBox[2] * $GmediaBox[3];
   my $measuresInMm =
     int($GmediaBox[2] / 72 * 25.4) . " x " . int($GmediaBox[3] / 72 * 25.4) . " mm";
 
@@ -593,9 +591,9 @@ sub setOutputPageDimensionAndSchema {
 ##########################################################
 sub alike {
 ##########################################################
-  my $hxw = $_[0]; my $namedHxw = $_[1];
+  my $num1 = $_[0]; my $num2 = $_[1];
   my $tolerance = 1500;
-  return 0 if $hxw > $namedHxw + $tolerance or $hxw < $namedHxw - $tolerance;
+  return 0 if $num1 > $num2 + $tolerance or $num1 < $num2 - $tolerance;
   return 1;
 }
 
@@ -617,7 +615,7 @@ sub getPage {
   $objectContent = getContentOfObjectNr($1);
   $objectContent = xformObjForThisPage($objectContent, $pagenumber);
   ($formRes, $formCont) = parseAsResourcesAndContentRef($objectContent);
-  return ($formRes, $formCont);
+  # return ($formRes, $formCont);
 }
 
 
@@ -696,7 +694,7 @@ sub getPageSizeAndSetMediabox {
     for ($objectContent) {
       if (m'MediaBox\s*\[\s*([\S]+)\s+([\S]+)\s+([\S]+)\s+([\S]+)\s*\]') {
         @GmediaBox = ($1, $2, $3, $4);
-      } elsif (m'MediaBox\s*(\d+)\s+\d+\s+R\b') { # Size to be found in reference
+      } elsif (m'MediaBox\s*(\d+)\s+\d+\s+R\b') { # Pagesize to be found in reference
         my $ref = getContentOfObjectNr($1);
         if ($ref =~ m'\[\s*([\S]+)\s+([\S]+)\s+([\S]+)\s+([\S]+)\s*\]') {
           @GmediaBox = ($1, $2, $3, $4)
@@ -796,8 +794,8 @@ sub openInputFile {
 sub getInputFileWeight {
 ##########################################################
   state $known;
-  $known = (stat($GinFile))[7] if ! $known;
-  return $known;
+  return $known if $known;
+  $known = (stat($GinFile))[7];
 }
 
 
@@ -851,8 +849,8 @@ sub extractXrefSection {
     $readBytes .= $c;
     sysread $IN_FILE, $c, 1;
   }
-  ($idx, $qty) = ($1, $2) if $readBytes =~ m'^(\d+)\s+(\d+)';
-  return ($qty, $idx);
+  ($qty, $idx) = ($2, $1) if $readBytes =~ m'^(\d+)\s+(\d+)';
+  # return ($qty, $idx);
 }
 
 

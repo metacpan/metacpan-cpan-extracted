@@ -12,7 +12,7 @@ Readonly::Array our @EXPORT_OK => qw(check_array check_array_object check_bool
 	check_code check_isa check_length check_number check_number_of_items
 	check_required);
 
-our $VERSION = 0.12;
+our $VERSION = 0.14;
 
 sub check_array {
 	my ($self, $key) = @_;
@@ -48,9 +48,7 @@ sub check_array_object {
 sub check_bool {
 	my ($self, $key) = @_;
 
-	if (! exists $self->{$key}) {
-		return;
-	}
+	_check_key($self, $key) && return;
 
 	if ($self->{$key} !~ m/^\d+$/ms || ($self->{$key} != 0 && $self->{$key} != 1)) {
 		err "Parameter '$key' must be a bool (0/1).",
@@ -64,9 +62,7 @@ sub check_bool {
 sub check_code {
 	my ($self, $key) = @_;
 
-	if (! defined $self->{$key}) {
-		return;
-	}
+	_check_key($self, $key) && return;
 
 	if (ref $self->{$key} ne 'CODE') {
 		err "Parameter '$key' must be a code.",
@@ -80,9 +76,7 @@ sub check_code {
 sub check_isa {
 	my ($self, $key, $class) = @_;
 
-	if (! defined $self->{$key}) {
-		return;
-	}
+	_check_key($self, $key) && return;
 
 	if (! blessed($self->{$key})) {
 		err "Parameter '$key' must be a '$class' object.",
@@ -110,13 +104,7 @@ sub check_isa {
 sub check_length {
 	my ($self, $key, $max_length) = @_;
 
-	if (! exists $self->{$key}) {
-		return;
-	}
-
-	if (! defined $self->{$key}) {
-		return;
-	}
+	_check_key($self, $key) && return;
 
 	if (length $self->{$key} > $max_length) {
 		err "Parameter '$key' has length greater than '$max_length'.",
@@ -130,13 +118,7 @@ sub check_length {
 sub check_number {
 	my ($self, $key) = @_;
 
-	if (! exists $self->{$key}) {
-		return;
-	}
-
-	if (! defined $self->{$key}) {
-		return;
-	}
+	_check_key($self, $key) && return;
 
 	if ($self->{$key} !~ m/^[-+]?\d+(\.\d+)?$/ms) {
 		err "Parameter '$key' must be a number.",
@@ -167,11 +149,21 @@ sub check_number_of_items {
 sub check_required {
 	my ($self, $key) = @_;
 
-	if (! defined $self->{$key}) {
+	if (! exists $self->{$key} || ! defined $self->{$key}) {
 		err "Parameter '$key' is required.";
 	}
 
 	return;
+}
+
+sub _check_key {
+	my ($self, $key) = @_;
+
+	if (! exists $self->{$key} || ! defined $self->{$key}) {
+		return 1;
+	}
+
+	return 0;
 }
 
 1;
@@ -813,6 +805,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.14
 
 =cut

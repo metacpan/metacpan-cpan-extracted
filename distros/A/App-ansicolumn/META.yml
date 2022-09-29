@@ -26,7 +26,7 @@ no_index:
 provides:
   App::ansicolumn:
     file: lib/App/ansicolumn.pm
-    version: '1.22'
+    version: '1.23'
   App::ansicolumn::Border:
     file: lib/App/ansicolumn/Border.pm
   App::ansicolumn::default:
@@ -35,6 +35,7 @@ requires:
   Clone: '0'
   Getopt::EX: v2.1.1
   Getopt::EX::Hashed: '1.05'
+  Getopt::EX::RPN: '0.01'
   List::Util: '1.56'
   Math::RPN: '0'
   Term::ReadKey: '0'
@@ -46,7 +47,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/App-ansicolumn/issues
   homepage: https://github.com/kaz-utashiro/App-ansicolumn
   repository: https://github.com/kaz-utashiro/App-ansicolumn.git
-version: '1.22'
+version: '1.23'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

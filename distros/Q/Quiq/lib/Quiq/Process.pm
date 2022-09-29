@@ -21,8 +21,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.203';
+our $VERSION = '1.204';
 
+use Quiq::Path;
 use Cwd ();
 use Quiq::System;
 
@@ -47,7 +48,7 @@ cd()
 
 Liefere das aktuelle Verzeichnis ("current working directory") des
 Prozesses. Ist ein Argument angegeben, wechsele in das betreffende
-Verzeichnis.
+Verzeichnis. Tilde-Nt
 
 =head4 Examples
 
@@ -71,7 +72,7 @@ sub cwd {
         return Cwd::cwd;
     }
 
-    my $dir = shift;
+    my $dir = Quiq::Path->expandTilde(shift);
     if (!defined($dir) || $dir eq '' || $dir eq '.') {
         return;
     }
@@ -268,7 +269,7 @@ sub user {
 
 =head1 VERSION
 
-1.203
+1.204
 
 =head1 AUTHOR
 

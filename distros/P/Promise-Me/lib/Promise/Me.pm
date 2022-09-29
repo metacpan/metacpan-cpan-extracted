@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.4.4
+## Version v0.4.5
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2022/08/24
+## Modified 2022/09/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -125,7 +125,7 @@ BEGIN
     our $OBJECTS_REPO = [];
     our $EXCEPTION_CLASS = 'Module::Generic::Exception';
     our $SERIALISER = 'storable';
-    our $VERSION = 'v0.4.4';
+    our $VERSION = 'v0.4.5';
 };
 
 use strict;
@@ -276,6 +276,7 @@ sub init
     $self->{result_shared_mem_size} = $RESULT_MEMORY_SIZE;
     $self->{serialiser} = $SERIALISER;
     $self->{shared_vars_mem_size}   = $SHARED_MEMORY_SIZE;
+    $self->{tmpdir} = undef;
     $self->{use_async} = 0;
     # By default, should we use file cache to store shared data or memory?
     $self->{use_cache_file} = ( $SHARE_MEDIUM eq 'file' ? 1 : 0 );
@@ -561,7 +562,7 @@ sub catch
     unless( Want::want( 'OBJECT' ) )
     {
         $self->no_more_chaining(1);
-        $self->exec;
+        $self->exec || return( $self->pass_error );
     }
     return( $self );
 }
@@ -970,6 +971,8 @@ sub shared_space_destroy { return( shift->_set_get_boolean( 'shared_space_destro
 
 sub shared_vars_mem_size { return( shift->_set_get_mem_size( 'shared_vars_mem_size', @_ ) ); }
 
+sub tmpdir { return( shift->_set_get_file( 'tmpdir', @_ ) ); }
+
 # $d->then(sub{ do_something() })->catch()->finally();
 sub then
 {
@@ -1002,7 +1005,7 @@ sub then
     unless( Want::want( 'OBJECT' ) || $self->executed )
     {
         $self->no_more_chaining(1);
-        $self->exec;
+        $self->exec || return( $self->pass_error );
     }
     return( $self );
 }
@@ -1085,7 +1088,7 @@ sub wait
     {
         $self->_set_get_boolean( 'wait', 1 );
         $self->no_more_chaining(1);
-        $self->exec;
+        $self->exec || return( $self->pass_error );
     }
     else
     {
@@ -1584,6 +1587,14 @@ sub _set_shared_space
         {
             if( $s->error->message =~ /No[[:blank:]\h]+space[[:blank:]\h]+left/i )
             {
+                my $tmpdir = $self->tmpdir;
+                if( defined( $tmpdir ) && 
+                    length( $tmpdir ) && 
+                    -e( $tmpdir ) &&
+                    -d( $tmpdir ) )
+                {
+                    $p->{tmpdir} = $tmpdir;
+                }
                 my $s = Module::Generic::File::Cache->new( %$p ) || return( $self->error( "Unable to create shared cache file object: ", Module::Generic::File::Cache->error ) );
                 $shm = $s->open ||
                     return( $self->error( "Unable to open shared cache file object: ", $s->error ) );
@@ -1601,6 +1612,14 @@ sub _set_shared_space
     # File Cache
     else
     {
+        my $tmpdir = $self->tmpdir;
+        if( defined( $tmpdir ) && 
+            length( $tmpdir ) && 
+            -e( $tmpdir ) &&
+            -d( $tmpdir ) )
+        {
+            $p->{tmpdir} = $tmpdir;
+        }
         my $s = Module::Generic::File::Cache->new( %$p ) || return( $self->error( "Unable to create shared cache file object: ", Module::Generic::File::Cache->error ) );
         $shm = $s->open ||
             return( $self->error( "Unable to open shared cache file object: ", $s->error ) );
@@ -1660,11 +1679,15 @@ END
         my $pid = $o->pid;
         next if( $pid ne $$ );
         my $shm;
-        if( $o->shared_space_destroy && 
-            ( $shm = $o->shared_mem ) &&
-            ( $shm->isa( 'Module::Generic::SharedMem' ) ||
-              $shm->isa( 'Module::Generic::SharedMemXS' )
-            ) )
+        if( (
+                $o->shared_space_destroy && 
+                ( $shm = $o->shared_mem ) &&
+                ( $shm->isa( 'Module::Generic::SharedMem' ) ||
+                  $shm->isa( 'Module::Generic::SharedMemXS' )
+                )
+            ) ||
+            $shm->isa( 'Module::Generic::File::Cache' ) ||
+            $shm->isa( 'Module::Generic::File::Mmap' ) )
         {
             $shm->remove;
         }
@@ -2461,7 +2484,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.4.4
+    v0.4.5
 
 =head1 DESCRIPTION
 
@@ -2639,6 +2662,10 @@ This value is passed to L<Module::Generic::File::Mmap>, L<Module::Generic::File:
 =item I<shared_vars_mem_size> integer
 
 Sets the shared memory segment to store the shared variable data, i.e. the ones declared with L</shared>. This defaults to the value of the global variable C<$SHARED_MEMORY_SIZE>, which is by default 64K bytes, or if empty or not defined, the value of the constant C<Module::Generic::SharedMemXS::SHM_BUFSIZ>, which is 64K bytes.
+
+=item I<tmpdir> string
+
+The optional path to the temporary directory to use when you want to use file cache as a medium for shared data.
 
 =item I<timeout> integer
 
@@ -2989,6 +3016,10 @@ This returns the object used for sharing data and result between the main parent
 =head2 shared_space_destroy
 
 Boolean. Default to true. If true, the shared space used by the parent and child processes will be destroy automatically. Disable this if you want to debug or take a sneak peek into the data. The shared space will be either shared memory of cache file depending on the value of C<$SHARE_MEDIUM>
+
+=head2 tmpdir
+
+The optional path to the temporary directory to use when you want to use file cache as a medium for shared data.
 
 =head2 use_async
 

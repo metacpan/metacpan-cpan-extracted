@@ -7,7 +7,7 @@ my $meta = {
   "abstract"       => "templates which compile into coderefs",
   "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config" => 1,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690",
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"       => [],
   "license"        => ["perl_5"],
   "meta-spec"      => {
@@ -27,15 +27,15 @@ my $meta = {
                                          "Moo" => "2.000000",
                                          "namespace::autoclean" => 0,
                                          "perl" => 5.008,
-                                         "Type::Params" => "1.002000",
+                                         "Type::Params" => "2.000000",
                                          "Types::Standard" => 0,
                                        },
                                      },
                         test      => { requires => { "Test::Fatal" => 0, "Test::More" => 0.96 } },
                       },
   "provides"       => {
-                        "Template::Compiled"        => { file => "lib/Template/Compiled.pm", version => 0.002 },
-                        "Template::Compiled::Utils" => { file => "lib/Template/Compiled/Utils.pm", version => 0.002 },
+                        "Template::Compiled"        => { file => "lib/Template/Compiled.pm", version => 0.003 },
+                        "Template::Compiled::Utils" => { file => "lib/Template/Compiled/Utils.pm", version => 0.003 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -46,7 +46,7 @@ my $meta = {
                         license      => ["http://dev.perl.org/licenses/"],
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Template-Compiled/project",
                       },
-  "version"        => 0.002,
+  "version"        => 0.003,
 };
 
 my %dynamic_config;
@@ -125,28 +125,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

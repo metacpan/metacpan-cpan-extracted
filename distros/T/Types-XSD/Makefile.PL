@@ -23,17 +23,17 @@ my $meta = {
                               "DateTime::Incomplete" => 0,
                               "DateTimeX::Auto"      => 0.004,
                               "perl"                 => 5.008003,
-                              "Type::Library"        => "1.000000",
-                              "Types::XSD::Lite"     => 0.006,
+                              "Type::Library"        => "2.000000",
+                              "Types::XSD::Lite"     => 0.007,
                               "XML::RegExp"          => 0,
                             },
                           },
                           test => {
-                            requires => { "Test::More" => 0.96, "Test::TypeTiny" => "1.000000" },
+                            requires => { "Test::More" => 0.96, "Test::TypeTiny" => "2.000000" },
                           },
                         },
   "provides"         => {
-                          "Types::XSD" => { file => "lib/Types/XSD.pm", version => 0.007 },
+                          "Types::XSD" => { file => "lib/Types/XSD.pm", version => 0.008 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -47,7 +47,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Types-XSD/project",
                         },
-  "version"          => 0.007,
+  "version"          => 0.008,
   "x_static_install" => 1,
 };
 

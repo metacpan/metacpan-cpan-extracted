@@ -1,0 +1,9 @@
+name = "Getopt-EX-RPN"
+badges = ["github-actions/test.yml"]
+authority = "cpan:UTASHIRO"
+
+module_maker = "ModuleBuildTiny"
+static_install = "auto"
+
+[release]
+branch = "main"

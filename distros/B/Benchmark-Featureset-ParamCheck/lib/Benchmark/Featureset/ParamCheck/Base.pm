@@ -5,7 +5,7 @@ use warnings;
 package Benchmark::Featureset::ParamCheck::Base;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 sub long_name            { ...; }
 sub short_name           { ...; }

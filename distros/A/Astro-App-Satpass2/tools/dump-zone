@@ -1,0 +1,88 @@
+#!/usr/bin/env perl
+
+use 5.008;
+
+use strict;
+use warnings;
+
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+
+use constant HAVE_DATE_MANIP	=> do {
+    local $@ = undef;
+    eval {
+	require Date::Manip;
+	Date::Manip->import();
+	1;
+    } || 0;
+};
+
+use lib 'inc';
+
+use My::Module::Test::App qw{ dump_date_manip dump_zones klass };
+
+our $VERSION = '0.050';
+
+my %opt;
+
+GetOptions( \%opt,
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+if ( HAVE_DATE_MANIP ) {
+    require Astro::App::Satpass2::ParseTime::Date::Manip;
+    klass( 'Astro::App::Satpass2::ParseTime::Date::Manip' );
+    dump_date_manip();
+} else {
+    dump_zones();
+}
+
+__END__
+
+=head1 TITLE
+
+dump-zone - Dump time zone information
+
+=head1 SYNOPSIS
+
+ dump-zone
+ dump-zone --help
+ dump-zone --version
+
+=head1 OPTIONS
+
+=head2 --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 --version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script dumps (or at least attempts to dump) the same time zone
+information as is dumped by F<t/parse_time_*.t> when a failure occurs.
+The dump is the L<Date::Manip|Date::Manip> dump if that module is
+available; otherwise it is the ISO dump, which is a subset.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

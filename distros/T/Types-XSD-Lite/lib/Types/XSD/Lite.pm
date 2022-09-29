@@ -7,25 +7,21 @@ use utf8;
 
 BEGIN {
 	$Types::XSD::Lite::AUTHORITY = 'cpan:TOBYINK';
-	$Types::XSD::Lite::VERSION   = '0.006';
+	$Types::XSD::Lite::VERSION   = '0.007';
 }
 
 use B qw(perlstring);
 use Carp;
-use Type::Utils;
-use Type::Library -base, -declare => qw(
+use Type::Library 2.000000 -base, -utils, -declare => qw(
 	AnyType AnySimpleType String NormalizedString Token Language Boolean
 	Base64Binary HexBinary Float Double AnyURI Decimal
 	Integer NonPositiveInteger NegativeInteger Long Int Short Byte
 	NonNegativeInteger PositiveInteger UnsignedLong UnsignedInt
 	UnsignedShort UnsignedByte
 );
-use Types::Standard;
+use Types::Standard 2.000000;
 
-our $T;
-
-sub create_range_check
-{
+sub create_range_check {
 	my $class = $_[0]; eval "require $class";
 	my ($lower, $upper) = map(defined($_) ? $class->new($_) : $_, @_[1,2]);
 	my ($lexcl, $uexcl) = map(!!$_, @_[3,4]);
@@ -69,9 +65,9 @@ sub create_range_check
 	);
 }
 
-sub quick_range_check
-{
-	my $class = $_[0]; eval "require $class";
+sub quick_range_check {
+	my $class = $_[0];
+	eval "require $class";
 	my ($lower, $upper) = map(defined($_) ? $class->new($_) : $_, @_[1,2]);
 	my ($lexcl, $uexcl) = map(!!$_, @_[3,4]);
 	my $var = $_[5];
@@ -86,15 +82,13 @@ sub quick_range_check
 	);
 }
 
-sub hex_length
-{
+sub hex_length {
 	my $str = shift;
 	my $len = ($str =~ tr/0-9A-Fa-f//);
 	$len / 2;
 }
 
-sub b64_length
-{
+sub b64_length {
 	my $str = shift;
 	$str =~ s/[^a-zA-Z0-9+\x{2f}=]//g;
 	my $padding = ($str =~ tr/=//);
@@ -103,6 +97,7 @@ sub b64_length
 
 our @patterns;   my $pattern_i = -1;
 our @assertions; my $assertion_i = -1;
+
 our %facets = (
 	assertions => sub {
 		my ($o, $var) = @_;
@@ -110,11 +105,9 @@ our %facets = (
 		my $ass = delete $o->{assertions};
 		$ass = [$ass] unless ref($ass) eq q(ARRAY);
 		my @r;
-		for my $a (@$ass)
-		{
+		for my $a (@$ass) {
 			require Types::TypeTiny;
-			if (Types::TypeTiny::CodeLike()->check($a))
-			{
+			if ( Types::TypeTiny::is_CodeLike($a) ) {
 				$assertion_i++;
 				$assertions[$assertion_i] = $a;
 				push @r,
@@ -122,15 +115,13 @@ our %facets = (
 						? sprintf('$Types::XSD::Lite::assertions[%d]->(%s)', $assertion_i, $var)
 						: sprintf('do { local $_ = %s; $Types::XSD::Lite::assertions[%d]->(%s) }', $var, $assertion_i, $var);
 			}
-			elsif (Types::TypeTiny::StringLike()->check($a))
-			{
+			elsif ( Types::TypeTiny::is_StringLike($a) ) {
 				push @r,
 					($var eq '$_')
 						? "do { $a }"
 						: "do { local \$_ = $var; $a }";
 			}
-			else
-			{
+			else {
 				croak "assertions should be strings or coderefs";
 			}
 		}
@@ -289,140 +280,175 @@ our %facets = (
 	},
 );
 
-sub facet
-{
-	my $self   = pop;
-	my @facets = ("assertions", @_);
-	my $regexp = qr{^${\(join "|", map quotemeta, @facets)}$}ms;
-	my $name   = "$self";
+sub with_facets {
+	my ( $arg, @more ) = @_;
+	my @allowed_facets = ( "assertions", @$arg );
+	my $allowed_regexp = qr{^${\(join "|", map quotemeta, @allowed_facets)}$}ms;
 	
-	my $inline_generator = sub
-	{
+	my %return;
+	my $IG = $return{inline_generator} = sub {
 		my %p_not_destroyed = @_;
 		return sub {
-			local $T = $_[0]->parent;
 			my %p    = %p_not_destroyed;  # copy;
 			my $var  = $_[1];
-			my $r    = sprintf(
-				'(%s)',
-				join(
-					' and ',
-					$self->inline_check($var),
-					map($facets{$_}->(\%p, $var), @facets),
-				),
-			);
+			my @r    = map( $facets{$_}->( \%p, $var ), @allowed_facets );
 			croak sprintf(
 				'Attempt to parameterize type "%s" with unrecognised parameter%s %s',
-				$name,
-				scalar(keys %p)==1 ? '' : 's',
-				join(", ", map(qq["$_"], sort keys %p)),
+				$_[0]->name,
+				scalar( keys %p ) == 1 ? '' : 's',
+				Type::Utils::english_list( map qq["$_"], sort keys %p ),
 			) if keys %p;
-			return $r;
+			return ( undef, @r );
 		};
 	};
 	
-	$self->{inline_generator} = $inline_generator;
-	$self->{constraint_generator} = sub {
+	$return{constraint_generator} = sub {
+		my $base   = $Type::Tiny::parameterize_type;
+		my %params = @_ or return $base;
+		my @checks = $IG->( %params )->( $base, '$_[0]' );
+		$checks[0] = $base->inline_check( '$_[0]' );
 		my $sub = sprintf(
 			'sub { %s }',
-			$inline_generator->(@_)->($self, '$_[0]'),
+			join( ' and ', map "($_)", @checks ),
 		);
 		eval($sub) or croak "could not build sub: $@\n\nCODE: $sub\n";
 	};
-	$self->{name_generator} = sub {
+	
+	$return{name_generator} = sub {
 		my ($s, %a) = @_;
-		sprintf('%s[%s]', $s, join q[,], map sprintf("%s=>%s", $_, perlstring $a{$_}), sort keys %a);
+		sprintf(
+			'%s[%s]',
+			$s,
+			join(
+				q[,],
+				map( sprintf( "%s=>%s", $_, perlstring $a{$_} ), sort keys %a )
+			),
+		);
 	};
 	
-	return if $self->is_anon;
-	
-	no strict qw( refs );
-	no warnings qw( redefine prototype );
-	*{$self->library . '::' . $self->name} = $self->library->_mksub($self);
+	return ( %return, @more );
 }
 
-declare AnyType, as Types::Standard::Any;
+declare AnyType,
+	as Types::Standard::Any;
 
-declare AnySimpleType, as Types::Standard::Value;
+declare AnySimpleType,
+	as Types::Standard::Value;
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare String, as Types::Standard::Str;
+declare String,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as Types::Standard::Str;
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare NormalizedString, as Types::Standard::StrMatch[qr{^[^\t\r\n]*$}sm];
+declare NormalizedString,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as Types::Standard::StrMatch[qr{^[^\t\r\n]*$}sm];
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare Token, as intersection([
-	NormalizedString,
-	Types::Standard::StrMatch([qr{\A\s}sm])->complementary_type,
-	Types::Standard::StrMatch([qr{\s\z}sm])->complementary_type,
-	Types::Standard::StrMatch([qr{\s{2}}sm])->complementary_type,
-]);
+declare Token,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as intersection([
+		NormalizedString,
+		Types::Standard::StrMatch([qr{\A\s}sm])->complementary_type,
+		Types::Standard::StrMatch([qr{\s\z}sm])->complementary_type,
+		Types::Standard::StrMatch([qr{\s{2}}sm])->complementary_type,
+	]);
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare Language, as Types::Standard::StrMatch[qr{\A[a-zA-Z]{1,8}(?:-[a-zA-Z0-9]{1,8})*\z}sm];
+declare Language,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as Types::Standard::StrMatch[qr{\A[a-zA-Z]{1,8}(?:-[a-zA-Z0-9]{1,8})*\z}sm];
 
-facet qw( pattern whiteSpace ),
-declare Boolean, as Types::Standard::StrMatch[qr{\A(?:true|false|0|1)\z}ism];
+declare Boolean,
+	with_facets [qw( pattern whiteSpace )],
+	as Types::Standard::StrMatch[qr{\A(?:true|false|0|1)\z}ism];
 
-facet qw( lengthB64 minLengthB64 maxLengthB64 pattern enumeration whiteSpace ),
-declare Base64Binary, as Types::Standard::StrMatch[qr{\A[a-zA-Z0-9+\x{2f}=\s]+\z}ism];
+declare Base64Binary,
+	with_facets [qw( lengthB64 minLengthB64 maxLengthB64 pattern enumeration whiteSpace )],
+	as Types::Standard::StrMatch[qr{\A[a-zA-Z0-9+\x{2f}=\s]+\z}ism];
 
-facet qw( lengthHex minLengthHex maxLengthHex pattern enumeration whiteSpace ),
-declare HexBinary, as Types::Standard::StrMatch[qr{\A[a-fA-F0-9]+\z}ism];
+declare HexBinary,
+	with_facets [qw( lengthHex minLengthHex maxLengthHex pattern enumeration whiteSpace )],
+	as Types::Standard::StrMatch[qr{\A[a-fA-F0-9]+\z}ism];
 
-facet qw( pattern enumeration whiteSpace maxInclusiveFloat maxExclusiveFloat minInclusiveFloat minExclusiveFloat ),
-declare Float, as Types::Standard::Num;
+declare Float,
+	with_facets [qw( pattern enumeration whiteSpace maxInclusiveFloat maxExclusiveFloat minInclusiveFloat minExclusiveFloat )],
+	as Types::Standard::Num;
 
-facet qw( pattern enumeration whiteSpace maxInclusiveFloat maxExclusiveFloat minInclusiveFloat minExclusiveFloat ),
-declare Double, as Types::Standard::Num;
+declare Double,
+	with_facets [qw( pattern enumeration whiteSpace maxInclusiveFloat maxExclusiveFloat minInclusiveFloat minExclusiveFloat )],
+	as Types::Standard::Num;
 
-facet qw( length minLength maxLength pattern enumeration whiteSpace ),
-declare AnyURI, as Types::Standard::Str;
+declare AnyURI,
+	with_facets [qw( length minLength maxLength pattern enumeration whiteSpace )],
+	as Types::Standard::Str;
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusiveFloat maxExclusiveFloat minInclusiveFloat minExclusiveFloat ),
-declare Decimal, as Types::Standard::StrMatch[qr{\A(?:(?:[+-]?[0-9]+(?:\.[0-9]+)?)|(?:[+-]?\.[0-9]+))\z}ism];
+declare Decimal,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusiveFloat maxExclusiveFloat minInclusiveFloat minExclusiveFloat )],
+	as Types::Standard::StrMatch[qr{\A(?:(?:[+-]?[0-9]+(?:\.[0-9]+)?)|(?:[+-]?\.[0-9]+))\z}ism];
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare Integer, as Types::Standard::Int;
+declare Integer,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as Types::Standard::Int;
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare NonPositiveInteger, as Integer, create_range_check("Math::BigInt", undef, 0);
+declare NonPositiveInteger,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as Integer,
+	create_range_check( "Math::BigInt", undef, 0 );
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare NegativeInteger, as NonPositiveInteger, create_range_check("Math::BigInt", undef, -1);
+declare NegativeInteger,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as NonPositiveInteger,
+	create_range_check( "Math::BigInt", undef, -1 );
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare NonNegativeInteger, as Integer, create_range_check("Math::BigInt", 0, undef);
+declare NonNegativeInteger,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as Integer,
+	create_range_check( "Math::BigInt", 0, undef );
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare PositiveInteger, as NonNegativeInteger, create_range_check("Math::BigInt", 1, undef);
+declare PositiveInteger,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as NonNegativeInteger,
+	create_range_check( "Math::BigInt", 1, undef );
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare Long, as Integer, create_range_check("Math::BigInt", q[-9223372036854775808], q[9223372036854775807]);
+declare Long,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as Integer,
+	create_range_check( "Math::BigInt", q[-9223372036854775808], q[9223372036854775807] );
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare Int, as Long, create_range_check("Math::BigInt", q[-2147483648], q[2147483647]);
+declare Int,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as Long,
+	create_range_check( "Math::BigInt", q[-2147483648], q[2147483647] );
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare Short, as Int, create_range_check("Math::BigInt", q[-32768], q[32767]);
+declare Short,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as Int,
+	create_range_check( "Math::BigInt", q[-32768], q[32767] );
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare Byte, as Short, create_range_check("Math::BigInt", q[-128], q[127]);
+declare Byte,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as Short,
+	create_range_check( "Math::BigInt", q[-128], q[127] );
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare UnsignedLong, as NonNegativeInteger, create_range_check("Math::BigInt", q[0], q[18446744073709551615]);
+declare UnsignedLong,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as NonNegativeInteger,
+	create_range_check( "Math::BigInt", q[0], q[18446744073709551615] );
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare UnsignedInt, as UnsignedLong, create_range_check("Math::BigInt", q[0], q[4294967295]);
+declare UnsignedInt,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as UnsignedLong,
+	create_range_check( "Math::BigInt", q[0], q[4294967295] );
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare UnsignedShort, as UnsignedInt, create_range_check("Math::BigInt", q[0], q[65535]);
+declare UnsignedShort,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as UnsignedInt,
+	create_range_check( "Math::BigInt", q[0], q[65535] );
 
-facet qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive ),
-declare UnsignedByte, as UnsignedShort, create_range_check("Math::BigInt", q[0], q[255]);
+declare UnsignedByte,
+	with_facets [qw( totalDigits fractionDigits pattern whiteSpace enumeration maxInclusive maxExclusive minInclusive minExclusive )],
+	as UnsignedShort,
+	create_range_check( "Math::BigInt", q[0], q[255] );
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

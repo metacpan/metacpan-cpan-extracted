@@ -3,10 +3,10 @@ package MooseX::Role::Validatable;
 use Moose::Role;
 use MooseX::Role::Validatable::Error;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
-use Class::Load qw/load_class/;
-use Carp qw(confess);
+use Class::Load  qw/load_class/;
+use Carp         qw(confess);
 use Scalar::Util qw/blessed/;
 
 has '_init_errors' => (

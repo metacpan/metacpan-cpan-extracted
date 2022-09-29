@@ -1,5 +1,6 @@
 class Sys::Socket::Sockaddr::Interface : interface_t {
-  required method has_interface : int ();
+  required method has_interfaces : int ();
   
-  method sa_family : int ();
+  method sa_family : byte ();
+  method sizeof : int ();
 }

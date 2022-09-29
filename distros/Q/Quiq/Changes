@@ -1,3 +1,47 @@
+1.204 2022-09-28
+================
+
+[Quiq::AnsiColor]
+* str(): Färbung über mehreren Zeilen korrigiert
+
+[Quiq::Assert]
+* check(): Doku bearbeitet
+
+[Quiq::CommandLine]
+* value(): Entscheidung bei Quoting verbessert
+
+[Quiq::Database::Connection]
+* applyPatches(): Verhindert, dass durch Fremschlüssel Daten verloren gehen
+* save(): RowStatus wird nun nach der Operation auf 0 gesetzt
+
+[Quiq::Database::Row::Object]
+* save(): RowStatus wird nun nach der Operation auf 0 gesetzt
+
+[Quiq::FileHandle]
+* DESTROY((): Destruktor eingeführt, der Filehandle nur schließt, wenn offen
+
+[Quiq::Hash]
+* AUTOLOAD(): Debugcode hinzugefügt
+
+[Quiq::Html::Form::Matrix]
+Klasse hinzugefügt
+
+[Quiq::Ipc]
+* pipeTo(): Methode hinzugefügt
+
+[Quiq::Path]
+* compare(): Unterscheidung, on Datei existiert oder nicht
+* copy(): Tilde-Expansion eingeführt, kein Kopieren, wenn Dateien identisch
+* size(): Methode hinzugefügt
+* tail(): Methode hinzugefügt
+* sameFile(): Methode hinzugefügt
+
+[Quiq::JQuery::DataTable]
+* instantiate(): Behandlung der Attribute searchable und visable korrigiert
+
+[Quiq::Process]
+* cwd(): Tilde-Expansion hinzugefügt
+
 1.203 2022-06-30
 ================
 

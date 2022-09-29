@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,29 +12,29 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 ae696b126de68050a697289daa9b273842f64009 COPYRIGHT
-SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
-SHA1 c65be27ae19273521854b451e57719157bba5047 Changes
-SHA1 3c0c968105faac8f41c6ad6c3d8235a65650fe77 INSTALL
-SHA1 c4c1e6c578edcfd14d13eadebc8f56dd9ca46821 LICENSE
-SHA1 15f8e0dc620b0e48637627cca1b53ab9f78930ee MANIFEST
-SHA1 90498b35b1353a3c54b969908f563a1f8c7a952f META.json
-SHA1 b816c73b160509a5e38cd212e2eb2982039a5d2a META.yml
-SHA1 a5ee0fbbceb4d8f6cb282b2ac4284a11d38815c1 Makefile.PL
-SHA1 b7a8b708ec8cd421f0cf3f5d1c1a73c475034d93 README
-SHA1 10f9dd4a358faa0c4fd910085391aec415dfbfbf dist.ini
-SHA1 60cd831d298bc6c7312bd75f03163fae32484e18 doap.ttl
-SHA1 b8298bb99ac6c86729464db83ad9aa1ae6cd3132 examples/html.pl
-SHA1 c20a5065eaf7c76c9cb80e90b0144f116a3ec0f7 lib/Template/Compiled.pm
-SHA1 4e898ccb90595968358871a6391fb4c73c9e46cc lib/Template/Compiled/Utils.pm
-SHA1 15a1c55b8b2208699c82a542e88baa0e40179247 t/01basic.t
-SHA1 84fec1d8e244309e1a67a07395508dea44b5f0c8 t/02complex.t
+SHA256 38a150168e17b293c706d3b932c1775d0340912a4479e99ab557887fa11d5c0e COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 4441312d7a3126511639eade9b80237ef485c6ee084ca20c1b8bde2ee7c2bccb Changes
+SHA256 e4feadd4e94157f0d51d01a87e4c812fad9138771cbd935e6490c59f3ff98493 INSTALL
+SHA256 a4f85c6f4d6e8bdd37b7ab08013e3e3bee1fe8e910e20f8f54d5025ffe40f384 LICENSE
+SHA256 08311f12acddf84b00fee085eee873ff3c5c6f85644384dfd5a46d54bc4c5a1f MANIFEST
+SHA256 27eb2acbfbe8e3b18d182c29443efb3720d81a9eaa5341686bb04d66538c55bc META.json
+SHA256 cf300e87afc35557303d545bea82a5f1cf25a817f05313bee2b08eb3c0bc5227 META.yml
+SHA256 834a23ea860a6de0fe588030e68d39f99fb9a6772ea95e460b6b5ff71c3a0ff3 Makefile.PL
+SHA256 67bb8d159d4bd8364bae67ea1390baf5cc1da502f876820cf81a48400852e622 README
+SHA256 49fe8073c39b89a5eec43c63bf805757c519b084570eaa5072f3f7876496dcc5 dist.ini
+SHA256 dd3bbc227d664542c56c93dc2eff8ea8280211ff5f3e1b8238e203205e3351dc doap.ttl
+SHA256 61c5d632baf010ac850965b13de7b0e8264dbf48f887b3ce245fa0db40b1c0c9 examples/html.pl
+SHA256 5b16d1e33a3c283710ee4c7426214aabbfc9acb9890d1c92fb4c6f750499d239 examples/template-bench.pl
+SHA256 c5507f0c5c7a51a3e12102f71c7095c1ac3ce54e3624226d3ad93dc982488f15 lib/Template/Compiled.pm
+SHA256 4201e6404beeab91352393d1bc0b8b34defeceeec8dac4cfc7cddea2d49e217f lib/Template/Compiled/Utils.pm
+SHA256 ea77755c75af9dc12ffa201324ed98f3691f1cbd7ac84c3be3718950029d60f7 t/01basic.t
+SHA256 905f9d9f6a84a791c8a066fe5b3bede1ba078cde9b894dd3ee0032b4e2584a93 t/02complex.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAllOUZIACgkQzr+BKGoqfTmjAwCgqeVeP4oQhljaiX2U8uwZ3hJa
-ngwAniGNqQmWyReyP7DZw0StNVzuMmoh
-=gNAl
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCYzL8lwAKCRDOv4Eoaip9
+Of5MAJ9BE61vg1MB6ApcPxo68aP9DgXgwwCgqmt/oUVZBiuib7il4NYuyNn8rLU=
+=xtRL
 -----END PGP SIGNATURE-----

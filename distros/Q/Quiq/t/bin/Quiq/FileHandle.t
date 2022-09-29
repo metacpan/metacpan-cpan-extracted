@@ -73,23 +73,23 @@ sub test_new : Test(3) {
 
 # -----------------------------------------------------------------------------
 
-sub test_destroy : Test(3) {
+sub test_close : Test(2) {
     my $self = shift;
 
-    my $testFile = '/tmp/destroy.tst';
+    my $testFile = '/tmp/close.tst';
 
     my $fh = Quiq::FileHandle->new('>',$testFile);
-    $self->is(ref($fh),'Quiq::FileHandle','destroy: Test auf Klasse');
+    $self->is(ref($fh),'Quiq::FileHandle','close: Test auf Klasse');
 
-    $fh->destroy;
-    $self->is($fh,undef,'destroy: Datei geschlossen');
+    $fh->close;
+    $self->is($fh,undef,'close: Datei geschlossen');
 
     $fh = Quiq::FileHandle->new('>',$testFile);
     CORE::close $fh;
 
-    eval { $fh->close };
-    $self->like($@,qr/FH-00009/,
-        'destroy: Schließen einer geschlossenen Handle');
+    # eval { $fh->close };
+    # $self->like($@,qr/FH-00009/,
+    #     'close: Schließen einer geschlossenen Handle');
 
     Quiq::Path->delete($testFile);
 }

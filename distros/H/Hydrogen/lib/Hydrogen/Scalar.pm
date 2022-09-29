@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::Scalar;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015';
+our $VERSION   = '0.016';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::Scalar - a standard library for scalars
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Scalar 0.015,
-which is based on Sub::HandlesVia::HandlerLibrary::Scalar 0.036.
+This documentation is for Hydrogen::Scalar 0.016,
+which is based on Sub::HandlesVia::HandlerLibrary::Scalar 0.037.
 
 =cut
 

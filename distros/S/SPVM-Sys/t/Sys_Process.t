@@ -76,9 +76,18 @@ else {
 
 ok(SPVM::TestCase::Sys::Process->system);
 
-# TODO: The test on Windows
-unless ($^O eq 'MSWin32') {
-  ok(SPVM::TestCase::Sys::Process->exit);
+# The exit method
+{
+  {
+    my $exit_success_program = "$^X -Mblib $FindBin::Bin/exit_success.pl";
+    my $status = system($exit_success_program);
+    ok($status >> 8 == POSIX::EXIT_SUCCESS);
+  }
+  {
+    my $exit_failure_program = "$^X -Mblib $FindBin::Bin/exit_failure.pl";
+    my $status = system($exit_failure_program);
+    ok($status >> 8 == POSIX::EXIT_FAILURE);
+  }
 }
 
 if ($^O eq 'MSWin32') {
@@ -119,10 +128,14 @@ else {
   is(getppid(), SPVM::Sys::Process->getppid);
 }
 
-# TODO: The test on Windows
-unless ($^O eq 'MSWin32') {
-  my $program_file = "$FindBin::Bin/print_hello.pl";
-  ok(SPVM::TestCase::Sys::Process->execv($^X, $program_file));
+# The execv method
+{
+  {
+    my $exit_success_program = "$^X -Mblib $FindBin::Bin/execv_success.pl";
+    my $output = `$exit_success_program`;
+    is($output, 'Hello abc');
+    ok($? >> 8 == POSIX::EXIT_SUCCESS);
+  }
 }
 
 if ($^O eq 'MSWin32') {

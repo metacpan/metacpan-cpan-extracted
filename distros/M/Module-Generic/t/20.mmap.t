@@ -203,7 +203,7 @@ subtest 'serialisation with cbor' => sub
             # destroy => 1,
             destroy => 0,
             mode => 0666,
-        );
+        ) || die( Module::Generic::File::Mmap->error );
         my $s = $cache->open({ mode => 'w' });
         ok( $s->write({ name => 'John Doe', location => 'Tokyo' }), 'write to cache mmap' );
         try
@@ -240,7 +240,7 @@ subtest 'serialisation with sereal' => sub
             # destroy => 1,
             destroy => 0,
             mode => 0666,
-        );
+        ) || die( Module::Generic::File::Mmap->error );
         my $s = $cache->open({ mode => 'w' });
         ok( $s->write({ name => 'John Doe', location => 'Tokyo' }), 'write to cache mmap' );
         try
@@ -275,7 +275,7 @@ subtest 'serialisation with storable' => sub
             # destroy => 1,
             destroy => 0,
             mode => 0666,
-        );
+        ) || die( Module::Generic::File::Mmap->error );
         my $s = $cache->open({ mode => 'w' });
         ok( $s->write({ name => 'John Doe', location => 'Tokyo' }), 'write to cache mmap' );
         try

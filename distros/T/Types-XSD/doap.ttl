@@ -19,12 +19,12 @@
 	], [
 		doap-deps:on "DateTimeX::Auto 0.004"^^doap-deps:CpanId;
 	], [
-		doap-deps:on "Type::Library 1.000000"^^doap-deps:CpanId;
+		doap-deps:on "Type::Library 2.000000"^^doap-deps:CpanId;
 	], [ doap-deps:on "XML::RegExp 0"^^doap-deps:CpanId ], [
-		doap-deps:on "Types::XSD::Lite 0.006"^^doap-deps:CpanId;
+		doap-deps:on "Types::XSD::Lite 0.007"^^doap-deps:CpanId;
 	];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [
-		doap-deps:on "Test::TypeTiny 1.000000"^^doap-deps:CpanId;
+		doap-deps:on "Test::TypeTiny 2.000000"^^doap-deps:CpanId;
 	];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD>;
 	doap:created         "2013-04-15"^^xsd:date;
@@ -35,7 +35,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Types-XSD";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-007>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-008>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-types-xsd>;
@@ -220,6 +220,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-XSD-0.007.tar.gz>;
 	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-XSD/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Types-XSD-0.008"^^xsd:string;
+	dc:issued            "2022-09-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Work with newer facet mechanism in Types::XSD::Lite 0.007.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-XSD-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/djerius>
 	a                    foaf:Person;

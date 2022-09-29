@@ -12,6 +12,7 @@ SIGNATURE
 dist.ini
 doap.ttl
 examples/html.pl
+examples/template-bench.pl
 lib/Template/Compiled.pm
 lib/Template/Compiled/Utils.pm
 t/01basic.t

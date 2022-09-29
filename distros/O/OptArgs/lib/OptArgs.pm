@@ -9,7 +9,7 @@ use Exporter::Tidy
 use Getopt::Long qw/GetOptionsFromArray/;
 use List::Util qw/max/;
 
-our $VERSION       = '0.1.20';
+our $VERSION       = '0.1.21';
 our $COLOUR        = 0;
 our $ABBREV        = 0;
 our $SORT          = 0;
@@ -67,7 +67,7 @@ sub subcmd {
       : ( $params->{cmd} );
     croak 'missing cmd elements' unless @cmd;
 
-    my $name = pop @cmd;
+    my $name   = pop @cmd;
     my $parent = join( '::', $caller, @cmd );
     $parent =~ s/-/_/g;
 
@@ -140,7 +140,7 @@ sub opt {
     croak "unknown type: $params->{isa}"
       unless exists $opt_isa{ $params->{isa} };
 
-    $params = { %opt_params, %$params };
+    $params            = { %opt_params, %$params };
     $params->{package} = $package;
     $params->{name}    = $name;
     $params->{length}  = length $name;
@@ -248,12 +248,12 @@ sub _usage {
     my $ishelp   = shift;
     my $terminal = -t STDOUT;
     my $red      = ( $COLOUR && $terminal ) ? "\e[0;31m" : '';
-    my $yellow = '';    #( $COLOUR && $terminal ) ? "\e[0;33m" : '';
-    my $grey   = '';    #( $COLOUR && $terminal ) ? "\e[1;30m" : '';
-    my $reset  = ( $COLOUR && $terminal ) ? "\e[0m" : '';
-    my $parent = $caller;
-    my @args   = @{ $args{$caller} };
-    my @opts   = @{ $opts{$caller} };
+    my $yellow   = '';    #( $COLOUR && $terminal ) ? "\e[0;33m" : '';
+    my $grey     = '';    #( $COLOUR && $terminal ) ? "\e[1;30m" : '';
+    my $reset    = ( $COLOUR && $terminal ) ? "\e[0m" : '';
+    my $parent   = $caller;
+    my @args     = @{ $args{$caller} };
+    my @opts     = @{ $opts{$caller} };
     my @parents;
     my @usage;
     my @uargs;
@@ -380,13 +380,13 @@ sub _usage {
     }
 
     if (@uopts) {
-        my $w1 = max( map { length $_->[0] } @uopts );
+        my $w1  = max( map { length $_->[0] } @uopts );
         my $fmt = '%-' . $w1 . "s %s";
 
         @uopts = map { [ sprintf( $fmt, $_->[0], $_->[1] ), $_->[2] ] } @uopts;
     }
 
-    my $w1 = max( map { length $_->[0] } @usage, @uargs, @uopts );
+    my $w1     = max( map { length $_->[0] } @usage, @uargs, @uopts );
     my $format = '    %-' . $w1 . "s   %s\n";
 
     if (@usage) {
@@ -468,7 +468,7 @@ sub _optargs {
     }
     else {
         $source_hash = { map { %$_ } grep { ref $_ eq 'HASH' } @$source };
-        $source = [ grep { ref $_ ne 'HASH' } @$source ];
+        $source      = [ grep { ref $_ ne 'HASH' } @$source ];
     }
 
     map { Carp::croak('_optargs argument undefined!') if !defined $_ } @$source;
@@ -556,7 +556,7 @@ sub _optargs {
                 if ($ABBREV) {
                     require Text::Abbrev;
                     my %words =
-                      map { m/^$package\:\:(\w+)$/; $1 => 1 }
+                      map  { m/^$package\:\:(\w+)$/; $1 => 1 }
                       grep { m/^$package\:\:(\w+)$/ }
                       keys %seen;
                     my %abbrev = Text::Abbrev::abbrev( keys %words );
@@ -568,7 +568,7 @@ sub _optargs {
 
                 if ( exists $seen{$newpackage} ) {
                     $package = $newpackage;
-                    @config = grep { $_->{type} eq 'opt' } @config;
+                    @config  = grep { $_->{type} eq 'opt' } @config;
                     push( @config, @{ $opts{$package} }, @{ $args{$package} } );
                 }
                 elsif ( !$ishelp ) {
@@ -654,7 +654,7 @@ sub dispatch {
     my $class  = shift;
 
     croak 'dispatch($method, $class, [@argv])' unless $method and $class;
-    croak $@ unless eval "require $class;1;";
+    croak $@                                   unless eval "require $class;1;";
 
     my ( $package, $optargs ) = class_optargs( $class, @_ );
 
@@ -684,7 +684,7 @@ OptArgs - integrated argument and option processing
 
 =head1 VERSION
 
-0.1.20 (2016-04-11)
+0.1.21 (2022-09-29)
 
 =head1 SYNOPSIS
 
@@ -708,6 +708,10 @@ OptArgs - integrated argument and option processing
     print "Painting $ref->{item}\n" unless $ref->{quiet};
 
 =head1 DESCRIPTION
+
+I<Deprecated>: development on OptArgs stopped in 2016. Consider using
+L<OptArgs2> instead, which is faster and better looking in many ways
+:-)
 
 B<OptArgs> processes Perl script I<options> and I<arguments>.  This is
 in contrast with most modules in the Getopt::* namespace, which deal
@@ -1231,7 +1235,7 @@ type of argument a options expects.
 
 =head1 SEE ALSO
 
-L<Getopt::Long>, L<Exporter::Tidy>
+L<OptArgs2>, L<Getopt::Long>, L<Exporter::Tidy>
 
 =head1 SUPPORT & DEVELOPMENT
 
@@ -1254,7 +1258,7 @@ Mark Lawrence <nomad@null.net>
 
 =head1 LICENSE
 
-Copyright 2012-2014 Mark Lawrence <nomad@null.net>
+Copyright 2012-2022 Mark Lawrence <nomad@null.net>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

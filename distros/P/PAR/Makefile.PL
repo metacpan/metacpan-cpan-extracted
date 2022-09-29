@@ -46,7 +46,7 @@ sub MY::postamble {
     return <<'...';
 pure_all :: t/hello.par
 t/hello.par:
-	$(PERL) t/gen-hello-par.pl
+	$(PERL) "t/gen-hello-par.pl"
 ...
 }
 

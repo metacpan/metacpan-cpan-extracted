@@ -1,0 +1,48 @@
+NAME
+    Type::FromSah - create an efficient Type::Tiny type constraint from a
+    Data::Sah schema
+
+SYNOPSIS
+      package My::Types {
+        use Type::Library -base;
+        use Type::FromSah qw( sah2type );
+    
+        __PACKAGE__->add_type(
+          sah2type( [ "int", min => 1, max => 10 ], name => 'SmallInt' )
+        );
+      }
+  
+      use MyTypes qw(SmallInt);
+  
+      SmallInt->assert_valid( 7 );
+
+DESCRIPTION
+  Functions
+    This module exports one function.
+
+   `sah2type( $schema, %options )`
+    Takes a Data::Sah schema (which should be an arrayref), and generates a
+    Type::Tiny type constraint object for it. Additional key-value pairs will
+    be passed to the Type::Tiny constructor.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Type-FromSah>.
+
+SEE ALSO
+    Data::Sah, Type::Tiny.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2022 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

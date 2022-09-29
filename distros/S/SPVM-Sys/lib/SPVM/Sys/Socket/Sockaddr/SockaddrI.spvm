@@ -1,5 +1,0 @@
-class Sys::Socket::Sockaddr::Interface : interface_t {
-  required static sockaddr_interface : int ();
-  
-  method new : int ();
-}

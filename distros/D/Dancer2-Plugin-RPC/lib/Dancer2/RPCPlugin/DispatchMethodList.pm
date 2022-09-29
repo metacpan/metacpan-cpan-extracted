@@ -148,6 +148,23 @@ sub list_methods {
     }
 }
 
+around ValidationTemplates => sub {
+    my ($orig, $class) = splice(@_, 0, 2);
+    my $templates = $class->$orig(@_);
+
+    use Dancer2::RPCPlugin::PluginNames;
+    use Types::Standard qw( StrMatch);
+
+    my $any_plugin = join("|", Dancer2::RPCPlugin::PluginNames->new->names, 'any');
+    $templates->{any_plugin} = {
+        type    => StrMatch [qr/(?:$any_plugin)/],
+        default => 'any'
+    };
+
+    return $templates;
+};
+
+use namespace::autoclean;
 1;
 
 =head1 COPYRIGHT

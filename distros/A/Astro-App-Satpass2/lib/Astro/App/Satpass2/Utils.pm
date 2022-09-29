@@ -14,7 +14,7 @@ use Getopt::Long 2.33;
 use Scalar::Util 1.26 qw{ blessed looks_like_number };
 use Text::ParseWords ();
 
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 our @CARP_NOT = qw{
     Astro::App::Satpass2
@@ -59,6 +59,7 @@ our @EXPORT_OK = qw{
     __legal_options
     __parse_class_and_args
     ARRAY_REF CODE_REF HASH_REF REGEXP_REF SCALAR_REF
+    HAVE_DATETIME
     @CARP_NOT
 };
 
@@ -71,6 +72,17 @@ use constant CODE_REF	=> ref sub {};
 use constant HASH_REF	=> ref {};
 use constant REGEXP_REF	=> ref qr{};
 use constant SCALAR_REF	=> ref \1;
+
+{
+    local $@ = undef;
+
+    use constant HAVE_DATETIME => eval {
+	require DateTime;
+	require DateTime::TimeZone;
+	1;
+    } || 0;
+
+}
 
 # Documented in POD
 
@@ -88,8 +100,32 @@ use constant SCALAR_REF	=> ref \1;
 	    has_method( $_, 'dereference' ) ?  $_->dereference() : $_
 	} @args;
 
+	my $code = \&{ ( caller 1 )[3] };
+
 	if ( HASH_REF eq ref $args[0] ) {
 	    my $opt = shift @args;
+	    my @orig_keys = sort keys %{ $opt };
+	    my $lgl = $self->__legal_options( $code, $opt );
+	    my %opt_name = (
+		level1	=> 1,
+	    );
+	    my $name;
+	    foreach my $inx ( 0 .. $#$lgl ) {
+		if ( CODE_REF eq ref $lgl->[$inx] ) {
+		    defined $name
+			or die "Bug - \$name undefined. Inx $inx; lgl @$lgl";
+		    if ( exists $opt->{$name} ) {
+			$lgl->[$inx]->( $name, $opt->{$name} );
+		    }
+		} else {
+		    ( $name = $lgl->[ $inx ] ) =~ s/ \W .* //smx;
+		    $opt_name{$name} = 1;
+		}
+	    }
+	    foreach my $key ( @orig_keys ) {
+		$opt_name{$key}
+		    or __error_out( $self, wail => "Illegal option '$key'" );
+	    }
 	    _apply_default( $self, $opt, \@args );
 	    return( $self, $opt, @args );
 	}
@@ -116,7 +152,6 @@ use constant SCALAR_REF	=> ref \1;
 
 
 	my ( $err, %opt );
-	my $code = \&{ ( caller 1 )[3] };
 	my $lgl = $self->__legal_options( $code, \%opt );
 
 	local $SIG{__WARN__} = sub {$err = $_[0]};
@@ -856,6 +891,12 @@ This constant is simply C<ref qr{}>.
 
 This constant is simply C<ref \1>.
 
+=head2 HAVE_DATETIME
+
+This Boolean constant is true if L<DateTime|DateTime> and
+L<DateTime::TimeZone|DateTime::TimeZone> can be loaded, and false if
+not.
+
 =head1 GLOBALS
 
 This module exports the following globals:
@@ -877,7 +918,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2021 by Thomas R. Wyant, III
+Copyright (C) 2011-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

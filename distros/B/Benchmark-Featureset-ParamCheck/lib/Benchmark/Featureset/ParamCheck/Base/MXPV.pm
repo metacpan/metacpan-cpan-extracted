@@ -5,7 +5,7 @@ use warnings;
 package Benchmark::Featureset::ParamCheck::Base::MXPV;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 use parent qw(Benchmark::Featureset::ParamCheck::Base);
 use MooseX::Params::Validate 0.21;

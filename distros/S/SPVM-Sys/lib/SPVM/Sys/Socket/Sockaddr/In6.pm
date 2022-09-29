@@ -32,67 +32,81 @@ Create a new C<Sys::Socket::Sockaddr::In6> object.
 
 =head2 DESTROY
 
-  method DESTROY : void ();
+  method DESTROY : void ()
 
 The destructor.
 
 =head2 sa_family
 
-  method sa_family : int ()s
+  method sa_family : byte ()
 
-Get C<sa_family>. This is the overriden method of the L<sa_family|SPVM::Sys::Socket::Sockaddr/"sa_family"> method in the Sys::Socket::Sockaddr class.
+Gets C<sa_family>. This is the overriden method of the L<sa_family|SPVM::Sys::Socket::Sockaddr/"sa_family"> method in the Sys::Socket::Sockaddr class.
 
 =head2 sin6_family
 
-  method sin6_family : int ();
+  method sin6_family : byte ();
 
-Get C<sin6_family>.
+Gets C<sin6_family>.
 
 =head2 set_sin6_family
 
-  method set_sin6_family : void ();
+  method set_sin6_family : void ($family : byte)
 
-Set C<sin6_family>.
+Sets C<sin6_family>.
 
 =head2 sin6_flowinfo
 
-  method sin6_flowinfo : int ();
+  method sin6_flowinfo : int ()
+
+Gets C<sin6_flowinfo>.
 
 =head2 set_sin6_flowinfo
 
-  method set_sin6_flowinfo : void ();
+  method set_sin6_flowinfo : void ()
+
+Sets C<sin6_flowinfo>.
 
 =head2 sin6_scope_id
 
   method sin6_scope_id : int ();
 
+Gets C<sin6_scope_id>.
+
 =head2 set_sin6_scope_id
 
-  method set_sin6_scope_id : void ();
+  method set_sin6_scope_id : void ()
+
+Sets C<sin6_scope_id>.
 
 =head2 sin6_addr
 
   method sin6_addr : Sys::Socket::In6_addr ();
 
-Get C<sin6_addr>. This is a L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> object.
+Gets C<sin6_addr>. This is a L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> object.
 
 =head2 set_sin6_addr
 
   method set_sin6_addr : void ($address : Sys::Socket::In6_addr);
 
-Set C<sin6_addr>. This is a L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> object.
+Sets C<sin6_addr>. This is a L<Sys::Socket::In6_addr|SPVM::Sys::Socket::In6_addr> object.
 
 =head2 sin6_port
 
   method sin6_port : short ();
 
-Get C<sin6_port>.
+Gets C<sin6_port>.
 
 =head2 set_sin6_port
 
   method set_sin6_port : void ($port : short);
 
-Set C<sin6_port>.
+Sets C<sin6_port>.
+
+=head2 sizeof
+
+  method sizeof : int ()
+
+The size of C<struct sockaddr_in6>.
 
 =head1 Copyright & License
 

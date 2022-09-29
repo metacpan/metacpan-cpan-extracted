@@ -24,7 +24,7 @@ name: Module-Installed-Tiny
 provides:
   Module::Installed::Tiny:
     file: lib/Module/Installed/Tiny.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Exporter: '5.57'
   strict: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Installed-Tiny
   homepage: https://metacpan.org/release/Module-Installed-Tiny
   repository: git://github.com/perlancar/perl-Module-Installed-Tiny.git
-version: '0.010'
+version: '0.011'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -311,7 +311,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'

@@ -21,12 +21,14 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.203';
+our $VERSION = '1.204';
 
 use Quiq::Option;
 use Quiq::Shell;
 use Quiq::Exit;
 use IPC::Open3 ();
+use Quiq::FileHandle;
+use Encode ();
 
 # -----------------------------------------------------------------------------
 
@@ -116,9 +118,78 @@ sub filter {
 
 # -----------------------------------------------------------------------------
 
+=head3 pipeTo() - Pipe Daten an Kommando
+
+=head4 Synopsis
+
+  $class->pipeTo($data,$cmd,@options);
+
+=head4 Arguments
+
+=over 4
+
+=item $data
+
+Die Daten, die an das Kommando gepiped werden.
+
+=item $cmd
+
+Das Kommando, das die Daten von stdin liest und verarbeitet.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -encoding => $encoding
+
+Mit welchem Encoding die Daten geschrieben werden.
+
+=item -toStdout => $bool (Default: 0)
+
+Pipe die Daten nicht an das Kommando, sondern schreibe sie nach STDOUT.
+Dies ist nützlich, wenn das Kommando ein Pager ist, der nicht gestartet
+werden soll, wenn STDOUT kein Terminal ist:
+
+  Quiq::Ipc->pipeTo($data,'less -R',-toStdout=>!-t);
+
+=back
+
+=head4 Description
+
+Pipe Daten $data an Kommando $cmd.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub pipeTo {
+    my ($class,$data,$cmd) = splice @_,0,3;
+    # @_: @options
+
+    my $encoding = undef;
+    my $toStdout = 0;
+
+    my $opt = $class->parameters(\@_,
+        -encoding => \$encoding,
+        -toStdout => \$toStdout,
+    );
+
+    my $fh = $toStdout? \*STDOUT: Quiq::FileHandle->new('|-',$cmd);
+    if ($encoding) {
+        $data = Encode::encode($encoding,$data);
+    }
+    print $fh $data;
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.203
+1.204
 
 =head1 AUTHOR
 

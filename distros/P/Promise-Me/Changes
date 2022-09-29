@@ -1,5 +1,11 @@
 Revision history for Perl module Promise::Me
 
+v0.4.5 2022-09-27T14:14:25+0900
+    - Better handling of error upon opening shared memory
+    - Improved unit test
+    - Added the 'tmpdir' parameter when instantiating a new promise, which will be passed to Module::Generic::File::Cache, as required, and the related tmpdir() method.
+    - Improved cleanup in the END block
+
 v0.4.4 2022-08-24T16:31:19Z +0900
     - Added new instance argument 'medium' and related method
     - Better handling of error upon writing to shared memory

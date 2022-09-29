@@ -18,9 +18,22 @@ use constant TEST_MOCKTIME	=> do {
 
 };
 
+use Astro::App::Satpass2::Utils qw{ HAVE_DATETIME };
+
 use My::Module::Test::App;
 
-use Astro::Coord::ECI::Utils 0.112 qw{ greg_time_gm greg_time_local };
+BEGIN {
+    local $@ = undef;
+    if ( HAVE_DATETIME ) {
+	*greg_time_gm = \&dt_greg_time_gm;
+	*greg_time_local = \&dt_greg_time_local;
+    } else {
+	require Astro::Coord::ECI::Utils;
+	Astro::Coord::ECI::Utils->VERSION( 0.112 );
+	Astro::Coord::ECI::Utils->import(
+	    qw{ greg_time_gm greg_time_local } );
+    }
+}
 
 # >>>> THIS MUST BE DONE BEFORE ANY TESTS <<<<
 #
@@ -28,6 +41,8 @@ use Astro::Coord::ECI::Utils 0.112 qw{ greg_time_gm greg_time_local };
 # value if we're using POSIX rather than DateTime.
 check_datetime_timezone_local()
     or plan skip_all => 'Cannot determine local time zone';
+
+dump_zones_init();
 
 require_ok 'Astro::App::Satpass2::ParseTime';
 
@@ -79,43 +94,61 @@ call_m( parse => '-0 12', $base - HALF_DAY,
 
 call_m( perltime => 1, TRUE, 'Set perltime true' );
 
+my $time_local = greg_time_local( 0, 0, 0, 1, 0, 2009 );
 call_m( parse => '20090101T000000',
-    greg_time_local( 0, 0, 0, 1, 0, 2009 ),
-    'Parse ISO-8601 20090101T000000' );
+    $time_local,
+    'Parse ISO-8601 20090101T000000' )
+    or dump_zones( $time_local );
 
+$time_local = greg_time_local( 0, 0, 0, 1, 6, 2009 );
 call_m( parse => '20090701T000000',
-    greg_time_local( 0, 0, 0, 1, 6, 2009 ),
-    'Parse ISO-8601 20090701T000000' );
+    $time_local,
+    'Parse ISO-8601 20090701T000000' )
+    or dump_zones( $time_local );
 
 call_m( perltime => 0, TRUE, 'Set perltime false' );
 
+$time_local = greg_time_local( 0, 0, 0, 1, 0, 2009 );
 call_m( parse => '20090101T000000',
-    greg_time_local( 0, 0, 0, 1, 0, 2009 ),
-    'Parse ISO-8601 20090101T000000, no help from perltime' );
+    $time_local,
+    'Parse ISO-8601 20090101T000000, no help from perltime' )
+    or dump_zones( $time_local );
 
+$time_local = greg_time_local( 0, 0, 0, 1, 6, 2009 );
 call_m( parse => '20090701T000000',
-    greg_time_local( 0, 0, 0, 1, 6, 2009 ),
-    'Parse ISO-8601 20090701T000000, no help from perltime' );
+    $time_local,
+    'Parse ISO-8601 20090701T000000, no help from perltime' )
+    or dump_zones( $time_local );
 
+my $time_gm = greg_time_gm( 0, 0, 0, 1, 0, 2009 );
 call_m( parse => '20090101T000000Z',
-    greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
-    'Parse ISO-8601 20090101T000000Z' );
+    $time_gm,
+    'Parse ISO-8601 20090101T000000Z' )
+    or dump_zones( $time_gm );
 
+$time_gm = greg_time_gm( 0, 0, 0, 1, 6, 2009 );
 call_m( parse => '20090701T000000Z',
-    greg_time_gm( 0, 0, 0, 1, 6, 2009 ),
-    'Parse ISO-8601 20090701T000000Z' );
+    $time_gm,
+    'Parse ISO-8601 20090701T000000Z' )
+    or dump_zones( $time_gm );
 
-call_m( parse => '20090702162337',
-    greg_time_local( 37, 23, 16, 2, 6, 2009 ),
-    q{Parse ISO-8601 '20090702162337'} );
+$time_local = greg_time_local( 37, 23, 16, 2, 6, 2009 );
+call_m( parse => '20090702T162337',
+    $time_local,
+    q{Parse ISO-8601 '20090702162337'} )
+    or dump_zones( $time_local );
 
+$time_gm = greg_time_gm( 37, 23, 16, 2, 6, 2009 );
 call_m( parse => '20090702162337Z',
-    greg_time_gm( 37, 23, 16, 2, 6, 2009 ),
-    q{Parse ISO-8601 '20090702162337Z'} );
+    $time_gm,
+    q{Parse ISO-8601 '20090702162337Z'} )
+    or dump_zones( $time_gm );
 
+$time_local = greg_time_local( 0, 23, 16, 2, 6, 2009 );
 call_m( parse => '200907021623',
-    greg_time_local( 0, 23, 16, 2, 6, 2009 ),
-    q{Parse ISO-8601 '200907021623'} );
+    $time_local,
+    q{Parse ISO-8601 '200907021623'} )
+    or dump_zones( $time_local );
 
 call_m( parse => '200907021623Z',
     greg_time_gm( 0, 23, 16, 2, 6, 2009 ),

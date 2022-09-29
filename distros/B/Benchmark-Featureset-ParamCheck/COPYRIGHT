@@ -32,14 +32,12 @@ Files: Changes
  lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/Specio.pm
  lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/TypeNano.pm
  lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams/TypeTiny.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams2/Moose.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams2/Mouse.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams2/Specio.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams2/TypeNano.pm
+ lib/Benchmark/Featureset/ParamCheck/Implementation/TypeParams2/TypeTiny.pm
 Copyright: Copyright 2022 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/01-named-correctness.t
- t/02-named-benchmark.t
- t/03-positional-correctness.t
- t/04-positional-benchmark.t
-Copyright: This software is copyright (c) 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -53,9 +51,19 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
+Files: t/01-named-correctness.t
+ t/03-positional-correctness.t
+Copyright: This software is copyright (c) 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/02-named-benchmark.t
+ t/04-positional-benchmark.t
+Copyright: This software is copyright (c) 2017, 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: README
  lib/Benchmark/Featureset/ParamCheck.pm
-Copyright: This software is copyright (c) 2017, 2018 by Toby Inkster.
+Copyright: This software is copyright (c) 2017, 2018, 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini

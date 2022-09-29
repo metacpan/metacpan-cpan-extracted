@@ -25,7 +25,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.203';
+our $VERSION = '1.204';
 
 use Time::HiRes ();
 use Quiq::Duration;
@@ -451,6 +451,7 @@ sub cd {
     }
 
     my $cwd = Quiq::Process->cwd;
+
     unless ($dryRun) {
         my $t0 = Time::HiRes::gettimeofday;
         Quiq::Process->cwd($dir);
@@ -571,7 +572,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.203
+1.204
 
 =head1 AUTHOR
 

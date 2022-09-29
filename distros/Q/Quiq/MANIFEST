@@ -91,6 +91,7 @@ lib/Quiq/Html/Component.pm
 lib/Quiq/Html/Component/Bundle.pm
 lib/Quiq/Html/Construct.pm
 lib/Quiq/Html/Form/Layout.pm
+lib/Quiq/Html/Form/Matrix.pm
 lib/Quiq/Html/HorizontalMenu.pm
 lib/Quiq/Html/Image.pm
 lib/Quiq/Html/List.pm
@@ -326,6 +327,7 @@ t/bin/Quiq/Html/Component.t
 t/bin/Quiq/Html/Component/Bundle.t
 t/bin/Quiq/Html/Construct.t
 t/bin/Quiq/Html/Form/Layout.t
+t/bin/Quiq/Html/Form/Matrix.t
 t/bin/Quiq/Html/HorizontalMenu.t
 t/bin/Quiq/Html/Image.t
 t/bin/Quiq/Html/List.t

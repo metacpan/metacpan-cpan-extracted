@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ansicolumn
 
+1.23 2022-09-29T01:31:38Z
+
+    - use Getopt::EX::RPN module
+
 1.22 2022-09-26T10:11:47Z
 
     - add border styles: dash-box, dash-frame

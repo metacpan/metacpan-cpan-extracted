@@ -1,0 +1,13 @@
+Type-FromSah
+============
+
+Created:      2022-09-28
+Home page:    <https://metacpan.org/release/Type-FromSah>
+Bug tracker:  <https://github.com/tobyink/p5-type-fromsah/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2022-09-29
+
+ - Improvements to inlining.
+
+0.001	2022-09-28	Initial release

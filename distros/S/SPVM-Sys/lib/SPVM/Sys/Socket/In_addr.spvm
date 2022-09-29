@@ -5,4 +5,9 @@ class Sys::Socket::In_addr : pointer_t {
 
   # Instance methods
   native method DESTROY : void ();
+
+  # Instance methods
+  native method s_addr : int ();
+
+  native method set_s_addr : void ($s_addr : int);
 }

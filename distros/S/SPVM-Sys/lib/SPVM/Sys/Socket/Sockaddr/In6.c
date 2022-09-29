@@ -47,7 +47,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__In6__sin6_family(SPVM_ENV* env, SPVM_VALUE*
   
   struct sockaddr_in6* socket_address = env->get_pointer(env, stack, obj_self);
   
-  stack[0].ival = socket_address->sin6_family;
+  stack[0].bval = socket_address->sin6_family;
   
   return 0;
 }
@@ -58,7 +58,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__In6__set_sin6_family(SPVM_ENV* env, SPVM_VA
   
   struct sockaddr_in6* socket_address = env->get_pointer(env, stack, obj_self);
   
-  socket_address->sin6_family = stack[1].ival;
+  socket_address->sin6_family = stack[1].bval;
   
   return 0;
 }
@@ -135,6 +135,11 @@ int32_t SPVM__Sys__Socket__Sockaddr__In6__set_sin6_addr(SPVM_ENV* env, SPVM_VALU
   struct sockaddr_in6* socket_address = env->get_pointer(env, stack, obj_self);
   
   void* obj_address = stack[1].oval;
+
+  if (!obj_address) {
+    return env->die(env, stack, "The address must be defined", FILE_NAME, __LINE__);
+  }
+  
   struct in6_addr* address = env->get_pointer(env, stack, obj_address);
 
   socket_address->sin6_addr = *address;
@@ -160,6 +165,15 @@ int32_t SPVM__Sys__Socket__Sockaddr__In6__set_sin6_port(SPVM_ENV* env, SPVM_VALU
   struct sockaddr_in6* socket_address = env->get_pointer(env, stack, obj_self);
   
   socket_address->sin6_port = stack[1].sval;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__Sockaddr__In6__sizeof(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_self = stack[0].oval;
+  
+  stack[0].ival = sizeof(struct sockaddr_in6);
   
   return 0;
 }

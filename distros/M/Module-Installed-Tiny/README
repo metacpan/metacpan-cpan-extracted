@@ -3,8 +3,8 @@ NAME
     code as possible
 
 VERSION
-    This document describes version 0.010 of Module::Installed::Tiny (from
-    Perl distribution Module-Installed-Tiny), released on 2022-07-30.
+    This document describes version 0.011 of Module::Installed::Tiny (from
+    Perl distribution Module-Installed-Tiny), released on 2022-08-22.
 
 SYNOPSIS
      use Module::Installed::Tiny qw(module_installed module_source);
@@ -182,9 +182,9 @@ FAQ
     This is what "module_installed()" does.
 
   How to know which @INC entry the source comes from?
-    Call the "module_source" in list context, where you will get more
-    information including the entry. See the function documentation for more
-    details.
+    Call the "module_source" function in list context, where you will get
+    more information including the entry. See the function documentation for
+    more details.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -219,10 +219,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022, 2021, 2020, 2016 by perlancar

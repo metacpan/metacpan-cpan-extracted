@@ -45,7 +45,7 @@ ok(
 $output_string = '';
 main($output, @local_argv);
 ok(
-  $output_string eq "foo\ntag.animals.platypus\ntag.something\ntag.topics.example\nwrt-noexpand\n",
+  $output_string eq "filters\nfoo\ntag.animals.platypus\ntag.something\ntag.topics.example\nwrt-noexpand\n",
   "Correctly listed properties."
 ) or diag($output_string);
 

@@ -1,10 +1,5 @@
 package Getopt::Long::Util;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-10'; # DATE
-our $DIST = 'Getopt-Long-Util'; # DIST
-our $VERSION = '0.895'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -16,7 +11,13 @@ our @EXPORT_OK = qw(
                        humanize_getopt_long_opt_spec
                        detect_getopt_long_script
                        gen_getopt_long_spec_from_getopt_std_spec
+                       array_getopt_long_spec_to_hash
                );
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-11'; # DATE
+our $DIST = 'Getopt-Long-Util'; # DIST
+our $VERSION = '0.896'; # VERSION
 
 our %SPEC;
 
@@ -104,7 +105,7 @@ sub parse_getopt_long_opt_spec {
                    )
                )?
                \z/x
-                   or return undef;
+                   or return;
     my %res = %+;
 
     if (defined $res{optnum}) {
@@ -141,7 +142,7 @@ Convert <pm:Getopt::Long> option specification into a more human-friendly
 notation that is suitable for including in help/usage text, for example:
 
     help|h|?       ->  "--help, -h, -?"
-    help|h|?       ->  "--help | -h | -?"               # if you provide 'separator')
+    help|h|?       ->  "--help | -h | -?"               # if you provide 'separator'
     --foo=s        ->  "--foo=s"
     --foo=s        ->  "--foo=somelabel"                # if you provide 'value_label'
     --foo:s        ->  "--foo[=s]"
@@ -412,6 +413,70 @@ sub gen_getopt_long_spec_from_getopt_std_spec {
     $spec;
 }
 
+$SPEC{array_getopt_long_spec_to_hash} = {
+    v => 1.1,
+    summary => 'Convert array form of Getopt::Long spec to hash',
+    description => <<'_',
+
+<pm:Getopt::Long>'s `GetOptions` function accepts a list of arguments. The first
+optional argument is a hash for option storage. After that, a list of option
+specs (e.g. `foo=s`), each optionally followed by a reference to specify
+destination (e.g. a reference to scalar, or array, or code).
+
+Die on failure (e.g. invalid option spec).
+
+This routine converts that array into a hash of option specs as keys and
+destinations as values. If an option spec does not have a destination, its
+destination is set to `undef`. If hash storage is specified then the destination
+will fall back to the hash storage's appropriate key when a specific destination
+is not specified.
+
+Note that by converting to hash, 1) duplicate option specs are merged; and 2)
+order of option specs is not preserved.
+
+_
+    args => {
+        spec => {
+            summary => 'Getopt::Long spec',
+            schema => 'array*',
+            req => 1,
+            pos => 0,
+        },
+    },
+    args_as => 'array',
+    result_naked => 1,
+    result => {
+        schema => 'hash*',
+    },
+};
+sub array_getopt_long_spec_to_hash {
+    my $go_spec = [ @_ ];
+    my $hash_spec = {};
+
+    my $hash_storage;
+    $hash_storage = shift @$go_spec
+        if @$go_spec && ref $go_spec->[0] eq 'HASH';
+
+    while (@$go_spec) {
+        my $opt_spec = shift @$go_spec;
+        my $dest;
+        if (@$go_spec && ref $go_spec->[0]) {
+            $dest = shift @$go_spec;
+        } elsif ($hash_storage) {
+            my $res = parse_getopt_long_opt_spec($opt_spec)
+                or die "Invalid option spec '$opt_spec'";
+            my $name = $res->{opts}[0];
+            $hash_storage->{$name} = undef unless exists $hash_storage->{$name};
+            $dest = ref $hash_storage->{$name} ?
+                $hash_storage->{$name} :
+                \($hash_storage->{$name});
+        }
+        $hash_spec->{$opt_spec} = $dest;
+    }
+
+    $hash_spec;
+}
+
 1;
 # ABSTRACT: Utilities for Getopt::Long
 
@@ -427,15 +492,50 @@ Getopt::Long::Util - Utilities for Getopt::Long
 
 =head1 VERSION
 
-This document describes version 0.895 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2021-07-10.
-
-=head1 CONTRIBUTOR
-
-=for stopwords Steven Haryanto
-
-Steven Haryanto <sharyanto@cpan.org>
+This document describes version 0.896 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2022-08-11.
 
 =head1 FUNCTIONS
+
+
+=head2 array_getopt_long_spec_to_hash
+
+Usage:
+
+ array_getopt_long_spec_to_hash($spec) -> hash
+
+Convert array form of Getopt::Long spec to hash.
+
+L<Getopt::Long>'s C<GetOptions> function accepts a list of arguments. The first
+optional argument is a hash for option storage. After that, a list of option
+specs (e.g. C<foo=s>), each optionally followed by a reference to specify
+destination (e.g. a reference to scalar, or array, or code).
+
+Die on failure (e.g. invalid option spec).
+
+This routine converts that array into a hash of option specs as keys and
+destinations as values. If an option spec does not have a destination, its
+destination is set to C<undef>. If hash storage is specified then the destination
+will fall back to the hash storage's appropriate key when a specific destination
+is not specified.
+
+Note that by converting to hash, 1) duplicate option specs are merged; and 2)
+order of option specs is not preserved.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$spec>* => I<array>
+
+Getopt::Long spec.
+
+
+=back
+
+Return value:  (hash)
+
 
 
 =head2 detect_getopt_long_script
@@ -540,7 +640,7 @@ Convert L<Getopt::Long> option specification into a more human-friendly
 notation that is suitable for including in help/usage text, for example:
 
  help|h|?       ->  "--help, -h, -?"
- help|h|?       ->  "--help | -h | -?"               # if you provide 'separator')
+ help|h|?       ->  "--help | -h | -?"               # if you provide 'separator'
  --foo=s        ->  "--foo=s"
  --foo=s        ->  "--foo=somelabel"                # if you provide 'value_label'
  --foo:s        ->  "--foo[=s]"
@@ -650,14 +750,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Getopt-Lon
 
 Source repository is at L<https://github.com/perlancar/perl-Getopt-Long-Util>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Util>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Getopt::Long>
@@ -674,11 +766,43 @@ Getopt::Long::Spec::Parser fails to parse, e.g. C<foo|f=s@>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Util>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

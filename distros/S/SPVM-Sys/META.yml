@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.9652'
+  SPVM: '0.9653'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -20,5 +20,5 @@ no_index:
 requires:
   SPVM::Errno: '0.06'
 resources: {}
-version: '0.05'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

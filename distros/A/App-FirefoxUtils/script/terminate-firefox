@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-20'; # DATE
+our $DATE = '2022-07-24'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FirefoxUtils/terminate_firefox",
@@ -40,11 +40,11 @@ terminate-firefox - Terminate Firefox (by default with -KILL signal)
 
 =head1 VERSION
 
-This document describes version 0.017 of terminate-firefox (from Perl distribution App-FirefoxUtils), released on 2022-05-20.
+This document describes version 0.018 of terminate-firefox (from Perl distribution App-FirefoxUtils), released on 2022-07-24.
 
 =head1 SYNOPSIS
 
-% B<terminate-firefox> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--signal>=I<unix::signal>] [(B<--user>=I<unix::local_uid>)+] [B<--users-json>=I<json>] [B<-s>=I<unix::signal>]
+% B<terminate-firefox> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--signal>=I<unix::signal>|B<-s>=I<unix::signal>] [(B<--user>=I<unix::uid::exists>)+|B<--users-json>=I<json>]
 
 =head1 OPTIONS
 
@@ -82,6 +82,17 @@ Shortcut for --log-level=debug.
 
 Set log level.
 
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<fatal>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
 =item B<--quiet>
 
 Shortcut for --log-level=error.
@@ -108,6 +119,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -122,24 +139,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 

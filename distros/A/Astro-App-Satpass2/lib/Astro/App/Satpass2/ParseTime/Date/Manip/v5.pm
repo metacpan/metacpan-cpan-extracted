@@ -4,13 +4,13 @@ use strict;
 use warnings;
 
 use Astro::Coord::ECI::Utils 0.112 qw{
-    looks_like_number greg_time_gm greg_time_local };
+    looks_like_number greg_time_local };
 
 use parent qw{ Astro::App::Satpass2::ParseTime::Date::Manip };
 
 use Astro::App::Satpass2::Utils qw{ load_package @CARP_NOT };
 
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 my $invalid;
 
@@ -30,8 +30,6 @@ my ( $default_zone ) = eval {
     grep { m{ \A TZ= }smx } Date_Init()
 };
 
-my $epoch_offset = greg_time_gm( 0, 0, 0, 1, 0, 1970 );
-
 sub delegate {
     return __PACKAGE__;
 }
@@ -39,7 +37,7 @@ sub delegate {
 sub parse_time_absolute {
     my ( $self, $string ) = @_;
     $invalid and $self->wail( $invalid );
-    my $time = UnixDate( $string, '%s' ) - $epoch_offset;
+    my $time = UnixDate( $string, '%s' ) - $self->__epoch_offset();
     if ( $self->perltime() ) {
 	my @gt = gmtime $time;
 	$gt[5] += 1900;
@@ -118,7 +116,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2021 by Thomas R. Wyant, III
+Copyright (C) 2009-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

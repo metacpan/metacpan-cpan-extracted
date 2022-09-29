@@ -131,8 +131,8 @@ my $es = App::WRT::EntryStore->new('archives');
 
   my @all_props = $es->all_props();
   ok(
-    scalar(@all_props) == 5,
-    'found 3 properties for example repo'
+    scalar(@all_props) == 6,
+    'found 6 properties for example repo'
   ) or diag(join ', ', @all_props);
 
 # property values:

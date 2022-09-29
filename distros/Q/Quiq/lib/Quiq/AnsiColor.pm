@@ -81,7 +81,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.203';
+our $VERSION = '1.204';
 
 use Term::ANSIColor ();
 
@@ -202,8 +202,11 @@ sub str {
     my ($self,$attr,$str) = @_;
 
     if ($$self) {
-        return Term::ANSIColor::color($attr).$str.
-            Term::ANSIColor::color('reset');
+        my $esc = Term::ANSIColor::color($attr);
+        my $reset = Term::ANSIColor::color('reset');
+        $str =~ s/^(\s*)(.*)/$1$esc$2$reset/mg;
+        # $str =~ s/$/$reset/mg;
+        return $str;
     }
     
     return $str;
@@ -241,7 +244,7 @@ sub strLn {
 
 =head1 VERSION
 
-1.203
+1.204
 
 =head1 AUTHOR
 

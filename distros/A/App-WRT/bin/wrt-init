@@ -80,6 +80,9 @@ fi
 printf 'Entries:\t%s/archives/\n' "$init_target"
 mkdir -p "$init_target/archives"
 
+printf 'Entries:\t%s/filters/\n' "$init_target"
+mkdir -p "$init_target/filters"
+
 printf 'Publish to:\t%s/public/\n' "$init_target"
 mkdir -p "$init_target/public"
 
@@ -87,6 +90,7 @@ printf 'Configuration:\t%s/wrt.json\n' "$init_target"
 cat > "$init_target/wrt.json" << 'JSON'
 {
    "entry_dir": "./archives",
+   "filter_dir": "./filters",
    "publish_dir": "./public",
    "title_prefix": "your title here",
    "template": "default",

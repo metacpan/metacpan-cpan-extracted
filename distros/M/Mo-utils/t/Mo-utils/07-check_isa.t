@@ -3,10 +3,10 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean err_msg);
-use Test::MockObject;
-use Test::More 'tests' => 7;
-use Test::NoWarnings;
 use Mo::utils qw(check_isa);
+use Test::MockObject;
+use Test::More 'tests' => 8;
+use Test::NoWarnings;
 
 # Test.
 my $self = {
@@ -107,3 +107,8 @@ $self = {
 };
 $ret = check_isa($self, 'key', 'Foo');
 is($ret, undef, "Value is undefined, that's ok.");
+
+# Test.
+$self = {};
+$ret = check_isa($self, 'key', 'Foo');
+is($ret, undef, 'Right not exist key.');

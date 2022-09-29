@@ -10,16 +10,20 @@ use My::Module::Test::App;
 
 BEGIN {
 
+    local $@ = undef;
+
     eval {
 
-	no warnings qw{ once };
+	no warnings qw{ deprecated once };
+	require Date::Manip::DM5;
+
 	# Force Date::Manip 5 backend if we have Date::Manip 6.
 	local $Date::Manip::Backend = 'DM5';
 
 	require Date::Manip;
 
 	1;
-    } or plan skip_all => 'Date::Manip not available';
+    } or plan skip_all => 'Date::Manip 5 not available';
 
     $^O eq 'MSWin32'
 	and plan skip_all => 'Date::Manip 5 tests fail under Windows';

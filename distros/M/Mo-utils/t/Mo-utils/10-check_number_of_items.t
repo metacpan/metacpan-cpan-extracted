@@ -3,10 +3,10 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
+use Mo::utils qw(check_number_of_items);
 use Test::MockObject;
 use Test::More 'tests' => 3;
 use Test::NoWarnings;
-use Mo::utils qw(check_number_of_items);
 
 # Test.
 my $self = Test::MockObject->new({

@@ -1,6 +1,10 @@
 Revision history for Dist::Zilla::PERLSRVDE
 ===========================================
 
+1.0.1  2022-09-29 10:28:00
+
+  * fix hyperlinks in POD (thanks to Håkon Hægland, @hakonhagland)
+
 1.0.0  2022-03-18 07:00:00
 
   * fix generated repository information

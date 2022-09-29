@@ -1,3 +1,15 @@
+2.057005 - 2022-09-28
+
+  [BUG FIXES]
+
+  * auto add port: and type: to legacy config for ignore_*
+
+2.057004 - 2022-09-27
+
+  [BUG FIXES]
+
+  * workaround DBICx::Sugar alias only working for non-default
+
 2.057002 - 2022-09-24
 
   [ENHANCEMENTS]

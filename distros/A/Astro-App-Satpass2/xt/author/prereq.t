@@ -16,7 +16,7 @@ eval {
 my $tpm = Test::Prereq::Meta->new(
     accept	=> [
 	My::Module::Recommend->optionals(),
-	qw{ Test::MockTime },
+	qw{ Date::Manip::DM5 Test::MockTime },
     ],
     uses	=> [ qw{
 	IPC::System::Simple

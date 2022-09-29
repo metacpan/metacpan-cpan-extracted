@@ -12,14 +12,11 @@ BEGIN {
 use Astro::App::Satpass2;
 use Test::More 0.88;	# Because of done_testing();
 
-eval {
-    require Term::ReadLine;
-    Term::ReadLine->new( 'test' );  # Done to get Term::ReadLine::readline
-				    # loaded correctly.
-    $INC{'Term/ReadLine/readline.pm'};
-} or plan skip_all => 'Term::ReadLine::readline not available';
+my $app = Astro::App::Satpass2->new();
+$app->_get_readline();	# To initialize internals.
+$INC{'Term/ReadLine/Perl.pm'}
+    or plan skip_all => 'Term::ReadLine::Perl not available';
 
-my $app = $Astro::App::Satpass2::READLINE_OBJ = Astro::App::Satpass2->new();
 
 complete( '', get_builtins( 0 ) );
 
@@ -46,6 +43,34 @@ complete( 'z', [] );
 complete( 'almanac -h', [ qw{ -horizon } ] );
 
 complete( 'almanac --h', [ qw{ --horizon } ] );
+
+complete( 'formatter ', [ qw{
+	date_format
+	desired_equinox_dynamical
+	gmt
+	local_coord
+	template
+	time_format
+	tz
+	} ] );
+
+complete( 'formatter d', [ qw{
+	date_format
+	desired_equinox_dynamical
+	} ] );
+
+complete( 'formatter te', [ qw{
+	template
+	} ] );
+
+complete( 'formatter template -', [ qw{
+	-changes
+	-raw
+	} ] );
+
+complete( 'formatter template lo', [ qw{
+	location
+	} ] );
 
 complete( 'macro ', [ qw{ brief define delete list load } ] );
 
@@ -104,8 +129,9 @@ sub complete {
     } else {
 	$text = '';
     }
-    my @rslt = Astro::App::Satpass2::__readline_completer_function(
-	$text, $line, $start );
+
+    my @rslt = $app->__readline_completer( $text, $line, $start );
+
     @_ = ( \@rslt, $want, $name || "Complete '$line'" );
     goto &is_deeply;
 }

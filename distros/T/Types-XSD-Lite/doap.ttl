@@ -14,11 +14,11 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008003"^^doap-deps:CpanId ], [
-		doap-deps:on "Type::Library 0.004"^^doap-deps:CpanId;
+		doap-deps:on "Type::Library 2.000000"^^doap-deps:CpanId;
 	];
 	doap-deps:test-recommendation [ doap-deps:on "Moo 1.003000"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [
-		doap-deps:on "Test::TypeTiny 0.004"^^doap-deps:CpanId;
+		doap-deps:on "Test::TypeTiny 2.000000"^^doap-deps:CpanId;
 	], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD-Lite>;
 	doap:created         "2013-07-08"^^xsd:date;
@@ -29,7 +29,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Types-XSD-Lite";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-006>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-007>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-types-xsd-lite>;
@@ -96,6 +96,21 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-XSD-Lite-0.006.tar.gz>;
 	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Types-XSD-Lite-0.007"^^xsd:string;
+	dc:issued            "2022-09-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Refactor facet-handling code to avoid poking too hard at Type::Tiny internals.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/djerius>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Types-XSD-Lite-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/brtastic>
 	a                    foaf:Person;

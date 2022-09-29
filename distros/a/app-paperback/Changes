@@ -1,5 +1,8 @@
 Revision history for Perl module and script App::paperback.
 
+1.36  Tue Sep 27 09:00:00 2022
+	- Renaming some variables to improve generalization
+
 1.35  Sat Sep 24 15:00:00 2022
 	- Perlify and improve speed of some conditionals
 

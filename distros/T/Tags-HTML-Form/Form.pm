@@ -10,7 +10,7 @@ use Data::HTML::Form;
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -232,7 +232,7 @@ sub _tags_input {
 		defined $object->value ? (
 			['a', 'value', $object->value],
 		) : (),
-		defined $object->checked ? (
+		$object->checked ? (
 			['a', 'checked', 'checked'],
 		) : (),
 		defined $object->placeholder ? (
@@ -491,6 +491,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

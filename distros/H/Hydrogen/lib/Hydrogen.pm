@@ -8,7 +8,7 @@ use Scalar::Util ();
 package Hydrogen;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015';
+our $VERSION   = '0.016';
 
 use Exporter::Shiny qw( croak fc );
 

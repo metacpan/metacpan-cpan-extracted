@@ -1,0 +1,71 @@
+{
+   "abstract" : "CLI argument and option processing",
+   "author" : [
+      "Mark Lawrence <nomad@null.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OptArgs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "OptArgs::Usage",
+         "Getopt::Args::Usage"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "File::Spec" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "2.24",
+            "Exporter::Tidy" : "0",
+            "File::Which" : "0",
+            "Getopt::Long" : "2.37",
+            "I18N::Langinfo" : "0",
+            "List::Util" : "0",
+            "Text::Abbrev" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Capture::Stdout" : "0",
+            "POSIX" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {},
+      "repository" : {
+         "type" : "git",
+         "url" : "ssh://git@github.com/mlawren/p5-OptArgs.git"
+      }
+   },
+   "version" : "v0.1.21",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

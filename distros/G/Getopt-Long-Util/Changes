@@ -1,3 +1,8 @@
+0.896   2022-08-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Add function: array_getopt_long_spec_to_hash.
+
+
 0.895   2021-07-10  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

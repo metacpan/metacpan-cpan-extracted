@@ -31,7 +31,7 @@ my $diva = Form::Diva->new(
             default => 2,
             values => [ '1:This', '2:That', '3:Something Else'],
         },
-        { 
+        {
             name => 'defaultzero',
             type => 'radio',
             default => 0,
@@ -52,17 +52,17 @@ is( $basic->[0]{input},
 </SELECT>|,
     'Check our select input, it has no elements' );
 
-like( $basic->[1]{input}, qr/name="checktest"/, 
+like( $basic->[1]{input}, qr/name="checktest"/,
     'input name is checktest');
-like( $basic->[1]{input}, qr/type="checkbox"/, 
+like( $basic->[1]{input}, qr/type="checkbox"/,
     'checktest is a checkbox');
-like( $basic->[1]{input}, qr/value="French" checked/, 
+like( $basic->[1]{input}, qr/value="French" checked/,
     'French is checked');
-like( $basic->[2]{input}, qr/name="radiotest"/, 
+like( $basic->[2]{input}, qr/name="radiotest"/,
     'input name is radiotest');
-like( $basic->[2]{input}, qr/type="radio"/, 
+like( $basic->[2]{input}, qr/type="radio"/,
     'radiotest is a radio');
-like( $basic->[2]{input}, qr/value="2" checked/, 
+like( $basic->[2]{input}, qr/value="2" checked/,
     'Value 2 is checked');
 like( $basic->[3]{input},
     qr/value="0" checked="checked"/,
@@ -74,23 +74,24 @@ my $data1 = {
 
 note( 'repeat the last generation with some data');
 my $basic_data = $diva->generate( $data1 );
-unlike( $basic_data->[1]{input}, qr/value="French" checked/, 
+unlike( $basic_data->[1]{input}, qr/value="French" checked/,
     'French is no lnger checked');
-like( $basic_data->[1]{input}, qr/value="Canadian" checked/, 
+like( $basic_data->[1]{input}, qr/value="Canadian" checked/,
     'Canadian is now checked');
-like( $basic_data->[2]{input}, qr/value="1" checked/, 
+like( $basic_data->[2]{input}, qr/value="1" checked/,
     'Value 1 is now checked in the radio');
 unlike( $basic_data->[3]{input},
     qr/value="0" checked="checked"/,
     "defaultzero value is not checked because there was data for other fields");
 
 note( 'override the empty list in the select');
-my $over = $diva->generate( {empty => 'dog'}, { 
+my $over = $diva->generate( {empty => 'dog'}, {
     empty => [ qw/ cat mouse dog rabbit deer /] }
     );
-like( $over->[0]{input}, qr/rabbit/, 
+like( $over->[0]{input}, qr/rabbit/,
     'rabbit now has an entry in select');
-like( $over->[0]{input}, qr/selected>dog/, 
+like( $over->[0]{input}, qr/selected>dog/,
     'selected dog in the data and dog is now selected');
 
 done_testing();
+

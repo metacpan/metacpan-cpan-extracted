@@ -1,6 +1,10 @@
 Revision history for Types::Mojo
 ================================
 
+0.06  2022-09-29 10:20:00
+
+    * remove duplicated coercion (thanks to E. Choroba, @choroba)
+
 0.05  2019-02-28 15:13:00
 
     * Fix parameter of MojoCollection (thanks to NGEFreak)

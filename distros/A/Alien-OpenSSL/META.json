@@ -26,6 +26,7 @@
          "requires" : {
             "Alien::Build" : "1.19",
             "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Build::SearchDep" : "0.35",
             "ExtUtils::MakeMaker" : "6.52",
             "Path::Tiny" : "0",
             "perl" : "5.006"
@@ -87,7 +88,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
@@ -99,6 +100,7 @@
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
             "Mojo::DOM58" : "1.00",
+            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "Test::More" : "0.96",
@@ -114,8 +116,8 @@
       "Graham Ollis <plicease@cpan.org>",
       "Salvador Fandi\u00f1o"
    ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "x_generated_by_perl" : "v5.37.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

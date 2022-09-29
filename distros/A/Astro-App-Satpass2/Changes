@@ -1,3 +1,18 @@
+0.050		2022-09-28	T. R. Wyant
+    Silence DM5 deprecation warnings.
+
+    More consistent testing of time parsing, primarily of DM6 and the
+    hand-rolled ISO parsing.
+
+    Fix Blead error, as of 6a011f13d7690dbe2e03ad7500756c983bcb1834
+
+    Add completion for formatter command.
+
+    Correct processing of options specified as hash refs to be more like
+    the processing of command-style options.
+
+    Have template pass_ics pay attention to --magnitude.
+
 0.049		2021-11-04	T. R. Wyant
     Add command completion if Term::ReadLine::Perl is available. This
     adds command, macro, and option completion to Term::ReadLine::Perl's

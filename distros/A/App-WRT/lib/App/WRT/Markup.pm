@@ -91,7 +91,10 @@ sub eval_perl {
 =item line_parse
 
 Performs substitutions on lines called by fragment_slurp, at least.  Calls
-include_process(), image_markup(), textile_process(), markdown_process().
+include_process(), image_markup(), textile_process(), markdown_process(),
+eval_perl().
+
+Applies before-parsing and after-parsing filters.
 
 Returns string.
 
@@ -118,6 +121,9 @@ Parses some special markup.  Specifically:
 sub line_parse {
     my $self = shift;
     my ($everything, $file) = (@_);
+
+    # Eventually, this should probably only happen for templates:
+    $everything = $self->eval_perl($everything);
 
     # Take care of <include>, <textile>, <markdown>, and <image> tags:
     include_process($self, $everything);

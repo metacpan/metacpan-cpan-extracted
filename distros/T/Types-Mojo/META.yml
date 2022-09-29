@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,9 +20,8 @@ name: Types-Mojo
 provides:
   Types::Mojo:
     file: lib/Types/Mojo.pm
-    version: '0.05'
+    version: '0.06'
 requires:
-  List::Util: '0'
   Mojolicious: '8'
   Scalar::Util: '0'
   Type::Library: '1.004004'
@@ -30,11 +29,13 @@ requires:
   Types::Standard: '1.004004'
   perl: '5.010001'
 resources:
-  bugtracker: http://github.com/reneeb/Types-Mojo/issues
-  homepage: http://github.com/reneeb/Types-Mojo
+  bugtracker: https://github.com/reneeb/Types-Mojo/issues
+  homepage: https://github.com/reneeb/Types-Mojo
   repository: git://github.com/reneeb/Types-Mojo.git
-version: '0.05'
+version: '0.06'
 x_contributors:
+  - 'E. Choroba <choroba@matfyz.cz>'
   - 'NGEfreak <NGEfreak@users.noreply.github.com>'
   - 'reneeb <info@perl-services.de>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

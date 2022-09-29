@@ -40,3 +40,29 @@ int32_t SPVM__Sys__Socket__In_addr__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   return 0;
 }
+
+int32_t SPVM__Sys__Socket__In_addr__s_addr(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_address = stack[0].oval;
+  
+  struct in_addr* address = env->get_pointer(env, stack, obj_address);
+  
+  assert(address);
+  
+  stack[0].ival = address->s_addr;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__In_addr__set_s_addr(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_address = stack[0].oval;
+  
+  struct in_addr* address = env->get_pointer(env, stack, obj_address);
+  
+  assert(address);
+
+  address->s_addr = stack[1].ival;
+  
+  return 0;
+}

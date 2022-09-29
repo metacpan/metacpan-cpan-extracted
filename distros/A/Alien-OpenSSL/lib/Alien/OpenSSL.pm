@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Alien wrapper for OpenSSL
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 
@@ -28,7 +28,7 @@ Alien::OpenSSL - Alien wrapper for OpenSSL
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 

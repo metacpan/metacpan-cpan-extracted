@@ -1,0 +1,1 @@
+class Sys::Socket::Error;

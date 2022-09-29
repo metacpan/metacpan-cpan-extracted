@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2022/08/05
+## Modified 2022/09/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -109,7 +109,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 use strict;
@@ -179,6 +179,8 @@ sub attach
 sub base64 { return( shift->_set_get_scalar( 'base64', @_ ) ); }
 
 sub cbor { return( shift->_packing_method( 'cbor' ) ); }
+
+sub close { return( shift->remove( @_ ) ); }
 
 sub create { return( shift->_set_get_boolean( 'create', @_ ) ); }
 
@@ -1280,7 +1282,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

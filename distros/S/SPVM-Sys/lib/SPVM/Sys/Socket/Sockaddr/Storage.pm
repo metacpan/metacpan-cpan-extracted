@@ -32,27 +32,33 @@ Create a new C<Sys::Socket::Sockaddr::Storage> object.
 
 =head2 DESTROY
 
-  method DESTROY : void ();
+  method DESTROY : void ()
 
 The destructor.
 
 =head2 sa_family
 
-  method sa_family : int ()
+  method sa_family : byte ()
 
-Get C<sa_family>. This is the overriden method of the L<sa_family|SPVM::Sys::Socket::Sockaddr/"sa_family"> method in the Sys::Socket::Sockaddr class.
+Gets C<sa_family>. This is the overriden method of the L<sa_family|SPVM::Sys::Socket::Sockaddr/"sa_family"> method in the Sys::Socket::Sockaddr class.
 
 =head2 ss_family
 
-  method ss_family : int ();
+  method ss_family : int ()
 
-Get C<ss_family>.
+Gets C<ss_family>.
 
 =head2 set_ss_family
 
-  method set_ss_family : void ();
+  method set_ss_family : void ($family : byte)
 
-Set C<ss_family>.
+Sets C<ss_family>.
+
+=head2 sizeof
+
+  method sizeof : int ()
+
+The size of C<struct sockaddr_storage>.
 
 =head1 Copyright & License
 

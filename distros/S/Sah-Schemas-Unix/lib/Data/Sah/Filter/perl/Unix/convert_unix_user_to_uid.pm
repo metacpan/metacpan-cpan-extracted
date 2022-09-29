@@ -1,13 +1,13 @@
 package Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-29'; # DATE
-our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.018'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-07-24'; # DATE
+our $DIST = 'Sah-Schemas-Unix'; # DIST
+our $VERSION = '0.019'; # VERSION
 
 sub meta {
     +{
@@ -48,7 +48,7 @@ Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid
 
 =head1 VERSION
 
-This document describes version 0.018 of Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid (from Perl distribution Sah-Schemas-Unix), released on 2021-07-29.
+This document describes version 0.019 of Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 =for Pod::Coverage ^(meta|filter)$
 
@@ -59,14 +59,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Unix>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Unix>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -79,11 +71,36 @@ L<Data::Sah::Filter::perl::Unix::try_convert_unix_group_to_gid>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Unix>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

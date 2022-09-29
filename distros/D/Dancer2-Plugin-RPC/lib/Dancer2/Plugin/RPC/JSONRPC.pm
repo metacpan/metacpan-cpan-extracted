@@ -332,7 +332,7 @@ The publiser key determines the way one connects the rpc-method name with the ac
 This way of publishing requires you to create a dispatch-table in the app's config YAML:
 
     plugins:
-        "RPC::JSON":
+        "RPC::JSONRPC":
             '/endpoint':
                 'MyProject::Admin':
                     admin.someFunction: rpc_admin_some_function_name
@@ -359,11 +359,11 @@ The code_ref you supply, gets the C<arguments> value of the C<%publisher_argumen
 A dispatch-table looks like:
 
     return {
-        'admin.someFuncion' => dispatch_item(
+        'admin.someFuncion' => Dancer2::RPCPlugin::DispatchItem->new(
             package => 'MyProject::Admin',
             code    => MyProject::Admin->can('rpc_admin_some_function_name'),
         ),
-        'user.otherFunction' => dispatch_item(
+        'user.otherFunction' => Dancer2::RPCPlugin::DispatchItem->new(
             package => 'MyProject::User',
             code    => MyProject::User->can('rpc_user_other_function_name'),
         ),
@@ -392,13 +392,15 @@ Deserializes the string as Perl-datastructure.
 
 Returns a jsonrpc response as a hashref.
 
-=head2 build_dispatcher_from_config
+=over
 
-Creates a (partial) dispatch table from data passed from the (YAML)-config file.
+=item B<jsonrpc> => I<2.0>
 
-=head2 build_dispatcher_from_pod
+=item B<id> => I<request_id>
 
-Creates a (partial) dispatch table from data provided in POD.
+=item B<result | error> => I<result_data | jsonrpc_error_struct>
+
+=back
 
 =begin pod_coverage
 
@@ -408,6 +410,6 @@ Creates a (partial) dispatch table from data provided in POD.
 
 =head1 COPYRIGHT
 
-(c) MMXVI - Abe Timmerman <abeltje@cpan.org>.
+E<copy> MMXVI - Abe Timmerman <abeltje@cpan.org>.
 
 =cut

@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-frame
 
+0.07 2022-09-29T02:41:48Z
+
+    - add experimental --frame-pages option
+
 0.06 2022-07-15T10:00:26Z
 
     - update frame format

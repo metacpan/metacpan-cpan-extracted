@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "1.08";
+our $VERSION = "1.09";
 
 use Cwd;
 use Term::ReadLine;
@@ -29,25 +29,27 @@ if ( !$@ ) {
     $HAVE_ModRefresh = 1;
 }
 
-my %COMMANDS_INT = (
+my %COMMANDS_INTERNAL = (
     debug     => 'print command',
     exit      => 'exit shell'
 );
 
 my %COMMANDS = (
-    cd        => 'change directory',
-    cls       => 'clear screen',
-    clear     => 'clear screen',
-    commands  => 'print available "commands" (sub)',
-    dir       => 'directory listing',
-    dumper    => 'use Data::Dumper to display variable',
-    help      => 'shell help - print this',
-    ls        => 'directory listing',
-    modules   => 'list used modules',
-    perldoc   => 'perldoc for current package',
-    pwd       => 'print working directory',
-    session   => 'start / stop logging session',
-    variables => 'list defined variables'
+    'cd'        => 'change directory',
+    'cls'       => 'clear screen',
+    'clear'     => 'clear screen',
+    'commands'  => 'print available "commands" (sub)',
+    'dir'       => 'directory listing',
+    'dumper'    => 'use Data::Dumper to display variable',
+    'env'       => 'list environment variables',
+    'help'      => 'shell help - print this',
+    'ls'        => 'directory listing',
+    'modules'   => 'list used modules',
+    'perldoc'   => 'perldoc for current package',
+    'pwd'       => 'print working directory',
+    'session'   => 'start / stop logging session',
+    'variables' => 'list defined variables',
+    'version'   => 'print version information'
 );
 
 use Exporter;
@@ -55,7 +57,7 @@ our @EXPORT = sort ( keys ( %COMMANDS ) );
 our @ISA = qw ( Exporter );
 
 sub _shellCommands {
-    return ( %COMMANDS, %COMMANDS_INT );
+    return ( %COMMANDS, %COMMANDS_INTERNAL );
 }
 
 sub new {
@@ -70,6 +72,7 @@ sub new {
     );
 
     my $lex = 0;
+    my $verbose = 0;
     if ( @_ == 1 ) {
         croak("Insufficient number of args - @_");
     } else {
@@ -89,8 +92,9 @@ sub new {
                 $params{package} = $cfg{$_};
             } elsif (/^-?prompt$/i) {
                 $params{prompt} = $cfg{$_};
+            } elsif (/^-?feature$/i) {
+                $params{feature} = $cfg{$_};
             } elsif (/^-?session$/i) {
-
                 # assign, will test open in run()
                 $params{session} = $cfg{$_};
             } elsif (/^-?skipvars$/i) {
@@ -99,6 +103,8 @@ sub new {
                 } else {
                     croak("Not array reference `$cfg{$_}'");
                 }
+            } elsif (/^-?verbose$/i) {
+                $verbose = 1;
             } else {
                 croak("Unknown parameter `$_' => `$cfg{$_}'");
             }
@@ -114,16 +120,25 @@ sub new {
                 "-lexical specified, `Lexical::Persistence' required but not found"
             );
         }
-    } else {
-        $ENV{PERLSHELL_PACKAGE} = $params{package};
     }
-    $ENV{PERLSHELL_HOME}   = $params{homedir};
-    $ENV{PERLSHELL_PROMPT} = $params{prompt};
+
+    # Setup Environment Variables
+    $ENV{PERLSHELL_FEATURE} = $params{feature};
+    $ENV{PERLSHELL_HOME}    = $params{homedir};
+    $ENV{PERLSHELL_PACKAGE} = $params{package};
+    $ENV{PERLSHELL_PERLDOC} = 'perldoc';
+    $ENV{PERLSHELL_PROMPT}  = $params{prompt};
+    $ENV{PERLSHELL_SEMIOFF} = 0;
     if ( defined $params{skipvars} ) {
         $ENV{PERLSHELL_SKIPVARS} = join ';', @{$params{skipvars}};
     }
 
+    if ( $verbose ) {
+        print "$params{execute}\n";
+    }
+
     # clean up object
+    delete $params{feature};
     delete $params{homedir};
     delete $params{package};
     delete $params{prompt};
@@ -288,6 +303,10 @@ sub run {
                 }
             }
 
+            $App_PerlShell_Shell->{shellCmdLine}
+              = "use feature qw(" . $ENV{PERLSHELL_FEATURE} . ");\n"
+              . $App_PerlShell_Shell->{shellCmdLine};
+
             # execute
             eval {
                 $App_PerlShell_Shell->{shellLexEnv}
@@ -303,8 +322,8 @@ sub run {
                 }
             }
             $App_PerlShell_Shell->{shellCmdLine}
-              = "package "
-              . $ENV{PERLSHELL_PACKAGE} . ";\n"
+              = "package " . $ENV{PERLSHELL_PACKAGE} . ";\n"
+              . "use feature qw(" . $ENV{PERLSHELL_FEATURE} . ");\n"
               . $App_PerlShell_Shell->{shellCmdLine}
               . "\nBEGIN {\$ENV{PERLSHELL_PACKAGE} = __PACKAGE__}";
 
@@ -318,11 +337,13 @@ sub run {
         # logging if requested and no error
         if ( defined( $ENV{PERLSHELL_SESSION} ) and !$@ ) {
 
+            # clean up command if we added stuff while not in -lex mode
+            $App_PerlShell_Shell->{shellCmdLine} =~ s/^package .*?;\n//;
+            $App_PerlShell_Shell->{shellCmdLine} =~ s/^use feature qw\(.*?\);\n//;
+
             # don't log session start command
             $App_PerlShell_Shell->{shellCmdLine} =~ s/\s*session\s*.*//;
 
-            # clean up command if we added stuff while not in -lex mode
-            $App_PerlShell_Shell->{shellCmdLine} =~ s/^package .*;\n//;
             $App_PerlShell_Shell->{shellCmdLine}
               =~ s/(?:\n)?BEGIN \{\$ENV\{PERLSHELL_PACKAGE\} = __PACKAGE__\}//;
 
@@ -420,6 +441,42 @@ sub dumper {
     use Data::Dumper;
     $Data::Dumper::Sortkeys = 1;
     print Dumper @dump;
+}
+
+sub env {
+    my ($arg) = @_;
+
+    my %rets;
+    my $retType = wantarray;
+
+    my $FOUND = 0;
+    for my $env ( sort( keys(%ENV) ) ) {
+        if ( defined $arg ) {
+            if ( $env =~ /$arg/ ) {
+                $rets{$env} = $ENV{$env};
+                $FOUND = 1;
+            }
+        } else {
+            $rets{$env} = $ENV{$env};
+            $FOUND = 1;
+        }
+    }
+
+    if ( !$FOUND ) {
+        printf "Environment variable(s) not found%s",
+          ( defined $arg ) ? " - `$arg'\n" : "\n";
+    }
+
+    if ( not defined $retType ) {
+        for my $env ( sort( keys(%rets) ) ) {
+            printf "$env=%s\n",
+              ( defined $rets{$env} ) ? $rets{$env} : "";
+        }
+    } elsif ($retType) {
+        return %rets;
+    } else {
+        return \%rets;
+    }
 }
 
 sub help {
@@ -520,7 +577,7 @@ sub perldoc {
         $args[0] = $ENV{PERLSHELL_PACKAGE} . $args[0];
     }
 
-    system( "perldoc", @args );
+    system( $ENV{PERLSHELL_PERLDOC}, @args );
 }
 
 sub pwd {
@@ -638,6 +695,12 @@ sub variables {
     }
 }
 
+sub version {
+    print Cwd::abs_path($0) . "\n" .
+          "Perl           = $]\n" .
+          "App::PerlShell = $VERSION\n";
+}
+
 1;
 
 __END__
@@ -688,20 +751,20 @@ without a ton of external dependencies.  I didn't want that trade off;
 I wanted functions B<without> dependencies.
 
 I also wanted to emulate a shell - not necessarily a REPL 
-(Read-Evaluate-Parse-Loop).  In the way sh, Bash, csh and others *nix or 
-cmd.exe on Windows are a shell - I wanted a Perl Shell.  For example, 
-many of the above modules will evaluate an expression:
+(Read-Evaluate-Parse-Loop).  In the way C<sh>, C<bash>, C<csh> and other 
+*nix or C<cmd.exe> or C<PowerShell> on Windows are a shell - I wanted a Perl 
+Shell.  For example, many of the above modules will evaluate an expression:
 
  5+1
  6
 
-If I enter "5+1" in cmd.exe or Bash, I don't get 6, I get an error.  In a 
-Perl program, if I have a line "5+1;", I get an error in execution.  If I 
-really want "6", I need to "print 5+1;".  And so it should be in the Perl 
+If I enter C<5+1> in C<cmd.exe> or C<bash>, I don't get C<6>, I get an error.  
+In a Perl program, if I have a line C<5+1;>, I get an error in execution.  If I 
+really want C<6>, I need to C<print 5+1;>.  And so it should be in the Perl 
 Shell.
 
 This is much closer to a command prompt / terminal than a REPL.  As such, 
-some basic shell commands are provided, like 'ls', 'cd' and 'pwd' for 
+some basic shell commands are provided, like C<ls>, C<cd> and C<pwd> for 
 example.
 
 =head1 CAVEATS
@@ -724,6 +787,7 @@ parameters.  Valid options are:
   ------     -----------                             -------
   -execute   Valid Perl code ending statements with  (none)
              semicolon (;).
+  -feature   Perl feature set to use e.g., ":5.10"   :default
   -homedir   Specify home directory.                 $ENV{HOME} or
              Used for `cd' with no argument.         $ENV{USERPROFILE}
   -lexical   Require "my" for variables.             (off)
@@ -744,8 +808,8 @@ Run the shell.  Provides interactive environment for entering commands.
 =head1 COMMANDS
 
 In the interactive shell, all valid Perl commands can be entered.  This 
-includes constructs like 'for () {}' and 'if () {} ... else {}' as well 
-as any subs from 'use'ed modules.  The following are also provided.
+includes constructs like C<for () {}> and C<if () {} ... else {}> as well 
+as any subs from C<use>'d modules.  The following are also provided.
 
 =over 4
 
@@ -780,7 +844,13 @@ Optional return value is array of output.
 
 =item B<dumper> $var
 
-Displays B<$var> with Data::Dumper.
+Displays C<$var> with Data::Dumper.
+
+=item B<env> [('SEARCH')]
+
+Displays environment variables.  With 'SEARCH', displays matching environment  
+variables.  Optional return value is hash with environment variables names as 
+keys and values as values.
 
 =item B<exit>
 
@@ -798,9 +868,9 @@ locations as values.
 
 =item B<perldoc> [('OPTIONS')]
 
-Open `perldoc` for current PACKAGE.  'OPTIONS' can start with '::' to 
-append to current PACKAGE, be a full Package name or use `perldoc` 
-command line options (e.g., "-f pack").
+Open C<perldoc> for current PACKAGE.  'OPTIONS' can start with '::' to 
+append to current PACKAGE, be a full Package name or use C<perldoc> 
+command line options (e.g., C<-f pack>).
 
 =item B<pwd>
 
@@ -814,6 +884,10 @@ file.  Use C<session (':close')> to end.
 =item B<variables>
 
 List user defined variables currently active in current package in shell.
+
+=item B<version>
+
+Print version information.
 
 =back
 
@@ -839,7 +913,7 @@ If you don't know what that means visit L<http://perl.com/>.
 
 =head1 AUTHOR
 
-Copyright (c) 2015 Michael Vincent
+Copyright (c) 2015-2022 Michael Vincent
 
 L<http://www.VinsWorld.com>
 

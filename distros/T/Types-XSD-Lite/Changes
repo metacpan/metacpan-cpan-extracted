@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Types-XSD-Lite>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Types-XSD-Lite>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.007	2022-09-23
+
+ - Updated: Refactor facet-handling code to avoid poking too hard at
+   Type::Tiny internals.
+   Diab Jerius++
+
 0.006	2021-01-08
 
  [ Bug Fixes ]

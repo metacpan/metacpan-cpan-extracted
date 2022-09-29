@@ -1,18 +1,21 @@
-Revision history for App-chalk
+0.050   2022-09-29  Released-By: PERLANCAR; Urgency: medium
 
-0.04    2015-07-22 (PERLANCAR)
+        - Add -n option for optional newline (RT#142212).
+
+
+0.04    2015-07-22  Released-By: PERLANCAR
 
 	- Observe envs COLOR & FORCE_COLOR (like in node's version).
 
 
-0.03    2015-07-22 (PERLANCAR)
+0.03    2015-07-22  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Add benchmark script.
 
 
-0.02    2015-07-21 (PERLANCAR)
+0.02    2015-07-21  Released-By: PERLANCAR
 
         - [Bugfix] Need to reset color before newline.
 
@@ -21,6 +24,6 @@ Revision history for App-chalk
         - [doc] Remove unnecessary example.
 
 
-0.01    2015-07-21 (PERLANCAR)
+0.01    2015-07-21  Released-By: PERLANCAR
 
         - First release.

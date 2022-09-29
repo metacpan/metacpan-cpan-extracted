@@ -1150,10 +1150,16 @@ static void S_copy_result(pTHX_ struct FutureXS *self, SV *src)
   /* TODO: Handle non-Future::XS instances too */
   struct FutureXS *srcself = get_future(src);
 
-  if(srcself->failure)
+  assert(srcself->ready);
+  assert(!srcself->cancelled);
+
+  if(srcself->failure) {
     self->failure = newAV_svn_dup(AvARRAY(srcself->failure), av_count(srcself->failure));
-  else
-    self->result  = newAV_svn_dup(AvARRAY(srcself->result),  av_count(srcself->result));
+  }
+  else {
+    assert(srcself->result);
+    self->result = newAV_svn_dup(AvARRAY(srcself->result),  av_count(srcself->result));
+  }
 }
 
 #define cancel_pending_subs(self)  S_cancel_pending_subs(aTHX_ self)
@@ -1280,7 +1286,7 @@ SV *Future_new_waitanyv(pTHX_ const char *cls, SV **subs, size_t n)
   SV *immediate_ready = NULL;
   for(Size_t i = 0; i < n; i++) {
     /* TODO: This should probably use some API function to make it transparent */
-    if(future_is_ready(subs[i])) {
+    if(future_is_ready(subs[i]) && !future_is_cancelled(subs[i])) {
       immediate_ready = subs[i];
       break;
     }
@@ -1307,6 +1313,9 @@ SV *Future_new_waitanyv(pTHX_ const char *cls, SV **subs, size_t n)
   CvANON_off(sub_on_ready);
 
   for(Size_t i = 0; i < n; i++) {
+    if(future_is_cancelled(subs[i]))
+      continue;
+
     future_on_ready(subs[i], sv_2mortal(newRV_inc((SV *)sub_on_ready)));
     self->pending_subs++;
   }
@@ -1377,6 +1386,11 @@ SV *Future_new_needsallv(pTHX_ const char *cls, SV **subs, size_t n)
 
   SV *immediate_fail = NULL;
   for(Size_t i = 0; i < n; i++) {
+    if(future_is_cancelled(subs[i])) {
+      future_failp(f, "A component future was cancelled");
+      cancel_pending_subs(self);
+      return f;
+    }
     if(future_is_failed(subs[i])) {
       immediate_fail = subs[i];
       break;

@@ -1,3 +1,10 @@
+0.04 2022-09-29T10:28:58+02:00
+ - Add tests for Data::HTML::Form.
+ - Fix minimal dependency for Mo::utils.
+
+0.03 2022-09-28T13:46:02+02:00
+ - Fix minimal dependency for Mo::utils::check_bool().
+
 0.02 2022-09-14T10:53:59+02:00
  - Add constructor tests for Data::HTML::Form.
  - Fix dependencies.

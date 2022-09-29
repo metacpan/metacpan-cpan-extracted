@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::Code;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015';
+our $VERSION   = '0.016';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::Code - a standard library for code blocks
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Code 0.015,
-which is based on Sub::HandlesVia::HandlerLibrary::Code 0.036.
+This documentation is for Hydrogen::Code 0.016,
+which is based on Sub::HandlesVia::HandlerLibrary::Code 0.037.
 
 =cut
 

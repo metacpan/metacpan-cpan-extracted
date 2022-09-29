@@ -40,14 +40,14 @@ sub TIEHASH
     @$list{ @$disable } = ( 1 ) x scalar( @$disable );
     my $hash =
     {
-    ## The caller sets this to its class, so we can differentiate calls from inside and outside our caller's package
+    # The caller sets this to its class, so we can differentiate calls from inside and outside our caller's package
     disable => $list,
     debug => $opts->{debug},
-    ## When disabled, the Tie::Hash system will return hash key values directly under $self instead of $self->{data}
-    ## Disabled by default so the new() method can access its setup data directly under $self
-    ## Then new() can call enable to active it
+    # When disabled, the Tie::Hash system will return hash key values directly under $self instead of $self->{data}
+    # Disabled by default so the new() method can access its setup data directly under $self
+    # Then new() can call enable to active it
     enable => 0,
-    ## Where to store the actual hash data
+    # Where to store the actual hash data
     data  => {},
     };
     my $class = ref( $self ) || $self;

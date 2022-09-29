@@ -45,6 +45,7 @@
             "Clone" : "0",
             "Getopt::EX" : "v2.1.1",
             "Getopt::EX::Hashed" : "1.05",
+            "Getopt::EX::RPN" : "0.01",
             "List::Util" : "1.56",
             "Math::RPN" : "0",
             "Term::ReadKey" : "0",
@@ -63,7 +64,7 @@
    "provides" : {
       "App::ansicolumn" : {
          "file" : "lib/App/ansicolumn.pm",
-         "version" : "1.22"
+         "version" : "1.23"
       },
       "App::ansicolumn::Border" : {
          "file" : "lib/App/ansicolumn/Border.pm"
@@ -84,7 +85,7 @@
          "web" : "https://github.com/kaz-utashiro/App-ansicolumn"
       }
    },
-   "version" : "1.22",
+   "version" : "1.23",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

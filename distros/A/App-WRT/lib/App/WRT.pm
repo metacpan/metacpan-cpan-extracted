@@ -16,7 +16,7 @@ package App::WRT;
 # without overthinking a bunch of hair-splitting decisions and categories,
 # but whatever.  I'll try to follow it, roughly.
 
-use version; our $VERSION = version->declare("v7.1.2");
+use version; our $VERSION = version->declare("v8.0.0");
 
 use strict;
 use warnings;
@@ -39,6 +39,7 @@ use XML::Atom::SimpleFeed;
 use App::WRT::Date qw(iso_date rfc_3339_date get_mtime month_name);
 use App::WRT::EntryStore;
 use App::WRT::FileIO;
+use App::WRT::Filters;
 use App::WRT::HTML qw(:all);
 use App::WRT::Image qw(image_size);
 use App::WRT::Markup qw(line_parse image_markup eval_perl);
@@ -276,6 +277,7 @@ Here's a verbatim copy of C<%default>, with some commentary about values.
     my %default = (
       root_dir       => '.',         # dir for wrt repository
       entry_dir      => 'archives',  # dir for entry files
+      filter_dir     => 'filters',   # dir to contain filter scripts
       publish_dir    => 'public',    # dir to publish site to
       url_root       => "/",         # root URL for building links
       image_url_root => '',          # same for images
@@ -311,6 +313,7 @@ my %default = (
   root_dir       => '.',         # dir for wrt repository
   root_dir_abs   => undef,       # for stashing absolute path to wrt repo
   entry_dir      => 'archives',  # dir for entry files
+  filter_dir     => 'filters',   # dir to contain filter scripts
   publish_dir    => 'public',    # dir to publish site to
   url_root       => "/",         # root URL for building links
   image_url_root => '',          # same for images
@@ -444,6 +447,7 @@ sub new {
   $self->{template_source} = file_get_contents($self->{template_path});
 
   $self->{entries} = App::WRT::EntryStore->new( $self->{entry_dir} );
+  $self->{filters} = App::WRT::Filters->new( $self->{filter_dir} );
 
   $self->populate_entry_caches();
   $self->populate_metadata_cache();
@@ -468,6 +472,7 @@ sub populate_entry_caches {
     next unless length $html_cache{$entry};
 
     my @headers;
+
     eval {
       local $SIG{__WARN__} = sub { die; };
       my $dom = Mojo::DOM->new($html_cache{$entry});
@@ -600,10 +605,9 @@ sub display {
   # code.  For now, I'm leaving it alone.
 
   # Evaluate the template much like an entry:
-  return $self->line_parse(
-    $self->eval_perl($self->{template_source}),
-    $self->{template_path}
-  );
+  # Eventually, the eval_perl() call should probably be hoisted up here and
+  # only used for templates.
+  return $self->line_parse($self->{template_source}, $self->{template_path});
 }
 
 =item handle($entry)
@@ -622,12 +626,12 @@ sub handle {
   my ($self, $entry) = @_;
 
   for ($entry) {
-    if ($_ eq 'index'            ) { return entry(@_);                  }
-    if (m'^[\d/]+[[:lower:]_/]+$') { return entry_stamped(@_, 'index'); }
-    if (m'^\d+/\d{1,2}/\d{1,2}$' ) { return entry_stamped(@_, 'all');   }
-    if (m'^\d+/\d{1,2}$'         ) { return month(@_);                  }
-    if (m'^\d+$'                 ) { return year(@_);                   }
-    if (m'^[[:lower:]_]'         ) { return entry_stamped(@_, 'index'); }
+    return entry(@_)                  if $_ eq 'index';
+    return entry_stamped(@_, 'index') if m'^ [\d/]+ [[:lower:]_ /]+  $'x;
+    return entry_stamped(@_, 'all')   if m'^ \d+ / \d{1,2} / \d{1,2} $'x;
+    return month(@_)                  if m'^ \d+ / \d{1,2}           $'x;
+    return year(@_)                   if m'^ \d+                     $'x;
+    return entry_stamped(@_, 'index') if m'^ [[:lower:]_]             'x;
   }
 }
 
@@ -869,7 +873,7 @@ sub entry_tag_list {
   } $self->{entries}->props_for($entry);
 
   if (@tags) {
-    return 'tags: ' . join ', ', map {
+    return '<b>tags:</b> ' . join ', ', map {
       s/^tag[.](.*)$/$1/;
       s{[.]}{/}g;
       a(encode_entities($_), { href => $self->{url_root} . $_ })
@@ -889,36 +893,31 @@ sub entry {
   my ($self, $entry, $level) = @_;
   $level ||= 'index';
 
-  # Location of entry on local filesystem, and its URL:
-  my ($entry_loc, $entry_url) = $self->root_locations($entry);
-
   my $result;
 
   # Display an icon, if we have one:
-  if ( my $ico_markup = $self->icon_markup($entry) ) {
-    $result .= heading($ico_markup, 2) . "\n\n";
+  if ( my $icon_markup = $self->icon_markup($entry) ) {
+    $result = heading($icon_markup, 2) . "\n\n";
   }
 
-  # For text files:
+  # Note this may be an empty string
+  $result .= $self->get_entry_body($entry);
+
+  # For text files we can bail out early:
   if ($self->{entries}->is_file($entry)) {
-    return $result . $self->fragment_slurp($entry_loc);
+    return $result;
   }
 
   # Past this point, we're assuming a directory.
 
-  # Print index as head, if extant and a normal file:
-  if ($self->{entries}->has_index($entry)) {
-    $result .= $self->fragment_slurp("$entry_loc/index");
-  }
-
-  # Followed by any sub-entries:
+  # Head of entry is followed by any sub-entries:
   my @sub_entries = $self->{entries}->get_sub_entries($entry);
 
   if (@sub_entries >= 1) {
-    # If the wrt-noexpand property is present, then don't expand sub-entries.
-    # A hack.
-
     if ($level eq 'index' || $self->{entries}->has_prop($entry, 'wrt-noexpand')) {
+      # If we're only supposed to show the index, or the wrt-noexpand property
+      # is present, then don't expand sub-entries.  A hack.
+
       # Icons or text links:
       $result .= $self->list_contents($entry, @sub_entries);
     }
@@ -926,6 +925,8 @@ sub entry {
       # Everything displayable in the directory:
       foreach my $se (@sub_entries) {
         next if ($se =~ $self->{binfile_expr});
+
+        # Recurse violently:
         $result .= p({class => 'centerpiece'}, '+')
                  . $self->entry("$entry/$se");
       }
@@ -939,6 +940,55 @@ sub entry {
   }
 
   return $result;
+}
+
+=item get_entry_body($entry)
+
+Returns the markup for an entry's body - which will be either the contents of
+the entry if it's a text file, or an index file contained therein if it's a
+directory.
+
+Also handles any filters.
+
+=cut
+
+sub get_entry_body {
+  my ($self, $entry) = @_;
+
+  # Location of entry on local filesystem, and its URL:
+  my ($entry_loc, $entry_url) = $self->root_locations($entry);
+
+  my $path_to_body;
+
+  # For entries which are text files:
+  if ($self->{entries}->is_file($entry)) {
+    $path_to_body = $entry_loc;
+  }
+
+  # For entries which are directories containing an index:
+  if ($self->{entries}->has_index($entry)) {
+    $path_to_body = "$entry_loc/index";
+  }
+
+  # Process filters
+  my @filter_list;
+  if ($self->{entries}->has_prop($entry, 'filters')) {
+    my $filter_prop = $self->{entries}->prop_value($entry, 'filters');
+    @filter_list = split("\n", $filter_prop);
+  }
+
+  if (defined $path_to_body) {
+    my $html = $self->line_parse(
+      file_get_contents($path_to_body),
+      $path_to_body
+    );
+    if (scalar @filter_list) {
+      return $self->{filters}->dispatch($entry, $html, @filter_list);
+    }
+    return $html;
+  }
+
+  return '';
 }
 
 =item list_contents($entry, @entries)
@@ -1066,31 +1116,13 @@ sub datestamp {
              title => $fragment }, $fragment);
   }
 
-  my $stamp = join(" /\n", @fragment_stamps);
+  my $stamp = p({class => 'datestamp'}, join(" /\n", @fragment_stamps));
   my $tag_list = $self->entry_tag_list($entry);
   if ($tag_list) {
-    $stamp .= "<br>\n$tag_list";
+    $stamp = "\n" . p({class => 'tags'}, $tag_list) . $stamp;
   }
 
-  return p({class => 'datestamp'}, "\n<i>$stamp</i>\n");
-}
-
-=item fragment_slurp($file)
-
-Read a text fragment, call line_parse() and eval_perl() to take care of
-lightweight markup sections and interpret embedded code, and then return it as
-a string. Takes one parameter, the name of the file.
-
-=cut
-
-sub fragment_slurp {
-  my $self = shift;
-  my ($file) = @_;
-
-  return $self->line_parse(
-    $self->eval_perl(file_get_contents($file)),
-    $file
-  );
+  return "\n$stamp\n";
 }
 
 =item root_locations($file)
@@ -1282,14 +1314,13 @@ Image::Size, and about a gazillion static site generators.
 
 =head1 AUTHOR
 
-Copyright 2001-2019 Brennen Bearnes
+Copyright 2001-2022 Brennen Bearnes
 
 =head1 LICENSE
 
     wrt is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+    the Free Software Foundation, version 2 or 3 of the License.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of

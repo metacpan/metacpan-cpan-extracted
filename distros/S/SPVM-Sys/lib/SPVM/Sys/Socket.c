@@ -10,6 +10,7 @@
 # include <ws2tcpip.h>
 # include <winsock2.h>
 # include <io.h>
+# include <winerror.h>
 #else
 # include <sys/types.h>
 # include <sys/socket.h>
@@ -26,6 +27,271 @@ static int32_t FIELD_INDEX_ADDRINFO_MEMORY_ALLOCATED = 0;
 static int32_t ADDRINFO_MEMORY_ALLOCATED_BY_NEW = 1;
 static int32_t ADDRINFO_MEMORY_ALLOCATED_BY_GETADDRINFO = 2;
 
+static int32_t socket_errno (void) {
+#ifdef _WIN32
+  return WSAGetLastError();
+#else
+  return errno;
+#endif
+}
+
+#ifdef _WIN32
+static void* socket_strerror_string_win (SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
+  char* error_message = NULL;
+  FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 
+                 NULL, error_number,
+                 MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+                 (LPSTR)&error_message, length, NULL);
+  
+  void* obj_error_message = env->new_string(env, stack, error_message, strlen(error_message));
+  
+  LocalFree(error_message);
+  
+  return obj_error_message;
+}
+#endif
+
+static void* socket_strerror_string (SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
+  void*
+#ifdef _WIN32
+  obj_strerror_value = socket_strerror_string_win(env, stack, error_number, length);
+#else
+  obj_strerror_value = env->strerror_string(env, stack, error_number, length);
+#endif
+  return obj_strerror_value;
+}
+
+
+static const char* socket_strerror(SPVM_ENV* env, SPVM_VALUE* stack, int32_t error_number, int32_t length) {
+  void* obj_socket_strerror = socket_strerror_string(env, stack, error_number, length);
+  
+  const char* ret_socket_strerror = NULL;
+  if (obj_socket_strerror) {
+    ret_socket_strerror = env->get_chars(env, stack, obj_socket_strerror);
+  }
+  
+  return ret_socket_strerror;
+}
+
+int32_t SPVM__Sys__Socket__socket_errno(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t ret_socket_errno = socket_errno();
+  
+  stack[0].ival = ret_socket_errno;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__socket_strerror(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t error_number = stack[0].ival;
+  int32_t length = stack[1].ival;
+  
+  void* obj_socket_strerror = socket_strerror_string(env, stack, error_number, length);
+  
+  stack[0].oval = obj_socket_strerror;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__htonl(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t hostlong = stack[0].ival;
+  
+  int32_t netlong = htonl(hostlong);
+  
+  stack[0].ival = netlong;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__htons(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int16_t hostshort = stack[0].sval;
+  
+  int16_t netshort = htons(hostshort);
+  
+  stack[0].sval = netshort;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__ntohl(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t netlong = stack[0].ival;
+  
+  int32_t hostlong = ntohl(netlong);
+  
+  stack[0].ival = hostlong;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__ntohs(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int16_t netshort = stack[0].sval;
+  
+  int16_t hostshort = htons(netshort);
+  
+  stack[0].sval = hostshort;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__inet_aton(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+  int32_t e = 0;
+  
+  int32_t InvalidNetworkAddress = env->get_class_id_by_name(env, stack, "Sys::Socket::Error::InetInvalidNetworkAddress", &e, FILE_NAME, __LINE__);
+  
+  void* obj_cp = stack[0].oval;
+  
+  if (!obj_cp) {
+    return env->die(env, stack, "The input address(cp) must be defined", FILE_NAME, __LINE__);
+  }
+  
+  const char* cp = env->get_chars(env, stack, obj_cp);
+  
+  void* obj_inp = stack[1].oval;
+  
+  if (!obj_inp) {
+    return env->die(env, stack, "The output address(inp) must be defined", FILE_NAME, __LINE__);
+  }
+  
+  struct in_addr* st_in_addr = env->get_pointer(env, stack, obj_inp);
+  
+#ifdef _WIN32
+  int32_t status = inet_pton(AF_INET, cp, st_in_addr);
+#else
+  int32_t status = inet_aton(cp, st_in_addr);
+#endif
+
+  if (status == 0) {
+    env->die(env, stack, "The address is not a valid network address", FILE_NAME, __LINE__);
+    return InvalidNetworkAddress;
+  }
+  else if (status == -1) {
+    env->die(env, stack, "[System Error]inet_aton failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  }
+  
+  stack[0].ival = status;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__inet_ntoa(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_in = stack[0].oval;
+  
+  if (!obj_in) {
+    return env->die(env, stack, "The input address must be defined", FILE_NAME, __LINE__);
+  }
+  
+  struct in_addr* in = env->get_pointer(env, stack, obj_in);
+  
+  char* output_address = inet_ntoa(*in);
+
+  if (!output_address) {
+    env->die(env, stack, "[System Error]inet_ntoa failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  }
+  
+  void* obj_output_address;
+  if (output_address) {
+    obj_output_address = env->new_string(env, stack, output_address, strlen(output_address));
+  }
+  else {
+    assert(0);
+  }
+  
+  stack[0].oval = obj_output_address;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__inet_pton(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t e = 0;
+  
+  int32_t InvalidNetworkAddress = env->get_class_id_by_name(env, stack, "Sys::Socket::Error::InetInvalidNetworkAddress", &e, FILE_NAME, __LINE__);
+  
+  if (e) { return e; }
+  
+  int32_t af = stack[0].ival;
+  
+  if (!(af == AF_INET || af == AF_INET6)) {
+    return env->die(env, stack, "The address family must be AF_INET or AF_INET6", FILE_NAME, __LINE__);
+  }
+  
+  void* obj_src = stack[1].oval;
+  
+  if (!obj_src) {
+    return env->die(env, stack, "The input address(src) must be defined", FILE_NAME, __LINE__);
+  }
+  
+  const char* src = env->get_chars(env, stack, obj_src);
+  
+  void* obj_dst = stack[2].oval;
+  
+  if (!obj_dst) {
+    return env->die(env, stack, "The output address(dst) must be defined", FILE_NAME, __LINE__);
+  }
+  
+  void* dst = env->get_pointer(env, stack, obj_dst);
+  
+  int32_t status = inet_pton(af, src, dst);
+  
+  if (status == 0) {
+    env->die(env, stack, "The address is not a valid network address", FILE_NAME, __LINE__);
+    return InvalidNetworkAddress;
+  }
+  else if (status == -1) {
+    env->die(env, stack, "[System Error]inet_pton failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  }
+  
+  stack[0].ival = status;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__inet_ntop(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+  // The address family
+  int32_t af = stack[0].ival;
+
+  if (!(af == AF_INET || af == AF_INET6)) {
+    return env->die(env, stack, "The address family must be AF_INET or AF_INET6", FILE_NAME, __LINE__);
+  }
+  
+  // The input address
+  void* obj_src = stack[1].oval;
+  if (!obj_src) {
+    return env->die(env, stack, "The input address(src) must be defined", FILE_NAME, __LINE__);
+  }
+  void* src = env->get_pointer(env, stack, obj_src);
+  
+  // The output address
+  void* obj_dst = stack[2].oval;
+  if (!obj_dst) {
+    return env->die(env, stack, "The output address(dst) must be defined", FILE_NAME, __LINE__);
+  }
+  char* dst = (char*)env->get_chars(env, stack, obj_dst);
+  
+  // The size of the output address
+  int32_t size = stack[3].ival;
+  
+  const char* dst_ret = inet_ntop(af, src, dst, size);
+  
+  if (!dst_ret) {
+    env->die(env, stack, "[System Error]inet_ntop failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  }
+  
+  stack[0].oval = obj_dst;
+  
+  return 0;
+}
+
 int32_t SPVM__Sys__Socket__socket(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t domain = stack[0].ival;
@@ -37,7 +303,7 @@ int32_t SPVM__Sys__Socket__socket(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t sockfd = socket(domain, type, protocol);
   
   if (sockfd == -1) {
-    env->die(env, stack, "[System Error]socket failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]socket failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -63,7 +329,7 @@ int32_t SPVM__Sys__Socket__connect(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = connect(sockfd, addr, addrlen);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]connect failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]connect failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -89,7 +355,7 @@ int32_t SPVM__Sys__Socket__bind(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = bind(sockfd, addr, addrlen);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]bind failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]bind failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -117,7 +383,7 @@ int32_t SPVM__Sys__Socket__accept(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = accept(sockfd, addr, &sl_addrlen);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]accept failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]accept failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -137,7 +403,7 @@ int32_t SPVM__Sys__Socket__listen(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = listen(sockfd, backlog);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]listen failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]listen failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -165,7 +431,7 @@ int32_t SPVM__Sys__Socket__recv(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t bytes_length = recv(sockfd, buf, len, flags);
   
   if (bytes_length == -1) {
-    env->die(env, stack, "[System Error]recv failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]recv failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -193,7 +459,7 @@ int32_t SPVM__Sys__Socket__send(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t bytes_length = send(sockfd, buf, len, flags);
   
   if (bytes_length == -1) {
-    env->die(env, stack, "[System Error]send failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]send failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -221,7 +487,7 @@ int32_t SPVM__Sys__Socket__getpeername(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = getpeername(sockfd, addr, &sl_addrlen);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]getpeername failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]getpeername failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -251,7 +517,7 @@ int32_t SPVM__Sys__Socket__getsockname(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = getsockname(sockfd, addr, &sl_addrlen);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]getsockname failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]getsockname failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -291,7 +557,7 @@ int32_t SPVM__Sys__Socket__socketpair(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = socketpair(domain, type, protocol, int_sv);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]socketpair failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]socketpair failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -331,7 +597,7 @@ int32_t SPVM__Sys__Socket__setsockopt(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = setsockopt(sockfd, level, optname, optval, optlen);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]setsockopt failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]setsockopt failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -385,7 +651,7 @@ int32_t SPVM__Sys__Socket__getsockopt(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = getsockopt(sockfd, level, optname, optval, &int_optlen);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]getsockopt failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]getsockopt failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -424,176 +690,11 @@ int32_t SPVM__Sys__Socket__shutdown(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = shutdown(sockfd, how);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]shutdown failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]shutdown failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
   stack[0].ival = status;
-  
-  return 0;
-}
-
-int32_t SPVM__Sys__Socket__inet_aton(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "inet_aton is not supported on this system", FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
-#else
-  
-  void* obj_cp = stack[0].oval;
-  
-  if (!obj_cp) {
-    return env->die(env, stack, "The input address(cp) must be defined", FILE_NAME, __LINE__);
-  }
-  
-  const char* cp = env->get_chars(env, stack, obj_cp);
-  
-  void* obj_inp = stack[1].oval;
-  
-  if (!obj_inp) {
-    return env->die(env, stack, "The output address(inp) must be defined", FILE_NAME, __LINE__);
-  }
-  
-  struct in_addr* inp = env->get_pointer(env, stack, obj_inp);
-  
-  int32_t success = inet_aton(cp, inp);
-  
-  stack[0].ival = success;
-  
-  return 0;
-#endif
-}
-
-int32_t SPVM__Sys__Socket__inet_ntoa(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  void* obj_in = stack[0].oval;
-  
-  if (!obj_in) {
-    return env->die(env, stack, "The input address must be defined", FILE_NAME, __LINE__);
-  }
-  
-  struct in_addr* in = env->get_pointer(env, stack, obj_in);
-  
-  char* output_address = inet_ntoa(*in);
-  
-  void* obj_output_address;
-  if (output_address) {
-    obj_output_address = env->new_string(env, stack, output_address, strlen(output_address));
-  }
-  else {
-    assert(0);
-  }
-  
-  stack[0].oval = obj_output_address;
-  
-  return 0;
-}
-
-int32_t SPVM__Sys__Socket__inet_pton(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t af = stack[0].ival;
-  
-  void* obj_src = stack[1].oval;
-  
-  if (!obj_src) {
-    return env->die(env, stack, "The input address(src) must be defined", FILE_NAME, __LINE__);
-  }
-  
-  const char* src = env->get_chars(env, stack, obj_src);
-  
-  void* obj_dst = stack[2].oval;
-  
-  if (!obj_dst) {
-    return env->die(env, stack, "The output address(dst) must be defined", FILE_NAME, __LINE__);
-  }
-  
-  void* dst = env->get_pointer(env, stack, obj_dst);
-  
-  int32_t success = inet_pton(af, src, dst);
-  
-  if (success == -1) {
-    env->die(env, stack, "[System Error]inet_pton failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
-    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
-  }
-  
-  stack[0].ival = success;
-  
-  return 0;
-}
-
-int32_t SPVM__Sys__Socket__inet_ntop(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-  // The address family
-  int32_t af = stack[0].ival;
-  
-  // The input address
-  void* obj_src = stack[1].oval;
-  if (!obj_src) {
-    return env->die(env, stack, "The input address(src) must be defined", FILE_NAME, __LINE__);
-  }
-  void* src = env->get_pointer(env, stack, obj_src);
-  
-  // The output address
-  void* obj_dst = stack[2].oval;
-  if (!obj_dst) {
-    return env->die(env, stack, "The output address(dst) must be defined", FILE_NAME, __LINE__);
-  }
-  char* dst = (char*)env->get_chars(env, stack, obj_dst);
-  
-  // The size of the output address
-  int32_t size = stack[3].ival;
-  
-  const char* dst_ret = inet_ntop(af, src, dst, size);
-  
-  if (!dst_ret) {
-    env->die(env, stack, "[System Error]inet_ntop failed: %s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
-    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
-  }
-  
-  stack[0].oval = obj_dst;
-  
-  return 0;
-}
-
-int32_t SPVM__Sys__Socket__htonl(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t hostlong = stack[0].ival;
-  
-  int32_t netlong = htonl(hostlong);
-  
-  stack[0].ival = netlong;
-  
-  return 0;
-}
-
-int32_t SPVM__Sys__Socket__htons(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int16_t hostshort = stack[0].sval;
-  
-  int16_t netshort = htons(hostshort);
-  
-  stack[0].sval = netshort;
-  
-  return 0;
-}
-
-int32_t SPVM__Sys__Socket__ntohl(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int32_t netlong = stack[0].ival;
-  
-  int32_t hostlong = ntohl(netlong);
-  
-  stack[0].ival = hostlong;
-  
-  return 0;
-}
-
-int32_t SPVM__Sys__Socket__ntohs(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
-  int16_t netshort = stack[0].sval;
-  
-  int16_t hostshort = htons(netshort);
-  
-  stack[0].sval = hostshort;
   
   return 0;
 }
@@ -618,7 +719,7 @@ int32_t SPVM__Sys__Socket__ioctlsocket(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = ioctlsocket(s, cmd, &arg_u_long);
 
   if (!(status == 0)) {
-    env->die(env, stack, "[System Error]ioctlsocket failed: socket error", FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]ioctlsocket failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -641,7 +742,7 @@ int32_t SPVM__Sys__Socket__closesocket(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = closesocket(s);
   
   if (!(status == 0)) {
-    env->die(env, stack, "[System Error]closesocket failed: socket error", FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]closesocket failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -668,7 +769,7 @@ int32_t SPVM__Sys__Socket__WSAPoll(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = WSAPoll(fds, nfds, timeout);
   
   if (status == SOCKET_ERROR) {
-    env->die(env, stack, "[System Error]WSAPoll failed: socket error", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]WSAPoll failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -678,7 +779,27 @@ int32_t SPVM__Sys__Socket__WSAPoll(SPVM_ENV* env, SPVM_VALUE* stack) {
 #endif
 }
 
-int32_t SPVM__Sys__Socket__getaddrinfo(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__Socket__gai_strerror(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t errcode = stack[0].ival;
+  
+  const char* error_string = gai_strerror(errcode);
+  
+  if (error_string) {
+    int32_t error_string_length = strlen(error_string);
+    void* obj_error_string = env->new_string(env, stack, error_string, error_string_length);
+    stack[0].oval = obj_error_string;
+  }
+  else {
+    stack[0].oval = NULL;
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__getaddrinfo_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t e = 0;
   
   void* obj_node = stack[0].oval;
@@ -728,7 +849,26 @@ int32_t SPVM__Sys__Socket__getaddrinfo(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Sys__Socket__getnameinfo(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__Socket__getaddrinfo(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t e = 0;
+  
+  e = SPVM__Sys__Socket__getaddrinfo_raw(env, stack);
+  if (e) { return e; }
+  
+  int32_t status = stack[0].ival;
+  if (!(status == 0)) {
+    stack[0].ival = status;
+    SPVM__Sys__Socket__gai_strerror(env, stack);
+    void* obj_gai_strerror = stack[0].oval;
+    const char* ch_gai_strerror = env->get_chars(env, stack, obj_gai_strerror);
+    env->die(env, stack, "[System Error]getaddrinfo failed: %s", ch_gai_strerror, FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__getnameinfo_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t e = 0;
   
   void* obj_sa = stack[0].oval;
@@ -766,21 +906,20 @@ int32_t SPVM__Sys__Socket__getnameinfo(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Sys__Socket__gai_strerror(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
+int32_t SPVM__Sys__Socket__getnameinfo(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t e = 0;
   
-  int32_t errcode = stack[0].ival;
+  e = SPVM__Sys__Socket__getnameinfo_raw(env, stack);
+  if (e) { return e; }
   
-  const char* error_string = gai_strerror(errcode);
-  
-  if (error_string) {
-    int32_t error_string_length = strlen(error_string);
-    void* obj_error_string = env->new_string(env, stack, error_string, error_string_length);
-    stack[0].oval = obj_error_string;
-  }
-  else {
-    stack[0].oval = NULL;
+  int32_t status = stack[0].ival;
+  if (!(status == 0)) {
+    stack[0].ival = status;
+    SPVM__Sys__Socket__gai_strerror(env, stack);
+    void* obj_gai_strerror = stack[0].oval;
+    const char* ch_gai_strerror = env->get_chars(env, stack, obj_gai_strerror);
+    env->die(env, stack, "[System Error]getnameinfo failed: %s", ch_gai_strerror, FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
   return 0;

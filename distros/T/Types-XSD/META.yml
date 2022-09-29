@@ -4,7 +4,7 @@ author:
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
 build_requires:
   Test::More: '0.96'
-  Test::TypeTiny: '1.000000'
+  Test::TypeTiny: '2.000000'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
@@ -26,12 +26,12 @@ optional_features: {}
 provides:
   Types::XSD:
     file: lib/Types/XSD.pm
-    version: '0.007'
+    version: '0.008'
 requires:
   DateTime::Incomplete: '0'
   DateTimeX::Auto: '0.004'
-  Type::Library: '1.000000'
-  Types::XSD::Lite: '0.006'
+  Type::Library: '2.000000'
+  Types::XSD::Lite: '0.007'
   XML::RegExp: '0'
   perl: '5.008003'
 resources:
@@ -40,6 +40,6 @@ resources:
   homepage: https://metacpan.org/release/Types-XSD
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-types-xsd.git
-version: '0.007'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -25,7 +25,7 @@ my @local_argv = ();
 main($output, $mock_io, @local_argv);
 
 ok(
-  $output_string =~ 'rendered 26 entries',
+  $output_string =~ 'rendered 27 entries',
   'rendered expected number of entries'
 ) or diag($output_string);
 

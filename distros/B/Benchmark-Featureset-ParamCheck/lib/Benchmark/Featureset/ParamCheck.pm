@@ -5,7 +5,7 @@ use warnings;
 package Benchmark::Featureset::ParamCheck;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 use IO::String ();
 
@@ -30,6 +30,11 @@ sub implementations {
 		Benchmark::Featureset::ParamCheck::Implementation::TypeParams::Specio
 		Benchmark::Featureset::ParamCheck::Implementation::TypeParams::TypeNano
 		Benchmark::Featureset::ParamCheck::Implementation::TypeParams::TypeTiny
+		Benchmark::Featureset::ParamCheck::Implementation::TypeParams2::Moose
+		Benchmark::Featureset::ParamCheck::Implementation::TypeParams2::Mouse
+		Benchmark::Featureset::ParamCheck::Implementation::TypeParams2::Specio
+		Benchmark::Featureset::ParamCheck::Implementation::TypeParams2::TypeNano
+		Benchmark::Featureset::ParamCheck::Implementation::TypeParams2::TypeTiny
 	);
 }
 
@@ -129,7 +134,7 @@ This class provides the following class methods:
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Benchmark-Featureset-ParamCheck>.
+L<https://github.com/tobyink/p5-benchmark-featureset-paramcheck/issues>.
 
 =head1 SEE ALSO
 
@@ -139,14 +144,17 @@ L<MooseX::Params::Validate>,
 L<Params::Check>,
 L<Params::Validate>,
 L<Params::ValidationCompiler>,
-L<Ref::Util::XS>,
 L<Type::Params>.
 
 B<< Type constraint libraries: >>
 L<Moose>,
 L<Mouse>,
 L<Specio>,
-L<Type::Tiny>.
+L<Type::Tiny>,
+L<Type::Nano>.
+
+B<< Other tested libraries: >>
+L<Ref::Util::XS>.
 
 =head1 AUTHOR
 
@@ -154,7 +162,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2017, 2018 by Toby Inkster.
+This software is copyright (c) 2017, 2018, 2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

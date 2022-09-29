@@ -62,7 +62,7 @@ is( $diva4->{FormMap}[3]{id}, 'mystery_site_url',
 
 my $generated4 = $diva4->generate ;
 is( $generated4->[2]{input},
-    qq(<INPUT type="text" name="secret" id="formdiva_secret"\n class="different" value="">),
+    qq(<INPUT type="text" name="secret" id="formdiva_secret" class="different" value="">),
     'previously hidden field is now a textfield'     );
 is( $generated4->[2]{label},
    '<LABEL for="formdiva_secret" id="formdiva_secret_label" class="testclass">Secret</LABEL>',
@@ -77,3 +77,4 @@ like( $generated4->[3]{input},
    qr/custom="bizarre"/,
    'extra for previously hidden field in generated input' );
 done_testing();
+

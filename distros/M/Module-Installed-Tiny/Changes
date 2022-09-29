@@ -1,3 +1,9 @@
+0.011   2022-08-22  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] module_source() was broken when find_prefix option is
+          set to true, due to the wrong variable being chopped.
+
+
 0.010   2022-07-30  Released-By: PERLANCAR; Urgency: medium
 
         - Add option: all.

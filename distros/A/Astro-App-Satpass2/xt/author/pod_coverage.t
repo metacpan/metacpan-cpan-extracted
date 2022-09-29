@@ -19,6 +19,14 @@ eod
     };
 }
 
+{
+    local $@ = undef;
+    eval {
+	no warnings qw{ deprecated };
+	require Date::Manip::DM5;
+    };
+}
+
 all_pod_coverage_ok ({
 	also_private => [
 	    qr{^[[:upper:]\d_]+$},

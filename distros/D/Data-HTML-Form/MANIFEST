@@ -23,9 +23,16 @@ README
 SIGNATURE
 t/Data-HTML-Form-Input/01-use.t
 t/Data-HTML-Form-Input/02-version.t
+t/Data-HTML-Form-Input/03-new.t
 t/Data-HTML-Form/01-use.t
 t/Data-HTML-Form/02-version.t
 t/Data-HTML-Form/03-new.t
+t/Data-HTML-Form/04-action.t
+t/Data-HTML-Form/05-css_class.t
+t/Data-HTML-Form/05-enctype.t
+t/Data-HTML-Form/06-id.t
+t/Data-HTML-Form/07-label.t
+t/Data-HTML-Form/08-method.t
 xt/Data-HTML-Form-Input/01-pod_coverage.t
 xt/Data-HTML-Form-Input/02-pod.t
 xt/Data-HTML-Form/01-pod_coverage.t

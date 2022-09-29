@@ -1,3 +1,8 @@
+0.018   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to App::BrowserUtils 0.017 (updated Sah schema name).
+
+
 0.017   2022-05-20  Released-By: PERLANCAR; Urgency: medium
 
         - Adjust to App::BrowserUtils 0.016 (add 'signal' argument to

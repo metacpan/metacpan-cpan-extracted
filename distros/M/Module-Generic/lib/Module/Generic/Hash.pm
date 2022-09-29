@@ -58,7 +58,7 @@ sub new
     my $tied = tied( %$data );
     return( $that->error( "Hash provided is already tied to ", ref( $tied ), " and our package $class cannot use it, or it would disrupt the tie." ) ) if( $tied );
     my %hash = ();
-    ## This enables access to the hash just like a real hash while still the user an call our object methods
+    # This enables access to the hash just like a real hash while still the user an call our object methods
     my $obj = tie( %hash, 'Module::Generic::TieHash', {
         disable => ['Module::Generic'],
         debug => 0,

@@ -18,7 +18,7 @@ Readonly::Array our @ENCTYPES => (
 Readonly::Array our @FORM_METHODS => qw(get post);
 Readonly::Array our @TYPES => qw(button reset submit);
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 has autofocus => (
 	ro => 1,
@@ -492,6 +492,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.04
 
 =cut

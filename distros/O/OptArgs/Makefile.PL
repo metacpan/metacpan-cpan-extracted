@@ -1,39 +1,40 @@
-use inc::Module::Install;
-use File::Spec;
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.016;
+use ExtUtils::MakeMaker::CPANfile;
 
-name 'OptArgs';
-version '0.1.20';
-all_from 'lib/OptArgs.pm';
-readme_from 'lib/OptArgs.pm';
-
-build_requires 'File::Spec' => 0;
-
-requires 'Carp'           => 0;
-requires 'Encode'         => 2.24;
-requires 'Exporter::Tidy' => 0;
-requires 'Getopt::Long'   => 2.37;
-requires 'I18N::Langinfo' => 0 if $^O ne 'MSWin32';
-requires 'List::Util'     => 0;
-requires 'Text::Abbrev'   => 0;
-
-test_requires 'IO::Capture::Stdout';
-test_requires 'POSIX';
-test_requires 'Test::More';
-test_requires 'Test::Fatal';
-test_requires 'Test::Output';
-
-perl_version '5.006';
-
-author_tests 'xt';
-
-install_script 'bin/optargs';
-
-no_index package => 'OptArgs::Usage';
-no_index package => 'Getopt::Args::Usage';
-
-repository 'https://github.com/mlawren/p5-OptArgs';
-
-WriteAll;
+WriteMakefile(
+    NAME       => 'OptArgs',
+    ABSTRACT   => 'CLI argument and option processing',
+    AUTHOR     => 'Mark Lawrence <nomad@null.net>',
+    VERSION    => '0.1.21',
+    LICENSE    => 'gpl_3',
+    test       => { RECURSIVE_TEST_FILES => 1, },
+    EXE_FILES  => ['bin/optargs'],
+    META_MERGE => {
+        dynamic_config => 1,
+        'meta-spec'    => { version => 2 },
+        no_index       => {
+            package => [
+                qw/
+                  OptArgs::Usage
+                  Getopt::Args::Usage
+                  /
+            ],
+        },
+        resources => {
+            bugtracker =>
+              { web => 'https//github.com/mlawren/p5-OptArgs/issues', },
+            homepage   => 'https//github.com/mlawren/p5-OptArgs',
+            repository => {
+                type => 'git',
+                url  => 'ssh://git@github.com/mlawren/p5-OptArgs.git',
+                web  => 'https//github.com/mlawren/p5-OptArgs',
+            }
+        },
+    },
+);
 
 # Duplicate OptArgs as Getopt::Args for easy discoverability
 

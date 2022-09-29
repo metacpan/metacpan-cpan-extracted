@@ -39,7 +39,7 @@
    "provides" : {
       "Apache::Session::Browseable" : {
          "file" : "lib/Apache/Session/Browseable.pm",
-         "version" : "v1.3.10"
+         "version" : "v1.3.11"
       },
       "Apache::Session::Browseable::DBI" : {
          "file" : "lib/Apache/Session/Browseable/DBI.pm",
@@ -91,7 +91,7 @@
       },
       "Apache::Session::Browseable::Store::DBI" : {
          "file" : "lib/Apache/Session/Browseable/Store/DBI.pm",
-         "version" : "v1.3.10"
+         "version" : "v1.3.11"
       },
       "Apache::Session::Browseable::Store::File" : {
          "file" : "lib/Apache/Session/Browseable/Store/File.pm",
@@ -155,6 +155,6 @@
          "url" : "https://github.com/LemonLDAPNG/Apache-Session-Browseable"
       }
    },
-   "version" : "v1.3.10",
+   "version" : "v1.3.11",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

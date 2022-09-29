@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.28.2
+## Version v0.28.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/09/18
+## Modified 2022/09/25
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -43,7 +43,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.28.2';
+    our $VERSION     = 'v0.28.3';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -6678,7 +6678,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.28.2
+    v0.28.3
 
 =head1 DESCRIPTION
 

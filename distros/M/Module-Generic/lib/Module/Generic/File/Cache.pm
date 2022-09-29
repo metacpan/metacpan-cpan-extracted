@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Cache.pm
-## Version v0.2.3
+## Version v0.2.5
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/16
-## Modified 2022/08/05
+## Modified 2022/09/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     $CACHE_REPO = [];
     $CACHE_TO_OBJECT = {};
     $DEBUG = 0;
-    our $VERSION = 'v0.2.3';
+    our $VERSION = 'v0.2.5';
 };
 
 use strict;
@@ -50,13 +50,14 @@ sub init
     $self->{serial}     = '';
     # SHM_BUFSIZ
     $self->{size}       = 0;
+    $self->{tmpdir}     = sys_tmpdir();
     $self->{_init_strict_use_sub} = 1;
     # Storable keps breaking :(
     # I leave the feature of using it as a choice to the user, but defaults to JSON.
     # Other possibilities could be cbor, sereal and storable
     $self->{_packing_method} = 'json';
     $self->SUPER::init( @_ ) || return( $self->pass_error );
-    my $tmpdir = sys_tmpdir();
+    my $tmpdir = $self->{tmpdir} || sys_tmpdir();
     $self->{_cache_dir} = $tmpdir->child( 'cache_file' );
     $self->{_cache_file} = '';
     $self->{id}         = undef();
@@ -191,7 +192,14 @@ sub open
     return( $self->error( "Cache directory is not a Module::Generic::File object!" ) ) if( !$self->_is_a( $cache_dir => 'Module::Generic::File' ) );
     if( $cache_dir->exists )
     {
-        return( $self->error( "Cache directory exists, but is not a directory!" ) ) if( !$cache_dir->is_dir );
+        if( !$cache_dir->is_dir )
+        {
+            return( $self->error( "Cache directory exists, but is not a directory!" ) );
+        }
+        elsif( !$cache_dir->can_write )
+        {
+            return( $self->error( "Cache directory exists, but the current user id $> is not allowed to write to it!" ) );
+        }
     }
     else
     {
@@ -404,6 +412,7 @@ sub remove
         $self->{_cache_file} = '';
         $self->id( undef() );
     }
+    $self->{_cache_dir}->remove if( $self->{_cache_dir} && $self->{_cache_dir}->is_empty );
     return( $rv ? 1 : 0 );
 }
 
@@ -454,6 +463,8 @@ sub stat
 sub storable { return( shift->_packing_method( 'storable' ) ); }
 
 sub supported { return(1); }
+
+sub tmpdir { return( shift->_set_get_file( 'tmpdir', @_ ) ); }
 
 sub unlock
 {
@@ -862,7 +873,7 @@ Module::Generic::File::Cache - File-based Cache
 
 =head1 VERSION
 
-    v0.2.3
+    v0.2.5
 
 =head1 DESCRIPTION
 
@@ -945,6 +956,10 @@ This is set once it is created. You can create again the shared cache file with 
 =item I<storable>
 
 Provided with a value (true or false does not matter), and this will set L<Storable::Improved> as the data serialisation mechanism when storing data to cache file.
+
+=item I<tmpdir>
+
+The temporary directory to use to store the cache files. By default this is the system standard temporary directory.
 
 =back
 
@@ -1138,6 +1153,10 @@ When called, this will set L<Storable> as the data packing mechanism when storin
 =head2 supported
 
 Returns always true as cache file relies solely on file.
+
+=head2 tmpdir
+
+The temporary directory to use to save cache file. By default, this will be the system standard temporary directory.
 
 =head2 unlock
 

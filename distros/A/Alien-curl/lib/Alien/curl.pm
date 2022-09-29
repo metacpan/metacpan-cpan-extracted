@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Discover or download and install curl + libcurl
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 
@@ -27,7 +27,7 @@ Alien::curl - Discover or download and install curl + libcurl
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -100,7 +100,7 @@ Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

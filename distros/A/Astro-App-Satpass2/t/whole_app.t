@@ -872,6 +872,33 @@ Date       Time     OID    Event Illum Eleva  Azimuth      Range
 EOD
     'Calculate pass events over Greenwich' );
 
+call_m( pass => {
+	chronological	=> 1,
+	ics		=> 1,
+    },
+    '19801015T000000Z',
+    '+1',
+    <<'EOD',
+BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+DTSTART:19801015T052629Z
+BEGIN:VALARM
+TRIGGER:-PT5M
+ACTION:DISPLAY
+END:VALARM
+BEGIN:VALARM
+TRIGGER:PT0M
+ACTION:DISPLAY
+END:VALARM
+SUMMARY:
+DESCRIPTION:rise 05:26:29 Az 210 SW\nlit 05:27:33 Az 212 SW Ele 5\nmax 05:30:12 Az 298 NW Ele 64\nset 05:34:08 Az 25 NE
+DTEND:19801015T053408Z
+END:VEVENT
+END:VCALENDAR
+EOD
+    q{Generate iCal event for pass},
+);
 execute( 'pass -horizon -transit 19801015T000000Z +1', <<'EOD',
     Time Eleva  Azimuth      Range Latitude Longitude Altitud Illum Event
 

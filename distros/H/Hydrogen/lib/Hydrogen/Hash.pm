@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::Hash;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015';
+our $VERSION   = '0.016';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::Hash - a standard library for hashes
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Hash 0.015,
-which is based on Sub::HandlesVia::HandlerLibrary::Hash 0.036.
+This documentation is for Hydrogen::Hash 0.016,
+which is based on Sub::HandlesVia::HandlerLibrary::Hash 0.037.
 
 =cut
 
@@ -593,18 +593,16 @@ sub set (\%$$;@) {
       or Hydrogen::croak( "Wrong number of parameters for set; usage: "
           . "Hydrogen::Hash::set( %hash, \$key, \$value, ... )" );
     my (@shv_params) = @_[ 1 .. $#_ ];
-    scalar(@shv_params) % 2 and do {
-        require Carp;
-        Carp::croak(
+    scalar(@shv_params) % 2
+      and Hydrogen::croak(
 "Wrong number of parameters; expected even-sized list of keys and values"
-        );
-    };
+      );
     my (@shv_keys_idx)   = grep( !( $_ % 2 ), 0 .. $#shv_params );
     my (@shv_values_idx) = grep( ( $_ % 2 ),  0 .. $#shv_params );
-    grep( !defined, @shv_params[@shv_keys_idx] ) and do {
-        require Carp;
-        Carp::croak("Undef did not pass type constraint; keys must be defined");
-    };
+    grep( !defined, @shv_params[@shv_keys_idx] )
+      and Hydrogen::croak(
+        "Undef did not pass type constraint; keys must be defined");
+
     for my $shv_tmp (@shv_keys_idx) {
         do {
             do {

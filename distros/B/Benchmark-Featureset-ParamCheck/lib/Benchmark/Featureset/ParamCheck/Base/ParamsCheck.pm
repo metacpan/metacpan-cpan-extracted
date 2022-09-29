@@ -5,7 +5,7 @@ use warnings;
 package Benchmark::Featureset::ParamCheck::Base::ParamsCheck;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 use parent qw(Benchmark::Featureset::ParamCheck::Base);
 use Params::Check 0.38 qw(check);

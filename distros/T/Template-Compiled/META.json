@@ -4,14 +4,14 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Template-Compiled",
    "no_index" : {
@@ -41,7 +41,7 @@
             "Exporter::Tiny" : "0",
             "HTML::Entities" : "0",
             "Moo" : "2.000000",
-            "Type::Params" : "1.002000",
+            "Type::Params" : "2.000000",
             "Types::Standard" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.008"
@@ -57,11 +57,11 @@
    "provides" : {
       "Template::Compiled" : {
          "file" : "lib/Template/Compiled.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "Template::Compiled::Utils" : {
          "file" : "lib/Template/Compiled/Utils.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -75,5 +75,6 @@
       ],
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Template-Compiled/project"
    },
-   "version" : "0.002"
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

@@ -7,6 +7,20 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+2.000001	2022-09-29
+
+ [ Bug Fixes ]
+ - Avoid uninitialized warnings when creating a union between an Enum type
+   and a non-Enum type.
+   Diab Jerius++
+
+ [ Documentation ]
+ - Clearer documentation of Types::TypeTiny::to_TypeTiny.
+
+ [ Test Suite ]
+ - No longer report Type::Tie version at start of test suite, as Type::Tie
+   is now bundled.
+
 2.000000	2022-09-23
 
  [ Test Suite ]

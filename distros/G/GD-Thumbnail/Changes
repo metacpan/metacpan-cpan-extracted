@@ -1,5 +1,11 @@
 Revision history for Perl extension GD::Thumbnail.
 
+1.46 2022-09-27 BURAK
+    - Fill in the whole rectangle to prevent black backgrounds.
+
+1.45 2022-09-26 BURAK
+    - TTF font support for the info strip.
+
 1.44 2018-12-24 BURAK
     - Migrate to dzil.
 

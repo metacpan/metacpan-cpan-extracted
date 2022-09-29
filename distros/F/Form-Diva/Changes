@@ -1,5 +1,7 @@
 Revision history for Form::Diva
 
+1.05	28 Sep 2022
+	fix: avoid remaining whitespace problems with improved HTML generation
 1.04	02 Aug 2022
 	fix: generate HTML placeholders regardless of form data availability
 	fix: do not remove whitespace from generated HTML input

@@ -26,11 +26,12 @@ sub ValidationTemplates {
         arguments    => Types::Standard::Optional [ Maybe [ArrayRef] ],
         callback     => Types::Standard::Optional [CodeRef],
         code_wrapper => Types::Standard::Optional [CodeRef],
+        plugin_args  => Types::Standard::Optional [HashRef],
     ];
     my $plugins = Dancer2::RPCPlugin::PluginNames->new->regex;
     my $any_plugin = qr{(?:any|$plugins)};
     return {
-        endpoint => { type => StrMatch [qr{^ [\w/\\%]+ $}x] },
+        endpoint => { type => StrMatch [qr{^ [\w/\\%-]+ $}x] },
         publish  => {
             type    => Maybe [$publisher],
             default => 'config'

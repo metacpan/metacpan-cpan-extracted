@@ -9,7 +9,7 @@ use Hydrogen::Counter ();
 package Hydrogen::Curry::Counter;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.015';
+our $VERSION   = '0.016';
 
 =head1 NAME
 
@@ -17,8 +17,8 @@ Hydrogen::Curry::Counter - easily curry functions from Hydrogen::Counter
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Curry::Counter 0.015,
-which is based on Sub::HandlesVia::HandlerLibrary::Counter 0.036.
+This documentation is for Hydrogen::Curry::Counter 0.016,
+which is based on Sub::HandlesVia::HandlerLibrary::Counter 0.037.
 
 =cut
 

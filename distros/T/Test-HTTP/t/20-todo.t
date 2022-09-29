@@ -7,8 +7,8 @@ use Test::More;
 TODO: {
     local $TODO = 'testing TODO mechanism';
 
-    test_http "Socialtext" {
-        >> GET http://www.socialtext.com/
+    test_http "ICANN" {
+        >> GET https://www.icann.org/
 
         << 302
     }

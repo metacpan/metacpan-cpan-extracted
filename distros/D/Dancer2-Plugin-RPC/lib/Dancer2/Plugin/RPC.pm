@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use v5.10.1;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 =head1 NAME
 
@@ -11,20 +11,20 @@ Dancer2::Plugin::RPC - Namespace for XMLRPC, JSONRPC2 and RESTRPC plugins
 
 =head1 DESCRIPTION
 
-This module contains plugins for L<Dancer2>: L<Dancer2::Plugin::RPC::XML>,
-L<Dancer2::Plugin::RPC::JSON> and L<Dancer2::Plugin::RPC::REST>.
+This module contains plugins for L<Dancer2>: L<Dancer2::Plugin::RPC::XMLRPC>,
+L<Dancer2::Plugin::RPC::JSONRPC> and L<Dancer2::Plugin::RPC::RESTRPC>.
 
-=head2 Dancer2::Plugin::RPC::XML
+=head2 Dancer2::Plugin::RPC::XMLRPC
 
 This plugin exposes the new keyword C<xmlrpc> that is followed by 2 arguments:
 the endpoint and the arguments to configure the xmlrpc-calls at this endpoint.
 
-=head2 Dancer2::Plugin::RPC::JSON
+=head2 Dancer2::Plugin::RPC::JSONRPC
 
 This plugin exposes the new keyword C<jsonrpc> that is followed by 2 arguments:
 the endpoint and the arguments to configure the jsonrpc-calls at this endpoint.
 
-=head2 Dancer2::Plugin::RPC::REST
+=head2 Dancer2::Plugin::RPC::RESTRPC
 
 This plugin exposes the new keyword C<restrpc> that is followed by 2 arguments:
 the endpoint and the arguments to configure the restrpc-calls at this endpoint.
@@ -42,7 +42,7 @@ The dispatch table is build by endpoint.
 The dispatch table is build from the YAML-config:
 
     plugins:
-        'RPC::XML':
+        'RPC::XMLRPC':
             '/endpoint1':
                 'Module::Name1':
                     method1: sub1
@@ -60,7 +60,7 @@ The B<arguments> argument should be empty for this publishing type.
 The dispatch table is build by parsing the POD for C<=for xmlrpc>,
 C<=for jsonrpc> or C<=for restrpc>.
 
-    =for xmlrpc <method_name> <sub_name>
+    =for xmlrpc <method_name> <sub_name> [<base_dir>]
 
 The B<arguments> argument must be an Arrayref with module names. The
 POD-directive must be in the same file as the code!
@@ -71,15 +71,15 @@ With this publishing type, you will need to build your own dispatch table and re
 
     use Dancer2::RPCPlugin::DispatchItem;
     return {
-        method1 => dispatch_item(
+        method1 => Dancer2::RPCPlugin::DispatchItem->new(
             package => 'Module::Name1',
             code => Module::Name1->can('sub1'),
         ),
-        method2 => dispatch_item(
+        method2 => Dancer2::RPCPlugin::DispatchItem->new(
             package => 'Module::Name1',
             code    => Module::Name1->can('sub2'),
         ),
-        method3 => dispatch_item(
+        method3 => Dancer2::RPCPlugin::DispatchItem->new(
             pacakage => 'Module::Name2',
             code     => Module::Name2->can('sub3'),
         ),
@@ -138,6 +138,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 AUTHOR
 
-(c) MMXVII - Abe Timmerman <abeltje@cpan.org>
+E<copy> MMXVII - Abe Timmerman <abeltje@cpan.org>
 
 =cut

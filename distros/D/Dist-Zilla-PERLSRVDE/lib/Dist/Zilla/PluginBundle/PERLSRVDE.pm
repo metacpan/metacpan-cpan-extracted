@@ -7,7 +7,7 @@ use v5.24;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.0.1'; # VERSION
 
 use namespace::autoclean;
 
@@ -299,7 +299,7 @@ Dist::Zilla::PluginBundle::PERLSRVDE - The plugin bundle we use at Perl-Services
 
 =head1 VERSION
 
-version 1.0.0
+version 1.0.1
 
 =head1 SYNOPSIS
 
@@ -325,7 +325,7 @@ Using L</Options>:
 
 =head1 DESCRIPTION
 
-This is a L<Dist::Zilla> PluginBundle. It lists the plugins we use at L<https://perl-services.de|Perl-Services.de>.
+This is a L<Dist::Zilla> PluginBundle. It lists the plugins we use at L<Perl-Services.de|https://perl-services.de>.
 It is roughly equivalent to the following dist.ini:
 
     [ContributorsFile]

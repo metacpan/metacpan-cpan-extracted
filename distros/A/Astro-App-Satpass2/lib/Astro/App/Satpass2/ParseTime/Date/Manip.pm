@@ -12,8 +12,9 @@ use Astro::App::Satpass2::Utils qw{
     __parse_class_and_args
     @CARP_NOT
 };
+use Astro::Coord::ECI::Utils 0.112 qw{ greg_time_gm };
 
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 sub __class_name {
     return __PACKAGE__;
@@ -29,6 +30,14 @@ sub delegate {
     defined ( $back_end = __date_manip_backend() )
 	or return $back_end;
     return __PACKAGE__ . "::v$back_end";
+}
+
+{
+    my $epoch_offset = greg_time_gm( 0, 0, 0, 1, 0, 1970 );
+
+    sub __epoch_offset {
+	return $epoch_offset;
+    }
 }
 
 sub station {
@@ -126,7 +135,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2021 by Thomas R. Wyant, III
+Copyright (C) 2009-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

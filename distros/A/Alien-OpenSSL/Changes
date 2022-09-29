@@ -1,5 +1,9 @@
 Changes for Alien-OpenSSL
 
+0.15      2022-09-26 17:22:50 -0600
+  - make sure share install installs into lib not lib64 (gh#19)
+  - .pc files will include static libs for static build (gh#19)
+
 0.14      2022-08-02 17:03:49 -0600
   - Add support for mac ports system install (gh#18)
 

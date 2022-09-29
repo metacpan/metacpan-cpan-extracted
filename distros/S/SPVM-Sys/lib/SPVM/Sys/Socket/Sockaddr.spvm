@@ -1,11 +1,17 @@
 class Sys::Socket::Sockaddr : pointer_t {
   interface Sys::Socket::Sockaddr::Interface;
   
-  method has_interface : int () { return 1; }
+  method has_interfaces : int () { return 1; }
   
-  method sa_family : int () {
+  method sa_family : byte () {
     my $sa_family = $self->(Sys::Socket::Sockaddr::Interface)->sa_family;
     
     return $sa_family;
+  }
+  
+  method sizeof : int () {
+    my $size = $self->(Sys::Socket::Sockaddr::Interface)->sizeof;
+    
+    return $size;
   }
 }

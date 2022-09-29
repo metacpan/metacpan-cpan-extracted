@@ -48,7 +48,7 @@ if (ref {} eq ref setting('database')) {
 
     # set up the netdisco schema now we have access to the config
     # but only if it doesn't exist from an earlier config style
-    setting('plugins')->{DBIC}->{netdisco} ||= {
+    setting('plugins')->{DBIC}->{'default'} ||= {
         dsn  => $dsn,
         user => $user,
         password => $pass,
@@ -96,7 +96,7 @@ if (ref {} eq ref setting('database')) {
     }
 
     # and support tenancies by setting what the default schema points to
-    setting('plugins')->{DBIC}->{'default'}->{'alias'} = 'netdisco';
+    setting('plugins')->{DBIC}->{'netdisco'}->{'alias'} = 'default';
 }
 
 # always set this
@@ -249,15 +249,15 @@ else { config->{'ignore_deviceports'} ||= [] }
 # copy old ignore_* into new settings
 if (scalar @{ config->{'ignore_interfaces'} }) {
   config->{'host_groups'}->{'__IGNORE_INTERFACES__'}
-    = config->{'ignore_interfaces'};
+    = [ map { ($_ !~ m/^port:/) ? "port:$_" : $_ } @{ config->{'ignore_interfaces'} } ];
 }
 if (scalar @{ config->{'ignore_interface_types'} }) {
   config->{'host_groups'}->{'__IGNORE_INTERFACE_TYPES__'}
-    = config->{'ignore_interface_types'};
+    = [ map { ($_ !~ m/^type:/) ? "type:$_" : $_ } @{ config->{'ignore_interface_types'} } ];
 }
 if (scalar @{ config->{'ignore_notpresent_types'} }) {
   config->{'host_groups'}->{'__NOTPRESENT_TYPES__'}
-    = config->{'ignore_notpresent_types'};
+    = [ map { ($_ !~ m/^type:/) ? "type:$_" : $_ } @{ config->{'ignore_notpresent_types'} } ];
 }
 
 # copy devices_no and devices_only into others

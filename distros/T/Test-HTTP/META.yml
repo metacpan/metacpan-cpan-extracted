@@ -28,5 +28,5 @@ requires:
   Test::Builder::Module: '0'
   Test::More: '0'
   Text::Balanced: '0'
-version: 0.19
+version: 0.22
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

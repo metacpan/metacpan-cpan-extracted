@@ -61,9 +61,8 @@ use base qw/Quiq::Object/;
 use v5.10;
 use strict;
 use warnings;
-use utf8;
 
-our $VERSION = '1.203';
+our $VERSION = '1.204';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -224,15 +223,15 @@ sub new {
 
 # -----------------------------------------------------------------------------
 
-=head3 destroy() - Schließe Dateihandle
+=head3 close() - Schließe Dateihandle
 
 =head4 Synopsis
 
-  $fh->destroy;
+  $fh->close;
 
 =head4 Alias
 
-close()
+destroy()
 
 =head4 Description
 
@@ -243,20 +242,40 @@ Nach Aufruf der Methode ist die Objektreferenz ungültig.
 
 # -----------------------------------------------------------------------------
 
-sub destroy {
-    my ($self) = @_; # Nicht ändern!
-
-    CORE::close $self or do {
-        $self->throw('FH-00009: FileHandle schließen fehlgeschlagen');
-    };
+sub close {
     $_[0] = undef;
-
     return;
 }
 
 {
     no warnings 'once';
-    *close = \&destroy;
+    *destroy = \&close;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 DESTROY() - Schließe Dateihandle
+
+=head4 Synopsis
+
+  $fh->DESTROY;
+
+=head4 Description
+
+Schließe Dateihandle. Die Methode liefert keinen Wert zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub DESTROY {
+    # warn "DESTROY $_[0]\n";
+    if (Scalar::Util::openhandle($_[0])) {
+        CORE::close $_[0] or do {
+            $_[0]->throw('FH-00009: Close of FileHandle failed');
+        };
+    }
+    return;
 }
 
 # -----------------------------------------------------------------------------
@@ -960,7 +979,7 @@ sub slurpFromStdin {
 
 =head1 VERSION
 
-1.203
+1.204
 
 =head1 AUTHOR
 

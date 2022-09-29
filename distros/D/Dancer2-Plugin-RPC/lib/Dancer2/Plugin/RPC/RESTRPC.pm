@@ -265,7 +265,7 @@ The publiser key determines the way one connects the rpc-method name with the ac
 This way of publishing requires you to create a dispatch-table in the app's config YAML:
 
     plugins:
-        "RPC::REST":
+        "RPC::RESTRPC":
             '/base_url':
                 'MyProject::Admin':
                     admin.someFunction: rpc_admin_some_function_name
@@ -292,11 +292,11 @@ The code_ref you supply, gets the C<arguments> value of the C<%publisher_argumen
 A dispatch-table looks like:
 
     return {
-        'admin_someFuncion' => dispatch_item(
+        'admin_someFuncion' => Dancer2::RPCPlugin::DispatchItem->new(
             package => 'MyProject::Admin',
             code    => MyProject::Admin->can('rpc_admin_some_function_name'),
         ),
-        'user_otherFunction' => dispatch_item(
+        'user_otherFunction' => Dancer2::RPCPlugin::DispatchItem->new(
             package => 'MyProject::User',
             code    => MyProject::User->can('rpc_user_other_function_name'),
         ),
@@ -329,6 +329,6 @@ Creates a cannonical-JSON response.
 
 =head1 COPYRIGHT
 
-(c) MMXVII - Abe Timmerman <abeltje@cpan.org>
+E<copy> MMXVII - Abe Timmerman <abeltje@cpan.org>
 
 =cut

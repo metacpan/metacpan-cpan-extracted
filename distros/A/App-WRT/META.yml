@@ -15,7 +15,7 @@ name: App-WRT
 provides:
   App::WRT:
     file: lib/App/WRT.pm
-    version: v7.1.2
+    version: v8.0.0
   App::WRT::Date:
     file: lib/App/WRT/Date.pm
   App::WRT::EntryStore:
@@ -38,16 +38,17 @@ provides:
     file: lib/App/WRT/Util.pm
 requires:
   Data::Dumper: '2.170'
-  Exporter: '5.73'
+  Exporter: '5.74'
   File::Basename: '2.85'
-  File::Copy: '2.33'
-  File::Spec: '3.74'
-  Getopt::Long: '2.5'
-  HTML::Entities: '3.69'
+  File::Copy: '2.39'
+  File::Spec: '3.75'
+  Getopt::Long: '2.52'
+  HTML::Entities: '3.78'
+  IPC::Cmd: '1.04'
   Image::Size: '3.300'
-  JSON: '4.02'
-  JSON::Feed: '0.001'
-  Mojo::DOM: '0'
+  JSON: '4.06'
+  JSON::Feed: '1.001'
+  Mojo::DOM: '9.26'
   POSIX: '1.84'
   Text::Markdown::Discount: '0.11'
   Text::Textile: '2.13'
@@ -56,5 +57,5 @@ requires:
   perl: v5.14.0
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: v7.1.2
+version: v8.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

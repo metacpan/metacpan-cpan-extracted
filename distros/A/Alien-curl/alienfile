@@ -1,5 +1,5 @@
 use alienfile;
-use Env::ShellWords qw( @CPPFLAGS @LDFLAGS );
+use Env::ShellWords qw( @LDFLAGS );
 use Text::ParseWords qw( shellwords );
 use FFI::CheckLib qw( find_lib_or_die );
 
@@ -40,7 +40,7 @@ share {
   elsif($^O eq 'openbsd')
   {
     $alien_ssl = 'Alien::LibreSSL';
-    unshift @acflags, '--with-ssl';
+    unshift @acflags, '--with-openssl';
   }
   # - macOS has its own native SSL implementation which is supported by curl
   elsif($^O eq 'darwin')
@@ -51,12 +51,29 @@ share {
   # - elsewhere OpenSSL is probably a reasonable option
   else
   {
-    unshift @acflags, '--with-ssl';
+    unshift @acflags, '--with-openssl';
   }
 
   if($alien_ssl)
   {
-    requires $alien_ssl => 0;
+    if($alien_ssl eq 'Alien::OpenSSL')
+    {
+      requires $alien_ssl => '0.15';
+    }
+    else
+    {
+      requires $alien_ssl => 0;
+    }
+
+    # Build::SearchDep should have an option to do just this
+    # without modifying the build stage
+    # https://github.com/PerlAlien/Alien-Build/issues/373
+    meta->after_hook(
+      gather_share => sub {
+        my($build) = @_;
+        $build->runtime_prop->{$_} .= $alien_ssl->$_ for qw( libs libs_static cflags cflags_static );
+      }
+    );
   }
 
   plugin Download => (
@@ -65,22 +82,19 @@ share {
   );
   plugin Extract => 'tar.gz';
 
-  # make sure that curl uses the compiler / linker flags
+  # make sure that curl uses the linker flags
   # from our Alien SSL
-  meta->around_hook( build => sub {
-    my $orig = shift;
-    my $build = shift;
-    local $ENV{CPPFLAGS} = $ENV{CPPFLAGS};
-    local $ENV{LDFLAGS}  = $ENV{LDFLAGS};
-    if($alien_ssl)
-    {
-      unshift @CPPFLAGS, shellwords( $alien_ssl->cflags );
+  if($alien_ssl)
+  {
+    meta->around_hook( $_ => sub {
+      my $orig = shift;
+      my $build = shift;
+      local $ENV{LDFLAGS}  = $ENV{LDFLAGS};
       unshift @LDFLAGS,  grep /^-L/, shellwords( $alien_ssl->libs   );
-      log "using CPPFLAGS = $ENV{CPPFLAGS}";
       log "using LDFLAGS = $ENV{LDFLAGS}";
-    }
-    $orig->($build, @_);
-  });
+      $orig->($build, @_);
+    }) for qw( build build_ffi );
+  }
 
   plugin 'Build::Autoconf' => ();
 

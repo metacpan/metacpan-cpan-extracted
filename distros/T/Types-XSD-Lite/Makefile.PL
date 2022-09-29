@@ -18,19 +18,21 @@ my $meta = {
   "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
   "prereqs"          => {
                           configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                          runtime => { requires => { "perl" => 5.008003, "Type::Library" => 0.004 } },
+                          runtime => {
+                            requires => { "perl" => 5.008003, "Type::Library" => "2.000000" },
+                          },
                           test => {
                             recommends => { Moo => "1.003000" },
                             requires   => {
                                             "Test::Fatal"    => 0,
                                             "Test::More"     => 0.96,
                                             "Test::Requires" => 0,
-                                            "Test::TypeTiny" => 0.004,
+                                            "Test::TypeTiny" => "2.000000",
                                           },
                           },
                         },
   "provides"         => {
-                          "Types::XSD::Lite" => { file => "lib/Types/XSD/Lite.pm", version => 0.006 },
+                          "Types::XSD::Lite" => { file => "lib/Types/XSD/Lite.pm", version => 0.007 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -46,7 +48,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Types-XSD-Lite/project",
                         },
-  "version"          => 0.006,
+  "version"          => 0.007,
   "x_static_install" => 1,
 };
 

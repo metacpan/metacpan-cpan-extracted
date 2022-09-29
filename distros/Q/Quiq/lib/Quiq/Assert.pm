@@ -59,7 +59,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.203';
+our $VERSION = '1.204';
 
 use Quiq::Path;
 use Quiq::Math;
@@ -152,7 +152,12 @@ Wert, der geprüft wird.
 =item $sub
 
 Prüf-Subroutine. Ist die Bedingung erfüllt, liefert sie "wahr",
-andernfalls "falsch".
+andernfalls "falsch". Beispiel:
+
+  sub {
+      my $val = shift;
+      return $val =~ /\.export$/? 1: 0;
+  }
 
 =back
 
@@ -177,8 +182,8 @@ Boolean
 Prüfe den Wert $val daraufhin, ob er die Prüfung $sub besteht.
 Ist dies nicht der Fall, wirf eine Exception, wenn die Methode im
 Void-Kontext gerufen wurde, andernfalls 0. Ein leerer Wert verletzt
-die Bedingung nicht (die Subroutine wird für einen leeren Wert nicht
-gerufen).
+die Bedingung nicht, d.h. die Subroutine wird für einen leeren Wert nicht
+gerufen und muss diesen Fall daher nicht behandeln.
 
 =cut
 
@@ -523,7 +528,7 @@ sub isNumber {
 
 =head1 VERSION
 
-1.203
+1.204
 
 =head1 AUTHOR
 

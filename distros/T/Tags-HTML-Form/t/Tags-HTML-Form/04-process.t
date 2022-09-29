@@ -6,7 +6,7 @@ use Data::HTML::Form;
 use Data::HTML::Form::Input;
 use Tags::HTML::Form;
 use Tags::Output::Structure;
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 
 # Test.
@@ -122,4 +122,37 @@ is_deeply(
 		['e', 'form'],
 	],
 	'Form HTML code (only submit button with custom text).',
+);
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::Form->new(
+	'tags' => $tags,
+);
+my $checkbox = Data::HTML::Form::Input->new(
+	'checked' => 0,
+	'type' => 'checkbox',
+);
+$obj->process($checkbox);
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'form'],
+		['a', 'class', 'form'],
+		['a', 'method', 'get'],
+		['b', 'p'],
+		['b', 'input'],
+		['a', 'type', 'checkbox'],
+		['e', 'input'],
+		['e', 'p'],
+		['b', 'p'],
+		['b', 'button'],
+		['a', 'type', 'submit'],
+		['d', 'Save'],
+		['e', 'button'],
+		['e', 'p'],
+		['e', 'form'],
+	],
+	'Form HTML code (checkbox with submit button).',
 );

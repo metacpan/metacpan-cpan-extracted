@@ -6,9 +6,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-30'; # DATE
+our $DATE = '2022-08-22'; # DATE
 our $DIST = 'Module-Installed-Tiny'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our @EXPORT_OK = qw(module_installed module_source);
 
@@ -90,7 +90,7 @@ sub module_source {
                 my $res = wantarray ? [scalar <$fh>, $path, $entry, $index, $name_mod, $name_pm, $name_path] : scalar <$fh>;
                 if ($opts->{all}) { push @res, $res } else { return wantarray ? @$res : $res }
             } elsif ($opts->{find_prefix}) {
-                $name_path =~ s/\.pm\z//;
+                $path =~ s/\.pm\z//;
                 if (-d $path) {
                     my $res = wantarray ? [undef, $path, $entry, $index, $name_mod, $name_pm, $name_path] : \$path;
                     if ($opts->{all}) { push @res, $res } else { return wantarray ? @$res : $res }
@@ -170,7 +170,7 @@ Module::Installed::Tiny - Check if a module is installed, with as little code as
 
 =head1 VERSION
 
-This document describes version 0.010 of Module::Installed::Tiny (from Perl distribution Module-Installed-Tiny), released on 2022-07-30.
+This document describes version 0.011 of Module::Installed::Tiny (from Perl distribution Module-Installed-Tiny), released on 2022-08-22.
 
 =head1 SYNOPSIS
 
@@ -362,8 +362,9 @@ This is what C<module_installed()> does.
 
 =head2 How to know which @INC entry the source comes from?
 
-Call the L</module_source> in list context, where you will get more information
-including the entry. See the function documentation for more details.
+Call the L</module_source> function in list context, where you will get more
+information including the entry. See the function documentation for more
+details.
 
 =head1 HOMEPAGE
 
@@ -401,9 +402,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

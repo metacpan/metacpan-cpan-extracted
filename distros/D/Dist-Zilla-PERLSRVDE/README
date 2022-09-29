@@ -4,19 +4,18 @@ NAME
 
 VERSION
 
-    version 1.0.0
+    version 1.0.1
 
 DESCRIPTION
 
     This is a collection of Dist::Zilla related modules used at
-    https://perl-services.de|Perl-Services.de.
+    Perl-Services.de <https://perl-services.de>.
 
 MODULES
 
  Dist::Zilla::PluginBundle::PERLSRVDE
 
-    This is the Dist::Zilla::PluginBundle::PERLSRVDE to include the Plugins
-    we usually use.
+    This is the PluginBundle to include the Plugins we usually use.
 
 AUTHOR
 

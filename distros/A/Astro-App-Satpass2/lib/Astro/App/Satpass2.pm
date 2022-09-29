@@ -60,8 +60,6 @@ use Scalar::Util 1.26 qw{ blessed isdual openhandle };
 use Text::Abbrev;
 use Text::ParseWords ();	# Used only for {level1} stuff.
 
-our $READLINE_OBJ;	# Used for readline completion.
-
 use constant ASTRO_SPACETRACK_VERSION => 0.105;
 use constant DEFAULT_STDOUT_LAYERS	=> ':encoding(utf-8)';
 
@@ -80,14 +78,20 @@ BEGIN {
 # The following is returned by method _attribute_value() when a
 # non-existent attribute is specified. We can't use undef for this,
 # because the attribute might really be undef.
-use constant NULL	=> bless \( my $x = undef ), 'Null';
+# NOTE that this used to be just bless \( $x = undef ) ..., but blead
+# Perl 6a011f13d7690dbe2e03ad7500756c983bcb1834 did not like this
+# (modificatoin of read-only variable).
+use constant NULL	=> do {
+    my $x = undef;
+    bless \$x, 'Null';
+};
 # The canonical way to see if $rslt actually contains the above is
 # NULL_REF eq ref $rslt
 use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -1024,9 +1028,54 @@ sub flare : Verb( algorithm=s am! choose=s@ day! dump! pm! questionable|spare! q
     return $self->__format_data( flare => \@flares, $opt );
 }
 
-sub formatter : Verb() {
+sub formatter : Verb() Tweak( -completion _readline_complete_subcommand ) {
     splice @_, ( HASH_REF eq ref $_[1] ? 2 : 1 ), 0, 'formatter';
     goto &_helper_handler;
+}
+
+# Calls to the following _formatter_sub method are generated dynamically
+# above, so there is no way Perl::Critic can find them.
+
+sub _formatter_sub {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $app, $text, $line, $start, @arg ) = @_;
+    my $fmtr = $app->get( 'formatter' );
+    if ( @arg == 2 ) {
+	my @list = qw{
+	    date_format
+	    desired_equinox_dynamical
+	    gmt
+	    local_coord
+	    time_format
+	    tz
+	};
+	$fmtr->can( '__list_templates' )
+	    and push @list, 'template';
+	my $re = qr/ \A \Q$arg[1]\E /smx;
+	return [ grep { $_ =~ $re } sort @list ];
+    }
+    my $code = $app->can( "_formatter_complete_$arg[1]" )
+	or return;
+
+    my $r;
+    $r = $app->_readline_complete_options( $code, $text, $line,
+	$start )
+	and return $r;
+
+    return $code->( $app, @arg );
+}
+
+# Calls to the following _formatter_complete_... methods are generated
+# dynamically above, so there is no way Perl::Critic can find them.
+# The Verb attribute must aggree with _helper_handler().
+
+sub _formatter_complete_template : Verb( changes! raw! ) {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $app, undef, @arg ) = __arguments( @_ );
+    my $fmtr = $app->get( 'formatter' );
+    my $re = qr/ \A \Q$arg[2]\E /smx;
+    return [
+	grep { $_ =~ $re }
+	sort( $fmtr->__list_templates() )
+    ];
 }
 
 sub geocode : Verb( debug! ) {
@@ -1810,23 +1859,6 @@ sub _macro_sub_list : Verb() Tweak( -completion _macro_list_complete ) {	## no c
 	$output .= $self->{macro}{$name}->generator( $name );
     }
     return $output;
-}
-
-sub _macro_list_complete {	## no critic (ProhibitUnusedPrivateSubroutines)
-    # my ( $invocant, $code, $text, $line, $start ) = @_;
-    my ( $invocant, undef, undef, $line, undef ) = @_;
-    ref $invocant
-	or return;
-    my @part = _readline_line_to_parts( $line );
-    3 == @part
-	or return;
-    my $re = qr< \A \Q$part[2]\E >smx;
-    my @rslt;
-    foreach ( sort keys %{ $invocant->{macro} } ) {
-	m/$re/smx
-	    and push @rslt, $_;
-    }
-    return \@rslt;
 }
 
 sub _macro_sub_load : Verb( lib=s verbose! ) {	## no critic (ProhibitUnusedPrivateSubroutines)
@@ -2992,8 +3024,9 @@ sub _sky_object {
     return;
 }
 
-# Calls to the following _macro_sub_... methods are generated dynamically
+# Calls to the following _sky_sub_... methods are generated dynamically
 # above, so there is no way Perl::Critic can find them.
+#
 sub _sky_sub_add : Verb()  {	## no critic (ProhibitUnusedPrivateSubroutines)
     my ( $self, undef, @args ) = __arguments( @_ );	# $opt unused
     my $name = shift @args
@@ -3098,26 +3131,6 @@ sub _sky_sub_drop : Verb() Tweak( -completion _sky_body_complete ) {	## no criti
 	$self->_drop_from_sky( $name );
     }
     return;
-}
-
-sub _sky_body_complete {	## no critic (ProhibitUnusedPrivateSubroutines)
-    # my ( $invocant, $code, $text, $line, $start ) = @_;
-    my ( $invocant, undef, undef, $line, undef ) = @_;
-    ref $invocant
-	or return;
-    my @part = _readline_line_to_parts( $line );
-    3 == @part
-	or return;
-    my $re = qr< \A \Q$part[2]\E >smxi;
-    my @rslt;
-    foreach my $body ( @{ $invocant->{sky} } ) {
-	if ( ( my $name = $body->get( 'name' ) ) =~ $re ) {
-	    push @rslt, $name;
-	} elsif ( ( my $id = $body->get( 'id' ) ) =~ $re ) {
-	    push @rslt, $id;
-	}
-    }
-    return [ sort @rslt ];
 }
 
 sub _sky_sub_list : Verb( verbose! ) {	## no critic (ProhibitUnusedPrivateSubroutines)
@@ -3549,7 +3562,7 @@ sub version : Verb() {
 
 @{[__PACKAGE__]} $VERSION - Satellite pass predictor
 based on Astro::Coord::ECI @{[Astro::Coord::ECI->VERSION]}
-Copyright (C) 2009-2021 by Thomas R. Wyant, III
+Copyright (C) 2009-2022 by Thomas R. Wyant, III
 
 EOD
 }
@@ -4330,15 +4343,22 @@ my $readline_word_break_re;
 			or return;
 		    unless ( $rl ) {
 			$rl = Term::ReadLine->new( 'satpass2' );
-			if ( $INC{'Term/ReadLine/readline.pm'} ) {
+			if ( 'Term::ReadLine::Perl' eq $rl->ReadLine() ) {
+
+			    $readline_word_break_re ||= qr<
+				[\Q$readline::rl_completer_word_break_characters\E]+
+			    >smx;
+
 			    no warnings qw{ once };
-			    $readline::rl_completion_function =
-				__PACKAGE__->can( '__readline_completer_function' );
+			    $readline::rl_completion_function = sub {
+				my ( $text, $line, $start ) = @_;
+				return $self->__readline_completer(
+				    $text, $line, $start );
+			    };
 			}
 		    }
 		    sub {
 			defined $buffer or return $buffer;
-			local $READLINE_OBJ = $self;
 			return ( $buffer = $rl->readline($_[0]) );
 		    }
 		} || sub {
@@ -4360,43 +4380,37 @@ my $readline_word_break_re;
     }
 }
 
-sub __readline_completer_function {
-    my ( $text, $line, $start ) = @_;
-
-    my $invocant = $READLINE_OBJ || __PACKAGE__;
-
-    $readline_word_break_re ||= qr<
-	[\Q$readline::rl_completer_word_break_characters\E]+
-    >smx;
+sub __readline_completer {
+    my ( $app, $text, $line, $start ) = @_;
 
     $start
-	or return $invocant->_readline_complete_command( $text );
+	or return $app->_readline_complete_command( $text );
 
     my ( $cmd ) = split $readline_word_break_re, $line, 2;
     my $code;
     not $cmd =~ s/ \A core [.] //smx
-	and ref $invocant
-	and $invocant->{macro}{$cmd}
-	and $code = $invocant->{macro}{$cmd}->implements( $cmd );
-    $code ||= $invocant->can( $cmd );
+	and ref $app
+	and $app->{macro}{$cmd}
+	and $code = $app->{macro}{$cmd}->implements( $cmd );
+    $code ||= $app->can( $cmd );
 
     if ( CODE_REF eq ref $code ) {
 	# builtins and code macros go here
 
 	my $rslt;
 
-	if ( my $method = $invocant->__get_attr( $code, Tweak => {}
+	if ( my $method = $app->__get_attr( $code, Tweak => {}
 	    )->{completion} ) {
-	    $rslt = $invocant->$method( $code, $text, $line, $start )
+	    $rslt = $app->$method( $code, $text, $line, $start )
 		and return @{ $rslt };
 	}
 
-	$rslt = $invocant->_readline_complete_options( $code, $text,
+	$rslt = $app->_readline_complete_options( $code, $text,
 	    $line, $start )
 	    and @{ $rslt }
 	    and return @{ $rslt };
 
-    } elsif ( my $macro = $invocant->{macro}{$cmd} ) {
+    } elsif ( my $macro = $app->{macro}{$cmd} ) {
 	# command macros go here
 
 	my $rslt;
@@ -4405,36 +4419,38 @@ sub __readline_completer_function {
     }
 
     my @files = bsd_glob( "$text*" );
-    if ( $readline::var_CompleteAddsuffix ) {
+    if ( 1 == @files ) {
+	$files[0] .= -d $files[0] ? '/' : ' ';
+    } elsif ( $readline::var_CompleteAddsuffix ) {
 	foreach ( @files ) {
-	    if (-l $_) {
-##		$_ .= '@';
-	    } elsif (-d _) {
+	    if ( -l $_ ) {
+		$_ .= '@';
+	    } elsif ( -d $_ ) {
 		$_ .= '/';
-		$readline::rl_completer_terminator_character = '';
-	    } elsif (-x _) {
-##		$_ .= '*';
-	    } elsif (-S _ || -p _) {
-##		$_ .= '=';
+	    } elsif ( -x _) {
+		$_ .= '*';
+	    } elsif ( -S _ || -p _ ) {
+		$_ .= '=';
 	    }
 	}
     }
+    $readline::rl_completer_terminator_character = '';
     return @files;
 }
 
 {
     my @builtins;
     sub _readline_complete_command {
-	my ( $invocant, $text ) = @_;
+	my ( $app, $text ) = @_;
 	unless ( @builtins ) {
-	    my $stash = ( ref $invocant || $invocant ) . '::';
+	    my $stash = ( ref $app || $app ) . '::';
 	    no strict qw{ refs };
 	    foreach my $sym ( keys %$stash ) {
 		$sym =~ m/ \A _ /smx
 		    and next;
-		my $code = $invocant->can( $sym )
+		my $code = $app->can( $sym )
 		    or next;
-		$invocant->__get_attr( $code, 'Verb' )
+		$app->__get_attr( $code, 'Verb' )
 		    or next;
 		push @builtins, $sym;
 	    }
@@ -4447,7 +4463,7 @@ sub __readline_completer_function {
 	} else {
 	    my $match = qr< \A \Q$text\E >smx;
 	    @rslt = grep { $_ =~ $match } @builtins, 'core.',
-		ref $invocant ? keys %{ $invocant->{macro} } : ();
+		ref $app ? keys %{ $app->{macro} } : ();
 	}
 	1 == @rslt
 	    and $rslt[0] =~ m/ \W \z /smx
@@ -4457,12 +4473,12 @@ sub __readline_completer_function {
 }
 
 sub _readline_complete_options {
-    # my ( $invocant, $code, $text, $line, $start ) = @_;
-    my ( $invocant, $code, $text ) = @_;
+    # my ( $app, $code, $text, $line, $start ) = @_;
+    my ( $app, $code, $text ) = @_;
     $text =~ m/ \A ( --? ) ( .* ) /smx
 	or return;
     my ( $prefix, $match ) = ( $1, $2 );
-    my $lgl = $invocant->__legal_options( $code );
+    my $lgl = $app->__legal_options( $code );
     my $re = qr< \A \Q$match\E >smx;
     my @rslt;
     foreach ( @{ $lgl } ) {
@@ -4478,12 +4494,16 @@ sub _readline_complete_options {
 
 # The following subroutine is called dynamically
 sub _readline_complete_subcommand { ## no critic (ProhibitUnusedPrivateSubroutines)
-    my ( $invocant, $code, $text, $line, $start ) = @_;
+    # my ( $app, $code, $text, $line, $start ) = @_;
+    my ( $app, undef, $text, $line, $start ) = @_;
     my @part = _readline_line_to_parts( $line );
+    if ( my $code = $app->can( "_$part[0]_sub" ) ) {
+	return $code->( $app, $text, $line, $start, @part );
+    }
     my @rslt;
     if ( 2 == @part ) {
 	my $re = qr< \A _$part[0]_sub_ ( \Q$part[1]\E \w* ) >smx;
-	my $stash = ( ref $invocant || $invocant ) . '::';
+	my $stash = ( ref $app || $app ) . '::';
 	no strict qw{ refs };
 	foreach my $key ( keys %$stash ) {
 	    $key =~ m/$re/smx
@@ -4492,28 +4512,65 @@ sub _readline_complete_subcommand { ## no critic (ProhibitUnusedPrivateSubroutin
 	return [ sort @rslt ];
     }
 
-    $code = $invocant->can( "_$part[0]_sub_$part[1]" )
+    my $code = $app->can( "_$part[0]_sub_$part[1]" )
 	or return;
 
     my $r;
-    $r = $invocant->_readline_complete_options( $code, $text, $line,
+    $r = $app->_readline_complete_options( $code, $text, $line,
 	$start )
 	and return $r;
 
-    my $complete = $invocant->__get_attr( $code, Tweak => {} )->{completion}
+    my $complete = $app->__get_attr( $code, Tweak => {} )->{completion}
 	or return;
 
-    $r = $invocant->$complete( $code, $text, $line, $start )
+    $r = $app->$complete( $code, $text, $line, $start )
 	and return $r;
 
     return;
 }
 
+sub _macro_list_complete {	## no critic (ProhibitUnusedPrivateSubroutines)
+    # my ( $app, $code, $text, $line, $start ) = @_;
+    my ( $app, undef, undef, $line, undef ) = @_;
+    ref $app
+	or return;
+    my @part = _readline_line_to_parts( $line );
+    3 == @part
+	or return;
+    my $re = qr< \A \Q$part[2]\E >smx;
+    my @rslt;
+    foreach ( sort keys %{ $app->{macro} } ) {
+	m/$re/smx
+	    and push @rslt, $_;
+    }
+    return \@rslt;
+}
+
+sub _sky_body_complete {	## no critic (ProhibitUnusedPrivateSubroutines)
+    # my ( $app, $code, $text, $line, $start ) = @_;
+    my ( $app, undef, undef, $line, undef ) = @_;
+    ref $app
+	or return;
+    my @part = _readline_line_to_parts( $line );
+    3 == @part
+	or return;
+    my $re = qr< \A \Q$part[2]\E >smxi;
+    my @rslt;
+    foreach my $body ( @{ $app->{sky} } ) {
+	if ( ( my $name = $body->get( 'name' ) ) =~ $re ) {
+	    push @rslt, $name;
+	} elsif ( ( my $id = $body->get( 'id' ) ) =~ $re ) {
+	    push @rslt, $id;
+	}
+    }
+    return [ sort @rslt ];
+}
+
 sub _readline_line_to_parts {
     my ( $line ) = @_;
-    my @parts = split $readline_word_break_re, $line;
-    $line =~ m/ \s+ \z /smx	# Trailing spaces do not produce an
-	and push @parts, '';	# empty part, so we force one.
+    # NOTE that the field count of -1 causes a trailing separator to
+    # result in a trailing empty field.
+    my @parts = split $readline_word_break_re, $line, -1;
     # NOTE that we strip the leading 'core.' if any, so the return from
     # this method does not distinguish between a core command and the
     # same-named macro if any.
@@ -9618,7 +9675,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2021 by Thomas R. Wyant, III
+Copyright (C) 2009-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

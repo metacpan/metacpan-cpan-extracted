@@ -2258,40 +2258,25 @@ int32_t SPVM__Sys__Socket__Constant__MSG_NOERROR(SPVM_ENV* env, SPVM_VALUE* stac
 
 int32_t SPVM__Sys__Socket__Constant__SHUT_RD(SPVM_ENV* env, SPVM_VALUE* stack) {
 
-#ifdef SHUT_RD
-  stack[0].ival = SHUT_RD;
+  stack[0].ival = 0;
+  
   return 0;
-#else
-  env->die(env, stack, "SHUT_RD is not defined on this system", FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
-#endif
-
 }
 
 
 int32_t SPVM__Sys__Socket__Constant__SHUT_WR(SPVM_ENV* env, SPVM_VALUE* stack) {
 
-#ifdef SHUT_WR
-  stack[0].ival = SHUT_WR;
+  stack[0].ival = 1;
+  
   return 0;
-#else
-  env->die(env, stack, "SHUT_WR is not defined on this system", FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
-#endif
-
 }
 
 
 int32_t SPVM__Sys__Socket__Constant__SHUT_RDWR(SPVM_ENV* env, SPVM_VALUE* stack) {
 
-#ifdef SHUT_RDWR
-  stack[0].ival = SHUT_RDWR;
+  stack[0].ival = 2;
+  
   return 0;
-#else
-  env->die(env, stack, "SHUT_RDWR is not defined on this system", FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
-#endif
-
 }
 
 int32_t SPVM__Sys__Socket__Constant__TCP_CONGESTION(SPVM_ENV* env, SPVM_VALUE* stack) {

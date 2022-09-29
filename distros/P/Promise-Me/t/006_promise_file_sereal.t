@@ -10,6 +10,7 @@ BEGIN
     use Test::More;
     use Promise::Me qw( :all );
     use Test::Promise::Me;
+    use Module::Generic::File qw( file );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     # our $DESTROY_SHARED_MEM = 0;
 };
@@ -24,9 +25,10 @@ plan( skip_all => "Sereal 4.020 required for testing promise serialisation with 
 
 my $medium     = 'file';
 my $serialiser = 'sereal';
+my $tmpdir = file(__FILE__)->parent;
 subtest "Promise using $medium and $serialiser serialiser" => sub
 {
-    &Test::Promise::Me::runtest( $medium, $serialiser );
+    &Test::Promise::Me::runtest( $medium, $serialiser, { tmpdir => $tmpdir } );
 };
 
 done_testing();

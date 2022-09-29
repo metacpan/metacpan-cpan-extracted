@@ -27,7 +27,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.203';
+our $VERSION = '1.204';
 
 use Quiq::Sql;
 use Quiq::Object;
@@ -1740,6 +1740,9 @@ sub applyPatches {
         my ($name,$sub,$descr) = @$_;
         my ($n) = map {int} $name =~ /(\d+)/;
         if ($n > $maxLevel) {
+            # für SQLite nötig, damit keine Daten durch Fremdschlüssel-
+            # Verweise verloren gehen
+            $self->sql('PRAGMA foreign_keys = OFF');
             $self->begin;
             $sub->($self,$n);
             $self->insert('patch',
@@ -1747,6 +1750,7 @@ sub applyPatches {
                 pat_description => $descr,
             );
             $self->commit;
+            $self->sql('PRAGMA foreign_keys = ON'); # s.o.
             $i++;
         }
     }
@@ -2327,6 +2331,7 @@ sub save {
             RowStatus => $stat,
         );
     }
+    $row->rowStatus(0); # NEU 2022-08-22
     $cur->{'rowOperation'} = $stat;
 
     return $cur;
@@ -5931,7 +5936,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.203
+1.204
 
 =head1 AUTHOR
 

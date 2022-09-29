@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.203';
+our $VERSION = '1.204';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -42,6 +42,7 @@ use Encode::Guess ();
 use Quiq::String;
 use Encode ();
 use Digest::SHA ();
+use Time::HiRes ();
 use Quiq::Unindent;
 use Fcntl qw/:DEFAULT/;
 use Quiq::Perl;
@@ -209,7 +210,9 @@ sub checkFileSecurity {
 =head4 Description
 
 Prüfe, ob der Inhalt der Dateien $file1 und $file2 differiert.
-Ist dies der Fall, liefere I<wahr>, andernfalls I<falsch>.
+Ist dies der Fall, liefere I<wahr> (1 oder 2), andernfalls I<falsch> (0).
+Differiert $file2, wird 1 geliefert, existiert $file2 nicht,
+wird 2 geliefert.
 
 =cut
 
@@ -219,6 +222,10 @@ sub compare {
     my $class = shift;
     my $file1 = $class->expandTilde(shift);
     my $file2 = $class->expandTilde(shift);
+
+    if (!-e $file2) {
+        return 2;
+    }
 
     if (-s $file1 != -s $file2) {
         return 1;
@@ -320,7 +327,7 @@ sub convertEncoding {
 
 =head4 Synopsis
 
-  $class->copy($srcPath,$destPath,@opt);
+  $this->copy($srcPath,$destPath,@opt);
 
 =head4 Options
 
@@ -347,16 +354,18 @@ Behalte den Zeitpunkt der letzten Änderung bei.
 
 =head4 Description
 
-Kopiere Datei $srcPath nach $destPath.
+Kopiere Datei $srcPath nach $destPath. Ist eine Nulloperation,
+wenn die Ziledatei existiert und identisch zur Quelldatei ist
+(gleicher Inode).
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub copy {
-    my $class = shift;
-    my $srcPath = shift;
-    my $destPath = shift;
+    my $this = shift;
+    my $srcPath = $this->expandTilde(shift);
+    my $destPath = $this->expandTilde(shift);
     # @_: @opt
 
     # Optionen
@@ -377,25 +386,31 @@ sub copy {
 
     # Operation ausführen
 
-    if (!$overwrite && -e $destPath) {
-        $class->throw(
-            'PATH-00099: Zieldatei existiert bereits',
-            Path => $destPath,
-        );
+    if (-e $destPath) {
+        if ($this->sameFile($srcPath,$destPath)) {
+            # Wenn Quell- und Zieldatei identisch sind
+            # (gleicher Inode), machen wir nichts
+            return;
+        }
+        if (!$overwrite) {
+            $this->throw(
+                'PATH-00099: Destination path already exists',
+                Path => $destPath,
+            );
+        }
     }
 
     my $fh1 = Quiq::FileHandle->new('<',$srcPath);
 
     if ($createDir) {
-        my ($destDir) = $class->split($destPath);
-        $class->mkdir($destDir,-recursive=>1);
+        my ($destDir) = $this->split($destPath);
+        $this->mkdir($destDir,-recursive=>1);
     }
-
 
     my $fh2 = Quiq::FileHandle->new('>',$destPath);
     while (<$fh1>) {
-        print $fh2 $_ or $class->throw(
-            'PATH-00007: Schreiben auf Datei fehlgeschlagen',
+        print $fh2 $_ or $this->throw(
+            'PATH-00007: Write failed',
             SourcePath => $srcPath,
             DestinationPath => $destPath,
         );
@@ -404,11 +419,11 @@ sub copy {
     $fh2->close;
 
     if ($preserve) {
-        $class->mtime($destPath,$class->mtime($srcPath));
+        $this->mtime($destPath,$this->mtime($srcPath));
     }
 
     if ($move) {
-        $class->delete($srcPath);
+        $this->delete($srcPath);
     }
 
     return;
@@ -1097,6 +1112,138 @@ sub sha1 {
     $sha->addfile($file);
 
     return $sha->hexdigest;;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 size() - Größe der Datei in Bytes
+
+=head4 Synopsis
+
+  $size = $this->size($file);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Pfad der Datei.
+
+=back
+
+=head4 Description
+
+Ermittele die Größe der Datei in Bytes und liefere diesen Wert zurück.
+Im Unterschied zu
+
+  -s $file
+
+führt die Methode eine Tilde-Expansion durch.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub size {
+    my $this = shift;
+    my $file = $this->expandTilde(shift);
+    return -s $file;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 tail() - Überwache Datei und gib hinzugefügte Daten kontinuierlich aus
+
+=head4 Synopsis
+
+  $data = $this->tail($file,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+(String) Pfad der Datei.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -offset => $pos (Default: 0)
+
+Beginne die Überwachung bei Datei-Offset $pos.
+
+=item -sleepInterval => $s (Default: 0.1)
+
+Zeitraum, der zwischen den Prüfungen auf Änderung gewartet wird.
+
+=item -timeout => $s (Default: I<überwache unendlich lange>)
+
+Beende die Überwachung der Datei, wenn $s Sekunden (Sekundenbruchteile
+erlaubt, z.B. C<0.5>) lang keine Änderung an der Datei erfolgt ist.
+Der Werte sollte größer sein als das Sleep Interval (s. C{-sleepInterval).
+
+=back
+
+=head4 Returns
+
+(String) Die während der Überwachung hinzugefügte Daten.
+
+=head4 Description
+
+Überwache Datei $file und gib die am Ende hinzugefügten Daten
+kontinuierlich aus. Die Überwachung endet, wenn der Datiinhalt sich
+$s Sekunden lang nicht geändert hat (Option C<--timeout>).
+Liefere die hinzugefügten Daten zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub tail {
+    my $this = shift;
+    my $file = $this->expandTilde(shift);
+
+    # Options
+
+    my $offset = 0;
+    my $sleepInterval = 0.1;
+    my $timeout = undef;
+
+    $this->parameters(\@_,
+        -offset => \$offset,
+        -timeout => \$timeout,
+    );
+
+    my $str = '';
+    my $lastChange = Time::HiRes::gettimeofday;
+    while (1) {
+        my $size = -s $file;
+        if ($size > $offset) {
+            my $fh = Quiq::FileHandle->new('<',$file);
+            $fh->seek($offset);
+            $fh->setEncoding('UTF-8');
+            my $data = $fh->slurp;
+            $str .= $data;
+            print $data;
+            $offset = $fh->tell;
+            $fh->close;
+            $lastChange = Time::HiRes::gettimeofday;
+        }
+        elsif (defined $timeout) {
+            my $now = Time::HiRes::gettimeofday;
+            if ($now-$lastChange > $timeout) {
+                last; # Ende der Überwachung
+            }
+        }
+        Time::HiRes::usleep(int $sleepInterval*1000_000);
+    }
+
+    return $str;
 }
 
 # -----------------------------------------------------------------------------
@@ -3389,6 +3536,47 @@ sub numberPaths {
 
 # -----------------------------------------------------------------------------
 
+=head3 sameFile() - Prüfe auf identische Datei
+
+=head4 Synopsis
+
+  $bool = $this->sameFile($path1,$path2);
+
+=head4 Arguments
+
+=over 4
+
+=item $path1
+
+Erster Pfad
+
+=item $path2
+
+Zweiter Pfad
+
+=back
+
+=head4 Returns
+
+(Integer)
+
+=head4 Description
+
+Prüfe, ob die beiden Pfade $path1 und $path2 auf dieselbe
+Datei (deselben Inode) verweisen. Wenn ja, liefere 1, sonst 0.
+Funktioniert auch bei Symlinks.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub sameFile {
+    my ($this,$path1,$path2) = @_;
+    return ($this->stat($path1))[1] == ($this->stat($path2))[1]? 1: 0;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 split() - Zerlege Pfad in seine Komponenten
 
 =head4 Synopsis
@@ -3720,7 +3908,7 @@ sub uid {
 
 =head1 VERSION
 
-1.203
+1.204
 
 =head1 AUTHOR
 

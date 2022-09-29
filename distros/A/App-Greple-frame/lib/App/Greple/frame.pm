@@ -1,5 +1,6 @@
 package App::Greple::frame;
-our $VERSION = "0.06";
+
+our $VERSION = "0.07";
 
 =encoding utf-8
 
@@ -35,6 +36,11 @@ Set frame and fold long lines with frame-friendly prefix string.
 Folding width is taken from the terminal.  Or you can specify the
 width by calling B<set> function with module option.
 
+=item B<--set-frame-width>=I<#>
+
+Set frame width.  You have to put this option before B<--frame>
+option.  See B<set> function in L</FUNCTION> section.
+
 =begin comment
 
 =item B<--frame-simple>
@@ -45,11 +51,15 @@ Set frame without folding.
 
 =back
 
+=begin comment
+
 Put next line in your F<~/.greplerc> to autoload B<App::Greple::frame> module.
 
     autoload -Mframe --frame
 
 Then you can use B<--frame> option whenever you want.
+
+=end comment
 
 =begin html
 
@@ -89,6 +99,8 @@ You can use like this:
 
 L<App::ansifold>
 
+L<Math::RPN>
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
@@ -105,13 +117,15 @@ it under the same terms as Perl itself.
 use 5.014;
 use warnings;
 use utf8;
+use Data::Dumper;
 
 my($mod, $argv);
-my $width;
 my($head, $blockend, $file_start, $file_end);
 
 my %param = (
-    width => undef,
+    width  => undef,
+    column => undef,
+    fold   => '',
 );
 
 sub terminal_width {
@@ -129,60 +143,103 @@ sub terminal_width {
 
 sub finalize {
     ($mod, $argv) = @_;
-    $width = $param{width} || terminal_width;
-    if ($width =~ /\D/) {
-	require App::Greple::frame::RPN
-	    and App::Greple::frame::RPN->import('rpn_calc');
-	$width = int(rpn_calc(terminal_width, $width)) or die "$width: format error\n";
+}
+
+my %frame_base = (
+    top    => '      ┌─' ,
+    middle => '    ⋮ ├╶' ,
+    bottom => '──────┴─' ,
+    );
+
+sub opt_frame {
+    my $pos = shift;
+    my $width = $param{width} //= terminal_width;
+    local $_ = $frame_base{$pos} or die;
+    if ((my $rest = $width - length) > 0) {
+	$_ .= (substr($_, -1, 1) x $rest);
     }
+    $_;
+}
 
-    my $frame_top    = '      ┌─' ;
-    my $frame_middle = '    ⋮ ├╶' ;
-    my $frame_bottom = '──────┴─' ;
-
-    for ($frame_top, $frame_middle, $frame_bottom) {
-	if ((my $rest = $width - length) > 0) {
-	    $_ .= (substr($_, -1, 1) x $rest);
-	}
-    }
-
-    $mod->setopt('--show-frame-top',    '--frame-top'    => "'$frame_top'");
-    $mod->setopt('--show-frame-middle', '--frame-middle' => "'$frame_middle'");
-    $mod->setopt('--show-frame-bottom', '--frame-bottom' => "'$frame_bottom'");
-    $mod->setopt(
-	'--ansifold',
-	'--pf' => "'ansifold -x --width=$width --prefix \"      │ \"'",
-	);
+my %rpn = (
+    width  => { init => sub { terminal_width } },
+    column => { init => sub { terminal_width } },
+    );
+sub rpn {
+    my($k, $v) = @_;
+    require Getopt::EX::RPN
+	and Getopt::EX::RPN->import('rpn_calc');
+    my $init = $rpn{$k}->{init} // die;
+    my @init = ref $init ? $init->() : $init ? $init : ();
+    int(rpn_calc(@init, $v)) or die "$v: format error\n";
 }
 
 sub set {
     while (my($k, $v) = splice(@_, 0, 2)) {
 	exists $param{$k} or next;
+	$v = rpn($k, $v) if $rpn{$k} and $v =~ /\D/;
 	$param{$k} = $v;
     }
     ();
+}
+
+sub get {
+    use List::Util qw(pairmap);
+    pairmap { $param{$a} } @_;
 }
 
 1;
 
 __DATA__
 
+mode function
+
+option --set-frame-width  &set(width=$<shift>)
+
+option --ansifold-with-width \
+       --pf "ansifold -x --discard=EL --padding --prefix '      │ ' $<shift> --width=$<shift>"
+
+option --ansifold \
+       --ansifold-with-width &get(fold,width)
+
 option --frame-color-filename \
-	--colormap FILE=555/CE --format FILE=' 📂 %s'
+       --colormap FILE=555/CE --format FILE=' %s'
 
 option --frame-simple \
-	--line-number --join-blocks \
-	--filestyle=once \
-	--colormap LINE=       --format LINE='%5d │ ' \
-	--blockend= \
-	--show-frame-middle
+       --line-number --join-blocks \
+       --filestyle=once \
+       --colormap LINE= --format LINE='%5d │ ' \
+       --blockend= \
+       --show-frame-middle
 
-option --frame-fold \
-	--frame-color-filename \
-	--frame-simple --ansifold
+option --show-frame-top    --frame_top    &opt_frame(top)
+option --show-frame-middle --frame_middle &opt_frame(middle)
+option --show-frame-bottom --frame_bottom &opt_frame(bottom)
 
-option --frame --frame-fold
+option --frame-plain --frame-color-filename --frame-simple
+option --frame-fold  --frame-plain --ansifold
+option --frame       --frame-fold
 
-option --frame-classic \
-	--frame-simple \
-	--show-frame-top --show-frame-bottom
+option --frame-classic-plain --frame-simple --show-frame-top --show-frame-bottom
+option --frame-classic-fold  --frame-classic-plain &opt_ansifold
+option --frame-classic       --frame-classic-fold
+
+##
+## EXPERIMENTAL: --frame-pages
+##
+
+define $FRAME_WIDTH 3
+define $COL_WIDTH   80:8+:$FRAME_WIDTH+
+define $PREFIX      '      │ '
+define $FOLD        ansifold -x --discard=EL --padding --prefix $PREFIX
+define $COLUMN      ansicolumn --border=box -P
+define $FOLD_COLUMN $FOLD $<shift> --width=$<shift> | $COLUMN -C $<shift>
+
+option --frame-column-with-param \
+       --pf $FOLD_COLUMN
+
+option --frame-pages \
+       &set(width=DUP:$COL_WIDTH/:INT:DUP:1:GE:EXCH:1:IF:/:$FRAME_WIDTH-) \
+       &set(column=$COL_WIDTH/:INT:DUP:1:GE:EXCH:1:IF) \
+       --frame-plain \
+       --frame-column-with-param &get(fold,width) &get(column)

@@ -9,6 +9,22 @@ class Sys::Socket {
   use Sys::Socket::In6_addr;
   use Sys::IO::PollfdArray;
 
+  native static method htonl : int ($hostlong : int);
+  
+  native static method htons : short ($hostshort : short);
+
+  native static method ntohl : int ($netlong : int);
+  
+  native static method ntohs : short ($netshort : short);
+
+  native static method inet_aton : int ($cp : string, $inp : Sys::Socket::In_addr);
+
+  native static method inet_ntoa : string ($in : Sys::Socket::In_addr);
+
+  native static method inet_pton : int ($af : int, $src : string, $dst : object of Sys::Socket::In_addr|Sys::Socket::In6_addr);
+  
+  native static method inet_ntop : string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
+  
   native static method socket : int ($domain : int, $type : int, $protocol : int);
 
   native static method connect : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
@@ -39,22 +55,6 @@ class Sys::Socket {
 
   native static method getsockopt_int : int ($sockfd : int, $level : int, $optname : int, $optval_ref : int*);
   
-  native static method inet_aton : int ($cp : string, $inp : Sys::Socket::In_addr);
-
-  native static method inet_ntoa : string ($in : Sys::Socket::In_addr);
-
-  native static method inet_pton : int ($af : int, $src : string, $dst : object of Sys::Socket::In_addr|Sys::Socket::In6_addr);
-  
-  native static method inet_ntop : string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
-  
-  native static method htonl : int ($hostlong : int);
-  
-  native static method htons : short ($hostshort : short);
-
-  native static method ntohl : int ($netlong : int);
-  
-  native static method ntohs : short ($netshort : short);
-
   native static method ioctlsocket : int ($s : int, $cmd : int, $argp : int*);
 
   native static method closesocket : int ($fd : int);
@@ -62,17 +62,25 @@ class Sys::Socket {
   native static method WSAPoll : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int);
 
 
+  native static method getaddrinfo_raw : int ($node : string, $service : string,
+                $hints : Sys::Socket::Addrinfo,
+                $res : Sys::Socket::Addrinfo[]);
+
   native static method getaddrinfo : int ($node : string, $service : string,
                 $hints : Sys::Socket::Addrinfo,
                 $res : Sys::Socket::Addrinfo[]);
 
+  native static method getnameinfo_raw : int ($sa : Sys::Socket::Sockaddr, $salen : int,
+                $host : mutable string, $hostlen : int,
+                $serv : mutable string, $servlen : int, $flags : int);
+                
   native static method getnameinfo : int ($sa : Sys::Socket::Sockaddr, $salen : int,
                 $host : mutable string, $hostlen : int,
                 $serv : mutable string, $servlen : int, $flags : int);
 
   native static method gai_strerror : string($errcode : int);
 
-  static method ioctl_int_portable : int ($fd : int, $request : int, $request_arg_ref : int*) {
+  static method ioctl_int : int ($fd : int, $request : int, $request_arg_ref : int*) {
     if (Sys->is_D_WIN32) {
       return Sys::Socket->ioctlsocket($fd, $request, $request_arg_ref);
     }
@@ -83,7 +91,7 @@ class Sys::Socket {
     }
   }
   
-  static method poll_portable : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int) {
+  static method poll : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int) {
     if (Sys->is_D_WIN32) {
       return Sys::Socket->WSAPoll($fds, $nfds, $timeout);
     }
@@ -92,7 +100,7 @@ class Sys::Socket {
     }
   }
   
-  static method close_portable : int ($fd : int) {
+  static method close : int ($fd : int) {
     if (Sys->is_D_WIN32) {
       return Sys::Socket->closesocket($fd);
     }
@@ -100,4 +108,7 @@ class Sys::Socket {
       return Sys::IO->close($fd);
     }
   }
+
+  native static method socket_errno : int ();
+  native static method socket_strerror : string ($errno : int, $length : int);
 }

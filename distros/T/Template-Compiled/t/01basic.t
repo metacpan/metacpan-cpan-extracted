@@ -41,7 +41,7 @@ do {
 	);
 	like(
 		exception { $compiled->render() },
-		qr/Missing required parameter/,
+		qr/(Missing required parameter)|(Wrong number of parameters)/,
 		'Exception for bad params',
 	);
 };

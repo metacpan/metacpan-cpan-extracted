@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::Union::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::Union::VERSION   = '2.000000';
+	$Type::Tiny::Union::VERSION   = '2.000001';
 }
 
 $Type::Tiny::Union::VERSION =~ tr/_//d;
@@ -30,7 +30,7 @@ sub new_by_overload {
 	if ( my @makers = map scalar( blessed($_) && $_->can( 'new_union' ) ), @types ) {
 		my $first_maker = shift @makers;
 		if ( ref $first_maker ) {
-			my $all_same = not grep $_ ne $first_maker, @makers;
+			my $all_same = not grep +( !defined $_ or $_ ne $first_maker ), @makers;
 			if ( $all_same ) {
 				return ref( $types[0] )->$first_maker( %opts );
 			}

@@ -105,6 +105,10 @@ subtest module_source => sub {
         $path = module_source("Foo::Bar$rand2", {die=>0, find_prefix=>1});
         is(ref $path, 'SCALAR');
         note "path=\\ ".$$path;
+
+        my ($source, $path) = module_source("Foo::Bar$rand1", {die=>0, find_prefix=>1});
+        ok($source);
+        ok($path);
     };
 
 };

@@ -12,7 +12,7 @@ use Astro::Coord::ECI::Utils 0.059 qw{ rad2deg };
 use Attribute::Handlers;
 use Scalar::Util 1.26 qw{ refaddr };
 
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 {
     my %operands;
@@ -338,7 +338,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2021 by Thomas R. Wyant, III
+Copyright (C) 2013-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

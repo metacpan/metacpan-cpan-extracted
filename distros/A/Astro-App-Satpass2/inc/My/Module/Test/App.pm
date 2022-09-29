@@ -21,14 +21,19 @@ use constant REGEXP_REF	=> ref qr{};
 
 our @EXPORT = qw{
     application
+    call_m
+    call_m_result
     check_access
     check_datetime_timezone_local
-    klass
+    dt_greg_time_gm
+    dt_greg_time_local
     dump_date_manip
     dump_date_manip_init
+    dump_zones
+    dump_zones_init
     execute
+    klass
     load_or_skip
-    call_m
     normalize_path
     same_path
     FALSE
@@ -40,8 +45,9 @@ BEGIN {
     # If I should need to write a test that uses a dirty environment (or
     # at least wants something in $ENV{TZ}) the plan is to handle it via
     # the import mechanism. See @EXPORT_FAIL, which is good back to at
-    # least 5.12.
-    delete $ENV{TZ};
+    # least 5.12. Except this may be causing problems with CPAN Testers
+    # machines set up correctly for zones other than their default.
+    # delete $ENV{TZ};
 
     # Note that we have to load Astro::App::Satpass2 this way because we
     # need to clean up the environment before we do the load.
@@ -94,6 +100,7 @@ sub check_access {
 sub check_datetime_timezone_local {
     local $@ = undef;
     eval {
+	require DateTime;
 	require DateTime::TimeZone;
 	1;
     } or return 1;
@@ -108,12 +115,51 @@ sub klass {
     return;
 }
 
-{
+sub _dtz_to_epoch {
+    my ( $sec, $min, $hr, $day, $mon, $yr, $zone ) = @_;
+    $mon += 1;
+    ( my $nano, $sec ) = POSIX::modf( $sec );
+    $nano *= 1_000_000_000;
+    return DateTime->new(
+	year	=> $yr,
+	month	=> $mon,
+	day	=> $day,
+	hour	=> $hr,
+	minute	=> $min,
+	second	=> $sec,
+	nanosecond	=> $nano,
+	time_zone	=> $zone,
+    )->epoch();
+}
 
+{
+    my $tz_utc;
+
+    sub dt_greg_time_gm {
+	my ( $sec, $min, $hr, $day, $mon, $yr ) = @_;
+	$tz_utc ||= DateTime::TimeZone->new( name => 'UTC' );
+	return _dtz_to_epoch( $sec, $min, $hr, $day, $mon, $yr, $tz_utc );
+    }
+}
+
+{
+    my $tz_local;
+
+    sub dt_greg_time_local {
+	my ( $sec, $min, $hr, $day, $mon, $yr ) = @_;
+	$tz_local ||= DateTime::TimeZone->new( name => 'local' );
+	return _dtz_to_epoch( $sec, $min, $hr, $day, $mon, $yr, $tz_local );
+    }
+}
+
+{
     my $dumped;
 
     sub dump_date_manip {
 	my ( $time_tested ) = @_;
+
+	diag '  difference: ', $time_tested - call_m_result();
+
 	$dumped++
 	    and return;
 
@@ -146,35 +192,86 @@ sub klass {
 	    # Only displays for Date::Manip v6 interface
 	    $app->can( 'dmd_zone' )
 		and diag 'dmd_zone = ', $app->dmd_zone();
+	    $app->can( '__epoch_offset' )
+		and diag 'epoch_offset = ', $app->__epoch_offset();
 	}
 
-	if ( eval { require DateTime::TimeZone; 1; } ) {
-	    my $dt_zone = DateTime::TimeZone->new( name => 'local')->name();
-	    diag "DateTime::TimeZone is '$dt_zone'";
-	} else {
-	    diag 'DateTime::TimeZone not available';
+	{
+	    local $ENV{DATE_MANIP_DEBUG} = 1;
+	    local $@ = undef;
+	    eval {
+		require Date::Manip::TZ;
+		my $text;
+		open my $fh, '>', \$text;
+		local *STDOUT = $fh;
+		Date::Manip::TZ->new();
+		close $fh;
+		diag $text;
+	    };
 	}
 
-	diag strftime(
-	    q<POSIX zone: %z ('%Z')>, localtime( $time_tested || 0 ) );
-
-	eval {
-	    no strict qw{ refs };
-	    my $class = defined $Time::y2038::VERSION ? 'Time::y2038' :
-		'Time::Local';
-	    diag sprintf 'Time to epoch uses %s %s', $class,
-		$class->VERSION();
-	};
-
-	diag q<$ENV{TZ} = >, defined $ENV{TZ} ? "'$ENV{TZ}'" : 'undef';
-
-	return;
+	goto &__dump_zones;
     }
 
     sub dump_date_manip_init {
 	$dumped = undef;
 	return;
     }
+}
+
+{
+    my $dumped;
+
+    sub dump_zones {
+	my ( $time_tested ) = @_;
+
+	diag '  difference: ', $time_tested - call_m_result();
+
+	$dumped++
+	    and return;
+
+	goto &__dump_zones;
+    }
+
+    sub dump_zones_init {
+	$dumped = undef;
+	return;
+    }
+}
+
+sub __dump_zones {
+    my ( $time_tested ) = @_;
+
+    if ( eval { require DateTime; 1; } ) {
+	diag 'Have DateTime ', DateTime->VERSION();
+    } else {
+	diag 'DateTime not available';
+    }
+
+    if ( eval { require DateTime::TimeZone; 1; } ) {
+	diag 'Have DateTime::TimeZone ', DateTime::TimeZone->VERSION();
+	my $dt_zone = DateTime::TimeZone->new( name => 'local')->name();
+	diag "DateTime::TimeZone is '$dt_zone'";
+    } else {
+	diag 'DateTime::TimeZone not available';
+    }
+
+    diag strftime(
+	q<POSIX zone: %z ('%Z')>, localtime( $time_tested || 0 ) );
+
+    eval {
+	no strict qw{ refs };
+	my $class = defined $Time::y2038::VERSION ? 'Time::y2038' :
+	    'Time::Local';
+	diag sprintf 'Time to epoch uses %s %s', $class,
+	    $class->VERSION();
+    };
+
+    diag '$main::TZ is ', defined $main::TZ ? "'$main::TZ'" : 'undef';
+
+    diag q<$ENV{TZ} = >, defined $ENV{TZ} ? "'$ENV{TZ}'" : 'undef';
+
+    return;
 }
 
 sub execute {	## no critic (RequireArgUnpacking)
@@ -238,31 +335,38 @@ sub execute {	## no critic (RequireArgUnpacking)
     }
 }
 
-sub call_m {	## no critic (RequireArgUnpacking)
-    my ( $method, @args ) = @_;
-    my ( $want, $title ) = splice @args, -2;
+{
     my $got;
-    if ( eval { $got = $app->$method( @args ); 1 } ) {
 
-	if ( CODE_REF eq ref $want ) {
-	    @_ = ( $want, $got, $title );
-	    goto &$want;
-	}
+    sub call_m {	## no critic (RequireArgUnpacking)
+	my ( $method, @args ) = @_;
+	my ( $want, $title ) = splice @args, -2;
+	if ( eval { $got = $app->$method( @args ); 1 } ) {
 
-	foreach ( $want, $got ) {
-	    defined and not ref and chomp;
+	    if ( CODE_REF eq ref $want ) {
+		@_ = ( $want, $got, $title );
+		goto &$want;
+	    }
+
+	    foreach ( $want, $got ) {
+		defined and not ref and chomp;
+	    }
+	    @_ = ( $got, $want, $title );
+	    REGEXP_REF eq ref $want ? goto &like :
+		ref $want ? goto &is_deeply : goto &is;
+	} else {
+	    $got = $@;
+	    chomp $got;
+	    defined $want or $want = 'Unexpected error';
+	    REGEXP_REF eq ref $want
+		or $want = qr<\Q$want>smx;
+	    @_ = ( $got, $want, $title );
+	    goto &like;
 	}
-	@_ = ( $got, $want, $title );
-	REGEXP_REF eq ref $want ? goto &like :
-	    ref $want ? goto &is_deeply : goto &is;
-    } else {
-	$got = $@;
-	chomp $got;
-	defined $want or $want = 'Unexpected error';
-	REGEXP_REF eq ref $want
-	    or $want = qr<\Q$want>smx;
-	@_ = ( $got, $want, $title );
-	goto &like;
+    }
+
+    sub call_m_result {
+	return $got;
     }
 }
 
@@ -411,6 +515,18 @@ this machinery will sort things out.
 This subroutine replaces the stored object (if any) with the given class
 name. The stored object is initialized to C<'Astro::App::Satpass2'>.
 
+=head2 dt_greg_time_gm
+
+This has the same signature and return as C<greg_time_gm> in
+L<Astro::Coord::ECI::Utils|Astro::Coord::ECI::Utils>, but the heavy
+lifting is done by L<DateTime|DateTime>.
+
+=head2 dt_greg_time_local
+
+This has the same signature and return as C<greg_time_local> in
+L<Astro::Coord::ECI::Utils|Astro::Coord::ECI::Utils>, but the heavy
+lifting is done by L<DateTime|DateTime>.
+
 =head2 execute
 
  execute 'location', <<'EOD', 'Verify location';
@@ -501,6 +617,14 @@ If the desired result is a C<Regexp>, the results are tested with
 C<like()>. If it is any other reference, the test is done with
 C<is_deeply()>. Otherwise, they are tested with C<is()>.
 
+=head2 call_m_result
+
+ call_m get => 'twilight', 'civil', 'Confirm civil twilight';
+ say call_m_result;
+
+This subroutine returns whatever value was returned by the method call
+executed by the most-recent C<call_m()>.
+
 =head2 normalize_path
 
  my $normalized = normalize_path( $path );
@@ -568,7 +692,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2021 by Thomas R. Wyant, III
+Copyright (C) 2011-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

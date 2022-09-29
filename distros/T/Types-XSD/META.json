@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Types-XSD",
    "no_index" : {
@@ -34,8 +34,8 @@
          "requires" : {
             "DateTime::Incomplete" : "0",
             "DateTimeX::Auto" : "0.004",
-            "Type::Library" : "1.000000",
-            "Types::XSD::Lite" : "0.006",
+            "Type::Library" : "2.000000",
+            "Types::XSD::Lite" : "0.007",
             "XML::RegExp" : "0",
             "perl" : "5.008003"
          }
@@ -43,14 +43,14 @@
       "test" : {
          "requires" : {
             "Test::More" : "0.96",
-            "Test::TypeTiny" : "1.000000"
+            "Test::TypeTiny" : "2.000000"
          }
       }
    },
    "provides" : {
       "Types::XSD" : {
          "file" : "lib/Types/XSD.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Types-XSD/project"
    },
-   "version" : "0.007",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "version" : "0.008",
+   "x_serialization_backend" : "JSON::PP version 4.09",
    "x_static_install" : 1
 }

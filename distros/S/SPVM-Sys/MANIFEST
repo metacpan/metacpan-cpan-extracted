@@ -73,6 +73,9 @@ lib/SPVM/Sys/Socket/Constant.c
 lib/SPVM/Sys/Socket/Constant.config
 lib/SPVM/Sys/Socket/Constant.pm
 lib/SPVM/Sys/Socket/Constant.spvm
+lib/SPVM/Sys/Socket/Error.spvm
+lib/SPVM/Sys/Socket/Error/InetInvalidNetworkAddress.pm
+lib/SPVM/Sys/Socket/Error/InetInvalidNetworkAddress.spvm
 lib/SPVM/Sys/Socket/In6_addr.c
 lib/SPVM/Sys/Socket/In6_addr.config
 lib/SPVM/Sys/Socket/In6_addr.pm
@@ -103,8 +106,8 @@ lib/SPVM/Sys/Socket/Sockaddr/In6.c
 lib/SPVM/Sys/Socket/Sockaddr/In6.config
 lib/SPVM/Sys/Socket/Sockaddr/In6.pm
 lib/SPVM/Sys/Socket/Sockaddr/In6.spvm
+lib/SPVM/Sys/Socket/Sockaddr/Interface.pm
 lib/SPVM/Sys/Socket/Sockaddr/Interface.spvm
-lib/SPVM/Sys/Socket/Sockaddr/SockaddrI.spvm
 lib/SPVM/Sys/Socket/Sockaddr/Storage.c
 lib/SPVM/Sys/Socket/Sockaddr/Storage.config
 lib/SPVM/Sys/Socket/Sockaddr/Storage.pm
@@ -130,6 +133,9 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+t/execv_success.pl
+t/exit_failure.pl
+t/exit_success.pl
 t/ftest/dir_empty/.gitkeep
 t/ftest/file_bytes8.txt
 t/ftest/file_empty.txt

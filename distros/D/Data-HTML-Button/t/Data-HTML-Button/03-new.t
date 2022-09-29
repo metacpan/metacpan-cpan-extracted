@@ -8,8 +8,7 @@ use Test::More 'tests' => 6;
 use Test::NoWarnings;
 
 # Test.
-my $obj = Data::HTML::Button->new(
-);
+my $obj = Data::HTML::Button->new;
 isa_ok($obj, 'Data::HTML::Button');
 
 # Test.

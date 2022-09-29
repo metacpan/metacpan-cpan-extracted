@@ -1,3 +1,133 @@
+0.07 2022-09-29
+  [Changes]
+    * The inet_aton method in the Sys::Socket class is emulated using inet_pton on Windows.
+  [Ineffective Changes]
+    * Sys::Socket::Constant->SHUT_RD always return 0.
+    * Sys::Socket::Constant->SHUT_WR always return 1.
+    * Sys::Socket::Constant->SHUT_RDWR always return 2.
+    
+  [New Features]
+    * Added the sizeof method in the Sys::Socket::Sockaddr.
+    
+      method sizeof : int ()
+    
+    * Added the size method in the Sys::Socket::Sockaddr::Interface.
+    
+      method sizeof : int ()
+    
+    * Added the size method in the Sys::Socket::Sockaddr::In.
+    
+      method sizeof : int ()
+    
+    * Added the size method in the Sys::Socket::Sockaddr::In6.
+    
+      method sizeof : int ()
+    
+    * Added the size method in the Sys::Socket::Sockaddr::Un.
+    
+      method sizeof : int ()
+    
+    * Added the size method in the Sys::Socket::Sockaddr::Strage.
+    
+      method sizeof : int ()
+    
+    * Added the s_addr and set_s_addr methods to the Sys::In_addr class.
+    
+      method s_addr : int ();
+
+      method set_s_addr : void ($s_addr : int);
+
+    * Added the s6_addr and set_s6_addr methods to the Sys::In6_addr class.
+
+      method s6_addr : string ();
+
+      method set_s6_addr : void ($address : string);
+    * Add Sys::Socket::Error::InetInvalidNetworkAddress.
+    
+  [Test Improvement]
+    * Added the test of the exit method in the Sys::Process class on Windows.
+    * Added the test of the execv method in the Sys::Process class on Windows.
+  [Bug Fix With Incompative Changes]
+    * Fixed the bug that the definitions of the sin_family and set_sin_family method in the Sys::Socket::Sockaddr::In were wrong.
+      [Before]
+        method sin_family : int ()
+        method set_sin_family : void ()
+      [After]
+        method sin_family : byte ()
+        method set_sin_family : void ($family : byte)
+    * Fixed the bug that the definitions of the sin6_family and set_sin6_family method in the Sys::Socket::Sockaddr::In6 were wrong.
+      [Before]
+        method sin6_family : int ()
+        method set_sin6_family : void ()
+      [After]
+        method sin6_family : byte ()
+        method set_sin6_family : void ($family : byte)
+    * Fixed the bug that the definitions of the sun_family and set_sun_family method in the Sys::Socket::Sockaddr::Un were wrong.
+      [Before]
+        method sun_family : int ()
+        method set_sun_family : void ()
+      [After]
+        method sun_family : byte ()
+        method set_sun_family : void ($family : byte)
+    * Fixed the bug that the definitions of the ss_family and set_ss_family method in the Sys::Socket::Sockaddr::Storage were wrong.
+      [Before]
+        method ss_family : int ()
+        method set_ss_family : void ()
+      [After]
+        method ss_family : byte ()
+        method set_ss_family : void ($family : byte)
+    * Fixed the bug that the definitions of the sa_family method in the Sys::Socket::Sockaddr and its child classes and the interface were wrong.
+      [Before]
+        method sa_family : int ()
+      [After]
+        method sa_family : byte ()
+  [Bug Fix]
+    * Fixed the bug that the socket_strerror method in the Sys::Socket class didn't work well.
+  [Test Fix]
+    * Fixed the test of the times method in the Sys::Process class.
+  [Document Improvement]
+    * Add the doc of the Sys::Socket::Sockaddr class.
+    * Add the doc of the Sys::Socket::Sockaddr::Interface class.
+  [Incompative Changes]
+    * The inet_ntop method in Sys::Socket throw an exception if the address family is not AF_INET and AF_INET6.
+    * The inet_pton method in Sys::Socket throw an exception if the address family is not AF_INET and AF_INET6.
+    * The inet_ntop and inet_pton method in Sys::Socket throw an exception with Sys::Socket::Error::InetInvalidNetworkAddress
+      if the address is an invalid network address.
+    * The inet_ntoa method in Sys::Socket throw an exception if inet_ntoa failed.
+    * The set_sin6_addr method in Sys::Socket::Sockaddr::In6 throw an exception if the address is not defined.
+    * The set_sin_addr method in Sys::Socket::Sockaddr::In throw an exception if the address is not defined.
+  [Internall Uneffective Changes]
+    * Rename the has_interface in the class Sys::Socket::Sockaddr::Interface to has_interfaces.
+    * Rename the has_interface in the class Sys::Socket::Sockaddr to has_interfaces.
+    
+0.06 2022-09-27
+  [Test Fix]
+    * Fix the test of the setpriority method in the Sys::Process class.
+    * Fix the test of the times method in the Sys::Process class.
+  [New Features]
+    * Add the getaddrinfo_raw to the Sys::Socket class. This is the same as original the getaddrinfo method.
+    * Add the getnameinfo_raw to the Sys::Socket class. This is the same as original the getnameinfo method.
+    * Add the following methods to the Sys::Socket class.
+    
+      static method socket_errno : int ();
+      static method socket_strerror : string ($errno : int, $length : int);
+    
+  [Prerequirement Changes]
+    * SPVM::Sys needs SPVM 0.9653+.
+  [Incompatible Changes]
+    * The getaddrinfo method in the Sys::Socket class gets to throw an exception.
+    * The getnameinfo method in the Sys::Socket class gets to throw an exception.
+    * Rename the follwing methods in the Sys::Socket class.
+      [Before]
+      static method ioctl_int_portable : int ($fd : int, $request : int, $request_arg_ref : int*);
+      static method poll_portable : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int);
+      static method close_portable : int ($fd : int);
+      
+      [After]
+      static method ioctl_int : int ($fd : int, $request : int, $request_arg_ref : int*);
+      static method poll : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int);
+      static method close : int ($fd : int);
+
 0.05 2022-09-26
   [Document Fix To Fix Typo]
     * Remove native attribute from the definitions of the methods.

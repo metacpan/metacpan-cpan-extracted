@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Unix - Various Sah schemas for Unix
 
 VERSION
-    This document describes version 0.018 of Sah::Schemas::Unix (from Perl
-    distribution Sah-Schemas-Unix), released on 2021-07-29.
+    This document describes version 0.019 of Sah::Schemas::Unix (from Perl
+    distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:
@@ -24,6 +24,19 @@ SAH SCHEMAS
 
         Group identifier (GID).
 
+        Note that this schema does not check whether the GID exists (has
+        record in the user database e.g. "/etc/group"). To do that, use the
+        "unix::gid::exists" schema.
+
+    *   unix::gid::exists
+
+        Group identifier (GID) that has to exist on the system.
+
+        Existing means having a group name associated with this GID, i.e.
+        "getgrgid" returns a record.
+
+        Support coercion from an existing group name.
+
     *   unix::groupname
 
         Unix group name.
@@ -36,36 +49,15 @@ SAH SCHEMAS
 
         The maximum length is 32 following libc6's limit.
 
-    *   unix::local_gid
+        Note that this schema does not check whether the group name exists
+        (has record in the user database e.g. "/etc/group"). To do that, use
+        the "unix::groupname::exists" schema.
 
-        Group identifier (GID) that has to exist on the system.
-
-        Existing means having a group name associated with this GID, i.e.
-        "getgrgid" returns a record.
-
-        Support coercion from an existing group name.
-
-    *   unix::local_groupname
+    *   unix::groupname::exists
 
         Unix group name that must exist on the system.
 
         Support coercion from GID.
-
-    *   unix::local_uid
-
-        User identifier (UID) that has to exist (has associated username) on
-        the system.
-
-        Existing means having a user name associated with this UID, i.e.
-        "getpwuid" returns a record.
-
-        Support coercion from an existing user name.
-
-    *   unix::local_username
-
-        Unix user name that must exist on the system.
-
-        Support coercion from UID.
 
     *   unix::pathname
 
@@ -85,6 +77,20 @@ SAH SCHEMAS
 
         User identifier (UID).
 
+        Note that this schema does not check whether the UID exists (has
+        record in the user database e.g. "/etc/passwd"). To do that, use the
+        "unix::uid::exists" schema.
+
+    *   unix::uid::exists
+
+        User identifier (UID) that has to exist (has associated username) on
+        the system.
+
+        Existing means having a user name associated with this UID, i.e.
+        "getpwuid" returns a record.
+
+        Support coercion from an existing user name.
+
     *   unix::username
 
         Unix account name.
@@ -97,6 +103,16 @@ SAH SCHEMAS
 
         The maximum length is 32 following libc6's limit.
 
+        Note that this schema does not check whether the user name exists
+        (has record in the user database e.g. "/etc/group"). To do that, use
+        the "unix::username::exists" schema.
+
+    *   unix::username::exists
+
+        Unix user name that must exist on the system.
+
+        Support coercion from UID.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Sah-Schemas-Unix>.
@@ -104,13 +120,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Sah-Schemas-Unix>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Unix>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Sah - schema specification
@@ -120,9 +129,33 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2020, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Unix>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

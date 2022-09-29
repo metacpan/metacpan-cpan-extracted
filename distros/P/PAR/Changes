@@ -1,3 +1,10 @@
+1.018  2022-09-28
+
+- Fix #6: PAR fails to test its build on MSWin32 with Perl-5.36.0
+
+  Makefile.PL:  Quote t/gen-hello-par.pl for Windows
+  Merge PR #5 by Tim Hoke <Tim.Hoke@veritas.com>
+
 1.017  2021-01-13
 
   - change bugtracker to GitHub issues

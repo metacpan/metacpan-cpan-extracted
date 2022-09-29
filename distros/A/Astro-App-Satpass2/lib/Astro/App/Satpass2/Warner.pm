@@ -8,7 +8,7 @@ use warnings;
 use Astro::App::Satpass2::Locale qw{ __message };
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 sub new {
     my ( $class, @arg ) = @_;
@@ -155,7 +155,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2021 by Thomas R. Wyant, III
+Copyright (C) 2011-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

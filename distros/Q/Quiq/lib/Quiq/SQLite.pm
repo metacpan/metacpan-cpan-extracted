@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.203';
+our $VERSION = '1.204';
 
 use Quiq::Database::Connection;
 use Quiq::Path;
@@ -351,7 +351,7 @@ sub recreateDatabase {
 
 =head1 VERSION
 
-1.203
+1.204
 
 =head1 AUTHOR
 

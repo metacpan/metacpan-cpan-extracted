@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.5.2
+## Version v0.5.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/08/05
+## Modified 2022/09/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.5.2';
+    our $VERSION = 'v0.5.3';
 };
 
 use strict;
@@ -1490,7 +1490,35 @@ sub is_empty
     my $self = shift( @_ );
     if( $self->is_dir )
     {
-        return( $self->content->length == 0 );
+        return(1) if( !$self->exists );
+        # 2022-09-27: works, but need something more efficient, because we could potentially be dealing with thousands of files
+        # return( $self->content->length == 0 );
+        my $file = $self->filepath;
+        my $is_empty = 1;
+        my $opened = $self->opened;
+        my( $io, $pos, $elem );
+        if( $opened )
+        {
+            $io = $opened;
+            $pos = $io->tell;
+            $io->rewind || return( $self->error( "Unable to position ourself at the top of the directory \"${file}\": $!" ) );
+        }
+        else
+        {
+            $io = $self->open || do
+            {
+                return( $self->pass_error );
+            };
+        }
+        
+        while( defined( $elem = $io->read ) )
+        {
+            next if( $elem eq '.' || $elem eq '..' );
+            $is_empty = 0, last;
+        }
+        $io->seek( $pos ) if( defined( $pos ) );
+        $io->close unless( $opened );
+        return( $is_empty );
     }
     else
     {
@@ -4075,7 +4103,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.5.2
+    v0.5.3
 
 =head1 DESCRIPTION
 

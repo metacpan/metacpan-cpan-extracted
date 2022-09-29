@@ -5,3 +5,6 @@ Authority = "cpan:UTASHIRO"
 module_maker = "ModuleBuildTiny"
 static_install = "auto"
 
+[release]
+branch = "main"
+

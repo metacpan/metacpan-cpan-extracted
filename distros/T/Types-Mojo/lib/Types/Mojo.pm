@@ -7,6 +7,8 @@ use v5.10;
 use strict;
 use warnings;
 
+our $VERSION = '0.06'; # VERSION
+
 use Type::Library
    -base,
    -declare => qw( MojoCollection MojoFile MojoFileList MojoUserAgent MojoURL );
@@ -19,8 +21,6 @@ use Mojo::File;
 use Mojo::Collection;
 use Mojo::URL;
 use Scalar::Util qw(blessed);
-
-our $VERSION = '0.05';
 
 my $meta = __PACKAGE__->meta;
 
@@ -113,10 +113,6 @@ coerce MojoURL,
     from Str, via { Mojo::URL->new( $_ ) }
 ;
 
-coerce MojoCollection,
-    from ArrayRef, via { Mojo::Collection->new( @{$_} ) }
-;
-
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -133,7 +129,7 @@ Types::Mojo - Types related to Mojo
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -4,20 +4,20 @@ Dancer2::Plugin::RPC - Namespace for XMLRPC, JSONRPC2 and RESTRPC plugins
 
 # DESCRIPTION
 
-This module contains plugins for [Dancer2](https://metacpan.org/pod/Dancer2): [Dancer2::Plugin::RPC::XML](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ARPC%3A%3AXML),
-[Dancer2::Plugin::RPC::JSON](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ARPC%3A%3AJSON) and [Dancer2::Plugin::RPC::REST](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ARPC%3A%3AREST).
+This module contains plugins for [Dancer2](https://metacpan.org/pod/Dancer2): [Dancer2::Plugin::RPC::XMLRPC](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ARPC%3A%3AXMLRPC),
+[Dancer2::Plugin::RPC::JSONRPC](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ARPC%3A%3AJSONRPC) and [Dancer2::Plugin::RPC::RESTRPC](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ARPC%3A%3ARESTRPC).
 
-## Dancer2::Plugin::RPC::XML
+## Dancer2::Plugin::RPC::XMLRPC
 
 This plugin exposes the new keyword `xmlrpc` that is followed by 2 arguments:
 the endpoint and the arguments to configure the xmlrpc-calls at this endpoint.
 
-## Dancer2::Plugin::RPC::JSON
+## Dancer2::Plugin::RPC::JSONRPC
 
 This plugin exposes the new keyword `jsonrpc` that is followed by 2 arguments:
 the endpoint and the arguments to configure the jsonrpc-calls at this endpoint.
 
-## Dancer2::Plugin::RPC::REST
+## Dancer2::Plugin::RPC::RESTRPC
 
 This plugin exposes the new keyword `restrpc` that is followed by 2 arguments:
 the endpoint and the arguments to configure the restrpc-calls at this endpoint.
@@ -33,7 +33,7 @@ The dispatch table is build by endpoint.
     The dispatch table is build from the YAML-config:
 ```yaml
         plugins:
-            'RPC::XML':
+            'RPC::XMLRPC':
                 '/endpoint1':
                     'Module::Name1':
                         method1: sub1
@@ -51,7 +51,7 @@ The dispatch table is build by endpoint.
     The dispatch table is build by parsing the POD for `=for xmlrpc`,
     `=for jsonrpc` or `=for restrpc`.
 ```perl
-        =for xmlrpc <method_name> <sub_name>
+        =for xmlrpc <method_name> <sub_name> [<endpoint>]
 ```
     The **arguments** argument must be an Arrayref with module names. The
     POD-directive must be in the same file as the code!
@@ -62,15 +62,15 @@ The dispatch table is build by endpoint.
 ```perl
         use Dancer2::RPCPlugin::DispatchItem;
         return {
-            method1 => dispatch_item(
+            method1 => Dancer2::RPCPlugin::DispatchItem->new(
                 package => 'Module::Name1',
                 code => Module::Name1->can('sub1'),
             ),
-            method2 => dispatch_item(
+            method2 => Dancer2::RPCPlugin::DispatchItem->new(
                 package => 'Module::Name1',
                 code    => Module::Name1->can('sub2'),
             ),
-            method3 => dispatch_item(
+            method3 => Dancer2::RPCPlugin::DispatchItem->new(
                 pacakage => 'Module::Name2',
                 code     => Module::Name2->can('sub3'),
             ),
@@ -84,7 +84,7 @@ module names that contain the pod (and code).
 ### callback => $coderef
 
 The **callback** argument may contain a `$coderef` that does additional checks
-and should return a [Dancer2::RPCPlugin::CallbackResult](https://metacpan.org/pod/Dancer2%3A%3ARPCPlugin%3A%3ACallbackResult) object.
+and should return a [Dancer2::RPCPlugin::CallbackResult](https://metacpan.org/pod/Dancer2%3A%3ARPCPlugin%3A%3ACallbackResult) object (with the use of [Dancer2::RPCPlugin::CallbackResultFactory](https://metacpan.org/pod/Dancer2::RPCPlugin::CallbackResultFactory)).
 
     $callback->($request, $method_name, @method_args);
 
@@ -122,4 +122,4 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # AUTHOR
 
-E<copy> MMXVII - Abe Timmerman <abeltje@cpan.org>
+&copy; MMXVII - Abe Timmerman <abeltje@cpan.org>

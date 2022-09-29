@@ -3,9 +3,9 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 6;
-use Test::NoWarnings;
 use Mo::utils qw(check_bool);
+use Test::More 'tests' => 7;
+use Test::NoWarnings;
 
 # Test.
 my $self = {
@@ -24,7 +24,7 @@ is($ret, undef, 'Right bool value.');
 # Test.
 $self = {};
 $ret = check_bool($self, 'key');
-is($ret, undef, 'No value.');
+is($ret, undef, 'Right not exist key.');
 
 # Test.
 $self = {
@@ -47,3 +47,10 @@ eval {
 is($EVAL_ERROR, "Parameter 'key' must be a bool (0/1).\n",
 	"Parameter 'key' must be a bool (0/1).");
 clean();
+
+# Test.
+$self = {
+	'key' => undef,
+};
+$ret = check_bool($self, 'key');
+is($ret, undef, 'Right undefined value.');

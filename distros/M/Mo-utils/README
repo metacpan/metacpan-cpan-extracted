@@ -140,6 +140,7 @@ ERRORS
              %s for %s '%s' has multiple values.
 
      check_required():
+             Parameter '%s' doesn't exist.
              Parameter '%s' is required.
 
 EXAMPLE1
@@ -549,5 +550,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.12
+    0.14
 

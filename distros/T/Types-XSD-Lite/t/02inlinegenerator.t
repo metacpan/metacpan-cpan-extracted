@@ -68,6 +68,6 @@ like(
 	ok(!$pass) or note("CODE: $code");
 }
 
-note explain [ $t1->inlined->($t1, '$VALUE') ];
+note explain [ $t1->inline_check('$VALUE') ];
 
 done_testing;

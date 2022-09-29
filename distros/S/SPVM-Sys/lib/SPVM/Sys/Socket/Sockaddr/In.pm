@@ -38,45 +38,51 @@ The destructor.
 
 =head2 sa_family
 
-  method sa_family : int ()
+  method sa_family : byte ()
 
-Get C<sa_family>. This is the overriden method of the L<sa_family|SPVM::Sys::Socket::Sockaddr/"sa_family"> method in the Sys::Socket::Sockaddr class.
+Gets C<sa_family>. This is the overriden method of the L<sa_family|SPVM::Sys::Socket::Sockaddr/"sa_family"> method in the Sys::Socket::Sockaddr class.
 
 =head2 sin_family
 
-  method sin_family : int ();
-
-Get C<sin_family>.
+  method sin_family : byte ();
+  
+Gets C<sin_family>.
 
 =head2 set_sin_family
 
-  method set_sin_family : void ();
+  method set_sin_family : void ($family : byte);
 
-Set C<sin_family>.
+Sets C<sin_family>.
 
 =head2 sin_addr
 
   method sin_addr : Sys::Socket::In_addr ();
 
-Get C<sin_addr>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+Gets C<sin_addr>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
 
 =head2 set_sin_addr
 
   method set_sin_addr : void ($address : Sys::Socket::In_addr);
 
-Set C<sin_addr>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+Sets C<sin_addr>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
 
 =head2 sin_port
 
   method sin_port : short ();
 
-Get C<sin_port>.
+Gets C<sin_port>.
 
 =head2 set_sin_port
 
   method set_sin_port : void ($port : short);
 
-Set C<sin_port>.
+Sets C<sin_port>.
+
+=head2 sizeof
+
+  method sizeof : int ()
+
+The size of C<struct sockaddr_in>.
 
 =head1 Copyright & License
 

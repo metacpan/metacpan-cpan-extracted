@@ -26,11 +26,10 @@ lines into a single block.  If you don't like this, override it by
     Folding width is taken from the terminal.  Or you can specify the
     width by calling **set** function with module option.
 
-Put next line in your `~/.greplerc` to autoload **App::Greple::frame** module.
+- **--set-frame-width**=_#_
 
-    autoload -Mframe --frame
-
-Then you can use **--frame** option whenever you want.
+    Set frame width.  You have to put this option before **--frame**
+    option.  See **set** function in ["FUNCTION"](#function) section.
 
 <div>
     <p><img width="75%" src="https://raw.githubusercontent.com/kaz-utashiro/greple-frame/main/images/terminal-3.png">
@@ -61,6 +60,8 @@ Then you can use **--frame** option whenever you want.
 # SEE ALSO
 
 [App::ansifold](https://metacpan.org/pod/App%3A%3Aansifold)
+
+[Math::RPN](https://metacpan.org/pod/Math%3A%3ARPN)
 
 # AUTHOR
 

@@ -118,8 +118,9 @@ share {
 
   if($system_type =~ /^(unix|windows-mingw)$/)
   {
+    plugin 'PkgConfig::MakeStatic';
     build [
-      './config --prefix=%{.install.prefix} shared',
+      './config --prefix=%{.install.prefix} --libdir=%{.install.prefix}/lib shared',
       '%{make}',
       '%{make} DESTDIR=%{env.DESTDIR} INSTALL_PREFIX=%{env.DESTDIR} install',
     ];
@@ -130,7 +131,7 @@ share {
     my $type = $Config{ptrsize} == 4 ? 'VC-WIN32' : 'VC-WIN64A';
     requires 'Alien::nasm' => '0.19';
     build [
-      "%{perl} Configure --prefix=%{.install.prefix} --openssldir=%{.runtime.prefix}/ssl no-shared $type",
+      "%{perl} Configure --prefix=%{.install.prefix} --libdir=%{.install.prefix}/lib --openssldir=%{.runtime.prefix}/ssl no-shared $type",
       '%{make}',
       '%{make} OPENSSLDIR=%{.install.prefix}/ssl install',
     ];

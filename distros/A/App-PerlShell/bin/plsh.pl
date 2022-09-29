@@ -10,29 +10,29 @@ use App::PerlShell;
 #use Text::ParseWords;    # quotewords()
 
 my %opt;
-my ( $opt_help, $opt_man, $opt_versions );
 
 GetOptions(
 
-    #    '' => \$opt{interact},    # lonesome dash is interactive test from STDIN
+    # '' => \$opt{interact},    # lonesome dash is interactive test from STDIN
     'e|execute=s@' => \$opt{execute},
     'E|exit!'      => \$opt{exit},
+    'feature=s'    => \$opt{feature},
     'Include=s@'   => \$opt{include},
     'lexical!'     => \$opt{lexical},
     'P|package=s'  => \$opt{package},
     'p|prompt=s'   => \$opt{prompt},
     'session=s'    => \$opt{session},
-
-    #    'words!'       => \$opt{words},
-    'help!'     => \$opt_help,
-    'man!'      => \$opt_man,
-    'versions!' => \$opt_versions
+    'V|verbose!'   => \$opt{verbose},
+    # 'words!'       => \$opt{words},
+    'help!'        => \$opt{help},
+    'man!'         => \$opt{man},
+    'versions!'    => \$opt{versions}
 ) or pod2usage( -verbose => 0 );
 
-pod2usage( -verbose => 1 ) if defined $opt_help;
-pod2usage( -verbose => 2 ) if defined $opt_man;
+pod2usage( -verbose => 1 ) if defined $opt{help};
+pod2usage( -verbose => 2 ) if defined $opt{man};
 
-if ( defined $opt_versions ) {
+if ( defined $opt{versions} ) {
     print
       "\nModules, Perl, OS, Program info:\n",
       "  $0\n",
@@ -64,6 +64,7 @@ if ( defined $opt{include} ) {
     unshift @INC, @temp;
 }
 
+# Must be here to `use package` BEFORE any -e args
 if ( defined $opt{package} ) {
     $params{package} = $opt{package};
     $params{execute} = "use $params{package};\n";
@@ -73,20 +74,28 @@ my $homedir = $ENV{HOME};
 if ( $^O eq 'MSWin32' ) {
     $homedir = $ENV{USERPROFILE};
 }
-if ( -e "$homedir/.plshrc" ) {
-    open my $fh, '<', "$homedir/.plshrc"
-      or die "$0: cannot open `$homedir/.plshrc': $!";
-    my @lines = <$fh>;
-    close $fh;
-    for (@lines) {
-        chomp $_;
-        $params{execute} .= $_;
-        if ( $params{execute} !~ /;$/ ) {
-            $params{execute} .= ';';
+
+sub parse_plshrc {
+    my ($file) = @_;
+
+    if ( -e "$file" ) {
+        open my $fh, '<', "$file"
+          or die "$0: cannot open `$file': $!";
+        my @lines = <$fh>;
+        close $fh;
+        for (@lines) {
+            chomp $_;
+            $params{execute} .= $_;
+            if ( $params{execute} !~ /;$/ ) {
+                $params{execute} .= ';';
+            }
+            $params{execute} .= "\n";
         }
-        $params{execute} .= "\n";
     }
 }
+
+parse_plshrc("$homedir/.plshrc");
+parse_plshrc(".plshrc");
 
 if ( defined $opt{execute} ) {
     for ( @{$opt{execute}} ) {
@@ -98,10 +107,35 @@ if ( defined $opt{execute} ) {
     }
 }
 
+if ( defined $opt{prompt} ) {
+    $params{prompt} = $opt{prompt};
+    $params{execute} .= "\$ENV{PERLSHELL_PROMPT}='$opt{prompt}';\n";
+}
+
+# Must be here again to add to end of execute to override .plshrc setting
+# of package with the command line -P if specified
+if ( defined $opt{package} ) {
+    $params{execute} .= "\$ENV{PERLSHELL_PACKAGE}='$opt{package}';\n";
+}
+
+if ( defined $opt{feature} ) {
+    $opt{feature} =~ s/^[v]//;
+    if ( $opt{feature} =~ /^\d\./ ) {
+        $opt{feature} = ":" . $opt{feature};
+    }
+
+    # append direct set to end of execute to override .plshrc setting of
+    # feature with the command line -f if specified
+    $params{execute} .= "\$ENV{PERLSHELL_FEATURE}='$opt{feature}';\n";
+} else {
+    $opt{feature} = ":default";
+}
+$params{feature} = $opt{feature};
+
 $params{execute} .= 'exit;' if defined $opt{exit};
 $params{lexical} = 1             if defined $opt{lexical};
-$params{prompt}  = $opt{prompt}  if defined $opt{prompt};
 $params{session} = $opt{session} if defined $opt{session};
+$params{verbose} = $opt{verbose} if defined $opt{verbose};
 
 # if ( defined $opt{interact} ) {
 #     my @temp;
@@ -144,8 +178,8 @@ PLSH - Perl Shell
 =head1 DESCRIPTION
 
 Creates an interactive Perl shell.  Startup configuration commands written
-in Perl syntax can be stored in '.plshrc' file in HOME directory (e.g., $HOME 
-on Linxu, %USERPROFILE% on Windows) which will initialize the Perl Shell on 
+in Perl syntax can be stored in '.plshrc' file in HOME directory (e.g., C<$HOME>
+on Linxu, C<%USERPROFILE%> on Windows) which will initialize the Perl Shell on
 every startup.
 
 =head1 OPTIONS
@@ -156,6 +190,9 @@ every startup.
  -e                   Valid Perl to execute.  Multiple valid Perl
  --execute            statements (semicolon-separated) and multiple
                       -e allowed.
+
+ -f                   Perl feature set to use.  Example: ":5.10"
+ --feature            DEFAULT:  (or not specified) ":default"
 
  -I dir               Specify directory to prepend @INC.  Multiple
  --Include            -I allowed.
@@ -173,6 +210,9 @@ every startup.
  -s file              Session command log file.
  --session
 
+ -V                   Output verbose initialization information.
+ --verose
+
 =cut
 
  -w                   Treat each element of args as a separate
@@ -184,7 +224,23 @@ every startup.
  --man                Print complete man page.
  --versions           Print Modules, Perl, OS, Program info.
 
+=head1 CONFIGURATION
+
+An example '.plshrc' file.
+
+    use App::PerlShell::Plugin::Macros;
+
+    # do not require a semicolon to terminate each line
+    $ENV{PERLSHELL_SEMIOFF}=1;
+    # turn on feature 5.10 (use feature ':5.10';)
+    $ENV{PERLSHELL_FEATURE}=":5.10";
+
+    # override the `version` command
+    no warnings 'redefine'; *App::PerlShell::version = sub { print "MyVersion" }
+
 =head1 ORDER
+
+Command line options -f, -p, -P override .'plshrc'.
 
 =over 4
 
@@ -198,13 +254,17 @@ Set -P package.  If provided, set -e to "use E<lt>packageE<gt>".
 
 =item 3
 
-Add any commmands from '.plshrc' file if exists in HOME directory.
+Add any commmands from '$HOME/.plshrc' file if exists in HOME directory.
 
 =item 4
 
-Add any additional -e arguments to -e.
+Add any commmands from '.plshrc' file if exists in working directory.
 
 =item 5
+
+Add any additional -e arguments to -e.
+
+=item 6
 
 If -E, add "exit;" to end of -e.
 
@@ -235,7 +295,7 @@ If you don't know what that means visit L<http://perl.com/>.
 
 =head1 AUTHOR
 
-Copyright (c) 2015 Michael Vincent
+Copyright (c) 2015-2022 Michael Vincent
 
 L<http://www.VinsWorld.com>
 

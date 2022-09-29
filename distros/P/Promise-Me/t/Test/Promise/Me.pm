@@ -9,6 +9,7 @@ use Scalar::Util ();
 use Promise::Me qw( :all );
 use Time::HiRes;
 our $DESTROY_SHARED_MEM = 0;
+$Promise::Me::RESULT_MEMORY_SIZE = 10240;
 
 # Credits:
 # <https://stackoverflow.com/questions/6855796/what-else-can-i-do-sleep-when-the-sleep-cant-work-well-with-alarm>
@@ -25,7 +26,8 @@ sub sleep_tight
 
 sub runtest
 {
-    my( $medium, $serialiser ) = @_;
+    my( $medium, $serialiser, $opts ) = @_;
+    $opts //= {};
     local $Promise::Me::SERIALISER = $serialiser;
     local $Promise::Me::SHARE_MEDIUM = $medium;
     my $pid = $$;
@@ -40,7 +42,12 @@ sub runtest
         pass( 'child sub' );
         ok( $$ != $pid, 'code executed in sub process' );
         return( $str );
-    }, { debug => $DEBUG, serialiser => $serialiser });
+    },
+    {
+        debug => $DEBUG,
+        serialiser => $serialiser,
+        ( $opts->{tmpdir} ? ( tmpdir => $opts->{tmpdir} ) : () ),
+    });
     isa_ok( $prom, ['Promise::Me'], 'promise object' );
 
     ok( !$prom->is_child, 'main process' );
@@ -60,7 +67,8 @@ sub runtest
     }, {
         share_auto_destroy => $DESTROY_SHARED_MEM,
         use_cache_file => 1,
-        serialiser => $serialiser
+        serialiser => $serialiser,
+        ( $opts->{tmpdir} ? ( tmpdir => $opts->{tmpdir} ) : () ),
     })->then(sub
     {
         diag( "[$medium] -> [$serialiser]: Got here, but should not" ) if( $DEBUG );
@@ -98,7 +106,12 @@ sub runtest
                 warn( "Error appending to file $file: ", $file->error, "\n" );
             };
             return( $file );
-        }, { debug => $DEBUG, serialiser => $serialiser })->then(sub
+        },
+        {
+            debug => $DEBUG,
+            serialiser => $serialiser,
+            ( $opts->{tmpdir} ? ( tmpdir => $opts->{tmpdir} ) : () ),
+        })->then(sub
         {
             diag( "[$medium] -> [$serialiser], [P1] Parameter received is '", overload::StrVal( $_[0] ), "'" ) if( $DEBUG );
             isa_ok( $_[0], ['Module::Generic::File'], "[P1] PID $$: Value passed to then is an object file" );
@@ -122,7 +135,13 @@ sub runtest
                 warn( "Error appending to file $file: ", $file->error, "\n" );
             };
             return( $file );
-        }, { debug => $DEBUG, timeout => 2, serialiser => $serialiser })->then(sub
+        },
+        {
+            debug => $DEBUG,
+            timeout => 2,
+            serialiser => $serialiser,
+            ( $opts->{tmpdir} ? ( tmpdir => $opts->{tmpdir} ) : () ),
+        })->then(sub
         {
             diag( "[$medium] -> [$serialiser], [P2] Parameter received is '", overload::StrVal( $_[0] ), "'" ) if( $DEBUG );
             diag( "[$medium] -> [$serialiser]: ", overload::StrVal( $_[0] ), " is not a blessed object." ) if( !defined( $_[0] ) || !Scalar::Util::blessed( $_[0] ) );

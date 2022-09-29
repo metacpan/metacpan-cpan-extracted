@@ -4,13 +4,13 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Types-Mojo",
    "prereqs" : {
@@ -22,13 +22,16 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::BOM" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
-            "List::Util" : "0",
             "Mojolicious" : "8",
             "Scalar::Util" : "0",
             "Type::Library" : "1.004004",
@@ -50,26 +53,28 @@
    "provides" : {
       "Types::Mojo" : {
          "file" : "lib/Types/Mojo.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/reneeb/Types-Mojo/issues"
+         "web" : "https://github.com/reneeb/Types-Mojo/issues"
       },
-      "homepage" : "http://github.com/reneeb/Types-Mojo",
+      "homepage" : "https://github.com/reneeb/Types-Mojo",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/reneeb/Types-Mojo.git",
-         "web" : "http://github.com/reneeb/Types-Mojo"
+         "web" : "https://github.com/reneeb/Types-Mojo"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
+      "E. Choroba <choroba@matfyz.cz>",
       "NGEfreak <NGEfreak@users.noreply.github.com>",
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 
