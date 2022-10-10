@@ -1,3 +1,6 @@
+// Windows 8.1+
+#define _WIN32_WINNT 0x0603
+
 #include "spvm_native.h"
 
 #include <stdio.h>
@@ -5,7 +8,13 @@
 #include <sys/stat.h>
 #include <sys/file.h>
 
-static const char* FILE_NAME = "Sys/Io/Constant.c";
+#ifdef _WIN32
+# include <winsock2.h>
+#else
+# include <poll.h>
+#endif
+
+static const char* FILE_NAME = "Sys/IO/Constant.c";
 
 int32_t SPVM__Sys__IO__Constant__AT_EMPTY_PATH(SPVM_ENV* env, SPVM_VALUE* stack) {
 

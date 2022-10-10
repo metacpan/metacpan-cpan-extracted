@@ -15,9 +15,9 @@ use File::Slurper qw(read_text);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-20'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 our @EXPORT_OK = qw(
                        test_sah_cases
@@ -320,7 +320,7 @@ Test::Data::Sah - Test routines for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.912 of Test::Data::Sah (from Perl distribution Data-Sah), released on 2022-08-20.
+This document describes version 0.913 of Test::Data::Sah (from Perl distribution Data-Sah), released on 2022-09-30.
 
 =head1 FUNCTIONS
 

@@ -1,3 +1,9 @@
+0.007   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to App::BrowserUtils 0.017 (updated Sah schema name, add
+          option --signal to terminate-opera).
+
+
 0.006   2020-08-18  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.005 and 0.005.1.
@@ -7,7 +13,8 @@
 
 	- [ux] [cli ps-opera] Make text output saner.
 
-        - Rename release from 0.004 to 0.005.1 and cancel (duplicate).
+        - UPDATE 2020-08-18: Rename release from 0.004 to 0.005.1 and cancel
+          (duplicate).
 
 
 0.005   2020-06-13  Released-By: PERLANCAR; Urgency: medium

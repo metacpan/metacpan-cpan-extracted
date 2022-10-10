@@ -1,0 +1,10 @@
+Revision history for Perl module Math::Numerical
+
+0.02 2022-10-05
+
+ - Fix TEST_REQUIRES in Makefile.PL.
+ - A couple more tests.
+
+0.01 2022-10-03
+
+ - Initial release with the find_root and bracket methods.

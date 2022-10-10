@@ -1,0 +1,177 @@
+NAME
+
+    Device::Serial::SLuRM - communicate the SLµRM protocol over a serial
+    port
+
+SYNOPSIS
+
+       use v5;36;
+       use Device::Serial::SLuRM;
+    
+       my $slurm = Device::Serial::SLuRM->new(
+          dev  => "/dev/ttyUSB0",
+          baud => 19200,
+       );
+    
+       $slurm->reset
+          ->await;
+    
+       $slurm->run(
+          on_notify => sub ($payload) {
+             printf "NOTIFY: %v02X\n", $payload;
+          }
+       )->await;
+
+DESCRIPTION
+
+    This module provides a Future::IO-based interface for communicating
+    with a peer device on a serial port (or similar device handle) which
+    talks the SLµRM messaging protocol. It supports sending and receiving
+    of NOTIFY packets, and sending of REQUEST packets that receive a
+    RESPONSE.
+
+    It currently does not support receiving REQUESTs, though this could be
+    added relatively easily.
+
+ SLµRM
+
+    SLµRM ("Serial Link Microcontroller Reliable Messaging") is a simple
+    bidirectional communication protocol for adding reliable message
+    framing and request/response semantics to byte-based data links (such
+    as asynchronous serial ports), which may themselves be somewhat
+    unreliable. SLµRM can tolerate bytes arriving corrupted or going
+    missing altogether, or additional noise bytes being received, while
+    still maintaining a reliable bidirectional flow of messages. There are
+    two main kinds of message flows - NOTIFYs and REQUESTs. In all cases,
+    packet payloads can be of a variable length (including zero bytes), and
+    the protocol itself does not put semantic meaning on those bytes - they
+    are free for the application to use as required.
+
+    A NOTIFY message is a simple notification from one peer to the other,
+    that does not yield a response.
+
+    A REQUEST message carries typically some sort of command instruction,
+    to which the peer should respond with a RESPONSE or ERR packet. Replies
+    to a REQUEST message do not have to be sent sequentially.
+
+    The doc/ directory of this distribution contains more detailed protocol
+    documentation which may be useful for writing other implementations.
+
+    The contrib/ directory of this distribution contains a reference
+    implementation in C for 8-bit microcontrollers, such as AVR ATtiny and
+    ATmega chips.
+
+PARAMETERS
+
+ dev
+
+       dev => PATH
+
+    Path to the /dev/... device node representing the serial port used for
+    this communication. This will be opened via IO::Termios and configured
+    into the appropriate mode and baud rate.
+
+ baud
+
+       baud => NUM
+
+    Optional baud rate to set for communication when opening a device node.
+
+    SLµRM does not specify a particular rate, but a default value of 115.2k
+    will apply if left unspecified.
+
+ fh
+
+       fh => IO
+
+    An IO handle directly to the the serial port device to be used for
+    reading and writing. It will be assumed to be set up correctly; no
+    further setup will be performed.
+
+    Either dev or fh are required.
+
+ retransmit_delay
+
+       retransmit_delay => NUM
+
+    Optional delay in seconds to wait after a non-response of a REQUEST
+    packet before sending it again. A default of 50msec (0.05) will apply
+    if not specified.
+
+    Applications that transfer large amounts of data over slow links, or
+    for which responding to a command may take a long time, should increase
+    this value.
+
+ retransmit_count
+
+       retransmit_count => NUM
+
+    Optional number of additional attempts to try sending REQUEST packets
+    before giving up entirely. A default of 2 will apply if not specified
+    (thus each request method will make up to 3 attempts).
+
+METHODS
+
+ recv_packet
+
+       ( $pktctrl, $payload ) = await $slurm->recv_packet;
+
+    Waits for and returns the next packet to be received from the serial
+    port.
+
+ run
+
+       $run_f = $slurm->run( %args );
+
+    Starts the receiver run-loop, which can be used to wait for incoming
+    NOTIFY packets. This method returns a future, but the returned future
+    will not complete in normal circumstances. It will remain pending while
+    the run-loop is running. If an unrecoverable error happens (such as an
+    IO error on the underlying serial port device) then this future will
+    fail.
+
+    Takes the following named arguments:
+
+    on_notify => CODE
+
+         $on_notify->( $payload )
+
+      Optional. Invoked on receipt of a NOTIFY packet.
+
+ stop
+
+       $slurm->stop;
+
+    Stops the receiver run-loop, if running, causing its future to be
+    cancelled.
+
+    It is not an error to call this method if the run loop is not running.
+
+ send_packet
+
+       await $slurm->send_packet( $pktctrl, $payload );
+
+    Sends a packet to the serial port.
+
+ reset
+
+       $slurm->reset;
+
+    Resets the transmitter sequence number and sends a META-RESET packet.
+
+ send_notify
+
+       await $slurm->send_notify( $payload )
+
+    Sends a NOTIFY packet.
+
+ request
+
+       $data_in = await $slurm->request( $data_out );
+
+    Sends a REQUEST packet, and waits for a response to it.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

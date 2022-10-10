@@ -33,7 +33,7 @@ subtest "Tests on Int" => sub {
 	ok( $Int->check( 42 ), 'value which passes' );
 	ok( !$Int->check( {} ), 'value which fails' );
 	ok( $Int->can_be_inlined, 'type can be inlined' );
-	is_deeply( $Int->{_data_sah}, [ 'int*' ], 'type knows where it came from' );
+	is_deeply( $Int->{_data_sah}, [ 'int', { req => 1 } ], 'type knows where it came from' );
 };
 
 my $SmallInt = $Int->of( min => 1, max => 10 );
@@ -43,7 +43,7 @@ subtest "Tests on Int[ min => 1, max => 10 ]" => sub {
 	ok( !$SmallInt->check( 42 ), 'value which fails' );
 	ok( !$SmallInt->check( {} ), 'value which fails parent' );
 	ok( $SmallInt->can_be_inlined, 'type can be inlined' );
-	is_deeply( $SmallInt->{_data_sah}, [ 'int*', min => 1, max => 10 ], 'type knows where it came from' );
+	is_deeply( $SmallInt->{_data_sah}, [ 'int', { min => 1, max => 10, req => 1 } ], 'type knows where it came from' );
 };
 
 done_testing;

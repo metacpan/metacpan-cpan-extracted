@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use utf8;
 
-our $VERSION = '2.61';    ## VERSION
+our $VERSION = '2.62';    ## VERSION
 
 =head1 NAME
 

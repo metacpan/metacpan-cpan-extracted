@@ -15,9 +15,18 @@ class Sys::Socket::Sockaddr::Un extends Sys::Socket::Sockaddr : pointer_t {
 
   native method set_sun_family : void ($family : byte);
 
-  native method sun_path : string ();
+  native method copy_sun_path : string ();
 
   native method set_sun_path : void ($path : string);
   
   native method sizeof : int ();
+  
+  method clone : Sys::Socket::Sockaddr::Un () {
+    my $clone = Sys::Socket::Sockaddr::Un->new;
+
+    $clone->set_sun_family($self->sun_family);
+    $clone->set_sun_path($self->copy_sun_path);
+    
+    return $clone;
+  }
 }

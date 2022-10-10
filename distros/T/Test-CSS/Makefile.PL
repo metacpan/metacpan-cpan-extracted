@@ -33,7 +33,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Test::CSS' => { file => 'lib/Test/CSS.pm', version => '0.08' },
+            'Test::CSS' => { file => 'lib/Test/CSS.pm', version => '0.09' },
         },
         resources => {
             repository => {
@@ -41,7 +41,10 @@ WriteMakefile(
                 url  => 'https://github.com/manwar/Test-CSS.git',
                 web  => 'https://github.com/manwar/Test-CSS',
             },
-        }})
+        bugtracker => {
+    	web => 'https://github.com/manwar/Test-CSS/issues',
+        },
+    }})
      : ()
     ),
 );

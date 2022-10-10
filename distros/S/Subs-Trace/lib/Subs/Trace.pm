@@ -10,11 +10,11 @@ Subs::Trace - Trace all calls in a package.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -66,10 +66,16 @@ sub import {
     no warnings 'redefine';
 
     for my $func ( sort keys %{"${pkg}::"} ) {
-        my $code = ${"${pkg}::"}{$func}->*{CODE};
+
+        # print "func=$func\n";
+
+        my $stash = "$pkg\::$func";
+        my $code  = *$stash{CODE};
         next if not $code;
 
-        ${"${pkg}::"}{$func}->** = sub {
+        # print "  Updated $stash\n";
+
+        *$stash = sub {
             print "--> $pkg\::$func\n";
             &$code;
         }

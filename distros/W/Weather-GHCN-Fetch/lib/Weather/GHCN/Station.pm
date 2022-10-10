@@ -1,17 +1,19 @@
 # Weather::GHCN::Station.pm - class for Station metadata
 
+## no critic (Documentation::RequirePodAtEnd)
+
 =head1 NAME
 
 Weather::GHCN::Station - class for Station metadata
 
 =head1 VERSION
 
-version v0.0.003
+version v0.0.005
 
 =head1 SYNOPSIS
 
     use Weather::GHCN::Station;
-    
+
     my $stn_obj = Weather::GHCN::Station->new (
         id      => 'CA006105976',
         country => 'CA',
@@ -26,14 +28,19 @@ version v0.0.003
 
 =head1 DESCRIPTION
 
-The B<Weather::GHCN::Station> class is used to encapsulate the metadata for a 
-station as obtained from the NOAA Global Historical Climatology 
-Network data repository.  Data is sourced from the station list and 
+The B<Weather::GHCN::Station> class is used to encapsulate the metadata for a
+station as obtained from the NOAA Global Historical Climatology
+Network data repository.  Data is sourced from the station list and
 the station inventory.
 
 The module is primarily for use by Weather::GHCN::Fetch and Weather::GHCN::StationTable.
 
 =cut
+
+# these are needed because perlcritic fails to detect that Object::Pad handles these things
+## no critic [ValuesAndExpressions::ProhibitVersionStrings]
+## no critic [TestingAndDebugging::RequireUseWarnings]
+## no critic [References::ProhibitDoubleSigils]
 
 use v5.18;  # minimum for Object::Pad
 use Object::Pad 0.66 qw( :experimental(init_expr) );
@@ -41,7 +48,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::Station;
 class   Weather::GHCN::Station;
 
-our $VERSION = 'v0.0.003';
+our $VERSION = 'v0.0.005';
 
 use Weather::GHCN::Common        qw( rng_new iso_date_time );
 use Const::Fast;

@@ -1,5 +1,8 @@
 Revision history for Pinto::Remote::SelfContained
 
+1.001   2022-10-09
+    - Fix tests
+
 1.000   2021-03-11
     - No further changes from 0.905
 

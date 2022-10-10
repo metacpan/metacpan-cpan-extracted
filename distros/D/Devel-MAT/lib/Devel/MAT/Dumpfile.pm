@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile 0.48;
+package Devel::MAT::Dumpfile 0.49;
 
 use v5.14;
 use warnings;
@@ -49,6 +49,9 @@ SV is represented by an instance of L<Devel::MAT::SV>.
 my @ROOTS;
 my %ROOTDESC;
 foreach (
+   [ sv_undef        => "+the undef SV" ],
+   [ sv_yes          => "+the true SV" ],
+   [ sv_no           => "+the false SV" ],
    [ main_cv         => "+the main code" ],
    [ defstash        => "+the default stash" ],
    [ mainstack       => "+the main stack AV" ],
@@ -228,6 +231,9 @@ sub load
    }
 
    $self->{roots} = \my %roots;
+   # The three immortals
+   $roots{"sv_$_"} = [ $self->{"\U$_"}->addr, $ROOTDESC{"sv_$_"} ] for qw( undef yes no );
+
    foreach ( 1 .. $self->_read_u32 ) {
       my $name = $self->_read_str;
       my $desc = $ROOTDESC{$name} // $name;

@@ -1,0 +1,26 @@
+- Add handling of XMLTABLE() expression
+    https://www.postgresql.org/docs/current/functions-xml.html#id-1.5.8.21.6.3
+- add handling of AlterFunctionStmt
+- add handling of AlterRoleSetStmt
+- add handling of AlterTableStmt
+- add handling of CopyStmt
+- add handling of CreateExtensionStmt
+- add handling of CreateFunctionStmt
+- add handling of CreateSeqStmt
+- add handling of CreateStmt
+- add handling of CreateTableAsStmt
+- add handling of DeclareCursorStmt
+- add handling of DiscardStmt
+- add handling of DoStmt
+- add handling of DropStmt
+- add handling of ExplainStmt
+- add handling of FetchStmt
+- add handling of IndexStmt
+- add handling of PrepareStmt
+- add handling of RefreshMatViewStmt
+- add handling of TransactionStmt
+- add handling of VacuumStmt
+- add handling of VacuumStmt
+- add handling of VariableSetStmt
+- add handling of VariableShowStmt
+- add handling of ViewStmt

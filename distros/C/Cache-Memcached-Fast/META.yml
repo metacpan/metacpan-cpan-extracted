@@ -2,20 +2,34 @@
 abstract: 'Perl client for memcached, in C language'
 author:
   - 'Tomash Brechko <tomash.brechko@gmail.com>'
-build_requires: {}
-dynamic_config: '1'
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+build_requires:
+  Test2::Suite: '0.000072'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Cache-Memcached-Fast
 requires:
-  Storable: '0'
-  perl: '5.006'
+  Carp: '1.25'
+  XSLoader: '0.14'
 resources:
-  repository: git://github.com/JRaspass/Cache-Memcached-Fast.git
-version: '0.27'
-x_generated_by_perl: v5.34.0
+  bugtracker: https://github.com/JRaspass/Cache-Memcached-Fast/issues
+  homepage: https://github.com/JRaspass/Cache-Memcached-Fast
+  repository: https://github.com/JRaspass/Cache-Memcached-Fast.git
+version: '0.28'
+x_contributors:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Dmitry Shalashov <dimaniac83@mail.ru>'
+  - 'Hunter McMillen <mcmillhj@gmail.com>'
+  - 'hurricup <hurricup@gmail.com>'
+  - 'James Raspass <jraspass@gmail.com>'
+  - 'Mutsutoshi Yoshimoto <negachov@gmail.com>'
+  - 'neguse <negcee@gmail.com>'
+  - 'Olli-Antti Kivilahti <olli-antti.kivilahti@jns.fi>'
+  - 'Sergey Aleynikov <sergey.aleynikov@gmail.com>'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

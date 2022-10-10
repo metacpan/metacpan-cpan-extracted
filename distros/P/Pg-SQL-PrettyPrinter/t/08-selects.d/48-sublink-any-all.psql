@@ -1,0 +1,21 @@
+SELECT
+    *
+FROM
+    generate_series( 1, 10 ) AS i
+WHERE
+    i > ANY(
+        SELECT
+            generate_series(
+                1,
+                8,
+                2
+            )
+    ) AND
+    i <> ALL(
+        SELECT
+            generate_series(
+                3,
+                7,
+                2
+            )
+    )

@@ -5,7 +5,7 @@ use warnings;
 
 use App::Schema::Deploy;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Run.
 exit App::Schema::Deploy->new->run;
@@ -28,11 +28,15 @@ schema-deploy - Script to deploy Schema.
 
 =head1 SYNOPSIS
 
- schema-deploy [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_module
+ schema-deploy [-d] [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_module
 
 =head1 ARGUMENTS
 
 =over 8
+
+=item * C<-d>
+
+Drop tables before deploy.
 
 =item * C<-h>
 
@@ -98,6 +102,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

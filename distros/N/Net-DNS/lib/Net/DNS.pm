@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.34';
+$VERSION = '1.35';
 $VERSION = eval { $VERSION };
-our $SVNVERSION = (qw$Id: DNS.pm 1867 2022-05-30 10:07:36Z willem $)[2];
+our $SVNVERSION = (qw$Id: DNS.pm 1882 2022-10-04 19:53:44Z willem $)[2];
 
 
 =head1 NAME
@@ -251,7 +251,7 @@ The type of an RR object must be checked before calling any methods.
 
 =head1 METHODS
 
-Net::DNS exports methods and auxilliary functions to support
+Net::DNS exports methods and auxiliary functions to support
 DNS updates, zone serial number management, and simple DNS queries.
 
 =head2 version
@@ -305,7 +305,7 @@ This method does not look up address records; it resolves MX only.
 
 =head1 Dynamic DNS Update Support
 
-The Net::DNS module provides auxilliary functions which support
+The Net::DNS module provides auxiliary functions which support
 dynamic DNS update requests.
 
     $update = Net::DNS::Update->new( 'example.com' );
@@ -413,7 +413,7 @@ be created.
 
 =head1 Zone Serial Number Management
 
-The Net::DNS module provides auxilliary functions which support
+The Net::DNS module provides auxiliary functions which support
 policy-driven zone serial numbering regimes.
 
     $soa->serial(SEQUENTIAL);
@@ -437,7 +437,7 @@ elapsed since the previous update is less than one second.
 
     $successor = $soa->serial( YYYYMMDDxx );
 
-The 32 bit value returned by the auxilliary C<YYYYMMDDxx()> function
+The 32 bit value returned by the auxiliary C<YYYYMMDDxx()> function
 will be used as the base for the date-coded zone serial number.
 Serial number increments must be limited to 100 per day for the
 date information to remain useful.
@@ -649,7 +649,7 @@ Net::DNS was created in 1997 by Michael Fuhr.
 
 L<perl>, L<Net::DNS::Resolver>, L<Net::DNS::Question>, L<Net::DNS::RR>,
 L<Net::DNS::Packet>, L<Net::DNS::Update>,
-RFC1035, L<http://www.net-dns.org/>,
+L<RFC1035|https://tools.ietf.org/html/rfc1035>,
 I<DNS and BIND> by Paul Albitz & Cricket Liu
 
 =cut

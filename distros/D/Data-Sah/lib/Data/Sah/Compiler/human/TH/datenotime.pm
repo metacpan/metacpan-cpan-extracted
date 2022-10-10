@@ -11,9 +11,9 @@ use Role::Tiny::With;
 extends 'Data::Sah::Compiler::human::TH::date';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-20'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 1;
 # ABSTRACT: perl's type handler for type "datenotime"
@@ -30,7 +30,7 @@ Data::Sah::Compiler::human::TH::datenotime - perl's type handler for type "daten
 
 =head1 VERSION
 
-This document describes version 0.912 of Data::Sah::Compiler::human::TH::datenotime (from Perl distribution Data-Sah), released on 2022-08-20.
+This document describes version 0.913 of Data::Sah::Compiler::human::TH::datenotime (from Perl distribution Data-Sah), released on 2022-09-30.
 
 =for Pod::Coverage ^(name|clause_.+|superclause_.+|before_.+|after_.+)$
 

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-17'; # DATE
+our $DATE = '2022-07-24'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 sub meta {
     +{
@@ -49,7 +49,7 @@ Data::Sah::Filter::perl::Str::trim - Trim whitespaces at the beginning and end o
 
 =head1 VERSION
 
-This document describes version 0.012 of Data::Sah::Filter::perl::Str::trim (from Perl distribution Data-Sah-Filter), released on 2022-07-17.
+This document describes version 0.013 of Data::Sah::Filter::perl::Str::trim (from Perl distribution Data-Sah-Filter), released on 2022-07-24.
 
 =head1 SYNOPSIS
 

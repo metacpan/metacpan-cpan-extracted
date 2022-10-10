@@ -4,7 +4,6 @@ Copying
 INSTALL
 LICENSE
 MANIFEST
-MANIFEST.SKIP
 META.json
 META.yml
 README.pod
@@ -16,4 +15,5 @@ t/01_load.t
 t/02_channel.t
 t/03_flock.t
 xt/channel_lock.t
+xt/channel_timedwait.t
 xt/flock_lock.t

@@ -15,7 +15,7 @@ format: v1
 
 name: Tie::ShadowHash
 maintainer: Russ Allbery <rra@cpan.org>
-version: '2.00'
+version: '2.01'
 synopsis: Merge multiple data sources into a hash with overrides
 
 license:
@@ -51,9 +51,9 @@ vcs:
   url: https://git.eyrie.org/git/perl/shadowhash.git
 
 docs:
-  api:
+  user:
     - name: docs
-      title: Tie::ShadowHash
+      title: Module documentation
 
 blurb: |
   Tie::ShadowHash is a Perl module that lets you stack together multiple

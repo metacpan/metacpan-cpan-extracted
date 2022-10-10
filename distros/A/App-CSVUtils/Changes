@@ -1,3 +1,9 @@
+0.045   2022-10-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option --output-filename (-o) and --overwrite (-O); allow
+          reading/writing to URL in addition to file.
+
+
 0.044   2022-08-09  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.041 & 0.041.2.
@@ -39,7 +45,7 @@
 
         [Incompatible changes]
 
-        - Rename csv-delete-field to csv-select-fields to reflect the fact that
+        - Rename csv-delete-field to csv-delete-fields to reflect the fact that
           it can now select multiple fields.
 
         - Short option -f now becomes shortcut for --include-field (a.k.a.

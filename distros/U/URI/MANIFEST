@@ -63,6 +63,7 @@ lib/URI/tn3270.pm
 lib/URI/urn.pm
 lib/URI/urn/isbn.pm
 lib/URI/urn/oid.pm
+perlimports.toml
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/abs.t

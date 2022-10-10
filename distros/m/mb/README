@@ -12,6 +12,7 @@ SYNOPSIS
   $ perl mb.pm -e gbk       script_by_gbk.pl
   $ perl mb.pm -e sjis      script_by_sjis.pl
   $ perl mb.pm -e sjis      script_by_cp932.pl
+  $ perl mb.pm -e rfc2279   script_by_rfc2279.pl
   $ perl mb.pm -e uhc       script_by_uhc.pl
   $ perl mb.pm -e utf8      script_by_utf8.pl
   $ perl mb.pm -e wtf8      script_by_wtf8.pl
@@ -27,6 +28,8 @@ SYNOPSIS
         tr/ DAMEMOJI 功声乗ソ / DAMEMOJI 功声乗ソ /
          y/ DAMEMOJI 功声乗ソ / DAMEMOJI 功声乗ソ /
         qr/ DAMEMOJI 功声乗ソ /
+        qw/ DAMEMOJI 功声乗ソ /
+        qx/ DAMEMOJI 功声乗ソ /
 
   MBCS subroutines:
     mb::chop(...);

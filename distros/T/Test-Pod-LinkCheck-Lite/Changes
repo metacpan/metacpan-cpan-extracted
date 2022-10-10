@@ -1,3 +1,6 @@
+0.010		2022-09-29	T. R. Wyant
+    Localize $_ before while (<>).
+
 0.009		2022-09-11	T. R. Wyant
     Add canned 'ignore_url' value MAYBE_IGNORE_GITHUB.  This causes
     GitHub URLs to be ignored unless the source directory contains a Git

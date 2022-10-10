@@ -1,8 +1,13 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
-**** 1.18  Aug 31, 2022
+**** 1.19  Oct 3, 2022
+	Improve test coverage.
 	Make Makefile.PL also work properly on MSWin32.
+
+
+**** 1.18  Aug 31, 2022
+	Rework Makefile.PL.
 
 
 **** 1.17  Aug 11, 2022

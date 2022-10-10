@@ -2,7 +2,7 @@
 package Sah::SchemaR::unix::signal;
 
 our $DATE = '2022-07-24'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{examples=>["HUP","INT","QUIT","ILL","ABRT","FPE","KILL","SEGV","PIPE","ALRM","TERM","USR1","USR2","CHLD","CONT","STOP","TSTP","TTIN","TTOU",1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,{data=>"",valid=>0}],match=>"\\A(?:[A-Z]+[0-9]*|[1-9][0-9]*)\\z",summary=>"Unix signal name (e.g. TERM or KILL) or number (9 or 15)"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::unix::signal - Unix signal name (e.g. TERM or KILL) or number (9 o
 
 =head1 VERSION
 
-This document describes version 0.019 of Sah::SchemaR::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.020 of Sah::SchemaR::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 =head1 DESCRIPTION
 

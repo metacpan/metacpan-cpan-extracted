@@ -134,7 +134,7 @@ like $row, qr/ OTTAWA \s CDA,,,45 /xms, 'row contains note references';
 
 # for test coverage
 subtest 'field accessors' => sub {
-    ok $stn_obj->id,           'id';
+    ok $stn_obj->id,           'detail';
     ok $stn_obj->country,      'country';
     ok $stn_obj->state,        'state';
     ok $stn_obj->active,       'active';

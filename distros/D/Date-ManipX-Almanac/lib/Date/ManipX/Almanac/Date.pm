@@ -13,7 +13,7 @@ use Module::Load ();
 use Scalar::Util ();
 use Text::ParseWords ();
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use constant DEFAULT_TWILIGHT	=> 'civil';
 use constant REF_ARRAY	=> ref [];
@@ -192,6 +192,7 @@ sub _config_almanac_config_file {
 	return 1;
     };
     my $config_file_processed;
+    local $_ = undef;	# while (<>) ... does not localize $_.
     while ( <$fh> ) {
 	m/ \S /smx
 	    or next;
@@ -1007,7 +1008,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2021 by Thomas R. Wyant, III
+Copyright (C) 2021-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

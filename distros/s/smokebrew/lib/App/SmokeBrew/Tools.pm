@@ -1,5 +1,5 @@
 package App::SmokeBrew::Tools;
-$App::SmokeBrew::Tools::VERSION = '1.00';
+$App::SmokeBrew::Tools::VERSION = '1.04';
 #ABSTRACT: Various utility functions for smokebrew
 
 use strict;
@@ -15,7 +15,6 @@ use URI;
 my @mirrors = (
   'http://www.cpan.org/',
   'http://cpan.cpantesters.org/',
-  'ftp://ftp.funet.fi/pub/CPAN/',
 );
 
 sub fetch {
@@ -204,7 +203,7 @@ App::SmokeBrew::Tools - Various utility functions for smokebrew
 
 =head1 VERSION
 
-version 1.00
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -312,7 +311,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Chris Williams.
+This software is copyright (c) 2022 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

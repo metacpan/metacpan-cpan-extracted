@@ -240,8 +240,6 @@ class Sys::IO::Constant {
 
   native static method POLLIN : int ();
 
-  native static method POLLNORM : int ();
-
   native static method POLLNVAL : int ();
 
   native static method POLLOUT : int ();

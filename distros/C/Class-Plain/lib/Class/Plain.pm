@@ -1,4 +1,4 @@
-package Class::Plain 0.04;
+package Class::Plain 0.05;
 
 use v5.16;
 use warnings;
@@ -6,6 +6,8 @@ use warnings;
 use Carp;
 
 use mro;
+use Role::Tiny ();
+use Role::Tiny::With ();
 
 sub dl_load_flags { 0x01 }
 
@@ -113,6 +115,8 @@ This module provides a class syntax for the hash-based Perl OO.
 
 =head2 class
 
+A class is defined by the C<class> keyword.
+
   class NAME { ... }
 
   class NAME : ATTRS... {
@@ -144,7 +148,7 @@ The following class attributes are supported:
  # The super class is nothing
  : isa()
 
-Define a supper classes that this class extends.
+Specifies a supper classes that this class extends.
 
 If the supper class is not specified by C<isa> attribute, the class inherits L<Class::Plain::Base>.
 
@@ -153,6 +157,18 @@ The super class is added to the end of C<@ISA>.
 If the the super class name doesn't exists in the Perl's symbol table, the super class is loaded.
 
 Otherwise if the super class doesn't have the C<new> method and doesn't have the class names in C<@ISA>, the super class is loaded.
+
+=head3 does Attribute
+ 
+ # The single inheritance
+ : does(ROLE)
+ 
+ # The multiple inheritance
+ : does(ROLE1) does(ROLE2)
+ 
+Specifies roles that this class does. This is the alias for L<Role::Tiny/"with">.
+
+See also L</"role">.
 
 =head2 field
   
@@ -275,6 +291,58 @@ B<Examples:>
     
     return $self;
   }
+
+=head2 role
+
+A role is defined by the C<role> keyword.
+
+  role NAME { ... }
+
+  role NAME : ATTRS... {
+    ...
+  }
+
+  role NAME;
+
+  role NAME : ATTRS...;
+
+C<Class::Plain> adopts the role features of L<Role::Tiny>. All features of L<Role::Tiny> can be used.
+
+B<Examples:>
+
+The SYNOPSYS of L<Role::Tiny> is rewritten to the following codes.
+
+  use Class::Plain;
+   
+  role Some::Role {
+   
+    method foo { ... }
+     
+    method bar { ... }
+  }
+  
+  class Some::Class : does(Some::Role) {
+    method foo { ... }
+     
+    # baz is wrapped in the around modifier by Class::Method::Modifiers
+    method baz { ... }
+  }
+
+=head3 Required Method
+
+In roles, the required method for the composed class can be defined by omitting its method block.
+
+  method required_method;
+
+This is alias for L<Role::Tiny/"requires">.
+
+  requires "required_method";
+
+=head3 does Method
+
+  $object->does('Some::Role');
+
+Checks if the object does the role.
 
 =head1 Required Perl Version
 

@@ -62,7 +62,7 @@
    "provides" : {
       "Alien::libmaxminddb" : {
          "file" : "lib/Alien/libmaxminddb.pm",
-         "version" : "1.008"
+         "version" : "1.009"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "https://github.com/voegelas/Alien-libmaxminddb"
       }
    },
-   "version" : "1.008",
+   "version" : "1.009",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

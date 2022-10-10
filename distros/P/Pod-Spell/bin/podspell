@@ -3,7 +3,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.23';
+our $VERSION = '1.25';
 
 use Pod::Spell;
 
@@ -43,7 +43,7 @@ podspell - pod spell checking command line interface
 
 =head1 VERSION
 
-version 1.23
+version 1.25
 
 =head1 SYNOPSIS
 

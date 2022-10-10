@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.66 ':experimental(init_expr)';
 
-package Device::Chip::Sensor 0.23;
+package Device::Chip::Sensor 0.24;
 
 use strict;
 use warnings;

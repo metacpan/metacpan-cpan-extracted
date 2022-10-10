@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2021  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2009-2022  Alex Schroeder <alex@gnu.org>
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -62,6 +62,7 @@ find files it needs to include.
 
 =cut
 
+has 'local_files';
 has 'dist_dir';
 has 'map';
 has 'regions' => sub { [] };
@@ -133,27 +134,33 @@ sub process {
     if (/^(-?\d\d)(-?\d\d)(\d\d)?\s+(.*)/) {
       my $region = $self->make_region(x => $1, y => $2, z => $3||'00', map => $self);
       my $rest = $4;
-      while (my ($tag, $label, $size) = $rest =~ /\b([a-z]+)=["“]([^"”]+)["”]\s*(\d+)?/) {
+      while (my ($tag, $label, $size) = $rest =~ /\b([a-z]+)=["“]([^"”]+)["”]\s*(\d+)/) {
 	if ($tag eq 'name') {
 	  $region->label($label);
 	  $region->size($size);
 	}
 	$rest =~ s/\b([a-z]+)=["“]([^"”]+)["”]\s*(\d+)?//;
       }
-      while (my ($label, $size) = $rest =~ /["“]([^"”]+)["”]\s*(\d+)?/) {
-	$region->label($label);
-	$region->size($size);
-	$rest =~ s/["“]([^"”]+)["”]\s*(\d+)?//;
+      while (my ($label, $size, $transform) = $rest =~ /["“]([^"”]+)["”]\s*(\d+)?((?:\s*[a-z]+\([^\)]+\))*)/) {
+	if ($transform) {
+	  push(@{$self->other()}, $self->other_text($region, $label, $size, $transform));
+	} else {
+	  $region->label($label);
+	  $region->size($size);
+	}
+	$rest =~ s/["“]([^"”]+)["”]\s*(\d+)?((?:\s*[a-z]+\([^\)]+\))*)//;
       }
       my @types = split(/\s+/, $rest);
       $region->type(\@types);
       push(@{$self->regions}, $region);
       push(@{$self->things}, $region);
-    } elsif (/^(-?\d\d-?\d\d(?:\d\d)?(?:--?\d\d-?\d\d(?:\d\d)?)+)\s+(\S+)\s*(?:["“](.+)["”])?/) {
+    } elsif (/^(-?\d\d-?\d\d(?:\d\d)?(?:--?\d\d-?\d\d(?:\d\d)?)+)\s+(\S+)\s*(?:["“](.+)["”])?\s*(left|right)?\s*(\d+%)?/) {
       my $line = $self->make_line(map => $self);
       my $str = $1;
       $line->type($2);
       $line->label($3);
+      $line->side($4);
+      $line->start($5);
       $line->id('line' . $line_id++);
       my @points;
       while ($str =~ /\G(-?\d\d)(-?\d\d)(\d\d)?-?/cg) {
@@ -192,9 +199,14 @@ sub process {
       } elsif (not $self->seen->{$1}) {
 	my $location = $1;
 	$self->seen->{$location} = 1;
-	my $path = Mojo::File->new($self->dist_dir, $location);
-	if (index($location, '/') == -1 and -f $path) {
+	my $path;
+	if (index($location, '/') == -1 and -f ($path = Mojo::File->new($self->dist_dir, $location))) {
 	  # without a slash, it could be a file from dist_dir
+	  $log->debug("Reading $location");
+	  $self->process(split(/\n/, decode_utf8($path->slurp())));
+	} elsif ($self->local_files and -f ($path = Mojo::File->new($location))) {
+	  # it could also be a local file in the same directory, but only if
+	  # called from the render command (which sets local_files)
 	  $log->debug("Reading $location");
 	  $self->process(split(/\n/, decode_utf8($path->slurp())));
 	} elsif ($location =~ /^https?:/) {
@@ -230,6 +242,23 @@ sub process {
   return $self;
 }
 
+# Very similar to svg_label, but given that we have a transformation, we
+# translate the object to it's final position.
+sub other_text {
+  my ($self, $region, $label, $size, $transform) = @_;
+  $transform = sprintf("translate(%.1f,%.1f)", $region->pixels($self->offset)) . $transform;
+  my $attributes = "transform=\"$transform\" " . $self->label_attributes;
+  if ($size and not $attributes =~ s/\bfont-size="\d+pt"/font-size="$size"/) {
+    $attributes .= " font-size=\"$size\"";
+  }
+  my $data = sprintf(qq{    <g><text text-anchor="middle" %s %s>%s</text>},
+                     $attributes, $self->glow_attributes||'', $label);
+  $data .= sprintf(qq{<text text-anchor="middle" %s>%s</text>},
+		   $attributes, $label);
+  $data .= qq{</g>\n};
+  return $data;
+}
+
 sub def {
   my ($self, $svg) = @_;
   $svg =~ s/>\s+</></g;
@@ -260,21 +289,19 @@ sub svg_header {
   foreach my $region (@{$self->regions}) {
     $maxz = $region->z if $region->z > $maxz;
   }
-  # these are required to calculate the viewBox for the SVG
+  # These are required to calculate the viewBox for the SVG. Min and max X are
+  # what you would expect. Min and max Y are different, however, since we want
+  # to count all the rows on all the levels, plus an extra separator between
+  # them. Thus, min y is the min y of the first level, and max y is the min y of
+  # the first level + 1 for every level beyond the first, + all the rows for
+  # each level.
   my $min_x_overall;
   my $max_x_overall;
   my $min_y_overall;
-  # $max_y_overall is the last row of the SVG with all the levels: if there is
-  # just one hex, 010100, then the last row shown on the SVG is 0 (the first
-  # one); if there are two hexes beneath each other, 010100 and 010101, then the
-  # last row shown on the SVG is 2 (y=0 is for z=0, y=1 is the space between
-  # levels, and y=2 is for z=1); note that this would be the same if the two
-  # hexes were 020200 and 020202!
-  my $max_y_overall = 0;
+  my $max_y_overall;
   for my $z (0 .. $maxz) {
     my ($minx, $miny, $maxx, $maxy);
-    $max_y_overall += 1 if $z > 0;
-    $self->offset->[$z] = $max_y_overall;
+    $self->offset->[$z] = $max_y_overall // 0;
     foreach my $region (@{$self->regions}) {
       next unless $region->z == $z;
       $minx = $region->x unless defined $minx and $minx <= $region->x;
@@ -284,8 +311,10 @@ sub svg_header {
     }
     $min_x_overall = $minx unless defined $min_x_overall and $minx >= $min_x_overall;
     $max_x_overall = $maxx unless defined $min_y_overall and $maxx <= $max_x_overall;;
-    $min_y_overall = $miny unless defined $min_y_overall;
-    $max_y_overall += 1 + $maxy - $miny;
+    $min_y_overall = $miny unless defined $min_y_overall; # first row of the first level
+    $max_y_overall = $miny unless defined $max_y_overall; # also (!) first row of the first level
+    $max_y_overall += 1 if $z > 0; # plus a separator row for every extra level
+    $max_y_overall += 1 + $maxy - $miny; # plus the number of rows for every level
   }
   my ($vx1, $vy1, $vx2, $vy2) = $self->viewbox($min_x_overall, $min_y_overall, $max_x_overall, $max_y_overall);
   my ($width, $height) = ($vx2 - $vx1, $vy2 - $vy1);

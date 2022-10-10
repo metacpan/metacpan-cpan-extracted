@@ -1,10 +1,14 @@
 # Weather::GHCN::Fetch.pm - class for creating applications that fetch NOAA GHCN data
 
+## no critic (Documentation::RequirePodAtEnd)
+## no critic [ValuesAndExpressions::ProhibitVersionStrings]
+## no critic [TestingAndDebugging::RequireUseWarnings]
+
 use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::Fetch;
 
-our $VERSION = 'v0.0.003';
+our $VERSION = 'v0.0.005';
 
 =head1 NAME
 
@@ -12,7 +16,7 @@ Weather::GHCN::Fetch - Access the NOAA GHCN Global Historical Climatology Networ
 
 =head1 VERSION
 
-version v0.0.003
+version v0.0.005
 
 =head1 DESCRIPTION
 

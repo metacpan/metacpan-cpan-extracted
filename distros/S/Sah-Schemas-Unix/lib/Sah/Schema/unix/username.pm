@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-07-24'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our $schema = [str => {
     summary => 'Unix account name',
@@ -56,7 +56,7 @@ Sah::Schema::unix::username - Unix account name
 
 =head1 VERSION
 
-This document describes version 0.019 of Sah::Schema::unix::username (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.020 of Sah::Schema::unix::username (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 =head1 SYNOPSIS
 
@@ -94,11 +94,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "andy2";
+ $data = "an.dy";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = 1234;
+ $data = "";
  my $errmsg = $validator->($data); # => "Must match regex pattern qr((?=\\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\\z)(?=.*[A-Za-z._-]))"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -109,12 +109,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "andy2";
- my $res = $validator->($data); # => ["","andy2"]
+ $data = "an.dy";
+ my $res = $validator->($data); # => ["","an.dy"]
  
  # a sample invalid data
- $data = 1234;
- my $res = $validator->($data); # => ["Must match regex pattern qr((?=\\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\\z)(?=.*[A-Za-z._-]))",1234]
+ $data = "";
+ my $res = $validator->($data); # => ["Must match regex pattern qr((?=\\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\\z)(?=.*[A-Za-z._-]))",""]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

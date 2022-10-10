@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-26'; # DATE
+our $DATE = '2022-10-09'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use App::orgadb::Common;
 
@@ -127,7 +127,7 @@ App::orgadb::Select::Shell::Commands - orgadb-sel shell commands
 
 =head1 VERSION
 
-This document describes version 0.008 of App::orgadb::Select::Shell::Commands (from Perl distribution App-orgadb), released on 2022-09-26.
+This document describes version 0.010 of App::orgadb::Select::Shell::Commands (from Perl distribution App-orgadb), released on 2022-10-09.
 
 =for Pod::Coverage .+
 
@@ -198,6 +198,14 @@ Find entry by string or regex search against the category title.
 
 Return just the number of matching entries instead of showing them.
 
+=item * B<default_formatter_rules> => I<array[any]>
+
+Specify conditional default formatters. This is for convenience and best
+specified in the configuration as opposed to on the command-line option.
+An example:
+
+ default_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i","formatters":[ ["Phone::format_phone_idn"] ]}
+
 =item * B<detail> => I<bool>
 
 =item * B<entry> => I<str_or_re>
@@ -243,6 +251,9 @@ If formatter name begins with C<[> character, it will be parsed as JSON. Example
 
  ['Str::remove_comment', {'style':'cpp'}]
 
+Overrides C<--default_formatter_rule> but overridden by the C<--no-formatters>
+(C<--raw-field-values>, C<-F>) option.
+
 =item * B<hide_category> => I<true>
 
 Do not show category.
@@ -254,6 +265,10 @@ Do not show entry headline.
 =item * B<hide_field_name> => I<true>
 
 Do not show field names, just show field values.
+
+=item * B<no_formatters> => I<true>
+
+Do not apply any formatters to field value (overrides --formatter option).
 
 =item * B<num_entries> => I<uint>
 

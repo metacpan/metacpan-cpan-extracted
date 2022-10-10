@@ -15,7 +15,7 @@ use Pod::Usage;
 use POSIX qw{ strftime };
 use Time::Local;
 
-our $VERSION = '0.127';
+our $VERSION = '0.128';
 
 # Map -want-events values to TLE event codes.
 my %wanted_event_map = (
@@ -224,6 +224,7 @@ sub load_file  {
     open $fh, '<', $fn	## no critic (RequireBriefOpen)
 	or die "Unable to open $fn: $!\n";
     local @ARGV;
+    local $_ = undef;
     while ( <$fh> ) {
 	s/ \s+ \z //smx;
 	'' eq $_ and next;

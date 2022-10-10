@@ -1,3 +1,8 @@
+0.010   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to App::BrowserUtils 0.017 (updated Sah schema name).
+
+
 0.009   2021-09-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: pause-and-unpause-chrome.

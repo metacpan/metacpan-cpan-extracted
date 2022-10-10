@@ -22,6 +22,12 @@ my $builder = Module::Build->new(
         'Data::DPath' => '0.58',
     },
     add_to_cleanup => ['Data-Trace-*'],
+    meta_merge     => {
+        resources => {
+            bugtracker => 'https://github.com/poti1/data-trace/issues',
+            repository => 'https://github.com/poti1/data-trace',
+        },
+    },
 );
 
 $builder->create_build_script();

@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.23";
+our $VERSION = "1.24";
 
 use v5.14;
 use warnings;
@@ -29,7 +29,7 @@ use Getopt::EX::Hashed 1.05; {
     has debug               => '         ' ;
     has help                => '    h    ' ;
     has version             => '    v    ' ;
-    has width               => ' =s c    ' ;
+    has width               => ' =s w c  ' ;
     has fillrows            => '    x    ' ;
     has table               => '    t    ' ;
     has table_columns_limit => ' =i l    ' , default => 0 ;
@@ -37,6 +37,7 @@ use Getopt::EX::Hashed 1.05; {
     has separator           => ' =s s    ' , default => ' ' ;
     has output_separator    => ' =s o    ' , default => '  ' ;
     has document            => '    D    ' ;
+    has parallel            => ' !  V    ' ;
     has up                  => ' :i U    ' ;
     has page                => ' :i P    ' , min => 0;
     has pane                => ' =s C    ' , default => 0 ;
@@ -57,7 +58,7 @@ use Getopt::EX::Hashed 1.05; {
     has runout              => ' =i      ' , min => 0, default => 2 ;
     has pagebreak           => ' !       ' , default => 1 ;
     has border              => ' :s      ' ; has B => '' , action => sub { $_->border = '' } ;
-    has border_style        => ' =s   bs ' , default => 'vbar' ;
+    has border_style        => ' =s   bs ' , default => 'box' ;
     has white_space         => ' !       ' , default => 2 ;
     has isolation           => ' !       ' , default => 2 ;
     has fillup              => ' :s      ' ; has F => '' , action => sub { $_->fillup = '' } ;
@@ -79,9 +80,10 @@ use Getopt::EX::Hashed 1.05; {
     }
 
     # for run-time use
-    has span                => ;
-    has panes               => ;
-    has border_height       => ;
+    has span          => ;
+    has panes         => ;
+    has border_height => ;
+    has current_page  => ;
 
     Getopt::EX::Hashed->configure( DEFAULT => [] );
 
@@ -146,13 +148,17 @@ sub run {
 
     warn Dumper $obj if $obj->debug;
 
-    chomp(my @lines = <>);
-    @lines = insert_space @lines if $obj->paragraph;
+    my @files = $obj->read_files(@ARGV ? @ARGV : '-');
 
     if ($obj->table) {
+	my @lines = map { @{$_->{data}} } @files;
 	$obj->table_out(@lines);
-    } else {
-	$obj->column_out(@lines);
+    }
+    elsif ($obj->parallel) {
+	$obj->parallel_out(@files);
+    }
+    else {
+	$obj->nup_out(@files);
     }
 
     return 0
@@ -161,12 +167,20 @@ sub run {
 sub setup_options {
     my $obj = shift;
 
+    ## --parallel or @ARGV > 1
+    if ($obj->parallel //= @ARGV > 1) {
+	$obj->linestyle ||= 'wrap';
+	$obj->widen = 1;
+	$obj->border //= '';
+    }
+
     ## --border takes optional border-style value
     if (defined(my $border = $obj->border)) {
 	if ($border ne '') {
 	    $obj->border_style = $border;
 	}
 	$obj->border = 1;
+	$obj->fillup //= 'pane';
     }
 
     ## --linestyle
@@ -220,90 +234,158 @@ sub setup_options {
     $obj;
 }
 
-sub column_out {
+sub parallel_out {
     my $obj = shift;
-    @_ or return;
+    my @files = @_;
 
-    my @data;
-    my @length;
-    for (@_) {
-	my($expanded, $dmy, $length) = ansi_fold($_, -1, expand => 1);
-	push @data, $expanded;
-	push @length, $length;
+    my $max_line_length = max map { $_->{length} } @files;
+    $obj->pane ||= @files;
+    $obj->set_horizontal($max_line_length);
+    $obj->set_contents($_->{data}) for @files;
+
+    while (@files) {
+	my @rows = splice @files, 0, $obj->pane;
+	my $max_length = max map { int @{$_->{data}} } @rows;
+	$obj->column_out(map {
+	    my $data = $_->{data};
+	    my $length = @$data;
+	    push @$data, (($obj->fillup_str) x ($max_length - $length));
+	    $data;
+	} @rows);
     }
+    return $obj;
+}
+
+sub nup_out {
+    my $obj = shift;
+    my @files = @_;
+    my $max_length = max map { $_->{length} } @files;
+    $obj->set_horizontal($max_length);
+    my $reset = do { my @o = %$obj; sub { %$obj = @o } };
+    for my $file (@files) {
+	my $data = $file->{data};
+	$obj->set_contents($data)
+	    ->set_vertical($data)
+	    ->set_layout($data)
+	    ->page_out(@$data);
+	$reset->();
+    }
+    return $obj;
+}
+
+sub read_files {
+    my $obj = shift;
+    map {
+	open my $fh, $_ or die "$_: $!";
+	chomp (my @line = <$fh>);
+	@line = insert_space @line if $obj->paragraph;
+	my $length = $obj->expand_tab(\@line);
+	{
+	    name   => $_,
+	    length => $length,
+	    data   => \@line,
+	};
+    } @_;
+}
+
+sub expand_tab {
+    my $obj = shift;
+    my $dp = shift;
+    my $max_length = 0;
+    @$dp = map {
+	my($expanded, $dmy, $length) = ansi_fold($_, -1, expand => 1);
+	$max_length = $length if $length > $max_length;
+	$expanded;
+    } @$dp;
+    $max_length;
+}
+
+sub set_horizontal {
+    my $obj = shift;
+    my $max_data_length = shift;
 
     use integer;
     my $width = $obj->get_width - $obj->border_width(qw(left right));
-    my $max_length = max @length;
     my $unit = $obj->column_unit || 1;
 
-    ($obj->span, $obj->panes) = do {
-	my $span;
-	my $panes;
-	if ($obj->widen and not $obj->pane_width) {
-	    my $min = $max_length + ($obj->border_width('center') || 1);
-	    $panes = $obj->pane || $width / $min || 1;
-	    $span = ($width + $obj->border_width('center')) / $panes;
-	} else {
-	    $span = $obj->pane_width ||
-		roundup($max_length + ($obj->border_width('center') || 1),
-			$unit);
-	    $panes = $obj->pane || $width / $span || 1;
-	}
-	$span -= $obj->border_width('center');
-	$span < 1 and die "Not enough space.\n";
-	($span, $panes);
-    };
+    my $span;
+    my $panes;
+    if ($obj->widen and not $obj->pane_width) {
+	my $min = $max_data_length + ($obj->border_width('center') || 1);
+	$panes = $obj->pane || $width / $min || 1;
+	$span = ($width + $obj->border_width('center')) / $panes;
+    } else {
+	$span = $obj->pane_width ||
+	    roundup($max_data_length + ($obj->border_width('center') || 1),
+		    $unit);
+	$panes = $obj->pane || $width / $span || 1;
+    }
+    $span -= $obj->border_width('center');
+    $span < 1 and die "Not enough space.\n";
 
-    ## Fold long lines.
+    ($obj->span, $obj->panes) = ($span, $panes);
+
+    return $obj;
+}
+
+sub set_contents {
+    my $obj = shift;
+    my $dp = shift;
     (my $cell_width = $obj->span - $obj->margin_width) < 1
 	and die "Not enough space.\n";
+    # Fold long lines
     if ($obj->linestyle and $obj->linestyle ne 'none') {
 	my $sub = $obj->foldsub($cell_width) or die;
-	@data = map { $sub->($_) } @data;
+	@$dp = map { $sub->($_) } @$dp;
     }
+    return $obj;
+}
 
+sub set_vertical {
+    my $obj = shift;
+    my $dp = shift;
     $obj->border_height = do {
 	sum map { length > 0 }
 	    map { $obj->get_border($_) }
 	    qw(top bottom);
     };
-    $obj->height ||=
-	div(0+@data, $obj->panes) + $obj->border_height;
-
+    $obj->height ||= div(int @$dp, $obj->panes) + $obj->border_height;
     die "Not enough height.\n" if $obj->effective_height <= 0;
+    return $obj;
+}
 
-    ## --white-space, --isolation, --fillup, top/bottom border
-    $obj->layout(\@data);
-
-    ## --border
-    $obj->insert_border(\@data);
-
-    my @data_index = 0 .. $#data;
-    my $is_last_data = sub { $_[0] == $#data };
-    for (my $page = 0; @data_index; $page++) {
-	my @page = splice @data_index, 0, $obj->height * $obj->panes;
-	my @index = 0 .. $#page;
-	my @lines = grep { @$_ } do {
+sub page_out {
+    my $obj = shift;
+    for ($obj->current_page = 0; @_; $obj->current_page++) {
+	my @columns = grep { @$_ } do {
 	    if ($obj->fillrows) {
-		map { [ splice @index, 0, $obj->panes ] } 1 .. $obj->height;
+		xpose map { [ splice @_, 0, $obj->panes ] } 1 .. $obj->effective_height;
 	    } else {
-		xpose map { [ splice @index, 0, $obj->height ] } 1 .. $obj->panes;
+		map { [ splice @_, 0, $obj->effective_height ] } 1 .. $obj->panes;
 	    }
 	};
-	for my $i (0 .. $#lines) {
-	    my $line = $lines[$i];
-	    my $pos = $i == 0 ? 0 : $i == $#lines ? 2 : 1;
-	    my @panes = map {
-		my $data_index = $page[${$line}[$_]];
-		ansi_sprintf "%-$obj->{span}s", $data[$data_index];
-	    } 0 .. $#{$line};
-	    print      $obj->get_border('left',   $pos, $page);
-	    print join $obj->get_border('center', $pos, $page), @panes;
-	    print      $obj->get_border('right',  $pos, $page);
-	    print      "\n";
-	}
+	$obj->column_out(@columns);
     }
+    return $obj;
+}
+
+sub column_out {
+    my $obj = shift;
+    my($bdr_top, $bdr_btm) = map { $obj->get_border($_) x $obj->span } qw(top bottom);
+    map { unshift @$_, $bdr_top } @_ if $bdr_top;
+    map { push    @$_, $bdr_btm } @_ if $bdr_btm;
+    my $max = max(map { int @$_ } @_) - 1;
+    for my $i (0 .. $max) {
+	my $pos = $i == 0 ? 0 : $i == $max ? 2 : 1;
+	my @panes = map {
+	    @$_ ? ansi_sprintf("%-$obj->{span}s", shift @$_) : ();
+	} @_;
+	print      $obj->get_border('left',   $pos, $obj->current_page);
+	print join $obj->get_border('center', $pos, $obj->current_page), @panes;
+	print      $obj->get_border('right',  $pos, $obj->current_page);
+	print      "\n";
+    }
+    return $obj;
 }
 
 sub table_out {
@@ -331,6 +413,7 @@ sub table_out {
     } continue {
 	print "\n";
     }
+    return $obj;
 }
 
 1;

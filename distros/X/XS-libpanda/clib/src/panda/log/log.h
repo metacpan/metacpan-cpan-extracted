@@ -32,12 +32,9 @@ namespace panda { namespace log {
 #define PANDA_LOG3(lvl, mod, msg) do {                                                                      \
     if (PANDA_SHOULD_LOG2(lvl, mod)) {                                                                      \
         std::ostream& log = panda::log::details::get_os();                                                  \
-        panda::static_if<panda::log::details::IsEval<panda::log::details::getf(#msg)>::value>([&](auto) {   \
-            (panda::log::details::LambdaStream&)log << msg;                                                 \
-        })(panda::log::details::Unique1{});                                                                 \
-        panda::static_if<!panda::log::details::IsEval<panda::log::details::getf(#msg)>::value>([&](auto) {  \
-            log << msg;                                                                                     \
-        })(panda::log::details::Unique2{});                                                                 \
+        using Stream = std::conditional<panda::log::details::IsEval<panda::log::details::getf(#msg)>::value,\
+                                        panda::log::details::LambdaStream&, std::ostream&>::type;           \
+        (Stream)log << msg;                                                                                 \
         panda::log::details::do_log(log, lvl, &(mod), PANDA_LOG_CODE_POINT);                                \
     }                                                                                                       \
 } while (0)

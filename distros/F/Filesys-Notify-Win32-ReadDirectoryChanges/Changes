@@ -1,0 +1,11 @@
+0.03 2022-10-05
+    * We explicitly don't support Windows XP and bail out in the Makefile.PL
+      when run under XP
+
+0.02 2022-10-03
+    * Note lack of Cygwin support
+    * Fix SYNOPSIS (contributed by Lorenzo)
+
+0.01 2022-10-02
+    * Released on an unsuspecting world, spun off from the unreleased
+      Filesys::DB

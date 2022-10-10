@@ -46,6 +46,6 @@
          "url" : "https://github.com/makamaka/JSON-PP"
       }
    },
-   "version" : "4.11",
-   "x_serialization_backend" : "JSON::PP version 4.11"
+   "version" : "4.12",
+   "x_serialization_backend" : "JSON::PP version 4.12"
 }

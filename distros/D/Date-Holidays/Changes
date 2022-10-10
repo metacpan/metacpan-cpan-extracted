@@ -1,5 +1,35 @@
 Changes file for Date-Holidays
 
+1.33 2022-10-04 Feature release, update not required
+
+- Further improvement to the handling of the parameters required by:
+
+  - Date::Holidays::NL via Date::Holidays::Adapter::NL
+  - Date::Holidays::AW via Date::Holidays::Adapter::AW
+  - Date::Holidays::BQ via Date::Holidays::Adapter::BQ
+
+  The `gov` and `lang` parameters can now be used in conjunction with the country list parameter
+
+- Exchanged TryCatch for Try::Tiny  
+
+1.32 2022-10-03 Feature release, update not required
+
+- Introduction of Date::Holidays::Adapter::BQ for adapting Date::Holidays::BQ
+
+- Support for extra parameters for `is_holiday` and `is_holiday_dt`:
+  
+  - Date::Holidays::NL via Date::Holidays::Adapter::NL
+  - Date::Holidays::AW via Date::Holidays::Adapter::AW
+  - Date::Holidays::BQ via Date::Holidays::Adapter::BQ
+
+  All via PR #70 (https://github.com/jonasbn/perl-date-holidays/pull/70) by Wesley Schwengle (@waterkip) author of:
+
+  - Date::Holidays::NL
+  - Date::Holidays::AW
+  - Date::Holidays::BQ
+
+- Fixed and clean up to Dist::Zilla configuration by @jonasbn
+
 1.31 2022-03-08 Feature release, update not required
 
 - Improved support for Date::Holidays::FR

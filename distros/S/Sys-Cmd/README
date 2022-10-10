@@ -2,7 +2,7 @@ NAME
     Sys::Cmd - run a system command or spawn a system processes
 
 VERSION
-    0.85.4 (2016-06-06)
+    0.99.0 (2022-10-05)
 
 SYNOPSIS
         use Sys::Cmd qw/run spawn/;
@@ -12,39 +12,55 @@ SYNOPSIS
 
         # Feed command some input, get output as lines,
         # raise exception on failure:
-        @output = run(@cmd, { input => 'feedme' });
+        @output = run( @cmd, { input => 'feedme' } );
 
         # Spawn and interact with a process somewhere else:
-        $proc = spawn( @cmd, { dir => '/' , encoding => 'iso-8859-3'} );
+        $proc = spawn(
+            @cmd,
+            {
+                dir      => '/',
+                encoding => 'encoding(iso-8859-3)'
+            },
+        );
 
-        while (my $line = $proc->stdout->getline) {
-            $proc->stdin->print("thanks");
+        while ( my $line = $proc->stdout->getline ) {
+            $proc->stdin->print("thanks\n");
         }
 
         my @errors = $proc->stderr->getlines;
 
-        $proc->close();       # Finished talking
-        $proc->wait_child();  # Cleanup
+        $proc->close();         # Finished talking to file handles
+        $proc->wait_child();    # Cleanup
 
         # read exit information
-        $proc->exit();      # exit status
-        $proc->signal();    # signal
-        $proc->core();      # core dumped? (boolean)
+        $proc->exit();          # exit status
+        $proc->signal();        # signal
+        $proc->core();          # core dumped? (boolean)
 
 DESCRIPTION
-    Sys::Cmd lets you run system commands and capture their output, or spawn
-    and interact with a system process through its "STDIN", "STDOUT", and
-    "STDERR" file handles. The following functions are exported on demand by
-    this module:
+    Sys::Cmd lets you run system commands and capture their output, or
+    spawn and interact with a system process through its "STDIN",
+    "STDOUT", and "STDERR" file handles. The following functions are
+    exported on demand by this module:
 
     run( @cmd, [\%opt] ) => $output | @output
         Execute @cmd and return what the command sent to its "STDOUT",
-        raising an exception in the event of error. In array context returns
-        a list instead of a plain string.
+        raising an exception in the event of error. In array context
+        returns a list instead of a plain string.
 
-        The first element of @cmd will be looked up using File::Which if it
-        doesn't exist as a relative file name is is a CODE reference (UNIX
-        only). The command input and environment can be modified with an
+        The first element of @cmd determines what/how things are run:
+
+        *   If it is a relative file name it is executed directly using
+            Proc::Spawn.
+
+        *   If it is a CODE reference (subroutine) Sys::Cmd forks before
+            running it in the child process. This is not supported on
+            Win32.
+
+        *   Everything else is looked up using File::Which and then
+            executed with Proc::Spawn.
+
+        The command input and environment can be modified with an
         optional hashref containing the following key/values:
 
         dir The working directory the command will be run in.
@@ -54,8 +70,8 @@ DESCRIPTION
             file-handles. Defaults to 'utf8'.
 
         env A hashref containing key/values to be added to the current
-            environment at run-time. If a key has an undefined value then
-            the key is removed from the environment altogether.
+            environment at run-time. If a key has an undefined value
+            then the key is removed from the environment altogether.
 
         input
             A string which is fed to the command via its standard input,
@@ -66,11 +82,10 @@ DESCRIPTION
         output appended to the "STDOUT" output.
 
     spawn( @cmd, [\%opt] ) => Sys::Cmd
-        Return a Sys::Cmd object (documented below) representing the process
-        running @cmd, with attributes set according to the optional \%opt
-        hashref. The first element of the @cmd array is looked up using
-        File::Which if it cannot be found in the file-system as a relative
-        file name or it is a CODE reference (UNIX only).
+        Return a Sys::Cmd object (documented below) representing the
+        process running @cmd, with attributes set according to the
+        optional \%opt hashref. The first element of @cmd determines the
+        execution method just like the "run()" function.
 
     Sys::Cmd objects can of course be created using the standard "new"
     constructor if you prefer that to the "spawn" function:
@@ -87,28 +102,30 @@ DESCRIPTION
             },
         );
 
-    Note that Sys::Cmd objects created this way will not lookup the command
-    using File::Which the way the "run", "runx" and "spawn" functions do.
+    Note that Sys::Cmd objects created this way will not lookup the
+    command using File::Which the way the "run", "runx" and "spawn"
+    functions do. CODE references in $cmd[0] are however still
+    recognized and forked off.
 
-    Sys::Cmd uses Log::Any "debug" calls for logging purposes. An easy way
-    to see the output is to add "use Log::Any::Adapter 'Stdout'" in your
-    program.
+    Sys::Cmd uses Log::Any "debug" calls for logging purposes. An easy
+    way to see the output is to add "use Log::Any::Adapter 'Stdout'" in
+    your program.
 
 CONSTRUCTOR
     new(%args) => Sys::Cmd
-        Spawns a process based on %args. %args must contain at least a "cmd"
-        value, and optionally "encoding", "env", "dir" and "input" values as
-        defined as attributes below.
+        Spawns a process based on %args. %args must contain at least a
+        "cmd" value, and optionally "encoding", "env", "dir" and "input"
+        values as defined as attributes below.
 
-        If an "on_exit" subref argument is provided it will be called by the
-        "wait_child" method, which can either be called manually or will be
-        automatically called when the object is destroyed.
+        If an "on_exit" subref argument is provided it will be called by
+        the "wait_child" method, which can either be called manually or
+        will be automatically called when the object is destroyed.
 
 ATTRIBUTES
     All attributes are read-only.
 
-    cmd An array ref containing the command or CODE reference (UNIX only)
-        and its arguments.
+    cmd An array ref containing the command or CODE reference (UNIX
+        only) and its arguments.
 
     dir The working directory the command will be run in.
 
@@ -117,35 +134,36 @@ ATTRIBUTES
         file-handles. Defaults to 'utf8'.
 
     env A hashref containing key/values to be added to the current
-        environment at run-time. If a key has an undefined value then the
-        key is removed from the environment altogether.
+        environment at run-time. If a key has an undefined value then
+        the key is removed from the environment altogether.
 
     input
-        A string which is fed to the command via its standard input, which
-        is then closed. This is a shortcut for printing to, and closing the
-        command's *stdin* file-handle. An empty string will close the
-        command's standard input without writing to it. On some systems,
-        some commands may close standard input on startup, which will cause
-        a SIGPIPE when trying to write to it for which Sys::Cmd will warn.
+        A string which is fed to the command via its standard input,
+        which is then closed. This is a shortcut for printing to, and
+        closing the command's *stdin* file-handle. An empty string will
+        close the command's standard input without writing to it. On
+        some systems, some commands may close standard input on startup,
+        which will cause a SIGPIPE when trying to write to it for which
+        Sys::Cmd will warn.
 
     pid The command's process ID.
 
     stdin
-        The command's *STDIN* file handle, based on IO::Handle so you can
-        call print() etc methods on it. Autoflush is automatically enabled
-        on this handle.
+        The command's *STDIN* file handle, based on IO::Handle so you
+        can call print() etc methods on it. Autoflush is automatically
+        enabled on this handle.
 
     stdout
-        The command's *STDOUT* file handle, based on IO::Handle so you can
-        call getline() etc methods on it.
+        The command's *STDOUT* file handle, based on IO::Handle so you
+        can call getline() etc methods on it.
 
     stderr
-        The command's *STDERR* file handle, based on IO::Handle so you can
-        call getline() etc methods on it.
+        The command's *STDERR* file handle, based on IO::Handle so you
+        can call getline() etc methods on it.
 
     exit
-        The command's exit value, shifted by 8 (see "perldoc -f system").
-        Set by "wait_child()".
+        The command's exit value, shifted by 8 (see "perldoc -f
+        system"). Set by "wait_child()".
 
     signal
         The signal number (if any) that terminated the command,
@@ -158,15 +176,15 @@ ATTRIBUTES
 
 METHODS
     cmdline => @list | $str
-        In array context returns a list of the command and its arguments. In
-        scalar context returns a string of the command and its arguments
-        joined together by spaces.
+        In array context returns a list of the command and its
+        arguments. In scalar context returns a string of the command and
+        its arguments joined together by spaces.
 
     close()
-        Close all filehandles to the child process. Note that file handles
-        will automaticaly be closed when the Sys::Cmd object is destroyed.
-        Annoyingly, this means that in the following example $fh will be
-        closed when you tried to use it:
+        Close all filehandles to the child process. Note that file
+        handles will automaticaly be closed when the Sys::Cmd object is
+        destroyed. Annoyingly, this means that in the following example
+        $fh will be closed when you tried to use it:
 
             my $fh = Sys::Cmd->new( %args )->stdout;
 
@@ -174,21 +192,21 @@ METHODS
 
     wait_child() -> $exit_value
         Wait for the child to exit using waitpid
-        <http://perldoc.perl.org/functions/waitpid.html>, collect the exit
-        status and return it. This method sets the *exit*, *signal* and
-        *core* attributes and will also be called automatically when the
-        Sys::Cmd object is destroyed.
+        <http://perldoc.perl.org/functions/waitpid.html>, collect the
+        exit status and return it. This method sets the *exit*, *signal*
+        and *core* attributes and will also be called automatically when
+        the Sys::Cmd object is destroyed.
 
 SEE ALSO
     Sys::Cmd::Template
 
 ALTERNATIVES
-    AnyEvent::Run, AnyEvent::Util, Argv, Capture::Tiny, Child, Forks::Super,
-    IO::Pipe, IPC::Capture, IPC::Cmd, IPC::Command::Multiplex, IPC::Exe,
-    IPC::Open3, IPC::Open3::Simple, IPC::Run, IPC::Run3,
-    IPC::RunSession::Simple, IPC::ShellCmd, IPC::System::Simple,
-    POE::Pipe::TwoWay, Proc::Background, Proc::Fork, Proc::Spawn,
-    Spawn::Safe, System::Command
+    AnyEvent::Run, AnyEvent::Util, Argv, Capture::Tiny, Child,
+    Forks::Super, IO::Pipe, IPC::Capture, IPC::Cmd,
+    IPC::Command::Multiplex, IPC::Exe, IPC::Open3, IPC::Open3::Simple,
+    IPC::Run, IPC::Run3, IPC::RunSession::Simple, IPC::ShellCmd,
+    IPC::System::Simple, POE::Pipe::TwoWay, Proc::Background,
+    Proc::Fork, Proc::Spawn, Spawn::Safe, System::Command
 
 SUPPORT
     This distribution is managed via github:
@@ -208,10 +226,10 @@ AUTHOR
     Git::Repository::Command by Philippe Bruhat (BooK).
 
 COPYRIGHT AND LICENSE
-    Copyright 2011-2014 Mark Lawrence <nomad@null.net>
+    Copyright 2011-2021 Mark Lawrence <nomad@null.net>
 
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
 

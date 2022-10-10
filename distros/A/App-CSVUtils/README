@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.044 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2022-08-09.
+    This document describes version 0.045 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2022-10-09.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -102,9 +102,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -208,9 +208,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -230,6 +230,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -270,6 +277,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -332,9 +343,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -354,6 +365,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -394,6 +412,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -490,9 +512,9 @@ FUNCTIONS
 
     *   filenames* => *array[filename]*
 
-        Input CSV files.
+        Input CSV files or URLs.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -512,6 +534,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -552,6 +581,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -614,9 +647,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -696,9 +729,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   hash => *bool*
 
@@ -722,6 +755,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -762,6 +802,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -832,9 +876,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -867,6 +911,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -907,6 +958,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -973,9 +1028,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   hash => *bool*
 
@@ -1068,9 +1123,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   hash => *bool*
 
@@ -1153,9 +1208,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -1166,6 +1221,17 @@ FUNCTIONS
         row). When you declare that CSV does not have header row
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -1234,9 +1300,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -1320,9 +1386,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -1424,9 +1490,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   hash => *bool*
 
@@ -1450,6 +1516,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -1490,6 +1563,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -1552,9 +1629,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -1627,9 +1704,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -1756,6 +1833,13 @@ FUNCTIONS
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
 
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
+
     *   output_header => *bool*
 
         Whether output CSV should have a header row.
@@ -1795,6 +1879,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -1895,9 +1983,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   hash => *bool*
 
@@ -1912,6 +2000,17 @@ FUNCTIONS
         row). When you declare that CSV does not have header row
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -1991,9 +2090,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -2013,6 +2112,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -2053,6 +2159,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -2135,9 +2245,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   hash => *bool*
 
@@ -2161,6 +2271,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -2201,6 +2318,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -2270,9 +2391,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -2292,6 +2413,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -2332,6 +2460,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -2404,9 +2536,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -2439,6 +2571,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -2479,6 +2618,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -2545,9 +2688,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -2567,6 +2710,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -2607,6 +2757,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -2748,9 +2902,9 @@ FUNCTIONS
 
     *   filenames* => *array[filename]*
 
-        Input CSV files.
+        Input CSV files or URLs.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -2776,6 +2930,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -2816,6 +2977,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -2901,9 +3066,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -2923,6 +3088,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -2963,6 +3135,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -3133,9 +3309,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   hash => *bool*
 
@@ -3170,6 +3346,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -3210,6 +3393,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -3288,9 +3475,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -3414,9 +3601,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -3436,6 +3623,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -3476,6 +3670,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -3542,9 +3740,9 @@ FUNCTIONS
 
     *   filename* => *filename*
 
-        Input CSV file.
+        Input CSV file or URL.
 
-        Use "-" to read from stdin.
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
 
     *   header => *bool* (default: 1)
 
@@ -3564,6 +3762,13 @@ FUNCTIONS
         This is like "--escape-char" option but for output instead of input.
 
         Defaults to "\\" (backslash). Overrides "--output-tsv" option.
+
+    *   output_filename => *filename*
+
+        Output filename or URL.
+
+        Use "-" to output to stdout (the default if you don't specify this
+        option), use "clipboard:" to write to clipboard.
 
     *   output_header => *bool*
 
@@ -3604,6 +3809,10 @@ FUNCTIONS
         Overriden by "--output-sep-char", "--output-quote-char",
         "--output-escape-char" options. If one of those options is
         specified, then "--output-tsv" will be ignored.
+
+    *   overwrite => *bool*
+
+        Whether to override existing output file.
 
     *   quote_char => *str*
 
@@ -3688,10 +3897,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016

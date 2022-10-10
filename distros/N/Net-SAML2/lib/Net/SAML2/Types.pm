@@ -2,7 +2,7 @@ package Net::SAML2::Types;
 use warnings;
 use strict;
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 # ABSTRACT: Custom Moose types for Net::SAML2
 
@@ -47,7 +47,7 @@ Net::SAML2::Types - Custom Moose types for Net::SAML2
 
 =head1 VERSION
 
-version 0.59
+version 0.61
 
 =head2 SAMLRequestType
 

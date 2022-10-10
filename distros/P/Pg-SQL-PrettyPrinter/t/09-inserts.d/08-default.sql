@@ -1,0 +1,1 @@
+INSERT INTO t ( a, b, c, d, e ) VALUES ( 1, 2, 3, DEFAULT, DEFAULT ) 

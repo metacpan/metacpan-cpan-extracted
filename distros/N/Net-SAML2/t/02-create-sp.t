@@ -208,7 +208,6 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
             {
                 Binding  => BINDING_HTTP_POST,
                 Location => 'https://foo.example.com/acs-http-post',
-                isDefault => 'false'
             },
             {
                 Binding  => BINDING_HTTP_ARTIFACT,
@@ -261,12 +260,20 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
             "... and has the correct index");
     }
 
-    my $default = $sp->get_default_assertion_service;
-    is($default->{Binding}, BINDING_HTTP_ARTIFACT,
-        "We found the default assertion service");
-    is($default->{Location}, 'https://foo.example.com/acs-http-artifact',
-        "... with the correct URI");
-    is($default->{index}, 2, "... and index");
+    {
+        my @warns;
+        local $SIG{__WARN__} = sub { push(@warns, shift); };
+        my $default = $sp->get_default_assertion_service;
+
+        is(@warns, 0, "No warnings for isDefault checks");
+
+        is($default->{Binding}, BINDING_HTTP_ARTIFACT,
+            "We found the default assertion service");
+        is($default->{Location}, 'https://foo.example.com/acs-http-artifact',
+            "... with the correct URI");
+        is($default->{index}, 2, "... and index");
+
+    }
 
     throws_ok(
         sub {

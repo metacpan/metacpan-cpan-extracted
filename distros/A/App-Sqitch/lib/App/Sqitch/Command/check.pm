@@ -15,7 +15,7 @@ extends 'App::Sqitch::Command';
 with 'App::Sqitch::Role::ContextCommand';
 with 'App::Sqitch::Role::ConnectingCommand';
 
-our $VERSION = 'v1.3.0'; # VERSION
+our $VERSION = 'v1.3.1'; # VERSION
 
 has target => (
     is  => 'ro',

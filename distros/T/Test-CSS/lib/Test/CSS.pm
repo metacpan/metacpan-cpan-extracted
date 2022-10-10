@@ -1,6 +1,6 @@
 package Test::CSS;
 
-$Test::CSS::VERSION = '0.08';
+$Test::CSS::VERSION = '0.09';
 $Test::CSS::AUTHOR  = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::CSS - Interface to test CSS string and file.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -133,7 +133,7 @@ L<https://github.com/manwar/Test-CSS>
 
 =head1 BUGS
 
-Please  eport  any bugs or feature requests to C<bug-test-css at rt.cpan.org>, or
+Please  report  any bugs or feature requests to C<bug-test-css at rt.cpan.org>, or
 or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-CSS>.
 I will be notified, and then you'll automatically be notified of progress on your
 bug as I make changes.
@@ -143,28 +143,6 @@ bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc Test::CSS
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-CSS>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test-CSS>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Test-CSS>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Test-CSS/>
-
-=back
 
 =head1 LICENSE AND COPYRIGHT
 

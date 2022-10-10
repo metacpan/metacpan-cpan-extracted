@@ -15,9 +15,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-11'; # DATE
+our $DATE = '2022-10-09'; # DATE
 our $DIST = 'Getopt-Long-Util'; # DIST
-our $VERSION = '0.896'; # VERSION
+our $VERSION = '0.897'; # VERSION
 
 our %SPEC;
 
@@ -176,6 +176,9 @@ _
         value_label => {
             schema => 'str*',
         },
+        value_label_link => {
+            schema => 'str*', # XXX url? podlink?
+        },
         extended => {
             summary => 'If set to true, will return a hash of multiple formats instead of a single plaintext format',
             schema => 'bool*',
@@ -229,7 +232,7 @@ sub humanize_getopt_long_opt_spec {
                 $opt_pod_res   .= "[" if $parse->{opttype};
                 $opt_pod_res   .= ($parse->{type} && $parse->{desttype} eq '%' ? " " : "=");
                 $opt_pod_res   .= "I<$key_label>=" if $parse->{desttype} eq '%';
-                $opt_pod_res   .= "I<$value_label>";
+                $opt_pod_res   .= defined $opts->{value_label_link} ? "L<$value_label|$opts->{value_label_link}>" : "I<$value_label>";
                 $opt_pod_res   .= "]" if $parse->{opttype};
             }
             $opt_plain_res = "($opt_plain_res)+" if ($parse->{desttype} // '') =~ /@|%/;
@@ -492,7 +495,7 @@ Getopt::Long::Util - Utilities for Getopt::Long
 
 =head1 VERSION
 
-This document describes version 0.896 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2022-08-11.
+This document describes version 0.897 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2022-10-09.
 
 =head1 FUNCTIONS
 
@@ -673,6 +676,8 @@ If set to true, will return a hash of multiple formats instead of a single plain
 =item * B<separator> => I<str> (default: ", ")
 
 =item * B<value_label> => I<str>
+
+=item * B<value_label_link> => I<str>
 
 
 =back

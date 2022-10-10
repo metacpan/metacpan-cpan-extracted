@@ -279,7 +279,7 @@ Protocol (RDAP) Object Tagging
 
 # COPYRIGHT
 
-Copyright 2019 CentralNic Ltd. All rights reserved.
+Copyright 2022 CentralNic Ltd. All rights reserved.
 
 # LICENSE
 

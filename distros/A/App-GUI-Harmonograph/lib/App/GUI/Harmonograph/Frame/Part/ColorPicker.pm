@@ -5,7 +5,6 @@ use Wx;
 package App::GUI::Harmonograph::Frame::Part::ColorPicker;
 use base qw/Wx::Panel/;
 use App::GUI::Harmonograph::ColorDisplay;
-use App::GUI::Harmonograph::Color;
 
 sub new {
     my ( $class, $parent, $frame, $label, $data, $length, $space ) = @_;

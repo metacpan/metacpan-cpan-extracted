@@ -8,7 +8,7 @@ Weather::GHCN::Measures - provide a list of meteorological metrics to be obtaine
 
 =head1 VERSION
 
-version v0.0.003
+version v0.0.005
 
 =head1 SYNOPSIS
 
@@ -46,9 +46,8 @@ The module is primarily for use by module Weather::GHCN::StationTable.
 =cut
 
 # these are needed because perlcritic fails to detect that Object::Pad handles these things
-## no critic [Modules::RequireFilenameMatchesPackage]
+## no critic [ValuesAndExpressions::ProhibitVersionStrings]
 ## no critic [TestingAndDebugging::RequireUseWarnings]
-## no critic [TestingAndDebugging::RequireUseStrict]
 
 use v5.18;  # minimum for Object::Pad
 use Object::Pad 0.66 qw( :experimental(init_expr) );
@@ -57,7 +56,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::Measures;
 class   Weather::GHCN::Measures;
 
-our $VERSION = 'v0.0.003';
+our $VERSION = 'v0.0.005';
 
 use Const::Fast;
 

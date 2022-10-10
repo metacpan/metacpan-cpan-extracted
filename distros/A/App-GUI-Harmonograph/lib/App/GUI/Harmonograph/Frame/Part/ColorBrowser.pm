@@ -6,7 +6,7 @@ package App::GUI::Harmonograph::Frame::Part::ColorBrowser;
 use base qw/Wx::Panel/;
 use App::GUI::Harmonograph::SliderCombo;
 use App::GUI::Harmonograph::ColorDisplay;
-use App::GUI::Harmonograph::Color;
+use Graphics::Toolkit::Color;
 
 sub new {
     my ( $class, $parent, $type, $init  ) = @_;
@@ -27,14 +27,14 @@ sub new {
     
     my $rgb2hsl = sub {
         my @rgb = ($self->{'red'}->GetValue, $self->{'green'}->GetValue, $self->{'blue'}->GetValue);
-        my @hsl = App::GUI::Harmonograph::Color::Value::hsl_from_rgb( @rgb );
+        my @hsl = Graphics::Toolkit::Color::Value::hsl_from_rgb( @rgb );
         $self->{'hue'}->SetValue( $hsl[0], 1 );
         $self->{'sat'}->SetValue( $hsl[1], 1 );
         $self->{'light'}->SetValue( $hsl[2], 1 );
         $self->{'display'}->set_color( { red => $rgb[0], green => $rgb[1], blue => $rgb[2] } );
     };
     my $hsl2rgb = sub {
-        my @rgb = App::GUI::Harmonograph::Color::Value::rgb_from_hsl( 
+        my @rgb = Graphics::Toolkit::Color::Value::rgb_from_hsl( 
             $self->{'hue'}->GetValue,  $self->{'sat'}->GetValue, $self->{'light'}->GetValue );
         $self->{'red'}->SetValue( $rgb[0], 1 );
         $self->{'green'}->SetValue( $rgb[1], 1 );

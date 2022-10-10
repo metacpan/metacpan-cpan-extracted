@@ -1,0 +1,49 @@
+=== Notice to users of PDL::IO::Touchstone ===
+
+All tradmarks, product names, logos, and brands are property of their
+respective owners and no grant or license is provided thereof.       
+
+The files in t/test-data/muRata/ ("DATA") were downloaded from the muRata
+website and are included as part of this Perl module for TESTING PURPOSES ONLY.
+They are included only to use as part of testing this module for correctness
+with `make test`. 
+
+These DATA files files are not distributed for use by end-users; as noted in
+LICENSE.muRata, "The DATA is subject to change from time to time or products
+may be discontinued without notice. Please check the latest version." See 
+LICENSE.muRata for "Restrictions on the use of the DATA".
+
+=== Notice to muRata ===
+
+We have permission to distribute a few .s2p sample files for testing as
+follows; the email below was spliced as shown in [brackets] for clarity and
+brevity since there were a few back-and-forth messages with Cindy Washer:
+
+--------------------------------------------------------------------------------
+
+On 10/04/2022 14:42 (America/Los_Angeles) - Cindy Wascher wrote:
+
+Hi Eric,
+
+I checked with the Murata product engineers, and they said it is ok to use the
+files from [Murata’s website.  We, Westmark, are their local representatives.]
+Please let me know if you have any questions.
+ 
+Cindy Wascher
+Inside Sales
+Westmark Electronics Inc.
+1750 - 112th Ave NE Suite C225
+Bellevue, WA  98004
+ 
+On 2022-09-30 02:37:49 (GMT) - Eric Wheeler wrote:
+[...]
+> I would like to include a few sample .s2p files in the Perl module distribution
+> to verify its correct operation on various platforms. Your s-parameter data
+> site says "You shall not redistribute or reproduce the DATA without prior
+> consent of Murata"; thus I am seeking permission to include a few .s2p sample
+> data files from the GRM, BLM, NFZ, and LQW product lines to validate proper
+> operation at build time.
+[...]
+
+--------------------------------------------------------------------------------
+

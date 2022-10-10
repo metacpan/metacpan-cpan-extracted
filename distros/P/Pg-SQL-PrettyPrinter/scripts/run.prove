@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# make sure that current dir is project top dir
+this_script="$( readlink -f "${BASH_SOURCE[0]}" )"
+script_directory="$( dirname "${this_script}" )"
+work_dir="$( readlink -f "$( dirname "${script_directory}" )" )"
+cd "$work_dir"
+# make sure that current dir is project top dir
+
+time prove -Ilib --jobs "$(nproc)" --recurse t/
+
+# vim: set ft=sh:

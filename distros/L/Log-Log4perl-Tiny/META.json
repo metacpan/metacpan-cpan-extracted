@@ -4,7 +4,7 @@
       "Flavio Poletti <polettix@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.21, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.20",
+            "Dist::Milla" : "v1.0.21",
             "Log::Log4perl" : "1.47",
             "Path::Tiny" : "0.084",
             "Template::Perlish" : "1.52",
@@ -62,15 +62,16 @@
          "web" : "https://github.com/polettix/Log-Log4perl-Tiny"
       }
    },
-   "version" : "1.6.4",
+   "version" : "1.8.0",
    "x_contributors" : [
       "Dave Jacoby <jacoby.david@gmail.com>",
       "Flavio Poletti <flavio@polettix.it>",
       "Matt <code@deployable.org>",
       "user <user@debian.localdomain>"
    ],
-   "x_generated_by_perl" : "v5.24.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }
 

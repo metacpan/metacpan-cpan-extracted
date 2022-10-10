@@ -1,6 +1,12 @@
 
 Revision history for Perl module Mutex.
 
+1.007 Mon Oct 10 04:00:00 EST 2022
+
+  * Improved reliability on the Windows platform.
+  * Improved Mutex::Channel::timedwait on the Windows platform.
+  * Improved Mutex::Channel performance on UNIX platforms.
+
 1.006 Thu Jul 16 11:00:00 EST 2020
 
   * Improved IPC performance on Linux.

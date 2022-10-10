@@ -306,6 +306,17 @@ ub_wait(struct ub_ctx* ctx)
 ## TEST PURPOSES ONLY ##
 ########################
 
+Net::DNS::Resolver::Unbound::Result
+mock_resolve(struct ub_ctx* ctx, SV* name, int secure, int bogus)
+    CODE:
+	checkerr( ub_resolve(ctx, (const char*) SvPVX(name), 1, 1, &RETVAL) );
+	if (bogus) RETVAL->answer_packet = NULL;
+	RETVAL->secure = secure;
+	RETVAL->bogus  = bogus;
+    OUTPUT:
+	RETVAL
+
+
 MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::libunbound
 
 SV*
@@ -333,17 +344,11 @@ emulate_wait(int async_id)
 	RETVAL
 
 
-MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::Unbound::Context
+#ifdef croak_memory_wrap
+void
+croak_memory_wrap()
 
-Net::DNS::Resolver::Unbound::Result
-mock_result(struct ub_ctx* ctx, SV* name, int secure, int bogus)
-    CODE:
-	checkerr( ub_resolve(ctx, (const char*) SvPVX(name), 1, 1, &RETVAL) );
-	if (bogus) RETVAL->answer_packet = NULL;
-	RETVAL->secure = secure;
-	RETVAL->bogus  = bogus;
-    OUTPUT:
-	RETVAL
+#endif
 
 ########################
 

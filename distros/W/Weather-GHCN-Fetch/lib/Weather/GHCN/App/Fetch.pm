@@ -1,12 +1,14 @@
 # Weather::GHCN::Fetch.pm - class for creating applications that fetch NOAA GHCN data
 
+## no critic (Documentation::RequirePodAtEnd)
+
 =head1 NAME
 
 Weather::GHCN::App::Fetch - Fetch station and weather data from the NOAA GHCN repository
 
 =head1 VERSION
 
-version v0.0.003
+version v0.0.005
 
 =head1 SYNOPSIS
 
@@ -41,14 +43,35 @@ See ghcn_fetch.pl -help for details.
 ########################################################################
 # Pragmas
 ########################################################################
+
+# these are needed because perlcritic fails to detect that Object::Pad handles these things
+## no critic [ProhibitVersionStrings]
+## no critic [RequireUseWarnings]
+
 use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::App::Fetch;
 
-our $VERSION = 'v0.0.003';
+our $VERSION = 'v0.0.005';
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
+
+########################################################################
+# perlcritic rules
+########################################################################
+
+## no critic [ProhibitSubroutinePrototypes]
+## no critic [ErrorHandling::RequireCarping]
+## no critic [Modules::ProhibitAutomaticExportation]
+## no critic [InputOutput::RequireBriefOpen]
+
+# due to subroutine signatures, perlcritic can't seem to handle disabling
+# the following warnings on the subs where they occur
+## no critic [Subroutines::ProhibitExcessComplexity]
+
+# due to use of postfix dereferencing, we have to disable these warnings
+## no critic [References::ProhibitDoubleSigils]
 
 ########################################################################
 # Export
@@ -61,21 +84,6 @@ use base 'Exporter';
 our @EXPORT = ( 'run' );
 
 ########################################################################
-# perlcritic rules
-########################################################################
-
-## no critic [ErrorHandling::RequireCarping]
-## no critic [InputOutput::RequireBriefOpen]
-## no critic [ProhibitSubroutinePrototypes]
-
-# due to subroutine signatures, perlcritic can't seem to handle disabling
-# the following warnings on the subs where they occur
-## no critic [Subroutines::ProhibitExcessComplexity]
-
-# due to use of postfix dereferencing, we have to disable these warnings
-## no critic [References::ProhibitDoubleSigils]
-
-########################################################################
 # Libraries and Features
 ########################################################################
 use Object::Pad 0.66 qw( :experimental(init_expr) );
@@ -86,10 +94,12 @@ use Const::Fast;
 use English         qw( -no_match_vars );
 
 # cpan modules
+use LWP::Simple;
+use Path::Tiny;
 use Text::Abbrev;
 
 # modules for Windows only
-use if $^O eq 'MSWin32', 'Win32::Clipboard';
+use if $OSNAME eq 'MSWin32', 'Win32::Clipboard';
 
 # conditional modules
 use Module::Load::Conditional qw( can_load check_install requires );
@@ -109,13 +119,13 @@ our $TK_MODULES = {
 };
 
 # is it ok to use Win32::Clipboard?
-our $USE_WINCLIP = $^O eq 'MSWin32';
+our $USE_WINCLIP = $OSNAME eq 'MSWin32';
 our $USE_TK      = can_load( modules => $TK_MODULES );
 
 my $Opt;    # options object, with property accessors for each user option
 
 # options that relate to script execution, not GHCN processing and output
-my $Opt_file;       # file in which to save options from GUI dialog
+my $Opt_savegui;    # file in which to save options from GUI dialog
 my $Opt_gui;        # launch the GUI dialog
 my $Opt_help;       # display POD documentation
 my $Opt_readme;     # launch a browser displaying the GHCN readme file
@@ -134,7 +144,7 @@ const my $NL     => qq(\n);    # perl universal newline (any platform)
 const my $TRUE   => 1;         # perl's usual TRUE
 const my $FALSE  => not $TRUE; # a dual-var consisting of '' and 0
 
-const my $CONFIG_FILE => '$HOME/.ghcn_fetch.yaml';
+const my $PROFILE_FILE => '~/.ghcn_fetch.yaml';
 
 const my $STN_THRESHOLD     => 100;     # ask if number of selected stations exceeds this
 
@@ -161,9 +171,6 @@ sub run ($progname, $argv_aref) {
 
     local @ARGV = $argv_aref->@*;
 
-    warn "*W* -gui option unavailable -- try installing Tk and Tk::GetOptions"
-        if not $USE_TK;
-
     my $ghcn = Weather::GHCN::StationTable->new;
 
     $ghcn->tstats->start('_Overall');
@@ -174,85 +181,71 @@ sub run ($progname, $argv_aref) {
     my $report_type;
     if (@ARGV > 0 and $ARGV[0] =~ m{ \A [^-][[:alpha:]]+ \b }xms ) {
         my $rt_arg = shift @ARGV;
-        my $rt = deabbrev_report_type( $rt_arg );
+        my $rt = Weather::GHCN::Options->deabbrev_report_type( $rt_arg );
         $report_type = $rt // $rt_arg;
-    }
-
-    # The -optfile option, which is preprocessed by GetOptions before
-    # we call Tk::Getopt, has an overlapping abbreviation with -outclip.
-    # To avoid GetOptions from stripping -o from @ARGV, we disambiguate
-    # -o by changing it to -outclip.  This means that -optfile can
-    # only by abbreviated down to -op.
-    # Note: normally we shouldn't be changing @ARGV but in this case
-    # we do want to.
-
-    ## no critic [ProhibitCStyleForLoops]
-    ## no critic [RequireLocalizedPunctuationVars]
-    for (my $ii=0; $ii < @ARGV; $ii++) {
-        $ARGV[$ii] = '-outclip'
-            if $ARGV[$ii] eq '-o' and
-                ($ii == $#ARGV)         # a lone -o at the end
-            or                          # a -o followed by an option
-                ($ii < $#ARGV - 1 and
-                 $ARGV[$ii+1] =~ m{ /A [-]}xms);
     }
 
     # record the number of command line arguments before they are removed by GetOptions
     my $argv_count = @ARGV;
 
     my %script_args = (
+        'gui'       => \$Opt_gui,
+        'outclip'   => \$Opt_outclip,
         'help'      => \$Opt_help,
         'usage|?'   => \$Opt_usage,
-        'optfile:s' => \$Opt_file,
+        'savegui:s' => \$Opt_savegui,   # file for options load/save
         'readme'    => \$Opt_readme,
     );
 
-    $script_args{'gui'} = \$Opt_gui
-        if $USE_TK;
-
-    $script_args{'outclip|o'} = \$Opt_outclip
-        if $USE_WINCLIP;
-
+    # parse out the script options into $Opt_ fields, letting the rest
+    # pass through to get_user_options below
     GetOptions( %script_args );
-
-    if ( $Opt_help ) {
-        pod2usage(-verbose => 2);
-        exit;
+    
+    if ($Opt_outclip and not $USE_WINCLIP) {
+        die "*E* -outclip not available (needs Win32::Clipboard)\n";
     }
 
+    if ( $Opt_help ) {
+        pod2usage( { -verbose => 2, -exitval => 'NOEXIT', -input => 'ghcn_fetch.pl' } );
+        return;
+    }
     if ( $Opt_usage ) {
-        pod2usage(1);
-        exit;
+        pod2usage( { -verbose => 1, -exitval => 'NOEXIT', -input => 'ghcn_fetch.pl' } );
+        return;
     }
 
     # launch the default browser with the NOAA Daily readme.txt file content
     if ( $Opt_readme ) {
-        system 'start https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/readme.txt';
-        exit;
+        my $readme_uri = 'https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/readme.txt';
+        say 'Source: ', $readme_uri;
+        say $EMPTY;
+        getprint $readme_uri;
+        return;
     }
 
-    # default to -gui if no command line arguments were provided and
-    # we aren't taking input from a pipe or file
+    # Default to -gui if no command line arguments were provided and
+    # we aren't taking input from a pipe or file.
+    # PBP recommends using IO::Interactive::is_interactive rather than -t
+    # because it better deals with ARGV magic; but here we just need to
+    # know if *STDIN is pointing at the terminal so we suppress the
+    # perlcritic warning.
+
+    ## no critic [ProhibitInteractiveTest]
+    # uncoverable branch true
     $Opt_gui = 1 if $USE_TK and $argv_count == 0 and -t *STDIN;
 
-    my $user_opt_href = get_user_options($Opt_file);
+    my $user_opt_href = get_user_options($Opt_savegui);
 
     $user_opt_href->{report} = $report_type
-        if $report_type;
-       
-    my $config_file = $user_opt_href->{config} // $CONFIG_FILE;
+        if defined $report_type;
+
+    $user_opt_href->{profile} //= $PROFILE_FILE;
 
     die '*E* unrecognized options: ' . join $SPACE, @ARGV
         if @ARGV;
 
-    my %stnid_filter;
-
     my @errors;
-    ($Opt, @errors) = $ghcn->set_options(
-                    user_options    => $user_opt_href,
-                    config_file     => $config_file,
-                    stnid_filter    => \%stnid_filter,
-                );
+    ($Opt, @errors) = $ghcn->set_options( $user_opt_href->%* );
 
     die join qq(\n), @errors, qq(\n)
         if @errors;
@@ -268,15 +261,16 @@ sub run ($progname, $argv_aref) {
     # (but not if stdin is pointing to the terminal)
     if ( -p *STDIN || -f *STDIN ) {
         my $ii;
-        while (<STDIN>) {
+        $ghcn->stnid_filter_href( {} );
+        while (my $line = <STDIN>) {       ## no critic [ProhibitExplicitStdin]
             chomp;
-            my @id_list = $_ =~ m{ $STN_ID_RE }xmsg;
+            my @id_list = $line =~ m{ $STN_ID_RE }xmsg;
             foreach my $id ( @id_list ) {
-                $stnid_filter{$id}++;
+                $ghcn->stnid_filter_href->{$id}++;
                 $ii++;
             }
         }
-        die "*E* no station id's found in the input"
+        die '*E* no station id\'s found in the input'
             unless $ii;
     }
 
@@ -296,19 +290,19 @@ sub run ($progname, $argv_aref) {
     if ($Opt->report) {
         say $ghcn->get_header;
 
-        # this prints detailed station data if $Opt->report eq 'id'
+        # this prints detailed station data if $Opt->report eq 'detail'
         $ghcn->load_data(
             # set a callback routine for printing progress messages
             progress_sub => sub { say {*STDERR} @_ },
-            # set a callback routine for printing rows when -report id
+            # set a callback routine for printing rows when -report detail
             row_sub      => sub { say join "\t", @{ $_[0] } },
         );
 
-        if ($Opt->report eq 'id' and $Opt->nogaps) {
+        if ($Opt->report eq 'detail' and $Opt->nogaps) {
             say $ghcn->get_missing_rows;
         }
-        
-        # these only do something when $Opt->report ne 'id'
+
+        # these only do something when $Opt->report ne 'detail'
         $ghcn->summarize_data;
         say $ghcn->get_summary_data;
         say $EMPTY;
@@ -357,11 +351,12 @@ sub run ($progname, $argv_aref) {
     say 'Script:';
     say $TAB, $PROGRAM_NAME;
     say "\tWeather::GHCN::StationTable version " . $Weather::GHCN::StationTable::VERSION;
-    say $TAB, 'Config file: ' . $ghcn->config_file;
+    say $TAB, 'Cache directory: ' . $ghcn->cachedir;
+    say $TAB, 'Profile file: ' . $ghcn->profile_file;
 
     if ( $Opt->performance ) {
         say $EMPTY;
-        say sprintf 'Timing statistics (ms)%s:', $Opt->performance ? ' and memory [bytes]' : $EMPTY;
+        say sprintf 'Timing statistics (ms) and memory [bytes]';
         say $ghcn->get_timing_stats;
 
         say $EMPTY;
@@ -372,7 +367,7 @@ WRAP_UP:
     # send output to the Windows clipboard
     if ( $Opt_outclip and $USE_WINCLIP ) {
         Win32::Clipboard->new()->Set( $output );
-        select $old_fh;
+        select $old_fh;     ## no critic [ProhibitOneArgSelect]
     }
 
     return;
@@ -391,7 +386,7 @@ via B<Tk::GetOptions> -- if it is installed -- or via B<Getopt::Long>.
 
 sub get_user_options ( $optfile=undef ) {
 
-    my $user_opt_href = $USE_TK 
+    my $user_opt_href = $Opt_gui
                       ? get_user_options_tk($optfile)
                       : get_user_options_no_tk($optfile)
                       ;
@@ -407,13 +402,26 @@ B<Weather::GHCN::Options->get_getopt_list()>.  The options (and their values)
 are extracted from @ARGV and put in a hash, a reference to which is
 then returned.
 
-The $optfile argument is only used by B<get_user_options_no_tk>.
+This function is called when the GUI is not being used.  The $optfile
+argument, if provided, is assumed to be a file saved from a GUI
+invocation and will be eval'd and used as the options list.
 
 =cut
 
 sub get_user_options_no_tk ( $optfile=undef ) {
 
     my @options = ( Weather::GHCN::Options->get_getopt_list() );
+
+    if ($optfile) {
+        my $saved_opt_perlsrc = join $SPACE, path($optfile)->lines( {chomp=>1} );
+        my $loadoptions;
+
+        ## no critic [ProhibitStringyEval]
+        ## no critic [RequireCheckingReturnValueOfEval]
+        eval $saved_opt_perlsrc;
+
+        return $loadoptions;
+    }
 
     my %opt;
     GetOptions( \%opt, @options);
@@ -427,21 +435,19 @@ This function returns a reference to a hash of user options obtained
 by calling B<Tk::Getopt>.  This may launch a GUI dialog to collect
 the options.
 
-The optional $optfile argument specifies a filename which 
-B<Tk::GetOptions> can use to store or load options.  
+The optional $optfile argument specifies a filename which
+B<Tk::GetOptions> can use to store or load options.
 
 =cut
 
 sub get_user_options_tk ( $optfile=undef ) {
-    
+
     if (not $USE_TK) {
-        warn "*E* Tk or Tk::Getopt not installed";
-        return;
+        die '*E* -gui option unavailable -- try installing Tk and Tk::Getopt';
     }
 
     my %opt;
 
-    ## no critic [ProhibitNoisyQuotes]
     my @opttable = ( Weather::GHCN::Options->get_tk_options_table() );
 
     my $optobj = Tk::Getopt->new(
@@ -451,31 +457,10 @@ sub get_user_options_tk ( $optfile=undef ) {
 
     $optobj->set_defaults;     # set default values
 
-    $optobj->load_options      # configuration file
+    $optobj->load_options      # Tk:Getopt configuration file
         if defined $optfile and -e $optfile;
 
     $optobj->get_options;      # command line
-
-    # Because Tk::Getopt doesn't support option abbreviations for choice
-    # lists -- there's no need for the gui since choices are provided in a
-    # drop list -- we run into a problem when using Tk:Getopt without the
-    # gui.  In that case, an abbrevation for a -report option will be caught
-    # during process_options call (just below), before our call to
-    # TableStation::set_options can expand the abbrevation by calling
-    # Options::validate. So, for the sake of this
-    # script we do an abbrevation substition right here, and then call our own
-    # validate_report_type sub which gets the valid report types from the
-    # options table.  We do our own error report too, because Tk::Getopt
-    # reports choices as a list of ARRAY(<address>) rather than as values.
-
-    if ( $optobj->{options}->{report} ) {
-        my %report_abbrev = abbrev( qw(id daily monthly yearly) );
-        my $rt = deabbrev_report_type( $optobj->{options}->{report} );
-        $optobj->{options}->{report} = $rt
-            if $rt;
-    }
-    die '*E* invalid report option: ' . $optobj->{options}->{report} . "\n"
-        unless valid_report_type( $optobj->{options}->{report}, \@opttable );
 
     $optobj->process_options;  # process callbacks, check restrictions ...
 
@@ -497,38 +482,6 @@ sub get_user_options_tk ( $optfile=undef ) {
     }
 
     return \%opt;
-}
-
-=head2 valid_report_type ($rt, \@opttable)
-
-This function is used to valid the report type.  Valid values are 
-defined in the built-in Tk options table, which can be obtained by 
-calling:
-
-    my @opttable = ( Weather::GHCN::Options->get_tk_options_table() );
-
-=cut
-
-sub valid_report_type ($rt, $opttable_aref) {
-    my $choices_href = Weather::GHCN::Options->get_option_choices;
-    return $choices_href->{'report'}->{$rt};
-}
-
-=head2 deabbrev_report_type ($rt)
-
-The report types supported by the -report option can be abbrevated,
-so long as the abbrevation is unambiquous.  For example, 'daily' can
-be abbreviated to 'dail', 'dai', 'da', or even 'd'.
-
-This function takes a (possibly abbreviated) report type and returns
-an unabbreviated report type.
-
-=cut
-
-sub deabbrev_report_type ($rt) {
-        my %r_abbrev = abbrev( qw(id daily monthly yearly) );
-        my $deabbreved = $r_abbrev{ $rt };
-        return $deabbreved;
 }
 
 =head1 AUTHOR

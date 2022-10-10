@@ -1,13 +1,13 @@
 ##############################################################################
 # Bing::ContentAPI
 #
-# Add, modify and delete products from the Bing Merchant Center platform via
-# the Bing Ads Content API.
+# Add, modify and delete products from the Microsoft Advertising Merchant Center platform
+# via the Bing Ads / Microsoft Advertising Content API.
 #
-# https://docs.microsoft.com/bingads/shopping-content/
+# https://learn.microsoft.com/en-us/advertising/shopping-content/
 #
 # Authentication is done via OAuth using Authorization Code Grant Flow
-# https://docs.microsoft.com/bingads/guides/authentication-oauth
+# https://learn.microsoft.com/en-us/advertising/guides/authentication-oauth
 #
 # AUTHOR
 #
@@ -15,12 +15,13 @@
 #
 # VERSION HISTORY
 #
+# + v1.02       09/28/2022 updated to use the new msads.manage scope for authentication
 # + v1.01       05/16/2018 dependency and documentation updates
 # + v1.00       05/04/2018 initial release
 #
 # COPYRIGHT AND LICENSE
 #
-# Copyright (C) 2018 Bill Gerrard
+# Copyright (C) 2018-2022 Bill Gerrard
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself, either Perl version 5.20.2 or,
@@ -47,7 +48,7 @@ use JSON;
 use REST::Client;
 use HTML::Entities;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub new {
     my ($class, $param) = @_;
@@ -127,7 +128,7 @@ sub prepare_method {
 sub init_rest_client {
     my $self = shift;
     my $r = REST::Client->new();
-    ### https://docs.microsoft.com/bingads/shopping-content/manage-products
+    ### https://learn.microsoft.com/en-us/advertising/shopping-content/manage-products
     $r->setHost('https://content.api.bingads.microsoft.com/shopping/v9.1/bmc');
     $r->addHeader('AuthenticationToken', $self->{access_token});
     $r->addHeader('DeveloperToken', $self->{developer_token});
@@ -139,7 +140,7 @@ sub init_rest_client {
 my $refresh_token_info = qq|################################################################################
 This error may be caused by an invalid refresh token. Follow the procedure
 to authorize app and obtain a valid refresh token.
-https://docs.microsoft.com/bingads/guides/authentication-oauth#authorizationcode
+https://learn.microsoft.com/en-us/advertising/guides/authentication-oauth
 ################################################################################
 \n|;
 
@@ -176,7 +177,7 @@ sub get_access_token {
     croak "Odd number of arguments for get_access_token()" if scalar(@_) % 2;
     my $opt = {@_};
 
-    my $bapiTokenURI = 'https://login.live.com/oauth20_token.srf';
+    my $bapiTokenURI = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
 
     croak "missing grant_type" unless $opt->{grant_type}
         || $opt->{grant_type} eq 'authorization_code'
@@ -209,11 +210,12 @@ sub refresh_access_token {
 #        $self->{$val} && $self->{$val} ne '' || croak "'$val' not defined for refresh_access_token()";
 #    }
 
-    my $bapiTokenURI = 'https://login.live.com/oauth20_token.srf';
+    my $bapiTokenURI = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
 
     my $ua = LWP::UserAgent->new();
     my $response = $ua->post($bapiTokenURI, {
         grant_type => 'refresh_token',
+        scope => 'offline_access https://ads.microsoft.com/msads.manage',
         client_id => $self->{client_id},
         redirect_uri => $self->{redirect_uri},
         refresh_token => $self->{refresh_token},
@@ -233,49 +235,61 @@ sub refresh_access_token {
 __END__
 =head1 NAME
 
-  Bing::ContentAPI - Perl interface to the Bing Ads Content API
+  Bing::ContentAPI - Perl interface to the Bing Ads / Microsoft Advertising Content API
 
 =head1 DESCRIPTION
 
-  Add, modify and delete products from the Bing Merchant Center platform via
-  the Bing Ads Content API.
+  Add, modify and delete products from the Microsoft Advertising Merchant Center platform
+  via the Bing Ads / Microsoft Advertising Content API.
 
-  https://docs.microsoft.com/bingads/shopping-content/
+  https://learn.microsoft.com/en-us/advertising/shopping-content/
 
   Authentication is done via OAuth using Authorization Code Grant Flow
-  https://docs.microsoft.com/bingads/guides/authentication-oauth
+
+  See https://learn.microsoft.com/en-us/advertising/guides/authentication-oauth and
+  https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
+
+  Follow the steps to register an application with the Microsoft identity platform:
+  https://learn.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app
+
+  Set up a Redirect URI. Set up a Mobile/Desktop app redirect URI (not a Web application redirect).
+  https://learn.microsoft.com/en-us/azure/active-directory/develop/reply-url
+
+  A redirect URI of 'http://localhost/native-app' is used as an example in this documentation.
 
   Steps to authorize a native application and generate an initial refresh token:
 
-  Note: Substitute CLIENT_ID, UNIQUE_CODE and AUTHORIZATION_CODE with the
+  Note: Substitute CLIENT_ID, REDIRECT_URI and AUTHORIZATION_CODE with the
   actual values in the appropriate locations in the examples.
 
   1) Request user consent through web browser:
-  (using existing Bing Ads Microsoft account when prompted)
+  (using an existing Bing Ads / Microsoft Advertising account when prompted)
 
-  https://login.live.com/oauth20_authorize.srf?client_id=CLIENT_ID&scope=bingads.manage&response_type=code&redirect_uri=https://login.live.com/oauth20_desktop.srf&state=UNIQUE_CODE
+  https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=CLIENT_ID&redirect_uri=REDIRECT_URI&response_type=code&response_mode=query&scope=offline_access%20https%3A%2F%2Fads.microsoft.com%2Fmsads.manage
 
   Response received:
-  https://login.live.com/oauth20_desktop.srf?code=AUTHORIZATION_CODE&state=UNIQUE_CODE&lc=1033
+  http://localhost/native-app?code=AUTHORIZATION_CODE
 
-  2) Use the authorization 'code' received to request the access token and refresh token:
+  2) Use the authorization 'code' received to request the access token and refresh token.
+  Note: scope must include 'offline_access', as included in the example, to receive a refresh token.
 
   $ curl \
     -d client_id=CLIENT_ID \
     -d code=AUTHORIZATION_CODE \
     -d grant_type=authorization_code \
-    -d redirect_uri=https://login.live.com/oauth20_desktop.srf \
+    -d redirect_uri=REDIRECT_URI \
+    -d scope=offline_access%20https%3A%2F%2Fads.microsoft.com%2Fmsads.manage \
     -H "Content-Type: application/x-www-form-urlencoded" \
-    https://login.live.com/oauth20_token.srf
+    https://login.microsoftonline.com/common/oauth2/v2.0/token
 
   Response:
   {
-    "token_type": "bearer",
+    "token_type": "Bearer",
+    "scope": "https://ads.microsoft.com/msads.manage",
     "expires_in": 3600,
-    "scope": "bingads.manage",
+    "ext_expires_in": 3600,
     "access_token": "...",
-    "refresh_token": "...",
-    "user_id": "..."
+    "refresh_token": "..."
   }
 
   3) Use the received refresh_token as the initial refresh_token in Bing::ContentAPI->new()
@@ -287,11 +301,11 @@ __END__
 
   my $bing = Bing::ContentAPI->new({
     debug => 0,
-    redirect_uri    => 'https://login.live.com/oauth20_desktop.srf',
-    merchant_id     => '12345',          # merchant_id is the BMC store ID
+    redirect_uri    => 'http://localhost/native-app',
+    merchant_id     => '12345',          # merchant_id is the Merchant Center store ID
     developer_token => '123ABC456DEF789',
     client_id       => '1234abcd-5679-efgh-123456789',
-    refresh_token   => load_token(),   # previously saved refresh token
+    refresh_token   => load_token(),     # previously saved refresh token
   });
   save_token($bing->{refresh_token}); # save new refresh token
 
@@ -521,23 +535,21 @@ __END__
 
 =head3 merchant_id
 
-  Merchant ID is the Bing Merchant Center Store ID
-  https://bingads.microsoft.com/
+  Merchant ID is the Microsoft Advertising Merchant Center Store ID at https://ads.microsoft.com/
 
 =head3 developer_token
 
-  Developer token from https://developers.bingads.microsoft.com/Account
+  Developer token from https://developers.ads.microsoft.com/Account
 
 =head3 client_id
 
   Client ID is the Application ID value in "Registering Your Application":
-  https://docs.microsoft.com/bingads/guides/authentication-oauth#registerapplication
+  https://learn.microsoft.com/en-us/advertising/guides/authentication-oauth-register
 
 =head3 redirect_uri
 
-  If you registered a native application, use "https://login.live.com/oauth20_desktop.srf"
-  as the redirect URI. If you registered a web application, use the redirect URI you
-  specified in "Registering Your Application".
+  Redirect URI is the Mobile/Desktop app redirect URI value in "Registering Your Application":
+  https://learn.microsoft.com/en-us/advertising/guides/authentication-oauth-register
 
 =head3 refresh_token
 
@@ -614,7 +626,7 @@ __END__
 
 =head1 COPYRIGHT AND LICENSE
 
-  Copyright (C) 2018 Bill Gerrard
+  Copyright (C) 2018-2022 Bill Gerrard
 
   This library is free software; you can redistribute it and/or modify
   it under the same terms as Perl itself, either Perl version 5.20.2 or,

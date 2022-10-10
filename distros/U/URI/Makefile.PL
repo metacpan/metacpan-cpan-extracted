@@ -38,12 +38,11 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "File::Spec::Functions" => 0,
     "File::Temp" => 0,
-    "Test" => 0,
     "Test::More" => "0.96",
     "Test::Needs" => 0,
     "utf8" => 0
   },
-  "VERSION" => "5.12",
+  "VERSION" => "5.13",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,7 +62,6 @@ my %FallbackPrereqs = (
   "MIME::Base64" => 2,
   "Net::Domain" => 0,
   "Scalar::Util" => 0,
-  "Test" => 0,
   "Test::More" => "0.96",
   "Test::Needs" => 0,
   "constant" => 0,

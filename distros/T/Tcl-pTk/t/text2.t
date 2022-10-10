@@ -1,10 +1,10 @@
 # -*- perl -*-
 
-# Copied from Perl/Tk 804.028_503
-# commit 5d2a97df1ed4f467b50ce833f8c03c25282b24d2
+# Based on text2.t from Perl/Tk 804.030_500
 #
-# TODO: there is a more recent text2.t
-# but it requires even more changes to Tcl::pTk
+# TODO: there are more tests in Perl/Tk text2.t
+# but they require adding support to Tcl::pTk
+# for tying filehandle to Text widget
 
 #
 # Author: Slaven Rezic
@@ -16,17 +16,7 @@ use warnings;
 use strict;
 use Tcl::pTk;
 
-BEGIN {
-    if (!eval q{
-	use Test::More;
-	1;
-    }) {
-	print "1..0 # skip no Test::More module\n";
-	exit;
-    }
-}
-
-plan tests => 6;
+use Test::More tests => 9;
 
 my $mw = MainWindow->new;
 $mw->geometry("+10+10");
@@ -47,6 +37,19 @@ $mw->geometry("+10+10");
     ok($t->FindNext('-b', '-e', '-c', 'world'), 'Backwards search');
     my @third_index = split /\./, $t->index('insert');
     cmp_ok($third_index[0], "<", $second_index[0], 'Really a backwards search');
+
+    $t->destroy;
+}
+
+
+{
+    my $t = $mw->Scrolled(qw(Text -width 20 -height 10))->pack;
+    is $t->Contents, '', 'fresh Tcl::pTk::Text is empty';
+    $t->Contents('newline-less');
+    is $t->Contents, 'newline-less', 'content without newline';
+    $t->Contents('');
+    is $t->Contents, '', 'after emptying Tcl::pTk::Text';
+    $t->destroy;
 }
 
 __END__

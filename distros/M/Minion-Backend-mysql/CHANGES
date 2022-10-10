@@ -4,6 +4,14 @@ Revision history for Perl extension Minion::Backend::mysql.
 
 You must upgrade to v0.30 before upgrading to v1.00 and beyond!
 
+1.001     2022-10-05 13:34:51-05:00 America/Chicago
+
+  [Docs]
+
+  - Added ERRORS section for common problems.
+  - Documented problem with database table not being created. Thanks
+    @toddbruner for reporting this issue! (Github #39)
+
 1.000     2021-12-21 12:22:50-06:00 America/Chicago
 
   Removed old migrations to improve performance

@@ -4,10 +4,8 @@ use Test2::API qw( context );
 use Path::Tiny qw( path );
 use Archive::Libarchive::ArchiveRead;
 use Test::Archive::Libarchive;
-use experimental qw( signatures );
-
-use lib 't/lib';
 use Test2::Tools::MemoryCycle qw( memory_cycle_ok );
+use experimental qw( signatures );
 
 subtest 'basic' => sub {
 

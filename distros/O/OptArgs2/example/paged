@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use OptArgs2::Pager;
+
+sub long_str {
+    my $mode = shift;
+    my $i    = 1;
+    join '', map { "Mode: $mode (" . $i++ . ")\n" } 1 .. 40;
+}
+
+my $pager = OptArgs2::Pager->new;    # auto is 1
+
+{
+    print long_str('Paged by default when new(auto => 1)');
+}
+
+{
+    $pager->close;
+    print "Not paged after close()\n";
+    sleep 1 if -t STDOUT;
+}
+
+{
+    $pager->open;    # auto has no effect
+    print "Not paged after manual open()\n";
+    sleep 1 if -t STDOUT;
+    print $pager->fh, long_str('printing to pager->fh');
+    $pager->close;
+}
+
+undef $pager;
+
+{
+    OptArgs2::Pager::page( long_str('page() function') );
+    print "Not paged after page() ends\n";
+    sleep 1 if -t STDOUT;
+}
+
+{
+    OptArgs2::Pager::start_pager();
+    print long_str('between start/stop_pager()');
+    OptArgs2::Pager::stop_pager();
+    print "Not paged after stop_pager()\n";
+}

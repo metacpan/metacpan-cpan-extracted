@@ -27,7 +27,7 @@ use LWP::UserAgent;
 use Web::Scraper;
 use String::Util qw(trim);
 
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.53'; # VERSION
 
 our @labels = qw/last isin name currency date isodate/;
 

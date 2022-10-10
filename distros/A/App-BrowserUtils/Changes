@@ -1,3 +1,8 @@
+0.017   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Replaca old schema name unix::local_uid with unix::uid::exists.
+
+
 0.016   2022-05-20  Released-By: PERLANCAR; Urgency: medium
 
         - Add argument 'signal' for terminate.

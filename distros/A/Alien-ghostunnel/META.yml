@@ -1,0 +1,56 @@
+---
+abstract: 'Find or install ghostunnel TLS proxy'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Alien::Build: '2.71'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  File::Which: '0'
+  Test2::V0: '0.000121'
+  Test::Alien: '0'
+  perl: '5.008004'
+configure_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Download::GitHub: '0.09'
+  ExtUtils::MakeMaker: '6.52'
+  File::Which: '0'
+  Path::Tiny: '0'
+  perl: '5.008004'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-ghostunnel
+requires:
+  Alien::Base: '0.038'
+  Alien::Build: '2.71'
+  perl: '5.008004'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/uperl/Alien-ghostunnel/issues
+  homepage: https://metacpan.org/pod/Alien::ghostunnel
+  repository: git://github.com/uperl/Alien-ghostunnel.git
+version: '0.01'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
+  requires:
+    share:
+      Alien::Build: '1.05'
+      Alien::Build::Plugin::Download::Negotiate: '1.30'
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_generated_by_perl: v5.37.4
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

@@ -1,0 +1,1 @@
+UPDATE t SET ( a, b, c ) = ( SELECT q.x, q.y, q.z FROM q WHERE q.w = t.v ) 

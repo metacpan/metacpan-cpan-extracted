@@ -107,7 +107,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__In6__set_sin6_flowinfo(SPVM_ENV* env, SPVM_
   return 0;
 }
 
-int32_t SPVM__Sys__Socket__Sockaddr__In6__sin6_addr(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__Socket__Sockaddr__In6__copy_sin6_addr(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t e = 0;
   

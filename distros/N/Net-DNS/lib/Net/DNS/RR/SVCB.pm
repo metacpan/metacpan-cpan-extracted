@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 1875 2022-09-23 13:41:03Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -15,7 +15,6 @@ Net::DNS::RR::SVCB - DNS SVCB resource record
 
 use integer;
 
-use Carp;
 use MIME::Base64;
 use Net::DNS::DomainName;
 use Net::DNS::RR::A;
@@ -31,6 +30,7 @@ my %keybyname = (
 	ipv4hint	  => 'key4',
 	ech		  => 'key5',
 	ipv6hint	  => 'key6',
+	dohpath		  => 'key7',				# draft-schwartz-svcb-dns
 	);
 
 
@@ -81,11 +81,11 @@ sub _format_rdata {			## format rdata portion of RR string.
 
 	my $encode = $self->{TargetName}->encode();
 	my $length = 2 + length $encode;
-	my @target = split /(\S{32})/, unpack 'H*', $encode;
+	my @target = grep {length} split /(\S{32})/, unpack 'H*', $encode;
 	my @rdata  = unpack 'H4', pack 'n', $priority;
 	push @rdata, "\t; priority: $priority\n";
 	push @rdata, shift @target;
-	push @rdata, join '', "\t\t; target: ", substr( $target, 0, 50 ), "\n";
+	push @rdata, join '', "\t; target: ", substr( $target, 0, 50 ), "\n";
 	push @rdata, @target;
 
 	my @params = @$params;
@@ -94,7 +94,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 		my $val = shift @params;
 		push @rdata, "\n";
 		push @rdata, "; key$key=...\n" if $key > 15;
-		push @rdata, unpack 'H4H4', pack( 'n2', $key, length $val );
+		push @rdata, unpack 'H4H4',    pack( 'n2', $key, length $val );
 		push @rdata, split /(\S{32})/, unpack 'H*', $val;
 		$length += 4 + length $val;
 	}
@@ -114,9 +114,9 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 			my @value;
 			if (/^key\d+=(.*)$/i) {
 				push @value, length($1) ? $1 : shift;
-			} elsif (/=(.*)$/) {
+			} elsif (/^[^=]+=(.*)$/) {
 				local $_ = length($1) ? $1 : shift;
-				s/^"(.*)"$/$1/;			# strip enclosing quotes
+				s/^"([^"]*)"$/$1/;		# strip enclosing quotes
 				push @value, split /,/;
 			} else {
 				push @value, '' unless $keybyname{lc $_};    # empty | Boolean
@@ -141,13 +141,13 @@ sub _post_parse {			## parser post processing
 	if ( defined $svcparam{0} ) {
 		my %unique;
 		foreach ( grep { !$unique{$_}++ } unpack 'n*', $svcparam{0} ) {
-			croak( $self->type . qq[: unexpected "key0" in mandatory list] ) if $unique{0};
-			croak( $self->type . qq[: duplicate "key$_" in mandatory list] ) if --$unique{$_};
-			croak( $self->type . qq[: mandatory "key$_" not present] ) unless defined $svcparam{$_};
+			die( $self->type . qq[: unexpected "key0" in mandatory list] ) if $unique{0};
+			die( $self->type . qq[: duplicate "key$_" in mandatory list] ) if --$unique{$_};
+			die( $self->type . qq[: mandatory "key$_" not present] ) unless defined $svcparam{$_};
 		}
 		$self->mandatory( keys %unique );		# restore mandatory key list
 	}
-	croak( $self->type . qq[: expected alpn="..." not present] ) if defined( $svcparam{2} ) and !$svcparam{1};
+	die( $self->type . qq[: expected alpn="..." not present] ) if defined( $svcparam{2} ) and !$svcparam{1};
 	return;
 }
 
@@ -182,7 +182,7 @@ sub targetname {
 sub mandatory {				## mandatory=key1,port,...
 	my $self = shift;
 	my @list = map { $keybyname{lc $_} || $_ } map { split /,/ } @_;
-	my @keys = map { /(\d+)$/ ? $1 : croak( $self->type . qq[: unexpected "$_"] ) } @list;
+	my @keys = map { /(\d+)$/ ? $1 : die( $self->type . qq[: unexpected "$_"] ) } @list;
 	return $self->key0( _integer16( sort { $a <=> $b } @keys ) );
 }
 
@@ -216,6 +216,11 @@ sub ipv6hint {				## ipv6hint=2001:DB8::1,...
 	return $self->key6( _ipv6(@_) );
 }
 
+sub dohpath {				## dohpath=/dns-query{?dns}
+	my $self = shift;					# uncoverable pod
+	return $self->key7(@_);
+}
+
 
 ########################################
 
@@ -243,12 +248,11 @@ sub _ipv6 {
 }
 
 sub _string {
-	local $_ = join ',', '', @_;				# reassemble argument string
-	s/\\092,/\\044/g;		### tolerate unnecessary double-escape nonsense in
-	s/\\092\\092/\\092/g;		### draft-ietf-dnsop-svcb-https that contradicts RFC1035
+	local $_ = join ',', @_;				# reassemble argument string
 	s/\\,/\\044/g;						# disguise (RFC1035) escaped comma
-	my ( undef, @reparsed ) = split /,/;			# multi-valued argument
-	return _presentation( map { Net::DNS::Text->new($_)->encode() } @reparsed );
+	die qq[SVCB: Please use standard RFC1035 escapes\n draft-ietf-dnsop-svcb-https double-escape nonsense not implemented]
+			if /\\092,|\\092\\092/;
+	return _presentation( map { Net::DNS::Text->new($_)->encode() } split /,/ );
 }
 
 
@@ -269,12 +273,13 @@ sub AUTOLOAD {				## Dynamic constructor/accessor methods
 	if ( scalar @_ ) {
 		my $arg = shift;				# keyNN($value);
 		delete $svcparams{$key} unless defined $arg;
-		croak( $self->type . qq[: duplicate SvcParam "key$key"] ) if defined $svcparams{$key};
+		die( $self->type . qq[: duplicate SvcParam "key$key"] ) if defined $svcparams{$key};
+		die( $self->type . qq[: invalid SvcParam "key$key"] )	if $key > 65534;
 		$svcparams{$key}   = Net::DNS::Text->new("$arg")->raw if defined $arg;
 		$self->{SvcParams} = [map { ( $_, $svcparams{$_} ) } sort { $a <=> $b } keys %svcparams];
-		croak( $self->type . qq[: unexpected number of values for "key$key"] ) if scalar @_;
+		die( $self->type . qq[: unexpected number of values for "key$key"] ) if scalar @_;
 	} else {
-		croak( $self->type . qq[: no value specified for "key$key"] ) unless defined wantarray;
+		die( $self->type . qq[: no value specified for "key$key"] ) unless defined wantarray;
 	}
 
 	my $value = $svcparams{$key};
@@ -361,7 +366,7 @@ The specified key will be deleted if the value is undefined.
 
 =head1 COPYRIGHT
 
-Copyright (c)2020-2021 Dick Franks. 
+Copyright (c)2020-2022 Dick Franks. 
 
 All rights reserved.
 
@@ -389,6 +394,9 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, draft-ietf-dnsop-svcb-https
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>, draft-ietf-dnsop-svcb-https,
+L<RFC1035|https://tools.ietf.org/html/rfc1035>
+
+L<Service Parameter Keys|https://www.iana.org/assignments/dns-svcb>
 
 =cut

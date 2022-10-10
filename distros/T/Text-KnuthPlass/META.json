@@ -1,5 +1,5 @@
 {
-   "abstract" : "Breaks paragraphs into lines using the TeX algorithm",
+   "abstract" : "Breaks paragraphs into lines using the TeX (Knuth-Plass) algorithm",
    "author" : [
       "Phil Perry"
    ],
@@ -32,7 +32,7 @@
    "provides" : {
       "Text::KnuthPlass" : {
          "file" : "lib/Text/KnuthPlass.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Text::KnuthPlass::Box" : {
          "file" : "lib/Text/KnuthPlass.pm"
@@ -63,6 +63,6 @@
          "url" : "https://github.com/PhilterPaper/Text-KnuthPlass"
       }
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

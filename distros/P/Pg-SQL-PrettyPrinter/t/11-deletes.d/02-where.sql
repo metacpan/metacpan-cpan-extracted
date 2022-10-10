@@ -1,0 +1,1 @@
+DELETE FROM a AS al WHERE al.id > 10

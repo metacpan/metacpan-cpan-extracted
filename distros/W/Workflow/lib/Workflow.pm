@@ -16,7 +16,7 @@ my @FIELDS   = qw( id type description state last_update time_zone );
 my @INTERNAL = qw( _factory _observers );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
-$Workflow::VERSION = '1.60';
+$Workflow::VERSION = '1.61';
 
 use constant NO_CHANGE_VALUE => 'NOCHANGE';
 
@@ -208,10 +208,6 @@ sub add_history {
             workflow_error "I don't know how to add a history of ", "type '",
                 ref($item), "'";
         }
-
-        if ($EVAL_ERROR) {
-            workflow_error "Unable to assert history object";
-        }
     }
     push @{ $self->{_histories} }, @to_add;
     $self->notify_observers( 'add history', \@to_add );
@@ -377,7 +373,7 @@ Workflow - Simple, flexible system to implement workflows
 
 =head1 VERSION
 
-This documentation describes version 1.60 of Workflow
+This documentation describes version 1.61 of Workflow
 
 =head1 SYNOPSIS
 

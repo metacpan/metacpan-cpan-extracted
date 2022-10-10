@@ -1,3 +1,18 @@
+0.45  2022-10-08  lichtkind
+-------
+    * = maintenance
+    * + display color flow in progress bar
+    * - clean some dead code
+    * ? push color code into module Graphics::Toolkit::Color  
+
+0.44  2022-10-02  lichtkind
+-------
+    * = minor optimizations
+    * + change image size in menu
+    * + change default image format in menu
+    * ~ added POD image for second panel
+    * ~ fix POD links
+
 0.43  2022-09-15  lichtkind
 -------
     * = GUI cleanup

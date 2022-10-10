@@ -1,5 +1,5 @@
 package Jacode4e;
-$VERSION = '2.13.6.19';
+$VERSION = '2.13.6.20';
 # 如果您可以阅读此字符，则可以通过选择所有内容并将其保存为文件名“Jacode4e.pm”来将其用作模块。
 # 如果您可以閱讀此字符，則可以通過選擇所有內容並將其保存為文件名“Jacode4e.pm”來將其用作模塊。
 # この文字が読める場合は、内容を全て選択してファイル名を "Jacode4e.pm" にして保存すればそのままモジュールとして利用することができます。
@@ -7,130 +7,11 @@ $VERSION = '2.13.6.19';
 # But that is very far into the future isn't it?
 ####################################################################
 #
-# Jacode4e - jacode.pl-like program for enterprise
+# Jacode4e - Converts Character Encodings for Enterprise in Japan
 #
 # Copyright (c) 2018, 2019, 2021, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
-#
-# ** ATTENTION **
-# ---------------
-#
-# This software IS NOT "jacode.pl"!
-# If you want "jacode.pl", search it on CPAN again.
-#
-# And if you need round-trip conversion, you had better use
-# Jacode4e::RoundTrip module.
-#
-# SYNOPSIS
-# --------
-#
-#   use FindBin;
-#   use lib "$FindBin::Bin/lib";
-#   use Jacode4e;
-#
-#   $return =
-#   Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
-#
-#     $return
-#       Number of characters in $line
-#
-#     $line
-#       String variable to convert
-#       After conversion, this variable is overwritten
-#
-#     $OUTPUT_encoding, and $INPUT_encoding
-#       To convert, you must specify both $OUTPUT_encoding and $INPUT_encoding.
-#       The encodings you can specify are as follows:
-#
-#       mnemonic      means
-#       -----------------------------------------------------------------------
-#       cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-#       cp932         Microsoft CP932, IANA Windows-31J
-#       cp932ibm      IBM CP932
-#       cp932nec      NEC CP932
-#       sjis2004      JISC Shift_JIS-2004
-#       cp00930       IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
-#       keis78        HITACHI KEIS78
-#       keis83        HITACHI KEIS83
-#       keis90        HITACHI KEIS90
-#       jef           FUJITSU JEF (12 point size for printing with option OUTPUT_SHIFTING)
-#       jef9p         FUJITSU JEF ( 9 point size for printing with option OUTPUT_SHIFTING)
-#       jipsj         NEC JIPS(J)
-#       jipse         NEC JIPS(E)
-#       letsj         UNISYS LetsJ
-#       utf8          UTF-8.0 (aka UTF-8)
-#       utf8.1        UTF-8.1
-#       utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
-#       -----------------------------------------------------------------------
-#
-#     %option
-#       The options you can specify are as follows:
-#
-#       key mnemonic      value means
-#       -----------------------------------------------------------------------
-#       INPUT_LAYOUT      input record layout by 'S' and 'D' sequence
-#                         'S' means one char as SBCS, 'D' means one char as DBCS
-#                         default is 'S'
-#                         each letter may optionally be followed by a number
-#                         indicating the repeat count, see samples
-#       OUTPUT_SHIFTING   true means use output shift code, false means not use
-#                         default is false
-#       SPACE             output space code in DBCS/MBCS
-#                         default is U+3000 in Unicode
-#       GETA              output geta code in DBCS/MBCS
-#                         default is U+3013 in Unicode
-#       OVERRIDE_MAPPING  hash reference of FROM => TO override mapping
-#                         { "\x12\x34"=>"\x56\x78", "\x9A\xBC"=>"\xDE\xFE", }
-#                         (CAUTION! override also SPACE option)
-#       -----------------------------------------------------------------------
-#
-# SAMPLES
-# -------
-#
-#   use FindBin;
-#   use lib "$FindBin::Bin/lib";
-#   use Jacode4e;
-#   Jacode4e::VERSION('2.13.6.19');
-#
-#   while (<>) {
-#       $return =
-#       Jacode4e::convert(\$_, 'cp932x', 'cp00930', {
-#           'INPUT_LAYOUT'     => 'SSSDDDSSDDSDSD',
-#           'OUTPUT_SHIFTING'  => 0,
-#           'SPACE'            => "\x81\xA2",
-#           'GETA'             => "\x81\xA1",
-#           'OVERRIDE_MAPPING' => { "\x44\x5A" => "\x81\x7C", },
-#       });
-#       print $_;
-#   }
-#
-#   while (<>) {
-#       $return =
-#       Jacode4e::convert(\$_, 'cp932x', 'cp00930', {
-#           'INPUT_LAYOUT'     => 'S3D3S2D2SDSD',
-#           'OUTPUT_SHIFTING'  => 0,
-#           'SPACE'            => "\x81\xA2",
-#           'GETA'             => "\x81\xA1",
-#           'OVERRIDE_MAPPING' => { "\x44\x5A" => "\x81\x7C", },
-#       });
-#       print $_;
-#   }
-#
-#   while (<>) {
-#       Jacode4e::convert(\$_, 'cp932ibm', 'utf8.1', {});
-#       print $_;
-#   }
-#
-#   while (<>) {
-#       $return =
-#       Jacode4e::convert(\$_, 'utf8.1', 'utf8', {
-#                                 # FULLWIDTH TILDE => WAVE DASH
-#           'OVERRIDE_MAPPING' => { "\xEF\xBD\x9E"  => "\xE3\x80\x9C", },
-#       });
-#       print $_;
-#   }
-#
-######################################################################
+
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -1033,7 +914,7 @@ END {
 
 =head1 NAME
 
-Jacode4e - jacode.pl-like program for enterprise
+Jacode4e - Converts Character Encodings for Enterprise in Japan
 
 =head1 SYNOPSIS
 
@@ -1041,71 +922,95 @@ Jacode4e - jacode.pl-like program for enterprise
   use lib "$FindBin::Bin/lib";
   use Jacode4e;
  
-  $return =
+  $char_count =
   Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
- 
-    $return
-      Number of characters in $line
- 
-    $line
-      String variable to convert
-      After conversion, this variable is overwritten
- 
-    $OUTPUT_encoding, and $INPUT_encoding
-      To convert, you must specify both $OUTPUT_encoding and $INPUT_encoding.
-      The encodings you can specify are as follows:
- 
-      mnemonic      means
-      -----------------------------------------------------------------------
-      cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-      cp932         Microsoft CP932, IANA Windows-31J
-      cp932ibm      IBM CP932
-      cp932nec      NEC CP932
-      sjis2004      JISC Shift_JIS-2004
-      cp00930       IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
-      keis78        HITACHI KEIS78
-      keis83        HITACHI KEIS83
-      keis90        HITACHI KEIS90
-      jef           FUJITSU JEF (12 point size for printing with option OUTPUT_SHIFTING)
-      jef9p         FUJITSU JEF ( 9 point size for printing with option OUTPUT_SHIFTING)
-      jipsj         NEC JIPS(J)
-      jipse         NEC JIPS(E)
-      letsj         UNISYS LetsJ
-      utf8          UTF-8.0 (aka UTF-8)
-      utf8.1        UTF-8.1
-      utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
-      -----------------------------------------------------------------------
- 
-    %option
-      The options you can specify are as follows:
- 
-      key mnemonic      value means
-      -----------------------------------------------------------------------
-      INPUT_LAYOUT      input record layout by 'S' and 'D' sequence
-                        'S' means one char as SBCS, 'D' means one char as DBCS
-                        each letter may optionally be followed by a number
-                        indicating the repeat count, see samples
-      OUTPUT_SHIFTING   true means use output shift code, false means not use
-                        default is false
-      SPACE             output space code in DBCS/MBCS
-      GETA              output geta code in DBCS/MBCS
-      OVERRIDE_MAPPING  hash reference of FROM => TO override mapping
-                        { "\x12\x34"=>"\x56\x78", "\x9A\xBC"=>"\xDE\xFE", }
-                        (CAUTION! override also SPACE option)
-      -----------------------------------------------------------------------
 
-    If you need round-trip conversion, you had better use Jacode4e::RoundTrip
-    module.
+=head2 $char_count
+
+Count of characters in $line
+
+=head2 $line
+
+=head2 $OUTPUT_encoding
+
+=head2 $INPUT_encoding
+
+Converts encoding of $line from $INPUT_encoding to $OUTPUT_encoding then overwrites $line.
+
+$OUTPUT_encoding and $INPUT_encoding cannot omit.
+
+You can use mnemonic as encoding name of $INPUT_encoding and $OUTPUT_encoding:
+
+  mnemonic      means
+  -----------------------------------------------------------------------
+  cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
+  cp932         Microsoft CP932, IANA Windows-31J
+  cp932ibm      IBM CP932
+  cp932nec      NEC CP932
+  sjis2004      JISC Shift_JIS-2004
+  cp00930       IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
+  keis78        HITACHI KEIS78
+  keis83        HITACHI KEIS83
+  keis90        HITACHI KEIS90
+  jef           FUJITSU JEF (12 point size for printing with option OUTPUT_SHIFTING)
+  jef9p         FUJITSU JEF ( 9 point size for printing with option OUTPUT_SHIFTING)
+  jipsj         NEC JIPS(J)
+  jipse         NEC JIPS(E)
+  letsj         UNISYS LetsJ
+  utf8          UTF-8.0 (aka UTF-8)
+  utf8.1        UTF-8.1
+  utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
+  -----------------------------------------------------------------------
+
+=head2 { %option }
+
+Hash reference "{ %option }" can omit.
+
+You can following mnemonics as keys of hash reference "{ %option }":
+
+=over 2
+
+=item * INPUT_LAYOUT
+
+input record layout by 'S' and 'D' sequence
+
+'S' means one char as SBCS, 'D' means one char as DBCS
+
+each letter may optionally be followed by a number indicating the repeat count, see samples
+
+=item * OUTPUT_SHIFTING
+
+true means use output shift code, false means not use
+
+default is false
+
+=item * SPACE
+
+output space code in DBCS/MBCS
+
+=item * GETA
+
+output geta code in DBCS/MBCS
+
+=item * OVERRIDE_MAPPING
+
+hash reference of FROM => TO override mapping { "\x12\x34"=>"\x56\x78", "\x9A\xBC"=>"\xDE\xFE", }
+
+(CAUTION! override also SPACE option)
+
+=back
+
+If you need round-trip conversion, you had better use Jacode4e::RoundTrip module.
 
 =head1 SAMPLES
+
+Converts from cp00930 to cp932x using option ('INPUT_LAYOUT' => 'SSSDDDSSDDSDSD')
 
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e;
-  Jacode4e::VERSION('2.13.6.19');
-  
   while (<>) {
-      $return =
+      $char_count =
       Jacode4e::convert(\$_, 'cp932x', 'cp00930', {
           'INPUT_LAYOUT'     => 'SSSDDDSSDDSDSD',
           'OUTPUT_SHIFTING'  => 0,
@@ -1115,9 +1020,14 @@ Jacode4e - jacode.pl-like program for enterprise
       });
       print $_;
   }
- 
+
+Converts from cp00930 to cp932x using option ('INPUT_LAYOUT' => 'S3D3S2D2SDSD')
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
   while (<>) {
-      $return =
+      $char_count =
       Jacode4e::convert(\$_, 'cp932x', 'cp00930', {
           'INPUT_LAYOUT'     => 'S3D3S2D2SDSD',
           'OUTPUT_SHIFTING'  => 0,
@@ -1127,14 +1037,24 @@ Jacode4e - jacode.pl-like program for enterprise
       });
       print $_;
   }
- 
+
+Converts from utf8.1 to cp932ibm
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
   while (<>) {
       Jacode4e::convert(\$_, 'cp932ibm', 'utf8.1', {});
       print $_;
   }
- 
+
+Converts from utf8 to utf8.1
+
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
   while (<>) {
-      $return =
+      $char_count =
       Jacode4e::convert(\$_, 'utf8.1', 'utf8', {
                                 # FULLWIDTH TILDE => WAVE DASH
           'OVERRIDE_MAPPING' => { "\xEF\xBD\x9E"  => "\xE3\x80\x9C", },
@@ -1144,19 +1064,17 @@ Jacode4e - jacode.pl-like program for enterprise
 
 =head1 INPUT SI/SO code
 
-  Wikipedia tells us Kanji shift code of each encoding of vendors.
-  Jacode4e::convert() handle SI/SO(Shift In and Shift Out) code in $line
-  automatically. If $line has no SI/SO code, we can use option INPUT_LAYOUT
-  instead of SI/SO code.
-  
-  Actually saying, we have to use option INPUT_LAYOUT almost always, if
-  $INPUT_encoding is any of enterprise encodings.
-  
-  If $INPUT_encoding is any of cp932x, cp932, cp932ibm, cp932nec, and sjis2004,
-  the INPUT_LAYOUT option is unnecessary. This is because SBCS and DBCS can be
-  judged from the character string itself. However, you can also use the
-  INPUT_LAYOUT option to force conversion as SBCS.
-  
+Wikipedia L<https://ja.wikipedia.org/wiki/%E6%BC%A2%E5%AD%97%E3%82%B7%E3%83%95%E3%83%88%E3%82%B3%E3%83%BC%E3%83%89> tells us Kanji shift code (means DBCS shift code) of each encoding of vendors.
+Jacode4e::convert() handle SI/SO(Shift In and Shift Out) code in $line automatically.
+If $line has no SI/SO code, we can use option "INPUT_LAYOUT" instead of SI/SO code.
+
+Realistically saying, we have to use option "INPUT_LAYOUT" almost always, if $INPUT_encoding is any of enterprise encodings(cp00930, keis78, keis83, keis90, jef, jef9p, jipsj, jipse, and letsj).
+Because SI/SO codes are rarely used.
+
+If $INPUT_encoding is any of cp932x, cp932, cp932ibm, cp932nec, and sjis2004, "INPUT_LAYOUT" option is unnecessary.
+Because SBCS and DBCS can be judged from the character string itself.
+However, you can also use "INPUT_LAYOUT" option to force conversion as SBCS.
+
   ---------------------------------------------------------------------------
                      SO(Shift Out)       SI(Shift In)
   $INPUT_encoding    KI(KANJI In)        KO(KANJI Out)
@@ -1183,9 +1101,9 @@ Jacode4e - jacode.pl-like program for enterprise
 
 =head1 OUTPUT SI/SO code
 
-  Jacode4e::convert() doesn't output SI/SO code on default. Thus, if you
-  need SI/SO code then you have to use option 'OUTPUT_SHIFTING' => 1.
-  
+Jacode4e::convert() doesn't output SI/SO code on default.
+Thus, if you need SI/SO code then you have to use option "'OUTPUT_SHIFTING' => 1".
+
   ---------------------------------------------------------------------------
                      SO(Shift Out)       SI(Shift In)
   $OUTPUT_encoding   KI(KANJI In)        KO(KANJI Out)
@@ -1212,9 +1130,12 @@ Jacode4e - jacode.pl-like program for enterprise
 
 =head1 OUTPUT DBCS/MBCS SPACE code
 
-  The default space code is as follows.
-  You can change the space code using the option 'SPACE' if you want.
-  
+We implemented default space code below without arguing with others.
+
+(We would appreciate any statistical information about its using.)
+
+You can change the space code using option "SPACE" if you want.
+
   ---------------------------------------------------------------------------
   $OUTPUT_encoding
   mnemonic           default code        %option
@@ -1240,18 +1161,17 @@ Jacode4e - jacode.pl-like program for enterprise
 
 =head1 OUTPUT DBCS/MBCS GETA code
 
-  If a character isn't included in $OUTPUT_encoding set, GETA code will be
-  used instead of converted code.
-  
-  The default GETA code is as follows.
-  You can change GETA code using option 'GETA' if you want.
-  
-  "GETA" doesn't mean "GETA", but means "GETA-MARK".
-  
-  GETA is Japanese wooden shoes that made for walk on paddy field. One GETA
-  has two teeth, and they make GETA-MARK on the ground by bite the earth
-  twice. Thus, GETA code is double byte code, or often multibyte code.
-  
+If a character isn't included in $OUTPUT_encoding set, GETA code will be used instead of converted code.
+
+The default GETA code is as follows.
+You can change GETA code using option "GETA" if you want.
+
+GETA doesn't mean GETA, but means B<GETA-MARK>.
+
+GETA is Japanese wooden shoes that made for walk on paddy field.
+One GETA has two teeth, and they make B<GETA-MARK> on the ground by bite the earth twice.
+Thus, GETA code is double byte code, or some time multibyte code.
+
   ---------------------------------------------------------------------------
   $OUTPUT_encoding
   mnemonic           default code        %option sample
@@ -1275,40 +1195,37 @@ Jacode4e - jacode.pl-like program for enterprise
   'utf8jp'           "\xF3\xB0\x85\xAB"  
   ---------------------------------------------------------------------------
 
-=head1 RAISON D'ETRE
+=head1 RAISON D'ETRE(Reason For Existence)
 
- This software has been developed for use promotion of JIS X 0213.
- 
- JIS X 0213 contains almost all of the characters used in everyday life in
- Japan. In addition, JIS X 0213 was designed with consideration for use
- in Shift_JIS environment. However, because it did not consider CP932 and
- GAIJI, it is not very popular.
- 
- "JIS X 0213 bridge" needs last one meter.
- 
- To solve the problem, Jacode4e proposes CP932X [shi:pi:kju:san'nikai]. #'
- 
- CP932X implements JIS X 0213 over CP932.
- 
- We can continue to use CP932 data, application programs, databases, and
- networks using CP932X.
- 
- If you need round-trip conversion, you had better use Jacode4e::RoundTrip
- module.
+This software has been developed for use promotion of JIS X 0213.
+
+JIS X 0213 contains almost all of characters used in everyday life in Japan.
+In addition, JIS X 0213 was designed with consideration for use in Shift_JIS environment.
+However, because it did not consider CP932 and GAIJI, Shift_JIS-2004 is not so popular.
+
+B<"JIS X 0213 bridge" needs last one meter more to bridge us.>
+
+To solve the problem, Jacode4e proposes CP932X [shi:pi:kju:san'nikai].
+
+CP932X implements JIS X 0213 over on CP932.
+
+We can continue to use CP932 data, application programs, databases, and networks using CP932X.
+
+If you need round-trip conversion, you had better use Jacode4e::RoundTrip module.
 
 =head1 WHAT IS "CP932X"?
 
 =over 4
 
-=item * "cp932x" as mnemonic
+=item * Mnemonic is "cp932x"
 
-=item * CP932X is CP932
+=item * CP932X is almost CP932
 
 =item * Pronounce [si: pi: nain thri: tu: kai] in English
 
-=item * Pronounce [shi: pi: kju: san' ni kai] in Japanese #'
+=item * Pronounce [shi: pi: kju: san' ni kai] in Japanese
 
-=item * [si: pi: nain thri: tu: iks] is reserved for Microsoft Corporation ;-P
+=item * We have reserved [si: pi: nain thri: tu: iks] for Microsoft Corporation-san
 
 =item * CP932 upper compatible
 
@@ -1320,9 +1237,9 @@ Jacode4e - jacode.pl-like program for enterprise
 
 =item * You can use private use characters you made
 
-=item * You can use your operating system, network, and database.
+=item * You can use your operating system, network, and database
 
-=item * In most cases, application programs can be used as it is.
+=item * In almost all cases, application programs can be used as it is
 
 =back
 
@@ -1330,7 +1247,7 @@ Jacode4e - jacode.pl-like program for enterprise
 
 =over 4
 
-=item * "utf8jp" as mnemonic
+=item * Mnemonic is "utf8jp"
 
 =item * UTF-8-SPUA-JP is UTF-8
 
@@ -1348,12 +1265,12 @@ Jacode4e - jacode.pl-like program for enterprise
 
 =head1 CP932 vs. CP932IBM
 
- A merit of the CP932IBM is that all of the extended characters are outside of
- the JIS row number 1 to 94. CP932IBM is useful when you transfer data to
- enterprise system.
- 
- The following is the difference between CP932 and CP932IBM.
- 
+B<A merit of CP932IBM is that all of extended characters are outside of JIS row No.1 to No.94.>
+
+CP932IBM is useful when you transfer data to enterprise system.
+
+The following is difference between CP932 and CP932IBM.
+
  #+++++++----------------------------------------------------------------------------------------------------------- CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
  #||||||| ++++------------------------------------------------------------------------------------------------------ Microsoft CP932, IANA Windows-31J
  #||||||| |||| ++++------------------------------------------------------------------------------------------------- IBM CP932
@@ -1389,12 +1306,12 @@ Jacode4e - jacode.pl-like program for enterprise
 
 =head1 CP932 vs. CP932NEC
 
- A merit of the CP932NEC is that all of the extended characters are inside the
- JIS row number 1 to 94. For example, CP932NEC is useful when you convert data
- to EUC-JP encoding.
- 
- The following is the difference between CP932 and CP932NEC.
- 
+B<A merit of CP932NEC is that all of extended characters are inside JIS row No.1 to No.94.>
+
+CP932NEC is useful when you convert data to EUC-JP encoding.
+
+The following is difference between CP932 and CP932NEC.
+
  #+++++++----------------------------------------------------------------------------------------------------------- CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
  #||||||| ++++------------------------------------------------------------------------------------------------------ Microsoft CP932, IANA Windows-31J
  #||||||| |||| ++++------------------------------------------------------------------------------------------------- IBM CP932
@@ -1790,21 +1707,21 @@ Jacode4e - jacode.pl-like program for enterprise
 
 =head1 UTF-8.0 vs. UTF-8.1
 
- The large character sets has always some problems. One of problem of UTF-8 is
- difference between Microsoft's definition and general definition. Already, #'
- in this software, "utf8" means Microsoft's definition. So I named the general #'
- UTF-8 "utf8.1" to distinguish them.
+The large character sets has always some problems.
+One of problem of UTF-8 is difference between Microsoft Corporation-san's definition and general definition.
+Already, in this software, "utf8" means Microsoft Corporation-san's definition.
+So we named the general UTF-8 "UTF-8.1" to distinguish them.
 
  Terminology and definitions
  -------------------------------------------------------------------------------
  UTF-8   [ju:ti:ef eit]         could mean sometimes UTF-8.0, sometimes UTF-8.x
- UTF-8.0 [ju:ti:ef hatten-zero] is Microsoft's definition of the UTF-8 #'
+ UTF-8.0 [ju:ti:ef hatten-zero] is Microsoft's definition of the UTF-8
  UTF-8.1 [ju:ti:ef hatten-ichi] is general definition of the UTF-8
  UTF-8.x [ju:ti:ef hatten-ekks] means both UTF-8.0 and UTF-8.1
  -------------------------------------------------------------------------------
- 
- The following is the difference between UTF-8.0 and UTF-8.1.
- 
+
+The following is difference between UTF-8.0 and UTF-8.1.
+
  #+++++++----------------------------------------------------------------------------------------------------------- CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
  #||||||| ++++------------------------------------------------------------------------------------------------------ Microsoft CP932, IANA Windows-31J
  #||||||| |||| ++++------------------------------------------------------------------------------------------------- IBM CP932
@@ -1831,13 +1748,13 @@ Jacode4e - jacode.pl-like program for enterprise
  9C5A8161  --   --   --  8161 447C  --   --   --   --   --   --  A1C2 2016      E28096       E288A5       F3B2B4B1
  9C5A817C  --   --   --  817C 4260  --   --   --   --   --   --  A1DD 2212      E28892       EFBC8D       F3B2B58C
 
-=head1 FIXED ERRATAS OF MAPPINGS
+=head1 ERRATAS OF MAPPINGS
 
-The mapping of Jacode4e version 2.13.6.17 or earlier has the following erattas:
+Mapping of Jacode4e version 2.13.6.17 or earlier has following errata:
 
 =head2 KEIS78, KEIS83, and KEIS90
 
-Mapping of 'keis78', 'keis83', and 'keis90' had erattas as following:
+Mapping of 'keis78', 'keis83', and 'keis90' had following errata:
 
   ----------------------------------------------
   Unicode      2.13.6.18             2.13.6.17
@@ -1850,7 +1767,7 @@ Mapping of 'keis78', 'keis83', and 'keis90' had erattas as following:
 
 =head2 JEF and JEF9P
 
-Mapping of 'jef' and 'jef9p' had erattas as following:
+Mapping of 'jef' and 'jef9p' had following errata:
 
   ----------------------------------------------
   Unicode      2.13.6.18             2.13.6.17
@@ -1883,7 +1800,7 @@ Mapping of 'jef' and 'jef9p' had erattas as following:
 
 =head2 JIPS(J)
 
-Mapping of 'jipsj' had erattas as following:
+Mapping of 'jipsj' had following errata:
 
   ----------------------------------------------
   Unicode      2.13.6.18             2.13.6.17
@@ -1895,7 +1812,7 @@ Mapping of 'jipsj' had erattas as following:
 
 =head2 JIPS(E)
 
-Mapping of 'jipse' had erattas as following:
+Mapping of 'jipse' had following errata:
 
   ----------------------------------------------
   Unicode      2.13.6.18             2.13.6.17
@@ -1907,8 +1824,7 @@ Mapping of 'jipse' had erattas as following:
 
 =head1 DEPENDENCIES
 
-This software requires perl version 5.00503 or later to run.
-(All of Perl4 users in the world, pardon me!)
+perl version 5.005_03 to newest perl
 
 =head1 SOFTWARE LIFE CYCLE
 
@@ -1945,58 +1861,55 @@ This software requires perl version 5.00503 or later to run.
     :     :                       V          V         V               V          
   --------------------------------------------------------------------------------
 
-=head1 SOFTWARE COVERAGE
+=head1 Why and how to CP932X Born?
 
-When you lost your way, you can see this matrix and find your way.
+In order to know why CP932X exists the way it is, one must first know why CP932X born.
 
-  Skill/Use  Amateur    Semipro    Pro        Enterprise  Enterprise(round-trip)
-  -------------------------------------------------------------------------------
-  Expert     jacode.pl  Encode.pm  Encode.pm  Jacode4e    Jacode4e::RoundTrip
-  -------------------------------------------------------------------------------
-  Middle     jacode.pl  jacode.pl  Encode.pm  Jacode4e    Jacode4e::RoundTrip
-  -------------------------------------------------------------------------------
-  Beginner   jacode.pl  jacode.pl  jacode.pl  Jacode4e    Jacode4e::RoundTrip
-  -------------------------------------------------------------------------------
+Q1) Is CCS of JIS X 0208 enough?
 
-=head1 Why CP932X Born?
+A1) No. Often we require GAIJI.
 
-In order to know why CP932X exists the way it is(or isn't), one must first know why CP932X born. #'
+Q2) Is CCS of JIS X 0213 enough?
 
-  Q1) Is CCS of JIS X 0208 enough?
-  A1) No. Often we require GAIJI.
-  
-  Q2) Is CCS of JIS X 0213 enough?
-  A2) It's not perfect, but enough for many people.
-  
-  Q3) Is CES by UTF-8 good?
-  A3) No. In Japanese information processing, it's unstable and not popular still now.
-  
-  Q4) Is CES by Shift_JIS-2004 good?
-  A4) No. Because Shift_JIS-2004 cannot support very popular CP932 and your GAIJI. We need a realistic solution to solving real problem.
-  
-  Q5) Is escape sequence good idea to support CCS of JIS X 0213?
-  A5) No. Because the programming is so hard.
-  
-  Q6) Which character is best as single shift code to support CCS of JIS X 0213?
-    -- The single shift code must be a DBCS code, because DBCS field cannot store SBCS code in some cases
-    -- Moreover, all GAIJI code points must be yours
-    -- The impact of this solution must be minimum
-  A6) I select 1-55-27 as single shift code. It is ghost character and not used by nobody.
+A2) It's not perfect, but enough for many people.
+
+Q3) Is CES by UTF-8 good?
+
+A3) No. On Japanese information processing, it's unstable and not popular still now.
+
+Q4) Is CES by Shift_JIS-2004 good?
+
+A4) No. Because Shift_JIS-2004 cannot support very popular CP932 and your GAIJI. We need a realistic solution to solving real problem.
+
+Q5) Is escape sequence good idea to support CCS of JIS X 0213?
+
+A5) No. Because the programming is so hard.
+
+Q6) Which character is best for single shift code to support CCS of JIS X 0213?
+
+=over 2
+
+=item * The single shift code must be a DBCS code, because field with DBCS type cannot store SBCS code in some cases
+
+=item * Moreover, all GAIJI code points must be yours
+
+=item * The impact of this solution must be minimum
+
+=back
+
+A6) We selected "1-55-27" for single shift code. Because it called "ghost character" and cannot use any purpose
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt> in a CPAN
+INABA Hitoshi L<ina@cpan.org> in a CPAN
 
 This project was originated by INABA Hitoshi.
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
+This software is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See L<perlartistic>.
 
-This software is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 SEE ALSO
 
@@ -2154,7 +2067,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  jacode - Perl program for Japanese character code conversion
  https://metacpan.org/search?q=jacode.pl
 
- Jacode4e - jacode.pl-like program for enterprise
+ Jacode4e - Converts Character Encodings for Enterprise in Japan
  https://metacpan.org/pod/Jacode4e
 
  Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
@@ -2168,19 +2081,18 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 ACKNOWLEDGEMENTS
 
- I could make this software by good luck. I thank all stakeholders.
+Thank on good luck and all stakeholders, we could make this software.
 
- I received character code table of KEIS, JEF, and JIPS by electronic data
- from Culti Co.,Ltd. Moreover, Culti Co.,Ltd. has allowed me to use it to
- make open source software.
+We received character code table of KEIS, JEF, and JIPS by electronic data from Culti Co.,Ltd.-san.
+Moreover, they allowed that we make open source software using it.
 
- I thank Culti Co.,Ltd. once again.
+Thank you, Culti Co.,Ltd-san.!
 
 =head1 HELLO WORLD
 
  To support JIS X 0213:2004,
  
-     Using ghost character 1-55-27(it's me!), #'
+     Using ghost character 1-55-27(it's me!),
  
  Found by JIS X 0208:1997,
  

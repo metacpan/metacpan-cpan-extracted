@@ -12,9 +12,9 @@ extends 'Data::Sah::Compiler::perl::TH::str';
 with 'Data::Sah::Type::cistr';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-20'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 sub before_all_clauses {
     my ($self, $cd) = @_;
@@ -154,7 +154,7 @@ Data::Sah::Compiler::perl::TH::cistr - perl's type handler for type "cistr"
 
 =head1 VERSION
 
-This document describes version 0.912 of Data::Sah::Compiler::perl::TH::cistr (from Perl distribution Data-Sah), released on 2022-08-20.
+This document describes version 0.913 of Data::Sah::Compiler::perl::TH::cistr (from Perl distribution Data-Sah), released on 2022-09-30.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+|handle_.+|before_.+|after_.+)$
 

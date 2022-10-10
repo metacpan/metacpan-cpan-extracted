@@ -62,6 +62,7 @@ sub satpass {
 #	there are. Tell the Test package how many.
 
     my $start = tell ($handle);
+    local $_ = undef;	# while (<>) ... does not localize $_.
     while (<$handle>) {
 	if (m/^\s*-test\b/) {
 	    $test++
@@ -153,6 +154,7 @@ sub tester {
     my ( $handle, undef, $output, $except ) = @_;	# Input unused
 ##  print "foo> $input" if $input;
 ##  print $output if $output;
+    local $_ = undef;	# while (<>) ... does not localize $_.
     while (<$handle>) {
 	chomp;
 	s/^\s+//;
@@ -171,6 +173,7 @@ sub tester {
 	s|<<(.*)|| and do {
 	    my $flag = ($1 || '') . "\n";
 	    my $buffer = $_ . "\n";
+	    local $_ = undef;	# while (<>) ... does not localize $_.
 	    while (<$handle>) {
 		$_ eq $flag and do {$flag = undef; last};
 		$buffer .= $_;

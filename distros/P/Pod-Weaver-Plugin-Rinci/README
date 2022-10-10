@@ -2,9 +2,9 @@ NAME
     Pod::Weaver::Plugin::Rinci - Insert stuffs to POD from Rinci metadata
 
 VERSION
-    This document describes version 0.783 of Pod::Weaver::Plugin::Rinci
+    This document describes version 0.784 of Pod::Weaver::Plugin::Rinci
     (from Perl distribution Pod-Weaver-Plugin-Rinci), released on
-    2022-06-23.
+    2022-07-24.
 
 SYNOPSIS
     In your weaver.ini:
@@ -123,6 +123,10 @@ ENVIRONMENT
   PERL_POD_WEAVER_PLUGIN_RINCI_FORCE_RELOAD
     Bool. Used to set the default for the "/force_reload" configuration
     option.
+
+  PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_MODULES
+    String (regex pattern). Used to set the default value for the
+    "/exclude_modules" configuration option.
 
 HOMEPAGE
     Please visit the project's homepage at

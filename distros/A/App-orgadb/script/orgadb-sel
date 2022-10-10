@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-26'; # DATE
+our $DATE = '2022-10-09'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -35,7 +35,7 @@ orgadb-sel - Select entries and fields from Org addressbook
 
 =head1 VERSION
 
-This document describes version 0.008 of orgadb-sel (from Perl distribution App-orgadb), released on 2022-09-26.
+This document describes version 0.010 of orgadb-sel (from Perl distribution App-orgadb), released on 2022-10-09.
 
 =head1 SYNOPSIS
 
@@ -110,7 +110,7 @@ To list all entries (categories will be shown as path prefix):
  ** work > newsradio/beth
  ** work > newsradio > ex/matthew
 
-=head2 Searching entries
+=head2 Searching entries by name
 
 To list entries that match the string 'sa':
 
@@ -124,14 +124,14 @@ To hide the category prefix, use C<-C> (C<--hide-category>):
  ** satya
  ** lisa
 
-=head2 Searching categories
+=head2 Filtering entries by categories
 
-To search against the category, use the C<-c> option:
+To only include entries that have certain category name, use the C<-c> option:
 
- % orgadb-sel sa -c work; # search for 'sa' from work
+ % orgadb-sel sa -c work; # search for entries 'sa' from category 'work'
  ** work > newsradio/lisa
 
- % orgadb-sel -c work; # list all entries from work
+ % orgadb-sel -c work; # list all entries from category 'work'
  ** work > newsradio/dave
  ** work > newsradio/lisa
  ** work > newsradio/joe
@@ -159,6 +159,18 @@ To display Lisa's full entry:
  - home phone :: 555-1234-712
  - note ::
    + [2022-07-03] :: do not call after office hours
+
+=head2 Filtering entries by the fields they have
+
+Aside from filterin by category, we can filter entries by the fields they have.
+For example, to only list entries that have 'bank information' field:
+
+ % orgadb-sel --filter-entries-by-fields '/bank information/'
+
+Another example, to only include entries that have 'deceased' field set to
+'true' or 'y/'yes':
+
+ % orgadb-sel --filter-entries-by-fields '/deceased/ = /(?:true|yes|y)/i'
 
 =head2 Searching fields
 
@@ -306,6 +318,27 @@ type:
  % orgadb-sel lis<tab>                ;# complete with entries matching 'lis'
  % orgadb-sel lisa <tab>              ;# complete with available fields or /lisa/ entries
 
+=head2 Using field formatters
+
+Suppose you want to format phone number using international notation:
+
+ % orgadb-sel lisa phone -f Phone::format
+
+=head2 Using default field formatter rules
+
+Instead of specifying formatters everytime, you can setup rules for default
+formatters in the configuration file:
+
+ default_formatter_rules={"field_name_matches":"/te?lp|wa|phone|whatsapp|hp/i", "formatters":["Phone::format_idn_nospace"]}
+ default_formatter_rules={"field_name_matches":"/pass(word)?/i", "formatters":["Str::remove_comment"], "note":"I often put comments after my password, e.g. 'foobar # last changed 2022-10-08'"}
+
+and after this, when you select they will automatically be applied when
+selecting matching fields:
+
+ % orgadb-sel lisa phone
+
+To disable formatters, use C<--no-formatters> (C<-F>).
+
 =head1 OPTIONS
 
 C<*> marks required options.
@@ -392,9 +425,22 @@ file.
 
 =over
 
+=item B<--default-formatter-rules-json>=I<s>
+
+See C<--default-formatter-rules>.
+
+=item B<--default-formatter-rules>=I<s>
+
+Specify conditional default formatters. This is for convenience and best
+specified in the configuration as opposed to on the command-line option.
+An example:
+
+ default_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i","formatters":[ ["Phone::format_phone_idn"] ]}
+
+
 =item B<--detail>, B<-l>
 
-=item B<--formatter>=I<s@>
+=item B<--formatter>=I<s@>, B<-f>
 
 Add one or more formatters to display field value.
 
@@ -411,6 +457,9 @@ A formatter can have arguments, which is specified using this format:
 If formatter name begins with C<[> character, it will be parsed as JSON. Example:
 
  ['Str::remove_comment', {'style':'cpp'}]
+
+Overrides C<--default_formatter_rule> but overridden by the C<--no-formatters>
+(C<--raw-field-values>, C<-F>) option.
 
 
 Can be specified multiple times.
@@ -432,6 +481,10 @@ Do not show entry headline.
 =item B<--hide-field-name>, B<-N>
 
 Do not show field names, just show field values.
+
+=item B<--no-formatters>, B<--raw-field-values>, B<-F>
+
+Do not apply any formatters to field value (overrides --formatter option).
 
 =back
 
@@ -523,7 +576,7 @@ Find entry by string or regex search against the category title.
 
 =over
 
-=item B<--file>=I<s@>, B<-f>
+=item B<--file>=I<s@>
 
 Path to addressbook file.
 
@@ -770,7 +823,7 @@ by two colons, followed by another space) as the separator:
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/orgadb.conf>, F</home/u1/.config/orgadb-sel.conf>, F</home/u1/orgadb.conf>, F</home/u1/orgadb-sel.conf>, F</etc/orgadb.conf>, or F</etc/orgadb-sel.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/orgadb.conf>, F</home/s1/.config/orgadb-sel.conf>, F</home/s1/orgadb.conf>, F</home/s1/orgadb-sel.conf>, F</etc/orgadb.conf>, or F</etc/orgadb-sel.conf>.
 
 All found files will be read and merged.
 
@@ -803,6 +856,7 @@ List of available configuration parameters:
  color (see --color)
  color_theme (see --color-theme)
  count (see --count)
+ default_formatter_rules (see --default-formatter-rules)
  detail (see --detail)
  entry (see --entry)
  fields (see --field)
@@ -815,6 +869,7 @@ List of available configuration parameters:
  hide_field_name (see --hide-field-name)
  log_level (see --log-level)
  naked_res (see --naked-res)
+ no_formatters (see --no-formatters)
  num_entries (see --num-entries)
  num_fields (see --num-fields)
  reload_files_on_change (see --no-reload-files-on-change)
@@ -837,13 +892,13 @@ variable.
 
 =head1 FILES
 
-=head2 /home/u1/.config/orgadb.conf
+=head2 /home/s1/.config/orgadb.conf
 
-=head2 /home/u1/.config/orgadb-sel.conf
+=head2 /home/s1/.config/orgadb-sel.conf
 
-=head2 /home/u1/orgadb.conf
+=head2 /home/s1/orgadb.conf
 
-=head2 /home/u1/orgadb-sel.conf
+=head2 /home/s1/orgadb-sel.conf
 
 =head2 /etc/orgadb.conf
 

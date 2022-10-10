@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::XML::Util;
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 use XML::LibXML;
 
@@ -25,10 +25,11 @@ sub no_comments {
 
     # Remove comments from XML to mitigate XML comment auth bypass
     my $dom = XML::LibXML->load_xml(
-                    string => $xml,
-                    no_network => 1,
-                    load_ext_dtd => 0,
-                    expand_entities => 0 );
+        string          => $xml,
+        no_network      => 1,
+        load_ext_dtd    => 0,
+        expand_entities => 0
+    );
 
     for my $comment_node ($dom->findnodes('//comment()')) {
         $comment_node->parentNode->removeChild($comment_node);
@@ -51,7 +52,7 @@ Net::SAML2::XML::Util - Net::SAML2::XML::Util - XML Util class
 
 =head1 VERSION
 
-version 0.59
+version 0.61
 
 =head1 SYNOPSIS
 

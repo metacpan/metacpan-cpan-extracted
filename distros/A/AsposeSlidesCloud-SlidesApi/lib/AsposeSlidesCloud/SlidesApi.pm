@@ -4244,6 +4244,173 @@ sub create_slide {
 }
 
 #
+# create_smart_art_node
+#
+# Add SmartArt node
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $smart_art_index Index of the object on the slide among the same type of objects. (required)
+# @param string $sub_node Sub-node path (e.g. \&quot;3\&quot;, \&quot;3/nodes/2). (optional)
+# @param string $text Node text. (optional)
+# @param int $position Position to insert a new node. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'smart_art_index' => {
+        data_type => 'int',
+        description => 'Index of the object on the slide among the same type of objects.',
+        required => '1',
+    },
+    'sub_node' => {
+        data_type => 'string',
+        description => 'Sub-node path (e.g. \&quot;3\&quot;, \&quot;3/nodes/2).',
+        required => '0',
+    },
+    'text' => {
+        data_type => 'string',
+        description => 'Node text.',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position to insert a new node.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'create_smart_art_node' } = { 
+    	summary => 'Add SmartArt node',
+        params => $params,
+        returns => 'SmartArt',
+        };
+}
+# @return SmartArt
+#
+sub create_smart_art_node {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling create_smart_art_node");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling create_smart_art_node");
+    }
+
+    # verify the required parameter 'smart_art_index' is set
+    unless (exists $args{'smart_art_index'}) {
+      croak("Missing the required parameter 'smart_art_index' when calling create_smart_art_node");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/SmartArts/{smartArtIndex}/nodes';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'sub_node'} && defined $args{'sub_node'}) {
+        $query_params->{'subNode'} = $self->{api_client}->to_query_value($args{'sub_node'});
+    }
+
+    # query params
+    if (exists $args{'text'} && defined $args{'text'}) {
+        $query_params->{'text'} = $self->{api_client}->to_query_value($args{'text'});
+    }
+
+    # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'smart_art_index'}) {
+        my $_base_variable = "{" . "smartArtIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'smart_art_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SmartArt', $response);
+    return $_response_object;
+}
+
+#
 # create_special_slide_animation_effect
 #
 # Add an effect to special slide (master, layout, notes) animation.
@@ -8597,7 +8764,7 @@ sub delete_embedded_font {
 # Removes specified embedded font and returns presentation.
 # 
 # @param File $document Document data. (required)
-# @param string $font_name Document name. (required)
+# @param string $font_name Font name. (required)
 # @param string $password Document password. (optional)
 {
     my $params = {
@@ -8608,7 +8775,7 @@ sub delete_embedded_font {
     },
     'font_name' => {
         data_type => 'string',
-        description => 'Document name.',
+        description => 'Font name.',
         required => '1',
     },
     'password' => {
@@ -10726,6 +10893,169 @@ sub delete_slides {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('Slides', $response);
+    return $_response_object;
+}
+
+#
+# delete_smart_art_node
+#
+# Delete SmartArt node
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $smart_art_index Index of the object on the slide among the same type of objects. (required)
+# @param int $node_index Root level node index. (required)
+# @param string $sub_node Sub-node path (e.g. \&quot;3\&quot;, \&quot;3/nodes/2). (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'smart_art_index' => {
+        data_type => 'int',
+        description => 'Index of the object on the slide among the same type of objects.',
+        required => '1',
+    },
+    'node_index' => {
+        data_type => 'int',
+        description => 'Root level node index.',
+        required => '1',
+    },
+    'sub_node' => {
+        data_type => 'string',
+        description => 'Sub-node path (e.g. \&quot;3\&quot;, \&quot;3/nodes/2).',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_smart_art_node' } = { 
+    	summary => 'Delete SmartArt node',
+        params => $params,
+        returns => 'SmartArt',
+        };
+}
+# @return SmartArt
+#
+sub delete_smart_art_node {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_smart_art_node");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_smart_art_node");
+    }
+
+    # verify the required parameter 'smart_art_index' is set
+    unless (exists $args{'smart_art_index'}) {
+      croak("Missing the required parameter 'smart_art_index' when calling delete_smart_art_node");
+    }
+
+    # verify the required parameter 'node_index' is set
+    unless (exists $args{'node_index'}) {
+      croak("Missing the required parameter 'node_index' when calling delete_smart_art_node");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/SmartArts/{smartArtIndex}/nodes/{nodeIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'sub_node'} && defined $args{'sub_node'}) {
+        $query_params->{'subNode'} = $self->{api_client}->to_query_value($args{'sub_node'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'smart_art_index'}) {
+        my $_base_variable = "{" . "smartArtIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'smart_art_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'node_index'}) {
+        my $_base_variable = "{" . "nodeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'node_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SmartArt', $response);
     return $_response_object;
 }
 
@@ -16289,8 +16619,8 @@ sub download_images_online {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param string $format Output file format. (required)
-# @param int $width Output file width. (optional)
-# @param int $height Output file height. (optional)
+# @param int $width The width of the slide representation in the output format. (optional)
+# @param int $height The height of the slide representation in the output format (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -16314,12 +16644,12 @@ sub download_images_online {
     },
     'width' => {
         data_type => 'int',
-        description => 'Output file width.',
+        description => 'The width of the slide representation in the output format.',
         required => '0',
     },
     'height' => {
         data_type => 'int',
-        description => 'Output file height.',
+        description => 'The height of the slide representation in the output format',
         required => '0',
     },
     'password' => {
@@ -16461,8 +16791,8 @@ sub download_notes_slide {
 # @param File $document Document data. (required)
 # @param int $slide_index Slide index. (required)
 # @param string $format Output file format. (required)
-# @param int $width Output file width. (optional)
-# @param int $height Output file height. (optional)
+# @param int $width The width of the slide representation in the output format. (optional)
+# @param int $height The height of the slide representation in the output format. (optional)
 # @param string $password Document password. (optional)
 # @param string $fonts_folder Storage folder containing custom fonts to be used with the document. (optional)
 {
@@ -16484,12 +16814,12 @@ sub download_notes_slide {
     },
     'width' => {
         data_type => 'int',
-        description => 'Output file width.',
+        description => 'The width of the slide representation in the output format.',
         required => '0',
     },
     'height' => {
         data_type => 'int',
-        description => 'Output file height.',
+        description => 'The height of the slide representation in the output format.',
         required => '0',
     },
     'password' => {
@@ -28018,6 +28348,7 @@ sub import_from_pdf {
 # @param int $width The width of the imported group of shapes (default is SVG image width). (optional)
 # @param int $height The height of the imported group of shapes (default is SVG image width). (optional)
 # @param string $shapes Indexes of shapes to import. All shapes are imported if not specified. (optional)
+# @param boolean $group If true, the set of shapes will be imported as a one group shape. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Presentation folder. (optional)
 # @param string $storage Presentation storage. (optional)
@@ -28061,6 +28392,11 @@ sub import_from_pdf {
     'shapes' => {
         data_type => 'string',
         description => 'Indexes of shapes to import. All shapes are imported if not specified.',
+        required => '0',
+    },
+    'group' => {
+        data_type => 'boolean',
+        description => 'If true, the set of shapes will be imported as a one group shape.',
         required => '0',
     },
     'password' => {
@@ -28138,6 +28474,11 @@ sub import_shapes_from_svg {
     # query params
     if (exists $args{'shapes'} && defined $args{'shapes'}) {
         $query_params->{'shapes'} = $self->{api_client}->to_query_value($args{'shapes'});
+    }
+
+    # query params
+    if (exists $args{'group'} && defined $args{'group'}) {
+        $query_params->{'group'} = $self->{api_client}->to_boolean_query_value($args{'group'});
     }
 
     # query params
@@ -29539,6 +29880,292 @@ sub reorder_slides {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('Slides', $response);
+    return $_response_object;
+}
+
+#
+# replace_font
+#
+# Replaces specified font and returns presentation fonts info.
+# 
+# @param string $name Document name. (required)
+# @param string $source_font Source font name. (required)
+# @param string $target_font Target font name. (required)
+# @param boolean $embed Embed target font. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'source_font' => {
+        data_type => 'string',
+        description => 'Source font name.',
+        required => '1',
+    },
+    'target_font' => {
+        data_type => 'string',
+        description => 'Target font name.',
+        required => '1',
+    },
+    'embed' => {
+        data_type => 'boolean',
+        description => 'Embed target font.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'replace_font' } = { 
+    	summary => 'Replaces specified font and returns presentation fonts info.',
+        params => $params,
+        returns => 'FontsData',
+        };
+}
+# @return FontsData
+#
+sub replace_font {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling replace_font");
+    }
+
+    # verify the required parameter 'source_font' is set
+    unless (exists $args{'source_font'} && $args{'source_font'}) {
+      croak("Missing the required parameter 'source_font' when calling replace_font");
+    }
+
+    # verify the required parameter 'target_font' is set
+    unless (exists $args{'target_font'} && $args{'target_font'}) {
+      croak("Missing the required parameter 'target_font' when calling replace_font");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/fonts/{sourceFont}/replace/{targetFont}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'embed'} && defined $args{'embed'}) {
+        $query_params->{'embed'} = $self->{api_client}->to_boolean_query_value($args{'embed'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'source_font'}) {
+        my $_base_variable = "{" . "sourceFont" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'source_font'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'target_font'}) {
+        my $_base_variable = "{" . "targetFont" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'target_font'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FontsData', $response);
+    return $_response_object;
+}
+
+#
+# replace_font_online
+#
+# Replaces specified font and returns presentation.
+# 
+# @param File $document Document data. (required)
+# @param string $source_font Source font name. (required)
+# @param string $target_font Target font name. (required)
+# @param boolean $embed Embed target font. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'source_font' => {
+        data_type => 'string',
+        description => 'Source font name.',
+        required => '1',
+    },
+    'target_font' => {
+        data_type => 'string',
+        description => 'Target font name.',
+        required => '1',
+    },
+    'embed' => {
+        data_type => 'boolean',
+        description => 'Embed target font.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'replace_font_online' } = { 
+    	summary => 'Replaces specified font and returns presentation.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub replace_font_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling replace_font_online");
+    }
+
+    # verify the required parameter 'source_font' is set
+    unless (exists $args{'source_font'} && $args{'source_font'}) {
+      croak("Missing the required parameter 'source_font' when calling replace_font_online");
+    }
+
+    # verify the required parameter 'target_font' is set
+    unless (exists $args{'target_font'} && $args{'target_font'}) {
+      croak("Missing the required parameter 'target_font' when calling replace_font_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/fonts/{sourceFont}/replace/{targetFont}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'embed'} && defined $args{'embed'}) {
+        $query_params->{'embed'} = $self->{api_client}->to_boolean_query_value($args{'embed'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'source_font'}) {
+        my $_base_variable = "{" . "sourceFont" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'source_font'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'target_font'}) {
+        my $_base_variable = "{" . "targetFont" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'target_font'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
     return $_response_object;
 }
 
@@ -33337,11 +33964,12 @@ sub set_document_property {
 # Embeds specified font and returns presentation fonts info.
 # 
 # @param string $name Document name. (required)
-# @param string $font_name Document name. (required)
+# @param string $font_name Font name. (required)
 # @param boolean $only_used Only used characters will be embedded. (optional, default to false)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
 {
     my $params = {
     'name' => {
@@ -33351,7 +33979,7 @@ sub set_document_property {
     },
     'font_name' => {
         data_type => 'string',
-        description => 'Document name.',
+        description => 'Font name.',
         required => '1',
     },
     'only_used' => {
@@ -33372,6 +34000,11 @@ sub set_document_property {
     'storage' => {
         data_type => 'string',
         description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
         required => '0',
     },
     };
@@ -33426,6 +34059,11 @@ sub set_embedded_font {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
     # header params
     if ( exists $args{'password'}) {
         $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
@@ -33459,6 +34097,226 @@ sub set_embedded_font {
 }
 
 #
+# set_embedded_font_from_request
+#
+# Embeds font from request and returns presentation fonts info.
+# 
+# @param File $font Font data. (required)
+# @param string $name Document name. (required)
+# @param boolean $only_used Only used characters will be embedded. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'font' => {
+        data_type => 'File',
+        description => 'Font data.',
+        required => '1',
+    },
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'only_used' => {
+        data_type => 'boolean',
+        description => 'Only used characters will be embedded.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'set_embedded_font_from_request' } = { 
+    	summary => 'Embeds font from request and returns presentation fonts info.',
+        params => $params,
+        returns => 'FontsData',
+        };
+}
+# @return FontsData
+#
+sub set_embedded_font_from_request {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'font' is set
+    unless (exists $args{'font'} && $args{'font'}) {
+      croak("Missing the required parameter 'font' when calling set_embedded_font_from_request");
+    }
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling set_embedded_font_from_request");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/fonts/embedded';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'only_used'} && defined $args{'only_used'}) {
+        $query_params->{'onlyUsed'} = $self->{api_client}->to_boolean_query_value($args{'only_used'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'font'} && $args{'font'}) {
+        push(@$files, $args{'font'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FontsData', $response);
+    return $_response_object;
+}
+
+#
+# set_embedded_font_from_request_online
+#
+# Embeds font from request and returns presentation.
+# 
+# @param File $document Document data. (required)
+# @param File $font Font data. (required)
+# @param boolean $only_used Only used characters will be embedded. (optional, default to false)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'font' => {
+        data_type => 'File',
+        description => 'Font data.',
+        required => '1',
+    },
+    'only_used' => {
+        data_type => 'boolean',
+        description => 'Only used characters will be embedded.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'set_embedded_font_from_request_online' } = { 
+    	summary => 'Embeds font from request and returns presentation.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub set_embedded_font_from_request_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling set_embedded_font_from_request_online");
+    }
+
+    # verify the required parameter 'font' is set
+    unless (exists $args{'font'} && $args{'font'}) {
+      croak("Missing the required parameter 'font' when calling set_embedded_font_from_request_online");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/fonts/embedded';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'only_used'} && defined $args{'only_used'}) {
+        $query_params->{'onlyUsed'} = $self->{api_client}->to_boolean_query_value($args{'only_used'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    if ( exists $args{'font'} && $args{'font'}) {
+        push(@$files, $args{'font'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
 # set_embedded_font_online
 #
 # Embeds specified font and returns presentation.
@@ -33467,6 +34325,7 @@ sub set_embedded_font {
 # @param string $font_name Font name. (required)
 # @param boolean $only_used Only used characters will be embedded. (optional, default to false)
 # @param string $password Document password. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
 {
     my $params = {
     'document' => {
@@ -33487,6 +34346,11 @@ sub set_embedded_font {
     'password' => {
         data_type => 'string',
         description => 'Document password.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
         required => '0',
     },
     };
@@ -33529,6 +34393,11 @@ sub set_embedded_font_online {
     # query params
     if (exists $args{'only_used'} && defined $args{'only_used'}) {
         $query_params->{'onlyUsed'} = $self->{api_client}->to_boolean_query_value($args{'only_used'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
     }
 
     # header params

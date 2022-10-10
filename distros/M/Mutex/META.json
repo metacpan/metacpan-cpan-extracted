@@ -9,7 +9,7 @@
       "perl_5"
    ],
    "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "url" : "https://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
    "name" : "Mutex",
@@ -50,19 +50,19 @@
    "provides" : {
       "Mutex" : {
          "file" : "lib/Mutex.pm",
-         "version" : "1.006"
+         "version" : "1.007"
       },
       "Mutex::Channel" : {
          "file" : "lib/Mutex/Channel.pm",
-         "version" : "1.006"
+         "version" : "1.007"
       },
       "Mutex::Flock" : {
          "file" : "lib/Mutex/Flock.pm",
-         "version" : "1.006"
+         "version" : "1.007"
       },
       "Mutex::Util" : {
          "file" : "lib/Mutex/Util.pm",
-         "version" : "1.006"
+         "version" : "1.007"
       }
    },
    "release_status" : "stable",
@@ -72,11 +72,11 @@
       },
       "homepage" : "https://github.com/marioroy/mutex-perl",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
          "url" : "https://github.com/marioroy/mutex-perl.git"
       }
    },
-   "version" : "1.006"
+   "version" : "1.007"
 }

@@ -20,6 +20,11 @@ my $build = Module::Build->new
                       "Test" => "0",
                      },                       
    keywords => [  "Cron", "Scheduler", "Job" ],
+  meta_merge => {
+    resources => {
+      repository => 'http://github.com/rhuss/schedule-cron',
+    },
+  },
    provides => {
                 "Schedule::Cron" => {
                                file =>  "lib/Schedule/Cron.pm"

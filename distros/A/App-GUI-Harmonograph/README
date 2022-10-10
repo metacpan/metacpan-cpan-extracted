@@ -9,7 +9,7 @@ SYNOPSIS
     3.  move knobs and observe how preview sketch reacts til you got an
         interesting configuration
 
-    4.  push "Draw" (Ctrl+D or below drawing board) to produce full image
+    4.  push "Draw" (below drawing board or Ctrl+D) to produce full image
 
     5.  choose "Save" in Image menu (or Ctrl+S) to store image in a PNG /
         JPEG / SVG file
@@ -166,12 +166,19 @@ GUI
     The first entry lets you reset the whole program to the starting state
     and the last is just to exit (safely with saving the configs).
 
-    The second menu has only two commands for drawing and saving an complete
-    image in an arbitrary named PNG, JPG or SVG file (the file ending
-    decides).
+    The second menu has only two commands for drawing an complete image and
+    saving it in an arbitrary named PNG, JPG or SVG file (the file ending
+    decides). The submenu above onle set the preferred format, which is the
+    format of serial images and the first wild card in dialog. Above that is
+    another submenu for setting the image size.
 
     The third menu has some dialogs with documentation and additional
     information.
+
+SEE ALSO
+    App::GUI::Cellgraph
+
+    App::GUI::Dynagraph
 
 AUTHOR
     Herbert Breunung (lichtkind@cpan.org)

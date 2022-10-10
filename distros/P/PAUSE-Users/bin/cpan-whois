@@ -30,6 +30,8 @@ while (defined(my $user = $iterator->next_user)) {
 
 die "Not found\n";
 
+=encoding utf8
+
 =head1 NAME
 
 cpan-whois - display details of one or more CPAN authors

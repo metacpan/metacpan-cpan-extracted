@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-07-24'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our $schema = ['str' => {
     'summary' => 'Unix signal name (e.g. TERM or KILL) or number (9 or 15)',
@@ -36,7 +36,7 @@ Sah::Schema::unix::signal - Unix signal name (e.g. TERM or KILL) or number (9 or
 
 =head1 VERSION
 
-This document describes version 0.019 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.020 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 =head1 SYNOPSIS
 
@@ -128,7 +128,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = 9;
+ $data = "TTIN";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -143,8 +143,8 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = 9;
- my $res = $validator->($data); # => ["",9]
+ $data = "TTIN";
+ my $res = $validator->($data); # => ["","TTIN"]
  
  # a sample invalid data
  $data = undef;

@@ -7,7 +7,7 @@ package Tcl::pTk::Tree;
 #
 # Converted to Tcl::pTk  John Cerney
 
-our ($VERSION) = ('1.09');
+our ($VERSION) = ('1.10');
 
 use Tcl::pTk ();
 use Tcl::pTk::Derived;

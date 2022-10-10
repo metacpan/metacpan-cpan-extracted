@@ -1,7 +1,7 @@
 package MoobX::Trait::Observable;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: turn a Moose object attribute into an MoobX observable
-$MoobX::Trait::Observable::VERSION = '0.1.0';
+$MoobX::Trait::Observable::VERSION = '0.1.2';
 
 use Moose::Role;
 use MoobX;
@@ -39,7 +39,7 @@ MoobX::Trait::Observable - turn a Moose object attribute into an MoobX observabl
 
 =head1 VERSION
 
-version 0.1.0
+version 0.1.2
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2022, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

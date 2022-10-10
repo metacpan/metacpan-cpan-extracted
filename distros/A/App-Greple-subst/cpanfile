@@ -4,7 +4,7 @@ requires 'App::Greple', '8.58';
 requires 'App::Greple::update', '0.03';
 requires 'Getopt::EX';
 requires 'Getopt::EX::termcolor', '1.08';
-requires 'File::Share';
+requires 'File::Share', '0.27';
 requires 'List::Util';
 requires 'Mo';
 

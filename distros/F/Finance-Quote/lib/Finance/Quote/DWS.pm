@@ -25,7 +25,7 @@ use Web::Scraper;
 use constant DEBUG => $ENV{DEBUG};
 use if DEBUG, 'Smart::Comments';
 
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.53'; # VERSION
 
 our @labels = qw/name date isodate last name currency/;
 
@@ -96,6 +96,7 @@ sub dwsfunds {
 
   foreach my $symbol (@_) {
     if (exists $quoter->{DWS_CACHE}->{$symbol}) {
+      $info{$symbol, 'symbol'}   = $symbol;
       $info{$symbol, 'name'}     = $quoter->{DWS_CACHE}->{$symbol}->{name};
       $info{$symbol, 'last'}     = $quoter->{DWS_CACHE}->{$symbol}->{last};
       $info{$symbol, 'wkn'}      = $quoter->{DWS_CACHE}->{$symbol}->{wkn};

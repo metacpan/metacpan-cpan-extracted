@@ -4,15 +4,34 @@ use warnings;
 use OptArgs2;
 use Test2::V0;
 
-like dies {
-    opt one => (
-        isa     => 'Flag',
-        ishelp  => 1,
-        trigger => sub { },
-        comment => 'comment',
-    );
+my $o;
+
+isa_ok dies {
+    subcmd not_found => ();
 },
-  qr/Define::IshelpTrigger/,
-  'ishelp and trigger conflict';
+  'OptArgs2::Error::ParentCmdNotFound';
+
+@ARGV = ('the arg');
+$o    = optargs(
+    comment => 'test',
+    optargs => [
+        arg => {
+            isa      => 'Str',
+            comment  => 'do soemthing',
+            required => 1,
+        },
+        opt => {
+            isa     => '--Flag',
+            comment => 'do soemthing',
+        },
+        three => {
+            isa     => '--Int',
+            comment => 'do soemthing',
+            default => 3,
+        },
+    ],
+);
+
+is $o, { arg => 'the arg', three => 3 }, 'optargs as ARRAY ref';
 
 done_testing;

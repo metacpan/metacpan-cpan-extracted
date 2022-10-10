@@ -1,3 +1,9 @@
+0.003   2022-10-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add functions: add_clipboard_content(),
+          clear_clipboard_content().
+
+
 0.002   2021-07-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Forgot to add clipboard_manager argument to the functions.

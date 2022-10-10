@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-msdoc
 
+1.06 2022-10-08T04:41:27Z
+
+    - Deprecate --text option.
+    - Update submodule for test.
+
 1.05 2021-12-16T05:43:23Z
 
     - Take care of *.docm and others.

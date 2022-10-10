@@ -13,9 +13,9 @@ extends 'Data::Sah::Compiler::perl::TH';
 with 'Data::Sah::Type::duration';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-20'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 sub handle_type {
     my ($self, $cd) = @_;
@@ -27,7 +27,7 @@ sub handle_type {
     my $coerce_to = $cd->{coerce_to};
 
     if ($coerce_to eq 'float(secs)') {
-        $cd->{_ccl_check_type} = "!ref($dt) && $dt =~ /\\A[0-9]+(?:\.[0-9]+)?\\z/"; # XXX no support exp notation for yet?
+        $cd->{_ccl_check_type} = "!ref($dt) && $dt =~ /\\A[0-9]+(?:\\.[0-9]+)?\\z/"; # XXX no support exp notation for yet?
     } elsif ($coerce_to eq 'DateTime::Duration') {
         $c->add_runtime_module($cd, 'Scalar::Util');
         $cd->{_ccl_check_type} = "Scalar::Util::blessed($dt) && $dt\->isa('DateTime::Duration')";
@@ -184,7 +184,7 @@ Data::Sah::Compiler::perl::TH::duration - perl's type handler for type "duration
 
 =head1 VERSION
 
-This document describes version 0.912 of Data::Sah::Compiler::perl::TH::duration (from Perl distribution Data-Sah), released on 2022-08-20.
+This document describes version 0.913 of Data::Sah::Compiler::perl::TH::duration (from Perl distribution Data-Sah), released on 2022-09-30.
 
 =head1 DESCRIPTION
 

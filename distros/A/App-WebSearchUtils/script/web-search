@@ -1,0 +1,612 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/WebSearchUtils/web_search
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-10'; # DATE
+our $DIST = 'App-WebSearchUtils'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/WebSearchUtils/web_search",
+    program_name => "web-search",
+    log => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Open web search page in browser
+# PODNAME: web-search
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+web-search - Open web search page in browser
+
+=head1 VERSION
+
+This document describes version 0.001 of web-search (from Perl distribution App-WebSearchUtils), released on 2022-10-10.
+
+=head1 SYNOPSIS
+
+B<web-search> [B<--action>=I<str>|B<--open-url>|B<--print-html-link>|B<--print-org-link>|B<--print-result-html-link>|B<--print-result-link>|B<--print-result-org-link>|B<--print-url>|B<--save-html>] [B<--append>=I<str>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--delay>=I<duration>] [B<--engine>=I<str>] [B<--format>=I<name>|B<--json>] [B<--max-delay>=I<duration>] [B<--min-delay>=I<duration>] [B<--(no)naked-res>] [B<--no-env>] [B<--num>=L<posint|Sah::Schema::posint>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--prepend>=I<str>] [B<--queries-from>=L<filename|Sah::Schema::filename>] [(B<--query>=I<str>)+|B<--queries-json>=I<json>] [B<--time-end>=I<date>] [B<--time-past>=I<str>] [B<--time-start>=I<date>] -- [I<query>] ...
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+This utility can save you time when you want to open multiple queries (with
+added common prefix/suffix words) or specify some options like time limit. It
+will formulate the search URL(s) then open them for you in browser. You can also
+specify to print out the URLs instead.
+
+Aside from standard web search, you can also generate/open other searches like
+image, video, news, or map.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--action>=I<s>
+
+What to do with the URLs.
+
+Default value:
+
+ "open_url"
+
+Valid values:
+
+ ["open_url","print_url","print_html_link","print_org_link","save_html","print_result_link","print_result_html_link","print_result_org_link"]
+
+Instead of opening the queries in browser (C<open_url>), you can also do other
+action instead.
+
+B<Printing search URLs>: C<print_url> will print the search URL.
+C<print_html_link> will print the HTML link (the <a> tag). And C<print_org_link>
+will print the Org-mode link, e.g. C<[[url...][query]]>.
+
+B<Saving search result HTMLs>: C<save_html> will first visit each search URL
+(currently using L<Firefox::Marionette>) then save each result page to a file
+named C<< E<lt>numE<gt>-E<lt>queryE<gt>.html >> in the current directory. Existing files will not be
+overwritten; the utility will save to C<*.html.1>, C<*.html.2> and so on instead.
+
+B<Extracting search result links>: C<print_result_link> will first will first
+visit each search URL (currently using L<Firefox::Marionette>) then extract
+result links and print them. C<print_result_html_link> and
+C<print_result_org_link> are similar but will instead format each link as HTML
+and Org link, respectively.
+
+The C<print_result_*link> actions are not very useful for some search engines
+like Google because result HTML page is obfuscated. Thus we can only extract all
+links in each page instead of selecting (via DOM) only the actual search result
+entry links, etc.
+
+If you want to filter the links further by domain, path, etc. you can use
+L<grep-url>.
+
+
+=item B<--append>=I<s>
+
+String to add at the end of each query.
+
+=item B<--delay>=I<s>
+
+Delay between opening each query.
+
+As an alternative to the C<--delay> option, you can also use C<--min-delay> and
+C<--max-delay> to set a random delay between a minimum and maximum value.
+
+
+=item B<--engine>=I<s>
+
+Search engine to use.
+
+Default value:
+
+ "web"
+
+Valid values:
+
+ ["google","google_image","google_video","google_news","google_map","bing","brave","ddg"]
+
+=item B<--max-delay>=I<s>
+
+Delay between opening each query.
+
+=item B<--min-delay>=I<s>
+
+Delay between opening each query.
+
+As an alternative to the C<--mindelay> and C<--max-delay> options, you can also
+use C<--delay> to set a constant delay between requests.
+
+
+=item B<--num>=I<s>
+
+Number of results per page.
+
+=item B<--open-url>
+
+Alias for --action=open_url.
+
+See C<--action>.
+
+=item B<--prepend>=I<s>
+
+String to add at the beginning of each query.
+
+=item B<--print-html-link>
+
+Alias for --action=print_html_link.
+
+See C<--action>.
+
+=item B<--print-org-link>
+
+Alias for --action=print_org_link.
+
+See C<--action>.
+
+=item B<--print-result-html-link>
+
+Alias for --action=extract_links.
+
+See C<--action>.
+
+=item B<--print-result-link>
+
+Alias for --action=extract_links.
+
+See C<--action>.
+
+=item B<--print-result-org-link>
+
+Alias for --action=extract_links.
+
+See C<--action>.
+
+=item B<--print-url>
+
+Alias for --action=print_url.
+
+See C<--action>.
+
+=item B<--queries-from>=I<s>
+
+Supply queries from lines of text file (specify "-" for stdin).
+
+=item B<--queries-json>=I<s>
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query>=I<s@>
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--save-html>
+
+Alias for --action=save_html.
+
+See C<--action>.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Time period criteria options
+
+=over
+
+=item B<--time-end>=I<s>
+
+=item B<--time-past>=I<s>
+
+Limit time period to the past hour/24hour/week/month/year.
+
+Valid values:
+
+ ["hour","24hour","day","week","month","year"]
+
+=item B<--time-start>=I<s>
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C web-search web-search
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete web-search 'p/*/`web-search`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/web-search.conf>, F</home/u1/web-search.conf>, or F</etc/web-search.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+ action (see --action)
+ append (see --append)
+ delay (see --delay)
+ engine (see --engine)
+ format (see --format)
+ log_level (see --log-level)
+ max_delay (see --max-delay)
+ min_delay (see --min-delay)
+ naked_res (see --naked-res)
+ num (see --num)
+ prepend (see --prepend)
+ queries (see --query)
+ queries_from (see --queries-from)
+ time_end (see --time-end)
+ time_past (see --time-past)
+ time_start (see --time-start)
+
+=head1 ENVIRONMENT
+
+=head2 WEB_SEARCH_OPT
+
+String. Specify additional command-line options.
+
+=head1 FILES
+
+=head2 /home/u1/.config/web-search.conf
+
+=head2 /home/u1/web-search.conf
+
+=head2 /etc/web-search.conf
+
+=head1 EXAMPLES
+
+=head2 Open a single query, show 100 results
+
+ % web-search "a query" -n 100
+
+=head2 Open several queries, limit time period all search to the past month
+
+ % web-search "query one" query2 "query number three" --time-past month
+
+=head2 Open queries from each line of file, add delay 3s after each query (e.g. to avoid getting rate-limited)
+
+ % web-search --queries-from phrases.txt --delay 3s
+
+=head2 Open queries from each line of stdin
+
+ % prog-that-produces-lines-of-phrases | web-search --queries-from -
+
+=head2 Use a custom browser
+
+ % BROWSER=lynx web-search "a query"
+
+=head2 Use with firefox-container
+
+ % BROWSER="firefox-container mycontainer" web-search "query one" query2
+
+=head2 Show image search URLs instead of opening them in browser
+
+ % web-search --engine google_image --print-url "query one" query2
+
+=head2 Print map search URLs as Org links
+
+ % web-search --engine google_map --print-org-link "jakarta selatan" "kebun raya bogor"
+
+=head2 Prepend prefix words to each query, use Brave Search instead of the default Google (I'm sick of CAPTCHAs)
+
+ % web-search --engine brave --prepend "imdb " "carrie" "hocus pocus" "raya"
+
+=head2 Append suffix words to each query
+
+ % web-search --append " net worth" "lewis capaldi" "beyonce" "lee mack" "mariah carey"
+
+=head2 Visit the search URL for each query using Firefox::Marionette then extract and print the links
+
+ % web-search "lee mack" --print-result-link
+
+Currently not very useful with some search engines like Google because result
+HTML page is obfuscated so we can just extract all links in each page instead of
+selecting (via DOM) only the result links, etc.
+
+If you want to filter the links further by domain, path, etc. you can use
+L<grep-url>.
+
+
+=head2 Get the IMDB URL for Lee Mack
+
+ % web-search "lee mack imdb" --print-result-link | grep-url --host-contains imdb.com | head -n1
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-WebSearchUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-WebSearchUtils>.
+
+=head1 SEE ALSO
+
+L<firefox-container>.
+
+L<App::FirefoxMultiAccountContainersUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-WebSearchUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

@@ -1,0 +1,57 @@
+{
+   "abstract" : "tidy up VCARD files",
+   "author" : [
+      "Mark Lawrence <nomad@null.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-vcardtidy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "Path::Tiny" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "OptArgs2" : "v2.0.0",
+            "Path::Tiny" : "0",
+            "Text::vCard::Addressbook" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {},
+      "repository" : {
+         "type" : "git",
+         "url" : "ssh://git@github.com/mlawren/vcardtidy.git"
+      }
+   },
+   "version" : "v1.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

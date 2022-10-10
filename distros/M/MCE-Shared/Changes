@@ -1,7 +1,21 @@
 
 Revision history for Perl module MCE::Shared.
 
-1.876 Sun Feb 20 02:30:00 EST 2021
+1.878 Mon Oct 10 04:00:00 EST 2022
+
+  * Improved reliability on the Windows platform.
+  * Added deeply-shared demonstration to POD.
+
+1.877 Tue May 24 05:00:00 EST 2022
+
+  * Replace http with https in documentation and meta files.
+  * Call PDL::set_autopthread_targ(1); disables PDL auto-threading.
+
+  * Allow sharing additional PDL objects via class methods:
+    pdl_sbyte, pdl_ulong, pdl_ulonglong, pdl_ldouble, pdl_grandom,
+    and pdl_zero.
+
+1.876 Sun Feb 20 02:30:00 EST 2022
 
   * Improved suppressing the PDL CLONE warning. Piddles should not be
     naively copied into new threads.
@@ -277,8 +291,8 @@ Revision history for Perl module MCE::Shared.
   * Load IO::Handle for extra stability, preventing workers loading uniquely.
 
   * Load Net::HTTP and Net::HTTPS before spawning if present LWP::UserAgent.
-    See http://www.perlmonks.org/?node_id=1199760
-    and http://www.perlmonks.org/?node_id=1199891.
+    See https://www.perlmonks.org/?node_id=1199760
+    and https://www.perlmonks.org/?node_id=1199891.
 
   * Bumped MCE dependency to 1.835.
 
@@ -316,10 +330,10 @@ Revision history for Perl module MCE::Shared.
 1.832 Sun Oct 08 20:30:00 EST 2017
 
   * Added STFL (Terminal UI) to list for enabling posix_exit.
-    See http://www.perlmonks.org/?node_id=1200923.
+    See https://www.perlmonks.org/?node_id=1200923.
 
   * Math::Prime::Util random numbers now unique between Hobo workers.
-    See http://www.perlmonks.org/?node_id=1200960.
+    See https://www.perlmonks.org/?node_id=1200960.
 
   * Bumped MCE dependency to 1.831.
 
@@ -387,7 +401,7 @@ Revision history for Perl module MCE::Shared.
 
   * Clarified "limitations" section in MCE::Share::{ Condvar, Handle, Queue }.
     Clarified "extra functionality" section in MCE::Shared.
-    Thank you, http://www.perlmonks.org/?node=zentara.
+    Thank you, https://www.perlmonks.org/?node=zentara.
 
   * Bumped MCE dependency to 1.829.
 

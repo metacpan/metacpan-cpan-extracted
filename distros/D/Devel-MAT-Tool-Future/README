@@ -11,7 +11,9 @@ DESCRIPTION
 
 METHODS
 
- $ok = $tool->class_is_future( $pkg )
+ class_is_future
+
+       $ok = $tool->class_is_future( $pkg )
 
     Returns true if the given package is a Future class. $pkg may be either
     a Devel::MAT::SV instance referring to a stash, or a plain string.

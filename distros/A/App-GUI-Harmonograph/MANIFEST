@@ -12,9 +12,6 @@ bin/harmonograph
 cpanfile
 dist.ini
 lib/App/GUI/Harmonograph.pm
-lib/App/GUI/Harmonograph/Color.pm
-lib/App/GUI/Harmonograph/Color/Constant.pm
-lib/App/GUI/Harmonograph/Color/Value.pm
 lib/App/GUI/Harmonograph/ColorDisplay.pm
 lib/App/GUI/Harmonograph/Config.pm
 lib/App/GUI/Harmonograph/Dialog/About.pm
@@ -31,6 +28,3 @@ lib/App/GUI/Harmonograph/ProgressBar.pm
 lib/App/GUI/Harmonograph/Settings.pm
 lib/App/GUI/Harmonograph/SliderCombo.pm
 t/01_load.t
-t/02_color_value.t
-t/03_color_constant.t
-t/04_color.t

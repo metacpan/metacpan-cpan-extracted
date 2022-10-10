@@ -15,7 +15,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 0 supported, 0 maximum usable queues
   Current address: Unspecified, Hardware address: Unspecified
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
     Input packets : 10[4m732[24m471
     Output packets: 10[4m732[24m311
   Interface transmit statistics: Disabled
@@ -33,7 +33,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 0 supported, 0 maximum usable queues
   Current address: Unspecified, Hardware address: Unspecified
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
     Input packets : 10[4m707[24m511
     Output packets: 10[4m706[24m936
   Interface transmit statistics: Disabled
@@ -55,7 +55,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 30:7c:5e:14:a1:43, Hardware address: 30:7c:5e:14:a1:43
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -81,7 +81,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
 ---(more)---                                          Current address: 30:7c:5e:14:a1:44, Hardware address: 30:7c:5e:14:a1:44
-  Last flapped   : [4m2[24m021-07-26 17:00:19 MDT (3w0d 20:18 ago)
+[36m  Last flapped   : [4m2[24m021-07-26 17:00:19 MDT (3w0d 20:18 ago)[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : [4m3[24m768 bps (3 pps)[0m
 [32m  Active alarms  : None[0m
@@ -107,7 +107,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 30:7c:5e:14:a1:45, Hardware address: 30:7c:5e:14:a1:45
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -133,7 +133,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 30:7c:5e:14:a1:46, Hardware address: 30:7c:5e:14:a1:46
-  Last flapped   : [4m2[24m021-01-25 20:05:19 MST (29w0d 16:13 ago)
+[36m  Last flapped   : [4m2[24m021-01-25 20:05:19 MST (29w0d 16:13 ago)[0m
 [36m  Input rate     : 504 bps (0 pps)[0m
 [36m  Output rate    : [4m4[24m832 bps (3 pps)[0m
 [32m  Active alarms  : None[0m
@@ -159,7 +159,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 30:7c:5e:14:a1:47, Hardware address: 30:7c:5e:14:a1:47
-  Last flapped   : [4m2[24m021-05-03 10:11:44 MDT (15w1d 03:06 ago)
+[36m  Last flapped   : [4m2[24m021-05-03 10:11:44 MDT (15w1d 03:06 ago)[0m
 [36m  Input rate     : [4m4[24m808 bps (7 pps)[0m
 [36m  Output rate    : [4m1[24m704 bps (2 pps)[0m
 [32m  Active alarms  : None[0m
@@ -185,7 +185,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:43, Hardware address: 30:7c:5e:14:a1:48
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -208,7 +208,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:45, Hardware address: 30:7c:5e:14:a1:49
-  Last flapped   : [4m2[24m021-01-26 14:10:17 MST (28w6d 22:08 ago)
+[36m  Last flapped   : [4m2[24m021-01-26 14:10:17 MST (28w6d 22:08 ago)[0m
 [36m  Input rate     : [4m84[24m376 bps (97 pps)[0m
 [36m  Output rate    : [4m90[24m160 bps (69 pps)[0m
 [32m  Active alarms  : None[0m
@@ -231,7 +231,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 30:7c:5e:14:a1:4a, Hardware address: 30:7c:5e:14:a1:4a
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -257,7 +257,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 30:7c:5e:14:a1:4b, Hardware address: 30:7c:5e:14:a1:4b
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -283,7 +283,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:44, Hardware address: 30:7c:5e:14:a1:4c
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -306,7 +306,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:44, Hardware address: 30:7c:5e:14:a1:4d
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -329,7 +329,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 30:7c:5e:14:a1:4e, Hardware address: 30:7c:5e:14:a1:4e
-  Last flapped   : [4m2[24m021-07-19 09:00:33 MDT (4w1d 04:17 ago)
+[36m  Last flapped   : [4m2[24m021-07-19 09:00:33 MDT (4w1d 04:17 ago)[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 800 bps (0 pps)[0m
 [32m  Active alarms  : None[0m
@@ -355,7 +355,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:43, Hardware address: 12:35:67:89:68:43
-  Last flapped   : [4m2[24m021-07-06 10:07:20 MDT (6w0d 03:11 ago)
+[36m  Last flapped   : [4m2[24m021-07-06 10:07:20 MDT (6w0d 03:11 ago)[0m
 [36m  Input rate     : [4m2[24m936 bps (3 pps)[0m
 [36m  Output rate    : [4m3[24m816 bps (3 pps)[0m
 [32m  Active alarms  : None[0m
@@ -381,7 +381,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:44, Hardware address: 12:35:67:89:68:44
-  Last flapped   : [4m2[24m021-01-25 20:01:02 MST (29w0d 16:17 ago)
+[36m  Last flapped   : [4m2[24m021-01-25 20:01:02 MST (29w0d 16:17 ago)[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : [4m1[24m520 bps (2 pps)[0m
 [32m  Active alarms  : None[0m
@@ -407,7 +407,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:45, Hardware address: 12:35:67:89:68:45
-  Last flapped   : [4m2[24m021-03-02 02:24:48 MST (24w0d 09:53 ago)
+[36m  Last flapped   : [4m2[24m021-03-02 02:24:48 MST (24w0d 09:53 ago)[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : [4m2[24m504 bps (3 pps)[0m
 [32m  Active alarms  : None[0m
@@ -433,7 +433,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:46, Hardware address: 12:35:67:89:68:46
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -459,7 +459,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:47, Hardware address: 12:35:67:89:68:47
-  Last flapped   : [4m2[24m021-07-21 21:24:22 MDT (3w5d 15:54 ago)
+[36m  Last flapped   : [4m2[24m021-07-21 21:24:22 MDT (3w5d 15:54 ago)[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : [4m1[24m520 bps (2 pps)[0m
 [32m  Active alarms  : None[0m
@@ -485,7 +485,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:48, Hardware address: 12:35:67:89:68:48
-  Last flapped   : [4m2[24m021-08-12 21:29:50 MDT (4d 15:48 ago)
+[36m  Last flapped   : [4m2[24m021-08-12 21:29:50 MDT (4d 15:48 ago)[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -511,7 +511,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:49, Hardware address: 12:35:67:89:68:49
-  Last flapped   : [4m2[24m021-08-15 11:34:22 MDT (2d 01:44 ago)
+[36m  Last flapped   : [4m2[24m021-08-15 11:34:22 MDT (2d 01:44 ago)[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [32m  Active alarms  : None[0m
@@ -537,7 +537,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:4a, Hardware address: 12:35:67:89:68:4a
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -563,7 +563,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:4b, Hardware address: 12:35:67:89:68:4b
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -589,7 +589,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:4c, Hardware address: 12:35:67:89:68:4c
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 ---(more 61%)---                                        [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -615,7 +615,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:4d, Hardware address: 12:35:67:89:68:4d
-  Last flapped   : [4m2[24m021-01-25 20:01:16 MST (29w0d 16:17 ago)
+[36m  Last flapped   : [4m2[24m021-01-25 20:01:16 MST (29w0d 16:17 ago)[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : [4m5[24m032 bps (4 pps)[0m
 [32m  Active alarms  : None[0m
@@ -641,7 +641,7 @@ user@swXX> show interfaces
   Link flags     : None
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 12:35:67:89:68:4e, Hardware address: 12:35:67:89:68:4e
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 [1;31m  Active alarms  : LINK[0m
@@ -664,7 +664,7 @@ user@swXX> show interfaces
   Device flags   : Present Running
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Current address: 12:35:67:89:68:43, Hardware address: 12:35:67:89:68:43
----(more 69%)---                                          Last flapped   : [4m2[24m021-01-25 20:00:19 MST (29w0d 16:18 ago)
+---(more 69%)---                                        [36m  Last flapped   : [4m2[24m021-01-25 20:00:19 MST (29w0d 16:18 ago)[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 
@@ -690,7 +690,7 @@ user@swXX> show interfaces
   Device flags   : Present Running
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Current address: 12:35:67:89:68:44, Hardware address: 12:35:67:89:68:44
-  Last flapped   : [4m2[24m021-01-25 20:00:19 MST (29w0d 16:18 ago)
+[36m  Last flapped   : [4m2[24m021-01-25 20:00:19 MST (29w0d 16:18 ago)[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 
@@ -716,7 +716,7 @@ user@swXX> show interfaces
   Device flags   : Present Running
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   Current address: 12:35:67:89:68:45, Hardware address: 12:35:67:89:68:45
-  Last flapped   : [4m2[24m021-01-26 14:10:26 MST (28w6d 22:08 ago)
+[36m  Last flapped   : [4m2[24m021-01-26 14:10:26 MST (28w6d 22:08 ago)[0m
 [36m  Input rate     : [4m67[24m152 bps (100 pps)[0m
 [36m  Output rate    : [4m141[24m968 bps (109 pps)[0m
 
@@ -742,7 +742,7 @@ user@swXX> show interfaces
   Device flags   : Present Running
   Interface flags: Hardware-Down SNMP-Traps Internal: 0x[4m4[24m000
   Current address: 12:35:67:89:68:46, Hardware address: 12:35:67:89:68:46
-  Last flapped   : [4m2[24m021-01-25 20:00:19 MST (29w0d 16:18 ago)
+[36m  Last flapped   : [4m2[24m021-01-25 20:00:19 MST (29w0d 16:18 ago)[0m
 [36m  Input rate     : 0 bps (0 pps)[0m
 [36m  Output rate    : 0 bps (0 pps)[0m
 
@@ -765,7 +765,7 @@ user@swXX> show interfaces
   Device flags   : Present Running
   Link flags     : None
   Current address: 00:0b:ca:fe:00:01, Hardware address: 00:0b:ca:fe:00:00
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
     Input packets : 0
     Output packets: 343[4m092[24m461
 
@@ -799,7 +799,7 @@ user@swXX> show interfaces
   Device flags   : Present Running
   Interface flags: Point-To-Point SNMP-Traps
   Link flags     : None
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
     Input packets : 0
     Output packets: 0
 
@@ -827,7 +827,7 @@ user@swXX> show interfaces
   Link type      : Full-Duplex
   Link flags     : None
   Current address: 12:35:67:89:68:40, Hardware address: 12:35:67:89:68:40
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
     Input packets : 0
     Output packets: 0
 
@@ -846,7 +846,7 @@ user@swXX> show interfaces
   Device flags   : Present Running Loopback
   Interface flags: SNMP-Traps
   Link flags     : None
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
     Input packets : 442[4m741[24m614
     Output packets: 442[4m741[24m614
 
@@ -864,7 +864,7 @@ user@swXX> show interfaces
   Type: Software-Pseudo, Link-level type: LSI, MTU: Unlimited, Speed: Unlimited
   Device flags   : Present Running
   Link flags     : None
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
     Input packets : 0
     Output packets: 0
 
@@ -874,7 +874,7 @@ user@swXX> show interfaces
   Device flags   : Present Running
   Interface flags: Hardware-Down SNMP-Traps
   Current address: 12:35:67:89:68:42, Hardware address: 12:35:67:89:68:7f
-  Last flapped   : [4m2[24m021-01-25 19:52:05 MST (29w0d 16:26 ago)
+[36m  Last flapped   : [4m2[24m021-01-25 19:52:05 MST (29w0d 16:26 ago)[0m
     Input packets : 0
     Output packets: 0
 
@@ -915,7 +915,7 @@ user@swXX> show interfaces
   Device flags   : Present Running
   Interface flags: SNMP-Traps
   Link flags     : None
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
     Input packets : 0
     Output packets: 0
 
@@ -926,7 +926,7 @@ user@swXX> show interfaces
   Link type      : Full-Duplex
   Link flags     : None
   Current address: 12:35:67:89:68:41, Hardware address: 12:35:67:89:68:41
-  Last flapped   : Never
+[36m  Last flapped   : Never[0m
     Input packets : 10[4m279[24m909
     Output packets: 4[4m911[24m225
 
@@ -956,7 +956,7 @@ user@swXX> show interfaces
   Link type      : Full-Duplex
   Link flags     : None
   Current address: 12:35:67:89:68:42, Hardware address: 12:35:67:89:68:42
----(more 99%)---                                          Last flapped   : Never
+---(more 99%)---                                        [36m  Last flapped   : Never[0m
     Input packets : 0
     Output packets: 0
 
@@ -1531,7 +1531,7 @@ Interface               Admin Link Proto    Local                 Remote
   Interface flags: SNMP-Traps Internal: 0x[4m4[24m000
   CoS queues     : 8 supported, 8 maximum usable queues
   Current address: 11:22:33:44:55:66, Hardware address: 11:22:33:44:55:66
-  Last flapped   : [4m2[24m022-05-17 20:59:13 UTC (12w0d 05:15 ago)
+[36m  Last flapped   : [4m2[24m022-05-17 20:59:13 UTC (12w0d 05:15 ago)[0m
 [36m  Input rate     : [4m37[24m824 bps (35 pps)[0m
 [36m  Output rate    : [4m11[24m104 bps (3 pps)[0m
 [32m  Active alarms  : None[0m
@@ -1731,6 +1731,31 @@ Interface               Admin Link Proto    Local                 Remote
 [32mtap                     up    up[0m
 [1;31mvme                     up    down[0m
 [32mvtep                    up    up[0m
+[32mge-0/0/0                up    up[0m
+[32mge-0/0/0.0              up    up   eth-switch[0m
+[32mgr-0/0/0                up    up[0m
+[32mip-0/0/0                up    up[0m
+[32mlsq-0/0/0               up    up[0m
+[32mlt-0/0/0                up    up[0m
+[32mmt-0/0/0                up    up[0m
+[32msp-0/0/0                up    up[0m
+[32msp-0/0/0.0              up    up   inet[0m
+                                   inet6
+[32msp-0/0/0.16383          up    up   inet     [30m[46m10.0.0.1[0m            --> [30m[43m10.0.0.16[0m[0m
+[32mesi                     up    up[0m
+[32mfti0                    up    up[0m
+[1;31mfxp0                    up    down[0m
+[32mgre                     up    up[0m
+[32mipip                    up    up[0m
+[32mirb                     up    up[0m
+[32mpime                    up    up[0m
+[32mpp0                     up    up[0m
+[32mppd0                    up    up[0m
+[32mppe0                    up    up        [0m
+[32mrbeb                    up    up[0m
+[32mst0                     up    up[0m
+[1;31mst0.1000                up    down inet     [30m[42m192.0.2.1/31[0m [0m
+
 
 {master:0}
 foobar@xxxx.xxxxxx> exit 

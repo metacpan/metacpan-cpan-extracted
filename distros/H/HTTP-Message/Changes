@@ -1,5 +1,18 @@
 Revision history for HTTP-Message
 
+6.39      2022-10-08 13:48:26Z
+    - Remove Travis config (GH#180) (Olaf Alders)
+    - Added status_constant_name() which maps status code
+      to the name of the corresponding constant. (GH#160) (Neil Bowers)
+    - Updated the doc for status_message() to clarify that it
+      returns "Not Found" and not "HTTP_NOT_FOUND". (GH#160) (Neil Bowers)
+
+6.38      2022-10-06 21:48:18Z
+    - Replace "base" with "parent" (GH#176) (James Raspass)
+    - Replace "print" with "note" in tests (GH#178) (James Raspass)
+    - Noted that OPTIONS supported was added in 6.1, to the doc
+      for HTTP::Request::Common. Addresses GH#177. (GH#179) (Neil Bowers)
+
 6.37      2022-06-14 14:08:55Z
     - Support for Brotli "br" encoding (GH#163) (trizen and Julien Fiegehenn)
     - Don't test Perl > 5.32 on Windows in GH Actions (GH#174) (Olaf Alders)
@@ -69,6 +82,7 @@ Revision history for HTTP-Message
     - Revert (GH#125) "try hard to make a usable file name" (GH#130) (Olaf
       Alders)
     - Fix JSON request encoding examples in POD (GH#126) (Michael Schout)
+    - Added support for OPTIONS requests.
 
 6.20      2019-02-05 01:46:39Z (TRIAL RELEASE)
     - Fix encoded file names when LC_ALL=C (GH#125) (Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯)

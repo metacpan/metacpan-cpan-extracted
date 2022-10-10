@@ -44,7 +44,7 @@ use if DEBUG, 'Smart::Comments';
 
 use vars qw/$ASX_URL_PRIMARY $ASX_URL_ALTERNATE/;
 
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.53'; # VERSION
 
 $ASX_URL_PRIMARY = 'https://www.asx.com.au/asx/1/share/';
 $ASX_URL_ALTERNATE = 'https://asx.api.markitdigital.com/asx-research/1.0/companies/';

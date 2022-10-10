@@ -13,7 +13,7 @@ use lib 'inc';
 use Mock::LWP::UserAgent;
 
 use constant DUMP_REQUEST => Astro::SpaceTrack->DUMP_REQUEST |
-    Astro::SpaceTrack->DUMP_NO_EXECUTE;
+    Astro::SpaceTrack->DUMP_DRY_RUN;
 use constant DUMP_NONE => Astro::SpaceTrack->DUMP_NONE;
 
 my $loader = Astro::SpaceTrack->__get_loader() or do {

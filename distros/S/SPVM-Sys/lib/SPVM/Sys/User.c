@@ -304,7 +304,7 @@ int32_t SPVM__Sys__User__getgroups(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   assert(sizeof(gid_t) == sizeof(int32_t));
   
-  int32_t status = getgroups(groups_length, groups);
+  int32_t status = getgroups(groups_length, (gid_t*)groups);
   if (status == -1) {
     env->die(env, stack, "[System Error]getgroups failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
@@ -334,8 +334,10 @@ int32_t SPVM__Sys__User__setgroups(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t* groups = env->get_elems_int(env, stack, obj_groups);
   int32_t groups_length = env->length(env, stack, obj_groups);
+
+  assert(sizeof(gid_t) == sizeof(int32_t));
   
-  int32_t status = setgroups(groups_length, groups);
+  int32_t status = setgroups(groups_length, (gid_t*)groups);
   if (status == -1) {
     env->die(env, stack, "[System Error]setgroups failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;

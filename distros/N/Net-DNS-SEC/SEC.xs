@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1853 2021-10-11 10:40:59Z willem $"
+#define XS_Id "$Id: SEC.xs 1872 2022-09-16 09:33:02Z willem $"
 
 
 =head1 NAME
@@ -44,9 +44,9 @@ extern "C" {
 
 #define PERL_NO_GET_CONTEXT
 #define PERL_REENTRANT
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
+#include <EXTERN.h>
+#include <perl.h>
+#include <XSUB.h>
 
 #include <openssl/opensslv.h>
 #include <openssl/bn.h>
@@ -92,11 +92,13 @@ static OSSL_LIB_CTX *libctx = NULL;
 #endif
 
 #ifdef OPENSSL_IS_BORINGSSL
+#define NO_DSA
+#define NO_EdDSA
 #define NO_SHA3
 #endif
 
 #ifdef LIBRESSL_VERSION_NUMBER
-#undef OPENSSL_VERSION_NUMBER
+#undef  OPENSSL_VERSION_NUMBER
 #define OPENSSL_VERSION_NUMBER 0x10100000L
 #endif
 
@@ -145,6 +147,7 @@ int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
 
 
 #if (OPENSSL_VERSION_NUMBER < 0x10101000)
+#define EOL
 #define NO_EdDSA
 #define NO_SHA3
 
@@ -166,24 +169,23 @@ int EVP_DigestVerify(EVP_MD_CTX *ctx,
 #endif
 
 
+#ifndef OBSOLETE_API
+int EVP_PKEY_fromparams(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey, int selection, OSSL_PARAM_BLD *bld)
+{
+	OSSL_PARAM *params = OSSL_PARAM_BLD_to_param(bld);
+	int retval = EVP_PKEY_fromdata_init(ctx);
+	if ( retval > 0 ) retval = EVP_PKEY_fromdata( ctx, ppkey, selection, params );
+	OSSL_PARAM_free(params);
+	return retval;
+}
+#endif
+
+
 #define checkerr(arg)	checkret( (arg), __LINE__ )
 void checkret(const int ret, int line)
 {
 	if ( ret <= 0 ) croak( "libcrypto error (%s line %d)", __FILE__, line );
 }
-
-
-#ifndef OBSOLETE_API
-int EVP_PKEY_fromparams(EVP_PKEY_CTX *ctx, EVP_PKEY **ppkey, int selection, OSSL_PARAM_BLD *bld)
-{
-	OSSL_PARAM *params = OSSL_PARAM_BLD_to_param(bld);
-	int retval;
-	checkerr( EVP_PKEY_fromdata_init(ctx) );
-	retval = EVP_PKEY_fromdata( ctx, ppkey, selection, params );
-	OSSL_PARAM_free(params);
-	return retval;
-}
-#endif
 
 
 MODULE = Net::DNS::SEC	PACKAGE = Net::DNS::SEC::libcrypto
@@ -195,7 +197,11 @@ VERSION(void)
     PREINIT:
 	char *v = SvEND( newSVpv(XS_Id, 17) );
     CODE:
+#ifdef EOL
+	RETVAL = newSVpvf( "%s	%s	[UNSUPPORTED]", v-5, OPENSSL_VERSION_TEXT );
+#else
 	RETVAL = newSVpvf( "%s	%s", v-5, OPENSSL_VERSION_TEXT );
+#endif
     OUTPUT:
 	RETVAL
 
@@ -208,33 +214,31 @@ EVP_PKEY_new()
 SV*
 EVP_sign(SV *message, EVP_PKEY *pkey, const EVP_MD *md=NULL)
     INIT:
+#define msgbuf (unsigned char*) SvPVX(message)
+#define msglen SvCUR(message)
 	EVP_MD_CTX *ctx = EVP_MD_CTX_new();
-	unsigned char *m = (unsigned char*) SvPVX(message);
 	unsigned char sigbuf[512];		/* RFC3110(2) */
-	STRLEN mlen = SvCUR(message);
-	STRLEN slen = sizeof(sigbuf);
+	STRLEN buflen = sizeof(sigbuf);
 	int r;
     CODE:
 	checkerr( EVP_DigestSignInit( ctx, NULL, md, NULL, pkey ) );
-	r = EVP_DigestSign( ctx, sigbuf, &slen, m, mlen );
+	r = EVP_DigestSign( ctx, sigbuf, &buflen, msgbuf, msglen );
 	EVP_MD_CTX_free(ctx);
 	EVP_PKEY_free(pkey);
 	checkerr(r);
-	RETVAL = newSVpvn( (char*)sigbuf, slen );
+	RETVAL = newSVpvn( (char*)sigbuf, buflen );
     OUTPUT:
 	RETVAL
 
 int
 EVP_verify(SV *message, SV *signature, EVP_PKEY *pkey, const EVP_MD *md=NULL)
     INIT:
+#define sigbuf (unsigned char*) SvPVX(signature)
+#define siglen SvCUR(signature)
 	EVP_MD_CTX *ctx = EVP_MD_CTX_new();
-	unsigned char *m = (unsigned char*) SvPVX(message);
-	unsigned char *s = (unsigned char*) SvPVX(signature);
-	STRLEN mlen = SvCUR(message);
-	STRLEN slen = SvCUR(signature);
     CODE:
 	checkerr( EVP_DigestVerifyInit( ctx, NULL, md, NULL, pkey ) );
-	RETVAL = EVP_DigestVerify( ctx, s, slen, m, mlen );
+	RETVAL = EVP_DigestVerify( ctx, sigbuf, siglen, msgbuf, msglen );
 	EVP_MD_CTX_free(ctx);
 	EVP_PKEY_free(pkey);
     OUTPUT:
@@ -254,11 +258,8 @@ EVP_DigestInit(EVP_MD_CTX *ctx, const EVP_MD *type)
 
 void
 EVP_DigestUpdate(EVP_MD_CTX *ctx, SV *message)
-    INIT:
-	unsigned char *m = (unsigned char*) SvPVX(message);
-	STRLEN mlen = SvCUR(message);
     CODE:
-	checkerr( EVP_DigestUpdate( ctx, m, mlen ) );
+	checkerr( EVP_DigestUpdate( ctx, msgbuf, msglen ) );
 
 SV*
 EVP_DigestFinal(EVP_MD_CTX *ctx)
@@ -454,33 +455,38 @@ EVP_PKEY_new_ECDSA(int nid, SV *qx_SV, SV *qy_SV)
 
 EVP_PKEY*
 EVP_PKEY_new_raw_public_key(int nid, SV *key)
-    ALIAS:
-	EVP_PKEY_new_raw_private_key = 1
-    INIT:
-	unsigned char *rawkey = (unsigned char*) SvPVX(key);
-	STRLEN keylen = SvCUR(key);
-#ifndef OBSOLETE_API
+    CODE:
+#define rawkey (unsigned char*) SvPVX(key)
+#define keylen SvCUR(key)
+#ifdef OBSOLETE_API
+	RETVAL = EVP_PKEY_new_raw_public_key( nid, NULL, rawkey , keylen );
+#else
 	EVP_PKEY_CTX *ctx = NULL;
 	OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
-#endif
-    CODE:
-#ifdef OBSOLETE_API
-	if ( ix > 0 ) {
-		RETVAL = EVP_PKEY_new_raw_private_key( nid, NULL, rawkey , keylen );
-	} else {
-		RETVAL = EVP_PKEY_new_raw_public_key( nid, NULL, rawkey , keylen );
-	}
-#else
+	RETVAL = NULL;
 	if ( nid == 1087 ) ctx = EVP_PKEY_CTX_new_from_name( libctx, "ED25519", NULL );
 	if ( nid == 1088 ) ctx = EVP_PKEY_CTX_new_from_name( libctx, "ED448", NULL );
+	checkerr( OSSL_PARAM_BLD_push_octet_string( bld, OSSL_PKEY_PARAM_PUB_KEY, rawkey, keylen ) );
+	checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_PUBLIC_KEY, bld ) );
+	OSSL_PARAM_BLD_free(bld);
+	EVP_PKEY_CTX_free(ctx);
+#endif
+    OUTPUT:
+	RETVAL
+
+EVP_PKEY*
+EVP_PKEY_new_raw_private_key(int nid, SV *key)
+    CODE:
+#ifdef OBSOLETE_API
+	RETVAL = EVP_PKEY_new_raw_private_key( nid, NULL, rawkey , keylen );
+#else
+	EVP_PKEY_CTX *ctx = NULL;
+	OSSL_PARAM_BLD *bld = OSSL_PARAM_BLD_new();
 	RETVAL = NULL;
-	if ( ix > 0 ) {
-		checkerr( OSSL_PARAM_BLD_push_octet_string( bld, OSSL_PKEY_PARAM_PRIV_KEY, rawkey, keylen ) );
-		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_KEYPAIR, bld ) );
-	} else {
-		checkerr( OSSL_PARAM_BLD_push_octet_string( bld, OSSL_PKEY_PARAM_PUB_KEY, rawkey, keylen ) );
-		checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_PUBLIC_KEY, bld ) );
-	}
+	if ( nid == 1087 ) ctx = EVP_PKEY_CTX_new_from_name( libctx, "ED25519", NULL );
+	if ( nid == 1088 ) ctx = EVP_PKEY_CTX_new_from_name( libctx, "ED448", NULL );
+	checkerr( OSSL_PARAM_BLD_push_octet_string( bld, OSSL_PKEY_PARAM_PRIV_KEY, rawkey, keylen ) );
+	checkerr( EVP_PKEY_fromparams( ctx, &RETVAL, EVP_PKEY_KEYPAIR, bld ) );
 	OSSL_PARAM_BLD_free(bld);
 	EVP_PKEY_CTX_free(ctx);
 #endif

@@ -18,7 +18,7 @@ use constant extra_target_keys => qw(uri);
 extends 'App::Sqitch::Command';
 with 'App::Sqitch::Role::TargetConfigCommand';
 
-our $VERSION = 'v1.3.0'; # VERSION
+our $VERSION = 'v1.3.1'; # VERSION
 
 sub configure {
     # No config; target config is actually targets.

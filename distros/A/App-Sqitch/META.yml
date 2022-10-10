@@ -5,6 +5,7 @@ author:
 build_requires:
   Capture::Tiny: '0.12'
   Carp: '0'
+  DBD::Mem: '0'
   File::Find: '0'
   File::Spec: '0'
   File::Spec::Functions: '0'
@@ -149,7 +150,7 @@ resources:
   bugtracker: https://github.com/sqitchers/sqitch/issues/
   homepage: https://sqitch.org/
   repository: https://github.com/sqitchers/sqitch/
-version: v1.3.0
+version: v1.3.1
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

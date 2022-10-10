@@ -12,7 +12,7 @@ use Module::Pluggable
     sub_name    => 'translation_classes',
     require     => 1;
 
-our $VERSION = '2.61';
+our $VERSION = '2.62';
 
 =head1 NAME
 
@@ -75,14 +75,14 @@ sub _load_translation {
     if (!$cached) {
         foreach my $locale_module ($self->translation_classes) {
             my $load_locale = (split('::', $locale_module))[-1];
-            next if (exists $locale_cache{$load_locale});    # Got this one already.
-            next unless ($locale_module->can('translation'));    # Chocolate in our peanut butter.
+            next if (exists $locale_cache{$load_locale});                        # Got this one already.
+            next unless ($locale_module->can('translation'));                    # Chocolate in our peanut butter.
             $locale_cache{$load_locale} = $locale_module->translation();
-            $cached = 1 if ($load_locale eq $req_locale);        # Good news, everyone!
+            $cached = 1 if ($load_locale eq $req_locale);                        # Good news, everyone!
         }
     }
 
-    return ($cached) ? $locale_cache{$req_locale} : $locale_cache{en};    # English default.
+    return ($cached) ? $locale_cache{$req_locale} : $locale_cache{en};           # English default.
 }
 
 sub as_string {
@@ -100,7 +100,7 @@ Object constructor
 =cut
 
 sub new {    ## no critic (RequireArgUnpacking)
-    my $class = shift;
+    my $class      = shift;
     my %params_ref = ref($_[0]) ? %{$_[0]} : @_;
 
     my $interval = $params_ref{'interval'};

@@ -41,6 +41,7 @@ Weaver
 WeaverConfig
 Zilla
 autarch
+authordep
 drolsky
 ether
 ini

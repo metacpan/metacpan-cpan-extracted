@@ -1,5 +1,8 @@
 Revision history for Perl extension Devel::Timer.
 
+0.14  2022.10.08 MANWAR
+      - Merged PR #2, Add reset() method, thanks @ivanych.
+
 0.13  2019.10.31 MANWAR
       - Proposed fix for no_files_to_be_skipped from CPANTS.
 

@@ -16,7 +16,8 @@
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [
 		doap-deps:on "Type::Tiny 2.000000"^^doap-deps:CpanId;
 	], [ doap-deps:on "Data::Sah"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ];
-	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "Data::Sah::Coerce"^^doap-deps:CpanId ], [ doap-deps:on "DateTime"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
 	doap:bug-database    <https://github.com/tobyink/p5-type-fromsah/issues>;
 	doap:created         "2022-09-28"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -26,7 +27,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Type-FromSah";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-FromSah/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-FromSah/v_0-002>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-FromSah/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-FromSah/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-FromSah/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-FromSah/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-FromSah/v_0-005>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-type-fromsah>;
@@ -55,6 +56,57 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-FromSah-0.002.tar.gz>;
 	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-FromSah/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Type-FromSah-0.003"^^xsd:string;
+	dc:issued            "2022-09-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Further improvements to inlining.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Handle coercions properly.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Set a type_default for types where the Sah schema had a default.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Type objects returned by sah2type will how have a parent of either Item or Optional[Item].";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-FromSah-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-FromSah/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Type-FromSah-0.004"^^xsd:string;
+	dc:issued            "2022-09-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add missing testing dependency on Test::Requires.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-FromSah-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-FromSah/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Type-FromSah-0.005"^^xsd:string;
+	dc:issued            "2022-09-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Skip 05coercion.t test if DateTime.pm is not available.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-FromSah-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

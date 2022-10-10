@@ -83,6 +83,7 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin/Extract/ArchiveZip.pm"       => "\$(INST_LIB)/Alien/Build/Plugin/Extract/ArchiveZip.pm",
     "lib/Alien/Build/Plugin/Extract/CommandLine.pm"      => "\$(INST_LIB)/Alien/Build/Plugin/Extract/CommandLine.pm",
     "lib/Alien/Build/Plugin/Extract/Directory.pm"        => "\$(INST_LIB)/Alien/Build/Plugin/Extract/Directory.pm",
+    "lib/Alien/Build/Plugin/Extract/File.pm"             => "\$(INST_LIB)/Alien/Build/Plugin/Extract/File.pm",
     "lib/Alien/Build/Plugin/Extract/Negotiate.pm"        => "\$(INST_LIB)/Alien/Build/Plugin/Extract/Negotiate.pm",
     "lib/Alien/Build/Plugin/Fetch.pod"                   => "\$(INST_LIB)/Alien/Build/Plugin/Fetch.pod",
     "lib/Alien/Build/Plugin/Fetch/CurlCommand.pm"        => "\$(INST_LIB)/Alien/Build/Plugin/Fetch/CurlCommand.pm",
@@ -145,7 +146,7 @@ my %WriteMakefileArgs = (
     "Test2::API" => "1.302096",
     "Test2::V0"  => "0.000121"
   },
-  "VERSION" => "2.70",
+  "VERSION" => "2.71",
   "test"    => {
     "TESTS" => "t/*.t"
   }

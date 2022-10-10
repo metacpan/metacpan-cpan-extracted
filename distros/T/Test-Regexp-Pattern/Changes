@@ -1,3 +1,10 @@
+0.010   2022-07-24  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Tweak note for clarity.
+
+
 0.009   2021-07-21  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Show string from example as subtest name.

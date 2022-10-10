@@ -5,7 +5,7 @@ package Tcl::pTk::Text;
 
 use Text::Tabs;
 
-our ($VERSION) = ('1.09');
+our ($VERSION) = ('1.10');
 
 # borrowed from Tk/Text.pm without any modifications
 
@@ -562,7 +562,7 @@ sub Contents
   }
  else
   {
-   return $w->get('1.0','end');
+   return $w->get('1.0','end -1c');
   }
 }
 
@@ -1077,6 +1077,11 @@ sub _expandModeFlag {
   return $mode;
 }
 
+sub get {
+    my $self = shift;
+    # Note that empty string is returned (as done by Perl/Tk) rather than undef.
+    return $self->interp->invoke($self->path, 'get', @_);
+}
 
 1;
 

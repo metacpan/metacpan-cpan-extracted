@@ -1,4 +1,4 @@
-Chemistry/File/CML    version 0.11
+Chemistry/File/CML    version 0.12
 ==================================
 
 This module reads CML (Chemical Markup Language) files. 
@@ -6,8 +6,9 @@ This module reads CML (Chemical Markup Language) files.
 The CML module automatically registers the 'cml' format with Chemistry::Mol,
 so that molfiles may be identified and read by Chemistry::Mol::read_mol().
 
-CHANGES SINCE VERSION 0.10
-        - Specified dependency on XML::LibXML.
+CHANGES SINCE VERSION 0.11
+        - Adjusted to read a wider variety of CML files.
+        - Prepared to read in some stereochemistry settings.
 
 INSTALLATION
 

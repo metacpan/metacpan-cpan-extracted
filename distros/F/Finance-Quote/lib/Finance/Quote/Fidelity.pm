@@ -40,7 +40,7 @@ use HTTP::Request::Common;
 use constant DEBUG => $ENV{DEBUG};
 use if DEBUG, 'Smart::Comments';
 
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.53'; # VERSION
 
 $FIDELITY_URL = ("https://fundresearch.fidelity.com/mutual-funds/fidelity-funds-daily-pricing-yields/download");
 

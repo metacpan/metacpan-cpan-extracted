@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.35; # role :compat(invokable)
 
-package Device::Chip::ProtocolBase::SPI 0.23;
+package Device::Chip::ProtocolBase::SPI 0.24;
 role Device::Chip::ProtocolBase::SPI :compat(invokable);
 
 =head1 NAME

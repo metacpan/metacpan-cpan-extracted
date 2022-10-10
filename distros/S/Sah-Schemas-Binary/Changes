@@ -1,3 +1,8 @@
+0.006   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] [schema hexbuf] Allow & remove whitespaces.
+
+
 0.005   2020-03-08  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

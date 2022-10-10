@@ -1,0 +1,69 @@
+# NAME
+
+DBIx::Class::ResultClass::TrackColumns - track changed columns
+
+# SYNOPSIS
+
+    package Example::Schema::Result;
+
+    use strict;
+    use warnings;
+
+    use base 'DBIx::Class';
+
+    __PACKAGE__->load_components(qw/
+      ResultClass::TrackColumns
+      Core
+    /);
+
+    package Example::Schema::Result::Todo;
+
+    use warnings;
+    use strict;
+
+    use base 'Example::Schema::Result';
+
+    __PACKAGE__->table("todo");
+    __PACKAGE__->add_columns(
+      id => { data_type => 'bigint', is_nullable => 0, is_auto_increment => 1 },  
+      title => { data_type => 'varchar', is_nullable => 0, size => 60 },
+      status => { data_type => 'varchar', is_nullable => 0, default=>'active', size => 60, track_storage => 1},
+    );
+
+Now the column 'status' is tracked such that if you change it we preserve the original
+loaded from storage value until you persist the row.
+
+# DESCRIPTION
+
+Allows you to preserve the original value of a column as it was loaded from storage
+if you change it (via ->set\_column, for example) but haven't saved the change to storage
+yet.  I wrote this because for the [Valiant](https://metacpan.org/pod/Valiant) DBIC glue ([DBIx::Class::Valiant](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AValiant)) you
+sometimes want the original storage value for doing certain types of constraints (for
+example you might have a status field which accepts an enum but there's rules about
+which states you can set based on the existing state).
+
+# METHODS
+
+This component defines the following public methods
+
+## get\_column\_storage
+
+    my $old = $row->get_column_storage($column);
+
+If a column has been changed since you loaded it from storage but has not yet been persisted you
+can get the original value using this method, if the column is marked as 'tracked'.
+
+# SEE ALSO
+
+[DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass)
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2022, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

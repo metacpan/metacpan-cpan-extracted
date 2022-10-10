@@ -12,7 +12,6 @@ lib/Devel/Timer.pm
 t/00-load.t
 t/my-timer.t
 t/test.t
-timer.log
 xt/author/pod-syntax.t
 xt/critic.t
 xt/pod.t

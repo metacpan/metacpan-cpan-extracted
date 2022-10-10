@@ -12,9 +12,9 @@ use Data::Sah qw(gen_validator);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-20'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 our @EXPORT_OK = qw(run_spectest_for_perl);
 
@@ -141,7 +141,7 @@ Test::Data::Sah::Perl - Routines for testing Data::Sah (perl compiler)
 
 =head1 VERSION
 
-This document describes version 0.912 of Test::Data::Sah::Perl (from Perl distribution Data-Sah), released on 2022-08-20.
+This document describes version 0.913 of Test::Data::Sah::Perl (from Perl distribution Data-Sah), released on 2022-09-30.
 
 =head1 FUNCTIONS
 

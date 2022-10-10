@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Find 0.48;
+package Devel::MAT::Tool::Find 0.49;
 
 use v5.14;
 use warnings;
@@ -530,7 +530,7 @@ sub build
    return sub {
       my ( $pad ) = @_;
       return unless $pad->type eq "PAD";
-      return unless my $sv = $pad->lexvar( $name );
+      return unless my $sv = $pad->maybe_lexvar( $name );
 
       my $cv = $pad->padcv;
 

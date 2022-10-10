@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 20-digest.t 1830 2021-01-26 09:08:12Z willem $	-*-perl-*-
+# $Id: 20-digest.t 1863 2022-03-14 14:59:21Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -42,38 +42,33 @@ use_ok('Net::DNS::SEC::Digest');
 
 sub test {
 	my ( $mnemonic, $class, @parameter ) = @_;
-	my $object = $class->new(@parameter);
 	my ( $head, $tail ) = unpack 'a20 a*', $text;
-	$object->add($text);
-	is( unpack( 'H*', $object->digest ), $digest{$mnemonic}, "message digest $mnemonic" );
-	$object->add($head);
-	$object->add($tail);
-	is( unpack( 'H*', $object->digest ), $digest{$mnemonic}, "concatenated digest $mnemonic" );
+SKIP: {
+		my $object = eval { $class->new(@parameter) };
+		skip( "digest algorithm $mnemonic not supported", 2 ) unless $object;
+		$object->add($text);
+		is( unpack( 'H*', $object->digest ), $digest{$mnemonic}, "digest algorithm $mnemonic" );
+		$object->add($head);
+		$object->add($tail);
+		is( unpack( 'H*', $object->digest ), $digest{$mnemonic}, "digest algorithm $mnemonic (concatenated)" );
+	}
 	return;
 }
 
 
-SKIP: {
-	skip( 'MD5 digest algorithm not supported', 1 )
-			unless eval { Net::DNS::SEC::libcrypto->can('EVP_md5') };
-	test( 'MD5', 'Net::DNS::SEC::Digest::MD5' );
-}
+test( 'MD5', 'Net::DNS::SEC::Digest::MD5' );
 
 test( 'SHA1',	'Net::DNS::SEC::Digest::SHA', 1 );
+
 test( 'SHA224', 'Net::DNS::SEC::Digest::SHA', 224 );
 test( 'SHA256', 'Net::DNS::SEC::Digest::SHA', 256 );
 test( 'SHA384', 'Net::DNS::SEC::Digest::SHA', 384 );
 test( 'SHA512', 'Net::DNS::SEC::Digest::SHA', 512 );
 
-SKIP: {
-	skip( 'SHA3 digest algorithm not supported', 8 )
-			unless eval { Net::DNS::SEC::libcrypto->can('EVP_sha3_256') };
-	test( 'SHA3_224', 'Net::DNS::SEC::Digest::SHA3', 224 );
-	test( 'SHA3_256', 'Net::DNS::SEC::Digest::SHA3', 256 );
-	test( 'SHA3_384', 'Net::DNS::SEC::Digest::SHA3', 384 );
-	test( 'SHA3_512', 'Net::DNS::SEC::Digest::SHA3', 512 );
-}
-
+test( 'SHA3_224', 'Net::DNS::SEC::Digest::SHA3', 224 );
+test( 'SHA3_256', 'Net::DNS::SEC::Digest::SHA3', 256 );
+test( 'SHA3_384', 'Net::DNS::SEC::Digest::SHA3', 384 );
+test( 'SHA3_512', 'Net::DNS::SEC::Digest::SHA3', 512 );
 
 exit;
 

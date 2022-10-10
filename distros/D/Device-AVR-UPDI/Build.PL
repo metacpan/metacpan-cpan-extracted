@@ -21,8 +21,8 @@ my $build = Module::Build->new(
       'perl' => '5.020',
    },
    test_requires => {
-      'Test::ExpectAndCheck' => 0,
-      'Test::Future::IO' => '0.02', # ->expect_sys*_anyfh
+      'Test::ExpectAndCheck' => '0.04',
+      'Test::Future::IO' => '0.04', # ->expect_sys*_anyfh
       'Test::More' => '0.88', # done_testing
    },
    share_dir => {

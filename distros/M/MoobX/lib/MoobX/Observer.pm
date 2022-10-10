@@ -1,7 +1,7 @@
 package MoobX::Observer;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: a MoobX object reacting to observable variable changes
-$MoobX::Observer::VERSION = '0.1.0';
+$MoobX::Observer::VERSION = '0.1.2';
 
 use 5.20.0;
 
@@ -78,7 +78,7 @@ MoobX::Observer - a MoobX object reacting to observable variable changes
 
 =head1 VERSION
 
-version 0.1.0
+version 0.1.2
 
 =head1 SYNOPSIS
 
@@ -138,7 +138,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2022, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

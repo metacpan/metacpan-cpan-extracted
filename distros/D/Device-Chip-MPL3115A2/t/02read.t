@@ -19,7 +19,7 @@ await $chip->mount(
 # check_id
 {
    $adapter->expect_write_then_read( "\x0C", 1 )
-      ->returns( "\xC4" );
+      ->will_done( "\xC4" );
 
    ok( await $chip->check_id, '$chip->check_id' );
 
@@ -29,7 +29,7 @@ await $chip->mount(
 # read_pressure
 {
    $adapter->expect_write_then_read( "\x01", 3 )
-      ->returns( "\x62\xF3\x40" );
+      ->will_done( "\x62\xF3\x40" );
 
    is( await $chip->read_pressure, 101325,
       '$chip->read_pressure yields pressure in Pascals' );
@@ -41,7 +41,7 @@ await $chip->mount(
 {
    # On a real chip you'd have to set ALT mode first, but we don't care for this test
    $adapter->expect_write_then_read( "\x01", 3 )
-      ->returns( "\x00\x14\x00" );
+      ->will_done( "\x00\x14\x00" );
 
    is( await $chip->read_altitude, 20,
       '$chip->read_altitude yields altitude in metres' );
@@ -52,7 +52,7 @@ await $chip->mount(
 # read_temperature
 {
    $adapter->expect_write_then_read( "\x04", 2 )
-      ->returns( "\x16\x80" );
+      ->will_done( "\x16\x80" );
 
    is( await $chip->read_temperature, 22.5,
       '$chip->read_temperature yields temperature in C' );

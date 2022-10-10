@@ -1,3 +1,6 @@
+0.03 2022-10-04T20:30:39+02:00
+ - Add -d option for drop tables.
+
 0.02 2022-08-28T08:50:56+02:00
  - Fix minimal dependency of Test::Warn (0.31).
  - Fix test of run on Windows.

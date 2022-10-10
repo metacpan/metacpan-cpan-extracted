@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.49';
+$VERSION = '0.50';
 $VERSION = $VERSION;
 
 # internal use
@@ -5299,6 +5299,8 @@ mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
         tr/ DAMEMOJI 功声乗ソ / DAMEMOJI 功声乗ソ /
          y/ DAMEMOJI 功声乗ソ / DAMEMOJI 功声乗ソ /
         qr/ DAMEMOJI 功声乗ソ /
+        qw/ DAMEMOJI 功声乗ソ /
+        qx/ DAMEMOJI 功声乗ソ /
 
   MBCS subroutines:
     mb::chop(...);
@@ -5415,7 +5417,7 @@ This software has the following features
 
 =back
 
-=head1 Larry Wall san's Style
+=head1 Larry Wall-san's Style
 
 If you're using the utf8 pragma and you have a big headache, probably, you're on the wrong way.
 You should back to the Larry Street where is a sign that says ver.5.00503, once.
@@ -5431,7 +5433,7 @@ Once, Larry Wall san said like this;
 
 "Easy jobs must be easy."
 
-Welcome to world of Larry Wall san's Style!!
+Welcome to world of Larry Wall-san's Style!!
 
 =head1 TERMINOLOGY
 
@@ -5493,167 +5495,268 @@ The necessary terms are listed below. Maybe world wide web will help you.
 
 The encodings supported by this software and their range of octets are as follows.
 
-  ------------------------------------------------------------------------------
-  big5 (Big5)
-             1st       2nd
-             81..FE    00..FF
-             00..7F
-             https://en.wikipedia.org/wiki/Big5
-             * needs multibyte anchoring
-             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
-             * needs escaping meta char of 2nd octet
-             * and DAMEMOJI samples, here
-               [@](40) 　(A140) ＼(A240) ｗ(A340) 一(A440) 世(A540) 共(A640) 作(A740) 杓(A840) 咖(A940) 昇(AA40) 陂(AB40) 拯(AC40) 耐(AD40) 哦(AE40) 浬(AF40) 虔(B040) 娼(B140) 毫(B240) 莆(B340) 婷(B440) 溉(B540) 詔(B640) 媳(B740) 睹(B840) 辟(B940) 愿(BA40) 罰(BB40) 劇(BC40) 瑾(BD40) 輥(BE40) 濃(BF40) 錐(C040) 瞧(C140) 駿(C240) 鞭(C340) 願(C440) 護(C540) 讖(C640) す(C740) 乂(C940) 汌(CA40) 杙(CB40) 坨(CC40) 泒(CD40) 哃(CE40) 柜(CF40) 穾(D040) 唊(D140) 毨(D240) 笄(D340) 酎(D440) 崰(D540) 淐(D640) 耞(D740) 釫(D840) 惲(D940) 湨(DA40) 罦(DB40) 軹(DC40) 媷(DD40) 毹(DE40) 稛(DF40) 觡(E040) 凘(E140) 榠(E240) 禗(E340) 裰(E440) 噚(E540) 澍(E640) 膞(E740) 踔(E840) 噳(E940) 澢(EA40) 蕀(EB40) 錋(EC40) 檕(ED40) 蕷(EE40) 鞞(EF40) 璸(F040) 蹛(F140) 徿(F240) 譑(F340) 嚵(F440) 鏼(F540) 蠩(F640) 糴(F740) 讌(F840) 纘(F940) 
-               [[](5B) ︴(A15B) 兞(A25B) Ω(A35B) 久(A45B) 加(A55B) 吆(A65B) 吝(A75B) 沍(A85B) 坤(A95B) 歧(AA5B) 俎(AB5B) 架(AC5B) 茉(AD5B) 娌(AE5B) 琉(AF5B) 豺(B05B) 崙(B15B) 涵(B25B) 訥(B35B) 廂(B45B) 琥(B55B) 跋(B65B) 愴(B75B) 稟(B85B) 鉀(B95B) 暨(BA5B) 蒜(BB5B) 墩(BC5B) 稼(BD5B) 閭(BE5B) 璟(BF5B) 頤(C05B) 繆(C15B) 攆(C25B) 鵠(C35B) 壤(C45B) 騾(C55B) 觀(C65B) ぴ(C75B) 夬(C95B) 伻(CA5B) 汥(CB5B) 岮(CC5B) 牪(CD5B) 垙(CE5B) 枮(CF5B) 胂(D05B) 娙(D15B) 浟(D25B) 罜(D35B) 倕(D45B) 惙(D55B) 焎(D65B) 莨(D75B) 偨(D85B) 揳(D95B) 烻(DA5B) 艵(DB5B) 鄅(DC5B) 幍(DD5B) 滃(DE5B) 絿(DF5B) 賌(E05B) 墁(E15B) 榞(E25B) 箙(E35B) 跽(E45B) 嬂(E55B) 潩(E65B) 蔈(E75B) 醅(E85B) 嬠(E95B) 獩(EA5B) 螛(EB5B) 頲(EC5B) 濨(ED5B) 蟅(EE5B) 駷(EF5B) 礐(F05B) 鎎(F15B) 氌(F25B) 辴(F35B) 瀼(F45B) 騴(F55B) 酄(F65B) 譿(F75B) 鱍(F85B) 鱮(F95B) 
-               [\](5C) ﹏(A15C) 兝(A25C) α(A35C) 么(A45C) 功(A55C) 吒(A65C) 吭(A75C) 沔(A85C) 坼(A95C) 歿(AA5C) 俞(AB5C) 枯(AC5C) 苒(AD5C) 娉(AE5C) 珮(AF5C) 豹(B05C) 崤(B15C) 淚(B25C) 許(B35C) 廄(B45C) 琵(B55C) 跚(B65C) 愧(B75C) 稞(B85C) 鈾(B95C) 暝(BA5C) 蓋(BB5C) 墦(BC5C) 穀(BD5C) 閱(BE5C) 璞(BF5C) 餐(C05C) 縷(C15C) 擺(C25C) 黠(C35C) 孀(C45C) 髏(C55C) 躡(C65C) ふ(C75C) 尐(C95C) 佢(CA5C) 汻(CB5C) 岤(CC5C) 狖(CD5C) 垥(CE5C) 柦(CF5C) 胐(D05C) 娖(D15C) 涂(D25C) 罡(D35C) 偅(D45C) 惝(D55C) 牾(D65C) 莍(D75C) 傜(D85C) 揊(D95C) 焮(DA5C) 茻(DB5C) 鄃(DC5C) 幋(DD5C) 滜(DE5C) 綅(DF5C) 赨(E05C) 塿(E15C) 槙(E25C) 箤(E35C) 踊(E45C) 嫹(E55C) 潿(E65C) 蔌(E75C) 醆(E85C) 嬞(E95C) 獦(EA5C) 螏(EB5C) 餤(EC5C) 燡(ED5C) 螰(EE5C) 駹(EF5C) 礒(F05C) 鎪(F15C) 瀙(F25C) 酀(F35C) 瀵(F45C) 騱(F55C) 酅(F65C) 贕(F75C) 鱋(F85C) 鱭(F95C) 
-               []](5D) （(A15D) 兡(A25D) β(A35D) 也(A45D) 包(A55D) 因(A65D) 吞(A75D) 沘(A85D) 夜(A95D) 氓(AA5D) 侷(AB5D) 柵(AC5D) 苗(AD5D) 孫(AE5D) 珠(AF5D) 財(B05D) 崧(B15D) 淫(B25D) 設(B35D) 弼(B45D) 琶(B55D) 跑(B65D) 愍(B75D) 窟(B85D) 鉛(B95D) 榜(BA5D) 蒸(BB5D) 奭(BC5D) 稽(BD5D) 霄(BE5D) 瓢(BF5D) 館(C05D) 縲(C15D) 擻(C25D) 鼕(C35D) 孃(C45D) 魔(C55D) 釁(C65D) ぶ(C75D) 巿(C95D) 佉(CA5D) 沎(CB5D) 岠(CC5D) 狋(CD5D) 垚(CE5D) 柛(CF5D) 胅(D05D) 娭(D15D) 涘(D25D) 罞(D35D) 偟(D45D) 惈(D55D) 牻(D65D) 荺(D75D) 傒(D85D) 揠(D95D) 焱(DA5D) 菏(DB5D) 酡(DC5D) 廅(DD5D) 滘(DE5D) 絺(DF5D) 赩(E05D) 塴(E15D) 榗(E25D) 箂(E35D) 踃(E45D) 嬁(E55D) 澕(E65D) 蓴(E75D) 醊(E85D) 寯(E95D) 獧(EA5D) 螗(EB5D) 餟(EC5D) 燱(ED5D) 螬(EE5D) 駸(EF5D) 礑(F05D) 鎞(F15D) 瀧(F25D) 鄿(F35D) 瀯(F45D) 騬(F55D) 醹(F65D) 躕(F75D) 鱕(F85D) 鸋(F95D) 
-               [^](5E) ）(A15E) 兣(A25E) γ(A35E) 乞(A45E) 匆(A55E) 回(A65E) 吾(A75E) 沂(A85E) 奉(A95E) 氛(AA5E) 兗(AB5E) 柩(AC5E) 英(AD5E) 屘(AE5E) 珪(AF5E) 貢(B05E) 崗(B15E) 淘(B25E) 訟(B35E) 彭(B45E) 琴(B55E) 跌(B65E) 愆(B75E) 窠(B85E) 鉋(B95E) 榨(BA5E) 蓀(BB5E) 嬉(BC5E) 稷(BD5E) 霆(BE5E) 甌(BF5E) 餞(C05E) 繃(C15E) 擷(C25E) 鼬(C35E) 孽(C45E) 魑(C55E) 鑲(C65E) ぷ(C75E) 旡(C95E) 体(CA5E) 灴(CB5E) 岵(CC5E) 狘(CD5E) 垕(CE5E) 柺(CF5E) 胣(D05E) 娮(D15E) 洯(D25E) 罠(D35E) 偩(D45E) 悱(D55E) 牼(D65E) 荳(D75E) 傂(D85E) 揶(D95E) 焣(DA5E) 菹(DB5E) 酤(DC5E) 廌(DD5E) 溙(DE5E) 綎(DF5E) 趑(E05E) 墋(E15E) 榐(E25E) 粻(E35E) 踇(E45E) 嬇(E55E) 潣(E65E) 蔪(E75E) 醁(E85E) 嶬(E95E) 獬(EA5E) 螓(EB5E) 餧(EC5E) 燨(ED5E) 螹(EE5E) 駶(EF5E) 禭(F05E) 鎦(F15E) 瀠(F25E) 醰(F35E) 瀷(F45E) 騪(F55E) 鐿(F65E) 躔(F75E) 鱙(F85E) 鸍(F95E) 
-               [`](60) ︶(A160) 瓩(A260) ε(A360) 亡(A460) 匝(A560) 圳(A660) 呎(A760) 灼(A860) 奈(A960) 注(AA60) 冑(AB60) 柄(AC60) 苜(AD60) 害(AE60) 畔(AF60) 躬(B060) 常(B160) 深(B260) 訢(B360) 循(B460) 琛(B560) 跆(B660) 戡(B760) 節(B860) 鉑(B960) 槁(BA60) 蒐(BB60) 嬋(BC60) 窯(BD60) 霉(BE60) 瘴(BF60) 餡(C060) 總(C160) 曜(C260) 嚥(C360) 巉(C460) 鰥(C560) 顱(C660) べ(C760) 毌(C960) 伾(CA60) 牣(CB60) 岨(CC60) 狜(CD60) 复(CE60) 柊(CF60) 胜(D060) 娏(D160) 涋(D260) 罛(D360) 偣(D460) 悷(D560) 猝(D660) 荴(D760) 兟(D860) 揲(D960) 焢(DA60) 菀(DB60) 酢(DC60) 廋(DD60) 溎(DE60) 綃(DF60) 趎(E060) 墇(E160) 榵(E260) 粼(E360) 踅(E460) 嬏(E560) 潪(E660) 蔕(E760) 醄(E860) 嶩(E960) 獫(EA60) 螈(EB60) 馞(EC60) 燤(ED60) 螼(EE60) 駽(EF60) 穟(F060) 鎈(F160) 瀫(F260) 鏞(F360) 瀱(F460) 騩(F560) 鐶(F660) 躒(F760) 鱎(F860) 鸏(F960) 
-               [{](7B) ﹃(A17B) ┐(A27B) ㄌ(A37B) 廾(A47B) 叻(A57B) 州(A67B) 坊(A77B) 肚(A87B) 宛(A97B) 泯(AA7B) 哂(AB7B) 洌(AC7B) 迦(AD7B) 徒(AE7B) 砸(AF7B) 閃(B07B) 惋(B17B) 現(B27B) 逢(B37B) 揩(B47B) 程(B57B) 閔(B67B) 暍(B77B) 腥(B87B) 頒(B97B) 漬(BA7B) 認(BB7B) 慮(BC7B) 緹(BD7B) 魷(BE7B) 篦(BF7B) 嚀(C07B) 臨(C17B) 璿(C27B) 爍(C37B) 糰(C47B) 瓤(C57B) 鬱(C67B) ァ(C77B) 忉(C97B) 吙(CA7B) 芅(CB7B) 怦(CC7B) 矼(CD7B) 峌(CE7B) 洑(CF7B) 苻(D07B) 彧(D17B) 烎(D27B) 荁(D37B) 唵(D47B) 捼(D57B) 畣(D67B) 虙(D77B) 喎(D87B) 斞(D97B) 琬(DA7B) 萑(DB7B) 閐(DC7B) 搒(DD7B) 煰(DE7B) 腞(DF7B) 輂(E07B) 嫨(E17B) 漻(E27B) 翢(E37B) 銠(E47B) 憱(E57B) 獛(E67B) 蔋(E77B) 鋞(E87B) 懆(E97B) 瞢(EA7B) 褬(EB7B) 鮒(EC7B) 瞫(ED7B) 覮(EE7B) 鴯(EF7B) 翸(F07B) 鞨(F17B) 矄(F27B) 霫(F37B) 礧(F47B) 鶒(F57B) 驄(F67B) 驌(F77B) 鼷(F87B) 鸔(F97B) 
-               [|](7C) ﹄(A17C) └(A27C) ㄍ(A37C) 弋(A47C) 四(A57C) 帆(A67C) 坑(A77C) 育(A87C) 尚(A97C) 泜(AA7C) 咽(AB7C) 洱(AC7C) 迢(AD7C) 徑(AE7C) 砝(AF7C) 院(B07C) 悴(B17C) 琍(B27C) 逖(B37C) 揉(B47C) 稅(B57C) 閏(B67C) 會(B77C) 腮(B87C) 頌(B97C) 漏(BA7C) 誡(BB7C) 慝(BC7C) 罵(BD7C) 魯(BE7C) 糕(BF7C) 嚐(C07C) 舉(C17C) 甕(C27C) 牘(C37C) 辮(C47C) 疊(C57C) 鸛(C67C) ア(C77C) 戉(C97C) 吜(CA7C) 芎(CB7C) 怙(CC7C) 矹(CD7C) 峗(CE7C) 洀(CF7C) 苶(D07C) 恝(D17C) 烡(D27C) 茦(D37C) 唰(D47C) 掤(D57C) 痎(D67C) 虖(D77C) 圌(D87C) 斮(D97C) 琰(DA7C) 萆(DB7C) 隇(DC7C) 搉(DD7C) 煟(DE7C) 腶(DF7C) 輋(E07C) 嫟(E17C) 漒(E27C) 翣(E37C) 銔(E47C) 憰(E57C) 獡(E67C) 蔙(E77C) 鋧(E87C) 懁(E97C) 瞣(EA7C) 褟(EB7C) 鮐(EC7C) 瞲(ED7C) 觲(EE7C) 鴱(EF7C) 聵(F07C) 鞫(F17C) 矱(F27C) 霬(F37C) 礨(F47C) 鶘(F57C) 驂(F67C) 驏(F77C) 鼶(F87C) 鸓(F97C) 
-               [}](7D) ﹙(A17D) ┘(A27D) ㄎ(A37D) 弓(A47D) 囚(A57D) 并(A67D) 址(A77D) 良(A87D) 屈(A97D) 泖(AA7D) 咪(AB7D) 洞(AC7D) 迪(AD7D) 徐(AE7D) 破(AF7D) 陣(B07D) 惦(B17D) 瓠(B27D) 逛(B37D) 揆(B47D) 稀(B57D) 開(B67D) 榔(B77D) 腳(B87D) 飼(B97D) 漂(BA7D) 誓(BB7D) 慕(BC7D) 罷(BD7D) 鴆(BE7D) 糖(BF7D) 嚅(C07D) 艱(C17D) 癖(C27D) 犢(C37D) 繽(C47D) 癮(C57D) 鸞(C67D) ィ(C77D) 扐(C97D) 吥(CA7D) 芑(CB7D) 怲(CC7D) 矻(CD7D) 峋(CE7D) 洝(CF7D) 苰(D07D) 恚(D17D) 牂(D27D) 茜(D37D) 啒(D47D) 挻(D57D) 痒(D67D) 蚿(D77D) 堩(D87D) 旐(D97D) 琫(DA7D) 菂(DB7D) 陾(DC7D) 搠(DD7D) 煐(DE7D) 腧(DF7D) 遒(E07D) 孷(E17D) 滭(E27D) 翥(E37D) 銪(E47D) 憢(E57D) 獚(E67D) 蔯(E77D) 鋑(E87D) 懌(E97D) 瞕(EA7D) 觱(EB7D) 魺(EC7D) 瞷(ED7D) 觳(EE7D) 鴸(EF7D) 臑(F07D) 鞤(F17D) 礝(F27D) 霨(F37D) 礤(F47D) 鶐(F57D) 驁(F67D) 驈(F77D) 齃(F87D) 黶(F97D) 
-  ------------------------------------------------------------------------------
-  big5hkscs (Big5-HKSCS)
-             1st       2nd
-             81..FE    00..FF
-             00..7F
-             https://en.wikipedia.org/wiki/Hong_Kong_Supplementary_Character_Set
-             * needs multibyte anchoring
-             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
-             * needs escaping meta char of 2nd octet
-             * and DAMEMOJI samples, here
-               [@](40) 倻(8C40) 蕋(8F40) 趩(9040) 媁(9340) 銉(9440) 桇(9640) 愌(9740) 䄉(9940) 鋣(9A40) 嵛(9C40) 籖(9F40) 　(A140) ＼(A240) ｗ(A340) 一(A440) 世(A540) 共(A640) 作(A740) 杓(A840) 咖(A940) 昇(AA40) 陂(AB40) 拯(AC40) 耐(AD40) 哦(AE40) 浬(AF40) 虔(B040) 娼(B140) 毫(B240) 莆(B340) 婷(B440) 溉(B540) 詔(B640) 媳(B740) 睹(B840) 辟(B940) 愿(BA40) 罰(BB40) 劇(BC40) 瑾(BD40) 輥(BE40) 濃(BF40) 錐(C040) 瞧(C140) 駿(C240) 鞭(C340) 願(C440) 護(C540) 讖(C640) す(C740) Л(C840) 乂(C940) 汌(CA40) 杙(CB40) 坨(CC40) 泒(CD40) 哃(CE40) 柜(CF40) 穾(D040) 唊(D140) 毨(D240) 笄(D340) 酎(D440) 崰(D540) 淐(D640) 耞(D740) 釫(D840) 惲(D940) 湨(DA40) 罦(DB40) 軹(DC40) 媷(DD40) 毹(DE40) 稛(DF40) 觡(E040) 凘(E140) 榠(E240) 禗(E340) 裰(E440) 噚(E540) 澍(E640) 膞(E740) 踔(E840) 噳(E940) 澢(EA40) 蕀(EB40) 錋(EC40) 檕(ED40) 蕷(EE40) 鞞(EF40) 璸(F040) 蹛(F140) 徿(F240) 譑(F340) 嚵(F440) 鏼(F540) 蠩(F640) 糴(F740) 讌(F840) 纘(F940) 廹(FC40) 鑂(FE40) 
-               [[](5B) É (885B) 团(895B) 撍(8A5B) 腭(8B5B) 冮(8C5B) 橗(8F5B) 迹(905B) 髠(915B) 㛓(935B) 釥(965B) 鋥(975B) 婮(985B) 䊔(995B) 靀(9A5B) 挵(9F5B) 惽(A05B) ︴(A15B) 兞(A25B) Ω(A35B) 久(A45B) 加(A55B) 吆(A65B) 吝(A75B) 沍(A85B) 坤(A95B) 歧(AA5B) 俎(AB5B) 架(AC5B) 茉(AD5B) 娌(AE5B) 琉(AF5B) 豺(B05B) 崙(B15B) 涵(B25B) 訥(B35B) 廂(B45B) 琥(B55B) 跋(B65B) 愴(B75B) 稟(B85B) 鉀(B95B) 暨(BA5B) 蒜(BB5B) 墩(BC5B) 稼(BD5B) 閭(BE5B) 璟(BF5B) 頤(C05B) 繆(C15B) 攆(C25B) 鵠(C35B) 壤(C45B) 騾(C55B) 觀(C65B) ぴ(C75B) ё(C85B) 夬(C95B) 伻(CA5B) 汥(CB5B) 岮(CC5B) 牪(CD5B) 垙(CE5B) 枮(CF5B) 胂(D05B) 娙(D15B) 浟(D25B) 罜(D35B) 倕(D45B) 惙(D55B) 焎(D65B) 莨(D75B) 偨(D85B) 揳(D95B) 烻(DA5B) 艵(DB5B) 鄅(DC5B) 幍(DD5B) 滃(DE5B) 絿(DF5B) 賌(E05B) 墁(E15B) 榞(E25B) 箙(E35B) 跽(E45B) 嬂(E55B) 潩(E65B) 蔈(E75B) 醅(E85B) 嬠(E95B) 獩(EA5B) 螛(EB5B) 頲(EC5B) 濨(ED5B) 蟅(EE5B) 駷(EF5B) 礐(F05B) 鎎(F15B) 氌(F25B) 辴(F35B) 瀼(F45B) 騴(F55B) 酄(F65B) 譿(F75B) 鱍(F85B) 鱮(F95B) 囯(FB5B) 玪(FE5B) 
-               [\](5C) Ě (885C) 声(895C) 蹾(8A5C) 胬(8B5C) 笋(8E5C) 蕚(8F5C) 髢(915C) 脪(935C) 䓀(965C) 珢(975C) 娫(985C) 糭(995C) 䨵(9A5C) 鞸(9B5C) 㘘(9C5C) 疱(9E5C) 髿(9F5C) 癧(A05C) ﹏(A15C) 兝(A25C) α(A35C) 么(A45C) 功(A55C) 吒(A65C) 吭(A75C) 沔(A85C) 坼(A95C) 歿(AA5C) 俞(AB5C) 枯(AC5C) 苒(AD5C) 娉(AE5C) 珮(AF5C) 豹(B05C) 崤(B15C) 淚(B25C) 許(B35C) 廄(B45C) 琵(B55C) 跚(B65C) 愧(B75C) 稞(B85C) 鈾(B95C) 暝(BA5C) 蓋(BB5C) 墦(BC5C) 穀(BD5C) 閱(BE5C) 璞(BF5C) 餐(C05C) 縷(C15C) 擺(C25C) 黠(C35C) 孀(C45C) 髏(C55C) 躡(C65C) ふ(C75C) ж(C85C) 尐(C95C) 佢(CA5C) 汻(CB5C) 岤(CC5C) 狖(CD5C) 垥(CE5C) 柦(CF5C) 胐(D05C) 娖(D15C) 涂(D25C) 罡(D35C) 偅(D45C) 惝(D55C) 牾(D65C) 莍(D75C) 傜(D85C) 揊(D95C) 焮(DA5C) 茻(DB5C) 鄃(DC5C) 幋(DD5C) 滜(DE5C) 綅(DF5C) 赨(E05C) 塿(E15C) 槙(E25C) 箤(E35C) 踊(E45C) 嫹(E55C) 潿(E65C) 蔌(E75C) 醆(E85C) 嬞(E95C) 獦(EA5C) 螏(EB5C) 餤(EC5C) 燡(ED5C) 螰(EE5C) 駹(EF5C) 礒(F05C) 鎪(F15C) 瀙(F25C) 酀(F35C) 瀵(F45C) 騱(F55C) 酅(F65C) 贕(F75C) 鱋(F85C) 鱭(F95C) 园(FB5C) 檝(FD5C) 
-               []](5D) È (885D) 处(895D) 尜(8B5D) 䀉(8C5D) 筕(8E5D) 㒖(8F5D) 哋(925D) 瑺(945D) 騟(955D) (965D) 㻩(975D) 输(995D) 鞲(9A5D) 襷(9C5D) 㷷(9D5D) 肶(9E5D) 篏(9F5D) 髗(A05D) （(A15D) 兡(A25D) β(A35D) 也(A45D) 包(A55D) 因(A65D) 吞(A75D) 沘(A85D) 夜(A95D) 氓(AA5D) 侷(AB5D) 柵(AC5D) 苗(AD5D) 孫(AE5D) 珠(AF5D) 財(B05D) 崧(B15D) 淫(B25D) 設(B35D) 弼(B45D) 琶(B55D) 跑(B65D) 愍(B75D) 窟(B85D) 鉛(B95D) 榜(BA5D) 蒸(BB5D) 奭(BC5D) 稽(BD5D) 霄(BE5D) 瓢(BF5D) 館(C05D) 縲(C15D) 擻(C25D) 鼕(C35D) 孃(C45D) 魔(C55D) 釁(C65D) ぶ(C75D) з(C85D) 巿(C95D) 佉(CA5D) 沎(CB5D) 岠(CC5D) 狋(CD5D) 垚(CE5D) 柛(CF5D) 胅(D05D) 娭(D15D) 涘(D25D) 罞(D35D) 偟(D45D) 惈(D55D) 牻(D65D) 荺(D75D) 傒(D85D) 揠(D95D) 焱(DA5D) 菏(DB5D) 酡(DC5D) 廅(DD5D) 滘(DE5D) 絺(DF5D) 赩(E05D) 塴(E15D) 榗(E25D) 箂(E35D) 踃(E45D) 嬁(E55D) 澕(E65D) 蓴(E75D) 醊(E85D) 寯(E95D) 獧(EA5D) 螗(EB5D) 餟(EC5D) 燱(ED5D) 螬(EE5D) 駸(EF5D) 礑(F05D) 鎞(F15D) 瀧(F25D) 鄿(F35D) 瀯(F45D) 騬(F55D) 醹(F65D) 躕(F75D) 鱕(F85D) 鸋(F95D) 㯳(FD5D) 
-               [^](5E) Ō (885E) 备(895E) 橣(8C5E) 笩(8E5E) 髴(915E) 嚞(925E) (965E) 璴(975E) 樫(985E) 烀(995E) 韂(9A5E) 顇(9B5E) 蠄(9E5E) 鬪(9F5E) 鵄(A05E) ）(A15E) 兣(A25E) γ(A35E) 乞(A45E) 匆(A55E) 回(A65E) 吾(A75E) 沂(A85E) 奉(A95E) 氛(AA5E) 兗(AB5E) 柩(AC5E) 英(AD5E) 屘(AE5E) 珪(AF5E) 貢(B05E) 崗(B15E) 淘(B25E) 訟(B35E) 彭(B45E) 琴(B55E) 跌(B65E) 愆(B75E) 窠(B85E) 鉋(B95E) 榨(BA5E) 蓀(BB5E) 嬉(BC5E) 稷(BD5E) 霆(BE5E) 甌(BF5E) 餞(C05E) 繃(C15E) 擷(C25E) 鼬(C35E) 孽(C45E) 魑(C55E) 鑲(C65E) ぷ(C75E) и(C85E) 旡(C95E) 体(CA5E) 灴(CB5E) 岵(CC5E) 狘(CD5E) 垕(CE5E) 柺(CF5E) 胣(D05E) 娮(D15E) 洯(D25E) 罠(D35E) 偩(D45E) 悱(D55E) 牼(D65E) 荳(D75E) 傂(D85E) 揶(D95E) 焣(DA5E) 菹(DB5E) 酤(DC5E) 廌(DD5E) 溙(DE5E) 綎(DF5E) 趑(E05E) 墋(E15E) 榐(E25E) 粻(E35E) 踇(E45E) 嬇(E55E) 潣(E65E) 蔪(E75E) 醁(E85E) 嶬(E95E) 獬(EA5E) 螓(EB5E) 餧(EC5E) 燨(ED5E) 螹(EE5E) 駶(EF5E) 禭(F05E) 鎦(F15E) 瀠(F25E) 醰(F35E) 瀷(F45E) 騪(F55E) 鐿(F65E) 躔(F75E) 鱙(F85E) 鸍(F95E) 㘣(FB5E) 釖(FC5E) 枱(FD5E) 珉(FE5E) 
-               [`](60) Ǒ(8860) 头(8960) 㞗(8B60) 䈣(8C60) 崾(8D60) 葘(8F60) 㦀(9060) 鬔(9160) 嚒(9260) 飜(9660) 総(9960) 䫤(9A60) 运(9D60) 裇(9E60) 鬮(9F60) 鮏(A060) ︶(A160) 瓩(A260) ε(A360) 亡(A460) 匝(A560) 圳(A660) 呎(A760) 灼(A860) 奈(A960) 注(AA60) 冑(AB60) 柄(AC60) 苜(AD60) 害(AE60) 畔(AF60) 躬(B060) 常(B160) 深(B260) 訢(B360) 循(B460) 琛(B560) 跆(B660) 戡(B760) 節(B860) 鉑(B960) 槁(BA60) 蒐(BB60) 嬋(BC60) 窯(BD60) 霉(BE60) 瘴(BF60) 餡(C060) 總(C160) 曜(C260) 嚥(C360) 巉(C460) 鰥(C560) 顱(C660) べ(C760) к(C860) 毌(C960) 伾(CA60) 牣(CB60) 岨(CC60) 狜(CD60) 复(CE60) 柊(CF60) 胜(D060) 娏(D160) 涋(D260) 罛(D360) 偣(D460) 悷(D560) 猝(D660) 荴(D760) 兟(D860) 揲(D960) 焢(DA60) 菀(DB60) 酢(DC60) 廋(DD60) 溎(DE60) 綃(DF60) 趎(E060) 墇(E160) 榵(E260) 粼(E360) 踅(E460) 嬏(E560) 潪(E660) 蔕(E760) 醄(E860) 嶩(E960) 獫(EA60) 螈(EB60) 馞(EC60) 燤(ED60) 螼(EE60) 駽(EF60) 穟(F060) 鎈(F160) 瀫(F260) 鏞(F360) 瀱(F460) 騩(F560) 鐶(F660) 躒(F760) 鱎(F860) 鸏(F960) 坆(FB60) 
-               [{](7B) ù (887B) 询(897B) 庙(8C7B) 拥(8D7B) 籴(8E7B) 蕳(8F7B) 鶃(917B) 塲(967B) 㬹(997B) 㝯(9A7B) 纇(9B7B) 画(9C7B) 䶜(9D7B) 饀(9F7B) ﹃(A17B) ┐(A27B) ㄌ(A37B) 廾(A47B) 叻(A57B) 州(A67B) 坊(A77B) 肚(A87B) 宛(A97B) 泯(AA7B) 哂(AB7B) 洌(AC7B) 迦(AD7B) 徒(AE7B) 砸(AF7B) 閃(B07B) 惋(B17B) 現(B27B) 逢(B37B) 揩(B47B) 程(B57B) 閔(B67B) 暍(B77B) 腥(B87B) 頒(B97B) 漬(BA7B) 認(BB7B) 慮(BC7B) 緹(BD7B) 魷(BE7B) 篦(BF7B) 嚀(C07B) 臨(C17B) 璿(C27B) 爍(C37B) 糰(C47B) 瓤(C57B) 鬱(C67B) ァ(C77B) 乚(C87B) 忉(C97B) 吙(CA7B) 芅(CB7B) 怦(CC7B) 矼(CD7B) 峌(CE7B) 洑(CF7B) 苻(D07B) 彧(D17B) 烎(D27B) 荁(D37B) 唵(D47B) 捼(D57B) 畣(D67B) 虙(D77B) 喎(D87B) 斞(D97B) 琬(DA7B) 萑(DB7B) 閐(DC7B) 搒(DD7B) 煰(DE7B) 腞(DF7B) 輂(E07B) 嫨(E17B) 漻(E27B) 翢(E37B) 銠(E47B) 憱(E57B) 獛(E67B) 蔋(E77B) 鋞(E87B) 懆(E97B) 瞢(EA7B) 褬(EB7B) 鮒(EC7B) 瞫(ED7B) 覮(EE7B) 鴯(EF7B) 翸(F07B) 鞨(F17B) 矄(F27B) 霫(F37B) 礧(F47B) 鶒(F57B) 驄(F67B) 驌(F77B) 鼷(F87B) 鸔(F97B) 够(FB7B) 樬(FE7B) 
-               [|](7C) ǖ(887C) 车(897C) 忂(8C7C) 挘(8D7C) 糳(8E7C) 䔖(8F7C) 諚(927C) 蠭(957C) (967C) 䤵(977C) 腖(997C) 补(9C7C) 鞺(9F7C) 捤(A07C) ﹄(A17C) └(A27C) ㄍ(A37C) 弋(A47C) 四(A57C) 帆(A67C) 坑(A77C) 育(A87C) 尚(A97C) 泜(AA7C) 咽(AB7C) 洱(AC7C) 迢(AD7C) 徑(AE7C) 砝(AF7C) 院(B07C) 悴(B17C) 琍(B27C) 逖(B37C) 揉(B47C) 稅(B57C) 閏(B67C) 會(B77C) 腮(B87C) 頌(B97C) 漏(BA7C) 誡(BB7C) 慝(BC7C) 罵(BD7C) 魯(BE7C) 糕(BF7C) 嚐(C07C) 舉(C17C) 甕(C27C) 牘(C37C) 辮(C47C) 疊(C57C) 鸛(C67C) ア(C77C) 戉(C97C) 吜(CA7C) 芎(CB7C) 怙(CC7C) 矹(CD7C) 峗(CE7C) 洀(CF7C) 苶(D07C) 恝(D17C) 烡(D27C) 茦(D37C) 唰(D47C) 掤(D57C) 痎(D67C) 虖(D77C) 圌(D87C) 斮(D97C) 琰(DA7C) 萆(DB7C) 隇(DC7C) 搉(DD7C) 煟(DE7C) 腶(DF7C) 輋(E07C) 嫟(E17C) 漒(E27C) 翣(E37C) 銔(E47C) 憰(E57C) 獡(E67C) 蔙(E77C) 鋧(E87C) 懁(E97C) 瞣(EA7C) 褟(EB7C) 鮐(EC7C) 瞲(ED7C) 觲(EE7C) 鴱(EF7C) 聵(F07C) 鞫(F17C) 矱(F27C) 霬(F37C) 礨(F47C) 鶘(F57C) 驂(F67C) 驏(F77C) 鼶(F87C) 鸓(F97C) 梦(FB7C) 憇(FC7C) 璂(FE7C) 
-               [}](7D) ǘ(887D) 轧(897D) 㧻(8A7D) 垜(8B7D) 㧸(8D7D) 糵(8E7D) 枿(8F7D) 鸎(917D) 堢(967D) 綤(987D) 腙(997D) 鵉(9A7D) 墵(9B7D) 达(9D7D) 匬(9F7D) 栂(A07D) ﹙(A17D) ┘(A27D) ㄎ(A37D) 弓(A47D) 囚(A57D) 并(A67D) 址(A77D) 良(A87D) 屈(A97D) 泖(AA7D) 咪(AB7D) 洞(AC7D) 迪(AD7D) 徐(AE7D) 破(AF7D) 陣(B07D) 惦(B17D) 瓠(B27D) 逛(B37D) 揆(B47D) 稀(B57D) 開(B67D) 榔(B77D) 腳(B87D) 飼(B97D) 漂(BA7D) 誓(BB7D) 慕(BC7D) 罷(BD7D) 鴆(BE7D) 糖(BF7D) 嚅(C07D) 艱(C17D) 癖(C27D) 犢(C37D) 繽(C47D) 癮(C57D) 鸞(C67D) ィ(C77D) 刂(C87D) 扐(C97D) 吥(CA7D) 芑(CB7D) 怲(CC7D) 矻(CD7D) 峋(CE7D) 洝(CF7D) 苰(D07D) 恚(D17D) 牂(D27D) 茜(D37D) 啒(D47D) 挻(D57D) 痒(D67D) 蚿(D77D) 堩(D87D) 旐(D97D) 琫(DA7D) 菂(DB7D) 陾(DC7D) 搠(DD7D) 煐(DE7D) 腧(DF7D) 遒(E07D) 孷(E17D) 滭(E27D) 翥(E37D) 銪(E47D) 憢(E57D) 獚(E67D) 蔯(E77D) 鋑(E87D) 懌(E97D) 瞕(EA7D) 觱(EB7D) 魺(EC7D) 瞷(ED7D) 觳(EE7D) 鴸(EF7D) 臑(F07D) 鞤(F17D) 礝(F27D) 霨(F37D) 礤(F47D) 鶐(F57D) 驁(F67D) 驈(F77D) 齃(F87D) 黶(F97D) 冲(FA7D) 㛃(FB7D) 宪(FC7D) 䥓(FE7D) 
-  ------------------------------------------------------------------------------
-  eucjp (EUC-JP)
-             1st       2nd
-             A1..FE    00..FF
-             00..7F
-             https://en.wikipedia.org/wiki/Extended_Unix_Code#EUC-JP
-             * needs multibyte anchoring
-             * needs no escaping meta char of 2nd octet
-             * safe US-ASCII casefolding of 2nd octet
-  ------------------------------------------------------------------------------
-  gb18030 (GB18030)
-             1st       2nd       3rd       4th
-             81..FE    30..39    81..FE    30..39
-             81..FE    00..FF
-             00..7F
-             https://en.wikipedia.org/wiki/GB_18030
-             * needs multibyte anchoring
-             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd-4th octet
-             * needs escaping meta char of 2nd octet
-             * and DAMEMOJI samples, here
-               [@](40) 丂(8140) 侤(8240) 傽(8340) 凘(8440) 匑(8540) 咢(8640) 嘆(8740) 園(8840) 堾(8940) 夽(8A40) 婡(8B40) 孈(8C40) 岪(8D40) 嶡(8E40) 廆(8F40) 怈(9040) 慇(9140) 扏(9240) 揁(9340) 擛(9440) 旲(9540) 朄(9640) 桜(9740) 楡(9840) 橜(9940) 欯(9A40) 汙(9B40) 淍(9C40) 滰(9D40) 濦(9E40) 烜(9F40) 燖(A040) ˊ(A840) 〡(A940) 狜(AA40) 獲(AB40) 珸(AC40) 瑻(AD40) 瓳(AE40) 疈(AF40) 癅(B040) 盄(B140) 睝(B240) 矦(B340) 碄(B440) 礍(B540) 禓(B640) 稝(B740) 窣(B840) 笯(B940) 篅(BA40) 籃(BB40) 粿(BC40) 紷(BD40) 継(BE40) 緻(BF40) 繞(C040) 罖(C140) 翤(C240) 聾(C340) 腀(C440) 臔(C540) 艪(C640) 茾(C740) 菮(C840) 葽(C940) 蔃(CA40) 薂(CB40) 藹(CC40) 虭(CD40) 蜙(CE40) 螥(CF40) 蠤(D040) 袬(D140) 褸(D240) 覢(D340) 訞(D440) 誁(D540) 諤(D640) 譆(D740) 谸(D840) 貮(D940) 贎(DA40) 跕(DB40) 蹳(DC40) 軥(DD40) 轅(DE40) 這(DF40) 郂(E040) 酅(E140) 釦(E240) 鉆(E340) 銨(E440) 錊(E540) 鍬(E640) 鏎(E740) 鐯(E840) 锧(E940) 闌(EA40) 隌(EB40) 霡(EC40) 鞞(ED40) 頏(EE40) 顯(EF40) 餈(F040) 馌(F140) 駺(F240) 驚(F340) 鬇(F440) 魼(F540) 鯜(F640) 鰼(F740) 鳣(F840) 鵃(F940) 鶣(FA40) 鸃(FB40) 麫(FC40) 鼲(FD40) 兀(FE40) 
-               [[](5B) 乕(815B) 俒(825B) 僛(835B) 刐(845B) 匸(855B) 哰(865B) 嘯(875B) 圼(885B) 塠(895B) 奫(8A5B) 媅(8B5B) 孾(8C5B) 峓(8D5B) 嶽(8E5B) 廩(8F5B) 怺(905B) 慬(915B) 抂(925B) 揫(935B) 擺(945B) 昜(955B) 朳(965B) 梉(975B) 榌(985B) 橻(995B) 歔(9A5B) 沎(9B5B) 淸(9C5B) 漑(9D5B) 瀃(9E5B) 焄(9F5B) 燵(A05B) ╗ (A85B) 猍(AA5B) 玔(AB5B) 琜(AC5B) 璠(AD5B) 甗(AE5B) 痆(AF5B) 癧(B05B) 盵(B15B) 瞇(B25B) 砙(B35B) 碵(B45B) 礫(B55B) 禰(B65B) 穂(B75B) 竅(B85B) 筟(B95B) 篬(BA5B) 籟(BB5B) 糩(BC5B) 絒(BD5B) 綶(BE5B) 縖(BF5B) 繹(C05B) 羀(C15B) 耓(C25B) 肹(C35B) 腫(C45B) 臶(C55B) 芠(C65B) 荹(C75B) 萚(C85B) 蒣(C95B) 蔥(CA5B) 薣(CB5B) 蘙(CC5B) 蚚(CD5B) 蝃(CE5B) 蟍(CF5B) 衃(D05B) 裑(D15B) 襕(D25B) 覽(D35B) 訹(D45B) 誟(D55B) 諿(D65B) 譡(D75B) 豙(D85B) 賉(D95B) 赱(DA5B) 踇(DB5B) 躘(DC5B) 輀(DD5B) 轠(DE5B) 遊(DF5B) 郲(E05B) 醄(E15B) 鈁(E25B) 鉡(E35B) 鋄(E45B) 錥(E55B) 鎇(E65B) 鏪(E75B) 鑋(E85B) 閇(E95B) 闧(EA5B) 隱(EB5B) 靃(EC5B) 韀(ED5B) 頪(EE5B) 颷(EF5B) 餥(F05B) 馵(F15B) 騕(F25B) 骩(F35B) 鬧(F45B) 鮗(F55B) 鯷(F65B) 鱗(F75B) 鳾(F85B) 鵞(F95B) 鶾(FA5B) 鸞(FB5B) 黐(FC5B) 齕(FD5B) 
-               [\](5C) 乗(815C) 俓(825C) 僜(835C) 刓(845C) 匼(855C) 哱(865C) 嘰(875C) 圽(885C) 塡(895C) 奬(8A5C) 媆(8B5C) 孿(8C5C) 峔(8D5C) 嶾(8E5C) 廫(8F5C) 怽(905C) 慭(915C) 抃(925C) 揬(935C) 擻(945C) 昞(955C) 朶(965C) 梊(975C) 榎(985C) 橽(995C) 歕(9A5C) 沑(9B5C) 淺(9C5C) 漒(9D5C) 瀄(9E5C) 焅(9F5C) 燶(A05C) ╘ (A85C) ‐(A95C) 猏(AA5C) 玕(AB5C) 琝(AC5C) 璡(AD5C) 甛(AE5C) 痋(AF5C) 癨(B05C) 盶(B15C) 瞈(B25C) 砛(B35C) 碶(B45C) 礬(B55C) 禱(B65C) 穃(B75C) 竆(B85C) 筡(B95C) 篭(BA5C) 籠(BB5C) 糪(BC5C) 絓(BD5C) 綷(BE5C) 縗(BF5C) 繺(C05C) 羂(C15C) 耚(C25C) 肻(C35C) 腬(C45C) 臷(C55C) 芢(C65C) 荺(C75C) 萛(C85C) 蒤(C95C) 蔦(CA5C) 薥(CB5C) 蘚(CC5C) 蚛(CD5C) 蝄(CE5C) 蟎(CF5C) 衆(D05C) 裓(D15C) 襖(D25C) 覾(D35C) 診(D45C) 誠(D55C) 謀(D65C) 譢(D75C) 豛(D85C) 賊(D95C) 赲(DA5C) 踈(DB5C) 躙(DC5C) 輁(DD5C) 轡(DE5C) 運(DF5C) 郳(E05C) 醆(E15C) 鈂(E25C) 鉢(E35C) 鋅(E45C) 錦(E55C) 鎈(E65C) 鏫(E75C) 鑌(E85C) 閈(E95C) 闬(EA5C) 隲(EB5C) 靄(EC5C) 韁(ED5C) 頫(EE5C) 颸(EF5C) 餦(F05C) 馶(F15C) 騖(F25C) 骪(F35C) 鬨(F45C) 鮘(F55C) 鯸(F65C) 鱘(F75C) 鳿(F85C) 鵟(F95C) 鶿(FA5C) 鸤(FB5C) 黒(FC5C) 齖(FD5C) 
-               []](5D) 乚(815D) 俔(825D) 僝(835D) 刔(845D) 匽(855D) 哴(865D) 嘳(875D) 圿(885D) 塢(895D) 奭(8A5D) 媇(8B5D) 宂(8C5D) 峕(8D5D) 嶿(8E5D) 廬(8F5D) 怾(905D) 慮(915D) 抅(925D) 揮(935D) 擼(945D) 昡(955D) 朷(965D) 梋(975D) 榏(985D) 橾(995D) 歖(9A5D) 沒(9B5D) 淽(9C5D) 漖(9D5D) 瀅(9E5D) 焆(9F5D) 燷(A05D) ╙ (A85D) 猐(AA5D) 玗(AB5D) 琞(AC5D) 璢(AD5D) 甝(AE5D) 痌(AF5D) 癩(B05D) 盷(B15D) 瞉(B25D) 砞(B35D) 碷(B45D) 礭(B55D) 禲(B65D) 穄(B75D) 竇(B85D) 筣(B95D) 篯(BA5D) 籡(BB5D) 糫(BC5D) 絔(BD5D) 綸(BE5D) 縘(BF5D) 繻(C05D) 羃(C15D) 耛(C25D) 胅(C35D) 腯(C45D) 臸(C55D) 芣(C65D) 荾(C75D) 萞(C85D) 蒥(C95D) 蔧(CA5D) 薦(CB5D) 蘛(CC5D) 蚞(CD5D) 蝅(CE5D) 蟏(CF5D) 衇(D05D) 裖(D15D) 襗(D25D) 覿(D35D) 註(D45D) 誡(D55D) 謁(D65D) 譣(D75D) 豜(D85D) 賋(D95D) 赸(DA5D) 踋(DB5D) 躚(DC5D) 輂(DD5D) 轢(DE5D) 遌(DF5D) 郵(E05D) 醈(E15D) 鈃(E25D) 鉣(E35D) 鋆(E45D) 錧(E55D) 鎉(E65D) 鏬(E75D) 鑍(E85D) 閉(E95D) 闿(EA5D) 隴(EB5D) 靅(EC5D) 韂(ED5D) 頬(EE5D) 颹(EF5D) 餧(F05D) 馷(F15D) 騗(F25D) 骫(F35D) 鬩(F45D) 鮙(F55D) 鯹(F65D) 鱙(F75D) 鴀(F85D) 鵠(F95D) 鷀(FA5D) 鸧(FB5D) 黓(FC5D) 齗(FD5D) 
-               [^](5E) 乛(815E) 俕(825E) 僞(835E) 刕(845E) 區(855E) 哵(865E) 嘵(875E) 坁(885E) 塣(895E) 奮(8A5E) 媈(8B5E) 宆(8C5E) 峖(8D5E) 巀(8E5E) 廭(8F5E) 恀(905E) 慯(915E) 抆(925E) 揯(935E) 擽(945E) 昢(955E) 朸(965E) 梌(975E) 榐(985E) 橿(995E) 歗(9A5E) 沕(9B5E) 淾(9C5E) 漗(9D5E) 瀆(9E5E) 焇(9F5E) 燸(A05E) ╚ (A85E) 猑(AA5E) 玘(AB5E) 琟(AC5E) 璣(AD5E) 甞(AE5E) 痎(AF5E) 癪(B05E) 盺(B15E) 瞊(B25E) 砠(B35E) 碸(B45E) 礮(B55E) 禴(B65E) 穅(B75E) 竈(B85E) 筤(B95E) 篰(BA5E) 籢(BB5E) 糬(BC5E) 絕(BD5E) 綹(BE5E) 縙(BF5E) 繼(C05E) 羄(C15E) 耝(C25E) 胇(C35E) 腲(C45E) 臹(C55E) 芧(C65E) 荿(C75E) 萟(C85E) 蒦(C95E) 蔨(CA5E) 薧(CB5E) 蘜(CC5E) 蚟(CD5E) 蝆(CE5E) 蟐(CF5E) 衈(D05E) 裗(D15E) 襘(D25E) 觀(D35E) 証(D45E) 誢(D55E) 謂(D65E) 譤(D75E) 豝(D85E) 賌(D95E) 赹(DA5E) 踍(DB5E) 躛(DC5E) 較(DD5E) 轣(DE5E) 過(DF5E) 郶(E05E) 醊(E15E) 鈄(E25E) 鉤(E35E) 鋇(E45E) 錨(E55E) 鎊(E65E) 鏭(E75E) 鑎(E85E) 閊(E95E) 阇(EA5E) 隵(EB5E) 靆(EC5E) 韃(ED5E) 頭(EE5E) 颺(EF5E) 館(F05E) 馸(F15E) 騘(F25E) 骬(F35E) 鬪(F45E) 鮚(F55E) 鯺(F65E) 鱚(F75E) 鴁(F85E) 鵡(F95E) 鷁(FA5E) 鸮(FB5E) 黕(FC5E) 齘(FD5E) 
-               [`](60) 乣(8160) 俙(8260) 僠(8360) 刞(8460) 卄(8560) 哷(8660) 嘸(8760) 坄(8860) 塦(8960) 奰(8A60) 媊(8B60) 宍(8C60) 峘(8D60) 巂(8E60) 廯(8F60) 恅(9060) 慲(9160) 抈(9260) 揱(9360) 擿(9460) 昤(9560) 朻(9660) 梎(9760) 榒(9860) 檂(9960) 歚(9A60) 沗(9B60) 渀(9C60) 漙(9D60) 瀈(9E60) 焋(9F60) 燻(A060) ╜ (A860) ー(A960) 猔(AA60) 玚(AB60) 琡(AC60) 璥(AD60) 甡(AE60) 痐(AF60) 癭(B060) 盽(B160) 瞏(B260) 砢(B360) 碻(B460) 礰(B560) 禶(B660) 穈(B760) 竊(B860) 筦(B960) 篳(BA60) 籤(BB60) 糮(BC60) 絗(BD60) 綻(BE60) 縛(BF60) 繾(C060) 羆(C160) 耟(C260) 胉(C360) 腵(C460) 臽(C560) 芵(C660) 莁(C760) 萡(C860) 蒨(C960) 蔪(CA60) 薫(CB60) 蘞(CC60) 蚡(CD60) 蝋(CE60) 蟕(CF60) 衊(D060) 裛(D160) 襚(D260) 觍(D360) 訿(D460) 誤(D560) 謄(D660) 譧(D760) 豟(D860) 賎(D960) 赻(DA60) 踐(DB60) 躟(DC60) 輅(DD60) 轥(DE60) 違(DF60) 郹(E060) 醏(E160) 鈆(E260) 鉦(E360) 鋊(E460) 錪(E560) 鎌(E660) 鏯(E760) 鑐(E860) 閌(E960) 阘(EA60) 隸(EB60) 靈(EC60) 韅(ED60) 頯(EE60) 颼(EF60) 餪(F060) 馺(F160) 騚(F260) 骮(F360) 鬬(F460) 鮜(F560) 鯼(F660) 鱜(F760) 鴃(F860) 鵣(F960) 鷃(FA60) 鸴(FB60) 黗(FC60) 齚(FD60) 
-               [{](7B) 亄(817B) 倇(827B) 儃(837B) 剓(847B) 厈(857B) 唟(867B) 噞(877B) 坽(887B) 墈(897B) 妠(8A7B) 媨(8B7B) 寋(8C7B) 峽(8D7B) 巤(8E7B) 弡(8F7B) 恵(907B) 憑(917B) 抺(927B) 搟(937B) 攞(947B) 晎(957B) 杮(967B) 梴(977B) 榹(987B) 檣(997B) 歿(9A7B) 泏(9B7B) 渰(9C7B) 漿(9D7B) 瀧(9E7B) 焮(9F7B) 爗(A07B) ▄ (A87B) ﹞(A97B) 獅(AA7B) 珄(AB7B) 瑊(AC7B) 瓄(AD7B) 畕(AE7B) 瘂(AF7B) 皗(B07B) 眥(B17B) 瞷(B27B) 硔(B37B) 磠(B47B) 祘(B57B) 秢(B67B) 穥(B77B) 竰(B87B) 箋(B97B) 簕(BA7B) 粄(BB7B) 納(BC7B) 絳(BD7B) 緖(BE7B) 縶(BF7B) 纚(C07B) 羬(C17B) 聓(C27B) 脅(C37B) 膡(C47B) 舺(C57B) 苳(C67B) 莧(C77B) 葅(C87B) 蓒(C97B) 蕒(CA7B) 藍(CB7B) 蘽(CC7B) 蛖(CD7B) 蝱(CE7B) 蟵(CF7B) 衶(D07B) 褅(D17B) 襸(D27B) 觷(D37B) 詛(D47B) 調(D57B) 謠(D67B) 讃(D77B) 貃(D87B) 賩(D97B) 趝(DA7B) 踸(DB7B) 躿(DC7B) 輠(DD7B) 辿(DE7B) 遻(DF7B) 鄘(E07B) 醷(E17B) 鈡(E27B) 銂(E37B) 鋥(E47B) 鍆(E57B) 鎨(E67B) 鐊(E77B) 鑬(E87B) 閧(E97B) 陒(EA7B) 雥(EB7B) 靮(EC7B) 韠(ED7B) 顊(EE7B) 飡(EF7B) 饆(F07B) 駕(F17B) 騵(F27B) 髙(F37B) 魗(F47B) 鮷(F57B) 鰗(F67B) 鱷(F77B) 鴞(F87B) 鵾(F97B) 鷞(FA7B) 鹻(FB7B) 鼂(FC7B) 齵(FD7B) 
-               [|](7C) 亅(817C) 倈(827C) 億(837C) 剕(847C) 厊(857C) 唡(867C) 噟(877C) 坾(887C) 墊(897C) 妡(8A7C) 媩(8B7C) 寍(8C7C) 峾(8D7C) 巪(8E7C) 弢(8F7C) 恷(907C) 憒(917C) 抾(927C) 搢(937C) 攟(947C) 晐(957C) 東(967C) 梶(977C) 榺(987C) 檤(997C) 殀(9A7C) 泑(9B7C) 渱(9C7C) 潀(9D7C) 瀨(9E7C) 焲(9F7C) 爘(A07C) ▅ (A87C) ﹟(A97C) 獆(AA7C) 珅(AB7C) 瑋(AC7C) 瓅(AD7C) 畖(AE7C) 瘄(AF7C) 皘(B07C) 眧(B17C) 瞸(B27C) 硘(B37C) 磡(B47C) 祙(B57C) 秥(B67C) 穦(B77C) 竱(B87C) 箌(B97C) 簗(BA7C) 粅(BB7C) 紎(BC7C) 絴(BD7C) 緗(BE7C) 縷(BF7C) 纜(C07C) 羭(C17C) 聕(C27C) 脇(C37C) 膢(C47C) 舼(C57C) 苵(C67C) 莬(C77C) 葇(C87C) 蓔(C97C) 蕓(CA7C) 藎(CB7C) 蘾(CC7C) 蛗(CD7C) 蝲(CE7C) 蟶(CF7C) 衸(D07C) 褆(D17C) 襹(D27C) 觸(D37C) 詜(D47C) 諀(D57C) 謡(D67C) 讄(D77C) 貄(D87C) 質(D97C) 趞(DA7C) 踻(DB7C) 軀(DC7C) 輡(DD7C) 迀(DE7C) 遼(DF7C) 鄚(E07C) 醸(E17C) 鈢(E27C) 銃(E37C) 鋦(E47C) 鍇(E57C) 鎩(E67C) 鐋(E77C) 鑭(E87C) 閨(E97C) 陓(EA7C) 雦(EB7C) 靯(EC7C) 韡(ED7C) 顋(EE7C) 飢(EF7C) 饇(F07C) 駖(F17C) 騶(F27C) 髚(F37C) 魘(F47C) 鮸(F57C) 鰘(F67C) 鱸(F77C) 鴟(F87C) 鵿(F97C) 鷟(FA7C) 鹼(FB7C) 鼃(FC7C) 齶(FD7C) 
-               [}](7D) 亇(817D) 倉(827D) 儅(837D) 剗(847D) 厎(857D) 唥(867D) 噠(877D) 坿(887D) 墋(897D) 妢(8A7D) 媫(8B7D) 寎(8C7D) 峿(8D7D) 巬(8E7D) 弣(8F7D) 恾(907D) 憓(917D) 拀(927D) 搣(937D) 攠(947D) 晑(957D) 杴(967D) 梷(977D) 榼(987D) 檥(997D) 殅(9A7D) 泒(9B7D) 渳(9C7D) 潁(9D7D) 瀩(9E7D) 焳(9F7D) 爙(A07D) ▆ (A87D) ﹠(A97D) 獇(AA7D) 珆(AB7D) 瑌(AC7D) 瓆(AD7D) 畗(AE7D) 瘆(AF7D) 皚(B07D) 眪(B17D) 瞹(B27D) 硙(B37D) 磢(B47D) 祡(B57D) 秨(B67D) 穧(B77D) 竲(B87D) 箎(B97D) 簘(BA7D) 粆(BB7D) 紏(BC7D) 絵(BD7D) 緘(BE7D) 縸(BF7D) 纝(C07D) 羮(C17D) 聖(C27D) 脈(C37D) 膤(C47D) 舽(C57D) 苶(C67D) 莭(C77D) 葈(C87D) 蓕(C97D) 蕔(CA7D) 藑(CB7D) 蘿(CC7D) 蛚(CD7D) 蝳(CE7D) 蟷(CF7D) 衹(D07D) 複(D17D) 襺(D27D) 觹(D37D) 詝(D47D) 諁(D57D) 謢(D67D) 讅(D77D) 貆(D87D) 賫(D97D) 趠(DA7D) 踼(DB7D) 軁(DC7D) 輢(DD7D) 迃(DE7D) 遾(DF7D) 鄛(E07D) 醹(E17D) 鈣(E27D) 銄(E37D) 鋧(E47D) 鍈(E57D) 鎪(E67D) 鐌(E77D) 鑮(E87D) 閩(E97D) 陖(EA7D) 雧(EB7D) 靰(EC7D) 韢(ED7D) 題(EE7D) 飣(EF7D) 饈(F07D) 駗(F17D) 騷(F27D) 髛(F37D) 魙(F47D) 鮹(F57D) 鰙(F67D) 鱹(F77D) 鴠(F87D) 鶀(F97D) 鷠(FA7D) 鹽(FB7D) 鼄(FC7D) 齷(FD7D) 
-  ------------------------------------------------------------------------------
-  gbk (GBK)
-             1st       2nd
-             81..FE    00..FF
-             00..7F
-             https://en.wikipedia.org/wiki/GBK_(character_encoding)
-             * needs multibyte anchoring
-             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
-             * needs escaping meta char of 2nd octet
-             * and DAMEMOJI samples, here
-               [@](40) 丂(8140) 侤(8240) 傽(8340) 凘(8440) 匑(8540) 咢(8640) 嘆(8740) 園(8840) 堾(8940) 夽(8A40) 婡(8B40) 孈(8C40) 岪(8D40) 嶡(8E40) 廆(8F40) 怈(9040) 慇(9140) 扏(9240) 揁(9340) 擛(9440) 旲(9540) 朄(9640) 桜(9740) 楡(9840) 橜(9940) 欯(9A40) 汙(9B40) 淍(9C40) 滰(9D40) 濦(9E40) 烜(9F40) 燖(A040) ˊ(A840) 〡(A940) 狜(AA40) 獲(AB40) 珸(AC40) 瑻(AD40) 瓳(AE40) 疈(AF40) 癅(B040) 盄(B140) 睝(B240) 矦(B340) 碄(B440) 礍(B540) 禓(B640) 稝(B740) 窣(B840) 笯(B940) 篅(BA40) 籃(BB40) 粿(BC40) 紷(BD40) 継(BE40) 緻(BF40) 繞(C040) 罖(C140) 翤(C240) 聾(C340) 腀(C440) 臔(C540) 艪(C640) 茾(C740) 菮(C840) 葽(C940) 蔃(CA40) 薂(CB40) 藹(CC40) 虭(CD40) 蜙(CE40) 螥(CF40) 蠤(D040) 袬(D140) 褸(D240) 覢(D340) 訞(D440) 誁(D540) 諤(D640) 譆(D740) 谸(D840) 貮(D940) 贎(DA40) 跕(DB40) 蹳(DC40) 軥(DD40) 轅(DE40) 這(DF40) 郂(E040) 酅(E140) 釦(E240) 鉆(E340) 銨(E440) 錊(E540) 鍬(E640) 鏎(E740) 鐯(E840) 锧(E940) 闌(EA40) 隌(EB40) 霡(EC40) 鞞(ED40) 頏(EE40) 顯(EF40) 餈(F040) 馌(F140) 駺(F240) 驚(F340) 鬇(F440) 魼(F540) 鯜(F640) 鰼(F740) 鳣(F840) 鵃(F940) 鶣(FA40) 鸃(FB40) 麫(FC40) 鼲(FD40) 兀(FE40) 
-               [[](5B) 乕(815B) 俒(825B) 僛(835B) 刐(845B) 匸(855B) 哰(865B) 嘯(875B) 圼(885B) 塠(895B) 奫(8A5B) 媅(8B5B) 孾(8C5B) 峓(8D5B) 嶽(8E5B) 廩(8F5B) 怺(905B) 慬(915B) 抂(925B) 揫(935B) 擺(945B) 昜(955B) 朳(965B) 梉(975B) 榌(985B) 橻(995B) 歔(9A5B) 沎(9B5B) 淸(9C5B) 漑(9D5B) 瀃(9E5B) 焄(9F5B) 燵(A05B) ╗ (A85B) 猍(AA5B) 玔(AB5B) 琜(AC5B) 璠(AD5B) 甗(AE5B) 痆(AF5B) 癧(B05B) 盵(B15B) 瞇(B25B) 砙(B35B) 碵(B45B) 礫(B55B) 禰(B65B) 穂(B75B) 竅(B85B) 筟(B95B) 篬(BA5B) 籟(BB5B) 糩(BC5B) 絒(BD5B) 綶(BE5B) 縖(BF5B) 繹(C05B) 羀(C15B) 耓(C25B) 肹(C35B) 腫(C45B) 臶(C55B) 芠(C65B) 荹(C75B) 萚(C85B) 蒣(C95B) 蔥(CA5B) 薣(CB5B) 蘙(CC5B) 蚚(CD5B) 蝃(CE5B) 蟍(CF5B) 衃(D05B) 裑(D15B) 襕(D25B) 覽(D35B) 訹(D45B) 誟(D55B) 諿(D65B) 譡(D75B) 豙(D85B) 賉(D95B) 赱(DA5B) 踇(DB5B) 躘(DC5B) 輀(DD5B) 轠(DE5B) 遊(DF5B) 郲(E05B) 醄(E15B) 鈁(E25B) 鉡(E35B) 鋄(E45B) 錥(E55B) 鎇(E65B) 鏪(E75B) 鑋(E85B) 閇(E95B) 闧(EA5B) 隱(EB5B) 靃(EC5B) 韀(ED5B) 頪(EE5B) 颷(EF5B) 餥(F05B) 馵(F15B) 騕(F25B) 骩(F35B) 鬧(F45B) 鮗(F55B) 鯷(F65B) 鱗(F75B) 鳾(F85B) 鵞(F95B) 鶾(FA5B) 鸞(FB5B) 黐(FC5B) 齕(FD5B) 
-               [\](5C) 乗(815C) 俓(825C) 僜(835C) 刓(845C) 匼(855C) 哱(865C) 嘰(875C) 圽(885C) 塡(895C) 奬(8A5C) 媆(8B5C) 孿(8C5C) 峔(8D5C) 嶾(8E5C) 廫(8F5C) 怽(905C) 慭(915C) 抃(925C) 揬(935C) 擻(945C) 昞(955C) 朶(965C) 梊(975C) 榎(985C) 橽(995C) 歕(9A5C) 沑(9B5C) 淺(9C5C) 漒(9D5C) 瀄(9E5C) 焅(9F5C) 燶(A05C) ╘ (A85C) ‐(A95C) 猏(AA5C) 玕(AB5C) 琝(AC5C) 璡(AD5C) 甛(AE5C) 痋(AF5C) 癨(B05C) 盶(B15C) 瞈(B25C) 砛(B35C) 碶(B45C) 礬(B55C) 禱(B65C) 穃(B75C) 竆(B85C) 筡(B95C) 篭(BA5C) 籠(BB5C) 糪(BC5C) 絓(BD5C) 綷(BE5C) 縗(BF5C) 繺(C05C) 羂(C15C) 耚(C25C) 肻(C35C) 腬(C45C) 臷(C55C) 芢(C65C) 荺(C75C) 萛(C85C) 蒤(C95C) 蔦(CA5C) 薥(CB5C) 蘚(CC5C) 蚛(CD5C) 蝄(CE5C) 蟎(CF5C) 衆(D05C) 裓(D15C) 襖(D25C) 覾(D35C) 診(D45C) 誠(D55C) 謀(D65C) 譢(D75C) 豛(D85C) 賊(D95C) 赲(DA5C) 踈(DB5C) 躙(DC5C) 輁(DD5C) 轡(DE5C) 運(DF5C) 郳(E05C) 醆(E15C) 鈂(E25C) 鉢(E35C) 鋅(E45C) 錦(E55C) 鎈(E65C) 鏫(E75C) 鑌(E85C) 閈(E95C) 闬(EA5C) 隲(EB5C) 靄(EC5C) 韁(ED5C) 頫(EE5C) 颸(EF5C) 餦(F05C) 馶(F15C) 騖(F25C) 骪(F35C) 鬨(F45C) 鮘(F55C) 鯸(F65C) 鱘(F75C) 鳿(F85C) 鵟(F95C) 鶿(FA5C) 鸤(FB5C) 黒(FC5C) 齖(FD5C) 
-               []](5D) 乚(815D) 俔(825D) 僝(835D) 刔(845D) 匽(855D) 哴(865D) 嘳(875D) 圿(885D) 塢(895D) 奭(8A5D) 媇(8B5D) 宂(8C5D) 峕(8D5D) 嶿(8E5D) 廬(8F5D) 怾(905D) 慮(915D) 抅(925D) 揮(935D) 擼(945D) 昡(955D) 朷(965D) 梋(975D) 榏(985D) 橾(995D) 歖(9A5D) 沒(9B5D) 淽(9C5D) 漖(9D5D) 瀅(9E5D) 焆(9F5D) 燷(A05D) ╙ (A85D) 猐(AA5D) 玗(AB5D) 琞(AC5D) 璢(AD5D) 甝(AE5D) 痌(AF5D) 癩(B05D) 盷(B15D) 瞉(B25D) 砞(B35D) 碷(B45D) 礭(B55D) 禲(B65D) 穄(B75D) 竇(B85D) 筣(B95D) 篯(BA5D) 籡(BB5D) 糫(BC5D) 絔(BD5D) 綸(BE5D) 縘(BF5D) 繻(C05D) 羃(C15D) 耛(C25D) 胅(C35D) 腯(C45D) 臸(C55D) 芣(C65D) 荾(C75D) 萞(C85D) 蒥(C95D) 蔧(CA5D) 薦(CB5D) 蘛(CC5D) 蚞(CD5D) 蝅(CE5D) 蟏(CF5D) 衇(D05D) 裖(D15D) 襗(D25D) 覿(D35D) 註(D45D) 誡(D55D) 謁(D65D) 譣(D75D) 豜(D85D) 賋(D95D) 赸(DA5D) 踋(DB5D) 躚(DC5D) 輂(DD5D) 轢(DE5D) 遌(DF5D) 郵(E05D) 醈(E15D) 鈃(E25D) 鉣(E35D) 鋆(E45D) 錧(E55D) 鎉(E65D) 鏬(E75D) 鑍(E85D) 閉(E95D) 闿(EA5D) 隴(EB5D) 靅(EC5D) 韂(ED5D) 頬(EE5D) 颹(EF5D) 餧(F05D) 馷(F15D) 騗(F25D) 骫(F35D) 鬩(F45D) 鮙(F55D) 鯹(F65D) 鱙(F75D) 鴀(F85D) 鵠(F95D) 鷀(FA5D) 鸧(FB5D) 黓(FC5D) 齗(FD5D) 
-               [^](5E) 乛(815E) 俕(825E) 僞(835E) 刕(845E) 區(855E) 哵(865E) 嘵(875E) 坁(885E) 塣(895E) 奮(8A5E) 媈(8B5E) 宆(8C5E) 峖(8D5E) 巀(8E5E) 廭(8F5E) 恀(905E) 慯(915E) 抆(925E) 揯(935E) 擽(945E) 昢(955E) 朸(965E) 梌(975E) 榐(985E) 橿(995E) 歗(9A5E) 沕(9B5E) 淾(9C5E) 漗(9D5E) 瀆(9E5E) 焇(9F5E) 燸(A05E) ╚ (A85E) 猑(AA5E) 玘(AB5E) 琟(AC5E) 璣(AD5E) 甞(AE5E) 痎(AF5E) 癪(B05E) 盺(B15E) 瞊(B25E) 砠(B35E) 碸(B45E) 礮(B55E) 禴(B65E) 穅(B75E) 竈(B85E) 筤(B95E) 篰(BA5E) 籢(BB5E) 糬(BC5E) 絕(BD5E) 綹(BE5E) 縙(BF5E) 繼(C05E) 羄(C15E) 耝(C25E) 胇(C35E) 腲(C45E) 臹(C55E) 芧(C65E) 荿(C75E) 萟(C85E) 蒦(C95E) 蔨(CA5E) 薧(CB5E) 蘜(CC5E) 蚟(CD5E) 蝆(CE5E) 蟐(CF5E) 衈(D05E) 裗(D15E) 襘(D25E) 觀(D35E) 証(D45E) 誢(D55E) 謂(D65E) 譤(D75E) 豝(D85E) 賌(D95E) 赹(DA5E) 踍(DB5E) 躛(DC5E) 較(DD5E) 轣(DE5E) 過(DF5E) 郶(E05E) 醊(E15E) 鈄(E25E) 鉤(E35E) 鋇(E45E) 錨(E55E) 鎊(E65E) 鏭(E75E) 鑎(E85E) 閊(E95E) 阇(EA5E) 隵(EB5E) 靆(EC5E) 韃(ED5E) 頭(EE5E) 颺(EF5E) 館(F05E) 馸(F15E) 騘(F25E) 骬(F35E) 鬪(F45E) 鮚(F55E) 鯺(F65E) 鱚(F75E) 鴁(F85E) 鵡(F95E) 鷁(FA5E) 鸮(FB5E) 黕(FC5E) 齘(FD5E) 
-               [`](60) 乣(8160) 俙(8260) 僠(8360) 刞(8460) 卄(8560) 哷(8660) 嘸(8760) 坄(8860) 塦(8960) 奰(8A60) 媊(8B60) 宍(8C60) 峘(8D60) 巂(8E60) 廯(8F60) 恅(9060) 慲(9160) 抈(9260) 揱(9360) 擿(9460) 昤(9560) 朻(9660) 梎(9760) 榒(9860) 檂(9960) 歚(9A60) 沗(9B60) 渀(9C60) 漙(9D60) 瀈(9E60) 焋(9F60) 燻(A060) ╜ (A860) ー(A960) 猔(AA60) 玚(AB60) 琡(AC60) 璥(AD60) 甡(AE60) 痐(AF60) 癭(B060) 盽(B160) 瞏(B260) 砢(B360) 碻(B460) 礰(B560) 禶(B660) 穈(B760) 竊(B860) 筦(B960) 篳(BA60) 籤(BB60) 糮(BC60) 絗(BD60) 綻(BE60) 縛(BF60) 繾(C060) 羆(C160) 耟(C260) 胉(C360) 腵(C460) 臽(C560) 芵(C660) 莁(C760) 萡(C860) 蒨(C960) 蔪(CA60) 薫(CB60) 蘞(CC60) 蚡(CD60) 蝋(CE60) 蟕(CF60) 衊(D060) 裛(D160) 襚(D260) 觍(D360) 訿(D460) 誤(D560) 謄(D660) 譧(D760) 豟(D860) 賎(D960) 赻(DA60) 踐(DB60) 躟(DC60) 輅(DD60) 轥(DE60) 違(DF60) 郹(E060) 醏(E160) 鈆(E260) 鉦(E360) 鋊(E460) 錪(E560) 鎌(E660) 鏯(E760) 鑐(E860) 閌(E960) 阘(EA60) 隸(EB60) 靈(EC60) 韅(ED60) 頯(EE60) 颼(EF60) 餪(F060) 馺(F160) 騚(F260) 骮(F360) 鬬(F460) 鮜(F560) 鯼(F660) 鱜(F760) 鴃(F860) 鵣(F960) 鷃(FA60) 鸴(FB60) 黗(FC60) 齚(FD60) 
-               [{](7B) 亄(817B) 倇(827B) 儃(837B) 剓(847B) 厈(857B) 唟(867B) 噞(877B) 坽(887B) 墈(897B) 妠(8A7B) 媨(8B7B) 寋(8C7B) 峽(8D7B) 巤(8E7B) 弡(8F7B) 恵(907B) 憑(917B) 抺(927B) 搟(937B) 攞(947B) 晎(957B) 杮(967B) 梴(977B) 榹(987B) 檣(997B) 歿(9A7B) 泏(9B7B) 渰(9C7B) 漿(9D7B) 瀧(9E7B) 焮(9F7B) 爗(A07B) ▄ (A87B) ﹞(A97B) 獅(AA7B) 珄(AB7B) 瑊(AC7B) 瓄(AD7B) 畕(AE7B) 瘂(AF7B) 皗(B07B) 眥(B17B) 瞷(B27B) 硔(B37B) 磠(B47B) 祘(B57B) 秢(B67B) 穥(B77B) 竰(B87B) 箋(B97B) 簕(BA7B) 粄(BB7B) 納(BC7B) 絳(BD7B) 緖(BE7B) 縶(BF7B) 纚(C07B) 羬(C17B) 聓(C27B) 脅(C37B) 膡(C47B) 舺(C57B) 苳(C67B) 莧(C77B) 葅(C87B) 蓒(C97B) 蕒(CA7B) 藍(CB7B) 蘽(CC7B) 蛖(CD7B) 蝱(CE7B) 蟵(CF7B) 衶(D07B) 褅(D17B) 襸(D27B) 觷(D37B) 詛(D47B) 調(D57B) 謠(D67B) 讃(D77B) 貃(D87B) 賩(D97B) 趝(DA7B) 踸(DB7B) 躿(DC7B) 輠(DD7B) 辿(DE7B) 遻(DF7B) 鄘(E07B) 醷(E17B) 鈡(E27B) 銂(E37B) 鋥(E47B) 鍆(E57B) 鎨(E67B) 鐊(E77B) 鑬(E87B) 閧(E97B) 陒(EA7B) 雥(EB7B) 靮(EC7B) 韠(ED7B) 顊(EE7B) 飡(EF7B) 饆(F07B) 駕(F17B) 騵(F27B) 髙(F37B) 魗(F47B) 鮷(F57B) 鰗(F67B) 鱷(F77B) 鴞(F87B) 鵾(F97B) 鷞(FA7B) 鹻(FB7B) 鼂(FC7B) 齵(FD7B) 
-               [|](7C) 亅(817C) 倈(827C) 億(837C) 剕(847C) 厊(857C) 唡(867C) 噟(877C) 坾(887C) 墊(897C) 妡(8A7C) 媩(8B7C) 寍(8C7C) 峾(8D7C) 巪(8E7C) 弢(8F7C) 恷(907C) 憒(917C) 抾(927C) 搢(937C) 攟(947C) 晐(957C) 東(967C) 梶(977C) 榺(987C) 檤(997C) 殀(9A7C) 泑(9B7C) 渱(9C7C) 潀(9D7C) 瀨(9E7C) 焲(9F7C) 爘(A07C) ▅ (A87C) ﹟(A97C) 獆(AA7C) 珅(AB7C) 瑋(AC7C) 瓅(AD7C) 畖(AE7C) 瘄(AF7C) 皘(B07C) 眧(B17C) 瞸(B27C) 硘(B37C) 磡(B47C) 祙(B57C) 秥(B67C) 穦(B77C) 竱(B87C) 箌(B97C) 簗(BA7C) 粅(BB7C) 紎(BC7C) 絴(BD7C) 緗(BE7C) 縷(BF7C) 纜(C07C) 羭(C17C) 聕(C27C) 脇(C37C) 膢(C47C) 舼(C57C) 苵(C67C) 莬(C77C) 葇(C87C) 蓔(C97C) 蕓(CA7C) 藎(CB7C) 蘾(CC7C) 蛗(CD7C) 蝲(CE7C) 蟶(CF7C) 衸(D07C) 褆(D17C) 襹(D27C) 觸(D37C) 詜(D47C) 諀(D57C) 謡(D67C) 讄(D77C) 貄(D87C) 質(D97C) 趞(DA7C) 踻(DB7C) 軀(DC7C) 輡(DD7C) 迀(DE7C) 遼(DF7C) 鄚(E07C) 醸(E17C) 鈢(E27C) 銃(E37C) 鋦(E47C) 鍇(E57C) 鎩(E67C) 鐋(E77C) 鑭(E87C) 閨(E97C) 陓(EA7C) 雦(EB7C) 靯(EC7C) 韡(ED7C) 顋(EE7C) 飢(EF7C) 饇(F07C) 駖(F17C) 騶(F27C) 髚(F37C) 魘(F47C) 鮸(F57C) 鰘(F67C) 鱸(F77C) 鴟(F87C) 鵿(F97C) 鷟(FA7C) 鹼(FB7C) 鼃(FC7C) 齶(FD7C) 
-               [}](7D) 亇(817D) 倉(827D) 儅(837D) 剗(847D) 厎(857D) 唥(867D) 噠(877D) 坿(887D) 墋(897D) 妢(8A7D) 媫(8B7D) 寎(8C7D) 峿(8D7D) 巬(8E7D) 弣(8F7D) 恾(907D) 憓(917D) 拀(927D) 搣(937D) 攠(947D) 晑(957D) 杴(967D) 梷(977D) 榼(987D) 檥(997D) 殅(9A7D) 泒(9B7D) 渳(9C7D) 潁(9D7D) 瀩(9E7D) 焳(9F7D) 爙(A07D) ▆ (A87D) ﹠(A97D) 獇(AA7D) 珆(AB7D) 瑌(AC7D) 瓆(AD7D) 畗(AE7D) 瘆(AF7D) 皚(B07D) 眪(B17D) 瞹(B27D) 硙(B37D) 磢(B47D) 祡(B57D) 秨(B67D) 穧(B77D) 竲(B87D) 箎(B97D) 簘(BA7D) 粆(BB7D) 紏(BC7D) 絵(BD7D) 緘(BE7D) 縸(BF7D) 纝(C07D) 羮(C17D) 聖(C27D) 脈(C37D) 膤(C47D) 舽(C57D) 苶(C67D) 莭(C77D) 葈(C87D) 蓕(C97D) 蕔(CA7D) 藑(CB7D) 蘿(CC7D) 蛚(CD7D) 蝳(CE7D) 蟷(CF7D) 衹(D07D) 複(D17D) 襺(D27D) 觹(D37D) 詝(D47D) 諁(D57D) 謢(D67D) 讅(D77D) 貆(D87D) 賫(D97D) 趠(DA7D) 踼(DB7D) 軁(DC7D) 輢(DD7D) 迃(DE7D) 遾(DF7D) 鄛(E07D) 醹(E17D) 鈣(E27D) 銄(E37D) 鋧(E47D) 鍈(E57D) 鎪(E67D) 鐌(E77D) 鑮(E87D) 閩(E97D) 陖(EA7D) 雧(EB7D) 靰(EC7D) 韢(ED7D) 題(EE7D) 飣(EF7D) 饈(F07D) 駗(F17D) 騷(F27D) 髛(F37D) 魙(F47D) 鮹(F57D) 鰙(F67D) 鱹(F77D) 鴠(F87D) 鶀(F97D) 鷠(FA7D) 鹽(FB7D) 鼄(FC7D) 齷(FD7D) 
-  ------------------------------------------------------------------------------
-  rfc2279 (UTF-8 RFC2279)
-             1st       2nd       3rd       4th
-             C2..DF    80..BF
-             E0..EF    80..BF    80..BF
-             F0..F4    80..BF    80..BF    80..BF
-             00..7F
-             https://www.ietf.org/rfc/rfc2279.txt
-             * needs no multibyte anchoring
-             * needs no escaping meta char of 2nd-4th octets
-             * safe US-ASCII casefolding of 2nd-4th octet
-             * allows encoding surrogate codepoints even if it is not pair
-  ------------------------------------------------------------------------------
-  sjis (Shift_JIS-like encodings, ex. cp932)
-             1st       2nd
-             81..9F    00..FF
-             E0..FC    00..FF
-             80..FF
-             00..7F
-             https://en.wikipedia.org/wiki/Shift_JIS
-             * needs multibyte anchoring
-             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
-             * needs escaping meta char of 2nd octet
-             * and DAMEMOJI samples, here
-               [@](40) 　(8140) ァ(8340) А(8440) 院(8940) 魁(8A40) 機(8B40) 掘(8C40) 后(8D40) 察(8E40) 宗(8F40) 拭(9040) 繊(9140) 叩(9240) 邸(9340) 如(9440) 鼻(9540) 法(9640) 諭(9740) 蓮(9840) 僉(9940) 咫(9A40) 奸(9B40) 廖(9C40) 戞(9D40) 曄(9E40) 檗(9F40) 漾(E040) 瓠(E140) 磧(E240) 紂(E340) 隋(E440) 蕁(E540) 襦(E640) 蹇(E740) 錙(E840) 顱(E940) 鵝(EA40) 
-               [[](5B) ー(815B) ゼ(835B) Ъ(845B) 閏(895B) 骸(8A5B) 擬(8B5B) 啓(8C5B) 梗(8D5B) 纂(8E5B) 充(8F5B) 深(905B) 措(915B) 端(925B) 甜(935B) 納(945B) 票(955B) 房(965B) 夕(975B) 麓(985B) 兌(995B) 喙(9A5B) 媼(9B5B) 彈(9C5B) 拏(9D5B) 杣(9E5B) 歇(9F5B) 濕(E05B) 畆(E15B) 禺(E25B) 綣(E35B) 膽(E45B) 藜(E55B) 觴(E65B) 躰(E75B) 鐚(E85B) 饉(E95B) 鷦(EA5B) 
-               [\](5C) ―(815C) ソ(835C) Ы(845C) 噂(895C) 浬(8A5C) 欺(8B5C) 圭(8C5C) 構(8D5C) 蚕(8E5C) 十(8F5C) 申(905C) 曾(915C) 箪(925C) 貼(935C) 能(945C) 表(955C) 暴(965C) 予(975C) 禄(985C) 兔(995C) 喀(9A5C) 媾(9B5C) 彌(9C5C) 拿(9D5C) 杤(9E5C) 歃(9F5C) 濬(E05C) 畚(E15C) 秉(E25C) 綵(E35C) 臀(E45C) 藹(E55C) 觸(E65C) 軆(E75C) 鐔(E85C) 饅(E95C) 鷭(EA5C) 
-               []](5D) ‐(815D) ゾ(835D) Ь(845D) 云(895D) 馨(8A5D) 犠(8B5D) 珪(8C5D) 江(8D5D) 讃(8E5D) 従(8F5D) 疹(905D) 曽(915D) 綻(925D) 転(935D) 脳(945D) 評(955D) 望(965D) 余(975D) 肋(985D) 兢(995D) 咯(9A5D) 嫋(9B5D) 彎(9C5D) 拆(9D5D) 枉(9E5D) 歉(9F5D) 濔(E05D) 畩(E15D) 秕(E25D) 緇(E35D) 臂(E45D) 蘊(E55D) 訃(E65D) 躱(E75D) 鐓(E85D) 饐(E95D) 鷯(EA5D) 
-               [^](5E) ／(815E) タ(835E) Э(845E) 運(895E) 蛙(8A5E) 疑(8B5E) 型(8C5E) 洪(8D5E) 賛(8E5E) 戎(8F5E) 真(905E) 楚(915E) 耽(925E) 顛(935E) 膿(945E) 豹(955E) 某(965E) 与(975E) 録(985E) 竸(995E) 喊(9A5E) 嫂(9B5E) 弯(9C5E) 擔(9D5E) 杰(9E5E) 歐(9F5E) 濘(E05E) 畤(E15E) 秧(E25E) 綽(E35E) 膺(E45E) 蘓(E55E) 訖(E65E) 躾(E75E) 鐃(E85E) 饋(E95E) 鷽(EA5E) 
-               [`](60) 〜(8160) Ａ(8260) チ(8360) Я(8460) 荏(8960) 柿(8A60) 義(8B60) 形(8C60) 港(8D60) 餐(8E60) 汁(8F60) 秦(9060) 疏(9160) 蛋(9260) 伝(9360) 覗(9460) 描(9560) 冒(9660) 輿(9760) 倭(9860) 兪(9960) 啻(9A60) 嫣(9B60) 彖(9C60) 拜(9D60) 杼(9E60) 歔(9F60) 濮(E060) 畫(E160) 秡(E260) 總(E360) 臍(E460) 藾(E560) 訌(E660) 軈(E760) 鐐(E860) 饒(E960) 鸛(EA60) 
-               [{](7B) ＋(817B) ボ(837B) к(847B) 閲(897B) 顎(8A7B) 宮(8B7B) 鶏(8C7B) 砿(8D7B) 施(8E7B) 旬(8F7B) 須(907B) 捜(917B) 畜(927B) 怒(937B) 倍(947B) 府(957B) 本(967B) 養(977B) 几(997B) 嘴(9A7B) 學(9B7B) 悳(9C7B) 掉(9D7B) 桀(9E7B) 毬(9F7B) 炮(E07B) 痣(E17B) 窖(E27B) 縵(E37B) 艝(E47B) 蛔(E57B) 諚(E67B) 轆(E77B) 閔(E87B) 驅(E97B) 黠(EA7B) 
-               [|](7C) − (817C) ポ(837C) л(847C) 榎(897C) 掛(8A7C) 弓(8B7C) 芸(8C7C) 鋼(8D7C) 旨(8E7C) 楯(8F7C) 酢(907C) 掃(917C) 竹(927C) 倒(937C) 培(947C) 怖(957C) 翻(967C) 慾(977C) 處(997C) 嘶(9A7C) 斈(9B7C) 忿(9C7C) 掟(9D7C) 桍(9E7C) 毫(9F7C) 烟(E07C) 痞(E17C) 窩(E27C) 縹(E37C) 艚(E47C) 蛞(E57C) 諫(E67C) 轎(E77C) 閖(E87C) 驂(E97C) 黥(EA7C) 
-               [}](7D) ±(817D) マ(837D) м(847D) 厭(897D) 笠(8A7D) 急(8B7D) 迎(8C7D) 閤(8D7D) 枝(8E7D) 殉(8F7D) 図(907D) 挿(917D) 筑(927D) 党(937D) 媒(947D) 扶(957D) 凡(967D) 抑(977D) 凩(997D) 嘲(9A7D) 孺(9B7D) 怡(9C7D) 掵(9D7D) 栲(9E7D) 毳(9F7D) 烋(E07D) 痾(E17D) 竈(E27D) 繃(E37D) 艟(E47D) 蛩(E57D) 諳(E67D) 轗(E77D) 閘(E87D) 驀(E97D) 黨(EA7D) 
-  ------------------------------------------------------------------------------
-  uhc (UHC)
-             1st       2nd
-             81..FE    00..FF
-             00..7F
-             https://en.wikipedia.org/wiki/Unified_Hangul_Code
-             * needs multibyte anchoring
-             * needs no escaping meta char of 2nd octet
-             * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
-  ------------------------------------------------------------------------------
-  utf8 (UTF-8 RFC3629)
-             1st       2nd       3rd       4th
-             E1..EC    80..BF    80..BF
-             C2..DF    80..BF
-             EE..EF    80..BF    80..BF
-             F0..F0    90..BF    80..BF    80..BF
-             E0..E0    A0..BF    80..BF
-             ED..ED    80..9F    80..BF
-             F1..F3    80..BF    80..BF    80..BF
-             F4..F4    80..8F    80..BF    80..BF
-             00..7F
-             https://en.wikipedia.org/wiki/UTF-8
-             * needs no multibyte anchoring
-             * needs no escaping meta char of 2nd-4th octets
-             * safe US-ASCII casefolding of 2nd-4th octet
-             * enforces surrogate codepoints must be paired
-  ------------------------------------------------------------------------------
-  wtf8 (WTF-8)
-             1st       2nd       3rd       4th
-             E1..EF    80..BF    80..BF
-             C2..DF    80..BF
-             E0..E0    A0..BF    80..BF
-             F0..F0    90..BF    80..BF    80..BF
-             F1..F3    80..BF    80..BF    80..BF
-             F4..F4    80..8F    80..BF    80..BF
-             00..7F
-             http://simonsapin.github.io/wtf-8/
-             * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
-             * needs no multibyte anchoring
-             * needs no escaping meta char of 2nd-4th octets
-             * safe US-ASCII casefolding of 2nd-4th octet
-  ------------------------------------------------------------------------------
+=head2 big5 (Big5)
+
+  1st       2nd
+  81..FE    00..FF
+  00..7F
+
+L<https://en.wikipedia.org/wiki/Big5>
+
+=over 2
+
+=item * needs multibyte anchoring
+
+=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+
+=item * needs escaping meta char of 2nd octet
+
+=item * and DAMEMOJI samples, here
+
+=back
+
+  [@](40) 　(A140) ＼(A240) ｗ(A340) 一(A440) 世(A540) 共(A640) 作(A740) 杓(A840) 咖(A940) 昇(AA40) 陂(AB40) 拯(AC40) 耐(AD40) 哦(AE40) 浬(AF40) 虔(B040) 娼(B140) 毫(B240) 莆(B340) 婷(B440) 溉(B540) 詔(B640) 媳(B740) 睹(B840) 辟(B940) 愿(BA40) 罰(BB40) 劇(BC40) 瑾(BD40) 輥(BE40) 濃(BF40) 錐(C040) 瞧(C140) 駿(C240) 鞭(C340) 願(C440) 護(C540) 讖(C640) す(C740) 乂(C940) 汌(CA40) 杙(CB40) 坨(CC40) 泒(CD40) 哃(CE40) 柜(CF40) 穾(D040) 唊(D140) 毨(D240) 笄(D340) 酎(D440) 崰(D540) 淐(D640) 耞(D740) 釫(D840) 惲(D940) 湨(DA40) 罦(DB40) 軹(DC40) 媷(DD40) 毹(DE40) 稛(DF40) 觡(E040) 凘(E140) 榠(E240) 禗(E340) 裰(E440) 噚(E540) 澍(E640) 膞(E740) 踔(E840) 噳(E940) 澢(EA40) 蕀(EB40) 錋(EC40) 檕(ED40) 蕷(EE40) 鞞(EF40) 璸(F040) 蹛(F140) 徿(F240) 譑(F340) 嚵(F440) 鏼(F540) 蠩(F640) 糴(F740) 讌(F840) 纘(F940) 
+  [[](5B) ︴(A15B) 兞(A25B) Ω(A35B) 久(A45B) 加(A55B) 吆(A65B) 吝(A75B) 沍(A85B) 坤(A95B) 歧(AA5B) 俎(AB5B) 架(AC5B) 茉(AD5B) 娌(AE5B) 琉(AF5B) 豺(B05B) 崙(B15B) 涵(B25B) 訥(B35B) 廂(B45B) 琥(B55B) 跋(B65B) 愴(B75B) 稟(B85B) 鉀(B95B) 暨(BA5B) 蒜(BB5B) 墩(BC5B) 稼(BD5B) 閭(BE5B) 璟(BF5B) 頤(C05B) 繆(C15B) 攆(C25B) 鵠(C35B) 壤(C45B) 騾(C55B) 觀(C65B) ぴ(C75B) 夬(C95B) 伻(CA5B) 汥(CB5B) 岮(CC5B) 牪(CD5B) 垙(CE5B) 枮(CF5B) 胂(D05B) 娙(D15B) 浟(D25B) 罜(D35B) 倕(D45B) 惙(D55B) 焎(D65B) 莨(D75B) 偨(D85B) 揳(D95B) 烻(DA5B) 艵(DB5B) 鄅(DC5B) 幍(DD5B) 滃(DE5B) 絿(DF5B) 賌(E05B) 墁(E15B) 榞(E25B) 箙(E35B) 跽(E45B) 嬂(E55B) 潩(E65B) 蔈(E75B) 醅(E85B) 嬠(E95B) 獩(EA5B) 螛(EB5B) 頲(EC5B) 濨(ED5B) 蟅(EE5B) 駷(EF5B) 礐(F05B) 鎎(F15B) 氌(F25B) 辴(F35B) 瀼(F45B) 騴(F55B) 酄(F65B) 譿(F75B) 鱍(F85B) 鱮(F95B) 
+  [\](5C) ﹏(A15C) 兝(A25C) α(A35C) 么(A45C) 功(A55C) 吒(A65C) 吭(A75C) 沔(A85C) 坼(A95C) 歿(AA5C) 俞(AB5C) 枯(AC5C) 苒(AD5C) 娉(AE5C) 珮(AF5C) 豹(B05C) 崤(B15C) 淚(B25C) 許(B35C) 廄(B45C) 琵(B55C) 跚(B65C) 愧(B75C) 稞(B85C) 鈾(B95C) 暝(BA5C) 蓋(BB5C) 墦(BC5C) 穀(BD5C) 閱(BE5C) 璞(BF5C) 餐(C05C) 縷(C15C) 擺(C25C) 黠(C35C) 孀(C45C) 髏(C55C) 躡(C65C) ふ(C75C) 尐(C95C) 佢(CA5C) 汻(CB5C) 岤(CC5C) 狖(CD5C) 垥(CE5C) 柦(CF5C) 胐(D05C) 娖(D15C) 涂(D25C) 罡(D35C) 偅(D45C) 惝(D55C) 牾(D65C) 莍(D75C) 傜(D85C) 揊(D95C) 焮(DA5C) 茻(DB5C) 鄃(DC5C) 幋(DD5C) 滜(DE5C) 綅(DF5C) 赨(E05C) 塿(E15C) 槙(E25C) 箤(E35C) 踊(E45C) 嫹(E55C) 潿(E65C) 蔌(E75C) 醆(E85C) 嬞(E95C) 獦(EA5C) 螏(EB5C) 餤(EC5C) 燡(ED5C) 螰(EE5C) 駹(EF5C) 礒(F05C) 鎪(F15C) 瀙(F25C) 酀(F35C) 瀵(F45C) 騱(F55C) 酅(F65C) 贕(F75C) 鱋(F85C) 鱭(F95C) 
+  []](5D) （(A15D) 兡(A25D) β(A35D) 也(A45D) 包(A55D) 因(A65D) 吞(A75D) 沘(A85D) 夜(A95D) 氓(AA5D) 侷(AB5D) 柵(AC5D) 苗(AD5D) 孫(AE5D) 珠(AF5D) 財(B05D) 崧(B15D) 淫(B25D) 設(B35D) 弼(B45D) 琶(B55D) 跑(B65D) 愍(B75D) 窟(B85D) 鉛(B95D) 榜(BA5D) 蒸(BB5D) 奭(BC5D) 稽(BD5D) 霄(BE5D) 瓢(BF5D) 館(C05D) 縲(C15D) 擻(C25D) 鼕(C35D) 孃(C45D) 魔(C55D) 釁(C65D) ぶ(C75D) 巿(C95D) 佉(CA5D) 沎(CB5D) 岠(CC5D) 狋(CD5D) 垚(CE5D) 柛(CF5D) 胅(D05D) 娭(D15D) 涘(D25D) 罞(D35D) 偟(D45D) 惈(D55D) 牻(D65D) 荺(D75D) 傒(D85D) 揠(D95D) 焱(DA5D) 菏(DB5D) 酡(DC5D) 廅(DD5D) 滘(DE5D) 絺(DF5D) 赩(E05D) 塴(E15D) 榗(E25D) 箂(E35D) 踃(E45D) 嬁(E55D) 澕(E65D) 蓴(E75D) 醊(E85D) 寯(E95D) 獧(EA5D) 螗(EB5D) 餟(EC5D) 燱(ED5D) 螬(EE5D) 駸(EF5D) 礑(F05D) 鎞(F15D) 瀧(F25D) 鄿(F35D) 瀯(F45D) 騬(F55D) 醹(F65D) 躕(F75D) 鱕(F85D) 鸋(F95D) 
+  [^](5E) ）(A15E) 兣(A25E) γ(A35E) 乞(A45E) 匆(A55E) 回(A65E) 吾(A75E) 沂(A85E) 奉(A95E) 氛(AA5E) 兗(AB5E) 柩(AC5E) 英(AD5E) 屘(AE5E) 珪(AF5E) 貢(B05E) 崗(B15E) 淘(B25E) 訟(B35E) 彭(B45E) 琴(B55E) 跌(B65E) 愆(B75E) 窠(B85E) 鉋(B95E) 榨(BA5E) 蓀(BB5E) 嬉(BC5E) 稷(BD5E) 霆(BE5E) 甌(BF5E) 餞(C05E) 繃(C15E) 擷(C25E) 鼬(C35E) 孽(C45E) 魑(C55E) 鑲(C65E) ぷ(C75E) 旡(C95E) 体(CA5E) 灴(CB5E) 岵(CC5E) 狘(CD5E) 垕(CE5E) 柺(CF5E) 胣(D05E) 娮(D15E) 洯(D25E) 罠(D35E) 偩(D45E) 悱(D55E) 牼(D65E) 荳(D75E) 傂(D85E) 揶(D95E) 焣(DA5E) 菹(DB5E) 酤(DC5E) 廌(DD5E) 溙(DE5E) 綎(DF5E) 趑(E05E) 墋(E15E) 榐(E25E) 粻(E35E) 踇(E45E) 嬇(E55E) 潣(E65E) 蔪(E75E) 醁(E85E) 嶬(E95E) 獬(EA5E) 螓(EB5E) 餧(EC5E) 燨(ED5E) 螹(EE5E) 駶(EF5E) 禭(F05E) 鎦(F15E) 瀠(F25E) 醰(F35E) 瀷(F45E) 騪(F55E) 鐿(F65E) 躔(F75E) 鱙(F85E) 鸍(F95E) 
+  [`](60) ︶(A160) 瓩(A260) ε(A360) 亡(A460) 匝(A560) 圳(A660) 呎(A760) 灼(A860) 奈(A960) 注(AA60) 冑(AB60) 柄(AC60) 苜(AD60) 害(AE60) 畔(AF60) 躬(B060) 常(B160) 深(B260) 訢(B360) 循(B460) 琛(B560) 跆(B660) 戡(B760) 節(B860) 鉑(B960) 槁(BA60) 蒐(BB60) 嬋(BC60) 窯(BD60) 霉(BE60) 瘴(BF60) 餡(C060) 總(C160) 曜(C260) 嚥(C360) 巉(C460) 鰥(C560) 顱(C660) べ(C760) 毌(C960) 伾(CA60) 牣(CB60) 岨(CC60) 狜(CD60) 复(CE60) 柊(CF60) 胜(D060) 娏(D160) 涋(D260) 罛(D360) 偣(D460) 悷(D560) 猝(D660) 荴(D760) 兟(D860) 揲(D960) 焢(DA60) 菀(DB60) 酢(DC60) 廋(DD60) 溎(DE60) 綃(DF60) 趎(E060) 墇(E160) 榵(E260) 粼(E360) 踅(E460) 嬏(E560) 潪(E660) 蔕(E760) 醄(E860) 嶩(E960) 獫(EA60) 螈(EB60) 馞(EC60) 燤(ED60) 螼(EE60) 駽(EF60) 穟(F060) 鎈(F160) 瀫(F260) 鏞(F360) 瀱(F460) 騩(F560) 鐶(F660) 躒(F760) 鱎(F860) 鸏(F960) 
+  [{](7B) ﹃(A17B) ┐(A27B) ㄌ(A37B) 廾(A47B) 叻(A57B) 州(A67B) 坊(A77B) 肚(A87B) 宛(A97B) 泯(AA7B) 哂(AB7B) 洌(AC7B) 迦(AD7B) 徒(AE7B) 砸(AF7B) 閃(B07B) 惋(B17B) 現(B27B) 逢(B37B) 揩(B47B) 程(B57B) 閔(B67B) 暍(B77B) 腥(B87B) 頒(B97B) 漬(BA7B) 認(BB7B) 慮(BC7B) 緹(BD7B) 魷(BE7B) 篦(BF7B) 嚀(C07B) 臨(C17B) 璿(C27B) 爍(C37B) 糰(C47B) 瓤(C57B) 鬱(C67B) ァ(C77B) 忉(C97B) 吙(CA7B) 芅(CB7B) 怦(CC7B) 矼(CD7B) 峌(CE7B) 洑(CF7B) 苻(D07B) 彧(D17B) 烎(D27B) 荁(D37B) 唵(D47B) 捼(D57B) 畣(D67B) 虙(D77B) 喎(D87B) 斞(D97B) 琬(DA7B) 萑(DB7B) 閐(DC7B) 搒(DD7B) 煰(DE7B) 腞(DF7B) 輂(E07B) 嫨(E17B) 漻(E27B) 翢(E37B) 銠(E47B) 憱(E57B) 獛(E67B) 蔋(E77B) 鋞(E87B) 懆(E97B) 瞢(EA7B) 褬(EB7B) 鮒(EC7B) 瞫(ED7B) 覮(EE7B) 鴯(EF7B) 翸(F07B) 鞨(F17B) 矄(F27B) 霫(F37B) 礧(F47B) 鶒(F57B) 驄(F67B) 驌(F77B) 鼷(F87B) 鸔(F97B) 
+  [|](7C) ﹄(A17C) └(A27C) ㄍ(A37C) 弋(A47C) 四(A57C) 帆(A67C) 坑(A77C) 育(A87C) 尚(A97C) 泜(AA7C) 咽(AB7C) 洱(AC7C) 迢(AD7C) 徑(AE7C) 砝(AF7C) 院(B07C) 悴(B17C) 琍(B27C) 逖(B37C) 揉(B47C) 稅(B57C) 閏(B67C) 會(B77C) 腮(B87C) 頌(B97C) 漏(BA7C) 誡(BB7C) 慝(BC7C) 罵(BD7C) 魯(BE7C) 糕(BF7C) 嚐(C07C) 舉(C17C) 甕(C27C) 牘(C37C) 辮(C47C) 疊(C57C) 鸛(C67C) ア(C77C) 戉(C97C) 吜(CA7C) 芎(CB7C) 怙(CC7C) 矹(CD7C) 峗(CE7C) 洀(CF7C) 苶(D07C) 恝(D17C) 烡(D27C) 茦(D37C) 唰(D47C) 掤(D57C) 痎(D67C) 虖(D77C) 圌(D87C) 斮(D97C) 琰(DA7C) 萆(DB7C) 隇(DC7C) 搉(DD7C) 煟(DE7C) 腶(DF7C) 輋(E07C) 嫟(E17C) 漒(E27C) 翣(E37C) 銔(E47C) 憰(E57C) 獡(E67C) 蔙(E77C) 鋧(E87C) 懁(E97C) 瞣(EA7C) 褟(EB7C) 鮐(EC7C) 瞲(ED7C) 觲(EE7C) 鴱(EF7C) 聵(F07C) 鞫(F17C) 矱(F27C) 霬(F37C) 礨(F47C) 鶘(F57C) 驂(F67C) 驏(F77C) 鼶(F87C) 鸓(F97C) 
+  [}](7D) ﹙(A17D) ┘(A27D) ㄎ(A37D) 弓(A47D) 囚(A57D) 并(A67D) 址(A77D) 良(A87D) 屈(A97D) 泖(AA7D) 咪(AB7D) 洞(AC7D) 迪(AD7D) 徐(AE7D) 破(AF7D) 陣(B07D) 惦(B17D) 瓠(B27D) 逛(B37D) 揆(B47D) 稀(B57D) 開(B67D) 榔(B77D) 腳(B87D) 飼(B97D) 漂(BA7D) 誓(BB7D) 慕(BC7D) 罷(BD7D) 鴆(BE7D) 糖(BF7D) 嚅(C07D) 艱(C17D) 癖(C27D) 犢(C37D) 繽(C47D) 癮(C57D) 鸞(C67D) ィ(C77D) 扐(C97D) 吥(CA7D) 芑(CB7D) 怲(CC7D) 矻(CD7D) 峋(CE7D) 洝(CF7D) 苰(D07D) 恚(D17D) 牂(D27D) 茜(D37D) 啒(D47D) 挻(D57D) 痒(D67D) 蚿(D77D) 堩(D87D) 旐(D97D) 琫(DA7D) 菂(DB7D) 陾(DC7D) 搠(DD7D) 煐(DE7D) 腧(DF7D) 遒(E07D) 孷(E17D) 滭(E27D) 翥(E37D) 銪(E47D) 憢(E57D) 獚(E67D) 蔯(E77D) 鋑(E87D) 懌(E97D) 瞕(EA7D) 觱(EB7D) 魺(EC7D) 瞷(ED7D) 觳(EE7D) 鴸(EF7D) 臑(F07D) 鞤(F17D) 礝(F27D) 霨(F37D) 礤(F47D) 鶐(F57D) 驁(F67D) 驈(F77D) 齃(F87D) 黶(F97D) 
+
+=head2 big5hkscs (Big5-HKSCS)
+
+  1st       2nd
+  81..FE    00..FF
+  00..7F
+
+L<https://en.wikipedia.org/wiki/Hong_Kong_Supplementary_Character_Set>
+
+=over 2
+
+=item * needs multibyte anchoring
+
+=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+
+=item * needs escaping meta char of 2nd octet
+
+=item * and DAMEMOJI samples, here
+
+=back
+
+  [@](40) 倻(8C40) 蕋(8F40) 趩(9040) 媁(9340) 銉(9440) 桇(9640) 愌(9740) 䄉(9940) 鋣(9A40) 嵛(9C40) 籖(9F40) 　(A140) ＼(A240) ｗ(A340) 一(A440) 世(A540) 共(A640) 作(A740) 杓(A840) 咖(A940) 昇(AA40) 陂(AB40) 拯(AC40) 耐(AD40) 哦(AE40) 浬(AF40) 虔(B040) 娼(B140) 毫(B240) 莆(B340) 婷(B440) 溉(B540) 詔(B640) 媳(B740) 睹(B840) 辟(B940) 愿(BA40) 罰(BB40) 劇(BC40) 瑾(BD40) 輥(BE40) 濃(BF40) 錐(C040) 瞧(C140) 駿(C240) 鞭(C340) 願(C440) 護(C540) 讖(C640) す(C740) Л(C840) 乂(C940) 汌(CA40) 杙(CB40) 坨(CC40) 泒(CD40) 哃(CE40) 柜(CF40) 穾(D040) 唊(D140) 毨(D240) 笄(D340) 酎(D440) 崰(D540) 淐(D640) 耞(D740) 釫(D840) 惲(D940) 湨(DA40) 罦(DB40) 軹(DC40) 媷(DD40) 毹(DE40) 稛(DF40) 觡(E040) 凘(E140) 榠(E240) 禗(E340) 裰(E440) 噚(E540) 澍(E640) 膞(E740) 踔(E840) 噳(E940) 澢(EA40) 蕀(EB40) 錋(EC40) 檕(ED40) 蕷(EE40) 鞞(EF40) 璸(F040) 蹛(F140) 徿(F240) 譑(F340) 嚵(F440) 鏼(F540) 蠩(F640) 糴(F740) 讌(F840) 纘(F940) 廹(FC40) 鑂(FE40) 
+  [[](5B) É (885B) 团(895B) 撍(8A5B) 腭(8B5B) 冮(8C5B) 橗(8F5B) 迹(905B) 髠(915B) 㛓(935B) 釥(965B) 鋥(975B) 婮(985B) 䊔(995B) 靀(9A5B) 挵(9F5B) 惽(A05B) ︴(A15B) 兞(A25B) Ω(A35B) 久(A45B) 加(A55B) 吆(A65B) 吝(A75B) 沍(A85B) 坤(A95B) 歧(AA5B) 俎(AB5B) 架(AC5B) 茉(AD5B) 娌(AE5B) 琉(AF5B) 豺(B05B) 崙(B15B) 涵(B25B) 訥(B35B) 廂(B45B) 琥(B55B) 跋(B65B) 愴(B75B) 稟(B85B) 鉀(B95B) 暨(BA5B) 蒜(BB5B) 墩(BC5B) 稼(BD5B) 閭(BE5B) 璟(BF5B) 頤(C05B) 繆(C15B) 攆(C25B) 鵠(C35B) 壤(C45B) 騾(C55B) 觀(C65B) ぴ(C75B) ё(C85B) 夬(C95B) 伻(CA5B) 汥(CB5B) 岮(CC5B) 牪(CD5B) 垙(CE5B) 枮(CF5B) 胂(D05B) 娙(D15B) 浟(D25B) 罜(D35B) 倕(D45B) 惙(D55B) 焎(D65B) 莨(D75B) 偨(D85B) 揳(D95B) 烻(DA5B) 艵(DB5B) 鄅(DC5B) 幍(DD5B) 滃(DE5B) 絿(DF5B) 賌(E05B) 墁(E15B) 榞(E25B) 箙(E35B) 跽(E45B) 嬂(E55B) 潩(E65B) 蔈(E75B) 醅(E85B) 嬠(E95B) 獩(EA5B) 螛(EB5B) 頲(EC5B) 濨(ED5B) 蟅(EE5B) 駷(EF5B) 礐(F05B) 鎎(F15B) 氌(F25B) 辴(F35B) 瀼(F45B) 騴(F55B) 酄(F65B) 譿(F75B) 鱍(F85B) 鱮(F95B) 囯(FB5B) 玪(FE5B) 
+  [\](5C) Ě (885C) 声(895C) 蹾(8A5C) 胬(8B5C) 笋(8E5C) 蕚(8F5C) 髢(915C) 脪(935C) 䓀(965C) 珢(975C) 娫(985C) 糭(995C) 䨵(9A5C) 鞸(9B5C) 㘘(9C5C) 疱(9E5C) 髿(9F5C) 癧(A05C) ﹏(A15C) 兝(A25C) α(A35C) 么(A45C) 功(A55C) 吒(A65C) 吭(A75C) 沔(A85C) 坼(A95C) 歿(AA5C) 俞(AB5C) 枯(AC5C) 苒(AD5C) 娉(AE5C) 珮(AF5C) 豹(B05C) 崤(B15C) 淚(B25C) 許(B35C) 廄(B45C) 琵(B55C) 跚(B65C) 愧(B75C) 稞(B85C) 鈾(B95C) 暝(BA5C) 蓋(BB5C) 墦(BC5C) 穀(BD5C) 閱(BE5C) 璞(BF5C) 餐(C05C) 縷(C15C) 擺(C25C) 黠(C35C) 孀(C45C) 髏(C55C) 躡(C65C) ふ(C75C) ж(C85C) 尐(C95C) 佢(CA5C) 汻(CB5C) 岤(CC5C) 狖(CD5C) 垥(CE5C) 柦(CF5C) 胐(D05C) 娖(D15C) 涂(D25C) 罡(D35C) 偅(D45C) 惝(D55C) 牾(D65C) 莍(D75C) 傜(D85C) 揊(D95C) 焮(DA5C) 茻(DB5C) 鄃(DC5C) 幋(DD5C) 滜(DE5C) 綅(DF5C) 赨(E05C) 塿(E15C) 槙(E25C) 箤(E35C) 踊(E45C) 嫹(E55C) 潿(E65C) 蔌(E75C) 醆(E85C) 嬞(E95C) 獦(EA5C) 螏(EB5C) 餤(EC5C) 燡(ED5C) 螰(EE5C) 駹(EF5C) 礒(F05C) 鎪(F15C) 瀙(F25C) 酀(F35C) 瀵(F45C) 騱(F55C) 酅(F65C) 贕(F75C) 鱋(F85C) 鱭(F95C) 园(FB5C) 檝(FD5C) 
+  []](5D) È (885D) 处(895D) 尜(8B5D) 䀉(8C5D) 筕(8E5D) 㒖(8F5D) 哋(925D) 瑺(945D) 騟(955D) (965D) 㻩(975D) 输(995D) 鞲(9A5D) 襷(9C5D) 㷷(9D5D) 肶(9E5D) 篏(9F5D) 髗(A05D) （(A15D) 兡(A25D) β(A35D) 也(A45D) 包(A55D) 因(A65D) 吞(A75D) 沘(A85D) 夜(A95D) 氓(AA5D) 侷(AB5D) 柵(AC5D) 苗(AD5D) 孫(AE5D) 珠(AF5D) 財(B05D) 崧(B15D) 淫(B25D) 設(B35D) 弼(B45D) 琶(B55D) 跑(B65D) 愍(B75D) 窟(B85D) 鉛(B95D) 榜(BA5D) 蒸(BB5D) 奭(BC5D) 稽(BD5D) 霄(BE5D) 瓢(BF5D) 館(C05D) 縲(C15D) 擻(C25D) 鼕(C35D) 孃(C45D) 魔(C55D) 釁(C65D) ぶ(C75D) з(C85D) 巿(C95D) 佉(CA5D) 沎(CB5D) 岠(CC5D) 狋(CD5D) 垚(CE5D) 柛(CF5D) 胅(D05D) 娭(D15D) 涘(D25D) 罞(D35D) 偟(D45D) 惈(D55D) 牻(D65D) 荺(D75D) 傒(D85D) 揠(D95D) 焱(DA5D) 菏(DB5D) 酡(DC5D) 廅(DD5D) 滘(DE5D) 絺(DF5D) 赩(E05D) 塴(E15D) 榗(E25D) 箂(E35D) 踃(E45D) 嬁(E55D) 澕(E65D) 蓴(E75D) 醊(E85D) 寯(E95D) 獧(EA5D) 螗(EB5D) 餟(EC5D) 燱(ED5D) 螬(EE5D) 駸(EF5D) 礑(F05D) 鎞(F15D) 瀧(F25D) 鄿(F35D) 瀯(F45D) 騬(F55D) 醹(F65D) 躕(F75D) 鱕(F85D) 鸋(F95D) 㯳(FD5D) 
+  [^](5E) Ō (885E) 备(895E) 橣(8C5E) 笩(8E5E) 髴(915E) 嚞(925E) (965E) 璴(975E) 樫(985E) 烀(995E) 韂(9A5E) 顇(9B5E) 蠄(9E5E) 鬪(9F5E) 鵄(A05E) ）(A15E) 兣(A25E) γ(A35E) 乞(A45E) 匆(A55E) 回(A65E) 吾(A75E) 沂(A85E) 奉(A95E) 氛(AA5E) 兗(AB5E) 柩(AC5E) 英(AD5E) 屘(AE5E) 珪(AF5E) 貢(B05E) 崗(B15E) 淘(B25E) 訟(B35E) 彭(B45E) 琴(B55E) 跌(B65E) 愆(B75E) 窠(B85E) 鉋(B95E) 榨(BA5E) 蓀(BB5E) 嬉(BC5E) 稷(BD5E) 霆(BE5E) 甌(BF5E) 餞(C05E) 繃(C15E) 擷(C25E) 鼬(C35E) 孽(C45E) 魑(C55E) 鑲(C65E) ぷ(C75E) и(C85E) 旡(C95E) 体(CA5E) 灴(CB5E) 岵(CC5E) 狘(CD5E) 垕(CE5E) 柺(CF5E) 胣(D05E) 娮(D15E) 洯(D25E) 罠(D35E) 偩(D45E) 悱(D55E) 牼(D65E) 荳(D75E) 傂(D85E) 揶(D95E) 焣(DA5E) 菹(DB5E) 酤(DC5E) 廌(DD5E) 溙(DE5E) 綎(DF5E) 趑(E05E) 墋(E15E) 榐(E25E) 粻(E35E) 踇(E45E) 嬇(E55E) 潣(E65E) 蔪(E75E) 醁(E85E) 嶬(E95E) 獬(EA5E) 螓(EB5E) 餧(EC5E) 燨(ED5E) 螹(EE5E) 駶(EF5E) 禭(F05E) 鎦(F15E) 瀠(F25E) 醰(F35E) 瀷(F45E) 騪(F55E) 鐿(F65E) 躔(F75E) 鱙(F85E) 鸍(F95E) 㘣(FB5E) 釖(FC5E) 枱(FD5E) 珉(FE5E) 
+  [`](60) Ǒ(8860) 头(8960) 㞗(8B60) 䈣(8C60) 崾(8D60) 葘(8F60) 㦀(9060) 鬔(9160) 嚒(9260) 飜(9660) 総(9960) 䫤(9A60) 运(9D60) 裇(9E60) 鬮(9F60) 鮏(A060) ︶(A160) 瓩(A260) ε(A360) 亡(A460) 匝(A560) 圳(A660) 呎(A760) 灼(A860) 奈(A960) 注(AA60) 冑(AB60) 柄(AC60) 苜(AD60) 害(AE60) 畔(AF60) 躬(B060) 常(B160) 深(B260) 訢(B360) 循(B460) 琛(B560) 跆(B660) 戡(B760) 節(B860) 鉑(B960) 槁(BA60) 蒐(BB60) 嬋(BC60) 窯(BD60) 霉(BE60) 瘴(BF60) 餡(C060) 總(C160) 曜(C260) 嚥(C360) 巉(C460) 鰥(C560) 顱(C660) べ(C760) к(C860) 毌(C960) 伾(CA60) 牣(CB60) 岨(CC60) 狜(CD60) 复(CE60) 柊(CF60) 胜(D060) 娏(D160) 涋(D260) 罛(D360) 偣(D460) 悷(D560) 猝(D660) 荴(D760) 兟(D860) 揲(D960) 焢(DA60) 菀(DB60) 酢(DC60) 廋(DD60) 溎(DE60) 綃(DF60) 趎(E060) 墇(E160) 榵(E260) 粼(E360) 踅(E460) 嬏(E560) 潪(E660) 蔕(E760) 醄(E860) 嶩(E960) 獫(EA60) 螈(EB60) 馞(EC60) 燤(ED60) 螼(EE60) 駽(EF60) 穟(F060) 鎈(F160) 瀫(F260) 鏞(F360) 瀱(F460) 騩(F560) 鐶(F660) 躒(F760) 鱎(F860) 鸏(F960) 坆(FB60) 
+  [{](7B) ù (887B) 询(897B) 庙(8C7B) 拥(8D7B) 籴(8E7B) 蕳(8F7B) 鶃(917B) 塲(967B) 㬹(997B) 㝯(9A7B) 纇(9B7B) 画(9C7B) 䶜(9D7B) 饀(9F7B) ﹃(A17B) ┐(A27B) ㄌ(A37B) 廾(A47B) 叻(A57B) 州(A67B) 坊(A77B) 肚(A87B) 宛(A97B) 泯(AA7B) 哂(AB7B) 洌(AC7B) 迦(AD7B) 徒(AE7B) 砸(AF7B) 閃(B07B) 惋(B17B) 現(B27B) 逢(B37B) 揩(B47B) 程(B57B) 閔(B67B) 暍(B77B) 腥(B87B) 頒(B97B) 漬(BA7B) 認(BB7B) 慮(BC7B) 緹(BD7B) 魷(BE7B) 篦(BF7B) 嚀(C07B) 臨(C17B) 璿(C27B) 爍(C37B) 糰(C47B) 瓤(C57B) 鬱(C67B) ァ(C77B) 乚(C87B) 忉(C97B) 吙(CA7B) 芅(CB7B) 怦(CC7B) 矼(CD7B) 峌(CE7B) 洑(CF7B) 苻(D07B) 彧(D17B) 烎(D27B) 荁(D37B) 唵(D47B) 捼(D57B) 畣(D67B) 虙(D77B) 喎(D87B) 斞(D97B) 琬(DA7B) 萑(DB7B) 閐(DC7B) 搒(DD7B) 煰(DE7B) 腞(DF7B) 輂(E07B) 嫨(E17B) 漻(E27B) 翢(E37B) 銠(E47B) 憱(E57B) 獛(E67B) 蔋(E77B) 鋞(E87B) 懆(E97B) 瞢(EA7B) 褬(EB7B) 鮒(EC7B) 瞫(ED7B) 覮(EE7B) 鴯(EF7B) 翸(F07B) 鞨(F17B) 矄(F27B) 霫(F37B) 礧(F47B) 鶒(F57B) 驄(F67B) 驌(F77B) 鼷(F87B) 鸔(F97B) 够(FB7B) 樬(FE7B) 
+  [|](7C) ǖ(887C) 车(897C) 忂(8C7C) 挘(8D7C) 糳(8E7C) 䔖(8F7C) 諚(927C) 蠭(957C) (967C) 䤵(977C) 腖(997C) 补(9C7C) 鞺(9F7C) 捤(A07C) ﹄(A17C) └(A27C) ㄍ(A37C) 弋(A47C) 四(A57C) 帆(A67C) 坑(A77C) 育(A87C) 尚(A97C) 泜(AA7C) 咽(AB7C) 洱(AC7C) 迢(AD7C) 徑(AE7C) 砝(AF7C) 院(B07C) 悴(B17C) 琍(B27C) 逖(B37C) 揉(B47C) 稅(B57C) 閏(B67C) 會(B77C) 腮(B87C) 頌(B97C) 漏(BA7C) 誡(BB7C) 慝(BC7C) 罵(BD7C) 魯(BE7C) 糕(BF7C) 嚐(C07C) 舉(C17C) 甕(C27C) 牘(C37C) 辮(C47C) 疊(C57C) 鸛(C67C) ア(C77C) 戉(C97C) 吜(CA7C) 芎(CB7C) 怙(CC7C) 矹(CD7C) 峗(CE7C) 洀(CF7C) 苶(D07C) 恝(D17C) 烡(D27C) 茦(D37C) 唰(D47C) 掤(D57C) 痎(D67C) 虖(D77C) 圌(D87C) 斮(D97C) 琰(DA7C) 萆(DB7C) 隇(DC7C) 搉(DD7C) 煟(DE7C) 腶(DF7C) 輋(E07C) 嫟(E17C) 漒(E27C) 翣(E37C) 銔(E47C) 憰(E57C) 獡(E67C) 蔙(E77C) 鋧(E87C) 懁(E97C) 瞣(EA7C) 褟(EB7C) 鮐(EC7C) 瞲(ED7C) 觲(EE7C) 鴱(EF7C) 聵(F07C) 鞫(F17C) 矱(F27C) 霬(F37C) 礨(F47C) 鶘(F57C) 驂(F67C) 驏(F77C) 鼶(F87C) 鸓(F97C) 梦(FB7C) 憇(FC7C) 璂(FE7C) 
+  [}](7D) ǘ(887D) 轧(897D) 㧻(8A7D) 垜(8B7D) 㧸(8D7D) 糵(8E7D) 枿(8F7D) 鸎(917D) 堢(967D) 綤(987D) 腙(997D) 鵉(9A7D) 墵(9B7D) 达(9D7D) 匬(9F7D) 栂(A07D) ﹙(A17D) ┘(A27D) ㄎ(A37D) 弓(A47D) 囚(A57D) 并(A67D) 址(A77D) 良(A87D) 屈(A97D) 泖(AA7D) 咪(AB7D) 洞(AC7D) 迪(AD7D) 徐(AE7D) 破(AF7D) 陣(B07D) 惦(B17D) 瓠(B27D) 逛(B37D) 揆(B47D) 稀(B57D) 開(B67D) 榔(B77D) 腳(B87D) 飼(B97D) 漂(BA7D) 誓(BB7D) 慕(BC7D) 罷(BD7D) 鴆(BE7D) 糖(BF7D) 嚅(C07D) 艱(C17D) 癖(C27D) 犢(C37D) 繽(C47D) 癮(C57D) 鸞(C67D) ィ(C77D) 刂(C87D) 扐(C97D) 吥(CA7D) 芑(CB7D) 怲(CC7D) 矻(CD7D) 峋(CE7D) 洝(CF7D) 苰(D07D) 恚(D17D) 牂(D27D) 茜(D37D) 啒(D47D) 挻(D57D) 痒(D67D) 蚿(D77D) 堩(D87D) 旐(D97D) 琫(DA7D) 菂(DB7D) 陾(DC7D) 搠(DD7D) 煐(DE7D) 腧(DF7D) 遒(E07D) 孷(E17D) 滭(E27D) 翥(E37D) 銪(E47D) 憢(E57D) 獚(E67D) 蔯(E77D) 鋑(E87D) 懌(E97D) 瞕(EA7D) 觱(EB7D) 魺(EC7D) 瞷(ED7D) 觳(EE7D) 鴸(EF7D) 臑(F07D) 鞤(F17D) 礝(F27D) 霨(F37D) 礤(F47D) 鶐(F57D) 驁(F67D) 驈(F77D) 齃(F87D) 黶(F97D) 冲(FA7D) 㛃(FB7D) 宪(FC7D) 䥓(FE7D) 
+
+=head2 eucjp (EUC-JP)
+
+  1st       2nd
+  A1..FE    00..FF
+  00..7F
+
+L<https://en.wikipedia.org/wiki/Extended_Unix_Code#EUC-JP>
+
+=over 2
+
+=item * needs multibyte anchoring
+
+=item * needs no escaping meta char of 2nd octet
+
+=item * safe US-ASCII casefolding of 2nd octet
+
+=back
+
+=head2 gb18030 (GB18030)
+
+  1st       2nd       3rd       4th
+  81..FE    30..39    81..FE    30..39
+  81..FE    00..FF
+  00..7F
+
+L<https://en.wikipedia.org/wiki/GB_18030>
+
+=over 2
+
+=item * needs multibyte anchoring
+
+=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd-4th octet
+
+=item * needs escaping meta char of 2nd octet
+
+=item * and DAMEMOJI samples, here
+
+=back
+
+  [@](40) 丂(8140) 侤(8240) 傽(8340) 凘(8440) 匑(8540) 咢(8640) 嘆(8740) 園(8840) 堾(8940) 夽(8A40) 婡(8B40) 孈(8C40) 岪(8D40) 嶡(8E40) 廆(8F40) 怈(9040) 慇(9140) 扏(9240) 揁(9340) 擛(9440) 旲(9540) 朄(9640) 桜(9740) 楡(9840) 橜(9940) 欯(9A40) 汙(9B40) 淍(9C40) 滰(9D40) 濦(9E40) 烜(9F40) 燖(A040) ˊ(A840) 〡(A940) 狜(AA40) 獲(AB40) 珸(AC40) 瑻(AD40) 瓳(AE40) 疈(AF40) 癅(B040) 盄(B140) 睝(B240) 矦(B340) 碄(B440) 礍(B540) 禓(B640) 稝(B740) 窣(B840) 笯(B940) 篅(BA40) 籃(BB40) 粿(BC40) 紷(BD40) 継(BE40) 緻(BF40) 繞(C040) 罖(C140) 翤(C240) 聾(C340) 腀(C440) 臔(C540) 艪(C640) 茾(C740) 菮(C840) 葽(C940) 蔃(CA40) 薂(CB40) 藹(CC40) 虭(CD40) 蜙(CE40) 螥(CF40) 蠤(D040) 袬(D140) 褸(D240) 覢(D340) 訞(D440) 誁(D540) 諤(D640) 譆(D740) 谸(D840) 貮(D940) 贎(DA40) 跕(DB40) 蹳(DC40) 軥(DD40) 轅(DE40) 這(DF40) 郂(E040) 酅(E140) 釦(E240) 鉆(E340) 銨(E440) 錊(E540) 鍬(E640) 鏎(E740) 鐯(E840) 锧(E940) 闌(EA40) 隌(EB40) 霡(EC40) 鞞(ED40) 頏(EE40) 顯(EF40) 餈(F040) 馌(F140) 駺(F240) 驚(F340) 鬇(F440) 魼(F540) 鯜(F640) 鰼(F740) 鳣(F840) 鵃(F940) 鶣(FA40) 鸃(FB40) 麫(FC40) 鼲(FD40) 兀(FE40) 
+  [[](5B) 乕(815B) 俒(825B) 僛(835B) 刐(845B) 匸(855B) 哰(865B) 嘯(875B) 圼(885B) 塠(895B) 奫(8A5B) 媅(8B5B) 孾(8C5B) 峓(8D5B) 嶽(8E5B) 廩(8F5B) 怺(905B) 慬(915B) 抂(925B) 揫(935B) 擺(945B) 昜(955B) 朳(965B) 梉(975B) 榌(985B) 橻(995B) 歔(9A5B) 沎(9B5B) 淸(9C5B) 漑(9D5B) 瀃(9E5B) 焄(9F5B) 燵(A05B) ╗ (A85B) 猍(AA5B) 玔(AB5B) 琜(AC5B) 璠(AD5B) 甗(AE5B) 痆(AF5B) 癧(B05B) 盵(B15B) 瞇(B25B) 砙(B35B) 碵(B45B) 礫(B55B) 禰(B65B) 穂(B75B) 竅(B85B) 筟(B95B) 篬(BA5B) 籟(BB5B) 糩(BC5B) 絒(BD5B) 綶(BE5B) 縖(BF5B) 繹(C05B) 羀(C15B) 耓(C25B) 肹(C35B) 腫(C45B) 臶(C55B) 芠(C65B) 荹(C75B) 萚(C85B) 蒣(C95B) 蔥(CA5B) 薣(CB5B) 蘙(CC5B) 蚚(CD5B) 蝃(CE5B) 蟍(CF5B) 衃(D05B) 裑(D15B) 襕(D25B) 覽(D35B) 訹(D45B) 誟(D55B) 諿(D65B) 譡(D75B) 豙(D85B) 賉(D95B) 赱(DA5B) 踇(DB5B) 躘(DC5B) 輀(DD5B) 轠(DE5B) 遊(DF5B) 郲(E05B) 醄(E15B) 鈁(E25B) 鉡(E35B) 鋄(E45B) 錥(E55B) 鎇(E65B) 鏪(E75B) 鑋(E85B) 閇(E95B) 闧(EA5B) 隱(EB5B) 靃(EC5B) 韀(ED5B) 頪(EE5B) 颷(EF5B) 餥(F05B) 馵(F15B) 騕(F25B) 骩(F35B) 鬧(F45B) 鮗(F55B) 鯷(F65B) 鱗(F75B) 鳾(F85B) 鵞(F95B) 鶾(FA5B) 鸞(FB5B) 黐(FC5B) 齕(FD5B) 
+  [\](5C) 乗(815C) 俓(825C) 僜(835C) 刓(845C) 匼(855C) 哱(865C) 嘰(875C) 圽(885C) 塡(895C) 奬(8A5C) 媆(8B5C) 孿(8C5C) 峔(8D5C) 嶾(8E5C) 廫(8F5C) 怽(905C) 慭(915C) 抃(925C) 揬(935C) 擻(945C) 昞(955C) 朶(965C) 梊(975C) 榎(985C) 橽(995C) 歕(9A5C) 沑(9B5C) 淺(9C5C) 漒(9D5C) 瀄(9E5C) 焅(9F5C) 燶(A05C) ╘ (A85C) ‐(A95C) 猏(AA5C) 玕(AB5C) 琝(AC5C) 璡(AD5C) 甛(AE5C) 痋(AF5C) 癨(B05C) 盶(B15C) 瞈(B25C) 砛(B35C) 碶(B45C) 礬(B55C) 禱(B65C) 穃(B75C) 竆(B85C) 筡(B95C) 篭(BA5C) 籠(BB5C) 糪(BC5C) 絓(BD5C) 綷(BE5C) 縗(BF5C) 繺(C05C) 羂(C15C) 耚(C25C) 肻(C35C) 腬(C45C) 臷(C55C) 芢(C65C) 荺(C75C) 萛(C85C) 蒤(C95C) 蔦(CA5C) 薥(CB5C) 蘚(CC5C) 蚛(CD5C) 蝄(CE5C) 蟎(CF5C) 衆(D05C) 裓(D15C) 襖(D25C) 覾(D35C) 診(D45C) 誠(D55C) 謀(D65C) 譢(D75C) 豛(D85C) 賊(D95C) 赲(DA5C) 踈(DB5C) 躙(DC5C) 輁(DD5C) 轡(DE5C) 運(DF5C) 郳(E05C) 醆(E15C) 鈂(E25C) 鉢(E35C) 鋅(E45C) 錦(E55C) 鎈(E65C) 鏫(E75C) 鑌(E85C) 閈(E95C) 闬(EA5C) 隲(EB5C) 靄(EC5C) 韁(ED5C) 頫(EE5C) 颸(EF5C) 餦(F05C) 馶(F15C) 騖(F25C) 骪(F35C) 鬨(F45C) 鮘(F55C) 鯸(F65C) 鱘(F75C) 鳿(F85C) 鵟(F95C) 鶿(FA5C) 鸤(FB5C) 黒(FC5C) 齖(FD5C) 
+  []](5D) 乚(815D) 俔(825D) 僝(835D) 刔(845D) 匽(855D) 哴(865D) 嘳(875D) 圿(885D) 塢(895D) 奭(8A5D) 媇(8B5D) 宂(8C5D) 峕(8D5D) 嶿(8E5D) 廬(8F5D) 怾(905D) 慮(915D) 抅(925D) 揮(935D) 擼(945D) 昡(955D) 朷(965D) 梋(975D) 榏(985D) 橾(995D) 歖(9A5D) 沒(9B5D) 淽(9C5D) 漖(9D5D) 瀅(9E5D) 焆(9F5D) 燷(A05D) ╙ (A85D) 猐(AA5D) 玗(AB5D) 琞(AC5D) 璢(AD5D) 甝(AE5D) 痌(AF5D) 癩(B05D) 盷(B15D) 瞉(B25D) 砞(B35D) 碷(B45D) 礭(B55D) 禲(B65D) 穄(B75D) 竇(B85D) 筣(B95D) 篯(BA5D) 籡(BB5D) 糫(BC5D) 絔(BD5D) 綸(BE5D) 縘(BF5D) 繻(C05D) 羃(C15D) 耛(C25D) 胅(C35D) 腯(C45D) 臸(C55D) 芣(C65D) 荾(C75D) 萞(C85D) 蒥(C95D) 蔧(CA5D) 薦(CB5D) 蘛(CC5D) 蚞(CD5D) 蝅(CE5D) 蟏(CF5D) 衇(D05D) 裖(D15D) 襗(D25D) 覿(D35D) 註(D45D) 誡(D55D) 謁(D65D) 譣(D75D) 豜(D85D) 賋(D95D) 赸(DA5D) 踋(DB5D) 躚(DC5D) 輂(DD5D) 轢(DE5D) 遌(DF5D) 郵(E05D) 醈(E15D) 鈃(E25D) 鉣(E35D) 鋆(E45D) 錧(E55D) 鎉(E65D) 鏬(E75D) 鑍(E85D) 閉(E95D) 闿(EA5D) 隴(EB5D) 靅(EC5D) 韂(ED5D) 頬(EE5D) 颹(EF5D) 餧(F05D) 馷(F15D) 騗(F25D) 骫(F35D) 鬩(F45D) 鮙(F55D) 鯹(F65D) 鱙(F75D) 鴀(F85D) 鵠(F95D) 鷀(FA5D) 鸧(FB5D) 黓(FC5D) 齗(FD5D) 
+  [^](5E) 乛(815E) 俕(825E) 僞(835E) 刕(845E) 區(855E) 哵(865E) 嘵(875E) 坁(885E) 塣(895E) 奮(8A5E) 媈(8B5E) 宆(8C5E) 峖(8D5E) 巀(8E5E) 廭(8F5E) 恀(905E) 慯(915E) 抆(925E) 揯(935E) 擽(945E) 昢(955E) 朸(965E) 梌(975E) 榐(985E) 橿(995E) 歗(9A5E) 沕(9B5E) 淾(9C5E) 漗(9D5E) 瀆(9E5E) 焇(9F5E) 燸(A05E) ╚ (A85E) 猑(AA5E) 玘(AB5E) 琟(AC5E) 璣(AD5E) 甞(AE5E) 痎(AF5E) 癪(B05E) 盺(B15E) 瞊(B25E) 砠(B35E) 碸(B45E) 礮(B55E) 禴(B65E) 穅(B75E) 竈(B85E) 筤(B95E) 篰(BA5E) 籢(BB5E) 糬(BC5E) 絕(BD5E) 綹(BE5E) 縙(BF5E) 繼(C05E) 羄(C15E) 耝(C25E) 胇(C35E) 腲(C45E) 臹(C55E) 芧(C65E) 荿(C75E) 萟(C85E) 蒦(C95E) 蔨(CA5E) 薧(CB5E) 蘜(CC5E) 蚟(CD5E) 蝆(CE5E) 蟐(CF5E) 衈(D05E) 裗(D15E) 襘(D25E) 觀(D35E) 証(D45E) 誢(D55E) 謂(D65E) 譤(D75E) 豝(D85E) 賌(D95E) 赹(DA5E) 踍(DB5E) 躛(DC5E) 較(DD5E) 轣(DE5E) 過(DF5E) 郶(E05E) 醊(E15E) 鈄(E25E) 鉤(E35E) 鋇(E45E) 錨(E55E) 鎊(E65E) 鏭(E75E) 鑎(E85E) 閊(E95E) 阇(EA5E) 隵(EB5E) 靆(EC5E) 韃(ED5E) 頭(EE5E) 颺(EF5E) 館(F05E) 馸(F15E) 騘(F25E) 骬(F35E) 鬪(F45E) 鮚(F55E) 鯺(F65E) 鱚(F75E) 鴁(F85E) 鵡(F95E) 鷁(FA5E) 鸮(FB5E) 黕(FC5E) 齘(FD5E) 
+  [`](60) 乣(8160) 俙(8260) 僠(8360) 刞(8460) 卄(8560) 哷(8660) 嘸(8760) 坄(8860) 塦(8960) 奰(8A60) 媊(8B60) 宍(8C60) 峘(8D60) 巂(8E60) 廯(8F60) 恅(9060) 慲(9160) 抈(9260) 揱(9360) 擿(9460) 昤(9560) 朻(9660) 梎(9760) 榒(9860) 檂(9960) 歚(9A60) 沗(9B60) 渀(9C60) 漙(9D60) 瀈(9E60) 焋(9F60) 燻(A060) ╜ (A860) ー(A960) 猔(AA60) 玚(AB60) 琡(AC60) 璥(AD60) 甡(AE60) 痐(AF60) 癭(B060) 盽(B160) 瞏(B260) 砢(B360) 碻(B460) 礰(B560) 禶(B660) 穈(B760) 竊(B860) 筦(B960) 篳(BA60) 籤(BB60) 糮(BC60) 絗(BD60) 綻(BE60) 縛(BF60) 繾(C060) 羆(C160) 耟(C260) 胉(C360) 腵(C460) 臽(C560) 芵(C660) 莁(C760) 萡(C860) 蒨(C960) 蔪(CA60) 薫(CB60) 蘞(CC60) 蚡(CD60) 蝋(CE60) 蟕(CF60) 衊(D060) 裛(D160) 襚(D260) 觍(D360) 訿(D460) 誤(D560) 謄(D660) 譧(D760) 豟(D860) 賎(D960) 赻(DA60) 踐(DB60) 躟(DC60) 輅(DD60) 轥(DE60) 違(DF60) 郹(E060) 醏(E160) 鈆(E260) 鉦(E360) 鋊(E460) 錪(E560) 鎌(E660) 鏯(E760) 鑐(E860) 閌(E960) 阘(EA60) 隸(EB60) 靈(EC60) 韅(ED60) 頯(EE60) 颼(EF60) 餪(F060) 馺(F160) 騚(F260) 骮(F360) 鬬(F460) 鮜(F560) 鯼(F660) 鱜(F760) 鴃(F860) 鵣(F960) 鷃(FA60) 鸴(FB60) 黗(FC60) 齚(FD60) 
+  [{](7B) 亄(817B) 倇(827B) 儃(837B) 剓(847B) 厈(857B) 唟(867B) 噞(877B) 坽(887B) 墈(897B) 妠(8A7B) 媨(8B7B) 寋(8C7B) 峽(8D7B) 巤(8E7B) 弡(8F7B) 恵(907B) 憑(917B) 抺(927B) 搟(937B) 攞(947B) 晎(957B) 杮(967B) 梴(977B) 榹(987B) 檣(997B) 歿(9A7B) 泏(9B7B) 渰(9C7B) 漿(9D7B) 瀧(9E7B) 焮(9F7B) 爗(A07B) ▄ (A87B) ﹞(A97B) 獅(AA7B) 珄(AB7B) 瑊(AC7B) 瓄(AD7B) 畕(AE7B) 瘂(AF7B) 皗(B07B) 眥(B17B) 瞷(B27B) 硔(B37B) 磠(B47B) 祘(B57B) 秢(B67B) 穥(B77B) 竰(B87B) 箋(B97B) 簕(BA7B) 粄(BB7B) 納(BC7B) 絳(BD7B) 緖(BE7B) 縶(BF7B) 纚(C07B) 羬(C17B) 聓(C27B) 脅(C37B) 膡(C47B) 舺(C57B) 苳(C67B) 莧(C77B) 葅(C87B) 蓒(C97B) 蕒(CA7B) 藍(CB7B) 蘽(CC7B) 蛖(CD7B) 蝱(CE7B) 蟵(CF7B) 衶(D07B) 褅(D17B) 襸(D27B) 觷(D37B) 詛(D47B) 調(D57B) 謠(D67B) 讃(D77B) 貃(D87B) 賩(D97B) 趝(DA7B) 踸(DB7B) 躿(DC7B) 輠(DD7B) 辿(DE7B) 遻(DF7B) 鄘(E07B) 醷(E17B) 鈡(E27B) 銂(E37B) 鋥(E47B) 鍆(E57B) 鎨(E67B) 鐊(E77B) 鑬(E87B) 閧(E97B) 陒(EA7B) 雥(EB7B) 靮(EC7B) 韠(ED7B) 顊(EE7B) 飡(EF7B) 饆(F07B) 駕(F17B) 騵(F27B) 髙(F37B) 魗(F47B) 鮷(F57B) 鰗(F67B) 鱷(F77B) 鴞(F87B) 鵾(F97B) 鷞(FA7B) 鹻(FB7B) 鼂(FC7B) 齵(FD7B) 
+  [|](7C) 亅(817C) 倈(827C) 億(837C) 剕(847C) 厊(857C) 唡(867C) 噟(877C) 坾(887C) 墊(897C) 妡(8A7C) 媩(8B7C) 寍(8C7C) 峾(8D7C) 巪(8E7C) 弢(8F7C) 恷(907C) 憒(917C) 抾(927C) 搢(937C) 攟(947C) 晐(957C) 東(967C) 梶(977C) 榺(987C) 檤(997C) 殀(9A7C) 泑(9B7C) 渱(9C7C) 潀(9D7C) 瀨(9E7C) 焲(9F7C) 爘(A07C) ▅ (A87C) ﹟(A97C) 獆(AA7C) 珅(AB7C) 瑋(AC7C) 瓅(AD7C) 畖(AE7C) 瘄(AF7C) 皘(B07C) 眧(B17C) 瞸(B27C) 硘(B37C) 磡(B47C) 祙(B57C) 秥(B67C) 穦(B77C) 竱(B87C) 箌(B97C) 簗(BA7C) 粅(BB7C) 紎(BC7C) 絴(BD7C) 緗(BE7C) 縷(BF7C) 纜(C07C) 羭(C17C) 聕(C27C) 脇(C37C) 膢(C47C) 舼(C57C) 苵(C67C) 莬(C77C) 葇(C87C) 蓔(C97C) 蕓(CA7C) 藎(CB7C) 蘾(CC7C) 蛗(CD7C) 蝲(CE7C) 蟶(CF7C) 衸(D07C) 褆(D17C) 襹(D27C) 觸(D37C) 詜(D47C) 諀(D57C) 謡(D67C) 讄(D77C) 貄(D87C) 質(D97C) 趞(DA7C) 踻(DB7C) 軀(DC7C) 輡(DD7C) 迀(DE7C) 遼(DF7C) 鄚(E07C) 醸(E17C) 鈢(E27C) 銃(E37C) 鋦(E47C) 鍇(E57C) 鎩(E67C) 鐋(E77C) 鑭(E87C) 閨(E97C) 陓(EA7C) 雦(EB7C) 靯(EC7C) 韡(ED7C) 顋(EE7C) 飢(EF7C) 饇(F07C) 駖(F17C) 騶(F27C) 髚(F37C) 魘(F47C) 鮸(F57C) 鰘(F67C) 鱸(F77C) 鴟(F87C) 鵿(F97C) 鷟(FA7C) 鹼(FB7C) 鼃(FC7C) 齶(FD7C) 
+  [}](7D) 亇(817D) 倉(827D) 儅(837D) 剗(847D) 厎(857D) 唥(867D) 噠(877D) 坿(887D) 墋(897D) 妢(8A7D) 媫(8B7D) 寎(8C7D) 峿(8D7D) 巬(8E7D) 弣(8F7D) 恾(907D) 憓(917D) 拀(927D) 搣(937D) 攠(947D) 晑(957D) 杴(967D) 梷(977D) 榼(987D) 檥(997D) 殅(9A7D) 泒(9B7D) 渳(9C7D) 潁(9D7D) 瀩(9E7D) 焳(9F7D) 爙(A07D) ▆ (A87D) ﹠(A97D) 獇(AA7D) 珆(AB7D) 瑌(AC7D) 瓆(AD7D) 畗(AE7D) 瘆(AF7D) 皚(B07D) 眪(B17D) 瞹(B27D) 硙(B37D) 磢(B47D) 祡(B57D) 秨(B67D) 穧(B77D) 竲(B87D) 箎(B97D) 簘(BA7D) 粆(BB7D) 紏(BC7D) 絵(BD7D) 緘(BE7D) 縸(BF7D) 纝(C07D) 羮(C17D) 聖(C27D) 脈(C37D) 膤(C47D) 舽(C57D) 苶(C67D) 莭(C77D) 葈(C87D) 蓕(C97D) 蕔(CA7D) 藑(CB7D) 蘿(CC7D) 蛚(CD7D) 蝳(CE7D) 蟷(CF7D) 衹(D07D) 複(D17D) 襺(D27D) 觹(D37D) 詝(D47D) 諁(D57D) 謢(D67D) 讅(D77D) 貆(D87D) 賫(D97D) 趠(DA7D) 踼(DB7D) 軁(DC7D) 輢(DD7D) 迃(DE7D) 遾(DF7D) 鄛(E07D) 醹(E17D) 鈣(E27D) 銄(E37D) 鋧(E47D) 鍈(E57D) 鎪(E67D) 鐌(E77D) 鑮(E87D) 閩(E97D) 陖(EA7D) 雧(EB7D) 靰(EC7D) 韢(ED7D) 題(EE7D) 飣(EF7D) 饈(F07D) 駗(F17D) 騷(F27D) 髛(F37D) 魙(F47D) 鮹(F57D) 鰙(F67D) 鱹(F77D) 鴠(F87D) 鶀(F97D) 鷠(FA7D) 鹽(FB7D) 鼄(FC7D) 齷(FD7D) 
+
+=head2 gbk (GBK)
+
+  1st       2nd
+  81..FE    00..FF
+  00..7F
+
+L<https://en.wikipedia.org/wiki/GBK_(character_encoding)>
+
+=over 2
+
+=item * needs multibyte anchoring
+
+=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+
+=item * needs escaping meta char of 2nd octet
+
+=item * and DAMEMOJI samples, here
+
+=back
+
+  [@](40) 丂(8140) 侤(8240) 傽(8340) 凘(8440) 匑(8540) 咢(8640) 嘆(8740) 園(8840) 堾(8940) 夽(8A40) 婡(8B40) 孈(8C40) 岪(8D40) 嶡(8E40) 廆(8F40) 怈(9040) 慇(9140) 扏(9240) 揁(9340) 擛(9440) 旲(9540) 朄(9640) 桜(9740) 楡(9840) 橜(9940) 欯(9A40) 汙(9B40) 淍(9C40) 滰(9D40) 濦(9E40) 烜(9F40) 燖(A040) ˊ(A840) 〡(A940) 狜(AA40) 獲(AB40) 珸(AC40) 瑻(AD40) 瓳(AE40) 疈(AF40) 癅(B040) 盄(B140) 睝(B240) 矦(B340) 碄(B440) 礍(B540) 禓(B640) 稝(B740) 窣(B840) 笯(B940) 篅(BA40) 籃(BB40) 粿(BC40) 紷(BD40) 継(BE40) 緻(BF40) 繞(C040) 罖(C140) 翤(C240) 聾(C340) 腀(C440) 臔(C540) 艪(C640) 茾(C740) 菮(C840) 葽(C940) 蔃(CA40) 薂(CB40) 藹(CC40) 虭(CD40) 蜙(CE40) 螥(CF40) 蠤(D040) 袬(D140) 褸(D240) 覢(D340) 訞(D440) 誁(D540) 諤(D640) 譆(D740) 谸(D840) 貮(D940) 贎(DA40) 跕(DB40) 蹳(DC40) 軥(DD40) 轅(DE40) 這(DF40) 郂(E040) 酅(E140) 釦(E240) 鉆(E340) 銨(E440) 錊(E540) 鍬(E640) 鏎(E740) 鐯(E840) 锧(E940) 闌(EA40) 隌(EB40) 霡(EC40) 鞞(ED40) 頏(EE40) 顯(EF40) 餈(F040) 馌(F140) 駺(F240) 驚(F340) 鬇(F440) 魼(F540) 鯜(F640) 鰼(F740) 鳣(F840) 鵃(F940) 鶣(FA40) 鸃(FB40) 麫(FC40) 鼲(FD40) 兀(FE40) 
+  [[](5B) 乕(815B) 俒(825B) 僛(835B) 刐(845B) 匸(855B) 哰(865B) 嘯(875B) 圼(885B) 塠(895B) 奫(8A5B) 媅(8B5B) 孾(8C5B) 峓(8D5B) 嶽(8E5B) 廩(8F5B) 怺(905B) 慬(915B) 抂(925B) 揫(935B) 擺(945B) 昜(955B) 朳(965B) 梉(975B) 榌(985B) 橻(995B) 歔(9A5B) 沎(9B5B) 淸(9C5B) 漑(9D5B) 瀃(9E5B) 焄(9F5B) 燵(A05B) ╗ (A85B) 猍(AA5B) 玔(AB5B) 琜(AC5B) 璠(AD5B) 甗(AE5B) 痆(AF5B) 癧(B05B) 盵(B15B) 瞇(B25B) 砙(B35B) 碵(B45B) 礫(B55B) 禰(B65B) 穂(B75B) 竅(B85B) 筟(B95B) 篬(BA5B) 籟(BB5B) 糩(BC5B) 絒(BD5B) 綶(BE5B) 縖(BF5B) 繹(C05B) 羀(C15B) 耓(C25B) 肹(C35B) 腫(C45B) 臶(C55B) 芠(C65B) 荹(C75B) 萚(C85B) 蒣(C95B) 蔥(CA5B) 薣(CB5B) 蘙(CC5B) 蚚(CD5B) 蝃(CE5B) 蟍(CF5B) 衃(D05B) 裑(D15B) 襕(D25B) 覽(D35B) 訹(D45B) 誟(D55B) 諿(D65B) 譡(D75B) 豙(D85B) 賉(D95B) 赱(DA5B) 踇(DB5B) 躘(DC5B) 輀(DD5B) 轠(DE5B) 遊(DF5B) 郲(E05B) 醄(E15B) 鈁(E25B) 鉡(E35B) 鋄(E45B) 錥(E55B) 鎇(E65B) 鏪(E75B) 鑋(E85B) 閇(E95B) 闧(EA5B) 隱(EB5B) 靃(EC5B) 韀(ED5B) 頪(EE5B) 颷(EF5B) 餥(F05B) 馵(F15B) 騕(F25B) 骩(F35B) 鬧(F45B) 鮗(F55B) 鯷(F65B) 鱗(F75B) 鳾(F85B) 鵞(F95B) 鶾(FA5B) 鸞(FB5B) 黐(FC5B) 齕(FD5B) 
+  [\](5C) 乗(815C) 俓(825C) 僜(835C) 刓(845C) 匼(855C) 哱(865C) 嘰(875C) 圽(885C) 塡(895C) 奬(8A5C) 媆(8B5C) 孿(8C5C) 峔(8D5C) 嶾(8E5C) 廫(8F5C) 怽(905C) 慭(915C) 抃(925C) 揬(935C) 擻(945C) 昞(955C) 朶(965C) 梊(975C) 榎(985C) 橽(995C) 歕(9A5C) 沑(9B5C) 淺(9C5C) 漒(9D5C) 瀄(9E5C) 焅(9F5C) 燶(A05C) ╘ (A85C) ‐(A95C) 猏(AA5C) 玕(AB5C) 琝(AC5C) 璡(AD5C) 甛(AE5C) 痋(AF5C) 癨(B05C) 盶(B15C) 瞈(B25C) 砛(B35C) 碶(B45C) 礬(B55C) 禱(B65C) 穃(B75C) 竆(B85C) 筡(B95C) 篭(BA5C) 籠(BB5C) 糪(BC5C) 絓(BD5C) 綷(BE5C) 縗(BF5C) 繺(C05C) 羂(C15C) 耚(C25C) 肻(C35C) 腬(C45C) 臷(C55C) 芢(C65C) 荺(C75C) 萛(C85C) 蒤(C95C) 蔦(CA5C) 薥(CB5C) 蘚(CC5C) 蚛(CD5C) 蝄(CE5C) 蟎(CF5C) 衆(D05C) 裓(D15C) 襖(D25C) 覾(D35C) 診(D45C) 誠(D55C) 謀(D65C) 譢(D75C) 豛(D85C) 賊(D95C) 赲(DA5C) 踈(DB5C) 躙(DC5C) 輁(DD5C) 轡(DE5C) 運(DF5C) 郳(E05C) 醆(E15C) 鈂(E25C) 鉢(E35C) 鋅(E45C) 錦(E55C) 鎈(E65C) 鏫(E75C) 鑌(E85C) 閈(E95C) 闬(EA5C) 隲(EB5C) 靄(EC5C) 韁(ED5C) 頫(EE5C) 颸(EF5C) 餦(F05C) 馶(F15C) 騖(F25C) 骪(F35C) 鬨(F45C) 鮘(F55C) 鯸(F65C) 鱘(F75C) 鳿(F85C) 鵟(F95C) 鶿(FA5C) 鸤(FB5C) 黒(FC5C) 齖(FD5C) 
+  []](5D) 乚(815D) 俔(825D) 僝(835D) 刔(845D) 匽(855D) 哴(865D) 嘳(875D) 圿(885D) 塢(895D) 奭(8A5D) 媇(8B5D) 宂(8C5D) 峕(8D5D) 嶿(8E5D) 廬(8F5D) 怾(905D) 慮(915D) 抅(925D) 揮(935D) 擼(945D) 昡(955D) 朷(965D) 梋(975D) 榏(985D) 橾(995D) 歖(9A5D) 沒(9B5D) 淽(9C5D) 漖(9D5D) 瀅(9E5D) 焆(9F5D) 燷(A05D) ╙ (A85D) 猐(AA5D) 玗(AB5D) 琞(AC5D) 璢(AD5D) 甝(AE5D) 痌(AF5D) 癩(B05D) 盷(B15D) 瞉(B25D) 砞(B35D) 碷(B45D) 礭(B55D) 禲(B65D) 穄(B75D) 竇(B85D) 筣(B95D) 篯(BA5D) 籡(BB5D) 糫(BC5D) 絔(BD5D) 綸(BE5D) 縘(BF5D) 繻(C05D) 羃(C15D) 耛(C25D) 胅(C35D) 腯(C45D) 臸(C55D) 芣(C65D) 荾(C75D) 萞(C85D) 蒥(C95D) 蔧(CA5D) 薦(CB5D) 蘛(CC5D) 蚞(CD5D) 蝅(CE5D) 蟏(CF5D) 衇(D05D) 裖(D15D) 襗(D25D) 覿(D35D) 註(D45D) 誡(D55D) 謁(D65D) 譣(D75D) 豜(D85D) 賋(D95D) 赸(DA5D) 踋(DB5D) 躚(DC5D) 輂(DD5D) 轢(DE5D) 遌(DF5D) 郵(E05D) 醈(E15D) 鈃(E25D) 鉣(E35D) 鋆(E45D) 錧(E55D) 鎉(E65D) 鏬(E75D) 鑍(E85D) 閉(E95D) 闿(EA5D) 隴(EB5D) 靅(EC5D) 韂(ED5D) 頬(EE5D) 颹(EF5D) 餧(F05D) 馷(F15D) 騗(F25D) 骫(F35D) 鬩(F45D) 鮙(F55D) 鯹(F65D) 鱙(F75D) 鴀(F85D) 鵠(F95D) 鷀(FA5D) 鸧(FB5D) 黓(FC5D) 齗(FD5D) 
+  [^](5E) 乛(815E) 俕(825E) 僞(835E) 刕(845E) 區(855E) 哵(865E) 嘵(875E) 坁(885E) 塣(895E) 奮(8A5E) 媈(8B5E) 宆(8C5E) 峖(8D5E) 巀(8E5E) 廭(8F5E) 恀(905E) 慯(915E) 抆(925E) 揯(935E) 擽(945E) 昢(955E) 朸(965E) 梌(975E) 榐(985E) 橿(995E) 歗(9A5E) 沕(9B5E) 淾(9C5E) 漗(9D5E) 瀆(9E5E) 焇(9F5E) 燸(A05E) ╚ (A85E) 猑(AA5E) 玘(AB5E) 琟(AC5E) 璣(AD5E) 甞(AE5E) 痎(AF5E) 癪(B05E) 盺(B15E) 瞊(B25E) 砠(B35E) 碸(B45E) 礮(B55E) 禴(B65E) 穅(B75E) 竈(B85E) 筤(B95E) 篰(BA5E) 籢(BB5E) 糬(BC5E) 絕(BD5E) 綹(BE5E) 縙(BF5E) 繼(C05E) 羄(C15E) 耝(C25E) 胇(C35E) 腲(C45E) 臹(C55E) 芧(C65E) 荿(C75E) 萟(C85E) 蒦(C95E) 蔨(CA5E) 薧(CB5E) 蘜(CC5E) 蚟(CD5E) 蝆(CE5E) 蟐(CF5E) 衈(D05E) 裗(D15E) 襘(D25E) 觀(D35E) 証(D45E) 誢(D55E) 謂(D65E) 譤(D75E) 豝(D85E) 賌(D95E) 赹(DA5E) 踍(DB5E) 躛(DC5E) 較(DD5E) 轣(DE5E) 過(DF5E) 郶(E05E) 醊(E15E) 鈄(E25E) 鉤(E35E) 鋇(E45E) 錨(E55E) 鎊(E65E) 鏭(E75E) 鑎(E85E) 閊(E95E) 阇(EA5E) 隵(EB5E) 靆(EC5E) 韃(ED5E) 頭(EE5E) 颺(EF5E) 館(F05E) 馸(F15E) 騘(F25E) 骬(F35E) 鬪(F45E) 鮚(F55E) 鯺(F65E) 鱚(F75E) 鴁(F85E) 鵡(F95E) 鷁(FA5E) 鸮(FB5E) 黕(FC5E) 齘(FD5E) 
+  [`](60) 乣(8160) 俙(8260) 僠(8360) 刞(8460) 卄(8560) 哷(8660) 嘸(8760) 坄(8860) 塦(8960) 奰(8A60) 媊(8B60) 宍(8C60) 峘(8D60) 巂(8E60) 廯(8F60) 恅(9060) 慲(9160) 抈(9260) 揱(9360) 擿(9460) 昤(9560) 朻(9660) 梎(9760) 榒(9860) 檂(9960) 歚(9A60) 沗(9B60) 渀(9C60) 漙(9D60) 瀈(9E60) 焋(9F60) 燻(A060) ╜ (A860) ー(A960) 猔(AA60) 玚(AB60) 琡(AC60) 璥(AD60) 甡(AE60) 痐(AF60) 癭(B060) 盽(B160) 瞏(B260) 砢(B360) 碻(B460) 礰(B560) 禶(B660) 穈(B760) 竊(B860) 筦(B960) 篳(BA60) 籤(BB60) 糮(BC60) 絗(BD60) 綻(BE60) 縛(BF60) 繾(C060) 羆(C160) 耟(C260) 胉(C360) 腵(C460) 臽(C560) 芵(C660) 莁(C760) 萡(C860) 蒨(C960) 蔪(CA60) 薫(CB60) 蘞(CC60) 蚡(CD60) 蝋(CE60) 蟕(CF60) 衊(D060) 裛(D160) 襚(D260) 觍(D360) 訿(D460) 誤(D560) 謄(D660) 譧(D760) 豟(D860) 賎(D960) 赻(DA60) 踐(DB60) 躟(DC60) 輅(DD60) 轥(DE60) 違(DF60) 郹(E060) 醏(E160) 鈆(E260) 鉦(E360) 鋊(E460) 錪(E560) 鎌(E660) 鏯(E760) 鑐(E860) 閌(E960) 阘(EA60) 隸(EB60) 靈(EC60) 韅(ED60) 頯(EE60) 颼(EF60) 餪(F060) 馺(F160) 騚(F260) 骮(F360) 鬬(F460) 鮜(F560) 鯼(F660) 鱜(F760) 鴃(F860) 鵣(F960) 鷃(FA60) 鸴(FB60) 黗(FC60) 齚(FD60) 
+  [{](7B) 亄(817B) 倇(827B) 儃(837B) 剓(847B) 厈(857B) 唟(867B) 噞(877B) 坽(887B) 墈(897B) 妠(8A7B) 媨(8B7B) 寋(8C7B) 峽(8D7B) 巤(8E7B) 弡(8F7B) 恵(907B) 憑(917B) 抺(927B) 搟(937B) 攞(947B) 晎(957B) 杮(967B) 梴(977B) 榹(987B) 檣(997B) 歿(9A7B) 泏(9B7B) 渰(9C7B) 漿(9D7B) 瀧(9E7B) 焮(9F7B) 爗(A07B) ▄ (A87B) ﹞(A97B) 獅(AA7B) 珄(AB7B) 瑊(AC7B) 瓄(AD7B) 畕(AE7B) 瘂(AF7B) 皗(B07B) 眥(B17B) 瞷(B27B) 硔(B37B) 磠(B47B) 祘(B57B) 秢(B67B) 穥(B77B) 竰(B87B) 箋(B97B) 簕(BA7B) 粄(BB7B) 納(BC7B) 絳(BD7B) 緖(BE7B) 縶(BF7B) 纚(C07B) 羬(C17B) 聓(C27B) 脅(C37B) 膡(C47B) 舺(C57B) 苳(C67B) 莧(C77B) 葅(C87B) 蓒(C97B) 蕒(CA7B) 藍(CB7B) 蘽(CC7B) 蛖(CD7B) 蝱(CE7B) 蟵(CF7B) 衶(D07B) 褅(D17B) 襸(D27B) 觷(D37B) 詛(D47B) 調(D57B) 謠(D67B) 讃(D77B) 貃(D87B) 賩(D97B) 趝(DA7B) 踸(DB7B) 躿(DC7B) 輠(DD7B) 辿(DE7B) 遻(DF7B) 鄘(E07B) 醷(E17B) 鈡(E27B) 銂(E37B) 鋥(E47B) 鍆(E57B) 鎨(E67B) 鐊(E77B) 鑬(E87B) 閧(E97B) 陒(EA7B) 雥(EB7B) 靮(EC7B) 韠(ED7B) 顊(EE7B) 飡(EF7B) 饆(F07B) 駕(F17B) 騵(F27B) 髙(F37B) 魗(F47B) 鮷(F57B) 鰗(F67B) 鱷(F77B) 鴞(F87B) 鵾(F97B) 鷞(FA7B) 鹻(FB7B) 鼂(FC7B) 齵(FD7B) 
+  [|](7C) 亅(817C) 倈(827C) 億(837C) 剕(847C) 厊(857C) 唡(867C) 噟(877C) 坾(887C) 墊(897C) 妡(8A7C) 媩(8B7C) 寍(8C7C) 峾(8D7C) 巪(8E7C) 弢(8F7C) 恷(907C) 憒(917C) 抾(927C) 搢(937C) 攟(947C) 晐(957C) 東(967C) 梶(977C) 榺(987C) 檤(997C) 殀(9A7C) 泑(9B7C) 渱(9C7C) 潀(9D7C) 瀨(9E7C) 焲(9F7C) 爘(A07C) ▅ (A87C) ﹟(A97C) 獆(AA7C) 珅(AB7C) 瑋(AC7C) 瓅(AD7C) 畖(AE7C) 瘄(AF7C) 皘(B07C) 眧(B17C) 瞸(B27C) 硘(B37C) 磡(B47C) 祙(B57C) 秥(B67C) 穦(B77C) 竱(B87C) 箌(B97C) 簗(BA7C) 粅(BB7C) 紎(BC7C) 絴(BD7C) 緗(BE7C) 縷(BF7C) 纜(C07C) 羭(C17C) 聕(C27C) 脇(C37C) 膢(C47C) 舼(C57C) 苵(C67C) 莬(C77C) 葇(C87C) 蓔(C97C) 蕓(CA7C) 藎(CB7C) 蘾(CC7C) 蛗(CD7C) 蝲(CE7C) 蟶(CF7C) 衸(D07C) 褆(D17C) 襹(D27C) 觸(D37C) 詜(D47C) 諀(D57C) 謡(D67C) 讄(D77C) 貄(D87C) 質(D97C) 趞(DA7C) 踻(DB7C) 軀(DC7C) 輡(DD7C) 迀(DE7C) 遼(DF7C) 鄚(E07C) 醸(E17C) 鈢(E27C) 銃(E37C) 鋦(E47C) 鍇(E57C) 鎩(E67C) 鐋(E77C) 鑭(E87C) 閨(E97C) 陓(EA7C) 雦(EB7C) 靯(EC7C) 韡(ED7C) 顋(EE7C) 飢(EF7C) 饇(F07C) 駖(F17C) 騶(F27C) 髚(F37C) 魘(F47C) 鮸(F57C) 鰘(F67C) 鱸(F77C) 鴟(F87C) 鵿(F97C) 鷟(FA7C) 鹼(FB7C) 鼃(FC7C) 齶(FD7C) 
+  [}](7D) 亇(817D) 倉(827D) 儅(837D) 剗(847D) 厎(857D) 唥(867D) 噠(877D) 坿(887D) 墋(897D) 妢(8A7D) 媫(8B7D) 寎(8C7D) 峿(8D7D) 巬(8E7D) 弣(8F7D) 恾(907D) 憓(917D) 拀(927D) 搣(937D) 攠(947D) 晑(957D) 杴(967D) 梷(977D) 榼(987D) 檥(997D) 殅(9A7D) 泒(9B7D) 渳(9C7D) 潁(9D7D) 瀩(9E7D) 焳(9F7D) 爙(A07D) ▆ (A87D) ﹠(A97D) 獇(AA7D) 珆(AB7D) 瑌(AC7D) 瓆(AD7D) 畗(AE7D) 瘆(AF7D) 皚(B07D) 眪(B17D) 瞹(B27D) 硙(B37D) 磢(B47D) 祡(B57D) 秨(B67D) 穧(B77D) 竲(B87D) 箎(B97D) 簘(BA7D) 粆(BB7D) 紏(BC7D) 絵(BD7D) 緘(BE7D) 縸(BF7D) 纝(C07D) 羮(C17D) 聖(C27D) 脈(C37D) 膤(C47D) 舽(C57D) 苶(C67D) 莭(C77D) 葈(C87D) 蓕(C97D) 蕔(CA7D) 藑(CB7D) 蘿(CC7D) 蛚(CD7D) 蝳(CE7D) 蟷(CF7D) 衹(D07D) 複(D17D) 襺(D27D) 觹(D37D) 詝(D47D) 諁(D57D) 謢(D67D) 讅(D77D) 貆(D87D) 賫(D97D) 趠(DA7D) 踼(DB7D) 軁(DC7D) 輢(DD7D) 迃(DE7D) 遾(DF7D) 鄛(E07D) 醹(E17D) 鈣(E27D) 銄(E37D) 鋧(E47D) 鍈(E57D) 鎪(E67D) 鐌(E77D) 鑮(E87D) 閩(E97D) 陖(EA7D) 雧(EB7D) 靰(EC7D) 韢(ED7D) 題(EE7D) 飣(EF7D) 饈(F07D) 駗(F17D) 騷(F27D) 髛(F37D) 魙(F47D) 鮹(F57D) 鰙(F67D) 鱹(F77D) 鴠(F87D) 鶀(F97D) 鷠(FA7D) 鹽(FB7D) 鼄(FC7D) 齷(FD7D) 
+
+=head2 rfc2279 (UTF-8 RFC2279)
+
+  1st       2nd       3rd       4th
+  C2..DF    80..BF
+  E0..EF    80..BF    80..BF
+  F0..F4    80..BF    80..BF    80..BF
+  00..7F
+
+L<https://www.ietf.org/rfc/rfc2279.txt>
+
+=over 2
+
+=item * needs no multibyte anchoring
+
+=item * needs no escaping meta char of 2nd-4th octets
+
+=item * safe US-ASCII casefolding of 2nd-4th octet
+
+=item * allows encoding surrogate codepoints even if it is not pair
+
+=back
+
+=head2 sjis (Shift_JIS-like encodings, ex. cp932)
+
+  1st       2nd
+  81..9F    00..FF
+  E0..FC    00..FF
+  80..FF
+  00..7F
+
+L<https://en.wikipedia.org/wiki/Shift_JIS>
+
+=over 2
+
+=item * needs multibyte anchoring
+
+=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+
+=item * needs escaping meta char of 2nd octet
+
+=item * and DAMEMOJI samples, here
+
+=back
+
+  [@](40) 　(8140) ァ(8340) А(8440) 院(8940) 魁(8A40) 機(8B40) 掘(8C40) 后(8D40) 察(8E40) 宗(8F40) 拭(9040) 繊(9140) 叩(9240) 邸(9340) 如(9440) 鼻(9540) 法(9640) 諭(9740) 蓮(9840) 僉(9940) 咫(9A40) 奸(9B40) 廖(9C40) 戞(9D40) 曄(9E40) 檗(9F40) 漾(E040) 瓠(E140) 磧(E240) 紂(E340) 隋(E440) 蕁(E540) 襦(E640) 蹇(E740) 錙(E840) 顱(E940) 鵝(EA40) 
+  [[](5B) ー(815B) ゼ(835B) Ъ(845B) 閏(895B) 骸(8A5B) 擬(8B5B) 啓(8C5B) 梗(8D5B) 纂(8E5B) 充(8F5B) 深(905B) 措(915B) 端(925B) 甜(935B) 納(945B) 票(955B) 房(965B) 夕(975B) 麓(985B) 兌(995B) 喙(9A5B) 媼(9B5B) 彈(9C5B) 拏(9D5B) 杣(9E5B) 歇(9F5B) 濕(E05B) 畆(E15B) 禺(E25B) 綣(E35B) 膽(E45B) 藜(E55B) 觴(E65B) 躰(E75B) 鐚(E85B) 饉(E95B) 鷦(EA5B) 
+  [\](5C) ―(815C) ソ(835C) Ы(845C) 噂(895C) 浬(8A5C) 欺(8B5C) 圭(8C5C) 構(8D5C) 蚕(8E5C) 十(8F5C) 申(905C) 曾(915C) 箪(925C) 貼(935C) 能(945C) 表(955C) 暴(965C) 予(975C) 禄(985C) 兔(995C) 喀(9A5C) 媾(9B5C) 彌(9C5C) 拿(9D5C) 杤(9E5C) 歃(9F5C) 濬(E05C) 畚(E15C) 秉(E25C) 綵(E35C) 臀(E45C) 藹(E55C) 觸(E65C) 軆(E75C) 鐔(E85C) 饅(E95C) 鷭(EA5C) 
+  []](5D) ‐(815D) ゾ(835D) Ь(845D) 云(895D) 馨(8A5D) 犠(8B5D) 珪(8C5D) 江(8D5D) 讃(8E5D) 従(8F5D) 疹(905D) 曽(915D) 綻(925D) 転(935D) 脳(945D) 評(955D) 望(965D) 余(975D) 肋(985D) 兢(995D) 咯(9A5D) 嫋(9B5D) 彎(9C5D) 拆(9D5D) 枉(9E5D) 歉(9F5D) 濔(E05D) 畩(E15D) 秕(E25D) 緇(E35D) 臂(E45D) 蘊(E55D) 訃(E65D) 躱(E75D) 鐓(E85D) 饐(E95D) 鷯(EA5D) 
+  [^](5E) ／(815E) タ(835E) Э(845E) 運(895E) 蛙(8A5E) 疑(8B5E) 型(8C5E) 洪(8D5E) 賛(8E5E) 戎(8F5E) 真(905E) 楚(915E) 耽(925E) 顛(935E) 膿(945E) 豹(955E) 某(965E) 与(975E) 録(985E) 竸(995E) 喊(9A5E) 嫂(9B5E) 弯(9C5E) 擔(9D5E) 杰(9E5E) 歐(9F5E) 濘(E05E) 畤(E15E) 秧(E25E) 綽(E35E) 膺(E45E) 蘓(E55E) 訖(E65E) 躾(E75E) 鐃(E85E) 饋(E95E) 鷽(EA5E) 
+  [`](60) 〜(8160) Ａ(8260) チ(8360) Я(8460) 荏(8960) 柿(8A60) 義(8B60) 形(8C60) 港(8D60) 餐(8E60) 汁(8F60) 秦(9060) 疏(9160) 蛋(9260) 伝(9360) 覗(9460) 描(9560) 冒(9660) 輿(9760) 倭(9860) 兪(9960) 啻(9A60) 嫣(9B60) 彖(9C60) 拜(9D60) 杼(9E60) 歔(9F60) 濮(E060) 畫(E160) 秡(E260) 總(E360) 臍(E460) 藾(E560) 訌(E660) 軈(E760) 鐐(E860) 饒(E960) 鸛(EA60) 
+  [{](7B) ＋(817B) ボ(837B) к(847B) 閲(897B) 顎(8A7B) 宮(8B7B) 鶏(8C7B) 砿(8D7B) 施(8E7B) 旬(8F7B) 須(907B) 捜(917B) 畜(927B) 怒(937B) 倍(947B) 府(957B) 本(967B) 養(977B) 几(997B) 嘴(9A7B) 學(9B7B) 悳(9C7B) 掉(9D7B) 桀(9E7B) 毬(9F7B) 炮(E07B) 痣(E17B) 窖(E27B) 縵(E37B) 艝(E47B) 蛔(E57B) 諚(E67B) 轆(E77B) 閔(E87B) 驅(E97B) 黠(EA7B) 
+  [|](7C) − (817C) ポ(837C) л(847C) 榎(897C) 掛(8A7C) 弓(8B7C) 芸(8C7C) 鋼(8D7C) 旨(8E7C) 楯(8F7C) 酢(907C) 掃(917C) 竹(927C) 倒(937C) 培(947C) 怖(957C) 翻(967C) 慾(977C) 處(997C) 嘶(9A7C) 斈(9B7C) 忿(9C7C) 掟(9D7C) 桍(9E7C) 毫(9F7C) 烟(E07C) 痞(E17C) 窩(E27C) 縹(E37C) 艚(E47C) 蛞(E57C) 諫(E67C) 轎(E77C) 閖(E87C) 驂(E97C) 黥(EA7C) 
+  [}](7D) ±(817D) マ(837D) м(847D) 厭(897D) 笠(8A7D) 急(8B7D) 迎(8C7D) 閤(8D7D) 枝(8E7D) 殉(8F7D) 図(907D) 挿(917D) 筑(927D) 党(937D) 媒(947D) 扶(957D) 凡(967D) 抑(977D) 凩(997D) 嘲(9A7D) 孺(9B7D) 怡(9C7D) 掵(9D7D) 栲(9E7D) 毳(9F7D) 烋(E07D) 痾(E17D) 竈(E27D) 繃(E37D) 艟(E47D) 蛩(E57D) 諳(E67D) 轗(E77D) 閘(E87D) 驀(E97D) 黨(EA7D) 
+
+=head2 uhc (UHC)
+
+  1st       2nd
+  81..FE    00..FF
+  00..7F
+
+L<https://en.wikipedia.org/wiki/Unified_Hangul_Code>
+
+=over 2
+
+=item * needs multibyte anchoring
+
+=item * needs no escaping meta char of 2nd octet
+
+=item * has CHANTOSHITAMOJI, unsafe US-ASCII casefolding of 2nd octet
+
+=back
+
+=head2 utf8 (UTF-8 RFC3629)
+
+  1st       2nd       3rd       4th
+  E1..EC    80..BF    80..BF
+  C2..DF    80..BF
+  EE..EF    80..BF    80..BF
+  F0..F0    90..BF    80..BF    80..BF
+  E0..E0    A0..BF    80..BF
+  ED..ED    80..9F    80..BF
+  F1..F3    80..BF    80..BF    80..BF
+  F4..F4    80..8F    80..BF    80..BF
+  00..7F
+
+L<https://en.wikipedia.org/wiki/UTF-8>
+
+=over 2
+
+=item * needs no multibyte anchoring
+
+=item * needs no escaping meta char of 2nd-4th octets
+
+=item * safe US-ASCII casefolding of 2nd-4th octet
+
+=item * enforces surrogate codepoints must be paired
+
+=back
+
+=head2 wtf8 (WTF-8)
+
+  1st       2nd       3rd       4th
+  E1..EF    80..BF    80..BF
+  C2..DF    80..BF
+  E0..E0    A0..BF    80..BF
+  F0..F0    90..BF    80..BF    80..BF
+  F1..F3    80..BF    80..BF    80..BF
+  F4..F4    80..8F    80..BF    80..BF
+  00..7F
+
+L<http://simonsapin.github.io/wtf-8/>
+
+=over 2
+
+=item * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
+
+=item * needs no multibyte anchoring
+
+=item * needs no escaping meta char of 2nd-4th octets
+
+=item * safe US-ASCII casefolding of 2nd-4th octet
+
+=back
 
 =head1 MBCS subroutines provided by this software
 
@@ -5887,6 +5990,7 @@ Single quotes are follows
   split('')
   split(m'')
   qr''
+  qx''
   ------------------------------------------------------------------
  
 In single quote, DAMEMOJI are double-byte characters that include the following metacharacters at second octet
@@ -5958,179 +6062,100 @@ In double quote, DAMEMOJI are double-byte characters that include the following 
 
 =head1 How to escape 2nd octet of DAMEMOJI
 
-$ perl mb.pm script.pl
+=over 2
 
-in script "script.pl",
+=item * (1) $ perl mb.pm script.pl
 
-    -----------------------------------------
-    encoding     DAMEMOJI      hex dump
-    -----------------------------------------
-    big5         "世"          [A5 40]
-                 "加"          [A5 5B]
-                 "功"          [A5 5C]
-                 "包"          [A5 5D]
-                 "匆"          [A5 5E]
-                 "匝"          [A5 60]
-                 "叻"          [A5 7B]
-                 "四"          [A5 7C]
-                 "囚"          [A5 7D]
-    -----------------------------------------
-    big5hkscs    "蕋"          [8F 40]
-                 "团"          [89 5B]
-                 "声"          [89 5C]
-                 "处"          [89 5D]
-                 "备"          [89 5E]
-                 "头"          [89 60]
-                 "询"          [89 7B]
-                 "车"          [89 7C]
-                 "轧"          [89 7D]
-    -----------------------------------------
-    gb18030      "丂"          [81 40]
-                 "乕"          [81 5B]
-                 "乗"          [81 5C]
-                 "乚"          [81 5D]
-                 "乛"          [81 5E]
-                 "乣"          [81 60]
-                 "亄"          [81 7B]
-                 "亅"          [81 7C]
-                 "亇"          [81 7D]
-    -----------------------------------------
-    gbk          "丂"          [81 40]
-                 "乕"          [81 5B]
-                 "乗"          [81 5C]
-                 "乚"          [81 5D]
-                 "乛"          [81 5E]
-                 "乣"          [81 60]
-                 "亄"          [81 7B]
-                 "亅"          [81 7C]
-                 "亇"          [81 7D]
-    -----------------------------------------
-    sjis         "ァ"          [83 40]
-                 "ゼ"          [83 5B]
-                 "ソ"          [83 5C]
-                 "ゾ"          [83 5D]
-                 "タ"          [83 5E]
-                 "チ"          [83 60]
-                 "ボ"          [83 7B]
-                 "ポ"          [83 7C]
-                 "マ"          [83 7D]
-    -----------------------------------------
+=item * (2) mb.pm modulino escapes literal DAMEMOJI in your "script.pl" and save as new "script.oo.pl"
 
-mb.pm modulino escapes literal DAMEMOJI in your script and save as new script
+=item * (3) mb.pm executes "script.oo.pl"
 
-in script "script.oo.pl",
+=back
 
-    -----------------------------------------
-    encoding     not DAMEMOJI  hex dump
-    -----------------------------------------
-    big5         "功@"         [A5 [5C] 40]
-                 "功["         [A5 [5C] 5B]
-                 "功\"         [A5 [5C] 5C]
-                 "功]"         [A5 [5C] 5D]
-                 "功^"         [A5 [5C] 5E]
-                 "功`"         [A5 [5C] 60]
-                 "功{"         [A5 [5C] 7B]
-                 "功|"         [A5 [5C] 7C]
-                 "功}"         [A5 [5C] 7D]
-    -----------------------------------------
-    big5hkscs    "蕚@"         [8F [5C] 40]
-                 "声["         [89 [5C] 5B]
-                 "声\"         [89 [5C] 5C]
-                 "声]"         [89 [5C] 5D]
-                 "声^"         [89 [5C] 5E]
-                 "声`"         [89 [5C] 60]
-                 "声{"         [89 [5C] 7B]
-                 "声|"         [89 [5C] 7C]
-                 "声}"         [89 [5C] 7D]
-    -----------------------------------------
-    gb18030      "乗@"         [81 [5C] 40]
-                 "乗["         [81 [5C] 5B]
-                 "乗\"         [81 [5C] 5C]
-                 "乗]"         [81 [5C] 5D]
-                 "乗^"         [81 [5C] 5E]
-                 "乗`"         [81 [5C] 60]
-                 "乗{"         [81 [5C] 7B]
-                 "乗|"         [81 [5C] 7C]
-                 "乗}"         [81 [5C] 7D]
-    -----------------------------------------
-    gbk          "乗@"         [81 [5C] 40]
-                 "乗["         [81 [5C] 5B]
-                 "乗\"         [81 [5C] 5C]
-                 "乗]"         [81 [5C] 5D]
-                 "乗^"         [81 [5C] 5E]
-                 "乗`"         [81 [5C] 60]
-                 "乗{"         [81 [5C] 7B]
-                 "乗|"         [81 [5C] 7C]
-                 "乗}"         [81 [5C] 7D]
-    -----------------------------------------
-    sjis         "ソ@"         [83 [5C] 40]
-                 "ソ["         [83 [5C] 5B]
-                 "ソ\"         [83 [5C] 5C]
-                 "ソ]"         [83 [5C] 5D]
-                 "ソ^"         [83 [5C] 5E]
-                 "ソ`"         [83 [5C] 60]
-                 "ソ{"         [83 [5C] 7B]
-                 "ソ|"         [83 [5C] 7C]
-                 "ソ}"         [83 [5C] 7D]
-    -----------------------------------------
+=head2 on big5 encoding
 
-then mb.pm executes "script.oo.pl"
+    ------------------------------------------------------------
+    (1)                (2)                      (3)
+    in "script.pl"     in "script.oo.pl"        in perl's memory
+    ------------------------------------------------------------
+    "世" [A5 40]  ==>  "功@" [A5 [5C] 40]  ==>  "世" [A5] [40]  
+    "加" [A5 5B]  ==>  "功[" [A5 [5C] 5B]  ==>  "加" [A5] [5B]  
+    "功" [A5 5C]  ==>  "功\" [A5 [5C] 5C]  ==>  "功" [A5] [5C]  
+    "包" [A5 5D]  ==>  "功]" [A5 [5C] 5D]  ==>  "包" [A5] [5D]  
+    "匆" [A5 5E]  ==>  "功^" [A5 [5C] 5E]  ==>  "匆" [A5] [5E]  
+    "匝" [A5 60]  ==>  "功`" [A5 [5C] 60]  ==>  "匝" [A5] [60]  
+    "叻" [A5 7B]  ==>  "功{" [A5 [5C] 7B]  ==>  "叻" [A5] [7B]  
+    "四" [A5 7C]  ==>  "功|" [A5 [5C] 7C]  ==>  "四" [A5] [7C]  
+    "囚" [A5 7D]  ==>  "功}" [A5 [5C] 7D]  ==>  "囚" [A5] [7D]  
+    ------------------------------------------------------------
 
-in perl interpreter memory,
+=head2 on big5hkscs encoding
 
-    -----------------------------------------
-    encoding     memory        hex dump
-    -----------------------------------------
-    big5         "世"          [A5] [40]
-                 "加"          [A5] [5B]
-                 "功"          [A5] [5C]
-                 "包"          [A5] [5D]
-                 "匆"          [A5] [5E]
-                 "匝"          [A5] [60]
-                 "叻"          [A5] [7B]
-                 "四"          [A5] [7C]
-                 "囚"          [A5] [7D]
-    -----------------------------------------
-    big5hkscs    "蕋"          [8F] [40]
-                 "团"          [89] [5B]
-                 "声"          [89] [5C]
-                 "处"          [89] [5D]
-                 "备"          [89] [5E]
-                 "头"          [89] [60]
-                 "询"          [89] [7B]
-                 "车"          [89] [7C]
-                 "轧"          [89] [7D]
-    -----------------------------------------
-    gb18030      "丂"          [81] [40]
-                 "乕"          [81] [5B]
-                 "乗"          [81] [5C]
-                 "乚"          [81] [5D]
-                 "乛"          [81] [5E]
-                 "乣"          [81] [60]
-                 "亄"          [81] [7B]
-                 "亅"          [81] [7C]
-                 "亇"          [81] [7D]
-    -----------------------------------------
-    gbk          "丂"          [81] [40]
-                 "乕"          [81] [5B]
-                 "乗"          [81] [5C]
-                 "乚"          [81] [5D]
-                 "乛"          [81] [5E]
-                 "乣"          [81] [60]
-                 "亄"          [81] [7B]
-                 "亅"          [81] [7C]
-                 "亇"          [81] [7D]
-    -----------------------------------------
-    sjis         "ァ"          [83] [40]
-                 "ゼ"          [83] [5B]
-                 "ソ"          [83] [5C]
-                 "ゾ"          [83] [5D]
-                 "タ"          [83] [5E]
-                 "チ"          [83] [60]
-                 "ボ"          [83] [7B]
-                 "ポ"          [83] [7C]
-                 "マ"          [83] [7D]
-    -----------------------------------------
+    ------------------------------------------------------------
+    (1)                (2)                      (3)
+    in "script.pl"     in "script.oo.pl"        in perl's memory
+    ------------------------------------------------------------
+    "蕋" [8F 40]  ==>  "蕚@" [8F [5C] 40]  ==>  "蕋" [8F] [40]  
+    "团" [89 5B]  ==>  "声[" [89 [5C] 5B]  ==>  "团" [89] [5B]  
+    "声" [89 5C]  ==>  "声\" [89 [5C] 5C]  ==>  "声" [89] [5C]  
+    "处" [89 5D]  ==>  "声]" [89 [5C] 5D]  ==>  "处" [89] [5D]  
+    "备" [89 5E]  ==>  "声^" [89 [5C] 5E]  ==>  "备" [89] [5E]  
+    "头" [89 60]  ==>  "声`" [89 [5C] 60]  ==>  "头" [89] [60]  
+    "询" [89 7B]  ==>  "声{" [89 [5C] 7B]  ==>  "询" [89] [7B]  
+    "车" [89 7C]  ==>  "声|" [89 [5C] 7C]  ==>  "车" [89] [7C]  
+    "轧" [89 7D]  ==>  "声}" [89 [5C] 7D]  ==>  "轧" [89] [7D]  
+    ------------------------------------------------------------
+
+=head2 on gb18030 encoding
+
+    ------------------------------------------------------------
+    (1)                (2)                      (3)
+    in "script.pl"     in "script.oo.pl"        in perl's memory
+    ------------------------------------------------------------
+    "丂" [81 40]  ==>  "乗@" [81 [5C] 40]  ==>  "丂" [81] [40]  
+    "乕" [81 5B]  ==>  "乗[" [81 [5C] 5B]  ==>  "乕" [81] [5B]  
+    "乗" [81 5C]  ==>  "乗\" [81 [5C] 5C]  ==>  "乗" [81] [5C]  
+    "乚" [81 5D]  ==>  "乗]" [81 [5C] 5D]  ==>  "乚" [81] [5D]  
+    "乛" [81 5E]  ==>  "乗^" [81 [5C] 5E]  ==>  "乛" [81] [5E]  
+    "乣" [81 60]  ==>  "乗`" [81 [5C] 60]  ==>  "乣" [81] [60]  
+    "亄" [81 7B]  ==>  "乗{" [81 [5C] 7B]  ==>  "亄" [81] [7B]  
+    "亅" [81 7C]  ==>  "乗|" [81 [5C] 7C]  ==>  "亅" [81] [7C]  
+    "亇" [81 7D]  ==>  "乗}" [81 [5C] 7D]  ==>  "亇" [81] [7D]  
+    ------------------------------------------------------------
+
+=head2 on gbk encoding
+
+    ------------------------------------------------------------
+    (1)                (2)                      (3)
+    in "script.pl"     in "script.oo.pl"        in perl's memory
+    ------------------------------------------------------------
+    "丂" [81 40]  ==>  "乗@" [81 [5C] 40]  ==>  "丂" [81] [40]  
+    "乕" [81 5B]  ==>  "乗[" [81 [5C] 5B]  ==>  "乕" [81] [5B]  
+    "乗" [81 5C]  ==>  "乗\" [81 [5C] 5C]  ==>  "乗" [81] [5C]  
+    "乚" [81 5D]  ==>  "乗]" [81 [5C] 5D]  ==>  "乚" [81] [5D]  
+    "乛" [81 5E]  ==>  "乗^" [81 [5C] 5E]  ==>  "乛" [81] [5E]  
+    "乣" [81 60]  ==>  "乗`" [81 [5C] 60]  ==>  "乣" [81] [60]  
+    "亄" [81 7B]  ==>  "乗{" [81 [5C] 7B]  ==>  "亄" [81] [7B]  
+    "亅" [81 7C]  ==>  "乗|" [81 [5C] 7C]  ==>  "亅" [81] [7C]  
+    "亇" [81 7D]  ==>  "乗}" [81 [5C] 7D]  ==>  "亇" [81] [7D]  
+    ------------------------------------------------------------
+
+=head2 on sjis encoding
+
+    ------------------------------------------------------------
+    (1)                (2)                      (3)
+    in "script.pl"     in "script.oo.pl"        in perl's memory
+    ------------------------------------------------------------
+    "ァ" [83 40]  ==>  "ソ@" [83 [5C] 40]  ==>  "ァ" [83] [40]  
+    "ゼ" [83 5B]  ==>  "ソ[" [83 [5C] 5B]  ==>  "ゼ" [83] [5B]  
+    "ソ" [83 5C]  ==>  "ソ\" [83 [5C] 5C]  ==>  "ソ" [83] [5C]  
+    "ゾ" [83 5D]  ==>  "ソ]" [83 [5C] 5D]  ==>  "ゾ" [83] [5D]  
+    "タ" [83 5E]  ==>  "ソ^" [83 [5C] 5E]  ==>  "タ" [83] [5E]  
+    "チ" [83 60]  ==>  "ソ`" [83 [5C] 60]  ==>  "チ" [83] [60]  
+    "ボ" [83 7B]  ==>  "ソ{" [83 [5C] 7B]  ==>  "ボ" [83] [7B]  
+    "ポ" [83 7C]  ==>  "ソ|" [83 [5C] 7C]  ==>  "ポ" [83] [7C]  
+    "マ" [83 7D]  ==>  "ソ}" [83 [5C] 7D]  ==>  "マ" [83] [7D]  
+    ------------------------------------------------------------
 
 =head1 What are CHANTOSHITAMOJI?
 
@@ -6212,6 +6237,8 @@ In other words, fullwidth alphabetic characters are treated as KANJI.
 In that case, it is desirable that those characters are not converted by "lc()" and "uc()".
 You may feel it a little strange, but this is normal in the JPerl world.
 
+=head2 lc() works as
+
     ----------------------------------------------------------------------------------------------
                                                bare Perl4, bare Perl5     mb.pm modulino
     encoding    your script                    makes MOJIBAKE             makes no MOJIBAKE
@@ -6224,7 +6251,9 @@ You may feel it a little strange, but this is normal in the JPerl world.
     sjis        lc("AアＡ") [41][8341][8261]   "aヂＡ" [61][8361][8261]   "aアＡ" [61][8341][8261]
     uhc         lc("A갂Ａ") [41][8141][A3C1]   "a갵Ａ" [61][8161][A3C1]   "a갂Ａ" [61][8141][A3C1]
     ----------------------------------------------------------------------------------------------
-    
+
+=head2 uc() works as
+
     ----------------------------------------------------------------------------------------------
                                                bare Perl4, bare Perl5     mb.pm modulino
     encoding    your script                    makes MOJIBAKE             makes no MOJIBAKE
@@ -6670,7 +6699,8 @@ Each elements in regular expressions are transpiled as follows
 See:
 P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-224-7 CJKV Information Processing
 
-  on every encodings
+=head2 on every encodings
+
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
@@ -6720,7 +6750,8 @@ P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-
   qr/[[:^xdigit:]]/                          qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[[:^xdigit:]])]})/ ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
-  on big5 encoding
+=head2 on big5 encoding
+
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
@@ -6770,7 +6801,8 @@ P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
-  on big5hkscs encoding
+=head2 on big5hkscs encoding
+
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
@@ -6820,7 +6852,8 @@ P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
-  on eucjp encoding
+=head2 on eucjp encoding
+
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
@@ -6870,7 +6903,8 @@ P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\xA1-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
-  on gb18030 encoding
+=head2 on gb18030 encoding
+
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
@@ -6920,7 +6954,8 @@ P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
-  on gbk encoding
+=head2 on gbk encoding
+
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
@@ -6970,7 +7005,8 @@ P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
-  on rfc2279 encoding
+=head2 on rfc2279 encoding
+
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
@@ -7020,7 +7056,8 @@ P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
-  on sjis encoding
+=head2 on sjis encoding
+
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
@@ -7070,7 +7107,8 @@ P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
-  on uhc encoding
+=head2 on uhc encoding
+
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
@@ -7120,7 +7158,8 @@ P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\xFE][\x00-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
-  on utf8 encoding
+=head2 on utf8 encoding
+
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
@@ -7170,7 +7209,8 @@ P.1023 Multiple-Byte Anchoring in Appendix W Perl Code Examples of ISBN 1-56592-
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F]))))(?^:(?>(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   ----------------------------------------------------------------------------------------------------------------------
 
-  on wtf8 encoding
+=head2 on wtf8 encoding
+
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
   ----------------------------------------------------------------------------------------------------------------------
@@ -7518,9 +7558,7 @@ Because it is difficult to implement and you can write the same script in other 
 
 =back
 
-=head1 Our Goals (and UTF8 Flag Considered Harmful)
-
-Maybe Larry Wall-san think that "escaping" is the best solution in this case.
+=head1 Our Goals
 
 P.401 See chapter 15: Unicode
 of ISBN 0-596-00027-8 Programming Perl Third Edition.
@@ -7528,13 +7566,34 @@ of ISBN 0-596-00027-8 Programming Perl Third Edition.
 Before the introduction of Unicode support in perl, The eq operator just compared the byte-strings represented by two scalars.
 Beginning with perl 5.8, eq compares two byte-strings with simultaneous consideration of the UTF8 flag.
 
+"I/O flow" L<https://metacpan.org/pod/perlunitut#I/O-flow-(the-actual-5-minute-tutorial)> shows us this
+
+  The typical input/output flow of a program is:
+  1. Receive and decode
+  2. Process
+  3. Encode and output
+
 -- we have been taught so for a long time.
 
-Perl is a powerful language for everyone, but UTF8 flag is a barrier for common beginners.
-Calling Encode::encode() and Encode::decode() in application program is not good way.
-Making one script for information processing, and other one for encoding conversion are better.
+However,
 
-"That's a small bit for someone, but the giant  bug on the Perl for mankind."
+  Every inside has
+    its inside that has
+    its inside that has
+    its inside that has ...
+  
+  Every outside has
+    its outside that has
+    its outside that has
+    its outside that has ...
+
+We know inside has its inside more, outside has its outside more.
+Inside is never only one and outside is never only one.
+So string model of Perl 5.8 cannot fit our common thinking.
+
+Spreading of EMOJI on MBCS encoding in today had remind us this idea is not bad.
+
+B<UTF8 flag is harmful.>
 
  /*
   * You are not expected to understand this.
@@ -7572,9 +7631,15 @@ Making one script for information processing, and other one for encoding convers
 
 Perl 5.8's string model will not be accepted by common people.
 
-Information processing model of UNIX/C-ism, 
-Information processing model of perl3 or later, and
-Information processing model of this software.
+=over 2
+
+=item * Information processing model of UNIX/C-ism
+
+=item * Information processing model of perl3 or later
+
+=item * Information processing model of this software
+
+=back
 
     +--------------------------------------------+
     |    Text string as Digital octet string     |
@@ -7648,7 +7713,8 @@ figure of Goal #1 and Goal #2.
 There is a combination from (a) to (e) in data, script, and interpreter of old and new. Let's add JPerl, utf8 pragma, and this software.
 
                         (a)     (b)     (c)     (d)     (e)
-                                      JPerl,mb        utf8
+                                      JPerl            utf8
+                                      mb.pm
       +--------------+-------+-------+-------+-------+-------+
       | data         |  Old  |  Old  |  New  |  Old  |  New  |
       +--------------+-------+-------+-------+-------+-------+

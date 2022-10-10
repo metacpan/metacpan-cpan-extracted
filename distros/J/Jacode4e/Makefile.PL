@@ -4,8 +4,8 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Jacode4e},
-    'VERSION'   => q{2.13.6.19},
-    'ABSTRACT'  => q{jacode.pl-like program for enterprise},
+    'VERSION'   => q{2.13.6.20},
+    'ABSTRACT'  => q{Converts Character Encodings for Enterprise in Japan},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',
         'File::Basename' => '2.6',

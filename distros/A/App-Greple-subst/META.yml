@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple::subst:
     file: lib/App/Greple/subst.pm
-    version: '2.3102'
+    version: '2.3104'
   App::Greple::subst::Dict:
     file: lib/App/Greple/subst/Dict.pm
   App::Greple::subst::Dict::Ent:
@@ -36,7 +36,7 @@ provides:
 requires:
   App::Greple: '8.58'
   App::Greple::update: '0.03'
-  File::Share: '0'
+  File::Share: '0.27'
   Getopt::EX: '0'
   Getopt::EX::termcolor: '1.08'
   List::Util: '0'
@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple-subst/issues
   homepage: https://github.com/kaz-utashiro/greple-subst
   repository: https://github.com/kaz-utashiro/greple-subst.git
-version: '2.3102'
+version: '2.3104'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

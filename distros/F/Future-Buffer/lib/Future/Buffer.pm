@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
 package Future::Buffer;
 
@@ -9,7 +9,7 @@ use 5.010; # //
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Future;
 
@@ -117,7 +117,7 @@ sub _fill
       my $fill = $self->{fill};
 
       # Arm the fill loop
-      $self->{fill_f} = $fill->() # TODO: give it a size hint?
+      $fill->() # TODO: give it a size hint?
          ->on_done( sub {
             my ( $data ) = @_;
             $weakself or return;
@@ -135,12 +135,37 @@ sub _fill
 sub _new_read_future
 {
    my $self = shift;
+   my ( $code ) = @_;
 
-   if( $self->{fill} and my $fill_f = $self->_fill ) {
-      return $fill_f->new;
+   my $pending = $self->{pending};
+
+   # First see if the buffer is already sufficient;
+   if( !@$pending and
+         ( my @ret = $code->( \$self->{data} ) ) ) {
+      return Future->done( @ret );
    }
 
-   return Future->new;
+   my $f;
+   if( $self->{fill} and my $fill_f = $self->_fill ) {
+      $f = $fill_f->new;
+   }
+   else {
+      $f = Future->new;
+   }
+
+   push @$pending, [ $code, $f ];
+
+   $self->_invoke_pending if length $self->{data};
+
+   $f->on_cancel( sub {
+      shift @$pending while @$pending and $pending->[0]->[1]->is_cancelled;
+      return if @$pending or !$self->{fill_f};
+
+      $self->{fill_f}->cancel;
+      undef $self->{fill_f};
+   } );
+
+   return $f;
 }
 
 sub _invoke_pending
@@ -150,10 +175,14 @@ sub _invoke_pending
    my $pending = $self->{pending};
 
    while( @$pending and length $self->{data} ) {
-      $pending->[0]->( \$self->{data} )
+      my $p = $pending->[0];
+      shift @$pending and next if $p->[1]->is_cancelled;
+
+      defined( my $ret = $p->[0]->( \$self->{data} ) )
          or last;
 
       shift @$pending;
+      $p->[1]->done( $ret );
    }
 }
 
@@ -221,19 +250,14 @@ sub read_atmost
    my $self = shift;
    my ( $maxlen ) = @_;
 
-   my $f = $self->_new_read_future;
+   return $self->_new_read_future(
+      sub {
+         my ( $dref ) = @_;
+         return unless length $$dref;
 
-   push @{ $self->{pending} }, sub {
-      my ( $dref ) = @_;
-      return unless length $$dref;
-
-      my $ret = substr( $$dref, 0, $maxlen, "" );
-      $f->done( $ret );
-   };
-
-   $self->_invoke_pending if length $self->{data};
-
-   return $f;
+         return substr( $$dref, 0, $maxlen, "" );
+      }
+   );
 }
 
 =head2 read_exactly
@@ -252,19 +276,14 @@ sub read_exactly
    my $self = shift;
    my ( $len ) = @_;
 
-   my $f = $self->_new_read_future;
+   return $self->_new_read_future(
+      sub {
+         my ( $dref ) = @_;
+         return unless length $$dref >= $len;
 
-   push @{ $self->{pending} }, sub {
-      my ( $dref ) = @_;
-      return unless length $$dref >= $len;
-
-      my $ret = substr( $$dref, 0, $len, "" );
-      $f->done( $ret );
-   };
-
-   $self->_invoke_pending if length $self->{data};
-
-   return $f;
+         return substr( $$dref, 0, $len, "" );
+      }
+   );
 }
 
 =head2 read_until
@@ -291,19 +310,126 @@ sub read_until
 
    $pattern = qr/\Q$pattern/ unless ref $pattern eq "Regexp";
 
-   my $f = $self->_new_read_future;
+   return $self->_new_read_future(
+      sub {
+         my ( $dref ) = @_;
+         return unless $$dref =~ m/$pattern/;
 
-   push @{ $self->{pending} }, sub {
-      my ( $dref ) = @_;
-      return unless $$dref =~ m/$pattern/;
+         return substr( $$dref, 0, $+[0], "" );
+      }
+   );
+}
 
-      my $ret = substr( $$dref, 0, $+[0], "" );
-      $f->done( $ret );
-   };
+=head2 read_unpacked
 
-   $self->_invoke_pending if length $self->{data};
+   $f = $buffer->read_unpacked( $pack_format )
 
-   return $f;
+      @fields = $f->get
+
+I<Since version 0.03.>
+
+Returns a future which will complete when the buffer contains enough data to
+unpack all of the requested fields using the given C<pack()> format. The
+future will yield a list of all the fields extracted by the format.
+
+Note that because the implementation is shamelessly stolen from
+L<IO::Handle::Packable> the same limitations on what pack formats are
+recognized will apply.
+
+=cut
+
+# Gratuitously stolen from IO::Handle::Packable
+
+use constant {
+   BYTES_FMT_i => length( pack "i", 0 ),
+   BYTES_FMT_f => length( pack "f", 0 ),
+   BYTES_FMT_d => length( pack "d", 0 ),
+};
+
+sub _length_of_packformat
+{
+   my ( $format ) = @_;
+   local $_ = $format;
+
+   my $bytes = 0;
+   while( length ) {
+      s/^\s+//;
+      length or last;
+
+      my $this;
+
+      # Basic template
+      s/^[aAcC]// and $this = 1 or
+      s/^[sSnv]// and $this = 2 or
+      s/^[iI]//   and $this = BYTES_FMT_i or
+      s/^[lLNV]// and $this = 4 or
+      s/^[qQ]//   and $this = 8 or
+      s/^f//      and $this = BYTES_FMT_f or
+      s/^d//      and $this = BYTES_FMT_d or
+         die "TODO: unrecognised template char ${\substr $_, 0, 1}\n";
+
+      # Ignore endian specifiers
+      s/^[<>]//;
+
+      # Repeat count
+      s/^(\d+)// and $this *= $1;
+
+      $bytes += $this;
+   }
+
+   return $bytes;
+}
+
+sub read_unpacked
+{
+   my $self = shift;
+   my ( $format ) = @_;
+
+   my $len = _length_of_packformat $format;
+   return $self->_new_read_future(
+      sub {
+         my ( $dref ) = @_;
+         return unless length $$dref >= $len;
+
+         return unpack $format, substr( $$dref, 0, $len, "" );
+      }
+   );
+}
+
+=head2 unread
+
+   $buffer->unread( $data )
+
+I<Since version 0.03.>
+
+Prepends more data back into the buffer,
+
+It is uncommon to need this method, but it may be useful in certain situations
+such as when it is hard to determine upfront how much data needs to be read
+for a single operation, and it turns out too much was read. The trailing
+content past what is needed can be put back for a later operation.
+
+Note that use of this method causes an inherent race condition between
+outstanding read futures and existing data in the buffer. If there are no
+pending futures then this is safe. If there is no existing data already in the
+buffer this is also safe. If neither of these is true then a warning is
+printed indicating that the logic of the caller is not well-defined.
+
+=cut
+
+sub unread
+{
+   my $self = shift;
+   my ( $data ) = @_;
+
+   if( @{ $self->{pending} } and length $self->{data} ) {
+      warn "Racy use of ->unread with both pending read futures and existing data";
+   }
+
+   $self->{data} = $data . $self->{data};
+   $self->_invoke_pending if @{ $self->{pending} };
+
+   return Future->done;
 }
 
 =head1 TODO
@@ -323,8 +449,9 @@ unbounded C<read_until> though.
 
 =item *
 
-Consider some C<read + unpack> assistance, to allow nice handling of binary
-protocols by unpacking out of the buffer directly.
+Consider extensions of the L</read_unpacked> method to handle more situations.
+This may require building a shared CPAN module for doing streaming-unpack
+along with C<IO::Handle::Packable> and other situations.
 
 =item *
 

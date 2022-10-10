@@ -74,6 +74,6 @@ test_simple_render(
   "0101 forest\n",
   sub { ok(shift->at("g#things use"), "things") },
   sub { is(shift->at("g#coordinates text")->text, "01.01", "text") },
-  sub { ok(shift->at("g#regions polygon#hex010100"), "text") });
+  sub { ok(shift->at("g#regions polygon#hex0101"), "text") });
 
 done_testing;

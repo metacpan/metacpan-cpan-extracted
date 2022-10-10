@@ -4,6 +4,11 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.46 2022-10-06
+  - Added lib/Power/Outlet/Dingtian.pm to support Dingtian Ethernet-based Relay Boards
+  - Updated lib/Power/Outlet/Common/IP/HTTP.pm to add support for http_scheme to support https capability in Dingtian boards
+  - Added tests to support Dingtian
+
 0.45 2022-05-22
   - Updated Makefile.PL yet again to try to get github links to work easy
 

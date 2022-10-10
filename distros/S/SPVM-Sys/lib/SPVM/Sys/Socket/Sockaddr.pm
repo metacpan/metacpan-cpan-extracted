@@ -22,6 +22,8 @@ This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
 
 =item L<Sys::Socket::Sockaddr::Interface|SPVM::Sys::Socket::Sockaddr::Interface>
 
+=item L<Cloneable|SPVM::Cloneable>
+
 =back
 
 =head1 Instance Methods
@@ -43,6 +45,12 @@ Gets C<sa_family>.
   method sizeof : int ()
 
 The size of the structure internally used.
+
+=head2 clone
+
+  method clone : Sys::Socket::Sockaddr ();
+
+Clones this object.
 
 =head1 Well Known Child Classes
 

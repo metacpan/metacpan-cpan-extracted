@@ -133,6 +133,44 @@ METHODS
 
        $f = $buffer->read_until( "\x0d\x0a" );
 
+ read_unpacked
+
+       $f = $buffer->read_unpacked( $pack_format )
+    
+          @fields = $f->get
+
+    Since version 0.03.
+
+    Returns a future which will complete when the buffer contains enough
+    data to unpack all of the requested fields using the given pack()
+    format. The future will yield a list of all the fields extracted by the
+    format.
+
+    Note that because the implementation is shamelessly stolen from
+    IO::Handle::Packable the same limitations on what pack formats are
+    recognized will apply.
+
+ unread
+
+       $buffer->unread( $data )
+
+    Since version 0.03.
+
+    Prepends more data back into the buffer,
+
+    It is uncommon to need this method, but it may be useful in certain
+    situations such as when it is hard to determine upfront how much data
+    needs to be read for a single operation, and it turns out too much was
+    read. The trailing content past what is needed can be put back for a
+    later operation.
+
+    Note that use of this method causes an inherent race condition between
+    outstanding read futures and existing data in the buffer. If there are
+    no pending futures then this is safe. If there is no existing data
+    already in the buffer this is also safe. If neither of these is true
+    then a warning is printed indicating that the logic of the caller is
+    not well-defined.
+
 TODO
 
       * An "on-read" event, taking maybe inspiration from
@@ -143,8 +181,10 @@ TODO
       calls return pending futures until buffer can accept it. Needs
       consideration of unbounded read_until though.
 
-      * Consider some read + unpack assistance, to allow nice handling of
-      binary protocols by unpacking out of the buffer directly.
+      * Consider extensions of the "read_unpacked" method to handle more
+      situations. This may require building a shared CPAN module for doing
+      streaming-unpack along with IO::Handle::Packable and other
+      situations.
 
       * Consider what happens at EOF. Add a close method for producers to
       call. Understand what fill would do there. Have all the pending read

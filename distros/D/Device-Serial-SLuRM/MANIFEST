@@ -1,0 +1,19 @@
+Build.PL
+Changes
+contrib/slurm.c
+contrib/slurm.h
+doc/protocol.md
+examples/slurm-recv.pl
+lib/Device/Serial/SLuRM.pm
+MANIFEST			This list of files
+t/00use.t
+t/01packet.t
+t/02recv-errors.t
+t/10reset.t
+t/11notify.t
+t/13request.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

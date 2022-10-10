@@ -67,6 +67,16 @@ deprecated. Six months from the release of 0.150 this attribute will
 warn on the first use; six months after that it will warn on all uses,
 and six months after that any use will be fatal.
 
+The absence of OID lists also means that the Space Track options on
+Celestrak queries are deprecated. Six months after the release of 0.158
+these will warn on the first use, and so on as for the C<direct>
+attribute.
+
+The absence of OID lists also means that the Space Track options on
+Celestrak queries are deprecated. Six months after the release of 0.158
+these will warn on the first use, and so on as for the C<direct>
+attribute.
+
 =head2 DEPRECATION NOTICE: IRIDIUM STATUS
 
 As of version 0.137, Iridium status format C<'mccants'> is fully
@@ -113,7 +123,7 @@ This package retrieves orbital data from the Space Track web site
 L<https://www.space-track.org> and several others. You must register and
 get a user name and password before you can get data from Space Track.
 
-Other methods (C<celestrak()>, C<amsat()>, C<spaceflight()> ...) have
+Other methods (C<celestrak()>, C<amsat()>, ...) have
 been added to access other repositories of orbital data, and in general
 these do not require a Space Track username and password.
 
@@ -146,7 +156,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.157';
+our $VERSION = '0.158';
 our @EXPORT_OK = qw{
     shell
 
@@ -175,6 +185,7 @@ use HTTP::Status qw{
     HTTP_NOT_FOUND
     HTTP_I_AM_A_TEAPOT
     HTTP_INTERNAL_SERVER_ERROR
+    HTTP_NOT_ACCEPTABLE
     HTTP_NOT_MODIFIED
     HTTP_OK
     HTTP_PRECONDITION_FAILED
@@ -220,12 +231,17 @@ use constant DEFAULT_SPACE_TRACK_VERSION => 2;
 use constant DUMP_NONE => 0;		# No dump
 use constant DUMP_TRACE => 0x01;	# Logic trace
 use constant DUMP_REQUEST => 0x02;	# Request content
-use constant DUMP_NO_EXECUTE => 0x04;	# Do not execute request
+use constant DUMP_DRY_RUN => 0x04;	# Do not execute request
 use constant DUMP_COOKIE => 0x08;	# Dump cookies.
 use constant DUMP_RESPONSE => 0x10;	# Dump response.
-use constant DUMP_RESPONSE_TRUNCATED => 0x20;	# Dump w/ truncated content
-# The following is used to see if we want to dump the response at all.
-use constant _DUMP_RESPONSE => DUMP_RESPONSE | DUMP_RESPONSE_TRUNCATED;
+use constant DUMP_TRUNCATED => 0x20;	# Dump with truncated content
+
+my @dump_options;
+foreach my $key ( sort keys %Astro::SpaceTrack:: ) {
+    $key =~ s/ \A DUMP_ //smx
+	or next;
+    push @dump_options, lc $key;
+}
 
 # Manifest constants for reference types
 use constant ARRAY_REF	=> ref [];
@@ -235,7 +251,7 @@ use constant HASH_REF	=> ref {};
 # These are the Space Track version 1 retrieve Getopt::Long option
 # specifications, and the descriptions of each option. These need to
 # survive the returement of Version 1 as a separate entity because I
-# emulated them in the celestrak() and spaceflight() methods. I'm _NOT_
+# emulated them in the celestrak() method. I'm _NOT_
 # emulating the options added in version 2 because they require parsing
 # the TLE.
 use constant CLASSIC_RETRIEVE_OPTIONS => [
@@ -246,6 +262,22 @@ use constant CLASSIC_RETRIEVE_OPTIONS => [
 	"type ('catnum' or 'epoch', with 'catnum' the default)",
     'start_epoch=s' => 'date',
 ];
+
+use constant CELESTRAK_API_OPTIONS	=> [
+    'query=s',	'query type',
+    'format=s',	'data format',
+];
+
+use constant CELESTRAK_OPTIONS	=> [
+    @{ CLASSIC_RETRIEVE_OPTIONS() },	# TODO deprecate and remove
+    @{ CELESTRAK_API_OPTIONS() },
+];
+
+use constant CELESTRAK_SUPPLEMENTAL_VALID_QUERY => {
+    map { $_ => 1 } qw{ CATNR INTDES SOURCE NAME SPECIAL FILE } };
+
+use constant CELESTRAK_VALID_QUERY => {
+    map { $_ => 1 } qw{ CATNR INTDES GROUP NAME SPECIAL } };
 
 our $COMPLETION_APP;	# A hack.
 
@@ -1102,134 +1134,99 @@ B<Note:> As of version 0.150 of this module a false value of the
 C<'direct'> attribute is unsupported. See L<CELESTRAK API|/CELESTRAK API>
 above for details.
 
-This method takes the name of a Celestrak data set and returns an
-HTTP::Response object whose content is the relevant element sets.
-If called in list context, the first element of the list is the
-aforementioned HTTP::Response object, and the second element is a
-list reference to list references  (i.e. a list of lists). Each
-of the list references contains the catalog ID of a satellite or
-other orbiting body and the common name of the body.
-
-If the C<direct> attribute is true, or if the C<fallback> attribute is
-true and the data are not available from Space Track, the elements will
-be fetched directly from Celestrak, and no login is needed. Otherwise,
-this method implicitly calls the C<login()> method if the session cookie
-is missing or expired, and returns the SpaceTrack data for the OIDs
-fetched from Celestrak. If C<login()> fails, you will get the
-HTTP::Response from C<login()>.
-
-A list of valid names and brief descriptions can be obtained by calling
-C<< $st->names ('celestrak') >>. If you have set the C<verbose> attribute true
-(e.g. C<< $st->set (verbose => 1) >>), the content of the error response will
-include this list. Note, however, that this list does not determine what
-can be retrieved; if Dr.  Kelso adds a data set, it can be retrieved
-even if it is not on the list, and if he removes one, being on the list
-won't help.
-
-In general, the data set names are the same as the file names given at
-L<https://celestrak.org/NORAD/elements/>, but without the '.txt' on the
-end; for example, the name of the 'International Space Station' data set
-is 'stations', since the URL for this is
-L<https://celestrak.org/NORAD/elements/stations.txt>.
-
-The Celestrak web site makes a few items available for direct-fetching
-only (C<< $st->set(direct => 1) >>, see below.) These are typically
-debris from collisions or explosions. I have not corresponded with Dr.
-Kelso on this, but I think it reasonable to believe that asking Space
-Track for a couple thousand sets of data at once would not be a good
-thing.
-
-As of this release, the following data sets may be direct-fetched only:
+As of version 0.158 this version is an interface to the CelesTrak API.
+The argument is the argument of a Celestrak query (see
+L<https://celestrak.org/NORAD/documentation/gp-data-formats.php>). The
+following options are available:
 
 =over
 
-=item 1999-025
+=item format
 
-This is the debris of Chinese communication satellite Fengyun 1C,
-created by an antisatellite test on January 11 2007. As of February 21
-2010 there are 2631 pieces of debris in the data set. This is an
-increase from the 2375 recorded on March 9 2009.
+ --format json
 
-=item usa-193-debris
+This option specifies the format of the returned data. Valid values are
+C<'TLE'>, C<'3LE'>, C<'2LE'>, C<'XML'>, C<'KVN'>, C<'JSON'>, or
+C<'CSV'>. See
+L<https://celestrak.org/NORAD/documentation/gp-data-formats.php> for a
+discussion of these. C<'JSON-PRETTY'> is not a valid format option, but
+will be generated if the C<pretty> attribute is true.
 
-This is the debris of U.S. spy satellite USA-193 shot down by the U.S.
-on February 20 2008. As of February 21 2010 there are no pieces of
-debris in the data set. I noted 1 piece on March 9 2009, but this was an
-error - that piece actually decayed October 9 2008, but I misread the
-data. The maximum was 173. Note that as of February 21 2010 you still
-get the remaining piece when you direct-fetch the data from Celestrak.
+The default is C<'TLE'>.
 
-=item cosmos-2251-debris
+=item query
 
-This is the debris of Russian communication satellite Cosmos 2251,
-created by its collision with Iridium 33 on February 10 2009. As of
-February 21 2010 there are 1105 pieces of debris in the data set, up
-from the 357 that had been cataloged as of March 9 2009.
+ --query name
 
-=item iridium-33-debris
+This option specifies the type of query to be done. Valid values are
 
-This is the debris of U.S. communication satellite Iridium 33, created
-by its collision with Cosmos 2251 on February 10 2009. As of February 21
-2010 there are 461 pieces of debris in the data set, up from the 159
-that had been cataloged as of March 9 2009.
+=over
 
-=item 2012-044
+=item CATNR
 
-This is the debris of a Breeze-M upper stage (OID 38746, International
-Designator 2012-044C), which exploded October 16 2012. As of October 25
-there were 81 pieces of debris in the data set.
+The argument is a NORAD catalog number (1-9 digits).
+
+=item GROUP
+
+The argument is the name of a named group of satellites.
+
+=item INTDES
+
+The argument is an international launch designator of the form yyyy-nnn,
+where the C<yyyy> is the Gregorian year, and the C<nnn> is the launch
+number in the year.
+
+=item NAME
+
+The argument is a satellite name or a portion thereof.
+
+=item SPECIAL
+
+The argument specifies a special data set.
 
 =back
+
+The default is C<'CATNR'> if the argument is numeric, C<'INTDES'> if the
+argument looks like an international designator, or C<'GROUP'>
+otherwise.
+
+=back
+
+A list of valid C<GROUP> names and brief descriptions can be obtained by
+calling C<< $st->names ('celestrak') >>. If you have set the C<verbose>
+attribute true (e.g. C<< $st->set (verbose => 1) >>), the content of the
+error response will include this list. Note, however, that this list
+does not determine what can be retrieved; if Dr. Kelso adds a data set,
+it can be retrieved even if it is not on the list, and if he removes
+one, being on the list won't help.
 
 If this method succeeds, the response will contain headers
 
  Pragma: spacetrack-type = orbit
- Pragma: spacetrack-source = 
-
-The spacetrack-source will be C<'spacetrack'> if the TLE data actually
-came from Space Track, or C<'celestrak'> if the TLE data actually came
-from Celestrak. The former will be the case if the C<direct> attribute
-is false and either the C<fallback> attribute was false or the Space
-Track web site was accessible. Otherwise, the latter will be the case.
+ Pragma: spacetrack-source = celestrak
 
 These can be accessed by C<< $st->content_type( $resp ) >> and
 C<< $st->content_source( $resp ) >> respectively.
 
 You can specify the C<retrieve()> options on this method as well, but
-they will have no effect if the C<'direct'> attribute is true.
-
-In addition, this method takes the C<observing_list> option, which
-causes the return of the actual observing list corresponding to the
-catalog. This can be specified as C<--observing-list> if you are passing
-options command-style. This option will also have no effect if the
-C<'direct'> attribute is true. If this option is passed, a successful
-response will contain headers
-
- Pragma: spacetrack-type = observing-list
- Pragma: spacetrack-source = celestrak
+they will have no effect, and are deprecated. Six months after the
+release of version 0.158 these will warn on the first use. Six months
+after that, they will warn on every use, and six months after that they
+will be fatal. After a further six months all related code will be
+removed.
 
 =cut
 
 # Called dynamically
 sub _celestrak_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
-    return $COMPLETION_APP->{direct} ?
-    CLASSIC_RETRIEVE_OPTIONS :
-    [
-	_get_retrieve_options(),
-	'observing_list|observing-list!' => 'return observing list',
-    ];
+    return CELESTRAK_OPTIONS;
 }
 
 sub celestrak {
     my ($self, @args) = @_;
     delete $self->{_pragmata};
 
-    ( my $opt, @args ) = $self->{direct} ?
-	_parse_args( CLASSIC_RETRIEVE_OPTIONS, @args ) :
-	$self->_parse_retrieve_args(
-	    [ 'observing_list|observing-list!' => 'return observing list' ],
-	    @args,
-	);
+    ( my $opt, @args ) = _parse_args( CELESTRAK_OPTIONS, @args );
 
     my $name = shift @args;
     defined $name
@@ -1238,19 +1235,41 @@ sub celestrak {
 	'No catalog name specified' );
 
     $self->_deprecation_notice( celestrak => $name );
+    $self->_deprecation_notice( celestrak => "--$_" ) foreach sort keys %{ $opt };
 
-    $self->{direct}
-	and return $self->_celestrak_direct( $opt, $name );
-    my $resp = $self->_get_agent()->get (
-	"https://celestrak.org/SpaceTrack/query/$name.txt");
-    if ( my $check = $self->_response_check( $resp, celestrak => $name ) ) {
-	return $check;
-    }
-    $self->_convert_content ($resp);
-    $self->__dump_response( $resp );
-    $resp = $self->_handle_observing_list( $opt, $resp->content() );
-    return ( $resp->is_success || !$self->{fallback} ) ? $resp :
-	$self->_celestrak_direct( $opt, $name );
+    my $query;
+    ref( $query = $self->_celestrak_validate_query(
+	    delete $opt->{query}, $name,
+	    CELESTRAK_VALID_QUERY, 'GROUP' ) )
+	and return $query;
+
+    my $format;
+    ref( $format = $self->_celestrak_validate_format(
+	    delete $opt->{format} ) )
+	and return $format;
+
+    my $uri = URI->new( 'https://celestrak.org/NORAD/elements/gp.php' );
+    $uri->query_form(
+	$query	=> $name,
+	FORMAT	=> $format,
+    );
+
+    return $self->_get_from_net(
+	%{ $opt },
+	url		=> $uri,
+	post_process	=> sub {
+	    my ( $self, $resp ) = @_;
+	    my $check;
+	    $check = $self->_celestrak_response_check( $resp,
+		celestrak => $name )
+		and return $check;
+	    $name eq 'iridium'
+		and _celestrak_repack_iridium( $resp );
+	    return $resp;
+	},
+	spacetrack_source	=> 'celestrak',
+	spacetrack_type		=> 'orbit',
+    );
 }
 
 =for html <a name="celestrak_supplemental"></a>
@@ -1263,7 +1282,91 @@ sets.
 
 These TLE data are B<not> redistributed from Space Track, but are
 derived from publicly available ephemeris data for the satellites in
-question. Valid data set names are:
+question.
+
+As of version 0.158 this version is an interface to the CelesTrak API.
+The argument is the argument of a Celestrak query (see
+L<https://celestrak.org/NORAD/documentation/gp-data-formats.php>).  The
+following options are available:
+
+=over
+
+=item file
+
+ --file my_data.tle
+
+This option specifies the name of an output file for the data.
+
+=item format
+
+ --format json
+
+This option specifies the format of the returned data. Valid values are
+C<'TLE'>, C<'3LE'>, C<'2LE'>, C<'XML'>, C<'KVN'>, C<'JSON'>, or
+C<'CSV'>. See
+L<https://celestrak.org/NORAD/documentation/gp-data-formats.php> for a
+discussion of these. C<'JSON-PRETTY'> is not a valid format option, but
+will be generated if the C<pretty> attribute is true.
+
+The default is C<'TLE'>.
+
+=item match
+
+This Boolean option specifies that match data be returned rather than
+TLE data, if available. This option is valid only on known catalogs that
+actually have match data. If this option is asserted, C<--format> and
+C<--query> are invalid.
+
+=item query
+
+ --query name
+
+This option specifies the type of query to be done. Valid values are
+
+=over
+
+=item CATNR
+
+The argument is a NORAD catalog number (1-9 digits).
+
+=item FILE
+
+The argument is the name of a standard data set.
+
+=item INTDES
+
+The argument is an international launch designator of the form yyyy-nnn,
+where the C<yyyy> is the Gregorian year, and the C<nnn> is the launch
+number in the year.
+
+=item NAME
+
+The argument is a satellite name or a portion thereof.
+
+=item SOURCE
+
+The argument specifies a data source as specified at
+L<https://celestrak.org/NORAD/documentation/sup-gp-queries.php>.
+
+=item SPECIAL
+
+The argument specifies a special data set.
+
+=back
+
+The default is C<'CATNR'> if the argument is numeric, C<'INTDES'> if the
+argument looks like an international designator, or C<'FILE'> otherwise.
+
+=item rms
+
+This Boolean option specifies that RMS data be returned rather than TLE
+data, if available. This option is valid only on known catalogs that
+actually have RMS data. If this option is asserted, C<--format> and
+C<--query> are invalid.
+
+=back
+
+Valid catalog names are:
 
  cpf: CPF TLEs
  glonass: Glonass satellites
@@ -1285,28 +1388,9 @@ options.  If you specify command-type options, they may be abbreviated,
 as long as the abbreviation is unique. Errors in either sort result in
 an exception being thrown.
 
-The legal options are:
-
- -file
-   specifies the name of the cache file. If the data
-   on line are newer than the modification date of
-   the cache file, the cache file will be updated.
-   Otherwise the data will be returned from the file.
-   Either way the content of the file and the content
-   of the returned HTTP::Response object end up the
-   same.
- -rms
-   specifies that RMS data be returned rather than TLE
-   data, if available. If RMS data are not available
-   for the data set, an error is returned.
- -match
-   specifies that match data be returned rather than TLE
-   data, if available. If match data are not available
-   for the data set, an error is returned.
-
-A list of valid names and brief descriptions can be obtained by calling
-C<< $st->names( 'celestrak_supplemental' ) >>. If you have set the
-C<verbose> attribute true (e.g. C<< $st->set (verbose => 1) >>), the
+A list of valid catalog names and brief descriptions can be obtained by
+calling C<< $st->names( 'celestrak_supplemental' ) >>. If you have set
+the C<verbose> attribute true (e.g. C<< $st->set (verbose => 1) >>), the
 content of the error response will include this list. Note, however,
 that this list does not determine what can be retrieved; if Dr. Kelso
 adds a data set, it can be retrieved even if it is not on the list, and
@@ -1321,6 +1405,10 @@ This can be accessed by the C<cache_hit()> method. If this pragma is
 true, the C<Last-Modified> header of the response will contain the
 modification time of the file.
 
+B<Note> that it is my belief that the current Celestrak API (as of
+September 26 2022) does not support this kind of functionality, so
+C<cache_hit()> will always return false.
+
 For more information, see
 L<https://celestrak.org/NORAD/elements/supplemental/>.
 
@@ -1329,6 +1417,7 @@ L<https://celestrak.org/NORAD/elements/supplemental/>.
 # Called dynamically
 sub _celestrak_supplemental_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
     return [
+	@{ CELESTRAK_API_OPTIONS() },
 	'file=s'	=> 'Name of cache file',
 	'rms!'		=> 'Return RMS data',
 	'match!'	=> 'Return match data',
@@ -1338,120 +1427,133 @@ sub _celestrak_supplemental_opts {	## no critic (Subroutines::ProhibitUnusedPriv
 sub celestrak_supplemental {
     my ( $self, @args ) = @_;
     ( my $opt, @args ) = _parse_args( @args );
+
     $opt->{rms}
 	and $opt->{match}
 	and return HTTP::Response->new(
 	HTTP_PRECONDITION_FAILED,
-	'You may not assert both -rms and -match',
+	'You may not assert both --rms and --match',
     );
+
+    if ( $opt->{rms} || $opt->{match} ) {
+	foreach my $key ( qw{ query format } ) {
+	    defined $opt->{$key}
+		and return HTTP::Response->new(
+		HTTP_PRECONDITION_FAILED,
+		"You may not assert --$key with --rms or --match",
+	    );
+	}
+    }
+
     my $name = $args[0];
+
+    my $info = $catalogs{celestrak_supplemental}{$name};
+
+    foreach my $key ( qw{ rms match } ) {
+	not $opt->{$key}
+	    or $info->{$key}
+	    or return HTTP::Response->new(
+	    HTTP_PRECONDITION_FAILED,
+	    "$name does not take the --$key option" );
+    }
+
+    my $base_url = 'https://celestrak.org/NORAD/elements/supplemental';
+
+    my ( $spacetrack_type, $uri );
+
+    if ( $opt->{rms} ) {
+	$spacetrack_type = 'rms';
+	$uri = URI->new( "$base_url/$name.rms.txt" );
+    } elsif ( $opt->{match} ) {
+	$spacetrack_type = 'match';
+	$uri = URI->new( "$base_url/$name.match.txt" );
+    } else {
+	$spacetrack_type = 'orbit';
+
+	my $source = $info->{source};
+	defined $source
+	    or $source = $name;
+
+	my $query;
+	ref( $query = $self->_celestrak_validate_query(
+		delete $opt->{query}, $name,
+		CELESTRAK_SUPPLEMENTAL_VALID_QUERY, 'FILE' ) )
+	    and return $query;
+
+	my $format;
+	ref( $format = $self->_celestrak_validate_format(
+		delete $opt->{format} ) )
+	    and return $format;
+
+	$uri = URI->new( "$base_url/sup-gp.php" );
+	$uri->query_form(
+	    $query	=> $source,
+	    FORMAT	=> $format,
+	);
+    }
+
     return $self->_get_from_net(
 	%{ $opt },
-	catalog		=> $name,
-	pre_process	=> sub {
-	    my ( undef, $arg, $info ) = @_;	# Invocant not used
-	    foreach my $key ( qw{ rms match } ) {
-		not $arg->{$key}
-		    or $info->{$key}
-		    or return HTTP::Response->new(
-		    HTTP_PRECONDITION_FAILED,
-		    "$name does not take the -$key option" );
-	    }
-	    my $source = $catalogs{celestrak_supplemental}{$name}{source}
-		|| $name;
-		my $base_url = 'https://celestrak.org/NORAD/elements/supplemental';
-	    if ( $arg->{rms} ) {
-		$info->{spacetrack_type} = 'rms';
-		$info->{url} = "$base_url/$name.rms.txt";
-	    } elsif ( $arg->{match} ) {
-		$info->{spacetrack_type} = 'match';
-		$info->{url} = "$base_url/$name.match.txt";
-
-	    } else {
-		$info->{spacetrack_type} = 'orbit';
-		my $uri = URI->new( "$base_url/sup-gp.php" );
-		$uri->query_form(
-		    FILE	=> $source,
-		    FORMAT	=> 'tle',
-		);
-		$info->{url} = $uri;
-	    }
-	    return;
-	},
+	url		=> $uri,
 	post_process	=> sub {
 	    my ( $self, $resp ) = @_;
 	    my $check;
-	    $check = $self->_response_check( $resp,
-		celestrak_supplemental => $name, 'direct' )
+	    $check = $self->_celestrak_response_check( $resp,
+		celestrak_supplemental => $name )
 		and return $check;
 	    return $resp;
 	},
 	spacetrack_source	=> 'celestrak',
+	spacetrack_type		=> $spacetrack_type,
     );
 }
 
-sub _celestrak_direct {
-##  my ( $self, $opt, $name ) = @_;
-    my ( $self, undef, $name ) = @_;		# Options unused
-    delete $self->{_pragmata};
+{
+    my %valid_format = map { $_ => 1 } qw{ TLE 3LE 2LE XML KVN JSON CSV };
 
-=begin comment
-
-    my $resp = $self->_get_agent()->get (
-	"https://celestrak.org/NORAD/elements/$name.txt");
-
-=end comment
-
-=cut
-
-    my $uri = URI->new( 'https://celestrak.org/NORAD/elements/gp.php' );
-    $uri->query_form(
-	GROUP	=> $name,
-	FORMAT	=> 'tle',
-    );
-
-    if ( my $resp = $self->_dump_request(
-	    args	=> [ $name ],
-	    method	=> 'GET',
-	    url		=> $uri,
-	    version	=> 2,
-	) ) {
-	return $resp;
+    sub _celestrak_validate_format {
+	my ( $self, $format ) = @_;
+	$format = defined $format ? uc( $format ) : 'TLE';
+	$valid_format{$format}
+	    or return HTTP::Response->new(
+	    HTTP_PRECONDITION_FAILED,
+	    "Format '$format' is not valid" );
+	$format eq 'JSON'
+	    and $self->getv( 'pretty' )
+	    and $format = 'JSON-PRETTY';
+	return $format;
     }
+}
 
-    my $resp = $self->_get_agent()->get ( $uri );
-
-    if (my $check = $self->_response_check($resp, celestrak => $name, 'direct')) {
-	return $check;
-    }
-    $self->_convert_content ($resp);
-    if ($name eq 'iridium') {
-	_celestrak_repack_iridium( $resp );
-    }
-    $self->_add_pragmata($resp,
-	'spacetrack-type' => 'orbit',
-	'spacetrack-source' => 'celestrak',
-    );
-    $self->__dump_response( $resp );
-    return $resp;
+sub _celestrak_validate_query {
+    my ( undef, $query, $name, $valid, $dflt ) = @_;
+    $query = defined $query ? uc( $query ) :
+	$name =~ m/ \A [0-9]+ \z /smx ? 'CATNR' :
+	$name =~ m/ \A [0-9]{4}-[0-9]+ \z /smx ? 'INTDES' :
+	defined $dflt ? uc( $dflt ) : $dflt;
+    defined $query
+	or return $query;
+    $valid->{$query}
+	or return HTTP::Response->new(
+	HTTP_PRECONDITION_FAILED,
+	"Query '$query' is not valid" );
+    return $query;
 }
 
 sub _celestrak_repack_iridium {
     my ( $resp ) = @_;
-    my @content;
-    foreach ( split qr{ \n }smx, $resp->content() ) {
-	s/ \s+ [[] . []] \s* \z //smx;
-	push @content, $_;
-    }
-    $resp->content( join "\n", @content );
+    local $_ = $resp->content();
+    s/ \s+ [[] . []] [ \t]* (?= \r? \n | \z ) //smxg;
+    $resp->content( $_ );
     return;
 }
 
 {	# Local symbol block.
 
-    my %valid_type = ('text/plain' => 1, 'text/text' => 1);
+    my %valid_type = map { $_ => 1 }
+	qw{ text/plain text/text application/json application/xml };
 
-    sub _response_check {
+    sub _celestrak_response_check {
 	my ($self, $resp, $source, $name, @args) = @_;
 	unless ($resp->is_success) {
 	    $resp->code == HTTP_NOT_FOUND
@@ -1534,7 +1636,7 @@ content_source value of C<'mccants'>.
 
 If the C<content_type()> method returns C<'orbit'>, you can expect
 content-source values of C<'amsat'>, C<'celestrak'>, C<'mccants'>,
-C<'spaceflight'>, or C<'spacetrack'>, corresponding to the actual source
+or C<'spacetrack'>, corresponding to the actual source
 of the TLE data.  Note that the C<celestrak()> method may return a
 content_type of C<'spacetrack'> if the C<direct> attribute is false.
 
@@ -1893,13 +1995,32 @@ sub _readline_complete_command_get {	## no critic (Subroutines::ProhibitUnusedPr
 sub get {
     my ( $self, $name ) = @_;
     delete $self->{_pragmata};
-    my $value = $self->getv( $name );
+    my $code = $self->can( "_get_attr_$name" ) || $self->can( 'getv' );
+    my $value = $code->( $self, $name );
     my $resp = HTTP::Response->new( HTTP_OK, COPACETIC, undef, $value );
     $self->_add_pragmata( $resp,
 	'spacetrack-type' => 'get',
     );
     $self->__dump_response( $resp );
     return wantarray ? ($resp, $value ) : $resp;
+}
+
+# Called dynamically
+sub _get_attr_dump_headers {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    my ( $self, $name ) = @_;
+    my $value = $self->getv( $name );
+    my @opts = ( $value, '#' );
+    if ( $value ) {
+	foreach my $key ( @dump_options ) {
+	    my $const = "DUMP_\U$key";
+	    my $mask = __PACKAGE__->$const();
+	    $value & $mask
+		and push @opts, "--$key";
+	}
+    } else {
+	push @opts, '--none';
+    }
+    return "@opts";
 }
 
 
@@ -2005,10 +2126,8 @@ The following commands are defined:
       cookie_expires = Perl date the session cookie expires;
       direct = true to fetch orbital elements directly
         from a redistributer. Currently this only affects the
-        celestrak() method. The default is false.
-      dump_headers is unsupported, and intended for debugging -
-        don't be suprised at anything it does, and don't rely
-        on anything it does;
+        celestrak() method. The default is true, and it is
+        deprecated.
       filter = true supresses all output to stdout except
         orbital elements;
       identity = load username and password from identity file
@@ -2025,8 +2144,6 @@ The following commands are defined:
     only be set to previously-retrieved, matching values.
   source filename
     Executes the contents of the given file as shell commands.
-  spaceflight
-    Deprecated. Web site http://spaceflight.nasa.gov/ retired.
   spacetrack name
     Retrieves the named catalog of orbital elements from
     Space Track.
@@ -2848,7 +2965,7 @@ sub mccants {
 
 This method retrieves the names of the catalogs for the given source,
 either C<'celestrak'>, C<'celestrak_supplemental'>, C<'iridium_status'>,
-C<'mccants'>, C<'spaceflight'>, or C<'spacetrack'>, in the content of
+C<'mccants'>, or C<'spacetrack'>, in the content of
 the given HTTP::Response object. If the argument is not one of the
 supported values, the C<$resp> object represents a 404 (Not found)
 error.
@@ -3012,7 +3129,7 @@ sub retrieve {
     @args = $self->_expand_oid_list( @args )
 	or return HTTP::Response->new( HTTP_PRECONDITION_FAILED, NO_CAT_ID );
 
-    my $no_execute = $self->getv( 'dump_headers' ) & DUMP_NO_EXECUTE;
+    my $no_execute = $self->getv( 'dump_headers' ) & DUMP_DRY_RUN;
 
 ##  $rest->{orderby} = 'EPOCH desc';
 
@@ -3755,18 +3872,17 @@ sub _readline_complete_command_set {	## no critic (Subroutines::ProhibitUnusedPr
 sub set {	## no critic (ProhibitAmbiguousNames)
     my ($self, @args) = @_;
     delete $self->{_pragmata};
-    @args % 2
-	and Carp::croak __PACKAGE__, '->set( ',
-	join( ', ', map { "'$_'" } @args ),
-	') requires an even number of arguments';
-    while (@args) {
+    while ( @args > 1 ) {
 	my $name = shift @args;
 	Carp::croak "Attribute $name may not be set. Legal attributes are ",
 		join (', ', sort keys %mutator), ".\n"
 	    unless $mutator{$name};
-	my $value = shift @args;
-	$mutator{$name}->($self, $name, $value);
+	my $value = $args[0];
+	$mutator{$name}->( $self, $name, $value, \@args );
+	shift @args;
     }
+    @args
+	and Carp::croak __PACKAGE__, "->set() specifies no value for @args";
     my $resp = HTTP::Response->new( HTTP_OK, COPACETIC, undef, COPACETIC );
     $self->_add_pragmata( $resp,
 	'spacetrack-type' => 'set',
@@ -4436,7 +4552,7 @@ HTTP::Response from C<login()>.
     sub _unpack_query {
 	my ( $arg ) = @_;
 	my $code = $unpack_query{ref $arg}
-	    or Carp::confess "Programming error - unexpected query $arg";
+	    or Carp::confess "Bug - unexpected query $arg";
 	return $code->( $arg );
     }
 
@@ -4596,7 +4712,7 @@ C<'tle_latest'>,
 	my ( $self ) = @_;
 	$SPACETRACK_DELAY_SECONDS
 	    or return;
-	$self->{dump_headers} & DUMP_NO_EXECUTE
+	$self->{dump_headers} & DUMP_DRY_RUN
 	    and return;
 	if ( defined $spacetrack_delay_until ) {
 	    my $now = _time();
@@ -5080,7 +5196,7 @@ sub _accumulate_tle_data {	## no critic (ProhibitUnusedPrivateSubroutines)
 # Accessed via __PACKAGE__->can( "accumulate_${name}_data" ) in
 # _accumulator_for(), above
 sub _accumulate_xml_data {	## no critic (ProhibitUnusedPrivateSubroutines)
-    my ( undef, $content, $context ) = @_;	# Invocant unused
+    my ( undef, $content, $context ) = @_;
     if ( defined $context->{data} ) {
 	$context->{data} =~ s{ \s* </xml> \s* \z }{}smx;
 	$content =~ s{ .* <xml> \s* }{}smx;
@@ -5200,9 +5316,14 @@ sub _check_cookie_generic {
 {
 
     my %deprecate = (
-#	celestrak => {
+	celestrak => {
 #	    sts	=> 3,
-#	},
+	    '--descending'	=> 0,
+	    '--end_epoch'	=> 0,
+	    '--last5'		=> 0,
+	    '--sort'		=> 0,
+	    '--start_epoch'	=> 0,
+	},
 	spaceflight => 3,
 	attribute	=> {
 	    url_iridium_status_mccants	=> 3,
@@ -5287,9 +5408,9 @@ sub _check_cookie_generic {
 sub __dump_response {
     my ( $self, $resp, $message ) = @_;
 
-    if ( $self->{dump_headers} & _DUMP_RESPONSE ) {
+    if ( $self->{dump_headers} & DUMP_RESPONSE ) {
 	my $content = $resp->content();
-	if ( $self->{dump_headers} & DUMP_RESPONSE_TRUNCATED
+	if ( $self->{dump_headers} & DUMP_TRUNCATED
 	    && 61 < length $content ) {
 	    $content = substr( $content, 0, 61 ) . '...';
 	}
@@ -5317,7 +5438,7 @@ sub __dump_response {
 #	_dump_request dumps the request if desired.
 #
 #	If the dump_request attribute has the DUMP_REQUEST bit set, this
-#	routine dumps the request. If the DUMP_NO_EXECUTE bit is set,
+#	routine dumps the request. If the DUMP_DRY_RUN bit is set,
 #	the dump is returned in the content of an HTTP::Response object,
 #	with the response code set to HTTP_I_AM_A_TEAPOT. Otherwise the
 #	request is dumped to STDERR.
@@ -5342,10 +5463,8 @@ sub _dump_request {
 	    or next;
 	$args{$key} = $args{$key}->( \%args );
     }
-    ref $args{url}
-	and $args{url} = $args{url}->as_string();
 
-    $self->{dump_headers} & DUMP_NO_EXECUTE
+    $self->{dump_headers} & DUMP_DRY_RUN
 	and return HTTP::Response->new(
 	HTTP_I_AM_A_TEAPOT, undef, undef, $json->encode( [ \%args ] )
     );
@@ -5359,7 +5478,7 @@ sub _get_json_object {
     my ( $self, %arg ) = @_;
     defined $arg{pretty}
 	or $arg{pretty} = $self->{pretty};
-    my $json = JSON->new()->utf8();
+    my $json = JSON->new()->utf8()->convert_blessed();
     $arg{pretty}
 	and $json->pretty()->canonical();
     return $json;
@@ -5502,13 +5621,6 @@ sub _get_agent {
 #      If this is defined, it is the name of the method doing the
 #      catalog lookup. This is unused unless 'catalog' is defined, and
 #      defaults to the name of the calling method.
-#   pre_process => code_reference
-#      If 'catalog' was specified and this is defined, it is called and
-#      passed the invocant, a reference to the %arg hash, and a
-#      reference to the catalog information hash, which it is allowed to
-#      modify. The retrurn is either nothing or an HTTP::Response
-#      object. In the latter case, the HTTP::Response object is returned
-#      to the caller if it does not represent success.
 #   post_process => code reference
 #      If the network operation succeeded and this is defined, it is
 #      called and passed the invocant, the HTTP::Response object, and
@@ -5546,17 +5658,10 @@ sub _get_from_net {
 	    and $info = $catalogs{$method}{$arg{catalog}}
 	    or return $self->_no_such_catalog( $method, $arg{catalog} );
 	$self->_deprecation_notice( $method => $arg{catalog} );
-	if ( defined $arg{pre_process} ) {
-	    $info = { %{ $info } };	# Shallow clone
-	    my $resp = $arg{pre_process}->( $self, \%arg, $info );
-	    $resp
-		and not $resp->is_success()
-		and return $resp;
-	}
 	$url = $info->{url}
-	    or Carp::confess "Programming error - No url defined for $method( '$arg{catalog}' )";
+	    or Carp::confess "Bug - No url defined for $method( '$arg{catalog}' )";
     } else {
-	Carp::confess q<Programming error - neither 'url' nor 'catalog' specified>;
+	Carp::confess q<Bug - neither 'url' nor 'catalog' specified>;
     }
 
     if ( my $resp = $self->_dump_request(
@@ -5582,7 +5687,7 @@ sub _get_from_net {
     $resp = $self->_dump_request(
 	arg	=> sub {
 	    my %sanitary = %arg;
-	    foreach my $key ( qw{ pre_process post_process } ) {
+	    foreach my $key ( qw{ post_process } ) {
 		delete $sanitary{$key}
 		    and $sanitary{$key} = CODE_REF;
 	    }
@@ -5785,9 +5890,27 @@ sub _mutate_attrib {
 }
 
 sub _mutate_dump_headers {
-    my ( $self, $name, $value ) = @_;
-    $value =~ m/ \A 0 (?: [0-7]+ | x [[:xdigit:]]+ ) \z /smx
-	and $value = oct $value;
+    my ( $self, $name, $value, $args ) = @_;
+    if ( $value =~ m/ \A --? /smx ) {
+	$value = 0;
+	my $go = Getopt::Long::Parser->new();
+	$go->configure( qw{ require_order } );
+	$go->getoptionsfromarray(
+	    $args,
+	    map {; "$_!" => sub {
+		    $_[1] and do {
+			my $method = "DUMP_\U$_[0]";
+			$value |= $self->$method();
+		    };
+		    return;
+		}
+	    } @dump_options
+	);
+	push @{ $args }, $value;	# Since caller pops it.
+    } else {
+	$value =~ m/ \A 0 (?: [0-7]+ | x [[:xdigit:]]+ ) \z /smx
+	    and $value = oct $value;
+    }
     return ( $self->{$name} = $value );
 }
 
@@ -5988,12 +6111,12 @@ sub _mutate_verify_hostname {
 	my ( $self, $source, @args ) = @_;
 
 	my $info = $catalogs{$source}
-	    or Carp::confess "Programming error - No such source as '$source'";
+	    or Carp::confess "Bug - No such source as '$source'";
 
 	if ( ARRAY_REF eq ref $info ) {
 	    my $inx = shift @args;
 	    $info = $info->[$inx]
-		or Carp::confess "Programming error - Illegal index $inx ",
+		or Carp::confess "Bug - Illegal index $inx ",
 		    "for '$source'";
 	}
 
@@ -6003,9 +6126,9 @@ sub _mutate_verify_hostname {
 
 	my $lead = defined $catalog ?
 	    $info->{$catalog} ?
-		"Missing $name catalog '$catalog'" :
-		"No such $name catalog as '$catalog'" :
-	    'Catalog name not defined';
+		"$name '$catalog' missing" :
+		"$name '$catalog' not found" :
+	    "$name item not defined";
 	$lead .= defined $note ? " ($note)." : '.';
 
 	return HTTP::Response->new (HTTP_NOT_FOUND, "$lead\n")
@@ -6243,7 +6366,7 @@ sub _parse_launch_date {
 	    and $opt->{format} ne 'json'
 	    and Carp::croak 'Inconsistent retrieval format specification';
 	$format{$table}
-	    or Carp::confess "Programming error - $table not supported";
+	    or Carp::confess "Bug - $table not supported";
 	defined $opt->{format}
 	    or $opt->{format} = $opt->{json} ? 'json' :
 		$format{$table}{default};
@@ -6794,10 +6917,10 @@ the name of the session cookie you can use this to get you going again.
 =item direct (Boolean)
 
 This attribute specifies that orbital elements should be fetched
-directly from the redistributer if possible. At the moment the only
-methods affected by this are celestrak() and spaceflight().
+directly from the redistributer This attribute is deprecated, and as of
+version 0.150 its value is ignored.
 
-The default is false (i.e. 0).
+The default is true (i.e. 1).
 
 =item domain_space_track (string)
 

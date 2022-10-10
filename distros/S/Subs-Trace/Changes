@@ -1,5 +1,9 @@
 Revision history for Subs-Trace
 
+0.04
+      # 2022-10-04 Can now work on perl 5.10.1.
+0.03    2022-10-01 Another attempt to make it work on older perls.
+0.02    2022-09-30 Remove postref deref to work on older versions.
 0.01    Date/time
         First version, released on an unsuspecting world.
 

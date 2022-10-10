@@ -4,7 +4,7 @@
       "Jonas B. <jonasbn@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -14,9 +14,15 @@
    },
    "name" : "Date-Holidays",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.30"
+         }
+      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.30"
          }
       },
       "develop" : {
@@ -40,9 +46,7 @@
             "Locale::Country" : "0",
             "Module::Load" : "0",
             "Scalar::Util" : "0",
-            "TryCatch" : "0",
-            "constant" : "0",
-            "perl" : "5.006"
+            "Try::Tiny" : "0"
          }
       },
       "test" : {
@@ -51,138 +55,141 @@
             "FindBin" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Module::Load" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::Class" : "0",
             "Test::Fatal" : "0",
             "Test::Kwalitee" : "1.21",
-            "Test::MockModule" : "0.13",
+            "Test::MockModule" : "0",
             "Test::More" : "0",
-            "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
          }
       }
    },
    "provides" : {
       "Date::Holidays" : {
          "file" : "lib/Date/Holidays.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter" : {
          "file" : "lib/Date/Holidays/Adapter.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::AT" : {
          "file" : "lib/Date/Holidays/Adapter/AT.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::AU" : {
          "file" : "lib/Date/Holidays/Adapter/AU.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::AW" : {
          "file" : "lib/Date/Holidays/Adapter/AW.pm",
-         "version" : "1.31"
+         "version" : "1.33"
+      },
+      "Date::Holidays::Adapter::BQ" : {
+         "file" : "lib/Date/Holidays/Adapter/BQ.pm",
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::BR" : {
          "file" : "lib/Date/Holidays/Adapter/BR.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::BY" : {
          "file" : "lib/Date/Holidays/Adapter/BY.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::CA_ES" : {
          "file" : "lib/Date/Holidays/Adapter/CA_ES.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::CN" : {
          "file" : "lib/Date/Holidays/Adapter/CN.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::CZ" : {
          "file" : "lib/Date/Holidays/Adapter/CZ.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::DE" : {
          "file" : "lib/Date/Holidays/Adapter/DE.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::DK" : {
          "file" : "lib/Date/Holidays/Adapter/DK.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::ES" : {
          "file" : "lib/Date/Holidays/Adapter/ES.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::FR" : {
          "file" : "lib/Date/Holidays/Adapter/FR.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::GB" : {
          "file" : "lib/Date/Holidays/Adapter/GB.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::JP" : {
          "file" : "lib/Date/Holidays/Adapter/JP.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::KR" : {
          "file" : "lib/Date/Holidays/Adapter/KR.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::KZ" : {
          "file" : "lib/Date/Holidays/Adapter/KZ.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::Local" : {
          "file" : "lib/Date/Holidays/Adapter/Local.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::NL" : {
          "file" : "lib/Date/Holidays/Adapter/NL.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::NO" : {
          "file" : "lib/Date/Holidays/Adapter/NO.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::NZ" : {
          "file" : "lib/Date/Holidays/Adapter/NZ.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::PL" : {
          "file" : "lib/Date/Holidays/Adapter/PL.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::PT" : {
          "file" : "lib/Date/Holidays/Adapter/PT.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::RU" : {
          "file" : "lib/Date/Holidays/Adapter/RU.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::SK" : {
          "file" : "lib/Date/Holidays/Adapter/SK.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::UA" : {
          "file" : "lib/Date/Holidays/Adapter/UA.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::UK" : {
          "file" : "lib/Date/Holidays/Adapter/UK.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::US" : {
          "file" : "lib/Date/Holidays/Adapter/US.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       },
       "Date::Holidays::Adapter::USFederal" : {
          "file" : "lib/Date/Holidays/Adapter/USFederal.pm",
-         "version" : "1.31"
+         "version" : "1.33"
       }
    },
    "release_status" : "stable",
@@ -197,7 +204,7 @@
          "web" : "https://github.com/jonasbn/perl-date-holidays"
       }
    },
-   "version" : "1.31",
+   "version" : "1.33",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-2.0"

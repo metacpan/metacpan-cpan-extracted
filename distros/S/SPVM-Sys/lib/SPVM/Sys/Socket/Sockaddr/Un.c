@@ -82,7 +82,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__set_sun_family(SPVM_ENV* env, SPVM_VALU
 #endif
 }
 
-int32_t SPVM__Sys__Socket__Sockaddr__Un__sun_path(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__Socket__Sockaddr__Un__copy_sun_path(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
   env->die(env, stack, "The \"sun_path\" method in the class \"Sys::Socket::Sockaddr::Un\" is not supported on this system", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
@@ -93,12 +93,8 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__sun_path(SPVM_ENV* env, SPVM_VALUE* sta
   struct sockaddr_un* socket_address = env->get_pointer(env, stack, obj_self);
   
   void* obj_path;
-  if (socket_address->sun_path) {
-    obj_path = env->new_string(env, stack, socket_address->sun_path, strlen(socket_address->sun_path));
-  }
-  else {
-    obj_path = NULL;
-  };
+  
+  obj_path = env->new_string(env, stack, socket_address->sun_path, strlen(socket_address->sun_path));
   
   stack[0].oval = obj_path;
   
@@ -117,6 +113,10 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__set_sun_path(SPVM_ENV* env, SPVM_VALUE*
   struct sockaddr_un* socket_address = env->get_pointer(env, stack, obj_self);
   
   void* obj_path = stack[1].oval;
+
+  if (!obj_path) {
+    return env->die(env, stack, "The sun_path must be be defined", FILE_NAME, __LINE__);
+  }
   
   const char* path = env->get_chars(env, stack, obj_path);
   int32_t path_length = env->length(env, stack, obj_path);

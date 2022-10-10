@@ -25,7 +25,7 @@ use if DEBUG, 'Smart::Comments';
 
 use XML::LibXML;
 
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.53'; # VERSION
 
 sub new
 {

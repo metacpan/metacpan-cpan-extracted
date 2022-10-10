@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 23-RSA-SHA256.t 1830 2021-01-26 09:08:12Z willem $	-*-perl-*-
+# $Id: 23-RSA-SHA256.t 1863 2022-03-14 14:59:21Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -22,7 +22,7 @@ foreach my $package ( sort keys %prerequisite ) {
 plan skip_all => 'disabled RSA'
 		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_RSA') };
 
-plan tests => 8;
+plan tests => 17;
 
 
 my %filename;
@@ -83,7 +83,70 @@ is( $verified, 1, 'signature verified using public key' );
 
 
 my $verifiable = $class->verify( $corrupt, $key, $signature );
-is( $verifiable, 0, 'signature not verifiable if data corrupt' );
+is( $verifiable, 0, 'signature not verifiable if data corrupted' );
+
+
+# The following tests are not replicated for other RSA/SHA flavours
+
+my $wrongkey = Net::DNS::RR->new( <<'END' );
+ECDSAP256SHA256.example.	IN	DNSKEY	( 257 3 13
+	IYHbvpnqrhxM4i0SuOyAq9hk19tNXpjja7jCQnfAjZBFBfcLorJPnq4FWMVDg6QT2C4JeW0yCxK4
+	iEhb4w9KWQ== ) ; Key ID = 27566
+END
+ok( $wrongkey, 'set up non-RSA public key' );
+
+
+my $wrongfile = $filename{wrongfile} = $wrongkey->privatekeyname;
+
+my $handle = IO::File->new( $wrongfile, '>' ) or die qq(open: "$wrongfile" $!);
+print $handle <<'END';
+Private-key-format: v1.3
+; comment discarded
+; empty line discarded
+
+Algorithm: 13 (ECDSAP256SHA256)
+PrivateKey: w+AjPo650IA8DWeEq5QqZ2LWYpuC/oeEaYaGE1ZvKyA=
+Created: 20141209015301
+Publish: 20141209015301
+Activate: 20141209015301
+END
+close($handle);
+
+my $wrongprivate = Net::DNS::SEC::Private->new($wrongfile);
+ok( $wrongprivate, 'set up non-RSA private key' );
+
+
+is( eval { $class->sign( $sigdata, $wrongprivate ) }, undef, 'signature not created using wrong private key' );
+
+is( eval { $class->verify( $sigdata, $wrongkey, $signature ) }, undef, 'verify fails using wrong public key' );
+
+is( eval { $class->verify( $sigdata, $key, undef ) }, undef, 'verify fails if signature undefined' );
+
+
+# test detection of invalid private key descriptors
+eval { Net::DNS::SEC::Private->new('Kinvalid.private') };
+my ($exception1) = split /\n/, "$@\n";
+ok( $exception1, "invalid keyfile:	[$exception1]" );
+
+eval { Net::DNS::SEC::Private->new('Kinvalid.+0+0.private') };
+my ($exception2) = split /\n/, "$@\n";
+ok( $exception2, "missing keyfile:	[$exception2]" );
+
+eval { Net::DNS::SEC::Private->new( signame => 'private' ) };
+my ($exception3) = split /\n/, "$@\n";
+ok( $exception3, "unspecified algorithm:	[$exception3]" );
+
+eval { Net::DNS::SEC::Private->new( algorithm => 1 ) };
+my ($exception4) = split /\n/, "$@\n";
+ok( $exception4, "unspecified signame:	[$exception4]" );
+
+
+# exercise code for key with long exponent (not required for DNSSEC)
+eval {
+	my $longformat = pack 'xn a*', unpack 'C a*', $key->keybin;
+	$key->keybin($longformat);
+	$class->verify( $sigdata, $key, $signature );
+};
 
 
 exit;

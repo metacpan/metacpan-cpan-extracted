@@ -1,0 +1,1 @@
+INSERT INTO t ( a ) VALUES ( 'a' ) RETURNING b, c, d

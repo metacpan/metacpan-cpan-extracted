@@ -22,32 +22,32 @@ $updi->_set_nvm_version( 0 );
    # KEY
    $mockfio->expect_syswrite_anyfh( "\x55\xE0" . " gorPMVN" );
    $mockfio->expect_sysread_anyfh( 10 )
-      ->returns( "\x55\xE0" . " gorPMVN" );
+      ->will_done( "\x55\xE0" . " gorPMVN" );
    $mockfio->expect_sleep( 0.1 );
    # read ASI_KEY_STATUS
    $mockfio->expect_syswrite_anyfh( "\x55\x87" );
    $mockfio->expect_sysread_anyfh( 3 )
-      ->returns( "\x55\x87" . "\x10" );
+      ->will_done( "\x55\x87" . "\x10" );
    $mockfio->expect_sleep( 0.1 );
    # Reset
    $mockfio->expect_syswrite_anyfh( "\x55\xC8\x59" );
    $mockfio->expect_sysread_anyfh( 3 )
-      ->returns( "\x55\xC8\x59" );
+      ->will_done( "\x55\xC8\x59" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_syswrite_anyfh( "\x55\xC8\x00" );
    $mockfio->expect_sysread_anyfh( 3 )
-      ->returns( "\x55\xC8\x00" );
+      ->will_done( "\x55\xC8\x00" );
    $mockfio->expect_sleep( 0.1 );
    # read ASI_SYS_STATUS
    $mockfio->expect_syswrite_anyfh( "\x55\x8B" );
    $mockfio->expect_sysread_anyfh( 3 )
-      ->returns( "\x55\x8B\x00" );
+      ->will_done( "\x55\x8B\x00" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_sleep( 0.05 )
-      ->returns();
+      ->will_done();
    $mockfio->expect_syswrite_anyfh( "\x55\x8B" );
    $mockfio->expect_sysread_anyfh( 3 )
-      ->returns( "\x55\x8B\x08" );
+      ->will_done( "\x55\x8B\x08" );
    $mockfio->expect_sleep( 0.1 );
 
    $updi->enable_nvmprog->get;

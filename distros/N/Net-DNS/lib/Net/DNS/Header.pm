@@ -3,7 +3,7 @@ package Net::DNS::Header;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Header.pm 1855 2021-11-26 11:33:48Z willem $)[2];
+our $VERSION = (qw$Id: Header.pm 1875 2022-09-23 13:41:03Z willem $)[2];
 
 
 =head1 NAME
@@ -67,7 +67,7 @@ sub string {
 	my $ns	   = $self->nscount;
 	my $ar	   = $self->arcount;
 
-	my $opt = $$self->edns;
+	my $opt	 = $$self->edns;
 	my $edns = $opt->_specified ? $opt->string : '';
 
 	return <<END . $edns if $opcode eq 'UPDATE';
@@ -120,11 +120,16 @@ A random value is assigned if the argument value is undefined.
 
 =cut
 
+my ( $cache1, $cache2, $limit ) = ( {}, {}, 50 );		# two part cache
+
 sub id {
-	my ( $self, @arg ) = @_;
-	$$self->{id} = shift(@arg) if scalar @arg;
-	return $$self->{id} if defined $$self->{id};
-	return $$self->{id} = int rand(0xffff);
+	my $self  = shift;
+	my $ident = scalar(@_) ? ( $$self->{id} = shift ) : $$self->{id};
+	return $ident if defined $ident;
+	$cache2->{$ident = int rand(0xffff)}++;			# preserve recent uniqueness
+	$cache2->{$ident = int rand(0xffff)}++ while $cache1->{$ident}++;
+	( $cache1, $cache2, $limit ) = ( $cache2, {}, 50 ) unless $limit--;
+	return $$self->{id} = $ident;
 }
 
 
@@ -143,7 +148,7 @@ sub opcode {
 	for ( $$self->{status} ) {
 		return opcodebyval( ( $_ >> 11 ) & 0x0f ) unless defined $arg;
 		$opcode = opcodebyname($arg);
-		$_ = ( $_ & 0x87ff ) | ( $opcode << 11 );
+		$_	= ( $_ & 0x87ff ) | ( $opcode << 11 );
 	}
 	return $opcode;
 }
@@ -305,7 +310,7 @@ our $warned;
 sub qdcount {
 	my $self = shift;
 	return $$self->{count}[0] || scalar @{$$self->{question}} unless scalar @_;
-	carp 'header->qdcount attribute is read-only' unless $warned++;
+	carp 'packet->header->qdcount attribute is read-only'	  unless $warned++;
 	return;
 }
 
@@ -325,7 +330,7 @@ to the number of RRs in the prerequisite section.
 sub ancount {
 	my $self = shift;
 	return $$self->{count}[1] || scalar @{$$self->{answer}} unless scalar @_;
-	carp 'header->ancount attribute is read-only' unless $warned++;
+	carp 'packet->header->ancount attribute is read-only'	unless $warned++;
 	return;
 }
 
@@ -345,7 +350,7 @@ to the number of RRs in the update section.
 sub nscount {
 	my $self = shift;
 	return $$self->{count}[2] || scalar @{$$self->{authority}} unless scalar @_;
-	carp 'header->nscount attribute is read-only' unless $warned++;
+	carp 'packet->header->nscount attribute is read-only'	   unless $warned++;
 	return;
 }
 
@@ -364,7 +369,7 @@ In dynamic update packets, this field is known as C<adcount>.
 sub arcount {
 	my $self = shift;
 	return $$self->{count}[3] || scalar @{$$self->{additional}} unless scalar @_;
-	carp 'header->arcount attribute is read-only' unless $warned++;
+	carp 'packet->header->arcount attribute is read-only'	    unless $warned++;
 	return;
 }
 
@@ -441,23 +446,23 @@ sub _dnsflag {
 	my $flag = shift;
 	for ( $$self->{status} ) {
 		my $set = $_ | $flag;
-		my $not = $set - $flag;
-		$_ = (shift) ? $set : $not if scalar @_;
-		$flag = ( $_ & $flag ) ? 1 : 0;
+		$_ = (shift) ? $set : ( $set ^ $flag ) if scalar @_;
+		$flag &= $_;
 	}
-	return $flag;
+	return $flag ? 1 : 0;
 }
 
 
 sub _ednsflag {
-	my ( $self, $flag, @val ) = @_;
-	my $edns = $$self->edns->flags || 0;
-	return $flag & $edns ? 1 : 0 unless scalar @val;
-	my $set = $flag | $edns;
-	my $not = $set - $flag;
-	my $val = shift(@val) ? $set : $not;
-	$$self->edns->flags($val) unless $val == $edns;
-	return ( $val & $flag ) ? 1 : 0;
+	my $self = shift;
+	my $flag = shift;
+	my $edns = $$self->edns;
+	for ( $edns->flags ) {
+		my $set = $_ | $flag;
+		$edns->flags( $_ = (shift) ? $set : ( $set ^ $flag ) ) if scalar @_;
+		$flag &= $_;
+	}
+	return $flag ? 1 : 0;
 }
 
 
@@ -499,8 +504,8 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::Packet>, L<Net::DNS::RR::OPT>
-RFC 1035 Section 4.1.1
+L<perl>, L<Net::DNS>, L<Net::DNS::Packet>, L<Net::DNS::RR::OPT>,
+L<RFC1035(4.1.1)|https://tools.ietf.org/html/rfc1035>
 
 =cut
 

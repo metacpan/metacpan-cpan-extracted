@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-07-24'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 sub meta {
     +{
@@ -27,7 +27,7 @@ sub filter {
     $res->{expr_match} = "$dt !~ ";
     $res->{expr_filter} = join(
         "",
-        "do { my \$tmp = $dt; if (\$tmp !~ /\\A[0-9]+\\z/) { my \@pw = getpwnam(\$tmp); \@pw ? [undef, \$pw[2]] : [\"Unknown Unix group '\$tmp'\", \$tmp] } else { [undef, \$tmp] } }",
+        "do { my \$tmp = $dt; if (\$tmp !~ /\\A[0-9]+\\z/) { my \@pw = getpwnam(\$tmp); \@pw ? [undef, \$pw[2]] : [\"Unknown Unix user '\$tmp'\", \$tmp] } else { [undef, \$tmp] } }",
     );
 
     $res;
@@ -48,7 +48,7 @@ Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid
 
 =head1 VERSION
 
-This document describes version 0.019 of Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.020 of Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 =for Pod::Coverage ^(meta|filter)$
 

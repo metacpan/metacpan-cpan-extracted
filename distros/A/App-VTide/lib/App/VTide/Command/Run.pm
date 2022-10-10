@@ -20,7 +20,7 @@ use Algorithm::Cron;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.17');
+our $VERSION = version->new('0.1.18');
 our $NAME    = 'run';
 our $OPTIONS = [
     'name|n=s',
@@ -444,7 +444,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.17
+This documentation refers to App::VTide::Command::Run version 0.1.18
 
 =head1 SYNOPSIS
 

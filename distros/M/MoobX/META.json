@@ -4,26 +4,19 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MoobX",
    "prereqs" : {
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "develop" : {
-         "requires" : {
-            "Test::More" : "0",
-            "Test::PAUSE::Permissions" : "0",
-            "strict" : "0"
          }
       },
       "runtime" : {
@@ -64,47 +57,47 @@
    "provides" : {
       "MoobX" : {
          "file" : "lib/MoobX.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       },
       "MoobX::Array" : {
          "file" : "lib/MoobX/Array.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       },
       "MoobX::Array::Observable" : {
          "file" : "lib/MoobX/Array/Observable.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       },
       "MoobX::Attributes" : {
          "file" : "lib/MoobX/Attributes.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       },
       "MoobX::Hash" : {
          "file" : "lib/MoobX/Hash.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       },
       "MoobX::Hash::Observable" : {
          "file" : "lib/MoobX/Hash/Observable.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       },
       "MoobX::Observer" : {
          "file" : "lib/MoobX/Observer.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       },
       "MoobX::Scalar" : {
          "file" : "lib/MoobX/Scalar.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       },
       "MoobX::Scalar::Observable" : {
          "file" : "lib/MoobX/Scalar/Observable.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       },
       "MoobX::Trait::Observable" : {
          "file" : "lib/MoobX/Trait/Observable.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       },
       "MoobX::Trait::Observer" : {
          "file" : "lib/MoobX/Trait/Observer.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.2"
       }
    },
    "release_status" : "stable",
@@ -119,13 +112,21 @@
          "web" : "https://github.com/yanick/MoobX"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.2",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Toby Inkster <github@toby.ink>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
-   ]
+   ],
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

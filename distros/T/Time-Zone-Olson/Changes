@@ -1,5 +1,14 @@
 Revision history for Time-Zone-Olson
 
+0.44  Sat Oct 08 13:20:00 2022
+       Fixing abbr for Win32 platform
+
+0.43  Sun Oct 02 08:04:00 2022
+       Removing wip files
+
+0.42  Sat Oct 01 19:01:00 2022
+       Alpine Linux fixes
+
 0.41  Sun Aug 29 12:54:00 2021
        Solaris fixes
 

@@ -1,6 +1,6 @@
 package Net::SAML2::Protocol::LogoutRequest;
 use Moose;
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.61'; # VERSION
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
@@ -148,7 +148,7 @@ Net::SAML2::Protocol::LogoutRequest - SAML2 LogoutRequest Protocol object
 
 =head1 VERSION
 
-version 0.59
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -158,10 +158,6 @@ version 0.59
     nameid      => $nameid,
     session     => $session,
   );
-
-=head1 NAME
-
-Net::SAML2::Protocol::LogoutRequest - the SAML2 LogoutRequest object
 
 =head1 METHODS
 
@@ -175,24 +171,41 @@ Arguments:
 
 =item B<session>
 
-session to log out
+Session to log out
 
 =item B<nameid>
 
 NameID of the user to log out
 
-=item B<nameid_format>
-
-NameIDFormat to specify
-
-=item B<issuer>
-
-SP's identity URI
-
 =item B<destination>
 
 IdP's identity URI this is required for a signed message but likely should be
 sent regardless
+
+=back
+
+The following options alter the output of the NameID element
+
+=over
+
+=item B<nameid_format>
+
+When supplied adds the Format attribute to the NameID
+
+=item B<sp_provided_id>
+
+When supplied adds the SPProvidedID attribute to the NameID
+
+=item B<include_name_qualifier>
+
+Tell the module to include the NameQualifier and SPNameQualifier attributes in
+the NameID. Defaults to false unless the B<nameid_format> equals
+C<urn:oasis:names:tc:SAML:2.0:nameidformat:persistent>
+
+=item B<affiliation_group_id>
+
+When supplied sets the SPNameQualifier attribute. When not supplied, this
+defaults to the issuer.
 
 =back
 

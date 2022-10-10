@@ -92,7 +92,7 @@ The output address(dst) must be defined. Otherwise an exception will be thrown.
 
 =head2 inet_ntop
 
-  static method inet_ntop : string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
+  static method inet_ntop : mutable string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
 
 This function converts the network address structure src in the af address family into a character string. The resulting string is copied to the buffer pointed to by dst, which must be a non-NULL pointer. The caller specifies the number of bytes available in this buffer in the argument size.
 

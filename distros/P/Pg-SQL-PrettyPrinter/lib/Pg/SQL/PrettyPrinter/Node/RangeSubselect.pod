@@ -1,0 +1,45 @@
+=head1 NAME
+
+Pg::SQL::PrettyPrinter::Node::RangeSelect - Class representing subselect
+within FROM
+
+=head1 SYNOPSIS
+
+Not to be used directly.
+
+=head1 FUNCTIONS
+
+Aside from functions listed below, it inherits functions from
+L<Pg::SQL::PrettyPrinter::Node>.
+
+=head2 new
+
+Makes object, first using parent's constructur, and then "unpacks" it's elements.
+
+=head2 as_text
+
+Returns this object as plain text, with next to none formatting.
+
+=head2 pretty_print
+
+Returns this object as text using pretty printing.
+
+=head1 AUTHOR
+
+hubert depesz lubaczewski, C<< <depesz at depesz.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<depesz at depesz.com>.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Pg::SQL::PrettyPrinter::Node::RangeSubselect
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright  hubert depesz lubaczewski, all rights reserved.
+
+This program is distributed under the (Revised) BSD License.

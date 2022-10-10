@@ -202,7 +202,7 @@ Wakeup the guest from power management suspend state
 
 Tells the guest OS to enter the power management suspend state
 identified by C<$target>. The C<$target> parameter should be
-one of the NODE SUSPEND CONTANTS listed in C<Sys::Virt>. The
+one of the NODE SUSPEND CONSTANTS listed in C<Sys::Virt>. The
 C<$duration> specifies when the guest should automatically
 wakeup. The C<$flags> parameter is optional and defaults to
 zero.
@@ -757,7 +757,7 @@ to query the setting of the live config or inactive config.
 =item $dom->set_guest_vcpus($cpumap, $state, [$flags=0])
 
 Set the online status of the guest OS CPUs. The C<$cpumap>
-parameter describes the set of CPUs to modify (eg "0-3,^1").
+parameter describes the set of CPUs to modify (e.g. "0-3,^1").
 C<$state> is either B<1> to set the CPUs online, or B<0>
 to set them offline. The C<$flags> parameter is currently
 unused and defaults to 0.
@@ -942,7 +942,7 @@ Treat C<$newsize> as if it were in bytes, rather than KB.
 =item $dom->interface_stats($path)
 
 Fetch the current I/O statistics for the block device given by C<$path>.
-The returned hash containins keys for
+The returned hash contains keys for
 
 =over 4
 
@@ -984,7 +984,7 @@ Total packets dropped at transmission.
 
 Fetch the current memory statistics for the guest domain. The
 C<$flags> parameter is currently unused and can be omitted.
-The returned hash containins keys for
+The returned hash contains keys for
 
 =over 4
 
@@ -1022,7 +1022,7 @@ Resident set size. Size of memory resident in host RAM.
 
 Fetch information about the security label assigned to the guest
 domain. The returned hash reference has two keys, C<model> gives
-the name of the security model in effect (eg C<selinux>), while
+the name of the security model in effect (e.g. C<selinux>), while
 C<label> provides the name of the security label applied to the
 domain. This method only returns information about the first
 security label. To retrieve all labels, use C<get_security_label_list>.
@@ -1172,7 +1172,7 @@ Override the destination host name used for TLS verification.
 Normally the TLS certificate from the destination host must match
 the host's name for TLS verification to succeed. When the
 certificate does not match the destination hostname and the
-expected cetificate's hostname is known, this parameter can be
+expected certificate's hostname is known, this parameter can be
 used to pass this expected hostname when starting the migration.
 
 =item C<Sys::Virt::Domain::MIGRATE_PARAM_DISKS_URI>
@@ -1408,7 +1408,7 @@ defaulting to 0.
 
 Open the graphics console for a guest, identified by C<$idx>,
 counting from 0. The C<$fd> should be a file descriptor for an
-anoymous socket pair. The C<$flags> argument should be one of
+anonymous socket pair. The C<$flags> argument should be one of
 the constants listed at the end of this document, and defaults
 to 0.
 
@@ -1438,7 +1438,7 @@ where each elements contains a hash reference. The keys in the hash
 are, C<number> the vCPU number, C<cpu> the physical CPU on which the
 vCPU is currently scheduled, C<cpuTime> the cumulative execution
 time of the vCPU, C<state> the running state and C<affinity> giving
-the allowed shedular placement. The value for C<affinity> is a
+the allowed scheduler placement. The value for C<affinity> is a
 string representing a bitmask against physical CPUs, 8 cpus per
 character. To extract the bits use the C<unpack> function with
 the C<b*> template. NB The C<state>, C<cpuTime>, C<cpu> values are
@@ -1472,7 +1472,7 @@ Obtain information about the state of all IOThreads in a running
 guest domain. The returned list will have one element for each IOThread,
 where each elements contains a hash reference. The keys in the hash
 are, C<number> the IOThread number and C<affinity> giving the allowed
-schedular placement. The value for C<affinity> is a
+scheduler placement. The value for C<affinity> is a
 string representing a bitmask against physical CPUs, 8 cpus per
 character. To extract the bits use the C<unpack> function with
 the C<b*> template.
@@ -1546,15 +1546,15 @@ The expected amount of data remaining to be processed by the job, in bytes.
 
 =item memTotal
 
-The total amount of mem expected to be processed by the job, in bytes.
+The total amount of memory expected to be processed by the job, in bytes.
 
 =item memProcessed
 
-The current amount of mem processed by the job, in bytes.
+The current amount of memory processed by the job, in bytes.
 
 =item memRemaining
 
-The expected amount of mem remaining to be processed by the job, in bytes.
+The expected amount of memory remaining to be processed by the job, in bytes.
 
 =item fileTotal
 
@@ -1629,15 +1629,15 @@ The expected amount of data remaining to be processed by the job, in bytes.
 
 =item Sys::Virt::Domain::JOB_MEMORY_TOTAL
 
-The total amount of mem expected to be processed by the job, in bytes.
+The total amount of memory expected to be processed by the job, in bytes.
 
 =item Sys::Virt::Domain::JOB_MEMORY_PROCESSED
 
-The current amount of mem processed by the job, in bytes.
+The current amount of memory processed by the job, in bytes.
 
 =item Sys::Virt::Domain::JOB_MEMORY_REMAINING
 
-The expected amount of mem remaining to be processed by the job, in bytes.
+The expected amount of memory remaining to be processed by the job, in bytes.
 
 =item Sys::Virt::Domain::JOB_MEMORY_CONSTANT
 
@@ -1799,7 +1799,7 @@ The guest is performing a block backup
 
 =item $dom->abort_job($flags=0)
 
-Aborts the currently executing job. Valid C<$flags> incude:
+Aborts the currently executing job. Valid C<$flags> include:
 
 =over 4
 
@@ -2101,7 +2101,7 @@ The name of the guest device that is mounted
 
 =item fstype
 
-The filesystem type (eg 'ext4', 'fat', 'ntfs', etc)
+The filesystem type (e.g. 'ext4', 'fat', 'ntfs', etc)
 
 =item mountpoint
 
@@ -2398,7 +2398,7 @@ C<state> key in the hash returned by the C<get_info> method.
 
 =item Sys::Virt::Domain::STATE_NOSTATE
 
-The domain is active, but is not running / blocked (eg idle)
+The domain is active, but is not running / blocked (e.g. idle)
 
 =item Sys::Virt::Domain::STATE_RUNNING
 
@@ -2851,11 +2851,11 @@ Enable compression of the migration data stream
 
 =item Sys::Virt::Domain::MIGRATE_ABORT_ON_ERROR
 
-Abort if an I/O error occurrs on the disk
+Abort if an I/O error occurs on the disk
 
 =item Sys::Virt::Domain::MIGRATE_AUTO_CONVERGE
 
-Force convergance of the migration operation by
+Force convergence of the migration operation by
 throttling guest runtime
 
 =item Sys::Virt::Domain::MIGRATE_RDMA_PIN_ALL
@@ -3843,7 +3843,7 @@ The channel on a running guest changed state
 =item Sys::Virt::Domain::EVENT_ID_JOB_COMPLETED
 
 Domain background job completion notification. The callback
-provides a hash containing the job stats. The keyus in the
+provides a hash containing the job stats. The keys in the
 hash are the same as those used with the C<Sys::Virt::Domain::get_job_stats()>
 method.
 
@@ -4053,7 +4053,7 @@ An unsuccessful block job
 
 =item Sys::Virt::Domain::BLOCK_JOB_CANCELED
 
-A block job canceled byy the user
+A block job canceled by the user
 
 =item Sys::Virt::Domain::BLOCK_JOB_READY
 

@@ -1,7 +1,7 @@
 package MoobX;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Reactive programming framework heavily inspired by JavaScript's MobX
-$MoobX::VERSION = '0.1.0';
+$MoobX::VERSION = '0.1.2';
 
 use 5.20.0;
 
@@ -20,26 +20,33 @@ use experimental 'signatures';
 use parent 'Exporter::Tiny';
 
 our @EXPORT = qw/ observer observable autorun :attributes :traits /;
+our %EXPORT_TAGS = (
+    'attributes' => [ '__ATTRIBUTES__' ],
+    'traits'     => [ '__TRAITS__' ],
+);
 
 our $WARN_NO_DEPS = 1;
 
-sub _exporter_expand_tag {
-    my( $class, $name, $args, $globals ) = @_;
+sub _exporter_expand_sub {
+    my ( $class, $name, $args, $globals ) = ( shift, @_ );
 
-    if ( $name eq 'attributes' ) {
+    if ( $name eq '__ATTRIBUTES__' ) {
         my $target = $globals->{into};
-
+        return if ref $target;
+        local $@;
         eval qq{
             package $target;
             use parent 'MoobX::Attributes';
             1;
         } or die $@;
+        return;
     }
-    elsif( $name eq 'traits' ) {
-        use_module( 'MoobX::Trait::'.$_) for qw/ Observer Observable /;
+    elsif ( $name eq '__TRAITS__' ) {
+        use_module( "MoobX::Trait::$_" ) for qw/ Observer Observable /;
+        return;
     }
 
-    return ();
+    return $class->SUPER::_exporter_expand_sub( $name, $args, $globals );
 }
 
 our $graph = Graph::Directed->new;
@@ -133,7 +140,7 @@ MoobX - Reactive programming framework heavily inspired by JavaScript's MobX
 
 =head1 VERSION
 
-version 0.1.0
+version 0.1.2
 
 =head1 SYNOPSIS
 
@@ -271,7 +278,7 @@ Like C<observer>, but immediatly recompute its value when its observable depende
 
 =item L<https://github.com/mobxjs/mobx|MobX> - the original inspiration
 
-=item L<http://techblog.babyl.ca/entry/moobx> and L<http://techblog.babyl.ca/entry/moobx-2> - the two blog entries that introduced MobX.
+=item L<https://techblog.babyl.ca/entry/moobx> and L<https://techblog.babyl.ca/entry/moobx-2> - the two blog entries that introduced MobX.
 
 =back
 
@@ -281,7 +288,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2022, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

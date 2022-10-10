@@ -1,0 +1,133 @@
+---
+abstract: 'Pretty printer for SQL queries'
+author:
+  - 'hubert depesz lubaczewski <depesz@depesz.com>'
+build_requires:
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  autodie: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pg-SQL-PrettyPrinter
+provides:
+  Pg::SQL::PrettyPrinter:
+    file: lib/Pg/SQL/PrettyPrinter.pm
+    version: '0.4'
+  Pg::SQL::PrettyPrinter::Node:
+    file: lib/Pg/SQL/PrettyPrinter/Node.pm
+  Pg::SQL::PrettyPrinter::Node::A_ArrayExpr:
+    file: lib/Pg/SQL/PrettyPrinter/Node/A_ArrayExpr.pm
+  Pg::SQL::PrettyPrinter::Node::A_Const:
+    file: lib/Pg/SQL/PrettyPrinter/Node/A_Const.pm
+  Pg::SQL::PrettyPrinter::Node::A_Expr:
+    file: lib/Pg/SQL/PrettyPrinter/Node/A_Expr.pm
+  Pg::SQL::PrettyPrinter::Node::A_Indices:
+    file: lib/Pg/SQL/PrettyPrinter/Node/A_Indices.pm
+  Pg::SQL::PrettyPrinter::Node::A_Indirection:
+    file: lib/Pg/SQL/PrettyPrinter/Node/A_Indirection.pm
+  Pg::SQL::PrettyPrinter::Node::A_Star:
+    file: lib/Pg/SQL/PrettyPrinter/Node/A_Star.pm
+  Pg::SQL::PrettyPrinter::Node::BitString:
+    file: lib/Pg/SQL/PrettyPrinter/Node/BitString.pm
+  Pg::SQL::PrettyPrinter::Node::BoolExpr:
+    file: lib/Pg/SQL/PrettyPrinter/Node/BoolExpr.pm
+  Pg::SQL::PrettyPrinter::Node::BooleanTest:
+    file: lib/Pg/SQL/PrettyPrinter/Node/BooleanTest.pm
+  Pg::SQL::PrettyPrinter::Node::CaseExpr:
+    file: lib/Pg/SQL/PrettyPrinter/Node/CaseExpr.pm
+  Pg::SQL::PrettyPrinter::Node::CaseWhen:
+    file: lib/Pg/SQL/PrettyPrinter/Node/CaseWhen.pm
+  Pg::SQL::PrettyPrinter::Node::CoalesceExpr:
+    file: lib/Pg/SQL/PrettyPrinter/Node/CoalesceExpr.pm
+  Pg::SQL::PrettyPrinter::Node::CollateClause:
+    file: lib/Pg/SQL/PrettyPrinter/Node/CollateClause.pm
+  Pg::SQL::PrettyPrinter::Node::ColumnRef:
+    file: lib/Pg/SQL/PrettyPrinter/Node/ColumnRef.pm
+  Pg::SQL::PrettyPrinter::Node::CommonTableExpr:
+    file: lib/Pg/SQL/PrettyPrinter/Node/CommonTableExpr.pm
+  Pg::SQL::PrettyPrinter::Node::DefElem:
+    file: lib/Pg/SQL/PrettyPrinter/Node/DefElem.pm
+  Pg::SQL::PrettyPrinter::Node::DeleteStmt:
+    file: lib/Pg/SQL/PrettyPrinter/Node/DeleteStmt.pm
+  Pg::SQL::PrettyPrinter::Node::ExplainStmt:
+    file: lib/Pg/SQL/PrettyPrinter/Node/ExplainStmt.pm
+  Pg::SQL::PrettyPrinter::Node::Float:
+    file: lib/Pg/SQL/PrettyPrinter/Node/Float.pm
+  Pg::SQL::PrettyPrinter::Node::FuncCall:
+    file: lib/Pg/SQL/PrettyPrinter/Node/FuncCall.pm
+  Pg::SQL::PrettyPrinter::Node::GroupingFunc:
+    file: lib/Pg/SQL/PrettyPrinter/Node/GroupingFunc.pm
+  Pg::SQL::PrettyPrinter::Node::GroupingSet:
+    file: lib/Pg/SQL/PrettyPrinter/Node/GroupingSet.pm
+  Pg::SQL::PrettyPrinter::Node::IndexElem:
+    file: lib/Pg/SQL/PrettyPrinter/Node/IndexElem.pm
+  Pg::SQL::PrettyPrinter::Node::InsertStmt:
+    file: lib/Pg/SQL/PrettyPrinter/Node/InsertStmt.pm
+  Pg::SQL::PrettyPrinter::Node::Integer:
+    file: lib/Pg/SQL/PrettyPrinter/Node/Integer.pm
+  Pg::SQL::PrettyPrinter::Node::JoinExpr:
+    file: lib/Pg/SQL/PrettyPrinter/Node/JoinExpr.pm
+  Pg::SQL::PrettyPrinter::Node::List:
+    file: lib/Pg/SQL/PrettyPrinter/Node/List.pm
+  Pg::SQL::PrettyPrinter::Node::LockingClause:
+    file: lib/Pg/SQL/PrettyPrinter/Node/LockingClause.pm
+  Pg::SQL::PrettyPrinter::Node::MinMaxExpr:
+    file: lib/Pg/SQL/PrettyPrinter/Node/MinMaxExpr.pm
+  Pg::SQL::PrettyPrinter::Node::MultiAssignRef:
+    file: lib/Pg/SQL/PrettyPrinter/Node/MultiAssignRef.pm
+  Pg::SQL::PrettyPrinter::Node::NamedArgExpr:
+    file: lib/Pg/SQL/PrettyPrinter/Node/NamedArgExpr.pm
+  Pg::SQL::PrettyPrinter::Node::Null:
+    file: lib/Pg/SQL/PrettyPrinter/Node/Null.pm
+  Pg::SQL::PrettyPrinter::Node::NullTest:
+    file: lib/Pg/SQL/PrettyPrinter/Node/NullTest.pm
+  Pg::SQL::PrettyPrinter::Node::ParamRef:
+    file: lib/Pg/SQL/PrettyPrinter/Node/ParamRef.pm
+  Pg::SQL::PrettyPrinter::Node::RangeFunction:
+    file: lib/Pg/SQL/PrettyPrinter/Node/RangeFunction.pm
+  Pg::SQL::PrettyPrinter::Node::RangeSubselect:
+    file: lib/Pg/SQL/PrettyPrinter/Node/RangeSubselect.pm
+  Pg::SQL::PrettyPrinter::Node::RangeTableSample:
+    file: lib/Pg/SQL/PrettyPrinter/Node/RangeTableSample.pm
+  Pg::SQL::PrettyPrinter::Node::RangeVar:
+    file: lib/Pg/SQL/PrettyPrinter/Node/RangeVar.pm
+  Pg::SQL::PrettyPrinter::Node::ResTarget:
+    file: lib/Pg/SQL/PrettyPrinter/Node/ResTarget.pm
+  Pg::SQL::PrettyPrinter::Node::RowExpr:
+    file: lib/Pg/SQL/PrettyPrinter/Node/RowExpr.pm
+  Pg::SQL::PrettyPrinter::Node::SQLValueFunction:
+    file: lib/Pg/SQL/PrettyPrinter/Node/SQLValueFunction.pm
+  Pg::SQL::PrettyPrinter::Node::SelectStmt:
+    file: lib/Pg/SQL/PrettyPrinter/Node/SelectStmt.pm
+  Pg::SQL::PrettyPrinter::Node::SetToDefault:
+    file: lib/Pg/SQL/PrettyPrinter/Node/SetToDefault.pm
+  Pg::SQL::PrettyPrinter::Node::SortBy:
+    file: lib/Pg/SQL/PrettyPrinter/Node/SortBy.pm
+  Pg::SQL::PrettyPrinter::Node::String:
+    file: lib/Pg/SQL/PrettyPrinter/Node/String.pm
+  Pg::SQL::PrettyPrinter::Node::SubLink:
+    file: lib/Pg/SQL/PrettyPrinter/Node/SubLink.pm
+  Pg::SQL::PrettyPrinter::Node::TypeCast:
+    file: lib/Pg/SQL/PrettyPrinter/Node/TypeCast.pm
+  Pg::SQL::PrettyPrinter::Node::UpdateStmt:
+    file: lib/Pg/SQL/PrettyPrinter/Node/UpdateStmt.pm
+  Pg::SQL::PrettyPrinter::Node::XmlExpr:
+    file: lib/Pg/SQL/PrettyPrinter/Node/XmlExpr.pm
+  Pg::SQL::PrettyPrinter::Node::XmlSerialize:
+    file: lib/Pg/SQL/PrettyPrinter/Node/XmlSerialize.pm
+requires:
+  JSON::MaybeXS: '0'
+resources:
+  bugtracker: https://gitlab.com/depesz/pg-sql-prettyprinter/-/issues
+  homepage: https://gitlab.com/depesz/pg-sql-prettyprinter
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://gitlab.com/depesz/pg-sql-prettyprinter.git
+version: '0.4'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

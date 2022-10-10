@@ -12,7 +12,7 @@ use Locale::Country; # all_country_codes
 use Test::MockModule;
 use English qw(-no_match_vars);
 
-our $VERSION = '1.31';
+our $VERSION = '1.33';
 
 #run prior and once per suite
 sub startup : Test(startup => 1) {
@@ -208,10 +208,10 @@ sub test_au : Test(7) {
     }
 }
 
-sub test_aw : Test(7) {
+sub test_aw : Test(5) {
     SKIP: {
         eval { require Date::Holidays::AW };
-        skip 'Date::Holidays::AW not installed', 7 if $EVAL_ERROR;
+        skip 'Date::Holidays::AW not installed', 5 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::AW', qw(holidays is_holiday));
 
@@ -232,8 +232,6 @@ sub test_aw : Test(7) {
             month  => 1,
             day    => 15,
         ), 'Testing Aruban national holiday');
-
-        can_ok('Date::Holidays::AW', qw(holidays is_holiday));
     }
 }
 
@@ -261,6 +259,34 @@ sub test_br : Test(4) {
             'Checking for Brazillian first day of year' );
     }
 }
+
+sub test_bq : Test(5) {
+    SKIP: {
+        eval { require Date::Holidays::BQ };
+        skip 'Date::Holidays::BQ not installed', 5 if $EVAL_ERROR;
+
+        can_ok('Date::Holidays::BQ', qw(holidays is_holiday));
+
+        ok( my $dh = Date::Holidays->new( countrycode => 'aw' ),
+            'Testing Date::Holidays::BQ' );
+
+        ok( $dh->holidays( year => 2020 ),
+            'Testing holidays for Date::Holidays::BQ' );
+
+        ok($dh->is_holiday(
+            year   => 2020,
+            month  => 1,
+            day    => 1,
+        ), 'Testing Bonaires national holiday');
+
+        ok(! $dh->is_holiday(
+            year   => 2020,
+            month  => 1,
+            day    => 15,
+        ), 'Testing Bonaires national holiday');
+    }
+}
+
 
 sub test_by : Test(4) {
     SKIP: {
@@ -553,10 +579,10 @@ sub test_gb : Test(10) {
     }
 }
 
-sub test_nl : Test(6) {
+sub test_nl : Test(4) {
     SKIP: {
         eval { require Date::Holidays::NL };
-        skip 'Date::Holidays::NL not installed', 6 if $EVAL_ERROR;
+        skip 'Date::Holidays::NL not installed', 4 if $EVAL_ERROR;
 
         can_ok('Date::Holidays::NL', qw(holidays is_holiday));
 
@@ -572,7 +598,6 @@ sub test_nl : Test(6) {
             day    => 1,
         ), 'Testing Netherlands national holiday');
 
-        can_ok('Date::Holidays::NL', qw(holidays is_holiday));
     }
 }
 

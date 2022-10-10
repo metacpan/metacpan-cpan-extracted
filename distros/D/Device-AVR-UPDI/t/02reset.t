@@ -20,7 +20,7 @@ my $updi = Device::AVR::UPDI->new( fh => MockFH->new, part => "ATtiny814" );
 {
    $mockfio->expect_syswrite_anyfh( "\x55\xC8\x59" );
    $mockfio->expect_sysread_anyfh( 3 )
-      ->returns( "\x55\xC8\x59" );
+      ->will_done( "\x55\xC8\x59" );
    $mockfio->expect_sleep( 0.1 );
 
    $updi->request_reset( 1 )->get;
@@ -29,7 +29,7 @@ my $updi = Device::AVR::UPDI->new( fh => MockFH->new, part => "ATtiny814" );
 
    $mockfio->expect_syswrite_anyfh( "\x55\xC8\x00" ); # SYNC
    $mockfio->expect_sysread_anyfh( 3 )
-      ->returns( "\x55\xC8\x00" );
+      ->will_done( "\x55\xC8\x00" );
    $mockfio->expect_sleep( 0.1 );
 
    $updi->request_reset( 0 )->get;

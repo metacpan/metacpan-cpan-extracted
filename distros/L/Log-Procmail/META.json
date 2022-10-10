@@ -1,48 +1,93 @@
 {
    "abstract" : "Perl extension for reading procmail logfiles.",
    "author" : [
-      "Philippe \"BooK\" Bruhat <book@cpan.org>"
+      "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "procmail"
+   ],
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Log-Procmail",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : 0
+            "Carp" : "0",
+            "IO::File" : "0",
+            "IO::Select" : "0",
+            "UNIVERSAL" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Cmd" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "Log::Procmail" : {
          "file" : "lib/Log/Procmail.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "Log::Procmail::Abstract" : {
          "file" : "lib/Log/Procmail.pm",
-         "version" : 0
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "bugtracker" : {
+         "mailto" : "bug-log-procmail@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Procmail"
+      },
       "repository" : {
-         "url" : "http://github.com/book/Log-Procmail"
+         "type" : "git",
+         "url" : "https://github.com/book/Log-Procmail.git",
+         "web" : "https://github.com/book/Log-Procmail"
       }
    },
-   "version" : "0.12"
+   "version" : "0.14",
+   "x_contributors" : [
+      "Tony Cook <tonyc@cpan.org>",
+      "Enrico Sorcinelli <enrys@cpan.org>",
+      "Mathieu Arnold <mat@cpan.org>"
+   ],
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
+

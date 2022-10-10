@@ -91,9 +91,6 @@ starting jobs and detaching itself to the background:
   * For  detaching it  uses either  setsid (POSIX)  or the  ioctl call
     TIOCNOTTY
 
-The roadmap  include plans  for porting the  fork mechanism over  to a
-thread based scheme, which should make dynamic update much easier.
-
 If the  system calls mentioned  above are not available  (which should
 hapen nowadays only  under rare circumstances), you can  still use the
 'nofork' option to run all jobs within a single process/thread. Please
@@ -102,7 +99,7 @@ refer to the documentation for further reading.
 INSTALLATION
 ------------
 
-Installation can be don either in the old fashioned way
+Installation can be done either in the old fashioned way
 
    perl Makefile.PL
    make
@@ -142,12 +139,26 @@ execution date  (relative to  the reference time).   The dates  can be
 specified in  a format understood by  'parsedate' from Time::ParseDate
 (like 'now  + 5  days').  Please include  the output of  this command.
 
-LICENSE
--------
+REPOSITORY
+----------
 
-Copyright 1999-2011 Roland Huss.
+Schedule::Cron's         source          is         located         at
+https://github.com/rhuss/schedule-cron  Please feel  free  to send  me
+pull requests if they apply  to the license below.  Also, don't forget
+documentation and tests.
 
-This library is  free software; you can redistribute  it and/or modify
+Please note also, that the active development for this module has been
+stopped since it is considered  to be feature complete. Bugs and minor
+(external) additions will be added from time to time, though.
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright (c) 1999-2013 Roland Huß.
+
+Copyright (c) 2022 Nicholas Hubbard.
+
+This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 Enjoy it...

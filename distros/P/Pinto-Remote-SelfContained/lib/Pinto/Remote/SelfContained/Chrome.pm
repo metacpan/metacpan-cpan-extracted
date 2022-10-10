@@ -105,7 +105,20 @@ sub should_render_progress {
 }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Chrome
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Chrome
 
 =head1 NAME
 
@@ -113,7 +126,7 @@ Pinto::Remote::SelfContained::Chrome - UI for self-contained remote operations
 
 =head1 AUTHOR
 
-Aaron Crane, E<lt>arc@cpan.orgE<gt>
+Aaron Crane E<lt>arc@cpan.orgE<gt>, Brad Lhotsky E<lt>brad@divisionbyzero.netE<gt>
 
 =head1 COPYRIGHT
 

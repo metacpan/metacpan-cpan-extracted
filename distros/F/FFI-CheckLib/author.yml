@@ -21,6 +21,11 @@ pod_spelling_system:
     - ppisar
     - UX
     - MRDVT
+    - macOS
+    - Homebrew
+    - MacPorts
+    - cdalvaro
+    - lvaro
 
 
 pod_coverage:

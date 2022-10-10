@@ -14,7 +14,7 @@ Alien::Build::Manual::Alien - General alien author documentation
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 

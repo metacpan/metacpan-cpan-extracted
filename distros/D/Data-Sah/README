@@ -2,8 +2,8 @@ NAME
     Data::Sah - Fast and featureful data structure validation
 
 VERSION
-    This document describes version 0.912 of Data::Sah (from Perl
-    distribution Data-Sah), released on 2022-08-20.
+    This document describes version 0.913 of Data::Sah (from Perl
+    distribution Data-Sah), released on 2022-09-30.
 
 SYNOPSIS
     Non-OO interface:
@@ -195,14 +195,41 @@ MODULE ORGANIZATION
 FUNCTIONS
     None exported by default.
 
-  normalize_schema($schema) => ARRAY
-    Normalize $schema.
+  normalize_clset (function)
+    Usage:
 
-    Can also be used as a method.
+     # as function
+     my $nclset = Data::Sah::normalize_clset($clset[, \%opts]); # => hash
 
-  gen_validator($schema, \%opts) => CODE (or STR)
-    Generate validator code for $schema. Can also be used as a method. Known
-    options (unknown options will be passed to Perl schema compiler):
+    Convert a clause set to its normalized form, e.g. change
+    "{"!match"=>"abc"}" into "{"match"=>"abc", "match.op"=>"not"}". Produce
+    a shallow copy of the input clause set hash.
+
+  normalize_schema (function)
+    Usage:
+
+     # as function
+     my $nschema = normalize_schema($schema); # => ARRAY
+
+    Convert $schema to its normalized form, i.e. the two-element array form.
+    See Sah for more information about schema forms. Produces a new copy of
+    arrayref as well as clause set hashref, even if the input $schema is
+    already in array form. Implemented by Data::Sah::Normalize.
+
+    Can also be used as a method, see "normalize_clset (method)".
+
+  gen_validator (function)
+    Usage:
+
+     $code_or_str = gen_validator($schema, \%opts); # => CODE (or STR)
+
+    Generate validator code for $schema (or, if "source" option is set to
+    true, a source code string).
+
+    Can also be used as a method, see "gen_validator (method)".
+
+    Known options (unknown options will be passed to Perl schema compiler,
+    see Data::Sah::Compiler::perl):
 
     *   accept_ref => BOOL (default: 0)
 
@@ -259,39 +286,23 @@ METHODS
 
      my $plc = $sah->get_compiler("perl"); # loads Data::Sah::Compiler::perl
 
-  normalize_schema
+  normalize_schema (method)
     Usage:
 
      # as method
      my $nschema = $sah->normalize_schema($schema);
 
-     # as function
-     my $nschema = normalize_schema($schema);
+    See "normalize_schema (function)", see "normalize_schema (function)" for
+    more details on arguments.
 
-    Normalize a schema, e.g. change "int*" into "[int => {req=>1}]", as well
-    as do some sanity checks on it. Returns the normalized schema if
-    succeeds, or dies on error.
-
-    Can also be used as a function.
-
-    Note: this functionality is implemented in Data::Sah::Normalize
-    (distributed separately in Data-Sah-Normalize). Use that module instead
-    if you just need normalizing schemas, to reduce dependencies.
-
-  normalize_clset
+  normalize_clset (method)
     Usage:
 
      # as method
      my $nclset = $sah->normalize_clset($clset[, \%opts]); # => hash
 
-     # as function
-     my $nclset = Data::Sah::normalize_clset($clset[, \%opts]); # => hash
-
-    Normalize a clause set, e.g. change "{"!match"=>"abc"}" into
-    "{"match"=>"abc", "match.op"=>"not"}". Produce a shallow copy of the
-    input clause set hash.
-
-    Can also be used as a function.
+    Can also be used as function, see "normalize_clset (function)" for more
+    details on arguments.
 
   normalize_var
      my $nvarname = $sah->normalize_var($var);
@@ -314,11 +325,8 @@ METHODS
      # as function
      my $vdr = gen_validator($schema [ , \%opts ]); # => coderef
 
-    Use the Perl compiler to generate validator code. Can also be used as a
-    function. This is a wrapper for Data::Sah::Compiler::Prog's "compile()";
-    %opts will be passed to compile()'s arguments, including "return_type",
-    "comment", "debug", and so on. See the documentation in
-    "Data::Sah::Compiler::Prog" for more details.
+    Can also be used as a function, see "gen_validator (function)" for more
+    details on arguments.
 
 FAQ
     See also Sah::FAQ.

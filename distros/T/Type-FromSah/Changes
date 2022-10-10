@@ -6,6 +6,24 @@ Home page:    <https://metacpan.org/release/Type-FromSah>
 Bug tracker:  <https://github.com/tobyink/p5-type-fromsah/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.005	2022-09-30
+
+ [ Test Suite ]
+ - Skip 05coercion.t test if DateTime.pm is not available.
+
+0.004	2022-09-30
+
+ [ Packaging ]
+ - Add missing testing dependency on Test::Requires.
+
+0.003	2022-09-30
+
+ - Further improvements to inlining.
+ - Handle coercions properly.
+ - Set a type_default for types where the Sah schema had a default.
+ - Type objects returned by sah2type will how have a parent of either Item
+   or Optional[Item].
+
 0.002	2022-09-29
 
  - Improvements to inlining.

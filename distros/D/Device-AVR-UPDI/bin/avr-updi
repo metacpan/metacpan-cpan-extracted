@@ -210,9 +210,12 @@ sub _generic_write
 
       my $readback = $updi->$readmethod( $addr, length $chunk )->get;
       if( $readback ne $chunk ) {
+         my $offset = 0;
+         $offset++ while substr( $readback, $offset, 1 ) eq substr( $chunk, $offset, 1 );
+
          printf STDERR "Read: %v02X\n", $readback;
          printf STDERR "Exp : %v02X\n", $chunk;
-         die "Verify failed at addr=$addr\n";
+         die sprintf "Verify failed at addr=0x%04X\n", $addr + $offset;
       }
 
       $addr += length $chunk;

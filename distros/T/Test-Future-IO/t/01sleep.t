@@ -19,7 +19,7 @@ my $test_fio = Test::Future::IO->controller;
    test_out q[ok 2 - ->sleep];
 
    $test_fio->expect_sleep( 0.5 )
-      ->returns;
+      ->will_done;
 
    ok( eval { Future::IO->sleep( 0.5 )->is_done; 1 }, 'Future::IO->sleep is done' ) or
       diag( "Failure was $@" );
@@ -40,7 +40,7 @@ my $test_fio = Test::Future::IO->controller;
    test_fail( +4 );
 
    $test_fio->expect_sleep( 0.5 )
-      ->returns;
+      ->will_done;
    $test_fio->check_and_clear( '->sleep' );
 
    test_test 'sleep fail not called';
@@ -62,7 +62,7 @@ my $test_fio = Test::Future::IO->controller;
    test_fail( +5 );
 
    $test_fio->expect_sleep( 0.5 )
-      ->returns;
+      ->will_done;
    ok( !defined eval { Future::IO->sleep( 1.0 ) }, '->sleep with wrong args dies' );
    $test_fio->check_and_clear( '->sleep fails' );
 

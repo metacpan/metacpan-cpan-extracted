@@ -1,3 +1,9 @@
+0.003		2022-09-30	T. R. Wyant
+    Localize $_ before while (<>) reading config file in
+    Date::ManipX::Almanac::Date.
+
+    Add CONTRIBUTING.
+
 0.002		2021-08-09	T. R. Wyant
     In English, add 'up' and 'down' as synonyms for 'rise' and 'set'.
 

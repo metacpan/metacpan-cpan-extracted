@@ -201,7 +201,7 @@ subtest "pause/resume" => sub {
     select undef, undef, undef, 0.006;
     $l->run_nowait;
     $t->resume;
-    cmp_ok $t->due_in, '<=', 0.005;
+    cmp_ok $t->due_in, '<=', 0.0051;
     my $called;
     $t->callback(sub { $called = 1 });
     select undef, undef, undef, 0.006;

@@ -1,5 +1,28 @@
 Revision history for Perl module libary Windows-GHCN-Fetch
 
+v0.0.005       2022-10-09
+  - always allow -gui, even when Tk/Tk::Getopt is not installed, but die if it's requested
+  - always allow -outclip, even when Win32::Clipboard is not installed, but die if it's requested
+  - fix -help/-usage/-?: pod2usage was passed a list of options instead of a hash
+
+v0.0.004       2022-10-07
+  - fixes for bugs preventing tests from succeeding on Linux and Win32-x86
+  - added -profile, -cachedir and -refresh options, and put them on a separate GUI tab
+  - option -refresh now replaces -nonetwork
+  - option -report "id" renamed -report "detail"
+  - eliminated the API distinction between user options and configuration options
+  - "configuration" options renamed "profile" options
+  - option precedence (high to low): user, profile, built-in defaults
+  - switched to a new caching mechanism for file portability and more suitable refresh options
+  - option -optfile renamed -savegui
+  - cached files are now named the same as the corresponding file in the NOAA repository
+  - replaced $HOME in profile and cache filespecs with ~ (Unix and Windows)
+  - got rid of the cache namespace subdirectory -- all cached files are store in the same folder
+  - the cache and profile filespecs are now reported in the epilog output
+  - Fixed the POD description for VERSIONING and COMPATIBILITY.
+  - for portability, replaced GIS::Distance with a custom Haversine calculation.
+  - for portability, the -readme option now sends text to stdout rather starting a browser on a url
+
 v0.0.003       2022-09-16
   - fixes for bugs preventing tests from succeeding on Linux and Win32-x86
   - 00_initialize_test_env.t now clears the cache files on MSWin32-x8

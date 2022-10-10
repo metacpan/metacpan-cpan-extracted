@@ -45,9 +45,9 @@
          "requires" : {
             "Class::Tiny" : "0",
             "File::Share" : "0",
-            "Math::Random" : "0",
             "YAML::XS" : "0",
-            "perl" : "5.022001"
+            "perl" : "v5.22.0",
+            "version" : "0"
          }
       },
       "test" : {
@@ -59,7 +59,7 @@
    "provides" : {
       "Data::Gimei" : {
          "file" : "lib/Data/Gimei.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.4.0"
       },
       "Data::Gimei::Address" : {
          "file" : "lib/Data/Gimei/Address.pm"
@@ -86,7 +86,7 @@
          "web" : "https://github.com/youpong/pl-gimei"
       }
    },
-   "version" : "v0.3.0",
+   "version" : "v0.4.0",
    "x_authority" : "cpan:YOUPONG",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",

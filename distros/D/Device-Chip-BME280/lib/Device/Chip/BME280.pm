@@ -6,11 +6,11 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Device::Chip::BME280 0.04;
+package Device::Chip::BME280 0.05;
 class Device::Chip::BME280
    :isa(Device::Chip::Base::RegisteredI2C);
 
-use Device::Chip::Sensor -declare;
+use Device::Chip::Sensor 0.23 -declare;
 
 use Data::Bitfield qw( bitfield enumfield boolfield );
 use Future::AsyncAwait;
@@ -317,6 +317,7 @@ declare_sensor pressure =>
       return await $self->_compensate_pressure( $rawP );
    },
    units => "pascals",
+   sanity_bounds => [ 80_000, 120_000 ],
    precision => 0;
 
 declare_sensor temperature =>
@@ -325,6 +326,7 @@ declare_sensor temperature =>
       return await $self->_compensate_temperature( $rawT );
    },
    units => "°C",
+   sanity_bounds => [ -50, 80 ],
    precision => 2;
 
 declare_sensor humidity =>
@@ -334,6 +336,7 @@ declare_sensor humidity =>
       return await $self->_compensate_humidity( $rawH );
    },
    units => "%RH",
+   sanity_bounds => [ -1, 101 ], # give it slight headroom beyond the 0-100 range for rounding errors/etc
    precision => 2;
 
 =head1 AUTHOR

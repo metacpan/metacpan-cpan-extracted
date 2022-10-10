@@ -1,0 +1,94 @@
+NAME
+    ArrayData::Lingua::Word::EN::Medical::Glutanimate - Medical word list
+    (English)
+
+VERSION
+    This document describes version 20220727.0.0 of
+    ArrayData::Lingua::Word::EN::Medical::Glutanimate (from Perl
+    distribution ArrayData-Lingua-Word-EN-Medical-Glutanimate), released on
+    2022-07-27.
+
+SYNOPSIS
+     use ArrayData::Lingua::Word::EN::Medical::Glutanimate;
+
+     my $ary = ArrayData::Lingua::Word::EN::Medical::Glutanimate->new;
+
+     # Iterate the elements
+     $ary->reset_iterator;
+     while ($ary->has_next_item) {
+         my $element = $ary->get_next_item;
+         ... # do something with the element
+     }
+
+     # Another way to iterate
+     $ary->each_item(sub { my ($item, $obj, $pos) = @_; ... }); # return false in anonsub to exit early
+
+     # Get elements by position (array index)
+     my $element = $ary->get_item_at_pos(0);  # get the first element
+     my $element = $ary->get_item_at_pos(90); # get the 91th element, will die if there is no element at that position.
+
+     # Get number of elements in the list
+     my $count = $ary->get_item_count;
+
+     # Get all elements from the list
+     my @all_elements = $ary->get_all_items;
+
+     # Find an item.
+     my @found = $ary->find_item(item => 'foo');
+     my $has_item = $ary->has_item('foo'); # bool
+
+     # Pick one or several random elements.
+     my $element = $ary->pick_item;
+     my @elements = $ary->pick_items(n=>3);
+
+DESCRIPTION
+    Source is from:
+    <https://github.com/glutanimate/wordlist-medicalterms-en>, (license:
+    GPL-3).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ArrayData-Lingua-Word-EN-Medical-Glutanima
+    te>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ArrayData-Lingua-Word-EN-Medical-Glut
+    animate>.
+
+SEE ALSO
+    WordList::EN::Medical::Glutanimate uses us.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData-Lingua-Word
+    -EN-Medical-Glutanimate>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

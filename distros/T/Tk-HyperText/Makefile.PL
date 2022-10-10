@@ -20,6 +20,7 @@ WriteMakefile(
         'Tk::PNG'          => 0,
         'Tk::Text'         => 0,
         'URI::Escape'      => 0,
+        'HTML::Entities::Numbered' => 0,
     }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Tk/HyperText.pm', # retrieve abstract from module

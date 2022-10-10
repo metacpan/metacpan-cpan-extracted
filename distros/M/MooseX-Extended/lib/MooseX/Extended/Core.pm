@@ -32,7 +32,7 @@ use Ref::Util qw(
 use Carp 'croak';
 #
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 our @EXPORT_OK = qw(
   _assert_import_list_is_valid
@@ -268,7 +268,7 @@ sub _apply_optional_features ( $config, $for_class ) {
             module  => 'Syntax::Keyword::Try',
             skip    => sub ($for_class) {
                 if (HAVE_FEATURE_TRY) {
-                    feature->import::into($for_class);
+                    feature->import::into( $for_class, 'try' );
                     warnings->unimport('experimental::try');
                     return 1;
                 }
@@ -545,7 +545,7 @@ MooseX::Extended::Core - Internal module for MooseX::Extended
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 DESCRIPTION
 

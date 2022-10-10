@@ -1,0 +1,7 @@
+SELECT
+    a
+FROM
+    b
+ORDER BY
+    a COLLATE "C" DESC,
+    z

@@ -792,7 +792,7 @@ use Test::More;
   }
   {
     my $source = 'class MyClass { static method main : void () { my $object = new MyClass; $object->{foo}; } }';
-    compile_not_ok($source, q|The field "foo" is not defined in the class "MyClass" or the super classes|);
+    compile_not_ok($source, q|The field "foo" is not defined in the class "MyClass" or its super classes|);
   }
   {
     my $source = 'class MyClass { has x : int; static method main : void () { my $object = new MyClass; weaken $object->{x}; } }';
@@ -860,6 +860,10 @@ use Test::More;
 # Assignability
 {
   {
+    my $source = q|class MyClass { static method main : void () { my $ret = &main(); } }|;
+    compile_not_ok($source, q|The void type can't be assigned in the assignment operator|);
+  }
+  {
     my $source = 'class MyClass { static method main : void () { my $string : mutable string = "abc"; } }';
     compile_not_ok($source, q|The non-mutable type can't be assign to a mutable type in the assignment operator|);
   }
@@ -909,7 +913,7 @@ use Test::More;
   }
   {
     my $source = 'class MyClass { static method main : void () { my $var = Int->new(1); $var->not_defined; } }';
-    compile_not_ok($source, q|The instance method "not_defined" is not defined in the class "Int" or the super classes|);
+    compile_not_ok($source, q|The instance method "not_defined" is not defined in the class "Int" or its super classes|);
   }
   {
     my $source = 'class MyClass { static method main : void () { my $var = 1; $var->new; } }';
@@ -925,7 +929,7 @@ use Test::More;
   }
   {
     my $source = 'class MyClass { use Point; static method main : void () { my $point = Point->new; $point->Point::not_found; } }';
-    compile_not_ok($source, q|The instance method "not_found" is not defined in the class "Point" or the super classes|);
+    compile_not_ok($source, q|The instance method "not_found" is not defined in the class "Point" or its super classes|);
   }
   {
     my $source = 'class MyClass { static method main : void () { my $var = Int->new(1); $var->new; } }';
@@ -944,11 +948,19 @@ use Test::More;
   }
   {
     my $source = 'class MyClass { static method main : void () { my $var = Int->new(1); $var->not_defined; } }';
-    compile_not_ok($source, q|The instance method "not_defined" is not defined in the class "Int" or the super classes|);
+    compile_not_ok($source, q|The instance method "not_defined" is not defined in the class "Int" or its super classes|);
   }
   {
     my $source = 'class MyClass { static method main : void () { my $var = Int->new(1); $var->not_defined; } }';
-    compile_not_ok($source, q|The instance method "not_defined" is not defined in the class "Int" or the super classes|);
+    compile_not_ok($source, q|The instance method "not_defined" is not defined in the class "Int" or its super classes|);
+  }
+  {
+    my $source = [
+      'class MyClass { use MySockaddrIn; static method main : void () { my $result_address = new MySockaddrIn; $result_address->port;} }',
+      'class MySockaddrIn extends MySockaddr : public;',
+      'class MySockaddr : public;',
+    ];
+    compile_not_ok($source, q|The instance method "port" is not defined in the class "MySockaddrIn" or its super classes|);
   }
 }
 # Multi-Numeric Type
@@ -1054,6 +1066,57 @@ use Test::More;
   {
     my $source = 'class MyClass  { interface Stringable; }';
     compile_not_ok($source, q|The class "MyClass" must have the method "to_string" defined as a required method in the interface "Stringable"|);
+  }
+  {
+    my $source = 'class MyClass  { interface Stringable; method to_string : string ($arg : int) {} }';
+    compile_not_ok($source, q|The length of the arguments of the method "to_string" in the class "MyClass" must be equal to the length of the arguments of the method "to_string" in the interface "Stringable|);
+  }
+  {
+    my $source = 'class MyClass  { interface Stringable; static method to_string : string ($self : Stringable) {} }';
+    compile_not_ok($source, q|The method "to_string" in the class "MyClass" must an instance method because the method "to_string" is defined as an instance method in the interface "Stringable"|);
+  }
+  {
+    my $source = [
+      'class MyClass { interface MyInterface; method foo : void ($arg1 : int, $arg2 : long) {} }',
+      'class MyInterface : interface_t { required method foo : void ($arg1 : int, $arg2 : int); }',
+    ];
+    compile_not_ok($source, q|The type of the 2th argument of the method "foo" in the class "MyClass" must be equal to the type of the 2th argument of the method "foo" in the interface "MyInterface"|);
+  }
+  {
+    my $source = [
+      'class MyClass { interface MyInterface; method foo : MyClass () {} }',
+      'class MyInterface : interface_t { required method foo : object (); }',
+    ];
+    compile_ok($source);
+  }
+  {
+    my $source = [
+      'class MyClass { interface MyInterface; method foo : object () {} }',
+      'class MyInterface : interface_t { required method foo : MyClass  (); }',
+    ];
+    compile_not_ok($source, q|The return type of the "foo" in the class "MyClass" must be able to be assigned to the return type of the method "foo" in the interface "MyInterface"|);
+  }
+  {
+    my $source = [
+      'class MyClass { use Point; use Point3D; interface MyInterface; method foo : Point3D () {} }',
+      'class MyInterface : interface_t { required method foo : Point (); }',
+    ];
+    compile_ok($source);
+  }
+  {
+    my $source = [
+      'class MyClass { use Point; use Point3D; interface MyInterface; method foo : Point () {} }',
+      'class MyInterface : interface_t { required method foo : Point3D  (); }',
+    ];
+    compile_not_ok($source, q|The return type of the "foo" in the class "MyClass" must be able to be assigned to the return type of the method "foo" in the interface "MyInterface"|);
+  }
+
+  {
+    my $source = [
+      'class MyClass { use Point; use Point3D; interface MyInterface; method foo : int () {} }',
+      'class MyInterface : interface_t { required method foo : long  (); }',
+    ];
+    compile_not_ok($source, q|The return type of the "foo" in the class "MyClass" must be able to be assigned without an implicite type conversion to the return type of the method "foo" in the interface "MyInterface"|);
   }
 }
 

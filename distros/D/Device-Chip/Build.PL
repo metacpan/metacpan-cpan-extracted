@@ -14,7 +14,7 @@ my $build = Module::Build->new(
       'List::Util' => '1.33',
       'Struct::Dumb' => 0,
       'Test::Builder' => 0,
-      'Test::ExpectAndCheck::Future' => 0,
+      'Test::ExpectAndCheck::Future' => '0.04',
    },
    test_requires => {
       'Test::Fatal' => 0,

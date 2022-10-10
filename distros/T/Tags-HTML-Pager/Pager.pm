@@ -11,7 +11,7 @@ use Unicode::UTF8 qw(decode_utf8);
 
 Readonly::Scalar our $NUMBER_OF_BOXES => 7;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -428,6 +428,8 @@ Returns undef.
 
 =head1 EXAMPLE
 
+=for comment filename=print_pager_html_and_css.pl
+
  use strict;
  use warnings;
 
@@ -535,6 +537,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

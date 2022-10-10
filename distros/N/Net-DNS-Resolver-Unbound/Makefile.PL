@@ -7,6 +7,7 @@ use strict;
 use warnings;
 use Config;
 use ExtUtils::MakeMaker;
+use constant MSWin32 => $^O eq 'MSWin32';
 
 my $distro = 'Net::DNS::Resolver::Unbound';
 my $module = join '/', 'lib', split /::/, "$distro.pm";
@@ -46,7 +47,7 @@ my @debris = qw(*.gcov *.gcda *.gcno *.lock);
 
 my $inc = '';
 my $lib = '-lunbound';
-my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
+my $nul = MSWin32 ? 'nul' : '/dev/null';
 
 if ( my $dir = $ENV{UNBOUND_PREFIX} ) {
 	chomp $dir;
@@ -57,7 +58,7 @@ if ( my $dir = $ENV{UNBOUND_PREFIX} ) {
 	$inc = `pkg-config --cflags libunbound 2>$nul`;
 	$lib = `pkg-config --libs   libunbound 2>$nul`;
 
-} elsif ( $^O eq 'MSWin32' ) {
+} elsif (MSWin32) {
 	$lib = '-llibunbound' if $Config{cc} =~ /cl/;
 	$lib = '-lunbound'    if $Config{cc} =~ /gcc/;
 }
@@ -69,10 +70,15 @@ chomp $_ foreach ( $inc, $lib );
 
 my @header = qw(unbound.h);					# library headers
 
-if ( my $cpp = $Config{cpprun} ) {
-	for my $header (@header) {
-		my @text = `$Config{echo} | $cpp $inc -include $header - 2>$nul`;
-		die "$header  file not found" unless grep {/$header/i} @text;
+if ( my $cpp = $Config{cppstdin} ) {
+	my $last = $Config{cppminus};
+	my $echo = $Config{echo} || qq[perl -e 'print "\@ARGV\\n"'];
+	foreach my $header (@header) {
+		my $scriptlet = qq[$echo "#include <$header>" | $cpp $inc $last -o -];
+		$scriptlet = qq[$echo | $cpp $inc -include $header $last] if MSWin32;
+		next unless scalar(`$echo "#include <$header>" 2>$nul`);
+		next unless scalar( my @text = `$scriptlet 2>$nul` );
+		die "$header  file not found" unless grep /$header/i, @text;
 	}
 }
 

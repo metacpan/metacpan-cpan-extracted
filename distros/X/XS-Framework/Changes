@@ -1,4 +1,6 @@
-1.5.4  xx.xx.2022
+1.5.5  xx.xx.2022
+           - fix test for perl 5.37.4 (possibly bug in perl)
+1.5.4  28.06.2022
            - fix for blead perl 5.37
 1.5.3  22.06.2022
            - fixes for perl 5.36

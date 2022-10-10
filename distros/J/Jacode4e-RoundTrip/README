@@ -1,33 +1,32 @@
 NAME
 
-    Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
+    Jacode4e::RoundTrip - Converts JIS X 0213 Encodings with Round-Trip
+
+CAUTION
+
+    TO ROUND-TRIP CONVERTION, MUST USE SAME VERSION OF THIS SOFTWARE WHEN "A to B"
+    AND "B to A".
 
 SYNOPSIS
 
-    *** CAUTION ********************************
-      MUST USE SAME VERSION OF THIS SOFTWARE
-      BOTH CONVERTING "A to B" AND "B to A"
-      TO HAVE ROUND-TRIP CONVERSION.
-    ********************************************
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e::RoundTrip;
 
-    use FindBin;
-    use lib "$FindBin::Bin/lib";
-    use Jacode4e::RoundTrip;
+  $char_count =
+  Jacode4e::RoundTrip::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
 
-    $return =
-    Jacode4e::RoundTrip::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
+    $char_count
+      Count of characters in $line
 
-    $return
-      Number of characters in $line
- 
     $line
-      String variable to convert
-      After conversion, this variable is overwritten
- 
-    $OUTPUT_encoding, and $INPUT_encoding
-      To convert, you must specify both $OUTPUT_encoding and $INPUT_encoding.
-      The encodings you can specify are as follows:
- 
+    $OUTPUT_encoding
+    $INPUT_encoding
+      Converts encoding of $line from $INPUT_encoding to $OUTPUT_encoding then
+      overwrites $line.
+      $OUTPUT_encoding and $INPUT_encoding cannot omit.
+      You can use mnemonic as encoding name of $INPUT_encoding and $OUTPUT_encoding:
+
       mnemonic      means
       -----------------------------------------------------------------------
       cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
@@ -44,9 +43,9 @@ SYNOPSIS
       utf8.1        UTF-8.1
       utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
       -----------------------------------------------------------------------
- 
+
       Round-trip conversion impossible, only for reference
- 
+
       mnemonic      means
       -----------------------------------------------------------------------
       cp932         Microsoft CP932, IANA Windows-31J
@@ -54,10 +53,11 @@ SYNOPSIS
       cp932nec      NEC CP932
       sjis2004      JISC Shift_JIS-2004
       -----------------------------------------------------------------------
- 
-    %option
-      The options you can specify are as follows:
- 
+
+    { %option }
+      Hash reference "{ %option }" can omit.
+      You can following mnemonics as keys of hash reference "{ %option }":
+
       key mnemonic      value means
       -----------------------------------------------------------------------
       INPUT_LAYOUT      input record layout by 'S' and 'D' sequence
@@ -73,28 +73,7 @@ SYNOPSIS
                         (CAUTION! override also SPACE option)
       -----------------------------------------------------------------------
 
-    *** CAUTION ********************************
-      MUST USE SAME VERSION OF THIS SOFTWARE
-      BOTH CONVERTING "A to B" AND "B to A"
-      TO HAVE ROUND-TRIP CONVERSION.
-    ********************************************
-
-WHAT IS "CP932X"?
-
-    * "cp932x" as mnemonic
-    * CP932X is CP932
-    * Pronounce [si: pi: nain thri: tu: kai] in English
-    * Pronounce [shi: pi: kju: san' ni kai] in Japanese
-    * [si: pi: nain thri: tu: iks] is reserved for Microsoft Corporation ;-P
-    * CP932 upper compatible
-    * Supports JIS X 0213 character set
-    * Used ghost character "\x9C\x5A" as single shift code
-    * Used "\x9C\x5A\x9C\x5A" for single "\x9C\x5A"
-    * You can use private use characters you made
-    * You can use your operating system, network, and database.
-    * In most cases, application programs can be used as it is.
-
-SUPPORTED PERL VERSIONS
+DEPENDENCIES
 
     perl version 5.005_03 to newest perl
 

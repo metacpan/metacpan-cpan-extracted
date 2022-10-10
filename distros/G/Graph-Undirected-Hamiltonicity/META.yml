@@ -1,30 +1,61 @@
 ---
-abstract: 'decide whether a given Graph::Undirected contains a Hamiltonian Cycle.'
+abstract: 'decide whether a given Graph::Undirected     contains a Hamiltonian Cycle.'
 author:
-  - 'Ashwin Dixit <ashwin@cpan.org>'
+  - 'Ashwin Dixit, C<< <ashwin at CPAN dot org> >>'
 build_requires:
-  Test::Exception: '0'
-  Test::More: '0'
-  strict: '0'
+  Test::More: '0.98'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Graph-Undirected-Hamiltonicity
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Graph::Undirected::Hamiltonicity:
+    file: lib/Graph/Undirected/Hamiltonicity.pm
+    version: '0.17'
+  Graph::Undirected::Hamiltonicity::Output:
+    file: lib/Graph/Undirected/Hamiltonicity/Output.pm
+  Graph::Undirected::Hamiltonicity::Spoof:
+    file: lib/Graph/Undirected/Hamiltonicity/Spoof.pm
+  Graph::Undirected::Hamiltonicity::Tests:
+    file: lib/Graph/Undirected/Hamiltonicity/Tests.pm
+  Graph::Undirected::Hamiltonicity::Transforms:
+    file: lib/Graph/Undirected/Hamiltonicity/Transforms.pm
+  Graph::Undirected::Hamiltonicity::Wolfram:
+    file: lib/Graph/Undirected/Hamiltonicity/Wolfram.pm
 requires:
-  Carp: '0'
-  Config::INI::Reader: '0'
-  Exporter: '0'
-  Getopt::Long: '0'
-  Graph::Undirected: '0'
-  LWP::UserAgent: '0'
+  CGI::Minimal: '1.29'
+  Carp: '1.29'
+  Config::INI::Reader: '0.025'
+  Exporter: '5'
+  Graph: '0.9'
+  LWP::UserAgent: '6'
   Modern::Perl: '0'
-  lib: '0'
-version: '0.013'
-x_generated_by_perl: v5.20.3
-x_serialization_backend: 'YAML::Tiny version 1.73'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+  Test::Exception: '0'
+  perl: '5.018004'
+resources:
+  bugtracker: https://github.com/ownlifeful/Graph-Undirected-Hamiltonicity/issues
+  homepage: https://github.com/ownlifeful/Graph-Undirected-Hamiltonicity
+  repository: https://github.com/ownlifeful/Graph-Undirected-Hamiltonicity.git
+version: '0.17'
+x_contributors:
+  - 'Ashwin Dixit <ashwin.dixit@gmail.com>'
+  - 'Ashwin Dixit <ashwin.dixit@reopenlabs.com>'
+  - 'Ashwin Dixit <ashwin@cpan.org>'
+  - 'Ashwin Dixit <ashwin@ownlifeful.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

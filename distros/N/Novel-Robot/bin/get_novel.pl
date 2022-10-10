@@ -21,6 +21,7 @@ GetOptions(
     'type|t=s', 'output|o=s',
     'item|i=s', 'page|p=s', 'cookie|c=s',
     'not_download|D', 'verbose|v',
+    'term_progress_bar', 
 
     'use_chrome', 
     'with_toc', 'grep_content=s', 'filter_content=s', 'only_poster', 'min_content_word_num=i',
@@ -58,8 +59,9 @@ sub read_option {
   $opt{site} ||= $opt{url} || $opt{file};
   $opt{type} ||= 'html';
   $opt{with_toc}        //= 1;
+  $opt{term_progress_bar}        //= 0;
   $opt{max_process_num} //= 1;
-  $opt{verbose}         //= 1;
+  $opt{verbose}         //= 0;
 
   for my $k (
     qw/writer writer_path writer_regex book book_path book_regex content_path content_regex item_list_path

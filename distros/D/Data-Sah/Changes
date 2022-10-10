@@ -1,3 +1,12 @@
+0.913   2022-09-30  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix escaping mistake in generating type check for
+          duration, which resulted in 00:10 being passed as OK when only
+          00.10 should've been passed.
+
+        - [doc] Some reorganization and formatting tweaks in Data::Sah's POD.
+
+
 0.912   2022-08-20  Released-By: PERLANCAR; Urgency: low
 
         - Note about Module::List::More & Regexp::From::String pp/noncore.

@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-L<Novel::Robot::Packer> pack novel/bbs content to txt / html , etc
+L<Novel::Robot::Packer> pack novel/bbs content to txt / html / raw, etc
 
 小说/贴子 打包引擎
 
@@ -17,8 +17,6 @@ L<Novel::Robot::Packer> pack novel/bbs content to txt / html , etc
     html : html单网页格式
 
     txt  : txt文本格式
-
-    web  : html多网页格式(目录为index.html，每个章节1个html)
 
 =head1 FUNCTION
 

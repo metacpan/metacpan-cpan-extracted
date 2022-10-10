@@ -1513,14 +1513,14 @@ int32_t SPVM__Sys__IO__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t timeout = stack[2].ival;
   
-  int32_t status = poll(fds, nfds, timeout);
+  int32_t ready_count = poll(fds, nfds, timeout);
   
-  if (status == -1) {
+  if (ready_count == -1) {
     env->die(env, stack, "[System Error]poll failed:%s.", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
-  stack[0].ival = status;
+  stack[0].ival = ready_count;
   
   return 0;
 #endif

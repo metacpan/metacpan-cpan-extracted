@@ -5,13 +5,14 @@ author:
   - 'Olaf Kolkman'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  File::Find: '1.05'
-  File::Spec: '0.86'
-  Test::More: '0.47'
+  File::Find: '1.13'
+  File::Spec: '3.29'
+  IO::File: '1.14'
+  Test::More: '0.8'
 configure_requires:
-  ExtUtils::MakeMaker: '6.66'
+  ExtUtils::MakeMaker: '6.48'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,14 +22,14 @@ no_index:
   directory:
     - t
     - inc
-recommends: {}
 requires:
   Carp: '1.1'
   DynaLoader: '1.04'
   Exporter: '5.56'
-  File::Spec: '0.86'
+  File::Spec: '3.29'
+  IO::File: '1.14'
   MIME::Base64: '2.13'
   Net::DNS: '1.08'
-  perl: '5.008008'
-version: '1.19'
+  perl: '5.008009'
+version: '1.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

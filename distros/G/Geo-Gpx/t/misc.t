@@ -6,7 +6,7 @@ use Geo::Gpx;
 
 my $time = time();
 my @wpt  = (
-  {
+  Geo::Gpx::Point->new ( (
     # All standard GPX fields
     lat         => 54.786989,
     lon         => -2.344214,
@@ -32,13 +32,13 @@ my @wpt  = (
     pdop          => 10,
     ageofdgpsdata => 45,
     dgpsid        => 247
-  },
-  {
+  )),
+  Geo::Gpx::Point->new ( (
     # Fewer fields
     lat  => -38.870059,
     lon  => -151.210030,
     name => 'Sydney, AU'
-  }
+  )),
 );
 
 {

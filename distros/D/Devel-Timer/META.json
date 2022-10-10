@@ -45,20 +45,20 @@
    "provides" : {
       "Devel::Timer" : {
          "file" : "lib/Devel/Timer.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/Manwar/Devel-Timer",
+      "homepage" : "https://github.com/manwar/Devel-Timer",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Manwar/Devel-Timer.git",
-         "web" : "https://github.com/Manwar/Devel-Timer"
+         "url" : "https://github.com/manwar/Devel-Timer.git",
+         "web" : "https://github.com/manwar/Devel-Timer"
       }
    },
-   "version" : "0.13",
-   "x_generated_by_perl" : "v5.18.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "version" : "0.14",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

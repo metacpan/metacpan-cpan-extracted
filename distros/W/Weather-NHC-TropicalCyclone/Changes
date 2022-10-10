@@ -1,5 +1,11 @@
 Change Log
 ^^^^^^^^^^
+Version 0.34
+
+Gave Weather::NHC::TropicalCyclone::fetch an 3rd optional
+argument to specify a file in which to save the fetched
+JSON, locally.
+
 Version 0.33
 
 New installs failing because we missed the requirement for

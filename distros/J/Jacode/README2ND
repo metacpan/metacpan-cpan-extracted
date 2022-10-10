@@ -8,24 +8,13 @@ SYNOPSIS
     use lib "$FindBin::Bin/lib";
     use Jacode;
 
-    Jacode::convert(\$line, $OUTPUT_encoding [, $INPUT_encoding [, $option]])
-    Jacode::xxx2yyy(\$line [, $option])
-    Jacode::to($OUTPUT_encoding, $line [, $INPUT_encoding [, $option]])
-    Jacode::jis($line [, $INPUT_encoding [, $option]])
-    Jacode::euc($line [, $INPUT_encoding [, $option]])
-    Jacode::sjis($line [, $INPUT_encoding [, $option]])
-    Jacode::utf8($line [, $INPUT_encoding [, $option]])
-    Jacode::jis_inout($JIS_Kanji_IN, $ASCII_IN)
-    Jacode::get_inout($string)
-    Jacode::cache()
-    Jacode::nocache()
-    Jacode::flushcache()
-    Jacode::flush()
-    Jacode::h2z_xxx(\$line)
-    Jacode::z2h_xxx(\$line)
-    Jacode::tr(\$line, $from, $to [, $option])
-    Jacode::trans($line, $from, $to [, $option])
-    Jacode::init()
+         ($subref, $got_INPUT_encoding) = Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, $option])
+                    $got_INPUT_encoding = Jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, $option])
+                ($esc_DBCS, $esc_ASCII) = Jacode::get_inout($line)
+    ($esc_DBCS_fully, $esc_ASCII_fully) = Jacode::jis_inout([$esc_DBCS [, $esc_ASCII]])
+           ($matched_length, $encoding) = Jacode::getcode(\$line)
+                              $encoding = Jacode::getcode(\$line)
+                                          Jacode::init()
 
 INSTALLATION
 
@@ -54,6 +43,7 @@ SEE ALSO
     Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
     https://metacpan.org/pod/Jacode4e::RoundTrip
 
-    Modern::Open - Autovivification, Autodie, and 3-args open support
-    https://metacpan.org/pod/Modern::Open
-
+    Other Tools
+    https://metacpan.org/release/Perl7-Handy
+    https://metacpan.org/release/UTF8-R2
+    https://metacpan.org/release/mb

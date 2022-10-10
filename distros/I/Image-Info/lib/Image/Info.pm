@@ -13,12 +13,12 @@ package Image::Info;
 # modify it under the same terms as Perl v5.8.8 itself.
 #
 # Previously maintained by Tels - (c) 2006 - 2008.
-# Currently maintained by Slaven Rezic - (c) 2008 - 2019.
+# Currently maintained by Slaven Rezic - (c) 2008 - 2022.
 
 use strict;
 use vars qw($VERSION @EXPORT_OK);
 
-$VERSION = '1.42';
+$VERSION = '1.43';
 
 require Exporter;
 *import = \&Exporter::import;

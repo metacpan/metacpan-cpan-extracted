@@ -1,0 +1,7 @@
+
+1.0     2022-10-04  lichtkind
+-------
+    * = initial release - moved code out of Chart module
+    * & created own distro
+    * ~ small POD fixes
+

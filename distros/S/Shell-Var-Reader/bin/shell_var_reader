@@ -1,0 +1,115 @@
+#!/usr/bin/env perl
+
+my $version = '0.0.1';
+
+use strict;
+use warnings;
+use Shell::Var::Reader;
+use TOML qw(to_toml);
+use JSON qw(to_json);
+use YAML;
+use Getopt::Long qw(:config pass_through);
+use Data::Dumper;
+
+my $to_read;
+my $format = 'json';
+my $pretty=0;
+my $sort=0;
+my $version_flag;
+my $help;
+GetOptions(
+	'r=s'     => \$to_read,
+	'o=s'     => \$format,
+	'p'       => \$pretty,
+	's'       => \$sort,
+	'h'       => \$help,
+	'help'    => \$help,
+	'v'       => \$version_flag,
+	'version' => \$version_flag,
+
+);
+
+if ($version_flag) {
+	print 'shell_var_reader v. ' . $version . "\n";
+	exit 255;
+}
+
+if ($help) {
+	print 'shell_var_reader v. ' . $version . '
+
+-r <file>     File to read/run
+-o <format>   Output formats
+              Default: json
+              Formats: json,yaml,toml,dumper(Data::Dumper)
+-p            Pretty print
+-s            Sort
+
+-h/--help     Help
+-v/--version  Version
+';
+	exit 255;
+}
+
+if (!defined($to_read)) {
+	die('No file specified to read via -r');
+}
+
+if ($format ne 'json' && $format ne 'yaml' && $format ne 'toml' && $format ne 'dumper') {
+	die("'".$format."' is not a recognized format");
+}
+
+my $found_vars=Shell::Var::Reader->read_in($to_read);
+
+# print in the requested format
+if ($format eq 'toml') {
+	print to_toml($found_vars);
+}elsif ($format eq 'yaml') {
+	if (!$sort) {
+		$YAML::SortKeys=0;
+	}
+	print Dump($found_vars);
+}elsif ($format eq 'json') {
+	my $json=JSON->new;
+	$json->canonical($sort);
+	$json->pretty($pretty);
+	print $json->encode($found_vars);
+	if (!$pretty) {
+		print "\n";
+	}
+}elsif ($format eq 'dumper') {
+	print Dumper($found_vars);
+}
+
+exit 0;
+
+=head1 NAME
+
+shell_var_reader - Read/run a shell script and return set variable in it.
+
+=head1 SYNOPSIS
+
+shell_var_reader B<-r> <file> [B<-o> <format>] [B<-p>] [B<-s>]
+
+=head1 FLAGS
+
+=head2 -r <file>
+
+The file to read/run.
+
+=head2 -o <format>
+
+The output format.
+
+Default: json
+
+Formats: json,yaml,toml,dumper(Data::Dumper)
+
+=head2 -p
+
+Pretty print. Not relevant to all outputs.
+
+=head2 -s
+
+Sort. Not relevant to all outputs.
+
+=cut

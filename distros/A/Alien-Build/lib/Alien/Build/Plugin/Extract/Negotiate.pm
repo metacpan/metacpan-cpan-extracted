@@ -10,7 +10,7 @@ use Alien::Build::Plugin::Extract::CommandLine;
 use Alien::Build::Plugin::Extract::Directory;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '2.70'; # VERSION
+our $VERSION = '2.71'; # VERSION
 
 
 has '+format' => 'tar';
@@ -68,6 +68,10 @@ sub pick
   {
     return 'Extract::Directory';
   }
+  elsif($format eq 'f')
+  {
+    return 'Extract::File';
+  }
   else
   {
     die "do not know how to handle format: $format";
@@ -88,7 +92,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 

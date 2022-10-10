@@ -1,16 +1,16 @@
 package App::OperaUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-18'; # DATE
-our $DIST = 'App-OperaUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
 
 use App::BrowserUtils ();
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-07-24'; # DATE
+our $DIST = 'App-OperaUtils'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 our %SPEC;
 
@@ -107,6 +107,7 @@ $SPEC{terminate_opera} = {
     summary => "Terminate  (kill -KILL) Opera",
     args => {
         %App::BrowserUtils::args_common,
+        %App::BrowserUtils::argopt_signal,
     },
 };
 sub terminate_opera {
@@ -158,7 +159,7 @@ App::OperaUtils - Utilities related to the Opera browser
 
 =head1 VERSION
 
-This document describes version 0.006 of App::OperaUtils (from Perl distribution App-OperaUtils), released on 2020-08-18.
+This document describes version 0.007 of App::OperaUtils (from Perl distribution App-OperaUtils), released on 2022-07-24.
 
 =head1 SYNOPSIS
 
@@ -197,7 +198,7 @@ This distribution includes several utilities related to the Opera browser:
 
 Usage:
 
- opera_has_processes(%args) -> [status, msg, payload, meta]
+ opera_has_processes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check whether Opera has processes.
 
@@ -209,7 +210,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -218,12 +219,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -233,7 +234,7 @@ Return value:  (any)
 
 Usage:
 
- opera_is_paused(%args) -> [status, msg, payload, meta]
+ opera_is_paused(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check whether Opera is paused.
 
@@ -247,7 +248,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -256,12 +257,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -271,7 +272,7 @@ Return value:  (any)
 
 Usage:
 
- opera_is_running(%args) -> [status, msg, payload, meta]
+ opera_is_running(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check whether Opera is running.
 
@@ -288,7 +289,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -297,12 +298,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -312,17 +313,18 @@ Return value:  (any)
 
 Usage:
 
- pause_opera(%args) -> [status, msg, payload, meta]
+ pause_opera(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Pause (kill -STOP) Opera.
 
 A modern browser now runs complex web pages and applications. Despite browser's
 power management feature, these pages/tabs on the browser often still eat
-considerable CPU cycles even though they only run in the background. Stopping
+considerable CPU cycles even though they only run in the background. Pausing
 (kill -STOP) the browser processes is a simple and effective way to stop CPU
-eating on Unix. It can be performed whenever you are not using your browser for
-a little while, e.g. when you are typing on an editor or watching a movie. When
-you want to use your browser again, simply unpause it.
+eating on Unix and prolong your laptop battery life. It can be performed
+whenever you are not using your browser for a little while, e.g. when you are
+typing on an editor or watching a movie. When you want to use your browser
+again, simply unpause (kill -CONT) it.
 
 This function is not exported.
 
@@ -330,7 +332,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -339,12 +341,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -354,7 +356,7 @@ Return value:  (any)
 
 Usage:
 
- ps_opera(%args) -> [status, msg, payload, meta]
+ ps_opera(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List Opera processes.
 
@@ -364,7 +366,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -373,12 +375,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -388,7 +390,7 @@ Return value:  (any)
 
 Usage:
 
- restart_opera(%args) -> [status, msg, payload, meta]
+ restart_opera(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Restart opera.
 
@@ -420,12 +422,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -435,7 +437,7 @@ Return value:  (any)
 
 Usage:
 
- start_opera(%args) -> [status, msg, payload, meta]
+ start_opera(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Start opera if not already started.
 
@@ -467,12 +469,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -482,7 +484,7 @@ Return value:  (any)
 
 Usage:
 
- terminate_opera(%args) -> [status, msg, payload, meta]
+ terminate_opera(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Terminate  (kill -KILL) Opera.
 
@@ -492,7 +494,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -501,12 +503,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -516,7 +518,7 @@ Return value:  (any)
 
 Usage:
 
- unpause_opera(%args) -> [status, msg, payload, meta]
+ unpause_opera(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Unpause (resume, continue, kill -CONT) Opera.
 
@@ -526,7 +528,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -535,12 +537,12 @@ Kill browser processes that belong to certain user(s) only.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -551,14 +553,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-OperaU
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-OperaUtils>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OperaUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -577,11 +571,36 @@ L<App::BrowserUtils>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OperaUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

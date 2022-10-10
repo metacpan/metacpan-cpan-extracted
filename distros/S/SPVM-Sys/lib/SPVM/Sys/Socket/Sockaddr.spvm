@@ -1,5 +1,6 @@
 class Sys::Socket::Sockaddr : pointer_t {
   interface Sys::Socket::Sockaddr::Interface;
+  interface Cloneable;
   
   method has_interfaces : int () { return 1; }
   
@@ -13,5 +14,15 @@ class Sys::Socket::Sockaddr : pointer_t {
     my $size = $self->(Sys::Socket::Sockaddr::Interface)->sizeof;
     
     return $size;
+  }
+  
+  method clone : Sys::Socket::Sockaddr () {
+    warn("OOO");
+    
+    my $clone = (Sys::Socket::Sockaddr)$self->(Cloneable)->clone;
+
+    warn("PPP");
+    
+    return $clone;
   }
 }

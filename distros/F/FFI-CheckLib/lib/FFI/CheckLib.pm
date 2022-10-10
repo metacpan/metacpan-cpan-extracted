@@ -5,6 +5,7 @@ use warnings;
 use File::Spec;
 use List::Util 1.33 qw( any );
 use Carp qw( croak carp );
+use Env qw( @FFI_CHECKLIB_PATH );
 use base qw( Exporter );
 
 our @EXPORT = qw(
@@ -23,13 +24,45 @@ our @EXPORT_OK = qw(
 );
 
 # ABSTRACT: Check that a library is available for FFI
-our $VERSION = '0.30'; # VERSION
+our $VERSION = '0.31'; # VERSION
 
 
 our $system_path = [];
 our $os ||= $^O;
 my $try_ld_on_text = 0;
 
+sub _homebrew_lib_path {
+  require File::Which;
+  return undef unless File::Which::which('brew');
+  chomp(my $brew_path = (qx`brew --prefix`)[0]);
+  return "$brew_path/lib";
+}
+
+sub _macports_lib_path {
+  require File::Which;
+  my $port_path = File::Which::which('port');
+  return undef unless $port_path;
+  $port_path =~ s|bin/port|lib|;
+  return $port_path;
+}
+
+sub _darwin_extra_paths {
+  my $pkg_managers = lc( $ENV{FFI_CHECKLIB_PACKAGE} || 'homebrew,macports' );
+  return () if $pkg_managers eq 'none';
+  my $supported_managers = {
+      homebrew => \&_homebrew_lib_path,
+      macports => \&_macports_lib_path
+  };
+  my @extra_paths = ();
+  foreach my $pkg_manager (split( /,/, $pkg_managers )) {
+    if (my $lib_path = $supported_managers->{$pkg_manager}()) {
+      push @extra_paths, $lib_path;
+    }
+  }
+  return @extra_paths;
+}
+
+my @extra_paths = ();
 if($os eq 'MSWin32' || $os eq 'msys')
 {
   $system_path = eval {
@@ -47,6 +80,7 @@ else
     \@DynaLoader::dl_library_path;
   };
   die $@ if $@;
+  @extra_paths = _darwin_extra_paths() if $os eq 'darwin';
 }
 
 our $pattern = [ qr{^lib(.*?)\.so(?:\.([0-9]+(?:\.[0-9]+)*))?$} ];
@@ -151,9 +185,37 @@ sub find_lib
 
   my @path = @{ $args{libpath} };
   @path = map { _recurse($_) } @path if $recursive;
-  push @path, grep { defined } defined $args{systempath}
-    ? @{ $args{systempath} }
-    : @$system_path;
+
+  if(defined $args{systempath})
+  {
+    push @path, grep { defined } @{ $args{systempath} }
+  }
+  else
+  {
+    # This is a little convaluted, but:
+    # 1. These are modifications of what we consider the "system" path
+    #    if systempath isn't explicitly passed in as systempath
+    # 2. FFI_CHECKLIB_PATH is considered an authortative modification
+    #    so it goes first and overrides FFI_CHECKLIB_PACKAGE
+    # 3. otherwise FFI_CHECKLIB_PACKAGE does its thing and goes on
+    #    the end because homebrew does a good job of not replacing
+    #    anything in the system by default.
+    # 4. We finally add what we consider the "system" path to the end of
+    #    the search path so that libpath will be searched first.
+    my @system_path = @$system_path;
+    if($ENV{FFI_CHECKLIB_PATH})
+    {
+      @system_path = (@FFI_CHECKLIB_PATH, @system_path);
+    }
+    else
+    {
+      foreach my $extra_path (@extra_paths)
+      {
+        push @path, $extra_path unless any { $_ eq $extra_path } @path;
+      }
+    }
+    push @path, @system_path;
+  }
 
   my $any = any { $_ eq '*' } @{ $args{lib} };
   my %missing = map { $_ => 1 } @{ $args{lib} };
@@ -406,7 +468,7 @@ FFI::CheckLib - Check that a library is available for FFI
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -646,6 +708,51 @@ probably do some careful consideration before you do so.
 
 This function is not exportable, even on request.
 
+=head1 ENVIRONMENT
+
+L<FFI::CheckLib> responds to these environment variables:
+
+=over 4
+
+=item FFI_CHECKLIB_PACKAGE
+
+On macOS platforms with L<Homebrew|http://brew.sh> and/or L<MacPorts|https://www.macports.org>
+installed, their corresponding lib paths will be automatically appended to C<$system_path>.
+In case of having both managers installed, Homebrew will appear before.
+
+This behaviour can be overridden using the environment variable C<FFI_CHECKLIB_PACKAGE>.
+
+Allowed values are:
+
+- C<none>: Won't use either Homebrew's path nor MacPorts
+- C<homebrew>: Will append C<$(brew --prefix)/lib> to the system paths
+- C<macports>: Will append C<port>'s default lib path
+
+A comma separated list is also valid:
+
+ export FFI_CHECKLIB_PACKAGE=macports,homebrew
+
+Order matters. So in this example, MacPorts' lib path appears before Homebrew's path.
+
+=item FFI_CHECKLIB_PATH
+
+List of directories that will be considered by L<FFI::CheckLib> as additional "system
+directories".  They will be searched before other system directories but after C<libpath>.
+The variable is colon separated on Unix and semicolon separated on Windows.  If you
+use this variable, C<FFI_CHECKLIB_PACKAGE> will be ignored.
+
+=item PATH
+
+On Windows the C<PATH> environment variable will be used as a search path for
+libraries.
+
+=back
+
+On some operating systems C<LD_LIBRARY_PATH>, C<DYLD_LIBRARY_PATH>,
+C<DYLD_FALLBACK_LIBRARY_PATH> or others I<may> be used as part of the search
+for dynamic libraries and I<may> be used (indirectly) by L<FFI::CheckLib>
+as well.
+
 =head1 FAQ
 
 =over 4
@@ -736,6 +843,8 @@ Petr Písař (ppisar)
 Michael R. Davis (MRDVT)
 
 Shawn Laffan (SLAFFAN)
+
+Carlos D. Álvaro (cdalvaro)
 
 =head1 COPYRIGHT AND LICENSE
 

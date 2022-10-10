@@ -25,6 +25,12 @@ my $builder = Module::Build->new(
         'Role::Tiny'      => '2.002004',
     },
     add_to_cleanup => ['Pod-Query-*'],
+    meta_merge     => {
+        resources => {
+            bugtracker => 'https://github.com/poti1/pod-query/issues',
+            repository => 'https://github.com/poti1/pod-query',
+        },
+    },
 );
 
 $builder->create_build_script();

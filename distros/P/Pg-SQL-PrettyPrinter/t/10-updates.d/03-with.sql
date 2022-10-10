@@ -1,0 +1,1 @@
+UPDATE a AS al SET b = x.w FROM whatever AS x WHERE al.id = x.id

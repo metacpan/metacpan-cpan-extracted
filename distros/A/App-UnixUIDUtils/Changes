@@ -1,3 +1,9 @@
+0.002   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Replaca old schema name unix::local_{uid,username,gid,groupname}
+          with unix::{uid,username,gid,groupname}::exists.
+
+
 0.001   2020-06-13  Released-By: PERLANCAR
 
         - First release, mainly to test Sah-Schemas-Unix.

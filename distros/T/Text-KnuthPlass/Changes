@@ -1,4 +1,66 @@
+2022-10-03  1.07  (Phil M Perry)
+
+  lib/Text/KnuthPlass.xs, lib/Text/KnuthPlass.pm, t/01-nodes.t
+   Fix mishandling of line length array in XS code (was only looking at first 
+    two elements). Remove elements as used, and return to application.
+
+  examples/text/KP.pl (new), examples/text/Flatland.pl (new), 
+    examples/text/Triangle.pl (new), MANIFEST, tools/3_examples.pl
+   Add more examples, this time for text file (.txt) output (constant width).
+
+  examples/PDF/Flatland.pl (new), examples/PDF/Triangle.pl (new),
+    examples/PDF/KP.pl, MANIFEST, tools/3_examples.pl
+   Add more examples of PDF document creation, and update KP example.
+
+  lib/Text/KnuthPlass.pm, lib/Text/KnuthPlass.xs, examples/*, t/01-nodes.t
+   Pass paragraph indentation (or negative outdent amount) to KP algorithm, so
+    can start even the first line of paragraph at same x value every time. 
+    Allow per-paragraph setting of indentation via typeset() method and the new
+    line_lengths() method. For compatibility with older applications, the
+    default indentation is 0.
+
+  lib/Text/KnuthPlass.pm, README.md
+   Add flag to ignore XS code (whether or not successfully installed) and just 
+    run pure Perl. This is good for debugging, watching paint dry, or torturing
+    your users! In other words, pure Perl is quite slow.
+
+  lib/Text/KnuthPlass.pm 
+   Add flag for minimum 3 letter suffix in hyphenation (not sure Text::Hyphen
+    is obeying it).
+
+  META.json, MANIFEST add META.json
+
+  examples/PDF/KP.pl sample put all three texts on one page
+
+  LICENSE, MANIFEST  add separate LICENSE file
+
+  META.yml  add minimum Perl version (5.8.1)
+
+  examples/PDF/KP.pl, examples/resources/, tools/3_examples.pl, MANIFEST,
+    README.md
+   Move PDF examples to own subdirectory, leaving room in examples/ for
+    other language examples (such as plain text). Common resources directory.
+
+  tools/*.pl, lib/Text/KnuthPlass.pm
+   Change "my $LAST_UPDATE" to "our $LAST_UPDATE" so info available to a
+    program.
+
+  README.md, lib/Text/KnuthPlass.pm
+   2022 copyright
+
+  lib/Text/KnuthPlass.xs 
+   Fix compiler warnings (#8).
+
+  In examples, change lead() to leading() per PDF::API2 and PDF::Builder.
+
+  Update build process to ensure that all human-readable files are "unix"
+   format and not MS-DOS (CRLF) format on line-ends. Some non-CPAN packagers
+   are complaining about the mixed line-end formats.
+
 2021-02-12  1.06  (Phil M Perry)
+
+  lib/Text/KnuthPlass.pm, lib/Text/KnuthPlass.xs
+   Minor fix to properly index line length list on longer paragraphs.
 
   Build.PL
    Add resources for repository and bugtracker (point to GitHub).

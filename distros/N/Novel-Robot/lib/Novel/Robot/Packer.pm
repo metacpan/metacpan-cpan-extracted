@@ -1,11 +1,11 @@
-# ABSTRACT: pack novel/bbs content to html / txt / web , etc
+# ABSTRACT: pack novel/bbs content to html / txt / raw , etc
 package  Novel::Robot::Packer;
 use strict;
 use warnings;
 use Encode::Locale;
 use Encode;
 
-our $VERSION = 0.21;
+#our $VERSION = 0.21;
 
 sub new {
     my ( $self, %opt ) = @_;
@@ -55,6 +55,6 @@ sub format_default_filename {
 
 =head1 NAME
 
-Novel::Robot::Packer - Pack novel/bbs content to html / txt / web , etc
+Novel::Robot::Packer - Pack novel/bbs content to html / txt / raw, etc
 
 =cut

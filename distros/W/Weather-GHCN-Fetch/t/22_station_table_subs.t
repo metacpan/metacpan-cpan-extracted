@@ -11,7 +11,7 @@ use Weather::GHCN::StationTable;
 
 package Weather::GHCN::StationTable;
 
-use Test::More tests => 10;
+use Test::More tests => 9;
 use Test::Exception;
 
 use Const::Fast;
@@ -61,6 +61,7 @@ subtest 'undef-safe numeric functions' => sub {
 
 subtest 'date functions' => sub {
 
+    is _days_in_year(1889), 365, '_days_in_year 1889';
     is _days_in_year(1900), 365, '_days_in_year 1900';
     is _days_in_year(1901), 365, '_days_in_year 1901';
     is _days_in_year(1904), 366, '_days_in_year 1904';
@@ -68,6 +69,7 @@ subtest 'date functions' => sub {
     is _days_in_year(2004), 366, '_days_in_year 2004';
     is _days_in_year(2005), 365, '_days_in_year 2005';
 
+    is _days_in_month(1889, 10),31, '_days_in_month 1889-10';
     is _days_in_month(2019, 1), 31, '_days_in_month 2019-01';
     is _days_in_month(2019, 2), 28, '_days_in_month 2019-02';
     is _days_in_month(2019, 3), 31, '_days_in_month 2019-03';
@@ -82,12 +84,15 @@ subtest 'date functions' => sub {
     is _days_in_month(2019,12), 31, '_days_in_month 2019-12';
     is _days_in_month(2020, 2), 29, '_days_in_month 2020-02';
 
-    is _is_leap_year(1900), 0, '_is_leap_year 1900';
-    is _is_leap_year(1901), 0, '_is_leap_year 1901';
-    is _is_leap_year(1904), 1, '_is_leap_year 1904';
-    is _is_leap_year(2000), 1, '_is_leap_year 2000';
-    is _is_leap_year(2004), 1, '_is_leap_year 2004';
-    is _is_leap_year(2005), 0, '_is_leap_year 2005';
+    is _is_leap_year(1600), 1, '_is_leap_year 1600 is';
+    is _is_leap_year(1889), 0, '_is_leap_year 1889 isnt';
+    is _is_leap_year(1900), 0, '_is_leap_year 1900 isnt';
+    is _is_leap_year(1901), 0, '_is_leap_year 1901 isnt';
+    is _is_leap_year(1904), 1, '_is_leap_year 1904 is';
+    is _is_leap_year(2000), 1, '_is_leap_year 2000 is';
+    is _is_leap_year(2004), 1, '_is_leap_year 2004 is';
+    is _is_leap_year(2005), 0, '_is_leap_year 2005 isnt';
+    is _is_leap_year(2100), 0, '_is_leap_year 2100 isnt';
 
     is _seasonal_qtr(2018,11), 'Q4', '_seasonal_qtr 2018-11';
     is _seasonal_qtr(2018,12), 'Q1', '_seasonal_qtr 2018-12';
@@ -106,28 +111,28 @@ subtest 'date functions' => sub {
     is _seasonal_decade(2010,01), '2010', '_seasonal_decade 2010-01';
 };
 
-subtest '_get_config_options' => sub {
+subtest '_get_profile_options' => sub {
 
-    is_deeply _get_config_options(undef), {}, '_get_config_options(undef) returns {}';
+    is_deeply _get_profile_options(undef), {}, '_get_profile_options(undef) returns {}';
 
     my $href;
     my @got_keys;
     my @expected_keys;
-    
-    if ( _get_default_config_filespec() ) {
-        $href = _get_config_options("");
-        is ref $href, 'HASH', '_get_config_options("") loaded a default config';
+
+    if ( _get_profile_filespec('') ) {
+        $href = _get_profile_options("");
+        is ref $href, 'HASH', '_get_profile_options("") loaded a default profile';
     } else {
-        ok 1, 'no default config file found';
+        ok 1, 'no default profile file found';
     }
-    
+
 
     my $fname = $FindBin::Bin . '/ghcn_fetch.yaml';
-    $href = _get_config_options($fname);
+    $href = _get_profile_options($fname);
     @got_keys = sort keys $href->%*;
 
-    @expected_keys = qw(aliases cache);
-    is_deeply \@got_keys, \@expected_keys, "_get_config_options($fname)";
+    @expected_keys = qw(aliases);
+    is_deeply \@got_keys, \@expected_keys, "_get_profile_options($fname)";
 };
 
 subtest '_get_kml_color' => sub {
@@ -145,7 +150,7 @@ subtest '_get_kml_color' => sub {
 
 subtest '_match_location' => sub {
     my ($stn_id, $stn_name, $pattern);
-    
+
     ($stn_id, $stn_name, $pattern) = ('CA006105887', 'irrelevant', 'CA006105887');
     is _match_location($stn_id, $stn_name, $pattern), $TRUE, '_match_location: stn_id matched';
 
@@ -173,7 +178,7 @@ subtest '_parse_missing_text' => sub {
     my %got;
     my $months_aref;
     my $mmdd_aref;
-    
+
     my $_month_names = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct';
     ($months_aref, $mmdd_aref) = _parse_missing_text($_month_names);
 
@@ -181,7 +186,7 @@ subtest '_parse_missing_text' => sub {
     is_deeply $mmdd_aref,   [],      '_parse_missing_text: month names Jan-Oct - 2nd retval';
 
     my $day_ranges = 'May[2] Oct[3,11] Nov[1] Dec[2,5]';
-    
+
     ($months_aref, $mmdd_aref) = _parse_missing_text($day_ranges);
 
     my $expected = [
@@ -206,10 +211,10 @@ subtest '_month_names' => sub {
     is _month_names('alpha'), '???', '_month_names for invalid mm - string "alpha"';
     is _month_names(0), '???', '_month_names for invalid mm - zero (0)';
     is _month_names(13), '???', '_month_names for invalid mm - thirteen (13)';
-    
+
     @mm = ();
     is scalar _month_names(@mm), 0, '_month_names() returns ()';
-    
+
 };
 
 subtest '_memsize' => sub {
@@ -225,7 +230,7 @@ subtest '_qflags_as_string' => sub {
         I => 1,
         S => 5,
     };
-    
+
     my $s = _qflags_as_string( $qflags_href );
     is $s, 'I:1, N:9, S:5', '_qflags_as_string with hashref';
 
@@ -236,17 +241,3 @@ subtest '_qflags_as_string' => sub {
     is $s, $EMPTY, '_qflags_as_string with empty hash';
 };
 
-subtest 'time functions' => sub {
-
-    like _now(),
-         qr{ \A \d{4}-\d{2}-\d{2} \s \d{2}:\d{2}:\d{2} \Z }xms,
-         '_now() as scalar';
-    my @now = _now();
-    is @now, 6, '_now() as list (count)';
-
-    like _today(), 
-        qr{ \A \d{4}-\d{2}-\d{2} \Z }xms, 
-        '_today() as scalar';
-    my @today = _today();
-    is @today, 3, '_today as list (count)';
-};

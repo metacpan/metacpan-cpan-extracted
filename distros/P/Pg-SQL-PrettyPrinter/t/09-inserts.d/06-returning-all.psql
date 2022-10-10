@@ -1,0 +1,4 @@
+INSERT INTO t
+    VALUES
+        ( 'a' )
+    RETURNING *

@@ -2,7 +2,7 @@
 package Sah::SchemaR::unix::dirname;
 
 our $DATE = '2022-07-24'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our $rschema = do{my$var={base=>"dirname::unix",clsets_after_base=>[{description=>"\nThis is just a convenient alias for dirname::unix.\n\n",examples=>[],summary=>"Directory name (with optional path) on a Unix system"}],clsets_after_type=>[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"/"},{valid=>1,value=>"foo/bar"},{valid=>1,validated_value=>"foo/bar",value=>"foo//bar"},{summary=>"Path element too long",valid=>0,value=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{summary=>"Contains null character",valid=>0,value=>"foo\0"}],match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem directory name on a Unix system","x.completion"=>["dirname"]},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","dirname::unix"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::unix::dirname - Directory name (with optional path) on a Unix syst
 
 =head1 VERSION
 
-This document describes version 0.019 of Sah::SchemaR::unix::dirname (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.020 of Sah::SchemaR::unix::dirname (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,18 @@
+0.020   2022-10-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Perinci::Sub::To::CLIDocData (0.301) to
+          improve usage line (link to apppropriate Sah::Schema::* module).
+
+
+0.019   2022-10-07  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention App::BraveUtils.
+
+
 0.018   2022-07-24  Released-By: PERLANCAR; Urgency: medium
 
         - Update to App::BrowserUtils 0.017 (updated Sah schema name).

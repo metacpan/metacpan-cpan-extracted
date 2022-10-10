@@ -2,6 +2,7 @@ use v5.12;
 use warnings;
 use FindBin;
 use File::Spec;
+
 # parameter of a drawing
 
 package App::GUI::Harmonograph::Settings;

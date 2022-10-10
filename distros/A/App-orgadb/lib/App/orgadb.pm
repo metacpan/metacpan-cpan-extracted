@@ -8,9 +8,9 @@ use Log::ger;
 use App::orgadb::Common;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-26'; # DATE
+our $DATE = '2022-10-09'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our %SPEC;
 
@@ -41,19 +41,34 @@ sub _select_single {
 
     my $res = [200, "OK", ""];
 
-    my $formatter;
-    if ($args{formatters} && @{ $args{formatters} }) {
-        my @filter_names;
+    my @parsed_default_formatter_rules;
+
+    my ($formatter, @filter_names);
+  SET_FORMATTERS:
+    {
+        last if $args{no_formatters};
+        last unless $args{formatters} && @{ $args{formatters} };
         for my $f (@{ $args{formatters} }) {
             if ($f =~ /\A\[/) {
                 require JSON::PP;
                 $f = JSON::PP::decode_json($f);
+            } else {
+                if ($f =~ /(.+)=(.*)/) {
+                    my ($modname, $args) = ($1, $2);
+                    # normalize / to :: in the module name part
+                    $modname =~ s!/!::!g;
+                    $f = [$modname, { split /,/, $args }];
+                } else {
+                    # normalize / to ::
+                    $f =~ s!/!::!g;
+                }
             }
             push @filter_names, $f;
         }
         require Data::Sah::Filter;
         $formatter = Data::Sah::Filter::gen_filter(
             filter_names => \@filter_names,
+            return_type => 'str_errmsg+val',
         );
     }
 
@@ -211,21 +226,100 @@ sub _select_single {
                 $res->[2] .= $str;
             } elsif (@matching_fields) {
                 for my $field (@matching_fields) {
-
+                    my $field_name0 = $field->desc_term->text;
                     unless ($args{hide_field_name}) {
                         my $field_name = '';
                         $field_name = _highlight(
                             $clrtheme_obj,
                             $re_field,
-                            $field->bullet . ' ' . $field->desc_term->text,
+                            $field->bullet . ' ' . $field_name0,
                         ) . " ::";
                         $res->[2] .= $field_name;
                     }
 
-                    my $field_value = $field->children_as_string;
-                    $field_value =~ s/\A\s+//s if $args{hide_field_name};
-                    $field_value = $formatter->($field_value) if $formatter;
-                    $res->[2] .= $field_value;
+                    my ($default_formatter);
+                  SET_DEFAULT_FORMATTERS:
+                    {
+                        last if $args{no_formatters};
+                        last if $formatter;
+                        last unless $args{default_formatter_rules} && @{ $args{default_formatter_rules} };
+                        unless (@parsed_default_formatter_rules) {
+                            for my $r0 (@{ $args{default_formatter_rules} }) {
+                                my $r;
+                                if (!ref($r0) && $r0 =~ /\A\{/) {
+                                    require JSON::PP;
+                                    $r = JSON::PP::decode_json($r0);
+                                } else {
+                                    $r = {%$r0};
+                                }
+
+                                # precompile regexes
+                                require Regexp::From::String;
+                                if (defined $r->{field_name_matches}) {
+                                    $r->{field_name_matches} = Regexp::From::String::str_to_re({case_insensitive=>1}, $r->{field_name_matches});
+                                }
+
+                                if ($r->{formatters} && @{ $r->{formatters} }) {
+                                    my @filter_names2;
+                                    for my $f (@{ $r->{formatters} }) {
+                                        if ($f =~ /\A\[/) {
+                                            require JSON::PP;
+                                            $f = JSON::PP::decode_json($f);
+                                        } else {
+                                            if ($f =~ /(.+)=(.*)/) {
+                                                my ($modname, $args) = ($1, $2);
+                                                # normalize / to :: in the module name part
+                                                $modname =~ s!/!::!g;
+                                                $f = [$modname, { split /,/, $args }];
+                                            } else {
+                                                # normalize / to ::
+                                                $f =~ s!/!::!g;
+                                            }
+                                        }
+                                        push @filter_names2, $f;
+                                    }
+                                    require Data::Sah::Filter;
+                                    $r->{formatter} = Data::Sah::Filter::gen_filter(
+                                        filter_names => \@filter_names2,
+                                        return_type => 'str_errmsg+val',
+                                    );
+                                }
+                                push @parsed_default_formatter_rules, $r;
+                            }
+                            #log_error "parsed_default_formatter_rules=%s", \@parsed_default_formatter_rules;
+                        } # set @parsed_default_formatter_rules
+
+                        # do the filtering
+                        my $i = -1;
+                      RULE:
+                        for my $r (@parsed_default_formatter_rules) {
+                            $i++;
+                            my $matches = 1;
+                            if (defined $r->{field_name_matches}) {
+                                $field_name0 =~ $r->{field_name_matches} or do {
+                                    $matches = 0;
+                                    log_trace "Skipping default_formatter_rules[%d]: field_name_matches %s doesn't match %s", $i, $r->{field_name_matches}, $field_name0;
+                                    next RULE;
+                                };
+                            }
+                            log_trace "Using formatters from default_formatter_rules[%d] (%s) for field name %s", $i, $r->{formatters}, $field_name0;
+                            $default_formatter = $r->{formatter};
+                            last RULE;
+                        }
+                    } # SET_DEFAULT_FORMATTERS
+
+                    my $field_value0 = $field->children_as_string;
+                    my ($prefix, $field_value, $suffix) = $field_value0 =~ /\A(\s+)(.*?)(\s*)\z/s;
+                    if ($formatter || $default_formatter) {
+                        my ($ferr, $fres) = @{ ($formatter || $default_formatter)->($field_value) };
+                        if ($ferr) {
+                            log_warn "Formatting error: field value=%s, formatters=%s, errmsg=%s", $field_value, \@filter_names, $ferr;
+                            $field_value = "$field_value # CAN'T FORMAT: $ferr";
+                        } else {
+                            $field_value = $fres;
+                        }
+                    }
+                    $res->[2] .= ($args{hide_field_name} ? "" : $prefix) . $field_value . $suffix;
                 }
             }
         }
@@ -337,7 +431,7 @@ App::orgadb - An opinionated Org addressbook toolset
 
 =head1 VERSION
 
-This document describes version 0.008 of App::orgadb (from Perl distribution App-orgadb), released on 2022-09-26.
+This document describes version 0.010 of App::orgadb (from Perl distribution App-orgadb), released on 2022-10-09.
 
 =head1 SYNOPSIS
 
@@ -371,6 +465,14 @@ Whether to use color.
 =item * B<count> => I<true>
 
 Return just the number of matching entries instead of showing them.
+
+=item * B<default_formatter_rules> => I<array[any]>
+
+Specify conditional default formatters. This is for convenience and best
+specified in the configuration as opposed to on the command-line option.
+An example:
+
+ default_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i","formatters":[ ["Phone::format_phone_idn"] ]}
 
 =item * B<detail> => I<bool>
 
@@ -421,6 +523,9 @@ If formatter name begins with C<[> character, it will be parsed as JSON. Example
 
  ['Str::remove_comment', {'style':'cpp'}]
 
+Overrides C<--default_formatter_rule> but overridden by the C<--no-formatters>
+(C<--raw-field-values>, C<-F>) option.
+
 =item * B<hide_category> => I<true>
 
 Do not show category.
@@ -432,6 +537,10 @@ Do not show entry headline.
 =item * B<hide_field_name> => I<true>
 
 Do not show field names, just show field values.
+
+=item * B<no_formatters> => I<true>
+
+Do not apply any formatters to field value (overrides --formatter option).
 
 =item * B<num_entries> => I<uint>
 
@@ -470,6 +579,12 @@ Source repository is at L<https://github.com/perlancar/perl-App-orgadb>.
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 CONTRIBUTING
 

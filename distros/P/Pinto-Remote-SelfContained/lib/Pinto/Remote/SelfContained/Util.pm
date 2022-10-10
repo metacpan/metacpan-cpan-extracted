@@ -33,7 +33,20 @@ sub mask_uri_passwords {
 }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Util
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Util
 
 =head1 NAME
 
@@ -41,7 +54,7 @@ Pinto::Remote::SelfContained::Util - various utility functions
 
 =head1 AUTHOR
 
-Aaron Crane, E<lt>arc@cpan.orgE<gt>
+Aaron Crane E<lt>arc@cpan.orgE<gt>, Brad Lhotsky E<lt>brad@divisionbyzero.netE<gt>
 
 =head1 COPYRIGHT
 

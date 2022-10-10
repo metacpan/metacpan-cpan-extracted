@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Game-Ninja.t
+lib/Game/Ninja.pm

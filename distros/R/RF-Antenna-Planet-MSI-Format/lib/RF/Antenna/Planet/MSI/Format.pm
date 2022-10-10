@@ -5,7 +5,7 @@ use Scalar::Util qw();
 use Tie::IxHash qw{};
 use Path::Class qw{};
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -249,13 +249,13 @@ Please note that the format uses equal spacing of data points by angle.  Most fi
 =cut
 
 sub horizontal {
-  my $self = shift;
+  my $self              = shift;
   $self->{'horizontal'} = shift if @_;
   return $self->{'horizontal'};
 }
 
 sub vertical {
-  my $self = shift;
+  my $self            = shift;
   $self->{'vertical'} = shift if @_;
   return $self->{'vertical'};
 }
@@ -322,7 +322,7 @@ Attempts to read and parse the string header value and return the frequency as a
 =cut
 
 sub frequency_mhz {
-  my $self = shift;
+  my $self   = shift;
   my $string = $self->frequency;
   if (Scalar::Util::looks_like_number($string)) {
     return $string + 0; #convert from string to number
@@ -362,14 +362,18 @@ Attempts to read and parse the string header value and return the gain as a numb
 =cut
 
 sub gain_dbd {
-  my $self = shift;
+  my $self   = shift;
   my $string = $self->gain;
   if (Scalar::Util::looks_like_number($string)) {
     return $string + 0; #dBd is the default UOM
-  } elsif ($string =~ m/([0-9\.]+)\s*dBd/i) {
-    return $1 + 0;
-  } elsif ($string =~ m/([0-9\.]+)\s*dBi/i) {
-    return ($1 + 0) - 2.14;
+  } elsif ($string =~ m/dBd/i) {
+    if ($string =~ m/([0-9]*\.?[0-9]+)/) { #0.123 | .123 | 123
+      return $1 + 0;
+    }
+  } elsif ($string =~ m/dBi/i) {
+    if ($string =~ m/([0-9]*\.?[0-9]+)/) {
+      return ($1 + 0) - 2.14;
+    }
   } else {
     return undef;
   }

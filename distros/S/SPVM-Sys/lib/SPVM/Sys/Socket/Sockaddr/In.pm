@@ -54,11 +54,11 @@ Gets C<sin_family>.
 
 Sets C<sin_family>.
 
-=head2 sin_addr
+=head2 copy_sin_addr
 
-  method sin_addr : Sys::Socket::In_addr ();
+  method copy_sin_addr : Sys::Socket::In_addr ();
 
-Gets C<sin_addr>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
+Copies C<sin_addr>. This is a L<Sys::Socket::In_addr|SPVM::Sys::Socket::In_addr> object.
 
 =head2 set_sin_addr
 
@@ -83,6 +83,12 @@ Sets C<sin_port>.
   method sizeof : int ()
 
 The size of C<struct sockaddr_in>.
+
+=head2 clone
+
+  method clone : Sys::Socket::Sockaddr::In () {
+
+Clones this object.
 
 =head1 Copyright & License
 

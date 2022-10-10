@@ -8,7 +8,7 @@ Weather::GHCN::Common - common functions for GHCN scripts and modules
 
 =head1 VERSION
 
-version v0.0.003
+version v0.0.005
 
 =head1 SYNOPSIS
 
@@ -27,17 +27,20 @@ Weather::GHCN::Station, and Weather::GHCN::StationTable.
 
 =cut
 
+## no critic [ValuesAndExpressions::ProhibitVersionStrings]
+## no critic [TestingAndDebugging::RequireUseWarnings]
+## no critic [ProhibitSubroutinePrototypes]
+## no critic [References::ProhibitDoubleSigils]
+
 use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::Common;
 
-our $VERSION = 'v0.0.003';
+our $VERSION = 'v0.0.005';
 
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
-
-## no critic [ProhibitSubroutinePrototypes]
 
 use Exporter;
 use parent 'Exporter';
@@ -104,7 +107,7 @@ or a perl list of numbers (e.g. 1,7,12,20..25) or a mix of both.
 
 =cut
 
-sub rng_new (@args) {   ## no critic [RequireFinalReturn]
+sub rng_new (@args) {
     my $s;
 
     # treat undef as an empty range

@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+#
+# This file is part of Alien-Bazel
+#
+# This software is Copyright (c) 2022 by Auto-Parallel Technologies, Inc.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+use alienfile;
+
+use strict;
+use warnings;
+our $VERSION = 0.013_000;
+
+use Data::Dumper;
+use English qw(-no_match_vars);  # for $OSNAME
+use Time::HiRes qw(time);  # for performance timing
+
+use constant DEBUG_BAZEL_BOOTSTRAP =>
+    exists $ENV{ALIEN_BAZEL_DEBUG_BAZEL_BOOTSTRAP}
+    ? $ENV{ALIEN_BAZEL_DEBUG_BAZEL_BOOTSTRAP}
+    : 0;
+
+use lib 'lib';
+use Alien::Bazel::Util;
+
+# check if the operating system already has Bazel installed
+plugin 'Probe::CommandLine' => (
+    command => 'bazel',
+    args    => [ '--version' ],
+    match   => qr/bazel/,
+    version => qr/bazel ([0-9\.]+)/,
+);
+
+# if the operating system does not have Bazel, then compile from source
+share {
+    requires 'Path::Tiny';
+    requires 'File::Which';
+    requires 'Alien::Build::Plugin::Download::GitHub', '0.09';
+
+    my $time_start = time();
+    print {*STDERR} '<<< DEBUG >>> have $time_start = ', $time_start, ' seconds', "\n";
+
+    # START HERE, NEED ANSWER: how to handle prerequisites???
+    # START HERE, NEED ANSWER: how to handle prerequisites???
+    # START HERE, NEED ANSWER: how to handle prerequisites???
+
+    # must have prerequisites to compile from source
+    # https://bazel.build/install/compile-source#bootstrap-bazel
+    # $ sudo apt-get install build-essential openjdk-11-jdk zip unzip python2
+#    requires Alien::Bash;
+#    requires Alien::ZipUnzip;
+#    requires 'Alien::unzip';
+#    requires Alien::C++Toolchain;
+#    requires Alien::JDK;  # v11
+#    requires Alien::Python;  # v2 or v3
+
+    # https://github.com/bazelbuild/bazel/releases
+    # Bazel bootstrap archive is always "zip"; the "tar.gz" archives are NOT
+    # bootstrap capable
+    plugin 'Download::GitHub' => (
+        github_user  => 'bazelbuild',
+        github_repo  => 'bazel',
+        asset        => 1,
+        asset_name   => qr/^bazel-([0-9\.]+)-dist\.zip$/,
+        asset_format => 'zip',
+    );
+
+    # provides `bash` in crippled operating systems
+    plugin 'Build::MSYS';
+
+    # NEED UPGRADE: verify the signature made by Bazel's release key 3D5919B448457EE0
+    # https://bazel.build/bazel-release.pub.gpg
+
+    meta->prop->{env}->{JAVA_HOME} = Alien::Bazel::Util->_find_jdk_java_home;
+    # https://bazel.build/install/compile-source#bootstrap-bazel
+    # $ env EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk" bash ./compile.sh
+    meta->prop->{env}->{EXTRA_BAZEL_ARGS} = '--tool_java_runtime_version=local_jdk';
+
+    if( DEBUG_BAZEL_BOOTSTRAP ) {
+        meta->prop->{env}->{VERBOSE} = 'yes';
+        meta->prop->{env}->{BAZEL_DEBUG_JAVA_COMPILATION} = 1;
+    }
+    build [
+        sub {
+            my ($build) = @_;
+            $build->log("JAVA_HOME        = $ENV{JAVA_HOME}");
+            $build->log("EXTRA_BAZEL_ARGS = $ENV{EXTRA_BAZEL_ARGS}");
+        },
+        'bash ./compile.sh',
+        '%{make_path} %{.install.stage}/bin',
+        '%{cp} output/bazel %{.install.stage}/bin'
+    ];
+
+    after 'gather' => sub {
+        my $time_total = time() - $time_start;
+        print {*STDERR} '<<< DEBUG >>> have $time_total = ', $time_total, ' seconds', "\n";
+    };
+};
+

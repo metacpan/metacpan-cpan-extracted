@@ -49,8 +49,8 @@ my %WriteMakefileArgs = (
     "Proc::Background" => 0,
     "Proc::Find" => "0.051",
     "Sah::Schema::true" => 0,
-    "Sah::Schema::unix::local_uid" => 0,
     "Sah::Schema::unix::signal" => 0,
+    "Sah::Schema::unix::uid::exists" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -60,7 +60,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.017",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -92,8 +92,8 @@ my %FallbackPrereqs = (
   "Proc::Background" => 0,
   "Proc::Find" => "0.051",
   "Sah::Schema::true" => 0,
-  "Sah::Schema::unix::local_uid" => 0,
   "Sah::Schema::unix::signal" => 0,
+  "Sah::Schema::unix::uid::exists" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

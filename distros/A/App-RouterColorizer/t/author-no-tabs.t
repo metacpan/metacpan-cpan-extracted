@@ -40,6 +40,7 @@ my @files = (
     't/06-vyos.t',
     't/07-cisco.t',
     't/08-ciena.t',
+    't/90-meta-mode.t',
     't/author-critic.t',
     't/author-no-tabs.t',
     't/author-pod-syntax.t',

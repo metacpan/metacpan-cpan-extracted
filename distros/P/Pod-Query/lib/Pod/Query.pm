@@ -1,6 +1,6 @@
 package Pod::Query;
 
-use v5.24;    # Postfix defef :)
+use v5.16;
 use strict;
 use warnings;
 use Pod::Text();
@@ -16,11 +16,11 @@ Pod::Query - Query pod documents
 
 =head1 VERSION
 
-Version 0.33
+Version 0.35
 
 =cut
 
-our $VERSION                   = '0.33';
+our $VERSION                   = '0.35';
 our $DEBUG_LOL_DUMP            = 0;
 our $DEBUG_STRUCT_OVER         = 0;
 our $DEBUG_TREE                = 0;
@@ -688,30 +688,30 @@ Check if queries are valid.
 sub _check_conditions {
     my ( $sections ) = @_;
 
-    my $error_message = <<~'ERROR';
+    my $error_message = <<'ERROR';
 
-      Invalid input: expecting a hash reference!
+    Invalid input: expecting a hash reference!
 
-      Syntax:
+    Syntax:
 
-         $pod->find( 'QUERY' )         # As explained in _query_string_to_struct().
+        $pod->find( 'QUERY' )         # As explained in _query_string_to_struct().
 
-         # OR:
+        # OR:
 
-         $pod->find(
+        $pod->find(
             # section1
             {
-               tag          => "TAG",  # Search to look for.
-               text         => "TEXT", # Text of the tag to find.
-               keep         => 1,      # Must only be in last section.
-               keep_all     => 1,      # Keep this tag and sub tags.
-               nth          => 0,      # Stop searching after find so many matches.
-               nth_in_group => 0,      # Nth only in the current group.
+                tag          => "TAG",  # Search to look for.
+                text         => "TEXT", # Text of the tag to find.
+                keep         => 1,      # Must only be in last section.
+                keep_all     => 1,      # Keep this tag and sub tags.
+                nth          => 0,      # Stop searching after find so many matches.
+                nth_in_group => 0,      # Nth only in the current group.
             },
             # ...
             # conditionN
-         );
-   ERROR
+        );
+ERROR
 
     die "$error_message"
       if not $sections

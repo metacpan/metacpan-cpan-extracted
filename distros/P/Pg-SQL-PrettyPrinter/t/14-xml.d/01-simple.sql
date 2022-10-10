@@ -1,0 +1,1 @@
+SELECT XMLELEMENT( NAME element, XMLATTRIBUTES( 1 AS one, 'deuce' AS two ), 'content' ) 

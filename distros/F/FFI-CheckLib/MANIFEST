@@ -37,6 +37,9 @@ corpus/unix/lib/libfoo.so
 corpus/unix/lib/libfoo.so.2
 corpus/unix/lib/libfoo.so.2.3
 corpus/unix/lib/libfoo.so.2.3.4
+corpus/unix/path/path1/libfoo.so.1
+corpus/unix/path/path2/libfoo.so.2
+corpus/unix/path/path3/libfoo.so.3
 corpus/unix/usr/lib/libbar.so
 corpus/unix/usr/lib/libbar.so.1
 corpus/unix/usr/lib/libbar.so.1.2
@@ -85,6 +88,7 @@ xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t
 xt/author/pod_coverage.t
+xt/author/pod_link.t
 xt/author/pod_spelling_common.t
 xt/author/pod_spelling_system.t
 xt/author/strict.t

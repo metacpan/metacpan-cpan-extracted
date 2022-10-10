@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.876';
+our $VERSION = '1.878';
 
 use MCE::Shared::Base ();
 use base 'MCE::Shared::Base::Common';
@@ -1123,7 +1123,7 @@ MCE::Shared::Minidb - A pure-Perl in-memory data store
 
 =head1 VERSION
 
-This document describes MCE::Shared::Minidb version 1.876
+This document describes MCE::Shared::Minidb version 1.878
 
 =head1 DESCRIPTION
 
@@ -2104,7 +2104,7 @@ Increments the value of key-index by the given number and returns its new value.
 =head1 CREDITS
 
 The implementation is inspired by various Redis Hash/List primitives at
-L<http://redis.io/commands>.
+L<https://redis.io/commands>.
 
 =head1 INDEX
 

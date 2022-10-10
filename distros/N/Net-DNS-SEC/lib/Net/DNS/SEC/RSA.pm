@@ -3,7 +3,7 @@ package Net::DNS::SEC::RSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RSA.pm 1853 2021-10-11 10:40:59Z willem $)[2];
+our $VERSION = (qw$Id: RSA.pm 1863 2022-03-14 14:59:21Z willem $)[2];
 
 
 =head1 NAME
@@ -50,11 +50,11 @@ BEGIN { die 'RSA disabled or application has no "use Net::DNS::SEC"' unless RSA_
 
 
 my %parameters = (
-	1  => Net::DNS::SEC::libcrypto::EVP_md5(),
-	5  => Net::DNS::SEC::libcrypto::EVP_sha1(),
-	7  => Net::DNS::SEC::libcrypto::EVP_sha1(),
-	8  => Net::DNS::SEC::libcrypto::EVP_sha256(),
-	10 => Net::DNS::SEC::libcrypto::EVP_sha512(),
+	1  => scalar eval { Net::DNS::SEC::libcrypto::EVP_md5() },
+	5  => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha1() },
+	7  => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha1() },
+	8  => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha256() },
+	10 => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha512() },
 	);
 
 sub _index { return keys %parameters }
@@ -63,8 +63,8 @@ sub _index { return keys %parameters }
 sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
-	my $index = $private->algorithm;
-	my $evpmd = $parameters{$index} || die 'private key not RSA';
+	my $evpmd = $parameters{$private->algorithm};
+	die 'private key not RSA' unless $evpmd;
 
 	my ( $n, $e, $d, $p, $q ) =
 			map { decode_base64( $private->$_ ) } qw(Modulus PublicExponent PrivateExponent Prime1 Prime2);
@@ -78,8 +78,8 @@ sub sign {
 sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
-	my $index = $keyrr->algorithm;
-	my $evpmd = $parameters{$index} || die 'public key not RSA';
+	my $evpmd = $parameters{$keyrr->algorithm};
+	die 'public key not RSA' unless $evpmd;
 
 	return unless $sigbin;
 

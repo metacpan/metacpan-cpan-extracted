@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized );
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
@@ -19,10 +19,15 @@ use IO::Handle ();
 use Socket qw( AF_UNIX );
 use Errno ();
 
-my $is_winenv;
+my ($is_winenv, $zero_bytes, %sock_ready);
 
 BEGIN {
     $is_winenv = ( $^O =~ /mswin|mingw|msys|cygwin/i ) ? 1 : 0;
+    $zero_bytes = "\x00\x00\x00\x00";
+}
+
+sub CLONE {
+    %sock_ready = ();
 }
 
 ###############################################################################
@@ -105,45 +110,52 @@ sub pipe_pair {
 
 sub sock_pair {
     my ($obj, $r_sock, $w_sock, $i) = @_;
-    local ($!, $@);
+    local $!;
 
     if (defined $i) {
         # remove tainted'ness
         ($i) = $i =~ /(.*)/;
-
-        if ($^O eq 'linux' && eval q{ Socket::SOCK_SEQPACKET() }) {
-            socketpair( $obj->{$r_sock}[$i], $obj->{$w_sock}[$i],
-                AF_UNIX, Socket::SOCK_SEQPACKET(), 0 ) or do {
-                    socketpair( $obj->{$r_sock}[$i], $obj->{$w_sock}[$i],
-                        AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
-                };
-        }
-        else {
-            socketpair( $obj->{$r_sock}[$i], $obj->{$w_sock}[$i],
-                AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
-        }
-
+        socketpair( $obj->{$r_sock}[$i], $obj->{$w_sock}[$i],
+            AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
         $obj->{$r_sock}[$i]->autoflush(1);
         $obj->{$w_sock}[$i]->autoflush(1);
     }
     else {
-        if ($^O eq 'linux' && eval q{ Socket::SOCK_SEQPACKET() }) {
-            socketpair( $obj->{$r_sock}, $obj->{$w_sock},
-                AF_UNIX, Socket::SOCK_SEQPACKET(), 0 ) or do {
-                    socketpair( $obj->{$r_sock}, $obj->{$w_sock},
-                        AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
-                };
-        }
-        else {
-            socketpair( $obj->{$r_sock}, $obj->{$w_sock},
-                AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
-        }
-
+        socketpair( $obj->{$r_sock}, $obj->{$w_sock},
+            AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
         $obj->{$r_sock}->autoflush(1);
         $obj->{$w_sock}->autoflush(1);
     }
 
     return;
+}
+
+sub _sock_ready {
+   my ($socket, $timeout) = @_;
+   return '' if !defined $timeout && $sock_ready{"$socket"} > 1;
+
+   my ($delay, $val_bytes, $start) = (0, "\x00\x00\x00\x00", time);
+   my $ptr_bytes = unpack('I', pack('P', $val_bytes));
+
+   if (!defined $timeout) {
+      $sock_ready{"$socket"}++;
+   }
+   else {
+      $timeout = undef   if $timeout < 0;
+      $timeout += $start if $timeout;
+   }
+
+   while (1) {
+      # MSWin32 FIONREAD - from winsock2.h macro
+      ioctl($socket, 0x4004667f, $ptr_bytes);
+
+      return '' if $val_bytes ne $zero_bytes;
+      return  1 if $timeout && time > $timeout;
+
+      # delay after a while to not consume a CPU core
+      sleep(0.015), next if $delay;
+      $delay = 1 if time - $start > 0.015;
+   }
 }
 
 sub _sysread {
@@ -172,7 +184,7 @@ Mutex::Util - Utility functions for Mutex
 
 =head1 VERSION
 
-This document describes Mutex::Util version 1.006
+This document describes Mutex::Util version 1.007
 
 =head1 SYNOPSIS
 
@@ -183,24 +195,24 @@ This document describes Mutex::Util version 1.006
    use strict;
    use warnings;
 
-   our $VERSION = '0.001';
+   our $VERSION = '0.002';
 
    use Mutex::Util;
 
    my $has_threads = $INC{'threads.pm'} ? 1 : 0;
-   my $tid = $has_threads ? threads->tid() : 0;
+   my $tid = $has_threads ? threads->tid : 0;
 
    sub CLONE {
-       $tid = threads->tid() if $has_threads;
+       $tid = threads->tid if $has_threads;
    }
 
    sub new {
        my ($class, %obj) = @_;
-       $obj{_init_pid} = $has_threads ? $$ .'.'. $tid : $$;
+       $obj{init_pid} = $has_threads ? "$$.$tid" : $$;
 
        ($^O eq 'MSWin32')
-           ? Mutex::Util::pipe_pair(\%obj, qw(_r_sock _w_sock))
-           : Mutex::Util::sock_pair(\%obj, qw(_r_sock _w_sock));
+           ? Mutex::Util::sock_pair(\%obj, qw(_r_sock _w_sock))
+           : Mutex::Util::pipe_pair(\%obj, qw(_r_sock _w_sock));
 
        ...
 
@@ -208,12 +220,12 @@ This document describes Mutex::Util version 1.006
    }
 
    sub DESTROY {
-       my ($pid, $obj) = ($has_threads ? $$ .'.'. $tid : $$, @_);
+       my ($pid, $obj) = ($has_threads ? "$$.$tid" : $$, @_);
 
-       if ($obj->{_init_pid} eq $pid) {
+       if ($obj->{init_pid} eq $pid) {
            ($^O eq 'MSWin32')
-               ? Mutex::Util::destroy_pipes($obj, qw(_w_sock _r_sock))
-               : Mutex::Util::destroy_socks($obj, qw(_w_sock _r_sock));
+               ? Mutex::Util::destroy_socks($obj, qw(_w_sock _r_sock))
+               : Mutex::Util::destroy_pipes($obj, qw(_w_sock _r_sock));
        }
 
        return;

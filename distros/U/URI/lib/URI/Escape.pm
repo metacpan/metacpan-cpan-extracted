@@ -141,7 +141,7 @@ use Exporter 5.57 'import';
 our %escapes;
 our @EXPORT = qw(uri_escape uri_unescape uri_escape_utf8);
 our @EXPORT_OK = qw(%escapes);
-our $VERSION = '5.12';
+our $VERSION = '5.13';
 
 use Carp ();
 
@@ -163,7 +163,14 @@ sub uri_escape {
     if (defined $patn){
         unless (exists  $subst{$patn}) {
             # Because we can't compile the regex we fake it with a cached sub
-            (my $tmp = $patn) =~ s,/,\\/,g;
+            my @parts = $patn =~ m/(
+                (?: ^ \^? -? )
+                | (?: .-. )
+                | (?: \[:[^:]+:\] )
+                | .
+            )/gx;
+
+            my $tmp = join '', shift @parts, map { length > 1 ? $_ : quotemeta } @parts;
             eval "\$subst{\$patn} = sub {\$_[0] =~ s/([$tmp])/\$escapes{\$1} || _fail_hi(\$1)/ge; }";
             Carp::croak("uri_escape: $@") if $@;
         }

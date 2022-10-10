@@ -7,13 +7,6 @@ alien_diag 'Alien::Expat';
 
 alien_ok 'Alien::Expat';
 
-subtest xmlwf => sub {
-
-  run_ok(['xmlwf', '-v'])
-    ->success
-    ->note;
-};
-
 my $xs_version;
 
 subtest xs => sub {

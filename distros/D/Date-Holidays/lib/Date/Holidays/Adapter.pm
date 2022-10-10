@@ -3,14 +3,14 @@ package Date::Holidays::Adapter;
 use strict;
 use warnings;
 use Carp; # croak
-use TryCatch;
+use Try::Tiny;
 use Module::Load qw(load);
 use Locale::Country;
 use Scalar::Util qw(blessed);
 
 use vars qw($VERSION);
 
-$VERSION = '1.31';
+$VERSION = '1.33';
 
 sub new {
     my ($class, %params) = @_;
@@ -210,8 +210,8 @@ sub _fetch {
 
         $module = $self->_load($module);
 
-    } catch ($error) {
-        warn "Unable to load module: $module - $error";
+    } catch {
+        warn "Unable to load module: $module - $_";
 
         try {
             #$countrycode = uc $countrycode;
@@ -228,8 +228,8 @@ sub _fetch {
                 warn "we got a module and we return\n";
             }
 
-        } catch ($error) {
-            warn "Unable to load module: $module - $error";
+        } catch {
+            warn "Unable to load module: $module - $_";
 
             $module = 'Date::Holidays::Adapter';
             $module = $self->_load($module);
@@ -254,7 +254,7 @@ Date::Holidays::Adapter - an adapter class for Date::Holidays::* modules
 
 =head1 VERSION
 
-This POD describes version 1.31 of Date::Holidays::Adapter
+This POD describes version 1.33 of Date::Holidays::Adapter
 
 =head1 SYNOPSIS
 

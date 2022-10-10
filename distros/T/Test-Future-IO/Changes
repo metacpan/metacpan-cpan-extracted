@@ -1,5 +1,15 @@
 Revision history for Test-Future-IO
 
+0.05    2022-10-07
+        [CHANGES]
+         * Added `->use_sysread_buffer` and supporting methods
+
+0.04    2022-10-04
+        [CHANGES]
+         * Updated for Test::ExpectAndCheck::Future v0.04 API
+         * Accept fh arguments on real ->expect_sysread/->expect_syswrite
+           methods; warn about deprecated use if they're absent
+
 0.03    2021-03-23
         [BUGFIXES]
          * ->sleep no longer returns immediate futures; must still call ->get

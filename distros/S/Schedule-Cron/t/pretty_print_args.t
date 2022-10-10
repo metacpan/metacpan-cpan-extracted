@@ -11,4 +11,4 @@ my @args = (
            );     
 
 my $out = join(",",Schedule::Cron->_format_args(@args));
-like($out,qr/\['bla','blub',{.*?'and'\s*=>\s*'HASH\(.*?\)'.*?}\],3,{.*?'blub'\s*=>\s*'bla'.*?}/);
+like($out,qr/\['bla','blub',\{.*?'and'\s*=>\s*'HASH\(.*?\)'.*?}\],3,\{.*?'blub'\s*=>\s*'bla'.*?}/);

@@ -9,7 +9,7 @@ package Image::TIFF;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 my @types = (
   [ "BYTE",      "C1", 1],
@@ -937,7 +937,14 @@ sub add_fields
 	    }
 
 	    my $val = (@v > 1) ? \@v : $v[0];
-	    bless $val, "Image::TIFF::Rational" if $type =~ /^S?RATIONAL$/;
+	    if ($type =~ /^S?RATIONAL$/) {
+		if (ref $val) {
+		    bless $val, "Image::TIFF::Rational";
+		} else {
+		    print STDERR "# invalid rational value\n";
+		    $val = undef;
+		}
+	    }
 
 	    if ($type eq 'ASCII' || $type eq 'UNDEFINED')
 		{
@@ -966,7 +973,7 @@ sub add_fields
 		$maker =~ /^([A-Z]+)/; $maker = $1 || ''; # "OLYMPUS ..." > "OLYMPUS"
 
 		# if 'Panasonic' doesn't exist, try 'Panasonic DMC-FZ5'
-		$maker = join " " => grep m/\S/ => $self->{Make}, $self->{Model}
+		$maker = join " ", grep { defined && m/\S/ } $self->{Make}, $self->{Model}
 		    unless exists $makernotes{$maker};
 
 		if (exists $makernotes{$maker}) {

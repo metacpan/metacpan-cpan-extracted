@@ -13,7 +13,7 @@ use File::Spec;
 use List::Util qw{ uniq };
 use Pod::Usage;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use constant PATH_SEP	=> qr/ $Config{path_sep} /smx;
 use constant MANPATH_APPEND	=> qr/ (?<= $Config{path_sep} \z ) /smx;
@@ -159,6 +159,7 @@ sub man_path {
     foreach my $man_conf ( map { bsd_glob( $_ ) } @{ ( MAN_CONF ) } ) {
 	open my $fh, '<', $man_conf
 	    or next;
+	local $_ = undef;	# while (<>) ... does not localize $_.
 	while ( <$fh> ) {
 	    m/ \A \s* (?: \z | [#] ) /smx
 		and next;

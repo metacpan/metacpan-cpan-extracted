@@ -3,18 +3,23 @@
 use v5.14;
 use warnings;
 use feature qw( say );
+use utf8;
 
 use Devel::MAT;
+use Devel::MAT::Cmd::Terminal;
 use List::UtilsBy qw( nsort_by );
+
+# We're drawing pretty graphs with line drawing
+STDOUT->binmode( ":encoding(UTF-8)" );
 
 my $progress = ( -t STDERR ) ?
    sub { print STDERR "\r\e[K" . ( shift // "" ); } :
    undef;
 
-my $pmatA = Devel::MAT->load( ( $ARGV[0] // die "Need dumpfile A\n" ),
+my $pmatA = Devel::MAT->load( my $fileA = ( $ARGV[0] // die "Need dumpfile A\n" ),
    progress => $progress,
 );
-my $pmatB = Devel::MAT->load( ( $ARGV[1] // die "Need dumpfile B\n" ),
+my $pmatB = Devel::MAT->load( my $fileB = ( $ARGV[1] // die "Need dumpfile B\n" ),
    progress => $progress,
 );
 
@@ -25,11 +30,12 @@ my @svsB = nsort_by { $_->addr } $pmatB->dumpfile->heap;
 
 $progress->() if $progress;
 
-say "A\tB";
-
 my $countA = 0;
 my $countB = 0;
 my $countC = 0;
+
+my @onlyA;
+my @onlyB;
 
 while( @svsA && @svsB ) {
    my $svA = $svsA[0];
@@ -40,12 +46,12 @@ while( @svsA && @svsB ) {
 
    if( $addrA < $addrB ) {
       $countA++;
-      say $svA->desc_addr;
+      push @onlyA, $svA;
       shift @svsA;
    }
    elsif( $addrB < $addrA ) {
       $countB++;
-      say "\t", $svB->desc_addr;
+      push @onlyB, $svB;
       shift @svsB;
    }
    else {
@@ -56,12 +62,151 @@ while( @svsA && @svsB ) {
    }
 }
 
-while( @svsA ) {
-   say +( shift @svsA )->desc_addr;
-}
-while( @svsB ) {
-   say "\t", ( shift @svsB )->desc_addr;
+push @onlyA, @svsA;
+push @onlyB, @svsB;
+
+my %notesA;
+my %notesB;
+
+sub add_notes
+{
+   my ( $svs, $notes, $pmat ) = @_;
+   my %addrs = map { $_->addr => 1 } @$svs;
+
+   foreach my $sv ( $pmat->dumpfile->heap ) {
+      next unless $sv->type eq "STASH";
+      my $stash = $sv;
+
+      foreach my $field (qw( mro_isa mro_linearcurrent )) {
+         my $sv = $stash->$field or next;
+         $addrs{ $sv->addr } or next;
+
+         $notes->{ $sv->addr } = "$field of " . Devel::MAT::Cmd->format_symbol( $stash->stashname, $stash );
+      }
+   }
 }
 
-printf "---\n%d unique to A\n%d unique to B\n%d common\n",
-   $countA, $countB, $countC;
+add_notes \@onlyA, \%notesA, $pmatA;
+add_notes \@onlyB, \%notesB, $pmatB;
+
+sub svtrees_from_set
+{
+   my @svs = @_;
+
+   # In general the set of SVs and their cross-linkages are not yet suitable
+   # to print in a simple tree, because of cycles and multiple paths. We have
+   # to reduce the linkages down to something more well-behaved.
+
+   my %svs_by_addr = map { $_->addr => $_ } @svs;
+
+   # First, see what references between the SVs we can find
+   my %sv_outrefs; # {$addr} => [other svs here that it refers to]
+   foreach my $sv ( @svs ) {
+      $sv_outrefs{ $sv->addr } = [];
+
+      foreach my $ref ( $sv->outrefs ) {
+         next unless $svs_by_addr{ $ref->sv->addr };
+         push $sv_outrefs{ $sv->addr }->@*, $ref->sv;
+      }
+   }
+
+   # Next, form a reachability matrix. This will be complete but may contain
+   # cycles which we'll delete in the next step.
+   # We can detect possible roots of cycles in this way
+   my %sv_refs_sv; # {$from}{$to} = 1
+   my @cyclic_svs;
+   foreach my $origsv ( @svs ) {
+      my $origaddr = $origsv->addr;
+      my @queue = $sv_outrefs{ $origaddr }->@*;
+      while( @queue ) {
+         my $sv = shift @queue;
+         my $addr = $sv->addr;
+
+         push @cyclic_svs, $sv and next if $addr == $origaddr; # already a cycle
+
+         next if $sv_refs_sv{ $origaddr }{ $addr };
+
+         $sv_refs_sv{ $origaddr }{ $addr } = 1;
+         push @queue, $sv_outrefs{ $addr }->@*;
+      }
+   }
+
+   # Now need to remove links from the reachability matrix until we have no cycles
+   foreach my $origsv ( @cyclic_svs ) {
+      my $origaddr = $origsv->addr;
+      my @queue = sort keys $sv_refs_sv{ $origaddr }->%*;
+      while( @queue ) {
+         my $addr = shift @queue;
+
+         if( $sv_refs_sv{ $addr }{ $origaddr } ) {
+            delete $sv_refs_sv{ $addr }{ $origaddr };
+            next;
+         }
+
+         push @queue, sort keys $sv_refs_sv{ $addr }->%*;
+      }
+   }
+
+   # Now build them up into trees
+   my %sv_tree = map { $_->addr => [ $_ ] } @svs;
+
+   # At this point, %sv_refs_sv is now acyclic but may still have multipaths
+   # in it. We use this second hash to track that
+   my %seen_by_addr;
+
+   foreach my $sv ( @svs ) {
+      my @outref_addrs = sort keys $sv_refs_sv{ $sv->addr }->%*;
+
+      my $tree = $sv_tree{ $sv->addr };
+
+      foreach my $addr ( @outref_addrs ) {
+         next if $seen_by_addr{$addr}++;
+
+         push @$tree, $sv_tree{$addr};
+      }
+   }
+
+   # Any SVs we didn't already see on that walk must now be toplevel ones
+   return @sv_tree{ map { $seen_by_addr{ $_->addr } ? () : $_->addr } @svs };
+}
+
+our $Indent = "";
+sub print_svtree
+{
+   my ( $tree, $leader0, $leader1, $notes ) = @_;
+   my ( $sv, @subtrees ) = @$tree;
+
+   my $note = $notes->{ $sv->addr } ? " (" . $notes->{ $sv->addr } . ")" : "";
+
+   Devel::MAT::Cmd->printf( "  %s%s%s%s\n",
+      $Indent,
+      $leader0,
+      Devel::MAT::Cmd->format_sv( $sv ),
+      $note,
+   );
+
+   return unless @subtrees;
+
+   local $Indent = "$Indent$leader1";
+
+   my $final_subtree = pop @subtrees;
+   {
+      print_svtree( $_, "├─ ", "│  ", $notes ) for @subtrees;
+   }
+   {
+      print_svtree( $final_subtree, "└─ ", "   ", $notes );
+   }
+}
+
+print "\n";
+printf "%d unique to %s:\n", $countA, $fileA;
+my @treesA = svtrees_from_set @onlyA;
+print_svtree $_, "- ", "  ", \%notesA for @treesA;
+
+print "\n";
+printf "%d unique to %s:\n", $countB, $fileB;
+my @treesB = svtrees_from_set @onlyB;
+print_svtree $_, "+ ", "  ", \%notesB for @treesB;
+
+print "\n";
+printf "%d common\n", $countC;

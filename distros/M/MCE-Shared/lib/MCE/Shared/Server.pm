@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.876';
+our $VERSION = '1.878';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -287,21 +287,33 @@ sub _share {
       local $@; local $SIG{__DIE__};
 
       $_class = 'PDL', $_item = eval q{
-         use PDL; my $_func = pop @{ $_item };
+         unless ($INC{'PDL.pm'}) {
+            use PDL;
+            # Disable PDL auto-threading.
+            eval q{ PDL::set_autopthread_targ(1) };
+         }
 
-         if    ($_func eq 'byte'    ) { byte     (@{ $_item }); }
-         elsif ($_func eq 'short'   ) { short    (@{ $_item }); }
-         elsif ($_func eq 'ushort'  ) { ushort   (@{ $_item }); }
-         elsif ($_func eq 'long'    ) { long     (@{ $_item }); }
-         elsif ($_func eq 'longlong') { longlong (@{ $_item }); }
-         elsif ($_func eq 'float'   ) { float    (@{ $_item }); }
-         elsif ($_func eq 'double'  ) { double   (@{ $_item }); }
-         elsif ($_func eq 'ones'    ) { ones     (@{ $_item }); }
-         elsif ($_func eq 'random'  ) { random   (@{ $_item }); }
-         elsif ($_func eq 'sequence') { sequence (@{ $_item }); }
-         elsif ($_func eq 'zeroes'  ) { zeroes   (@{ $_item }); }
-         elsif ($_func eq 'indx'    ) { indx     (@{ $_item }); }
-         else                         { pdl      (@{ $_item }); }
+         my $_func = pop @{ $_item };
+
+         if    ($_func eq 'sbyte'    ) { sbyte     (@{ $_item }); }
+         elsif ($_func eq 'byte'     ) { byte      (@{ $_item }); }
+         elsif ($_func eq 'short'    ) { short     (@{ $_item }); }
+         elsif ($_func eq 'ushort'   ) { ushort    (@{ $_item }); }
+         elsif ($_func eq 'long'     ) { long      (@{ $_item }); }
+         elsif ($_func eq 'ulong'    ) { ulong     (@{ $_item }); }
+         elsif ($_func eq 'indx'     ) { indx      (@{ $_item }); }
+         elsif ($_func eq 'longlong' ) { longlong  (@{ $_item }); }
+         elsif ($_func eq 'ulonglong') { ulonglong (@{ $_item }); }
+         elsif ($_func eq 'float'    ) { float     (@{ $_item }); }
+         elsif ($_func eq 'double'   ) { double    (@{ $_item }); }
+         elsif ($_func eq 'ldouble'  ) { ldouble   (@{ $_item }); }
+         elsif ($_func eq 'sequence' ) { sequence  (@{ $_item }); }
+         elsif ($_func eq 'zeroes'   ) { zeroes    (@{ $_item }); }
+         elsif ($_func eq 'zeros'    ) { zeros     (@{ $_item }); }
+         elsif ($_func eq 'ones'     ) { ones      (@{ $_item }); }
+         elsif ($_func eq 'random'   ) { random    (@{ $_item }); }
+         elsif ($_func eq 'grandom'  ) { grandom   (@{ $_item }); }
+         else                          { pdl       (@{ $_item }); }
       };
    }
 
@@ -349,10 +361,12 @@ sub _start {
    return if $_svr_pid;
 
    if ($INC{'PDL.pm'}) { local $@;
-      ## PDL::IO::Storable is required for serializing piddles.
+      # PDL::IO::Storable is required for serializing piddles.
       eval 'use PDL::IO::Storable' unless $INC{'PDL/IO/Storable.pm'};
-      ## PDL data should not be naively copied in new threads.
+      # PDL data should not be naively copied in new threads.
       eval 'no warnings; sub PDL::CLONE_SKIP { 1 }';
+      # Disable PDL auto-threading.
+      eval q{ PDL::set_autopthread_targ(1) };
    }
 
    local $_;  $_init_pid = "$$.$_tid", $_stopped = undef;
@@ -1105,7 +1119,7 @@ sub _loop {
 
    if ($_is_MSWin32) {
       # The normal loop hangs on Windows when processes/threads start/exit.
-      # Using ioctl() properly, http://www.perlmonks.org/?node_id=780083
+      # Using ioctl() properly, https://www.perlmonks.org/?node_id=780083
 
       my $_val_bytes = "\x00\x00\x00\x00";
       my $_ptr_bytes = unpack( 'I', pack('P', $_val_bytes) );
@@ -1297,6 +1311,7 @@ sub _start {
    # inlined for performance
    $_dat_ex = sub {
       my $_pid = $_tid ? $$ .'.'. $_tid : $$;
+      MCE::Util::_sock_ready($_DAT_LOCK->{_r_sock}) if $_is_MSWin32;
       MCE::Util::_sysread($_DAT_LOCK->{_r_sock}, my($b), 1), $_DAT_LOCK->{ $_pid } = 1
          unless $_DAT_LOCK->{ $_pid };
    };
@@ -1928,7 +1943,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.876
+This document describes MCE::Shared::Server version 1.878
 
 =head1 DESCRIPTION
 

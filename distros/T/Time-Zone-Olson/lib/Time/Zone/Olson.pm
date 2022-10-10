@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.41';
+our $VERSION = '0.44';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -617,6 +617,9 @@ sub new {
             }
             else {
                 $env_tz = $ENV{TZ};
+                if ( !$params{timezone} ) {
+                    $self->{_determined_env} = 1;
+                }
             }
         }
         if ( ( defined $params{timezone} ) || ( defined $env_tz ) ) {
@@ -702,7 +705,8 @@ sub _tz_definition_equiv {
     my ( $self, $compare ) = @_;
     my $current_time_zone = $self->timezone();
     my $compare_time_zone = $compare->timezone();
-    if ( ( defined $self->{_tzdata}->{$current_time_zone}->{tz_definition} )
+    if (
+        ( defined $self->{_tzdata}->{$current_time_zone}->{tz_definition} )
         && (
             defined $compare->{_tzdata}->{$compare_time_zone}->{tz_definition} )
       )
@@ -1022,7 +1026,9 @@ sub _guess_tz {
 
 sub determining_path {
     my ($self) = @_;
-    if ( !defined $self->{determining_path} ) {
+    if ( $self->{_determined_env} ) {
+    }
+    elsif ( !defined $self->{determining_path} ) {
         $self->_guess_tz();
     }
     return $self->{determining_path};
@@ -1039,6 +1045,15 @@ sub _guess_olson_tz {
             my $guessed = $self->_matched_timezone_full_name_regex_tz();
             $self->{determining_path} = $path;
             return $guessed;
+        }
+        elsif (
+            $readlink =~ m{(
+                               UTC
+                               )}smx
+          )
+        {
+            return $1;
+
         }
     }
     elsif (
@@ -1270,8 +1285,11 @@ sub _guess_win32_tz {
 }
 
 sub _guess_old_win32_tz {
-    my ( $self, $current_timezone_registry_path,
-        $current_timezone_registry_key ) = @_;
+    my (
+        $self,
+        $current_timezone_registry_path,
+        $current_timezone_registry_key
+    ) = @_;
     my $win32_timezone_name;
 
     Win32API::Registry::RegQueryValueExW(
@@ -2280,6 +2298,17 @@ sub local_time {
     }
 }
 
+sub local_abbr {
+    my ( $self, $time ) = @_;
+    if ( !defined $time ) {
+        $time = time;
+    }
+
+    my ( $isdst, $gmtoff, $abbr ) =
+      $self->_get_isdst_gmtoff_abbr_calculating_for_local_time($time);
+    return $abbr;
+}
+
 sub transition_times {
     my ($self) = @_;
     my $tz = $self->timezone();
@@ -2803,24 +2832,13 @@ sub _initialise_undefined_tz_definition_values {
 
 sub _set_abbrs {
     my ( $self, $tz ) = @_;
-    my $index = 0;
     foreach
       my $local_time_type ( @{ $self->{_tzdata}->{$tz}->{local_time_types} } )
     {
-        if ( $self->{_tzdata}->{$tz}->{local_time_types}->[ $index + 1 ] ) {
-            $local_time_type->{abbr} =
-              substr $self->{_tzdata}->{$tz}->{time_zone_abbreviation_strings},
-              $local_time_type->{abbrind},
-              $self->{_tzdata}->{$tz}->{local_time_types}->[ $index + 1 ]
-              ->{abbrind};
-        }
-        else {
-            $local_time_type->{abbr} =
-              substr $self->{_tzdata}->{$tz}->{time_zone_abbreviation_strings},
-              $local_time_type->{abbrind};
-        }
-        $local_time_type->{abbr} =~ s/\0+$//smx;
-        $index += 1;
+        $local_time_type->{abbr} =
+          substr $self->{_tzdata}->{$tz}->{time_zone_abbreviation_strings},
+          $local_time_type->{abbrind};
+        $local_time_type->{abbr} =~ s/\0.*$//smx;
     }
     return;
 }
@@ -3086,8 +3104,9 @@ sub _unpack_win32_tzi_structure {
                 dst_minutes => (
                     (
                         ( $bias + $daylight_bias ) < 0
-                        ? $minutes_in_one_hour -
-                          ( ( $bias + $daylight_bias ) % $minutes_in_one_hour )
+                        ? $minutes_in_one_hour - (
+                            ( $bias + $daylight_bias ) % $minutes_in_one_hour
+                          )
                         : ( $bias + $daylight_bias ) % $minutes_in_one_hour
                     ) % $minutes_in_one_hour
                 ),
@@ -3259,7 +3278,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.41
+Version 0.44
 
 =cut
 
@@ -3332,6 +3351,10 @@ This method will return the location component of the current time zone, such as
 =head2 local_offset
 
 This method takes the same arguments as C<localtime> but returns the appropriate offset from GMT in minutes.  This can to used as a C<offset> parameter to a subsequent call to Time::Zone::Olson.
+
+=head2 local_abbr
+
+This method takes the same arguments as C<localtime> but returns the appropriate abbreviation for the timezone such as AEST or AEDT.  This is the same result as from a C<date +%Z> command.
 
 =head2 local_time
 

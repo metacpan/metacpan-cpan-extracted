@@ -1,5 +1,5 @@
 Name:           perl-RF-Antenna-Planet-MSI-Format
-Version:        0.01
+Version:        0.02
 Release:        1%{?dist}
 Summary:        RF Antenna Pattern File Reader and Writer in Planet MSI Format
 License:        mit

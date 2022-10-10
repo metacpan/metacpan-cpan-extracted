@@ -1,6 +1,6 @@
 package Net::SAML2::Protocol::ArtifactResolve;
 use Moose;
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 use MooseX::Types::URI qw/ Uri /;
 use URN::OASIS::SAML2 qw(:urn);
@@ -23,7 +23,7 @@ has 'provider' => (
 
 
 sub as_xml {
-    my ($self) = @_;
+    my $self = shift;
 
     my $x = XML::Generator->new(':pretty');
     my $saml  = ['saml' => URN_ASSERTION ];
@@ -65,15 +65,18 @@ Net::SAML2::Protocol::ArtifactResolve - Net::SAML2::Protocol::ArtifactResolve - 
 
 =head1 VERSION
 
-version 0.59
+version 0.61
 
 =head1 SYNOPSIS
 
-  my $resolver = Net::SAML2::Binding::ArtifactResolve->new(
-    issuer => 'http://localhost:3000',
-  );
+    my $resolver = Net::SAML2::Protocol::ArtifactResolve->new(
+        artifact    => 'yourartifact',
+        destination => $idp->art_url('urn:oasis:names:tc:SAML:2.0:bindings:SOAP'), # https://idp.example.net/idp
+        issuer      => $sp->id, # https://you.example.com/auth/saml
+    );
 
-  my $response = $resolver->resolve(params->{SAMLart});
+    my $binding = Net::SAML2::Binding::SOAP->new(...);
+    $binding->request($resolved->as_xml);
 
 =head1 NAME
 
@@ -81,7 +84,13 @@ Net::SAML2::Protocol::ArtifactResolve - ArtifactResolve protocol class.
 
 =head1 METHODS
 
-=head2 new( ... )
+=head2 new(%args)
+
+    my $resolver = Net::SAML2::Protocol::ArtifactResolve->new(
+        artifact    => 'yourartifact',
+        destination => $idp->art_url('urn:oasis:names:tc:SAML:2.0:bindings:SOAP'), # https://idp.example.net/idp
+        issuer      => $sp->id, # https://you.example.com/auth/saml
+    );
 
 Constructor. Returns an instance of the ArtifactResolve request for
 the given issuer and artifact.
@@ -92,19 +101,23 @@ Arguments:
 
 =item B<issuer>
 
-issuing SP's identity URI
+Issuing SP's identity URI
 
 =item B<artifact>
 
-artifact to be resolved
+Artifact to be resolved
 
 =item B<destination>
 
 IdP's identity URI
 
+=item B<provider>
+
+IdP's provider name
+
 =back
 
-=head2 as_xml( )
+=head2 as_xml()
 
 Returns the ArtifactResolve request as XML.
 

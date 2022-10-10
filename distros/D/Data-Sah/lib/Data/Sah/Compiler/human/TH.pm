@@ -11,9 +11,9 @@ use Role::Tiny::With;
 extends 'Data::Sah::Compiler::TH';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-20'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 sub name { undef }
 
@@ -109,7 +109,7 @@ Data::Sah::Compiler::human::TH - Base class for human type handlers
 
 =head1 VERSION
 
-This document describes version 0.912 of Data::Sah::Compiler::human::TH (from Perl distribution Data-Sah), released on 2022-08-20.
+This document describes version 0.913 of Data::Sah::Compiler::human::TH (from Perl distribution Data-Sah), released on 2022-09-30.
 
 =for Pod::Coverage ^(name|compiler|clause_.+|handle_.+|before_.+|after_.+)$
 

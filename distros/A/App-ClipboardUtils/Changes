@@ -1,3 +1,8 @@
+0.003   2022-10-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLIs: add-clipboard-content, clear-clipboard-content.
+
+
 0.002   2021-07-15  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

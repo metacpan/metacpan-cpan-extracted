@@ -19,7 +19,7 @@ await $chip->mount(
 # ->read_id
 {
    $adapter->expect_write_then_read( "\xD0", 1 )
-      ->returns( "\x60" );
+      ->will_done( "\x60" );
 
    is( await $chip->read_id, 0x60,
       '->read_id yields correct chip ID' );

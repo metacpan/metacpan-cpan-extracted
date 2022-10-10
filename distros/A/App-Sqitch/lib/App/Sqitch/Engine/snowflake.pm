@@ -12,7 +12,7 @@ use App::Sqitch::Types qw(DBH ArrayRef HashRef URIDB Str);
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.3.0'; # VERSION
+our $VERSION = 'v1.3.1'; # VERSION
 
 sub key    { 'snowflake' }
 sub name   { 'Snowflake' }
@@ -98,6 +98,8 @@ has uri => (
 
         # Set defaults in the URI.
         $uri->host($self->_host($uri));
+        # Use _port instead of port so it's empty if no port is in the URI.
+        # https://github.com/sqitchers/sqitch/issues/675
         # XXX SNOWSQL_PORT deprecated; remove once Snowflake removes it.
         $uri->port($ENV{SNOWSQL_PORT}) if !$uri->_port && $ENV{SNOWSQL_PORT};
         $uri->dbname(

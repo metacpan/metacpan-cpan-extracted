@@ -28,7 +28,7 @@ TEST("normal upgrade") {
     REQUIRE(res);
     auto s = res.value();
 
-    p.conn->read_event.add([&](auto, auto& str, auto...) {
+    p.conn->read_event.add([&](auto, auto& str, auto) {
         test.happens();
         CHECK(str == "hello");
         test.loop->stop();
@@ -37,7 +37,7 @@ TEST("normal upgrade") {
     s->write("hello");
     test.run();
 
-    s->read_event.add([&](auto, auto& str, auto...) {
+    s->read_event.add([&](auto, auto& str, auto) {
         test.happens();
         CHECK(str == "world");
         test.loop->stop();

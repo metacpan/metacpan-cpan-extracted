@@ -1,0 +1,104 @@
+{
+   "abstract" : "decide whether a given Graph::Undirected     contains a Hamiltonian Cycle.",
+   "author" : [
+      "Ashwin Dixit, C<< <ashwin at CPAN dot org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.19",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Graph-Undirected-Hamiltonicity",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Minimal" : "1.29",
+            "Carp" : "1.29",
+            "Config::INI::Reader" : "0.025",
+            "Exporter" : "5",
+            "Graph" : "0.9",
+            "LWP::UserAgent" : "6",
+            "Modern::Perl" : "0",
+            "Test::Exception" : "0",
+            "perl" : "5.018004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Graph::Undirected::Hamiltonicity" : {
+         "file" : "lib/Graph/Undirected/Hamiltonicity.pm",
+         "version" : "0.17"
+      },
+      "Graph::Undirected::Hamiltonicity::Output" : {
+         "file" : "lib/Graph/Undirected/Hamiltonicity/Output.pm"
+      },
+      "Graph::Undirected::Hamiltonicity::Spoof" : {
+         "file" : "lib/Graph/Undirected/Hamiltonicity/Spoof.pm"
+      },
+      "Graph::Undirected::Hamiltonicity::Tests" : {
+         "file" : "lib/Graph/Undirected/Hamiltonicity/Tests.pm"
+      },
+      "Graph::Undirected::Hamiltonicity::Transforms" : {
+         "file" : "lib/Graph/Undirected/Hamiltonicity/Transforms.pm"
+      },
+      "Graph::Undirected::Hamiltonicity::Wolfram" : {
+         "file" : "lib/Graph/Undirected/Hamiltonicity/Wolfram.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ownlifeful/Graph-Undirected-Hamiltonicity/issues"
+      },
+      "homepage" : "https://github.com/ownlifeful/Graph-Undirected-Hamiltonicity",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ownlifeful/Graph-Undirected-Hamiltonicity.git",
+         "web" : "https://github.com/ownlifeful/Graph-Undirected-Hamiltonicity"
+      }
+   },
+   "version" : "0.17",
+   "x_contributors" : [
+      "Ashwin Dixit <ashwin.dixit@gmail.com>",
+      "Ashwin Dixit <ashwin.dixit@reopenlabs.com>",
+      "Ashwin Dixit <ashwin@cpan.org>",
+      "Ashwin Dixit <ashwin@ownlifeful.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_static_install" : 1
+}

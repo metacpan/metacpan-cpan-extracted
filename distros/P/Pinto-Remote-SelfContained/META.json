@@ -1,7 +1,7 @@
 {
    "abstract" : "interact with a remote Pinto repository",
    "author" : [
-      "Aaron Crane, <arc@cpan.org>"
+      "Aaron Crane <arc@cpan.org>, Brad Lhotsky <brad@divisionbyzero.net>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "App::ModuleBuildTiny version 0.029",
@@ -58,21 +58,21 @@
    "provides" : {
       "Pinto::Remote::SelfContained" : {
          "file" : "lib/Pinto/Remote/SelfContained.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/arc/Pinto-Remote-SelfContained/issues"
+         "web" : "https://github.com/reyjrar/Pinto-Remote-SelfContained/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/arc/Pinto-Remote-SelfContained.git",
-         "web" : "https://github.com/arc/Pinto-Remote-SelfContained"
+         "url" : "git://github.com/reyjrar/Pinto-Remote-SelfContained.git",
+         "web" : "https://github.com/reyjrar/Pinto-Remote-SelfContained"
       }
    },
-   "version" : "1.000",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

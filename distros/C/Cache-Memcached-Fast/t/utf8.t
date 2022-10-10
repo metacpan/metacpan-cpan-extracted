@@ -1,29 +1,36 @@
-use warnings;
-use strict;
+use lib 't';
 
-use Test::More;
-
-use FindBin;
-
-use lib "$FindBin::Bin";
 use Memd;
+use Test2::V0 -target => 'Cache::Memcached::Fast';
 
-if ($Memd::memd) {
-    if ($Memd::params{utf8}) {
-        plan tests => 1;
-    } else {
-        plan skip_all => "'utf8' is disabled";
-    }
-} else {
-    plan skip_all => 'Not connected';
-}
+my $memd_bytes = CLASS->new( { %Memd::params, utf8 => 0 } );
 
+utf8::encode my $bytes = my $string = 'Кириллица в UTF-8 🐪';
 
-use utf8;
+subtest bytes => sub {
+    ok !utf8::is_utf8 $bytes;
 
-my $value = "Кириллица в UTF-8";
-$Memd::memd->set('utf8', $value);
-my $value2 = $Memd::memd->get('utf8');
-is($value2, $value);
+    ok $memd_bytes->set( bytes => $bytes );
 
-$Memd::memd->delete('utf8');
+    is $memd_bytes->get('bytes'), $bytes;
+
+    is $memd->get('bytes'), $bytes;
+};
+
+subtest string => sub {
+    ok utf8::is_utf8 $string;
+
+    ok $memd->set( string => $string );
+
+    is $memd->get('string'), $string;
+
+    is $memd_bytes->get('string'), $bytes;
+
+    is dies { $memd_bytes->set( string => $string ) },
+        'Wide character in subroutine entry at '
+        . ( __FILE__ . ' line ' . ( __LINE__ - 2 ) . ".\n" );
+};
+
+$memd->delete_multi(qw/bytes string/);
+
+done_testing;

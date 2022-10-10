@@ -2,12 +2,6 @@ use alienfile;
 
 plugin 'PkgConfig' => 'expat';
 
-plugin 'Probe::CommandLine' => (
-  command   => 'xmlwf',
-  args      => '-v',
-  secondary => 1,
-);
-
 share {
   plugin 'Download::GitHub' => (
     github_user => 'libexpat',

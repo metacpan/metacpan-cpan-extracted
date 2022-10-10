@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/ClipboardUtils.pm','script/clear-clipboard-history','script/detect-clipboard-manager','script/get-clipboard-content','script/list-clipboard-history'];
+my $filenames = ['lib/App/ClipboardUtils.pm','script/add-clipboard-content','script/clear-clipboard-content','script/clear-clipboard-history','script/detect-clipboard-manager','script/get-clipboard-content','script/list-clipboard-history'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -1,8 +1,31 @@
 class Sys::Socket::Addrinfo {
+  use Sys::Socket::Sockaddr;
+  use Sys::Socket::Sockaddr::In;
+  use Sys::Socket::Sockaddr::In6;
   
   # Class methods
   native static method new : Sys::Socket::Addrinfo ();
   
   # Instance methods
   native method DESTROY : void ();
+  
+  native method ai_flags : int ();
+
+  native method set_ai_flags : void ($ai_flags : int);
+
+  native method ai_family : int ();
+
+  native method set_ai_family : void ($ai_family : int);
+
+  native method ai_socktype : int ();
+
+  native method set_ai_socktype : void ($ai_socktype : int);
+
+  native method ai_protocol : int ();
+
+  native method set_ai_protocol : void ($ai_protocol : int);
+
+  native method copy_ai_addr : Sys::Socket::Sockaddr ();
+
+  native method copy_ai_canonname : string ();
 }

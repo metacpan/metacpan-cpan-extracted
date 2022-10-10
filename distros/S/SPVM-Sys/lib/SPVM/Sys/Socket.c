@@ -213,9 +213,14 @@ int32_t SPVM__Sys__Socket__inet_pton(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t e = 0;
   
   int32_t InvalidNetworkAddress = env->get_class_id_by_name(env, stack, "Sys::Socket::Error::InetInvalidNetworkAddress", &e, FILE_NAME, __LINE__);
-  
   if (e) { return e; }
-  
+
+  int32_t In_addr = env->get_basic_type_id(env, "Sys::Socket::In_addr");
+  if (e) { return e; }
+
+  int32_t In6_addr = env->get_basic_type_id(env, "Sys::Socket::In6_addr");
+  if (e) { return e; }
+
   int32_t af = stack[0].ival;
   
   if (!(af == AF_INET || af == AF_INET6)) {
@@ -234,6 +239,20 @@ int32_t SPVM__Sys__Socket__inet_pton(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   if (!obj_dst) {
     return env->die(env, stack, "The output address(dst) must be defined", FILE_NAME, __LINE__);
+  }
+  
+  if (af == AF_INET) {
+    if (!env->is_type(env, stack, obj_dst, In_addr, 0)) {
+      return env->die(env, stack, "The output address(dst) must be the Sys::Socket::In_addr class", FILE_NAME, __LINE__);
+    }
+  }
+  else if (af == AF_INET6) {
+    if (!env->is_type(env, stack, obj_dst, In6_addr, 0)) {
+      return env->die(env, stack, "The output address(dst) must be the Sys::Socket::In6_addr class", FILE_NAME, __LINE__);
+    }
+  }
+  else {
+    return env->die(env, stack, "The type of the output address(dst) is invalid", FILE_NAME, __LINE__);
   }
   
   void* dst = env->get_pointer(env, stack, obj_dst);
@@ -586,7 +605,7 @@ int32_t SPVM__Sys__Socket__setsockopt(SPVM_ENV* env, SPVM_VALUE* stack) {
   optval = (char*)env->get_chars(env, stack, obj_optval);
   int32_t optval_length = env->length(env, stack, obj_optval);
 
-  int32_t optlen = stack[4].ival;
+  socklen_t optlen = stack[4].ival;
   if (!(optlen >= 0)) {
     env->die(env, stack, "The option length must be greater than or equal to 0", FILE_NAME, __LINE__);
   }
@@ -647,15 +666,15 @@ int32_t SPVM__Sys__Socket__getsockopt(SPVM_ENV* env, SPVM_VALUE* stack) {
     env->die(env, stack, "The length of the option value must be less than or equal to the option length", FILE_NAME, __LINE__);
   }
   
-  int int_optlen = *optlen_ref;
-  int32_t status = getsockopt(sockfd, level, optname, optval, &int_optlen);
+  socklen_t socklen_t_optlen = *optlen_ref;
+  int32_t status = getsockopt(sockfd, level, optname, optval, &socklen_t_optlen);
   
   if (status == -1) {
     env->die(env, stack, "[System Error]getsockopt failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
-  *optlen_ref = int_optlen;
+  *optlen_ref = socklen_t_optlen;
   
   stack[0].ival = status;
   
@@ -665,7 +684,9 @@ int32_t SPVM__Sys__Socket__getsockopt(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Socket__getsockopt_int(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  int32_t int32_optval = stack[3].ival;
+  int32_t* int32_optval_ref = stack[3].iref;
+  
+  int32_t int32_optval = *int32_optval_ref;
   
   int int_optval = int32_optval;
   
@@ -678,7 +699,11 @@ int32_t SPVM__Sys__Socket__getsockopt_int(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t optlen = sizeof(int);
   stack[4].iref = &optlen;
   
-  return SPVM__Sys__Socket__getsockopt(env, stack);
+  int32_t status = SPVM__Sys__Socket__getsockopt(env, stack);
+  
+  *int32_optval_ref = *(int*)optval;
+  
+  return status;
 }
 
 int32_t SPVM__Sys__Socket__shutdown(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -766,14 +791,14 @@ int32_t SPVM__Sys__Socket__WSAPoll(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t timeout = stack[2].ival;
   
-  int32_t status = WSAPoll(fds, nfds, timeout);
-  
-  if (status == SOCKET_ERROR) {
+  int32_t ready_count = WSAPoll(fds, nfds, timeout);
+
+  if (ready_count == SOCKET_ERROR) {
     env->die(env, stack, "[System Error]WSAPoll failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
-  stack[0].ival = status;
+  stack[0].ival = ready_count;
   
   return 0;
 #endif
@@ -838,9 +863,8 @@ int32_t SPVM__Sys__Socket__getaddrinfo_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   if (status == 0) {
     int32_t fields_length = 1;
-    void* obj_res = env->new_pointer_with_fields_by_name(env, stack, "Sys::Socket::Addrinfo", res, fields_length, &e, FILE_NAME, __LINE__);
+    void* obj_res = env->new_pointer_by_name(env, stack, "Sys::Socket::AddrinfoLinkedList", res, &e, FILE_NAME, __LINE__);
     if (e) { return e; }
-    env->set_pointer_field_int(env, stack, obj_res, FIELD_INDEX_ADDRINFO_MEMORY_ALLOCATED, ADDRINFO_MEMORY_ALLOCATED_BY_GETADDRINFO);
     env->set_elem_object(env, stack, obj_res_array, 0, obj_res);
   }
   

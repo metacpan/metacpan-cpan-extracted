@@ -1,6 +1,6 @@
 # ABSTRACT: Internal module with the API specification
 package Arango::Tango::API;
-$Arango::Tango::API::VERSION = '0.015';
+$Arango::Tango::API::VERSION = '0.016';
 #use Arango::Tango::Database;
 #use Arango::Tango::Collection;
 
@@ -65,8 +65,14 @@ sub _install_methods($$) {
 }
 
 my %API = (
+    bulk_import_list   => {
+        rest => [ post => '{{database}}_api/import?collection={collection}&type=list']
+    },
     create_document    => {
         rest => [ post  => '{{database}}_api/document/{collection}']
+    },
+    replace_document   => {
+        rest => [ put => '{{database}}_api/document/{collection}/{key}' ],
     },
     list_collections   => {
         rest => [ get   => '{{database}}_api/collection'],
@@ -208,7 +214,7 @@ Arango::Tango::API - Internal module with the API specification
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 AUTHOR
 
@@ -216,7 +222,7 @@ Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2021 by Alberto Simões.
+This software is copyright (c) 2019-2022 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

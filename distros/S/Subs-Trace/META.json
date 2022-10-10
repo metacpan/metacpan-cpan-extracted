@@ -19,6 +19,11 @@
             "Module::Build" : "0.4004"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.1"
+         }
+      },
       "test" : {
          "requires" : {
             "Test::More" : "0"
@@ -28,15 +33,21 @@
    "provides" : {
       "Subs::Trace" : {
          "file" : "lib/Subs/Trace.pm",
-         "version" : "0.01"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/poti1/subs-trace/issues"
+      },
       "license" : [
          "http://opensource.org/licenses/artistic-license-2.0.php"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/poti1/subs-trace"
+      }
    },
-   "version" : "0.01",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

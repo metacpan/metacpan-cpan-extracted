@@ -2,10 +2,10 @@ Changes		A change history
 Gnu.pm		The GNU Readline extension Perl module
 Gnu.xs		The GNU Readline extension external subroutines
 Gnu/XS.pm
-INSTALL		Installtion instructions
+INSTALL.md	Installtion instructions
 MANIFEST	This list of files
 Makefile.PL	The GNU Readline extension makefile writer
-README		The Instructions
+README.md	The Instructions
 eg/perlsh	A powerful calculator
 eg/fileman	A short completion example
 eg/pftp		An ftp client with the GNU Readline support

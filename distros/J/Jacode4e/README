@@ -1,6 +1,6 @@
 NAME
 
-    Jacode4e - jacode.pl-like program for enterprise
+    Jacode4e - Converts Character Encodings for Enterprise in Japan
 
 SYNOPSIS
 
@@ -8,20 +8,20 @@ SYNOPSIS
   use lib "$FindBin::Bin/lib";
   use Jacode4e;
  
-  $return =
+  $char_count =
   Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
  
-    $return
-      Number of characters in $line
- 
+    $char_count
+      Count of characters in $line
+
     $line
-      String variable to convert
-      After conversion, this variable is overwritten
- 
-    $OUTPUT_encoding, and $INPUT_encoding
-      To convert, you must specify both $OUTPUT_encoding and $INPUT_encoding.
-      The encodings you can specify are as follows:
- 
+    $OUTPUT_encoding
+    $INPUT_encoding
+      Converts encoding of $line from $INPUT_encoding to $OUTPUT_encoding then
+      overwrites $line.
+      $OUTPUT_encoding and $INPUT_encoding cannot omit.
+      You can use mnemonic as encoding name of $INPUT_encoding and $OUTPUT_encoding:
+
       mnemonic      means
       -----------------------------------------------------------------------
       cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
@@ -42,10 +42,11 @@ SYNOPSIS
       utf8.1        UTF-8.1
       utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
       -----------------------------------------------------------------------
- 
-    %option
-      The options you can specify are as follows:
- 
+
+    { %option }
+      Hash reference "{ %option }" can omit.
+      You can following mnemonics as keys of hash reference "{ %option }":
+
       key mnemonic      value means
       -----------------------------------------------------------------------
       INPUT_LAYOUT      input record layout by 'S' and 'D' sequence
@@ -64,22 +65,30 @@ SYNOPSIS
     If you need round-trip conversion, you had better use Jacode4e::RoundTrip
     module.
 
-WHAT IS "CP932X"?
-
-    * "cp932x" as mnemonic
-    * CP932X is CP932
-    * Pronounce [si: pi: nain thri: tu: kai] in English
-    * Pronounce [shi: pi: kju: san' ni kai] in Japanese
-    * [si: pi: nain thri: tu: iks] is reserved for Microsoft Corporation ;-P
-    * CP932 upper compatible
-    * Supports JIS X 0213 character set
-    * Used ghost character "\x9C\x5A" as single shift code
-    * Used "\x9C\x5A\x9C\x5A" for single "\x9C\x5A"
-    * You can use private use characters you made
-    * You can use your operating system, network, and database.
-    * In most cases, application programs can be used as it is.
-
-SUPPORTED PERL VERSIONS
+DEPENDENCIES
 
     perl version 5.005_03 to newest perl
 
+SEE ALSO
+
+    jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
+    https://metacpan.org/author/UTASHIRO
+    http://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
+    http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
+    ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
+    http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
+    https://twitter.com/uta46/status/11578906320
+
+    jacode - Perl program for Japanese character code conversion
+    https://metacpan.org/search?q=jacode.pl
+
+    Jacode4e - jacode.pl-like program for enterprise
+    https://metacpan.org/pod/Jacode4e
+
+    Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
+    https://metacpan.org/pod/Jacode4e::RoundTrip
+
+    Other Tools
+    https://metacpan.org/release/Perl7-Handy
+    https://metacpan.org/release/UTF8-R2
+    https://metacpan.org/release/mb

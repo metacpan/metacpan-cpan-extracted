@@ -36,6 +36,7 @@ lib/Data/Sah/Filter/perl/Str/ltrim.pm
 lib/Data/Sah/Filter/perl/Str/oneline.pm
 lib/Data/Sah/Filter/perl/Str/remove_comment.pm
 lib/Data/Sah/Filter/perl/Str/remove_nondigit.pm
+lib/Data/Sah/Filter/perl/Str/remove_whitespace.pm
 lib/Data/Sah/Filter/perl/Str/replace_map.pm
 lib/Data/Sah/Filter/perl/Str/rtrim.pm
 lib/Data/Sah/Filter/perl/Str/trim.pm

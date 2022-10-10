@@ -1,0 +1,1 @@
+{"version":130003,"stmts":[{"stmt":{"UpdateStmt":{"relation":{"relname":"t","inh":true,"relpersistence":"p","location":7},"targetList":[{"ResTarget":{"name":"a","val":{"A_Const":{"val":{"Integer":{"ival":123}},"location":17}},"location":13}}]}}}]}

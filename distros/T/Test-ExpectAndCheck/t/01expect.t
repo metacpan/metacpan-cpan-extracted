@@ -8,7 +8,7 @@ use Test::More;
 
 use Test::ExpectAndCheck;
 
-my ( $controller, $puppet ) = Test::ExpectAndCheck->create;
+my ( $controller, $mock ) = Test::ExpectAndCheck->create;
 
 # pass
 {
@@ -18,42 +18,59 @@ my ( $controller, $puppet ) = Test::ExpectAndCheck->create;
    test_out q[ok 1 - ->amethod];
 
    $controller->expect( amethod => 0.5 );
-   $puppet->amethod( 0.5 );
+   $mock->amethod( 0.5 );
    $controller->check_and_clear( '->amethod' );
 
    test_test 'amethod OK';
 }
 
-# returns
+# will_return
 {
-   test_out q[ok 1 - $puppet->one returns 1];
+   test_out q[ok 1 - $mock->one returns 1];
    test_out q[# Subtest: ->one];
    test_out q[    ok 1 - ->one()];
    test_out q[    1..1];
    test_out q[ok 2 - ->one];
 
    $controller->expect( one => )
-      ->returns( 1 );
-   is( $puppet->one, 1, '$puppet->one returns 1' );
+      ->will_return( 1 );
+   is( $mock->one, 1, '$mock->one returns 1' );
    $controller->check_and_clear( '->one' );
 
    test_test 'one OK';
 }
 
-# throws
+# will_throw
 {
-   test_out q[ok 1 - $puppet->two throws];
+   test_out q[ok 1 - $mock->two throws];
    test_out q[# Subtest: ->two];
    test_out q[    ok 1 - ->two()];
    test_out q[    1..1];
    test_out q[ok 2 - ->two];
 
    $controller->expect( two => )
-      ->throws( "Oopsie\n" );
-   is( !eval { $puppet->two } && $@, "Oopsie\n", '$puppet->two throws' );
+      ->will_throw( "Oopsie\n" );
+   is( !eval { $mock->two } && $@, "Oopsie\n", '$mock->two throws' );
    $controller->check_and_clear( '->two' );
 
    test_test 'two throws';
+}
+
+# will_return_using
+{
+   test_out q[ok 1 - $mock->three returns 3];
+   test_out q[# Subtest: ->three];
+   test_out q[    ok 1 - ->three()];
+   test_out q[    1..1];
+   test_out q[ok 2 - ->three];
+
+   my $result = 3;
+   $controller->expect( three => )
+      ->will_return_using( sub { return $result } );
+   is( $mock->three, 3, '$mock->three returns 3' );
+   $controller->check_and_clear( '->three' );
+
+   test_test 'three OK';
 }
 
 # fail not called
@@ -90,7 +107,7 @@ my ( $controller, $puppet ) = Test::ExpectAndCheck->create;
 
    my $line = __LINE__;
    $controller->expect( cmethod => 0.5 );
-   ok( !defined eval { $puppet->cmethod( 1.0 ) }, '->cmethod with wrong args dies' );
+   ok( !defined eval { $mock->cmethod( 1.0 ) }, '->cmethod with wrong args dies' );
    my $e = "$@";
    $controller->check_and_clear( '->cmethod fails' );
 
@@ -114,10 +131,30 @@ my ( $controller, $puppet ) = Test::ExpectAndCheck->create;
    test_out q[    1..1];
    test_out q[ok 2 - ->dmethod fails];
 
-   ok( !defined eval { $puppet->dmethod( 2.0 ) }, 'unexpected ->dmethod dies' );
+   ok( !defined eval { $mock->dmethod( 2.0 ) }, 'unexpected ->dmethod dies' );
    $controller->check_and_clear( '->dmethod fails' );
 
    test_test 'dmethod fail unexpected';
+}
+
+# will_also
+{
+   test_out q[ok 1 - $mock->more returns 1];
+   test_out q[# Subtest: ->more];
+   test_out q[    ok 1 - ->more()];
+   test_out q[    1..1];
+   test_out q[ok 2 - ->more];
+   test_out q[ok 3 - ->will_also code is invoked];
+
+   my $called;
+   $controller->expect( more => )
+      ->will_return( 1 )
+      ->will_also( sub { $called++ } );
+   is( $mock->more, 1, '$mock->more returns 1' );
+   $controller->check_and_clear( '->more' );
+   ok( $called, '->will_also code is invoked' );
+
+   test_test 'more OK';
 }
 
 done_testing;

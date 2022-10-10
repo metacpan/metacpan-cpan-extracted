@@ -57,7 +57,6 @@ add_server(pTHX_ Cache_Memcached_Fast *memd, SV *addr_sv,
            double weight, int noreply)
 {
   struct client *c = memd->c;
-  static const int delim = ':';
   const char *host, *port;
   size_t host_len, port_len;
   STRLEN len;
@@ -72,11 +71,10 @@ add_server(pTHX_ Cache_Memcached_Fast *memd, SV *addr_sv,
   /*
     NOTE: here we relay on the fact that host is zero-terminated.
   */
-  port = strrchr(host, delim);
+  port = strrchr(host, ':');
   if (port)
     {
-      host_len = port - host;
-      ++port;
+      host_len = port++ - host;
       port_len = len - host_len - 1;
       res = client_add_server(c, host, host_len, port, port_len,
                               weight, noreply);
@@ -109,20 +107,18 @@ parse_server(pTHX_ Cache_Memcached_Fast *memd, SV *sv)
             double weight = 1.0;
             int noreply = 0;
 
-            addr_sv = hv_fetch(hv, "address", 7, 0);
+            addr_sv = hv_fetchs(hv, "address", 0);
             if (addr_sv)
               SvGETMAGIC(*addr_sv);
             else
               croak("server should have { address => $addr }");
-            ps = hv_fetch(hv, "weight", 6, 0);
+            ps = hv_fetchs(hv, "weight", 0);
             if (ps)
               SvGETMAGIC(*ps);
             if (ps && SvOK(*ps))
               weight = SvNV(*ps);
-            ps = hv_fetch(hv, "noreply", 7, 0);
+            ps = hv_fetchs(hv, "noreply", 0);
             if (ps)
-              SvGETMAGIC(*ps);
-            if (ps && SvOK(*ps))
               noreply = SvTRUE(*ps);
             add_server(aTHX_ memd, *addr_sv, weight, noreply);
           }
@@ -164,13 +160,11 @@ parse_serialize(pTHX_ Cache_Memcached_Fast *memd, HV *conf)
   memd->serialize_method = NULL;
   memd->deserialize_method = NULL;
 
-  ps = hv_fetch(conf, "utf8", 4, 0);
+  ps = hv_fetchs(conf, "utf8", 0);
   if (ps)
-    SvGETMAGIC(*ps);
-  if (ps && SvOK(*ps))
     memd->utf8 = SvTRUE(*ps);
 
-  ps = hv_fetch(conf, "serialize_methods", 17, 0);
+  ps = hv_fetchs(conf, "serialize_methods", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
@@ -199,19 +193,19 @@ parse_compress(pTHX_ Cache_Memcached_Fast *memd, HV *conf)
   memd->compress_method = NULL;
   memd->decompress_method = NULL;
 
-  ps = hv_fetch(conf, "compress_threshold", 18, 0);
+  ps = hv_fetchs(conf, "compress_threshold", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
     memd->compress_threshold = SvIV(*ps);
 
-  ps = hv_fetch(conf, "compress_ratio", 14, 0);
+  ps = hv_fetchs(conf, "compress_ratio", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
     memd->compress_ratio = SvNV(*ps);
 
-  ps = hv_fetch(conf, "compress_methods", 16, 0);
+  ps = hv_fetchs(conf, "compress_methods", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
@@ -237,7 +231,7 @@ parse_config(pTHX_ Cache_Memcached_Fast *memd, HV *conf)
 
   memd->servers = newAV();
 
-  ps = hv_fetch(conf, "ketama_points", 13, 0);
+  ps = hv_fetchs(conf, "ketama_points", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
@@ -247,13 +241,11 @@ parse_config(pTHX_ Cache_Memcached_Fast *memd, HV *conf)
         croak("client_set_ketama() failed");
     }
 
-  ps = hv_fetch(conf, "hash_namespace", 14, 0);
+  ps = hv_fetchs(conf, "hash_namespace", 0);
   if (ps)
-    SvGETMAGIC(*ps);
-  if (ps && SvOK(*ps))
     client_set_hash_namespace(c, SvTRUE(*ps));
 
-  ps = hv_fetch(conf, "servers", 7, 0);
+  ps = hv_fetchs(conf, "servers", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
@@ -276,7 +268,7 @@ parse_config(pTHX_ Cache_Memcached_Fast *memd, HV *conf)
         }
     }
 
-  ps = hv_fetch(conf, "namespace", 9, 0);
+  ps = hv_fetchs(conf, "namespace", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
@@ -288,50 +280,46 @@ parse_config(pTHX_ Cache_Memcached_Fast *memd, HV *conf)
         croak("Not enough memory");
     }
 
-  ps = hv_fetch(conf, "connect_timeout", 15, 0);
+  ps = hv_fetchs(conf, "connect_timeout", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
     client_set_connect_timeout(c, SvNV(*ps) * 1000.0);
 
-  ps = hv_fetch(conf, "io_timeout", 10, 0);
+  ps = hv_fetchs(conf, "io_timeout", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
     client_set_io_timeout(c, SvNV(*ps) * 1000.0);
 
   /* For compatibility with Cache::Memcached.  */
-  ps = hv_fetch(conf, "select_timeout", 14, 0);
+  ps = hv_fetchs(conf, "select_timeout", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
     client_set_io_timeout(c, SvNV(*ps) * 1000.0);
 
-  ps = hv_fetch(conf, "max_failures", 12, 0);
+  ps = hv_fetchs(conf, "max_failures", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
     client_set_max_failures(c, SvIV(*ps));
 
-  ps = hv_fetch(conf, "failure_timeout", 15, 0);
+  ps = hv_fetchs(conf, "failure_timeout", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
     client_set_failure_timeout(c, SvIV(*ps));
 
-  ps = hv_fetch(conf, "close_on_error", 14, 0);
+  ps = hv_fetchs(conf, "close_on_error", 0);
   if (ps)
-    SvGETMAGIC(*ps);
-  if (ps && SvOK(*ps))
     client_set_close_on_error(c, SvTRUE(*ps));
 
-  ps = hv_fetch(conf, "nowait", 6, 0);
+  ps = hv_fetchs(conf, "nowait", 0);
   if (ps)
-    SvGETMAGIC(*ps);
-  if (ps && SvOK(*ps))
     client_set_nowait(c, SvTRUE(*ps));
 
-  ps = hv_fetch(conf, "max_size", 8, 0);
+  ps = hv_fetchs(conf, "max_size", 0);
   if (ps)
     SvGETMAGIC(*ps);
   if (ps && SvOK(*ps))
@@ -361,8 +349,8 @@ compress(pTHX_ Cache_Memcached_Fast *memd, SV *sv, flags_type *flags)
       csv = newSV(0);
 
       PUSHMARK(SP);
-      XPUSHs(sv_2mortal(newRV_inc(sv)));
-      XPUSHs(sv_2mortal(newRV_noinc(csv)));
+      mXPUSHs(newRV_inc(sv));
+      mXPUSHs(newRV_noinc(csv));
       PUTBACK;
 
       count = call_sv(memd->compress_method, G_SCALAR);
@@ -401,8 +389,8 @@ decompress(pTHX_ Cache_Memcached_Fast *memd, SV **sv, flags_type flags)
       rsv = newSV(0);
 
       PUSHMARK(SP);
-      XPUSHs(sv_2mortal(newRV_inc(*sv)));
-      XPUSHs(sv_2mortal(newRV_inc(rsv)));
+      mXPUSHs(newRV_inc(*sv));
+      mXPUSHs(newRV_inc(rsv));
       PUTBACK;
 
       count = call_sv(memd->decompress_method, G_SCALAR);
@@ -529,7 +517,7 @@ alloc_value(value_size_type value_size, void **opaque)
   SV *sv;
   char *res;
 
-  sv = newSVpvn("", 0);
+  sv = newSVpvs("");
   res = SvGROW(sv, value_size + 1); /* FIXME: check OOM.  */
   res[value_size] = '\0';
   SvCUR_set(sv, value_size);
@@ -560,15 +548,12 @@ struct xs_value_result
 
 static
 void
-svalue_store(void *arg, void *opaque, int key_index, void *meta)
+svalue_store(void *arg, void *opaque, int key_index PERL_UNUSED_DECL, void *meta)
 {
   dTHX;
   SV *value_sv = (SV *) opaque;
   struct xs_value_result *value_res = (struct xs_value_result *) arg;
   struct meta_object *m = (struct meta_object *) meta;
-
-  /* Suppress warning about unused key_index.  */
-  if (key_index) {}
 
   if (! decompress(aTHX_ value_res->memd, &value_sv, m->flags)
       || ! deserialize(aTHX_ value_res->memd, &value_sv, m->flags))
@@ -625,32 +610,23 @@ mvalue_store(void *arg, void *opaque, int key_index, void *meta)
 
 static
 void
-result_store(void *arg, void *opaque, int key_index, void *meta)
+result_store(void *arg, void *opaque, int key_index, void *meta PERL_UNUSED_DECL)
 {
   dTHX;
   AV *av = (AV *) arg;
   int res = (ptrdiff_t) opaque;
 
-  /* Suppress warning about unused meta.  */
-  if (meta) {}
-
-  if (res)
-    av_store(av, key_index, newSViv(res));
-  else
-    av_store(av, key_index, newSVpvn("", 0));
+  av_store(av, key_index, res ? newSViv(res) : newSVpvs(""));
 }
 
 
 static
 void
-embedded_store(void *arg, void *opaque, int key_index, void *meta)
+embedded_store(void *arg, void *opaque, int key_index, void *meta PERL_UNUSED_DECL)
 {
   dTHX;
   AV *av = (AV *) arg;
   SV *sv = (SV *) opaque;
-
-  /* Suppress warning about unused meta.  */
-  if (meta) {}
 
   av_store(av, key_index, sv);
 }
@@ -687,7 +663,7 @@ _new(class, conf)
     PREINIT:
         Cache_Memcached_Fast *memd;
     CODE:
-        memd = (Cache_Memcached_Fast *) malloc(sizeof(Cache_Memcached_Fast));
+        Newx(memd, 1, Cache_Memcached_Fast);
         memd->c = client_init();
         if (! memd->c)
           croak("Not enough memory");
@@ -716,7 +692,15 @@ _destroy(memd)
             SvREFCNT_dec(memd->deserialize_method);
           }
         SvREFCNT_dec(memd->servers);
-        free(memd);
+        Safefree(memd);
+
+
+void
+_weaken(sv)
+        SV *sv
+    PROTOTYPE: $
+    CODE:
+        sv_rvweaken(sv);
 
 
 void
@@ -898,7 +882,7 @@ set_multi(memd, ...)
                           SvREFCNT_dec(*val);
                       }
                   }
-                PUSHs(sv_2mortal(newRV_noinc((SV *) hv)));
+                mPUSHs(newRV_noinc((SV *) hv));
                 XSRETURN(1);
               }
             else
@@ -939,7 +923,7 @@ get(memd, ...)
         client_execute(memd->c, 2);
         if (value_res.vals)
           {
-            PUSHs(sv_2mortal(value_res.vals));
+            mPUSHs(value_res.vals);
             XSRETURN(1);
           }
         XSRETURN_EMPTY;
@@ -986,7 +970,7 @@ get_multi(memd, ...)
                   SvREFCNT_dec(*val);
               }
           }
-        PUSHs(sv_2mortal(newRV_noinc((SV *) hv)));
+        mPUSHs(newRV_noinc((SV *) hv));
         XSRETURN(1);
 
 
@@ -1018,7 +1002,7 @@ gat(memd, ...)
         client_execute(memd->c, 4);
         if (value_res.vals)
           {
-            PUSHs(sv_2mortal(value_res.vals));
+            mPUSHs(value_res.vals);
             XSRETURN(1);
           }
         XSRETURN_EMPTY;
@@ -1071,7 +1055,7 @@ gat_multi(memd, ...)
                   SvREFCNT_dec(*val);
               }
           }
-        PUSHs(sv_2mortal(newRV_noinc((SV *) hv)));
+        mPUSHs(newRV_noinc((SV *) hv));
         XSRETURN(1);
 
 
@@ -1187,7 +1171,7 @@ incr_multi(memd, ...)
                           SvREFCNT_dec(*val);
                       }
                   }
-                PUSHs(sv_2mortal(newRV_noinc((SV *) hv)));
+                mPUSHs(newRV_noinc((SV *) hv));
                 XSRETURN(1);
               }
             else
@@ -1210,6 +1194,8 @@ incr_multi(memd, ...)
 void
 delete(memd, ...)
         Cache_Memcached_Fast *  memd
+    ALIAS:
+        remove = CMD_REMOVE
     PROTOTYPE: $@
     PREINIT:
         struct result_object object =
@@ -1218,6 +1204,7 @@ delete(memd, ...)
         const char *key;
         STRLEN key_len;
     PPCODE:
+        PERL_UNUSED_ARG(ix);
         object.arg = newAV();
         sv_2mortal((SV *) object.arg);
         noreply = (GIMME_V == G_VOID);
@@ -1318,7 +1305,7 @@ delete_multi(memd, ...)
                           SvREFCNT_dec(*val);
                       }
                   }
-                PUSHs(sv_2mortal(newRV_noinc((SV *) hv)));
+                mPUSHs(newRV_noinc((SV *) hv));
                 XSRETURN(1);
               }
             else
@@ -1443,7 +1430,7 @@ touch_multi(memd, ...)
                           SvREFCNT_dec(*val);
                       }
                   }
-                PUSHs(sv_2mortal(newRV_noinc((SV *) hv)));
+                mPUSHs(newRV_noinc((SV *) hv));
                 XSRETURN(1);
               }
             else
@@ -1570,11 +1557,3 @@ disconnect_all(memd)
     PROTOTYPE: $
     CODE:
         client_reinit(memd->c);
-
-
-void
-_weaken(sv)
-        SV *sv
-    PROTOTYPE: $
-    CODE:
-        sv_rvweaken(sv);

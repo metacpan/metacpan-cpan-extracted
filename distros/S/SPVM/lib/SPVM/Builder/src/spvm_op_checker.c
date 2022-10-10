@@ -3201,7 +3201,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               // Remove type cast op if not needed
-              if (cast_type->basic_type->id == src_type->basic_type->id && cast_type->dimension == src_type->dimension && cast_type->flag == src_type->flag) {
+              if (SPVM_TYPE_equals(compiler, cast_type->basic_type->id, cast_type->dimension, cast_type->flag, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
                 SPVM_OP_cut_op(compiler, op_src);
                 SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                 SPVM_OP_replace_op(compiler, op_stab, op_src);
@@ -4151,6 +4151,14 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
   int32_t src_type_dimension = src_type->dimension;
   int32_t src_type_flag = src_type->flag;
 
+  const char* src_type_name = SPVM_TYPE_new_type_name(compiler, src_type_basic_type_id, src_type_dimension, src_type_flag);
+  const char* dist_type_name = SPVM_TYPE_new_type_name(compiler, dist_type_basic_type_id, dist_type_dimension, dist_type_flag);
+
+  if (SPVM_TYPE_is_void_type(compiler, src_type_basic_type_id, src_type_dimension, src_type_flag)) {
+    SPVM_COMPILER_error(compiler, "The void type can't be assigned in %s at %s line %d", place, file, line);
+    return NULL;
+  }
+
   SPVM_CONSTANT* src_constant = NULL;
   if (op_src->id == SPVM_OP_C_ID_CONSTANT) {
     src_constant = op_src->uv.constant;
@@ -4168,8 +4176,6 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
   );
     
   if (!assignability) {
-    const char* src_type_name = SPVM_TYPE_new_type_name(compiler, src_type_basic_type_id, src_type_dimension, src_type_flag);
-    const char* dist_type_name = SPVM_TYPE_new_type_name(compiler, dist_type_basic_type_id, dist_type_dimension, dist_type_flag);
     if (mutable_invalid) {
       SPVM_COMPILER_error(compiler, "The non-mutable type can't be assign to a mutable type in %s at %s line %d", place, file, line);
     }
@@ -4381,7 +4387,8 @@ void SPVM_OP_CHECKER_resolve_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_ca
         if (found_method) {
           break;
         }
-        parent_class = class->parent_class;
+        parent_class = parent_class->parent_class;
+        
         if (!parent_class) {
           break;
         }
@@ -4397,7 +4404,7 @@ void SPVM_OP_CHECKER_resolve_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_ca
         call_method->method = found_method;
       }
       else {
-        SPVM_COMPILER_error(compiler, "The instance method \"%s\" is not defined in the class \"%s\" or the super classes at %s line %d", method_name, class->name, op_call_method->file, op_call_method->line);
+        SPVM_COMPILER_error(compiler, "The instance method \"%s\" is not defined in the class \"%s\" or its super classes at %s line %d", method_name, class->name, op_call_method->file, op_call_method->line);
         return;
       }
     }
@@ -4463,7 +4470,7 @@ void SPVM_OP_CHECKER_resolve_field_access(SPVM_COMPILER* compiler, SPVM_OP* op_f
     op_field_access->uv.field_access->field = found_field;
   }
   else {
-    SPVM_COMPILER_error(compiler, "The field \"%s\" is not defined in the class \"%s\" or the super classes at %s line %d", field_name, class->name, op_field_access->file, op_field_access->line);
+    SPVM_COMPILER_error(compiler, "The field \"%s\" is not defined in the class \"%s\" or its super classes at %s line %d", field_name, class->name, op_field_access->file, op_field_access->line);
     return;
   }
 }
@@ -4895,22 +4902,96 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
   for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
     SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
     // Check the class has interface methods
-    for (int32_t i = 0; i < class->interfaces->length; i++) {
-      SPVM_CLASS* interface = SPVM_LIST_get(class->interfaces, i);
+    for (int32_t interface_index = 0; interface_index < class->interfaces->length; interface_index++) {
+      SPVM_CLASS* interface = SPVM_LIST_get(class->interfaces, interface_index);
       assert(interface);
       
-      SPVM_METHOD* required_method = interface->required_method;
-      assert(required_method);
+      SPVM_METHOD* interface_required_method = interface->required_method;
       
-      int32_t method_found = 0;
-      for (int32_t i = 0; i < class->methods->length; i++) {
-        SPVM_METHOD* method = SPVM_LIST_get(class->methods, i);
-        if (strcmp(method->name, required_method->name) == 0) {
-          method_found = 1;
+      int32_t require_method_found = 0;
+      for (int32_t method_index = 0; method_index < class->methods->length; method_index++) {
+        SPVM_METHOD* method = SPVM_LIST_get(class->methods, method_index);
+        if (strcmp(method->name, interface_required_method->name) == 0) {
+          require_method_found = 1;
         }
       }
-      if (!method_found) {
-        SPVM_COMPILER_error(compiler, "The class \"%s\" must have the method \"%s\" defined as a required method in the interface \"%s\" at %s line %d", class->name, required_method->name, interface->name, class->op_class->file, class->op_class->line);
+      
+      if (!require_method_found) {
+        SPVM_COMPILER_error(compiler, "The class \"%s\" must have the method \"%s\" defined as a required method in the interface \"%s\" at %s line %d", class->name, interface_required_method->name, interface->name, class->op_class->file, class->op_class->line);
+        return;
+      }
+      
+      for (int32_t interface_method_index = 0; interface_method_index < interface->methods->length; interface_method_index++) {
+        SPVM_METHOD* interface_method = SPVM_LIST_get(interface->methods, interface_method_index);
+        
+        for (int32_t method_index = 0; method_index < class->methods->length; method_index++) {
+          SPVM_METHOD* method = SPVM_LIST_get(class->methods, method_index);
+          
+          if (strcmp(method->name, interface_method->name) == 0) {
+            
+            if (method->is_class_method) {
+              SPVM_COMPILER_error(compiler, "The method \"%s\" in the class \"%s\" must an instance method because the method \"%s\" is defined as an instance method in the interface \"%s\" at %s line %d", method->name, class->name, interface_method->name, interface->name, class->op_class->file, class->op_class->line);
+              return;
+            }
+            
+            // Check the equality of the arguments
+            SPVM_LIST* method_var_decls = method->var_decls;
+            
+            SPVM_LIST* interface_method_var_decls = interface_method->var_decls;
+            
+            if (method->args_length != interface_method->args_length) {
+              SPVM_COMPILER_error(compiler, "The length of the arguments of the method \"%s\" in the class \"%s\" must be equal to the length of the arguments of the method \"%s\" in the interface \"%s\" at %s line %d", method->name, class->name, interface_method->name, interface->name, class->op_class->file, class->op_class->line);
+              return;
+            }
+            
+            for (int32_t arg_index = 1; arg_index < interface_method->args_length; arg_index++) {
+              SPVM_VAR_DECL* method_var_decl = SPVM_LIST_get(method_var_decls, arg_index);
+              SPVM_VAR_DECL* interface_method_var_decl = SPVM_LIST_get(interface_method_var_decls, arg_index);
+              
+              SPVM_TYPE* method_var_decl_type = method_var_decl->type;
+              SPVM_TYPE* interface_method_var_decl_type = interface_method_var_decl->type;
+              
+              if (!SPVM_TYPE_equals(compiler, method_var_decl_type->basic_type->id, method_var_decl_type->dimension, method_var_decl_type->flag, interface_method_var_decl_type->basic_type->id, interface_method_var_decl_type->dimension, interface_method_var_decl_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The type of the %dth argument of the method \"%s\" in the class \"%s\" must be equal to the type of the %dth argument of the method \"%s\" in the interface \"%s\" at %s line %d", arg_index, method->name, class->name, arg_index, interface_method->name, interface->name, class->op_class->file, class->op_class->line);
+                return;
+              }
+            }
+            
+            // Check the assignability of the return value
+            SPVM_TYPE* method_return_type = method->return_type;
+            SPVM_TYPE* interface_method_return_type = interface_method->return_type;
+            
+            int32_t method_return_type_is_void = SPVM_TYPE_is_void_type(compiler, method_return_type->basic_type->id, method_return_type->dimension, method_return_type->flag);
+            int32_t interface_method_return_type_is_void = SPVM_TYPE_is_void_type(compiler, interface_method_return_type->basic_type->id, interface_method_return_type->dimension, interface_method_return_type->flag);
+            
+            if (method_return_type_is_void && interface_method_return_type_is_void) {
+              // OK
+            }
+            else {
+              SPVM_CONSTANT* src_constant = NULL;
+              int32_t need_implicite_conversion = 0;
+              int32_t narrowing_conversion_error = 0;
+              int32_t mutable_invalid = 0;
+              int32_t assignability = SPVM_TYPE_can_assign(
+                compiler,
+                interface_method_return_type->basic_type->id, interface_method_return_type->dimension, interface_method_return_type->flag,
+                method_return_type->basic_type->id, method_return_type->dimension, method_return_type->flag,
+                src_constant, &need_implicite_conversion, &narrowing_conversion_error, &mutable_invalid
+              );
+              
+              if (assignability) {
+                if (need_implicite_conversion) {
+                  SPVM_COMPILER_error(compiler, "The return type of the \"%s\" in the class \"%s\" must be able to be assigned without an implicite type conversion to the return type of the method \"%s\" in the interface \"%s\" at %s line %d", method->name, class->name, interface_method->name, interface->name, class->op_class->file, class->op_class->line);
+                  return;
+                }
+              }
+              else {
+                SPVM_COMPILER_error(compiler, "The return type of the \"%s\" in the class \"%s\" must be able to be assigned to the return type of the method \"%s\" in the interface \"%s\" at %s line %d", method->name, class->name, interface_method->name, interface->name, class->op_class->file, class->op_class->line);
+                return;
+              }
+            }
+          }
+        }
       }
     }
   }

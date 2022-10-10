@@ -26,7 +26,7 @@ WriteMakefile(
   },
   # SPVM::Builder::Util::API is needed for Makefile.PL
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9653',
+    'SPVM'              => '0.9654',
   },
   PREREQ_PM         => {
     'SPVM::Errno' => '0.06',
@@ -55,6 +55,7 @@ sub MY::postamble {
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Constant');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Addrinfo');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::AddrinfoLinkedList');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Sockaddr::In');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Sockaddr::In6');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Sockaddr::Un');

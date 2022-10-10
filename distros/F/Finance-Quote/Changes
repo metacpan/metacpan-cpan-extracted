@@ -1,3 +1,24 @@
+1.53      2022-10-08 12:26:55-07:00 America/Los_Angeles
+	* dist.ini - changed bugtracker.web to
+	  https://github.com/finance-quote/finance-quote/issues
+	* DWS.pm - Set $info{$symbol, 'symbol'} to $symbol.
+	* Union.pm - #231 - reworked for a different CSV file.
+        * CurrencyRates/AlphaVantage.pm - API CURRENCY_EXCHANGE_RATE
+          no longer accepts free API keys. Changed to use FX_DAILY API. 
+          Issue #229 PR #230
+        * Set minimum version for LWP::UserAgent in dist.ini to
+          honor redirects.
+        * CurrencyRates/AlphaVantage.pm - Added logic to account
+          for empty JSON returned from currency exchange fetch.
+        * Bourso.pm - Added Europe and France back as failover
+          methods. These were removed some time ago in commit e26484b.
+        * Tradeville.pm - Changed hostname in URL to tradeville.ro.
+          Added logic to better account for the symbol not being
+          found.
+        * YahooJSON.pm - #202 - Account for symbols with '&'.
+        * Minor change to isoTime function in Quote.pm.
+        * Updated TSP.pm - PR #227 - update URL and handling of dates.
+
 1.52      2022-07-03 15:15:38-07:00 America/Los_Angeles
         * Quote.pm - Fixed logic for FQ_LOAD_QUOTELET starting with "-defaults"
           reported in issue #197. PR #199.

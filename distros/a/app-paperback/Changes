@@ -1,5 +1,9 @@
 Revision history for Perl module and script App::paperback.
 
+
+1.37  Mon Oct 3 09:00:00 2022
+	- Fix regression in calcRotateMatrix
+
 1.36  Tue Sep 27 09:00:00 2022
 	- Renaming some variables to improve generalization
 

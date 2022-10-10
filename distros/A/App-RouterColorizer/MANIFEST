@@ -25,6 +25,7 @@ t/05-junos.t
 t/06-vyos.t
 t/07-cisco.t
 t/08-ciena.t
+t/90-meta-mode.t
 t/author-critic.t
 t/author-no-tabs.t
 t/author-pod-syntax.t
@@ -43,6 +44,8 @@ t/data/07-cisco.input
 t/data/07-cisco.output
 t/data/08-ciena.input
 t/data/08-ciena.output
+t/data/90-meta-mode.input
+t/data/90-meta-mode.output
 t/data/perlcriticrc
 t/release-changes_has_content.t
 t/release-kwalitee.t

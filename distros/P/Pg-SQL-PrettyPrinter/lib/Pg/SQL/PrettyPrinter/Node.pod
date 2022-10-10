@@ -1,0 +1,169 @@
+
+=head1 NAME
+
+Pg::SQL::PrettyPrinter::Node - Base class for all elements of query parse tree.
+
+=head1 SYNOPSIS
+
+This is base class for all Pg::SQL::PrettyPrinter::Node::* classes.
+
+Not to be used separately
+
+=head1 FUNCTIONS
+
+=head2 new
+
+Base object constructor, to be inherited by all
+Pg::SQL::PrettyPrinter::Node::* subclasses.
+
+In its base form, it just clones given data, and blesses it using its own
+class.
+
+=head2 make_from
+
+Makes objects based on data given.
+
+=head3 make_from(HASHREF)
+
+If given data is HASHREF, it makes single object.
+
+The hashref should contain just one key, whose name starts with upper case
+letter.
+
+Based on this hash, new class is being generated:
+
+    Pg::SQL::PrettyPrinter::<NAME_OF_THIS_KEY>
+
+And then object of this class is built with value from given HASHREF being
+passed as source.
+
+For example, if we'd call:
+
+    $self->make_from( { 'SelectStmt' => [ 1, 2, 3 ] } )
+
+It would return result of:
+
+    Pg::SQL::PrettyPrinter::Node::SelectStmt->new( [ 1, 2, 3 ] )
+
+=head3 make_from(ARRAYREF)
+
+If given data is arrayref, make_from will be called on each element of the
+array separately, and then it will return arrayref with all gathered elements.
+
+This is to repeat writing similar code:
+
+    my $whatver = [ map { $self->make_from( $_ ) } @{ $self->{ 'something'} } ];
+
+Instead you can just:
+
+    my $whatever = $self->make_from( $self->{ 'something' } );
+
+=head2 objectify(key, key, key)
+
+Wrapper around make_from, which, for every given argument, checks if the
+argument exists inside $self, and if so, replaces it with output from
+C<$self->make_path> of it.
+
+This means that these blocks are functionally equivalent:
+
+    $self->{'xxx'} = $self->make_from( $self->{'xxx'} ) if exists $self->{'xxx'};
+
+and
+
+    $self->objectify( 'xxx' )
+
+In case key is arrayref, it is then treated as subhashes within $self, so
+
+    $self->objectify( ['a', 'b'] )
+
+is the same as:
+
+    $self->{'a'}->{'b'} = $self->make_from( $self->{'a'}->{'b'} ) if exists $self->{'a'}->{'b'};
+
+=head2 get_container_key
+
+Helper method that converts given argument into pair of (container, key) using
+following semantics:
+
+=over
+
+=item * $self->get_container_key( 'x' ) => ($self, 'x')
+
+=item * $self->get_container_key( [ 'a', 'b', 'c' ] ) => ( $self->{'a'}->{'b'}, 'c' )
+
+=back
+
+If any key within final expression doesn't exist in upper container
+(C<$self->{'a'}> or C<$self->{'a'}->{'b'}) it will return undef;
+
+=head2 pretty_print
+
+This is supposed to be overriden in Node::* classes that require smart
+pretty-printing. This method just returns the same thing as as_text(), to make
+it easier to write classes that don't require special pretty printing.
+
+=head2 quote_literal
+
+Returns given value as fully quoted literal value ready to be used in SQL.
+
+For example:
+
+    $self->quote_literal( "String with ' character" )
+
+will return
+
+    'String with '' character'
+
+=head2 quote_ident
+
+Returns given value as fully quoted identifier ready to be used in SQL.
+
+For example:
+
+    $self->quote_literal( 'Abc"d' )
+
+will return
+
+    "Abc""d"
+
+=head2 increase_indent
+
+Takes given argument and increases indentation level on all of its lines, by
+one level (four spaces).
+
+    $self->increase_indent( "abc\ndef" )
+
+will return
+
+    "    abc\n    def"
+
+=head2 increase_indent_n
+
+Takes two arguments, where first is number of levels to increase indent, and
+behaves like increase_indent repeated n times.
+
+    $self->increase_indent_n( 2, "abc\ndef" )
+
+will return
+
+    "        abc\n    def"
+
+=head1 AUTHOR
+
+hubert depesz lubaczewski, C<< <depesz at depesz.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<depesz at depesz.com>.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Pg::SQL::PrettyPrinter::Node
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright  hubert depesz lubaczewski, all rights reserved.
+
+This program is distributed under the (Revised) BSD License.

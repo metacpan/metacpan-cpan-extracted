@@ -1,0 +1,23 @@
+Revision history for Pg-SQL-PrettyPrinter
+
+0.4     2022-10-03
+        Add handling of:
+        - INSERT ... ON CONFLICT
+        - SELECT agg(..) FILTER ( WHERE ... )
+        - SELECT ... FOR UPDATE/SHARE
+        per reports from Jamey Courtney and Ben Davies
+
+0.3     2022-09-10
+        Fix badly formatted where clauses in delete and update.
+        Add handing of CTEs to INSERT, UPDATE, and DELETE queries (per gripe
+        from Jamey Courtney)
+
+0.2     2022-09-01
+        Fix bugs reported by ztane on IRC:
+        1. LATERAL keyword disappeared
+        2. CURRENT ROW specification as end of frame got mistakenly written as
+           CURRENT_ROW
+
+0.1     2022-08-31
+        Initial release
+

@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::CSS.
 
+0.09  Sat Oct 09 04:05:00 2022
+      - Change bugtracker; remove obsolete links #1, thanks @benkasminbullock.
+
 0.08  Sat Sep 09 12:00:00 2017
       - Updated copyright year information.
 

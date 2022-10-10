@@ -14,3 +14,6 @@ doap.ttl
 lib/Type/FromSah.pm
 t/01basic.t
 t/02simple-usage.t
+t/03type-default.t
+t/04parent.t
+t/05coercion.t

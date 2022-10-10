@@ -22,6 +22,7 @@ lib/Net/SAML2/Protocol/AuthnRequest.pm
 lib/Net/SAML2/Protocol/LogoutRequest.pm
 lib/Net/SAML2/Protocol/LogoutResponse.pm
 lib/Net/SAML2/Role/ProtocolMessage.pm
+lib/Net/SAML2/Role/VerifyXML.pm
 lib/Net/SAML2/SP.pm
 lib/Net/SAML2/Types.pm
 lib/Net/SAML2/Util.pm
@@ -44,6 +45,9 @@ t/13-verify-issues.t
 t/15-evil-nameid-and-email-assertion.t
 t/16-encrypted-assertion.t
 t/17-lowercase-url-escaping.t
+t/18-metadata-multiple-signing.t
+t/19-metadata-multiple-signing.t
+t/20-path-only-redirect.t
 t/author-critic.t
 t/author-eof.t
 t/author-eol.t
@@ -54,6 +58,12 @@ t/author/notabs.t
 t/author/pod.t
 t/author/podcoverage.t
 t/cacert.pem
+t/data/cacert-azure.pem
+t/data/cacert-google.pem
+t/data/idp-metadata-multiple-invalid-use.xml
+t/data/idp-metadata-multiple-signing-azure.xml
+t/data/idp-metadata-multiple-signing.xml
+t/data/idp-metadata-signing-encryption.xml
 t/encrypted-sign-private.pem
 t/idp-metadata.xml
 t/idp-metadata2.xml

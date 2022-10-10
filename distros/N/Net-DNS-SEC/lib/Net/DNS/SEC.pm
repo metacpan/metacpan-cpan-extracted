@@ -2,10 +2,20 @@ package Net::DNS::SEC;
 
 use strict;
 use warnings;
+use Carp;
 
+our $SVNVERSION = (qw$Id: SEC.pm 1882 2022-10-04 19:53:44Z willem $)[2];
 our $VERSION;
-$VERSION = '1.19';
-our $SVNVERSION = (qw$Id: SEC.pm 1854 2021-10-11 10:43:36Z willem $)[2];
+$VERSION = '1.20';
+
+use base qw(Exporter DynaLoader);
+
+eval { __PACKAGE__->bootstrap($VERSION) };
+warn "\n\n$@\n" if $@;
+
+use Net::DNS 1.01 qw(:DEFAULT);
+
+our @EXPORT = ( @Net::DNS::EXPORT, qw(algorithm digtype key_difference) );
 
 
 =head1 NAME
@@ -31,16 +41,6 @@ The extended features are made available by replacing Net::DNS by
 Net::DNS::SEC in the use declaration.
 
 =cut
-
-
-use base qw(Exporter DynaLoader);
-
-use Net::DNS 1.01 qw(:DEFAULT);
-
-our @EXPORT = ( @Net::DNS::EXPORT, qw(algorithm digtype key_difference) );
-
-use integer;
-use Carp;
 
 
 =head1 UTILITY FUNCTIONS
@@ -99,13 +99,9 @@ sub key_difference {
 
 ########################################
 
-eval { Net::DNS::SEC->bootstrap($VERSION) } || croak;
-
-
 foreach (qw(DS CDS RRSIG)) {
 	Net::DNS::RR->new( type => $_ );			# pre-load to access class methods
 }
-
 
 1;
 __END__

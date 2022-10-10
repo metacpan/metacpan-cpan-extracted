@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2021  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2009-2022  Alex Schroeder <alex@gnu.org>
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -69,6 +69,8 @@ has 'offset';
 has 'type';
 has 'label';
 has 'map';
+has 'side';
+has 'start';
 
 =head1 METHODS
 
@@ -180,16 +182,22 @@ sub svg_label {
   my $glow = $self->map->glow_attributes || "";
   my $url = $self->map->url;
   $url =~ s/\%s/url_escape($self->label)/e or $url .= url_escape($self->label) if $url;
-  # default is left, but if the line goes from right to left, then "left" means "upside down"
-  my $side = '';
-  if ($self->points->[1]->x < $self->points->[0]->x
-      or $#{$self->points} >= 2 and $self->points->[2]->x < $self->points->[0]->x) {
-    $side = ' side="right"';
+  # Default side is left, but if the line goes from right to left, then "left"
+  # means "upside down", so allow people to control it.
+  my $pathAttributes = '';
+  if ($self->side) {
+    $pathAttributes = ' side="' . $self->side . '"';
+  } elsif ($self->points->[1]->x < $self->points->[0]->x
+	   or $#{$self->points} >= 2 and $self->points->[2]->x < $self->points->[0]->x) {
+    $pathAttributes = ' side="right"';
+  }
+  if ($self->start) {
+    $pathAttributes .= ' startOffset="' . $self->start . '"';
   }
   my $data = qq{    <g>\n};
-  $data .= qq{      <text $attributes $glow><textPath$side href='#$id'>$label</textPath></text>\n} if $glow;
+  $data .= qq{      <text $attributes $glow><textPath$pathAttributes href='#$id'>$label</textPath></text>\n} if $glow;
   $data .= qq{      <a xlink:href="$url">} if $url;
-  $data .= qq{      <text $attributes><textPath href='#$id'>$label</textPath></text>\n};
+  $data .= qq{      <text $attributes><textPath$pathAttributes href='#$id'>$label</textPath></text>\n};
   $data .= qq{      </a>} if $url;
   $data .= qq{    </g>\n};
   return $data;

@@ -1,5 +1,9 @@
 Revision history for App-VTide
 
+0.1.18   2022-10-09
+        Updating for release of version 0.1.18
+        Adding the ability to search or exclude from history (Ivan Wills)
+
 0.1.17   2022-07-03
         Updating for release of version 0.1.17
         Updated (Ivan Wills)

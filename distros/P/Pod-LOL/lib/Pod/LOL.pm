@@ -12,11 +12,11 @@ Pod::LOL - parse Pod into a list of lists (LOL)
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our $DEBUG   = 0;
 
 

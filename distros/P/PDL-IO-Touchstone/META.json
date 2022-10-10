@@ -34,7 +34,7 @@
          "requires" : {
             "PDL" : "2.080",
             "PDL::Constants" : "0",
-            "PDL::LinearAlgebra" : "0",
+            "PDL::LinearAlgebra" : "0.35",
             "perl" : "5.010"
          }
       },
@@ -43,7 +43,7 @@
             "File::Temp" : "0",
             "PDL" : "2.080",
             "PDL::Constants" : "0",
-            "PDL::LinearAlgebra" : "0",
+            "PDL::LinearAlgebra" : "0.35",
             "Test::More" : "0"
          }
       }
@@ -59,6 +59,6 @@
          "web" : "https://github.com/KJ7LNW/perl-PDL-IO-Touchstone.git"
       }
    },
-   "version" : 1.005,
+   "version" : 1.006,
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

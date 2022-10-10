@@ -229,7 +229,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.127';
+our $VERSION = '0.128';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -1003,6 +1003,7 @@ functionality that would otherwise accept them.
 	    open $fh, '<', $file_name	## no critic (RequireBriefOpen)
 		or croak "Failed to open $file_name: $!";
 	}
+	local $_ = undef;	# while (<>) ... does not localize $_.
 	while ( <$fh> ) {
 	    chomp;
 	    m/ \A \s* (?: \# | \z ) /smx

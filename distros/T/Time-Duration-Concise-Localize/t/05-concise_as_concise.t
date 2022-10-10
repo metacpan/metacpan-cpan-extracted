@@ -6,7 +6,7 @@ use Test::More;
 my $min_tpc = 1.27;
 eval "use Time::Seconds $min_tpc";
 plan skip_all => "Time::Seconds $min_tpc required for testing" if $@;
-plan tests => 15;
+plan tests    => 15;
 
 eval "use Test::NoWarnings";
 use Time::Duration::Concise;

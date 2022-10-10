@@ -6,7 +6,7 @@ Graph::Undirected::Hamiltonicity - decide whether a given Graph::Undirected
 
 =head1 VERSION
 
-Version 0.013
+Version 0.17
 
 
 =head1 SYNOPSIS
@@ -51,6 +51,6 @@ Please report issues L<on GitHub|https://github.com/ownlifeful/Graph-Undirected-
 
 =head1 AUTHOR
 
-Ashwin Dixit, C<< <ashwin at ownlifeful dot com> >>
+Ashwin Dixit, C<< <ashwin at CPAN dot org> >>
 
 =cut

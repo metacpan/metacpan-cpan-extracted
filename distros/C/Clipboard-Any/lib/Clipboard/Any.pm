@@ -1,10 +1,5 @@
 package Clipboard::Any;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-15'; # DATE
-our $DIST = 'Clipboard-Any'; # DIST
-our $VERSION = '0.002'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -13,6 +8,11 @@ use Log::ger;
 use Exporter::Rinci qw(import);
 use File::Which qw(which);
 use IPC::System::Options 'system', 'readpipe', -log=>1;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-09'; # DATE
+our $DIST = 'Clipboard-Any'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 my $known_clipboard_managers = [qw/klipper/];
 my $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
@@ -121,6 +121,39 @@ sub clear_clipboard_history {
     [412, "Cannot clear clipboard history (clipboard manager=$clipboard_manager)"];
 }
 
+$SPEC{'clear_clipboard_content'} = {
+    v => 1.1,
+    summary => 'Delete current clipboard content',
+    description => <<'_',
+
+_
+    args => {
+        %argspecopt_clipboard_manager,
+    },
+    result => {
+        schema => $sch_clipboard_manager,
+    },
+};
+sub clear_clipboard_content {
+    my %args = @_;
+
+    my $clipboard_manager = $args{clipboard_manager} // detect_clipboard_manager();
+    return [412, "Can't detect any known clipboard manager"]
+        unless $clipboard_manager;
+
+    if ($clipboard_manager eq 'klipper') {
+        my ($stdout, $stderr);
+        # qdbus likes to emit an empty line
+        system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+               "qdbus", "org.kde.klipper", "/klipper", "clearClipboardContents");
+        my $exit_code = $? < 0 ? $? : $?>>8;
+        return [500, "/klipper's clearClipboardContents failed: $exit_code"] if $exit_code;
+        return [200, "OK"];
+    }
+
+    [412, "Cannot clear clipboard content (clipboard manager=$clipboard_manager)"];
+}
+
 $SPEC{'get_clipboard_content'} = {
     v => 1.1,
     summary => 'Get the clipboard content (most recent, history index [0])',
@@ -218,6 +251,40 @@ sub list_clipboard_history {
     [412, "Cannot list clipboard history (clipboard manager=$clipboard_manager)"];
 }
 
+$SPEC{'add_clipboard_content'} = {
+    v => 1.1,
+    summary => 'Add a new content to the clipboard',
+    description => <<'_',
+
+_
+    args => {
+        %argspecopt_clipboard_manager,
+        content => {schema => 'str*', req=>1, pos=>0},
+    },
+    result => {
+        schema => $sch_clipboard_manager,
+    },
+};
+sub add_clipboard_content {
+    my %args = @_;
+
+    my $clipboard_manager = $args{clipboard_manager} // detect_clipboard_manager();
+    return [412, "Can't detect any known clipboard manager"]
+        unless $clipboard_manager;
+
+    if ($clipboard_manager eq 'klipper') {
+        my ($stdout, $stderr);
+        # qdbus likes to emit an empty line
+        system({capture_stdout=>\$stdout, capture_stderr=>\$stderr},
+               "qdbus", "org.kde.klipper", "/klipper", "setClipboardContents", $args{content});
+        my $exit_code = $? < 0 ? $? : $?>>8;
+        return [500, "/klipper's setClipboardContents failed: $exit_code"] if $exit_code;
+        return [200, "OK"];
+    }
+
+    [412, "Cannot add clipboard content (clipboard manager=$clipboard_manager)"];
+}
+
 1;
 # ABSTRACT: Common interface to clipboard manager functions
 
@@ -233,7 +300,7 @@ Clipboard::Any - Common interface to clipboard manager functions
 
 =head1 VERSION
 
-This document describes version 0.002 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2021-07-15.
+This document describes version 0.003 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2022-10-09.
 
 =head1 DESCRIPTION
 
@@ -269,6 +336,80 @@ welcome.
 2021-07-15 - Tested on my system (KDE Plasma 5.12.9 on Linux).
 
 =head1 FUNCTIONS
+
+
+=head2 add_clipboard_content
+
+Usage:
+
+ add_clipboard_content(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Add a new content to the clipboard.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<clipboard_manager> => I<str>
+
+Explicitly set clipboard manager to use.
+
+The default, when left undef, is to detect what clipboard manager is running.
+
+=item * B<content>* => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (str)
+
+
+
+=head2 clear_clipboard_content
+
+Usage:
+
+ clear_clipboard_content(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Delete current clipboard content.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<clipboard_manager> => I<str>
+
+Explicitly set clipboard manager to use.
+
+The default, when left undef, is to detect what clipboard manager is running.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (str)
+
 
 
 =head2 clear_clipboard_history
@@ -416,6 +557,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Clipboard-
 
 Source repository is at L<https://github.com/perlancar/perl-Clipboard-Any>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Clipboard-Any>
@@ -423,16 +593,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

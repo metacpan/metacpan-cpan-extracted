@@ -17,7 +17,7 @@ use Net::RDAP::SearchResult;
 use vars qw($VERSION);
 use strict;
 
-$VERSION = 0.15;
+$VERSION = 0.16;
 
 =pod
 
@@ -124,9 +124,9 @@ sub new {
 This method returns a L<Net::RDAP::Object::Domain> object containing
 information about the domain name referenced by C<$domain>.
 
-C<$domain> must be a L<Net::DNS::Domain> object. The domain may be
-either a "forward" domain (such as C<example.com>) or a "reverse"
-domain (such as C<168.192.in-addr.arpa>).
+C<$domain> must be a L<Net::DNS::Domain> object or a string containing a
+fully-qualified domain name. The domain may be either a "forward" domain
+(such as C<example.com>) or a "reverse" domain (such as C<168.192.in-addr.arpa>).
 
 If there was an error, this method will return a L<Net::RDAP::Error>.
 
@@ -149,10 +149,7 @@ sub domain {
 	my ($self, $object, %args) = @_;
 
 	if ('Net::DNS::Domain' ne ref($object)) {
-		return $self->error(
-			'errorCode'	=> 400,
-			'title'		=> 'argument must be a Net::DNS::Domain',
-		);
+		return $self->query('object' => Net::DNS::Domain->new($object), %args);
 
 	} else {
 		return $self->query('object' => $object, %args);
@@ -169,7 +166,7 @@ sub domain {
 This method returns a L<Net::RDAP::Object::IPNetwork> object containing
 information about the resource referenced by C<$ip>.
 
-C<$ip> must be a L<Net::IP> object and can represent any of the
+C<$ip> must be either a L<Net::IP> object or a string, and can represent any of the
 following:
 
 =over
@@ -192,10 +189,7 @@ sub ip {
 	my ($self, $object, %args) = @_;
 
 	if ('Net::IP' ne ref($object)) {
-		return $self->error(
-			'errorCode'	=> 400,
-			'title'		=> 'argument must be a Net::IP',
-		);
+		return $self->query('object' => Net::IP->new($object), %args);
 
 	} else {
 		return $self->query('object' => $object, %args);
@@ -212,7 +206,7 @@ sub ip {
 This method returns a L<Net::RDAP::Object::Autnum> object containing
 information about the autonymous system referenced by C<$autnum>.
 
-C<$autnum> must be a L<Net::ASN> object.
+C<$autnum> must be a L<Net::ASN> object or an literal integer AS number.
 
 If there was an error, this method will return a L<Net::RDAP::Error>.
 
@@ -222,10 +216,7 @@ sub autnum {
 	my ($self, $object, %args) = @_;
 
 	if ('Net::ASN' ne ref($object)) {
-		return $self->error(
-			'errorCode'	=> 400,
-			'title'		=> 'argument must be a Net::ASN',
-		);
+		return $self->query('object' => Net::ASN->new($object), %args);
 
 	} else {
 		return $self->query('object' => $object, %args);
@@ -533,7 +524,7 @@ sub object_from_response {
 sub is_rdap {
 	my ($self, $response) = @_;
 
-	return ('file' eq $response->base->scheme || $response->header('Content-Type') =~ /^application\/rdap\+json/);
+	return ('file' eq $response->base->scheme || ($response->header('Content-Type') =~ /^application\/rdap\+json/ || $response->header('Content-Type') =~ /^application\/json/));
 }
 
 #
@@ -748,7 +739,7 @@ Protocol (RDAP) Object Tagging
 
 =head1 COPYRIGHT
 
-Copyright 2019 CentralNic Ltd. All rights reserved.
+Copyright 2022 CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

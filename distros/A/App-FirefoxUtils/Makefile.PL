@@ -32,10 +32,11 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::FirefoxUtils",
   "PREREQ_PM" => {
-    "App::BrowserUtils" => "0.017",
+    "App::BrowserUtils" => "0.018",
     "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
     "Data::Sah::Coerce::perl::To_duration::From_float::seconds" => 0,
     "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" => 0,
+    "Data::Sah::Coerce::perl::To_duration::From_str::hms" => 0,
     "Data::Sah::Coerce::perl::To_duration::From_str::human" => 0,
     "Data::Sah::Coerce::perl::To_duration::From_str::iso8601" => 0,
     "Data::Sah::Compiler::perl::TH::any" => "0.911",
@@ -63,7 +64,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.018",
+  "VERSION" => "0.020",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,10 +72,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::BrowserUtils" => "0.017",
+  "App::BrowserUtils" => "0.018",
   "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
   "Data::Sah::Coerce::perl::To_duration::From_float::seconds" => 0,
   "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" => 0,
+  "Data::Sah::Coerce::perl::To_duration::From_str::hms" => 0,
   "Data::Sah::Coerce::perl::To_duration::From_str::human" => 0,
   "Data::Sah::Coerce::perl::To_duration::From_str::iso8601" => 0,
   "Data::Sah::Compiler::perl::TH::any" => "0.911",

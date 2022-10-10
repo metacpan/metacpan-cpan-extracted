@@ -10,9 +10,9 @@ use Tie::IxHash;
 # currently incomplete
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-20'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 our %translations;
 tie %translations, 'Tie::IxHash', (
@@ -130,7 +130,7 @@ Data::Sah::Lang::zh_CN - zh_CN locale
 
 =head1 VERSION
 
-This document describes version 0.912 of Data::Sah::Lang::zh_CN (from Perl distribution Data-Sah), released on 2022-08-20.
+This document describes version 0.913 of Data::Sah::Lang::zh_CN (from Perl distribution Data-Sah), released on 2022-09-30.
 
 =for Pod::Coverage .+
 

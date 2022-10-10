@@ -3,7 +3,7 @@ package Net::DNS::SEC::Keyset;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Keyset.pm 1853 2021-10-11 10:40:59Z willem $)[2];
+our $VERSION = (qw$Id: Keyset.pm 1868 2022-08-31 20:13:35Z willem $)[2];
 
 
 =head1 NAME
@@ -192,7 +192,8 @@ sub sigs {
 
 =head2 extract_ds
 
-    @ds = $keyset->extract_ds;
+    @ds = $keyset->extract_ds();	# default SHA-1
+    @ds = $keyset->extract_ds( digtype => 'SHA-256' );
     die Net::DNS::SEC::Keyset->keyset_err unless @ds;
 
 Extracts DS records from the keyset. Note that the keyset will be verified
@@ -203,9 +204,9 @@ The method sets keyset_err if verification fails.
 =cut
 
 sub extract_ds {
-	my $self = shift;
+	my ( $self, @arg ) = @_;
 	my @ds;
-	@ds = map { Net::DNS::RR::DS->create($_) } $self->keys if $self->verify;
+	@ds = map { Net::DNS::RR::DS->create( $_, @arg ) } $self->keys if $self->verify;
 	return @ds;
 }
 
@@ -261,9 +262,10 @@ sub verify {
 	my @names = CORE::keys %names;
 	push @keyset_err, "Multiple names in keyset: @names" if scalar(@names) > 1;
 
+
 	if ($keyid) {
 		@sigs = grep { $_->keytag == $keyid } @sigs;
-		push @keyset_err, "No signature made with $keyid found" unless @sigs;
+		push @keyset_err, "No signature made with key $keyid" unless @sigs;
 	} elsif ( my @sepkeys = grep { $_->sep } @keys ) {
 		my %sepkey = map { ( $_->keytag => $_ ) } @sepkeys;
 		push @keyset_err, 'No signature found for key with SEP flag'
@@ -274,8 +276,7 @@ sub verify {
 		my $keytag = $sig->keytag;
 		next if $sig->verify( \@keys, $keysbytag{$keytag} || [] );
 		my $vrfyerr = $sig->vrfyerrstr;
-		my $signame = $sig->signame;
-		push @keyset_err, "$vrfyerr on key $signame $keytag ";
+		push @keyset_err, "$vrfyerr for keyset @names";
 	}
 
 	$keyset_err = join "\n", @keyset_err;

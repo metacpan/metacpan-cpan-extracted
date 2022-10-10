@@ -1,0 +1,238 @@
+NAME
+
+    Exception::FFI::ErrorCode - Exception class based on integer error
+    codes common in C code
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+    Throwing:
+
+     # realish world example for use with libcurl
+     package Curl::Error {
+       use Exception::FFI::ErrorCode
+         code => {
+           CURLE_OK                   => 0,
+           CURLE_UNKNOWN_OPTION       => 48
+           ...
+         };
+       $ffi->attach( [ curl_easy_strerror => strerror ] => ['enum'] => 'string' => sub {
+         my($xsub, $self) = @_;
+         $xsub->($self->code);
+       });
+     }
+     
+     # foo is an unknown option, so this will return 48
+     my $code = $curl->setopt( "foo" => "bar" );
+     # throw as an exception
+     Curl::Error->throw( code => $code ) if $code != Curl::Error::CURLE_OK;
+
+    Defining error class without a strerror
+
+     package Curl::<Error {
+       use Exception::FFI::ErrorCode
+         code => {
+           CURLE_OK                   => [ 0,  'no error'                        ],
+           CURLE_UNKNOWN_OPTION       => [ 48, 'unknown option passed to setopt' ],
+           ...
+         };
+     }
+     ...
+
+    Catching:
+
+     try {
+       might_die;
+     }
+     catch ($ex) {
+       if($ex isa Curl::Error) {
+         my $package  = $ex->package;   # the package where thrown
+         my $filename = $ex->filename;  # the filename where thrown
+         my $line     = $ex->line;      # the linenumber where thrown
+         my $code     = $ex->code;      # the error code
+         my $human    = $ex->strerror;  # human readable error
+         my $diag     = $ex->as_string; # human readable error at filename.pl line xxx
+         my $diag     = "$ex";          # same as $ex->as_string
+     
+         if($ex->code == Curl::Error::UNKNOWN_OPTION) {
+           # handle the unknown option variant of this error
+         }
+       }
+     }
+
+DESCRIPTION
+
+    A common pattern in C libraries is to return an integer error code to
+    classify an error. When translating those APIs to Perl you often want
+    to instead throw an exception. This class provides an interface for
+    building exception classes that help with that pattern.
+
+    For APIs that provide a strerror or similar function that converts the
+    error code into a human readable diagnostic, you can simply attach it.
+    If not you can provide human readable diagnostics for each error code
+    using an array reference, as shown above.
+
+    The base class for your exception class will be set to
+    Exception::FFI::ErrorCode::Base. The base class handles determining the
+    location of where the exception was thrown and will stringify in a way
+    to look like a regular Perl string exception with the filename and line
+    number you would expect.
+
+    A stack trace can be generated, either on a per-subclass basis, or
+    globally via an environment variable. This is not done by default due
+    to the overhead involved. See the trace method for details.
+
+    This class will attempt to detect if Carp::Always is running and
+    produce a long message when stringified, as it already does for regular
+    string exceptions. By default it will only do this if Carp::Always is
+    running when this module is loaded. Since typically Carp::Always is
+    loaded via the command line -MCarp::Always or via PERL5OPT environment
+    variable this should cover all of the typical use cases, but if for
+    some reason Carp::Always does get loaded after this module, you can
+    force redetection by calling the detect method.
+
+METHODS
+
+ detect
+
+     Exception::FFI::ErrorCode->detect;
+
+    This will redetect if Carp::Always has been loaded yet. You do not need
+    to call this method if Carp::Always has been enabled or disabled (we
+    check for that when the exception is thrown and stringified), just if
+    the module has been loaded.
+
+ import
+
+     use Exception::FFI::ErrorCode
+       %options;
+
+    The import method will set the base class, and set up any specific
+    error codes. Options include:
+
+    class
+
+      The exception class. If not provided this will be determined using
+      caller.
+
+    codes
+
+      The error codes. This is a hash reference. The keys are the constant
+      names, in C and Perl these are usually all upper case like
+      FOO_BAD_FILENAME. The values can be either an integer constant, or an
+      array reference with the integer constant and human readable
+      diagnostic. The former is intended for when there is a strerror type
+      function that will convert the error code into a diagnostic for you.
+
+    const_class
+
+      Where to put the constants. If not provided, these will be be the
+      same as class.
+
+Exception::FFI::ErrorCode::Base
+
+    The base class uses Class::Tiny, so feel free to add additional
+    attributes. The base class provides these attributes and methods:
+
+ throw
+
+     Exception::FFI::ErrorCode::Base->throw( code => $code );
+
+    Throws the exception with the given code. Obviously you would throw the
+    subclass, not the base class.
+
+ strerror
+
+     my $string = $ex->strerror;
+
+    Returns a human readable message for the exception. If available this
+    should be overridden by attaching the appropriate C function.
+
+ as_string
+
+     my $string = $ex->as_string;
+     my $string = "$ex";
+
+    Returns a human readable diagnostic. This is in the form of a familiar
+    Perl warning or string exception, including the filename and line
+    number where the exception was thrown. If you stringify the exception
+    it will use this method, adding a new line.
+
+ package
+
+     my $package = $ex->package;
+
+    The package where the exception happened.
+
+ filename
+
+     my $filename = $ex->filename;
+
+    The filename where the exception happened.
+
+ line
+
+     my $line = $ex->line;
+
+    The line number where the exception happened.
+
+ code
+
+     my $code = $ex->code;
+
+    The integer error code.
+
+ trace
+
+     my $trace = $ex->trace;
+
+    This will return a Devel::StackTrace trace, if it was recorded when the
+    exception was thrown. Generally the trace will only be generated if
+    EXCEPTION_FFI_ERROR_CODE_STACK_TRACE set to a true value. Individual
+    subclasses may also choose to always generate a stack trace.
+
+ get_stack_trace
+
+     my $trace = $ex->get_stack_trace;
+
+    This is the method that is called internally to generate a stack trace.
+    By default this is only done if EXCEPTION_FFI_ERROR_CODE_STACK_TRACE is
+    set to true. If you want a stack trace to always be generated, you can
+    override this method in your subclass.
+
+CAVEATS
+
+    The Carp::Always detection is pretty solid, but if Carp::Always is off
+    when the exception is thrown but on when it is stringified then strange
+    things might happen.
+
+ENVIRONMENT
+
+    EXCEPTION_FFI_ERROR_CODE_STACK_TRACE
+
+      If this environment variable is set to a true value, then a stack
+      trace will be generated and attached to all exceptions managed by
+      Exception::FFI::ErrorCode.
+
+SEE ALSO
+
+    FFI::Platypus
+
+    Exception::Class
+
+    Class:Tiny
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2022 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

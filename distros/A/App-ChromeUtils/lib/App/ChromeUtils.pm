@@ -8,9 +8,9 @@ use Log::ger;
 use App::BrowserUtils ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-27'; # DATE
+our $DATE = '2022-07-24'; # DATE
 our $DIST = 'App-ChromeUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our %SPEC;
 
@@ -171,7 +171,7 @@ App::ChromeUtils - Utilities related to Google Chrome browser
 
 =head1 VERSION
 
-This document describes version 0.009 of App::ChromeUtils (from Perl distribution App-ChromeUtils), released on 2021-09-27.
+This document describes version 0.010 of App::ChromeUtils (from Perl distribution App-ChromeUtils), released on 2022-07-24.
 
 =head1 SYNOPSIS
 
@@ -226,7 +226,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -264,7 +264,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -305,7 +305,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -371,7 +371,7 @@ minutes, then unpause for 30 seconds (then repeat the pattern), you can use:
 
  300,10,120,30
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -414,7 +414,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -448,7 +448,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -576,7 +576,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -610,7 +610,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -672,7 +672,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

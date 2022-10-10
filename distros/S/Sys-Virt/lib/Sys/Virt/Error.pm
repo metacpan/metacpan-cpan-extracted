@@ -549,7 +549,7 @@ Missing root device information in domain configuration
 
 =item Sys::Virt::Error::ERR_NO_SECURITY_MODEL
 
-Missing security model information in domain configuratio
+Missing security model information in domain configuration
 
 =item Sys::Virt::Error::ERR_NO_SOURCE
 
@@ -677,7 +677,7 @@ There are multiple interfaces with the requested MAC address
 
 =item Sys::Virt::Error::ERR_BUILD_FIREWALL
 
-The firwall could not be constructed
+The firewall could not be constructed
 
 =item Sys::Virt::Error::WAR_NO_NWFILTER
 

@@ -1,34 +1,37 @@
 #!/usr/bin/perl
-# $Id: 00-load.t 1823 2020-11-16 16:29:45Z willem $	-*-perl-*-
+# $Id: 00-load.t 1875 2022-09-23 13:41:03Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
+use IO::File;
 use Test::More;
 
-my @module = qw(
-		Net::DNS
-		Digest::BubbleBabble
-		Digest::HMAC
-		Digest::MD5
-		Digest::SHA
-		Encode
-		File::Spec
-		IO::File
-		IO::Select
-		IO::Socket::IP
-		MIME::Base64
-		Net::LibIDN2
-		PerlIO
-		Scalar::Util
-		Time::Local
-		Win32::API
-		Win32::IPHelper
-		Win32::TieRegistry
-		);
+my @module = qw(Net::DNS);
+
+my %metadata;
+my $handle = IO::File->new('MYMETA.json') || IO::File->new('META.json');
+if ($handle) {
+	my $json = join '', (<$handle>);
+	for ($json) {
+		s/\s:\s/ => /g;					# Perl? en voilà!
+		my $hashref = eval $_;
+		%metadata = %$hashref;
+	}
+	close $handle;
+}
+
+my %prerequisite;
+foreach ( values %{$metadata{prereqs}} ) {			# build, runtime, etc.
+	foreach ( values %$_ ) {				# requires
+		$prerequisite{$_}++ for keys %$_;
+	}
+	delete @prerequisite{@module};
+	delete $prerequisite{perl};
+}
 
 my @diag;
-foreach my $module (@module) {
+foreach my $module ( @module, sort keys %prerequisite ) {
 	eval "require $module";		## no critic
 	for ( eval { $module->VERSION || () } ) {
 		s/^(\d+\.\d)$/${1}0/;

@@ -1,17 +1,3 @@
-package    # Trick xt/ tests into working
-  Sys::Cmd::Mo;
-
-BEGIN {
-#<<< No perltidy
-# use Mo qw/build is required default import/;
-#   The following line of code was produced from the previous line by
-#   Mo::Inline version 0.39
-no warnings;my$M=__PACKAGE__.'::';*{$M.Object::new}=sub{my$c=shift;my$s=bless{@_},$c;my%n=%{$c.::.':E'};map{$s->{$_}=$n{$_}->()if!exists$s->{$_}}keys%n;$s};*{$M.import}=sub{import warnings;$^H|=1538;my($P,%e,%o)=caller.'::';shift;eval"no Mo::$_",&{$M.$_.::e}($P,\%e,\%o,\@_)for@_;return if$e{M};%e=(extends,sub{eval"no $_[0]()";@{$P.ISA}=$_[0]},has,sub{my$n=shift;my$m=sub{$#_?$_[0]{$n}=$_[1]:$_[0]{$n}};@_=(default,@_)if!($#_%2);$m=$o{$_}->($m,$n,@_)for sort keys%o;*{$P.$n}=$m},%e,);*{$P.$_}=$e{$_}for keys%e;@{$P.ISA}=$M.Object};*{$M.'build::e'}=sub{my($P,$e)=@_;$e->{new}=sub{$c=shift;my$s=&{$M.Object::new}($c,@_);my@B;do{@B=($c.::BUILD,@B)}while($c)=@{$c.::ISA};exists&$_&&&$_($s)for@B;$s}};*{$M.'is::e'}=sub{my($P,$e,$o)=@_;$o->{is}=sub{my($m,$n,%a)=@_;$a{is}or return$m;sub{$#_&&$a{is}eq'ro'&&caller ne'Mo::coerce'?die$n.' is ro':$m->(@_)}}};*{$M.'required::e'}=sub{my($P,$e,$o)=@_;$o->{required}=sub{my($m,$n,%a)=@_;if($a{required}){my$C=*{$P."new"}{CODE}||*{$M.Object::new}{CODE};no warnings 'redefine';*{$P."new"}=sub{my$s=$C->(@_);my%a=@_[1..$#_];if(!exists$a{$n}){require Carp;Carp::croak($n." required")}$s}}$m}};*{$M.'default::e'}=sub{my($P,$e,$o)=@_;$o->{default}=sub{my($m,$n,%a)=@_;exists$a{default}or return$m;my($d,$r)=$a{default};my$g='HASH'eq($r=ref$d)?sub{+{%$d}}:'ARRAY'eq$r?sub{[@$d]}:'CODE'eq$r?$d:sub{$d};my$i=exists$a{lazy}?$a{lazy}:!${$P.':N'};$i or ${$P.':E'}{$n}=$g and return$m;sub{$#_?$m->(@_):!exists$_[0]{$n}?$_[0]{$n}=$g->(@_):$m->(@_)}}};my$i=\&import;*{$M.import}=sub{(@_==2 and not$_[1])?pop@_:@_==1?push@_,grep!/import/,@f:();goto&$i};@f=qw[build is required default import];use strict;use warnings;
-$INC{'Sys/Cmd/Mo.pm'} = __FILE__;
-#>>>
-}
-1;
-
 package Sys::Cmd;
 use strict;
 use warnings;
@@ -21,9 +7,72 @@ use Exporter::Tidy all => [qw/spawn run runx/];
 use File::Spec;
 use IO::Handle;
 use Log::Any qw/$log/;
-use Sys::Cmd::Mo;
+use Sys::Cmd_CI has => {
+    cmd => {
+        isa => sub {
+            ref $_[0] eq 'ARRAY' || Carp::confess "cmd must be ARRAYREF";
+            @{ $_[0] }           || Carp::confess "Missing cmd elements";
+            if ( grep { !defined $_ } @{ $_[0] } ) {
+                Carp::confess 'cmd array cannot contain undef elements';
+            }
+            $_[0];
+        },
+        required => 1,
+    },
+    _code => {
+        default => sub {
+            my $c = $_[0]->cmd->[0];
+            ref($c) eq 'CODE' ? $c : undef;
+        },
+    },
+    encoding => {
+        default => sub { ':utf8' },
+    },
+    env => {
+        isa => sub {
+            ref $_[0] eq 'HASH' || Carp::confess "env must be HASHREF";
+            $_[0];
+        },
+    },
+    dir   => {},
+    input => {},
+    pid   => {
+        is       => 'rw',
+        init_arg => undef,
+    },
+    stdin => {
+        is       => 'rw',
+        init_arg => undef,
+        default  => sub { IO::Handle->new },
+    },
+    stdout => {
+        is       => 'rw',
+        init_arg => undef,
+        default  => sub { IO::Handle->new },
+    },
+    stderr => {
+        is       => 'rw',
+        init_arg => undef,
+        default  => sub { IO::Handle->new },
+    },
+    on_exit => {
+        is => 'rw',
+    },
+    exit => {
+        is       => 'rw',
+        init_arg => undef,
+    },
+    signal => {
+        is       => 'rw',
+        init_arg => undef,
+    },
+    core => {
+        is       => 'rw',
+        init_arg => undef,
+    },
+};
 
-our $VERSION = '0.85.4';
+our $VERSION = '0.99.0';
 our $CONFESS;
 
 sub run {
@@ -75,11 +124,20 @@ sub runx {
 }
 
 sub spawn {
-    my @cmd = grep { ref $_ ne 'HASH' } @_;
+    my ( @cmd, @opts );
+    map {
+        if ( ref($_) eq 'HASH' ) {
+            push( @opts, $_ );
+        }
+        else {
+            push( @cmd, $_ );
+        }
+    } @_;
 
-    defined $cmd[0] || Carp::confess '$cmd must be defined';
+    Carp::confess '$cmd must be defined' unless @cmd && defined $cmd[0];
+    Carp::confess __PACKAGE__ . ": only a single hashref allowed" if @opts > 1;
 
-    unless ( ref $cmd[0] eq 'CODE' ) {
+    unless ( 'CODE' eq ref $cmd[0] ) {
 
         if ( File::Spec->splitdir( $cmd[0] ) == 1 ) {
             require File::Which;
@@ -92,91 +150,15 @@ sub spawn {
         }
     }
 
-    my @opts = grep { ref $_ eq 'HASH' } @_;
-    if ( @opts > 2 ) {
-        Carp::confess __PACKAGE__ . ": only a single hashref allowed";
-    }
-
-    my %args = @opts ? %{ $opts[0] } : ();
-    $args{cmd} = \@cmd;
-
-    return Sys::Cmd->new(%args);
+    $opts[0]->{cmd} = \@cmd;
+    Sys::Cmd->new( %{ $opts[0] } );
 }
-
-has 'cmd' => (
-    is  => 'ro',
-    isa => sub {
-        ref $_[0] eq 'ARRAY' || Carp::confess "cmd must be ARRAYREF";
-        @{ $_[0] } || Carp::confess "Missing cmd elements";
-        if ( grep { !defined $_ } @{ $_[0] } ) {
-            Carp::confess 'cmd array cannot contain undef elements';
-        }
-    },
-    required => 1,
-);
-
-has 'encoding' => (
-    is      => 'ro',
-    default => sub { 'utf8' },
-);
-
-has 'env' => (
-    is  => 'ro',
-    isa => sub { ref $_[0] eq 'HASH' || Carp::confess "env must be HASHREF" },
-);
-
-has 'dir' => ( is => 'ro', );
-
-has 'input' => ( is => 'ro', );
-
-has 'pid' => (
-    is       => 'rw',
-    init_arg => undef,
-);
-
-has 'stdin' => (
-    is       => 'rw',
-    init_arg => undef,
-    default  => sub { IO::Handle->new },
-);
-
-has 'stdout' => (
-    is       => 'rw',
-    init_arg => undef,
-    default  => sub { IO::Handle->new },
-);
-
-has 'stderr' => (
-    is       => 'rw',
-    init_arg => undef,
-    default  => sub { IO::Handle->new },
-);
-
-has on_exit => (
-    is       => 'rw',
-    init_arg => 'on_exit',
-);
-
-has 'exit' => (
-    is       => 'rw',
-    init_arg => undef,
-);
-
-has 'signal' => (
-    is       => 'rw',
-    init_arg => undef,
-);
-
-has 'core' => (
-    is       => 'rw',
-    init_arg => undef,
-);
 
 sub BUILD {
     my $self = shift;
     my $dir  = $self->dir;
 
-    require File::chdir if $dir;
+    require File::chdir            if $dir;
     local $File::chdir::CWD = $dir if $dir;
 
     local %ENV = %ENV;
@@ -192,19 +174,15 @@ sub BUILD {
         }
     }
 
-    if ( ref $self->cmd->[0] eq 'CODE' ) {
-        $self->_fork;
-    }
-    else {
-        $self->_spawn;
-    }
+    $self->_code ? $self->_fork : $self->_spawn;
+    $self->stdin->autoflush(1);
 
-    $log->debugf( '(PID %d) %s', $self->pid, scalar $self->cmdline );
+    my $enc = $self->encoding;
+    binmode( $self->stdin,  $enc ) or warn "binmode stdin: $!";
+    binmode( $self->stdout, $enc ) or warn "binmode stdout: $!";
+    binmode( $self->stderr, $enc ) or warn "binmode stderr: $!";
 
-    my $enc = ':encoding(' . $self->encoding . ')';
-    binmode $self->stdin,  $enc;
-    binmode $self->stdout, $enc;
-    binmode $self->stderr, $enc;
+    $log->debugf( '[%d][%s] %s', $self->pid, $enc, scalar $self->cmdline );
 
     # some input was provided
     if ( defined( my $input = $self->input ) ) {
@@ -279,8 +257,6 @@ sub _spawn {
     close($_)
       for $old_fd0, $old_fd1, $old_fd2, $child_in, $child_out, $child_err;
 
-    $self->stdin->autoflush(1);
-
     return;
 }
 
@@ -297,47 +273,48 @@ sub _fork {
         die "fork: $why";
     }
 
-    if ( $self->pid == 0 ) {    # Child
-        $self->exit(0);         # stop DESTROY() from trying to reap
-
-        $child_out->autoflush(1);
-        $child_err->autoflush(1);
-
-        if ( !open STDERR, '>&=', fileno($child_err) ) {
-            print $child_err "open: $! at ", caller, "\n";
-            die "open: $!";
-        }
-        open STDIN,  '<&=', fileno($child_in)  || die "open: $!";
-        open STDOUT, '>&=', fileno($child_out) || die "open: $!";
-
-        close $self->stdin;
-        close $self->stdout;
-        close $self->stderr;
+    if ( $self->pid > 0 ) {    # parent
         close $child_in;
         close $child_out;
         close $child_err;
-
-        if ( ref $self->cmd->[0] eq 'CODE' ) {
-            my $enc = ':encoding(' . $self->encoding . ')';
-            binmode STDIN,  $enc;
-            binmode STDOUT, $enc;
-            binmode STDERR, $enc;
-            $self->cmd->[0]->();
-            _exit(0);
-        }
-
-        exec( @{ $self->cmd } );
-        die "exec: $!";
+        return;
     }
 
-    # Parent continues from here
+    # Child
+    $self->exit(0);            # stop DESTROY() from trying to reap
+    $child_err->autoflush(1);
+
+    my $enc = $self->encoding;
+
+    foreach my $quad (
+        [ \*STDIN,  '<&=' . $enc, fileno($child_in),  0 ],
+        [ \*STDOUT, '>&=' . $enc, fileno($child_out), 1 ],
+        [ \*STDERR, '>&=' . $enc, fileno($child_err), 1 ]
+      )
+    {
+        my ( $fh, $mode, $fileno, $autoflush ) = @$quad;
+
+        open( $fh, $mode, $fileno )
+          or print $child_err sprintf "[%d] open %s, %s: %s\n", $self->pid,
+          $fh, $mode, $!;
+
+        $fh->autoflush(1) if $autoflush;
+    }
+
+    close $self->stdin;
+    close $self->stdout;
+    close $self->stderr;
     close $child_in;
     close $child_out;
     close $child_err;
 
-    $self->stdin->autoflush(1);
+    if ( my $code = $self->_code ) {
+        $code->();
+        _exit(0);
+    }
 
-    return;
+    exec( @{ $self->cmd } );
+    die "exec: $!";
 }
 
 sub cmdline {
@@ -414,7 +391,11 @@ sub close {
 
         # may not be defined during global destruction
         my $fh = $self->$h or next;
-        $fh->opened or next;
+        $fh->opened        or next;
+        if ( $h eq 'stderr' ) {
+            warn sprintf( '[%d] uncollected stderr: %s', $self->pid, $_ )
+              for $self->stderr->getlines;
+        }
         $fh->close || Carp::carp "error closing $h: $!";
     }
 
@@ -438,7 +419,7 @@ Sys::Cmd - run a system command or spawn a system processes
 
 =head1 VERSION
 
-0.85.4 (2016-06-06)
+0.99.0 (2022-10-05)
 
 =head1 SYNOPSIS
 
@@ -449,24 +430,30 @@ Sys::Cmd - run a system command or spawn a system processes
 
     # Feed command some input, get output as lines,
     # raise exception on failure:
-    @output = run(@cmd, { input => 'feedme' });
+    @output = run( @cmd, { input => 'feedme' } );
 
     # Spawn and interact with a process somewhere else:
-    $proc = spawn( @cmd, { dir => '/' , encoding => 'iso-8859-3'} );
+    $proc = spawn(
+        @cmd,
+        {
+            dir      => '/',
+            encoding => 'encoding(iso-8859-3)'
+        },
+    );
 
-    while (my $line = $proc->stdout->getline) {
-        $proc->stdin->print("thanks");
+    while ( my $line = $proc->stdout->getline ) {
+        $proc->stdin->print("thanks\n");
     }
 
     my @errors = $proc->stderr->getlines;
 
-    $proc->close();       # Finished talking
-    $proc->wait_child();  # Cleanup
+    $proc->close();         # Finished talking to file handles
+    $proc->wait_child();    # Cleanup
 
     # read exit information
-    $proc->exit();      # exit status
-    $proc->signal();    # signal
-    $proc->core();      # core dumped? (boolean)
+    $proc->exit();          # exit status
+    $proc->signal();        # signal
+    $proc->core();          # core dumped? (boolean)
 
 =head1 DESCRIPTION
 
@@ -483,10 +470,23 @@ Execute C<@cmd> and return what the command sent to its C<STDOUT>,
 raising an exception in the event of error. In array context returns a
 list instead of a plain string.
 
-The first element of C<@cmd> will be looked up using L<File::Which> if
-it doesn't exist as a relative file name is is a CODE reference (UNIX
-only).  The command input and environment can be modified with an
-optional hashref containing the following key/values:
+The first element of C<@cmd> determines what/how things are run:
+
+=over
+
+=item * If it is a relative file name it is executed directly using
+L<Proc::Spawn>.
+
+=item * If it is a CODE reference (subroutine) B<Sys::Cmd> forks before
+running it in the child process. This is not supported on Win32.
+
+=item * Everything else is looked up using L<File::Which> and then
+executed with L<Proc::Spawn>.
+
+=back
+
+The command input and environment can be modified with an optional
+hashref containing the following key/values:
 
 =over 4
 
@@ -521,9 +521,8 @@ appended to the C<STDOUT> output.
 
 Return a B<Sys::Cmd> object (documented below) representing the process
 running @cmd, with attributes set according to the optional \%opt
-hashref.  The first element of the C<@cmd> array is looked up using
-L<File::Which> if it cannot be found in the file-system as a relative
-file name or it is a CODE reference (UNIX only).
+hashref.  The first element of C<@cmd> determines the execution method
+just like the C<run()> function.
 
 =back
 
@@ -544,7 +543,8 @@ constructor if you prefer that to the C<spawn> function:
 
 Note that B<Sys::Cmd> objects created this way will not lookup the
 command using L<File::Which> the way the C<run>, C<runx> and C<spawn>
-functions do.
+functions do. CODE references in C<$cmd[0]> are however still
+recognized and forked off.
 
 B<Sys::Cmd> uses L<Log::Any> C<debug> calls for logging purposes. An
 easy way to see the output is to add C<use Log::Any::Adapter 'Stdout'>
@@ -704,7 +704,7 @@ L<Git::Repository::Command> by Philippe Bruhat (BooK).
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2011-2014 Mark Lawrence <nomad@null.net>
+Copyright 2011-2021 Mark Lawrence <nomad@null.net>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

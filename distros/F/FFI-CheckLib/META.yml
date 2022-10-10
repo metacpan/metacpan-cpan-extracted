@@ -22,6 +22,7 @@ no_index:
   directory:
     - corpus
 requires:
+  File::Which: '0'
   List::Util: '1.33'
   perl: '5.006'
 resources:
@@ -29,7 +30,7 @@ resources:
   bugtracker: https://github.com/PerlFFI/FFI-CheckLib/issues
   homepage: https://metacpan.org/pod/FFI::CheckLib
   repository: git://github.com/PerlFFI/FFI-CheckLib.git
-version: '0.30'
+version: '0.31'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'
@@ -39,7 +40,8 @@ x_contributors:
   - 'Petr Písař (ppisar)'
   - 'Michael R. Davis (MRDVT)'
   - 'Shawn Laffan (SLAFFAN)'
-x_generated_by_perl: v5.37.3
+  - 'Carlos D. Álvaro (cdalvaro)'
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

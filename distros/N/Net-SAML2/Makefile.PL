@@ -46,6 +46,7 @@ my %WriteMakefileArgs = (
     "Types::Serialiser" => 0,
     "URI" => 0,
     "URI::Encode" => 0,
+    "URI::Escape" => 0,
     "URI::QueryParam" => 0,
     "URN::OASIS::SAML2" => "0.002",
     "XML::Enc" => "0.05",
@@ -76,7 +77,7 @@ my %WriteMakefileArgs = (
     "URI::URL" => 0,
     "XML::LibXML::XPathContext" => 0
   },
-  "VERSION" => "0.59",
+  "VERSION" => "0.61",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t"
   }
@@ -125,6 +126,7 @@ my %FallbackPrereqs = (
   "Types::Serialiser" => 0,
   "URI" => 0,
   "URI::Encode" => 0,
+  "URI::Escape" => 0,
   "URI::QueryParam" => 0,
   "URI::URL" => 0,
   "URN::OASIS::SAML2" => "0.002",

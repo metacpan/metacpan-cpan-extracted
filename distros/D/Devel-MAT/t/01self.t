@@ -127,6 +127,10 @@ BEGIN { our @AofA = ( [] ); }
    is( $outrefs_indirect[0]->sv,        $av2,                'AV outref[0] SV is $av2' );
    is( $outrefs_indirect[0]->strength, "indirect",           'AV outref[0] strength is indirect' );
    is( $outrefs_indirect[0]->name,     "element [0] via RV", 'AV outref[0] name' );
+
+   is( $av->outref_named( "element [0]" )->name, "element [0]", 'AV ->outref_named' );
+
+   ok( !defined $av->maybe_outref_named( "element [1]" ), 'AV has no outref named "element [1]"' );
 }
 
 BEGIN { our $LVREF = \substr our $TMPPV = "abc", 1, 2 }

@@ -19,6 +19,7 @@ Karen
 Knop
 Kogman
 Main
+Ollis
 Ragwitz
 Sub
 Tail
@@ -30,6 +31,7 @@ haarg
 irc
 lib
 nothingmuch
+plicease
 rafl
 zefram
 יובל

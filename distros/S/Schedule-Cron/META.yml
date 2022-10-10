@@ -3,24 +3,26 @@ abstract: 'cron-like scheduler for Perl subroutines'
 author:
   - 'Roland Huss (roland@cpan.org)'
 build_requires:
-  Test: 0
-  Test::More: 0
+  Test: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0
-dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110580'
+  Module::Build: '0'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Schedule-Cron
 provides:
   Schedule::Cron:
     file: lib/Schedule/Cron.pm
-    version: 1.01
+    version: '1.03'
 requires:
-  Data::Dumper: 0
-  Time::ParseDate: 2011.0505
+  Data::Dumper: '0'
+  Time::ParseDate: '2011.0505'
 resources:
   license: http://dev.perl.org/licenses/
-version: 1.01
+  repository: http://github.com/rhuss/schedule-cron
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

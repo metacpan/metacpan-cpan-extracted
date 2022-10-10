@@ -2,8 +2,8 @@ NAME
     App::orgadb - An opinionated Org addressbook toolset
 
 VERSION
-    This document describes version 0.008 of App::orgadb (from Perl
-    distribution App-orgadb), released on 2022-09-26.
+    This document describes version 0.010 of App::orgadb (from Perl
+    distribution App-orgadb), released on 2022-10-09.
 
 SYNOPSIS
 FUNCTIONS
@@ -31,6 +31,14 @@ FUNCTIONS
     *   count => *true*
 
         Return just the number of matching entries instead of showing them.
+
+    *   default_formatter_rules => *array[any]*
+
+        Specify conditional default formatters. This is for convenience and
+        best specified in the configuration as opposed to on the
+        command-line option. An example:
+
+         default_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i","formatters":[ ["Phone::format_phone_idn"] ]}
 
     *   detail => *bool*
 
@@ -85,6 +93,9 @@ FUNCTIONS
 
          ['Str::remove_comment', {'style':'cpp'}]
 
+        Overrides "--default_formatter_rule" but overridden by the
+        "--no-formatters" ("--raw-field-values", "-F") option.
+
     *   hide_category => *true*
 
         Do not show category.
@@ -96,6 +107,11 @@ FUNCTIONS
     *   hide_field_name => *true*
 
         Do not show field names, just show field values.
+
+    *   no_formatters => *true*
+
+        Do not apply any formatters to field value (overrides --formatter
+        option).
 
     *   num_entries => *uint*
 
@@ -133,6 +149,9 @@ SOURCE
 
 AUTHOR
     perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull

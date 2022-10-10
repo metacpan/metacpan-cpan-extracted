@@ -1,4 +1,6 @@
-1.5.8    xx.xx.2021
+1.5.9    xx.xx.2022
+            - improve tests for iptr/wiptr
+1.5.8    26.11.2021
             - upgrade tests for catch-v3
 1.5.7    18.11.2021
             - add C++20's features to panda::optional

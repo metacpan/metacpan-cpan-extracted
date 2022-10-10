@@ -20,7 +20,7 @@ filters, power splitters, etc.
 
         # Read input matrix:
         ($f, $m, $param_type, $z0, $comments, $fmt, $funit, $orig_f_unit) =
-                rsnp('input-file.s2p', { units => 'MHz' }); 
+                rsnp('input-file.s2p', { units => 'MHz' });
 
 
         # Write output file:
@@ -50,15 +50,21 @@ parameter types (or impedances).  Use the `P_to_Q()` functions below to transfor
 
 ## `rsnp($filename, $options)` - Read touchstone file
 
-### Arguments: 
+### Arguments:
 
 - $filename - the file to read
-- $options - A hashref of options.
+- $options - A hashref of options:
+    - units: Hz, KHz, MHz, GHz, or THz.
 
-    Currently only 'units' is supported, which may specify one of Hz, KHz, MHz,
-    GHz, or THz.  The resulting `$f` vector will be scaled to the frequency format
-    you specify.  If you do not specify a format then `$f` will be scaled to Hz
-    such that a value of 1e6 in the `$f` vector is equal to 1 MHz.
+        Units may specify one of Hz, KHz, MHz, GHz, or THz.  The resulting `$f` vector
+        will be scaled to the frequency format you specify.  If you do not specify a
+        format then `$f` will be scaled to Hz such that a value of 1e6 in the `$f`
+        vector is equal to 1 MHz.
+
+    - freq\_min\_hz, freq\_max\_hz, freq\_count: see `m_interpolate()`
+
+        If these options are passed then the matrix (`$m`) and frequency (`$f`) PDLs
+        returned by `rsnp()` will have been interpolated by `m_interpolate()`.
 
 ### Return values
 
@@ -68,11 +74,11 @@ utilize the data loaded by `rsnp()`:
 - `$f` - A (M) vector piddle of input frequencies where `M` is the
 number of frequencies.
 - `$m` - A (N,N,M) piddle of X-parameter matrices where `N` is the number
-of ports and `M` is the number of frequencies. 
+of ports and `M` is the number of frequencies.
 
     These matrixes have been converted from their 2-part RI/MA/DB input format and
     are ready to perform computation.  Matrix values (S11, etc) use PDL's
-    native complex values.  
+    native complex values.
 
 - `$param_type` - one of S, Y, Z, H, G, T, or A that indicates the
 matrix parameter type.
@@ -82,7 +88,7 @@ matrix parameter type.
 
 - `$z0` - The characteristic impedance reference used to collect the measurements.
 
-The remaining parameters (`$comments`, `$fmt`, `$funit`) are useful only if you wish to 
+The remaining parameters (`$comments`, `$fmt`, `$funit`) are useful only if you wish to
 re-create the original file format by calling `wsnp()`:
 
 - `$comments` - An ARRAY-ref of full-line comments provided at the top of the input file.
@@ -108,7 +114,7 @@ same as those returned by `rsnp()`.
 When writing it is up to you to maintain consistency between the output format
 and the data being represented.  Except for complex value representation in
 `$fmt` and frequency scale in `$f`, this `PDL::IO::Touchstone` module will
-not make any mathematical transform on the matrix data. 
+not make any mathematical transform on the matrix data.
 
 Changing `$to_hz` will modify the frequency format in the resultant Touchstone
 file, but the represented data will remain correct because Touchstone knows how
@@ -124,7 +130,7 @@ However, there are a few output differences that may occur:
 - Same-line "suffix comments" are stripped
 - The order of comments and the "# format" line may be changed.
 `wsnp()` will write comments before the "# format" line.
-- Whitespace may differ in the output.  Touchstone specifies any whitespace as a 
+- Whitespace may differ in the output.  Touchstone specifies any whitespace as a
 field delimiter and this module uses tabs as delimiters when writing output data.
 
 ## `wsnp_fh($fh, $f, $m, $param_type, $z0, $comments, $fmt, $from_hz, $to_hz)`
@@ -185,7 +191,7 @@ is represented as either:
 
 All functions prefixed with "s\_" require an S-parameter matrix.
 
-## `$z0n = s_port_z($S, $z0, $n)` - Return the complex port impedance vector for all frequencies given:
+## `$z0n = s_port_z($S, $z0, $n)` - Return the complex port impedance vector for each frequency
 
 - - `$S`: S paramter matrix
 - - `$z0`: vector of \_reference\_ impedances at each port (from `rsnp`)
@@ -196,11 +202,128 @@ In a 2-port, this will provide the input or output impedance as follows:
     $z_in  = s_port_z($S, 50, 1);
     $z_out = s_port_z($S, 50, 2);
 
+Note that `$z_in` and `$z_out` are the PDL vectors for the input or output
+impedance at each frequency in `$f`.  (NB, `$f` is not actually needed for
+the calculation.)
+
+# Y-Paramter Calculaction Functions
+
+All functions prefixed with "y\_" require a Y-parameter matrix.
+
+These functions are intended for use with 2-port matrices---but if you know
+what you are doing they may work for higher-order matrices as well.
+
+Unless otherwise indicated:
+
+- `$Y` is a set Y-parameter matrices (one for each frequency), either  loaded directly from
+a Y-formatted .s2p file or converted via `s_to_y` or similar functions.
+- `$f_hz` is a vector of frequencies in Hz (one for each Y-matrix in
+`$Y`); `$f_hz` is assumed to be sorted in ascending order and correspond to
+each Mth element in `$Y` of dimension N,N,M where N is the number of ports and
+M is the number of sample frequencies.
+
+## `$C = y_capacitance($Y, $f_hz)` - Return a vector of capacitance for each frequency in Farads (F)
+
+## `$C = y_cap_pF($Y, $f_hz)` - Return a vector of capacitance it each frequency in picofarads (pF)
+
+## `$L = y_inductance($Y, $f_hz)` - Return a vector of inductance for each frequency in Henrys (H)
+
+## `$L = y_ind_nH($Y, $f_hz)` - Return a vector of inductance for each frequency in nanohenrys (nH)
+
+## `$Qc = y_qfactor_c($Y, $f_hz)` - Return the capacitive Q-factor vector for each frequency
+
+Note that all inductive values are zeroed.
+
+## `$Ql = y_qfactor_l($Y, $f_hz)` - Return the inductive Q-factor vector for each frequency
+
+Note that all capacitive values are zeroed.
+
+## `$X = y_reactance($Y, $f_hz)` - Return a vector of total reactance for each frequency
+
+This is the same as (Xl - Xc).
+
+## `$Xc = y_reactance_c($Y, $f_hz)` - Return a vector of capacitive reactance for each frequency
+
+## `$Xl = y_reactance_l($Y, $f_hz)` - Return a vector of inductive reactance for each frequency
+
+## `$R = y_resistance($Y)` - Return the equivalent series resistance (ESR) in Ohms
+
+## `$R = y_esr($Y, $f_hz)` - An alias for `y_resistance`.
+
+## `@srf_list_hz = y_srf($Y, $f_hz)` - Return the component's self-resonant frequencies (SRF)
+
+To calculate SRF, reactance is evaluated at each frequency.  If the next frequency being
+evaulated has an opposite sign (ie, going from capacitive to inductive reactance) then
+that previous frequency is selected as an SRF.
+
+Return value:
+
+- List context: Return the list of SRF's in ascending order, or an empty list if no SRF is found.
+- Scalar context: Return the lowest-frequency SRF, or undef if no SRF is found.
+
+## `$f_hz = y_srf_ideal($Y, $f_hz)` - Return the component's first self-resonant frequency
+
+Notice: In almost all cases you will want `y_srf` instead of `y_srf_ideal`.
+
+This is included for ideal Y-matrices only and may not be accurate.  While the
+equation is a classic SRF calculation (1/(2\*pi\*sqrt(LC)), srf should scan the
+frequency lines as follows: "The SRF is determined to be the frequency at which
+the insertion (S21) phase changes from negative through zero to positive."
+\[ https://www.coilcraft.com/getmedia/8ef1bd18-d092-40e8-a3c8-929bec6adfc9/doc363\_measuringsrf.pdf \]
+
+# Circuit Composition
+
+## `$Y_pp = y_parallel($Y1, $Y2, [...])` - Compose a parallel circuit
+
+For example, if `$Y1` and `$Y2` represent a 100pF capacitor, then `$Y_pp` will
+represent a ~200pF capacitor. Parameters and return value must be
+Y matrices converted by a function like `s_to_y`.
+
+## `$ABCD_ss = abcd_series($ABCD1, $ABCD2, [...])` - Compose a series circuit
+
+For example, if `$ABCD1` and `$ABCD2` represent a 100pF capacitor, then
+`$ABCD_ss` will represent a ~50pF capacitor.  Parameters and return value must be
+ABCD matrices converted by a function like `s_to_abcd`.
+
 # Helper Functions
 
 ## `$n = n_ports($S)` - return the number of ports represented by the matrix.
 
 Given any matrix (N,N,M) formatted matrix, this function will return N.
+
+## `($f_new, $m_new) = m_interpolate($f, $m, $args)` - return the number of ports represented by the matrix.
+
+This function rescales the X-parameter matrix (`$m`) and frequency set (`$f`)
+to fit the requested frequency bounds.  This example will return the
+interpolated `$S_new` and `$f_new` with 10 frequency samples from 100 to 1000
+MHz (inclusive):
+
+    ($f_new, $S_new) = m_interpolate($f, $S,
+        { freq_min_hz => 100e6, freq_max_hz => 1000e6, freq_count => 10,
+          quiet => 1 # optional
+        } )
+
+This function returns `$f` and `$m` verbatim if no `$args` are passed.
+
+- freq\_min\_hz: the minimum frequency at which to interpolate
+- freq\_max\_hz: the maximum frequency at which to interpolate
+- freq\_count: the total number of frequencies sampled
+- quiet: suppress warnings when interpolating beyond the available frequency range
+
+## `$max_diff = f_uniformity($f)` - Return maximum frequency deviation.
+
+Return the maximum difference between an ideal uniformally-spaced frequency set
+and the frequency set provided.  This is used internally by `f_is_uniform()`.
+For example:
+
+    0.0 == f_uniformity(pdl [ 1, 2, 3  , 4 ]);
+    0.5 == f_uniformity(pdl [ 1, 2, 2.5, 4 ]);
+
+## `$bool = f_is_uniform($f, $tolerance_hz)` - Return true if the frequency set is uniform
+
+Return true if the provided frequency set is uniform within a Hz value.
+We assume `$f` is provided in Hz, so adjust `$tolerance_hz` accordingly if
+$f is in a different unit.
 
 # SEE ALSO
 

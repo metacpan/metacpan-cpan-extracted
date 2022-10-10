@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-07-24'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 sub meta {
     +{
@@ -46,7 +46,7 @@ Data::Sah::Filter::perl::Unix::try_convert_gid_to_unix_group
 
 =head1 VERSION
 
-This document describes version 0.019 of Data::Sah::Filter::perl::Unix::try_convert_gid_to_unix_group (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.020 of Data::Sah::Filter::perl::Unix::try_convert_gid_to_unix_group (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 =for Pod::Coverage ^(meta|filter)$
 

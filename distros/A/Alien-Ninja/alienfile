@@ -13,32 +13,44 @@ plugin 'Probe::CommandLine' => (
 
 share {
   requires 'Path::Tiny';
+  requires 'Sort::Versions';
+  requires 'Alien::Build::Plugin::Download::GitHub', '0.09';
 
   # same URL used for both source and binary releases
-  start_url 'https://github.com/ninja-build/ninja/releases';
+  # https://github.com/ninja-build/ninja/releases
+  my %github_info = (
+      github_user => 'ninja-build',
+      github_repo => 'ninja',
+  );
 
-  my ($binary_release_name, $binary_release_format);
-  if( $^O eq 'linux' && $Config{archname} =~ /^x86_64/ ) {
+  my %os_arch_to_binary_release = (
     # ELF 64-bit LSB executable, x86-64
-    $binary_release_name = 'ninja-linux';
-    $binary_release_format = 'zip';
-  } elsif( $^O eq 'darwin' ) {
-    # Mach-O universal binary with 2 architectures: [x86_64:Mach-O 64-bit x86_64 executable] [arm64:Mach-O 64-bit arm64 executable]
-    $binary_release_name = 'ninja-mac';
-    $binary_release_format = 'zip';
-  } elsif( $^O eq 'MSWin32' && $Config{ptrsize} == 8 ) {
-    # PE32+ executable (console) x86-64
-    $binary_release_name = 'ninja-win';
-    $binary_release_format = 'zip';
-  }
+    'linux:x86_64' => { name => 'ninja-linux', format => 'zip', },
 
-  if($binary_release_name && !$ENV{ALIEN_NINJA_FROM_SOURCE}) {
-    my $binary_release_re = qr/$binary_release_name\.\Q$binary_release_format\E/;
-    plugin Download => (
-      filter  => qr/^$binary_release_re$/,
-      version => qr/([0-9\.]+)/,
+    # Mach-O universal binary with 2 architectures:
+    # [x86_64:Mach-O 64-bit x86_64 executable]
+    # [arm64:Mach-O 64-bit arm64 executable]
+    do {
+      map { $_ => { name => 'ninja-mac', format => 'zip', } }
+        ('darwin:x86_64', 'darwin:aarch64')
+    },
+
+    # PE32+ executable (console) x86-64
+    'MSWin32:x86_64' => { name => 'ninja-win', format => 'zip', },
+  );
+
+  my $os_arch = join ":", ( $^O, meta->prop->{platform}{cpu}{arch}{name} );
+  if(exists $os_arch_to_binary_release{$os_arch}
+      && !$ENV{ALIEN_NINJA_FROM_SOURCE}) {
+    my ($name, $format) = @{ $os_arch_to_binary_release{$os_arch} }{qw(name format)};
+    my $binary_release_re = qr/$name\.\Q$format\E/;
+    plugin 'Download::GitHub' => (
+      %github_info,
+      asset        => 1,
+      asset_name   => $name,
+      asset_format => $format,
+      version      => qr/v([0-9\.]+)/,
     );
-    plugin 'Prefer::SortVersions';
 
     my $cmp = sub {
       my($A,$B) = @_;
@@ -59,7 +71,6 @@ share {
 
       return +{ type => 'list', list => \@sorted };
     });
-    plugin Extract => $binary_release_format;
     patch sub {
       my $bin_dir = Path::Tiny->new('bin');
       $bin_dir->mkpath;
@@ -75,11 +86,9 @@ share {
     });
   } else {
     # build from source
-    plugin Download => (
-      filter  => qr/^v.*\.tar\.gz$/,
-      version => qr/([0-9\.]+)/,
+    plugin 'Download::GitHub' => (
+      %github_info,
     );
-    plugin Extract => 'tar.gz';
     plugin 'Build::CMake';
     build [
       ['%{cmake}',

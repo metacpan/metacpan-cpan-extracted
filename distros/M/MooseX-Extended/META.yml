@@ -35,28 +35,28 @@ no_index:
 provides:
   Moose::Exception::InvalidAttributeDefinition:
     file: lib/Moose/Exception/InvalidAttributeDefinition.pm
-    version: '0.33'
+    version: '0.34'
   Moose::Exception::InvalidImportList:
     file: lib/Moose/Exception/InvalidImportList.pm
-    version: '0.33'
+    version: '0.34'
   MooseX::Extended:
     file: lib/MooseX/Extended.pm
-    version: '0.33'
+    version: '0.34'
   MooseX::Extended::Core:
     file: lib/MooseX/Extended/Core.pm
-    version: '0.33'
+    version: '0.34'
   MooseX::Extended::Custom:
     file: lib/MooseX/Extended/Custom.pm
-    version: '0.33'
+    version: '0.34'
   MooseX::Extended::Role:
     file: lib/MooseX/Extended/Role.pm
-    version: '0.33'
+    version: '0.34'
   MooseX::Extended::Role::Custom:
     file: lib/MooseX/Extended/Role/Custom.pm
-    version: '0.33'
+    version: '0.34'
   MooseX::Extended::Types:
     file: lib/MooseX/Extended/Types.pm
-    version: '0.33'
+    version: '0.34'
 requires:
   B::Hooks::AtRuntime: '8'
   Carp: '0'
@@ -95,7 +95,7 @@ resources:
   bugtracker: https://github.com/Ovid/moosex-extended/issues
   homepage: https://github.com/Ovid/moosex-extended
   repository: https://github.com/Ovid/moosex-extended.git
-version: '0.33'
+version: '0.34'
 x_contributors:
   - 'gmbow <g@mbow.org>'
   - 'Graham Knop <haarg@haarg.org>'
@@ -103,6 +103,6 @@ x_contributors:
   - 'Ovid <ovid@cpan.org>'
   - 'Toby Inkster <github@toby.ink>'
   - 'Wesley Schwengle <wesleys@opperschaap.net>'
-x_generated_by_perl: v5.26.3
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

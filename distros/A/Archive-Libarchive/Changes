@@ -1,5 +1,9 @@
 Revision history for Archive-Libarchive,
 
+0.08      2022-09-29 10:40:53 -0600
+  - Unbundle Test2::Tools::MemoryCycle as it is now on
+    CPAN (gh#450
+
 0.07      2022-09-22 06:08:16 -0600
   - Documentation improvements (gh#44)
 

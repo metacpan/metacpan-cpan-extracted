@@ -3,7 +3,7 @@ package Net::DNS::SEC::DSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: DSA.pm 1853 2021-10-11 10:40:59Z willem $)[2];
+our $VERSION = (qw$Id: DSA.pm 1863 2022-03-14 14:59:21Z willem $)[2];
 
 
 =head1 NAME
@@ -44,14 +44,15 @@ public key resource record.
 use integer;
 use MIME::Base64;
 
-use constant DSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_DSA');
+use constant Digest_SHA1    => Net::DNS::SEC::libcrypto->can('EVP_sha1');
+use constant DSA_configured => Digest_SHA1 && Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_DSA');
 
 BEGIN { die 'DSA disabled or application has no "use Net::DNS::SEC"' unless DSA_configured }
 
 
 my %parameters = (
-	3 => Net::DNS::SEC::libcrypto::EVP_sha1(),
-	6 => Net::DNS::SEC::libcrypto::EVP_sha1(),
+	3 => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha1() },
+	6 => scalar eval { Net::DNS::SEC::libcrypto::EVP_sha1() },
 	);
 
 sub _index { return keys %parameters }
@@ -60,8 +61,8 @@ sub _index { return keys %parameters }
 sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
-	my $index = $private->algorithm;
-	my $evpmd = $parameters{$index} || die 'private key not DSA';
+	my $evpmd = $parameters{$private->algorithm};
+	die 'private key not DSA' unless $evpmd;
 
 	my ( $p, $q, $g, $x, $y ) =
 			map { decode_base64( $private->$_ ) } qw(prime subprime base private_value public_value);
@@ -77,8 +78,8 @@ sub sign {
 sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
-	my $index = $keyrr->algorithm;
-	my $evpmd = $parameters{$index} || die 'public key not DSA';
+	my $evpmd = $parameters{$keyrr->algorithm};
+	die 'public key not DSA' unless $evpmd;
 
 	return unless $sigbin;
 

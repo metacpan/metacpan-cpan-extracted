@@ -7,7 +7,7 @@ A simple but powerful tool to examine hierarchies of text files for
 the occurrence of a pattern. Kind of recursive 'grep'.
 
 A feature not present in similar tools is the ability to pass each
-file that matches to vi or emacs for editing.
+file that matches to less for viewing, or to vi or emacs for editing.
 
 A simple driver script 'afg' is included for convenience.
 
@@ -22,26 +22,19 @@ To install this module, run the following commands:
 
 SUPPORT AND DOCUMENTATION
 
-After installing, you can find documentation for this module with the
-perldoc command.
+Development of this module takes place on GitHub:
+L<https://github.com/sciurius/afg>.
 
-    perldoc App::File::Grepper
+You can find documentation for this module with the perldoc command.
 
-You can also look for information at:
+    perldoc App::Packager
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-File-Grepper
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/App-File-Grepper
-
-    Search CPAN
-        http://search.cpan.org/dist/App-File-Grepper
-
+Please report any bugs or feature requests using the issue tracker on
+GitHub.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2012,2016 Johan Vromans
+Copyright (C) 2012,2016,2022 Johan Vromans
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

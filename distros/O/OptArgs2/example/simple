@@ -2,39 +2,72 @@
 use strict;
 use warnings;
 use FindBin;
+use lib 'lib';
 use lib "$FindBin::Bin/../lib";
-use lib "$FindBin::Bin/lib";
 use Data::Dumper;
 use OptArgs2;
 
 $Data::Dumper::Indent   = 1;
 $Data::Dumper::Sortkeys = 1;
 
-arg aaa => (
-    isa      => 'Str',
-    required => 1,
-    comment  => 'some kind of arg',
-);
+$SIG{__DIE__} = sub {
+    my $err = shift;
+    my $ref = ref $err;
+    die "$err\n$ref\n" if $ref;
+    die $err           if $err;
+};
 
-arg bbb => (
-    isa          => 'Str',
-    comment      => 'other some kind of arg',
-    default      => 'meh',
+my $opts = optargs(
+    comment      => 'an example optargs-based command',
     show_default => 1,
+    optargs      => [
+        aaa => {
+            isa      => 'Str',
+            required => 1,
+            comment  => 'some kind of arg',
+        },
+
+        bbb => {
+            isa     => 'Str',
+            comment => 'other some kind of arg',
+            default => 'meh',
+        },
+
+        dump => {
+            isa     => '--Flag',
+            alias   => 'd',
+            comment => 'print result using Data::Dumper',
+            trigger => sub {
+                require Data::Dumper;
+                print Dumper $_[1];
+            }
+        },
+
+        message => {
+            isa     => '--Str',
+            alias   => 'm',
+            comment => 'possibly very long option',
+        },
+
+        other => {
+            isa     => '--Str',
+            default => 'some thing',
+            comment => 'an option with a default',
+        },
+
+        required => {
+            isa      => '--Str',
+            alias    => 'r',
+            comment  => 'a very necessary option',
+            required => 1,
+        },
+
+        quiet => {
+            isa     => '--Flag',
+            comment => 'work quietly',
+            alias   => 'q',
+        },
+    ],
 );
 
-opt help => (
-    isa     => 'Flag',
-    comment => 'print help message and exit',
-    alias   => 'h',
-    ishelp  => 1,
-);
-
-opt quiet => (
-    isa     => 'Flag',
-    comment => 'work quietly',
-    alias   => 'q',
-);
-
-my $opts = optargs;
-print Dumper($opts) =~ s/VAR1/opts/r;
+print Dumper $opts;

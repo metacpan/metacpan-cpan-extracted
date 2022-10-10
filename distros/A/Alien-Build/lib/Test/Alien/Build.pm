@@ -29,7 +29,7 @@ our @EXPORT = qw(
 );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '2.70'; # VERSION
+our $VERSION = '2.71'; # VERSION
 
 
 my $build;
@@ -327,6 +327,7 @@ sub alien_extract_ok
       else
       {
         $ok = 0;
+        push @diag, $out if defined $out;
         push @diag, 'no directory';
       }
     }
@@ -626,7 +627,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 

@@ -18,7 +18,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 ansicolumn [options] [file ...]
 
-    -c#                  output width
+    -w#, -c#             output width
     -s#                  separator string
     -t                   table style output
     -l#                  maximum number of table columns
@@ -29,11 +29,12 @@ ansicolumn [options] [file ...]
     -P[#], --page=#      page mode, with optional page length
     -U[#], --up=#        show in N-up format (-WC# --linestyle=wrap)
     --2up .. --9up       same as -U2 .. -U9
-    -D                   document mode
-    -C#                  number of panes
-    -S#                  pane width
-    -W                   widen to terminal width
-    -p                   paragraph mode
+    -D, --document       document mode
+    -V, --parallel       parallel view mode
+    -C#, --pane=#        number of panes
+    -S#, --pane-width=#  pane width
+    -W, --widen          widen to terminal width
+    -p, --paragraph      paragraph mode
 
     -B, --border[=#]     print border with optional style
     -F, --fillup[=#]     fill-up unit (pane|page|none)
@@ -58,14 +59,25 @@ ansicolumn [options] [file ...]
 
 =head1 VERSION
 
-Version 1.23
+Version 1.24
 
 =head1 DESCRIPTION
 
 B<ansicolumn> is a L<column(1)> command clone which can handle ANSI
 terminal sequences.  It supports traditional options and some of Linux
-extended, and other original options.  Empty lines are B<not> ignored,
-though.
+extended, and many other original options.  Empty lines are B<not>
+ignored, though.
+
+In contrast to the original L<column(1)> command which handles mainly
+short item list, and Linux variant which has been expanded to have
+ritch table style output, B<ansicolumn(1)> has been expanded to show
+text file in multi-column view.  Combined with pagenation and
+document-friendly folding mechanism, it can be used as a document
+viewing preprocessor for pager program.
+
+When multiple files are given as arguments, it gets in the parallel
+view mode, and show all files in parallel.  It's convenient to see
+multiple files side-by-side.
 
 =head2 COMPATIBLE OPTIONS
 
@@ -75,10 +87,12 @@ default, from the standard input.
 
 =over 7
 
-=item B<-c>#, B<--width>=#, B<--output-width>=#
+=item B<-w>#, B<-c>#, B<--width>=#, B<--output-width>=#
 
 Output is formatted for a display columns wide.  See L</CALCULATION>
 section.
+
+Accept B<-c> for compatibility, but B<-w> is more popular.
 
 =item B<-s>#, B<--separator>=#
 
@@ -92,7 +106,7 @@ table.  Columns are delimited with whitespace, by default, or
 with the characters supplied using the -s option.  Useful for
 pretty-printing displays.
 
-=item B<-l>I<#>, B<--table-columns-limit> I<number>
+=item B<-l>#, B<--table-columns-limit>=#
 
 Specify maximal number of the input columns.  The last column will
 contain all remaining line data if the limit is smaller than the
@@ -107,18 +121,18 @@ Fill columns before filling rows.
 When used B<--table> or B<-t> option, each column are joined by two
 space characters (' ') by default.  This option will change it.
 
-=item B<-R>I<columns>, B<--table-right>=I<columns>
+=item B<-R>#, B<--table-right>=#
 
 Right align text in these columns.
 Support only numbers.
 
 =back
 
-=head2 EXTENDED OPTION
+=head2 EXTENDED OPTIONS
 
 =over 7
 
-=item B<-P>[I<#>], B<--page>[=I<#>]
+=item B<-P>[#], B<--page>[=#]
 
 Page mode.  Set these options.
 
@@ -152,6 +166,23 @@ Next command display DOCX text in 3-up format using
 L<App::optex::textconv>.
 
     optex -Mtextconv ansicolumn -DPC3 foo.docx | less
+
+=item B<-V>, [B<--no->]B<parallel>
+
+Parallel view mode.  Implicitly enabled when multiple files are
+specified.  Use B<--no-parallel> to disable.
+
+Set these options, and cancel all pagenation behavior.
+
+    --widen
+    --linestyle=wrap
+    --border
+
+By default, all files are displayed in parallel.  In other words,
+number of pane is set as a number of files.  You can use B<-C> option
+to specify number of files displayed simultaneously.
+
+You can use this option mixed with B<-D> option to see document files.
 
 =item B<-C>#, B<--pane>=#
 
@@ -188,7 +219,7 @@ considered as 'pane' by default.  Set by B<--page> option
 automatically.  Use B<--fillup=none> if you want to explicitly disable
 it.
 
-Option B<-U> is a shortcut for B<--border=pane>.
+Option B<-F> is a shortcut for B<--fillup=pane>.
 
 =item B<--height>=#
 
@@ -204,8 +235,8 @@ changes the number of the unit.
 Set the style of treatment for longer lines.
 Default is C<none>.
 
-B<--linestyle=wordrap> is equivalent to B<--linestyle=wrap>
-B<--boundary=word>.
+Option B<--linestyle=wordrap> sets B<--linestyle=wrap> and
+B<--boundary=word> at once.
 
 =item B<--boundary>=C<none>|C<word>|C<space>
 
@@ -223,6 +254,13 @@ Set the linebreak mode.
 Set the number of runin/runout column.
 Default is both 2.
 
+As for Japanese text, only one character can be moved with default
+value.  Longer value allows more flexible arrangement, but makes text
+area shorter.  Author is using the command with own F<~/.ansicolumnrc>
+like this:
+
+    option default --runin=4 --runout=4
+
 =item B<-->[B<no->]B<pagebreak>
 
 Move to next pane when form feed character found.
@@ -230,31 +268,31 @@ Default true.
 
 =item B<--border-style>=I<style>, B<--bs>=...
 
-Set the border style.  Current default style is C<vbar>, which is
-light vertical line filling the page height.
+Set the border style.  Current default style is C<box>, which enclose
+each pane with box drawing graphic characters.
 
 Sample styles:
 none,
 space,
-vbar,          heavy-vbar,       fat-vbar,
-line,          heavy-line,
-stick,         heavy-stick,
+vbar, heavy-vbar, fat-vbar,
+line, heavy-line,
+stick, heavy-stick,
 ascii-frame,
 ascii-box,
 c-box,
-box,           heavy-box,        fat-box,   very-fat-box,
-dash-box,      heavy-dash-box,
-round-box,     heavy-round-box,
-frame,         heavy-frame,      fat-frame, very-fat-frame,
-dash-frame,    heavy-dash-frame,
-page-frame,    heavy-page-frame,
+box, heavy-box, fat-box, very-fat-box,
+dash-box, heavy-dash-box,
+round-box, heavy-round-box,
+frame, heavy-frame, fat-frame, very-fat-frame,
+dash-frame, heavy-dash-frame,
+page-frame, heavy-page-frame,
 shadow,
-shadow-box,    heavy-shadow-box,
-comb,          heavy-comb,
-rake,          heavy-rake,
-mesh,          heavy-mesh,
-dumbbell,      heavy-dumbbell,
-ribbon,        heavy-ribbon,
+shadow-box, heavy-shadow-box,
+comb, heavy-comb,
+rake, heavy-rake,
+mesh, heavy-mesh,
+dumbbell, heavy-dumbbell,
+ribbon, heavy-ribbon,
 round-ribbon,
 double-ribbon,
 etc.
@@ -333,9 +371,9 @@ Set padding chracter.
 As for B<--height>, B<--width>, B<--pane> and B<--pane-width> options,
 besides giving numeric digits, you can calculate the number using
 terminal size.  If the expression contains non-digit character, it is
-evaluated as a Reverse Polish Notation with the terminal size pushed
-on the stack.  Initial value for B<--height> options is terminal
-height, and terminal width for others.
+evaluated as an RPN (Reverse Polish Notation) with the terminal size
+pushed on the stack.  Initial value for B<--height> options is
+terminal height, and terminal width for others.
 
     OPTION              VALUE
     =================   =========================
@@ -356,14 +394,16 @@ If you consider the case the terminal width is less than 85:
 
     ansicolumn --pane 85/,DUP,1,GE,EXCH,1,IF
 
+This RPN means C<< $height/85 >= 1 ? $height/85 : 1 >>.
+
 =head1 STARTUP
 
 This command is implemented with L<Getopt::EX> module.  So
 
     ~/.ansicolumnrc
 
-file is read at start up.  If you want use B<--no-white-space> always,
-put this line in your F<~/.ansicolumnrc>.
+file is read at start up time.  If you want use B<--no-white-space>
+always, put this line in your F<~/.ansicolumnrc>.
 
     option default --no-white-space
 

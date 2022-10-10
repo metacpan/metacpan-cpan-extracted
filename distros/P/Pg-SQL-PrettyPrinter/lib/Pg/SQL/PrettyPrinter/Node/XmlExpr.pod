@@ -1,0 +1,103 @@
+=head1 NAME
+
+Pg::SQL::PrettyPrinter::Node::XmlExpr - Class representing xmlelement
+
+=head1 SYNOPSIS
+
+Not to be used directly.
+
+=head1 FUNCTIONS
+
+Aside from functions listed below, it inherits functions from
+L<Pg::SQL::PrettyPrinter::Node>.
+
+=head2 new
+
+Makes object, first using parent's constructur, and then "unpacks" it's elements.
+
+=head2 as_text
+
+Fetches textual representation, without formatting, from appropriate
+C<*_as_text> method.
+
+=head2 pretty_print
+
+Fetches pretty printed representation, from appropriate C<*_pretty_print>
+method.
+
+=head2 element_as_text
+
+Provides text generation for xmlelement expressions.
+
+=head2 element_pretty_print
+
+Provides pretty printed text generation for xmlelement expressions.
+
+=head2 concat_as_text
+
+Provides text generation for xmlconcat expressions.
+
+=head2 concat_pretty_print
+
+Provides pretty printed text generation for xmlconcat expressions.
+
+=head2 forest_as_text
+
+Provides text generation for xmlforest expressions.
+
+=head2 forest_pretty_print
+
+Provides pretty printed text generation for xmlforest expressions.
+
+=head2 parse_as_text
+
+Provides text generation for xmlparse expressions.
+
+=head2 parse_pretty_print
+
+Provides pretty printed text generation for xmlparse expressions.
+
+=head2 pi_as_text
+
+Provides text generation for xmlpi expressions.
+
+=head2 pi_pretty_print
+
+Provides pretty printed text generation for xmlpi expressions.
+
+=head2 root_as_text
+
+Provides text generation for xmlroot expressions.
+
+=head2 root_pretty_print
+
+Provides pretty printed text generation for xmlroot expressions.
+
+=head2 isdocument_as_text
+
+Provides text generation for C<... IS DOCUMENT> predicate.
+
+=head2 isdocument_pretty_print
+
+Provides pretty printed text generation for C<... IS DOCUMENT> predicate.
+
+=head1 AUTHOR
+
+hubert depesz lubaczewski, C<< <depesz at depesz.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<depesz at depesz.com>.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Pg::SQL::PrettyPrinter::Node::XmlExpr
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright  hubert depesz lubaczewski, all rights reserved.
+
+This program is distributed under the (Revised) BSD License.
+

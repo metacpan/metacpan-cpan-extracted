@@ -1,0 +1,4 @@
+SELECT
+    count(*) FILTER ( WHERE relkind = 'r' )
+FROM
+    pg_class

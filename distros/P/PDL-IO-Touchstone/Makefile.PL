@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 my %REQUIRES = (
 	'PDL'                 =>  '2.080',
 	'PDL::Constants'      =>  '0',
-	'PDL::LinearAlgebra'  =>  '0',
+	'PDL::LinearAlgebra'  =>  '0.35',
     );
 
 my %WriteMakefileArgs = (

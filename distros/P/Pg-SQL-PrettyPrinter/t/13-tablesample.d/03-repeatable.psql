@@ -1,0 +1,4 @@
+SELECT
+    *
+FROM
+    pg_class TABLESAMPLE SYSTEM ( 5 ) REPEATABLE ( 123.5 )

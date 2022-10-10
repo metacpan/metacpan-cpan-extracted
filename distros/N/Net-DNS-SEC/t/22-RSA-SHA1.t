@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 22-RSA-SHA1.t 1830 2021-01-26 09:08:12Z willem $	-*-perl-*-
+# $Id: 22-RSA-SHA1.t 1863 2022-03-14 14:59:21Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -22,7 +22,10 @@ foreach my $package ( sort keys %prerequisite ) {
 plan skip_all => 'disabled RSA'
 		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_RSA') };
 
-plan tests => 17;
+plan skip_all => 'disabled SHA1'
+		unless eval { Net::DNS::SEC::libcrypto->can('EVP_sha1') };
+
+plan tests => 8;
 
 
 my %filename;
@@ -56,9 +59,6 @@ my $keyfile = $filename{keyfile} = $key->privatekeyname;
 my $privatekey = IO::File->new( $keyfile, '>' ) or die qq(open: "$keyfile" $!);
 print $privatekey <<'END';
 Private-key-format: v1.2
-; comment discarded
-
-; empty line discarded
 Algorithm: 5 (RSASHA1)
 Modulus: 58/RHMrcrf1rnDOeN5YDU+ywjZ3Go9v1Iv6mljzByKY64QGZIk/mfr9vCD3bdUWVGJgkd7mJ/ixrFYJh6dDjqFbPjiwr3jcrTe18eTGjnhrICT/t0yPXBDsNvLkUnUAAwZlk7rkGUpIP7YFNzCkgv2YBi6Edh+QboVMQQqAdWY5Wa3IpYDeCXdGtJKBfNNadRLlv+MR6HZJ+Vcb15dptqhVcQdA36gl1OICIStlbj5mXHmkitLJxkGkh1a+fi3vUveKToZy1Cob2WfXaPaeCOLduVUjcQ0ydRzbfuNR5izKTsTlO6CFBy0tg4Vcdp5MyAm3QtRPK/eAiANNGa+BANQ==
 PublicExponent: AQAB
@@ -88,75 +88,6 @@ is( $verified, 1, 'signature verified using public key' );
 
 my $verifiable = $class->verify( $corrupt, $key, $signature );
 is( $verifiable, 0, 'signature not verifiable if data corrupted' );
-
-
-# The following tests are not replicated for other RSA/SHA flavours
-
-my $wrongkey = Net::DNS::RR->new( <<'END' );
-DSA.example.	IN	DNSKEY	256 3 3 (
-	CMKzsCaT2Jy1w/sPdpigEE+nbeJ/x5C6cruWvStVum6/YulcR7MHeujx9c2iBDbo3kW4X8/l+qgk
-	7ZEZ+yV5lphWtJMmMtOHIU+YdAhgLpt84NKhcupWL8wfuBW/97cqIv5Z+51fwn0YEAcZsoCrE0nL
-	5+31VfkK9LTNuVo38hsbWa3eWZFalID5NesF6sJRgXZoAyeAH46EQVCq1UBnnaHslvSDkdb+Z1kT
-	bMQ64ZVI/sBRXRbqIcDlXVZurCTDV7JL9KZwwfeyrQcnVyYh5mdHPsXbpX5NQJvoqPgvRZWBpP4h
-	pjkAm9UrUbow9maPCQ1JQ3JuiU5buh9cjAI+QIyGMujKLT2OsogSZD2IFUciaZBL/rSe0gmAUv0q
-	XrczmIYFUCoRGZ6+lKVqQQ6f2U7Gsr6zRbeJN+JCVD6BJ52zjLUaWUPHbakhZb/wMO7roX/tnA/w
-	zoDYBIIF7yuRYWblgPXBJTK2Bp07xre8lKCRbzY4J/VXZFziZgHgcn9tkHnrfov04UG9zlWEdT6X
-	E/60HjrP ; Key ID = 53244
-	)
-END
-
-ok( $wrongkey, 'set up non-RSA public key' );
-
-
-my $wrongfile = $filename{wrongfile} = $wrongkey->privatekeyname;
-
-my $handle = IO::File->new( $wrongfile, '>' ) or die qq(open: "$wrongfile" $!);
-print $handle <<'END';
-Private-key-format: v1.2
-Algorithm: 3 (DSA)
-Prime(p): x5C6cruWvStVum6/YulcR7MHeujx9c2iBDbo3kW4X8/l+qgk7ZEZ+yV5lphWtJMmMtOHIU+YdAhgLpt84NKhcupWL8wfuBW/97cqIv5Z+51fwn0YEAcZsoCrE0nL5+31VfkK9LTNuVo38hsbWa3eWZFalID5NesF6sJRgXZoAyc=
-Subprime(q): wrOwJpPYnLXD+w92mKAQT6dt4n8=
-Base(g): gB+OhEFQqtVAZ52h7Jb0g5HW/mdZE2zEOuGVSP7AUV0W6iHA5V1Wbqwkw1eyS/SmcMH3sq0HJ1cmIeZnRz7F26V+TUCb6Kj4L0WVgaT+IaY5AJvVK1G6MPZmjwkNSUNybolOW7ofXIwCPkCMhjLoyi09jrKIEmQ9iBVHImmQS/4=
-Private_value(x): vdClrOqZ1qONKg0CZH5hVnq1i40=
-Public_value(y): tJ7SCYBS/SpetzOYhgVQKhEZnr6UpWpBDp/ZTsayvrNFt4k34kJUPoEnnbOMtRpZQ8dtqSFlv/Aw7uuhf+2cD/DOgNgEggXvK5FhZuWA9cElMrYGnTvGt7yUoJFvNjgn9VdkXOJmAeByf22Qeet+i/ThQb3OVYR1PpcT/rQeOs8=
-END
-close($handle);
-
-my $wrongprivate = Net::DNS::SEC::Private->new($wrongfile);
-ok( $wrongprivate, 'set up non-RSA private key' );
-
-
-is( eval { $class->sign( $sigdata, $wrongprivate ) }, undef, 'signature not created using wrong private key' );
-
-is( eval { $class->verify( $sigdata, $wrongkey, $signature ) }, undef, 'verify fails using wrong public key' );
-
-is( eval { $class->verify( $sigdata, $key, undef ) }, undef, 'verify fails if signature undefined' );
-
-
-# test detection of invalid private key descriptors
-eval { Net::DNS::SEC::Private->new('Kinvalid.private') };
-my ($exception1) = split /\n/, "$@\n";
-ok( $exception1, "invalid keyfile:	[$exception1]" );
-
-eval { Net::DNS::SEC::Private->new('Kinvalid.+0+0.private') };
-my ($exception2) = split /\n/, "$@\n";
-ok( $exception2, "missing keyfile:	[$exception2]" );
-
-eval { Net::DNS::SEC::Private->new( signame => 'private' ) };
-my ($exception3) = split /\n/, "$@\n";
-ok( $exception3, "unspecified algorithm:	[$exception3]" );
-
-eval { Net::DNS::SEC::Private->new( algorithm => 1 ) };
-my ($exception4) = split /\n/, "$@\n";
-ok( $exception4, "unspecified signame:	[$exception4]" );
-
-
-# exercise code for key with long exponent (not required for DNSSEC)
-eval {
-	my $longformat = pack 'xn a*', unpack 'C a*', $key->keybin;
-	$key->keybin($longformat);
-	$class->verify( $sigdata, $key, $signature );
-};
 
 
 exit;

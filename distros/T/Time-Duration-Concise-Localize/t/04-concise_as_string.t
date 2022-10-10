@@ -8,7 +8,7 @@ use Test::More;
 my $min_tpc = 1.27;
 eval "use Time::Seconds $min_tpc";
 plan skip_all => "Time::Seconds $min_tpc required for testing" if $@;
-plan tests => 17;
+plan tests    => 17;
 
 eval "use Test::NoWarnings";
 
@@ -38,7 +38,7 @@ my %display_tests = (
         2 => '4 days 12 hours',
         3 => '4 days 12 hours 16 minutes',
         4 => '4 days 12 hours 16 minutes 8 seconds',
-        }
+    }
 
 );
 

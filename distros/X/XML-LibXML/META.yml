@@ -19,7 +19,7 @@ configure_requires:
   Config: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 keywords:
   - dom
   - html
@@ -69,5 +69,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/shlomif/perl-XML-LibXML.git
-version: '2.0207'
+version: '2.0208'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

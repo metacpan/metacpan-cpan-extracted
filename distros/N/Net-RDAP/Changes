@@ -1,0 +1,27 @@
+Revision history for perl module Net::RDAP
+
+0.16 - 2022-10-06
+  - be more lenient in what we accept to improve
+    interoperability
+
+0.15 - 2020-07-07
+  - fixed RT#132736 (Noisy warning on ->fetch(url))
+
+0.14 - 2019-03-06
+  - support for getting help response from RDAP
+    services
+
+  - added Net::RDAP::Registry::IANARegistry and
+    Net::RDAP::Registry::IANARegistry::Service
+    and refactored Net::RDAP::Registry to use them
+
+0.13 - 2019-01-15
+  - add support for RFC 8521 object tagging
+
+0.12 - 2018-12-04
+  - remove colons from cache filenames to avoid
+    problems on Windows (RT#127684)
+
+0.11 - 2018-20-29
+  - add MANIFEST, MYMETA.(json|yml) and this file
+  - minor documentation updates

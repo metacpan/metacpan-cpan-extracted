@@ -1,0 +1,1 @@
+SELECT a, count(*) FROM b GROUP BY a HAVING count(*) > 10 AND min( id ) > 123

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Game-SDL.t
+lib/Game/SDL.pm

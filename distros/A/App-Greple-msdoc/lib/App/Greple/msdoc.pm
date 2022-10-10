@@ -4,7 +4,7 @@ msdoc - Greple module for access MS office docx/pptx/xlsx documents
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2018-2021 Kazumasa Utashiro.
+Copyright 2018-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -86,7 +86,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::msdoc;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use strict;
 use warnings;
@@ -207,10 +207,6 @@ help	--indent-mark	Specify text for indentation
 help	--type		Specify document type (docx, pptx, xlsx)
 help	--dump		Print entire data
 help	--msdoc-format	ignore
-
-# --text option is deprecated, and to be removed
-option	--text		$<move(0,0)>
-help	--text		ignore
 
 option default \
 	--if '/\.(doc|ppt|xls)[xm]$/:&__PACKAGE__::extract_content'

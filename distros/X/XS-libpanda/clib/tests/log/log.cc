@@ -84,3 +84,11 @@ TEST("prettify_json") {
     panda_log_warning(prettify_json{Hello()});
     CHECK(c.str != "{hello:1}");
 }
+
+TEST("VLA capture") {
+    // check if it compiles, gcc has bug with VLA capture
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=102272
+    int size = 10;
+    int a[size];
+    panda_log_error(a[1]);
+}

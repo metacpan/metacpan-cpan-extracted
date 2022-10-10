@@ -1,0 +1,89 @@
+=head1 NAME
+
+Pg::SQL::PrettyPrinter - Pretty printing SQL queries
+
+=head1 SYNOPSIS
+
+Formats SQL queries "nicely". To do so it first has to parse it, and for this
+it's using microservice available over HTTP:
+L<https://gitlab.com/depesz/pg-query-parser-microservice>.
+
+Usage example:
+
+    use Pg::SQL::PrettyPrinter;
+
+    my $pp = Pg::SQL::PrettyPrinter->new(
+        'service' => 'http://127.0.0.1:15283/',
+        'sql' => 'select 1'
+    );
+
+    my $nice = $pp->pretty_print();
+
+
+=head1 FUNCTIONS
+
+=head2 new
+
+Object constructor.
+
+Takes following arguments:
+
+=over
+
+=item * sql : obligatory query that will be pretty-printed
+
+=item * service : usually obligatory url to parsing microservice
+
+=item * struct : data structure that was obtained from the parsing microservice separately
+
+=back
+
+Normally one will provide C<sql> and C<service>, but for testing purposes one
+can skip C<service> and instead provide C<struct>, which should be perl hash
+that is exactly what is being sent from the parser as JSON.
+
+=head2 validate_struct
+
+Checks if given structure (either from constructor's C<struct> field, or
+obtained after deserializing JSON obtained from parsing microservice) matches
+some basic assumptions on what should be there.
+
+In case of problems, exception is raised.
+
+=head2 parse
+
+Wraps all work related with gettin data from C<struct> given to constructor,
+or from parsing C<sql> into tree of perl objects that will be responsible for
+pretty printing.
+
+In case anything goes wrong - it will raise an exception.
+
+=head2 fetch_struct
+
+Sends C<sql> that was given to L<new()> call to parsing microservice,
+deserializes it's output, and calls C<validate_struct> to make sure that the
+result is sane.
+
+=head2 remove_irrelevant
+
+Removes irrelevant parts of query, like prompts.
+
+=head1 AUTHOR
+
+hubert depesz lubaczewski, C<< <depesz at depesz.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<depesz at depesz.com>.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Pg::SQL::PrettyPrinter
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright  hubert depesz lubaczewski, all rights reserved.
+
+This program is distributed under the (Revised) BSD License.

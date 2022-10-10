@@ -1,0 +1,35 @@
+---
+abstract: 'Exception class based on integer error codes common in C code'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000121'
+  perl: '5.020'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.020'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Exception-FFI-ErrorCode
+requires:
+  Carp: '1.25'
+  Class::Tiny: '0'
+  Devel::StackTrace: '0'
+  Ref::Util: '0'
+  Sub::Identify: '0'
+  constant: '1.32'
+  perl: '5.020'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/PerlFFI/Exception-FFI-ErrorCode/issues
+  homepage: https://metacpan.org/pod/Exception::FFI::ErrorCode
+  repository: git://github.com/PerlFFI/Exception-FFI-ErrorCode.git
+version: '0.02'
+x_generated_by_perl: v5.37.4
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

@@ -453,3 +453,10 @@ Revision history for StreamFinder
         - StreamFinder::Rumble - Fix not capturing full video descriptions.
         - StreamFinder::Youtube - Add -formats_by_url => {hash} option to allow 
         specifying different video formats allowed based on URL matching.
+1.90    2022/10/04
+        - Add StreamFinder::SoundCloud (soundcloud.com songs)
+        - StreamFinder::Bitchute - Fix not capturing full video descriptions,
+        and fix failure to capture proper genre.
+        - StreamFinder::Anystream - Handle extended M3U (HLS) playlist URLs.
+1.91    2022/10/04
+        - Add StreamFinder::SoundCloud to MANIFEST file.

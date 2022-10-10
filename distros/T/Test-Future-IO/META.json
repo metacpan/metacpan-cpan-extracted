@@ -21,9 +21,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Future::Buffer" : "0",
             "Future::IO" : "0",
             "Test::Deep" : "0",
-            "Test::ExpectAndCheck::Future" : "0"
+            "Test::ExpectAndCheck::Future" : "0.05"
          }
       },
       "test" : {
@@ -36,7 +37,7 @@
    "provides" : {
       "Test::Future::IO" : {
          "file" : "lib/Test/Future/IO.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -45,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

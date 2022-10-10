@@ -1,5 +1,11 @@
 Revision history for FFI-CheckLib
 
+0.31      2022-09-30 07:42:44 -0600
+  - Better support for Homebrew and MacPorts on macOS (gh#46 cdalvaro++)
+  - New environment variable FFI_CHECKLIB_PACKAGE (gh#46)
+  - New environment variable FFI_CHECKLIB_PATH (gh#50, gh#52)
+  - Documentation improvements (gh#49, gh#52)
+
 0.30      2022-09-22 04:24:26 -0600
   - [ BREAKING CHANGE ]
     If the alien option is provided, the libraries provided by aliens will be

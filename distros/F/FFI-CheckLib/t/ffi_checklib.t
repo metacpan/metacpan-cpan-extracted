@@ -2,6 +2,8 @@ use lib 't/lib';
 use Test2::V0 -no_srand => 1;
 use Test2::Plugin::FauxOS 'linux';
 use Test2::Tools::FauxDynaLoader;
+use File::Spec;
+use File::Basename qw( basename );
 use FFI::CheckLib qw( find_lib which where has_symbols );
 
 subtest 'recursive' => sub {
@@ -212,6 +214,27 @@ subtest 'alien' => sub {
     };
 
   };
+
+};
+
+subtest 'FFI_CHECKLIB_PATH' => sub {
+
+  $FFI::CheckLib::system_path = [File::Spec->rel2abs('corpus/unix/path/path1')];
+  $ENV{FFI_CHECKLIB_PATH} = File::Spec->rel2abs('corpus/unix/path/path2');
+  note "system_path       = @{[ @$FFI::CheckLib::system_path ]}";
+  note "FFI_CHECKLIB_PATH = $ENV{FFI_CHECKLIB_PATH}";
+
+  my $lib = FFI::CheckLib::find_lib( lib => 'foo' );
+
+  note "lib=$lib";
+
+  is(basename($lib), "libfoo.so.2");
+
+  $lib = FFI::CheckLib::find_lib( lib => 'foo', libpath => 'corpus/unix/path/path3' );
+
+  note "lib=$lib";
+
+  is(basename($lib), "libfoo.so.3");
 
 };
 

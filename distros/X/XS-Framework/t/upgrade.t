@@ -7,17 +7,19 @@ use Scalar::Util qw(reftype);
 my $obj;
 
 # undefs to HV
-$obj = bless \(my $a = undef), 'AAA';
-is(Scalar::Util::reftype(\$a), 'SCALAR');
+my $aaa = undef;
+$obj = bless \($aaa), 'AAA';
+is(Scalar::Util::reftype(\$aaa), 'SCALAR');
 XS::Framework::obj2hv($obj);
 ok($obj->{key} = 1);
 is($obj->{key}, 1);
-is(Scalar::Util::reftype(\$a), 'HASH');
+is(Scalar::Util::reftype(\$aaa), 'HASH');
 XS::Framework::obj2hv($obj);
 
 
 # undefs to AV
-$obj = bless \(my $d = undef), 'AAA';
+my $ddd = undef;
+$obj = bless \($ddd), 'AAA';
 XS::Framework::obj2av($obj);
 ok($obj->[9] = 1);
 is($obj->[9], 1);

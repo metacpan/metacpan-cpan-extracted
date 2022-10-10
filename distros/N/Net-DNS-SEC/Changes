@@ -1,12 +1,16 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.20 Oct 4, 2022
+
+	Circumvent failure of EdDSA test on EBCDIC platforms.
+	Improve Net::DNS::SEC::Keyset tests and error reporting.
+	Avoid test failures if/when DSA|MD5|SHA1 become unsupported.
+
+
 **** 1.19 Oct 11, 2021
 
-	Use new EVP_PKEY construction API for OpenSSL post 3.x.x.
-
-	Remove support for obsolete ECC-GOST.
-
+	Discontinue support for obsolete ECC-GOST.
 	Add LICENSE file to comply with Fedora/RedHat announcement
 	and WARNING of restrictions on use of strong cryptography.
 
@@ -26,9 +30,7 @@ Revision history for Perl extension Net::DNS::SEC.
 **** 1.16 May 11, 2020
 
 	Improve testing of verify() functions.
-
 	Rework code in Digest.pm
-
 	SEC.xs code reduction.
 
 
@@ -40,7 +42,6 @@ Revision history for Perl extension Net::DNS::SEC.
 **** 1.14 October 14, 2019
 
 	Improve exception capture in test scripts.
-
 	Support more efficient algorithm mapping in Net::DNS.
 
 
@@ -53,28 +54,24 @@ Revision history for Perl extension Net::DNS::SEC.
 
 	Avoid use of EC_POINT_set_affine_coordinates_GFp which is
 	deprecated in OpenSSL 3.0.0
-
 	Reduce level of support for OpenSSL non-LTS releases.
 
 
 **** 1.11 Dec 11, 2018
 
 	Explain why compilation aborted in Net::DNS::SEC::DSA et al.
-
 	Fix Makefile.PL to suppress parallel test execution.
 
 
 **** 1.10 Aug 31, 2018
 
-	make test_cover
-	now collects SEC.xs test coverage metrics using gcc and gcov.
+	Collect test coverage metrics for SEC.xs using gcc and gcov.
 
 
 **** 1.09 Jun 4, 2018
 
 	Avoid use of EC_GROUP_new, EC_GROUP_set_curve_GFp, and
 	EC_GFp_mont_method which are expected to disappear.
-
 	Fix filename conflict when tests run in parallel.
 
 
@@ -660,4 +657,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1854 2021-10-11 10:43:36Z willem $
+$Id: Changes 1882 2022-10-04 19:53:44Z willem $

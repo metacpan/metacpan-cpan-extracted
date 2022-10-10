@@ -17,6 +17,7 @@ Alex
 Base
 Berners
 Bonaccorso
+Branislav
 Brendan
 Byrd
 Chase
@@ -37,6 +38,7 @@ IDNA
 IRI
 ISBNs
 Ishigaki
+James
 Jan
 John
 Julien
@@ -71,6 +73,7 @@ Punycode
 QNX
 QueryParam
 Rabbitson
+Raspass
 Rezic
 Roszatycki
 Salvatore
@@ -95,6 +98,7 @@ Ville
 Whitener
 Win32
 WithBase
+Zahradník
 _foreign
 _generic
 _idna
@@ -122,6 +126,7 @@ ftp
 gerard
 gisle
 gopher
+happy
 hiratara
 http
 https
@@ -129,6 +134,7 @@ isbn
 ishigaki
 jand
 john
+jraspass
 kapranoff
 kentfredric
 ldap

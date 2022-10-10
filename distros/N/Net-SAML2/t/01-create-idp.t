@@ -95,7 +95,11 @@ is(
     'Has correct art_url'
 );
 
-looks_like_a_cert($idp->cert('signing'));
+foreach my $use (keys %{$idp->certs}) {
+    for my $cert (@{$idp->cert($use)}) {
+        looks_like_a_cert($cert);
+    }
+};
 
 is(
     $idp->entityid,
@@ -152,7 +156,11 @@ is(
         'Has correct art_url'
     );
 
-    looks_like_a_cert($idp->cert('signing'), 'Looks like signing certificate');
+    foreach my $use (keys %{$idp->certs}) {
+        for my $cert (@{$idp->cert($use)}) {
+            looks_like_a_cert($cert);
+        }
+    };
 
     is(
         $idp->entityid,
@@ -275,7 +283,11 @@ XML
         'Has correct art_url'
     );
 
-    looks_like_a_cert($idp->cert('signing'), 'Looks like signing certificate');
+    foreach my $use (keys %{$idp->certs}) {
+        for my $cert (@{$idp->cert($use)}) {
+            looks_like_a_cert($cert);
+        }
+    };
 
     is(
         $idp->entityid,
@@ -373,6 +385,24 @@ XML
         qr/Error retrieving metadata: I'm a teapot \(418\)/,
         "Unable to get metadata because we're talking to a teapot",
     );
+}
+
+{
+    my $xml = path('t/data/idp-metadata-signing-encryption.xml')->slurp;
+    my $idp = Net::SAML2::IdP->new_from_xml(
+        xml => $xml,
+    );
+
+    isa_ok($idp, "Net::SAML2::IdP");
+    is(@{$idp->cert('signing')}, 1, 'Got one signing cert');
+    is(@{$idp->cert('encryption')}, 1, 'Got one encryption cert');
+}
+
+{
+    my $xml = path('t/data/idp-metadata-multiple-invalid-use.xml')->slurp;
+    my $idp = Net::SAML2::IdP->new_from_xml(xml => $xml);
+    is(@{$idp->cert('signing')}, 1, 'Got one signing cert');
+    is(@{$idp->cert('encryption')}, 2, 'Got two encryption certs');
 }
 
 done_testing;

@@ -23,10 +23,10 @@ name: Pod-Spell
 provides:
   Pod::Spell:
     file: lib/Pod/Spell.pm
-    version: '1.23'
+    version: '1.25'
   Pod::Wordlist:
     file: lib/Pod/Wordlist.pm
-    version: '1.23'
+    version: '1.25'
 requires:
   Carp: '0'
   Class::Tiny: '0'
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Spell
   homepage: https://github.com/perl-pod/Pod-Spell
   repository: https://github.com/perl-pod/Pod-Spell.git
-version: '1.23'
+version: '1.25'
 x_contributors:
   - 'David Golden <dagolden@cpan.org>'
   - 'Graham Knop <haarg@haarg.org>'

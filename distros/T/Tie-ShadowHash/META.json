@@ -28,7 +28,7 @@
    "provides" : {
       "Tie::ShadowHash" : {
          "file" : "lib/Tie/ShadowHash.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "web" : "https://github.com/rra/shadowhash"
       }
    },
-   "version" : "2.00",
+   "version" : "2.01",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

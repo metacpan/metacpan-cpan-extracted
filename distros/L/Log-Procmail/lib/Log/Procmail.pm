@@ -1,5 +1,5 @@
 package Log::Procmail;
-
+$Log::Procmail::VERSION = '0.14';
 require 5.005;
 use strict;
 use IO::File;
@@ -36,6 +36,8 @@ sub next {
     {
         my $read;
 
+        # ensure we can read past the previous end of file
+        $fh->clearerr if $fh->eof;
       LINE:
         while (<$fh>) {
             $read++;
@@ -171,7 +173,7 @@ sub DESTROY {
 # a small class for the abstracts themselves
 #
 package Log::Procmail::Abstract;
-
+$Log::Procmail::Abstract::VERSION = '0.14';
 use Carp;
 
 sub new {
@@ -201,11 +203,15 @@ sub ymd {
 
 __END__
 
-=encoding iso-8859-1
+=encoding utf-8
 
 =head1 NAME
 
 Log::Procmail - Perl extension for reading procmail logfiles.
+
+=head1 VERSION
+
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -408,7 +414,7 @@ Philippe "BooK" Bruhat <book@cpan.org>.
 
 =head1 ACKNOWLEDGMENTS
 
-Thanks to Briac "Oeufmayo" Pilpré and David "Sniper" Rigaudiere for early
+Thanks to Briac "Oeufmayo" PilprÃ© and David "Sniper" Rigaudiere for early
 comments on irc. Thanks to Olivier "rs" Poitrey for giving me his huge
 procmail log file (51 Mb spanning over a two-year period) and for probably
 being the first user of this module. Many thanks to Michael Schwern for
@@ -432,4 +438,3 @@ and/or modified under the terms of the Perl Artistic License
 perl(1), procmail(1).
 
 =cut
-

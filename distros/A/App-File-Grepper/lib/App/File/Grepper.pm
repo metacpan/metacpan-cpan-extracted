@@ -11,7 +11,7 @@ App::File::Grepper - Greps files for pattern
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 SYNOPSIS
 
@@ -107,8 +107,10 @@ sub main {
 
     my $opat = $pat;
 
-    $pat = $pat =~ m;^/(.*); ? qr/$1/ :
-      $ignorecase ? qr/\Q$pat\E/i : qr/\Q$pat\E/;
+    $pat = $pat =~ m;^/(.*);
+      ? $ignorecase ? qr/$1/i : qr/$1/
+      : $ignorecase ? qr/\Q$pat\E/i : qr/\Q$pat\E/;
+    warn("PAT:  $pat\n") if $opts->{debug};
 
     *hilite = ( !$edit && -t STDOUT )
       ? sub { color('red bold').$_[0].color('reset') }
@@ -150,6 +152,7 @@ sub main {
 	    warn("FLTR: $_\n") if $opts->{debug};
 	    return;
 	}
+	warn("FILE: $_\n") if $opts->{debug};
 
 	my $file = $_;
 
@@ -221,26 +224,15 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
+Development of this module takes place on GitHub:
+L<https://github.com/sciurius/afg>.
+
 You can find documentation for this module with the perldoc command.
 
-    perldoc App::File::Grepper
+    perldoc App::Packager
 
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-File-Grepper>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/App-File-Grepper>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/App-File-Grepper>
+Please report any bugs or feature requests using the issue tracker on
+GitHub.
 
 =back
 
@@ -250,7 +242,7 @@ This program was inspired by C<ack> not having a B<-e> option.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2012,2016 Johan Vromans, all rights reserved.
+Copyright 2012,2016,2022 Johan Vromans, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

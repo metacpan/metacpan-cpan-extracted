@@ -39,9 +39,11 @@ complete( 'box_score -n', [ qw{ --no-json } ] );
 
 $app->set( direct => 1 );
 complete( 'celestrak -',
-    [ classic_retrieve_options() ],
+    [ celestrak_direct_retrieve_options() ],
     q/Complete 'celestrak -', direct => 1/,
 );
+
+=begin comment
 
 $app->set( direct => 0 );
 complete( 'celestrak -',
@@ -54,10 +56,14 @@ complete( 'celestrak -',
     q/Complete 'celestrak -', direct => 0/,
 );
 
+=end comment
+
+=cut
+
 complete( 'celestrak o', [ qw{ oneweb orbcomm other other-comm } ] );
 
-complete( 'celestrak_supplemental -', [ qw{ --file --match --no-match
-	--no-rms --rms } ] );
+complete( 'celestrak_supplemental -', [ qw{ --file --format --match --no-match
+	--no-rms --query --rms } ] );
 
 complete( 'celestrak_supplemental o', [ qw{ oneweb orbcomm } ] );
 
@@ -147,6 +153,16 @@ sub complete {
 	    @core = sort @core;
 	}
 	return \@core;
+    }
+}
+
+{
+    my @opt;
+    sub celestrak_direct_retrieve_options {
+	@opt
+	    or @opt = sort +process_options(
+		Astro::SpaceTrack::CELESTRAK_OPTIONS() );
+	return @opt;
     }
 }
 

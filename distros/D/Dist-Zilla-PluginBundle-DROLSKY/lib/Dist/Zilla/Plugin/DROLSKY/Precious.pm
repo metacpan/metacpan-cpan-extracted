@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 use Path::Tiny qw( path );
 use Path::Tiny::Rule;
@@ -72,7 +72,7 @@ sub _new_precious_toml {
 
             # I think this is really only true for linting mode, but perltidy
             # is so complicated it's hard for me to tell.
-            expect_stderr => 'true',
+            ignore_stderr => 'Begin Error Output Stream',
         },
         'commands.omegasort-gitignore' => {
             type                    => 'both',
@@ -82,7 +82,6 @@ sub _new_precious_toml {
             tidy_flags              => '--in-place',
             ok_exit_codes           => 0,
             lint_failure_exit_codes => 1,
-            expect_stderr           => 'true',
         },
         'commands.podchecker' => {
             type          => 'lint',
@@ -92,7 +91,10 @@ sub _new_precious_toml {
             lint_failure_exit_codes => 1,
 
             # podchecker will print a warning to stderr if a file has no POD at all.
-            expect_stderr => 'true',
+            ignore_stderr => [
+                '.+ pod syntax OK',
+                '.+ does not contain any pod commands',
+            ]
         },
         'commands.podtidy' => {
             type    => 'tidy',
@@ -113,7 +115,6 @@ sub _new_precious_toml {
             tidy_flags    => '--in-place',
             ok_exit_codes => 0,
             lint_failure_exit_codes => 1,
-            expect_stderr           => 'true',
         };
     }
 
@@ -124,8 +125,6 @@ sub _munged_precious_toml {
     my $self = shift;
 
     return path('precious.toml')->slurp_utf8;
-
-    #    return $self->_config_to_toml($precious);
 }
 
 sub _default_perl_exclude {
@@ -167,7 +166,6 @@ my @key_order = qw(
 
 my %unquoted_keys = map { $_ => 1 } qw(
     chdir
-    expect_stderr
     lint_failure_exit_codes
     ok_exit_codes
 );
@@ -242,7 +240,7 @@ Dist::Zilla::Plugin::DROLSKY::Precious - Creates a default precious.toml file if
 
 =head1 VERSION
 
-version 1.20
+version 1.22
 
 =for Pod::Coverage .*
 
@@ -260,7 +258,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2022 by Dave Rolsky.
 
 This is free software, licensed under:
 

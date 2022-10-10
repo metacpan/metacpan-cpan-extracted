@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 use File::Which qw( which );
 
@@ -47,7 +47,7 @@ __PACKAGE__->meta->make_immutable;
 
 1;
 
-# ABSTRACT: Subclasses MakeMaker::Awesome to always run tests in parallel and add -W flags for XS code
+# ABSTRACT: Subclasses MakeMaker::Awesome to add -W flags for XS code
 
 __END__
 
@@ -57,11 +57,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::DROLSKY::MakeMaker - Subclasses MakeMaker::Awesome to always run tests in parallel and add -W flags for XS code
+Dist::Zilla::Plugin::DROLSKY::MakeMaker - Subclasses MakeMaker::Awesome to add -W flags for XS code
 
 =head1 VERSION
 
-version 1.20
+version 1.22
 
 =for Pod::Coverage .*
 
@@ -79,7 +79,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2022 by Dave Rolsky.
 
 This is free software, licensed under:
 

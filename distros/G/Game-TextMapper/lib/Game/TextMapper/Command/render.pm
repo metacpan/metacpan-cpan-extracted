@@ -61,8 +61,9 @@ use Mojo::Base 'Mojolicious::Command';
 use File::ShareDir 'dist_dir';
 use Pod::Simple::Text;
 use Getopt::Long qw(GetOptionsFromArray);
+use Encode;
 
-has description => 'Render map from STDIN to STDOUT, as SVG';
+has description => 'Render map from STDIN to STDOUT, as SVG (all UTF-8)';
 
 has usage => sub { my $self = shift; $self->extract_usage };
 
@@ -82,13 +83,13 @@ sub run {
   warn "Unhandled arguments: @args\n" if @args;
   my $mapper;
   if ($square) {
-    $mapper = Game::TextMapper::Mapper::Square->new(dist_dir => $dist_dir);
+    $mapper = Game::TextMapper::Mapper::Square->new(dist_dir => $dist_dir, local_files => 1);
   } else {
-    $mapper = Game::TextMapper::Mapper::Hex->new(dist_dir => $dist_dir);
+    $mapper = Game::TextMapper::Mapper::Hex->new(dist_dir => $dist_dir, local_files => 1);
   }
   local $/ = undef;
-  $mapper->initialize(<STDIN>);
-  print $mapper->svg;
+  $mapper->initialize(decode_utf8 <STDIN>);
+  print encode_utf8 $mapper->svg;
 }
 
 1;

@@ -5,6 +5,8 @@ use warnings;
 
 sub class {}
 
+sub role {}
+
 sub field {}
 
 sub method {}
@@ -16,6 +18,8 @@ sub reader {}
 sub common {}
 
 class(1);
+
+role(1);
 
 field(1);
 

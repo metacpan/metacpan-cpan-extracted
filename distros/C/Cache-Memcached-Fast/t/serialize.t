@@ -1,48 +1,27 @@
-use warnings;
-use strict;
+use lib 't';
 
-use Test::More;
-
-use FindBin;
-
-use lib "$FindBin::Bin";
 use Memd;
-
-if ($Memd::memd) {
-    plan tests => 12;
-} else {
-    plan skip_all => 'Not connected';
-}
-
+use Test2::V0;
 
 my %hash = ( a => 'a', b => 2, c => [ 'a', 1 ], d => { a => 1, b => [] } );
+my $key  = 'serialize';
 
-is_deeply(\%hash, \%hash, 'Check that is_deeply works');
+ok $memd->set( $key => \%hash ), 'set()';
 
-my $key = 'serialize';
+is $memd->get($key), \%hash, 'get()';
 
-ok($Memd::memd->set($key, \%hash), 'Serialize and store');
+is $memd->get_multi($key), { $key => \%hash }, 'get_multi()';
 
-my $res = $Memd::memd->get($key);
-ok($res, 'Fetch');
-is_deeply($res, \%hash, 'De-serialization');
+subtest prepend => sub {
+    plan skip_all => 'memcached 1.2.4 is required' if $memd_version < v1.2.4;
 
-$res = $Memd::memd->get_multi($key);
-isa_ok($res, 'HASH');
-ok(exists $res->{$key}, 'Fetch');
-is_deeply($res->{$key}, \%hash, 'De-serialization');
+    ok $memd->prepend( $key => 'garbage' ), 'prepend()';
 
-SKIP: {
-    skip "memcached 1.2.4 is required for prepend command", 4
-      if $Memd::version_num < 10204;
+    is $memd->get($key), undef, 'get()';
 
-    ok($Memd::memd->prepend($key, 'garbage'), 'Prepend garbage');
-    $res = $Memd::memd->get($key);
-    ok(! $res, 'Check that fetch fails');
+    is $memd->get_multi($key), {}, 'get_multi()';
+};
 
-    $res = $Memd::memd->get_multi($key);
-    isa_ok($res, 'HASH');
-    ok(! exists $res->{$key}, 'Check that fetch fails');
-}
+ok $memd->delete($key), 'delete()';
 
-ok($Memd::memd->delete($key), 'Delete');
+done_testing;

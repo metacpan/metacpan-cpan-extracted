@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Device::Chip::MPL3115A2 0.10;
+package Device::Chip::MPL3115A2 0.11;
 class Device::Chip::MPL3115A2
    :isa(Device::Chip::Base::RegisteredI2C);
 
@@ -18,7 +18,7 @@ use Future::AsyncAwait;
 
 use Data::Bitfield 0.02 qw( bitfield boolfield enumfield );
 
-use Device::Chip::Sensor -declare;
+use Device::Chip::Sensor 0.23 -declare;
 
 =encoding UTF-8
 
@@ -260,6 +260,7 @@ declare_sensor pressure =>
       return await $self->read_pressure;
    },
    units     => "pascals",
+   sanity_bounds => [ 80_000, 120_000 ],
    precision => 0;
 
 =head2 read_altitude
@@ -291,6 +292,7 @@ declare_sensor temperature =>
       return await $self->read_temperature;
    },
    units     => "°C",
+   sanity_bounds => [ -50, 80 ],
    precision => 2;
 
 =head2 read_min_pressure

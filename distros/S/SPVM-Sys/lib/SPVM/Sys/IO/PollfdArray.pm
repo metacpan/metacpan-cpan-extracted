@@ -1,20 +1,20 @@
-package SPVM::Sys::Poll::PollfdArray;
+package SPVM::Sys::IO::PollfdArray;
 
 1;
 
 =head1 Name
 
-SPVM::Sys::Poll::PollfdArray - Array of C<struct pollfd> in C<C language>
+SPVM::Sys::IO::PollfdArray - Array of C<struct pollfd> in C<C language>
 
 =head1 Usage
 
-  use Sys::Poll::PollfdArray;
+  use Sys::IO::PollfdArray;
   
-  my $pollfds = Sys::Poll::PollfdArray->new(1024);
+  my $pollfds = Sys::IO::PollfdArray->new(1024);
 
 =head1 Description
 
-C<Sys::Poll::PollfdArray> is the class for the array of C<struct pollfd> in C<C language>.
+C<Sys::IO::PollfdArray> is the class for the array of C<struct pollfd> in C<C language>.
 
 This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
 
@@ -24,7 +24,7 @@ This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
 
   static method new : Sys::IO::PollfdArray ($length : int);
 
-Create a new C<Sys::Poll::PollfdArray> object with the length.
+Create a new C<Sys::IO::PollfdArray> object with the length.
 
 =head1 Instance Methods
 

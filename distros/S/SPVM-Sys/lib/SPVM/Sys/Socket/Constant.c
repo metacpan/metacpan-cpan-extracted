@@ -1,4 +1,5 @@
-#include "spvm_native.h"
+// Windows 8.1+
+#define _WIN32_WINNT 0x0603
 
 #include "spvm_native.h"
 
@@ -18,6 +19,8 @@
 # include <netinet/udp.h>
 # include <sys/un.h>
 # include <arpa/inet.h>
+# include <netdb.h>
+# include <poll.h>
 #endif
 
 static const char* FILE_NAME = "Sys/Socket/Constant.c";
@@ -318,6 +321,18 @@ int32_t SPVM__Sys__Socket__Constant__AF_XDP(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "AF_XDP is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+  
+}
+
+int32_t SPVM__Sys__Socket__Constant__FIONBIO(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef FIONBIO
+  stack[0].ival = FIONBIO;
+  return 0;
+#else
+  env->die(env, stack, "FIONBIO is not defined on this system", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #endif
   
@@ -1290,6 +1305,18 @@ int32_t SPVM__Sys__Socket__Constant__SOL_SOCKET(SPVM_ENV* env, SPVM_VALUE* stack
   return 0;
 #else
   env->die(env, stack, "SOL_SOCKET is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+  
+}
+
+int32_t SPVM__Sys__Socket__Constant__SOMAXCONN(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef SOMAXCONN
+  stack[0].ival = SOMAXCONN;
+  return 0;
+#else
+  env->die(env, stack, "SOMAXCONN is not defined on this system", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #endif
   
@@ -2482,6 +2509,30 @@ int32_t SPVM__Sys__Socket__Constant__IN6ADDR_LOOPBACK(SPVM_ENV* env, SPVM_VALUE*
   return 0;
 #else
   env->die(env, stack, "IN6ADDR_LOOPBACK is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__NI_MAXHOST(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef NI_MAXHOST
+  stack[0].ival = NI_MAXHOST;
+  return 0;
+#else
+  env->die(env, stack, "NI_MAXHOST is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__NI_MAXSERV(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef NI_MAXSERV
+  stack[0].ival = NI_MAXSERV;
+  return 0;
+#else
+  env->die(env, stack, "NI_MAXSERV is not defined on this system", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #endif
 

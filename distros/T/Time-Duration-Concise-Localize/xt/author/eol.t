@@ -24,6 +24,7 @@ my @files = (
     'lib/Time/Duration/Concise/Locale/zh_cn.pm',
     'lib/Time/Duration/Concise/Locale/zh_tw.pm',
     'lib/Time/Duration/Concise/Localize.pm',
+    'lib/Time/Duration/Concise/Localize.pod',
     't/00-check-deps.t',
     't/00-compile.t',
     't/00-report-prereqs.dd',
@@ -36,8 +37,17 @@ my @files = (
     't/05-concise_as_concise.t',
     't/06-localize.t',
     't/boilerplate.t',
-    't/rc/.perlcriticrc',
-    't/rc/.perltidyrc'
+    'xt/author/critic.t',
+    'xt/author/distmeta.t',
+    'xt/author/eol.t',
+    'xt/author/minimum-version.t',
+    'xt/author/mojibake.t',
+    'xt/author/no-tabs.t',
+    'xt/author/pod-syntax.t',
+    'xt/author/portability.t',
+    'xt/author/test-version.t',
+    'xt/release/common_spelling.t',
+    'xt/release/cpan-changes.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

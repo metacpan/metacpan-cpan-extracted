@@ -1,0 +1,6 @@
+Revision history for Perl extension Game::SDL.
+
+0.1.1  Sun Oct  9 14:35:54 2022
+	- original version; created by h2xs 1.23 with options
+		-X -n Game::SDL
+

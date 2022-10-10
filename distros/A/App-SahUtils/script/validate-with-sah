@@ -7,9 +7,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.481'; # VERSION
+our $VERSION = '0.482'; # VERSION
 
 our %SPEC;
 
@@ -171,7 +171,7 @@ _
             tags => ['category:action-selection'],
         },
         show_code => {
-            summary => "Don't validate data, show generated validator code only",
+            summary => "Don't validate data, show generated validator source code only",
             schema=>['bool', is=>1],
             cmdline_aliases => {c=>{}},
             tags => ['category:action-selection'],
@@ -191,7 +191,7 @@ _
             summary => 'Generate validator with debug on',
             description => <<'_',
 
-This means e.g. to pepper the validator code with logging statements.
+This means e.g. to pepper the validator source code with logging statements.
 
 _
             schema => ['bool', is=>1],
@@ -228,6 +228,14 @@ _
             cmdline_aliases => {C=>{}},
             tags => ['category:validator-specification'],
         },
+        coerce => {
+            summary => 'Whether to generate coercion code',
+            'summary.alt.bool.not' => 'Generate validator that does not do coercions',
+            schema => 'bool',
+            default => 1,
+            tags => ['category:validator-specification'],
+        },
+
         linenum => {
             summary => 'When showing source code, add line numbers',
             schema=>['bool', is=>1],
@@ -259,7 +267,17 @@ _
         {
             src => q([[prog]] '["int","min",1,"max",10]' -c -l),
             src_plang => 'bash',
-            summary => 'Show validator Perl code only, with line number',
+            summary => 'Show validator Perl source code only, with line number',
+        },
+        {
+            src => q([[prog]] '["date"]' -c --no-coerce),
+            src_plang => 'bash',
+            summary => 'Show validator Perl source code, with no coercion code (the validator will only accept epochs)',
+        },
+        {
+            src => q([[prog]] '["date",{"x.perl.coerce_to":"DateTime"}]' -c --no-coerce),
+            src_plang => 'bash',
+            summary => 'Show validator Perl source code, with no coercion code (the validator will only accept DateTime objects)',
         },
         {
             src => q([[prog]] '["int","min",1,"max",10]' -c -C js),
@@ -269,7 +287,7 @@ _
         {
             src => q([[prog]] '["int","min",1,"max",10]' -C js -c -l),
             src_plang => 'bash',
-            summary => 'Show validator JS code only, with line number',
+            summary => 'Show validator JS source code only, with line number',
         },
         {
             src => q{[[prog]] -f schema1.json '["data"]'},
@@ -378,6 +396,7 @@ sub validate_with_sah {
             $gen_opts{core} = 1 if $args{core};
             $gen_opts{core_or_pp} = 1 if $args{core_or_pp};
             $gen_opts{no_modules} = 1 if $args{no_modules};
+            $gen_opts{coerce} = $args{coerce} // 1;
         }
 
         if ($args{show_raw_compile}) {
@@ -498,11 +517,11 @@ validate-with-sah - Validate data with Sah schema
 
 =head1 VERSION
 
-This document describes version 0.481 of validate-with-sah (from Perl distribution App-SahUtils), released on 2022-09-11.
+This document describes version 0.482 of validate-with-sah (from Perl distribution App-SahUtils), released on 2022-09-30.
 
 =head1 SYNOPSIS
 
-B<validate-with-sah> [B<--compiler>=I<str>|B<-C>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--core>] [B<--core-or-pp>] [B<--data-file-type>=I<str>] [B<--data-file>=I<str>] [B<--data-with-result>|B<-d>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-file>=I<str>] [B<--multiple-data>=I<any>|B<--multiple-data-json>=I<json>] [B<--(no)naked-res>] [B<--no-env>] [B<--no-modules>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pp>] [B<--return-type>=I<str>|B<--bool>|B<--bool-val>|B<--full>|B<-r>=I<str>|B<--str-val>] [B<--schema-file-type>=I<str>|B<-t>=I<str>] [B<--schema-file>=I<str>|B<-f>=I<str>] [B<--schema-module>=I<str>|B<-m>=I<str>] [B<--show-code>|B<-c>] [B<--show-raw-compile>|B<-R>] [B<--show-schema>|B<-s>] [B<--with-debug>] -- [I<schema>] [I<data>]
+B<validate-with-sah> [B<--coerce>|B<--no-coerce>|B<--nocoerce>] [B<--compiler>=I<str>|B<-C>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--core>] [B<--core-or-pp>] [B<--data-file-type>=I<str>] [B<--data-file>=I<str>] [B<--data-with-result>|B<-d>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-file>=I<str>] [B<--multiple-data>=I<any>|B<--multiple-data-json>=I<json>] [B<--(no)naked-res>] [B<--no-env>] [B<--no-modules>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pp>] [B<--return-type>=I<str>|B<--bool>|B<--bool-val>|B<--full>|B<-r>=I<str>|B<--str-val>] [B<--schema-file-type>=I<str>|B<-t>=I<str>] [B<--schema-file>=I<str>|B<-f>=I<str>] [B<--schema-module>=I<str>|B<-m>=I<str>] [B<--show-code>|B<-c>] [B<--show-raw-compile>|B<-R>] [B<--show-schema>|B<-s>] [B<--with-debug>] -- [I<schema>] [I<data>]
 
 
 
@@ -526,7 +545,7 @@ C<*> marks required options.
 
 =item B<--show-code>, B<-c>
 
-Don't validate data, show generated validator code only.
+Don't validate data, show generated validator source code only.
 
 =item B<--show-raw-compile>, B<-R>
 
@@ -827,6 +846,10 @@ Shortcut for --return-type full.
 
 See C<--return-type>.
 
+=item B<--no-coerce>
+
+Generate validator that does not do coercions.
+
 =item B<--no-modules>
 
 Generate Perl validator that does not use modules.
@@ -855,7 +878,7 @@ See C<--return-type>.
 
 Generate validator with debug on.
 
-This means e.g. to pepper the validator code with logging statements.
+This means e.g. to pepper the validator source code with logging statements.
 
 
 =back
@@ -948,6 +971,7 @@ which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-F
 
 List of available configuration parameters:
 
+ coerce (see --no-coerce)
  compiler (see --compiler)
  core (see --core)
  core_or_pp (see --core-or-pp)
@@ -1012,7 +1036,7 @@ String. Specify additional command-line options.
    { data => 15, result => "Must be at most 10" },
  ]
 
-=head2 Show validator Perl code only, with line number
+=head2 Show validator Perl source code only, with line number
 
  % validate-with-sah '["int","min",1,"max",10]' -c -l
     1|do {
@@ -1043,6 +1067,49 @@ String. Specify additional command-line options.
      |        
    27|        return($err_data);
    28|    }}
+
+=head2 Show validator Perl source code, with no coercion code (the validator will only accept epochs)
+
+ % validate-with-sah '["date"]' -c --no-coerce
+ do {
+     no warnings ('void');
+     sub {
+         my ($data) = @_;
+         my $err_data;
+         my $_sahv_res = 
+         
+             # skip if undef
+             (!defined($data) ? 1 : 
+             
+             (# check type 'date'
+             ((!ref($data) && $data =~ /\A[0-9]+\z/) ? 1 : (($err_data //= "Not of type date"),0))));
+         
+         ($err_data //= "");
+         
+         return($err_data);
+     }}
+
+=head2 Show validator Perl source code, with no coercion code (the validator will only accept DateTime objects)
+
+ % validate-with-sah '["date",{"x.perl.coerce_to":"DateTime"}]' -c --no-coerce
+ do {
+     no warnings ('void');
+     require Scalar::Util;
+     sub {
+         my ($data) = @_;
+         my $err_data;
+         my $_sahv_res = 
+         
+             # skip if undef
+             (!defined($data) ? 1 : 
+             
+             (# check type 'date'
+             ((Scalar::Util::blessed($data) && $data->isa('DateTime')) ? 1 : (($err_data //= "Not of type date"),0))));
+         
+         ($err_data //= "");
+         
+         return($err_data);
+     }}
 
 =head2 Show validator JavaScript code
 
@@ -1083,7 +1150,7 @@ String. Specify additional command-line options.
      return(err_data);
  }
 
-=head2 Show validator JS code only, with line number
+=head2 Show validator JS source code only, with line number
 
  % validate-with-sah '["int","min",1,"max",10]' -C js -c -l
     1|function(data) {

@@ -32,7 +32,9 @@ sub convert_novel {
   my ( $writer, $book ) = $opt{f} =~ /([^\\\/]+?)-([^\\\/]+?)\.[^.\\\/]+$/;
   my %conv = (
     'authors' => $opt{w} || $writer,
+    'author-sort' => $opt{w} || $writer,
     'title'   => $opt{b} || $book,
+    'title-sort' => $opt{b} || $book,
     'chapter-mark'       => "none",
     'page-breaks-before' => "/",
     'max-toc-links'      => 0,

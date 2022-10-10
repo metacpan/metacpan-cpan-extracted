@@ -3,7 +3,7 @@
 #   BOUNDARY
 #	DEFAULT : \pP
 #	BORDER  : \b
-#	JPUNCT   : [。、（）()])
+#	JPUNCT  : [。、（）()])
 #
 BOUNDARY?=JPUNCT
 

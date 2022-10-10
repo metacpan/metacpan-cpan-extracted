@@ -8,7 +8,7 @@ Weather::GHCN::CountryCodes - convert between various country codes
 
 =head1 VERSION
 
-version v0.0.003
+version v0.0.005
 
 =head1 SYNOPSIS
 
@@ -30,15 +30,19 @@ Weather::GHCN::StationTable.
 
 =cut
 
+## no critic [ValuesAndExpressions::ProhibitVersionStrings]
+## no critic [TestingAndDebugging::RequireUseWarnings]
+## no critic [ProhibitSubroutinePrototypes]
 
 use v5.18;  # minimum for Object::Pad
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
+
 package Weather::GHCN::CountryCodes;
 
-our $VERSION = 'v0.0.003';
+our $VERSION = 'v0.0.005';
 
 use Carp        qw(carp croak cluck confess);
 use English     qw(-no_match_vars);
@@ -77,7 +81,7 @@ UNITCHECK {
         my ($entity, $gec, $iso2, $iso3, $isonum, $nato, $internet, $comment) = split m{ [|] }xms, $line;
 
         # skip table entries with no GEC
-        next if $gec eq '-';
+        next if $gec eq q(-);
 
         # check for duplicates, though there shouldn't be any
         croak "*W* country $entity with GEC $gec already exists"
@@ -141,9 +145,10 @@ sub search_country ($search_value, $field) {
     my $search_key;
 
     ## no critic [ValuesAndExpressions::ProhibitMagicNumbers]
+    ## no critic [ControlStructures::ProhibitCascadingIfElse]
 
     if ( defined $field ) {
-        if ( $field !~ m{ \A (gec | iso2 | iso3 | isonum | nato | internet | name) \Z }xmsi) {
+        if ( $field !~ m{ \A (?: gec | iso2 | iso3 | isonum | nato | internet | name) \Z }xmsi) {
             croak 'invalid search field name';
         }
         $search_key = lc $field;

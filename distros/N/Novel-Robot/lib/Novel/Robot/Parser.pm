@@ -14,7 +14,7 @@ use Data::Dumper;
 
 ### {{{ data
 
-our $VERSION = 0.32;
+#our $VERSION = 0.32;
 
 our %SITE_DOM_NAME = (
   'bbs.jjwxc.net'   => 'hjj',
@@ -32,7 +32,7 @@ our %NULL_INDEX = (
   book       => '',
   writer     => '',
   writer_url => '',
-  item_list => [],
+  item_list  => [],
 
   intro    => '',
   series   => '',
@@ -106,7 +106,6 @@ sub generate_novel_url {
   return ( $index_url, @args );
 }
 
-
 ### }}}
 
 ### {{{ novel
@@ -158,7 +157,7 @@ sub get_novel_ref {
       %o,
     );
 
-    $r->{url}        = $index_url;
+    $r->{url}       = $index_url;
     $r->{item_list} = $item_list || [];
 
     #$r->{item_num}  = $max_item_num || undef;
@@ -180,10 +179,10 @@ sub get_novel_ref {
 sub scrape_novel {
   my ( $self ) = @_;
   my $r = {};
-  $r->{book}{path}    = $self->{book_path}    if ( exists $self->{book_path} );
-  $r->{book}{regex}   = $self->{book_regex}   if ( exists $self->{book_regex} );
-  $r->{writer}{path}  = $self->{writer_path}  if ( exists $self->{writer_path} );
-  $r->{writer}{regex} = $self->{writer_regex} if ( exists $self->{writer_regex} );
+  push @{$r->{book}}, { path => $self->{book_path} } if ( exists $self->{book_path} );
+  push @{$r->{book}}, { regex => $self->{book_regex} } if ( exists $self->{book_regex} );
+  push @{$r->{writer}}, { path => $self->{writer_path} } if ( exists $self->{writer_path} );
+  push @{$r->{writer}}, { regex => $self->{writer_regex} } if ( exists $self->{writer_regex} );
   return $r;
 }
 
@@ -269,8 +268,11 @@ sub parse_item_list {
 sub guess_item_list {
   my ( $self, $h, %opt ) = @_;
 
+  my $new_h = $$h;
+  $new_h=~s#<dt>[^<]+最新\d+章节</dt>.+?<dt>#<dt>#s;
+
   my $tree = HTML::TreeBuilder->new();
-  $tree->parse( $$h );
+  $tree->parse( $new_h );
 
   my @links = $tree->look_down( '_tag', 'a' );
   @links = grep { $_->attr( 'href' ) } @links;
@@ -324,9 +326,9 @@ sub guess_item_list {
   while ( 1 ) {
     my $x = $res_arr->[0];
     my $y = $res_arr->[ int( $#$res_arr / 2 ) ];
-    if ( $y->{title} =~ /$title_regex/ and $y->{url} =~ /\.html$/ and $x->{url} !~ /\.html$/ ) {
+    if ( defined $y->{title} and $y->{title} =~ /$title_regex/ and defined $y->{url} and $y->{url} =~ /\.html$/ and $x->{url} !~ /\.html$/ ) {
       shift( @$res_arr );
-    } elsif ( $y->{title} =~ /$title_regex/ and $y->{url} =~ /$chap_num_regex/ and $x->{url} !~ /$chap_num_regex/ ) {
+    } elsif ( defined $y->{title} and $y->{title} =~ /$title_regex/ and defined $y->{url} and $y->{url} =~ /$chap_num_regex/ and $x->{url} !~ /$chap_num_regex/ ) {
       shift( @$res_arr );
     } else {
       last;
@@ -334,9 +336,14 @@ sub guess_item_list {
   }
 
   #sort chapter url
-  if ( $res_arr and $res_arr->[0]{url} =~ /$chap_num_regex/ ) {
+  if ( $res_arr and defined $res_arr->[0]{url} and $res_arr->[0]{url} =~ /$chap_num_regex/ ) {
     my $trim_sub    = sub { my $s = $_[0]; $s =~ s/^.+\///; $s =~ s/\.html$//; return $s };
-    my @sort_arr    = sort { $trim_sub->( $a->{url} ) <=> $trim_sub->( $b->{url} ) } grep { $_->{url} =~ /$chap_num_regex/ } @$res_arr;
+    my @sort_arr;
+    if($opt{sort_chapter_url}){
+        @sort_arr = sort { $trim_sub->( $a->{url} ) <=> $trim_sub->( $b->{url} ) } grep { $_->{url} =~ /$chap_num_regex/ } @$res_arr;
+    }else{
+        @sort_arr = @$res_arr;
+    }
     my @s           = map { $trim_sub->( $_->{url} ) } @sort_arr;
     my $random_sort = 0;
     for my $i ( 0 .. $#s - 1 ) {
@@ -352,10 +359,12 @@ sub guess_item_list {
 sub scrape_novel_item {
   my ( $self ) = @_;
   my $r = {};
-  $r->{content}{path}  = $self->{content_path}  if ( exists $self->{content_path} );
-  $r->{content}{regex} = $self->{content_regex} if ( exists $self->{content_regex} );
-  $r = { content => { path => '//div[@id="content"]' } } unless ( exists $r->{content} );
-  $r->{content}{extract} ||= 'HTML' if ( exists $r->{content}{path} );
+  push @{$r->{content}}, { path => $self->{content_path}, extract => 'HTML' } if( exists $self->{content_path} );
+  push @{$r->{content}}, { regex => $self->{content_regex} } if( exists $self->{content_regex} );
+  push @{$r->{content}}, (
+      { path => '//div[@class="novel_content"]' }, 
+      { path => '//div[@id="content"]' }, 
+  );
   return $r;
 }
 
@@ -398,11 +407,13 @@ sub guess_novel_item {
   }
 
   #my @grep_next_r = grep { $_->{content} =~ /(上|下)一(章|页|篇)\w{0,20}$/s and $_->{word_num} > 50 } @out_links;
-  my @grep_next_r = grep { $_->{content} =~ /(上|下)一(章|页|篇)/s and $_->{word_num} > 50 } @out_links;
+  my @grep_next_r = grep { $_->{content} =~ /(上|下)一(章|页|篇)/s 
+          and $_->{word_num} > 50 
+  } @out_links;
 
   my $cc   = $no_next_r->{content};
   my $cc_n = $cc =~ s/(\n|<p[^>]*>|<br[^>]*>)//sg;
-  return $no_next_r if ( ( $cc_n > 5 and $no_next_r->{word_num} > 50 ) or !@grep_next_r );
+  return $no_next_r if ( ( $cc_n > 5 and $no_next_r->{word_num} > 50) or !@grep_next_r );
 
   return $grep_next_r[-1] || {};
 } ## end sub guess_novel_item
@@ -445,7 +456,7 @@ sub get_tiezi_ref {
     %$topic,
     writer => $o{writer} || $topic->{writer},
     book   => $o{book}   || $topic->{book} || $topic->{title},
-    url        => $url,
+    url       => $url,
     item_list => $item_list,
   );
   $self->filter_item_list( \%r, %o );
@@ -460,16 +471,16 @@ sub get_iterate_ref {
   my ( $self, $url, %o ) = @_;
   my ( $info, $item_list ) = $self->{browser}->request_url_whole(
     $url,
-    post_data     => $o{post_data},
-    info_sub => sub {
+    post_data => $o{post_data},
+    info_sub  => sub {
       $self->extract_elements(
         @_,
-        path => { },
-        sub  => sub { my ($self, $html_ref, $r) = @_; return $r; }, 
+        path => {},
+        sub  => sub { my ( $self, $html_ref, $r ) = @_; return $r; },
       );
     },
-    item_sub      => sub { my ($self, $html_ref) = @_; return {}; }, 
-    item_list_sub => sub { my ($self, $html_ref) = @_; return []; }, 
+    item_sub      => sub { my ( $self, $html_ref ) = @_; return {}; },
+    item_list_sub => sub { my ( $self, $html_ref ) = @_; return []; },
 
     #min_page_num  => $o{"min_page_num"},
     #max_page_num  => $o{"max_page_num"},
@@ -483,7 +494,7 @@ sub get_iterate_ref {
   $info->{item_list} = $self->update_item_list( $item_list, $url );
 
   return $info;
-} ## end sub get_iterate_data
+} ## end sub get_iterate_ref
 
 ### }}}
 
@@ -492,25 +503,34 @@ sub get_iterate_ref {
 sub update_item_list {
   my ( $self, $arr, $base_url ) = @_;
 
-  my $i = 0;
   my %rem;
+  for my $chap (@$arr){
+      $chap = { url => $chap || '' } if ( ref( $chap ) ne 'HASH' );
+      if ( $chap->{url} ) {
+          $chap->{url} = $self->format_abs_url( $chap->{url}, $base_url );
+          $rem{ $chap->{url} }++;
+      }
+  }
+
+  my $i = 0;
   my @res;
   for my $chap ( @$arr ) {
-    $chap = { url => $chap || '' } if ( ref( $chap ) ne 'HASH' );
-
-    if ( $chap->{url} ) {
-      $chap->{url} = $self->format_abs_url( $chap->{url}, $base_url );
-
-      next if ( exists $rem{ $chap->{url} } );
-      $rem{ $chap->{url} } = 1;
-    }
-
-    ++$i;
-    $chap->{pid} //= $i;               #page id
-    $chap->{id}  //= $i;               #item id
-    push @res, $chap;
+      if($chap->{url} and $rem{ $chap->{url} }>1){
+          $rem{$chap->{url}}--;
+      }else{
+          ++$i;
+          $chap->{pid} //= $i;               #page id
+          $chap->{id}  //= $i;               #item id
+          $chap->{content} //= '';
+          push @res, $chap  unless($chap->{content}=~m#正在手打中#s);
+      }
   }
-  $i = $arr->[-1]{id} if ( $#$arr >= 0 and exists $arr->[-1]{id} and $arr->[-1]{id} > $i );
+
+  while(@res and $res[-1]{content}=~m#正在手打中#s ){
+      pop @res;
+  }
+
+  #$i = $arr->[-1]{id} if ( $#$arr >= 0 and exists $arr->[-1]{id} and $arr->[-1]{id} > $i );
   return wantarray ? ( \@res, $i ) : \@res;
 } ## end sub update_item_list
 
@@ -527,7 +547,7 @@ sub extract_elements {
 
   my $r = {};
   while ( my ( $xk, $xr ) = each %{ $o{path} } ) {
-    $r->{$xk} = $self->scrape_element( $h, $xr );
+    $r->{$xk} = $self->scrape_element_try( $h, $xr );
   }
   $r = $o{sub}->( $self, $h, $r ) if ( $o{sub} );
   return $r;
@@ -685,10 +705,10 @@ sub unescape_js {
 }
 
 sub encode_cjk_for_url {
-    my ($self, $key) = @_;
-    my $b = uc( unpack( "H*", encode( $self->charset(), $key ) ) );
-    $b =~ s/(..)/%$1/g;
-    return $b;
+  my ( $self, $key ) = @_;
+  my $b = uc( unpack( "H*", encode( $self->charset(), $key ) ) );
+  $b =~ s/(..)/%$1/g;
+  return $b;
 }
 
 ### }}}

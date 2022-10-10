@@ -7,7 +7,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 ansicolumn \[options\] \[file ...\]
 
-    -c#                  output width
+    -w#, -c#             output width
     -s#                  separator string
     -t                   table style output
     -l#                  maximum number of table columns
@@ -18,11 +18,12 @@ ansicolumn \[options\] \[file ...\]
     -P[#], --page=#      page mode, with optional page length
     -U[#], --up=#        show in N-up format (-WC# --linestyle=wrap)
     --2up .. --9up       same as -U2 .. -U9
-    -D                   document mode
-    -C#                  number of panes
-    -S#                  pane width
-    -W                   widen to terminal width
-    -p                   paragraph mode
+    -D, --document       document mode
+    -V, --parallel       parallel view mode
+    -C#, --pane=#        number of panes
+    -S#, --pane-width=#  pane width
+    -W, --widen          widen to terminal width
+    -p, --paragraph      paragraph mode
 
     -B, --border[=#]     print border with optional style
     -F, --fillup[=#]     fill-up unit (pane|page|none)
@@ -47,14 +48,25 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.23
+Version 1.24
 
 # DESCRIPTION
 
 **ansicolumn** is a [column(1)](http://man.he.net/man1/column) command clone which can handle ANSI
 terminal sequences.  It supports traditional options and some of Linux
-extended, and other original options.  Empty lines are **not** ignored,
-though.
+extended, and many other original options.  Empty lines are **not**
+ignored, though.
+
+In contrast to the original [column(1)](http://man.he.net/man1/column) command which handles mainly
+short item list, and Linux variant which has been expanded to have
+ritch table style output, **ansicolumn(1)** has been expanded to show
+text file in multi-column view.  Combined with pagenation and
+document-friendly folding mechanism, it can be used as a document
+viewing preprocessor for pager program.
+
+When multiple files are given as arguments, it gets in the parallel
+view mode, and show all files in parallel.  It's convenient to see
+multiple files side-by-side.
 
 ## COMPATIBLE OPTIONS
 
@@ -62,10 +74,12 @@ The column utility formats its input into multiple columns.  Rows are
 filled before columns.  Input is taken from _file_ operands, or, by
 default, from the standard input.
 
-- **-c**#, **--width**=#, **--output-width**=#
+- **-w**#, **-c**#, **--width**=#, **--output-width**=#
 
     Output is formatted for a display columns wide.  See ["CALCULATION"](#calculation)
     section.
+
+    Accept **-c** for compatibility, but **-w** is more popular.
 
 - **-s**#, **--separator**=#
 
@@ -79,7 +93,7 @@ default, from the standard input.
     with the characters supplied using the -s option.  Useful for
     pretty-printing displays.
 
-- **-l**_#_, **--table-columns-limit** _number_
+- **-l**#, **--table-columns-limit**=#
 
     Specify maximal number of the input columns.  The last column will
     contain all remaining line data if the limit is smaller than the
@@ -94,14 +108,14 @@ default, from the standard input.
     When used **--table** or **-t** option, each column are joined by two
     space characters (' ') by default.  This option will change it.
 
-- **-R**_columns_, **--table-right**=_columns_
+- **-R**#, **--table-right**=#
 
     Right align text in these columns.
     Support only numbers.
 
-## EXTENDED OPTION
+## EXTENDED OPTIONS
 
-- **-P**\[_#_\], **--page**\[=_#_\]
+- **-P**\[#\], **--page**\[=#\]
 
     Page mode.  Set these options.
 
@@ -135,6 +149,23 @@ default, from the standard input.
     [App::optex::textconv](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv).
 
         optex -Mtextconv ansicolumn -DPC3 foo.docx | less
+
+- **-V**, \[**--no-**\]**parallel**
+
+    Parallel view mode.  Implicitly enabled when multiple files are
+    specified.  Use **--no-parallel** to disable.
+
+    Set these options, and cancel all pagenation behavior.
+
+        --widen
+        --linestyle=wrap
+        --border
+
+    By default, all files are displayed in parallel.  In other words,
+    number of pane is set as a number of files.  You can use **-C** option
+    to specify number of files displayed simultaneously.
+
+    You can use this option mixed with **-D** option to see document files.
 
 - **-C**#, **--pane**=#
 
@@ -171,7 +202,7 @@ default, from the standard input.
     automatically.  Use **--fillup=none** if you want to explicitly disable
     it.
 
-    Option **-U** is a shortcut for **--border=pane**.
+    Option **-F** is a shortcut for **--fillup=pane**.
 
 - **--height**=#
 
@@ -187,8 +218,8 @@ default, from the standard input.
     Set the style of treatment for longer lines.
     Default is `none`.
 
-    **--linestyle=wordrap** is equivalent to **--linestyle=wrap**
-    **--boundary=word**.
+    Option **--linestyle=wordrap** sets **--linestyle=wrap** and
+    **--boundary=word** at once.
 
 - **--boundary**=`none`|`word`|`space`
 
@@ -206,6 +237,13 @@ default, from the standard input.
     Set the number of runin/runout column.
     Default is both 2.
 
+    As for Japanese text, only one character can be moved with default
+    value.  Longer value allows more flexible arrangement, but makes text
+    area shorter.  Author is using the command with own `~/.ansicolumnrc`
+    like this:
+
+        option default --runin=4 --runout=4
+
 - **--**\[**no-**\]**pagebreak**
 
     Move to next pane when form feed character found.
@@ -213,31 +251,31 @@ default, from the standard input.
 
 - **--border-style**=_style_, **--bs**=...
 
-    Set the border style.  Current default style is `vbar`, which is
-    light vertical line filling the page height.
+    Set the border style.  Current default style is `box`, which enclose
+    each pane with box drawing graphic characters.
 
     Sample styles:
     none,
     space,
-    vbar,          heavy-vbar,       fat-vbar,
-    line,          heavy-line,
-    stick,         heavy-stick,
+    vbar, heavy-vbar, fat-vbar,
+    line, heavy-line,
+    stick, heavy-stick,
     ascii-frame,
     ascii-box,
     c-box,
-    box,           heavy-box,        fat-box,   very-fat-box,
-    dash-box,      heavy-dash-box,
-    round-box,     heavy-round-box,
-    frame,         heavy-frame,      fat-frame, very-fat-frame,
-    dash-frame,    heavy-dash-frame,
-    page-frame,    heavy-page-frame,
+    box, heavy-box, fat-box, very-fat-box,
+    dash-box, heavy-dash-box,
+    round-box, heavy-round-box,
+    frame, heavy-frame, fat-frame, very-fat-frame,
+    dash-frame, heavy-dash-frame,
+    page-frame, heavy-page-frame,
     shadow,
-    shadow-box,    heavy-shadow-box,
-    comb,          heavy-comb,
-    rake,          heavy-rake,
-    mesh,          heavy-mesh,
-    dumbbell,      heavy-dumbbell,
-    ribbon,        heavy-ribbon,
+    shadow-box, heavy-shadow-box,
+    comb, heavy-comb,
+    rake, heavy-rake,
+    mesh, heavy-mesh,
+    dumbbell, heavy-dumbbell,
+    ribbon, heavy-ribbon,
     round-ribbon,
     double-ribbon,
     etc.
@@ -301,9 +339,9 @@ default, from the standard input.
 As for **--height**, **--width**, **--pane** and **--pane-width** options,
 besides giving numeric digits, you can calculate the number using
 terminal size.  If the expression contains non-digit character, it is
-evaluated as a Reverse Polish Notation with the terminal size pushed
-on the stack.  Initial value for **--height** options is terminal
-height, and terminal width for others.
+evaluated as an RPN (Reverse Polish Notation) with the terminal size
+pushed on the stack.  Initial value for **--height** options is
+terminal height, and terminal width for others.
 
     OPTION              VALUE
     =================   =========================
@@ -324,14 +362,16 @@ If you consider the case the terminal width is less than 85:
 
     ansicolumn --pane 85/,DUP,1,GE,EXCH,1,IF
 
+This RPN means `$height/85 >= 1 ? $height/85 : 1`.
+
 # STARTUP
 
 This command is implemented with [Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX) module.  So
 
     ~/.ansicolumnrc
 
-file is read at start up.  If you want use **--no-white-space** always,
-put this line in your `~/.ansicolumnrc`.
+file is read at start up time.  If you want use **--no-white-space**
+always, put this line in your `~/.ansicolumnrc`.
 
     option default --no-white-space
 

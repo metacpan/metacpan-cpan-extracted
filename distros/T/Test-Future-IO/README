@@ -10,9 +10,9 @@ SYNOPSIS
        my $controller = Test::Future::IO->controller;
     
        {
-          $controller->expect_syswrite( "Hello, world\n" );
-          $controller->expect_sysread( 256 )
-             ->returns( "A string\n");
+          $controller->expect_syswrite_anyfh( "Hello, world\n" );
+          $controller->expect_sysread_anyfh( 256 )
+             ->will_done( "A string\n" );
     
           code_under_test();
     
@@ -37,27 +37,58 @@ EXPECTATIONS
     object which has additional methods to control the behaviour of that
     invocation.
 
-       $exp = $controller->expect_sleep( $secs )
+       $exp = $controller->expect_sleep( $secs );
     
-       $exp = $controller->expect_sysread( $len )
-       $exp = $controller->expect_syswrite( $bytes )
+       $exp = $controller->expect_sysread( $fh, $len );
+       $exp = $controller->expect_syswrite( $fh, $bytes );
 
-    Note that the sysread and syswrite expectations currently ignore the
-    filehandle argument. This behaviour will be changed in a future
-    version. To keep this behaviour use the following methods instead:
+    For testing simpler code that does not operate on multiple filehandles,
+    two additional methods that ignore the filehandle argument may be more
+    convenient:
 
-       $exp = $controller->expect_sysread_anyfh( $len )
-       $exp = $controller->expect_syswrite_anyfh( $bytes )
+       $exp = $controller->expect_sysread_anyfh( $len );
+       $exp = $controller->expect_syswrite_anyfh( $bytes );
 
-    The returned expectation object allows the test script to specify what
-    such an invocation should return.
+    In each case the returned expectation object allows the test script to
+    specify what such an invocation should return.
 
-       $exp->returns( @result )
+       $exp->will_done( @result );
 
     Expectations can make methods fail instead.
 
-       $exp->fails( $message )
-       $exp->fails( $message, $category, @details )
+       $exp->will_fail( $message );
+       $exp->will_fail( $message, $category, @details );
+
+    Expectations can be set to remain pending rather than completing.
+
+       $exp->remains_pending;
+
+    As a convenience, a syswrite expectation will default to returning a
+    future that will complete yielding its length (as is usual for
+    successful writes), and a sleep expectation will return a future that
+    completes yielding nothing.
+
+    Testing event-based code with expect_sysread can be fragile, as it
+    relies on exact ordering, buffer sizes, and so on. A more flexible
+    approach that leads to less brittle tests is to use a buffer around
+    that filehandle that is provided by the test module. The test module
+    then intercepts all sysread method calls on the given filehandle to
+    return data from that buffer:
+
+       $controller->use_sysread_buffer( $fh );
+    
+       $controller->write_sysread_buffer( $fh, $data );
+
+    As a convenience for filling the sysread buffer at the right time, any
+    expectation returned by this module supports two extra methods for
+    invoking write_sysread_buffer when another expectation completes:
+
+       $exp->will_write_sysread_buffer( $fh, $data );
+    
+       $exp->will_write_sysread_buffer_later( $fh, $data );
+
+    These are both shortcuts for calling "write_sysread_buffer" from within
+    a will_also or will_also_later code block.
 
 METHODS
 
@@ -76,10 +107,50 @@ METHODS
     new test output line via Test::Builder. Regardless, the expectations
     are also cleared out ready for the start of the next test.
 
+ use_sysread_buffer
+
+       $controller->use_sysread_buffer( $fh );
+
+    Since version 0.05.
+
+    This method enables a read buffer for a given filehandle, that provides
+    an alternative means of testing reading on a filehandle than using
+    expect_sysread. Once enabled, Future::IO->sysread calls on the given
+    filehandle handled internally by the test controller.
+
+    The sysread buffer is initially empty, and can be written to by
+    "write_sysread_buffer".
+
+    This is provided using a Test::ExpectAndCheck::Future ->whenever
+    expectation, which is returned by this method. This is useful in case
+    you want to call the ->indefinitely method on it, meaning it will
+    survive past calls to "check_and_clear".
+
+       $controller->use_sysread_buffer( "FH" )
+          ->indefinitely;
+
+ write_sysread_buffer
+
+       $controller->write_sysread_buffer( $fh, $data );
+
+    Since version 0.05.
+
+    Appends more data to the sysread buffer previously established by the
+    "use_sysread_buffer".
+
+    Typically this is performed either initially as part of test setup, or
+    later as a side-effect of other expectations completing.
+
+    For example:
+
+       $controller->use_sysread_buffer( "FH" );
+    
+       $controller->expect_syswrite( "FH", "Question?\n" )
+          ->will_write_sysread_buffer_later( "FH", "Answer!\n" );
+
 TODO
 
-      * Configurable matching on filehandles. Provision of a mock
-      filehandle object to assist unit tests.
+      * Provision of a mock filehandle object to assist unit tests.
 
 AUTHOR
 

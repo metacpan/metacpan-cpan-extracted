@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::SV 0.48;
+package Devel::MAT::SV 0.49;
 
 use v5.14;
 use warnings;
@@ -17,6 +17,8 @@ use Syntax::Keyword::Match;
 require Devel::MAT;
 
 use constant immortal => 0;
+
+use List::Util qw( first );
 
 use Struct::Dumb 0.07 qw( readonly_struct );
 readonly_struct Reference => [qw( name strength sv )];
@@ -446,6 +448,42 @@ sub outrefs_direct   { $_[0]->_outrefs_matching( STRENGTH_DIRECT,   $_[1] ) }
 sub outrefs_indirect { $_[0]->_outrefs_matching( STRENGTH_INDIRECT, $_[1] ) }
 sub outrefs_inferred { $_[0]->_outrefs_matching( STRENGTH_INFERRED, $_[1] ) }
 
+=head2 outref_named
+
+   $ref = $sv->outref_named( $name )
+
+I<Since version 0.49.>
+
+Looks for a reference whose name is exactly that given, and returns it if so.
+
+Throws an exception if the SV has no such outref of that name.
+
+=head2 maybe_outref_named
+
+   $ref = $sv->maybe_outref_named( $name )
+
+I<Since version 0.49.>
+
+As L</outref_named> but returns C<undef> if there is no such reference.
+
+=cut
+
+sub maybe_outref_named
+{
+   my $self = shift;
+   my ( $name ) = @_;
+
+   return first { $_->name eq $name } $self->outrefs;
+}
+
+sub outref_named
+{
+   my $self = shift;
+   my ( $name ) = @_;
+
+   return $self->maybe_outref_named( $name ) // croak "No outref named $name";
+}
+
 =head1 IMMORTAL SVs
 
 Three special SV objects exist outside of the heap, to represent C<undef> and
@@ -463,7 +501,7 @@ boolean true and false. They are
 
 =cut
 
-package Devel::MAT::SV::Immortal 0.48;
+package Devel::MAT::SV::Immortal 0.49;
 use base qw( Devel::MAT::SV );
 use constant immortal => 1;
 use constant basetype => "SV";
@@ -476,12 +514,12 @@ sub new {
 }
 sub _outrefs { () }
 
-package Devel::MAT::SV::UNDEF 0.48;
+package Devel::MAT::SV::UNDEF 0.49;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc { "UNDEF" }
 sub type { "UNDEF" }
 
-package Devel::MAT::SV::YES 0.48;
+package Devel::MAT::SV::YES 0.49;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc { "YES" }
 sub type { "SCALAR" }
@@ -494,7 +532,7 @@ sub pv { "1" }
 sub rv { undef }
 sub is_weak { '' }
 
-package Devel::MAT::SV::NO 0.48;
+package Devel::MAT::SV::NO 0.49;
 use base qw( Devel::MAT::SV::Immortal );
 sub desc { "NO" }
 sub type { "SCALAR" }
@@ -507,7 +545,7 @@ sub pv { "0" }
 sub rv { undef }
 sub is_weak { '' }
 
-package Devel::MAT::SV::Unknown 0.48;
+package Devel::MAT::SV::Unknown 0.49;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 0xff );
 
@@ -515,7 +553,7 @@ sub desc { "UNKNOWN" }
 
 sub _outrefs {}
 
-package Devel::MAT::SV::GLOB 0.48;
+package Devel::MAT::SV::GLOB 0.49;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 1 );
 use constant $CONSTANTS;
@@ -701,7 +739,7 @@ sub _more_saved
    push @{ $self->{saved} }, [ $slot => $addr ];
 }
 
-package Devel::MAT::SV::SCALAR 0.48;
+package Devel::MAT::SV::SCALAR 0.49;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 2 );
 use constant $CONSTANTS;
@@ -862,7 +900,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::REF 0.48;
+package Devel::MAT::SV::REF 0.49;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 3 );
 use constant $CONSTANTS;
@@ -953,7 +991,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::BOOL 0.48;
+package Devel::MAT::SV::BOOL 0.49;
 use base qw( Devel::MAT::SV::SCALAR );
 
 sub type { return "BOOL" }
@@ -965,7 +1003,7 @@ sub desc
    return "BOOL(NO)";
 }
 
-package Devel::MAT::SV::ARRAY 0.48;
+package Devel::MAT::SV::ARRAY 0.49;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 4 );
 use constant $CONSTANTS;
@@ -1121,7 +1159,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::PADLIST 0.48;
+package Devel::MAT::SV::PADLIST 0.49;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PADLIST";
@@ -1169,7 +1207,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::PADNAMES 0.48;
+package Devel::MAT::SV::PADNAMES 0.49;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PADNAMES";
@@ -1252,7 +1290,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::PAD 0.48;
+package Devel::MAT::SV::PAD 0.49;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
 use constant type => "PAD";
@@ -1300,15 +1338,20 @@ sub lexvars
    } 1 .. $#svs;
 }
 
-=head2 lexvar
+=head2 maybe_lexvar
 
-   $sv = $pad->lexvar( $padname )
+   $sv = $pad->maybe_lexvar( $padname )
 
-Returns the SV associated with the given padname.
+I<Since version 0.49.>
+
+Returns the SV associated with the given padname if one exists, or C<undef> if
+not.
+
+Used to be named C<lexvar>.
 
 =cut
 
-sub lexvar
+sub maybe_lexvar
 {
    my $self = shift;
    my ( $padname ) = @_;
@@ -1316,6 +1359,8 @@ sub lexvar
    my $padix = $self->padcv->padix_from_padname( $padname ) or return undef;
    return $self->elem( $padix );
 }
+
+*lexvar = \&maybe_lexvar;
 
 # Totally different outrefs format than ARRAY
 sub _outrefs
@@ -1362,7 +1407,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::HASH 0.48;
+package Devel::MAT::SV::HASH 0.49;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 5 );
 use constant $CONSTANTS;
@@ -1543,7 +1588,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::STASH 0.48;
+package Devel::MAT::SV::STASH 0.49;
 use base qw( Devel::MAT::SV::HASH );
 __PACKAGE__->register_type( 6 );
 use constant $CONSTANTS;
@@ -1682,7 +1727,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::CODE 0.48;
+package Devel::MAT::SV::CODE 0.49;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 7 );
 use constant $CONSTANTS;
@@ -2123,17 +2168,22 @@ sub pad
    return $self->{pads} ? $self->{pads}[$depth-1] : undef;
 }
 
-=head2 lexvar
+=head2 maybe_lexvar
 
-   $sv = $cv->lexvar( $padname, $depth )
+   $sv = $cv->maybe_lexvar( $padname, $depth )
+
+I<Since version 0.49.>
 
 Returns the SV on the PAD associated with the given padname, at the
 optionally-given depth (1-based index). If I<$depth> is not provided, the
-topmost live PAD will be used.
+topmost live PAD will be used. If no variable exists of the given name returns
+C<undef>.
+
+Used to be called C<lexvar>.
 
 =cut
 
-sub lexvar
+sub maybe_lexvar
 {
    my $self = shift;
    my ( $padname, $depth ) = @_;
@@ -2141,8 +2191,10 @@ sub lexvar
    $depth //= $self->depth;
    $depth or croak "Cannot fetch current pad of a non-live CODE";
 
-   return $self->pad( $depth )->lexvar( $padname );
+   return $self->pad( $depth )->maybe_lexvar( $padname );
 }
+
+*lexvar = \&maybe_lexvar;
 
 sub desc
 {
@@ -2247,7 +2299,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::IO 0.48;
+package Devel::MAT::SV::IO 0.49;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 8 );
 use constant $CONSTANTS;
@@ -2321,7 +2373,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::LVALUE 0.48;
+package Devel::MAT::SV::LVALUE 0.49;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 9 );
 use constant $CONSTANTS;
@@ -2362,7 +2414,7 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::REGEXP 0.48;
+package Devel::MAT::SV::REGEXP 0.49;
 use base qw( Devel::MAT::SV );
 use constant basetype => "REGEXP";
 __PACKAGE__->register_type( 10 );
@@ -2373,7 +2425,7 @@ sub desc { "REGEXP()" }
 
 sub _outrefs { () }
 
-package Devel::MAT::SV::FORMAT 0.48;
+package Devel::MAT::SV::FORMAT 0.49;
 use base qw( Devel::MAT::SV );
 use constant basetype => "PVFM";
 __PACKAGE__->register_type( 11 );
@@ -2384,7 +2436,7 @@ sub desc { "FORMAT()" }
 
 sub _outrefs { () }
 
-package Devel::MAT::SV::INVLIST 0.48;
+package Devel::MAT::SV::INVLIST 0.49;
 use base qw( Devel::MAT::SV );
 use constant basetype => "INVLIST";
 __PACKAGE__->register_type( 12 );
@@ -2396,7 +2448,7 @@ sub desc { "INVLIST()" }
 sub _outrefs { () }
 
 # A hack to compress files
-package Devel::MAT::SV::_UNDEFSV 0.48;
+package Devel::MAT::SV::_UNDEFSV 0.49;
 use base qw( Devel::MAT::SV::SCALAR );
 __PACKAGE__->register_type( 13 );
 
@@ -2412,7 +2464,7 @@ sub load
    );
 }
 
-package Devel::MAT::SV::_YESSV 0.48;
+package Devel::MAT::SV::_YESSV 0.49;
 use base qw( Devel::MAT::SV::BOOL );
 __PACKAGE__->register_type( 14 );
 
@@ -2428,7 +2480,7 @@ sub load
    );
 }
 
-package Devel::MAT::SV::_NOSV 0.48;
+package Devel::MAT::SV::_NOSV 0.49;
 use base qw( Devel::MAT::SV::BOOL );
 __PACKAGE__->register_type( 15 );
 
@@ -2444,7 +2496,7 @@ sub load
    );
 }
 
-package Devel::MAT::SV::OBJECT 0.48;
+package Devel::MAT::SV::OBJECT 0.49;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 16 );
 use constant $CONSTANTS;
@@ -2551,10 +2603,12 @@ sub _outrefs
    return @outrefs;
 }
 
-package Devel::MAT::SV::CLASS 0.48;
+package Devel::MAT::SV::CLASS 0.49;
 use base qw( Devel::MAT::SV::STASH );
 __PACKAGE__->register_type( 17 );
 use constant $CONSTANTS;
+
+use Carp;
 
 use Struct::Dumb 0.07 qw( readonly_struct );
 readonly_struct Field => [qw( fieldix name )];
@@ -2617,16 +2671,24 @@ sub fields
    $field = $class->field( $name_or_fieldix )
 
 Returns the field definition of the given field; which may be specified by
-name or index directly.
+name or index directly. Throws an exception if none such exists.
 
 The returned field is a structure of the following fields:
 
    $fieldix = $field->fieldix
    $name    = $field->name
 
+=head2 maybe_field
+
+   $field = $class->maybe_field( $name_or_fieldix )
+
+I<Since version 0.49.>
+
+Similar to L</field> but returns undef if none such exists.
+
 =cut
 
-sub field
+sub maybe_field
 {
    my $self = shift;
    my ( $name_or_fieldix ) = @_;
@@ -2637,6 +2699,16 @@ sub field
    else {
       return first { $_->name eq $name_or_fieldix } $self->fields
    }
+}
+
+sub field
+{
+   my $self = shift;
+   return $self->maybe_field( @_ ) // do {
+      my ( $name_or_fieldix ) = @_;
+      croak "No field at index $name_or_fieldix" if $name_or_fieldix =~ m/^\d+$/;
+      croak "No field named '$name_or_fieldix'";
+   };
 }
 
 sub _outrefs
@@ -2658,7 +2730,7 @@ sub _outrefs
 
 # A "SV" type that isn't really an SV, but has many of the same methods. These
 # aren't created by core perl, but are used by XS extensions
-package Devel::MAT::SV::C_STRUCT 0.48;
+package Devel::MAT::SV::C_STRUCT 0.49;
 use base qw( Devel::MAT::SV );
 __PACKAGE__->register_type( 0x7F );
 use constant $CONSTANTS;
@@ -2755,9 +2827,17 @@ Looks for a field whose name is exactly that given, and returns its value.
 
 Throws an exception if the struct has no such field of that name.
 
+=head2 maybe_field_named
+
+   $val = $struct->maybe_field_named( $name )
+
+I<Since version 0.49.>
+
+As L</field_named> but returns C<undef> if there is no such field.
+
 =cut
 
-sub field_named
+sub maybe_field_named
 {
    my $self = shift;
    my ( $name ) = @_;
@@ -2765,7 +2845,7 @@ sub field_named
    my $fields = $self->structtype->fields;
 
    defined( my $idx = first { $fields->[$_]->name eq $name } 0 .. $#$fields )
-      or croak "No field named $name";
+      or return undef;
 
    my $field = $fields->[$idx];
 
@@ -2775,6 +2855,14 @@ sub field_named
    else {
       return $self->field( $idx );
    }
+}
+
+sub field_named
+{
+   my $self = shift;
+   my ( $name ) = @_;
+
+   return $self->maybe_field_named( $name ) // croak "No field named $name";
 }
 
 =head2 structtype
@@ -2791,9 +2879,9 @@ Has the following named accessors
 
 The name of the struct type, as given by the dumpfile.
 
-=item ptrnames => ARRAY[ STRING ]
+=item fields => ARRAY[ Field ]
 
-An ARRAY reference containing the names of each of the pointer fields.
+An ARRAY reference containing the definitions of each field in turn
 
 =back
 

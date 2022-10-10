@@ -5,7 +5,7 @@ use URI qw{};
 use HTTP::Tiny qw{};
 use base qw{Power::Outlet::Common::IP};
 
-our $VERSION='0.43';
+our $VERSION = '0.46';
 
 =head1 NAME
 
@@ -32,25 +32,40 @@ Returns a configured L<URI::http> object
 =cut
 
 sub url {
-  my $self=shift;
-  $self->{"url"}=shift if @_;
-  unless (defined $self->{"url"}) {
-    my $url=URI->new;
-    $url->scheme("http");
+  my $self       = shift;
+  $self->{'url'} = shift if @_;
+  unless (defined $self->{'url'}) {
+    my $url = URI->new;
+    $url->scheme($self->http_scheme);
     $url->host($self->host);      #from Power::Outlet::Common::IP
     $url->port($self->port);      #from Power::Outlet::Common::IP
     $url->path($self->http_path); #from Power::Outlet::Common::IP::HTTP
-    $self->{"url"}=$url;
+    $self->{'url'} = $url;
   }
-  die unless $self->{"url"}->isa("URI");
-  return $self->{"url"}->clone;
+  die unless $self->{'url'}->isa('URI');
+  return $self->{'url'}->clone;
 }
 
 =head1 PROPERTIES
 
+=head2 http_scheme
+
+Set and returns the http_scheme property
+
+Default: http
+
 =cut
 
-sub _port_default {"80"};            #HTTP
+sub http_scheme {
+  my $self               = shift;
+  $self->{'http_scheme'} = shift if @_;
+  $self->{'http_scheme'} = $self->_http_scheme_default unless defined $self->{'http_scheme'};
+  return $self->{'http_scheme'};
+}
+
+sub _http_scheme_default {'http'};   
+
+sub _port_default {'80'};            #HTTP
 
 =head2 http_path
 
@@ -61,13 +76,13 @@ Default: /
 =cut
 
 sub http_path {
-  my $self=shift;
-  $self->{"http_path"}=shift if @_;
-  $self->{"http_path"}=$self->_http_path_default unless defined $self->{"http_path"};
-  return $self->{"http_path"};
+  my $self             = shift;
+  $self->{'http_path'} = shift if @_;
+  $self->{'http_path'} = $self->_http_path_default unless defined $self->{'http_path'};
+  return $self->{'http_path'};
 }
 
-sub _http_path_default {"/upnp/control/basicevent1"}; #WeMo
+sub _http_path_default {'/upnp/control/basicevent1'}; #WeMo
 
 =head1 OBJECT ACCESSORS
 
@@ -78,11 +93,11 @@ Returns a cached L<HTTP::Tiny> web client
 =cut
 
 sub http_client {
-  my $self=shift;
-  $self->{"http_client"}=shift if @_;
-  $self->{"http_client"}=HTTP::Tiny->new
-    unless ref($self->{"http_client"}) eq "HTTP::Tiny";
-  return $self->{"http_client"};
+  my $self               = shift;
+  $self->{'http_client'} = shift if @_;
+  $self->{'http_client'} = HTTP::Tiny->new
+    unless ref($self->{'http_client'}) eq 'HTTP::Tiny';
+  return $self->{'http_client'};
 }
 
 =head1 BUGS

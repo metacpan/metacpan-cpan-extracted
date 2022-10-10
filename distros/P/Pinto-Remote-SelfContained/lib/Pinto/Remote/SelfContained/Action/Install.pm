@@ -117,7 +117,20 @@ around execute => sub {
 };
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Action::Install
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Action::Install
 
 =head1 NAME
 
@@ -125,7 +138,7 @@ Pinto::Remote::SelfContained::Action::Install - Install packages from the reposi
 
 =head1 AUTHOR
 
-Aaron Crane, E<lt>arc@cpan.orgE<gt>
+Aaron Crane E<lt>arc@cpan.orgE<gt>, Brad Lhotsky E<lt>brad@divisionbyzero.netE<gt>
 
 =head1 COPYRIGHT
 

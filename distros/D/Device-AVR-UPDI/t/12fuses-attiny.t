@@ -22,42 +22,42 @@ $updi->_set_nvm_version( 0 );
    # NVMCTRL set ADDR
    $mockfio->expect_syswrite_anyfh( "\x55\x44\x08\x10" );
    $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x44\x08\x10" . "\x40" );
+      ->will_done( "\x55\x44\x08\x10" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_syswrite_anyfh( "\x85" );
    $mockfio->expect_sysread_anyfh( 2 )
-      ->returns( "\x85" . "\x40" );
+      ->will_done( "\x85" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_syswrite_anyfh( "\x55\x44\x09\x10" );
    $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x44\x09\x10" . "\x40" );
+      ->will_done( "\x55\x44\x09\x10" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_syswrite_anyfh( "\x12" );
    $mockfio->expect_sysread_anyfh( 2 )
-      ->returns( "\x12" . "\x40" );
+      ->will_done( "\x12" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    # NVMCTRL set DATA
    $mockfio->expect_syswrite_anyfh( "\x55\x44\x06\x10" );
    $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x44\x06\x10" . "\x40" );
+      ->will_done( "\x55\x44\x06\x10" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_syswrite_anyfh( "\xC8" );
    $mockfio->expect_sysread_anyfh( 2 )
-      ->returns( "\xC8" . "\x40" );
+      ->will_done( "\xC8" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    # NVMCTRL command - write fuse
    $mockfio->expect_syswrite_anyfh( "\x55\x44\x00\x10" );
    $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x44\x00\x10" . "\x40" );
+      ->will_done( "\x55\x44\x00\x10" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_syswrite_anyfh( "\x07" );
    $mockfio->expect_sysread_anyfh( 2 )
-      ->returns( "\x07" . "\x40" );
+      ->will_done( "\x07" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
    # NVMCTRL read status
    $mockfio->expect_syswrite_anyfh( "\x55\x04\x02\x10" );
    $mockfio->expect_sysread_anyfh( 5 )
-      ->returns( "\x55\x04\x02\x10" . "\x00" );
+      ->will_done( "\x55\x04\x02\x10" . "\x00" );
    $mockfio->expect_sleep( 0.1 );
 
    $updi->write_fuse( 5, 0xC8 )->get;

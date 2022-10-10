@@ -1,0 +1,6 @@
+SELECT
+    *
+FROM
+    pg_class
+WHERE
+    oid <> ALL( '{112,113}'::int4[] )

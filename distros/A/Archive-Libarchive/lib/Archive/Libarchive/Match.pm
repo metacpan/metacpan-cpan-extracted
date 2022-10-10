@@ -8,7 +8,7 @@ use experimental qw( signatures );
 use parent qw( Archive::Libarchive::Archive );
 
 # ABSTRACT: Libarchive match archive class
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 my $ffi = Archive::Libarchive::Lib->ffi;
 
@@ -41,7 +41,7 @@ Archive::Libarchive::Match - Libarchive match archive class
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

@@ -27,9 +27,9 @@ has logical_not_op => (is => 'rw', default => sub {'!'});
 #has logical_or_op => (is => 'rw', default => sub {'||'});
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-20'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 sub init_cd {
     my ($self, %args) = @_;
@@ -1168,7 +1168,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.912 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2022-08-20.
+This document describes version 0.913 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2022-09-30.
 
 =head1 SYNOPSIS
 

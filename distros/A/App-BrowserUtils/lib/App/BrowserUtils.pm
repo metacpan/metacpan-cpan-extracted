@@ -8,9 +8,9 @@ use Log::ger;
 use Hash::Subset qw(hash_subset);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-20'; # DATE
+our $DATE = '2022-07-24'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 our %SPEC;
 
@@ -150,7 +150,7 @@ our %argopt_users = (
         'x.name.is_plural' => 1,
         'x.name.singular' => 'user',
         summary => 'Kill browser processes that belong to certain user(s) only',
-        schema => ['array*', of=>'unix::local_uid*', 'x.perl.coerce_rules' => ['From_str::comma_sep']],
+        schema => ['array*', of=>'unix::uid::exists*', 'x.perl.coerce_rules' => ['From_str::comma_sep']],
     },
 );
 
@@ -717,7 +717,7 @@ App::BrowserUtils - Utilities related to browsers, particularly modern GUI ones
 
 =head1 VERSION
 
-This document describes version 0.016 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2022-05-20.
+This document describes version 0.017 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2022-07-24.
 
 =head1 SYNOPSIS
 
@@ -771,7 +771,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quiet> => I<true>
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -839,7 +839,7 @@ minutes, then unpause for 30 seconds (then repeat the pattern), you can use:
 
  300,10,120,30
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -884,7 +884,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -918,7 +918,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -1111,7 +1111,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<signal> => I<unix::signal>
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 
@@ -1147,7 +1147,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<users> => I<array[unix::local_uid]>
+=item * B<users> => I<array[unix::uid::exists]>
 
 Kill browser processes that belong to certain user(s) only.
 

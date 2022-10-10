@@ -3,21 +3,34 @@
    "author" : [
       "Mark Lawrence <nomad@null.net>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
-   "keywords" : [],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Sys-Cmd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "Sys::Cmd::Mo"
+      ]
+   },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4004"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
          }
       },
       "runtime" : {
@@ -41,28 +54,14 @@
          }
       }
    },
-   "provides" : {
-      "Sys::Cmd" : {
-         "file" : "lib/Sys/Cmd.pm",
-         "version" : "v0.85.4"
-      },
-      "Sys::Cmd::Template" : {
-         "file" : "lib/Sys/Cmd/Template.pm",
-         "version" : "v0.85.4"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/mlawren/p5-Sys-Cmd/issues"
-      },
-      "homepage" : "https://github.com/mlawren/p5-Sys-Cmd",
-      "license" : [
-         "http://www.gnu.org/licenses/gpl-3.0.txt"
-      ],
+      "bugtracker" : {},
       "repository" : {
-         "url" : "git://github.com/mlawren/p5-Sys-Cmd.git"
+         "type" : "git",
+         "url" : "ssh://git@github.com/mlawren/p5-Sys-Cmd.git"
       }
    },
-   "version" : "v0.85.4"
+   "version" : "v0.99.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

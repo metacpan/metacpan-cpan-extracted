@@ -3,7 +3,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.23';
+our $VERSION = '1.25';
 
 sub new {
     my ( $class, %args ) = @_;
@@ -164,7 +164,7 @@ Pod::Spell - a formatter for spellchecking Pod
 
 =head1 VERSION
 
-version 1.23
+version 1.25
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 #
 #       Makefile.PL for Term::ReadLine::Gnu
 #
-#       Copyright (c) 1996-2021 Hiroo Hayashi.  All rights reserved.
+#       Copyright (c) 1996-2022 Hiroo Hayashi.  All rights reserved.
 #               <hiroo.hayashi@computer.org>
 #
 #       This program is free software; you can redistribute it and/or
@@ -30,12 +30,11 @@ if ($ENV{AUTOMATED_TESTING} && !open(SESAMI, '/dev/tty')) {
     warn "cannot open /dev/tty\n";
     exit 0;
 }
-# test $TERM for CPAN Testers
 # https://rt.cpan.org/Ticket/Display.html?id=128806
-if ($ENV{AUTOMATED_TESTING}
-    && (!exists($ENV{TERM}) || !defined($ENV{TERM}) || $ENV{TERM} =~ /^(dumb|emacs|unknown|)$/)) {
-    warn "wrong \$TERM value: $ENV{TERM}\n";
-    exit 0;
+# https://github.com/hirooih/perl-trg/issues/11
+if (!exists($ENV{TERM}) || !defined($ENV{TERM}) || $ENV{TERM} =~ /^(dumb|emacs|unknown|)$/) {
+    warn "Warning: wrong \$TERM value, '$ENV{TERM}'. The GNU Readline Library does not work properly.\n";
+    exit 0 if $ENV{AUTOMATED_TESTING};  # exit on CPAN testers
 }
 
 push(@defs, '-DHAVE_STRING_H') if ($Config{strings} =~ m|/string.h$|);
@@ -377,27 +376,18 @@ int main() {
 EOF
     close($F);
 
-    my $extra_defs;
     for my $symbol_set (@symbol_sets) {
         my $xdef = join " ", map "-D$_=$symbol_set->{$_}", sort keys %$symbol_set;
         # compile it
         my $comp_cmd = "$Config{cc} $RLINC $Config{ccflags} $defs $xdef $frlmalloc -o rlmalloc $RLLIB $lddflags $Config{ldflags} $libs";
         print $comp_cmd, "\n" if $verbose;
-        unless (system($comp_cmd) || `./rlmalloc` !~ /^ok$/ || $?) {
-            $extra_defs = $xdef;
-            last;
-        }
+        return $xdef if (system($comp_cmd) == 0 && `./rlmalloc` =~ /^ok\s*$/); # maybe terminated by "\r\n"
     }
-
-    unless (defined $extra_defs) {
-        warn <<EOM;
+    warn <<EOM;
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 I was unable to find a working xmalloc in your readline library.
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 EOM
-        exit $err;
-    }
-
-    return $extra_defs;
+    exit $err;
 }
 # End of Makefile.PL

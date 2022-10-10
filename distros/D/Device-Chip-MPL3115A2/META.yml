@@ -3,7 +3,7 @@ abstract: 'chip driver for a F<MPL3115A2>'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::ExpectAndCheck::Future: '0.02'
+  Test::Device::Chip::Adapter: '0.24'
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
@@ -17,15 +17,16 @@ name: Device-Chip-MPL3115A2
 provides:
   Device::Chip::MPL3115A2:
     file: lib/Device/Chip/MPL3115A2.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Data::Bitfield: '0.02'
   Device::Chip::Base::RegisteredI2C: '0.03'
+  Device::Chip::Sensor: '0.23'
   Future::AsyncAwait: '0.47'
   Future::Mutex: '0.47'
   Object::Pad: '0.57'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

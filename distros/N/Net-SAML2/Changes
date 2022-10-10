@@ -1,6 +1,129 @@
 Revision history for Perl extension Net::SAML2.
 
+0.61 -- Tue Oct 04 23:37:21 ADT 2022
+
+  [ Significant Changes since 0.59 ]
+
+  There are multiple potentially BREAKING CHANGES depending on how you
+  have written your application.  Your application may need updates for
+  this version.
+
+  Same a version 0.60-TRIAL
+
+0.60 -- Mon Sep 19 10:53:23 ADT 2022
+
+  [ Significant Changes since 0.59 ]
+
+  There are multiple potentially BREAKING CHANGES depending on how you
+  have written your application.  Your application may need updates for
+  this version.
+
+  [BREAKING CHANGES]
+
+  - Support multiple signing keys in the metadata.  This version attempts
+  to ensure compatibility but the call to Net::SAML2::IdP->cert will return
+  an array of certs for each 'use'.  It is, however, likely that there will
+  only be one cert in the array.
+
+  - Net::SAML2::Binding::SOAP was improved.  The call to
+  Net::SAML2::Binding::SOAP->handle_request() now returns the XML whereas in
+  the past it returned the certificate's subject and the xml as an array.
+  This make it consistent with the Redirect and POST Bindings.
+
+  - Net::SAML2::Binding::POST was also improved.  Previously the call to
+  Net::SAML2::Binding::POST->handle_response() returned inconsistent results
+  depending on whether a cacert was provided.  This version returns the XML
+  of the decoded request.
+
+  - The testapp required only changes related to the call to
+  Net::SAML2::IdP->cert($use) that now returns an ARRAY.
+
+  [Changes of note:]
+
+  - Support multiple signing keys in the metadata.  This version attempts to
+    ensure compatability but the call to Net::SAML2::IdP->cert will return an
+    array of certs for each $use.  It is, however, likely that there will only
+    be one cert in the array.
+
+  - Redirects now validate the raw URI that is passed to the call.  It is
+    assumed that the URI that your application has sent is unmodified from the
+    response that the web server received.  lighttpd in particular normalizes
+    the response and will break Redirects from Microsoft Azure
+    (see lighttpd.conf in xt/testapp for a working configuration)
+
+  - Net::SAML2::Binding::SOAP and Net::SAML2::Binding::POST were improved.
+
+  - SAML trust anchors were implemented and the verification of the SAML
+    response was improved.  It is possible to validate the response with
+    subject, issuer or issuer_hash as anchors in addition to the cacert.
+    Neither cacert nor anchors are required as long as the signature of
+    the response is valid.  The cacert has not been required for the
+    Redirect or SOAP binding so this treats SOAP the same.
+
+  [Required Application Updates]
+
+  - There were several changed to the test suite that will likely need to be
+    made in your application:
+
+  - To support metadata.xml containing multiple KeyDescriptors the call to
+    Net::SAML2::IdP->cert($use) now returns an ARRAY.  As this is an helper
+    function that is meant to allow you to pass the cert to another Net::SAML2
+    call it was deemed low risk.  Your code may be unaffected.
+
+  - The call to Net::SAML2::Binding::SOAP->handle_request() needs to be updated
+    to reflect that it returns only the decoded XML not an array of the
+    Certificate Subject and XML.  Depending how your application uses the
+    response will determine whether changes are required.
+
+  - The call to Net::SAML2::Binding::POST->handle_response() returned
+    inconsistent results depending on whether a cacert was provided.  This
+    version returns the XML of the decoded request.  Previously it returned
+    either 1 for success or if a cacert was used, either "(verified) and the
+    certificate Subject" or 0 if the certificate verification failed.
+
+  - The lighttpd.conf for the testapp did require a change to prevent it from
+    "normalizing" a SAML Logout Redirect.  There are contradictory RFCs
+    concerning SAML and the "normalising" URIs.  If you use lighttpd in a SAML
+    application with AZURE as your SAML IdP see
+    [lighttpd.conf](https://github.com/perl-net-saml2/perl-Net-SAML2/commit/3855393eb454097e1e326a516a573f37ce3456a3#diff-8fd15aaa870fd2b9cda596bf3bb870ce2723ae412e55f0b653124b45d87e1bea)
+
+  [Possible Impacts]
+
+  - It is worth noting that the testapp (that implements a rudimentary Service
+    Provider) included in the git repo did not require any changes to the
+    application for this version.
+
+  - While my setup tests against multiple IdPs I do not have a working SOAP
+    IdP at present.
+
+  [ Full Change Log ]
+
+  - e95e7c2 Fix bug where two keys with different usage fails
+  - 33092f1 Add isDefault when isDefault is missing in assertion_consumer_service
+  - 66a4146 Bump version to .60
+  - 812ea36 0.59 updates
+  - f589dd0 v0.59
+  - c1b25f9 Sync changes with the wiki page and clean up indents
+  - 2c432f2 Remove unnecessary parameters
+  - 3855393 Allow URIs that do not include scheme and host in redirect
+  - e1774b6 Update docs for Net::SAML2::Protocol::LogoutRequest
+  - fdcfbeb Fix docs for Net::SAML2::Binding::Redirect
+  - 8d24c89 Update docs for Net::SAML2::Protocol::ArtifactResolve
+  - 27f6508 Update docs for Net::SAML::SP
+  - 4a89679 Fix docs for Net::SAML2::Binding::SOAP
+  - f43727d Verify the SAMLResponse based on the raw query string
+  - 50f5c8a Fixes #12 - multiple signing keys in metadata
+  - 4902c89 Make SAML trust anchors work on verification of the SAML request
+  - af68b68 SOAP binding does not require a cacert anymore
+  - 1854e35 Implement verify_xml() call which only verifies the XML
+
 0.59 -- Wed Aug 24 22:23:53 ADT 2022
+
+  There were no changes other than incrementing the version number
+  from 0.58-TRIAL.
+
+  - 564fa93 (tag: 0.59) Update Changes for .58 release
+  - 2a43f4e v0.58
 
 0.58 -- Fri Aug 12 16:25:59 ADT 2022
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010_000;
 
-our $VERSION = '2.057005';
+our $VERSION = '2.057007';
 use App::Netdisco::Configuration;
 
 =head1 NAME
@@ -341,7 +341,8 @@ of Waikato, Hamilton NZ), Dusty Hall (Auburn U), Jon Monroe (center pointe),
 Alexander Barthel, Bill Anderson, Alexander Hartmaier (t-systems.at), Justin
 Hunter (Arizona State U), Jethro Binks (U of Strathclyde, Glasgow), Jordi
 Guijarro (UAB.es), Sam Stickland (spacething.org),  Stefan Radman (CTBTO.org),
-Clint Wise, Max Kosmach, Bernhard Augenstein and Nick Nauwelaerts (aquafin.be).
+Clint Wise, Max Kosmach, Bernhard Augenstein, Sebastian Roesch and Nick 
+Nauwelaerts (aquafin.be).
 
 We probably forgot some names - sorry about that :-(.
 

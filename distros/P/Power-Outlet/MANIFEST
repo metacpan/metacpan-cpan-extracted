@@ -9,8 +9,10 @@ lib/Power/Outlet/Common.pm
 lib/Power/Outlet/Common/IP.pm
 lib/Power/Outlet/Common/IP/SNMP.pm
 lib/Power/Outlet/Common/IP/HTTP.pm
+lib/Power/Outlet/Common/IP/HTTPS.pm
 lib/Power/Outlet/Common/IP/HTTP/JSON.pm
 lib/Power/Outlet/Common/IP/HTTP/UPnP.pm
+lib/Power/Outlet/Dingtian.pm
 lib/Power/Outlet/Hue.pm
 lib/Power/Outlet/iBoot.pm
 lib/Power/Outlet/iBootBar.pm

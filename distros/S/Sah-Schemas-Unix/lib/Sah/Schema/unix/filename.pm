@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-07-24'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our $schema = ["filename::unix" => {
     summary => 'File name (with optional path) on a Unix system',
@@ -34,7 +34,7 @@ Sah::Schema::unix::filename - File name (with optional path) on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.019 of Sah::Schema::unix::filename (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.020 of Sah::Schema::unix::filename (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 =head1 SYNOPSIS
 

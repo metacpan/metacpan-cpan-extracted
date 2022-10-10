@@ -1,0 +1,26 @@
+---
+abstract: "Regional context SMS::Send driver to send messages via NIC's SMS Gateway ( https://smsgw.sms.gov.in )"
+author:
+  - 'Indranil Das Gupta <indradg@l2c2.co.in>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SMS-Send-IN-NICSMS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LWP::UserAgent: '0'
+  SMS::Send::Driver: '0'
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

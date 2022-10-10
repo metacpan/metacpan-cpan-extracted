@@ -1,3 +1,36 @@
+0.010   2022-10-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] We were repeatedly forming regex from string
+          (stringified regex) in --default-formatter-rules.
+
+        - Add categories for --no-formatters & --default-formatter-rules.
+
+
+0.009   2022-10-08  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [INCOMPATIBLE CHANGES]
+
+        - Make -f alias for --formatter instead of --file.
+
+        [BUG FIXES]
+
+        - Fix field displaying with regard to formatters & --hide-field-name (-N).
+
+        - Fix normalizing / to :: in module name in --formatter.
+
+        - Fix specifying module name with args in --formatter.
+
+        [ENHANCEMENTS]
+
+        - Add --no-formatters (a.k.a. --raw-field-values a.k.a. -F) option.
+
+        - Add option/configuration default_formatter_rules.
+
+        - Add completion for --formatter option.
+
+        - Handle formatting error.
+
+
 0.008   2022-09-26  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Make category/field matching case-insensitive.

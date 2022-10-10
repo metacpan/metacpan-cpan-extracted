@@ -1,3 +1,12 @@
+- Warn about unknown SubCmd
+
+- How about a default SubCmd? (e.g. bif list topics?)
+
+- Check for multiple use of the same alias character
+
+- Fix --version example to use $cmd->name instead of just $cmd (or else
+  pass $basename as additional argument to the trigger)
+
 - Roles:
 
     cmd_role 'role_name' => (
@@ -16,7 +25,7 @@
 
 - Do not inherit options from parent commands?
 
-- An Enum type
+- An Enum type (or allow callers to use Type::Tiny directly)
     opt things => (
         isa     => 'Enum',
         valid   => [qw/one two three/],
@@ -28,8 +37,6 @@
     - Arg/Opt name same as existing
     - Use X->new_from(%parameters) in place of BUILDARGS
     - Croak when two greedy arguments are defined
-
-- Why doesn't CARP_NOT work?
 
 - If UTF8 arguments becomes an issue somewhere take a look at
   Encode::Locale.

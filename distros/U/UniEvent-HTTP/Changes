@@ -1,4 +1,6 @@
-1.2.1    xx.xx.2022
+1.2.2    xx.xx.2022
+           - fix test for latest clang
+1.2.1    22.06.2022
            - bugfix with client's queued requests & timeout
            - bugfix with client's queued requests & pool desctructor
 1.2.0    10.02.2022

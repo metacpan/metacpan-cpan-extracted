@@ -50,6 +50,8 @@
             "File::Slurper::Dash" : "0",
             "Getopt::Long" : "2.50",
             "Hash::Subset" : "0.007",
+            "IO::Scalar" : "0",
+            "LWP::UserAgent" : "0",
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.152",
             "Perinci::CmdLine::Lite" : "1.915",
@@ -83,7 +85,7 @@
    "provides" : {
       "App::CSVUtils" : {
          "file" : "lib/App/CSVUtils.pm",
-         "version" : "0.044"
+         "version" : "0.045"
       }
    },
    "release_status" : "stable",
@@ -98,7 +100,7 @@
          "web" : "https://github.com/perlancar/perl-App-CSVUtils"
       }
    },
-   "version" : "0.044",
+   "version" : "0.045",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -610,7 +612,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",

@@ -88,11 +88,11 @@ if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
 my $todo;
 if ($^O eq 'MSWin32') {
 } elsif ($bsd_date) {
-	diag("bsd test of early date:" . `TZ="Australia/Melbourne" date -r "-2172355201" +"%Y/%m/%d %H:%M:%S" 2>&1`);
+	diag("bsd test of early date:" . `TZ="Australia/Melbourne" date -r "-2172355201" +"%Y/%m/%d %H:%M:%S %Z" 2>&1`);
 } elsif ($perl_date) {
 	$todo = "perl does not always agree with date(1)";
 } else {
-	diag("gnu test of early date:" . `TZ="Australia/Melbourne" date -d "1901/02/28 23:59:59 GMT" +"%Y/%m/%d %H:%M:%S" 2>&1`);
+	diag("gnu test of early date:" . `TZ="Australia/Melbourne" date -d "1901/02/28 23:59:59 GMT" +"%Y/%m/%d %H:%M:%S %Z" 2>&1`);
 }
 $TODO = $todo;
 
@@ -111,7 +111,7 @@ foreach my $area ($timezone->areas()) {
 			} else {
 				eval { gmtime $transition_time } or do { next };
 				my $correct_date = get_external_date($area, $location, $transition_time);
-				my $test_date = POSIX::strftime("%Y/%m/%d %H:%M:%S", $timezone->local_time($transition_time));
+				my $test_date = POSIX::strftime("%Y/%m/%d %H:%M:%S", $timezone->local_time($transition_time)) . q[ ] . $timezone->local_abbr($transition_time);
 				SKIP: {
 					if ($correct_date) {
 						ok($test_date eq $correct_date, "Matched $test_date to $correct_date for $area/$location for \$timezone->local_time($transition_time)");
@@ -124,7 +124,7 @@ foreach my $area ($timezone->areas()) {
 				my $revert_date = get_external_date($area, $location, $revert_time);
 				SKIP: {
 					if ($correct_date) {
-						ok($revert_date eq $correct_date, "Matched $revert_date to $correct_date for $area/$location for \$timezone->time_local");
+						ok(strip_external_date($revert_date) eq strip_external_date($correct_date), "Matched $revert_date to $correct_date for $area/$location for \$timezone->time_local");
 					} else {
 						skip("system 'date' command did not produce any output at all for $area/$location", 1);
 					}
@@ -160,7 +160,7 @@ foreach my $area ($timezone->areas()) {
 				}
 				$transition_time -= 1;
 				$correct_date = get_external_date($area, $location, $transition_time);
-				$test_date = POSIX::strftime("%Y/%m/%d %H:%M:%S", $timezone->local_time($transition_time));
+				$test_date = POSIX::strftime("%Y/%m/%d %H:%M:%S", $timezone->local_time($transition_time)) . q[ ] . $timezone->local_abbr($transition_time);
 				SKIP: {
 					if ($correct_date) {
 						ok($test_date eq $correct_date, "Matched $test_date to $correct_date for $area/$location for \$timezone->local_time - 1");
@@ -173,7 +173,7 @@ foreach my $area ($timezone->areas()) {
 				$revert_date = get_external_date($area, $location, $revert_time);
 				SKIP: {
 					if ($correct_date) {
-						ok($revert_date eq $correct_date, "Matched $revert_date to $correct_date for $area/$location for \$timezone->time_local - 1");
+						ok(strip_external_date($revert_date) eq strip_external_date($correct_date), "Matched $revert_date to $correct_date for $area/$location for \$timezone->time_local - 1");
 					} else {
 						skip("system 'date' command did not produce any output at all for $area/$location", 1);
 					}
@@ -210,7 +210,7 @@ foreach my $area ($timezone->areas()) {
 
 				$transition_time += 2;
 				$correct_date = get_external_date($area, $location, $transition_time);
-				$test_date = POSIX::strftime("%Y/%m/%d %H:%M:%S", $timezone->local_time($transition_time));
+				$test_date = POSIX::strftime("%Y/%m/%d %H:%M:%S", $timezone->local_time($transition_time)) . q[ ] . $timezone->local_abbr($transition_time);
 				SKIP: {
 					if ($correct_date) {
 						ok($test_date eq $correct_date, "Matched $test_date to $correct_date for $area/$location for \$timezone->local_time + 1");
@@ -223,7 +223,7 @@ foreach my $area ($timezone->areas()) {
 				$revert_date = get_external_date($area, $location, $revert_time);
 				SKIP: {
 					if ($correct_date) {
-						ok($revert_date eq $correct_date, "Matched $revert_date to $correct_date for $area/$location for \$timezone->time_local + 1");
+						ok(strip_external_date($revert_date) eq strip_external_date($correct_date), "Matched $revert_date to $correct_date for $area/$location for \$timezone->time_local + 1");
 					} else {
 						skip("system 'date' command did not produce any output at all for $area/$location", 1);
 					}
@@ -272,6 +272,16 @@ foreach my $area ($timezone->areas()) {
 				}
 			}
 		}
+	}
+}
+
+sub strip_external_date {
+	my ($date) = @_;
+	if ($date =~ /^(\d{4}\/\d{2}\/\d{2}[ ]\d{2}:\d{2}:\d{2})[ ]/smx) {
+		return $1;
+	} else {
+		warn "Failed to parse date";
+		return $date;
 	}
 }
 
@@ -373,12 +383,12 @@ sub get_external_date {
 		}
 		$formatted_date = $local_time->{wYear} . q[/] . $local_time->{wMonth} . q[/] . $local_time->{wDay} . q[ ] . $local_time->{wHour} . q[:] . $local_time->{wMinute} . q[:] . $local_time->{wSecond};
 	} elsif ($perl_date) {
-		$formatted_date = `TZ="$area/$location" perl -MPOSIX -e 'print POSIX::strftime("%Y/%m/%d %H:%M:%S", localtime($untainted_unix_time))'`;
+		$formatted_date = `TZ="$area/$location" perl -MPOSIX -e 'print POSIX::strftime("%Y/%m/%d %H:%M:%S %Z", localtime($untainted_unix_time))'`;
 	} elsif ($bsd_date) {
-		$formatted_date = `TZ="$area/$location" date -r $untainted_unix_time +"%Y/%m/%d %H:%M:%S"`;
+		$formatted_date = `TZ="$area/$location" date -r $untainted_unix_time +"%Y/%m/%d %H:%M:%S %Z"`;
 	} else {
 		my $gm_strftime = POSIX::strftime("%Y/%m/%d %H:%M:%S GMT", gmtime $untainted_unix_time);
-		$formatted_date = `TZ="$area/$location" date -d "$gm_strftime" +"%Y/%m/%d %H:%M:%S"`;
+		$formatted_date = `TZ="$area/$location" date -d "$gm_strftime" +"%Y/%m/%d %H:%M:%S %Z"`;
 	}
 	if ($? != 0) {
 		diag("external date command exited with a $? for $area/$location at " . POSIX::strftime("%Y/%m/%d %H:%M:%S GMT", gmtime $untainted_unix_time));

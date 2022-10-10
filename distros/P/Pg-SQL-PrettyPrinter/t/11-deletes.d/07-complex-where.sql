@@ -1,0 +1,1 @@
+DELETE FROM x USING y WHERE x.a = y.a AND x.t >= t.tmin AND x.t <= t.tmax 

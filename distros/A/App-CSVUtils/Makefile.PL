@@ -67,6 +67,8 @@ my %WriteMakefileArgs = (
     "File::Slurper::Dash" => 0,
     "Getopt::Long" => "2.50",
     "Hash::Subset" => "0.007",
+    "IO::Scalar" => 0,
+    "LWP::UserAgent" => 0,
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.152",
     "Perinci::CmdLine::Lite" => "1.915",
@@ -92,7 +94,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.044",
+  "VERSION" => "0.045",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -118,7 +120,9 @@ my %FallbackPrereqs = (
   "Getopt::Long" => "2.50",
   "Hash::Subset" => "0.007",
   "IO::Handle" => 0,
+  "IO::Scalar" => 0,
   "IPC::Open3" => 0,
+  "LWP::UserAgent" => 0,
   "Log::ger" => "0.038",
   "Perinci::CmdLine::Any" => "0.152",
   "Perinci::CmdLine::Lite" => "1.915",

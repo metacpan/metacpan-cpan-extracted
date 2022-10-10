@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::JSON;
 
-our $VERSION = '0.034'; # VERSION
+our $VERSION = '0.035'; # VERSION
 
 use base 'Exporter';
 our @EXPORT_OK = qw/

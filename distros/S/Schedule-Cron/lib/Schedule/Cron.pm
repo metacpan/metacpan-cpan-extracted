@@ -79,7 +79,7 @@ BEGIN {
 }
 
 
-$VERSION = "1.01";
+$VERSION = "1.04";
 
 our $DEBUG = 0;
 my %STARTEDCHILD = ();
@@ -123,11 +123,11 @@ my @LOWMAP = (
              );
 
 
-# Currently, there are two ways for reaping. One, which only waits explicitely
+# Currently, there are two ways for reaping. One, which only waits explicitly
 # on PIDs it forked on its own, and one which waits on all PIDs (even on those
 # it doesn't forked itself). The later has been proved to work on Win32 with
 # the 64 threads limit (RT #56926), but not when one creates forks on ones
-# one. The specific reaper works for RT #55741.
+# own. The specific reaper works for RT #55741.
 
 # It tend to use the specific one, if it also resolves RT #56926. Both are left
 # here for reference until a decision has been done for 1.01
@@ -138,7 +138,7 @@ sub REAPER {
 
 # Specific reaper
 sub _reaper_specific {
-    local ($!,%!);
+    local ($!,%!,$?);
     if ($HAS_POSIX)
     {
         foreach my $pid (keys %STARTEDCHILD) {
@@ -163,7 +163,13 @@ sub _reaper_specific {
 
 # Catch all reaper
 sub _reaper_all {
-    local ($!,%!);
+    #local ($!,%!,$?,${^CHILD_ERROR_NATIVE});
+
+    # Localizing ${^CHILD_ERROR_NATIVE} breaks signalhander.t which checks that
+    # chained SIGCHLD handlers are called. I don't know why, though, hence I
+    # leave it out for now. See #69916 for some discussion why this handler
+    # might be needed.
+    local ($!,%!,$?);
     my $kid;
     do 
     {
@@ -171,11 +177,11 @@ sub _reaper_all {
         # if there are no finished child processes. Simple 'wait'
         # waits blocking on childs.
         $kid = $HAS_POSIX ? waitpid(-1, WNOHANG) : wait;
-        print "Kid: $kid\n";
+        dbg "Kid: $kid" if $DEBUG;
         if ($kid != 0 && $kid != -1 && defined $STARTEDCHILD{$kid}) 
         {
             # We don't delete the hash entry here to avoid an issue
-            # when modifyinga global hash from multiple threads
+            # when modifying global hash from multiple threads
             $STARTEDCHILD{$kid} = 0;
             dbg "Reaped child $kid" if $DEBUG;
         }
@@ -328,6 +334,11 @@ option you can set it to something different. You can e.g. use C<$0> to include
 the original process name.  You can inhibit this with the C<nostatus> option, and
 prevent the argument display by setting C<loglevel> to zero or higher.
 
+=item processname => <name>
+
+Set the process name (i.e. C<$0>) to a literal string. Using this setting 
+overrides C<processprefix> and C<nostatus>.
+
 =item sleep => \&hook
 
 If specified, &hook will be called instead of sleep(), with the time to sleep
@@ -363,9 +374,11 @@ sub new
     die "Dispatcher not a ref to a subroutine" unless ref($dispatcher) eq "CODE";
     my $cfg = ref($_[0]) eq "HASH" ? $_[0] : {  @_ };
     $cfg->{processprefix} = "Schedule::Cron" unless $cfg->{processprefix};
+    my $timeshift = $cfg->{timeshift} || 0;
     my $self = { 
                 cfg => $cfg,
                 dispatcher => $dispatcher,
+                timeshift => $timeshift,
                 queue => [ ],
                 map => { }
              };
@@ -442,8 +455,7 @@ sub load_crontab
       # Strip off trailing comments and ignore empty 
       # or pure comments lines:
       s/#.*$//;
-      next if /^$/;
-      next if /^$/;
+      next if /^\s*$/;
       next if /^\s*#/;
       chomp;
       s/\s*(.*)\s*$/$1/;
@@ -543,11 +555,11 @@ Examples:
 In addition, ranges or lists of names are allowed. 
 
 An optional sixth column can be used to specify the seconds within the
-minute. If not present, it is implicitely set to "0".
+minute. If not present, it is implicitly set to "0".
 
 B<Command specification>
 
-The subroutine to be executed when the the C<$timespec> matches can be
+The subroutine to be executed when the C<$timespec> matches can be
 specified in several ways.
 
 First, if the optional C<arguments> are lacking, the default dispatching
@@ -680,10 +692,10 @@ The order index of each entry can be used within C<update_entry>, C<get_entry>
 and C<delete_entry>. But be aware, when you are deleting an entry, that you
 have to refetch the list, since the order will have changed.
 
-Note that these entries are returned by value and were opbtained from the
+Note that these entries are returned by value and were obtained from the
 internal list by a deep copy. I.e. you are free to modify it, but this won't
 influence the original entries. Instead use C<update_entry> if you need to
-modify an exisiting crontab entry.
+modify an existing crontab entry.
 
 =cut
 
@@ -761,7 +773,7 @@ sub delete_entry
 
 =item $cron->update_entry($idx,$entry)
 
-Updates the entry with index C<$idx>. C<$entry> is a hash ref as descibed in
+Updates the entry with index C<$idx>. C<$entry> is a hash ref as described in
 C<list_entries()> and must contain at least a value C<$entry-E<gt>{time}>. If no
 C<$entry-E<gt>{dispatcher}> is given, then the default dispatcher is used.  This
 method returns the old entry on success, C<undef> otherwise.
@@ -859,14 +871,23 @@ sub run
     unless ($cfg->{nofork}) {
         my $old_child_handler = $SIG{'CHLD'};
         $SIG{'CHLD'} = sub {
+            dbg "Calling reaper" if $DEBUG;
             &REAPER();
             if ($old_child_handler && ref $old_child_handler eq 'CODE')
             {
+                dbg "Calling old child handler" if $DEBUG;
+                #use B::Deparse ();
+                #my $deparse = B::Deparse->new;
+                #print 'sub ', $deparse->coderef2text($old_child_handler), "\n";
                 &$old_child_handler();
             }
         };
     }
     
+    if (my $name = $cfg->{processname}) {
+        $0 = $name
+    }
+
     my $mainloop = sub { 
       MAIN:
         while (42)          
@@ -874,19 +895,22 @@ sub run
             unless (@{$self->{queue}}) # Queue length
             { 
                 # Last job deleted itself, or we were run with no entries.
-                # We can't return, so throw an exception - perhaps somone will catch.
+                # We can't return, so throw an exception - perhaps someone will catch.
                 die "No more jobs to run\n";
             }
-            my ($index,$time) = @{shift @{$self->{queue}}};
-            my $now = time;
+            my ($indexes,$time) = $self->_get_next_jobs();
+            dbg "Jobs for $time : ",join(",",@$indexes) if $DEBUG;
+            my $now = $self->_now();
             my $sleep = 0;
             if ($time < $now)
             {
                 if ($cfg->{skip})
                 {
-                    $log->(0,"Schedule::Cron - Skipping job $index")
-                      if $log && $loglevel <= 0;
-                    $self->_update_queue($index);
+                    for my $index (@$indexes) {
+                        $log->(0,"Schedule::Cron - Skipping job $index")
+                          if $log && $loglevel <= 0;
+                        $self->_update_queue($index);
+                    }
                     next;
                 }
                 # At least a safety airbag
@@ -896,7 +920,11 @@ sub run
             {
                 $sleep = $time - $now;
             }
-            $0 = $self->_get_process_prefix()." MainLoop - next: ".scalar(localtime($time)) unless $cfg->{nostatus};
+
+            unless ($cfg->{processname} || $cfg->{nostatus}) {
+                $0 = $self->_get_process_prefix()." MainLoop - next: ".scalar(localtime($time)); 
+            }
+
             if (!$time) {
                 die "Internal: No time found, self: ",$self->{queue},"\n" unless $time;
             }
@@ -917,10 +945,15 @@ sub run
                 } else {
                     sleep($sleep);
                 }
-                $sleep = $time - time;
+                $sleep = $time - $self->_now();
             }
 
-            $self->_execute($index,$cfg);
+            for my $index (@$indexes) {                
+                $self->_execute($index,$cfg);
+                # If "skip" is set and the job takes longer than a second, then
+                # the remaining jobs are skipped.
+                last if $cfg->{skip} && $time < $self->_now();
+            }
             $self->_cleanup_process_list($cfg);
 
             if ($self->{entries_changed}) {
@@ -928,7 +961,9 @@ sub run
                $self->_rebuild_queue;
                delete $self->{entries_changed};
             } else {
-               $self->_update_queue($index);
+                for my $index (@$indexes) {
+                    $self->_update_queue($index);
+                }
             }
         } 
     };
@@ -990,7 +1025,10 @@ sub run
             }
             open STDERR, '>&STDOUT' or die "Can't dup stdout: $!";
             
-            $0 = $self->_get_process_prefix()." MainLoop" unless $cfg->{nostatus};
+            unless ($cfg->{processname} || $cfg->{nostatus}) {
+                $0 = $self->_get_process_prefix()." MainLoop"; 
+            }
+
             &$mainloop();
         }
     } 
@@ -1162,6 +1200,33 @@ sub get_next_execution_time
   }
 }
 
+=item $cron->set_timeshift($ts)
+
+Modify global time shift for all timetable. The timeshift is subbed from localtime
+to calculate next execution time for all scheduled jobs.
+
+ts parameter must be in seconds. Default value is 0. Negative values are allowed to
+shift time in the past.
+
+Returns actual timeshift in seconds.
+
+Example:
+
+   $cron->set_timeshift(120);
+
+   Will delay all jobs 2 minutes in the future.
+
+=cut
+
+sub set_timeshift
+{
+    my $self = shift;
+    my $value = shift || 0;
+
+    $self->{timeshift} = $value;
+    return $self->{timeshift};
+}
+
 # ==================================================
 # PRIVATE METHODS:
 # ==================================================
@@ -1172,7 +1237,7 @@ sub _rebuild_queue
 { 
     my $self = shift;
     $self->{queue} = [ ];
-    #  dbg "TT: ",$#{$self->{time_table}};
+    #dbg "TT: ",$#{$self->{time_table}};
     for my $id (0..$#{$self->{time_table}}) 
     {
         $self->_update_queue($id);
@@ -1188,6 +1253,19 @@ sub _deep_copy_entry
     my $copied_entry = { %$entry };
     $copied_entry->{args} = $args;
     return $copied_entry;
+}
+
+# Return an array with an arrayref of entry index and the time which should be
+# executed now
+sub _get_next_jobs {
+    my $self = shift;
+    my ($index,$time) = @{shift @{$self->{queue}}};
+    my $indexes = [ $index ];
+    while (@{$self->{queue}} && $self->{queue}->[0]->[1] == $time) {
+        my $index = @{shift @{$self->{queue}}}[0];
+        push @$indexes,$index;
+    }
+    return $indexes,$time;
 }
 
 # Execute a subroutine whose time has come
@@ -1230,10 +1308,10 @@ sub _execute
   }
 
 
-  if ($log && $loglevel <= 0 || !$cfg->{nofork} && !$cfg->{nostatus}) {
+  if ($log && $loglevel <= 0 || !$cfg->{nofork} && !$cfg->{processname} && !$cfg->{nostatus}) {
       my $args_label = (@args && $loglevel <= -1) ? " with (".join(",",$self->_format_args(@args)).")" : "";
       $0 = $self->_get_process_prefix()." Dispatched job $index$args_label"
-        unless $cfg->{nofork} || $cfg->{nostatus};
+        unless $cfg->{nofork} || $cfg->{processname} || $cfg->{nostatus};
       $log->(0,"Schedule::Cron - Starting job $index$args_label")
         if $log && $loglevel <= 0;
   }
@@ -1289,7 +1367,7 @@ sub _update_queue
     my $new_time = $self->get_next_execution_time($entry->{time});
     # Check, whether next execution time is *smaller* than the current time.
     # This can happen during DST backflip:
-    my $now = time;
+    my $now = $self->_now();
     if ($new_time <= $now) {
         dbg "Adjusting time calculation because of DST back flip (new_time - now = ",$new_time - $now,")" if $DEBUG;
         # We are adding hours as long as our target time is in the future
@@ -1300,12 +1378,18 @@ sub _update_queue
 
     dbg "Updating Queue: ",scalar(localtime($new_time)) if $DEBUG;
     $self->{queue} = [ sort { $a->[1] <=> $b->[1] } @{$self->{queue}},[$index,$new_time] ];
-    #  dbg "Queue now: ",Dumper($self->{queue});
+    #dbg "Queue now: ",Dumper($self->{queue});
 }
 
 
+# Out "now" which can be shifted if as argument
+sub _now { 
+    my $self = shift;
+    return time + $self->{timeshift};
+}
+
 # The heart of the module.
-# calulate the next concrete date
+# calculate the next concrete date
 # for execution from a crontab entry
 sub _calc_time 
 { 
@@ -1313,7 +1397,7 @@ sub _calc_time
     my $now = shift;
     my $expanded = shift;
 
-    my $offset = ($expanded->[5] ? 1 : 60);
+    my $offset = ($expanded->[5] ? 1 : 60) + $self->{timeshift};
     my ($now_sec,$now_min,$now_hour,$now_mday,$now_mon,$now_wday,$now_year) = 
       (localtime($now+$offset))[0,1,2,3,4,6,5];
     $now_mon++; 
@@ -1529,7 +1613,7 @@ sub _calc_time
         }
     }
 
-    # Die with an error because we couldnt find a next execution entry
+    # Die with an error because we couldn't find a next execution entry
     my $dumper = new Data::Dumper($expanded);
     $dumper->Terse(1);
     $dumper->Indent(0);
@@ -1798,7 +1882,7 @@ sub _verify_expanded_cron_entry {
 =head1 DST ISSUES
 
 Daylight saving occurs typically twice a year: In the first switch, one hour is
-skipped. Any job which which triggers in this skipped hour will be fired in the
+skipped. Any job which triggers in this skipped hour will be fired in the
 next hour. So, when the DST switch goes from 2:00 to 3:00 a job which is
 scheduled for 2:43 will be executed at 3:43.
 
@@ -1811,11 +1895,11 @@ would execute a second time. The reason is the way how L<Time::ParseDate>
 calculates epoch times for dates given like C<02:50:00 2009/10/25>. Should it
 return the seconds since 1970 for this time happening 'first', or for this time
 in the extra hour ? As it turns out, L<Time::ParseDate> returns the epoch time
-of the first occurence for C<PST8PDT> and for C<MET> it returns the second
-occurence. Unfortunately, there is no way to specify I<which> entry
+of the first occurrence for C<PST8PDT> and for C<MET> it returns the second
+occurrence. Unfortunately, there is no way to specify I<which> entry
 L<Time::ParseDate> should pick (until now). Of course, after all, this is
 obviously not L<Time::ParseDate>'s fault, since a simple date specification
-within the DST backswitch period B<is> ambigious. However, it would be nice if
+within the DST backswitch period B<is> ambiguous. However, it would be nice if
 the parsing behaviour of L<Time::ParseDate> would be consistent across time
 zones (a ticket has be raised for fixing this). Then L<Schedule::Cron>'s
 behaviour within a DST backward switch would be consistent as well.
@@ -1827,16 +1911,74 @@ hero is coming along and will fix this, but this is probably not me ;-)
 
 Sorry for that.
 
-=head1 LICENSE
+=head1 AUTHORS
 
-Copyright 1999-2011 Roland Huss.
+Roland Huß <roland@consol.de>
+
+Currently maintained by Nicholas Hubbard <nicholashubbard@posteo.net>
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+
+Alexandr Ciornii <alexchorny@gmail.com>
+
+=item *
+
+Andrew Danforth
+
+=item *
+
+Andy Ford
+
+=item *
+
+Bray Jones
+
+=item *
+
+Clinton Gormley
+
+=item *
+
+Eric Wilhelm
+
+=item *
+
+Frank Mayer
+
+=item *
+
+Jamie McCarthy
+
+=item *
+
+Loic Paillotin
+
+=item *
+
+Nicholas Hubbard <nicholashubbard@posteo.net>
+
+=item *
+
+Peter Vary
+
+=item *
+
+Philippe Verdret
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 1999-2013 Roland Huß.
+
+Copyright (c) 2022 Nicholas Hubbard.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-
-=head1 AUTHOR
-
-... roland
 
 =cut
 

@@ -1,0 +1,1 @@
+SELECT XMLPI( NAME xxx ), XMLPI( NAME zzz, 'whatever' ) 

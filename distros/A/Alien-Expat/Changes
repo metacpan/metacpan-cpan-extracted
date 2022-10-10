@@ -1,5 +1,10 @@
 Revision history for Alien-Expat
 
+0.04      2022-10-08 16:07:29 -0600
+  - Remove requirement or provide xmlwf since it is rarely
+    useful and decreases the number of system installs
+    possible (gh#8)
+
 0.03      2022-09-23 20:12:54 -0600
   - Use the Download::GitHub plugin, as Download  plugin is no
     longer works with GitHub release page (gh#7)

@@ -29,15 +29,15 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.66",
+            "ExtUtils::MakeMaker" : "6.48",
             "Getopt::Long" : "2.43",
-            "IO::File" : "1.08",
+            "IO::File" : "1.14",
             "IO::Socket::IP" : "0.38"
          }
       },
       "runtime" : {
          "recommends" : {
-            "Digest::BubbleBabble" : "0.01",
+            "Digest::BubbleBabble" : "0.02",
             "Net::LibIDN2" : "1"
          },
          "requires" : {
@@ -46,30 +46,31 @@
             "Digest::MD5" : "2.13",
             "Digest::SHA" : "5.23",
             "Encode" : "2.26",
-            "Exporter" : "5.56",
-            "File::Spec" : "0.86",
-            "IO::File" : "1.08",
-            "IO::Select" : "1.14",
-            "IO::Socket" : "1.26",
+            "Exporter" : "5.63",
+            "File::Spec" : "3.29",
+            "IO::File" : "1.14",
+            "IO::Select" : "1.17",
+            "IO::Socket" : "1.3",
             "IO::Socket::IP" : "0.38",
             "MIME::Base64" : "2.13",
             "PerlIO" : "1.05",
-            "Scalar::Util" : "1.25",
+            "Scalar::Util" : "1.19",
             "Time::Local" : "1.19",
             "perl" : "5.008009"
          }
       },
       "test" : {
          "requires" : {
-            "File::Find" : "1.05",
-            "File::Spec" : "0.86",
-            "IO::File" : "1.08",
-            "Test::Builder" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "1.13",
+            "File::Spec" : "3.29",
+            "IO::File" : "1.14",
+            "Test::Builder" : "0.8",
+            "Test::More" : "0.8"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.34",
+   "version" : "1.35",
    "x_serialization_backend" : "JSON::PP version 4.08"
 }

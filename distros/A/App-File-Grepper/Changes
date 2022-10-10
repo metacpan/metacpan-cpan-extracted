@@ -1,5 +1,11 @@
 Revision history for App-File-Grepper
 
+1.02	2022-10-03
+
+	Fix problem with case insensitivity and regexp.
+
+	Improve debugging.
+
 1.01	2021-07-21
 
 	Make the default exclusion pattern less picky, so that

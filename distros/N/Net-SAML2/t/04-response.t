@@ -67,23 +67,19 @@ my $sp = net_saml2_sp();
 
 my $post = $sp->post_binding;
 
-my $subject;
+my $response_xml;
 
 lives_ok(
     sub {
-        $subject = $post->handle_response($response);
+        $response_xml = $post->handle_response($response);
     },
     '$sp->handle_response works'
 );
 
 
-ok(defined $subject, "->handle response verified something");
-like($subject, qr/verified/, "Matches the verified string");
+is($xml, $response_xml, "We have the response XML as XML");
 
-## TODO: Move to t/03-assertion
-my $assertion_xml = decode_base64($response);
-my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $xml);
-
+my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $response_xml);
 isa_ok($assertion, 'Net::SAML2::Protocol::Assertion');
 
 done_testing;

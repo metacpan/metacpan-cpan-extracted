@@ -14,7 +14,7 @@ Alien::Build::Plugin::Extract - Extract Alien::Build plugins
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 
@@ -47,6 +47,10 @@ Extract using command line tools like C<tar> or C<unxip>.
 =item L<Alien::Build::Plugin::Extract::Directory>
 
 Extract a local directory.
+
+=item L<Alien::Build::Plugin::Extract::File>
+
+"Extract" a single file.
 
 =item L<Alien::Build::Plugin::Extract::Negotiate>
 

@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-07-24'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our $schema = ["unix::uid" => {
     summary => 'User identifier (UID) that has to exist (has associated username) on the system',
@@ -35,7 +35,7 @@ Sah::Schema::unix::uid::exists - User identifier (UID) that has to exist (has as
 
 =head1 VERSION
 
-This document describes version 0.019 of Sah::Schema::unix::uid::exists (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.020 of Sah::Schema::unix::uid::exists (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 =head1 SYNOPSIS
 

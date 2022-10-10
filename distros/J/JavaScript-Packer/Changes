@@ -1,5 +1,8 @@
 Revision history for JavaScript-Packer
 
+2.10       2022-10-03
+    - Fix template literals, as in: don't do any minifying in them (GH #12)
+
 2.09       2022-07-01
     - Fix use of URLs in strings as these are not comments but schemes (GH #11)
 

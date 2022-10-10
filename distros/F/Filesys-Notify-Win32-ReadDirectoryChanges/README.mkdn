@@ -1,0 +1,170 @@
+
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Filesys-Notify-Win32-ReadDirectoryChanges?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Filesys-Notify-Win32-ReadDirectoryChanges)
+[![Windows](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/workflows/windows/badge.svg)](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/workflows/macos/badge.svg)](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/workflows/linux/badge.svg)](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/actions?query=workflow%3Alinux)
+
+# NAME
+
+Filesys::Notify::Win32::ReadDirectoryChanges - read/watch directory changes
+
+# SYNOPSIS
+
+    my $watcher = Filesys::Notify::Win32::ReadDirectoryChanges->new();
+    for my $dir (@ARGV) {
+        $watcher->watch_directory( path => $dir, subtree => 1 );
+    };
+    $watcher->wait(sub {
+        my( $event ) = @_;
+        say $event->{action}, ":", $event->{path};
+    });
+
+This module allows to watch multiple directories for changes and invokes a
+callback for every change.
+
+This module spawns a thread for each watched directory. Each such thread
+synchronously reads file system changes and communicates them to the main
+thread through a [Thread::Queue](https://metacpan.org/pod/Thread%3A%3AQueue).
+
+# METHODS
+
+## `->new %options`
+
+    my $w = Filesys::Notify::Win32::ReadDirectoryChanges->new(
+        directories => \@ARGV,
+        subtree => 1,
+    );
+
+Creates a new watcher object.
+
+## `->queue`
+
+    my $q = $w->queue;
+
+Returns the [Thread::Queue](https://metacpan.org/pod/Thread%3A%3AQueue) object where the filesystem events get
+passed in. Use this for integration with your own event loop.
+
+## `->watch_directory`
+
+    $w->watch_directory( path => $dir, subtree => 1 );
+
+Add a directory to the list of watched directories.
+
+## `->unwatch_directory`
+
+    $w->unwatch_directory( path => $dir );
+
+Remove a directory from the list of watched directories. There still may
+come in some events stored for that directory previously in the queue.
+
+## `->wait $CB`
+
+    $w->wait(sub {
+        my ($event) = @_;
+        say $event->{action};
+        say $event->{path};
+    });
+
+Synchronously wait for file system events.
+
+# EVENTS
+
+The following events are created by ReadDirectoryChangesW resp. this module
+
+- **added**
+
+        {
+            action   => 'added',
+            path     => 'old-name.example',
+        }
+
+    A new file was created
+
+- **removed**
+
+        {
+            action   => 'removed',
+            path     => 'old-name.example',
+        }
+
+    A file was removed
+
+- **modified**
+
+        {
+            action   => 'modified',
+            path     => 'old-name.example',
+        }
+
+    A file was modified
+
+- **old\_name**
+
+        {
+            action   => 'old_name',
+            path     => 'old-name.example',
+        }
+
+    First half of a rename
+
+- **new\_name**
+
+        {
+            action   => 'new_name',
+            path     => 'new-name.example',
+        }
+
+    Second half of a rename
+
+- **renamed**
+
+    Whenever the event **old\_name** is followed immediately by **new\_name**,
+    a third, synthetic event is generated, `renamed`.
+
+        {
+            action   => 'renamed',
+            path     => 'old-name.example',
+            old_name => 'old-name.example',
+            new_name => 'new-name.example',
+        }
+
+# HELP WANTED
+
+In theory, this module should also work on Cygwin, but for some reason, it
+seems that there is memory corruption on Cygwin. If you happen to be handy
+with a debugger and familiar with Cygwin, your help is appreciated.
+
+# SEE ALSO
+
+[Filesys::Notify::Simple](https://metacpan.org/pod/Filesys%3A%3ANotify%3A%3ASimple) - simple cross-platform directory watcher
+
+[File::ChangeNotify](https://metacpan.org/pod/File%3A%3AChangeNotify) - complex cross-platform directory watcher
+
+[Win32::ChangeNotify](https://metacpan.org/pod/Win32%3A%3AChangeNotify) - Win32 directory watcher using the ChangeNotify API
+
+Currently, no additional information like that available through
+[https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-readdirectorychangesexw|ReadDirectoryChangesExW](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-readdirectorychangesexw|ReadDirectoryChangesExW)
+is collected. But a wrapper/emulation could provide that information whenever
+RDCE is unavailable (on Windows versions before Windows 10).
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges](https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2022 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

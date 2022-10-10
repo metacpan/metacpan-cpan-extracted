@@ -28,15 +28,21 @@
    "provides" : {
       "Pod::LOL" : {
          "file" : "lib/Pod/LOL.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/poti1/pod-lol/issues"
+      },
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/poti1/pod-lol"
+      }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

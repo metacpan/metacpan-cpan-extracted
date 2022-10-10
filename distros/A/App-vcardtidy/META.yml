@@ -1,0 +1,29 @@
+---
+abstract: 'tidy up VCARD files'
+author:
+  - 'Mark Lawrence <nomad@null.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  Path::Tiny: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-vcardtidy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  OptArgs2: v2.0.0
+  Path::Tiny: '0'
+  Text::vCard::Addressbook: '0'
+resources:
+  repository: ssh://git@github.com/mlawren/vcardtidy.git
+version: v1.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

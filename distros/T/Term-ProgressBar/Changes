@@ -1,5 +1,8 @@
 Revision history for Perl extension Term::ProgressBar
 
+2.23  2022-10-08 MANWAR
+      - Merged PR #11: Added a check to print a full bar at the end, thanks @cwallacetlc.
+
 2.22  2018-05-12 MANWAR
       - Merged PR #10: Amend to prevent uninitialised warning error, thanks @lharey.
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ansiexpand
 
+1.02 2022-10-07T02:40:51Z
+
+    - accept -80 style tabstop option
+
 1.01 2022-08-09T00:35:09Z
 
     - Release 1.01

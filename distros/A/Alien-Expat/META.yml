@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/uperl/Alien-Expat/issues
   homepage: https://metacpan.org/pod/Alien::Expat
   repository: git://github.com/uperl/Alien-Expat.git
-version: '0.03'
+version: '0.04'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

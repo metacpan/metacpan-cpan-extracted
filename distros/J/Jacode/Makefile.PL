@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Jacode},
-    'VERSION'   => q{2.13.4.26},
+    'VERSION'   => q{2.13.4.27},
     'ABSTRACT'  => q{Perl program for Japanese character code conversion},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

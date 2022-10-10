@@ -32,11 +32,11 @@ no_index:
 provides:
   Sub::Call::Tail:
     file: lib/Sub/Call/Tail.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   B::Hooks::OP::Check::EntersubForCV: '0'
-  DynaLoader: '0'
   Exporter: '0'
+  XSLoader: '0'
   parent: '0'
   perl: '5.008001'
   strict: '0'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Call-Tail
   homepage: https://github.com/karenetheridge/Sub-Call-Tail
   repository: https://github.com/karenetheridge/Sub-Call-Tail.git
-version: '0.07'
+version: '0.08'
 x_Dist_Zilla:
   perl:
     version: '5.037004'
@@ -82,7 +82,7 @@ x_Dist_Zilla:
           exclude_filename:
             - CONTRIBUTING
             - INSTALL
-            - LICENSE
+            - LICENCE
             - Makefile.PL
             - README.pod
             - inc/ExtUtils/MakeMaker/Dist/Zilla/Develop.pm
@@ -595,17 +595,6 @@ x_Dist_Zilla:
       name: '@Author::ETHER/UploadToCPAN'
       version: '6.025'
     -
-      class: Dist::Zilla::Plugin::Run::AfterRelease
-      config:
-        Dist::Zilla::Plugin::Run::Role::Runner:
-          eval:
-            - "unlink 'LICENSE'"
-          fatal_errors: 1
-          quiet: 1
-          version: '0.048'
-      name: '@Author::ETHER/remove old LICENSE'
-      version: '0.048'
-    -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
         Dist::Zilla::Plugin::CopyFilesFromRelease:
@@ -672,7 +661,7 @@ x_Dist_Zilla:
             - CONTRIBUTING
             - Changes
             - INSTALL
-            - LICENSE
+            - LICENCE
             - README.pod
             - ppport.h
           allow_dirty_match: []
@@ -691,7 +680,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.07
+          tag: v0.08
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -874,9 +863,10 @@ x_Dist_Zilla:
 x_authority: cpan:NUFFIN
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
-  - 'Florian Ragwitz <rafl@debian.org>'
   - 'Graham Knop <haarg@haarg.org>'
+  - 'Florian Ragwitz <rafl@debian.org>'
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
+  - 'Graham Ollis <plicease@cpan.org>'
   - 'Karen Etheridge <github@froods.org>'
 x_generated_by_perl: v5.37.4
 x_serialization_backend: 'YAML::Tiny version 1.73'

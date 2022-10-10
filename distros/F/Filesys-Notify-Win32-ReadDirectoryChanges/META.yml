@@ -1,0 +1,38 @@
+---
+abstract: 'read/watch directory changes'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Filesys-Notify-Win32-ReadDirectoryChanges
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  File::Spec: '0'
+  Moo: '2'
+  Thread::Queue: '0'
+  Win32::API: '0'
+  Win32API::File: '0'
+  perl: '5.020'
+  threads: '0'
+resources:
+  bugtracker: https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -51,6 +51,8 @@ class Sys::Socket::Constant {
 
   native static method AF_XDP : int ();
 
+  native static method FIONBIO : int ();
+
   native static method INADDR_ANY : int ();
 
   native static method INADDR_BROADCAST : int ();
@@ -213,7 +215,7 @@ class Sys::Socket::Constant {
 
   native static method SOL_SOCKET : int ();
 
-  native static method SO_BROADCAST : int ();
+  native static method SOMAXCONN : int ();
 
   native static method SO_EE_OFFENDER : int ();
 
@@ -410,4 +412,8 @@ class Sys::Socket::Constant {
   native static method IN6ADDR_ANY : Sys::Socket::In6_addr ();
   
   native static method IN6ADDR_LOOPBACK : Sys::Socket::In6_addr ();
+
+  native static method NI_MAXHOST : int ();
+
+  native static method NI_MAXSERV : int ();
 }

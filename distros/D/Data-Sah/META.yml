@@ -27,277 +27,277 @@ name: Data-Sah
 provides:
   Data::Sah:
     file: lib/Data/Sah.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler:
     file: lib/Data/Sah/Compiler.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::Prog:
     file: lib/Data/Sah/Compiler/Prog.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::Prog::TH:
     file: lib/Data/Sah/Compiler/Prog/TH.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::Prog::TH::all:
     file: lib/Data/Sah/Compiler/Prog/TH/all.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::Prog::TH::any:
     file: lib/Data/Sah/Compiler/Prog/TH/any.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::TH:
     file: lib/Data/Sah/Compiler/TH.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::TextResultRole:
     file: lib/Data/Sah/Compiler/TextResultRole.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human:
     file: lib/Data/Sah/Compiler/human.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH:
     file: lib/Data/Sah/Compiler/human/TH.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::Comparable:
     file: lib/Data/Sah/Compiler/human/TH/Comparable.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::HasElems:
     file: lib/Data/Sah/Compiler/human/TH/HasElems.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::Sortable:
     file: lib/Data/Sah/Compiler/human/TH/Sortable.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::all:
     file: lib/Data/Sah/Compiler/human/TH/all.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::any:
     file: lib/Data/Sah/Compiler/human/TH/any.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::array:
     file: lib/Data/Sah/Compiler/human/TH/array.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::bool:
     file: lib/Data/Sah/Compiler/human/TH/bool.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::buf:
     file: lib/Data/Sah/Compiler/human/TH/buf.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::cistr:
     file: lib/Data/Sah/Compiler/human/TH/cistr.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::code:
     file: lib/Data/Sah/Compiler/human/TH/code.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::date:
     file: lib/Data/Sah/Compiler/human/TH/date.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::datenotime:
     file: lib/Data/Sah/Compiler/human/TH/datenotime.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::datetime:
     file: lib/Data/Sah/Compiler/human/TH/datetime.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::duration:
     file: lib/Data/Sah/Compiler/human/TH/duration.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::float:
     file: lib/Data/Sah/Compiler/human/TH/float.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::hash:
     file: lib/Data/Sah/Compiler/human/TH/hash.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::int:
     file: lib/Data/Sah/Compiler/human/TH/int.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::num:
     file: lib/Data/Sah/Compiler/human/TH/num.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::obj:
     file: lib/Data/Sah/Compiler/human/TH/obj.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::re:
     file: lib/Data/Sah/Compiler/human/TH/re.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::str:
     file: lib/Data/Sah/Compiler/human/TH/str.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::timeofday:
     file: lib/Data/Sah/Compiler/human/TH/timeofday.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::human::TH::undef:
     file: lib/Data/Sah/Compiler/human/TH/undef.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl:
     file: lib/Data/Sah/Compiler/perl.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH:
     file: lib/Data/Sah/Compiler/perl/TH.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::all:
     file: lib/Data/Sah/Compiler/perl/TH/all.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::any:
     file: lib/Data/Sah/Compiler/perl/TH/any.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::array:
     file: lib/Data/Sah/Compiler/perl/TH/array.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::bool:
     file: lib/Data/Sah/Compiler/perl/TH/bool.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::buf:
     file: lib/Data/Sah/Compiler/perl/TH/buf.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::cistr:
     file: lib/Data/Sah/Compiler/perl/TH/cistr.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::code:
     file: lib/Data/Sah/Compiler/perl/TH/code.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::date:
     file: lib/Data/Sah/Compiler/perl/TH/date.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::datenotime:
     file: lib/Data/Sah/Compiler/perl/TH/datenotime.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::datetime:
     file: lib/Data/Sah/Compiler/perl/TH/datetime.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::duration:
     file: lib/Data/Sah/Compiler/perl/TH/duration.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::float:
     file: lib/Data/Sah/Compiler/perl/TH/float.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::hash:
     file: lib/Data/Sah/Compiler/perl/TH/hash.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::int:
     file: lib/Data/Sah/Compiler/perl/TH/int.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::num:
     file: lib/Data/Sah/Compiler/perl/TH/num.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::obj:
     file: lib/Data/Sah/Compiler/perl/TH/obj.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::re:
     file: lib/Data/Sah/Compiler/perl/TH/re.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::str:
     file: lib/Data/Sah/Compiler/perl/TH/str.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::timeofday:
     file: lib/Data/Sah/Compiler/perl/TH/timeofday.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Compiler::perl::TH::undef:
     file: lib/Data/Sah/Compiler/perl/TH/undef.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Human:
     file: lib/Data/Sah/Human.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Lang:
     file: lib/Data/Sah/Lang.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Lang::fr_FR:
     file: lib/Data/Sah/Lang/fr_FR.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Lang::id_ID:
     file: lib/Data/Sah/Lang/id_ID.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Lang::zh_CN:
     file: lib/Data/Sah/Lang/zh_CN.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::BaseType:
     file: lib/Data/Sah/Type/BaseType.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::Comparable:
     file: lib/Data/Sah/Type/Comparable.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::HasElems:
     file: lib/Data/Sah/Type/HasElems.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::Sortable:
     file: lib/Data/Sah/Type/Sortable.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::all:
     file: lib/Data/Sah/Type/all.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::any:
     file: lib/Data/Sah/Type/any.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::array:
     file: lib/Data/Sah/Type/array.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::bool:
     file: lib/Data/Sah/Type/bool.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::buf:
     file: lib/Data/Sah/Type/buf.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::cistr:
     file: lib/Data/Sah/Type/cistr.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::code:
     file: lib/Data/Sah/Type/code.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::date:
     file: lib/Data/Sah/Type/date.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::datenotime:
     file: lib/Data/Sah/Type/datenotime.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::datetime:
     file: lib/Data/Sah/Type/datetime.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::duration:
     file: lib/Data/Sah/Type/duration.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::float:
     file: lib/Data/Sah/Type/float.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::hash:
     file: lib/Data/Sah/Type/hash.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::int:
     file: lib/Data/Sah/Type/int.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::num:
     file: lib/Data/Sah/Type/num.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::obj:
     file: lib/Data/Sah/Type/obj.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::re:
     file: lib/Data/Sah/Type/re.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::str:
     file: lib/Data/Sah/Type/str.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::timeofday:
     file: lib/Data/Sah/Type/timeofday.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Type::undef:
     file: lib/Data/Sah/Type/undef.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Util::Func:
     file: lib/Data/Sah/Util/Func.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Util::Role:
     file: lib/Data/Sah/Util/Role.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Util::Type::Date:
     file: lib/Data/Sah/Util/Type/Date.pm
-    version: '0.912'
+    version: '0.913'
   Data::Sah::Util::TypeX:
     file: lib/Data/Sah/Util/TypeX.pm
-    version: '0.912'
+    version: '0.913'
   Test::Data::Sah:
     file: lib/Test/Data/Sah.pm
-    version: '0.912'
+    version: '0.913'
   Test::Data::Sah::Human:
     file: lib/Test/Data/Sah/Human.pm
-    version: '0.912'
+    version: '0.913'
   Test::Data::Sah::Perl:
     file: lib/Test/Data/Sah/Perl.pm
-    version: '0.912'
+    version: '0.913'
 recommends:
   DateTime: '0'
   DateTime::Duration: '0'
@@ -306,7 +306,7 @@ recommends:
   Time::Piece: '0'
 requires:
   Data::Cmp: '0.002'
-  Data::Dmp: '0.241'
+  Data::Dmp: '0.242'
   Data::Dump: '0'
   Data::Sah::Coerce: '0.050'
   Data::Sah::CoerceCommon: '0.050'
@@ -326,7 +326,7 @@ requires:
   Lingua::EN::Numbers::Ordinate: '1.02'
   Log::ger: '0.038'
   Mo: '0'
-  Module::Installed::Tiny: '0.006'
+  Module::Installed::Tiny: '0.011'
   POSIX: '0'
   Regexp::Stringify: '0'
   Role::Tiny: '0'
@@ -346,7 +346,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah
   homepage: https://metacpan.org/release/Data-Sah
   repository: git://github.com/perlancar/perl-Data-Sah.git
-version: '0.912'
+version: '0.913'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

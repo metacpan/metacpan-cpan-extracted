@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -63,20 +63,11 @@ SYNOPSIS
        lib => [ Alien::Expat->dynamic_libs ],
      );
 
-    or for xmlwf from your Perl script / module
-
-     use Alien::Expat;
-     use Env qw( @PATH );
-     
-     unshift @PATH, Alien::Expat->bin_dir;
-     system 'xmlwf', '-v';
-
 DESCRIPTION
 
     This module can be used as a prereq for XS or FFI modules that need
-    expat or the command-line tool that it comes from: xmlwf. For more
-    detail on how to use this module you can see the Alien::Build user
-    documentation at Alien::Build::Manual::AlienUser.
+    expat. For more detail on how to use this module you can see the
+    Alien::Build user documentation at Alien::Build::Manual::AlienUser.
 
 SEE ALSO
 

@@ -19,7 +19,7 @@ await $chip->mount(
 # ->read_config
 {
    $adapter->expect_write_then_read( "\xF2", 4 )
-      ->returns( "\x00\x00\x00\x00" );
+      ->will_done( "\x00\x00\x00\x00" );
 
    is_deeply( await $chip->read_config,
       {

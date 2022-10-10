@@ -1,0 +1,87 @@
+MooX::Tag::TO_HASH
+
+"MooX::Tag::TO_HASH" is a Moo::Role which provides a controlled method
+of converting your Moo based object into a hash.
+
+Simply mark each field that should be output with the special option
+"to_hash" when declaring it:
+
+    has field => ( is => 'ro', to_hash => 1 );
+
+and call the "TO_HASH" method on your instantiated object.
+
+   my %hash = $obj->TO_HASH;
+
+Fields inherited from superclasses or consumed from roles which use
+"MooX::Tag::TO_HASH" are automatically handled.
+
+If a field's value is another object, "TO_HASH" will automatically turn
+that into a hash if it has its own "TO_HASH" method (you can also
+prevent that).
+
+By applying a method modifier to the TO_HASH method, you can modify its
+output after the conversion.
+
+  Usage
+
+Add the "to_hash" option to each field which should be included in the
+hash. "to_hash" can either take a value of 1, e.g.
+
+    has field => ( is => 'ro', to_hash => 1 );
+
+or a string which looks like one of these:
+
+   alternate_name
+   alternate_name,option_flag,option_flag,...
+   ,option_flag,option_flag,...
+
+If "alternate_name" is specified, that'll be the key used in the output
+hash.
+
+"option_flag" may be one of the following:
+
+"if_exists"
+    Only output the field if it was set. This uses "Moo"'s attribute
+    predicate (one will be added to the field if it not already
+    specified).
+
+    It *will* be output if the field is set to "undef".
+
+    A synonym for this is "omit_if_empty", for compatibility with
+    MooX::TO_JSON.
+
+"if_defined"
+    Only output the field if it was set and its value is defined.
+
+"no_recurse"
+    If a field is an object, don't try and turn it into a hash via its
+    "TO_HASH" method.
+
+    (Yes, this name is backwards, but eventually a separate "recurse"
+    option may become available which limits the recursion depth).
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

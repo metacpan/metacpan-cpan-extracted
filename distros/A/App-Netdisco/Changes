@@ -1,3 +1,19 @@
+2.057007 - 2022-10-04
+
+  [BUG FIXES]
+
+  * fix ordering of device ports table column headers
+
+2.057006 - 2022-09-30
+
+  [ENHANCEMENTS]
+
+  * added Firepower SSH collector (FTD.pm) by Sebastian Roesch (roesch[at]alcera.de)
+
+  [BUG FIXES]
+
+  * fix wrong use of check_acl breaking snmp_field_protection
+
 2.057005 - 2022-09-28
 
   [BUG FIXES]

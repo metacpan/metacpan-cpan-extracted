@@ -1,10 +1,10 @@
 {
-   "abstract" : "Module to support Apple OS X Calendar data",
+   "abstract" : "Module to support Apple macOS Calendar data",
    "author" : [
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Greple" : "8.4301",
+            "App::Greple" : "8.58",
             "perl" : "v5.14.0"
          }
       },
@@ -55,7 +55,7 @@
    "provides" : {
       "App::Greple::ical" : {
          "file" : "lib/App/Greple/ical.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -65,15 +65,16 @@
       },
       "homepage" : "https://github.com/kaz-utashiro/greple-ical",
       "repository" : {
-         "url" : "git://github.com/kaz-utashiro/greple-ical.git",
+         "type" : "git",
+         "url" : "https://github.com/kaz-utashiro/greple-ical.git",
          "web" : "https://github.com/kaz-utashiro/greple-ical"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

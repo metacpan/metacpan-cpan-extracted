@@ -1,0 +1,1 @@
+select c.oid::regclass, u.grantor from pg_class c, lateral ( select u.usename as grantor from aclexplode( c.relacl ) as x join pg_user u on x.grantor = u.usesysid where x.privilege_type = 'SELECT' AND X.GRANTEE = 16514) u

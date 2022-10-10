@@ -137,13 +137,13 @@ target resource.
 
 =cut
 
-sub type { $_[0]->{'type'} ? MIME::Type->new($_[0]->{'type'}) : undef }
+sub type { $_[0]->{'type'} ? MIME::Type->new('type' => $_[0]->{'type'}) : undef }
 
 =pod
 
 =head1 COPYRIGHT
 
-Copyright 2019 CentralNic Ltd. All rights reserved.
+Copyright 2022 CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

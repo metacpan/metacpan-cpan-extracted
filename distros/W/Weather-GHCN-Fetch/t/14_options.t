@@ -23,7 +23,7 @@ const my $FALSE  => not $TRUE;  # a dual-var consisting of '' and 0
 const my $EMPTY  => '';
 const my $SPACE  => q( );
 
-# note that the test config file does not start with a '.' because
+# note that the test profile file does not start with a '.' because
 # Dist::Zilla would ignore it when gathering files for the installation
 # package.
 const my $CONFIG_TEST_FILE => $Bin . '/ghcn_fetch.yaml';
@@ -35,8 +35,8 @@ my @expected;
 my @got;
 my $href;
 my $count;
-my $config_href = {};
-my %config_opt;
+my $profile_href = {};
+my %profile_opt;
 my @all_options = Weather::GHCN::Options->get_getopt_list();
 my @errors;
 
@@ -76,10 +76,10 @@ subtest 'get methods' => sub {
     my @options = grep { m{ \A \w+ [=!] }xms } @got;
     ok @options > 20, 'get_getopt_list returned a GetOpt list';
 
-    $href = Weather::GHCN::Options->get_option_choices(); 
+    $href = Weather::GHCN::Options->get_option_choices();
     ok ref $href eq 'HASH', 'get_option_choices returned a hash';
     ok $href->{'report'}, 'get_option_choices hash has a report key';
-    ok $href->{'nonetwork'}, 'get_option_choices hash has a nonetwork key';
+    ok $href->{'refresh'}, 'get_option_choices hash has a refresh key';
 
     $href = Weather::GHCN::Options->get_option_defaults();
     ok ref $href eq 'HASH', 'get_option_defaults returned a hash';
@@ -184,7 +184,7 @@ subtest 'options_as_string' => sub {
     GetOptionsFromString($user_options, \%user_opt, @all_options);
 
     my ($opt_href, $opt_obj) = $opt->combine_options( \%user_opt );
-    # using the $config_href obtained from the test yaml ealier
+    # using the $profile_href obtained from the test yaml ealier
     @errors = $opt->validate();
     ok !@errors, 'validate returned no errors';
 
@@ -204,8 +204,8 @@ subtest 'options_as_string' => sub {
     $count = grep { $_ =~ m{ -location \s Ottawa }xms } @opt_list;
     is $count, 1, , '-location found';
 
-    $count = grep { $_ =~ m{ -nonetwork \s [-]?\d }xms } @opt_list;
-    is $count, 1, , '-nonetwork found';
+    $count = grep { $_ =~ m{ -refresh \s (\w+|\d+) }xms } @opt_list;
+    is $count, 1, , '-refresh found';
 
     $count = grep { $_ =~ m{ -quality \s \d+ }xms } @opt_list;
     is $count, 1, , '-quality found';
@@ -240,7 +240,7 @@ subtest 'validate - values for range and active' => sub {
 
     foreach my $testopt ('-range', '-active') {
         foreach my $r (@valid_ranges) {
-            @errors = init_and_validate ($config_href, $opt, "$testopt $r");
+            @errors = init_and_validate ($profile_href, $opt, "$testopt $r");
             ok !@errors, "validate good $testopt $r";
             # uncoverable branch true
             diag @errors if @errors;
@@ -250,7 +250,7 @@ subtest 'validate - values for range and active' => sub {
 
     foreach my $testopt ('-range', '-active') {
         foreach my $r (@invalid_ranges) {
-            @errors = init_and_validate ($config_href, $opt, "$testopt $r");
+            @errors = init_and_validate ($profile_href, $opt, "$testopt $r");
             # ok @errors, "testing $testopt $r - validate found errors";
             like $errors[0], qr/invalid/, "validate bad $testopt $r";
         }
@@ -274,7 +274,7 @@ subtest 'validate - range a subset of active' => sub {
     foreach my $aref (@combos) {
         my ($rng, $is_valid) = $aref->@*;
 
-        @errors = init_and_validate ($config_href, $opt, $rng);
+        @errors = init_and_validate ($profile_href, $opt, $rng);
 
         if ( $is_valid ) {
             ok !@errors, "validate is_subset $rng";
@@ -300,7 +300,7 @@ subtest 'validate - state' => sub {
     foreach my $aref (@testopts) {
         my ($uo, $is_valid) = $aref->@*;
 
-        @errors = init_and_validate ($config_href, $opt, $uo);
+        @errors = init_and_validate ($profile_href, $opt, $uo);
         if ( $is_valid ) {
             ok !@errors, "validate state $uo";
         } else {
@@ -318,7 +318,7 @@ subtest 'validate - partial' => sub {
     foreach my $aref (@testopts) {
         my ($uo, $is_valid) = $aref->@*;
 
-        @errors = init_and_validate ($config_href, $opt, $uo);
+        @errors = init_and_validate ($profile_href, $opt, $uo);
         if ( $is_valid ) {
             ok !@errors, "validate partial $uo";
         } else {
@@ -343,7 +343,7 @@ subtest 'validate - gps' => sub {
     foreach my $aref (@testopts) {
         my ($uo, $is_valid) = $aref->@*;
 
-        @errors = init_and_validate ($config_href, $opt, $uo);
+        @errors = init_and_validate ($profile_href, $opt, $uo);
         if ( $is_valid ) {
             ok !@errors, "validate gps $uo";
         } else {
@@ -356,7 +356,7 @@ subtest 'validate - report' => sub {
     my @testopts = (
         [ q/                 /, 1 ],
         [ q/ -report ""      /, 1 ],
-        [ q/ -report id      /, 1 ],
+        [ q/ -report detail  /, 1 ],
         [ q/ -report daily   /, 1 ],
         [ q/ -report monthly /, 1 ],
         [ q/ -report yearly  /, 1 ],
@@ -366,7 +366,7 @@ subtest 'validate - report' => sub {
     foreach my $aref (@testopts) {
         my ($uo, $is_valid) = $aref->@*;
 
-        @errors = init_and_validate ($config_href, $opt, $uo);
+        @errors = init_and_validate ($profile_href, $opt, $uo);
         if ( $is_valid ) {
             ok !@errors, "validate report $uo";
         } else {
@@ -392,7 +392,7 @@ subtest 'validate - color' => sub {
     foreach my $aref (@testopts) {
         my ($uo, $is_valid) = $aref->@*;
 
-        @errors = init_and_validate ($config_href, $opt, $uo);
+        @errors = init_and_validate ($profile_href, $opt, $uo);
         if ( $is_valid ) {
             ok !@errors, "validate color $uo";
         } else {
@@ -416,7 +416,7 @@ subtest 'validate - label with kml' => sub {
     foreach my $aref (@testopts) {
         my ($uo, $is_valid) = $aref->@*;
 
-        @errors = init_and_validate ($config_href, $opt, $uo);
+        @errors = init_and_validate ($profile_href, $opt, $uo);
         if ( $is_valid ) {
             ok !@errors, "validate label $uo";
         } else {
@@ -444,7 +444,7 @@ subtest 'validate - fmonth' => sub {
     foreach my $aref (@testopts) {
         my ($uo, $is_valid) = $aref->@*;
 
-        @errors = init_and_validate ($config_href, $opt, $uo);
+        @errors = init_and_validate ($profile_href, $opt, $uo);
         if ( $is_valid ) {
             ok !@errors, "validate fmonth $uo";
         } else {
@@ -473,7 +473,7 @@ subtest 'validate - fday' => sub {
     foreach my $aref (@testopts) {
         my ($uo, $is_valid) = $aref->@*;
 
-        @errors = init_and_validate ($config_href, $opt, $uo);
+        @errors = init_and_validate ($profile_href, $opt, $uo);
         if ( $is_valid ) {
             ok !@errors, "validate fday $uo";
         } else {
@@ -499,40 +499,29 @@ subtest 'validate - _get_boolean_options' => sub {
 };
 
 subtest 'for test coverage' => sub {
-    ok $opt->opt_href,      'field accessor: opt_href';
-    ok $opt->opt_obj,       'field accessor: opt_href';
-    ok $opt->config_href,   'field accessor: opt_href';
-    
-    my $config_href = {
-        aliases => {
-            nacenter => 'USC00326365',
-        }
-    };
-    my $user_options = '-location nacenter';
-    @errors = init_and_validate ($config_href, $opt, $user_options);
+    can_ok $opt, 'opt_href';
+    can_ok $opt, 'opt_obj';
+    can_ok $opt, 'profile_href';
 
-    ok !@errors, 'location alias nacenter is ok';
-    is $opt->opt_obj->location, 'USC00326365', 'Hash::Wrap method location value USC00326365';
-    is $opt->opt_href->{'location'}, 'USC00326365', 'opt_href contains key location value USC00326365';   
     is $opt->opt_href->{'locationXXX'}, undef, 'opt_href access via mispelled key returns undef';
     throws_ok
         { $opt->opt_obj->locationXXX }
         qr/Can't locate object method "locationXXX"/,
         'opt_obj access via mispelled key throws exception';
-    
 
 
-    $user_options = '-country West';
-    @errors = init_and_validate ($config_href, $opt, $user_options);
+
+    my $user_options = '-country West';
+    @errors = init_and_validate ($profile_href, $opt, $user_options);
     ok @errors, 'country West is ambiguous';
 
-    $config_href = {
+    $profile_href = {
         aliases => {
             InvalidAlias => 'USC00326365',
         }
     };
     $user_options = '-location InvalidAlias';
-    @errors = init_and_validate ($config_href, $opt, $user_options);
+    @errors = init_and_validate ($profile_href, $opt, $user_options);
     ok @errors, "alias 'InvalidAlias' caused error";
 };
 
@@ -542,24 +531,24 @@ TODO: { local $TODO = 'TODO: _get_boolean_options'; note $TODO };
 # Subroutines for this test script
 ######################################################################
 
-sub init_and_validate ($config_href, $opt, $user_options) {
+sub init_and_validate ($profile_href, $opt, $user_options) {
     my %user_opt;
     my @all_options = Weather::GHCN::Options->get_getopt_list;
 
-    # HACK:  Options->config_href is set by StationTable set_options
+    # HACK:  Options->profile_href is set by StationTable set_options
     #        but we need it here so Options->initialize (which is
     #        called by Options->validate) will have it for this
     #        test case, the only one involving aliases
-    my $save_config_href = $opt->config_href;
-    $opt->config_href = $config_href;
+    my $save_profile_href = $opt->profile_href;
+    $opt->profile_href = $profile_href;
 
     GetOptionsFromString($user_options, \%user_opt, @all_options);
 
-    my ($opt_href, $opt_obj) = $opt->combine_options( \%user_opt );
+    my ($opt_href, $opt_obj) = $opt->combine_options( \%user_opt, $profile_href );
 
     @errors = $opt->validate();
 
-    $opt->config_href = $save_config_href;
+    $opt->profile_href = $save_profile_href;
 
     return @errors;
 }

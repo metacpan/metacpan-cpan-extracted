@@ -39,7 +39,20 @@ around _make_body_parts => sub {
 };
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Action::Add
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Action::Add
 
 =head1 NAME
 
@@ -47,7 +60,7 @@ Pinto::Remote::SelfContained::Action::Add - add a distribution to a the reposito
 
 =head1 AUTHOR
 
-Aaron Crane, E<lt>arc@cpan.orgE<gt>
+Aaron Crane E<lt>arc@cpan.orgE<gt>, Brad Lhotsky E<lt>brad@divisionbyzero.netE<gt>
 
 =head1 COPYRIGHT
 

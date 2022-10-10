@@ -1,3 +1,149 @@
+2.0.0 (2022-10-05)
+
+    Code Maintenance
+        - Add a test case for RT#144053
+
+2.0.0_6 (2022-10-04)
+
+    API / Behaviour Changes:
+        - Partially restore legacy arg(), opt() and "optargs => sub {}"
+          interfaces to ease migration. The arg "fallback" parameter
+          was not restored, and neither was any documentation.
+        - StatusLine reworked to be much simpler in interface and
+          implementation.
+
+    Bug Fixes:
+        - Option types & defaults are no longer UPPERCASE
+
+    Packaging:
+        - Add missing ExtUtils::MakeMaker::CPANfile dependency
+
+2.0.0_5 (2022-09-29)
+
+    Bug Fixes:
+        - Replace a naked Carp::croak with OptArgs2->throw_error;
+
+    Code Maintenanc:e
+        - Remove 'ishelp' warning and conversion
+
+    Packaging:
+        - Remove unnecessary direct dependency on IO::Capture::Stdout
+
+2.0.0_4 (2022-09-28)
+
+    API / Behaviour Changes:
+        - Replace 'ishelp' attribute with isa => OptArgs2::STYLE_HELP
+        - Move to "optargs => \@ARRAY" construction style
+        - optargs2() renamed to replace optargs() completely
+        - arg() and opt() deprected
+        - Arg fallback replaced by fallthru option
+
+    New Features:
+        - Utility functions cols() and rows() made public
+
+    Dependencies:
+        - (development only) Use Class::Inline instead of Mo.
+
+    Packaging:
+        - No longer generating duplicate Getopt::Args package.
+
+2.0.0_3 (2022-04-30)
+
+    API / Behaviour Changes:
+        - None
+
+    New Features:
+        - ANSI terminal codes are used to color output, which can be
+          disabled with the new 'show_color' option.
+        - New optargs2() function
+
+    Enhancements:
+        - OptArgs2::STYLE_HELPTREE output has been improved and now
+          includes sub-command comments
+        - OptArgs2::Pager now includes '-S' in the $LESS environment
+          variable and documents this.
+
+    Bug Fixes:
+        - Fix a StatusLine import with no arguments.
+
+2.0.0_2 (2022-02-26)
+
+    New Features:
+        - New OptArgs2::StatusLine package for terminal status lines
+
+    Enhancements:
+        - Allow OptArgs2::Pager to work independently (by splitting out
+          OptArgs2::Mo into its own file)
+        - Code re-organisation
+        - Show SubCmd arguments in usage message
+
+    Bug Fixes:
+        - Fix for Getopt::Args2 conversion with a test
+
+    Dependencies:
+        - Minimum of perl 5.16 for package BLOCK syntax
+        - Test::Output for StatusLine tests
+
+    Packaging:
+        - Clean up non-indexed packages list
+
+2.0.0_1 (2022-02-03)
+
+    API / Behaviour Changes:
+        - Changed OptArgs2::Pager on()/off() methods to start_pager(),
+          stop_pager() and page() functions.
+
+    Enhancements:
+        - Pager will only be started for usage messages with more lines
+          than the terminal height.
+
+    Dependencies:
+        - Exporter::Tidy for OptArgs2::Pager.
+        - Term::Size::Perl and/or Win32::Console
+
+0.0.12_2 (2022-01-27)
+
+    API / Behaviour Changes:
+        - New 'show_default' feature
+        - Opt 'ishelp' no longer conflicts with 'trigger'
+        - The 'default' and 'required' parameters are no longer allowed
+          together.
+
+    New Features:
+        - New 'OptArgRef' arg type to support command aliases.  I.e.
+          capturing options and arguments that are passed back into
+          class_optargs() again.
+        - Pipe usage messages through a STDOUT pager
+
+    Enhancements:
+        - Various minor code refactoring improvements.
+        - Opt 'ishelp' now does what the documentation implies.
+        - Support default values relying on other default values
+        - Rework internal error reporting and usage generation
+        - New usage layout showing default values
+
+    Bug Fixes:
+        - Fix a ==/= comparison/assignment error in the usage()
+          function introduced by 2347144c.
+        - Bool option with true default turned off when --no-bool used.
+
+    Dependencies:
+        - File::Which for new OptArgs2::Pager module.
+
+    Packaging:
+        - Stop including ".readme_from" file in distribution
+
+0.0.12_1 (2018-08-31)
+
+    Enhancements:
+        - Refactor error handling to make it clearer and simpler.
+        - Report all caller (user) errors where they occur
+
+    Bug Fixes:
+        - The command abbreviation feature has never worked due to an
+          arrayref dereferencing mistake. Discovered and fixed by Mario
+          Domgoergen (mdom at Github).
+
 0.0.11 (2018-08-18)
 
     Enhancements:

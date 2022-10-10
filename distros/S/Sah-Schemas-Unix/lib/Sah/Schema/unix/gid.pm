@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-07-24'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our $schema = [uint => {
     summary => 'Group identifier (GID)',
@@ -40,7 +40,7 @@ Sah::Schema::unix::gid - Group identifier (GID)
 
 =head1 VERSION
 
-This document describes version 0.019 of Sah::Schema::unix::gid (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.020 of Sah::Schema::unix::gid (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 =head1 SYNOPSIS
 

@@ -14,9 +14,9 @@ with 'Data::Sah::Compiler::human::TH::Sortable';
 with 'Data::Sah::Type::timeofday';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-20'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 sub name { "time" }
 
@@ -42,7 +42,7 @@ Data::Sah::Compiler::human::TH::timeofday - human's type handler for type "timeo
 
 =head1 VERSION
 
-This document describes version 0.912 of Data::Sah::Compiler::human::TH::timeofday (from Perl distribution Data-Sah), released on 2022-08-20.
+This document describes version 0.913 of Data::Sah::Compiler::human::TH::timeofday (from Perl distribution Data-Sah), released on 2022-09-30.
 
 =for Pod::Coverage ^(name|clause_.+|superclause_.+|before_.+|after_.+)$
 

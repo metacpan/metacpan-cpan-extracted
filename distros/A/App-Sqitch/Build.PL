@@ -18,7 +18,7 @@ my %module_build_args = (
     "\"iovation Inc., David E. Wheeler\""
   ],
   "dist_name" => "App-Sqitch",
-  "dist_version" => "v1.3.0",
+  "dist_version" => "v1.3.1",
   "license" => "mit",
   "module_name" => "App::Sqitch",
   "recommends" => {
@@ -97,6 +97,7 @@ my %module_build_args = (
   "test_requires" => {
     "Capture::Tiny" => "0.12",
     "Carp" => 0,
+    "DBD::Mem" => 0,
     "File::Find" => 0,
     "File::Spec" => 0,
     "File::Spec::Functions" => 0,
@@ -124,6 +125,7 @@ my %module_build_args = (
 my %fallback_build_requires = (
   "Capture::Tiny" => "0.12",
   "Carp" => 0,
+  "DBD::Mem" => 0,
   "File::Find" => 0,
   "File::Spec" => 0,
   "File::Spec::Functions" => 0,

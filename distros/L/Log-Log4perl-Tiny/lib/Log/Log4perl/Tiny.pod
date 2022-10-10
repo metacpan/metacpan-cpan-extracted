@@ -8,7 +8,7 @@ Log::Log4perl::Tiny - mimic Log::Log4perl in one single module
 
 =head1 VERSION
 
-This document describes Log::Log4perl::Tiny version 1.6.4.
+This document describes Log::Log4perl::Tiny version 1.8.0.
 
 =begin html
 
@@ -286,7 +286,7 @@ useful: C<easy_init()> and I<stealth loggers>.
 =head2 C<easy_init()>
 
 L<Log::Log4perl::Tiny> only supports three options from the big
-brother:
+brother, plus its own:
 
 =over
 
@@ -317,6 +317,16 @@ the key C<channels> where you can pass an array reference with
 channels descriptions (see L</build_channels> for details).
 
 The default is to send logging messages to C<STDERR>;
+
+=item C<< filter >>
+
+(Not in L<Log::Log4perl>) (As of 1.8.0)
+
+a filter function to be applied onto every message before it is emitted.
+This can be useful for multi-line log messages, when a specific
+start-of-line is needed (e.g. a hash character).
+
+By default nothing is done.
 
 =item C<< layout >>
 
@@ -414,7 +424,7 @@ C<logexit_code()> - but you have to wait to read something about the
 object-oriented interface before doing this!
 
 As indicated, functions L</LOGWARN>, L</LOGDIE>, L</LOGCARP>,
-L</LOGCLUCK>, L</LOGCROACK>, and L</LOGCONFESS> (as well as their
+L</LOGCLUCK>, L</LOGCROAK>, and L</LOGCONFESS> (as well as their
 lowercase counterparts called as object methods) both emit the log
 message on the normal output channel for Log::Log4perl::Tiny and call
 the respective function. This might not be what you want in the default
@@ -655,6 +665,13 @@ set the minimum log level for sending a log message to the output;
 set a key-value pair useful for later expansion via code C<%{key}e>. See
 L</loglocal> below;
 
+=item C<< FILTER >>
+
+(Not in L<Log::Log4perl>) (Not imported with C<:easy>) (As of 1.8.0)
+
+set a filter function to apply to every expanded message before it is
+printed. See L</filter> below;
+
 =item C<< build_channels >>
 
 (Not in L<Log::Log4perl>) (Not imported with C<:easy>)
@@ -776,6 +793,7 @@ so you might want to take care when running in taint mode.
 See also L</build_channels> for additional information. This option takes
 precedence over C<fh> described below.
 
+=item B<< filter >>
 
 =item B<< format >>
 
@@ -929,6 +947,35 @@ through a proper subroutine reference of course).
 
 By default this parameter is set to be equal to C<STDERR>.
 
+=item C<< filter >>
+
+(Not in L<Log::Log4perl>) (As of 1.8.0)
+
+get/set a filter CODE reference to be applied to every expanded message.
+The filter function is passed the message as its only argument.
+
+This can be e.g. useful in case a specific start-of-line character
+sequence is needed for multi-line messages:
+
+   get_logger()->filter(sub {
+      my $message = shift;
+      $message =~ s{^}{# }gmxs; # pre-pend "# " to each line
+      return $message;
+   });
+
+Another use case might be taming some sensitive data:
+
+   get_logger()->filter(sub {
+      my $message = shift;
+      $message =~ s{password<.*?>}{password<***>}gmxs;
+      return $message;
+   });
+
+It is anyway suggested to deal with these cases explicitly at the source
+and not as an afterthought (only). As an example, the regular expression
+in the example above will leak parts of passwords that contain the C<< >
+>> character, and there might be other ways passwords are written too.
+
 =item C<< format >>
 
 =item C<< layout >>
@@ -982,7 +1029,7 @@ Flavio Poletti <polettix@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2016 by Flavio Poletti <polettix@cpan.org>.
+Copyright (C) 2010-2022 by Flavio Poletti <polettix@cpan.org>.
 
 This module is free software.  You can redistribute it and/or
 modify it under the terms of the Artistic License 2.0.

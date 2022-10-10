@@ -1,0 +1,1 @@
+SELECT a( b, NULL ), c IS NULL, d IS NOT NULL FROM e

@@ -1,8 +1,14 @@
+0.020   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix error message in Sah filter.
+
+
 0.019   2022-07-24  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
-        - [incompatible change] Rename
-          unix::local_{gid,groupname,uid,username} to
-          unix::{gid,groupname,uid,username}::exists.
+        - [incompatible change] Rename unix::local_{gid,groupname,uid,username}
+          to unix::{gid,groupname,uid,username}::exists, for more consistency
+          naming with perl::modname::exists. This also lets us create
+          unix::uid::not_exists etc when needed in the future.
 
 
 0.018   2021-07-22  Released-By: PERLANCAR; Urgency: medium

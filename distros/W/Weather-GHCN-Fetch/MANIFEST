@@ -14,6 +14,7 @@ bin/ghcn_station_counts.pl
 lib/Weather/GHCN/App/Extremes.pm
 lib/Weather/GHCN/App/Fetch.pm
 lib/Weather/GHCN/App/StationCounts.pm
+lib/Weather/GHCN/CacheURI.pm
 lib/Weather/GHCN/Common.pm
 lib/Weather/GHCN/CountryCodes.pm
 lib/Weather/GHCN/Fetch.pm
@@ -29,6 +30,7 @@ t/11_common.t
 t/12_country_codes.t
 t/13_measures.t
 t/14_options.t
+t/15_cacheURI.t
 t/21_station.t
 t/22_station_table_subs.t
 t/31_station_table_synthesis.t
@@ -36,10 +38,12 @@ t/81_timing_stats.t
 t/91_ghcn_fetch.t
 t/92_ghcn_extremes.t
 t/93_ghcn_station_counts.t
-t/ghcn_cache/ghcn/4/1/b/41b20a73c28753298d46ce55901a12cb2cd05dce
-t/ghcn_cache/ghcn/4/3/5/435d3c0c79f22947d2be31d76d82e84fcca73bd0
-t/ghcn_cache/ghcn/6/0/9/6097c03c8ffd644a312ec9f93dc98520de2ba0b6
-t/ghcn_cache/ghcn/c/0/2/c02fdf88dadf8e7042547eb0560b196e442f5d65
+t/ghcn_cache/CA006105976.dly
+t/ghcn_cache/CA006105978.dly
+t/ghcn_cache/USC00305816.dly
+t/ghcn_cache/USW00094728.dly
+t/ghcn_cache/ghcnd-inventory.txt
+t/ghcn_cache/ghcnd-stations.txt
 t/ghcn_fetch.yaml
 t/test_data/ny_data.tsv
 t/test_data/ny_stations.tsv

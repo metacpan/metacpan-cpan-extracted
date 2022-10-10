@@ -5,7 +5,7 @@ use strict;
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.004002';
+our $VERSION   = '1.004003';
 our @EXPORT_OK = qw< mkopt mkopt_hash _croak _carp >;
 
 sub _croak ($;@) { require Carp; my $fmt = shift; @_ = sprintf($fmt, @_); goto \&Carp::croak }
@@ -24,6 +24,11 @@ my $_process_optlist = sub
 		($name =~ m{\A\!(/.+/[msixpodual]*)\z}) ?
 			do {
 				my @not = $class->_exporter_expand_regexp("$1", $value, $global_opts);
+				++$not_want->{$_->[0]} for @not;
+			} :
+		($name =~ m{\A\![:-](.+)\z}) ?
+			do {
+				my @not = $class->_exporter_expand_tag("$1", $value, $global_opts);
 				++$not_want->{$_->[0]} for @not;
 			} :
 		($name =~ m{\A\!(.+)\z}) ?
@@ -227,11 +232,12 @@ sub _exporter_expand_sub
 		my $generator = $class->can("$generatorprefix$name");
 		return $sigilname => $class->$generator($sigilname, $value, $globals) if $generator;
 		
-		my $sub = $class->can($name);
-		return $sigilname => $sub if $sub;
-		
-		# Could do this more cleverly, but this works.
-		if ($sigil ne '&') {
+		if ($sigil eq '&') {
+			my $sub = $class->can($name);
+			return $sigilname => $sub if $sub;
+		}
+		else {
+			# Could do this more cleverly, but this works.
 			my $evalled = eval "\\${sigil}${class}::${name}";
 			return $sigilname => $evalled if $evalled;
 		}

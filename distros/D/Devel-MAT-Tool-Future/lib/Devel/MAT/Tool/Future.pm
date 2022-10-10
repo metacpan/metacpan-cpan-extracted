@@ -3,12 +3,12 @@
 #
 #  (C) Paul Evans, 2014-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Future 0.01;
+package Devel::MAT::Tool::Future 0.02;
 
 use v5.14;
 use warnings;
 use base qw( Devel::MAT::Tool );
-Devel::MAT::Tool->VERSION( '0.48' );
+Devel::MAT::Tool->VERSION( '0.49' );
 
 use Carp;
 
@@ -149,7 +149,9 @@ sub init_ui
 
 =cut
 
-=head2 $ok = $tool->class_is_future( $pkg )
+=head2 class_is_future
+
+   $ok = $tool->class_is_future( $pkg )
 
 Returns true if the given package is a C<Future> class. C<$pkg> may be either
 a C<Devel::MAT::SV> instance referring to a stash, or a plain string.
@@ -206,6 +208,16 @@ sub Devel::MAT::SV::is_future
    return defined $sv->{tool_future};
 }
 
+sub Devel::MAT::SV::_future_xs_struct
+{
+   my $sv = shift;
+
+   $sv->basetype eq "SV" or return undef;
+
+   my $ref = $sv->maybe_outref_named( "the FutureXS structure" ) or return undef;
+   return $ref->sv;
+}
+
 =head2 future_state (SV)
 
    $state = $sv->future_state
@@ -221,18 +233,36 @@ sub Devel::MAT::SV::future_state
 
    $sv->is_future or croak "$sv is not a Future";
 
-   my $tmp;
-   if( $tmp = $sv->value( "cancelled" ) and $tmp->uv ) {
-      return "cancelled";
-   }
-   elsif( $tmp = $sv->value( "failure" ) ) {
-      return "failed";
-   }
-   elsif( $tmp = $sv->value( "ready" ) and $tmp->uv ) {
-      return "done";
+   if( my $struct = $sv->_future_xs_struct ) {
+      # Using Future::XS
+      if( $struct->field_named( "cancelled" ) ) {
+         return "cancelled";
+      }
+      elsif( $struct->maybe_field_named( "the failure AV" ) ) {
+         return "failed";
+      }
+      elsif( $struct->field_named( "ready" ) ) {
+         return "done";
+      }
+      else {
+         return "pending";
+      }
    }
    else {
-      return "pending";
+      # Using Future::PP
+      my $tmp;
+      if( $tmp = $sv->value( "cancelled" ) and $tmp->uv ) {
+         return "cancelled";
+      }
+      elsif( $tmp = $sv->value( "failure" ) ) {
+         return "failed";
+      }
+      elsif( $tmp = $sv->value( "ready" ) and $tmp->uv ) {
+         return "done";
+      }
+      else {
+         return "pending";
+      }
    }
 }
 
@@ -250,7 +280,14 @@ sub Devel::MAT::SV::future_result
 
    $sv->is_future or croak "$sv is not a Future";
 
-   return $sv->value( "result" )->rv->elems;
+   if( my $struct = $sv->_future_xs_struct ) {
+      # Using Future::XS
+      return $struct->field_named( "the result AV" )->elems;
+   }
+   else {
+      # Using Future::PP
+      return $sv->value( "result" )->rv->elems;
+   }
 }
 
 =head2 future_failure
@@ -267,7 +304,14 @@ sub Devel::MAT::SV::future_failure
 
    $sv->is_future or croak "$sv is not a Future";
 
-   return $sv->value( "failure" )->rv->elems;
+   if( my $struct = $sv->_future_xs_struct ) {
+      # Using Future::XS
+      return $struct->field_named( "the failure AV" )->elems;
+   }
+   else {
+      # Using Future::XS
+      return $sv->value( "failure" )->rv->elems;
+   }
 }
 
 sub render_sv_detail

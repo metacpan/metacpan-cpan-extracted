@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 24-RSA-SHA512.t 1830 2021-01-26 09:08:12Z willem $	-*-perl-*-
+# $Id: 24-RSA-SHA512.t 1862 2021-12-24 10:09:08Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -86,7 +86,7 @@ is( $verified, 1, 'signature verified using public key' );
 
 
 my $verifiable = $class->verify( $corrupt, $key, $signature );
-is( $verifiable, 0, 'signature not verifiable if data corrupt' );
+is( $verifiable, 0, 'signature not verifiable if data corrupted' );
 
 
 exit;

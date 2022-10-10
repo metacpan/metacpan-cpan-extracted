@@ -1,6 +1,5 @@
 Build.PL
-ChangeLog
-CHANGES
+Changes
 examples/simple.pl
 examples/cron.tab
 examples/custom_sleep.pl
@@ -20,8 +19,10 @@ t/nofork.t
 t/pod.t
 t/pod_coverage.t
 t/pretty_print_args.t
+t/process_name.t
 t/sighandler.t
 t/startup.t
 t/test.crontab
 t/delete_entry.t
-META.json
+t/same_time_with_reschedule.t
+t/timeshift.t

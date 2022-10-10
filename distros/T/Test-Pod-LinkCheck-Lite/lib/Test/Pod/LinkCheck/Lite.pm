@@ -22,7 +22,7 @@ use Scalar::Util ();		# Core since 5.7.3
 use Storable ();		# Core since 5.7.3
 use Test::Builder ();		# Core since 5.6.2
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 our @ISA = qw{ Exporter };
 
@@ -78,6 +78,7 @@ use constant MAYBE_IGNORE_GITHUB	=> sub {
 	or return 1;
     open my $fh, '-|', qw{ git remote --verbose }	## no critic (RequireBriefOpen)
 	or return 1;
+    local $_ = undef;	# while (<>) ... does not localize $_.
     while ( <$fh> ) {
 	m< \b https://github\.com \b >smx
 	    and return;

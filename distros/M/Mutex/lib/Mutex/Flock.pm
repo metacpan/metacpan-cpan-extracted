@@ -11,11 +11,12 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 use base 'Mutex';
 use Fcntl ':flock';
-use Carp ();
+use Scalar::Util 'looks_like_number';
+use Time::HiRes 'alarm';
 
 my $tid = $INC{'threads.pm'} ? threads->tid() : 0;
 
@@ -27,7 +28,6 @@ sub DESTROY {
     my ($pid, $obj) = ($tid ? $$ .'.'. $tid : $$, @_);
 
     $obj->unlock(), close(delete $obj->{_fh}) if $obj->{ $pid };
-
     unlink $obj->{path} if ($obj->{_init} && $obj->{_init} eq $pid);
 
     return;
@@ -167,6 +167,24 @@ sub synchronize {
 
 *enter = \&synchronize;
 
+sub timedwait {
+    my ($obj, $timeout) = @_;
+    die 'Mutex::Flock::timedwait() unimplemented in this platform'
+        if ($^O eq 'MSWin32');
+
+    $timeout = 1 unless defined $timeout;
+    Carp::croak('Mutex::Flock: timedwait (timeout) is not valid')
+        if (!looks_like_number($timeout) || $timeout < 0);
+
+    $timeout = 0.0003 if $timeout < 0.0003;
+
+    local $@; local $SIG{ALRM} = sub { alarm 0; die "timed out\n" };
+    eval { alarm $timeout; $obj->lock_exclusive };
+    alarm 0;
+
+    ( $@ && $@ eq "timed out\n" ) ? '' : 1;
+}
+
 1;
 
 __END__
@@ -183,7 +201,7 @@ Mutex::Flock - Mutex locking via Fcntl
 
 =head1 VERSION
 
-This document describes Mutex::Flock version 1.006
+This document describes Mutex::Flock version 1.007
 
 =head1 DESCRIPTION
 

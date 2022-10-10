@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 # use warnings;
 $^W = 0;
-our $VERSION = "1.36";
+our $VERSION = "1.37";
 
 my ($GinFile, $GpageObjNr, $GrootNr, $Gpos, $GobjNr, $Gstream, $GoWid, $GoHei);
 my (@Gkids, @Gcounts, @GmediaBox, @Gobject, @Gparents, @Gto_be_created);
@@ -425,7 +425,8 @@ sub calcRotateMatrix {
   my $radian = sprintf( "%.6f", $rotate / 57.2957795 );  # approx.
   my $Cos    = sprintf( "%.6f", cos($radian) );
   my $Sin    = sprintf( "%.6f", sin($radian) );
-  $str .= "${Cos} ${Sin} -${Sin} ${Cos} ${upperX} ${upperY} cm\n";
+  my $negSin = $Sin * -1;
+  $str .= "${Cos} ${Sin} ${negSin} ${Cos} ${upperX} ${upperY} cm\n";
   # return $str;
 }
 

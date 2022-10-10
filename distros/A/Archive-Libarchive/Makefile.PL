@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( Archive::Tar Carp Encode Exporter File::Spec File::Temp Scalar::Util constant experimental lib parent strict utf8 warnings );
+  } qw( Archive::Tar Carp Encode Exporter File::Spec File::Temp Scalar::Util constant experimental parent strict utf8 warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -80,25 +80,24 @@ my %WriteMakefileArgs = (
     "Ref::Util"                      => 0
   },
   "TEST_REQUIRES" => {
-    "Devel::Cycle"              => 0,
     "FFI::C::File"              => 0,
     "File::chdir"               => 0,
     "Path::Tiny"                => 0,
     "Sub::Identify"             => 0,
     "Term::Table"               => 0,
     "Test2::API"                => "1.302015",
+    "Test2::Tools::MemoryCycle" => 0,
     "Test2::V0"                 => "0.000121",
     "Test::Archive::Libarchive" => 0,
     "Test::Script"              => "1.09"
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Devel::Cycle"                   => 0,
   "FFI::C::File"                   => 0,
   "FFI::C::Stat"                   => 0,
   "FFI::CheckLib"                  => "0.30",
@@ -111,6 +110,7 @@ my %FallbackPrereqs = (
   "Sub::Identify"                  => 0,
   "Term::Table"                    => 0,
   "Test2::API"                     => "1.302015",
+  "Test2::Tools::MemoryCycle"      => 0,
   "Test2::V0"                      => "0.000121",
   "Test::Archive::Libarchive"      => 0,
   "Test::Script"                   => "1.09"

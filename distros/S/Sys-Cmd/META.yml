@@ -5,26 +5,25 @@ author:
 build_requires:
   Cwd: '0'
   Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   File::Temp: '0'
   Test::More: '0'
 configure_requires:
-  Module::Build: '0.4004'
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.142690'
-keywords: []
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Sys-Cmd
-provides:
-  Sys::Cmd:
-    file: lib/Sys/Cmd.pm
-    version: v0.85.4
-  Sys::Cmd::Template:
-    file: lib/Sys/Cmd/Template.pm
-    version: v0.85.4
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Sys::Cmd::Mo
 requires:
   Carp: '0'
   Exporter::Tidy: '0'
@@ -34,8 +33,6 @@ requires:
   Log::Any: '0'
   Proc::FastSpawn: '0'
 resources:
-  bugtracker: https://github.com/mlawren/p5-Sys-Cmd/issues
-  homepage: https://github.com/mlawren/p5-Sys-Cmd
-  license: http://www.gnu.org/licenses/gpl-3.0.txt
-  repository: git://github.com/mlawren/p5-Sys-Cmd.git
-version: v0.85.4
+  repository: ssh://git@github.com/mlawren/p5-Sys-Cmd.git
+version: v0.99.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

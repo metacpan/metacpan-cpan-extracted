@@ -1,0 +1,1 @@
+INSERT INTO t ( a, b, c ) VALUES ( 'aa', 'bb', 'cc' ) ON CONFLICT ON CONSTRAINT some_constraint DO NOTHING

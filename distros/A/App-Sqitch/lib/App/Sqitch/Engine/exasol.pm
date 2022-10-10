@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.3.0'; # VERSION
+our $VERSION = 'v1.3.1'; # VERSION
 
 sub _dt($) {
     require App::Sqitch::DateTime;
@@ -78,6 +78,8 @@ has _exaplus => (
             }
         }
 
+        # Use _port instead of port so it's empty if no port is in the URI.
+        # https://github.com/sqitchers/sqitch/issues/675
         for my $spec (
             [ u => $self->username ],
             [ p => $self->password ],

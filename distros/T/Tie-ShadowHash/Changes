@@ -1,5 +1,9 @@
                    Revision history for Tie::ShadowHash
 
+2.01 - 2022-10-08
+
+ - Fix test suite issues on Windows and when DB_File is not available.
+
 2.00 - 2022-06-27
 
  - Remove the new() method, since tie should always be used instead.

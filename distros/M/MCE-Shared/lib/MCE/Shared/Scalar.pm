@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.876';
+our $VERSION = '1.878';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -37,7 +37,7 @@ sub FETCH { ${ $_[0] } }
 
 ###############################################################################
 ## ----------------------------------------------------------------------------
-## Sugar API, mostly resembles http://redis.io/commands#string primitives.
+## Sugar API, mostly resembles https://redis.io/commands#string primitives.
 ##
 ###############################################################################
 
@@ -100,7 +100,7 @@ MCE::Shared::Scalar - Scalar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Scalar version 1.876
+This document describes MCE::Shared::Scalar version 1.878
 
 =head1 DESCRIPTION
 
@@ -220,7 +220,7 @@ and C<get> explicitly. In shared context, the benefit is atomicity and
 reduction in inter-process communication.
 
 The API resembles a subset of the Redis primitives
-L<http://redis.io/commands#strings> without the key argument.
+L<https://redis.io/commands#strings> without the key argument.
 
 =head2 append ( value )
 

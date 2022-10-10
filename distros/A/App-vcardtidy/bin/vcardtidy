@@ -1,0 +1,225 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use OptArgs2;
+use Path::Tiny;
+use Text::vCard::Addressbook;
+use Time::Piece;
+
+our $VERSION = '1.0.2';
+
+my $opts = optargs(
+    comment => 'tidy (normalize) VCARD contact files',
+    optargs => [
+        files => {
+            isa     => 'ArrayRef',
+            default => sub {
+                [ ( -t STDIN ) ? ( die OptArgs2::usage(__PACKAGE__) ) : '-' ]
+            },
+            greedy  => 1,
+            comment => 'file to tidy (default is stdin)',
+        },
+        do_nothing => {
+            isa     => '--Flag',
+            alias   => 'n',
+            comment => q{don't modify files, only report errors},
+        },
+        no_rev => {
+            isa     => '--Flag',
+            alias   => 'R',
+            comment => 'do not update REV value'
+        },
+        filter => {
+            isa      => '--ArrayRef',
+            isa_name => 'PERL',
+            alias    => 'f',
+            comment  => 'Perl filter(s) to run against $_ first',
+            default  => sub { [] },
+        },
+        version => {
+            isa     => '--Flag',
+            alias   => 'V',
+            comment => 'print version information and exit',
+            trigger => sub {
+                require File::Basename;
+                die File::Basename::basename($0)
+                  . ' version '
+                  . $VERSION . "\n";
+            },
+        },
+    ],
+);
+
+my $dtstamp = localtime->strftime('%Y-%m-%dT%H%M%SZ');
+
+foreach my $f ( @{ $opts->{files} } ) {
+    $opts->{input} = $f;
+    vcardtidy($opts);
+}
+
+sub vcardtidy {
+    my $opts = shift;
+
+    my $data;
+    my $file;
+
+    if ( $opts->{input} eq '-' ) {
+        local $/;
+        $data = <STDIN>;
+    }
+    else {
+        $file = path( $opts->{input} );
+        $data = $file->slurp( { binmode => ':raw:encoding(UTF-8)' } );
+    }
+
+    $data = App::vcardtidy::run_filters( $data, @{ $opts->{filter} } );
+
+    my $tidy = eval {
+        my $ab    = Text::vCard::Addressbook->new( { 'source_text' => $data } );
+        my $clean = $ab->export;
+
+        my $clean2 = $clean =~ s/^REV:.*\015\012//mr;
+        my $data2  = $data  =~ s/^REV:.*\015\012//mr;
+        if ( not( $opts->{no_rev} )
+            and ( $clean2 eq $clean or $clean2 ne $data2 ) )
+        {
+            foreach my $vcard ( $ab->vcards ) {
+                $vcard->REV($dtstamp);
+            }
+            $ab->export;
+        }
+        else {
+            $clean;
+        }
+    };
+
+    if ($@) {
+        warn "Invalid VCARD in '$opts->{input}': $@";
+        return;
+    }
+    elsif ( length($tidy) == 0 ) {
+        warn "Invalid VCARD in '$opts->{input}'\n";
+        return;
+    }
+
+    # Fix for multiple categories
+    while ( $tidy =~ s/^(CATEGORIES:.*?)\\,/$1,/mg ) { }
+
+    if ( $opts->{input} eq '-' ) {
+        print $tidy;
+    }
+    else {
+        $file->spew( { binmode => ':raw:encoding(UTF-8)' }, $tidy )
+          unless $opts->{do_nothing};
+    }
+}
+
+package App::vcardtidy;
+
+sub run_filters {
+    local $_ = shift;
+    foreach my $filter (@_) {
+        eval $filter;
+        die qq{filter "$filter" failed:\n$@} if $@;
+    }
+    $_;
+}
+
+__END__
+
+=head1 NAME
+
+vcardtidy - normalize the format of VCARD files
+
+=head1 VERSION
+
+1.0.2 (2022-10-10)
+
+=head1 SYNOPSIS
+
+  usage: vcardtidy [FILES...] [OPTIONS...]
+
+    Synopsis:
+      tidy (normalize) VCARD contact files
+
+    Arguments:
+      FILES         Str   file to tidy (default is stdin)
+
+    Options:
+      --filter,  -f PERL  Perl filter(s) to run against $_ first
+      --help,    -h       print a Help message and exit
+      --no-rev,  -R       do not update REV value
+      --version, -V       print version information and exit
+
+=head1 DESCRIPTION
+
+B<vcardtidy> formats VCARD files, using L<Text::vCard::Addressbook> to
+normalize field order and capitalization.
+
+By default B<vcardtidy> acts like a filter, reading from C<stdin> and
+writing to C<stdout>.
+
+Any C<FILES...> provided as arguments are tidied up in place B<without
+backup>! Users are encouraged to use a revision control system (e.g.
+Git) or have secure backups.
+
+=head1 OPTIONS
+
+=over
+
+=item --filter, -f PERL
+
+Before tidying, evaluate the C<PERL> string with C<$_> set to the input
+text. The modified C<$_> value then input to
+L<Text::vCard::Addressbook> for tidying.
+
+Tools like sed(1), awk(1) and of course perl(1) are obviously natively
+designed to modify text, in a better way. But C<--filter> ensures that
+you still have a valid VCARD afterwards, allowing you to easily iterate
+while you develop your change.
+
+To add an additional or missing category for example:
+
+	$ vcardtidy \
+       -f '$_ .= "\nCATEGORIES:\n" unless m/^CATEGORIES:/m' \
+       -f 's/^(CATEGORIES:\S+)(\s+)$/$1,$2/m' \
+       -f 's/^(CATEGORIES:.*)(\s+)$/${1}NewCat$2/m'
+
+=item --help, -h
+
+Print the full usage message and exit.
+
+=item --no-rev, -R
+
+By default B<vcardtidy> sets a new "REV" timestamp. Use this flag to
+prevent that.
+
+=item --version, -V
+
+Print the version and exit.
+
+=back
+
+=head1 SUPPORT
+
+This tool is managed via github:
+
+    https://github.com/mlawren/vcardtidy
+
+=head1 SEE ALSO
+
+L<githook-perltidy>(1), L<Text::vCard::Addressbook>
+
+=head1 AUTHOR
+
+Mark Lawrence E<lt>nomad@null.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2022 Mark Lawrence <nomad@null.net>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+

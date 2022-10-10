@@ -4,82 +4,40 @@ jacode - Perl program for Japanese character code conversion
 
 SYNOPSIS
 
-    require 'jacode.pl';
+    works like 'jcode.pl' in your script
 
-    # note: You can use either of the package of 'jcode' and 'jacode'
+      require 'jacode.pl';
 
-    jacode::convert(\$line, $OUTPUT_encoding [, $INPUT_encoding [, $option]])
-    jacode::xxx2yyy(\$line [, $option])
-    jacode::to($OUTPUT_encoding, $line [, $INPUT_encoding [, $option]])
-    jacode::jis($line [, $INPUT_encoding [, $option]])
-    jacode::euc($line [, $INPUT_encoding [, $option]])
-    jacode::sjis($line [, $INPUT_encoding [, $option]])
-    jacode::utf8($line [, $INPUT_encoding [, $option]])
-    jacode::jis_inout($JIS_Kanji_IN, $ASCII_IN)
-    jacode::get_inout($string)
-    jacode::cache()
-    jacode::nocache()
-    jacode::flushcache()
-    jacode::flush()
-    jacode::h2z_xxx(\$line)
-    jacode::z2h_xxx(\$line)
-    jacode::getcode(\$line)
-    jacode::tr(\$line, $from, $to [, $option])
-    jacode::trans($line, $from, $to [, $option])
-    jacode::init()
-    $jacode::convf{'xxx', 'yyy'}
-    $jacode::z2hf{'xxx'}
-    $jacode::h2zf{'xxx'}
+           ($subref, $got_INPUT_encoding) = jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, $option])
+                      $got_INPUT_encoding = jacode::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, $option])
+                  ($esc_DBCS, $esc_ASCII) = jacode::get_inout($line)
+      ($esc_DBCS_fully, $esc_ASCII_fully) = jacode::jis_inout([$esc_DBCS [, $esc_ASCII]])
+             ($matched_length, $encoding) = jacode::getcode(\$line)
+                                $encoding = jacode::getcode(\$line)
+                                            jacode::init()
 
-    &jcode'convert(*line, $OUTPUT_encoding [, $INPUT_encoding [, $option]])
-    &jcode'xxx2yyy(*line [, $option])
-    &jcode'to($OUTPUT_encoding, $line [, $INPUT_encoding [, $option]])
-    &jcode'jis($line [, $INPUT_encoding [, $option]])
-    &jcode'euc($line [, $INPUT_encoding [, $option]])
-    &jcode'sjis($line [, $INPUT_encoding [, $option]])
-    &jcode'utf8($line [, $INPUT_encoding [, $option]])
-    &jcode'jis_inout($JIS_Kanji_IN, $ASCII_IN)
-    &jcode'get_inout($string)
-    &jcode'cache()
-    &jcode'nocache()
-    &jcode'flushcache()
-    &jcode'flush()
-    &jcode'h2z_xxx(*line)
-    &jcode'z2h_xxx(*line)
-    &jcode'getcode(*line)
-    &jcode'tr(*line, $from, $to [, $option])
-    &jcode'trans($line, $from, $to [, $option])
-    &jcode'init()
-    $jcode'convf{'xxx', 'yyy'}
-    $jcode'z2hf{'xxx'}
-    $jcode'h2zf{'xxx'}
+    works as 'pkf' command on command line (shows help)
 
-ABSTRACT
+      $ perl jacode.pl
 
-    This software will be useful for DX (Digital Transformation) and IT
-    modernization of Japanese information processing. This software has upper
-    compatibility to jcode.pl and multiple inheritance both stable jcode.pl
-    library and active Encode module.
+DESCRIPTION
+
+    This software can convert each other "JIS", "SJIS", "EUC-JP", and "UTF-8"
+    that are frequently used as encoding for Japanese string.
+    Interface of "jacode.pl" is same of "jcode.pl" that we know well.
+    On the other hand its ability is same of "Encode" module that can
+    everything to convert character encoding.
+    So we believe this software will be useful for DX (Digital Transformation)
+    and IT modernization of Japanese information processing.
 
     * jcode.pl upper compatible
     * pkf command upper compatible
-    * Perl4 script also Perl5 script
-    * Powered by Encode::from_to (Yes, not only Japanese!)
-    * future-proof software
-    * Support HALFWIDTH KATAKANA
-    * Support UTF-8 by cp932 to Unicode table
-        http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP932.TXT
-        http://support.microsoft.com/kb/170559/ja
-        (JIS X 0221:2007 BASIC JAPANESE and COMMON JAPANESE)
-    * Hidden UTF8 flag
-    * No Object oriented
-    * Maintain the traditional programming
+    * is Perl4 script and also Perl5 script
+    * supports HALFWIDTH KATAKANA
+    * supports UTF-8 by cp932 to Unicode table
+    * powered by Encode::from_to (not only Japanese!)
 
 INSTALLATION
-
-   To test this software, type the following:
-
-   make test
 
    To install this software, copy 'jacode.pl' to any directory of @INC.
 
@@ -92,13 +50,13 @@ AUTHOR
     Copyright (c) 1992,1993,1994 Kazumasa Utashiro
     Copyright (c) 1995-2000 Kazumasa Utashiro
     Copyright (c) 2002 Kazumasa Utashiro
-    Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020 INABA Hitoshi
+    Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022 INABA Hitoshi
 
 SEE ALSO
 
     jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
     https://metacpan.org/author/UTASHIRO
-    ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
+    http://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
     http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
     ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
     http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
@@ -113,6 +71,7 @@ SEE ALSO
     Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
     https://metacpan.org/pod/Jacode4e::RoundTrip
 
-    Modern::Open - Autovivification, Autodie, and 3-args open support
-    https://metacpan.org/pod/Modern::Open
-
+    Other Tools
+    https://metacpan.org/release/Perl7-Handy
+    https://metacpan.org/release/UTF8-R2
+    https://metacpan.org/release/mb

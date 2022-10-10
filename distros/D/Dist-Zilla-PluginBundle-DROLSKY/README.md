@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 1.20
+version 1.22
 
 # SYNOPSIS
 
@@ -306,7 +306,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
+button at [https://houseabsolute.com/foss-donations/](https://houseabsolute.com/foss-donations/).
 
 # AUTHOR
 
@@ -319,7 +319,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2022 by Dave Rolsky.
 
 This is free software, licensed under:
 

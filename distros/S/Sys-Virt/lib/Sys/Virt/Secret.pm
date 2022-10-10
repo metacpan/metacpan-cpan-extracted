@@ -92,7 +92,7 @@ format of the unique identifier for this secret.
 
 Returns the identifier of the object with which the secret is to
 be used. For secrets with a usage type of volume, the identifier
-is the fully qualfied path.
+is the fully qualified path.
 
 =item my $xml = $sec->get_xml_description()
 

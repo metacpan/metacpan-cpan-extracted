@@ -6,6 +6,19 @@ Home page:    <https://metacpan.org/release/Exporter-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-exporter-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.004003	2022-09-30
+
+ [ Bug Fixes ]
+ - If exporting non-CODE items which happen to have the same name as
+   exported CODE items, their export was being quietly blocked. These
+   exports should now work.
+   Diab Jerius++
+   <https://github.com/tobyink/p5-exporter-tiny/issues/9>
+ - Using ! with a tag now works; it was previously documented as working
+   but not implemented.
+   Diab Jerius++
+   <https://github.com/tobyink/p5-exporter-tiny/issues/8>
+
 1.004002	2022-09-16
 
  [ Test Suite ]

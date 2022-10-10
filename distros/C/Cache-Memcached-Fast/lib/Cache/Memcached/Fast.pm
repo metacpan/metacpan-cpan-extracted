@@ -1,31 +1,94 @@
-# See the end of the file for copyright and license.
-#
+package Cache::Memcached::Fast 0.28;
 
-package Cache::Memcached::Fast;
-
-use 5.006;
-use strict;
+use v5.12;
 use warnings;
 
+use Carp           ();
+use Compress::Zlib ();
+use Storable;
+use XSLoader;
+
+my %instance;
+my %known_args = map { $_ => 1 } qw(
+    check_args close_on_error compress_algo compress_methods compress_ratio
+    compress_threshold connect_timeout failure_timeout hash_namespace
+    io_timeout ketama_points max_failures max_size namespace nowait
+    select_timeout serialize_methods servers utf8
+);
+
+sub new {
+    my ( $class, $conf ) = @_;
+
+    unless ( lc( $conf->{check_args} // '' ) eq 'skip' ) {
+        Carp::carp 'compress_algo was removed in 0.08, use compress_methods'
+            if exists $conf->{compress_algo};
+
+        if ( my @unknown = grep !$known_args{$_}, sort keys %$conf ) {
+            local $" = ', ';
+            Carp::carp "Unknown arguments: @unknown";
+        }
+    }
+
+    # Note that the functions below can't return false when operation succeed.
+    # This is because "" and "0" compress to a longer values (because of
+    # additional format data), and compress_ratio will force them to be stored
+    # uncompressed, thus decompression will never return them.
+    $conf->{compress_methods} //= [
+        sub { ${ $_[1] } = Compress::Zlib::memGzip( ${ $_[0] } ) },
+        sub { ${ $_[1] } = Compress::Zlib::memGunzip( ${ $_[0] } ) },
+    ];
+
+    $conf->{serialize_methods} //= [ \&Storable::nfreeze, \&Storable::thaw ];
+
+    my $memd = $class->_new($conf);
+
+    my $context = [ $memd, $conf ];
+    _weaken( $context->[0] );
+    $instance{$$memd} = $context;
+
+    return $memd;
+}
+
+sub CLONE {
+    my $class = shift;
+
+    # Empty %instance and loop over the values.
+    for my $context ( delete @instance{ keys %instance } ) {
+        my ( $memd, $conf ) = @$context;
+
+        my $memd2 = $class->_new($conf);
+
+        $instance{ $$memd = $$memd2 } = $context;
+
+        $$memd2 = 0;    # Prevent destruction in DESTROY.
+    }
+}
+
+sub DESTROY {
+    my $memd = shift;
+
+    return unless $$memd;
+
+    delete $instance{$$memd};
+
+    _destroy($memd);
+}
+
+XSLoader::load;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
 Cache::Memcached::Fast - Perl client for B<memcached>, in C language
 
-=head1 VERSION
-
-Version 0.27.
-
-=cut
-
-our $VERSION = '0.27';
-
-
 =head1 SYNOPSIS
 
-  use Cache::Memcached::Fast;
+    use Cache::Memcached::Fast;
 
-  my $memd = new Cache::Memcached::Fast({
+  my $memd = Cache::Memcached::Fast->new({
       servers => [ { address => 'localhost:11211', weight => 2.5 },
                    '192.168.254.2:11211',
                    { address => '/path/to/unix.sock', noreply => 1 } ],
@@ -43,7 +106,7 @@ our $VERSION = '0.27';
       nowait => 1,
       hash_namespace => 1,
       serialize_methods => [ \&Storable::freeze, \&Storable::thaw ],
-      utf8 => ($^V ge v5.8.1 ? 1 : 0),
+      utf8 => 1,
       max_size => 512 * 1024,
   });
 
@@ -114,28 +177,15 @@ our $VERSION = '0.27';
 
 =head1 DESCRIPTION
 
-B<Cache::Memcached::Fast> is a Perl client for B<memcached>, a memory
-cache daemon (L<http://www.memcached.org/>).  Module core is
-implemented in C and tries hard to minimize number of system calls and
-to avoid any key/value copying for speed.  As a result, it has very
-low CPU consumption.
+B<Cache::Memcached::Fast> is a Perl client for B<memcached>, a memory cache
+daemon (L<http://www.memcached.org>). Module core is implemented in C and
+tries hard to minimize number of system calls and to avoid any key/value
+copying for speed. As a result, it has very low CPU consumption.
 
-API is largely compatible with L<Cache::Memcached|Cache::Memcached>,
-original pure Perl client, most users of the original module may start
-using this module by installing it and adding I<"::Fast"> to the old
-name in their scripts (see L</"Compatibility with Cache::Memcached">
-below for full details).
-
-
-=cut
-
-
-use Carp;
-use Storable;
-
-require XSLoader;
-XSLoader::load('Cache::Memcached::Fast', $VERSION);
-
+API is largely compatible with L<Cache::Memcached>, original pure Perl client,
+most users of the original module may start using this module by installing it
+and adding I<"::Fast"> to the old name in their scripts
+(see L</"Compatibility with Cache::Memcached"> below for full details).
 
 =head1 CONSTRUCTOR
 
@@ -143,10 +193,10 @@ XSLoader::load('Cache::Memcached::Fast', $VERSION);
 
 =item C<new>
 
-  my $memd = new Cache::Memcached::Fast($params);
+  my $memd = Cache::Memcached::Fast->new($params);
 
-Create new client object.  I<$params> is a reference to a hash with
-client parameters.  Currently recognized keys are:
+Create new client object. I<$params> is a reference to a hash with client
+parameters. Currently recognized keys are:
 
 =over
 
@@ -157,37 +207,32 @@ client parameters.  Currently recognized keys are:
                { address => '/path/to/unix.sock', noreply => 1 } ],
   (default: none)
 
-The value is a reference to an array of server addresses.  Each
-address is either a scalar, a hash reference, or an array reference
-(for compatibility with Cache::Memcached, deprecated).  If hash
-reference, the keys are I<address> (scalar), I<weight> (positive
-rational number), and I<noreply> (boolean flag).  The server address
-is in the form I<host:port> for network TCP connections, or
-F</path/to/unix.sock> for local Unix socket connections.  When weight
-is not given, 1 is assumed.  Client will distribute keys across
-servers proportionally to server weights.
+The value is a reference to an array of server addresses. Each address is
+either a scalar, a hash reference, or an array reference (for compatibility
+with Cache::Memcached, deprecated). If hash reference, the keys are I<address>
+(scalar), I<weight> (positive rational number), and I<noreply> (boolean flag).
+The server address is in the form I<host:port> for network TCP connections, or
+F</path/to/unix.sock> for local Unix socket connections. When weight is not
+given, 1 is assumed. Client will distribute keys across servers proportionally
+to server weights.
 
-If you want to get key distribution compatible with Cache::Memcached,
-all server weights should be integer, and their sum should be less
-than 32768.
+If you want to get key distribution compatible with Cache::Memcached, all
+server weights should be integer, and their sum should be less than 32768.
 
-When I<noreply> is enabled, commands executed in a void context will
-instruct the server to not send the reply.  Compare with L</nowait>
-below.  B<memcached> server implements I<noreply> starting with
-version 1.2.5.  If you enable I<noreply> for earlier server versions,
-things will go wrongly, and the client will eventually block.  Use
-with care.
-
+When I<noreply> is enabled, commands executed in a void context will instruct
+the server to not send the reply. Compare with L</nowait> below. B<memcached>
+server implements I<noreply> starting with version 1.2.5. If you enable
+I<noreply> for earlier server versions, things will go wrongly, and the client
+will eventually block. Use with care.
 
 =item I<namespace>
 
   namespace => 'my::'
   (default: '')
 
-The value is a scalar that will be prepended to all key names passed
-to the B<memcached> server.  By using different namespaces clients
-avoid interference with each other.
-
+The value is a scalar that will be prepended to all key names passed to the
+B<memcached> server. By using different namespaces clients avoid interference
+with each other.
 
 =item I<hash_namespace>
 
@@ -218,7 +263,6 @@ examples above will use the same server, the one that I<'prefix/key'>
 is mapped to.  Note that there's no performance penalty then, as
 namespace prefix is hashed only once.  See L</namespace>.
 
-
 =item I<nowait>
 
   nowait => 1
@@ -236,7 +280,6 @@ should be, and on any command the client reads and discards any
 replies that have already arrived.  When you later execute some method
 in a non-void context, all outstanding replies will be waited for, and
 then the reply for this command will be read and returned.
-
 
 =item I<connect_timeout>
 
@@ -258,7 +301,6 @@ applies only to one such connect, i.e. to one I<connect(2)>
 call.  Thus overall connect process may take longer than
 I<connect_timeout> seconds, but this is unavoidable.
 
-
 =item I<io_timeout> (or deprecated I<select_timeout>)
 
   io_timeout => 0.5
@@ -273,7 +315,6 @@ server.  Thus it won't expire if one server is quick enough to
 communicate, even if others are silent.  But if some servers are dead
 those alive will finish communication, and then dead servers would
 timeout.
-
 
 =item I<close_on_error>
 
@@ -321,7 +362,6 @@ When connection dies, or the client receives the reply that it can't
 understand, it closes the socket regardless the I<close_on_error>
 setting.
 
-
 =item I<compress_threshold>
 
   compress_threshold => 10_000
@@ -333,7 +373,6 @@ compressed.  See L</compress_ratio> and L</compress_methods> below.
 
 Negative value disables compression.
 
-
 =item I<compress_ratio>
 
   compress_ratio => 0.9
@@ -343,7 +382,6 @@ The value is a fractional number between 0 and 1.  When
 L</compress_threshold> triggers the compression, compressed size
 should be less or equal to S<(original-size * I<compress_ratio>)>.
 Otherwise the data will be stored uncompressed.
-
 
 =item I<compress_methods>
 
@@ -375,7 +413,6 @@ By default we use L<Compress::Zlib|Compress::Zlib> because as of this
 writing it appears to be much faster than
 L<IO::Uncompress::Gunzip|IO::Uncompress::Gunzip>.
 
-
 =item I<max_failures>
 
   max_failures => 3
@@ -386,7 +423,6 @@ I<max_failures> in I<failure_timeout> seconds, the client does not try
 to connect to this particular server for another I<failure_timeout>
 seconds.  Value of zero disables this behaviour.
 
-
 =item I<failure_timeout>
 
   failure_timeout => 30
@@ -394,7 +430,6 @@ seconds.  Value of zero disables this behaviour.
 
 The value is a positive integer number of seconds.  See
 L</max_failures>.
-
 
 =item I<ketama_points>
 
@@ -414,7 +449,6 @@ integers each), so you probably shouldn't worry.
 
 Zero value disables the Ketama algorithm.  See also server weight in
 L</servers> above.
-
 
 =item I<serialize_methods>
 
@@ -437,7 +471,6 @@ if deserialization fails (say, wrong data format) it should throw an
 exception (call I<die>).  The exception will be caught by the module
 and L</get> will then pretend that the key hasn't been found.
 
-
 =item I<utf8>
 
   utf8 => 1
@@ -448,7 +481,6 @@ conversion of Perl character strings to octet sequences in UTF-8
 encoding on store, and the reverse conversion on fetch (when the
 retrieved data is marked as being UTF-8 octet sequence).  See
 L<perlunicode|perlunicode>.
-
 
 =item I<max_size>
 
@@ -466,7 +498,6 @@ S<I<[1MB - N bytes, 1MB]>>, where N is several hundreds, will still be
 sent to the server, and rejected there.  You may set I<max_size> to a
 smaller value to avoid this.
 
-
 =item I<check_args>
 
   check_args => 'skip'
@@ -483,144 +514,9 @@ When set to I<'skip'>, the check will be bypassed.  This may be
 desired when you share the same argument hash among different client
 versions, or among different clients.
 
-
 =back
 
 =back
-
-=cut
-
-our %known_params = (
-    servers => [ { address => 1, weight => 1, noreply => 1 } ],
-    namespace => 1,
-    nowait => 1,
-    hash_namespace => 1,
-    connect_timeout => 1,
-    io_timeout => 1,
-    select_timeout => 1,
-    close_on_error => 1,
-    compress_threshold => 1,
-    compress_ratio => 1,
-    compress_methods => 1,
-    compress_algo => sub {
-        carp "compress_algo has been removed in 0.08,"
-          . " use compress_methods instead"
-    },
-    max_failures => 1,
-    failure_timeout => 1,
-    ketama_points => 1,
-    serialize_methods => 1,
-    utf8 => 1,
-    max_size => 1,
-    check_args => 1,
-);
-
-
-sub _check_args {
-    my ($checker, $args, $level) = @_;
-
-    $level = 0 unless defined $level;
-
-    my @unknown;
-
-    if (ref($args) ne 'HASH') {
-        if (ref($args) eq 'ARRAY' and ref($checker) eq 'ARRAY') {
-            foreach my $v (@$args) {
-                push @unknown, _check_args($checker->[0], $v, $level + 1);
-            }
-        }
-        return @unknown;
-    }
-
-    if (exists $args->{check_args}
-        and lc($args->{check_args}) eq 'skip') {
-        return;
-    }
-
-    while (my ($k, $v) = each %$args) {
-        if (exists $checker->{$k}) {
-            if (ref($checker->{$k}) eq 'CODE') {
-                $checker->{$k}->($args, $k, $v);
-            } elsif (ref($checker->{$k})) {
-                push @unknown, _check_args($checker->{$k}, $v, $level + 1);
-            }
-        } else {
-            push @unknown, $k;
-        }
-    }
-
-    if ($level > 0) {
-        return @unknown;
-    } else {
-        carp "Unknown parameter: @unknown" if @unknown;
-    }
-}
-
-
-our %instance;
-
-sub new {
-    my Cache::Memcached::Fast $class = shift;
-    my ($conf) = @_;
-
-    _check_args(\%known_params, $conf);
-
-    if (not $conf->{compress_methods}
-        and defined $conf->{compress_threshold}
-        and $conf->{compress_threshold} >= 0
-        and eval "require Compress::Zlib") {
-        # Note that the functions below can't return false when
-        # operation succeed.  This is because "" and "0" compress to a
-        # longer values (because of additional format data), and
-        # compress_ratio will force them to be stored uncompressed,
-        # thus decompression will never return them.
-        $conf->{compress_methods} = [
-            sub { ${$_[1]} = Compress::Zlib::memGzip(${$_[0]}) },
-            sub { ${$_[1]} = Compress::Zlib::memGunzip(${$_[0]}) }
-        ];
-    }
-
-    if ($conf->{utf8} and $^V lt v5.8.1) {
-        carp "'utf8' may be enabled only for Perl >= 5.8.1, disabled";
-        undef $conf->{utf8};
-    }
-
-    $conf->{serialize_methods} ||= [ \&Storable::nfreeze, \&Storable::thaw ];
-
-    my $memd = Cache::Memcached::Fast::_new($class, $conf);
-
-    my $context = [$memd, $conf];
-    _weaken($context->[0]);
-    $instance{$$memd} = $context;
-
-    return $memd;
-}
-
-
-sub CLONE {
-    my ($class) = @_;
-
-    my @contexts = values %instance;
-    %instance = ();
-    foreach my $context (@contexts) {
-        my $memd = Cache::Memcached::Fast::_new($class, $context->[1]);
-        ${$context->[0]} = $$memd;
-        $instance{$$memd} = $context;
-        $$memd = 0;
-    }
-}
-
-
-sub DESTROY {
-    my ($memd) = @_;
-
-    return unless $$memd;
-
-    delete $instance{$$memd};
-
-    Cache::Memcached::Fast::_destroy($memd);
-}
-
 
 =head1 METHODS
 
@@ -639,11 +535,6 @@ is set.
 
 I<Return:> none.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<namespace>
 
   $memd->namespace;
@@ -655,11 +546,6 @@ prefix.
 
 I<Return:> scalar, the namespace prefix that was in effect before the
 call.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<set>
 
@@ -678,11 +564,6 @@ longer.
 
 I<Return:> boolean, true for positive server reply, false for negative
 server reply, or I<undef> in case of some error.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<set_multi>
 
@@ -705,11 +586,6 @@ position I<$index>.  In scalar context, hash reference is returned,
 where I<$href-E<gt>{$key}> holds the result value.  See L</set> to
 learn what the result value is.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<cas>
 
   $memd->cas($key, $cas, $value);
@@ -730,11 +606,6 @@ updated the value, and L</gets>, L</gats>, L</cas> command sequence should be
 repeated.
 
 B<cas> command first appeared in B<memcached> 1.2.4.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<cas_multi>
 
@@ -759,11 +630,6 @@ learn what the result value is.
 
 B<cas> command first appeared in B<memcached> 1.2.4.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<add>
 
   $memd->add($key, $value);
@@ -777,11 +643,6 @@ description.
 
 I<Return:> boolean, true for positive server reply, false for negative
 server reply, or I<undef> in case of some error.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<add_multi>
 
@@ -804,11 +665,6 @@ position I<$index>.  In scalar context, hash reference is returned,
 where I<$href-E<gt>{$key}> holds the result value.  See L</add> to
 learn what the result value is.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<replace>
 
  $memd->replace($key, $value);
@@ -822,11 +678,6 @@ description.
 
 I<Return:> boolean, true for positive server reply, false for negative
 server reply, or I<undef> in case of some error.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<replace_multi>
 
@@ -849,11 +700,6 @@ position I<$index>.  In scalar context, hash reference is returned,
 where I<$href-E<gt>{$key}> holds the result value.  See L</replace> to
 learn what the result value is.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<append>
 
   $memd->append($key, $value);
@@ -868,11 +714,6 @@ I<Return:> boolean, true for positive server reply, false for negative
 server reply, or I<undef> in case of some error.
 
 B<append> command first appeared in B<memcached> 1.2.4.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<append_multi>
 
@@ -895,11 +736,6 @@ learn what the result value is.
 
 B<append> command first appeared in B<memcached> 1.2.4.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<prepend>
 
   $memd->prepend($key, $value);
@@ -914,11 +750,6 @@ I<Return:> boolean, true for positive server reply, false for negative
 server reply, or I<undef> in case of some error.
 
 B<prepend> command first appeared in B<memcached> 1.2.4.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<prepend_multi>
 
@@ -941,11 +772,6 @@ learn what the result value is.
 
 B<prepend> command first appeared in B<memcached> 1.2.4.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<get>
 
   $memd->get($key);
@@ -953,11 +779,6 @@ B<prepend> command first appeared in B<memcached> 1.2.4.
 Retrieve the value for a I<$key>.  I<$key> should be a scalar.
 
 I<Return:> value associated with the I<$key>, or nothing.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<get_multi>
 
@@ -968,11 +789,6 @@ an array of scalars.
 
 I<Return:> reference to hash, where I<$href-E<gt>{$key}> holds
 corresponding value.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<gets>
 
@@ -993,11 +809,6 @@ may conveniently pass it back to L</cas> with I<@$res>:
 
 B<gets> command first appeared in B<memcached> 1.2.4.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<gets_multi>
 
   $memd->gets_multi(@keys);
@@ -1009,11 +820,6 @@ I<Return:> reference to hash, where I<$href-E<gt>{$key}> holds a
 reference to an array I<[$cas, $value]>.  Compare with L</gets>.
 
 B<gets> command first appeared in B<memcached> 1.2.4.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<incr>
 
@@ -1027,11 +833,6 @@ is assumed.  Note that the server doesn't check for overflow.
 
 I<Return:> unsigned integer, new value for the I<$key>, or false for
 negative server reply, or I<undef> in case of some error.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<incr_multi>
 
@@ -1055,11 +856,6 @@ position I<$index>.  In scalar context, hash reference is returned,
 where I<$href-E<gt>{$key}> holds the result value.  See L</incr> to
 learn what the result value is.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<decr>
 
   $memd->decr($key);
@@ -1075,11 +871,6 @@ true in a boolean context.
 
 I<Return:> unsigned integer, new value for the I<$key>, or false for
 negative server reply, or I<undef> in case of some error.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<decr_multi>
 
@@ -1103,11 +894,6 @@ position I<$index>.  In scalar context, hash reference is returned,
 where I<$href-E<gt>{$key}> holds the result value.  See L</decr> to
 learn what the result value is.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<delete>
 
   $memd->delete($key);
@@ -1117,19 +903,9 @@ Delete I<$key> and its value from the cache.
 I<Return:> boolean, true for positive server reply, false for negative
 server reply, or I<undef> in case of some error.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<remove> (B<deprecated>)
 
 Alias for L</delete>, for compatibility with B<Cache::Memcached>.
-
-=cut
-
-*remove = \&delete;
-
 
 =item C<delete_multi>
 
@@ -1147,11 +923,6 @@ position I<$index>.  In scalar context, hash reference is returned,
 where I<$href-E<gt>{$key}> holds the result value.  See L</delete> to
 learn what the result value is.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<touch>
 
   $memd->touch($key, $expiration_time);
@@ -1166,11 +937,6 @@ I<Return:> boolean, true for positive server reply, false for negative
 server reply, or I<undef> in case of some error.
 
 B<touch> command first appeared in B<memcached> 1.4.8.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<touch_multi>
 
@@ -1194,11 +960,6 @@ learn what the result value is.
 
 B<touch> command first appeared in B<memcached> 1.4.8.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<gat>
 
   $memd->gat($expiration_time, $key);
@@ -1213,10 +974,6 @@ I<Return:> value associated with the I<$key>, or nothing.
 
 B<gat> command first appeared in B<memcached> 1.5.3.
 
-=cut
-
-# See Fast.xs.
-
 =item C<gat_multi>
 
   $memd->gat_multi($expiration_time, @keys);
@@ -1228,9 +985,6 @@ I<Return:> reference to hash, where I<$href-E<gt>{$key}> holds
 corresponding value.
 
 B<gat> command first appeared in B<memcached> 1.5.3.
-
-# See Fast.xs.
-
 
 =item C<gats>
 
@@ -1250,9 +1004,6 @@ may conveniently pass it back to L</cas> with I<@$res>:
 
 B<gat> command first appeared in B<memcached> 1.5.3.
 
-# See Fast.xs.
-
-
 =item C<gats_multi>
 
   $memd->gats_multi($expiration_time, @keys);
@@ -1265,9 +1016,6 @@ I<Return:> reference to hash, where I<$href-E<gt>{$key}> holds a
 reference to an array I<[$cas, $value]>.  Compare with L</gats>.
 
 B<gat> command first appeared in B<memcached> 1.5.3.
-
-# See Fast.xs.
-
 
 =item C<flush_all>
 
@@ -1289,11 +1037,6 @@ F</path/to/unix.sock>, as described in L</servers>.  Result value is a
 boolean, true for positive server reply, false for negative server
 reply, or I<undef> in case of some error.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<nowait_push>
 
   $memd->nowait_push;
@@ -1312,11 +1055,6 @@ processed before the connection is closed.
 
 I<Return:> nothing.
 
-=cut
-
-# See Fast.xs.
-
-
 =item C<server_versions>
 
   $memd->server_versions;
@@ -1326,11 +1064,6 @@ Get server versions.
 I<Return:> reference to hash, where I<$href-E<gt>{$server}> holds
 corresponding server version.  I<$server> is either I<host:port> or
 F</path/to/unix.sock>, as described in L</servers>.
-
-=cut
-
-# See Fast.xs.
-
 
 =item C<disconnect_all>
 
@@ -1343,17 +1076,7 @@ socket which leads to protocol errors.)
 
 I<Return:> nothing.
 
-=cut
-
-# See Fast.xs.
-
-
-1;
-
-__END__
-
 =back
-
 
 =head1 Compatibility with Cache::Memcached
 
@@ -1373,7 +1096,6 @@ However, as of this release, the following features of
 Cache::Memcached are not supported by Cache::Memcached::Fast (and some
 of them will never be):
 
-
 =head2 Constructor parameters
 
 =over
@@ -1390,13 +1112,11 @@ clients might fail to reach a particular server, others may still
 reach it, so some clients will start rehashing, while others will not,
 and they will no longer agree which key goes where.
 
-
 =item I<readonly>
 
 Not supported.  Easy to add.  However I'm not sure about the demand
 for it, and it will slow down things a bit (because from design point
 of view it's better to add it on Perl side rather than on XS side).
-
 
 =item I<debug>
 
@@ -1404,7 +1124,6 @@ Not supported.  Since the implementation is different, there can't be
 any compatibility on I<debug> level.
 
 =back
-
 
 =head2 Methods
 
@@ -1415,48 +1134,39 @@ any compatibility on I<debug> level.
 Every key should be a scalar.  The syntax when key is a reference to
 an array I<[$precomputed_hash, $key]> is not supported.
 
-
 =item C<set_servers>
 
 Not supported.  Server set should not change after client object
 construction.
 
-
 =item C<set_debug>
 
 Not supported.  See L</debug>.
-
 
 =item C<set_readonly>
 
 Not supported.  See L</readonly>.
 
-
 =item C<set_norehash>
 
 Not supported.  See L</no_rehash>.
-
 
 =item C<set_compress_threshold>
 
 Not supported.  Easy to add.  Currently you specify
 I<compress_threshold> during client object construction.
 
-
 =item C<stats>
 
 Not supported.  Perhaps will appear in the future releases.
 
-
 =back
-
 
 =head1 Tainted data
 
 In current implementation tainted flag is neither tested nor
 preserved, storing tainted data and retrieving it back would clear
 tainted flag.  See L<perlsec|perlsec>.
-
 
 =head1 Threads
 
@@ -1468,7 +1178,7 @@ For example:
 
   use threads;
 
-  my $memd = new Cache::Memcached::Fast({...});
+  my $memd = Cache::Memcached::Fast->new({...});
 
   sub thread_job {
     $memd->set("key", "thread value");
@@ -1498,7 +1208,7 @@ I.e., the following won't work:
   use threads;
 
   sub thread_job {
-    return new Cache::Memcached::Fast({...});
+    return Cache::Memcached::Fast->new({...});
   }
 
   my $thread = threads->new(\&thread_job);
@@ -1507,99 +1217,57 @@ I.e., the following won't work:
 
 This is a Perl limitation (see L<threads/"BUGS AND LIMITATIONS">).
 
-
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-cache-memcached-fast at rt.cpan.org>, or through the web
-interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Cache-Memcached-Fast>.
-I will be notified, and then you'll automatically be notified of
-progress on your bug as I make changes.
-
-
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+The code repository is available for public review and contribution at
+L<https://github.com/JRaspass/Cache-Memcached-Fast>.
 
-    perldoc Cache::Memcached::Fast
-
-
-You can also look for information at:
-
-=over 4
-
-=item * Project home
-
-L<https://github.com/kroki/Cache-Memcached-Fast>
-
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Cache-Memcached-Fast>
-
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Cache-Memcached-Fast>
-
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Cache-Memcached-Fast>
-
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Cache-Memcached-Fast>
-
-
-=back
-
+Please report any bugs or feature requests through the issue tracker at
+L<https://github.com/JRaspass/Cache-Memcached-Fast/issues>.
 
 =head1 SEE ALSO
 
-L<https://github.com/kroki/Cache-Memcached-Fast> - project home.  Latest
-development tree can be found there.
+=over
 
-L<http://openhack.ru/Cache-Memcached-Fast> - old project home.
+=item *
 
-L<Cache::Memcached|Cache::Memcached> - original pure Perl B<memcached>
-client.
+L<Cache::Memcached> - original pure Perl B<memcached> client.
 
-L<http://www.memcached.org/> - B<memcached> website.
+=item *
 
+L<https://memcached.org> - B<memcached> website.
+
+=back
 
 =head1 AUTHORS
 
-S<Tomash Brechko>, C<< <tomash.brechko at gmail.com> >> - design and
-implementation.
+=over
 
-S<Michael Monashev>, C<< <postmaster at softsearch.ru> >> - project
-management, design suggestions, testing.
+=item *
 
+Tomash Brechko <tomash.brechko@gmail.com> - design and implementation.
+
+=item *
+
+Michael Monashev <postmaster@softsearch.ru> - project management, design
+suggestions, testing.
+
+=item *
+
+James Raspass <jraspass@gmail.com> - recent additions and current maintenance.
+
+=back
 
 =head1 ACKNOWLEDGEMENTS
 
-Development of this module was sponsored by S<Monashev Co. Ltd.>
+Development of this module was sponsored by Monashev Co. Ltd.
 
-Thanks to S<Peter J. Holzer> for enlightening on UTF-8 support.
+Thanks to Peter J. Holzer for enlightening on UTF-8 support.
 
-Thanks to S<Yasuhiro Matsumoto> for initial Win32 patch.
-
-
-=head1 WARRANTY
-
-There's B<NONE>, neither explicit nor implied.  But you knew it already
-;).
-
+Thanks to Yasuhiro Matsumoto for the initial Win32 patch.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007-2010 Tomash Brechko.  All rights reserved.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
-
-=cut
+Copyright © 2007-2010 Tomash Brechko. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.

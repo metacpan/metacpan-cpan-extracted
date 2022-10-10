@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-26'; # DATE
+our $DATE = '2022-10-09'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 sub _heading_from_line {
     my $heading = shift;
@@ -198,7 +198,6 @@ our %argspecs_common = (
         'x.name.singular' => 'file',
         schema => ['array*', of=>'filename*', min_len=>1],
         'x.element_completion' => ['filename', {file_ext_filter=>[qw/org ORG/]}],
-        cmdline_aliases=>{f=>{}},
         tags => ['category:input'],
     },
     reload_files_on_change => {
@@ -315,11 +314,42 @@ our %argspecs_select = (
         summary => 'Return just the number of matching entries instead of showing them',
         schema => 'true*',
     },
+    no_formatters => {
+        summary => 'Do not apply any formatters to field value (overrides --formatter option)',
+        schema => 'true*',
+        cmdline_aliases => {raw_field_values=>{}, F=>{}},
+        tags => ['category:display'],
+    },
+    default_formatter_rules => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'default_formatter_rule',
+        schema => ['array*', of=>'any*'],
+        description => <<'_',
+
+Specify conditional default formatters. This is for convenience and best
+specified in the configuration as opposed to on the command-line option.
+An example:
+
+    default_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i","formatters":[ ["Phone::format_phone_idn"] ]}
+
+_
+        tags => ['category:display'],
+    },
     formatters => {
         'x.name.is_plural' => 1,
         'x.name.singular' => 'formatter',
         summary => 'Add one or more formatters to display field value',
+        #schema => ['array*', of=>'perl::perl_sah_filter::modname_with_optional_args*'], ## doesn't work yet with Perinci::Sub::GetArgs::Argv
         schema => ['array*', of=>'str*'],
+        element_completion => sub {
+            require Complete::Module;
+            my %args = @_;
+            Complete::Module::complete_module(
+                word => $args{word},
+                ns_prefix => 'Data::Sah::Filter::perl',
+            );
+        },
+        cmdline_aliases => {f=>{}},
         tags => ['category:display'],
         description => <<'_',
 
@@ -337,6 +367,8 @@ If formatter name begins with `[` character, it will be parsed as JSON. Example:
 
  ['Str::remove_comment', {'style':'cpp'}]
 
+Overrides `--default_formatter_rule` but overridden by the `--no-formatters`
+(`--raw-field-values`, `-F`) option.
 
 _
     },
@@ -370,7 +402,7 @@ App::orgadb::Common
 
 =head1 VERSION
 
-This document describes version 0.008 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2022-09-26.
+This document describes version 0.010 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2022-10-09.
 
 =head1 HOMEPAGE
 

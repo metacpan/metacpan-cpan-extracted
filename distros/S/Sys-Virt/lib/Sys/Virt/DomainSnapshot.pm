@@ -88,7 +88,7 @@ constants.
 =item $domss->revert_to($flags)
 
 Revert the domain to the state associated with this snapshot. The optional
-C<$flags> control the state of the vm after the revert via the
+C<$flags> control the state of the VM after the revert via the
 C<Sys::Virt::DomainSnapshot::REVERT_*> constants.
 
 =item $parentss = $domss->get_parent();

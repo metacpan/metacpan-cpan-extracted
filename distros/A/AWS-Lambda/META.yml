@@ -31,7 +31,7 @@ no_index:
 provides:
   AWS::Lambda:
     file: lib/AWS/Lambda.pm
-    version: v0.0.36
+    version: v0.0.37
   AWS::Lambda::Bootstrap:
     file: lib/AWS/Lambda/Bootstrap.pm
   AWS::Lambda::Context:
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://github.com/shogo82148/p5-aws-lambda/issues
   homepage: https://github.com/shogo82148/p5-aws-lambda
   repository: https://github.com/shogo82148/p5-aws-lambda.git
-version: 0.0.36
+version: 0.0.37
 x_contributors:
   - 'ICHINOSE Shogo <shogo82148@gmail.com>'
   - 'Jose Luis Martinez <jlmartinez@capside.com>'

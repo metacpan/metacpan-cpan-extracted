@@ -4,6 +4,7 @@ class Sys::Socket {
   use Sys::IO;
   use Sys::Socket::Constant;
   use Sys::Socket::Addrinfo;
+  use Sys::Socket::AddrinfoLinkedList;
   use Sys::Socket::Sockaddr;
   use Sys::Socket::In_addr;
   use Sys::Socket::In6_addr;
@@ -23,7 +24,7 @@ class Sys::Socket {
 
   native static method inet_pton : int ($af : int, $src : string, $dst : object of Sys::Socket::In_addr|Sys::Socket::In6_addr);
   
-  native static method inet_ntop : string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
+  native static method inet_ntop : mutable string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
   
   native static method socket : int ($domain : int, $type : int, $protocol : int);
 
@@ -64,11 +65,11 @@ class Sys::Socket {
 
   native static method getaddrinfo_raw : int ($node : string, $service : string,
                 $hints : Sys::Socket::Addrinfo,
-                $res : Sys::Socket::Addrinfo[]);
+                $res : Sys::Socket::AddrinfoLinkedList[]);
 
   native static method getaddrinfo : int ($node : string, $service : string,
                 $hints : Sys::Socket::Addrinfo,
-                $res : Sys::Socket::Addrinfo[]);
+                $res : Sys::Socket::AddrinfoLinkedList[]);
 
   native static method getnameinfo_raw : int ($sa : Sys::Socket::Sockaddr, $salen : int,
                 $host : mutable string, $hostlen : int,
@@ -78,19 +79,8 @@ class Sys::Socket {
                 $host : mutable string, $hostlen : int,
                 $serv : mutable string, $servlen : int, $flags : int);
 
-  native static method gai_strerror : string($errcode : int);
+  native static method gai_strerror : string ($errcode : int);
 
-  static method ioctl_int : int ($fd : int, $request : int, $request_arg_ref : int*) {
-    if (Sys->is_D_WIN32) {
-      return Sys::Socket->ioctlsocket($fd, $request, $request_arg_ref);
-    }
-    else {
-      my $int_object = Int->new($$request_arg_ref);
-      return Sys::IO->ioctl($fd, $request, $int_object);
-      $$request_arg_ref = $int_object->value;
-    }
-  }
-  
   static method poll : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int) {
     if (Sys->is_D_WIN32) {
       return Sys::Socket->WSAPoll($fds, $nfds, $timeout);

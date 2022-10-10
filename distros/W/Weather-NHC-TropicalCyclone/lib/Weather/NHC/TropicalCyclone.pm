@@ -8,7 +8,7 @@ use JSON::XS ();
 use Util::H2O qw/h2o/;
 use Weather::NHC::TropicalCyclone::Storm ();
 
-our $VERSION                     = q{0.33};
+our $VERSION                     = q{0.34};
 our $DEFAULT_URL                 = q{https://www.nhc.noaa.gov/CurrentStorms.json};
 our $DEFAULT_RSS_ATLANTIC        = q{https://www.nhc.noaa.gov/index-at.xml};
 our $DEFAULT_RSS_EAST_PACIFIC    = q{https://www.nhc.noaa.gov/index-ep.xml};
@@ -29,7 +29,7 @@ sub new {
 }
 
 sub fetch {
-    my ( $self, $timeout ) = @_;
+    my ( $self, $timeout, $file ) = @_;
     my $http = HTTP::Tiny->new();
 
     local $SIG{ALRM} = sub { die "Request has timed out.\n" };
@@ -46,6 +46,14 @@ sub fetch {
     alarm 0;
 
     my $content = $response->{content};
+
+    # if $file is provided, contents directly from the GET are
+    # written
+    if ($file) {
+      open my $fh, q{>}, $file || die qq{Can't open '$file': $!\n};
+      print $fh $content;
+      close $fh;
+    }
 
     my $ref = eval { JSON::XS::decode_json $content };
 
@@ -168,7 +176,7 @@ Weather::NHC::TropicalCyclone - Provides a convenient interface to NHC's Tropica
 Constructor - doesn't do much, but provide a convenient instance for the other
 provided methods described below.
 
-=item C<fetch>
+=item C<fetch(optional: timeout, optional: $file)>
 
 Makes an HTTP request to $Weather::NHC::TropicalCyclone::DEFAULT_URL to get
 the JSON provided by the NHC describing the current set of active storms.
@@ -181,6 +189,13 @@ throwing an exception. In order to disable the alarm, call C<fetch> with a
 parameter of 0:
 
     $nhc->fetch(0); 
+
+There is a 2nd optional argument for specifying a file path which, if provided,
+will be used to save the contents of the fetched upstream file, C<CurrentStorms.json>.
+However, for now a timeout has to be specified the first argument position. This
+will change in the future.
+
+    $nhc->fetch(120, q{/path/to/CurrentStorms.json});
 
 =item C<active_storms>
 

@@ -1,0 +1,1 @@
+SELECT * FROM pg_class ORDER BY oid LIMIT 5 FOR UPDATE 

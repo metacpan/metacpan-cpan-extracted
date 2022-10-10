@@ -10,9 +10,9 @@ Module::Build->VERSION( '0.4004' );
 my $class = Module::Build->subclass(
     code => q{
         use Perl::OSType    qw(os_type);
-        use File::HomeDir   qw( home );
+      # use File::HomeDir   qw( home );  # Not sure how to say this also is required.
         sub _clear_cache {
-            my $home = home();
+            my $home = $ENV{HOME} // $ENV{USERPROFILE} // $ENV{LOGDIR};
             for ( glob qq("$home/.cache/my_pod*.cache") ) {
                 print "Removing: $_\n";
                 unlink or warn $!;
@@ -81,6 +81,12 @@ my $builder = $class->new(
             $ENV{HOME} // $ENV{USEPROFILE}
               // catfile( $ENV{HOMEDRIVE}, $ENV{HOMEPATH}, '' ) ),
     ],
+    meta_merge => {
+        resources => {
+            bugtracker => 'https://github.com/poti1/app-pod/issues',
+            repository => 'https://github.com/poti1/app-pod',
+        },
+    },
 );
 
 $builder->create_build_script();

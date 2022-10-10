@@ -8,9 +8,9 @@ use warnings;
 use Mo qw(build default);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-20'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.912'; # VERSION
+our $VERSION = '0.913'; # VERSION
 
 our $Log_Validator_Code = $ENV{LOG_SAH_VALIDATOR_CODE} // 0;
 
@@ -126,7 +126,7 @@ Data::Sah - Fast and featureful data structure validation
 
 =head1 VERSION
 
-This document describes version 0.912 of Data::Sah (from Perl distribution Data-Sah), released on 2022-08-20.
+This document describes version 0.913 of Data::Sah (from Perl distribution Data-Sah), released on 2022-09-30.
 
 =head1 SYNOPSIS
 
@@ -326,16 +326,44 @@ code. See L<Dist::Zilla::Plugin::Rinci::GenValidator>.
 
 None exported by default.
 
-=head2 normalize_schema($schema) => ARRAY
+=head2 normalize_clset (function)
 
-Normalize C<$schema>.
+Usage:
 
-Can also be used as a method.
+ # as function
+ my $nclset = Data::Sah::normalize_clset($clset[, \%opts]); # => hash
 
-=head2 gen_validator($schema, \%opts) => CODE (or STR)
+Convert a clause set to its normalized form, e.g. change C<< {"!match"=>"abc"}
+>> into C<< {"match"=>"abc", "match.op"=>"not"} >>. Produce a shallow copy of
+the input clause set hash.
 
-Generate validator code for C<$schema>. Can also be used as a method. Known
-options (unknown options will be passed to Perl schema compiler):
+=head2 normalize_schema (function)
+
+Usage:
+
+ # as function
+ my $nschema = normalize_schema($schema); # => ARRAY
+
+Convert C<$schema> to its normalized form, i.e. the two-element array form. See
+L<Sah> for more information about schema forms. Produces a new copy of arrayref
+as well as clause set hashref, even if the input C<$schema> is already in array
+form. Implemented by L<Data::Sah::Normalize>.
+
+Can also be used as a method, see L</"normalize_clset (method)">.
+
+=head2 gen_validator (function)
+
+Usage:
+
+ $code_or_str = gen_validator($schema, \%opts); # => CODE (or STR)
+
+Generate validator code for C<$schema> (or, if C<source> option is set to true,
+a source code string).
+
+Can also be used as a method, see L</"gen_validator (method)">.
+
+Known options (unknown options will be passed to Perl schema compiler, see
+L<Data::Sah::Compiler::perl>):
 
 =over
 
@@ -398,41 +426,25 @@ Example:
 
  my $plc = $sah->get_compiler("perl"); # loads Data::Sah::Compiler::perl
 
-=head2 normalize_schema
+=head2 normalize_schema (method)
 
 Usage:
 
  # as method
  my $nschema = $sah->normalize_schema($schema);
 
- # as function
- my $nschema = normalize_schema($schema);
+See L</"normalize_schema (function)">, see L</"normalize_schema (function)"> for
+more details on arguments.
 
-Normalize a schema, e.g. change C<int*> into C<< [int => {req=>1}] >>, as well
-as do some sanity checks on it. Returns the normalized schema if succeeds, or
-dies on error.
-
-Can also be used as a function.
-
-Note: this functionality is implemented in L<Data::Sah::Normalize> (distributed
-separately in Data-Sah-Normalize). Use that module instead if you just need
-normalizing schemas, to reduce dependencies.
-
-=head2 normalize_clset
+=head2 normalize_clset (method)
 
 Usage:
 
  # as method
  my $nclset = $sah->normalize_clset($clset[, \%opts]); # => hash
 
- # as function
- my $nclset = Data::Sah::normalize_clset($clset[, \%opts]); # => hash
-
-Normalize a clause set, e.g. change C<< {"!match"=>"abc"} >> into C<<
-{"match"=>"abc", "match.op"=>"not"} >>. Produce a shallow copy of the input
-clause set hash.
-
-Can also be used as a function.
+Can also be used as function, see L</"normalize_clset (function)"> for more
+details on arguments.
 
 =head2 normalize_var
 
@@ -456,11 +468,8 @@ $min in the above expression will be normalized as C<schema:clauses.min>.
  # as function
  my $vdr = gen_validator($schema [ , \%opts ]); # => coderef
 
-Use the Perl compiler to generate validator code. Can also be used as a
-function. This is a wrapper for L<Data::Sah::Compiler::Prog>'s C<compile()>;
-C<%opts> will be passed to compile()'s arguments, including C<return_type>,
-C<comment>, C<debug>, and so on. See the documentation in
-C<Data::Sah::Compiler::Prog> for more details.
+Can also be used as a function, see L</"gen_validator (function)"> for more
+details on arguments.
 
 =head1 FAQ
 

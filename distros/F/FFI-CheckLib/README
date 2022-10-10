@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.30
+    version 0.31
 
 SYNOPSIS
 
@@ -237,6 +237,51 @@ FUNCTIONS
 
     This function is not exportable, even on request.
 
+ENVIRONMENT
+
+    FFI::CheckLib responds to these environment variables:
+
+    FFI_CHECKLIB_PACKAGE
+
+      On macOS platforms with Homebrew <http://brew.sh> and/or MacPorts
+      <https://www.macports.org> installed, their corresponding lib paths
+      will be automatically appended to $system_path. In case of having
+      both managers installed, Homebrew will appear before.
+
+      This behaviour can be overridden using the environment variable
+      FFI_CHECKLIB_PACKAGE.
+
+      Allowed values are:
+
+      - none: Won't use either Homebrew's path nor MacPorts - homebrew:
+      Will append $(brew --prefix)/lib to the system paths - macports: Will
+      append port's default lib path
+
+      A comma separated list is also valid:
+
+       export FFI_CHECKLIB_PACKAGE=macports,homebrew
+
+      Order matters. So in this example, MacPorts' lib path appears before
+      Homebrew's path.
+
+    FFI_CHECKLIB_PATH
+
+      List of directories that will be considered by FFI::CheckLib as
+      additional "system directories". They will be searched before other
+      system directories but after libpath. The variable is colon separated
+      on Unix and semicolon separated on Windows. If you use this variable,
+      FFI_CHECKLIB_PACKAGE will be ignored.
+
+    PATH
+
+      On Windows the PATH environment variable will be used as a search
+      path for libraries.
+
+    On some operating systems LD_LIBRARY_PATH, DYLD_LIBRARY_PATH,
+    DYLD_FALLBACK_LIBRARY_PATH or others may be used as part of the search
+    for dynamic libraries and may be used (indirectly) by FFI::CheckLib as
+    well.
+
 FAQ
 
     Why not just use dlopen?
@@ -320,6 +365,8 @@ AUTHOR
     Michael R. Davis (MRDVT)
 
     Shawn Laffan (SLAFFAN)
+
+    Carlos D. Álvaro (cdalvaro)
 
 COPYRIGHT AND LICENSE
 

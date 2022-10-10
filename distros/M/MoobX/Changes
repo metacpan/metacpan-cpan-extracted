@@ -1,15 +1,29 @@
 Revision history for MoobX
 
-0.1.0 2017-01-14
-  [ ENHANCEMENTS ]
-    - Adding Moose traits.
-    - Warn if an observer observes nothing.
+0.1.2 2022-10-08
+ [BUG FIXES]
+ - Fix urls in SEE ALL (#9, Mohammad S Anwar)
 
-  [ STATISTICS ]
-    - code churn: 9 files changed, 335 insertions(+), 16 deletions(-)
+ [STATISTICS]
+ - code churn: 2 files changed, 23 insertions(+), 16 deletions(-)
+
+0.1.1 2022-10-06
+ [BUG FIXES]
+ - Adapt to changes to Exporter::Tiny (#7, thanks to Toby Inkster)
+
+ [STATISTICS]
+ - code churn: 9 files changed, 169 insertions(+), 13 deletions(-)
+
+0.1.0 2017-01-14
+ [ENHANCEMENTS]
+ - Adding Moose traits.
+ - Warn if an observer observes nothing.
+
+ [STATISTICS]
+ - code churn: 9 files changed, 335 insertions(+), 16 deletions(-)
 
 0.0.1 2017-01-13
-  - First version, unleashed on an unsuspecting world.
+ - First version, unleashed on an unsuspecting world.
 
-  [ STATISTICS ]
-    - code churn: 3 files changed, 38 insertions(+), 3 deletions(-)
+ [STATISTICS]
+ - code churn: 3 files changed, 38 insertions(+), 3 deletions(-)

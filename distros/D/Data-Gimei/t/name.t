@@ -15,13 +15,13 @@ use Test::More;
 {    # test constructor of Name
     my $name = Data::Gimei::Name->new( gender => 'male' );
 
-    is $name->gender,       'male';
-    is $name->kanji,        '佐藤 愛斗';
-    is $name->hiragana,     'さとう あいと';
-    is $name->katakana,     'サトウ アイト';
-    is $name->romaji,       'Aito Sato';
-    is $name->given->to_s,  '愛斗, あいと, アイト, Aito';
-    is $name->family->to_s, '佐藤, さとう, サトウ, Sato';
+    is $name->gender,         'male';
+    is $name->kanji,          '佐藤 愛斗';
+    is $name->hiragana,       'さとう あいと';
+    is $name->katakana,       'サトウ アイト';
+    is $name->romaji,         'Aito Sato';
+    is $name->forename->to_s, '愛斗, あいと, アイト, Aito';
+    is $name->surname->to_s,  '佐藤, さとう, サトウ, Sato';
 }
 
 {    # test separater of kanji/katakana/hiragana/romaji

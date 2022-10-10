@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 21-RSA-MD5.t 1830 2021-01-26 09:08:12Z willem $	-*-perl-*-
+# $Id: 21-RSA-MD5.t 1863 2022-03-14 14:59:21Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -21,6 +21,9 @@ foreach my $package ( sort keys %prerequisite ) {
 
 plan skip_all => 'disabled RSA'
 		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_RSA') };
+
+plan skip_all => 'disabled MD5'
+		unless eval { Net::DNS::SEC::libcrypto->can('EVP_md5') };
 
 plan tests => 8;
 
@@ -83,7 +86,7 @@ is( $verified, 1, 'signature verified using public key' );
 
 
 my $verifiable = $class->verify( $corrupt, $key, $signature );
-is( $verifiable, 0, 'signature not verifiable if data corrupt' );
+is( $verifiable, 0, 'signature not verifiable if data corrupted' );
 
 
 exit;

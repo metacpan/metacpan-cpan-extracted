@@ -44,9 +44,9 @@ my %WriteMakefileArgs = (
     "URI::Escape" => 0,
     "Web::Scraper" => 0
   },
-  "VERSION" => "0.41",
+  "VERSION" => "0.42",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 

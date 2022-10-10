@@ -1,8 +1,22 @@
+1.05
+
+- Add offset and alignment properties to lines (rivers, trails).
+
+- Fix viewbox coordinates, which is important if your map doesn't
+  start with 0101.
+
+- Upgraded the Gnomeyland icons to CC BY SA 4.0 because 3.0 is
+  problematic.
+
+- Fix UTF-8 output for the render command.
+
+- Don't print z coordinates 00.
+
 1.04
 
 - Added better UI and parameters for Traveller and Apocalypse maps.
 
-= Fixed Gridmapper maps with room numbers that cannot be divided by 5
+- Fixed Gridmapper maps with room numbers that cannot be divided by 5
   and 7, e.g. 16. Those dungeons often had the last room disconnected.
 
 - Add castle to the default icons.

@@ -332,8 +332,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package StreamFinder::Anystream;
 
-use strict;
-use warnings;
+#use warnings;
 use URI::Escape;
 use HTML::Entities ();
 use LWP::UserAgent ();
@@ -404,9 +403,16 @@ sub new
 	} else {
 		print STDERR $response->status_line  if ($DEBUG);
 	}
-	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
-	return undef  unless ($html && $html =~ /\<\!DOCTYPE\s+(?:html|text)/i);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
+	my $isHLSpage = ($html =~ /#EXTM3U/) ? 1 : 0;  #SEE AUDACIOUS ISSUE#1169 FOR EMBEDDED HLS IN HTML PAGE EXAMPLE USED FOR THIS CODE:
+	print STDERR "-1: HLS=$isHLSpage=\n----html=$html=\n"  if ($DEBUG > 1);
+	return undef  unless ($html && ($html =~ /\<\!DOCTYPE\s+(?:html|text)/i
+			|| $isHLSpage));  #STEP 1 FAILED, INVALID STATION URL, PUNT!
 
+	print STDERR "-1: GOT SOME(<=1024 BYTES) HTML!\n"  if ($DEBUG);
+	if ($isHLSpage) {
+		$ua->requests_redirectable([]);
+	}
+	print STDERR "-1a: NOW RE-FETCH FULL PAGE!\n"  if ($DEBUG);
 	$ua->max_size(undef);  #(NOW OK TO FETCH THE WHOLE DOCUMENT)
 	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
@@ -414,9 +420,18 @@ sub new
 	} else {
 		print STDERR $response->status_line  if ($DEBUG);
 	}
-	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
+	if ($isHLSpage) {
+		my $location = $response->header('location');
+		($baseURL = $location) =~ s#\/[^\/]+$##  if ($location =~ /^http/);
+		print STDERR "-!!!- HLS BASE URL=$baseURL=\n"  if ($DEBUG);
+	} else {
+		return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
+	}
+
+	my $location = $response->header('location');
 
 	$baseURL = $1  if ($html =~ m#\<BASE\s+HREF\=\"([^\"]+)#si);
+	$baseURL .= '/'  unless ($baseURL =~ m#\/$#o);
 	$self->{'title'} = $self->{'id'} || $url;
 	$self->{'description'} = $url2fetch;
 	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
@@ -431,17 +446,27 @@ sub new
 	my $streams = '';
 	my $streamExts = join('|',@okStreams);
 	print STDERR "--EXTS=$streamExts=\n"  if ($DEBUG);
-	while ($html =~ s#((?:https?\:\/)?\/[^\s\'\"\:\<\>\[\]\{\}]+)\.($streamExts)##s) {
-		(my $one = $1) =~ s#\\\/#\/#gs;
-		my $ext = $2;
+	while ($html =~ s#(https?\:\/\/|\.\.\/)?([^\s\'\"\:\<\>\[\]\{\}]+)\.($streamExts)##s) {
+		(my $one = $1 . $2) =~ s#\\\/#\/#gs;
+		my $ext = $3;
 		my $streamURL = $one.'.'.$ext;
 		print STDERR "--1: streamURL=$streamURL= baseURL=$baseURL=\n"  if ($DEBUG);
+		my $tmpbase = $baseURL;
+		while ($streamURL =~ s#\.\.\/##o) {
+			$tmpbase =~ s#[^\/]+\/$##o;
+		}
 		if ($streamURL =~ m#^\/#o) {  #STREAM URL STARTS WITH "/", ASSUME ABSOLUTE TO BASE PAGE URL ("TITLE"):
-			$streamURL = $baseURL . $streamURL;
-			print STDERR "--2a: baseURL=$baseURL= stream=$streamURL=\n"  if ($DEBUG);
+			$tmpbase =~ s#\/$##o;
+			$streamURL = $tmpbase . $streamURL;
+			print STDERR "--2a: baseURL=$tmpbase= stream=$streamURL=\n"  if ($DEBUG);
 		} elsif ($streamURL !~ /^http/o) {  #NO PREFIX, ASSUME RELATIVE TO THE FETCHED URL ("LONG DESC."):
-			$streamURL = $url2fetch . '/' . $streamURL;
-			print STDERR "--2b: fetchURL=$url2fetch= stream=$streamURL=\n"  if ($DEBUG);
+			if ($isHLSpage) {
+				$tmpbase .= '/'  unless ($tmpbase =~ m#\/$#o);
+				$streamURL = $tmpbase . $streamURL;
+			} else {
+				$streamURL = $url2fetch . '/' . $streamURL;
+			}
+			print STDERR "--2b: baseURL=$tmpbase= stream=$streamURL=\n"  if ($DEBUG);
 		} #OTHERWISE STREAM URL IS A FULL URL (NO CHANGE).
 		$streams .= "$ext=$streamURL|"  unless ($self->{'secure'} && $streamURL !~ /^https/o);
 	}

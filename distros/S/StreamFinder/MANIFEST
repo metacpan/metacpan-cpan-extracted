@@ -16,6 +16,7 @@ lib/StreamFinder/PodcastAddict.pm
 lib/StreamFinder/RadioNet.pm
 lib/StreamFinder/Rumble.pm
 lib/StreamFinder/SermonAudio.pm
+lib/StreamFinder/SoundCloud.pm
 lib/StreamFinder/Spreaker.pm
 lib/StreamFinder/Tunein.pm
 lib/StreamFinder/Vimeo.pm

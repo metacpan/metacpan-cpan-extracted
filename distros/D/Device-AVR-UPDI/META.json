@@ -34,8 +34,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::ExpectAndCheck" : "0",
-            "Test::Future::IO" : "0.02",
+            "Test::ExpectAndCheck" : "0.04",
+            "Test::Future::IO" : "0.04",
             "Test::More" : "0.88"
          }
       }
@@ -43,7 +43,7 @@
    "provides" : {
       "Device::AVR::UPDI" : {
          "file" : "lib/Device/AVR/UPDI.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

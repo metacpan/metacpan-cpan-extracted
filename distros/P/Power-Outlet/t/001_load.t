@@ -1,13 +1,14 @@
 # -*- perl -*-
 use strict;
 use warnings;
-use Test::More tests => 69;
+use Test::More tests => 81;
 
 BEGIN { use_ok( 'Power::Outlet' ); }
 BEGIN { use_ok( 'Power::Outlet::Common' ); }
 BEGIN { use_ok( 'Power::Outlet::Common::IP' ); }
 BEGIN { use_ok( 'Power::Outlet::Common::IP::SNMP' ); }
 BEGIN { use_ok( 'Power::Outlet::Common::IP::HTTP' ); }
+BEGIN { use_ok( 'Power::Outlet::Common::IP::HTTPS' ); }
 BEGIN { use_ok( 'Power::Outlet::Common::IP::HTTP::UPnP' ); }
 BEGIN { use_ok( 'Power::Outlet::Common::IP::HTTP::JSON' ); }
 BEGIN { use_ok( 'Power::Outlet::iBoot' ); }
@@ -16,6 +17,7 @@ BEGIN { use_ok( 'Power::Outlet::WeMo' ); }
 BEGIN { use_ok( 'Power::Outlet::Hue' ); }
 BEGIN { use_ok( 'Power::Outlet::Tasmota' ); }
 BEGIN { use_ok( 'Power::Outlet::SonoffDiy' ); }
+BEGIN { use_ok( 'Power::Outlet::Dingtian' ); }
 
 {
 my $object = Power::Outlet->new(type=>"Common");
@@ -60,6 +62,13 @@ can_ok($object, qw{on off switch cycle query});
 }
 
 {
+my $object = Power::Outlet->new(type=>"Dingtian");
+isa_ok ($object, 'Power::Outlet::Dingtian');
+can_ok($object, qw{new});
+can_ok($object, qw{on off switch cycle query});
+}
+
+{
 my $object = Power::Outlet::Common->new;
 isa_ok ($object, 'Power::Outlet::Common');
 can_ok($object, qw{new});
@@ -90,6 +99,17 @@ can_ok($object, qw{new});
 can_ok($object, qw{on off switch cycle query});
 can_ok($object, qw{host port});
 can_ok($object, qw{http_path});
+can_ok($object, qw{http_scheme});
+}
+
+{
+my $object = Power::Outlet::Common::IP::HTTPS->new;
+isa_ok ($object, 'Power::Outlet::Common::IP::HTTPS');
+can_ok($object, qw{new});
+can_ok($object, qw{on off switch cycle query});
+can_ok($object, qw{host port});
+can_ok($object, qw{http_path});
+can_ok($object, qw{http_scheme});
 }
 
 {

@@ -1,28 +1,27 @@
-use strict;
-use warnings;
 package Net::SAML2::Binding::Redirect;
-our $VERSION = '0.59'; # VERSION
-
 use Moose;
+
+our $VERSION = '0.61'; # VERSION
+
+use Carp qw(croak);
+use Crypt::OpenSSL::RSA;
+use Crypt::OpenSSL::X509;
+use File::Slurper qw/ read_text /;
+use IO::Compress::RawDeflate qw/ rawdeflate /;
+use IO::Uncompress::RawInflate qw/ rawinflate /;
+use MIME::Base64 qw/ encode_base64 decode_base64 /;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::Types qw(signingAlgorithm SAMLRequestType);
-use Carp qw(croak);
+use URI::Encode qw/uri_decode/;
+use URI::Escape qw(uri_unescape);
+use URI::QueryParam;
+use URI;
 
 # ABSTRACT: Net::SAML2::Binding::Redirect - HTTP Redirect binding for SAML
 
 
-use MIME::Base64 qw/ encode_base64 decode_base64 /;
-use IO::Compress::RawDeflate qw/ rawdeflate /;
-use IO::Uncompress::RawInflate qw/ rawinflate /;
-use URI;
-use URI::QueryParam;
-use Crypt::OpenSSL::RSA;
-use Crypt::OpenSSL::X509;
-use File::Slurper qw/ read_text /;
-use URI::Encode qw/uri_decode/;
 
-
-has 'cert' => (isa => 'Str', is => 'ro', required => 1);
+has 'cert' => (isa => 'ArrayRef[Str]', is => 'ro', required => 0, predicate => 'has_cert');
 has 'url'  => (isa => Uri, is => 'ro', required => 0, coerce => 1, predicate => 'has_url');
 has 'key'  => (isa => 'Str', is => 'ro', required => 0, predicate => 'has_key');
 
@@ -40,18 +39,10 @@ has 'sig_hash' => (
     default  => 'sha1'
 );
 
-has 'sls_force_lcase_url_encoding' => (
-    isa      => 'Bool',
-    is       => 'ro',
-    required => 0,
-    default  => 0
-);
-
-has 'sls_double_encoded_response' => (
-    isa      => 'Bool',
-    is       => 'ro',
-    required => 0,
-    default  => 0
+has debug => (
+   is => 'ro',
+   isa => 'Bool',
+   required => 0,
 );
 
 
@@ -62,8 +53,30 @@ sub BUILD {
         croak("Need to have an URL specified") unless $self->has_url;
         croak("Need to have a key specified") unless $self->has_key;
     }
-    # other params don't need to have these per-se
+    elsif ($self->param eq 'SAMLResponse') {
+        croak("Need to have a cert specified") unless $self->has_cert;
+    }
 }
+
+# BUILDARGS
+
+# Earlier versions expected the cert to be a string.  However, metadata
+# can include multiple signing certificates so the $idp->cert is now
+# expected to be an arrayref to the certificates.  To avoid breaking existing
+# applications this changes the the cert to an arrayref if it is not
+# already an array ref.
+
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my %params = @_;
+    if ($params{cert} && ref($params{cert}) ne 'ARRAY') {
+            $params{cert} = [$params{cert}];
+    }
+
+    return $self->$orig(%params);
+};
 
 
 sub sign {
@@ -97,80 +110,65 @@ sub sign {
     return $u->as_string;
 }
 
+sub _verify {
+    my ($self, $sigalg, $signed, $sig) = @_;
+
+    foreach my $crt (@{$self->cert}) {
+        my $cert = Crypt::OpenSSL::X509->new_from_string($crt);
+        my $rsa_pub = Crypt::OpenSSL::RSA->new_public_key($cert->pubkey);
+
+        if ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256') {
+            $rsa_pub->use_sha256_hash;
+        } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha224') {
+            $rsa_pub->use_sha224_hash;
+        } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384') {
+            $rsa_pub->use_sha384_hash;
+        } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512') {
+            $rsa_pub->use_sha512_hash;
+        } elsif ($sigalg eq 'http://www.w3.org/2000/09/xmldsig#rsa-sha1') {
+            $rsa_pub->use_sha1_hash;
+        }
+        else {
+            warn "Unsupported Signature Algorithim: $sigalg, defaulting to sha256" if $self->debug;
+        }
+
+        return 1 if $rsa_pub->verify($signed, $sig);
+
+        warn "Unable to verify with " . $cert->subject if $self->debug;
+    }
+
+    croak("Unable to verify the XML signature");
+}
+
 
 sub verify {
     my ($self, $url) = @_;
-    my $u = URI->new($url);
 
-    # verify the response
-    my $sigalg = $u->query_param('SigAlg');
+    # This now becomes the query string
+    $url =~ s#^.*\?##;
 
-    my $cert = Crypt::OpenSSL::X509->new_from_string($self->cert);
-    my $rsa_pub = Crypt::OpenSSL::RSA->new_public_key($cert->pubkey);
+    my %params = map { split(/=/, $_, 2) } split(/&/, $url);
 
-    my $signed;
-    my $saml_request;
-    my $sig = $u->query_param_delete('Signature');
+    my $sigalg = uri_unescape($params{SigAlg});
 
-    # During the verify the only query parameters that should be in the query are
-    # 'SAMLRequest', 'RelayState', 'Sig', 'SigAlg' the other parameter values are
-    # deleted from the URI query that was created from the URL that was passed
-    # to the verify function
-    my @signed_params = ('SAMLRequest', 'SAMLResponse', 'RelayState', 'Sig', 'SigAlg');
+    my $encoded_sig = uri_unescape($params{Signature});
+    my $sig = decode_base64($encoded_sig);
 
-    for my $key ($u->query_param) {
-        if (grep /$key/, @signed_params ) {
-            next;
-        }
-        $u->query_param_delete($key);
+    my @signed_parts;
+    for my $p ($self->param, qw(RelayState SigAlg)) {
+        push @signed_parts, join('=', $p, $params{$p}) if exists $params{$p};
     }
+    my $signed = join('&', @signed_parts);
 
-    # Some IdPs (PingIdentity) seem to double encode the LogoutResponse URL
-    if ($self->sls_double_encoded_response) {
-        #if ($sigalg =~ m/%/) {
-        $signed = uri_decode($u->query);
-        $sig = uri_decode($sig);
-        $sigalg = uri_decode($sigalg);
-        $saml_request = uri_decode($u->query_param($self->param));
-    } else {
-        $signed = $u->query;
-        $saml_request = $u->query_param($self->param);
-    }
-
-    # What can we say about this one Microsoft Azure uses lower case in the
-    # URL encoding %2f not %2F.  As it is signed as %2f the resulting signed
-    # needs to change it to lowercase if the application layer reencoded the URL.
-    if ($self->sls_force_lcase_url_encoding) {
-        # TODO: This is a hack.
-        $signed =~ s/(%..)/lc($1)/ge;
-    }
-
-    $sig = decode_base64($sig);
-
-    if ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256') {
-        $rsa_pub->use_sha256_hash;
-    } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha224') {
-        $rsa_pub->use_sha224_hash;
-    } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384') {
-        $rsa_pub->use_sha384_hash;
-    } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512') {
-        $rsa_pub->use_sha512_hash;
-    } elsif ($sigalg eq 'http://www.w3.org/2000/09/xmldsig#rsa-sha1') {
-        $rsa_pub->use_sha1_hash;
-    } else {
-        die "Unsupported Signature Algorithim: $sigalg";
-    }
-
-    die "bad sig" unless $rsa_pub->verify($signed, $sig);
+    $self->_verify($sigalg, $signed, $sig);
 
     # unpack the SAML request
-    my $deflated = decode_base64($saml_request);
+    my $deflated = decode_base64(uri_unescape($params{$self->param}));
     my $request = '';
     rawinflate \$deflated => \$request;
 
     # unpack the relaystate
-    my $relaystate = $u->query_param('RelayState');
-
+    my $relaystate = uri_unescape($params{'RelayState'});
     return ($request, $relaystate);
 }
 
@@ -188,7 +186,7 @@ Net::SAML2::Binding::Redirect - Net::SAML2::Binding::Redirect - HTTP Redirect bi
 
 =head1 VERSION
 
-version 0.59
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -203,10 +201,6 @@ version 0.59
   my $url = $redirect->sign($authnreq);
 
   my $ret = $redirect->verify($url);
-
-=head1 NAME
-
-Net::SAML2::Binding::Redirect
 
 =head1 METHODS
 
@@ -223,16 +217,19 @@ Arguments:
 The SP's (Service Provider) also known as your application's signing key
 that your application uses to sign the AuthnRequest.  Some IdPs may not
 verify the signature.
+Required with B<param> being C<SAMLRequest>.
 
 =item B<cert>
 
 IdP's (Identity Provider's) certificate that is used to verify a signed
 Redirect from the IdP.  It is used to verify the signature of the Redirect
 response.
+Required with B<param> being C<SAMLResponse>.
 
 =item B<url>
 
 IdP's SSO (Single Sign Out) service url for the Redirect binding
+Required with B<param> being C<SAMLRequest>.
 
 =item B<param>
 
@@ -249,17 +246,9 @@ sha1, sha224, sha256, sha384, sha512
 
 Defaults to C<sha1>.
 
-=item B<sls_force_lcase_url_encoding>
+=item B<debug>
 
-Specifies that the IdP requires the encoding of a URL to be in lowercase.
-Necessary for a HTTP-Redirect of a LogoutResponse from Azure in particular.
-True (1) or False (0). Some web frameworks and underlying http requests assume
-that the encoding should be in the standard uppercase (%2F not %2f)
-
-=item B<sls_double_encoded_response>
-
-Specifies that the IdP response sent to the HTTP-Redirect is double encoded.
-The double encoding requires it to be decoded prior to processing.
+Output extra debugging information
 
 =back
 
@@ -274,11 +263,16 @@ Accepts an optional RelayState parameter, a string which will be
 returned to the requestor when the user returns from the
 authentication process with the IdP.
 
-=head2 verify( $url )
+=head2 verify( $query_string )
 
 Decode a Redirect binding URL.
 
 Verifies the signature on the response.
+
+Requires the *raw* query string to be passed, because L<URI> parses and
+re-encodes URI-escapes in uppercase (C<%3f> becomes C<%3F>, for instance),
+which leads to signature verification failures if the other party uses lower
+case (or mixed case).
 
 =head1 AUTHOR
 

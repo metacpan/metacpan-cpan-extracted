@@ -1,6 +1,6 @@
 package SPVM::Sys;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 1;
 
@@ -74,7 +74,7 @@ See the detail of the L<unsetenv|https://linux.die.net/man/3/unsetenv> function 
 
 =head1 Repository
 
-L<https://github.com/yuki-kimoto/SPVM-Sys>
+L<SPVM::Sys - Github|https://github.com/yuki-kimoto/SPVM-Sys>
 
 =head1 Copyright & License
 

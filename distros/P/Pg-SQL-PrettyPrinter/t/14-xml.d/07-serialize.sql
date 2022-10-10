@@ -1,0 +1,1 @@
+SELECT XMLSERIALIZE( CONTENT 'good' AS char( 10 ) ), XMLSERIALIZE( DOCUMENT 'bad' AS text ) 

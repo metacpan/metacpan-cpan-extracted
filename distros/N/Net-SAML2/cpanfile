@@ -30,6 +30,7 @@ requires "MooseX::Types::URI" => "0";
 requires "Types::Serialiser" => "0";
 requires "URI" => "0";
 requires "URI::Encode" => "0";
+requires "URI::Escape" => "0";
 requires "URI::QueryParam" => "0";
 requires "URN::OASIS::SAML2" => "0.002";
 requires "XML::Enc" => "0.05";

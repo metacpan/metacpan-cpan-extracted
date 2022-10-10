@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-SVCB.t 1847 2021-08-11 10:02:44Z willem $	-*-perl-*-
+# $Id: 05-SVCB.t 1875 2022-09-23 13:41:03Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -13,10 +13,10 @@ exit( plan skip_all => 'unresolved AUTOLOAD regression	[perl #120694]' )
 		if ( $] == 5.018000 )
 		or ( $] == 5.018001 );
 
-plan tests => 49;
+plan tests => 50;
 
 
-my $name = 'alias.example';
+my $name = 'SVCB.example';
 my $type = 'SVCB';
 my $code = 64;
 my @attr = qw( svcpriority targetname port );
@@ -101,7 +101,9 @@ END {
 	Net::DNS::RR->new( <<'END' )->print;
 example.com.	SVCB	16 foo.example.org.	( mandatory=alpn alpn=h2,h3-19
 			no-default-alpn port=1234 ipv4hint=192.0.2.1
-			ech=Li4u ipv6hint=2001:db8::1 )
+			ech=Li4u ipv6hint=2001:db8::1
+			dohpath=/dns-query{?dns}
+			)
 END
 }
 
@@ -134,8 +136,11 @@ testcase('unregistered key, quoted with decimal escape');
 testcase('two IPv6 hints in quoted presentation format');
 testcase('single IPv6 hint in IPv4 mapped IPv6 format');
 testcase('unsorted SvcParams and mandatory key list');
-testcase('alpn with escaped escape and escaped comma');
-testcase('alpn with numeric escape and escaped comma');
+
+failure('alpn with escaped escape and escaped comma');		# Appendix A not implemented
+$zonefile->read();
+failure('alpn with numeric escape and escaped comma');
+$zonefile->read();
 
 failure('key already defined');
 
@@ -152,6 +157,7 @@ failure('undefined mandatory key');
 failure('alpn not specified');
 
 failure('unrecognised key name');
+failure('invalid SvcParam key');
 failure('non-numeric port value');
 failure('corrupt wire format');
 
@@ -300,6 +306,7 @@ example.com.	SVCB	1 foo.example.com. (
 
 
 example.com.	SVCB	1 foo.example.com. mandatory=bogus
+example.com.	SVCB	1 foo.example.com. key65535=invalid
 example.com.	SVCB	1 foo.example.com. port=1234X5
 
 example.com.	SVCB	( \# 25 0001		; 1

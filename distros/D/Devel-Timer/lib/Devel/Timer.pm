@@ -1,6 +1,6 @@
 use strict;
 package Devel::Timer;
-$Devel::Timer::VERSION = '0.13';
+$Devel::Timer::VERSION = '0.14';
 use warnings;
 use 5.006;
 
@@ -14,17 +14,27 @@ use Time::HiRes();
 
 sub new {
     my ($class) = @_;
-    my $self = {
-                times => [],
-                count => 0,
-                label => {},        ## index:label
-                };
+    my $self = {};
 
     bless $self, $class;
+
+    $self->_self();
 
     $self->initialize();
 
     $self->mark('INIT');
+
+    return $self;
+}
+
+sub _self {
+    my ($self) = @_;
+
+    %{$self} = (
+                times => [],
+                count => 0,
+                label => {},        ## index:label
+                );
 
     return $self;
 }
@@ -65,6 +75,16 @@ sub mark {
     $self->{label}->{$self->{count}} = $label;
 
     $self->{count}++;
+}
+
+##
+## reset all accumulated data
+##
+
+sub reset {
+    my ($self) = @_;
+
+    return $self->_self;
 }
 
 
@@ -186,7 +206,7 @@ Devel::Timer - Track and report execution time for parts of code
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -249,6 +269,26 @@ you can override the print() method.  The initialize() and shutdown() methods
 can also overridden if you want to open and close log files or database
 connections.
 
+If you launch your program in a cycle (e.g. it's a web app which processes
+queries) you might want initialize timer once and then take measurements
+repeatedly. In that case you can use reset() method. After calling this method
+all accumulated data by timer will be deleted and timer will start countdown
+again.
+
+  $t->reset();
+  $t->report();
+
+Sample report:
+
+  Devel::Timer Report -- Total time: 0.3462 secs
+  Interval  Time    Percent
+  ----------------------------------------------
+  01 -> 02  0.3001  86.70%  second db query -> END
+  00 -> 01  0.0461  13.30%  first db query -> second db query
+
+Pay attention after calling reset() method there will be no mark INIT.
+This mark is only set once while calling new() method.
+
 =head1 METHODS
 
 =head2 new()
@@ -262,6 +302,10 @@ Empty method. Can be implemented in the subclass.
 =head2 mark($name)
 
 Set a timestamp with a C<$name>.
+
+=head2 reset()
+
+Delete all data accumulated by timer.
 
 =head2 print()
 

@@ -9,7 +9,7 @@ use Path::Tiny qw( path );
 use Capture::Tiny qw( capture_stderr );
 
 # ABSTRACT: Private legacy pkg-config class for Alien::Base
-our $VERSION = '2.70'; # VERSION
+our $VERSION = '2.71'; # VERSION
 
 
 sub new {
@@ -163,7 +163,7 @@ Alien::Base::PkgConfig - Private legacy pkg-config class for Alien::Base
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 DESCRIPTION
 

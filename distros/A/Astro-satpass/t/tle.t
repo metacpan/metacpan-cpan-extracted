@@ -49,19 +49,23 @@ my %action = (
     },
 );
 
-while ( <DATA> ) {
-    m/ \A \s* (?: [#] | \z ) /smx
-	and next;
-    if ( m/ \A \s* - [[:lower:]]+ \b /smx ) {
-	s/ \A \s* - //smx;
-	s/ \s+ \z //smx;
-	my ( $act, @args ) = split qr{ \s+ }smx;
-	$action{$act}
-	    or die "Unknown action -$act\n";
-	$handler->();
-	$handler = $action{$act}->( @args );
-    } else {
-	$handler->( $_ );
+{
+    local $_ = undef;
+
+    while ( <DATA> ) {
+	m/ \A \s* (?: [#] | \z ) /smx
+	    and next;
+	if ( m/ \A \s* - [[:lower:]]+ \b /smx ) {
+	    s/ \A \s* - //smx;
+	    s/ \s+ \z //smx;
+	    my ( $act, @args ) = split qr{ \s+ }smx;
+	    $action{$act}
+		or die "Unknown action -$act\n";
+	    $handler->();
+	    $handler = $action{$act}->( @args );
+	} else {
+	    $handler->( $_ );
+	}
     }
 }
 

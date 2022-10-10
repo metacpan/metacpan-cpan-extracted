@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.66;  # field
 
-package Test::Device::Chip::Adapter 0.23;
+package Test::Device::Chip::Adapter 0.24;
 class Test::Device::Chip::Adapter
    :does(Device::Chip::Adapter);
 
@@ -39,7 +39,7 @@ C<Test::Device::Chip::Adapter> - unit testing on C<Device::Chip>
 
    # An actual test
    $adapter->expect_readwrite( "123" )
-      ->returns( "45" );
+      ->will_done( "45" );
 
    is( await $chip->do_thing( "123" ), "45", 'result of ->do_thing' );
 
@@ -67,7 +67,7 @@ field $_txn_helper;
 
 ADJUST
 {
-   ( $_controller, $_obj ) = Test::ExpectAndCheck::Future->create;
+   ( $_controller, $_obj ) = Test::Device::Chip::Adapter::_TestController->create;
 }
 
 method make_protocol_GPIO ()
@@ -119,16 +119,26 @@ that invocation.
    $exp = $adapter->expect_write_no_ss( $bytes );
 
 The returned expectation object allows the test script to specify what such an
-invocation should return or throw.
+invocation should yield from its future.
 
-   $exp->returns( $bytes_in );
-   $exp->fails( $failure );
+   $exp->will_done( $bytes_in );
+   $exp->will_fail( $failure );
 
 Expectations for an atomic I²C transaction are performed inline, using the
 following additional methods:
 
    $adapter->expect_txn_start();
    $adapter->expect_txn_stop();
+
+As a lot of existing unit tests may have already been written to the API shape
+provided by C<Test::ExpectAndCheck::Future> version 0.03, the expectation
+object also recognises the C<return> method as an alias to C<will_done>.
+
+   $exp->returns( $bytes_in );
+
+This wrapper should be considered as a I<temporary> back-compatibility measure
+however; it will eventually print a warning and perhaps then removed entirely.
+You should avoid using it in new code; just call C<will_done> directly.
 
 =cut
 
@@ -170,7 +180,8 @@ BEGIN {
          "expect_$method" => method {
             @_ = $canonicalise->( @_ ) if $canonicalise;
 
-            return $_controller->expect( $method => @_ );
+            return $_controller->expect( $method => @_ )
+               ->will_done();
          }
       );
 
@@ -238,6 +249,26 @@ method check_and_clear ( $name )
 {
    $_controller->check_and_clear( $name );
    return;
+}
+
+package # hide
+   Test::Device::Chip::Adapter::_TestController
+{
+   use base "Test::ExpectAndCheck::Future";
+   use constant EXPECTATION_CLASS => "Test::Device::Chip::Adapter::_Expectation";
+}
+
+package # hide
+   Test::Device::Chip::Adapter::_Expectation
+{
+   use base "Test::ExpectAndCheck::Future::_Expectation";
+
+   sub returns ( $self, @result )
+   {
+      # warnings::warnif deprecated =>
+      #    "Calling ->returns on a Test::Device::Chip::Adapter expectation is now deprecated; use ->will_done instead";
+      $self->will_done( @result );
+   }
 }
 
 =head1 TODO

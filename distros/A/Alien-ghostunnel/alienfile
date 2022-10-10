@@ -1,0 +1,74 @@
+use alienfile;
+use Path::Tiny qw( path );
+use File::Which qw( which );
+
+configure {
+  requires 'Path::Tiny';
+  requires 'File::Which';
+};
+
+plugin 'Probe::CommandLine' => (
+  command => 'ghostunnel',
+  args    => '--version',
+);
+
+share {
+
+  my $asset_name;
+
+  my $cpu = meta->prop->{platform}->{cpu}->{arch}->{name};
+
+  if($^O eq 'linux' && $cpu eq 'x86_64')
+  {
+    $asset_name = 'ghostunnel-linux-amd64';
+  }
+  elsif($^O eq 'darwin' && $cpu eq 'x86_64')
+  {
+    $asset_name = 'ghostunnel-darwin-amd64';
+  }
+  elsif($^O eq 'darwin' && $cpu eq 'aarch64')
+  {
+    $asset_name = 'ghostunnel-darwin-arm64';
+  }
+  elsif($^O eq 'MSWin32' && $cpu eq 'x86_64')
+  {
+    $asset_name = 'ghostunnel-windows-amd64';
+  }
+
+  undef $asset_name if $ENV{ALIEN_GHOSTUNNEL_SOURCE};
+
+  plugin 'Download::GitHub' => (
+    github_user => 'ghostunnel',
+    github_repo => 'ghostunnel',
+    $asset_name ? (asset => 1, asset_name  => qr/^$asset_name$/, asset_format => 'f') : (),
+  );
+
+  if($asset_name)
+  {
+    my $exe = "ghostunnel";
+    $exe .= ".exe" if $^O eq 'MSWin32';
+
+    my @build = (
+      '%{make_path} %{.install.prefix}/bin',
+      "%{cp} %{.install.extract}/$asset_name %{.install.prefix}/bin/$exe",
+    );
+    push @build, "chmod +x %{.install.prefix}/bin/$exe" unless $^O eq 'MSWin32';
+
+    build \@build;
+  }
+  elsif(my $go = which('go'))
+  {
+    plugin 'Build::Make' => 'umake';
+    Alien::Build->log("no binary for your platform must build from source");
+    build [
+      '%{make} ghostunnel',
+      '%{make_path} %{.install.prefix}/bin',
+      '%{cp} %{.install.extract}/ghostunnel %{.install.prefix}/bin/ghostunnel',
+    ];
+  }
+  else
+  {
+    Alien::Build->log("no binary for your platform and no Go compiler");
+    die "no binary for your platform and no Go compiler";
+  }
+};

@@ -19,7 +19,7 @@ name: Pod-Weaver-Plugin-Rinci
 provides:
   Pod::Weaver::Plugin::Rinci:
     file: lib/Pod/Weaver/Plugin/Rinci.pm
-    version: '0.783'
+    version: '0.784'
 requires:
   File::Temp: '0.2307'
   Perinci::Access::Perl: '0.895'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Rinci
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Rinci
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Rinci.git
-version: '0.783'
+version: '0.784'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

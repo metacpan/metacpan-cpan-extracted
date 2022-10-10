@@ -19,11 +19,12 @@ name: Perinci-Sub-To-CLIDocData
 provides:
   Perinci::Sub::To::CLIDocData:
     file: lib/Perinci/Sub/To/CLIDocData.pm
-    version: '0.300'
+    version: '0.301'
 requires:
   Exporter: '5.57'
   Getopt::Long::Negate::EN: '0.060'
-  Getopt::Long::Util: '0.893'
+  Getopt::Long::Util: '0.897'
+  Module::Installed::Tiny: '0.011'
   Perinci::Object: '0.311'
   Perinci::Sub::ConvertArgs::Argv: '0'
   Perinci::Sub::GetArgs::Argv: '0.846'
@@ -37,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-To-CLIDocData
   homepage: https://metacpan.org/release/Perinci-Sub-To-CLIDocData
   repository: git://github.com/perlancar/perl-Perinci-Sub-To-CLIOptSpec.git
-version: '0.300'
+version: '0.301'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -319,7 +320,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -327,7 +328,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

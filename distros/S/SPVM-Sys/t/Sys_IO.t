@@ -10,6 +10,8 @@ use File::Temp;
 
 use SPVM 'TestCase::Sys::IO';
 
+use IO::Poll;
+
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
@@ -141,6 +143,19 @@ else {
   ok(SPVM::TestCase::Sys::IO->readlink("$tmp_dir"));
 }
 
+# poll constant values
+unless ($^O eq 'MSWin32') {
+  is(SPVM::Sys::IO::Constant->POLLERR, IO::Poll::POLLERR());
+  is(SPVM::Sys::IO::Constant->POLLHUP, IO::Poll::POLLHUP());
+  is(SPVM::Sys::IO::Constant->POLLIN, IO::Poll::POLLIN());
+  is(SPVM::Sys::IO::Constant->POLLNVAL, IO::Poll::POLLNVAL());
+  is(SPVM::Sys::IO::Constant->POLLOUT, IO::Poll::POLLOUT());
+  is(SPVM::Sys::IO::Constant->POLLPRI, IO::Poll::POLLPRI());
+  is(SPVM::Sys::IO::Constant->POLLRDBAND, IO::Poll::POLLRDBAND());
+  is(SPVM::Sys::IO::Constant->POLLRDNORM, IO::Poll::POLLRDNORM());
+  is(SPVM::Sys::IO::Constant->POLLWRBAND, IO::Poll::POLLWRBAND());
+  is(SPVM::Sys::IO::Constant->POLLWRNORM, IO::Poll::POLLWRNORM());
+}
 
 SPVM::set_exception(undef);
 

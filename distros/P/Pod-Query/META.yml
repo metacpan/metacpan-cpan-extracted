@@ -16,13 +16,15 @@ name: Pod-Query
 provides:
   Pod::Query:
     file: lib/Pod/Query.pm
-    version: '0.33'
+    version: '0.35'
 requires:
   Pod::LOL: '0.08'
   Role::Tiny: '2.002004'
   Term::Size::Any: '0.002'
   perl: '5.024'
 resources:
+  bugtracker: https://github.com/poti1/pod-query/issues
   license: http://opensource.org/licenses/artistic-license-2.0.php
-version: '0.33'
+  repository: https://github.com/poti1/pod-query
+version: '0.35'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,7 +8,7 @@ if [ -z "${ARCHIVE_LIBARCHIVE_REF_BUILD_FLAGS}" ]; then
   export ARCHIVE_LIBARCHIVE_REF_BUILD_FLAGS="--build-arg BUILDKIT_INLINE_CACHE=1"
 fi
 
-cd maint/ref
+cd maint
 docker build -t plicease/libarchive-ref:$REF_TAG \
   --build-arg latest=$REF_LATEST                 \
   --build-arg oldest=$REF_OLDEST                 \

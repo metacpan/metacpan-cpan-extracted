@@ -11,7 +11,7 @@ WriteMakefile(
    ABSTRACT => 'Various locking implementations supporting processes and threads',
    AUTHOR   => 'Mario E. Roy <marioeroy AT gmail DOT com>',
    NAME     => 'Mutex',
-   VERSION  => '1.006',
+   VERSION  => '1.007',
 
    NO_META  => 1,
 
@@ -41,25 +41,25 @@ WriteMakefile(
          'resources' => {
             'bugtracker' => 'https://github.com/marioroy/mutex-perl/issues',
             'homepage'   => 'https://github.com/marioroy/mutex-perl',
-            'license'    => 'http://dev.perl.org/licenses/',
+            'license'    => 'https://dev.perl.org/licenses/',
             'repository' => 'https://github.com/marioroy/mutex-perl.git'
          },
          'provides' => {
             'Mutex' => {
                'file'    => 'lib/Mutex.pm',
-               'version' => '1.006'
+               'version' => '1.007'
             },
             'Mutex::Channel' => {
                'file'    => 'lib/Mutex/Channel.pm',
-               'version' => '1.006'
+               'version' => '1.007'
             },
             'Mutex::Flock' => {
                'file'    => 'lib/Mutex/Flock.pm',
-               'version' => '1.006'
+               'version' => '1.007'
             },
             'Mutex::Util' => {
                'file'    => 'lib/Mutex/Util.pm',
-               'version' => '1.006'
+               'version' => '1.007'
             }
          }
       } ) : () ),

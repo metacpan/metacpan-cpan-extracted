@@ -1,3 +1,15 @@
+1.22     2022-10-06
+
+- No changes from the last release. The previous release was somehow
+  corrupted, leaving a broken file on CPAN. Reported by Olaf Alders. GH #4.
+
+
+1.21     2022-10-03
+
+- The config generator for precious has been changed to use hte
+  "ignore_stderr" config key added in precious 0.3.0.
+
+
 1.20     2021-09-24
 
 - Removed references to IRC in generated docs since I haven't been active in

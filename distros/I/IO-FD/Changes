@@ -1,0 +1,20 @@
+Revision history for Perl extension IO::FD.
+
+0.1.1	Sun  9 Oct 2022 18:42:13 AEST
+	- Added thread context macros to fix failing build on threaded perl
+	- Fixed IO::FD::recv bug, not updating current length of PV
+	- IO::FD::recv now returns single element, like perl
+	- Added test for IO::FD::send and IO::FD::recv
+	- IO::FD::mkstemp returns undef for second item
+		- This is a stop gap until a cross platform 'fd=>path' is implemented
+	- IO::FD::mktemp  and IO::FD::mkstemp now requires 6 'X' characters for better compatibility (linux)
+	- Fixed IO:FD::readline to actually work as documented.
+	- Added tests for IO::FD::readline
+	- IO::FD::readline now dies if called expecting a line split read
+		- Works for  $/=undef   or $/=\integer only
+	- Renamed some tests and other test cleanup
+
+0.1.0	Fri Aug  5 15:51:28 2022
+	- original version; created by h2xs 1.23 with options
+		--name IO::FD
+

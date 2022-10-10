@@ -18,6 +18,7 @@ lib/App/Yath/Command/ui.pm
 lib/App/Yath/Command/upload.pm
 lib/App/Yath/Plugin/YathUIDB.pm
 lib/App/Yath/Tester/UI.pm
+lib/Test2/EventFacet/Binary.pm
 lib/Test2/Harness/Renderer/UI.pm
 lib/Test2/Harness/Renderer/UIDB.pm
 lib/Test2/Harness/UI.pm
@@ -25,6 +26,7 @@ lib/Test2/Harness/UI/BackFill.pm
 lib/Test2/Harness/UI/CPANImporter.pm
 lib/Test2/Harness/UI/Config.pm
 lib/Test2/Harness/UI/Controller.pm
+lib/Test2/Harness/UI/Controller/Binary.pm
 lib/Test2/Harness/UI/Controller/Coverage.pm
 lib/Test2/Harness/UI/Controller/Download.pm
 lib/Test2/Harness/UI/Controller/Durations.pm
@@ -51,6 +53,7 @@ lib/Test2/Harness/UI/RunProcessor.pm
 lib/Test2/Harness/UI/Schema.pm
 lib/Test2/Harness/UI/Schema/MySQL.pm
 lib/Test2/Harness/UI/Schema/MySQL/ApiKey.pm
+lib/Test2/Harness/UI/Schema/MySQL/Binary.pm
 lib/Test2/Harness/UI/Schema/MySQL/Coverage.pm
 lib/Test2/Harness/UI/Schema/MySQL/CoverageManager.pm
 lib/Test2/Harness/UI/Schema/MySQL/Email.pm
@@ -74,6 +77,7 @@ lib/Test2/Harness/UI/Schema/MySQL/TestFile.pm
 lib/Test2/Harness/UI/Schema/MySQL/User.pm
 lib/Test2/Harness/UI/Schema/MySQL56.pm
 lib/Test2/Harness/UI/Schema/MySQL56/ApiKey.pm
+lib/Test2/Harness/UI/Schema/MySQL56/Binary.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Coverage.pm
 lib/Test2/Harness/UI/Schema/MySQL56/CoverageManager.pm
 lib/Test2/Harness/UI/Schema/MySQL56/Email.pm
@@ -96,6 +100,7 @@ lib/Test2/Harness/UI/Schema/MySQL56/SourceSub.pm
 lib/Test2/Harness/UI/Schema/MySQL56/TestFile.pm
 lib/Test2/Harness/UI/Schema/MySQL56/User.pm
 lib/Test2/Harness/UI/Schema/Overlay/ApiKey.pm
+lib/Test2/Harness/UI/Schema/Overlay/Binary.pm
 lib/Test2/Harness/UI/Schema/Overlay/Coverage.pm
 lib/Test2/Harness/UI/Schema/Overlay/CoverageManager.pm
 lib/Test2/Harness/UI/Schema/Overlay/Email.pm
@@ -119,6 +124,7 @@ lib/Test2/Harness/UI/Schema/Overlay/TestFile.pm
 lib/Test2/Harness/UI/Schema/Overlay/User.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/ApiKey.pm
+lib/Test2/Harness/UI/Schema/PostgreSQL/Binary.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Coverage.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/CoverageManager.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/Email.pm
@@ -141,6 +147,7 @@ lib/Test2/Harness/UI/Schema/PostgreSQL/SourceSub.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/TestFile.pm
 lib/Test2/Harness/UI/Schema/PostgreSQL/User.pm
 lib/Test2/Harness/UI/Schema/Result/ApiKey.pm
+lib/Test2/Harness/UI/Schema/Result/Binary.pm
 lib/Test2/Harness/UI/Schema/Result/Coverage.pm
 lib/Test2/Harness/UI/Schema/Result/CoverageManager.pm
 lib/Test2/Harness/UI/Schema/Result/Email.pm

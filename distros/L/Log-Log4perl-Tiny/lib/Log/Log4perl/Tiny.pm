@@ -2,7 +2,7 @@ package Log::Log4perl::Tiny;
 
 use strict;
 use warnings;
-{ our $VERSION = '1.6.4'; }
+{ our $VERSION = '1.8.0'; }
 
 use Carp;
 use POSIX ();
@@ -63,6 +63,8 @@ sub import {
                     if exists $conf->{format};
                   $_instance->format($conf->{layout})
                     if exists $conf->{layout};
+                  $_instance->filter($conf->{filter})
+                    if exists $conf->{filter};
                } ## end if (ref $conf)
                elsif (defined $conf) {
                   $_instance->level($conf);
@@ -116,7 +118,7 @@ sub new {
       level => $INFO,
    }, $package;
 
-   for my $accessor (qw( level fh format )) {
+   for my $accessor (qw( level fh format filter )) {
       next unless defined $args{$accessor};
       $self->$accessor($args{$accessor});
    }
@@ -205,6 +207,13 @@ sub loglocal {
 } ## end sub loglocal
 sub LOGLOCAL { return get_logger->loglocal(@_) }
 
+sub filter {
+   my $self = shift;
+   $self->{filter} = shift if @_;
+   return $self->{filter};
+}
+sub FILTER { return get_logger->filter(@_) }
+
 sub format {
    my $self = shift;
 
@@ -289,6 +298,8 @@ sub log {
    );
    my $message = sprintf $self->{format},
      map { $format_for{$_->[0]}[1]->(\%data_for, @$_); } @{$self->{args}};
+
+   $message = $self->{filter}->($message) if $self->{filter};
 
    return $self->emit_log($message);
 } ## end sub log

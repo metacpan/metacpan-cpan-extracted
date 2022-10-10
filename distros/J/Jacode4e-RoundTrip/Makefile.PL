@@ -4,8 +4,8 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Jacode4e::RoundTrip},
-    'VERSION'   => q{2.13.81.12},
-    'ABSTRACT'  => q{Jacode4e for round-trip conversion in JIS X 0213},
+    'VERSION'   => q{2.13.81.13},
+    'ABSTRACT'  => q{Converts JIS X 0213 Encodings with Round-Trip},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',
         'File::Basename' => '2.6',

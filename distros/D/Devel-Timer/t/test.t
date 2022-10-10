@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Capture::Tiny qw(capture);
 my $tests;
-plan tests => 5;
+plan tests => 6;
 
 use_ok( 'Devel::Timer');
 
@@ -47,6 +47,28 @@ subtest another => sub {
     like(  $stderr, qr/\n + 1 .* INIT -> A/,       "INIT -> A");
     like(  $stderr, qr/A -> B.* B -> C.* B -> A.* INIT -> A/s, 
                                                    "order by time descending");
+    #diag $stderr;
+};
+
+subtest simple_reset => sub {
+    plan tests => 9;
+
+    my ($stdout, $stderr, $exit) = capture {
+        my $t = _process();
+        $t->reset();
+        $t = _process_work($t);
+        $t->report();
+    };
+
+    like(  $stderr, qr/Total time/,                "Total time");
+    like(  $stderr, qr/Interval  Time    Percent/, "header");
+    like(  $stderr, qr/00 -> 01 .* A -> B/,        "step 0");
+    like(  $stderr, qr/01 -> 02 .* B -> A/,        "step 1");
+    like(  $stderr, qr/02 -> 03 .* A -> B/,        "step 2");
+    like(  $stderr, qr/03 -> 04 .* B -> A/,        "step 3");
+    like(  $stderr, qr/04 -> 05 .* A -> B/,        "step 4");
+    like(  $stderr, qr/05 -> 06 .* B -> C/,        "step 5");
+    unlike($stderr, qr/06 -> 07/,                  "no step 6");
     #diag $stderr;
 };
 
@@ -115,7 +137,21 @@ subtest process => sub {
 
 
 sub _process {
+    my $t = _process_init();
+
+    $t = _process_work($t);
+
+    return $t;
+}
+sub _process_init {
+
     my $t = Devel::Timer->new();
+
+    return $t;
+}
+
+sub _process_work {
+    my ($t) = @_;
 
     $t->mark("A");
 
@@ -136,4 +172,3 @@ sub _process {
 
     return $t;
 }
-

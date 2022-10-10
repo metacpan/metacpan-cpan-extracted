@@ -4,15 +4,14 @@ author:
   - 'Mark Lawrence <nomad@null.net>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  IO::Capture::Stdout: '0'
   POSIX: '0'
   Test2::V0: '0'
+  Test::Output: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.17'
-  ExtUtils::MakeMaker::CPANfile: '0.08'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
   File::Spec: '0'
-dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,28 +23,27 @@ no_index:
     - inc
   package:
     - OptArgs2::Arg
+    - OptArgs2::Arg_CI
     - OptArgs2::Cmd
-    - OptArgs2::Fallback
-    - OptArgs2::Mo
+    - OptArgs2::Cmd_CI
+    - OptArgs2::CODEREF
     - OptArgs2::Opt
-    - OptArgs2::Result
-    - OptArgs2::Util
-    - Getopt::Args2::Arg
-    - Getopt::Args2::Cmd
-    - Getopt::Args2::Fallback
-    - Getopt::Args2::Mo
-    - Getopt::Args2::Opt
-    - Getopt::Args2::Result
-    - Getopt::Args2::Util
+    - OptArgs2::Opt_CI
+    - OptArgs2::Pager_CI
+    - OptArgs2::StatusLine::Line
+    - OptArgs2::StatusLine::Prefix
 requires:
   Carp: '0'
   Encode: '2.24'
+  Exporter::Tidy: '0'
+  File::Which: '0'
   Getopt::Long: '2.37'
   I18N::Langinfo: '0'
   List::Util: '0'
+  Term::Size::Perl: '0'
   Text::Abbrev: '0'
-  perl: '5.01'
+  perl: '5.016'
 resources:
-  repository: ssh://git@github.com/mlawren/p5-OptArgs2.git
-version: v0.0.11
+  repository: ssh://git@github.com/mlawren/p5-OptArgs.git
+version: v2.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

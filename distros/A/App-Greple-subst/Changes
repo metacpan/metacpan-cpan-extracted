@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Greple-subst
 
+2.3104 2022-10-08T12:01:22Z
+
+    - require File::Share@0.27
+
+2.3103 2022-10-08T04:09:56Z
+
+    - Update test submodule.
+
 2.3102 2022-09-15T22:57:09Z
 
     - Update prerequisites.

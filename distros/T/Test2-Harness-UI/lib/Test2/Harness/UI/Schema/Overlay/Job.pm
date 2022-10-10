@@ -9,7 +9,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000125';
+our $VERSION = '0.000127';
 
 __PACKAGE__->inflate_column(
     parameters => {
@@ -113,6 +113,12 @@ sub normalize_to_mode {
     return if mode_check($mode, 'complete');
 
     if (mode_check($mode, 'summary', 'qvf')) {
+        my $has_binary = $self->events->search({has_binary => 1});
+        while (my $e = $has_binary->next()) {
+            $has_binary->binaries->delete;
+            $e->Delete;
+        }
+
         $self->events->delete;
         return;
     }
@@ -128,6 +134,12 @@ sub normalize_to_mode {
     }
     elsif(!mode_check($mode, 'qvfd')) {
         die "Unknown mode '$mode'";
+    }
+
+    my $has_binary = $self->events->search({%$query, has_binary => 1});
+    while (my $e = $has_binary->next()) {
+        $has_binary->binaries->delete;
+        $e->Delete;
     }
 
     $self->events->search($query)->delete();

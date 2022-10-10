@@ -3,7 +3,6 @@ bin/pmat-cat-svpv
 bin/pmat-counts
 bin/pmat-diff
 bin/pmat-leakreport
-bin/pmat-list-dangling-ptrs
 bin/pmat-list-orphans
 Build.PL
 Changes
@@ -24,6 +23,7 @@ lib/Devel/MAT/Tool/Count.pm
 lib/Devel/MAT/Tool/Find.pm
 lib/Devel/MAT/Tool/Identify.pm
 lib/Devel/MAT/Tool/Inrefs.pm
+lib/Devel/MAT/Tool/ListDanglingPtrs.pm
 lib/Devel/MAT/Tool/Outrefs.pm
 lib/Devel/MAT/Tool/Reachability.pm
 lib/Devel/MAT/Tool/Roots.pm

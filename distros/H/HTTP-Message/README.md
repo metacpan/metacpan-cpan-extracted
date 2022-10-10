@@ -4,11 +4,11 @@ HTTP::Message - HTTP style message (base class)
 
 # VERSION
 
-version 6.37
+version 6.39
 
 # SYNOPSIS
 
-    use base 'HTTP::Message';
+    use parent 'HTTP::Message';
 
 # DESCRIPTION
 

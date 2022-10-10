@@ -5,11 +5,11 @@ author:
 build_requires:
   Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
-  File::Path: '0'
   File::Spec: '0'
-  File::Temp: '0'
   Test::Exception: '0'
+  Test::LongString: '0'
   Test::More: '0'
+  Time::Local: '0'
   lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -31,61 +31,65 @@ no_index:
 provides:
   Weather::GHCN::App::Extremes:
     file: lib/Weather/GHCN/App/Extremes.pm
-    version: v0.0.3
+    version: v0.0.5
   Weather::GHCN::App::Fetch:
     file: lib/Weather/GHCN/App/Fetch.pm
-    version: v0.0.3
+    version: v0.0.5
   Weather::GHCN::App::StationCounts:
     file: lib/Weather/GHCN/App/StationCounts.pm
-    version: v0.0.3
+    version: v0.0.5
+  Weather::GHCN::CacheURI:
+    file: lib/Weather/GHCN/CacheURI.pm
+    version: v0.0.5
   Weather::GHCN::Common:
     file: lib/Weather/GHCN/Common.pm
-    version: v0.0.3
+    version: v0.0.5
   Weather::GHCN::CountryCodes:
     file: lib/Weather/GHCN/CountryCodes.pm
-    version: v0.0.3
+    version: v0.0.5
   Weather::GHCN::Fetch:
     file: lib/Weather/GHCN/Fetch.pm
-    version: v0.0.3
+    version: v0.0.5
   Weather::GHCN::Measures:
     file: lib/Weather/GHCN/Measures.pm
-    version: v0.0.3
+    version: v0.0.5
   Weather::GHCN::Options:
     file: lib/Weather/GHCN/Options.pm
-    version: v0.0.3
+    version: v0.0.5
   Weather::GHCN::Station:
     file: lib/Weather/GHCN/Station.pm
-    version: v0.0.3
+    version: v0.0.5
   Weather::GHCN::StationTable:
     file: lib/Weather/GHCN/StationTable.pm
-    version: v0.0.3
+    version: v0.0.5
   Weather::GHCN::TimingStats:
     file: lib/Weather/GHCN/TimingStats.pm
-    version: v0.0.3
+    version: v0.0.5
 requires:
-  Cache::FileCache: '0'
   Carp: '0'
   Const::Fast: '0'
   ControlBreak: '0'
   Devel::Size: '0'
   English: '0'
   Exporter: '0'
-  File::HomeDir: '0'
-  File::Spec: '0'
+  Fcntl: '0'
+  File::stat: '0'
   FindBin: '0'
-  GIS::Distance: '0'
   Getopt::Long: '0'
   HTML::Entities: '0'
   Hash::Wrap: '0'
+  LWP::Simple: '0'
   List::Util: '0'
+  Math::Trig: '0'
   Module::Load::Conditional: '0'
   Object::Pad: '0.66'
+  Path::Tiny: '0'
   Pod::Usage: '0'
   Set::IntSpan::Fast: '0'
   Text::Abbrev: '0'
   Time::HiRes: '0'
+  Time::Piece: '0'
   Try::Tiny: '0'
-  URI::Fetch: '0'
   YAML::Tiny: '0'
   base: '0'
   feature: '0'
@@ -98,7 +102,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Weather-GHCN-Fetch
   homepage: https://github.com/jgpuckering/Weather-GHCN-Fetch/wiki
   repository: git://github.com/jgpuckering/Weather-GHCN-Fetch.git
-version: v0.0.003
+version: v0.0.005
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

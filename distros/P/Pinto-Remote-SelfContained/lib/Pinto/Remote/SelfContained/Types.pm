@@ -43,7 +43,20 @@ coerce Uri, from Str, via { require URI; URI->new($_) };
 declare Username, as Str, where { /^[^:]+\z/ };
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Types
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Types
 
 =head1 NAME
 
@@ -51,7 +64,7 @@ Pinto::Remote::SelfContained::Types - types for Pinto::Remote::SelfContained
 
 =head1 AUTHOR
 
-Aaron Crane, E<lt>arc@cpan.orgE<gt>
+Aaron Crane E<lt>arc@cpan.orgE<gt>, Brad Lhotsky E<lt>brad@divisionbyzero.netE<gt>
 
 =head1 COPYRIGHT
 

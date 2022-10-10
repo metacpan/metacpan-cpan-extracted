@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.41
+    Version 0.44
 
 SYNOPSIS
 
@@ -115,6 +115,12 @@ SUBROUTINES/METHODS
     This method takes the same arguments as localtime but returns the
     appropriate offset from GMT in minutes. This can to used as a offset
     parameter to a subsequent call to Time::Zone::Olson.
+
+ local_abbr
+
+    This method takes the same arguments as localtime but returns the
+    appropriate abbreviation for the timezone such as AEST or AEDT. This is
+    the same result as from a date +%Z command.
 
  local_time
 

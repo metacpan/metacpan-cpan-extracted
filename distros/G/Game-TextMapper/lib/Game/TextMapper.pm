@@ -16,7 +16,7 @@
 
 package Game::TextMapper;
 
-our $VERSION = 1.04;
+our $VERSION = 1.05;
 
 use Game::TextMapper::Log;
 use Game::TextMapper::Point;
@@ -719,6 +719,25 @@ it will be used as the new font-size.
     0201 grass "promised land"
     0202 sea "deep blue sea" 20
 
+If you append transformation instructions after the font size, those will be
+applied, too. In order to make this easier, the text element is transformed
+first, and translated to the correct position in the middle of the hex.
+
+    text font-family="monospace" font-size="10pt"
+    label font-family="sans-serif" font-size="12pt"
+    glow fill="none" stroke="white" stroke-width="3pt"
+    default attributes fill="none" stroke="black" stroke-width="1px"
+    grass attributes fill="#90ee90"
+    sea attributes fill="#afeeee"
+    0101 grass
+    0102 sea
+    0201 grass "promised land"
+    0202 sea "deep blue sea" 20 translate(-75,-43.3) rotate(30)
+
+In the example above, remember that a hex is 2×100px wide and 173 (100×√3) high.
+The mid point between two hexes would therefore be a translation of
+(-¾×100,-½×100×√3).
+
 You can define SVG B<path> elements to use for your map. These can be
 independent of a type (such as an icon for a settlement) or they can
 be part of a type (such as a bit of grass).
@@ -809,9 +828,36 @@ rivers or roads, for example.
     0201 grass village "Beachton"
     0202 sea "deep blue sea" 20
     border path attributes stroke="red" stroke-width="15" stroke-opacity="0.5" fill-opacity="0"
-    0002-0200 border "The Wall"
+    0102-0101-0200 border "The Wall"
     road path attributes stroke="black" stroke-width="3" fill-opacity="0" stroke-dasharray="10 10"
-    0000-0301 road
+    0302-0201-0001 road "The Road"
+
+
+As you can see the lines can lead off the map. Lines can have two extra pieces
+of information attached after the label. The first is either C<left> or C<right>
+in case the default assignment doesn't work. In the example above, the defaults
+worked just fine. In the example below we'll reverse the direction. The second
+piece of information is a I<percentage> to indicate where along the line the text
+should display.
+
+    text font-family="monospace" font-size="10pt"
+    label font-family="sans-serif" font-size="12pt"
+    glow fill="none" stroke="white" stroke-width="3pt"
+    default attributes fill="none" stroke="black" stroke-width="1px"
+    grass attributes fill="#90ee90"
+    grass path attributes stroke="#458b00" stroke-width="5px"
+    grass path M -20,-20 l 10,40 M 0,-20 v 40 M 20,-20 l -10,40
+    village path attributes fill="none" stroke="black" stroke-width="5px"
+    village path M -40,-40 v 80 h 80 v -80 z
+    sea attributes fill="#afeeee"
+    0101 grass
+    0102 sea
+    0201 grass village "Beachton"
+    0202 sea "deep blue sea" 20
+    border path attributes stroke="red" stroke-width="15" stroke-opacity="0.5" fill-opacity="0"
+    0102-0101-0200 border "The Wall" right 10%
+    road path attributes stroke="black" stroke-width="3" fill-opacity="0" stroke-dasharray="10 10"
+    0302-0201-0001 road "The Road" left 50%
 
 =head2 Colours and Transparency
 
@@ -999,11 +1045,13 @@ keyword can be used multiple times.
     0101 grass
     0201 grass
     0302 grass
-    other <text x="150" y="20" font-size="40pt" transform="rotate(30)">Tundra of Sorrow</text>
+    other <circle cx="150" cy="90" r="30" fill="yellow" stroke="black" stroke-width="10"/>
 
-The B<other> keyword causes the item to be added to the end of the
-document. It can be used for frames and labels that are not connected
-to a single hex.
+The B<other> keyword causes the item to be added to the end of the document. It
+can be used for all sorts of one-time symbols, frames, regions, and so on.
+Sadly, it must all come on one line!
+
+=head2 URL
 
 You can make labels link to web pages using the B<url> keyword.
 

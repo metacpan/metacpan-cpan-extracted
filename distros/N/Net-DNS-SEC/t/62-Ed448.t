@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 62-Ed448.t 1808 2020-09-28 22:08:11Z willem $	-*-perl-*-
+# $Id: 62-Ed448.t 1868 2022-08-31 20:13:35Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -64,7 +64,7 @@ my $private = Net::DNS::SEC::Private->new($keyfile);
 ok( $private, 'set up EdDSA private key' );
 
 
-my $sigdata = 'arbitrary data';		## Note: ED448 signing is deterministic
+my $sigdata = Net::DNS::RR->new('. TXT arbitrary data')->txtdata;    # character set independent
 my $corrupt = 'corrupted data';
 
 my $signature = pack 'H*', join '', qw(
@@ -74,7 +74,7 @@ my $signature = pack 'H*', join '', qw(
 		f7651f828fb64c200e2ee5d0686490910c00
 		);
 
-my $signed = eval { $class->sign( $sigdata, $private ) } || '';
+my $signed = eval { $class->sign( $sigdata, $private ); } || '';     # Note: ED448 signing is deterministic
 ok( $signed eq $signature, 'signature created using private key' );
 
 
@@ -83,7 +83,7 @@ is( $verified, 1, 'signature verified using public key' );
 
 
 my $verifiable = $class->verify( $corrupt, $key, $signature );
-is( $verifiable, 0, 'signature not verifiable if data corrupt' );
+is( $verifiable, 0, 'signature not verifiable if data corrupted' );
 
 
 exit;

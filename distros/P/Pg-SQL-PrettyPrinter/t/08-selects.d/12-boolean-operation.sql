@@ -1,0 +1,1 @@
+SELECT ( a = b AND c = d AND e = f ) OR g = h, NOT i FROM z

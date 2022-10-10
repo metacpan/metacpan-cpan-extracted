@@ -1,0 +1,9 @@
+Changes
+lib/Math/Numerical.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+t/bracket.t
+t/find_root.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

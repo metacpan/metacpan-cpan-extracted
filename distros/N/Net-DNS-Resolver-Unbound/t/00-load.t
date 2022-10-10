@@ -73,5 +73,10 @@ use_ok('Net::DNS::Resolver::Unbound');
 exit;
 
 
+END {
+	eval { Net::DNS::SEC::libcrypto::croak_memory_wrap() }	# paper over crack in Devel::Cover
+}
+
+
 __END__
 

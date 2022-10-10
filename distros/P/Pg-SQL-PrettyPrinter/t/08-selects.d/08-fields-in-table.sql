@@ -1,0 +1,1 @@
+SELECT a, "Weird", t.b::int4, t."WeirdER"::int8 FROM table1 AS t

@@ -1,3 +1,10 @@
+0.016 2022-10-07
+
+     - Collection.pm
+       - removed: 'load' and 'unload' from the Collections API
+         (deprecated upstream)
+       - added: 'bulk_import' to import an array of documents 
+
 0.015 2021-02-20
     
      - Add configuration option for scheme (defaults to http)

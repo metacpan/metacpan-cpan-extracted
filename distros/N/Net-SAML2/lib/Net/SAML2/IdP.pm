@@ -1,9 +1,8 @@
-use strict;
-use warnings;
 package Net::SAML2::IdP;
-our $VERSION = '0.59'; # VERSION
-
 use Moose;
+
+our $VERSION = '0.61'; # VERSION
+
 use MooseX::Types::URI qw/ Uri /;
 
 # ABSTRACT: Net::SAML2::IdP - SAML Identity Provider object
@@ -22,9 +21,7 @@ has 'cacert'   => (isa => 'Maybe[Str]',   is => 'ro', required => 1);
 has 'sso_urls' => (isa => 'HashRef[Str]', is => 'ro', required => 1);
 has 'slo_urls' => (isa => 'Maybe[HashRef[Str]]', is => 'ro');
 has 'art_urls' => (isa => 'Maybe[HashRef[Str]]', is => 'ro');
-has 'certs'    => (isa => 'HashRef[Str]',        is => 'ro', required => 1);
-has 'sls_force_lcase_url_encoding'    => (isa => 'Bool', is => 'ro', required => 0);
-has 'sls_double_encoded_response' => (isa => 'Bool', is => 'ro', required => 0);
+has 'certs'    => (isa => 'HashRef[ArrayRef[Str]]', is => 'ro', required => 1);
 
 has 'formats' => (
     isa      => 'HashRef[Str]',
@@ -63,8 +60,6 @@ sub new_from_url {
     return $class->new_from_xml(
         xml                          => $xml,
         cacert                       => $args{cacert},
-        sls_force_lcase_url_encoding => $args{sls_force_lcase_url_encoding},
-        sls_double_encoded_response  => $args{sls_double_encoded_response},
     );
 }
 
@@ -80,36 +75,24 @@ sub new_from_xml {
 
     my $data;
 
-    for my $sso (
-        $xpath->findnodes(
-            '//md:EntityDescriptor/md:IDPSSODescriptor/md:SingleSignOnService')
-        )
-    {
+    my $basepath  = '//md:EntityDescriptor/md:IDPSSODescriptor';
+
+    for my $sso ($xpath->findnodes("$basepath/md:SingleSignOnService")) {
         my $binding = $sso->getAttribute('Binding');
         $data->{SSO}->{$binding} = $sso->getAttribute('Location');
     }
 
-    for my $slo (
-        $xpath->findnodes(
-            '//md:EntityDescriptor/md:IDPSSODescriptor/md:SingleLogoutService')
-        )
-    {
+    for my $slo ($xpath->findnodes("$basepath/md:SingleLogoutService")) {
         my $binding = $slo->getAttribute('Binding');
         $data->{SLO}->{$binding} = $slo->getAttribute('Location');
     }
 
-    for my $art (
-        $xpath->findnodes(
-            '//md:EntityDescriptor/md:IDPSSODescriptor/md:ArtifactResolutionService')
-        )
-    {
+    for my $art ($xpath->findnodes("$basepath/md:ArtifactResolutionService")) {
         my $binding = $art->getAttribute('Binding');
         $data->{Art}->{$binding} = $art->getAttribute('Location');
     }
 
-    for my $format (
-        $xpath->findnodes('//md:EntityDescriptor/md:IDPSSODescriptor/md:NameIDFormat'))
-    {
+    for my $format ($xpath->findnodes("$basepath/md:NameIDFormat")) {
         $format = $format->string_value;
         $format =~ s/^\s+//g;
         $format =~ s/\s+$//g;
@@ -123,44 +106,26 @@ sub new_from_xml {
         }
     }
 
-    for my $key (
-        $xpath->findnodes('//md:EntityDescriptor/md:IDPSSODescriptor/md:KeyDescriptor'))
-    {
-        my $use = $key->getAttribute('use') || 'signing';
-
-        $key->setNamespace('http://www.w3.org/2000/09/xmldsig#', 'ds');
-
-        my ($text)
-            = $key->findvalue("ds:KeyInfo/ds:X509Data/ds:X509Certificate", $key)
-            =~ /^\s*(.+?)\s*$/s;
-
-        # rewrap the base64 data from the metadata; it may not
-        # be wrapped at 64 characters as PEM requires
-        $text =~ s/\n//g;
-
-        my @lines;
-        while(length $text > 64) {
-            push @lines, substr $text, 0, 64, '';
+    my %certs = ();
+    for my $key ($xpath->findnodes("$basepath/md:KeyDescriptor")) {
+        my $use = $key->getAttribute('use');
+        my $pem = $class->_get_pem_from_keynode($key);
+        if (!$use) {
+            push(@{$certs{signing}}, $pem);
+            push(@{$certs{encryption}}, $pem);
         }
-        push @lines, $text;
-
-        $text = join "\n", @lines;
-
-        # form a PEM certificate
-        $data->{Cert}->{$use}
-            = sprintf("-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----\n",
-            $text);
+        else {
+            push(@{$certs{$use}}, $pem);
+        }
     }
 
-    my $self = $class->new(
+    return $class->new(
         entityid => $xpath->findvalue('//md:EntityDescriptor/@entityID'),
         sso_urls => $data->{SSO},
         slo_urls => $data->{SLO} || {},
         art_urls => $data->{Art} || {},
-        certs                        => $data->{Cert},
-        cacert                       => $args{cacert},
-        sls_force_lcase_url_encoding => $args{sls_force_lcase_url_encoding},
-        sls_double_encoded_response  => $args{sls_double_encoded_response},
+        certs    => \%certs,
+        cacert   => $args{cacert},
         $data->{DefaultFormat}
         ? (
             default_format => $data->{DefaultFormat},
@@ -169,26 +134,68 @@ sub new_from_xml {
         : (),
     );
 
-    return $self;
+}
+
+sub _get_pem_from_keynode {
+    my $self = shift;
+    my $node = shift;
+
+    $node->setNamespace('http://www.w3.org/2000/09/xmldsig#', 'ds');
+
+    my ($text)
+        = $node->findvalue("ds:KeyInfo/ds:X509Data/ds:X509Certificate", $node)
+        =~ /^\s*(.+?)\s*$/s;
+
+    # rewrap the base64 data from the metadata; it may not
+    # be wrapped at 64 characters as PEM requires
+    $text =~ s/\n//g;
+
+    my @lines;
+    while(length $text > 64) {
+        push @lines, substr $text, 0, 64, '';
+    }
+    push @lines, $text;
+
+    $text = join "\n", @lines;
+
+    return "-----BEGIN CERTIFICATE-----\n$text\n-----END CERTIFICATE-----\n";
 }
 
 
-sub BUILD {
-    my($self) = @_;
+# BUILDARGS ( hashref of the parameters passed to the constructor )
+#
+# Called after the object is created to validate the IdP using the cacert
+#
 
-    if ($self->cacert) {
-        my $ca = Crypt::OpenSSL::Verify->new($self->cacert, { strict_certs => 0, });
+around BUILDARGS => sub {
+    my $orig = shift;
+    my $self = shift;
 
-        for my $use (keys %{$self->certs}) {
-            my $cert = Crypt::OpenSSL::X509->new_from_string($self->certs->{$use});
-            ## BUGBUG this is failing for valid things ...
-            eval { $ca->verify($cert) };
-            if ($@) {
-                warn "Can't verify IdP '$use' cert: $@\n";
+    my %params = @_;
+
+    if ($params{cacert}) {
+        my $ca = Crypt::OpenSSL::Verify->new($params{cacert}, { strict_certs => 0, });
+
+        my %certificates;
+        for my $use (keys %{$params{certs}}) {
+            my $certs = $params{certs}{$use};
+            for my $pem (@{$certs}) {
+                my $cert = Crypt::OpenSSL::X509->new_from_string($pem);
+                ## BUGBUG this is failing for valid things ...
+                eval { $ca->verify($cert) };
+                if ($@) {
+                    warn "Can't verify IdP cert: $@";
+                    next;
+                }
+                push(@{$certificates{$use}}, $pem);
             }
         }
+
+        $params{certs} = \%certificates;
     }
-}
+
+    return $self->$orig(%params);
+};
 
 
 sub sso_url {
@@ -219,6 +226,7 @@ sub binding {
     my($self, $name) = @_;
 
     my $bindings = {
+        post     => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
         redirect => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
         soap     => 'urn:oasis:names:tc:SAML:2.0:bindings:SOAP',
     };
@@ -258,7 +266,7 @@ Net::SAML2::IdP - Net::SAML2::IdP - SAML Identity Provider object
 
 =head1 VERSION
 
-version 0.59
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -288,18 +296,6 @@ Constructor
 
 =item B<entityid>
 
-=item B<sls_force_lcase_url_encoding>
-
-Specifies that the IdP requires the encoding of a URL to be in lowercase.
-Necessary for a HTTP-Redirect of a LogoutResponse from Azure in particular.
-True (1) or False (0). Some web frameworks and underlying http requests assume
-that the encoding should be in the standard uppercase (%2F not %2f)
-
-=item B<sls_double_encoded_response>
-
-Specifies that the IdP response sent to the HTTP-Redirect is double encoded.
-The double encoding requires it to be decoded prior to processing.
-
 =back
 
 =head2 new_from_url( url => $url, cacert => $cacert, ssl_opts => {} )
@@ -312,10 +308,6 @@ Dies if the metadata can't be retrieved with reason.
 
 Constructor. Create an IdP object using the provided metadata XML
 document.
-
-=head2 BUILD ( hashref of the parameters passed to the constructor )
-
-Called after the object is created to validate the IdP using the cacert
 
 =head2 sso_url( $binding )
 
@@ -334,7 +326,13 @@ binding. Binding name should be the full URI.
 
 =head2 cert( $use )
 
-Returns the IdP's certificate for the given use (e.g. C<signing>).
+Returns the IdP's certificates for the given use (e.g. C<signing>).
+
+IdP's are generated from the metadata it is possible for multiple certificates
+to be contained in the metadata and therefore possible for them to be there to
+be multiple verified certs in $self->certs.  At this point any certs in the IdP
+have been verified and are valid for the specified use.  All certs are of type
+$use are returned.
 
 =head2 binding( $name )
 

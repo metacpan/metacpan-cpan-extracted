@@ -19,7 +19,7 @@ name: App-BrowserUtils
 provides:
   App::BrowserUtils:
     file: lib/App/BrowserUtils.pm
-    version: '0.016'
+    version: '0.017'
 requires:
   Capture::Tiny: '0'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
@@ -42,8 +42,8 @@ requires:
   Proc::Background: '0'
   Proc::Find: '0.051'
   Sah::Schema::true: '0'
-  Sah::Schema::unix::local_uid: '0'
   Sah::Schema::unix::signal: '0'
+  Sah::Schema::unix::uid::exists: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BrowserUtils
   homepage: https://metacpan.org/release/App-BrowserUtils
   repository: git://github.com/perlancar/perl-App-BrowserUtils.git
-version: '0.016'
+version: '0.017'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -377,7 +377,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

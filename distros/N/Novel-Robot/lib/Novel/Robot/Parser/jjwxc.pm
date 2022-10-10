@@ -40,7 +40,9 @@ sub parse_novel {
   $$h =~ s#本书霸王票读者排行.*##s;
 
   my %r;
-  ( $r{book}, $r{writer} ) = $$h =~ m#<title>\s*《(.+?)》\s*(.+?)_#s;
+  ( $r{book} ) = $$h =~ m#<title>\s*《(.+?)》#s;
+
+  ($r{writer}) = $$h=~m#<li>作者：<a href="/wapauthor/\d+">(.+?)</a>#s;
 
   my ( $cc )          = $$h =~ m#章节列表：<br/>.+?(<a.+?)<\/div>#s;
   my @f               = $cc =~ m#<a.+?href="(.+?/\d+/\d+.*?)".+?>(.+?)</a>#sg;

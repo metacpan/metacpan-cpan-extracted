@@ -13,7 +13,7 @@ use experimental qw( signatures );
 use parent qw( Archive::Libarchive::Archive );
 
 # ABSTRACT: Libarchive write archive class
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 my $ffi = Archive::Libarchive::Lib->ffi;
 my %keep;
@@ -172,7 +172,7 @@ Archive::Libarchive::ArchiveWrite - Libarchive write archive class
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

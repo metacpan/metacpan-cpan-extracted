@@ -44,7 +44,7 @@ package Astro::Coord::ECI::Moon;
 use strict;
 use warnings;
 
-our $VERSION = '0.127';
+our $VERSION = '0.128';
 
 use base qw{Astro::Coord::ECI};
 
@@ -57,6 +57,7 @@ use POSIX qw{floor strftime};
 my %terms;
 {	# Begin local symbol block.
 my $where;
+local $_ = undef;	# while (<>) ... does not localize $_.
 while (<DATA>) {
     chomp;
     s/ \A \s+ //smx;

@@ -5,8 +5,8 @@ use base qw{Power::Outlet::Common::IP};
 use IO::Socket;
 use Time::HiRes qw{sleep};
 
-our $VERSION='0.43';
-our $PACKAGE=__PACKAGE__;
+our $VERSION = '0.46';
+our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 

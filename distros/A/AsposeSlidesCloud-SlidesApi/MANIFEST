@@ -76,6 +76,7 @@ lib/AsposeSlidesCloud/Object/FontFallbackRule.pm
 lib/AsposeSlidesCloud/Object/FontScheme.pm
 lib/AsposeSlidesCloud/Object/FontsData.pm
 lib/AsposeSlidesCloud/Object/FontSet.pm
+lib/AsposeSlidesCloud/Object/FontSubstRule.pm
 lib/AsposeSlidesCloud/Object/FormatScheme.pm
 lib/AsposeSlidesCloud/Object/FractionElement.pm
 lib/AsposeSlidesCloud/Object/FunctionElement.pm

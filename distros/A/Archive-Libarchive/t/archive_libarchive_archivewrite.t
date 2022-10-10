@@ -8,7 +8,6 @@ use Archive::Tar;
 use File::chdir;
 use File::Temp qw( tempdir );
 use FFI::Platypus 1.00;
-use lib 't/lib';
 use Test2::Tools::MemoryCycle qw( memory_cycle_ok );
 
 subtest 'basic' => sub {

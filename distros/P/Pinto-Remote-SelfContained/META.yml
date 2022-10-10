@@ -1,7 +1,7 @@
 ---
 abstract: 'interact with a remote Pinto repository'
 author:
-  - 'Aaron Crane, <arc@cpan.org>'
+  - 'Aaron Crane <arc@cpan.org>, Brad Lhotsky <brad@divisionbyzero.net>'
 build_requires:
   Capture::Tiny: '0'
   Test::Deep: '0'
@@ -20,7 +20,7 @@ name: Pinto-Remote-SelfContained
 provides:
   Pinto::Remote::SelfContained:
     file: lib/Pinto/Remote/SelfContained.pm
-    version: '1.000'
+    version: '1.001'
 requires:
   Carp: '0'
   Getopt::Long::Descriptive: '0'
@@ -40,8 +40,8 @@ requires:
   namespace::clean: '0'
   perl: '5.010'
 resources:
-  bugtracker: https://github.com/arc/Pinto-Remote-SelfContained/issues
-  repository: git://github.com/arc/Pinto-Remote-SelfContained.git
-version: '1.000'
+  bugtracker: https://github.com/reyjrar/Pinto-Remote-SelfContained/issues
+  repository: git://github.com/reyjrar/Pinto-Remote-SelfContained.git
+version: '1.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

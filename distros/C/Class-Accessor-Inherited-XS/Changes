@@ -1,5 +1,8 @@
 Revision history for Class::Accessor::Inherited::XS.
 
+0.38 Tue Oct  4 21:42:44 MSK 2022
+    - fix for broken 5.37
+
 0.37 Tue Oct 27 11:36:44 MSK 2020
     - fix compilation on some clang compilers
 

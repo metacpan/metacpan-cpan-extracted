@@ -20,7 +20,8 @@ if ($OSNAME eq 'MSWin32') {
 	$script =~ s/\\/\//msg;
 }
 my $right_ret_stderr = <<"END";
-Usage: $script [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_module
+Usage: $script [-d] [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_module
+	-d			Drop tables.
 	-h			Print help.
 	-p password		Database password.
 	-u user			Database user.

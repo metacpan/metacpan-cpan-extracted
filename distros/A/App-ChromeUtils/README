@@ -2,8 +2,8 @@ NAME
     App::ChromeUtils - Utilities related to Google Chrome browser
 
 VERSION
-    This document describes version 0.009 of App::ChromeUtils (from Perl
-    distribution App-ChromeUtils), released on 2021-09-27.
+    This document describes version 0.010 of App::ChromeUtils (from Perl
+    distribution App-ChromeUtils), released on 2022-07-24.
 
 SYNOPSIS
 DESCRIPTION
@@ -48,7 +48,7 @@ FUNCTIONS
 
     *   quiet => *true*
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -82,7 +82,7 @@ FUNCTIONS
 
     *   quiet => *true*
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -118,7 +118,7 @@ FUNCTIONS
 
     *   quiet => *true*
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -181,7 +181,7 @@ FUNCTIONS
 
          300,10,120,30
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -219,7 +219,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -248,7 +248,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -351,7 +351,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -380,7 +380,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   users => *array[unix::local_uid]*
+    *   users => *array[unix::uid::exists]*
 
         Kill browser processes that belong to certain user(s) only.
 
@@ -438,7 +438,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019 by perlancar
+    This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

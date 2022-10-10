@@ -54,8 +54,8 @@
             "Proc::Background" : "0",
             "Proc::Find" : "0.051",
             "Sah::Schema::true" : "0",
-            "Sah::Schema::unix::local_uid" : "0",
             "Sah::Schema::unix::signal" : "0",
+            "Sah::Schema::unix::uid::exists" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -73,7 +73,7 @@
    "provides" : {
       "App::BrowserUtils" : {
          "file" : "lib/App/BrowserUtils.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
@@ -88,7 +88,7 @@
          "web" : "https://github.com/perlancar/perl-App-BrowserUtils"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -500,7 +500,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.780"
+                        "version" : "0.784"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

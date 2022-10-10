@@ -16,13 +16,13 @@ name: Devel-MAT-Tool-Future
 provides:
   Devel::MAT::Tool::Future:
     file: lib/Devel/MAT/Tool/Future.pm
-    version: '0.01'
+    version: '0.02'
 requires:
-  Devel::MAT::Tool: '0.48'
+  Devel::MAT::Tool: '0.49'
   File::ShareDir: '1.00'
   Syntax::Keyword::Match: '0'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

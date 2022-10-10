@@ -417,6 +417,63 @@ An example of embeding classes. Embeding class is similar to L<Corinna Role|http
   $object->b2; # 4
   $object->ps; # [1, 2, 3]
 
+=head1 Role
+
+An example of the role. The L<above example|/"Embeding Class"> is rewritten by L<Class::Plain/"role">.
+
+  use Class::Plain;
+
+  role EmbedBase1 {
+    field b1 : rw;
+    
+    method ps;
+    
+    method init {
+
+      push @{$self->ps}, 2;
+      $self->{b1} = 3;
+    }
+  }
+  
+  role EmbedBase2 {
+    field b2 : rw;
+
+    method ps;
+    
+    method init {
+      
+      push @{$self->ps}, 3;
+      $self->{b2} = 4;
+    }
+  }
+
+  class EmbedClass : does(EmbedBase1) does(EmbedBase2) {
+    field ps : rw;
+    
+    method new : common {
+      my $self = $class->SUPER::new(@_);
+      
+      $self->{ps} //= [];
+      
+      $self->init;
+      
+      return $self;
+    }
+    
+    method init {
+      push @{$self->{ps}}, 1;
+      
+      $self->EmbedBase1::init;
+      $self->EmbedBase2::init;
+    }
+  }
+  
+  my $object = EmbedClass->new;
+  
+  print $object->b1 . "\n"; # 3
+  print $object->b2 . "\n"; # 4
+  print "@{$object->ps}" . "\n"; # [1, 2, 3]
+
 =head1 Use Other OO Module With Class::Plain
 
 L<Class::Plain> can be used with other OO modules.

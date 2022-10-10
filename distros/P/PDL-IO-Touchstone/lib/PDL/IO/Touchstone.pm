@@ -20,7 +20,7 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::IO::Touchstone;
-$VERSION = 1.005;
+$VERSION = 1.006;
 
 use 5.010;
 use strict;
@@ -35,12 +35,15 @@ use PDL::Constants qw(PI);
 use constant RAD2DEG => 180/PI;
 use constant DEG2RAD => PI/180;
 
-BEGIN {  
+BEGIN {
 	use Exporter;
 	our @ISA = ( @ISA, qw(Exporter) );
 	our @EXPORT = qw/rsnp wsnp/;
 	our @EXPORT_OK = qw/
 		n_ports
+		m_interpolate
+		f_uniformity
+		f_is_uniform
 
 		s_to_y
 		y_to_s
@@ -52,6 +55,27 @@ BEGIN {
 		abcd_to_s
 
 		s_port_z
+
+		y_inductance
+		y_ind_nH
+		y_resistance
+		y_capacitance
+		y_cap_pF
+		y_qfactor_l
+		y_qfactor_c
+		y_reactance_l
+		y_reactance_c
+		y_reactance
+		y_srf
+		y_srf_ideal
+		y_parallel
+		abcd_series
+		abcd_is_lossless
+		abcd_is_symmetrical
+		abcd_is_reciprocal
+		abcd_is_open_circuit
+		abcd_is_short_circuit
+
 		/;
 }
 
@@ -123,7 +147,7 @@ sub rsnp
 		# If the line has an odd number of elements then the first is the frequency
 		# because data lines are always in pairs:
 		if (scalar(@params) % 2)
-		{ 
+		{
 			$row_idx++;
 
 			if ($row_idx > 0)
@@ -154,7 +178,7 @@ sub rsnp
 		for (my $i = 0; $i < @params; $i += 2)
 		{
 			# The data format could be ri, ma, or db but there is
-			# always a pair of data.  Please each in its own array 
+			# always a pair of data.  Please each in its own array
 			# and we will convert the format below.
 			push @{ $cols[$col_idx]->[0] }, $params[$i];
 			push @{ $cols[$col_idx]->[1] }, $params[$i+1];
@@ -174,16 +198,23 @@ sub rsnp
 		$cols[1] = $t;
 	}
 
+	# Convert input columns to PDLs
 	foreach my $c (@cols)
 	{
 		$c->[0] = pdl $c->[0];
 		$c->[1] = pdl $c->[1];
 	}
 
-	my $m = _cols_to_matrix($fmt, \@cols);
+	# Convert from R/I formats to native complex:
+	my @cx_cols = _cols_to_complex_cols($fmt, \@cols);
 
+	# Scale frequency unit:
 	my $funit = $args->{units} || 'Hz';
 	my $f = _si_scale_hz($orig_funit, $funit, pdl \@f);
+
+	my $m = _complex_cols_to_matrix(@cx_cols);
+
+	($f, $m) = m_interpolate($f, $m, $args);
 
 	return ($f, $m, $param_type, $z0, $comments, $fmt, $funit, $orig_funit);
 }
@@ -222,7 +253,7 @@ sub wsnp_fh
 	# 2-port matrixes are column-major:
 	$m = $m->transpose if ($n_ports == 2);
 
-	# Big thanks to mohawk and sivoais for helping figure out the reshape here. 
+	# Big thanks to mohawk and sivoais for helping figure out the reshape here.
 	# $d is arranged so real and imag parts can be separated into their own
 	# columns with clump() for writing to the sNp file:
 	my $d = $m->dummy(0,1);
@@ -274,7 +305,7 @@ sub wsnp_fh
 		my $freq = $f->slice("$i")->sclr;
 
 		# More than 2 ports are printed on multiple lines,
-		# at least one line for each port. 
+		# at least one line for each port.
 		if ($n_ports > 2)
 		{
 			$fm = $fm->reshape($n_ports*2,$n_ports);
@@ -310,14 +341,12 @@ sub wsnp_fh
 }
 
 # https://physics.stackexchange.com/questions/398988/converting-magnitude-ratio-to-complex-form
-sub _cols_to_matrix
+sub _cols_to_complex_cols
 {
 	my ($fmt, $cols) = @_;
 
 	$fmt = lc $fmt;
 	my @cx;
-	my $n = $cols->[0][0]->nelem;
-	my $n_ports = sqrt(scalar @$cols);
 
 	foreach my $c (@$cols)
 	{
@@ -342,6 +371,16 @@ sub _cols_to_matrix
 		}
 	}
 
+	return @cx;
+}
+
+sub _complex_cols_to_matrix
+{
+	my @cx = @_;
+
+	my $n = $cx[0]->nelem;
+	my $n_ports = sqrt(scalar @cx);
+
 	my $m = pdl \@cx;
 	$m = $m->mv(0, -1)->reshape($n_ports,$n_ports,$n);
 }
@@ -350,7 +389,12 @@ sub _si_scale_hz
 {
 	my ($from, $to, $n) = @_;
 
-	my %scale = 
+	$from = lc $from;
+	$to = lc $to;
+
+	return $n if $from eq $to;
+
+	my %scale =
 	(
 		hz => 1,
 		khz => 1e3,
@@ -359,8 +403,8 @@ sub _si_scale_hz
 		thz => 1e12,
 	);
 
-	$from = $scale{lc($from)};
-	$to = $scale{lc($to)};
+	$from = $scale{$from};
+	$to = $scale{$to};
 
 	my $fscale = $from/$to;
 
@@ -471,10 +515,6 @@ sub s_to_abcd
 	my $z01 = $Z_ref->slice(0,0)->reshape(1);
 	my $z02 = $Z_ref->slice(1,1)->reshape(1);
 
-	$z01 = pdl($z01) if (!ref($z01));
-	$z02 //= $z01;
-	$z02 = pdl($z02) if (!ref($z02));
-
 	my $z01_conj = $z01->conj;
 	my $z02_conj = $z02->conj;
 
@@ -484,6 +524,21 @@ sub s_to_abcd
 	# "Conversions Between S, Z, Y, h, ABCD, and T Parameters
 	#   which are Valid for Complex Source and Load Impedances"
 	# March 1994 IEEE Transactions on Microwave Theory and Techniques 42(2):205 - 211
+
+	# If this needs to be optimized in the future then:
+	# 	1. Factor out the divisor
+	# 	2. Separate each segment into its multiplicative or additive term
+	# 	3. Use PDL magic to compose elements with multiplication and addition.
+	#
+	# 	For example, the first multiplicative term (I think) becomes:
+	# 		$ABCD_part_1 = (
+	# 		    pdl([ [$z01_conj, $z01_conj],
+	# 			  [1        , 1] ])
+	# 			+ $S->slice(0,0) * pdl( [ [$z01, $z01],
+	# 			                            [-1, -1] ])
+	#		)
+	#
+	#	see https://m.perl.bot/p/qycs8z
 	return _pos_vecs_to_m(
 			# A
 			(($z01_conj + $S11*$z01) * (1 - $S22) + $S12*$S21*$z01)
@@ -574,7 +629,321 @@ sub s_port_z
 	return $z_port * ( (1+$s_port) / (1-$s_port) );
 }
 
-# Return the number of ports in an (N,N,M) matrix where N is the port 
+###############################################################################
+#                                                      Y-Parameter Calculations
+
+# Return a vector of inductance for each frequency in Henrys (H):
+# $Y - the Y parameter matrix (N,N,M)
+# $f_hz - a vector of frequencies (M)
+sub y_inductance
+{
+	my ($Y, $f_hz) = @_;
+
+	my $y12 = _pos_vec($Y, 1, 2);
+
+	return -(1/$y12)->im / (2*PI*$f_hz);
+}
+
+# Return a vector of inductance for each frequency in nH:
+sub y_ind_nH { return inductance(@_) * 1e9; }
+
+# Return ESR in Ohms:
+# $Y - the Y parameter matrix (N,N,M)
+# Equation from here:
+#   https://mdpi-res.com/d_attachment/electronics/electronics-11-02029/article_deploy/electronics-11-02029.pdf
+#   "Analytic Design of on-Chip Spiral Inductor with Variable Line Width"
+# See also:
+#   https://electronics.stackexchange.com/q/637472/256265
+sub y_resistance
+{
+	my ($Y) = @_;
+
+	my $y12 = _pos_vec($Y, 1, 2);
+
+	return (-1/$y12)->re;
+}
+
+sub y_esr { return y_resistance(@_) }
+
+
+# Return a vector of capacitance for each frequency in Farads (F):
+# $Y - the Y parameter matrix (N,N,M)
+# $f_hz - a vector of frequencies (M)
+sub y_capacitance
+{
+	my ($Y, $f_hz) = @_;
+
+	my $y11 = _pos_vec($Y, 1, 1);
+
+	return $y11->im / (2*PI*$f_hz);
+}
+
+# Return a vector of capacitance it each frequency in picofarads (pF):
+sub y_cap_pF { return y_capacitance(@_) * 1e12; }
+
+# Return the inductive Q-factor vector for each frequency.
+# All capacitive values are zeroed.
+# $Y - the Y parameter matrix (N,N,M)
+# $f_hz - a vector of frequencies (M)
+#
+# $Ql = y_qfactor_l($Y, $f_hz)
+sub y_qfactor_l
+{
+	my ($Y, $f_hz) = @_;
+
+	my $Xl = y_reactance_l($Y, $f_hz);
+
+	my $is_l = ($Xl > 0);
+
+	my $esr = y_resistance($Y);
+	my $Ql = ($is_l*$Xl)/$esr;
+
+	return $Ql;
+}
+
+# Return the capacitive Q-factor vector for each frequency.
+# All inductive values are zeroed.
+# $Y - the Y parameter matrix (N,N,M)
+# $f_hz - a vector of frequencies (M)
+#
+# $Qc = y_qfactor_c($Y, $f_hz)
+sub y_qfactor_c
+{
+	my ($Y, $f_hz) = @_;
+
+	my $Xc = y_reactance_c($Y, $f_hz);
+
+	my $is_c = ($Xc > 0);
+
+	my $esr = y_resistance($Y);
+	my $Qc = ($is_c*$Xc)/$esr;
+
+	return $Qc;
+}
+
+# Return a vector of inductive reactance for each frequency:
+# $Y - the Y parameter matrix (N,N,M)
+# $f_hz - a vector of frequencies (M)
+sub y_reactance_l
+{
+	my ($Y, $f_hz) = @_;
+
+	return 2*PI*$f_hz*y_inductance($Y, $f_hz);
+}
+
+# Return a vector of capacitive reactance for each frequency:
+# $Y - the Y parameter matrix (N,N,M)
+# $f_hz - a vector of frequencies (M)
+sub y_reactance_c
+{
+	my ($Y, $f_hz) = @_;
+
+	return 1.0/(2*PI*$f_hz*y_capacitance($Y, $f_hz));
+}
+
+# Return a vector of total reactance for each frequency:
+# $Y - the Y parameter matrix (N,N,M)
+# $f_hz - a vector of frequencies (M)
+sub y_reactance
+{
+	my ($Y, $f_hz) = @_;
+
+	return y_reactance_l($Y, $f_hz) - y_reactance_c($Y, $f_hz);
+}
+
+# Return an array of PDLs, each representing a resonant frequency.
+sub y_srf
+{
+	my ($Y, $f_hz) = @_;
+
+	my $X = y_reactance($Y, $f_hz);
+
+	my ($counts, $vals) = ($X <=> 0)->rle;
+
+	my $f_idx = 0;
+	my @ret;
+	my $nelem = $X->nelem;
+
+	foreach my $c ($counts->dog)
+	{
+		$f_idx += $c;
+		push @ret, $f_hz->slice($f_idx-1) if $f_idx < $nelem;
+	}
+
+	if (wantarray)
+	{
+		return @ret;
+	}
+	else
+	{
+		return $ret[0];
+	}
+}
+
+
+# srf: Self-resonating frequency.
+#
+# This may not be accurate.  While the equation is a classic
+# SRF calculation (1/(2*pi*sqrt(LC)), srf should scan the frequency lines as follows:
+#    "The SRF is determined to be the frequency at which the insertion (S21)
+#    phase changes from negative through zero to positive."
+#    [ https://www.coilcraft.com/getmedia/8ef1bd18-d092-40e8-a3c8-929bec6adfc9/doc363_measuringsrf.pdf ]
+#
+# $Y - the Y parameter matrix (N,N,M)
+# $f_hz - a vector of frequencies (M)
+sub y_srf_ideal
+{
+	my ($Y, $f_hz) = @_;
+
+	return 1/sqrt( abs 2*PI*y_inductance($Y, $f_hz)*y_capacitance($Y, $f_hz));
+}
+
+# Return a parallel representation from a list of (N,N,M) Y-Parameters
+#
+# @yparams: a list of (N,N,M) piddles
+#
+# Note: each yparam must be compatible in that:
+#   1. The number of frequencies of each must be the same
+#   2. The frequency values must correspond because inter-frequency
+#      interpolation is _not_ performed.
+#
+# For example, if you have the Y parameters for two capacitors $C1_y and $C2_y
+# at 100pF then in parallel you will get a 200pF capacitor:
+#
+#   $C_parallel_y = y_parallel($C1_y, $C2_y);
+# and thus:
+#   200 == y_cap_pF($C_parallel_y)
+sub y_parallel
+{
+	my @yparams = @_;
+
+	my $ret;
+	foreach my $y (@yparams)
+	{
+		if (!defined $ret)
+		{
+			$ret = $y;
+		}
+		else
+		{
+			$ret += $y;
+		}
+	}
+
+	return $ret;
+}
+
+###############################################################################
+#                                                   ABCD-Parameter Calculations
+
+# Return a series representation from a list of (N,N,M) ABCD-Parameters
+#
+# @abcd_params: a list of (N,N,M) piddles
+#
+# Note: each abcd_param must be compatible in that:
+#   1. The number of frequencies of each must be the same
+#   2. The frequency values must correspond because inter-frequency
+#      interpolation is _not_ performed.
+#
+# For example, if you have the ABCD parameters for two capacitors $C1_y and
+# $C2_y at 100pF then in series you will get a 50pF capacitor:
+#
+#   $C_series_abcd = abcd_series($C1_abcd, $C2_abcd);
+# and thus:
+#   50 == y_cap_pF($C_series_abcd)
+sub abcd_series
+{
+	my @abcd_params = @_;
+
+	my $ret;
+	foreach my $abcd (@abcd_params)
+	{
+		if (!defined $ret)
+		{
+			$ret = $abcd
+		}
+		else
+		{
+			$ret = $ret x $abcd;
+		}
+	}
+
+	return $ret;
+}
+
+sub abcd_is_lossless
+{
+	my ($ABCD, $tolerance) = @_;
+
+	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+
+	# How small should Im/Re be to be considered zero?
+	$tolerance //= 1e-6;
+
+	# Lossless when diagonal elements are purely Real and off-diagonal are
+	# purely imaginary: https://youtu.be/rfbvmGwN_8o
+	return (abs(Im($A)) < $tolerance && abs(Im($D)) < $tolerance
+		&& abs(Re($B)) < $tolerance && abs(Re($C)) < $tolerance);
+}
+
+# See reference for symmetrical, reciprocal, open_circuit, short_circuit:
+# https://resources.system-analysis.cadence.com/blog/msa2021-abcd-parameters-of-transmission-lines
+sub abcd_is_symmetrical
+{
+	my ($ABCD, $tolerance) = @_;
+
+	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+
+	# How small should Im/Re be to be considered zero?
+	$tolerance //= 1e-6;
+
+	# A =~ D:
+	return abs($A - $D) < $tolerance;
+}
+
+sub abcd_is_reciprocal
+{
+	my ($ABCD, $tolerance) = @_;
+
+	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+
+	# How small should Im/Re be to be considered zero?
+	$tolerance //= 1e-6;
+
+	# AD-BC=1
+	return abs($ABCD->det()) < $tolerance;
+}
+
+sub abcd_is_open_circuit
+{
+	my ($ABCD, $tolerance) = @_;
+
+	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+
+	# How small should Im/Re be to be considered zero?
+	$tolerance //= 1e-6;
+
+	# A=C=0
+	return (abs($A) < $tolerance && abs($C) < $tolerance);
+}
+
+sub abcd_is_short_circuit
+{
+	my ($ABCD, $tolerance) = @_;
+
+	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+
+	# How small should Im/Re be to be considered zero?
+	$tolerance //= 1e-6;
+
+	# B=D=0
+	return (abs($B) < $tolerance && abs($D) < $tolerance);
+}
+
+###############################################################################
+#                                                       Public Helper Functions
+
+# Return the number of ports in an (N,N,M) matrix where N is the port
 # count and M is the number of frequencies.
 sub n_ports
 {
@@ -586,6 +955,88 @@ sub n_ports
 
 	return $dims[0];
 }
+
+# Given a PDL of frequencies and a N,N,M piddle of X-parameters, re-scale
+# and return $m based on $args.
+sub m_interpolate
+{
+	my ($f, $m, $args) = @_;
+
+	croak "caller must expect an array!" if !wantarray;
+
+	# Interpolate frequency range and input data:
+	if (defined $args->{freq_min_hz} && defined $args->{freq_max_hz} && defined $args->{freq_count})
+	{
+		if ($args->{freq_min_hz} >= $args->{freq_max_hz})
+		{
+			croak "freq_min_hz=$args->{freq_min_hz} !< freq_max_hz=$args->{freq_max_hz}"
+		}
+
+		my $freq_step = ($args->{freq_max_hz} - $args->{freq_min_hz}) / ($args->{freq_count} - 1);
+		my $f_new = sequence($args->{freq_count}) * $freq_step + $args->{freq_min_hz};
+
+		# Scale the frequency unit to those requested by the caller:
+		my $funit = $args->{units} || 'Hz';
+		$f_new = _si_scale_hz('Hz', $funit, $f_new);
+
+		my @cx_cols = _m_to_pos_vecs($m);
+		my @cx_cols_new;
+		foreach my $cx (@cx_cols)
+		{
+			my ($cx_new, $err) = _interpolate($f_new, $f, $cx);
+			if (!$args->{quiet} && any $err != 0)
+			{
+				carp "Frequency range for interpolation is below/beyond reference frequencies."
+			}
+			push @cx_cols_new, $cx_new;
+		}
+
+		return ($f_new, _pos_vecs_to_m(@cx_cols_new));
+	}
+	elsif (defined $args->{freq_min_hz} || defined $args->{freq_max_hz} || defined $args->{freq_count})
+	{
+		croak("If any of freq_min_hz, freq_max_hz, or freq_count are defined then all must be defined.");
+	}
+	else
+	{
+		# Do nothing, just return the original values.
+		return ($f, $m);
+	}
+}
+
+# Return the maximum difference between an ideal uniformally-spaced frequency set
+# and the frequency set provided.  For example:
+#   $f = [ 1, 2, 3  , 4 ] would return 0.0
+#   $f = [ 1, 2, 2.5, 4 ] would return 0.5
+sub f_uniformity
+{
+	my ($f) = @_;
+
+	my $f_min = $f->slice(0);
+	my $f_max = $f->slice(-1);
+	my $f_count = $f->nelem;
+
+	my $f_step = ($f_max - $f_min) / ($f_count-1);
+
+	my $f_new = sequence($f_count) * $f_step + $f_min;
+
+	return max(abs($f-$f_new));
+}
+
+# Return true if the provided frequency set is uniform within a Hz value.
+# We assume $f is provided in Hz, so adjust $tolerance_hz accordingly if
+# $f is in a different unit.
+sub f_is_uniform
+{
+	my ($f, $tolerance_hz) = @_;
+
+	$tolerance_hz //= 1;
+
+	return f_uniformity($f) < $tolerance_hz;
+}
+
+###############################################################################
+#                                                      Private Helper Functions
 
 # Return the number of measurements in the n,n,m pdl:
 # This value will be equal to the number of frequencies:
@@ -616,6 +1067,7 @@ sub _n_meas
 # 	$T21 = ...
 # 	$T22 = ...
 #
+# @sivoais on irc.perl.org/#pdl calls these "index slices":
 sub _m_to_pos_vecs
 {
 	my $m = shift;
@@ -700,6 +1152,21 @@ sub _to_diagonal
 	return $ret;
 }
 
+sub _interpolate
+{
+	my ($xi, $x, $y) = @_;
+
+	#return interpolate($xi, $x, $y);
+
+	my $y_re = $y->re;
+	my $y_im = $y->im;
+
+	my ($yi_re, $err1) = interpolate($xi, $x, $y_re);
+	my ($yi_im, $err2) = interpolate($xi, $x, $y_im);
+
+	return ($yi_re+$yi_im*i(), $err1+$err2);
+}
+
 1;
 
 __END__
@@ -726,7 +1193,7 @@ filters, power splitters, etc.
 
 	# Read input matrix:
 	($f, $m, $param_type, $z0, $comments, $fmt, $funit, $orig_f_unit) =
-		rsnp('input-file.s2p', { units => 'MHz' }); 
+		rsnp('input-file.s2p', { units => 'MHz' });
 
 
 	# Write output file:
@@ -756,18 +1223,29 @@ parameter types (or impedances).  Use the C<P_to_Q()> functions below to transfo
 
 =head2 C<rsnp($filename, $options)> - Read touchstone file
 
-=head3 Arguments: 
+=head3 Arguments:
 
 =over 4
 
 =item * $filename - the file to read
 
-=item * $options - A hashref of options.
+=item * $options - A hashref of options:
 
-Currently only 'units' is supported, which may specify one of Hz, KHz, MHz,
-GHz, or THz.  The resulting C<$f> vector will be scaled to the frequency format
-you specify.  If you do not specify a format then C<$f> will be scaled to Hz
-such that a value of 1e6 in the C<$f> vector is equal to 1 MHz.
+=over 4
+
+=item units: Hz, KHz, MHz, GHz, or THz.
+
+Units may specify one of Hz, KHz, MHz, GHz, or THz.  The resulting C<$f> vector
+will be scaled to the frequency format you specify.  If you do not specify a
+format then C<$f> will be scaled to Hz such that a value of 1e6 in the C<$f>
+vector is equal to 1 MHz.
+
+=item freq_min_hz, freq_max_hz, freq_count: see C<m_interpolate()>
+
+If these options are passed then the matrix (C<$m>) and frequency (C<$f>) PDLs
+returned by C<rsnp()> will have been interpolated by C<m_interpolate()>.
+
+=back
 
 =back
 
@@ -782,11 +1260,11 @@ utilize the data loaded by C<rsnp()>:
 number of frequencies.
 
 =item * C<$m> - A (N,N,M) piddle of X-parameter matrices where C<N> is the number
-of ports and C<M> is the number of frequencies. 
+of ports and C<M> is the number of frequencies.
 
 These matrixes have been converted from their 2-part RI/MA/DB input format and
 are ready to perform computation.  Matrix values (S11, etc) use PDL's
-native complex values.  
+native complex values.
 
 =item * C<$param_type> - one of S, Y, Z, H, G, T, or A that indicates the
 matrix parameter type.
@@ -798,7 +1276,7 @@ still load them with this module (but it is up to you to know how to use them).
 
 =back
 
-The remaining parameters (C<$comments>, C<$fmt>, C<$funit>) are useful only if you wish to 
+The remaining parameters (C<$comments>, C<$fmt>, C<$funit>) are useful only if you wish to
 re-create the original file format by calling C<wsnp()>:
 
 =over 4
@@ -837,7 +1315,7 @@ same as those returned by C<rsnp()>.
 When writing it is up to you to maintain consistency between the output format
 and the data being represented.  Except for complex value representation in
 C<$fmt> and frequency scale in C<$f>, this C<PDL::IO::Touchstone> module will
-not make any mathematical transform on the matrix data. 
+not make any mathematical transform on the matrix data.
 
 Changing C<$to_hz> will modify the frequency format in the resultant Touchstone
 file, but the represented data will remain correct because Touchstone knows how
@@ -858,7 +1336,7 @@ However, there are a few output differences that may occur:
 =item * The order of comments and the "# format" line may be changed.
 C<wsnp()> will write comments before the "# format" line.
 
-=item * Whitespace may differ in the output.  Touchstone specifies any whitespace as a 
+=item * Whitespace may differ in the output.  Touchstone specifies any whitespace as a
 field delimiter and this module uses tabs as delimiters when writing output data.
 
 =back
@@ -970,7 +1448,7 @@ is represented as either:
 
 All functions prefixed with "s_" require an S-parameter matrix.
 
-=head2 C<$z0n = s_port_z($S, $z0, $n)> - Return the complex port impedance vector for all frequencies given:
+=head2 C<$z0n = s_port_z($S, $z0, $n)> - Return the complex port impedance vector for each frequency
 
 =over 4
 
@@ -987,12 +1465,147 @@ In a 2-port, this will provide the input or output impedance as follows:
     $z_in  = s_port_z($S, 50, 1);
     $z_out = s_port_z($S, 50, 2);
 
+Note that C<$z_in> and C<$z_out> are the PDL vectors for the input or output
+impedance at each frequency in C<$f>.  (NB, C<$f> is not actually needed for
+the calculation.)
+
+=head1 Y-Paramter Calculaction Functions
+
+All functions prefixed with "y_" require a Y-parameter matrix.
+
+These functions are intended for use with 2-port matrices---but if you know
+what you are doing they may work for higher-order matrices as well.
+
+Unless otherwise indicated:
+
+=over 4
+
+=item * C<$Y> is a set Y-parameter matrices (one for each frequency), either  loaded directly from
+a Y-formatted .s2p file or converted via C<s_to_y> or similar functions.
+
+=item * C<$f_hz> is a vector of frequencies in Hz (one for each Y-matrix in
+C<$Y>); C<$f_hz> is assumed to be sorted in ascending order and correspond to
+each Mth element in C<$Y> of dimension N,N,M where N is the number of ports and
+M is the number of sample frequencies.
+
+
+=back
+
+=head2 C<$C = y_capacitance($Y, $f_hz)> - Return a vector of capacitance for each frequency in Farads (F)
+
+=head2 C<$C = y_cap_pF($Y, $f_hz)> - Return a vector of capacitance it each frequency in picofarads (pF)
+
+=head2 C<$L = y_inductance($Y, $f_hz)> - Return a vector of inductance for each frequency in Henrys (H)
+
+=head2 C<$L = y_ind_nH($Y, $f_hz)> - Return a vector of inductance for each frequency in nanohenrys (nH)
+
+=head2 C<$Qc = y_qfactor_c($Y, $f_hz)> - Return the capacitive Q-factor vector for each frequency
+
+Note that all inductive values are zeroed.
+
+=head2 C<$Ql = y_qfactor_l($Y, $f_hz)> - Return the inductive Q-factor vector for each frequency
+
+Note that all capacitive values are zeroed.
+
+=head2 C<$X = y_reactance($Y, $f_hz)> - Return a vector of total reactance for each frequency
+
+This is the same as (Xl - Xc).
+
+=head2 C<$Xc = y_reactance_c($Y, $f_hz)> - Return a vector of capacitive reactance for each frequency
+
+=head2 C<$Xl = y_reactance_l($Y, $f_hz)> - Return a vector of inductive reactance for each frequency
+
+=head2 C<$R = y_resistance($Y)> - Return the equivalent series resistance (ESR) in Ohms
+
+=head2 C<$R = y_esr($Y, $f_hz)> - An alias for C<y_resistance>.
+
+=head2 C<@srf_list_hz = y_srf($Y, $f_hz)> - Return the component's self-resonant frequencies (SRF)
+
+To calculate SRF, reactance is evaluated at each frequency.  If the next frequency being
+evaulated has an opposite sign (ie, going from capacitive to inductive reactance) then
+that previous frequency is selected as an SRF.
+
+Return value:
+
+=over 4
+
+=item * List context: Return the list of SRF's in ascending order, or an empty list if no SRF is found.
+
+=item * Scalar context: Return the lowest-frequency SRF, or undef if no SRF is found.
+
+=back
+
+=head2 C<$f_hz = y_srf_ideal($Y, $f_hz)> - Return the component's first self-resonant frequency
+
+Notice: In almost all cases you will want C<y_srf> instead of C<y_srf_ideal>.
+
+This is included for ideal Y-matrices only and may not be accurate.  While the
+equation is a classic SRF calculation (1/(2*pi*sqrt(LC)), srf should scan the
+frequency lines as follows: "The SRF is determined to be the frequency at which
+the insertion (S21) phase changes from negative through zero to positive."
+[ https://www.coilcraft.com/getmedia/8ef1bd18-d092-40e8-a3c8-929bec6adfc9/doc363_measuringsrf.pdf ]
+
+=head1 Circuit Composition
+
+=head2 C<$Y_pp = y_parallel($Y1, $Y2, [...])> - Compose a parallel circuit
+
+For example, if C<$Y1> and C<$Y2> represent a 100pF capacitor, then C<$Y_pp> will
+represent a ~200pF capacitor. Parameters and return value must be
+Y matrices converted by a function like C<s_to_y>.
+
+=head2 C<$ABCD_ss = abcd_series($ABCD1, $ABCD2, [...])> - Compose a series circuit
+
+For example, if C<$ABCD1> and C<$ABCD2> represent a 100pF capacitor, then
+C<$ABCD_ss> will represent a ~50pF capacitor.  Parameters and return value must be
+ABCD matrices converted by a function like C<s_to_abcd>.
+
 =head1 Helper Functions
 
 =head2 C<$n = n_ports($S)> - return the number of ports represented by the matrix.
 
 Given any matrix (N,N,M) formatted matrix, this function will return N.
 
+=head2 C<($f_new, $m_new) = m_interpolate($f, $m, $args)> - return the number of ports represented by the matrix.
+
+This function rescales the X-parameter matrix (C<$m>) and frequency set (C<$f>)
+to fit the requested frequency bounds.  This example will return the
+interpolated C<$S_new> and C<$f_new> with 10 frequency samples from 100 to 1000
+MHz (inclusive):
+
+    ($f_new, $S_new) = m_interpolate($f, $S,
+	{ freq_min_hz => 100e6, freq_max_hz => 1000e6, freq_count => 10,
+	  quiet => 1 # optional
+	} )
+
+This function returns C<$f> and C<$m> verbatim if no C<$args> are passed.
+
+=over 4
+
+=item * freq_min_hz: the minimum frequency at which to interpolate
+
+=item * freq_max_hz: the maximum frequency at which to interpolate
+
+=item * freq_count: the total number of frequencies sampled
+
+=item * quiet: suppress warnings when interpolating beyond the available frequency range
+
+=back
+
+=head2 C<$max_diff = f_uniformity($f)> - Return maximum frequency deviation.
+
+Return the maximum difference between an ideal uniformally-spaced frequency set
+and the frequency set provided.  This is used internally by C<f_is_uniform()>.
+For example:
+
+  0.0 == f_uniformity(pdl [ 1, 2, 3  , 4 ]);
+  0.5 == f_uniformity(pdl [ 1, 2, 2.5, 4 ]);
+
+
+=head2 C<$bool = f_is_uniform($f, $tolerance_hz)> - Return true if the frequency set is uniform
+
+Return true if the provided frequency set is uniform within a Hz value.
+We assume C<$f> is provided in Hz, so adjust C<$tolerance_hz> accordingly if
+$f is in a different unit.
 
 =head1 SEE ALSO
 

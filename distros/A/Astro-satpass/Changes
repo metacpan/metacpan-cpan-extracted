@@ -1,3 +1,6 @@
+0.128		2022-10-02	T. R. Wyant
+    Localize $_ before while(<>).
+
 0.127		2022-08-12	T. R. Wyant
     Heavens-Above updates magnitude of Chinese Space Station.
     

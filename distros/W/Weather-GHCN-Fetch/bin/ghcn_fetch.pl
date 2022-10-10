@@ -25,7 +25,7 @@
 ########################################################################
 use v5.18;  # minimum for Object::Pad
 
-our $VERSION = 'v0.0.003';
+our $VERSION = 'v0.0.005';
 
 use Weather::GHCN::App::Fetch;
 
@@ -42,11 +42,11 @@ ghcn_fetch.pl - Fetch station and weather data from the NOAA GHCN repository
 
 =head1 VERSION
 
-version v0.0.003
+version v0.0.005
 
 =head1 SYNOPSIS
 
-    ghcn_fetch.pl [-gui] [-optfile <filespec>]
+    ghcn_fetch.pl [-gui] [-savegui <filespec>]
 
     ghcn_fetch.pl [<report_type>]
             [-country <str>] [-state <str>] [-location <str>] [-gsn]
@@ -55,11 +55,13 @@ version v0.0.003
             [-fmonth <str>] [-fday <str>]
             [-anomalies] [-baseline <str>] [-precip] [-tavg] [-nogaps]
             [-kml <filespec> [-color <str>] ]
-            [-dataonly] [-nonetwork <int>] [-performance] [-verbose]
-            [-outclip]
             [-report <report_type>]
+            [-dataonly] [-performance] [-verbose] [-outclip]
+            [-cachedir <directory>] [-refresh <str>] 
+            [-profile <filespec>] 
+            
 
-        <report_type> ::= id | daily | monthly | weekly | ""
+        <report_type> ::= detail | daily | monthly | weekly | ""
 
     ghcn_fetch.pl -readme
 
@@ -80,12 +82,14 @@ pages for the selected stations are scanned and the data from them
 aggregated and output as one row per designated period.  This is
 followed by the station list.
 
-If report type 'id' is given, then the daily data for each selected
+If report type 'detail' is given, then the daily data for each selected
 station id is reported, followed by the station list.
 
-The report type can be abbreviated; e.g. d or da for daily.  The report
-type can be provided as the first argument, or it can be provided via
-the -report option anywhere within the argument list.
+The report type can be abbreviated so long as it is unambiguous; e.g. 
+da or dai for daily; de for detail.  
+
+The report type can be provided as the first argument, or it can be 
+provided via the -report option anywhere within the argument list.
 
 In general it's best to narrow your filter criteria as much as
 possible otherwise it will take a very long time to load and process
@@ -107,20 +111,21 @@ names may be abbreviated, so long as they remains unambiguous.
 
 =head2 Report Types
 
-
 Data obtained from the GHCN database can be reported at various
-levels of aggregation using the -report option.  The string value
-given to -report specifies the type and level of aggregation.
-Abbrevations are permitted.
+levels of aggregation using the B<report> option.  The string value
+for B<report> specifies the type and level of aggregation.
+Abbrevations are permitted.  This value can be given as the very
+first argument on the command line, or anywhere on the command line
+if preceded by B<-report>.
 
 =over 4
 
-=item -report station
+=item -report "" (or omitted)
 
-Generate a list of the stations which match the criteria provided
-(location, geo coordinates, ranges etc.)  This is the default when
-no report type is requested.  No actual weather data is accessed; only
-station data.
+This is the default option when no report option is provided, or when
+the option is an empty string.  It generates a list of the stations
+which match the criteria provided (location, geo coordinates, ranges
+etc.)  No actual weather data is accessed; only station data.
 
 =item -report daily
 
@@ -147,7 +152,7 @@ the measure for monthly average temperature.
 Same as -daily except the output is summarized to the year level.
 See the explanation of TAVG vs Avg on -monthly.
 
-=item -report id
+=item -report detail
 
 Break the selected aggregation level down by station id and include
 the station id in the output.  This is like -daily, but with a
@@ -303,7 +308,7 @@ be averaged across stations and also across months or years if
 
 =item -nogaps
 
-For report 'id', generate rows for those months and days where data
+For report 'detail', generate rows for those months and days where data
 is missing.  This enables charting with a complete time x-axis.
 Without it, large gaps result in horizontal compression of the
 chart and a distorted picture across time.
@@ -329,47 +334,22 @@ down to one letter. Default is red.
 
 =back
 
-=head2 Output Options
-
-=over 4
-
-=item -outclip or -o
-
-Send output to the Windows clipboard.  (Windows only)
-
-=back
-
 =head2 Misc Options
 
 =over 4
+
+=item -cachedir <filespec>
+
+This section defines the location of the cache directory where pages 
+fetched from the NOAA GHCN repository will be saved, in accordance 
+with your -refresh option. Using a cache vastly improves the 
+performance of subsequent invocations of B<ghcn_fetch>, especially when 
+using the same station filtering criteria.
 
 =item -dataonly
 
 Print only the data table.  Other information, including notes, lists
 of stations kept and rejected, and statistics are suppressed.
-
-=item -nonetwork <int>
-
-Set the NoNetwork option used in URI::Fetch in order to alter the
-behaviour of caching.
-
-By default, -nonetwork is set to -1, which sets the NoNetwork option
-of URI::Fetch to the number of seconds in the current year at the
-time the script is run. This means that the HTTP server is not
-contacted if the page is in cache and the cached page was inserted
-sometime within the present year. If the cached copy is older than
-this year, then a normal HTTP request (full or cache check) is done.
-
-If -nonetwork is set to 0 and the requested page is found in the
-cache, the HTTP server is checked for a fresher copy.
-
-If -nonetwork is set to 1, the HTTP server is never contacted,
-regardless of the page being in cache or not. If the page is missing
-from cache, the fetch method will return undef and the script with
-die. If the page is in cache, that page will be returned, no matter
-how old it is. This is useful for situations where the NOAA HTTP
-server is slow or offline and the desired data is available in the
-cache.
 
 =item -performance
 
@@ -379,6 +359,43 @@ Statistics list because they are internal to the other timing
 metrics) as well as statistics for the memory consumption of the
 Data hash table.  Also some memory statistics are added to some
 Timing subjects.
+
+=item -refresh <str>
+
+This option determines whether and when cached files are refreshed from
+the network source.  Default is yearly.  Possible values are:
+
+=over 4
+
+=item yearly
+
+The origin HTTP server is contacted and the page refreshed if the
+cached file has not been changed within the current year. The
+rationale for this, and for this being the default, is that the GHCN
+data for the current year will always be incomplete, and that will
+skew any statistical analysis and so should normally be truncated.
+If the user needs the data for the current year, they should use a
+refresh value of 'always' or a number.
+
+=item always
+
+If a page is in the cache, the origin HTTP server is always checked for
+a fresher copy
+
+=item never
+
+The origin HTTP is never contacted, regardless of the page being in
+cache or not. If the page is missing from cache, the fetch method will
+return undef. If the page is in cache, that page will be returned, no
+matter how old it is.
+
+=item <number>
+
+The origin HTTP server is not contacted if the page is in cache
+and the cached page was inserted within the last <number> days.
+Otherwise the server is checked for a fresher page.
+
+=back
 
 =item -verbose
 
@@ -396,9 +413,14 @@ stderr.
 Launch a graphic user interface that can be used to set options.
 Not available unless modules Tk and Tk::Getopt are installed.
 
-=item -optfile <filespec>
+=item -savegui <filespec>
 
-Designate a file to be used to save or load options.
+Designate a file to be used to save load options, or from which to
+load options that were previously saved from the GUI.
+
+=item -outclip
+
+Send output to the Windows clipboard.  (Windows only)
 
 =item -readme
 
@@ -416,43 +438,33 @@ Display the Synopsis section of this documentation.
 
 =back
 
-=head1 CONFIGURATION FILE
+=head1 PROFILE FILE
 
 At startup, ghcn_fetch will look for the file .ghcn_fetch.yaml in
-either %UserProfile% (Windows) or $HOME (unix/linux) in order to capture some
-additional options. The file content should contain something like this:
+the user home directory (~ on Unix, %UserProfile% on Windows)
+in order to capture some additional options. The file content should
+contain something like this:
 
     ---
-    cache:
-        root: C:/ghcn_cache
-        namespace: ghcn
+    cachedir: C:/ghcn_cache
 
     aliases:
         yow: CA006106000,CA006106001    # Ottawa airport
         cda: CA006105976,CA006105978    # Ottawa CDA and CDA RCS
         center: USC00326365             # geographic center of North America
 
-Supported options are:
+Any option (except those listed in section Command-Line Only Options)
+can be included and will be preloaded as a default.  Command-line
+options will override them.  Anything left undefined will be filled in
+by built-in defaults.
 
-=over 4
-
-=item cache:
-
-This section defines the cache_root and namespace options for URI::Fetch.
-If present, then any pages which are fetched from the NOAA GHCN repository
-are cached in the folder and subfolder designated by root: and namespace:.
-This vastly improves the performance of subsequent invocations of
-ghcn_fetch, especially when using the same station filtering criteria.
-
-=item aliases:
-
-This section provides a list of shortcut names that are mapped to
-station id's or id-lists and which can be used in the -location
-option.  If a -location value matches a key in this section, the
-station id or id-list is substituted.  Note that keys must be lowercase
-letter only, with or without a leading underscore.
-
-=back
+One extra option not available via the command line but which can be 
+specified in the profile file is B<aliases>.  This optional section 
+provides a list of shortcut names that are mapped to station id's or 
+id-lists and which can be used in the -location option.  If a 
+-location value matches a key defined in this section, the station id 
+or id-list is substituted.  Note that keys must be lowercase letter 
+only, and may have a leading underscore.
 
 =head1 RELATED SCRIPTS
 

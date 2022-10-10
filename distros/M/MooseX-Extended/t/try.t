@@ -13,8 +13,8 @@ package My::Try {
         try {
             return 1 / $num;
         }
-        catch {
-            croak "Could not calculate reciprocal of $num: $@";
+        catch ($e) {
+            croak "Could not calculate reciprocal of $num: $e";
         }
     }
 }
@@ -26,8 +26,8 @@ package My::Try::Role {
         try {
             return 1 / $num;
         }
-        catch {
-            croak "Could not calculate reciprocal of $num: $@";
+        catch ($e) {
+            croak "Could not calculate reciprocal of $num: $e";
         }
     }
 }

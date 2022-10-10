@@ -1,0 +1,261 @@
+NAME
+    Graphics::Toolkit::Color - color palette creation tool
+
+SYNOPSIS
+        my $red = Graphics::Toolkit::Color->new('red');
+        say $red->add('blue')->name;              # 'magenta', mixed in RGB space
+        Graphics::Toolkit::Color->new( 0, 0, 255)->hsl    # 240, 100, 50 = blue
+        $blue->blend_with({H=> 0, S=> 0, L=> 80}, 0.1);# mix blue with a little grey
+        $red->gradient( '#0000FF', 10);           # 10 colors from red to blue  
+        $red->complementary( 3 );                 # get fitting red green and blue
+
+DESCRIPTION
+    Each object has 7 attributes, which are its RGB and HSL values and if
+    possible a name. This is because humans access colors on hardware level
+    (eye) in RGB, on cognition level in HSL (brain) and on cultural level
+    (language) with names. Having easy access to all three and some color
+    math should enable you to get the color palette you desire quickly and
+    with no additional dependencies.
+
+CONSTRUCTOR
+    There are many options to create a color objects. In short you can
+    either use the name of a predefined constant or provide values in RGB or
+    HSL color space.
+
+  new( 'name' )
+    Get a color by providing a name from the X11 or HTML (SVG) standard or a
+    Pantone report. Upper/Camel case will be treated as lower case and
+    inserted underscore letters ('_') will be ignored as perl does in
+    numbers (1_000 == 1000) (see more under
+    Graphics::Toolkit::Color::Constant).
+
+        my $color = Graphics::Toolkit::Color->new('Emerald');
+        my @names = Graphics::Toolkit::Color::Constant::all_names(); # select from these
+
+  new( 'standard:color' )
+    Get a color by name from a specific standard as provided by an external
+    module Graphics::ColorNames::* , which has to be installed separately. *
+    is a placeholder for the pallet name, which might be: Crayola, CSS,
+    EmergyC, GrayScale, HTML, IE, SVG, Werner, WWW or X. In ladder case
+    Graphics::ColorNames::X has to be installed.
+
+        my $color = Graphics::Toolkit::Color->new('SVG:green');
+        my @s = Graphics::ColorNames::all_schemes();    # installed pallets
+
+  new( '#rgb' )
+    Color definitions in hexadecimal format as widely used in the web, are
+    also acceptable.
+
+        my $color = Graphics::Toolkit::Color->new('#FF0000');
+        my $color = Graphics::Toolkit::Color->new('#f00');   # works too
+
+  new( [$r, $g, $b] )
+    Triplet of integer RGB values ("red", "green" and "blue" : 0 .. 255).
+    Out of range values will be corrected to the closest value in range.
+
+        my $red = Graphics::Toolkit::Color->new( 255, 0, 0 );
+        my $red = Graphics::Toolkit::Color->new([255, 0, 0]); # does the same
+
+  new( {r => $r, g => $g, b => $b} )
+    Hash with the keys 'r', 'g' and 'b' does the same as previous paragraph,
+    only more declarative. Casing of the keys will be normalised and only
+    the first letter of each key is significant.
+
+        my $red = Graphics::Toolkit::Color->new( r => 255, g => 0, b => 0 );
+        my $red = Graphics::Toolkit::Color->new({r => 255, g => 0, b => 0}); # works too
+        ... Color->new( Red => 255, Green => 0, Blue => 0);      # also fine
+
+  new( {h => $h, s => $s, l => $l} )
+    To define a color in HSL space, with values for "hue", "saturation" and
+    "lightness", use the following keys, which will be normalized as
+    decribed in previous paragraph. Out of range values will be corrected to
+    the closest value in range. Since "hue" is a polar coordinate, it will
+    be rotated into range, e.g. 361 = 1.
+
+        my $red = Graphics::Toolkit::Color->new( h =>   0, s => 100, b => 50 );
+        my $red = Graphics::Toolkit::Color->new({h =>   0, s => 100, b => 50}); # good too
+        ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # also fine
+
+GETTER / ATTRIBUTES
+    are all read only methods - giving access to different parts of the
+    objects data.
+
+  name
+    Name of the color in the X11 or HTML (SVG) standard or the Pantone
+    report. The name will be found and filled in, even when the object is
+    created with RGB or HSL values. If the color is not found in any of the
+    mentioned standards, it returns an empty string. All names are at:
+    "NAMES" in Graphics::Toolkit::Color::Constant
+
+  string
+    String to reproduce color object by: Graphics::Toolkit::Color->new (eval
+    $string). It is either the name (if color has one) or the stringified
+    triplet: "[ $red, $green, $blue ]".
+
+  red
+    Integer between 0 .. 255 describing the red portion in RGB space.
+
+  green
+    Integer between 0 .. 255 describing the green portion in RGB space.
+
+  blue
+    Integer between 0 .. 255 describing the blue portion in RGB space.
+
+  rgb
+    Three values of red, green and blue (see above).
+
+  rgb_hex
+    String starting with '#', followed by six hexadecimal figures. Two
+    digits for each of red, green and blue value - the format used in CSS.
+
+  hue
+    Integer between 0 .. 359 describing the angle (in degrees) of the
+    circular dimension in HSL space named hue. 0 approximates red, 30 -
+    orange, 60 - yellow, 120 - green, 180 - cyan, 240 - blue, 270 - violet,
+    300 - magenta, 330 - pink. 0 and 360 point to the same coordinate, but
+    this module only deals with 0.
+
+  saturation
+    Integer between 0 .. 100 describing percentage of saturation in HSL
+    space. 0 is grey and 100 the most colorful (except when lightness is 0
+    or 100).
+
+  lightness
+    Integer between 0 .. 100 describing percentage of lightness in HSL
+    space. 0 is always black, 100 is always white and 50 the most colorful
+    (depending on hue value) (or grey - if saturation = 0).
+
+  hsl
+    Three values of hue, saturation and lightness (see above).
+
+METHODS
+    create new, related color (objects) or compute similarity of colors
+
+  distance_to
+    A number that measures the distance (difference) between two colors: 1.
+    the calling object (C1) and 2. a provided first argument C2 - color
+    object or scalar data that is acceptable by new method : name or #hex or
+    [$r, $g, $b] or {...} (see chapter CONSTRUCTOR).
+
+    If no second argument is provided, than the difference is the Euclidean
+    distance in cylindric HSL space. If second argument is 'rgb' or 'RGB',
+    then its the Euclidean distance in RGB space. But als subspaces of both
+    are possible, as r, g, b, rg, rb, gb, h, s, l, hs, hl, and sl.
+
+        my $d = $blue->distance_to( 'lapisblue' ); # how close to lapis color?
+        # how different is my blue value to airy_blue
+        $d = $blue->distance_to( 'airyblue', 'Blue'); # same amount of blue?
+        $d = $color->distance_to( $c2, 'Hue' ); # same hue ?
+        $d = $color->distance_to( [10, 32, 112 ], 'rgb' );
+        $d = $color->distance_to( { Hue => 222, Sat => 23, Light => 12 } );
+
+  add
+    Create a Graphics::Toolkit::Color object, by adding any RGB or HSL
+    values to current color. (Same rules apply for key names as in new -
+    values can be negative.) RGB and HSL can be combined, but please note
+    that RGB are applied first.
+
+    If the first argument is a Graphics::Toolkit::Color object, than RGB
+    values will be added. In that case an optional second argument is a
+    factor (default = 1), by which the RGB values will be multiplied before
+    being added. Negative values of that factor lead to darkening of result
+    colors, but its not subtractive color mixing, since this module does not
+    support CMY color space. All RGB operations follow the logic of additive
+    mixing, and the result will be rounded (trimmed), to keep it inside the
+    defined RGB space.
+
+        my $blue = Graphics::Toolkit::Color->new('blue');
+        my $darkblue = $blue->add( Lightness => -25 );
+        my $blue2 = $blue->add( blue => 10 );
+        $blue->distance( $blue2 );           # == 0, can't get bluer than blue
+        my $color = $blue->add( $c2, -1.2 ); # subtract color c2 with factor 1.2
+
+  blend_with
+    Create Graphics::Toolkit::Color object, that is the average of two
+    colors in HSL space: 1. the calling object (C1) and 2. a provided
+    argument C2 (object or a refrence to data that is acceptable
+    definition).
+
+    The second argument is the blend ratio, which defaults to 0.5 ( 1:1 ). 0
+    represents here C1 and 1 C2. Numbers below 0 and above 1 are possible,
+    and will be applied, as long the result is inside the finite HSL space.
+    There is a slight overlap with the add method which mostly operates in
+    RGB (unless told so), while this method always operates in HSL space.
+
+        my $c = $color->blend_with( Graphics::Toolkit::Color->new('silver') );
+        $color->blend_with( 'silver' );                        # same thing
+        $color->blend_with( [192, 192, 192] );                 # still same
+        my $difference = $color->blend_with( $c2, -1 );
+
+  gradient_to
+    Creates a gradient (a list of colors that build a transition) between
+    current (C1) and a second, given color (C2).
+
+    The first argument is C2. Either as an Graphics::Toolkit::Color object
+    or a scalar (name, hex or reference), which is acceptable to the method
+    new.
+
+    Second argument is the number $n of colors, which make up the gradient
+    (including C1 and C2). It defaults to 3. These 3 colors C1, C2 and a
+    color in between, which is the same as the result of method blend_with.
+
+    Third argument is also a positive number $p, which defaults to one. It
+    defines the dynamics of the transition between the two colors. If $p ==
+    1 you get a linear transition - meaning the distance in HSL space
+    (distance_hsl) is equal from one color to the next. If $p != 1, the
+    formula $n ** $p starts to create a parabola function, which defines a
+    none linear mapping. For values $n > 1 the transition starts by sticking
+    to C1 and slowly getting faster and faster toward C2. Values $n < 1 do
+    the opposite: starting by moving fastest from C1 to C2 (big distances)
+    and becoming slower and slower.
+
+        my @colors = $c->gradient_to( $grey, 5 );         # we turn to grey
+        @colors = $c1->gradient_to( [14,10,222], 10, 3 ); # none linear gradient
+
+  complementary
+    Creates a set of complementary colors. It accepts 3 numerical arguments:
+    n, delta_S and delta_L.
+
+    Imagine an horizontal circle in HSL space, whith a center in the (grey)
+    center column. The saturation and lightness of all colors on that circle
+    is the same, they differ only in hue. The color of the current color
+    object ($self a.k.a C1) lies on that circle as well as C2, which is 180
+    degrees (half the circumference) apposed to C1.
+
+    This circle will be divided in $n (first argument) equal partitions,
+    creating $n equally distanced colors. All of them will be returned, as
+    objects, starting with C1. However, when $n is set to 1 (default), the
+    result is only C2, which is THE complementary color to C1.
+
+    The second argument moves C2 along the S axis (both directions), so that
+    the center of the circle is no longer in the HSL middle column and the
+    complementary colors differ in saturation. (C1 stays unmoved. )
+
+    The third argument moves C2 along the L axis (vertical), which gives the
+    circle a tilt, so that the complementary colors will differ in
+    lightness.
+
+        my @colors = $c->complementary( 3, +20, -10 );
+
+SEE ALSO
+    *   Color::Scheme
+
+    *   Graphics::ColorUtils
+
+    *   Graphics::ColorObject
+
+    *   Convert::Color
+
+    *   Graphics::ColorNames
+
+    *   Color::Similarity
+
+COPYRIGHT & LICENSE
+    Copyright 2022 Herbert Breunung.
+
+    This program is free software; you can redistribute it and/or modify it
+    under same terms as Perl itself.
+
+AUTHOR
+    Herbert Breunung, <lichtkind@cpan.org>
+

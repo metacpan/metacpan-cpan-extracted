@@ -1,3 +1,189 @@
+0.09 2022-10-07
+  [New Features]
+   * Add the clone method to the Sys::Socket::Sockaddr class.
+   
+     method clone : Sys::Socket::Sockaddr ()
+
+   * Add the clone method to the Sys::Socket::Sockaddr::In class.
+   
+     method clone : Sys::Socket::Sockaddr::In ()
+
+   * Add the clone method to the Sys::Socket::Sockaddr::In6 class.
+   
+     method clone : Sys::Socket::Sockaddr::In6 ()
+    
+   * Add the clone method to the Sys::Socket::Sockaddr::Un class.
+   
+     method clone : Sys::Socket::Sockaddr::Un ()
+    
+   * Add the clone method to the Sys::Socket::Sockaddr::Storage class.
+   
+     method clone : Sys::Socket::Sockaddr::Storage ()
+   
+   * Sys::Socket::Sockaddr has Cloneable interface.
+
+   * Added the accessor methods to the Sys::Socket::Addrinfo class.
+
+     method ai_flags : int ();
+     
+     method set_ai_flags : void ($ai_flags : int);
+     
+     method ai_family : int ();
+     
+     method set_ai_family : void ($ai_family : int);
+     
+     method ai_socktype : int ();
+     
+     method set_ai_socktype : void ($ai_socktype : int);
+     
+     method ai_protocol : int ();
+     
+     method set_ai_protocol : void ($ai_protocol : int);
+     
+     method copy_ai_addr : Sys::Socket::Sockaddr ();
+     
+     method copy_ai_canonname : string ();
+   
+   * Added the Sys::Socket::AddrinfoLinkedList class.
+    * Add the following methods to the Sys::Socket::Constant class.
+      
+      static method NI_MAXHOST : int ();
+      
+      static method NI_MAXSERV : int ();
+    
+  [Bug Fix With Incompatible Changes]
+    * Fixed the bug that the set_sin6_flowinfo method in the Sys::Socket::Sockaddr::In6 class didn't have the argument.
+      [Before]
+        method set_sin6_flowinfo : void ()
+      [After]
+        method set_sin6_flowinfo : void ($flowinfo : int)
+    * Fixed the bug that the set_sin6_scope_id in the Sys::Socket::Sockaddr::In6 class didn't have the argument.
+      [Before]
+        method set_sin6_scope_id : void ()
+      [After]
+        method set_sin6_scope_id : void ($scope_id : int)
+  [Prerequirement Changes]
+    * Need SPVM 0.9654+.
+  [Incompativle Changes]
+    * The definition of the getaddrinfo_raw and getaddrinfo methods in the Sys::Socket
+      [Before]
+        static method getaddrinfo_raw : int ($node : string, $service : string,
+                $hints : Sys::Socket::Addrinfo,
+                $res : Sys::Socket::Addrinfo[]);
+        static method getaddrinfo : int ($node : string, $service : string,
+                $hints : Sys::Socket::Addrinfo,
+                $res : Sys::Socket::Addrinfo[]);
+      [After]
+        static method getaddrinfo_raw : int ($node : string, $service : string,
+                $hints : Sys::Socket::Addrinfo,
+                $res : Sys::Socket::AddrinfoLinkedList[]);
+        static method getaddrinfo : int ($node : string, $service : string,
+                $hints : Sys::Socket::Addrinfo,
+                $res : Sys::Socket::AddrinfoLinkedList[]);
+    * Removed the POLLNORM method in the Sys::IO::Constant.
+    
+      static method POLLNORM : int ();
+      
+  [Bug Fix]
+    * Fixed the bug that the poll constant values in the Sys::IO::Constant was not used.
+    * Fixed the but that the return value of the WSAPoll method in the Sys::Socket class was wrong.
+  [Document Fix]
+    * Add the doc of the poll constant methods of Sys::IO::Constant.
+      
+      =head2 POLLERR
+
+        static method POLLERR : int ();
+
+      Get the constant value of C<POLLERR>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+      =head2 POLLHUP
+
+        static method POLLHUP : int ();
+
+      Get the constant value of C<POLLHUP>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+      =head2 POLLIN
+
+        static method POLLIN : int ();
+
+      Get the constant value of C<POLLIN>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+      =head2 POLLNVAL
+
+        static method POLLNVAL : int ();
+
+      Get the constant value of C<POLLNVAL>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+      =head2 POLLOUT
+
+        static method POLLOUT : int ();
+
+      Get the constant value of C<POLLOUT>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+      =head2 POLLPRI
+
+        static method POLLPRI : int ();
+
+      Get the constant value of C<POLLPRI>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+      =head2 POLLRDBAND
+
+        static method POLLRDBAND : int ();
+
+      Get the constant value of C<POLLRDBAND>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+      =head2 POLLRDNORM
+
+        static method POLLRDNORM : int ();
+
+      Get the constant value of C<POLLRDNORM>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+      =head2 POLLWRBAND
+
+        static method POLLWRBAND : int ();
+
+      Get the constant value of C<POLLWRBAND>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+      =head2 POLLWRNORM
+
+        static method POLLWRNORM : int ();
+
+      Get the constant value of C<POLLWRNORM>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+    * Fixed the document bug that Sys::IO::PollfdArray was called Sys::Poll::PollfdArray.
+
+0.08 2022-10-04
+  [New Features]
+   * Add the FIONBIO method to the Sys::Socket::Constant class.
+     
+     static method FIONBIO : int ();
+  
+  [Warning Fix]
+    * Fixed the some warnings on Mac.
+  [Bug Fix]
+    * Fixed the bug that the SOMAXCONN method in the Sys::Socket::Constant class couldn't be called.
+    * Fixed the bug that the getsockopt_int method in the Sys::Socket class doesn't work well.
+  [Changes]
+    * Change the return type of the inet_ntop method in the Sys::Socket class.
+      [Before]
+        static method inet_ntop : string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
+      [After]
+        static method inet_ntop : mutable string ($af : int, $src : object of Sys::Socket::In_addr|Sys::Socket::In6_addr, $dst : mutable string, $size : int);
+  [Testing Bug Fix]
+    * Fixed the testing bug of the getpriority method in the Sys::Process class.
+  [Incompatible Changes]
+    * Removed the ioctl_int method in the Sys::Socket class.
+    * Renamed the following method in the Sys::Socket::Sockaddr::In class.
+      [Before]
+        method sin_addr : Sys::Socket::In_addr ()
+      [After]
+        method copy_sin_addr : Sys::Socket::In_addr ()
+    * Renamed the following method in the Sys::Socket::Sockaddr::In6 class.
+      [Before]
+        method sin6_addr : Sys::Socket::In6_addr ();
+      [After]
+        method copy_sin6_addr : Sys::Socket::In6_addr ()
+    
 0.07 2022-09-29
   [Changes]
     * The inet_aton method in the Sys::Socket class is emulated using inet_pton on Windows.

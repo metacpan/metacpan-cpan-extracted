@@ -231,6 +231,7 @@ lib/Alien/Build/Plugin/Extract/ArchiveTar.pm
 lib/Alien/Build/Plugin/Extract/ArchiveZip.pm
 lib/Alien/Build/Plugin/Extract/CommandLine.pm
 lib/Alien/Build/Plugin/Extract/Directory.pm
+lib/Alien/Build/Plugin/Extract/File.pm
 lib/Alien/Build/Plugin/Extract/Negotiate.pm
 lib/Alien/Build/Plugin/Fetch.pod
 lib/Alien/Build/Plugin/Fetch/CurlCommand.pm
@@ -326,6 +327,7 @@ t/alien_build_plugin_extract_archivezip.t
 t/alien_build_plugin_extract_commandline.t
 t/alien_build_plugin_extract_commandline__tar_can.t
 t/alien_build_plugin_extract_directory.t
+t/alien_build_plugin_extract_file.t
 t/alien_build_plugin_extract_negotiate.t
 t/alien_build_plugin_fetch_curlcommand.t
 t/alien_build_plugin_fetch_httptiny.t

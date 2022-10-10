@@ -12,7 +12,7 @@ use App::Sqitch::Types qw(DBH ArrayRef);
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.3.0'; # VERSION
+our $VERSION = 'v1.3.1'; # VERSION
 
 sub key    { 'vertica' }
 sub name   { 'Vertica' }
@@ -46,6 +46,8 @@ has _vsql => (
         my $self = shift;
         my $uri  = $self->uri;
         my @ret  = ( $self->client );
+        # Use _port instead of port so it's empty if no port is in the URI.
+        # https://github.com/sqitchers/sqitch/issues/675
         for my $spec (
             [ username => $self->username ],
             [ dbname   => $uri->dbname    ],

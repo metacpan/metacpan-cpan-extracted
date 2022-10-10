@@ -1,0 +1,1 @@
+SELECT d1, d2, d3, sum( v ) FROM test GROUP BY ROLLUP( d1, ( d2, d3 ) ) 

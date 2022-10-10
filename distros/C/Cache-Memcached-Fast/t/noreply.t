@@ -1,43 +1,24 @@
-use warnings;
-use strict;
+use lib 't';
 
-use Test::More;
-
-use FindBin;
-
-use lib "$FindBin::Bin";
 use Memd;
+use Test2::V0 -target => 'Cache::Memcached::Fast';
 
-if ($Memd::memd) {
-    if ($Memd::version_num >= 10205) {
-        plan tests => 3;
-    } else {
-        plan skip_all => 'memcached 1.2.5 is required for noreply mode';
-    }
-} else {
-    plan skip_all => 'Not connected';
-}
-
+plan skip_all => 'memcached 1.2.5 is required' if $memd_version < v1.2.5;
 
 use constant count => 100;
 
 my %params = %Memd::params;
-foreach my $h (@{$params{servers}}) {
-    $h->{noreply} = 1 if ref($h) eq 'HASH';
+for ( @{ $params{servers} } ) {
+    $_->{noreply} = 1 if ref eq 'HASH';
 }
 
-my $another_memd = new Cache::Memcached::Fast(\%params);
+my $memd = CLASS->new( \%params );
 
-my @keys = map { "noreply-$_" } (1..count);
+my @keys = map "noreply-$_", 1 .. count;
+$memd->set_multi( map [ $_, $_ ], @keys );
 
-$another_memd->set_multi(map { [$_, $_] } @keys);
-my $res = $another_memd->get_multi(@keys);
-isa_ok($res, 'HASH');
-is(scalar keys %$res, scalar @keys, 'Number of entries in result');
-my $count = 0;
-foreach my $k (@keys) {
-    ++$count if exists $res->{$k} and $res->{$k} eq $k;
-}
-is($count, count);
+is $memd->get_multi(@keys), { map { $_ => $_ } @keys };
 
-$another_memd->delete_multi(@keys);
+$memd->delete_multi(@keys);
+
+done_testing;

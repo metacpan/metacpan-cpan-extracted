@@ -55,7 +55,7 @@
    "provides" : {
       "Pod::Weaver::Plugin::Rinci" : {
          "file" : "lib/Pod/Weaver/Plugin/Rinci.pm",
-         "version" : "0.783"
+         "version" : "0.784"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-Pod-Weaver-Plugin-Rinci"
       }
    },
-   "version" : "0.783",
+   "version" : "0.784",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

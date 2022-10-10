@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/CSVUtils.pm
 lib/App/CSVUtils/Manual/Cookbook.pod
+lib/App/CSVUtils/Manual/Tips.pod
 script/csv-add-field
 script/csv-avg
 script/csv-concat

@@ -94,12 +94,13 @@ sub foldsub {
     }
 }
 
-sub layout {
+sub set_layout {
     my $obj = shift;
     my $dp = shift;
-    $obj->do_pagebreak($dp);
-    $obj->do_space_layout($dp);
-    $obj->do_fillup($dp);
+    $obj->do_pagebreak($dp)
+        ->do_space_layout($dp)
+        ->do_fillup($dp);
+    return $obj;
 }
 
 sub do_space_layout {
@@ -123,7 +124,7 @@ sub do_space_layout {
 	    }
 	}
     }
-    @$dp;
+    return $obj;
 }
 
 sub _fillup {
@@ -142,6 +143,7 @@ sub do_fillup {
     $obj->{fillup} ||= 'pane';
     $line *= $obj->panes if $obj->fillup eq 'page';
     _fillup $dp, $line, $obj->fillup_str;
+    return $obj;
 }
 
 sub do_pagebreak {
@@ -158,25 +160,7 @@ sub do_pagebreak {
 	_fillup \@up, $height, $obj->fillup_str;
     }
     unshift @$dp, @up if @up;
-}
-
-sub insert_border {
-    my $obj = shift;
-    my $dp = shift;
-    my $height = $obj->height;
-    my $span = $obj->span;
-    my($bdr_top, $bdr_btm) = map { $obj->get_border($_) x $span } qw(top bottom);
-    $bdr_top or $bdr_btm or return;
-    for (my $page = 0; (my $top = $page * $height) < @$dp; $page++) {
-	if ($bdr_top) {
-	    splice @$dp, $top, 0, $bdr_top;
-	}
-	my $bottom_line = $top + $height - 1;
-	if ($bdr_btm and $bottom_line <= @$dp) {
-	    splice @$dp, $bottom_line, 0, $bdr_btm;
-	}
-    }
-    @$dp;
+    return $obj;
 }
 
 ######################################################################

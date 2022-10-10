@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or install the Expat stream-oriented XML parser
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 1;
@@ -23,7 +23,7 @@ Alien::Expat - Find or install the Expat stream-oriented XML parser
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -82,20 +82,11 @@ or L<FFI::Platypus>:
    lib => [ Alien::Expat->dynamic_libs ],
  );
 
-or for xmlwf from your Perl script / module
-
- use Alien::Expat;
- use Env qw( @PATH );
- 
- unshift @PATH, Alien::Expat->bin_dir;
- system 'xmlwf', '-v';
-
 =head1 DESCRIPTION
 
-This module can be used as a prereq for XS or FFI modules that need expat or the
-command-line tool that it comes from: xmlwf.  For more detail on how to use this
-module you can see the L<Alien::Build> user documentation at
-L<Alien::Build::Manual::AlienUser>.
+This module can be used as a prereq for XS or FFI modules that need expat.
+For more detail on how to use this module you can see the L<Alien::Build>
+user documentation at L<Alien::Build::Manual::AlienUser>.
 
 =head1 SEE ALSO
 

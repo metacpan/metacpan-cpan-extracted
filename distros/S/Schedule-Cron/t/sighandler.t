@@ -18,13 +18,13 @@ SKIP: {
     skip "alarm() not available", 1 if $@;
     
     # Check, whether an already installed signalhandler is called
-    $SIG{CHLD} = sub { 
-        pass;
+    $SIG{CHLD} = sub {         
+        pass "SIGCHLD received";
         exit 0;
     };
     
     $SIG{ALRM} = sub { 
-        fail;
+        fail "SIGALRM received";
         exit 0;
     };
     

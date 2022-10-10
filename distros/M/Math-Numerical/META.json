@@ -1,0 +1,63 @@
+{
+   "abstract" : "Algorithms for numerical functions (solver, root findings, etc.)",
+   "author" : [
+      "Mathias Kende <mathias@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "math",
+      "numerical",
+      "analysis",
+      "root",
+      "solver",
+      "derivative",
+      "integral"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-Numerical",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mkende/math_numerical/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mkende/math_numerical"
+      }
+   },
+   "version" : 0.02,
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

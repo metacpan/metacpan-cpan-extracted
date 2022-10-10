@@ -1,0 +1,167 @@
+# NAME
+
+MoobX - Reactive programming framework heavily inspired by JavaScript's MobX
+
+# VERSION
+
+version 0.1.2
+
+# SYNOPSIS
+
+```perl
+use 5.20.0;
+
+use MoobX;
+
+my $first_name :Observable;
+my $last_name  :Observable;
+my $title      :Observable;
+
+my $address = observer {
+    join ' ', $title || $first_name, $last_name;
+};
+
+say $address;  # nothing
+
+$first_name = "Yanick";
+$last_name  = "Champoux";
+
+say $address;  # Yanick Champoux
+
+$title = 'Dread Lord';
+
+say $address;  # Dread Lord Champoux
+```
+
+# DESCRIPTION
+
+As I was learning how to use [https://github.com/mobxjs/mobx|MobX](https://github.com/mobxjs/mobx|MobX), I thought
+it'd be fun to try to implement something similar in Perl. So I did. 
+
+To set Moose object attributes to be observers or observables, take
+a gander at [MoobX::Trait::Observable](https://metacpan.org/pod/MoobX%3A%3ATrait%3A%3AObservable) and [MoobX::Trait::Observer](https://metacpan.org/pod/MoobX%3A%3ATrait%3A%3AObserver).
+
+To have an idea of the mechanics of MoobX, see the two blog entries in the SEE ALSO
+section.
+
+This is also the early stages of life for this module. Consider everythign as alpha quality,
+and the API still subject to huge changes.
+
+# EXPORTED FUNCTIONS
+
+The module automatically exports 3 functions: `observer`, `observable` and `autorun`.
+
+## observable
+
+```perl
+observable my $foo;
+observable my @bar;
+observable my %quux;
+```
+
+Marks the variable as an observable, i.e. a variable which value can be 
+watched by observers, which will be updated when it changes.
+
+Under the hood, the variable is tied to the relevant [MoobX::TYPE](https://metacpan.org/pod/MoobX%3A%3ATYPE) class 
+[MoobX::TYPE::Observable](https://metacpan.org/pod/MoobX%3A%3ATYPE%3A%3AObservable) role.
+
+If you want to declare the variable, assign it a value and set it as observable,
+there are a few good ways to do it, and one bad:
+
+```perl
+my $foo = 3;
+observable $foo;            # good
+
+observable( my $foo = 3 );  # good
+
+observable my $foo;         # good
+$foo = 3;
+
+observable my $foo = 3;     # bad
+```
+
+That last one doesn't work because Perl parses it as `observable( my $foo ) = 3`,
+and assigning values to non _lvalue_ed functions don't work.
+
+Or, better, simply use the `:Observable` attribute when you define the variable.
+
+```perl
+my $foo :Observable = 2;
+my @bar :Observable = 1..10;
+my %baz :Observable = ( a => 1, b => 2 );
+```
+
+## observer
+
+```perl
+observable my $quantity;
+observable my $price;
+
+my $total = observer {
+    $quantity * $price
+};
+
+$quantity = 2;
+$price = 6.00;
+
+print $total; # 12
+```
+
+Creates a [MoobX::Observer](https://metacpan.org/pod/MoobX%3A%3AObserver) object. The value returned by the object will
+react to change to any `observable` values within its definition.
+
+Observers are lazy, meaning that they compute or recompute their values 
+when they are accessed. If you want
+them to eagerly recompute their values, `autorun` is what you want.
+
+If an observer function is run and doesn't report any dependency,
+it'll emit the warning '`MoobX observer doesn't observe anything`',
+because chances are there's something weird going on. The warning can 
+be silenced via the global variable `$MoobX::WARN_NO_DEPS`.
+
+```perl
+my $foo :Observable;
+
+my $debugging = 0;
+
+# if $debugging == 1, we'd get a warning
+local $MoobX::WARN_NO_DEPS = 0;
+
+my $spy = observer {
+    return unless $debugging;
+
+    say $foo;
+};
+```
+
+## autorun 
+
+```perl
+observable my $foo;
+
+autorun {
+    say "\$foo is now $foo";
+};
+
+$foo = 1; # prints '$foo is now 1'
+
+$foo = 2; # prints '$foo is now 2'
+```
+
+Like `observer`, but immediatly recompute its value when its observable dependencies change.
+
+# SEE ALSO
+
+- [https://github.com/mobxjs/mobx|MobX](https://github.com/mobxjs/mobx|MobX) - the original inspiration
+- [https://techblog.babyl.ca/entry/moobx](https://techblog.babyl.ca/entry/moobx) and [https://techblog.babyl.ca/entry/moobx-2](https://techblog.babyl.ca/entry/moobx-2) - the two blog entries that introduced MobX.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2017 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

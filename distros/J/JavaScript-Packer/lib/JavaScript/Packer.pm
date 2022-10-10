@@ -8,7 +8,7 @@ use Regexp::RegGrp;
 
 # =========================================================================== #
 
-our $VERSION = "2.09";
+our $VERSION = "2.10";
 
 our @BOOLEAN_ACCESSORS = ( 'no_compress_comment', 'remove_copyright' );
 
@@ -47,6 +47,7 @@ our $BASE62_VARS = {
 our $DICTIONARY = {
     STRING1     => qr~"(?>(?:(?>[^"\\]+)|\\.|\\")*)"~,
     STRING2     => qr~'(?>(?:(?>[^'\\]+)|\\.|\\')*)'~,
+    STRING3     => qr~`(?>(?:(?>[^`\\]+)|\\.|\\`)*)`~,
     REGEXP      => qr~\/(\\[\/\\]|[^*\/])(\\.|[^\/\n\\])*\/[gim]*~,
     OPERATOR    => qr'return|typeof|[\[(\^=,{}:;&|!*?]',
     CONDITIONAL => qr~\/\*\@\w*|\w*\@\*\/|\/\/\@\w*|\@(?>\w+)~,
@@ -61,13 +62,14 @@ our $DICTIONARY = {
 our $DATA = [
     { regexp => $DICTIONARY->{STRING1} },
     { regexp => $DICTIONARY->{STRING2} },
+    { regexp => $DICTIONARY->{STRING3} },
     { regexp => $DICTIONARY->{CONDITIONAL} },
     {
         regexp      => '(' . $DICTIONARY->{OPERATOR} . ')\s*(' . $DICTIONARY->{REGEXP} . ')',
         replacement => sub {
             return sprintf( "%s%s", $_[0]->{submatches}->[0], $_[0]->{submatches}->[1] );
         },
-    }
+    },
 ];
 
 our $COMMENTS = [
@@ -234,7 +236,7 @@ sub init {
     bless( $self, $class );
 
     @{ $self->{clean}->{reggrp_data} } = ( @$DATA, @$CLEAN );
-    @{ $self->{whitespace}->{reggrp_data} } = ( @$DATA[ 0, 1, 3 ], @$WHITESPACE );
+    @{ $self->{whitespace}->{reggrp_data} } = ( @$DATA[ 0, 1, 2, 4 ], @$WHITESPACE );
     $self->{trim}->{reggrp_data} = $TRIM;
 
     @{ $self->{data_store}->{reggrp_data} } = map {
@@ -260,18 +262,20 @@ sub init {
         {
             regexp => $data->{regexp},
             store  => sub {
-                my ( $quote, $string ) = $_[0]->{match} =~ /^(['"])(.*)(['"])$/;
+                my ( $quote, $string, $rest ) = $_[0]->{match} =~ /^(['"`])(.*)(['"`])$/;
+				return $_[0]->{match} if ! $rest;
 
                 return $string;
             },
             replacement => sub {
-                my ( $quote, $string ) = $_[0]->{match} =~ /^(['"])(.*)(['"])$/;
+                my ( $quote, $string, $rest ) = $_[0]->{match} =~ /^(['"`])(.*)(['"`])$/;
+				return $_[0]->{match} if ! $rest;
 
                 return sprintf( "%s$RESTORE_REPLACEMENT%s", $quote, $_[0]->{store_index}, $quote );
             },
 
         };
-    } @$DATA[ 0, 1 ];
+    } @$DATA[ 0, 1, 2 ];
 
     @{ $self->{concat}->{reggrp_data} } = map {
         my $quote           = $_;
@@ -298,9 +302,9 @@ sub init {
                 return $ret;
             },
         };
-    } ( '"', '\'' );
+    } ( '"', '\'', '\`' );
 
-    @{ $self->{comments}->{reggrp_data} } = ( @$DATA[ 0, 1, 3 ], @$COMMENTS );
+    @{ $self->{comments}->{reggrp_data} } = ( @$DATA[ 0, 1, 2, 4 ], @$COMMENTS );
 
     # single line comment
     $self->{comments}->{reggrp_data}->[-2]->{replacement} = sub {
@@ -753,7 +757,7 @@ JavaScript::Packer - Perl version of Dean Edwards' Packer.js
 
 =head1 VERSION
 
-Version 2.09
+Version 2.10
 
 =head1 DESCRIPTION
 

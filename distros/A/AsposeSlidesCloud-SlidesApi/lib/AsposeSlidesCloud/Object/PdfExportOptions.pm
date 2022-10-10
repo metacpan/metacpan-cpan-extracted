@@ -40,6 +40,7 @@ use DateTime;
 use AsposeSlidesCloud::Object::AccessPermissions;
 use AsposeSlidesCloud::Object::ExportOptions;
 use AsposeSlidesCloud::Object::FontFallbackRule;
+use AsposeSlidesCloud::Object::FontSubstRule;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -193,6 +194,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'font_subst_rules' => {
+    	datatype => 'ARRAY[FontSubstRule]',
+    	base_name => 'FontSubstRules',
+    	description => 'Gets of sets list of font substitution rules.',
+    	format => '',
+    	read_only => '',
+    		},
     'format' => {
     	datatype => 'string',
     	base_name => 'Format',
@@ -338,6 +346,7 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'default_regular_font' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
+    'font_subst_rules' => 'ARRAY[FontSubstRule]',
     'format' => 'string',
     'text_compression' => 'string',
     'embed_full_fonts' => 'boolean',
@@ -363,6 +372,7 @@ __PACKAGE__->swagger_types( {
 __PACKAGE__->attribute_map( {
     'default_regular_font' => 'DefaultRegularFont',
     'font_fallback_rules' => 'FontFallbackRules',
+    'font_subst_rules' => 'FontSubstRules',
     'format' => 'Format',
     'text_compression' => 'TextCompression',
     'embed_full_fonts' => 'EmbedFullFonts',

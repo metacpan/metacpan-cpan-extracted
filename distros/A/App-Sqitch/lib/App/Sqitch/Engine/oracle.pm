@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.3.0'; # VERSION
+our $VERSION = 'v1.3.1'; # VERSION
 
 BEGIN {
     # We tell the Oracle connector which encoding to use. The last part of the
@@ -695,6 +695,8 @@ sub _script {
     my $self = shift;
     my $uri  = $self->uri;
     my $conn = '';
+    # Use _port instead of port so it's empty if no port is in the URI.
+    # https://github.com/sqitchers/sqitch/issues/675
     my ($user, $pass, $host, $port) = (
         $self->username, $self->password, $uri->host, $uri->_port
     );

@@ -8,7 +8,7 @@ use Encode qw( decode );
 use experimental qw( signatures );
 
 # ABSTRACT: Private class for Archive::Libarchive
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub lib
@@ -97,7 +97,7 @@ Archive::Libarchive::Lib - Private class for Archive::Libarchive
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

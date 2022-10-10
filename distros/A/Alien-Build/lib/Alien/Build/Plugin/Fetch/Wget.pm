@@ -12,7 +12,7 @@ use File::chdir;
 use List::Util qw( pairmap );
 
 # ABSTRACT: Plugin for fetching files using wget
-our $VERSION = '2.70'; # VERSION
+our $VERSION = '2.71'; # VERSION
 
 
 sub _wget
@@ -144,7 +144,7 @@ Alien::Build::Plugin::Fetch::Wget - Plugin for fetching files using wget
 
 =head1 VERSION
 
-version 2.70
+version 2.71
 
 =head1 SYNOPSIS
 

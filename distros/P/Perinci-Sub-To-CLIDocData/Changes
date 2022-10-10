@@ -1,3 +1,9 @@
+0.301   2022-10-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] In generated POD usage line, link to appropriate Sah::Schema
+          module.
+
+
 0.300   2022-06-03  Released-By: PERLANCAR; Urgency: medium
 
         - In generating usage line, tweak grouping again: now all arg-based

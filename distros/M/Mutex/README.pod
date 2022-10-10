@@ -6,7 +6,7 @@ Mutex - Various locking implementations supporting processes and threads
 
 =head1 VERSION
 
-This document describes Mutex version 1.006
+This document describes Mutex version 1.007
 
 =head1 SYNOPSIS
 
@@ -161,10 +161,10 @@ Mario E. Roy, S<E<lt>marioeroy AT gmail DOT comE<gt>>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2020 by Mario E. Roy
+Copyright (C) 2017-2022 by Mario E. Roy
 
 Mutex is released under the same license as Perl.
 
-See L<http://dev.perl.org/licenses/> for more information.
+See L<https://dev.perl.org/licenses/> for more information.
 
 =cut

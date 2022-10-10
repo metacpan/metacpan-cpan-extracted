@@ -8,13 +8,16 @@ use English;
 use Error::Pure qw(err);
 use List::Util qw(none);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub new {
 	my ($class, @params) = @_;
 
 	# Create object.
 	my $self = bless {}, $class;
+
+	# db debug.
+	$self->{'db_debug'} = 0;
 
 	# db user password.
 	$self->{'db_password'} = undef;
@@ -50,8 +53,8 @@ sub new {
 	$self->{'_schema'} = eval {
 		$self->{'schema_module'}->connect(
 			$self->{'dsn'},
-			$self->{'user'},
-			$self->{'password'},
+			$self->{'db_user'},
+			$self->{'db_password'},
 			$self->{'db_options'},
 		);
 	};
@@ -64,6 +67,10 @@ sub new {
 		err "Instance of schema must be a 'DBIx::Class::Schema' object.",
 			'Reference', $self->{'_schema'}->isa,
 		;
+	}
+
+	if ($self->{'db_debug'}) {
+		$self->{'_schema'}->storage->debug(1);
 	}
 
 	return $self;

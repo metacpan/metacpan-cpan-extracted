@@ -1,21 +1,20 @@
-package Sub::Call::Tail; # git description: v0.06-16-g0ca0d45
+package Sub::Call::Tail; # git description: v0.07-8-g55f94e4
 # ABSTRACT: Tail calls for subroutines and methods
 
 use strict;
 use warnings;
 
-require 5.008001;
-use parent qw(Exporter DynaLoader);
+use 5.008001;
+use parent qw(Exporter);
+use XSLoader ();
 use B::Hooks::OP::Check::EntersubForCV;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our @EXPORT = our @EXPORT_OK = qw(tail);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-__PACKAGE__->bootstrap($VERSION);
-
-pop our @ISA;
+XSLoader::load(__PACKAGE__, $VERSION);
 
 # ex: set sw=4 et:
 
@@ -33,7 +32,7 @@ Sub::Call::Tail - Tail calls for subroutines and methods
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -55,7 +54,7 @@ at compile time into a goto.
 
 =head1 USAGE WARNING
 
-<B>WARNING! The author does not endorse using this module for anything real.
+B<WARNING>! The author does not endorse using this module for anything real.
 It was written primarily to demonstrate that such quackery can be achieved.
 Use at your own risk!
 
@@ -76,7 +75,7 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Florian Ragwitz Graham Knop Andrew Main (Zefram)
+=for stopwords Karen Etheridge Graham Knop Florian Ragwitz Andrew Main (Zefram) Ollis
 
 =over 4
 
@@ -86,15 +85,19 @@ Karen Etheridge <ether@cpan.org>
 
 =item *
 
-Florian Ragwitz <rafl@debian.org>
-
-=item *
-
 Graham Knop <haarg@haarg.org>
 
 =item *
 
+Florian Ragwitz <rafl@debian.org>
+
+=item *
+
 Andrew Main (Zefram) <zefram@fysh.org>
+
+=item *
+
+Graham Ollis <plicease@cpan.org>
 
 =item *
 

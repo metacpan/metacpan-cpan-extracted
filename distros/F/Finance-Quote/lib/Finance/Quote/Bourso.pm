@@ -81,12 +81,15 @@ use Encode qw(decode);
 use JSON qw( decode_json );
 use utf8;
 
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.53'; # VERSION
 
 my $Bourso_URL = 'https://www.boursorama.com/cours/';
 
 sub methods {
-    return ( bourso => \&bourso
+    return (
+             europe => \&bourso,
+             france => \&bourso,
+             bourso => \&bourso
     );
 }
 
@@ -95,7 +98,10 @@ sub methods {
         qw/name last date isodate p_change open high low close volume currency method exchange/;
 
     sub labels {
-        return ( bourso => \@labels
+        return (
+                 europe => \@labels,
+                 france => \@labels,
+                 bourso => \@labels
         );
     }
 }

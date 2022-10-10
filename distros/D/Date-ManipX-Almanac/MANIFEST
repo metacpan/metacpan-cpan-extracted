@@ -1,5 +1,6 @@
 Build.PL
 Changes
+CONTRIBUTING
 eg/dmd-almanac
 eg/dmd-almanac.cfg
 inc/My/Module/Build.pm

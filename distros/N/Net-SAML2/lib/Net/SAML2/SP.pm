@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 use Moose;
 
@@ -136,6 +136,9 @@ around BUILDARGS => sub {
         }
     }
 
+    foreach (@{$args{assertion_consumer_service}}) {
+        $_->{isDefault} = 'false' if !exists $_->{isDefault};
+    }
 
     return $self->$orig(%args);
 };
@@ -230,8 +233,6 @@ sub slo_redirect_binding {
         cert  => $idp->cert('signing'),
         key   => $self->key,
         param => $param,
-        sls_force_lcase_url_encoding => $idp->{sls_force_lcase_url_encoding},
-        sls_double_encoded_response => $idp->{sls_double_encoded_response},
     );
     return $redirect;
 }
@@ -240,17 +241,13 @@ sub slo_redirect_binding {
 sub soap_binding {
     my ($self, $ua, $idp_url, $idp_cert) = @_;
 
-    if (!$self->has_cacert) {
-        croak("Unable to create SOAP binding, no CA certificate provided");
-    }
-
     return Net::SAML2::Binding::SOAP->new(
         ua       => $ua,
         key      => $self->key,
         cert     => $self->cert,
         url      => $idp_url,
         idp_cert => $idp_cert,
-        cacert   => $self->cacert,
+        $self->has_cacert ? (cacert => $self->cacert) : (),
     );
 }
 
@@ -415,7 +412,7 @@ Net::SAML2::SP - Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.59
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -438,7 +435,11 @@ Arguments:
 
 =item B<url>
 
-base for all SP service URLs
+Base for all SP service URLs
+
+=item B<error_url>
+
+The error URI. Can be relative to the base URI or a regular URI
 
 =item B<id>
 
@@ -446,15 +447,15 @@ SP's identity URI.
 
 =item B<cert>
 
-path to the signing certificate
+Path to the signing certificate
 
 =item B<key>
 
-path to the private key for the signing certificate
+Path to the private key for the signing certificate
 
 =item B<cacert>
 
-path to the CA certificate for verification
+Path to the CA certificate for verification
 
 =item B<org_name>
 

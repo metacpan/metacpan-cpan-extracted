@@ -12,6 +12,8 @@ use Devel::MAT;
 
 use Future;
 
+use constant USING_FUTURE_XS => defined &Future::XS::new;
+
 use Scalar::Util qw( refaddr );
 
 ( my $file = __FILE__ ) =~ s/\.t$/.pmat/;
@@ -60,49 +62,52 @@ BEGIN {
    $FUTURES{cancelled}->cancel;
 }
 
+my $MATCH_Future = USING_FUTURE_XS ? "SCALAR(UV)=Future" : "HASH(_NUM_)=Future";
+my $DETAIL       = USING_FUTURE_XS ? "UV=_NUM_"          : "_NUM_ values (use 'values' command to show)";
+
 # show command with added output
 #   Note: these tests are quite fragile as they depend on the exact output format of 'show'
 {
    output_matches_ok {
       $pmat->run_command( Commandable::Invocation->new( "show " . (refaddr $::FUTURES{pending}) ) );
-   } <<'EOF', 'output from "classes" command';
-HASH(_NUM_)=Future at _ADDR_ with refcount 1
+   } <<"EOF", 'output from "show" command on pending';
+$MATCH_Future at _ADDR_ with refcount 1
   size _NUM_ bytes
   blessed as Future
   Future state pending
-  _NUM_ values (use 'values' command to show)
+  $DETAIL
 EOF
 
    output_matches_ok {
       $pmat->run_command( Commandable::Invocation->new( "show " . (refaddr $::FUTURES{done}) ) );
-   } <<'EOF', 'output from "classes" command';
-HASH(_NUM_)=Future at _ADDR_ with refcount 1
+   } <<"EOF", 'output from "show" command on done';
+$MATCH_Future at _ADDR_ with refcount 1
   size _NUM_ bytes
   blessed as Future
   Future state done
   Future result: SCALAR(UV) at _ADDR_ = 1, ...
-  _NUM_ values (use 'values' command to show)
+  $DETAIL
 EOF
 
    output_matches_ok {
       $pmat->run_command( Commandable::Invocation->new( "show " . (refaddr $::FUTURES{failed}) ) );
-   } <<'EOF', 'output from "classes" command';
-HASH(_NUM_)=Future at _ADDR_ with refcount 1
+   } <<"EOF", 'output from "show" command on failed';
+$MATCH_Future at _ADDR_ with refcount 1
   size _NUM_ bytes
   blessed as Future
   Future state failed
   Future failure: "oops"
-  _NUM_ values (use 'values' command to show)
+  $DETAIL
 EOF
 
    output_matches_ok {
       $pmat->run_command( Commandable::Invocation->new( "show " . (refaddr $::FUTURES{cancelled}) ) );
-   } <<'EOF', 'output from "classes" command';
-HASH(_NUM_)=Future at _ADDR_ with refcount 1
+   } <<"EOF", 'output from "show" command on cancelled';
+$MATCH_Future at _ADDR_ with refcount 1
   size _NUM_ bytes
   blessed as Future
   Future state cancelled
-  _NUM_ values (use 'values' command to show)
+  $DETAIL
 EOF
 }
 
@@ -110,26 +115,26 @@ EOF
 {
    output_matches_ok {
       $pmat->run_command( Commandable::Invocation->new( "find future -p" ) );
-   } <<'EOF', 'output from "find future -p" command';
-HASH(_NUM_)=Future at _ADDR_: Future(pending)
+   } <<"EOF", 'output from "find future -p" command';
+$MATCH_Future at _ADDR_: Future(pending)
 EOF
 
    output_matches_ok {
       $pmat->run_command( Commandable::Invocation->new( "find future -d" ) );
-   } <<'EOF', 'output from "find future -d" command';
-HASH(_NUM_)=Future at _ADDR_: Future(done) - SCALAR(UV) at _ADDR_ = 1, ...
+   } <<"EOF", 'output from "find future -d" command';
+$MATCH_Future at _ADDR_: Future(done) - SCALAR(UV) at _ADDR_ = 1, ...
 EOF
 
    output_matches_ok {
       $pmat->run_command( Commandable::Invocation->new( "find future -f" ) );
-   } <<'EOF', 'output from "find future -f" command';
-HASH(_NUM_)=Future at _ADDR_: Future(failed) - "oops"
+   } <<"EOF", 'output from "find future -f" command';
+$MATCH_Future at _ADDR_: Future(failed) - "oops"
 EOF
 
    output_matches_ok {
       $pmat->run_command( Commandable::Invocation->new( "find future -c" ) );
-   } <<'EOF', 'output from "find future -c" command';
-HASH(_NUM_)=Future at _ADDR_: Future(cancelled)
+   } <<"EOF", 'output from "find future -c" command';
+$MATCH_Future at _ADDR_: Future(cancelled)
 EOF
 }
 

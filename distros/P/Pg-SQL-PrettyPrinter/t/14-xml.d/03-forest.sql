@@ -1,0 +1,1 @@
+SELECT XMLFOREST( name, age, salary AS pay ) 

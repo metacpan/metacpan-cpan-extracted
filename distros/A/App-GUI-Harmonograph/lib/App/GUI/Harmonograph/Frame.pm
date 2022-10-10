@@ -54,14 +54,13 @@ sub new {
     $self->{'color_flow'}       = App::GUI::Harmonograph::Frame::Part::ColorFlow->new( $self->{'tab'}{'pen'}, $self );
     $self->{'line'}             = App::GUI::Harmonograph::Frame::Part::PenLine->new( $self->{'tab'}{'pen'} );
                                
-    $self->{'progress'}            = App::GUI::Harmonograph::ProgressBar->new( $self, 450, 5, { red => 20, green => 20, blue => 110 });
-    $self->{'board'}               = App::GUI::Harmonograph::Frame::Part::Board->new($self, 600, 600);
+    $self->{'progress'}            = App::GUI::Harmonograph::ProgressBar->new( $self, 450, 10, { red => 20, green => 20, blue => 110 });
+    $self->{'board'}               = App::GUI::Harmonograph::Frame::Part::Board->new( $self , 600, 600 );
     $self->{'dialog'}{'about'}     = App::GUI::Harmonograph::Dialog::About->new();
     $self->{'dialog'}{'interface'} = App::GUI::Harmonograph::Dialog::Interface->new();
     $self->{'dialog'}{'function'}  = App::GUI::Harmonograph::Dialog::Function->new();
 
     my $btnw = 50; my $btnh     = 40;# button width and height
-    #Wx::Event::EVT_BUTTON( $self, $self->{'btn'}{'exit'},  sub { $self->Close; } );
     $self->{'btn'}{'dir'}       = Wx::Button->new( $self, -1, 'Dir',   [-1,-1],[$btnw, $btnh] );
     $self->{'btn'}{'write_next'}= Wx::Button->new( $self, -1, 'INI',   [-1,-1],[$btnw, $btnh] );
     $self->{'btn'}{'draw'}      = Wx::Button->new( $self, -1, '&Draw', [-1,-1],[$btnw, $btnh] );
@@ -70,18 +69,13 @@ sub new {
     $self->{'txt'}{'file_bname'}= Wx::TextCtrl->new( $self,-1, $self->{'config'}->get_value('file_base_name'), [-1,-1],   [100, -1] );
     $self->{'txt'}{'file_bnr'}  = Wx::TextCtrl->new( $self,-1, $self->{'config'}->get_value('file_base_counter'), [-1,-1], [ 36, -1], &Wx::wxTE_READONLY );
 
-    $self->{'btn'}{'dir'}->SetToolTip('slect directory to save file series in');
+    $self->{'btn'}{'dir'}->SetToolTip('select directory to save file series in');
     $self->{'btn'}{'write_next'}->SetToolTip('save current image settings into text file with name seen in text field with added number and file ending .ini');
     $self->{'btn'}{'draw'}->SetToolTip('redraw the harmonographic image');
     $self->{'btn'}{'save_next'}->SetToolTip('save current image into SVG file with name seen in text field with added number and file ending .svg');
     $self->{'txt'}{'file_bname'}->SetToolTip("file base name (without ending) for a series of files you save (settings and images)");
     $self->{'txt'}{'file_bnr'}->SetToolTip("index of file base name,\nwhen pushing Next button, image or settings are saved under Dir + File + Index + Ending");
 
-
-    #Wx::Event::EVT_TOGGLEBUTTON( $self, $self->{'btn'}{'tips'},  sub { 
-    #    Wx::ToolTip::Enable( $_[1]->IsChecked );
-    #    $self->{'config'}->set_value('tips', $_[1]->IsChecked ? 1 : 0 );
-    #});
     Wx::Event::EVT_TEXT_ENTER( $self, $self->{'txt'}{'file_bname'}, sub { $self->update_base_name });
     Wx::Event::EVT_KILL_FOCUS(        $self->{'txt'}{'file_bname'}, sub { $self->update_base_name });
     
@@ -127,9 +121,6 @@ sub new {
 
 
     # GUI layout assembly
-    my $image_menu = Wx::Menu->new();
-    $image_menu->Append( 12100, "&Draw\tCtrl+D", "complete a sketch drawing" );
-    $image_menu->Append( 12200, "&Save\tCtrl+S", "save currently displayed image" );
     
     my $settings_menu = $self->{'setting_menu'} = Wx::Menu->new();
     $settings_menu->Append( 11100, "&Init\tCtrl+I", "put all settings to default" );
@@ -137,6 +128,40 @@ sub new {
     $settings_menu->Append( 11400, "&Write\tCtrl+W", "store curent settings into an INI file" );
     $settings_menu->AppendSeparator();
     $settings_menu->Append( 11500, "&Quit\tAlt+Q", "save configs and close program" );
+
+
+    my $image_size_menu = Wx::Menu->new();
+    for (1 .. 20) {
+        my $size = $_ * 100;
+        $image_size_menu->AppendRadioItem(12100 + $_, $size, "set image size to $size x $size");
+        Wx::Event::EVT_MENU( $self, 12100 + $_, sub { 
+            my $size = 100 * ($_[1]->GetId - 12100); 
+            $self->{'config'}->set_value('image_size', $size);
+            $self->{'board'}->set_size( $size );
+        });
+        
+    }
+    $image_size_menu->Check( 12100 +($self->{'config'}->get_value('image_size') / 100), 1);
+
+    my $image_format_menu = Wx::Menu->new();
+    $image_format_menu->AppendRadioItem(12201, 'PNG', "set default image format to PNG");
+    $image_format_menu->AppendRadioItem(12202, 'JPEG', "set default image format to JPEG");
+    $image_format_menu->AppendRadioItem(12203, 'SVG', "set default image format to SVG");
+    
+    Wx::Event::EVT_MENU( $self, 12201, sub { $self->{'config'}->set_value('file_base_ending', 'png') });
+    Wx::Event::EVT_MENU( $self, 12202, sub { $self->{'config'}->set_value('file_base_ending', 'jpg') });
+    Wx::Event::EVT_MENU( $self, 12203, sub { $self->{'config'}->set_value('file_base_ending', 'svg') });
+
+    $image_format_menu->Check( 12201, 1 ) if $self->{'config'}->get_value('file_base_ending') eq 'png';
+    $image_format_menu->Check( 12202, 1 ) if $self->{'config'}->get_value('file_base_ending') eq 'jpg';
+    $image_format_menu->Check( 12203, 1 ) if $self->{'config'}->get_value('file_base_ending') eq 'svg';
+    
+    my $image_menu = Wx::Menu->new();
+    $image_menu->Append( 12300, "&Draw\tCtrl+D", "complete a sketch drawing" );
+    $image_menu->Append( 12100, "S&ize",  $image_size_menu,   "set image size" );
+    $image_menu->Append( 12200, "&Format",  $image_format_menu, "set default image formate" );
+    $image_menu->Append( 12400, "&Save\tCtrl+S", "save currently displayed image" );
+
     
     my $help_menu = Wx::Menu->new();
     $help_menu->Append( 13100, "&Function\tAlt+F", "Dialog with information how an Harmonograph works" );
@@ -153,8 +178,8 @@ sub new {
     Wx::Event::EVT_MENU( $self, 11200, sub { $self->open_settings_dialog });
     Wx::Event::EVT_MENU( $self, 11400, sub { $self->write_settings_dialog });
     Wx::Event::EVT_MENU( $self, 11500, sub { $self->Close });
-    Wx::Event::EVT_MENU( $self, 12100, sub { $self->draw });
-    Wx::Event::EVT_MENU( $self, 12200, sub { $self->save_image_dialog });
+    Wx::Event::EVT_MENU( $self, 12300, sub { $self->draw });
+    Wx::Event::EVT_MENU( $self, 12400, sub { $self->save_image_dialog });
     Wx::Event::EVT_MENU( $self, 13100, sub { $self->{'dialog'}{'function'}->ShowModal });
     Wx::Event::EVT_MENU( $self, 13200, sub { $self->{'dialog'}{'interface'}->ShowModal });
     Wx::Event::EVT_MENU( $self, 13300, sub { $self->{'dialog'}{'about'}->ShowModal });
@@ -292,8 +317,13 @@ sub write_settings_dialog {
 
 sub save_image_dialog {
     my ($self) = @_;
-    my $dialog = Wx::FileDialog->new ( $self, "select a file name to save image", $self->{'config'}->get_value('save_dir'), '',
-                   ( join '|', 'SVG files (*.svg)|*.svg', 'PNG files (*.png)|*.png', 'JPEG files (*.jpg)|*.jpg', 'All files (*.*)|*.*' ), &Wx::wxFD_SAVE );
+    my @wildcard = ( 'SVG files (*.svg)|*.svg', 'PNG files (*.png)|*.png', 'JPEG files (*.jpg)|*.jpg');
+    my $wildcard = '|All files (*.*)|*.*';
+    $wildcard = ( join '|', @wildcard[2,1,0]) . $wildcard if $self->{'config'}->get_value('file_base_ending') eq 'jpg';
+    $wildcard = ( join '|', @wildcard[1,0,2]) . $wildcard if $self->{'config'}->get_value('file_base_ending') eq 'png';
+    $wildcard = ( join '|', @wildcard[0,1,2]) . $wildcard if $self->{'config'}->get_value('file_base_ending') eq 'svg';
+    
+    my $dialog = Wx::FileDialog->new ( $self, "select a file name to save image", $self->{'config'}->get_value('save_dir'), '', $wildcard, &Wx::wxFD_SAVE );
     return if $dialog->ShowModal == &Wx::wxID_CANCEL;
     my $path = $dialog->GetPath;
     return if -e $path and
@@ -329,7 +359,7 @@ sub set_data {
 sub draw {
     my ($self) = @_;
     $self->SetStatusText( "drawing .....", 0 );
-    $self->{'progress'}->set_percentage( 0 );
+    $self->{'progress'}->reset;
     $self->{'progress'}->set_color( $self->{'color'}{'start'}->get_data );
     $self->{'board'}->set_data( $self->get_data );
     $self->{'board'}->Refresh;
@@ -339,7 +369,7 @@ sub draw {
 sub sketch {
     my ($self) = @_;
     $self->SetStatusText( "sketching a preview .....", 0 );
-    $self->{'progress'}->set_percentage( 0 );
+    $self->{'progress'}->reset;
     $self->{'board'}->set_data( $self->get_data );
     $self->{'board'}->set_sketch_flag( );
     $self->{'board'}->Refresh;
@@ -446,10 +476,4 @@ sub write_image {
     $self->SetStatusText( "saved image under: $file", 0 );
 }
 
-
-
 1;
-
-__END__
-
-# Wx::Event::EVT_LEFT_DOWN( $self->{'board'}, sub {});

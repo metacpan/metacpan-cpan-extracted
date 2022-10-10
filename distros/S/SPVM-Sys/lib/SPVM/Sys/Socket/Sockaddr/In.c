@@ -63,7 +63,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__In__set_sin_family(SPVM_ENV* env, SPVM_VALU
   return 0;
 }
 
-int32_t SPVM__Sys__Socket__Sockaddr__In__sin_addr(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__Socket__Sockaddr__In__copy_sin_addr(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t e = 0;
   

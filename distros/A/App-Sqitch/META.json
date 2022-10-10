@@ -271,6 +271,7 @@
          "requires" : {
             "Capture::Tiny" : "0.12",
             "Carp" : "0",
+            "DBD::Mem" : "0",
             "File::Find" : "0",
             "File::Spec" : "0",
             "File::Spec::Functions" : "0",
@@ -304,9 +305,9 @@
          "url" : "https://github.com/sqitchers/sqitch/"
       }
    },
-   "version" : "v1.3.0",
+   "version" : "v1.3.1",
    "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.31",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "MIT"
 }
 

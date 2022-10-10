@@ -1,0 +1,1 @@
+SELECT * FROM ( SELECT a FROM b ) AS x

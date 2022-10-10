@@ -1,3 +1,6 @@
+0.018		2022-09-29	T. R. Wyant
+    Localize $_ before while (<>) in eg/ scripts.
+
 0.017		2021-08-01	T. R. Wyant
     Correct generation of 'provides' metadata.  Thanks to Favio Poletti
     for blogging

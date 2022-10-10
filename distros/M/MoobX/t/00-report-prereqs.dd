@@ -4,13 +4,6 @@ do { my $x = {
                                         'ExtUtils::MakeMaker' => '0'
                                       }
                       },
-       'develop' => {
-                      'requires' => {
-                                      'Test::More' => '0',
-                                      'Test::PAUSE::Permissions' => '0',
-                                      'strict' => '0'
-                                    }
-                    },
        'runtime' => {
                       'requires' => {
                                       'Attribute::Handlers' => '0',

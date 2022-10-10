@@ -8,13 +8,13 @@ SYNOPSIS
        use Test::More;
        use Test::ExpectAndCheck;
     
-       my ( $controller, $puppet ) = Test::ExpectAndCheck->create;
+       my ( $controller, $mock ) = Test::ExpectAndCheck->create;
     
        {
           $controller->expect( act => 123, 45 )
-             ->returns( 678 );
+             ->will_return( 678 );
     
-          is( $puppet->act( 123, 45 ), 678, '$puppet->act returns result' );
+          is( $mock->act( 123, 45 ), 678, '$mock->act returns result' );
     
           $controller->check_and_clear( '->act' );
        }
@@ -24,39 +24,65 @@ SYNOPSIS
 DESCRIPTION
 
     This package creates objects that assist in writing unit tests with
-    mocked object instances. Each mocked "puppet" instance will expect to
-    receive a given list of method calls. Each method call is checked that
-    it received the right arguments, and will return a prescribed result.
-    At the end of each test, each object is checked to ensure all the
-    expected methods were called.
+    mocked object instances. Each mock instance will expect to receive a
+    given list of method calls. Each method call is checked that it
+    received the right arguments, and will return a prescribed result. At
+    the end of each test, each object is checked to ensure all the expected
+    methods were called.
 
 METHODS
 
  create
 
-       ( $controller, $puppet ) = Test::ExpectAndCheck->create;
+       ( $controller, $mock ) = Test::ExpectAndCheck->create;
 
     Objects are created in "entangled pairs" by the create method. The
     first object is called the "controller", and is used by the unit
     testing script to set up what method calls are to be expected, and what
-    their results shall be. The second object is the "puppet", the object
-    to be passed to the code being tested, on which the expected method
-    calls are (hopefully) invoked. It will have whatever interface is
-    implied by the method call expectations.
+    their results shall be. The second object is the "mock", the object to
+    be passed to the code being tested, on which the expected method calls
+    are (hopefully) invoked. It will have whatever interface is implied by
+    the method call expectations.
 
  expect
 
-       $exp = $controller->expect( $method, @args )
+       $exp = $controller->expect( $method, @args );
 
-    Specifies that the puppet will expect to receive a method call of the
+    Specifies that the mock will expect to receive a method call of the
     given name, with the given arguments.
 
     The argument values are compared using "cmp_deeply" in Test::Deep.
     Values can be specified literally, or using any of the "Special
     Comparisons" defined by Test::Deep.
 
-    The test script can call the "returns" or "throws" methods on the
-    expectation to set what the result of invoking this method will be.
+    The test script can call the "will_return" or "will_throw" methods on
+    the expectation to set what the result of invoking this method will be.
+
+ whenever
+
+       $exp = $controller->whenever( $method, @args );
+
+    Since version 0.05.
+
+    Specifies that the mock might expect to receive method calls of the
+    given name with the given arguments. These expectations are not expired
+    once called, nor do they expect to be called in any particular order.
+    Furthermore it is not a test failure for one of these not to be invoked
+    at all.
+
+    These expectations do not directly form part of the test assertions
+    checked by the "check_and_clear" method, but they may be useful to
+    assist the code under test, such as providing support behaviours that
+    it may rely on but would make the test script too fragile if spelled
+    out in full using a regular expect.
+
+    These expectations are only used as a fallback mechanism, if the next
+    real expect-based expectation does not match a method call. Individual
+    special cases can still be set up using expect even though a whenever
+    exists that might also match it.
+
+    As with "expect", the argument values are compared using Test::Deep,
+    and results can be set with "will_return" or "will_throw".
 
  check_and_clear
 
@@ -72,17 +98,68 @@ EXPECTATIONS
     object that represents one expected method call, the arguments it
     should receive, and the return value it should provide.
 
- returns
+ will_return
 
-       $exp->returns( @result )
+       $exp->will_return( @result );
+
+    Since version 0.04.
 
     Sets the result that will be returned by this method call.
 
- throws
+    This method used to be named returns, which should be avoided in new
+    code. Uses of the old name will print a deprecation warning.
 
-       $exp->throws( $e )
+ will_return_using
+
+       $exp->will_return_using( sub ($args) { ... } );
+
+    Since version 0.05.
+
+    Sets the result that will be returned, calculated by invoking the code.
+
+    The code block is invoked at the time that a result is needed. It is
+    invoked with an array reference containing the arguments to the
+    original method call. This is especially useful for expectations
+    created using "whenever".
+
+    There is no corresponding will_throw_using, but an exception thrown by
+    this code will be seen by the calling code.
+
+ will_throw
+
+       $exp->will_throw( $e );
+
+    Since version 0.04.
 
     Sets the exception that will be thrown by this method call.
+
+    This method used to be named throws, which should be avoided in new
+    code.
+
+ will_also
+
+       $exp->will_also( sub { ... } );
+
+    Since version 0.04.
+
+    Adds extra code which is run when the expected method is called, in
+    addition to generating the result value or exception.
+
+    When invoked, the code body is invoked in void context with no
+    additional arguments.
+
+ indefinitely
+
+       $exp->indefinitely;
+
+    Since version 0.05.
+
+    On an expectation created using "whenever", this expectation will not
+    be cleared by "check_and_clear", effectively establishing its effects
+    for the entire lifetime of the test script.
+
+    On an expectation created using "expect" this has no effect; such an
+    expectation will still be cleared as usual.
 
 AUTHOR
 

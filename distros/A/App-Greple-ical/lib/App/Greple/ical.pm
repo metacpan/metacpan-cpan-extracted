@@ -1,6 +1,6 @@
 =head1 NAME
 
-ical - Module to support Apple OS X Calendar data
+ical - Module to support Apple macOS Calendar data
 
 =head1 SYNOPSIS
 
@@ -17,7 +17,7 @@ Exported functions
 
 =head1 SAMPLES
 
-greple -Mical ...
+greple -Mical [ -dnf ] ...
 
 greple -Mical --simple ...
 
@@ -27,14 +27,14 @@ greple -Mical --all --print print_desc ...
 
 =head1 DESCRIPTION
 
-Used without options, it will search all OS X Calendar files under
+Used without options, it will search all macOS Calendar files under
 user's home directory.
 
-With B<--simple> option, summarize content in single line.
-Output is not sorted.
+With B<--simple> option, summarize content in single line.  Output is
+not sorted.
 
-With B<--detail> option, pirnt summrized line with description data if
-it is attached.  The result is sorted.
+With B<--detail> option, print summarized line with description data
+if it is attached.  The result is sorted.
 
 Sample:
 
@@ -65,7 +65,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2017-2021 Kazumasa Utashiro.
+Copyright 2017-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -74,7 +74,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::ical;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use v5.14;
 use warnings;

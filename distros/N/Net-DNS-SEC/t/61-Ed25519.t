@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 61-Ed25519.t 1808 2020-09-28 22:08:11Z willem $	-*-perl-*-
+# $Id: 61-Ed25519.t 1868 2022-08-31 20:13:35Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -87,7 +87,7 @@ my $wrongprivate = Net::DNS::SEC::Private->new($wrongfile);
 ok( $wrongprivate, 'set up non-EdDSA private key' );
 
 
-my $sigdata = 'arbitrary data';		## Note: ED25519 signing is deterministic
+my $sigdata = Net::DNS::RR->new('. TXT arbitrary data')->txtdata;    # character set independent
 my $corrupt = 'corrupted data';
 
 my $signature = pack 'H*', join '', qw(
@@ -95,7 +95,7 @@ my $signature = pack 'H*', join '', qw(
 		c14292cf8c28af0efe6ee30cbf9d643cba3ab56f1e1ae27b6074147ed9c55a0e
 		);
 
-my $signed = eval { $class->sign( $sigdata, $private ); } || '';
+my $signed = eval { $class->sign( $sigdata, $private ); } || '';     # Note: ED25519 signing is deterministic
 ok( $signed eq $signature, 'signature created using private key' );
 
 

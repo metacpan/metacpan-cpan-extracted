@@ -14,12 +14,16 @@ use Tk::Listbox;
 use Tk::Text;
 use HTML::TokeParser;
 use URI::Escape;
+use HTML::Entities::Numbered ();
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
+
+my %fontCache = ();
 
 Construct Tk::Widget 'HyperText';
 
-sub Populate {
+sub Populate
+{
 	my ($cw,$args) = @_;
 
 	# Strip out the custom arguments for this widget.
@@ -104,7 +108,8 @@ sub Populate {
 	}
 }
 
-sub setHandler {
+sub setHandler
+{
 	my ($cw,%handlers) = @_;
 
 	foreach my $event (keys %handlers) {
@@ -113,7 +118,8 @@ sub setHandler {
 	}
 }
 
-sub _event {
+sub _event
+{
 	my ($cw,$event,@args) = @_;
 
 	if (exists $cw->{hypertext}->{events}->{$event}) {
@@ -123,7 +129,8 @@ sub _event {
 	return undef;
 }
 
-sub loadString {
+sub loadString
+{
 	my $cw = shift;
 	my $text = shift;
 
@@ -139,14 +146,16 @@ sub loadString {
 	$cw->render ($text);
 }
 
-sub loadBlank {
+sub loadBlank
+{
 	my $cw = shift;
 	$cw->{hypertext}->{html} = '';
 	$cw->{hypertext}->{plain} = '';
 	$cw->delete ("0.0","end");
 }
 
-sub allowedTags {
+sub allowedTags
+{
 	my ($cw,@tags) = @_;
 	$cw->{hypertext}->{allow} = {};
 	foreach (@tags) {
@@ -155,7 +164,8 @@ sub allowedTags {
 	}
 }
 
-sub deniedTags {
+sub deniedTags
+{
 	my ($cw,@tags) = @_;
 	$cw->{hypertext}->{deny} = {};
 	foreach (@tags) {
@@ -164,7 +174,8 @@ sub deniedTags {
 	}
 }
 
-sub allowHypertext {
+sub allowHypertext
+{
 	my $cw = shift;
 
 	# Allow AIM-style HTML tags.
@@ -178,7 +189,8 @@ sub allowHypertext {
 	}
 }
 
-sub allowEverything {
+sub allowEverything
+{
 	my $cw = shift;
 
 	# Allow everything again.
@@ -186,7 +198,8 @@ sub allowEverything {
 	$cw->{hypertext}->{deny} = {};
 }
 
-sub getText {
+sub getText
+{
 	my $cw = shift;
 	my $asHTML = shift || 0;
 
@@ -196,12 +209,14 @@ sub getText {
 	return $cw->{hypertext}->{plain};
 }
 
-sub clearHistory {
+sub clearHistory
+{
 	my $cw = shift;
 	$cw->{hypertext}->{history} = {};
 }
 
-sub render {
+sub render
+{
 	my ($cw,$html) = @_;
 
 	# Initialize the style stack.
@@ -235,13 +250,6 @@ sub render {
 		'&gt;'   => '>',
 		'&quot;' => '"',
 		'&apos;' => "'",
-		'&nbsp;' => ' ',
-		'&reg;'  => chr(0x00ae),
-		'&copy;' => chr(0x00a9),
-		'&hearts;' => chr(0x2665),
-		'&diams;'  => chr(0x2666),
-		'&spades;' => chr(0x2660),
-		'&clubs;'  => chr(0x2663),
 		'&amp;'  => '&',
 	);
 	my @stackList = ();
@@ -277,21 +285,30 @@ sub render {
 	my $foundOneBody = 0;
 	my $end = 0;
 	my $lineWritten = 0; # 1 = a line of text was written
+	my $endedBlock = 0;  # 1 = just ended a single line block element such as: H#, P, HR
+			     #     (to implement implied paragraphs when plain text comes after this)
 	while (my $token = $parser->get_token) {
 		my @data = @{$token};
 
 		if ($data[0] eq "T") { # Plain Text
 			my $text = $data[1];
+			next if ($text eq "\n");   # newline only
 			$text =~ s/([A-Za-z0-9]+)(\n+)([A-Za-z0-9]+)/$1 $3/ig;
 
 			# Process escape sequences.
+			# fix the entities
+			# actually fix all but the 5 xml entities, really only need to avoid AMP
+			#   but there's no easy way to do that
+			$text = HTML::Entities::Numbered::name2hex_xml($text);
+			# fix hex sequences
 			while ($text =~ /&#x([^;]+?)\;/i) {
 				my $hex = $1;
-				my $qm  = quotemeta("&#x$hex");
+				my $qm  = quotemeta("&#x$hex;");
 				my $chr = hex $hex;
 				my $char = chr($chr);
 				$text =~ s/$qm/$char/ig;
 			}
+			# fix decimal sequences
 			while ($text =~ /&#([^;]+?)\;/i) {
 				my $decimal = $1;
 				my $hex = sprintf("%x", $decimal);
@@ -300,10 +317,11 @@ sub render {
 				my $char = chr($chr);
 				$text =~ s/$qm/$char/ig;
 			}
+			# fix the exception entities
 			for (my $i = 0; $i < scalar(@escape) - 1; $i += 2) {
-				my $qm = quotemeta($escape[$i]);
-				my $rep = $escape[$i + 1];
-				$text =~ s/$qm/$rep/ig;
+			    my $qm = quotemeta($escape[$i]);
+			    my $rep = $escape[$i + 1];
+			    $text =~ s/$qm/$rep/ig;
 			}
 
 			# Unless in <pre>, remove newlines.
@@ -398,8 +416,10 @@ sub render {
 
 			# Insert the plain text.
 			if (length $text > 0) {
+				$browser->insert ('end',"\n") if ($endedBlock);
 				$browser->insert ('end', $text, $tag);
 				$lineWritten = 1;
+				$endedBlock = 0;
 			}
 
 			if ($style{linking}) {
@@ -414,6 +434,14 @@ sub render {
 
 			my $tag = lc($data[1]);
 			my $format = $cw->_makeTag(\%style);
+
+			# if we just finished a single line block and we have one of these
+			# tags listed, then we really shouldn't turn off the flag because
+			# it's legal to start an implied paragraph with these tags.
+			if ($endedBlock && ($tag !~ m/^(font|big|small|b|i|u|s|sub|sup|strong|em)$/)) {
+				$endedBlock = 0;
+			}
+
 			if ($tag =~ /^(html|head)$/) { # HTML, HEAD
 				# That was nice of them.
 			}
@@ -488,7 +516,8 @@ sub render {
 				$lineWritten = 0;
 			}
 			elsif ($tag eq 'p') { # Paragraph
-				$browser->insert ('end', "\n\n", $format);
+				$browser->insert ('end', "\n", $format) if ($lineWritten);
+				$browser->insert ('end', "\n", $format);
 				$lineWritten = 0;
 			}
 			elsif ($tag eq 'form') { # Form
@@ -824,6 +853,7 @@ sub render {
 				push (@stack, $cw->_addStack(\%style));
 			}
 			elsif ($tag eq 'hr') { # HR
+				$browser->insert ('end',"\n") if $lineWritten;
 				my $at = $data[2];
 				my $height = 4;
 				if (exists $at->{size}) {
@@ -845,12 +875,13 @@ sub render {
 				);
 				$browser->insert ('end', "\n", $format);
 				$lineWritten = 0;
+				$endedBlock = 1;
 			}
 			elsif ($tag eq 'img') { # IMG
 				my $at = $data[2];
 
 				my $format = '';
-				my $align = lc($at->{align}) || '';
+				my $align = lc($at->{align} // '');
 				$align = 'baseline' unless $align =~ /^(top|center|bottom|baseline)$/;
 				if (length $at->{src}) {
 					my ($ext) = $at->{src} =~ /\.([^\.]+)$/i;
@@ -936,7 +967,8 @@ sub render {
 			elsif ($tag =~ /^h(1|2|3|4|5|6)$/) { # Heading
 				my $level = $1;
 				my $size = $cw->_heading($level);
-				$browser->insert ('end',"\n\n") if $lineWritten;
+				$browser->insert ('end',"\n") if $lineWritten;
+				$browser->insert ('end',"\n");
 				$style{size} = $size;
 				$style{weight} = 'bold';
 				push (@stack, $cw->_addStack(\%style));
@@ -1104,6 +1136,7 @@ sub render {
 			}
 		}
 		elsif ($data[0] eq "E") { # End Tag
+			$endedBlock = 0;
 			# Skip blocked tags.
 			next if $cw->_blockedTag ($data[1]);
 
@@ -1126,8 +1159,9 @@ sub render {
 				$style{linktag} = '';
 			}
 			elsif ($tag eq 'p') { # /Paragraph
-				$browser->insert('end',"\n\n",$format);
+				$browser->insert('end',"\n",$format);
 				$lineWritten = 0;
+				$endedBlock = 1;
 			}
 			elsif ($tag eq 'table') { # /Table
 				$browser->insert('end',"\n",$format);
@@ -1224,9 +1258,9 @@ sub render {
 			}
 			elsif ($tag =~ /^h(1|2|3|4|5|6)$/) { # /Heading
 				$browser->insert('end',"\n\n",$format);
-				%style = $cw->_rollbackStack(\@stack,
-					qw(size weight));
+				%style = $cw->_rollbackStack(\@stack, qw(size weight));
 				$lineWritten = 0;
+				#$endedBlock = 1;
 			}
 			elsif ($tag eq 'ol') { # /Ordered List
 				pop (@stackList);
@@ -1328,7 +1362,8 @@ sub render {
 	}
 }
 
-sub _addStack {
+sub _addStack
+{
 	my ($cw,$style) = @_;
 
 	my @keys = sort { $a cmp $b } keys %{$style};
@@ -1342,7 +1377,8 @@ sub _addStack {
 	return join ("&",@parts);
 }
 
-sub _rollbackStack {
+sub _rollbackStack
+{
 	my ($cw,$stack,@keys) = @_;
 
 	my $newStyle = {};
@@ -1388,7 +1424,8 @@ sub _rollbackStack {
 	}
 }
 
-sub _makeTag {
+sub _makeTag
+{
 	my ($cw,$style,$widget) = @_;
 
 	my @parts = ();
@@ -1397,52 +1434,52 @@ sub _makeTag {
 		push (@parts,$val);
 	}
 
-	my $tag = join("-",@parts);
+	my $tag = join("_",@parts);
 
-	if (defined $widget) {
-		$widget->tagConfigure ($tag,
-			-foreground => $style->{foreground},
-			-background => $style->{background},
-			-font       => [
-				-family => $style->{family},
-				-weight => $style->{weight},
-				-slant  => $style->{slant},
-				-size   => $cw->_size ($style->{size}),
-				-underline => $style->{underline},
-				-overstrike => $style->{overstrike},
-			],
-			-offset => $style->{offset},
-			-justify => $style->{justify},
-			-lmargin1 => $style->{lmargin1},
-			-lmargin2 => $style->{lmargin2},
-			-rmargin  => $style->{rmargin},
+	# cache the fonts because if we don't performance is really bad
+	# with the cache life is good
+	my $fontSize = $cw->_size($style->{size});
+	my $fontKey = join("_", $style->{family},
+				$style->{weight},
+				$style->{slant},
+				$fontSize,
+				$style->{underline},
+				$style->{overstrike},
+				);
+	if (!$fontCache{$fontKey}) {
+	    $fontCache{$fontKey} = $cw->fontCreate(
+		-family => $style->{family},
+		-weight => $style->{weight},
+		-slant  => $style->{slant},
+		-size   => $fontSize,
+		-underline => $style->{underline},
+		-overstrike => $style->{overstrike},
+	    );
+	}
+
+	my @args = ($tag,
+		-foreground => $style->{foreground},
+		-background => $style->{background},
+		-font       => $fontCache{$fontKey},
+		-offset => $style->{offset},
+		-justify => $style->{justify},
+		-lmargin1 => $style->{lmargin1},
+		-lmargin2 => $style->{lmargin2},
+		-rmargin  => $style->{rmargin},
 		);
+	if (defined $widget) {
+		$widget->tagConfigure (@args);
 	}
 	else {
-		$cw->SUPER::tagConfigure ($tag,
-			-foreground => $style->{foreground},
-			-background => $style->{background},
-			-font       => [
-				-family => $style->{family},
-				-weight => $style->{weight},
-				-slant  => $style->{slant},
-				-size   => $cw->_size ($style->{size}),
-				-underline => $style->{underline},
-				-overstrike => $style->{overstrike},
-			],
-			-offset => $style->{offset},
-			-justify => $style->{justify},
-			-lmargin1 => $style->{lmargin1},
-			-lmargin2 => $style->{lmargin2},
-			-rmargin  => $style->{rmargin},
-		);
+		$cw->SUPER::tagConfigure (@args);
 	}
 
 	return $tag;
 }
 
 # Calculates the point size from an HTML size.
-sub _size {
+sub _size
+{
 	my ($cw,$size) = @_;
 
 	# Translate words to numbers?
@@ -1452,20 +1489,21 @@ sub _size {
 
 	my %map = (
 		# HTML => Point
-		0 => 8,
-		1 => 9,
-		2 => 10,
-		3 => 12,
-		4 => 14,
-		5 => 16,
-		6 => 18,
+		1 => 8,
+		2 => 9,
+		3 => 10,
+		4 => 12,
+		5 => 14,
+		6 => 16,
+		7 => 18,
 	);
 
 	return exists $map{$size} ? $map{$size} : 10;
 }
 
 # Calculates the HTML size for a heading.
-sub _heading {
+sub _heading
+{
 	my ($cw,$level) = @_;
 
 	my %map = (
@@ -1481,7 +1519,8 @@ sub _heading {
 	return exists $map{$level} ? $map{$level} : 6;
 }
 
-sub _sizeStringToNumber {
+sub _sizeStringToNumber
+{
 	my ($cw,$string) = @_;
 
 	my %map = (
@@ -1497,7 +1536,8 @@ sub _sizeStringToNumber {
 	return exists $map{$string} ? $map{$string} : 3;
 }
 
-sub _isNumber {
+sub _isNumber
+{
 	my ($cw,$number,$default) = @_;
 
 	if (defined $number && length $number && $number !~ /[^0-9]/) {
@@ -1508,7 +1548,8 @@ sub _isNumber {
 	}
 }
 
-sub _getOLsym {
+sub _getOLsym
+{
 	my ($cw,$type,$pos) = @_;
 
 	my %letterhash = (
@@ -1576,7 +1617,8 @@ sub _getOLsym {
 	return $pos;
 }
 
-sub _getULsym {
+sub _getULsym
+{
 	my ($cw,$type) = @_;
 
 	my $circle = chr(0x25cb);
@@ -1594,7 +1636,8 @@ sub _getULsym {
 	}
 }
 
-sub _roman {
+sub _roman
+{
 	my ($cw,$dec) = @_;
 
 	0 < $dec and $dec < 4000 or return undef;
@@ -1629,7 +1672,8 @@ sub _roman {
 	return $roman;
 }
 
-sub _blockedTag {
+sub _blockedTag
+{
 	my ($self,$tag) = @_;
 
 	my $deny = 0;
@@ -1654,7 +1698,8 @@ sub _blockedTag {
 	return $deny;
 }
 
-sub _brokenImage {
+sub _brokenImage
+{
 	return q~iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABGdBTUEAAK/INwWK6QAAABl0RVh0
 U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAKTSURBVHjaYmxpafnPMEAgPT2dASCAWECM
 6upqxoFwwJs3b/4DBBATwwADgAAacAcABNCAOwAggAbcAQABNOAOAAigAXcAQAANuAMAAmjAHQAQ
@@ -2105,3 +2150,4 @@ it under the same terms as Perl itself, either Perl version 5.10.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
+# vim: noet ts=8 sw=8

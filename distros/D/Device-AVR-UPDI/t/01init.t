@@ -26,31 +26,31 @@ my $mockfio = Test::Future::IO->controller;
 
    # BREAK
    $mockfio->expect_sleep( 0.1 )
-      ->returns();
+      ->will_done();
    $mockfh->expect( getobaud => )
-      ->returns( 115200 );
+      ->will_return( 115200 );
    $mockfh->expect( setbaud => 300 );
    $mockfh->expect( print =>"\0" );
    $mockfio->expect_sysread_anyfh( 1 )
-      ->returns( "\0" );
+      ->will_done( "\0" );
    $mockfio->expect_sleep( 0.05 )
-      ->returns();
+      ->will_done();
    $mockfh->expect( setbaud =>115200 );
    # Store CTRLB
    $mockfio->expect_syswrite_anyfh( "\x55\xC3\x08" );
    $mockfio->expect_sysread_anyfh( 3 )
-      ->returns( "\x55\xC3\x08" );
+      ->will_done( "\x55\xC3\x08" );
    $mockfio->expect_sleep( 0.1 );
    # Store CTRLA
    $mockfio->expect_syswrite_anyfh( "\x55\xC2\x00" );
    $mockfio->expect_sysread_anyfh( 3 )
-      ->returns( "\x55\xC2\x00" );
+      ->will_done( "\x55\xC2\x00" );
    $mockfio->expect_sleep( 0.1 );
 
    # Read SIB
    $mockfio->expect_syswrite_anyfh( "\x55\xE5" );
    $mockfio->expect_sysread_anyfh( 18 )
-      ->returns( "\x55\xE5" . "tinyAVR\x00P:0D:0\x003" );
+      ->will_done( "\x55\xE5" . "tinyAVR\x00P:0D:0\x003" );
    $mockfio->expect_sleep( 0.1 );
 
    $updi->init_link->get;

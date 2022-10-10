@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+
+### Test script specific setup ###
+BEGIN {
+    $ENV{PATH} = "/home/mark/src/vcardtidy/yZRejKy5/t" .':'.$ENV{PATH};
+    $ENV{SHARE_DIR} //= "/home/mark/src/vcardtidy/yZRejKy5/share";
+}
+use lib "/home/mark/src/vcardtidy/yZRejKy5/lib";
+my $ret = do "/home/mark/src/vcardtidy/yZRejKy5/bin/vcardtidy";
+die $@ if $@;
+$ret;

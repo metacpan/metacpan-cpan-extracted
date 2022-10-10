@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Cmd::Terminal 0.48;
+package Devel::MAT::Cmd::Terminal 0.49;
 
 use v5.14;
 use warnings;

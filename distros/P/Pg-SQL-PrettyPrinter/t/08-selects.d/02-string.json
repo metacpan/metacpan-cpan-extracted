@@ -1,0 +1,1 @@
+{"version":130003,"stmts":[{"stmt":{"SelectStmt":{"targetList":[{"ResTarget":{"val":{"A_Const":{"val":{"String":{"str":"abc"}},"location":7}},"location":7}},{"ResTarget":{"val":{"A_Const":{"val":{"String":{"str":"a'bc"}},"location":14}},"location":14}}],"limitOption":"LIMIT_OPTION_DEFAULT","op":"SETOP_NONE"}}}]}

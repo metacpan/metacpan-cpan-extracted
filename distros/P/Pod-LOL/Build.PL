@@ -22,6 +22,12 @@ my $builder = Module::Build->new(
       # 'Mojolicious' => '9.19',
     },
     add_to_cleanup     => [ 'Pod-LOL-*' ],
+    meta_merge     => {
+        resources => {
+            bugtracker => 'https://github.com/poti1/pod-lol/issues',
+            repository => 'https://github.com/poti1/pod-lol',
+        },
+    },
 );
 
 $builder->create_build_script();

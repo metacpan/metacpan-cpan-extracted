@@ -8,8 +8,8 @@ use YAML::XS;
 
 use Class::Tiny qw(
   gender
-  given
-  family
+  forename
+  surname
 );
 
 our $names;
@@ -28,9 +28,9 @@ sub BUILDARGS {
     $names //= load();
 
     $args{'gender'} //= Data::Gimei::sample( [ 'male', 'female' ] );
-    $args{'given'} = Data::Gimei::Word->new(
+    $args{'forename'} = Data::Gimei::Word->new(
         Data::Gimei::sample( $names->{'first_name'}->{ $args{'gender'} } ) );
-    $args{'family'} =
+    $args{'surname'} =
       Data::Gimei::Word->new( Data::Gimei::sample( $names->{'last_name'} ) );
 
     return \%args;
@@ -45,22 +45,22 @@ sub to_s {
 
 sub kanji {
     my ( $self, $s ) = @_;
-    return join $s // ' ', map { $_->kanji } ( $self->family, $self->given );
+    return join $s // ' ', map { $_->kanji } ( $self->surname, $self->forename );
 }
 
 sub hiragana {
     my ( $self, $s ) = @_;
-    return join $s // ' ', map { $_->hiragana } ( $self->family, $self->given );
+    return join $s // ' ', map { $_->hiragana } ( $self->surname, $self->forename );
 }
 
 sub katakana {
     my ( $self, $s ) = @_;
-    return join $s // ' ', map { $_->katakana } ( $self->family, $self->given );
+    return join $s // ' ', map { $_->katakana } ( $self->surname, $self->forename );
 }
 
 sub romaji {
     my ( $self, $s ) = @_;
-    return join $s // ' ', map { $_->romaji } ( $self->given, $self->family );
+    return join $s // ' ', map { $_->romaji } ( $self->forename, $self->surname );
 }
 
 1;

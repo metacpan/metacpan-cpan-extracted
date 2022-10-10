@@ -10,7 +10,7 @@ my $build = Module::Build->new(
       'perl' => '5.014',
       'Syntax::Keyword::Match' => 0,
 
-      'Devel::MAT::Tool' => '0.48',
+      'Devel::MAT::Tool' => '0.49',
    },
    test_requires => {
       'Future' => 0,

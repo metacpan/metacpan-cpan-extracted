@@ -14,7 +14,6 @@ my $idp = Net::SAML2::IdP->new_from_xml(
     xml    => $metadata,
     cacert => 't/cacert.pem'
 );
-
 isa_ok($idp, "Net::SAML2::IdP");
 
 my $sso_url = $idp->sso_url($idp->binding('redirect'));
@@ -55,7 +54,7 @@ is($relaystate, 'http://return/url', "Relay state shows correct uri");
 lives_ok(
     sub {
         my $binding = Net::SAML2::Binding::Redirect->new(
-            cert  => $sp->cert,
+            cert  => $idp->cert('signing'),
             param => 'SAMLResponse',
         );
         isa_ok($binding, "Net::SAML2::Binding::Redirect");
@@ -63,10 +62,22 @@ lives_ok(
     "We can create a binding redirect without key/url for verification purposes"
 );
 
+lives_ok(
+    sub {
+        my $binding = Net::SAML2::Binding::Redirect->new(
+            param => 'SAMLRequest',
+            url   => 'https://foo.example.com',
+            key   => $sp->key,
+        );
+        isa_ok($binding, "Net::SAML2::Binding::Redirect");
+    },
+    "We do not need a cert to sign a SAMLRequest"
+);
+
 throws_ok(
     sub {
         Net::SAML2::Binding::Redirect->new(
-            cert  => $sp->cert,
+            cert  => $idp->cert('signing'),
             key   => $sp->key,
         );
     },
@@ -77,7 +88,6 @@ throws_ok(
 throws_ok(
     sub {
         Net::SAML2::Binding::Redirect->new(
-            cert  => $sp->cert,
             url   => 'https://foo.example.com',
         );
     },

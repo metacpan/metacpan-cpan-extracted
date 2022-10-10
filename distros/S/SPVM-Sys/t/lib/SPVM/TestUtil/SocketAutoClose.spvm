@@ -1,0 +1,18 @@
+class TestUtil::SocketAutoClose {
+  use Sys::Socket;
+  
+  has socket : int;
+  
+  static method new : TestUtil::SocketAutoClose ($socket : int) {
+    
+    my $self = new TestUtil::SocketAutoClose;
+    
+    $self->{socket} = $socket;
+    
+    return $self;
+  }
+  
+  method DESTROY : void () {
+    Sys::Socket->close($self->{socket});
+  }
+}

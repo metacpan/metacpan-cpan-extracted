@@ -1,0 +1,1 @@
+SELECT a OPERATOR( "Schema".- ) b FROM c

@@ -7,9 +7,34 @@ use Exporter::Tidy default => [qw/cmd_template/];
 use File::Spec::Functions qw/splitdir/;
 use File::Which;
 use Sys::Cmd;
-use Sys::Cmd::Mo qw/is default/;
+use Sys::Cmd::Template_CI has => {
+    cmd => {
+        is => 'rw',
+        isa =>
+          sub { ref $_[0] eq 'ARRAY' || confess "cmd must be ARRAYREF"; $_[0] },
+        default => sub { [] },
+    },
+    dir => {
+        is        => 'rw',
+        predicate => 'have_dir',
+    },
+    encoding => {
+        is        => 'rw',
+        predicate => 'have_encoding',
+    },
+    env => {
+        is => 'rw',
+        isa =>
+          sub { ref $_[0] eq 'HASH' || confess "env must be HASHREF", $_[0] },
+        predicate => 'have_env',
+    },
+    input => {
+        is        => 'rw',
+        predicate => 'have_input',
+    },
+};
 
-our $VERSION = '0.85.4';
+our $VERSION = '0.99.0';
 our $CONFESS;
 
 sub cmd_template {
@@ -29,33 +54,6 @@ sub cmd_template {
 
     return Sys::Cmd::Template->new(%args);
 }
-
-has 'cmd' => (
-    is  => 'rw',
-    isa => sub { ref $_[0] eq 'ARRAY' || confess "cmd must be ARRAYREF" },
-    default => sub { [] },
-);
-
-has 'dir' => (
-    is        => 'rw',
-    predicate => 'have_dir',
-);
-
-has 'encoding' => (
-    is        => 'rw',
-    predicate => 'have_encoding',
-);
-
-has 'env' => (
-    is        => 'rw',
-    isa       => sub { ref $_[0] eq 'HASH' || confess "env must be HASHREF" },
-    predicate => 'have_env',
-);
-
-has 'input' => (
-    is        => 'rw',
-    predicate => 'have_input',
-);
 
 sub run {
     my $self = shift;
@@ -152,7 +150,7 @@ Sys::Cmd::Template - command/process templates for Sys::Cmd
 
 =head1 VERSION
 
-0.85.4 (2016-06-06) Development release
+0.99.0 (2022-10-05) Development release
 
 =head1 SYNOPSIS
 
@@ -375,7 +373,7 @@ Mark Lawrence E<lt>nomad@null.netE<gt>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2014 Mark Lawrence <nomad@null.net>
+Copyright (C) 2011-2021 Mark Lawrence <nomad@null.net>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

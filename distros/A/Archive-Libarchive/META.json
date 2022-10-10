@@ -119,13 +119,13 @@
       },
       "test" : {
          "requires" : {
-            "Devel::Cycle" : "0",
             "FFI::C::File" : "0",
             "File::chdir" : "0",
             "Path::Tiny" : "0",
             "Sub::Identify" : "0",
             "Term::Table" : "0",
             "Test2::API" : "1.302015",
+            "Test2::Tools::MemoryCycle" : "0",
             "Test2::V0" : "0.000121",
             "Test::Archive::Libarchive" : "0",
             "Test::Script" : "1.09",
@@ -146,8 +146,8 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.07",
-   "x_generated_by_perl" : "v5.37.3",
+   "version" : "0.08",
+   "x_generated_by_perl" : "v5.37.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

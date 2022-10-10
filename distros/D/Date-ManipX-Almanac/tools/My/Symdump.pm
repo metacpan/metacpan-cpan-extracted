@@ -9,14 +9,14 @@ use warnings;
 use Devel::Symdump;
 use Module::Load ();
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub dmd_public_interface {
     my $dmd = find_public_methods( 'Date::Manip::Date' );
 
     # The following have the form of public methods but are not actually
     # part of the Date::Manip::Date public interface.
-    delete $dmd->{$_} for qw{ dclone };
+    delete $dmd->{$_} for qw{ carp confess croak dclone };
     return wantarray ? sort keys %{ $dmd } : $dmd;
 }
 
@@ -141,7 +141,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2021 by Thomas R. Wyant, III
+Copyright (C) 2021-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

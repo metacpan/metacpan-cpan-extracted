@@ -17,6 +17,8 @@ my $skip;
 $skip = site_check( 'celestrak.org' )
     and plan skip_all => $skip;
 
+=begin comment
+
 $st->set(
     direct	=> 0,
 );
@@ -38,6 +40,10 @@ SKIP: {
     is $st->content_source( $resp ), 'celestrak',
 	"Result source is 'celestrak'";
 }
+
+=end comment
+
+=cut
 
 $st->set(
     direct	=> 1,

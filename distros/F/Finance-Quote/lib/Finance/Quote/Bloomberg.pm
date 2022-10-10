@@ -7,7 +7,7 @@ use HTTP::Request::Common;
 use HTML::TreeBuilder;
 use Encode;
 
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.53'; # VERSION
 
 use vars qw($BLOOMBERG_URL);
 

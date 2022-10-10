@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Sizes 0.48;
+package Devel::MAT::Tool::Sizes 0.49;
 
 use v5.14;
 use warnings;

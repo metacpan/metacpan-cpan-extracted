@@ -32,6 +32,8 @@ no_index:
 requires:
   Class::Utils: 0.02
   Error::Pure: 0.07
+  Exporter: 0
+  POSIX: 0
   Readonly: 0
   Tags::HTML: 0
   Unicode::UTF8: 0
@@ -41,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Pager
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Pager
-version: '0.03'
+version: '0.04'

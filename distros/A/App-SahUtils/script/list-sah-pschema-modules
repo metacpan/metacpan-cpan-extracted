@@ -9,9 +9,9 @@ use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 use Module::List::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-09-30'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.481'; # VERSION
+our $VERSION = '0.482'; # VERSION
 
 my $res = gen_read_table_func(
     name => 'app',
@@ -74,7 +74,7 @@ list-sah-pschema-modules - List Sah coerce rule modules
 
 =head1 VERSION
 
-This document describes version 0.481 of list-sah-pschema-modules (from Perl distribution App-SahUtils), released on 2022-09-11.
+This document describes version 0.482 of list-sah-pschema-modules (from Perl distribution App-SahUtils), released on 2022-09-30.
 
 =head1 SYNOPSIS
 

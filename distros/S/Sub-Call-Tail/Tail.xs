@@ -8,7 +8,7 @@
 #include "ppport.h"
 
 #ifndef AvREIFY_only
-#define AvREIFY_only(av)	(AvREAL_off(av), AvREIFY_on(av))
+#define AvREIFY_only(av)  (AvREAL_off(av), AvREIFY_on(av))
 #endif
 
 #include "hook_op_check_entersubforcv.h"
@@ -36,7 +36,7 @@ goto_entersub (pTHX) {
             cxix--;
         }
     }
-    
+
     if (cx == NULL)
         DIE(aTHX_ "Can't goto subroutine outside a subroutine");
 
@@ -44,7 +44,7 @@ goto_entersub (pTHX) {
      * it's pretty the original but the ENTER/LEAVE or the actual execution */
 
     if (!sv)
-        DIE(aTHX_ "Not a CODE reference");    
+        DIE(aTHX_ "Not a CODE reference");
 
     switch (SvTYPE(sv)) {
         /* This is overwhelming the most common case:  */
@@ -161,10 +161,10 @@ try_autoload:
     }
 
     if (GvAV(PL_defgv) != av) {
-	AV *olddefav = GvAV(PL_defgv);
-	SvREFCNT_inc((SV*)av);
-	GvAV(PL_defgv) = av;
-	SvREFCNT_dec((SV*)olddefav);
+        AV *olddefav = GvAV(PL_defgv);
+        SvREFCNT_inc((SV*)av);
+        GvAV(PL_defgv) = av;
+        SvREFCNT_dec((SV*)olddefav);
     }
 
     /* copy items from the stack to defgv */

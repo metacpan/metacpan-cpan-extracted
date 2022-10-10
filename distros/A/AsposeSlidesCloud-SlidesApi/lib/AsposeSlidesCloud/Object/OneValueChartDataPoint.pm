@@ -38,6 +38,10 @@ use Date::Parse;
 use DateTime;
 
 use AsposeSlidesCloud::Object::DataPoint;
+use AsposeSlidesCloud::Object::EffectFormat;
+use AsposeSlidesCloud::Object::FillFormat;
+use AsposeSlidesCloud::Object::LineFormat;
+use AsposeSlidesCloud::Object::ThreeDFormat;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -176,6 +180,34 @@ __PACKAGE__->class_documentation({description => 'One value chart data point.',
 }                                 );
 
 __PACKAGE__->method_documentation({
+    'fill_format' => {
+    	datatype => 'FillFormat',
+    	base_name => 'FillFormat',
+    	description => 'Gets or sets the fill format.',
+    	format => '',
+    	read_only => '',
+    		},
+    'effect_format' => {
+    	datatype => 'EffectFormat',
+    	base_name => 'EffectFormat',
+    	description => 'Gets or sets the effect format.',
+    	format => '',
+    	read_only => '',
+    		},
+    'three_d_format' => {
+    	datatype => 'ThreeDFormat',
+    	base_name => 'ThreeDFormat',
+    	description => 'Gets or sets the 3D format',
+    	format => '',
+    	read_only => '',
+    		},
+    'line_format' => {
+    	datatype => 'LineFormat',
+    	base_name => 'LineFormat',
+    	description => 'Gets or sets the line format.',
+    	format => '',
+    	read_only => '',
+    		},
     'value' => {
     	datatype => 'double',
     	base_name => 'Value',
@@ -200,12 +232,20 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
+    'fill_format' => 'FillFormat',
+    'effect_format' => 'EffectFormat',
+    'three_d_format' => 'ThreeDFormat',
+    'line_format' => 'LineFormat',
     'value' => 'double',
     'set_as_total' => 'boolean',
     'invert_if_negative' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
+    'fill_format' => 'FillFormat',
+    'effect_format' => 'EffectFormat',
+    'three_d_format' => 'ThreeDFormat',
+    'line_format' => 'LineFormat',
     'value' => 'Value',
     'set_as_total' => 'SetAsTotal',
     'invert_if_negative' => 'InvertIfNegative'

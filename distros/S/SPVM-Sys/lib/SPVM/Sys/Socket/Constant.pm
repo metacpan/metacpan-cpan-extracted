@@ -169,6 +169,13 @@ Get the constant value of C<AF_X25>. If the system doesn't define this constant,
 
 Get the constant value of C<AF_XDP>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
+=head2 FIONBIO
+
+  static method FIONBIO : int ();
+
+Get the constant value of C<FIONBIO>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+
 =head2 INADDR_ANY
 
   static method INADDR_ANY : int ();
@@ -654,6 +661,12 @@ Get the constant value of C<SOL_IP>. If the system doesn't define this constant,
   static method SOL_SOCKET : int ();
 
 Get the constant value of C<SOL_SOCKET>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 SOMAXCONN
+
+  static method SOMAXCONN : int ();
+
+Get the constant value of C<SOMAXCONN>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
 =head2 SO_BROADCAST
 
@@ -1248,3 +1261,16 @@ Get the value initialized by C<IN6ADDR_ANY_INIT>. If the system doesn't define t
   static method IN6ADDR_LOOPBACK : int ();
 
 Get the value initialized by C<IN6ADDR_LOOPBACK_INIT>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 NI_MAXHOST
+
+  static method NI_MAXHOST : int ();
+
+Get the constant value of C<NI_MAXHOST>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 NI_MAXSERV
+
+  static method NI_MAXSERV : int ();
+
+Get the constant value of C<NI_MAXSERV>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+

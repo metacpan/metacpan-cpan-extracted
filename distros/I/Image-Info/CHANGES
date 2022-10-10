@@ -1,5 +1,23 @@
 Revision history for Image::Info
 
+2022-10-03  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.43
+
+    Stable release with all changes in 1.42_50
+
+2022-07-17  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.42_50
+
+    Fix XML::Simple-related test failures (RT #143685)
+
+    Cease warnings with inconsistent maker info (RT #133006)
+
+    Don't fail on invalid rational value in EXIF (RT #135126)
+
+    Don't bail out on erroneous APP1 EXIF segments (RT #131616)
+
 2019-10-19  Slaven Rezic  <slaven@rezic.de>
 
     Release 1.42

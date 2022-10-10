@@ -1,34 +1,37 @@
 #
-# $Id: Makefile.PL 1853 2021-10-11 10:40:59Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1874 2022-09-23 13:37:00Z willem $	-*-perl-*-
 #
 
-use 5.008008;
+use 5.008009;
 use strict;
 use warnings;
 use Config;
 use ExtUtils::MakeMaker;
-my $MM = $ExtUtils::MakeMaker::VERSION;
+use constant MSWin32 => $^O eq 'MSWin32';
+
+my $distro = 'Net::DNS::SEC';
+my $module = join '/', 'lib', split /::/, "$distro.pm";
+my $author = ['Dick Franks', 'Olaf Kolkman'];
+$author = join ', ', @$author if $ExtUtils::MakeMaker::VERSION < 6.58;
 
 
 # See perldoc ExtUtils::MakeMaker for details of how to influence
 # the contents of the Makefile that is written.
 
-my @author = ( 'Dick Franks', 'Olaf Kolkman' );
-
 my %metadata = (
-	NAME		 => 'Net::DNS::SEC',
-	VERSION_FROM	 => 'lib/Net/DNS/SEC.pm',
-	ABSTRACT_FROM	 => 'lib/Net/DNS/SEC.pm',
-	AUTHOR		 => $MM < 6.58 ? "$author[0] et al" : [@author],
-	LICENSE		 => 'mit',
-	MIN_PERL_VERSION => 5.008008,
-	CONFIGURE_REQUIRES => {
-		'ExtUtils::MakeMaker' => 6.66,
-		},
-	TEST_REQUIRES => {
-		'File::Find'	=> 1.05,
-		'File::Spec'	=> 0.86,
-		'Test::More'	=> 0.47,
+	NAME		   => $distro,
+	VERSION_FROM	   => $module,
+	ABSTRACT_FROM	   => $module,
+	AUTHOR		   => $author,
+	LICENSE		   => 'mit',
+	MIN_PERL_VERSION   => 5.008009,
+	CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.48},
+	TEST_REQUIRES	   => {
+		'ExtUtils::MakeMaker' => 0,
+		'File::Find'	      => 1.13,
+		'File::Spec'	      => 3.29,
+		'IO::File'	      => 1.14,
+		'Test::More'	      => 0.80,
 		} );
 
 
@@ -36,13 +39,11 @@ my %prerequisite = (
 	'Carp'	       => 1.10,
 	'DynaLoader'   => 1.04,
 	'Exporter'     => 5.56,
-	'File::Spec'   => 0.86,
+	'File::Spec'   => 3.29,
+	'IO::File'     => 1.14,
 	'MIME::Base64' => 2.13,
 	'Net::DNS'     => 1.08,
 	);
-
-
-my %optional;
 
 
 my @debris = qw(*.gcov *.gcda *.gcno *.lock);
@@ -50,9 +51,10 @@ my @debris = qw(*.gcov *.gcda *.gcno *.lock);
 
 my $inc = '';
 my $lib = '-lcrypto';
-my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
+my $nul = MSWin32 ? 'nul' : '/dev/null';
 
 if ( my $dir = $ENV{OPENSSL_PREFIX} ) {
+	chomp $dir;
 	$inc = "-I$dir/include";
 	$lib = "-L$dir/lib -lcrypto";
 
@@ -60,22 +62,25 @@ if ( my $dir = $ENV{OPENSSL_PREFIX} ) {
 	$inc = `pkg-config --cflags libcrypto 2>$nul`;
 	$lib = `pkg-config --libs   libcrypto 2>$nul`;
 
-} elsif ( $^O eq 'MSWin32' ) {
+} elsif (MSWin32) {
 	$lib = '-llibeay32' if $Config{cc} =~ /cl/;
 	$lib = '-leay32'    if $Config{cc} =~ /gcc/;
 }
 
 $inc = $ENV{OPENSSL_INCLUDE} if $ENV{OPENSSL_INCLUDE};
 $lib = $ENV{OPENSSL_LIB}     if $ENV{OPENSSL_LIB};
+chomp $_ for ( $inc, $lib );
+
 
 WriteMakefile(
 	%metadata,
-	PREREQ_PM  => {%prerequisite},
-	INC	   => $inc,
-	LIBS	   => [$lib],
-	META_MERGE => {recommends => {%optional}},
-	clean	   => {FILES => "@debris"},
+	PREREQ_PM => {%prerequisite},
+	INC	  => $inc,
+	LIBS	  => [$lib],
+	clean	  => {FILES => "@debris"},
 	);
+
+exit;
 
 
 package MY;				## customise generated Makefile
@@ -85,7 +90,7 @@ sub test {
 
 	return join '', shift->SUPER::test(), <<'END';
 # suppress parallel test execution
-FULLPERLRUN = HARNESS_OPTIONS=c $(FULLPERL)
+FULLPERLRUN = HARNESS_OPTIONS=j1:c $(FULLPERL)
 END
 }
 
@@ -109,9 +114,10 @@ sub install {
 		s|([/])[/]+|$1|g;				# remove gratuitous //s
 	}
 
-	my @version = ( 'version', eval { require Net::DNS::SEC; $Net::DNS::SEC::VERSION; } );
+	eval "require $distro";		## no critic
+	my @version = grep {$_} 'version', eval { $distro->VERSION };
 
-	my $nameregex = '\W+Net\W+DNS\W+SEC.pm$';
+	my $nameregex = join '\W+', '', split /::/, "$distro.pm\$";
 	my @installed = grep { $_ && m/$nameregex/io } values %INC;
 	my %occluded;
 
@@ -132,12 +138,12 @@ sub install {
 	my $message;
 	warn $message = <<"AMEN";
 ##
-##	The install location for this version of Net::DNS::SEC differs
-##	from the existing @version in your perl library at
+##	The install location for this version of $distro
+##	differs from the existing @version in your perl library at
 ##	@installed
 ##
 ##	The installation would be rendered ineffective because the
-##	installed version occurs in the library search path before
+##	existing @version occurs in the library search path before
 ##	$install_site
 ##
 ##	The generated Makefile supports build and test only.
@@ -146,13 +152,10 @@ AMEN
 	my $echo = '	$(NOECHO) $(ECHO) "##"';
 	$message =~ s/##/$echo/eg;
 
-	return join '', <<'END', $message;
+	return join '', <<"END";
 install :
-	$(NOECHO) $(ECHO) "##	Makefile supports build and test only"
-	$(NOECHO) $(ECHO) "##	(see message from Makefile.PL)"
-	$(NOECHO) $(FALSE)
-
-test :: $(TEST_TYPE)
+	$message
+	\$(NOECHO) \$(FALSE)
 END
 }
 
@@ -170,7 +173,6 @@ PlanB
 	return <<"PlanA";
 test_cover :
 	cover -delete
-	\$(NOECHO) \$(TOUCH) SEC.c	# recompile XS component
 	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) -W SEC.xs test CCFLAGS="$ccflags" OTHERLDFLAGS="$ldflags"
 	gcov SEC.xs
 	gcov2perl SEC.xs.gcov

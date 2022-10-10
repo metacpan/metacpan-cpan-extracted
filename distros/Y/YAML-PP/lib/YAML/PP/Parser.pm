@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Parser;
 
-our $VERSION = '0.034'; # VERSION
+our $VERSION = '0.035'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -1085,6 +1085,13 @@ sub cb_send_alias {
     my ($self, $token) = @_;
     my $alias = substr($token->{value}, 1);
     $self->alias_event({ value => $alias });
+}
+
+sub cb_send_alias_key {
+    my ($self, $token) = @_;
+    my $alias = substr($token->{value}, 1);
+    $self->alias_event({ value => $alias });
+    $self->set_new_node(1);
 }
 
 sub cb_send_alias_from_stack {

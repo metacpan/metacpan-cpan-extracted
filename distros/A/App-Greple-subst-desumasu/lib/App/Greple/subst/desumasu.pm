@@ -1,6 +1,6 @@
 package App::Greple::subst::desumasu;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use 5.014;
 use warnings;
@@ -33,7 +33,7 @@ greple -Msubst module based on
 L<desumasu-converter|https://github.com/kssfilo/desumasu-converter>.
 
 This is a simple checker/converter module for Japanese writing style
-so called DUSU/MASU (ですます調: 敬体) and DEARU (である調: 常態).
+so called DUSU/MASU (ですます調: 敬体) and DEARU (である調: 常体).
 This is not my own idea and the dictionary is based on
 L<https://github.com/kssfilo/desumasu-converter>.
 

@@ -19,7 +19,7 @@ await $chip->mount(
 # ->read_raw
 {
    $adapter->expect_write_then_read( "\xF7", 8 )
-      ->returns( "\x53\x93\x00\x7F\xB4\x00\x64\xC0" );
+      ->will_done( "\x53\x93\x00\x7F\xB4\x00\x64\xC0" );
 
    is_deeply( [ await $chip->read_raw ],
       [ 342320, 523072, 25792 ],
@@ -33,18 +33,18 @@ await $chip->mount(
 {
    # sensor values
    $adapter->expect_write_then_read( "\xF7", 8 )
-      ->returns( "\x53\x93\x00\x7F\xB4\x00\x64\xC0" );
+      ->will_done( "\x53\x93\x00\x7F\xB4\x00\x64\xC0" );
    # DIG_T compensation
    $adapter->expect_write_then_read( "\x88", 6 )
-      ->returns( "\x1C\x6F\x27\x69\x32\x00" );
+      ->will_done( "\x1C\x6F\x27\x69\x32\x00" );
    # DIG_P compensation
    $adapter->expect_write_then_read( "\x8E", 18 )
-      ->returns( "\xAA\x8E\x03\xD7\xD0\x0B\x21\x21\x83\xFF\xF9\xFF\xAC\x26\x0A\xD8\xBD\x10" );
+      ->will_done( "\xAA\x8E\x03\xD7\xD0\x0B\x21\x21\x83\xFF\xF9\xFF\xAC\x26\x0A\xD8\xBD\x10" );
    # DIG_H compensation is in two pieces
    $adapter->expect_write_then_read( "\xA1", 1 )
-      ->returns( "\x4B" );
+      ->will_done( "\x4B" );
    $adapter->expect_write_then_read( "\xE1", 7 )
-      ->returns( "\x78\x01\x00\x11\x2E\x03\x1E" );
+      ->will_done( "\x78\x01\x00\x11\x2E\x03\x1E" );
 
    # Round values to 2DP to avoid floating inaccuracies
    is_deeply( [ map { sprintf "%.1f", $_ } await $chip->read_sensor ],

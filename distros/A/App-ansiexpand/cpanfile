@@ -1,5 +1,5 @@
 requires 'Encode';
-requires 'Getopt::EX::Hashed', '1.03';
+requires 'Getopt::EX::Hashed', '1.05';
 requires 'Getopt::EX::Long';
 requires 'Pod::Usage';
 requires 'Text::ANSI::Tabs', '1.01';

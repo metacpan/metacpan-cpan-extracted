@@ -164,6 +164,9 @@ $hash{foo} = undef;
 is($hash{foo}, undef, 'The value is undef after explicitly storing that');
 
 # Clean up after ourselves (delete first* in $data except for first.txt).
+undef $obj;
+untie(%hash);
+untie(%db);
 opendir(my $dir, $data);
 for my $file (grep { m{ ^ first }xms } readdir($dir)) {
     if ($file ne 'first.txt') {

@@ -1,6 +1,5 @@
 use Test::Lib;
 use Test::Net::SAML2;
-use Test::More tests => 2;
 
 use Net::SAML2::Binding::Redirect;
 use File::Slurper qw/read_text/;
@@ -15,13 +14,11 @@ my $redirect = Net::SAML2::Binding::Redirect->new(
     param   => 'SAMLRequest',
     cert    => read_text('t/net-saml2-cert.pem'),
     sig_hash => 'sha256',
-    sls_force_lcase_url_encoding => 1,
 );
 
 my ($request, $relaystate) = $redirect->verify($url);
 
-like($request, qr/NETSAML/, 'Good Signature if sls_force_lcase_url_encoding = 1');
+like($request, qr/NETSAML/,
+    "Good Signature because we now don't alter the input with URI anymore");
 
-$redirect->{sls_force_lcase_url_encoding} = 0;
-
-throws_ok( sub { $redirect->verify($url) }, qr/bad sig/, "Bad Signature if sls_force_lcase_url_encoding = 0");
+done_testing();

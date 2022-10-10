@@ -43,7 +43,7 @@ class TestCase::Sys::Process {
     
     my $nice = Sys::Process->getpriority(Process->PRIO_PROCESS, 0);
     
-    unless ($nice == 0) {
+    unless ($nice >= -20 && $nice <= 19) {
       return 0;
     }
     
@@ -65,7 +65,7 @@ class TestCase::Sys::Process {
     eval { $status = Sys::Process->setpriority(Process->PRIO_PROCESS, 0, 0); };
     
     if ($@ && error == class_id Error::System) {
-      warn $@;
+      warn "\n[Test Output]setpriority:setpriority failed on this environment";
     }
     else {
       unless ($status == 0) {
@@ -179,7 +179,7 @@ class TestCase::Sys::Process {
 
   static method system : int () {
     
-    my $cmd = "perl -e \"warn '[Test Output]system';\"";
+    my $cmd = "perl -e \"warn qq(\\n[Test Output]system);\"";
     my $status = Sys::Process->system($cmd);
     
     unless ($status == 0) {

@@ -33,7 +33,7 @@ use HTTP::Request::Common;
 use HTML::TableExtract;
 use Time::Piece;
 
-our $VERSION = '1.52'; # VERSION
+our $VERSION = '1.53'; # VERSION
 
 my $YIND_URL_HEAD = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=';
 my $YIND_URL_TAIL = '';
@@ -57,12 +57,17 @@ sub yahoo_json {
     my $quoter = shift;
     my @stocks = @_;
     my ( %info, $reply, $url, $te, $ts, $row, @cells, $ce );
-    my ( $my_date );
+    my ( $my_date, $amp_stocks );
     my $ua = $quoter->user_agent();
 
     foreach my $stocks (@stocks) {
 
-        $url   = $YIND_URL_HEAD . $stocks . $YIND_URL_TAIL;
+        # Issue 202 - Fix symbols with Ampersand
+        # Can also be written as
+				# $amp_stocks = $stocks =~ s/&/%26/gr;
+        ($amp_stocks = $stocks) =~ s/&/%26/g;
+
+        $url   = $YIND_URL_HEAD . $amp_stocks . $YIND_URL_TAIL;
         $reply = $ua->request( GET $url);
 
         my $code    = $reply->code;

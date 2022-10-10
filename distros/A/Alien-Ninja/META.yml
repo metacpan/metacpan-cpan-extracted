@@ -3,7 +3,7 @@ abstract: 'Find or build Ninja build tool'
 author:
   - 'Zakariyya Mughal <zmughal@cpan.org>'
 build_requires:
-  Alien::Build: '0.32'
+  Alien::Build: '2.70'
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
   File::Spec: '0'
@@ -12,12 +12,13 @@ build_requires:
   Test::Alien::Diag: '0'
   Test::More: '0'
 configure_requires:
-  Alien::Build: '1.19'
+  Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Build::Copy: '0'
+  Alien::Build::Plugin::Download::GitHub: '0.09'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +35,7 @@ no_index:
 provides:
   Alien::Ninja:
     file: lib/Alien/Ninja.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Alien::Base: '0.038'
   base: '0'
@@ -45,16 +46,19 @@ resources:
   IRC: irc://irc.perl.org/#native
   homepage: https://github.com/PerlAlien/Alien-Ninja
   repository: https://github.com/PerlAlien/Alien-Ninja.git
-version: '0.02'
+version: '0.03'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
+      Alien::Build::Plugin::Download::GitHub: '0.09'
+      Alien::Build::Plugin::Download::Negotiate: '1.30'
       Archive::Zip: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       Mojo::DOM: '0'
       Mojolicious: '7.00'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
       Path::Tiny: '0'
       Sort::Versions: '0'

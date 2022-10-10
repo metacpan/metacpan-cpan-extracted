@@ -2,7 +2,7 @@ package Net::DNS::RR::SOA;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SOA.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: SOA.pm 1875 2022-09-23 13:41:03Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -257,14 +257,14 @@ widely used zone serial numbering policies.
     $successor = $soa->serial( SEQUENTIAL );
 
 The existing serial number is incremented modulo 2**32 because the
-value returned by the auxilliary SEQUENTIAL() function can never
+value returned by the auxiliary SEQUENTIAL() function can never
 satisfy the serial number ordering constraint.
 
 =head2 Date Encoded
 
     $successor = $soa->serial( YYYYMMDDxx );
 
-The 32 bit value returned by the auxilliary YYYYMMDDxx() function will
+The 32 bit value returned by the auxiliary YYYYMMDDxx() function will
 be used if it satisfies the ordering constraint, otherwise the serial
 number will be incremented as above.
 
@@ -275,7 +275,7 @@ information to remain useful.
 
     $successor = $soa->serial( UNIXTIME );
 
-The 32 bit value returned by the auxilliary UNIXTIME() function will
+The 32 bit value returned by the auxiliary UNIXTIME() function will
 used if it satisfies the ordering constraint, otherwise the existing
 serial number will be incremented as above.
 
@@ -314,6 +314,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC1035 Section 3.3.13, RFC1982
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<RFC1035|https://tools.ietf.org/html/rfc1035>,
+L<RFC1982|https://tools.ietf.org/html/rfc1982>
 
 =cut

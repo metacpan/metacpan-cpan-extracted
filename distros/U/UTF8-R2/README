@@ -104,7 +104,7 @@ SUBROUTINES
       $_ =~ m<\G$mb{qr/$utf8regex/imsxo}>gc
       $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
-SUPPORTED PERL VERSIONS
+DEPENDENCIES
 
   perl version 5.005_03 to newest perl
 

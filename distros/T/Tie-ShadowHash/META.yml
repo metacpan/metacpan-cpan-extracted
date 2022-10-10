@@ -15,7 +15,7 @@ name: Tie-ShadowHash
 provides:
   Tie::ShadowHash:
     file: lib/Tie/ShadowHash.pm
-    version: '2.00'
+    version: '2.01'
 requires:
   perl: '5.024'
 resources:
@@ -23,5 +23,5 @@ resources:
   homepage: https://www.eyrie.org/~eagle/software/shadowhash
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rra/shadowhash.git
-version: '2.00'
+version: '2.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

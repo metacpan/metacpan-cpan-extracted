@@ -1,40 +1,41 @@
 #
-# $Id: Makefile.PL 1864 2022-04-14 15:18:49Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1875 2022-09-23 13:41:03Z willem $	-*-perl-*-
 #
 
 use 5.008009;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-my $MM = $ExtUtils::MakeMaker::VERSION;
 
 my $distro = 'Net::DNS';
 my $module = join '/', 'lib', split /::/, "$distro.pm";
-my @author = ( 'Dick Franks', 'Olaf Kolkman', 'Michael Fuhr' );
+my $author = ['Dick Franks', 'Olaf Kolkman', 'Michael Fuhr'];
+$author = join ', ', @$author if $ExtUtils::MakeMaker::VERSION < 6.58;
 
 
 # See perldoc ExtUtils::MakeMaker for details of how to influence
 # the contents of the Makefile that is written.
 
 my %metadata = (
-	NAME		   => "$distro",
-	VERSION_FROM	   => "$module",
-	ABSTRACT_FROM	   => "$module",
-	AUTHOR		   => $MM < 6.58 ? "$author[0] et al" : [@author],
+	NAME		   => $distro,
+	VERSION_FROM	   => $module,
+	ABSTRACT_FROM	   => $module,
+	AUTHOR		   => $author,
 	LICENSE		   => 'mit',
 	MIN_PERL_VERSION   => '5.008009',
 	CONFIGURE_REQUIRES => {
-		'ExtUtils::MakeMaker' => 6.66,
+		'ExtUtils::MakeMaker' => 6.48,
 		'Getopt::Long'	      => 2.43,
-		'IO::File'	      => 1.08,
+		'IO::File'	      => 1.14,
 		'IO::Socket::IP'      => 0.38,
 		},
 	TEST_REQUIRES => {
-		'File::Find'	=> 1.05,
-		'File::Spec'	=> 0.86,
-		'IO::File'	=> 1.08,
-		'Test::Builder' => 0,
-		'Test::More'	=> 0,
+		'ExtUtils::MakeMaker' => 0,
+		'File::Find'	      => 1.13,
+		'File::Spec'	      => 3.29,
+		'IO::File'	      => 1.14,
+		'Test::Builder'	      => 0.80,
+		'Test::More'	      => 0.80,
 		} );
 
 
@@ -54,22 +55,22 @@ my %prerequisite = (
 	'Digest::MD5'	 => 2.13,
 	'Digest::SHA'	 => 5.23,
 	'Encode'	 => 2.26,
-	'Exporter'	 => 5.56,
-	'File::Spec'	 => 0.86,
-	'IO::File'	 => 1.08,
-	'IO::Select'	 => 1.14,
-	'IO::Socket'	 => 1.26,
+	'Exporter'	 => 5.63,
+	'File::Spec'	 => 3.29,
+	'IO::File'	 => 1.14,
+	'IO::Select'	 => 1.17,
+	'IO::Socket'	 => 1.30,
 	'IO::Socket::IP' => 0.38,
 	'MIME::Base64'	 => 2.13,
 	'PerlIO'	 => 1.05,
-	'Scalar::Util'	 => 1.25,
+	'Scalar::Util'	 => 1.19,
 	'Time::Local'	 => 1.19,
 	%$platform
 	);
 
 
 my %optional = (
-	'Digest::BubbleBabble' => 0.01,
+	'Digest::BubbleBabble' => 0.02,
 	'Net::LibIDN2'	       => 1.00,
 	);
 
@@ -219,7 +220,7 @@ sub test {
 
 	return join '', shift->SUPER::test(), <<'END';
 # suppress parallel test execution
-FULLPERLRUN = HARNESS_OPTIONS=c $(FULLPERL)
+FULLPERLRUN = HARNESS_OPTIONS=j1:c $(FULLPERL)
 END
 }
 
@@ -272,7 +273,7 @@ sub install {
 ##	@installed
 ##
 ##	The installation would be rendered ineffective because the
-##	installed version occurs in the library search path before
+##	existing @version occurs in the library search path before
 ##	$install_site
 ##
 ##	The generated Makefile supports build and test only.
@@ -281,13 +282,10 @@ AMEN
 	my $echo = '	$(NOECHO) $(ECHO) "##"';
 	$message =~ s/##/$echo/eg;
 
-	return join '', <<'END', $message;
+	return join '', <<"END";
 install :
-	$(NOECHO) $(ECHO) "##	Makefile supports build and test only"
-	$(NOECHO) $(ECHO) "##	(see message from Makefile.PL)"
-	$(NOECHO) $(FALSE)
-
-test :: $(TEST_TYPE)
+	$message
+	\$(NOECHO) \$(FALSE)
 END
 }
 

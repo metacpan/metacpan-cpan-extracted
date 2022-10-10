@@ -1,3 +1,11 @@
+0.158		2022-10-05	T. R. Wyant
+    Implement new Celestrak API. Add options --format and --query to
+    celestrak() and celestrak_supplemental(). Deprecate Space Track
+    options on celestrak().
+
+    Drop celestrak() code involving the 'direct' attribute. The
+    retained code assumes direct => 1.
+
 0.157		2022-09-10	T. R. Wyant
     Method spaceflight() now dies.
 

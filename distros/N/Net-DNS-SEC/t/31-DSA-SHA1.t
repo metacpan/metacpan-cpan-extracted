@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 31-DSA-SHA1.t 1830 2021-01-26 09:08:12Z willem $	-*-perl-*-
+# $Id: 31-DSA-SHA1.t 1863 2022-03-14 14:59:21Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -22,6 +22,9 @@ foreach my $package ( sort keys %prerequisite ) {
 
 plan skip_all => "disabled DSA"
 		unless eval { Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_DSA') };
+
+plan skip_all => "disabled SHA1"
+		unless eval { Net::DNS::SEC::libcrypto->can('EVP_sha1') };
 
 plan tests => 13;
 

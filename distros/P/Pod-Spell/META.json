@@ -76,11 +76,11 @@
    "provides" : {
       "Pod::Spell" : {
          "file" : "lib/Pod/Spell.pm",
-         "version" : "1.23"
+         "version" : "1.25"
       },
       "Pod::Wordlist" : {
          "file" : "lib/Pod/Wordlist.pm",
-         "version" : "1.23"
+         "version" : "1.25"
       }
    },
    "release_status" : "stable",
@@ -96,7 +96,7 @@
          "web" : "https://github.com/perl-pod/Pod-Spell"
       }
    },
-   "version" : "1.23",
+   "version" : "1.25",
    "x_contributors" : [
       "David Golden <dagolden@cpan.org>",
       "Graham Knop <haarg@haarg.org>",

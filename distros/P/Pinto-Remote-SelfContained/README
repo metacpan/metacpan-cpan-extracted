@@ -1,6 +1,10 @@
 NAME
 
-    Pinto::Remote::SelfContained - interact with a remote Pinto repository
+    Pinto::Remote::SelfContained
+
+VERSION
+
+    version 1.001
 
 DESCRIPTION
 
@@ -13,6 +17,18 @@ DESCRIPTION
     any alternative, but wants something smaller than the whole of Pinto
     for interacting with the remote repo.
 
+NAME
+
+    Pinto::Remote::SelfContained
+
+VERSION
+
+    version 1.001
+
+NAME
+
+    Pinto::Remote::SelfContained - interact with a remote Pinto repository
+
 METHODS
 
  run($action_name => %action_args)
@@ -24,7 +40,7 @@ METHODS
 
 AUTHOR
 
-    Aaron Crane, <arc@cpan.org>
+    Aaron Crane <arc@cpan.org>, Brad Lhotsky <brad@divisionbyzero.net>
 
 COPYRIGHT
 

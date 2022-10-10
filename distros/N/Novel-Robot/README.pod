@@ -113,16 +113,21 @@ download novel from url
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t web -o some_dir
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-4
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
 
-use chrome to parse dom: (飘灯-青春期妖怪.html)
+use chrome to parse dom: 
 
-    get_novel.pl -u "https://www.aliwx.com.cn/chapter?bid=7964189" --use_chrome --writer_path "//div[@class='chapterbox']//span" --book_regex "<title>(.+?)-阿里文学网" --content_path "//div[@class='chapter-content']"
+飘灯-青春期妖怪.html
+
+    get_novel.pl -u "https://www.aliwx.com.cn/chapter?bid=7964189" --use_chrome --writer_path "//div[@class='chapterbox']//span" --book_regex "<title>(.+?)-" --content_path "//div[@class='chapter-content']"
+
+公众号
+
+    get_novel.pl -u "https://mp.weixin.qq.com/s?xxxx" --use_chrome --content_path "//div[@id='js_content']" --item_list_path "//div[@id='js_content']//a"  -w somewriter -b somebook
 
 jjwxc vip: 可以使用firefox浏览器，先登录m.jjwxc.net，然后用 L<cookies.txt|https://addons.mozilla.org/zh-CN/firefox/addon/cookies-txt/> 扩展导出cookies.txt，则可以下载当前登录账号所购买的小说；也可直接指定firefox配置目录下的cookies.sqlite文件；或者直接使用m.jjwxc.net的cookie字符串
 
@@ -167,7 +172,8 @@ only print info, but not download, 输出小说信息（不下载）
     -i : min_item_num-max_item_num, 只取 x-y 章/楼
 
     -D : only print info, not download, 只输出信息，不下载
-    -v : verbose, 显示进度条(默认显示)
+    -v : verbose
+    --term_progress_bar: 显示进度条(默认不显示)
 
     --use_chrome      : use chrome dump_dom, only support GET method
     --with_toc        : 小说保存时是否生成目录(默认是)

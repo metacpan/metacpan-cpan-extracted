@@ -1,5 +1,12 @@
 Summary of Changes to Tcl::pTk
 
+1.10  2022-10-07
+
+ * Perl/Tk compatibility updates to Text widget:
+   - get() method returns empty string rather than undef
+   - Contents() method does not return trailing newline
+     as of Perl/Tk 804.030_500
+
 1.09  2022-05-19
 
  * Support ttk::treeview `cellselection` command (Tk 8.7 TIP 552)

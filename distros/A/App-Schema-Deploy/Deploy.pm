@@ -7,7 +7,7 @@ use English;
 use Error::Pure qw(err);
 use Getopt::Std;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -26,17 +26,19 @@ sub run {
 
 	# Process arguments.
 	$self->{'_opts'} = {
+		'd' => 0,
 		'h' => 0,
 		'p' => '',
 		'u' => '',
 		'v' => undef,
 	};
-	if (! getopts('hp:u:v:', $self->{'_opts'})
+	if (! getopts('dhp:u:v:', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
 		|| @ARGV < 2) {
 
-		print STDERR "Usage: $0 [-h] [-p password] [-u user] [-v schema_version] ".
+		print STDERR "Usage: $0 [-d] [-h] [-p password] [-u user] [-v schema_version] ".
 			"[--version] dsn schema_module\n";
+		print STDERR "\t-d\t\t\tDrop tables.\n";
 		print STDERR "\t-h\t\t\tPrint help.\n";
 		print STDERR "\t-p password\t\tDatabase password.\n";
 		print STDERR "\t-u user\t\t\tDatabase user.\n";
@@ -89,7 +91,11 @@ sub run {
 	}
 
 	# Deploy.
-	$schema->deploy;
+	my $sqlt_args_hr = {};
+	if ($self->{'_opts'}->{'d'}) {
+		$sqlt_args_hr->{'add_drop_table'} = 1;
+	}
+	$schema->deploy($sqlt_args_hr);
 
 	my $print_version = '';
 	if (defined $schema_version) {
@@ -209,6 +215,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

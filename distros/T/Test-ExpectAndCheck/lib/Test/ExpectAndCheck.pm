@@ -8,7 +8,7 @@ package Test::ExpectAndCheck;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Carp;
 
@@ -28,13 +28,13 @@ C<Test::ExpectAndCheck> - C<expect/check>-style unit testing with object methods
    use Test::More;
    use Test::ExpectAndCheck;
 
-   my ( $controller, $puppet ) = Test::ExpectAndCheck->create;
+   my ( $controller, $mock ) = Test::ExpectAndCheck->create;
 
    {
       $controller->expect( act => 123, 45 )
-         ->returns( 678 );
+         ->will_return( 678 );
 
-      is( $puppet->act( 123, 45 ), 678, '$puppet->act returns result' );
+      is( $mock->act( 123, 45 ), 678, '$mock->act returns result' );
 
       $controller->check_and_clear( '->act' );
    }
@@ -44,8 +44,8 @@ C<Test::ExpectAndCheck> - C<expect/check>-style unit testing with object methods
 =head1 DESCRIPTION
 
 This package creates objects that assist in writing unit tests with mocked
-object instances. Each mocked "puppet" instance will expect to receive a given
-list of method calls. Each method call is checked that it received the right
+object instances. Each mock instance will expect to receive a given list of
+method calls. Each method call is checked that it received the right
 arguments, and will return a prescribed result. At the end of each test, each
 object is checked to ensure all the expected methods were called.
 
@@ -57,12 +57,12 @@ object is checked to ensure all the expected methods were called.
 
 =head2 create
 
-   ( $controller, $puppet ) = Test::ExpectAndCheck->create;
+   ( $controller, $mock ) = Test::ExpectAndCheck->create;
 
 Objects are created in "entangled pairs" by the C<create> method. The first
 object is called the "controller", and is used by the unit testing script to
 set up what method calls are to be expected, and what their results shall be.
-The second object is the "puppet", the object to be passed to the code being
+The second object is the "mock", the object to be passed to the code being
 tested, on which the expected method calls are (hopefully) invoked. It will
 have whatever interface is implied by the method call expectations.
 
@@ -74,24 +74,25 @@ sub create
 
    my $controller = bless {
       expectations => [],
+      whenever     => {},
    }, $class;
-   my $puppet = Test::ExpectAndCheck::_Obj->new( $controller );
+   my $mock = Test::ExpectAndCheck::_Obj->new( $controller );
 
-   return ( $controller, $puppet );
+   return ( $controller, $mock );
 }
 
 =head2 expect
 
-   $exp = $controller->expect( $method, @args )
+   $exp = $controller->expect( $method, @args );
 
-Specifies that the puppet will expect to receive a method call of the given
+Specifies that the mock will expect to receive a method call of the given
 name, with the given arguments.
 
 The argument values are compared using L<Test::Deep/cmp_deeply>. Values can
 be specified literally, or using any of the "Special Comparisons" defined by
 L<Test::Deep>.
 
-The test script can call the L</returns> or L</throws> methods on the
+The test script can call the L</will_return> or L</will_throw> methods on the
 expectation to set what the result of invoking this method will be.
 
 =cut
@@ -105,6 +106,48 @@ sub expect
    defined $file or ( undef, $file, $line ) = caller(0);
 
    push @{ $self->{expectations} }, my $exp = $self->EXPECTATION_CLASS->new(
+      $method => [ @args ], $file, $line,
+   );
+
+   return $exp;
+}
+
+=head2 whenever
+
+   $exp = $controller->whenever( $method, @args );
+
+I<Since version 0.05.>
+
+Specifies that the mock might expect to receive method calls of the given name
+with the given arguments. These expectations are not expired once called, nor
+do they expect to be called in any particular order. Furthermore it is not a
+test failure for one of these not to be invoked at all.
+
+These expectations do not directly form part of the test assertions checked by
+the L</check_and_clear> method, but they may be useful to assist the code
+under test, such as providing support behaviours that it may rely on but would
+make the test script too fragile if spelled out in full using a regular
+C<expect>.
+
+These expectations are only used as a fallback mechanism, if the next real
+C<expect>-based expectation does not match a method call. Individual special
+cases can still be set up using C<expect> even though a C<whenever> exists
+that might also match it.
+
+As with L</expect>, the argument values are compared using C<Test::Deep>, and
+results can be set with L</will_return> or L</will_throw>.
+
+=cut
+
+sub whenever
+{
+   my $self = shift;
+   my ( $method, @args ) = @_;
+
+   my ( undef, $file, $line ) = caller(1);
+   defined $file or ( undef $file, $line ) = caller(0);
+
+   push @{ $self->{whenever}{$method} }, my $exp = $self->EXPECTATION_CLASS->new(
       $method => [ @args ], $file, $line,
    );
 
@@ -152,14 +195,17 @@ sub _call
 
    my $e;
    $e = first { !$_->_called } @{ $self->{expectations} } and
-      $e->_consume( $method, @args ) or do {
-         my $message = Carp::shortmess( "Unexpected call to ->$method(${\ _stringify_args @args })" );
-         $message .= "... while expecting " . $e->_stringify if $e;
-         $message .= "... after all expectations done" if !$e;
-         die "$message.\n";
-      };
+      $e->_consume( $method, @args ) and
+      return $e->_result( @args );
 
-   return $e->_result;
+   if( my $wh = first { $_->_consume( $method, @args ) } @{ $self->{whenever}{$method} } ) {
+      return $wh->_result( @args );
+   }
+
+   my $message = Carp::shortmess( "Unexpected call to ->$method(${\ _stringify_args @args })" );
+   $message .= "... while expecting " . $e->_stringify if $e;
+   $message .= "... after all expectations done" if !$e;
+   die "$message.\n";
 }
 
 =head2 check_and_clear
@@ -191,23 +237,21 @@ sub check_and_clear
    });
 
    undef @{ $self->{expectations} };
+
+   # Only clear the non-indefinite ones
+   foreach my $method ( keys %{ $self->{whenever} } ) {
+      my $whenevers = $self->{whenever}{$method};
+
+      @$whenevers = grep { $_->{indefinitely} } @$whenevers;
+
+      @$whenevers or delete $self->{whenever}{$method};
+   }
 }
 
 package
    Test::ExpectAndCheck::_Expectation;
 
 use List::Util qw( all );
-
-use constant {
-   METHOD  => 0,
-   ARGS    => 1,
-   FILE    => 2,
-   LINE    => 3,
-   CALLED  => 4,
-   RETURNS => 5,
-   THROWS  => 6,
-   DIAG    => 7,
-};
 
 =head1 EXPECTATIONS
 
@@ -221,39 +265,136 @@ sub new
 {
    my $class = shift;
    my ( $method, $args, $file, $line ) = @_;
-   return bless [ $method, $args, $file, $line, 0 ], $class;
+   return bless {
+      method => $method,
+      args   => $args,
+      file   => $file,
+      line   => $line,
+   }, $class;
 }
 
-=head2 returns
+=head2 will_return
 
-   $exp->returns( @result )
+   $exp->will_return( @result );
+
+I<Since version 0.04.>
 
 Sets the result that will be returned by this method call.
 
+This method used to be named C<returns>, which should be avoided in new code.
+Uses of the old name will print a deprecation warning.
+
 =cut
+
+sub will_return
+{
+   my $self = shift;
+   my @result = @_;
+
+   return $self->will_return_using( sub { return @result } );
+}
 
 sub returns
 {
-   my $self = shift;
+   warnings::warnif deprecated => "Calling \$exp->returns() is now deprecated; use ->will_return instead";
+   return shift->will_return( @_ );
+}
 
-   $self->[RETURNS] = [ @_ ];
-   undef $self->[THROWS];
+=head2 will_return_using
+
+   $exp->will_return_using( sub ($args) { ... } );
+
+I<Since version 0.05.>
+
+Sets the result that will be returned, calculated by invoking the code.
+
+The code block is invoked at the time that a result is needed. It is invoked
+with an array reference containing the arguments to the original method call.
+This is especially useful for expectations created using L</whenever>.
+
+There is no corresponding C<will_throw_using>, but an exception thrown by this
+code will be seen by the calling code.
+
+=cut
+
+sub will_return_using
+{
+   my $self = shift;
+   my ( $code ) = @_;
+
+   $self->{gen_return} = $code;
 
    return $self;
 }
 
-=head2 throws
+=head2 will_throw
 
-   $exp->throws( $e )
+   $exp->will_throw( $e );
+
+I<Since version 0.04.>
 
 Sets the exception that will be thrown by this method call.
 
+This method used to be named C<throws>, which should be avoided in new code.
+
 =cut
+
+sub will_throw
+{
+   my $self = shift;
+   my ( $exception ) = @_;
+
+   return $self->will_return_using( sub { die $exception } );
+}
 
 sub throws
 {
+   warnings::warnif deprecated => "Calling \$exp->throws() is now deprecated; use ->will_throw instead";
+   return shift->will_throw( @_ );
+}
+
+=head2 will_also
+
+   $exp->will_also( sub { ... } );
+
+I<Since version 0.04.>
+
+Adds extra code which is run when the expected method is called, in addition
+to generating the result value or exception.
+
+When invoked, the code body is invoked in void context with no additional
+arguments.
+
+=cut
+
+sub will_also
+{
    my $self = shift;
-   ( $self->[THROWS] ) = @_;
+   push @{ $self->{also} }, @_;
+
+   return $self;
+}
+
+=head2 indefinitely
+
+   $exp->indefinitely;
+
+I<Since version 0.05.>
+
+On an expectation created using L</whenever>, this expectation will not be
+cleared by L</check_and_clear>, effectively establishing its effects for the
+entire lifetime of the test script.
+
+On an expectation created using L</expect> this has no effect; such an
+expectation will still be cleared as usual.
+
+=cut
+
+sub indefinitely
+{
+   my $self = shift;
+
+   $self->{indefinitely}++;
 
    return $self;
 }
@@ -263,16 +404,16 @@ sub _consume
    my $self = shift;
    my ( $method, @args ) = @_;
 
-   $method eq $self->[METHOD] or
+   $method eq $self->{method} or
       return 0;
 
-   my ( $ok, $stack ) = Test::Deep::cmp_details( \@args, $self->[ARGS] );
+   my ( $ok, $stack ) = Test::Deep::cmp_details( \@args, $self->{args} );
    unless( $ok ) {
-      $self->[DIAG] = Test::Deep::deep_diag( $stack );
+      $self->{diag} = Test::Deep::deep_diag( $stack );
       return 0;
    }
 
-   $self->[CALLED]++;
+   $self->{called}++;
    return 1;
 }
 
@@ -281,30 +422,36 @@ sub _check
    my $self = shift;
    my ( $builder ) = @_;
 
-   my $method = $self->[METHOD];
-   $builder->ok( $self->[CALLED], "->$method(${\ Test::ExpectAndCheck::_stringify_args @{ $self->[ARGS] } })" );
-   $builder->diag( $self->[DIAG] ) if defined $self->[DIAG];
+   my $method = $self->{method};
+   $builder->ok( $self->{called}, "->$method(${\ Test::ExpectAndCheck::_stringify_args @{ $self->{args} } })" );
+   $builder->diag( $self->{diag} ) if defined $self->{diag};
 }
 
 sub _result
 {
    my $self = shift;
-   die $self->[THROWS] if defined $self->[THROWS];
-   return unless $self->[RETURNS];
-   return @{ $self->[RETURNS] } if wantarray;
-   return $self->[RETURNS][0];
+   my @args = @_;
+
+   if( my $also = $self->{also} ) {
+      $_->() for @$also;
+   }
+
+   my @result;
+   @result = $self->{gen_return}->( \@args ) if $self->{gen_return};
+   return @result if wantarray;
+   return $result[0];
 }
 
 sub _called
 {
    my $self = shift;
-   return $self->[CALLED];
+   return $self->{called};
 }
 
 sub _stringify
 {
    my $self = shift;
-   return "->$self->[METHOD](${\( Test::ExpectAndCheck::_stringify_args @{ $self->[ARGS] } )}) at $self->[FILE] line $self->[LINE]";
+   return "->$self->{method}(${\( Test::ExpectAndCheck::_stringify_args @{ $self->{args} } )}) at $self->{file} line $self->{line}";
 }
 
 package

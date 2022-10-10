@@ -481,6 +481,7 @@ sub new
 
 	$html =~ s/\\\"/\&quot\;/gs;
 	$html =~ s/\\u00([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 	if ($html =~ m#\<video(.*?)\<\/video\>#s) {
 		my $videotag = $1;
 		my $streams = '';
@@ -554,12 +555,13 @@ sub new
 	if ($html =~ m#\<tr\>\<td\>Category\<\/td\>\<td\>\<a\s+(.+?)</a>#) {
 		my $genredata = $1;
 		my $genre = ($genredata =~ m#\bclass\=\"spa\"\>([^\<]+)#s) ? $1 : '';
-		$self->{'genre'} = $genre  if ($genre =~ /\w+/ && $genre != /^none/i);
+		$self->{'genre'} = $genre  if ($genre =~ /\w+/ && $genre !~ /^\s*none/i);
 	}
 	$self->{'title'} = ($html =~ m#\<title\>([^\<]+)\<#s) ? $1 : '';
 	$self->{'title'} ||= $1  if ($html =~ m#\<h1\s+id\=\"video\-title\"\s+class\=\"page\-title\"\>([^\<]+)\<#i);
 	$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"#);
-	$self->{'description'} = $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"#);
+	$self->{'description'} = $1  if ($html =~ m#\<div\s+class\=\"full\s+hidden\"\>(.+?)\<\/div\>#s);
+	$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"#);
 	$self->{'description'} ||= $self->{'title'};
 
 	$self->{'iconurl'} = ($html =~ m#\"og\:image\:secure_url\"\s+content\=\"([^\"]+)#) ? $1 : '';

@@ -77,7 +77,6 @@ sub net_saml2_binding_redirect_request {
 
     my $metadata_xml = path('t/net-saml2-idp-metadata.xml')->slurp;
     my $cacert       = 't/net-saml2-cacert.pem';
-    my $cert_file    = 't/net-saml2-cert.pem';
     my $sp_acs_url   = 'http://ct.local/saml/consumer-post';
 
     my $nameid  = 'timlegge@cpan.org';
@@ -93,11 +92,9 @@ sub net_saml2_binding_redirect_request {
         cacert => $cacert,          # Filename of the Identity Providers CACert
     );
 
-    my $sp_signing_cert = path($cert_file)->slurp;
-
     my $redirect = Net::SAML2::Binding::Redirect->new(
         key => '',
-        cert => $sp_signing_cert,
+        cert => $idp->certs->{signing},
         param => 'SAMLRequest',
         # The ssl_url destination for redirect
         url => $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),

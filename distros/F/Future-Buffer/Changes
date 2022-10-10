@@ -1,5 +1,16 @@
 Revision history for Future-Buffer
 
+0.03    2022-09-30
+        [CHANGES]
+         * Added ->unread
+         * Added ->read_unpacked
+
+        [BUGFIXES]
+         * Make sure cancelled read futures don't block the queue
+         * Propagate read future cancellation to a pending fill future
+         * Don't invoke fill future if enough data exists in the buffer
+           already
+
 0.02    2020-06-12
         [CHANGES]
          * Rename ->read to ->read_atmost to match the IO::Async::Stream

@@ -18,13 +18,13 @@ class Sys::Socket::Sockaddr::In6 extends Sys::Socket::Sockaddr : pointer_t {
 
   native method sin6_flowinfo : int ();
   
-  native method set_sin6_flowinfo : void ();
+  native method set_sin6_flowinfo : void ($flowinfo : int);
   
   native method sin6_scope_id : int ();
   
-  native method set_sin6_scope_id : void ();
+  native method set_sin6_scope_id : void ($scope_id : int);
 
-  native method sin6_addr : Sys::Socket::In6_addr ();
+  native method copy_sin6_addr : Sys::Socket::In6_addr ();
   
   native method set_sin6_addr : void ($address : Sys::Socket::In6_addr);
   
@@ -33,4 +33,16 @@ class Sys::Socket::Sockaddr::In6 extends Sys::Socket::Sockaddr : pointer_t {
   native method set_sin6_port : void ($port : short);
 
   native method sizeof : int ();
+
+  method clone : Sys::Socket::Sockaddr::In6 () {
+    my $clone = Sys::Socket::Sockaddr::In6->new;
+
+    $clone->set_sin6_family($self->sin6_family);
+    $clone->set_sin6_flowinfo($self->sin6_flowinfo);
+    $clone->set_sin6_scope_id($self->sin6_scope_id);
+    $clone->set_sin6_addr($self->copy_sin6_addr);
+    $clone->set_sin6_port($self->sin6_port);
+
+    return $clone;
+  }
 }

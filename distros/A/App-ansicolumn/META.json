@@ -57,6 +57,9 @@
       },
       "test" : {
          "requires" : {
+            "Data::Section::Simple" : "0",
+            "File::Slurper" : "0",
+            "File::Spec" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -64,7 +67,7 @@
    "provides" : {
       "App::ansicolumn" : {
          "file" : "lib/App/ansicolumn.pm",
-         "version" : "1.23"
+         "version" : "1.24"
       },
       "App::ansicolumn::Border" : {
          "file" : "lib/App/ansicolumn/Border.pm"
@@ -85,7 +88,7 @@
          "web" : "https://github.com/kaz-utashiro/App-ansicolumn"
       }
    },
-   "version" : "1.23",
+   "version" : "1.24",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

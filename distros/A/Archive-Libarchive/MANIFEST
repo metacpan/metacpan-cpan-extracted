@@ -47,6 +47,7 @@ lib/Archive/Libarchive/Lib/EntryLinkResolver.pm
 lib/Archive/Libarchive/Lib/Match.pm
 lib/Archive/Libarchive/Lib/Unbound.pm
 lib/Archive/Libarchive/Match.pm
+maint/Dockerfile
 maint/README.md
 maint/cip-before-install
 maint/lib/LibarchiveRef.pm
@@ -61,7 +62,6 @@ maint/ref-test
 maint/ref-test.pl
 maint/ref-update
 maint/ref-update.pl
-maint/ref/Dockerfile
 maint/tt/Code.pm.tt
 maint/tt/Const.pm.tt
 maint/tt/Doc.pm.tt
@@ -81,7 +81,6 @@ t/archive_libarchive_entrylinkresolver.t
 t/archive_libarchive_lib.t
 t/archive_libarchive_match.t
 t/examples.t
-t/lib/Test2/Tools/MemoryCycle.pm
 xt/author/critic.t
 xt/author/eol.t
 xt/author/no_tabs.t

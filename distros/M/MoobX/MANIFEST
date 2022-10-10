@@ -1,4 +1,5 @@
 AUTHOR_PLEDGE
+CODE_OF_CONDUCT.md
 CONTRIBUTORS
 Changes
 INSTALL
@@ -7,7 +8,7 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
+README.mkdn
 SIGNATURE
 cpanfile
 doap.xml
@@ -33,4 +34,3 @@ t/mixed.t
 t/moose.t
 t/no-deps.t
 t/scalar.t
-xt/release/pause-permissions.t

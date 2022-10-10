@@ -142,6 +142,7 @@ my %makeArgs = (
     },
     TEST_REQUIRES => {
         'Test::Deep' => 0,
+        'Test::More' => 0,
     },
 );
 

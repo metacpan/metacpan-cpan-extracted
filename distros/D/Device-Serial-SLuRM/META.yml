@@ -1,0 +1,34 @@
+---
+abstract: 'communicate the SLÂµRM protocol over a serial port'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::ExpectAndCheck::Future: '0.04'
+  Test::Future::IO: '0.05'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-Serial-SLuRM
+provides:
+  Device::Serial::SLuRM:
+    file: lib/Device/Serial/SLuRM.pm
+    version: '0.01'
+requires:
+  Digest::CRC: '0'
+  Future::AsyncAwait: '0'
+  Future::Buffer: '0.03'
+  Future::IO: '0'
+  IO::Termios: '0'
+  Object::Pad: '0.57'
+  Syntax::Keyword::Match: '0'
+  perl: '5.026'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

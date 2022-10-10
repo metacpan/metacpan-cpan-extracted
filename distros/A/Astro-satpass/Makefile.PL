@@ -72,6 +72,7 @@ Error - Unable to open $fno
         $!
 eod
 	    print $fho "$Config{startperl}\n";
+	    local $_ = undef;	# while (<>) ... does not localize $_.
 	    while (<$fhi>) {print $fho $_}
 	    }
 	@clean_files = @exe_files = map {"[.script]$_.com"} @exe_files;

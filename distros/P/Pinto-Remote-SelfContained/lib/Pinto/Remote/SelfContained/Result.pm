@@ -57,7 +57,20 @@ sub to_string {
 }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Result
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Result
 
 =head1 NAME
 
@@ -65,7 +78,7 @@ Pinto::Remote::SelfContained::Result - the result of running an Action
 
 =head1 AUTHOR
 
-Aaron Crane, E<lt>arc@cpan.orgE<gt>
+Aaron Crane E<lt>arc@cpan.orgE<gt>, Brad Lhotsky E<lt>brad@divisionbyzero.netE<gt>
 
 =head1 COPYRIGHT
 

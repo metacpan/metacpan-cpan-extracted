@@ -1,5 +1,16 @@
 Revision history for Graph-Undirected-Hamiltonicity
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.15    2022/10/01
+	- Added Modern::Perl
 
+0.17 2022-10-07T22:49:52Z
+	- Fix Bug #7
+
+0.16 2022-10-04T21:50:46Z
+	- Added Modern::Perl to cpanfile
+
+0.15 2022-10-01T20:15:09Z
+	- Added Modern::Perl
+
+0.14 2022-10-01T20:08:36Z
+	- version

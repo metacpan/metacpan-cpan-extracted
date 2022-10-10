@@ -17,11 +17,11 @@ Data::Trace - Trace when a data structure gets updated.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -88,11 +88,16 @@ Please report any bugs or feature requests to L<https://github.com/poti1/data-tr
 Currently only detect C<STORE> operations.
 Expand this to also detect C<PUSH>, C<POP>, C<DELETE>, etc.
 
+=head1 TODO
+
+Consider adding an option to have a warn message anytime a structure is FETCHed.
+
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Data::Trace
+
 
 =head1 LICENSE AND COPYRIGHT
 

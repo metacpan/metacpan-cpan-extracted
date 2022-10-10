@@ -1,3 +1,7 @@
+0.04 2022-10-06T17:31:58+02:00
+ - Add utilities for pager.
+ - Rename example for Pager.
+
 0.03 2022-09-26T13:12:12+02:00
  - Fix runtime dependencies.
  - Regen README file.

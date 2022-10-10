@@ -20,7 +20,8 @@ sub new {
 sub exec {
     my $obj = shift;
     my $stdin = shift;
-    my $result = $obj->setstdin($stdin)->update->data;
+    $obj->setstdin($stdin) if defined $stdin;
+    my $result = $obj->update->data;
     $result =~ s/ +$//mg;
     $result;
 }

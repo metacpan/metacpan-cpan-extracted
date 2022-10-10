@@ -216,6 +216,7 @@ my %determiners = (
     'FontData' => {  },
     'FontFallbackRule' => {  },
     'FontSet' => {  },
+    'FontSubstRule' => {  },
     'FontsData' => {  },
     'GeometryPath' => {  },
     'GeometryPaths' => {  },

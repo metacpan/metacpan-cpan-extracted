@@ -77,27 +77,27 @@ subtest 'rng tests' => sub {
     isnt rng_within('5-9', '1-3'),$TRUE, "range '5-9' is not within '1-3'";
     isnt rng_within('0-5', '2-9'),$TRUE, "range '0-9' is not within '2-9'";
     isnt rng_within('7-9', '1-7'),$TRUE, "range '7-9' is not within '1-7'";
-    
+
     # for test coverage
     is rng_new(undef)->as_string, rng_new('')->as_string, 'rng_new(undef)';
-    
+
     throws_ok
         { rng_within('invalid_range', '1-5') }
         qr/invalid range argument/,
         'rng_within invalid range';
-        
+
     throws_ok
         { rng_within('1-5', 'invalid_domain') }
         qr/invalid domain argument/,
         'rng_within invalid domain';
-        
+
 };
 
 subtest 'tsv tests' => sub {
     my $tsv;
 
     my @list = ( qw/ a b c /);
-    
+
     $tsv = tsv(\@list);
     is $tsv, "a\nb\nc", 'tsv list';
 
@@ -113,7 +113,7 @@ subtest 'tsv tests' => sub {
     is tsv(undef), $EMPTY, 'tsv undef';
     is tsv([]),    $EMPTY, "tsv []";
     is tsv( ['', 'xxx'] ), "\nxxx", "tsv ['','xxx']";
-    
+
     throws_ok
         { tsv( [ {} ] ) }
         qr/invalid argument/,
@@ -123,22 +123,22 @@ subtest 'tsv tests' => sub {
 subtest 'iso_date_time tests' => sub {
     #         $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)
     my @dt = (10,  15,  13,   2,    8,   122,  5,    244,  1);
-    
+
     my $got = iso_date_time(@dt);
     my $expected = '2022-09-02 13:15:10';
 
     is $got, $expected, 'iso_date_time';
-    
+
     throws_ok
         { iso_date_time() }
         qr/requires at least a 6-element localtime array/,
         'iso_date_time() is invalid';
-    
+
     throws_ok
         { iso_date_time('2022-08-30') }
         qr/requires at least a 6-element localtime array/,
         "iso_date_time('2022-08-30') is invalid";
-    
+
     SKIP: {
         # iso_date_time doesn't do any argument validation
         # it just takes a localtime list and makes the argumets
@@ -163,5 +163,5 @@ subtest 'iso_date_time tests' => sub {
             { iso_date_time(10,15,13,   2,8,2022,  5,244,1) }
             qr/some kind of error/,
             "iso_date_time doesn't validate day";
-    };    
+    };
 };

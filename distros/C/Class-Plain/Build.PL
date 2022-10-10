@@ -21,6 +21,7 @@ my $build = Module::Build->new(
       'perl' => '5.016',
       'XS::Parse::Keyword' => '0.22',
       'XS::Parse::Sublike' => '0.15',
+      'Role::Tiny' => '2.002004',
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

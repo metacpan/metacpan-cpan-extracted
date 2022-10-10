@@ -27,10 +27,13 @@ my $meta = {
                                            "Type::Tiny" => "2.000000",
                                          },
                                        },
-                          test      => { requires => { "Test::More" => 0.96 } },
+                          test      => {
+                                         recommends => { "Data::Sah::Coerce" => 0, "DateTime" => 0 },
+                                         requires   => { "Test::More" => 0.96, "Test::Requires" => 0 },
+                                       },
                         },
   "provides"         => {
-                          "Type::FromSah" => { file => "lib/Type/FromSah.pm", version => 0.002 },
+                          "Type::FromSah" => { file => "lib/Type/FromSah.pm", version => 0.005 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -44,7 +47,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Type-FromSah/project",
                         },
-  "version"          => 0.002,
+  "version"          => 0.005,
   "x_static_install" => 1,
 };
 

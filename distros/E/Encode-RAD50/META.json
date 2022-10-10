@@ -51,7 +51,7 @@
    "provides" : {
       "Encode::RAD50" : {
          "file" : "lib/Encode/RAD50.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       }
    },
    "release_status" : "stable",
@@ -69,6 +69,6 @@
          "web" : "https://github.com/trwyant/perl-Encode-RAD50"
       }
    },
-   "version" : "0.017",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.018",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

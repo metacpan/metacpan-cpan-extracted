@@ -24,13 +24,14 @@ my %WriteMakefileArgs = (
     "File::HomeDir" => 1,
     "File::Spec" => 3,
     "FindBin" => 1,
+    "Graphics::Toolkit::Color" => 1,
     "Wx" => "0.9"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "0.43",
+  "VERSION" => "0.45",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %FallbackPrereqs = (
   "File::HomeDir" => 1,
   "File::Spec" => 3,
   "FindBin" => 1,
+  "Graphics::Toolkit::Color" => 1,
   "Test::More" => "1.3",
   "Test::Warn" => "0.30",
   "Wx" => "0.9"

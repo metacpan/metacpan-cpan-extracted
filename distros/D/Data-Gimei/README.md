@@ -17,15 +17,15 @@ Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
     say $name->katakana;             # "サイトウ ハルナ"
     say $name->romaji;               # "Haruna Saito"
 
-    say $name->family->kanji;        # "斎藤"
-    say $name->family->hiragana;     # "さいとう"
-    say $name->family->katakana;     # "サイトウ"
-    say $name->family->romaji;       # "Saito"
+    say $name->surname->kanji;       # "斎藤"
+    say $name->surname->hiragana;    # "さいとう"
+    say $name->surname->katakana;    # "サイトウ"
+    say $name->surname->romaji;      # "Saito"
 
-    say $name->given->kanji;         # "陽菜"
-    say $name->given->hiragana;      # "はるな"
-    say $name->given->katakana;      # "ハルナ"
-    say $name->given->romaji;        # "Haruna"
+    say $name->forename->kanji;      # "陽菜"
+    say $name->forename->hiragana;   # "はるな"
+    say $name->forename->katakana;   # "ハルナ"
+    say $name->forename->romaji;     # "Haruna"
 
     say $name->gender;               # "female"
 

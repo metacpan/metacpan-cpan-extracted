@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine::pg';
 
-our $VERSION = 'v1.3.0'; # VERSION
+our $VERSION = 'v1.3.1'; # VERSION
 
 sub key    { 'cockroach' }
 sub name   { 'CockroachDB' }

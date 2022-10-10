@@ -10,7 +10,6 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
-  Devel::Cycle
   ExtUtils::MakeMaker
   FFI::C::File
   FFI::C::Stat
@@ -24,6 +23,7 @@ $modules{$_} = $_ for qw(
   Sub::Identify
   Term::Table
   Test2::API
+  Test2::Tools::MemoryCycle
   Test2::V0
   Test::Archive::Libarchive
   Test::Script

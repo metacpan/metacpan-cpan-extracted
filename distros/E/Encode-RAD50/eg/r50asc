@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 
 use 5.008;
 
@@ -9,7 +9,7 @@ use Encode::RAD50;
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 my %opt;
 
@@ -18,12 +18,15 @@ GetOptions( \%opt,
 ) or pod2usage( { -verbose => 0 } );
 
 use open IN => ':encoding(rad50)';
-binmode (STDIN, 'encoding(rad50)');
+binmode STDIN, 'encoding(rad50)';
 
 Encode::RAD50->silence_warnings( 1 );
 
-while (<>) {
-    print;
+{
+    local $_ = undef;
+    while (<>) {
+	print;
+    }
 }
 __END__
 
@@ -59,7 +62,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005-2007, 2011-2021 by Thomas R. Wyant, III
+Copyright 2005-2007, 2011-2022 by Thomas R. Wyant, III
 (F<wyant at cpan dot org>). All rights reserved.
 
 PDP-11, RSTS-11, RSTS/E,  RSX-11, RSX-11M+, P/OS and RT-11 are

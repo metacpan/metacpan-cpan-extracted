@@ -165,7 +165,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.70",
+   "version" : "2.71",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -197,8 +197,8 @@
       "H\u00e5kon H\u00e6gland (hakonhagland, HAKONH)",
       "nick nauwelaerts (INPHOBIA)"
    ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "x_generated_by_perl" : "v5.37.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

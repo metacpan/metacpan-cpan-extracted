@@ -33,10 +33,11 @@
       },
       "runtime" : {
          "requires" : {
-            "App::BrowserUtils" : "0.017",
+            "App::BrowserUtils" : "0.018",
             "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" : "0",
             "Data::Sah::Coerce::perl::To_duration::From_float::seconds" : "0",
             "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" : "0",
+            "Data::Sah::Coerce::perl::To_duration::From_str::hms" : "0",
             "Data::Sah::Coerce::perl::To_duration::From_str::human" : "0",
             "Data::Sah::Coerce::perl::To_duration::From_str::iso8601" : "0",
             "Data::Sah::Compiler::perl::TH::any" : "0.911",
@@ -72,7 +73,7 @@
    "provides" : {
       "App::FirefoxUtils" : {
          "file" : "lib/App/FirefoxUtils.pm",
-         "version" : "0.018"
+         "version" : "0.020"
       }
    },
    "release_status" : "stable",
@@ -87,7 +88,7 @@
          "web" : "https://github.com/perlancar/perl-App-FirefoxUtils"
       }
    },
-   "version" : "0.018",
+   "version" : "0.020",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -509,7 +510,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",

@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.876';
+our $VERSION = '1.878';
 
 use MCE::Shared::Base ();
 use MCE::Util ();
@@ -81,7 +81,7 @@ sub wait      { }
 
 ###############################################################################
 ## ----------------------------------------------------------------------------
-## Sugar API, mostly resembles http://redis.io/commands#string primitives.
+## Sugar API, mostly resembles https://redis.io/commands#string primitives.
 ##
 ###############################################################################
 
@@ -296,6 +296,8 @@ sub timedwait {
    _req1('O~CVW', $_id.$LF);
    $_[0]->[6]->unlock();
 
+   $_timeout = 0.0003 if $_timeout < 0.0003;
+
    local $@; eval {
       local $SIG{ALRM} = sub { die "alarm clock restart\n" };
       alarm $_timeout unless $_is_MSWin32;
@@ -352,7 +354,7 @@ MCE::Shared::Condvar - Condvar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Condvar version 1.876
+This document describes MCE::Shared::Condvar version 1.878
 
 =head1 DESCRIPTION
 
@@ -550,7 +552,7 @@ and C<get> explicitly. In shared context, the benefit is atomicity and
 reduction in inter-process communication.
 
 The API resembles a subset of the Redis primitives
-L<http://redis.io/commands#strings> without the key argument.
+L<https://redis.io/commands#strings> without the key argument.
 
 =head2 append ( value )
 

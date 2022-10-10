@@ -1,49 +1,22 @@
-use warnings;
-use strict;
+use lib 't';
 
-use Test::More;
-
-use FindBin;
-
-use lib "$FindBin::Bin";
 use Memd;
-
-
-if ($^V lt v5.7.2) {
-   plan skip_all => 'Perl >= 5.7.2 is required';
-}
-
-use Config;
-unless ($Config{useithreads}) {
-   plan skip_all => 'ithreads are not configured';
-}
+use Test2::IPC;
+use Test2::Require::Threads;
+use Test2::V0;
 
 use constant COUNT => 5;
 
-if ($Memd::memd) {
-    plan tests => COUNT * 2;
-} else {
-    plan skip_all => 'Not connected';
-}
-
-
 require threads;
 
-sub job {
-    my ($num) = @_;
+my @threads = map threads->new( sub { $memd->set( (@_) x 2 ) }, $_ ),
+    1 .. COUNT;
 
-    $Memd::memd->set($num, $num);
+for ( 1 .. COUNT ) {
+    $threads[ $_ - 1 ]->join;
+
+    is $memd->get($_), $_, "get($_)";
+    ok $memd->delete($_), "delete($_)";
 }
 
-my @threads;
-for my $num (1..COUNT) {
-    push @threads, threads->new(\&job, $num);
-}
-
-for my $num (1..COUNT) {
-    $threads[$num - 1]->join;
-
-    my $n = $Memd::memd->get($num);
-    is($n, $num);
-    ok($Memd::memd->delete($num));
-}
+done_testing;

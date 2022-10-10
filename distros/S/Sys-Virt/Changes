@@ -1,5 +1,9 @@
 Revision history for perl module Sys::Virt
 
+8.8.0 2022-10-04
+
+ - Fix some spelling errors in various manpages
+
 8.5.0 2022-07-01
 
  - Fix parameter detection for save/restore_domain

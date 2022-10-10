@@ -1,7 +1,7 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::Tango::Database;
-$Arango::Tango::Database::VERSION = '0.015';
+$Arango::Tango::Database::VERSION = '0.016';
 use Arango::Tango::Cursor;
 use Arango::Tango::API;
 
@@ -137,7 +137,7 @@ Arango::Tango::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 USAGE
 
@@ -146,11 +146,18 @@ creating instances of this object.
 
 C<Arango::Tango::Database> answers to the following methods:
 
-=head2 C<list_collections>
+=head2 C<collection>
 
-   my $cols = $database->list_collections;
+    my $collection = $database->collection("some_collection");
 
-Returns an array reference to the collections available in the database.
+Opens an existing collection, and returns a reference to a L<Arango::Tango::Collection> representing it.
+
+=head2 C<clear_access_level>
+
+    $db->clear_access_level($user)
+    $db->clear_access_level($user, $collection)
+
+Clears the database or collection access level for a specific user.
 
 =head2 C<create_collection>
 
@@ -158,17 +165,19 @@ Returns an array reference to the collections available in the database.
 
 Creates a new collection and returns the object representing it (L<Arango::Tango::Collection>).
 
-=head2 C<collection>
+=head2 C<create_ttl_index>
 
-    my $collection = $database->collection("some_collection");
+   $idx = $db->create_ttl_index("col_name", %args);
 
-Opens an existing collection, and returns a reference to a L<Arango::Tango::Collection> representing it.
-
-=head2 C<delete_collection>
-
-   $database->delete_collection("col_name");
-
-Deletes a collection.
+Creates a new index of type ttl for the given collection. The
+mandatory args are C<type> (must be C<ttl>), C<name> (string,
+human name for the index), C<fields> (array ref with the
+names of the document fields to be used as expiration timestamps)
+and C<expireAfter> (integer, seconds).
+Returns an object containing the id of the created index and the
+confirmation of the provided arguments (C<type>, C<name>, C<fields>
+and C<expireAfter>). If an error occurs the error field will be
+true, otherwise false.
 
 =head2 C<cursor>
 
@@ -184,6 +193,25 @@ available in the ArangoDB REST API (L<https://docs.arangodb.com/3.4/HTTP/AqlQuer
 
 Deletes the supplied database.
 
+=head2 C<delete_collection>
+
+   $database->delete_collection("col_name");
+
+Deletes a collection.
+
+=head2 C<get_indexes>
+
+   $idxs = $db->get_indexes("col_name");
+
+Returns an object containing an array reference with the details
+of the indexes presently defined for the given collection.
+
+=head2 C<list_collections>
+
+   my $cols = $database->list_collections;
+
+Returns an array reference to the collections available in the database.
+
 =head2 C<get_access_level>
 
     $perms = $db->get_access_level($user)
@@ -198,41 +226,13 @@ Fetch the database or collection access level for a specific user.
 
 Set the database or collection access level for a specific user.
 
-=head2 C<clear_access_level>
-
-    $db->clear_access_level($user)
-    $db->clear_access_level($user, $collection)
-
-Clears the database or collection access level for a specific user.
-
-=head2 C<get_indexes>
-
-   $idxs = $db->get_indexes("col_name");
-
-Returns an object containing an array reference with the details
-of the indexes presently defined for the given collection.
-
-=head2 C<create_ttl_index>
-
-   $idx = $db->create_ttl_index("col_name", %args);
-
-Creates a new index of type ttl for the given collection. The
-mandatory args are "type" (must be "ttl"), "name" (string,
-human name for the index), "fields" (array ref with the
-names of the document fields to be used as expiration timestamps)
-and "expireAfter" (integer, seconds).
-Returns an object containing the id of the created index and the
-confirmation of the provided arguments ("type", "name", "fields"
-and "expireAfter"). If an error occurs the error field will be
-true, otherwise false.
-
 =head1 AUTHOR
 
 Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2021 by Alberto Simões.
+This software is copyright (c) 2019-2022 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

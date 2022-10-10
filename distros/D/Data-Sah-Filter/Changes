@@ -1,3 +1,8 @@
+0.013   2022-07-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add perl filter: Str::remove_whitespace.
+
+
 0.012   2022-07-17  Released-By: PERLANCAR; Urgency: low
 
         - Move tests to filter examples because we are now using

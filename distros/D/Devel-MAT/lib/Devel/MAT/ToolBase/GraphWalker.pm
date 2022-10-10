@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::ToolBase::GraphWalker 0.48;
+package Devel::MAT::ToolBase::GraphWalker 0.49;
 
 use v5.14;
 use warnings;

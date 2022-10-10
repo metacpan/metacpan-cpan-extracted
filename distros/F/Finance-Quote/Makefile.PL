@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Get stock and mutual fund quotes from various exchanges",
-  "AUTHOR" => "Ben Hemming <benh\@obsidian.com.au>, Bradley Dean <bjdean\@bjdean.id.au>, Brent Neal <brent\@reindeergraphics.com>, Bruce P Schuck <bschuck\@asgard-systems.com>, Caleb Begly <calebbegly\@gmail.com>, CleanShed <72849657+CleanShed\@users.noreply.github.com>, David Hampton <hampton-sf\@rainbolthampton.net>, Diego Marcolungo <diego.marcolungo\@gmail.com>, Eelco Dolstra <edolstra\@gmail.com>, Emmanuel Di Pretoro <edipretoro\@gmail.com>, Erik Colson <eco\@ecocode.net>, Florian Schlichting <fsfs\@debian.org>, Henrik Ahlgren <pablo\@seestieto.com>, Hiranya Samarasekera <hiranyas\@gmail.com>, Jacinta Richardson <jarich\@perltraining.com.au>, Jalon Avens <jalonavens\@snave.info>, Jean-Marie Pacquet <jm\@pacquet.net>, John Haiducek <jhaiduce\@gmail.com>, Lance Wicks <lw\@judocoach.com>, Linas Vepstas <linas\@linas.org>, Martin Kompf <skaringa\@nospam.org>, Mike Alexander <mta\@umich.edu>, Paul Fenwick <pjf\@perltraining.com.au>, Paul Howarth <paul\@city-fan.org>, Pawel Konieczny <konieczp\@zonnet.nl>, Ross Peachey <ross.peachey\@optusnet.com.au>, Sam Morris <sam\@robots.org.uk>, Sigve Indregard <sigve\@indregard.no>, Stephan Ebelt <ste\@shared-files.de>, Vinay S Shastry <vinayshastry\@gmail.com>, Vincent Lucarelli <vincent.lucarelli\@gmail.com>, alex314159 <alex314159\@users.noreply.github.com>, e-dorigatti <emilio.dorigatti\@gmail.com>, goodvibes2 <goodchris96\@gmail.com>, gregor herrmann <gregoa\@debian.org>, jvolkening <jdv\@base2bio.com>, linas <linas>, x42x64 <martin-jan\@arcor.de>",
+  "AUTHOR" => "alex314159 <alex314159\@users.noreply.github.com>, AndreJ <Andre-J\@users.noreply.github.com>, Ben Hemming <benh\@obsidian.com.au>, Bradley Dean <bjdean\@bjdean.id.au>, Brent Neal <brent\@reindeergraphics.com>, Bruce Schuck <bschuck\@asgard-systems.com>, Caleb Begly <calebbegly\@gmail.com>, CleanShed <72849657+CleanShed\@users.noreply.github.com>, David Hampton <hampton-sf\@rainbolthampton.net>, Diego Marcolungo <diego.marcolungo\@gmail.com>, e-dorigatti <emilio.dorigatti\@gmail.com>, Eelco Dolstra <edolstra\@gmail.com>, Emmanuel Di Pretoro <edipretoro\@gmail.com>, Erik Colson <eco\@ecocode.net>, Florian Schlichting <fsfs\@debian.org>, goodvibes2 <goodchris96\@gmail.com>, gregor herrmann <gregoa\@debian.org>, Gustavo R. Montesino <grmontesino\@gmail.com>, Henrik Ahlgren <pablo\@seestieto.com>, Hiranya Samarasekera <hiranyas\@gmail.com>, Jacinta Richardson <jarich\@perltraining.com.au>, Jalon Avens <jalonavens\@snave.info>, Jean-Marie Pacquet <jm\@pacquet.net>, John Haiducek <jhaiduce\@gmail.com>, jvolkening <jdv\@base2bio.com>, Lance Wicks <lw\@judocoach.com>, Linas Vepstas <linas\@linas.org>, Liviu Tinta <liviutinta\@chromium.org>, Manuel Friedli <manuel\@fritteli.ch>, Martin Kompf <skaringa\@nospam.org>, Mike Alexander <mta\@umich.edu>, Paul Fenwick <pjf\@perltraining.com.au>, Paul Howarth <paul\@city-fan.org>, Pawel Konieczny <konieczp\@zonnet.nl>, Pete Ratzlaff <pratzlaff\@gmail.com>, Ross Peachey <ross.peachey\@optusnet.com.au>, Sam Morris <sam\@robots.org.uk>, Sigve Indregard <sigve\@indregard.no>, Stephan Ebelt <ste\@shared-files.de>, thinus <thinus\@pollard.co.za>, Vinay Shastry <vinayshastry\@gmail.com>, Vincent Lucarelli <vincent.lucarelli\@gmail.com>, x42x64 <martin-jan\@arcor.de>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Finance::Quote",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Data::Dumper" => 0,
     "DateTime" => 0,
     "DateTime::Format::Strptime" => 0,
     "Encode" => 0,
@@ -35,9 +36,8 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IO::Uncompress::Unzip" => 0,
     "JSON" => 0,
-    "LWP::Protocol::https" => 0,
     "LWP::Simple" => 0,
-    "LWP::UserAgent" => 0,
+    "LWP::UserAgent" => "6.48",
     "Module::Load" => 0,
     "Mozilla::CA" => 0,
     "POSIX" => 0,
@@ -73,7 +73,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "1.00",
     "feature" => 0
   },
-  "VERSION" => "1.52",
+  "VERSION" => "1.53",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -82,6 +82,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Data::Dumper" => 0,
   "Date::Manip" => 0,
   "Date::Range" => 0,
   "Date::Simple" => 0,
@@ -105,9 +106,8 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IO::Uncompress::Unzip" => 0,
   "JSON" => 0,
-  "LWP::Protocol::https" => 0,
   "LWP::Simple" => 0,
-  "LWP::UserAgent" => 0,
+  "LWP::UserAgent" => "6.48",
   "Module::Load" => 0,
   "Mozilla::CA" => 0,
   "POSIX" => 0,

@@ -8,7 +8,7 @@ Weather::GHCN::Options - create and manage option lists/objects used by GHCN mod
 
 =head1 VERSION
 
-version v0.0.003
+version v0.0.005
 
 =head1 SYNOPSIS
 
@@ -26,13 +26,18 @@ The module is primarily for use by module Weather::GHCN::StationTable.
 
 =cut
 
+# these are needed because perlcritic fails to detect that Object::Pad handles these things
+## no critic [ValuesAndExpressions::ProhibitVersionStrings]
+## no critic [TestingAndDebugging::RequireUseWarnings]
+
 use v5.18;  # minimum for Object::Pad
+use warnings;
 use Object::Pad 0.66 qw( :experimental(init_expr) );
 
 package Weather::GHCN::Options;
 class   Weather::GHCN::Options;
 
-our $VERSION = 'v0.0.003';
+our $VERSION = 'v0.0.005';
 
 use Carp                qw(carp croak);
 use Const::Fast;
@@ -46,11 +51,16 @@ use YAML::Tiny;
 # Constants
 ######################################################################
 
-const my $SPACE => q( );
-const my $EMPTY => q();
-const my $DASH  => q(-);
+const my $TRUE   => 1;      # perl's usual TRUE
+const my $FALSE  => not $TRUE; # a dual-var consisting of '' and 0
+const my $SPACE  => q( );
+const my $EMPTY  => q();
+const my $DASH   => q(-);
+const my $BAR    => q(|);
+const my $BANG   => q(!);
 const my $NEWLINE => qq(\n);
 
+const my $DEFAULT_PROFILE_FILE  => '~/.ghcn_fetch.yaml';
 const my $ALIAS_NAME_RE => qr{ \A [_]?[[:lower:]]+ \Z }xms;
 
 =head1 METHODS
@@ -66,6 +76,10 @@ Create a new Options object.
 # both Tk::Getopt and to derive an options list of Getopt::Long
 # for when Tk::Getopt is not installed.
 ######################################################################
+
+## no critic [ValuesAndExpressions::ProhibitMagicNumbers]
+## no critic [ValuesAndExpressions::ProhibitNoisyQuotes]
+## no critic [ValuesAndExpressions::ProhibitEmptyQuotes]
 
 my $Tk_opt_table = [
     'Basic options',
@@ -83,23 +97,13 @@ my $Tk_opt_table = [
             [ 'yearly summary',     'yearly' ],
             [ 'monthly summary',    'monthly' ],
             [ 'daily summary',      'daily' ],
-            [ 'station (id) level', 'id' ],
+            [ 'detail level',       'detail' ],
         ]
     ],
     ['', '', '-'],
-    ['nonetwork',    '=i',   -1,
-        help => 'Set the NoNetwork option in URI::Fetch',
-        label => 'Cache refresh option',
-        choices => [
-            ['Refresh if stale this year', -1 ],    ## no critic [ProhibitMagicNumbers]
-            ['Check for fresher copy',      0 ],
-            [q(Don't refresh cache),        1 ],
-        ],
-    ],
+    ['dataonly',    '!',    undef, label => 'Only print the data table'],
     ['performance', '!',    undef, label => 'Report performance statistics'],
     ['verbose',     '!',    undef, label => 'Print information messages'],
-    ['dataonly',    '!',    undef, label => 'Only print the data table'],
-    ['config',      '=s',   undef, label => 'Configuration options (for testing only)', nogui => 1],
 
     'Date filters',
     ['range',       '=s',   undef, label => 'Filter selected station data by year range'],
@@ -129,16 +133,30 @@ my $Tk_opt_table = [
     ['color',       '=s',   'red', label => 'Color to use for KML placemarks',
                                    alias => ['colour'] ],
     ['label',       '!',    undef, label => 'Label KML placemarks'],
+
+    'Profile and Cache',
+    ['profile',     '=s',   $DEFAULT_PROFILE_FILE,
+                                   label => 'Profile file location (for option preloading)'], #, nogui => 1],
+    ['cachedir',    '=s',   undef, label => 'Directory for cached files'],
+    ['refresh',    '=s',   'yearly',
+        help => 'Refresh yearly, (default), never, always, or if N days old (N > 1)',
+        label => 'Cache refresh option',
+        choices => [ 'yearly', 'always', 'never', '<N days old>' ],
+    ],
 ];
 
-    ######################################################################
+## use critic [ValuesAndExpressions::ProhibitMagicNumbers]
+## use critic [ValuesAndExpressions::ProhibitNoisyQuotes]
+## use critic [ValuesAndExpressions::ProhibitEmptyQuotes]
+
+#####################################################################
 # Class fields
 ######################################################################
 
-field $opt_href     :mutator;   # a hashref of merged options (with default values applied))
-field $opt_obj      :mutator;   # a Hash::Wrap object derived from $opt_href
-field $config_href  :mutator;   # a hash containing config file options
-field $tk_opt_aref;             # the Tk:Getopt array that defines all GHCN options
+field $_opt_href     :mutator;   # a hashref of merged options (with default values applied))
+field $_opt_obj      :mutator;   # a Hash::Wrap object derived from $_opt_href
+field $_profile_href :mutator;   # a hash containing profile file options
+field $_tk_opt_aref;             # the Tk:Getopt array that defines all GHCN options
 
 =head1 FIELD ACCESSORS
 
@@ -170,10 +188,10 @@ values is safer programming choice as any misspelling of an option
 name will result in a run time error.  In contrast, mispelling a hash
 key will simply result in an undef being returned.
 
-=item config_href
+=item profile_href
 
 This writable field is set by StationTable->set_options and contains
-the configuration options it was given.
+the profile options it was given.
 
 =back
 
@@ -235,16 +253,16 @@ method get_getopt_list :common () {
     my @options_list;
     my @options;
 
-    # According to https://metacpan.org/pod/Tk::Getopt -opttable 
-    # should be a reference to an array containing all options. 
-    # Elements of this array may be strings, which indicate the 
-    # beginning of a new group, or array references describing the 
-    # options. The first element of this array is the name of the 
-    # option, the second is the type (=s for string, =i for integer, 
-    # ! for boolean, =f for float etc., see Getopt::Long) for a 
-    # detailed list. The third element is optional and contains the 
-    # default value (otherwise the default is undefined). 
-    # Further elements are optional too and describe more attributes. For a 
+    # According to https://metacpan.org/pod/Tk::Getopt -opttable
+    # should be a reference to an array containing all options.
+    # Elements of this array may be strings, which indicate the
+    # beginning of a new group, or array references describing the
+    # options. The first element of this array is the name of the
+    # option, the second is the type (=s for string, =i for integer,
+    # ! for boolean, =f for float etc., see Getopt::Long) for a
+    # detailed list. The third element is optional and contains the
+    # default value (otherwise the default is undefined).
+    # Further elements are optional too and describe more attributes. For a
     # complete list of these attributes refer to "OPTTABLE ARGUMENTS".
 
     foreach my $row ( $Tk_opt_table->@* ) {
@@ -254,9 +272,9 @@ method get_getopt_list :common () {
         my ($opt_kw, $opt_type, $default, @others) = $row->@*;
         # skip the group dividers
         next if not $opt_kw;
-        
+
         # now figure out whether the slurped values are a hash of
-        # other options (including label) or just a pair of scalars 
+        # other options (including label) or just a pair of scalars
         # ('label' and label value with no other options).
         my %h;
         if (@others > 1 && ref $others[0] eq 'HASH') {
@@ -268,7 +286,7 @@ method get_getopt_list :common () {
 
         my $label = $h{'label'} // $SPACE;
         my $alias_aref = $h{'alias'} // [];
-        my $opt_kw_with_aliases = join '|', $opt_kw, $alias_aref->@*;
+        my $opt_kw_with_aliases = join $BAR, $opt_kw, $alias_aref->@*;
 
         push @options_list, $opt_kw_with_aliases . $opt_type;
         push @options, [$opt_kw_with_aliases, $opt_type, $label];
@@ -300,7 +318,7 @@ method get_getopt_list :common () {
 
 Returns:  \%choices
 
-Find all the options which have a multiple choice response, and return 
+Find all the options which have a multiple choice response, and return
 a hash keyed on the option name and with a values consisting
 of a hash of the valid responses as value/label pairs.
 
@@ -316,7 +334,7 @@ method get_option_choices :common () {
         my ($opt_kw, $opt_type, $default, @others) = $row->@*;
         # skip the group dividers
         next if not $opt_kw;
-        
+
         my $href;
         if (@others and ref $others[0] eq 'HASH' ) {
             $href = $others[0];
@@ -328,10 +346,15 @@ method get_option_choices :common () {
 
         my %hv;
         if ( $href->{'choices'} and ref $href->{'choices'} eq 'ARRAY' ) {
-            foreach my $aref ( $href->{'choices'}->@* ) {
-                $hv{ $aref->[1] } = $aref->[0];
+            foreach my $slot ( $href->{'choices'}->@* ) {
+                if (ref $slot eq 'ARRAY') {
+                    $hv{ $slot->[1] } = $slot->[0];
+                }
+                elsif (ref $slot eq $EMPTY) {
+                    $hv{ $slot } = $TRUE;
+                }
             }
-            $choices{$opt_kw} = \%hv;            
+            $choices{$opt_kw} = \%hv;
         }
     }
 
@@ -361,21 +384,91 @@ method get_option_defaults :common () {
     return \%defaults;
 }
 
+=head2 valid_report_type ($rt, \@opttable)
+
+This function is used to validate the report type.  Valid values are
+defined in the built-in Tk options table, which can be obtained by
+calling:
+
+    my @opttable = ( Weather::GHCN::Options->get_tk_options_table() );
+
+=cut
+
+method valid_report_type :common ($rt, $opttable_aref) {
+    my $choices_href = Weather::GHCN::Options->get_option_choices;
+    return $choices_href->{'report'}->{ lc $rt };
+}
+
+=head2 deabbrev_report_type ($rt)
+
+The report types supported by the -report option can be abbrevated,
+so long as the abbrevation is unambiquous.  For example, 'daily' can
+be abbreviated to 'dail', 'dai', or 'da', but not 'd' because 'detail'
+is also a valid report type and 'd' would not disambiguate the two.
+
+This function takes a (possibly abbreviated) report type and returns
+an unabbreviated report type.
+
+=cut
+
+method deabbrev_report_type :common ($rt) {
+        my %r_abbrev = abbrev( qw(detail daily monthly yearly) );
+        my $deabbreved = $r_abbrev{ lc $rt };
+        return $deabbreved;
+}
+
+=head2 valid_refresh_option ($refresh, \@opttable)
+
+This function is used to validate the refresh option.  Valid values are
+defined in the built-in Tk options table, which can be obtained by
+calling:
+
+    my @opttable = ( Weather::GHCN::Options->get_tk_options_table() );
+
+=cut
+
+method valid_refresh_option :common ($refresh, $opttable_aref) {
+    my $choices_href = Weather::GHCN::Options->get_option_choices;
+    # we only validate the non-numeric options
+    return $TRUE if $refresh =~ m{ \A \d+ \Z }xms;
+    return $choices_href->{'refresh'}->{ lc $refresh };
+}
+
+=head2 deabbrev_refresh_option ($refresh)
+
+The refresh option values can be abbrevated, so long as the abbrevation
+is unambiquous.  For example, 'yearly' can
+be abbreviated to 'y', 'ye', 'yea', etc.
+
+This function takes a (possibly abbreviated) refresh option and returns
+an unabbreviated refresh option.
+
+=cut
+
+method deabbrev_refresh_option :common ($refresh) {
+    # we only deabbreviate the non-numeric options
+    return $refresh if $refresh =~ m{ \A \d+ \Z }xms;
+    my %r_abbrev = abbrev( qw(yearly never always) );
+    my $deabbreved = $r_abbrev{ lc $refresh };
+    return $deabbreved;
+}
+
 
 ######################################################################
 =head1 INSTANCE METHODS
 
 =over 4
 
-=item combine_options ($user_opt_href)
+=item combine_options ( $user_opt_href, $profile_href={} )
 
 Returns:  ($opt_href, $opt_obj)
 
-This method takes a hash reference containing user options, merges it
-with the full set of supported options, and applies any necessary
-default values.  The end result is a complete set of all the options
+This method takes a hash reference containing user options, and optionally
+a hash reference of profile options, and combines them with default
+values.  The end result is a complete set of all the options
 supported by Weather::GHCN::StationTable with user-specified options taking
-precedence over all other.
+precedence over profile options, and profile options taking precedence
+over defaults.
 
 This set of options is returned as both a hash reference and as a
 Hash::Wrap object.  The latter is preferred for use by consuming
@@ -390,35 +483,43 @@ is that a misspelled option name will cause a runtime error.
 
 =cut
 
-method combine_options ($user_opt_href) {
+method combine_options ( $user_opt_href, $profile_href={} ) {
     # assign the class-level tk_options_table aref, generated before BUILD, to the instance field
-    $tk_opt_aref = $Tk_opt_table;
+    $_tk_opt_aref = $Tk_opt_table;
+
+    # start with the user options
+    my %merged_options = ( $user_opt_href->%* );
+
+    # merge in the profile options
+    while ( my ($k,$v) = each $profile_href->%* ) {
+        $merged_options{$k} //= $v;
+    }
 
     my $defaults_href = get_option_defaults();
 
-    my %merged_options;
+    # merge in the defaults
     while ( my ($k,$v) = each $defaults_href->%* ) {
-        $merged_options{$k} = $user_opt_href->{$k} // $v;
+        $merged_options{$k} //= $v;
     }
 
-    $opt_href = \%merged_options;
-    $opt_obj  = _wrap_hash \%merged_options;
+    $_opt_href = \%merged_options;
+    $_opt_obj  = _wrap_hash \%merged_options;
 
-    return ($opt_href, $opt_obj);
+    return ($_opt_href, $_opt_obj);
 }
 
 =head2 initialize
 
 Returns:  @errors
 
-This method initialize various user and configuration options that
-can't simply be initialized by constants.  Specifically:
+This method initializes options that can't simply be initialized by
+constants.  Specifically:
 
 =over 4
 
 =item Aliases
 
-Alias entries defined in configuration options are matched against
+Alias entries defined in the user profile are matched against
 the -location option value.  If a match is found to the alias name,
 the alias value is substituted for the location value.
 
@@ -475,19 +576,10 @@ either the B<fmonth> or B<fday> options are present.
 method initialize () {
     my @errors;
 
-    # substitute any aliases found in -location string into their station id's
-    if ( $opt_obj->location and $config_href->{'aliases'} ) {
-        if ( $opt_obj->location =~ m{ \A [_]?[[:lower:]]+ \Z }xms ) {
-            while ( my ($k,$v) = each $config_href->{'aliases'}->%* ) {
-                $opt_obj->location =~ s{$k}{$v}xms;
-            }
-        }
-    }
-
-    if ( $opt_obj->country ) {
+    if ( $_opt_obj->country ) {
         # using undef as the search type so it will figure it out based
         # on the value pattern and length
-        my @cou = search_country( $opt_obj->country, undef );
+        my @cou = search_country( $_opt_obj->country, undef );
 
         push @errors, '*E* unrecognized country code or name'
             if not @cou;
@@ -496,16 +588,16 @@ method initialize () {
             if @cou > 1;
 
         # return the GEC (FIPS) country code, which is what GHCN uses
-        $opt_obj->country = $cou[0]->{gec};
+        $_opt_obj->country = $cou[0]->{gec};
     }
 
     # default the station active range to the year filter range if its value is an empty string
-    if ( $opt_obj->defined('active') and $opt_obj->active eq $EMPTY ) {
-        $opt_obj->active = $opt_obj->range;
+    if ( $_opt_obj->defined('active') and $_opt_obj->active eq $EMPTY ) {
+        $_opt_obj->active = $_opt_obj->range;
     }
 
-    $opt_obj->quality = 0
-        if $opt_obj->fmonth or $opt_obj->fday;
+    $_opt_obj->quality = 0
+        if $_opt_obj->fmonth or $_opt_obj->fday;
 
     return @errors;
 }
@@ -529,8 +621,11 @@ method options_as_string () {
     my @options;
     my $boolean = _get_boolean_options($Tk_opt_table);
 
-    foreach my $k ( sort keys $opt_href->%* ) {
-        my $v = $opt_href->{$k};
+    foreach my $k ( sort keys $_opt_href->%* ) {
+        next if $k eq 'aliases';
+        next if $k eq 'cachedir';
+        next if $k eq 'profile';
+        my $v = $_opt_href->{$k};
         next if not defined $v;
 
         if ( $boolean->{$k} ) {
@@ -553,11 +648,11 @@ method options_as_string () {
 Returns:  @errors
 
 This method is called by StationTable->set_options to make sure all
-the options and configuration values that were provided to
-B<set_options> are valid.  It also handles abbreviations for options
-color and report.  Any errors arising from invalid value or from
-problems detected during B<intialize> (which is called at the end of
-B<validate>) are retuned in a list.
+the options that were provided to B<set_options> are valid.  It also
+handles abbreviations for options color and report.  Any errors
+arising from invalid value or from problems detected during
+B<intialize> (which is called at the end of B<validate>) are returned
+in a list.
 
 =cut
 
@@ -565,42 +660,42 @@ method validate () {
     my @errors;
     my $bad_range_cnt = 0;
 
-    if ( $config_href->{aliases} ) {
-        foreach my $alias_name ( keys $config_href->{aliases}->%* ) {
-            my $errmsg = '*E* alias names in configuration must be lowercase letters with optional underscore prefix: ' . $alias_name;
+    if ( $_opt_obj->defined('aliases') ) {
+        foreach my $alias_name ( keys $_opt_obj->aliases->%* ) {
+            my $errmsg = '*E* alias names in profile must be lowercase letters with optional underscore prefix: ' . $alias_name;
             push @errors, $errmsg
                 unless $alias_name =~ $ALIAS_NAME_RE;
         }
     }
 
-    if ( $opt_obj->active ) {
-        if ( not $opt_obj->active =~ m{ \A (18|19|20)\d\d [-] (18|19|20)\d\d }xms ) {
-            push @errors, '*E* invalid -active year range ' . $opt_obj->active;
+    if ( $_opt_obj->active ) {
+        if ( not $_opt_obj->active =~ m{ \A (18|19|20)\d\d [-] (18|19|20)\d\d }xms ) {
+            push @errors, '*E* invalid -active year range ' . $_opt_obj->active;
             $bad_range_cnt++;
         }
     }
 
-    if ( $opt_obj->range ) {
-        if ( not $opt_obj->range =~ m{ \A (18|19|20)\d\d [-,] (18|19|20)\d\d }xms ) {
-            push @errors, '*E* invalid -range ' . $opt_obj->range;
+    if ( $_opt_obj->range ) {
+        if ( not $_opt_obj->range =~ m{ \A (18|19|20)\d\d [-,] (18|19|20)\d\d }xms ) {
+            push @errors, '*E* invalid -range ' . $_opt_obj->range;
             $bad_range_cnt++;
         }
     }
 
-    push @errors, '*E* invalid 2-character state or province code ' . $opt_obj->state
-        if $opt_obj->defined('state') and not $opt_obj->state =~ m{ \A [[:alpha:]]{2} \Z }xms;
+    push @errors, '*E* invalid 2-character state or province code ' . $_opt_obj->state
+        if $_opt_obj->defined('state') and not $_opt_obj->state =~ m{ \A [[:alpha:]]{2} \Z }xms;
 
     push @errors, '*E* -partial only allowed if -active specified'
-        if $opt_obj->partial and not $opt_obj->defined('active');
+        if $_opt_obj->partial and not $_opt_obj->defined('active');
 
     # Note: full Condition Coverage in Devel::Cover seems impossible if these two ifs are combined
     #       (I tried every combination of uncoverable branch and condition I could think of to
     #        to suppress the missing case.  In the end, this was the only thing that worked.)
-    if ( $opt_obj->range and $opt_obj->active ) {
+    if ( $_opt_obj->range and $_opt_obj->active ) {
         # uncoverable branch false
         if ( $bad_range_cnt == 0 ) {
-            my $r = rng_new( $opt_obj->range  );
-            my $a = rng_new( $opt_obj->active );
+            my $r = rng_new( $_opt_obj->range  );
+            my $a = rng_new( $_opt_obj->active );
 
             push @errors, '*E* -range must be a subset of -active'
                 if not $r->subset($a);
@@ -608,36 +703,51 @@ method validate () {
     }
 
     push @errors, '*E* -gps argument must be decimal lat/long, separated by spaces or punctuation'
-        if $opt_obj->gps and $opt_obj->gps !~ m{ \A [+-]? \d{1,3} [.] \d+ ( [[:punct:]] | \s+ ) [+-]? \d{1,3} [.] \d+ \Z }xms;
+        if $_opt_obj->gps and $_opt_obj->gps !~ m{ \A [+-]? \d{1,3} [.] \d+ (?: [[:punct:]] | \s+ ) [+-]? \d{1,3} [.] \d+ \Z }xms;
 
     #-----------------------------------------------------------------
     # Maintenance Note
     #-----------------------------------------------------------------
     #
-    # ghcn_fetch.pl uses Tk::Getopt rather than Getopt::Long and as
-    # a result it does it's own validation checking of -report before
-    # the validate() method of this module gets called.  Unfortunately,
-    # the error message is useless because it fails to print out the
-    # choices correctly.  So, special code was written in ghcn_fetch
-    # to allow the -report option to be abbreviated, and to validate
-    # it, and to issue a proper error message when it's invalid.
+    # GHCN::Fetch uses Tk::Getopt rather than Getopt::Long and as
+    # a result it does it's own validation checking of -report and
+    # -refresh before the validate() method of this module gets called.
+    # Unfortunately, the error message is useless because it fails to
+    # print out the choices correctly.  So, special code was written
+    # in GHCN::Fetch to allow the -report and -refresh options to be
+    # abbreviated, and to validate them, and to issue proper error
+    # messages when they are invalid.
     #
     # Consequently, by the time this code is reached, any abbreviation
-    # to $opt_obj->report has already be replaced, and validation
-    # and error reporting done.
+    # to $_opt_obj->report (or $_opt_obj->refresh) has already been replaced,
+    # and validation and error reporting has been done done.
 
-    my %report_abbrev = abbrev( qw(id daily monthly yearly) );
+    my %report_abbrev = abbrev( qw(detail daily monthly yearly) );
 
-    my $report = $opt_obj->report;
+    my $report = lc $_opt_obj->report;
 
     # uncoverable branch true
-    croak "*E* undef report type"
+    croak '*E* undef report type'
         if not defined $report;
 
     push @errors, '*E* invalid report option: ' . $report
         if $report and not $report_abbrev{ $report };
 
-    $opt_obj->report = $report_abbrev{ $report };
+    $_opt_obj->report = $report_abbrev{ $report };
+
+
+    my %refresh_abbrev = abbrev( qw(yearly never always) );
+
+    my $refresh = lc $_opt_obj->refresh;
+
+    # uncoverable branch true
+    croak '*E* undef refresh option'
+        if not defined $refresh;
+
+    push @errors, '*E* invalid refresh option: ' . $refresh
+        if $refresh and not $refresh_abbrev{ $refresh };
+
+    $_opt_obj->refresh = $refresh_abbrev{ $refresh };
 
     #-----------------------------------------------------------------
     # end of noted section
@@ -646,31 +756,31 @@ method validate () {
     my %color_abbrev = abbrev( qw(blue green azure purple red white yellow) );
 
     # uncoverable branch false
-    if ( $opt_obj->defined('color') ) {
-        my $color = $opt_obj->color;
+    if ( $_opt_obj->defined('color') ) {
+        my $color = $_opt_obj->color;
         if ( $color eq $EMPTY ) {
             push @errors, '*E* invalid -color value ""'
         } else {
             push @errors, '*E* invalid -color value'
                 if not $color_abbrev{ $color };
         }
-        $opt_obj->color = $color_abbrev{ $color };
+        $_opt_obj->color = $color_abbrev{ $color };
     }
 
 
     push @errors, '*E* -label/-nolabel only allowed if -kml specified'
-        if $opt_obj->defined('label') and not $opt_obj->defined('kml');
+        if $_opt_obj->defined('label') and not $_opt_obj->defined('kml');
 
-    if ( $opt_obj->defined('fmonth') ) {
+    if ( $_opt_obj->defined('fmonth') ) {
         push @errors, '*E* -fmonth must be a single number or valid range spec (e.g. 1-5,9)'
-            if not rng_valid($opt_obj->fmonth)
-            or not rng_within($opt_obj->fmonth, '1-12');
+            if not rng_valid($_opt_obj->fmonth)
+            or not rng_within($_opt_obj->fmonth, '1-12');
     }
 
-    if ( $opt_obj->defined('fday') ) {
+    if ( $_opt_obj->defined('fday') ) {
         push @errors, '*E* -fday must be a single number or valid range spec (e.g. 3,15,20-31)'
-            if not rng_valid($opt_obj->fday)
-            or not rng_within($opt_obj->fday, '1-31');
+            if not rng_valid($_opt_obj->fday)
+            or not rng_within($_opt_obj->fday, '1-31');
     }
 
     my @init_errors = $self->initialize();
@@ -692,18 +802,17 @@ Defined by Object::Pad.  Included for POD::Coverage.
 # Subroutines
 ######################################################################
 
-sub _get_boolean_options ($tk_opt_aref) {
+sub _get_boolean_options ($_tk_opt_aref) {
 
     my %boolean;
 
-    foreach my $row ( $tk_opt_aref->@* ) {
+    foreach my $row ( $_tk_opt_aref->@* ) {
         next unless ref $row eq 'ARRAY';
         my ($name, $type) = $row->@*;
-        $boolean{$name}++ if $type eq '!';
+        $boolean{$name}++ if $type eq $BANG;
     }
 
     return \%boolean;
 }
-
 
 1;

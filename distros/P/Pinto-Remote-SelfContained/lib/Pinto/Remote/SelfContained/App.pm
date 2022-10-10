@@ -605,14 +605,29 @@ sub make_chrome_instance {
 }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Pinto::Remote::SelfContained::App - app class for running Pinto commands
+Pinto::Remote::SelfContained::App
 
 =head1 SYNOPSIS
 
     use Pinto::Remote::SelfContained::App;
 
     Pinto::Remote::SelfContained::App->new_from_argv(\@ARGV, %attrs)->run;
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::App
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::App - app class for running Pinto commands
+
+=cut

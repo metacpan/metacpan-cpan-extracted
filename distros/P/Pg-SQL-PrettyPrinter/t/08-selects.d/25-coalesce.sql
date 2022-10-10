@@ -1,0 +1,1 @@
+SELECT COALESCE( a, b || c, 'missing' ) FROM d

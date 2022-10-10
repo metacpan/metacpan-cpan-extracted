@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 39 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 40 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Filter.pm',
@@ -38,6 +38,7 @@ my @module_files = (
     'Data/Sah/Filter/perl/Str/oneline.pm',
     'Data/Sah/Filter/perl/Str/remove_comment.pm',
     'Data/Sah/Filter/perl/Str/remove_nondigit.pm',
+    'Data/Sah/Filter/perl/Str/remove_whitespace.pm',
     'Data/Sah/Filter/perl/Str/replace_map.pm',
     'Data/Sah/Filter/perl/Str/rtrim.pm',
     'Data/Sah/Filter/perl/Str/trim.pm',

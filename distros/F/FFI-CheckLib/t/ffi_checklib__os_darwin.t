@@ -217,4 +217,64 @@ subtest '_cmp' => sub {
 
 };
 
+subtest '_darwin_extra_libraries' => sub {
+  my $homebrew_lib_path = '/opt/homebrew/lib';
+  my $macports_lib_path = '/opt/local/lib';
+  my $mock = mock 'FFI::CheckLib';
+  $mock->override(
+      _homebrew_lib_path => sub {$homebrew_lib_path},
+      _macports_lib_path => sub {$macports_lib_path}
+  );
+
+  subtest 'default' => sub {
+    local %ENV = %ENV;
+    delete $ENV{FFI_CHECKLIB_PACKAGE};
+    is(
+        [ FFI::CheckLib::_darwin_extra_paths() ],
+        [ $homebrew_lib_path, $macports_lib_path ],
+        'homebrew and macports lib paths added'
+    );
+  };
+
+  subtest 'none' => sub {
+    local %ENV = %ENV;
+    $ENV{FFI_CHECKLIB_PACKAGE} = 'NONE';
+    is(
+        [ FFI::CheckLib::_darwin_extra_paths() ],
+        [],
+        'None extra lib paths added'
+    );
+  };
+
+  subtest 'homebrew' => sub {
+    local %ENV = %ENV;
+    $ENV{FFI_CHECKLIB_PACKAGE} = 'Homebrew';
+    is(
+        [ FFI::CheckLib::_darwin_extra_paths() ],
+        [ $homebrew_lib_path ],
+        'homebrew lib path added'
+    );
+  };
+
+  subtest 'macports' => sub {
+    local %ENV = %ENV;
+    $ENV{FFI_CHECKLIB_PACKAGE} = 'MacPorts';
+    is(
+        [ FFI::CheckLib::_darwin_extra_paths() ],
+        [ $macports_lib_path ],
+        'macports lib path loaded'
+    );
+  };
+
+  subtest 'macports,homebrew' => sub {
+    local %ENV = %ENV;
+    $ENV{FFI_CHECKLIB_PACKAGE} = 'macports,homebrew';
+    is(
+        [ FFI::CheckLib::_darwin_extra_paths() ],
+        [ $macports_lib_path, $homebrew_lib_path ],
+        'macports and homebrew lib paths added (order matters)'
+    );
+  };
+};
+
 done_testing;

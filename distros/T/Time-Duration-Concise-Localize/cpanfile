@@ -2,7 +2,7 @@ requires 'Carp';
 requires 'Module::Pluggable';
 requires 'POSIX';
 requires 'Tie::Hash::LRU';
-requires 'Time::Seconds', '1.27';
+requires 'Time::Seconds', '1.32';
 requires 'perl', '5.006';
 
 on configure => sub {
@@ -14,4 +14,5 @@ on test => sub {
     requires 'Test::FailWarnings';
     requires 'Test::More', '0.84';
     requires 'Test::NoWarnings';
+    requires 'Test::CheckDeps';
 };

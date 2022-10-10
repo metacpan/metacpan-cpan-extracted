@@ -191,7 +191,7 @@ sub entities { $_[0]->objects('Net::RDAP::Object::Entity', $_[0]->{'entities'}) 
 
 =head1 COPYRIGHT
 
-Copyright 2019 CentralNic Ltd. All rights reserved.
+Copyright 2022 CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

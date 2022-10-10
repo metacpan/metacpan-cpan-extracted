@@ -19,6 +19,8 @@ readme_from 'Pager.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.02;
 requires 'Error::Pure' => 0.07;
+requires 'Exporter' => 0;
+requires 'POSIX' => 0;
 requires 'Readonly' => 0;
 requires 'Tags::HTML' => 0;
 requires 'Unicode::UTF8' => 0;
@@ -36,7 +38,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

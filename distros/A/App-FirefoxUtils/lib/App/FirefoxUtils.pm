@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2022-10-09'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our %SPEC;
 
@@ -172,7 +172,7 @@ App::FirefoxUtils - Utilities related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.018 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2022-07-24.
+This document describes version 0.020 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2022-10-09.
 
 =head1 SYNOPSIS
 
@@ -646,6 +646,8 @@ Source repository is at L<https://github.com/perlancar/perl-App-FirefoxUtils>.
 Some other CLI utilities related to Firefox: L<dump-firefox-history> (from
 L<App::DumpFirefoxHistory>), L<App::FirefoxMultiAccountContainersUtils>.
 
+L<App::BraveUtils>
+
 L<App::ChromeUtils>
 
 L<App::OperaUtils>
@@ -671,9 +673,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

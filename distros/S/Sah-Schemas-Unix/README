@@ -2,7 +2,7 @@ NAME
     Sah::Schemas::Unix - Various Sah schemas for Unix
 
 VERSION
-    This document describes version 0.019 of Sah::Schemas::Unix (from Perl
+    This document describes version 0.020 of Sah::Schemas::Unix (from Perl
     distribution Sah-Schemas-Unix), released on 2022-07-24.
 
 SAH SCHEMAS

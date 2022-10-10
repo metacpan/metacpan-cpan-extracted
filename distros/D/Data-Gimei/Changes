@@ -1,5 +1,11 @@
 Revision history for Perl extension Data-Gimei
 
+v0.4.0 2022-09-30T12:19:39Z
+
+    - clean up old random number generator
+    - change first, last -> forename, surname
+    - Add test for Address#romaji()
+
 v0.3.0 2022-09-16T03:38:25Z
 
     - use faster random number generator

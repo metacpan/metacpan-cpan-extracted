@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Symbols 0.48;
+package Devel::MAT::Tool::Symbols 0.49;
 
 use v5.14;
 use warnings;
@@ -186,8 +186,9 @@ sub run
    my $self = shift;
    my %opts = %{ +shift };
 
-   my @queue = grep { $_->[1] ne "main::" }
-      Devel::MAT::Tool::Symbols::extract_symbols( $self->df->defstash, "" );
+   my @queue = grep {
+      $_->[0]->isa( "Devel::MAT::SV::GLOB" ) and $_->[1] ne "main::"
+   } Devel::MAT::Tool::Symbols::extract_symbols( $self->df->defstash, "" );
 
    Devel::MAT::Tool::more->paginate( sub {
       my ( $count ) = @_;

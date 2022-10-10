@@ -1,5 +1,14 @@
 Revision history for Perl module Tk::HyperText
 
+0.13 Oct 01, 2022
+  - Changed HTML Entity handling so all named entities should work
+  - Fixed bug on hex entities where extra semi-colon was left behind
+  - Added dependency to HTML::Entities::Numbered
+  - Added more examples to the "escape sequence" demo page
+  - Fixed font so proper sizes and family were honored, which also fixed
+    the H? tags font size.
+  - Fixed font sizes that were off by 1
+
 0.12 Feb 25, 2016
   - Add more dependencies to get CPANTS to pass.
 

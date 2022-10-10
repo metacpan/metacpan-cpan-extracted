@@ -8,7 +8,7 @@ Weather::GHCN::StationTable - collect station objects and weather data
 
 =head1 VERSION
 
-version v0.0.003
+version v0.0.005
 
 =head1 SYNOPSIS
 
@@ -59,37 +59,37 @@ The module is primarily for use by modules Weather::GHCN::Fetch.
 
 =cut
 
+# these are needed because perlcritic fails to detect that Object::Pad handles these things
+## no critic [ValuesAndExpressions::ProhibitVersionStrings]
+
 use v5.18;  # minimum for Object::Pad
+use warnings;
 use Object::Pad 0.66 qw( :experimental(init_expr) );
 
 package Weather::GHCN::StationTable;
 class   Weather::GHCN::StationTable;
 
-our $VERSION = 'v0.0.003';
-
-## no critic [References::ProhibitDoubleSigils]
+our $VERSION = 'v0.0.005';
 
 # directly used by this module
 use Carp                qw( carp croak );
 use Const::Fast;
+use HTML::Entities;
+use Devel::Size;
+use FindBin;
+use Math::Trig;
+use Path::Tiny;
+use Try::Tiny;
 use Weather::GHCN::Common        qw( :all );
 use Weather::GHCN::TimingStats;
-use HTML::Entities;
 #use Hash::Wrap          {-lvalue => 1, -defined => 1, -as => '_wrap_hash' };
 
 # included so consumers of this module don't have to include these
-use Cache::FileCache;
-use Devel::Size;
-use File::HomeDir;
-use File::Spec;
-use FindBin;
+use Weather::GHCN::CacheURI;
 use Weather::GHCN::CountryCodes;
 use Weather::GHCN::Measures;
 use Weather::GHCN::Options;
 use Weather::GHCN::Station;
-use GIS::Distance;
-use Try::Tiny;
-use URI::Fetch;
 
 const my $EMPTY  => q();    # empty string
 const my $SPACE  => q( );   # space character
@@ -99,7 +99,7 @@ const my $NL     => qq(\n); # perl platform-universal newline
 const my $TRUE   => 1;      # perl's usual TRUE
 const my $FALSE  => not $TRUE; # a dual-var consisting of '' and 0
 
-const my $CONFIG_FILE => '$HOME/.ghcn_fetch.yaml';
+const my $DEFAULT_PROFILE_FILE => '~/.ghcn_fetch.yaml';
 
 const my %MMM_TO_MM => (
     Jan=>1, Feb=>2, Mar=>3, Apr=>4, May=>5, Jun=>6,
@@ -154,40 +154,43 @@ my $Opt;
 
 # private fields that are intialized by set_options()
 field $_ghcn_opt_obj;                # [0] Weather::GHCN::Options object providing filtering and other options
-field $_stnid_filter     { {} };     # [1] hashref of station id's to be loaded, or empty hash
-field $_return_list      { $FALSE }; # [2] return method results as tsv if true, a list if false
 
 # private fields that are intialized by load()
-field $_cache;                       # [3] Cache::FileCache object
-field $_measures_obj;                # [4] Measures object
+field $_measures_obj;                # [1] Measures object
 
 # private fields that are intialized by get_header()
-field $_measure_begin_idx {0};       # [5] column index where measures will go in the output
+field $_measure_begin_idx {0};       # [2] column index where measures will go in the output
 
 # private fields that are intialized by new() i.e. automatically or within sub BUILD
-field %_hstats;                      # [6] Hash for capturing data field hash statistics
-field $_tstats;                      # [7] TimingStats object (or undef)
+field %_hstats;                      # [3] Hash for capturing data field hash statistics
+field $_tstats;                      # [4] TimingStats object (or undef)
 
 # data fields
-field %_station;                     # [8]  loaded station objects, key station_id
-field $_aggregate_href   { {} } ;    # [9]  hashref of aggregated (summarized0 daily data
-field $_flag_cnts_href   { {} } ;    # [10] hashref of flag counts
-field $_daily_href       { {} } ;    # [11] hashref of most recent daily data loaded
-field $_baseline_href    { {} } ;    # [12] hashref of baseline data
+field %_station;                     # [5] loaded station objects, key station_id
+field $_aggregate_href   { {} } ;    # [6] hashref of aggregated (summarized0 daily data
+field $_flag_cnts_href   { {} } ;    # [7] hashref of flag counts
+field $_daily_href       { {} } ;    # [8] hashref of most recent daily data loaded
+field $_baseline_href    { {} } ;    # [9] hashref of baseline data
 
-# readable fields that are populated set_options
-field $opt_obj              :reader; # [13] $ghcn_opt_obj->opt_obj (a Hash::Wrap of $ghcn_opt_obj->opt_href)
-field $opt_href             :reader; # [14] $ghcn_opt_obj->opt_href
-field $config_file          :reader; # [15]
-field $config_href          :reader; # [16] hash reference containing cache and alias options
+# readable fields that are populated by set_options
+field $_opt_obj             :reader; # [10] $ghcn_opt_obj->opt_obj (a Hash::Wrap of $ghcn_opt_obj->opt_href)
+field $_opt_href            :reader; # [11] $ghcn_opt_obj->opt_href
+field $_cache_obj           :reader; # [12] cache object
+field $_cachedir            :reader; # [13] cache directory
+field $_profile_file        :reader; # [14]
+field $_profile_href        :reader; # [15] hash reference containing cache and alias options
 
 # other fields with read methods
-field $stn_count            :reader;         # [17]
-field $stn_selected_count   :reader;         # [18]
-field $stn_filtered_count   :reader;         # [19]
-field $missing_href         :reader  { {} }; # [20]
+field $_stn_count            :reader;         # [16]
+field $_stn_selected_count   :reader;         # [17]
+field $_stn_filtered_count   :reader;         # [18]
+field $_missing_href         :reader  { {} }; # [19]
 
-=head1 FIELD ACCESSORS
+# fields for API use that are readable and writable
+field $_stnid_filter_href   :accessor;       # [20] hashref of station id's to be loaded, or empty hash
+field $_return_list         :accessor;       # [21] return method results as tsv if true, a list if false
+
+=head1 FIELDS (read-only)
 
 =over 4
 
@@ -199,14 +202,14 @@ Returns a reference to the Options object created by set_options.
 
 Returns a reference to a hash of the Options created by set_options.
 
-=item config_file
+=item profile_file
 
-Returns the name of the configuration file, if one was passed to
+Returns the name of the profile file, if one was passed to
 set_options.
 
-=item config_href
+=item profile_href
 
-Returns a reference to a hash containing the configuration options
+Returns a reference to a hash containing the profile options
 set by set_options (if any).
 
 =item stn_count
@@ -228,6 +231,27 @@ processing, excluding those rejected due to errors or other criteria.
 
 Returns a hash of the missing months and days for the selected
 data.
+
+=back
+
+=head1 FIELDS (read or write)
+
+=over 4
+
+=item return_list(<bool>)
+
+For API use.  By default, get methods return a tab-separated string
+of results. If return_list is set to a perl true value, then these
+methods will return a list (or list of lists).  If no argument is
+given, the current value of return_list is returned.
+
+=item stnid_filter_href(\%stnid_filter)
+
+For API use.  With no argument, the current value is returned. If an
+argument is given, it must be a hash reference the keys of which are
+the specific station id's you want to fetch and process. When this is
+used, many filtering options set via set_options will be overridden;
+e.g. country, state, location etc.
 
 =back
 
@@ -512,7 +536,7 @@ method get_header ( %args ) {
     my $return_list = $args{list} // $_return_list;
 
     # if this is a summary report, then alter the measure column labels
-    if ( not $Opt->report eq 'id' ) {
+    if ( not $Opt->report eq 'detail' ) {
         foreach my $label ($_measures_obj->measures) {
             $label =~ s{ \A TMAX }{TMAX max}xms;
             $label =~ s{ \A TMIN }{TMIN min}xms;
@@ -530,7 +554,7 @@ method get_header ( %args ) {
     }
 
     my $includes_month =
-        $Opt->report eq 'id'    ||
+        $Opt->report eq 'detail'    ||
         $Opt->report eq 'daily' ||
         $Opt->report eq 'monthly';
 
@@ -539,7 +563,7 @@ method get_header ( %args ) {
     my @output;
     push @output, 'Year';
     push @output, 'Month'      if $includes_month;
-    push @output, 'Day'        if $Opt->report eq 'id' or $Opt->report eq 'daily';
+    push @output, 'Day'        if $Opt->report eq 'detail' or $Opt->report eq 'daily';
     push @output, 'Decade';
     push @output, 'S_Decade'   if $includes_month;
     push @output, 'S_Year'     if $includes_month;
@@ -548,11 +572,11 @@ method get_header ( %args ) {
     $_measure_begin_idx = @output;
     push @output, $_measures_obj->measures;
 
-    push @output, 'QFLAGS'     if $Opt->report eq 'id';
-    push @output, 'StationId'  if $Opt->report eq 'id';
-    push @output, 'Location'   if $Opt->report eq 'id';
-    push @output, 'StnIdx'     if $Opt->report eq 'id';
-    push @output, 'Grid'       if $Opt->report eq 'id';
+    push @output, 'QFLAGS'     if $Opt->report eq 'detail';
+    push @output, 'StationId'  if $Opt->report eq 'detail';
+    push @output, 'Location'   if $Opt->report eq 'detail';
+    push @output, 'StnIdx'     if $Opt->report eq 'detail';
+    push @output, 'Grid'       if $Opt->report eq 'detail';
 
     return $return_list ? @output : join $TAB, @output;
 }
@@ -596,10 +620,10 @@ method get_missing_data_ranges ( %args ) {
     push @output, ['Missing year, months and days by station id and year (for selected stations):']
         unless $args{no_header};
 
-    foreach my $stnid ( sort keys $missing_href->%* ) {
+    foreach my $stnid ( sort keys $_missing_href->%* ) {
         my $stnobj = $_station{$stnid};
         next if $stnobj->error_count > 0;
-        my $yyyy_href = $missing_href->{$stnid};
+        my $yyyy_href = $_missing_href->{$stnid};
 
         foreach my $yyyy ( sort keys $yyyy_href->%* ) {
             my $values_href = $yyyy_href->{$yyyy};
@@ -628,6 +652,7 @@ method datarow_as_hash ( $row_aref ) {
     my @header = $self->get_header( list => 1 );
     my %h;
 
+    ## no critic [ProhibitDoubleSigils]
     @h{@header} = $row_aref->@*;
 
     return %h;
@@ -670,8 +695,10 @@ method get_missing_rows ( %args ) {
     my %loc;
     map { $loc{$_} = $_station{$_}->name } keys %_station;
 
-    foreach my $stnid ( sort keys $missing_href->%* ) {
-        my $yyyy_href = $missing_href->{$stnid};
+    ## no critic [ProhibitDoubleSigils]
+    ## no critic [ProhibitMagicNumbers]
+    foreach my $stnid ( sort keys $_missing_href->%* ) {
+        my $yyyy_href = $_missing_href->{$stnid};
         foreach my $yyyy ( sort keys $yyyy_href->%* ) {
             my $values_href = $yyyy_href->{$yyyy};
             foreach my $v ( keys $values_href->%* ) {
@@ -731,10 +758,6 @@ method get_options ( %args ) {
     if ( not $args{no_header} ) {
         push @output, $EMPTY;
         push @output, $TAB . 'Note that quality is a percentage; radius in km';
-        push @output, $TAB . 'Note that nonetwork values mean the following:';
-        push @output, $TAB . ' -1 refresh the cache if last page not refreshed this year';
-        push @output, $TAB . '  0 always check for a fresher copy of the page';
-        push @output, $TAB . '  1 do not contact the server, just use what is cached';
     }
 
     return $return_list ? @output : tsv(\@output);
@@ -837,7 +860,7 @@ method get_station_note_list () {
 Gets a list of summarized the temperature or precipitation data
 by day, month or year depending on the report option.
 
-Returns undef if the report option is 'id'.
+Returns undef if the report option is 'detail'.
 
 The actual columns that are returned is dictated by the report option
 and by the tavg and precip options provided when the object was
@@ -867,9 +890,9 @@ those years that are within the specified range(s).
 method get_summary_data ( %args ) {
     my $return_list = $args{list} // $_return_list;
 
-    # when an 'id' report is requested, we generate detail data only
+    # when an 'detail' report is requested, we generate detail data only
     # so there is no summary data to print
-    return if $Opt->report eq 'id';
+    return if $Opt->report eq 'detail';
 
     my @output;
 
@@ -961,14 +984,14 @@ get_missing_data_ranges.
 =cut
 
 method has_missing_data () {
-    my $keycount = ( keys $missing_href->%* );
+    my $keycount = ( keys $_missing_href->%* );
     return $keycount ? $TRUE : $FALSE;
 }
 
 =head2 load_data ( progress_sub => undef, row_sub => sub { say @_ } )
 
 Load the daily weather data for each of the stations that are were
-loaded into the collection.  Print the data if option report id is
+loaded into the collection.  Print the data if option report detail is
 given.  Otherwise cache the data so it can be aggregated at a later
 step.
 
@@ -985,12 +1008,12 @@ progress => sub{ say {STDERR} @_ }.
 
 Optional callback hook to allow the caller to provide their own
 subroutine for printing (or collecting in a list, or both) the
-row-level station data that is fetched when the report option is 'id'.
+row-level station data that is fetched when the report option is 'detail'.
 Defaults to printing via the 'say' operator.
 
 =item option: report <id|daily|monthly|yearly>
 
-When report id is specified, the weather data for each station is
+When report detail is specified, the weather data for each station is
 printed immediately (via the row_sub callback hook).
 
 For all other report options, the data is fetched from each station
@@ -1014,7 +1037,7 @@ method load_data ( %args ) {
     my $ii = 0;
     foreach my $stn ( @station_objs ) {
         my $daily_url = $GHCN_DATA . $stn->id . '.dly';
-        my $content = $self->_fetch_url($daily_url, $_cache, 'URI::Fetch_daily');
+        my $content = $self->_fetch_url($daily_url, 'URI::Fetch_daily');
 
         if ($progress_callback) {
             no strict 'refs';  ## no critic [ProhibitNoStrict]
@@ -1029,7 +1052,7 @@ method load_data ( %args ) {
 
         my $insufficient_quality = $self->_load_daily_data($stn, $content);
 
-        if ( $Opt->report eq 'id' ) {
+        if ( $Opt->report eq 'detail' ) {
             $self->_print_detail_data( $_measure_begin_idx, $stn, $row_callback );
         } else {
             $self->_aggregate_station_data($stn)
@@ -1098,23 +1121,7 @@ cos-surface-network-gsn-program-overview>
 
 method load_stations () {
 
-    # get the caching configuration and use it to create a cache for URI::Fetch
-    # if no cache config, then $_cache will be undef and fetches will be uncached
-    if ($config_href and $config_href->{'cache'} ) {
-        my $cache_opt = $config_href->{'cache'};
-        my $namespace = $cache_opt->{'namespace'} // 'ghcn';
-        my $root = $cache_opt->{'root'};
-        my $root_abs = File::Spec->rel2abs( $root, $FindBin::Bin );
-
-        $_cache = Cache::FileCache->new(
-            {
-              cache_root => $root_abs,
-              namespace  => $namespace,
-            }
-        );
-    }
-
-    my $stations_content = $self->_fetch_url( $GHCN_STN_LIST_URL, $_cache, 'URI::Fetch_stn');
+    my $stations_content = $self->_fetch_url( $GHCN_STN_LIST_URL, 'URI::Fetch_stn');
 
     if ( $stations_content =~ m{<title>(.*?)</title>}xms ) {
         croak '*E* unable to fetch data from ' . $GHCN_STN_LIST_URL . ': ' . $1;
@@ -1126,23 +1133,26 @@ method load_stations () {
 
     $_tstats->start('Parse_stn');
 
+    my $is_stnid_filter = keys $_stnid_filter_href->%*
+        if $_stnid_filter_href;
+
     my %stnidx;
-    my $gps = GIS::Distance->new;
 
     # Scan the station table
     # - filtering on country, state, location and GIS distance according to options
     while ( my $line = <$stn_fh> ) {
-        $stn_count++;
+        $_stn_count++;  # increment the stn count in the object
 
         # |---  0---|--- 10---|--- 20---|--- 30---|--- 40---|--- 50---|--- 60---
         # |123456789|123456789|123456789|123456789|123456789|123456789|123456789
         # (stationid).(latitu).(longitu).(elev).st.--name-----------------------
         # ACW00011604  17.1167  -61.7833   10.1    ST JOHNS COOLIDGE FLD
 
+        ## no critic [ProhibitDoubleSigils]
         ## no critic [ProhibitMagicNumbers]
         my $id = substr $line, 0, 11;
 
-        next if $_stnid_filter->%* and not $_stnid_filter->{$id};
+        next if $is_stnid_filter and not $_stnid_filter_href->{$id};
 
         my $lat   = 0 + substr $line, 12, 8;    # coerce to number
         my $long  = 0 + substr $line, 21, 9;    # coerce to number
@@ -1156,27 +1166,29 @@ method load_stations () {
         my $country = substr $id, 0, 2;
         $name =~ s{ \s+ \Z }{}xms;
 
-        ## use critic [ProhibitMagicNumbers]
-
-        ## no critic [RequireExtendedFormatting]
-        my $opt_country = $Opt->country;
-        next if $Opt->country and $country !~ m{\A$opt_country}msi;
-
-        my $opt_state = $Opt->state;
-        next if $Opt->state and $state !~ m{\A$opt_state}msi;
-
-        ## use critic [RequireExtendedFormatting]
-        next if $Opt->location and not _match_location($id, $name, $Opt->location);
-
-        if ( $Opt->gps ) {
-            my ($opt_lat, $opt_long) = split m{[,;\s]}xms, $Opt->gps;
-            my $distance = $gps->distance($opt_lat, $opt_long, $lat, $long);
-            next if $distance->kilometers > $Opt->radius;
-        }
-
         my $gsn = $gsn_flag eq 'GSN' ? 'GSN' : $EMPTY;
 
-        next if $Opt->gsn and not $gsn;
+        ## use critic [ProhibitMagicNumbers]
+
+        if (not $is_stnid_filter) {
+            ## no critic [RequireExtendedFormatting]
+            my $opt_country = $Opt->country;
+            next if $Opt->country and $country !~ m{\A$opt_country}msi;
+
+            my $opt_state = $Opt->state;
+            next if $Opt->state and $state !~ m{\A$opt_state}msi;
+
+            ## use critic [RequireExtendedFormatting]
+            next if $Opt->location and not _match_location($id, $name, $Opt->location);
+
+            if ( $Opt->gps ) {
+                my ($opt_lat, $opt_long) = split m{[,;\s]}xms, $Opt->gps;
+                my $distance = _gis_distance($opt_lat, $opt_long, $lat, $long);
+                next if $distance > $Opt->radius;
+            }
+
+            next if $Opt->gsn and not $gsn;
+        }
 
         $_station{$id} = Weather::GHCN::Station->new(
             id      => $id,
@@ -1196,7 +1208,7 @@ method load_stations () {
 
     $_tstats->stop('Parse_stn');
 
-    $stn_selected_count = keys %_station;
+    $_stn_selected_count = keys %_station;
 
     # assign a unique index to each station with matching coordinates
     my $ii = 0;
@@ -1209,7 +1221,7 @@ method load_stations () {
         $stn->idx = $stnidx{$stn->coordinates};
     }
 
-    $stn_filtered_count = $self->_load_station_inventories();
+    $_stn_filtered_count = $self->_load_station_inventories();
 
     return \%_station;
 }
@@ -1220,8 +1232,8 @@ Set various options for this StationTable instance.  These options
 will affect the processing and output by subsequent method calls.
 
 Returns an Option object and a list of errors.  It is advised you
-check @errors after calling set_options cease processing; e.g.
-I<die @errors if @errors>.
+check @errors after calling set_options to report the errors and to
+cease processing if there are any; e.g. I<die @errors if @errors>.
 
 You may want to set up a file-scoped lexical variable to hold the
 options object.  That way it is accessible throughout your code.
@@ -1240,57 +1252,6 @@ The typical calling pattern would look like this:
 
 =over 4
 
-=item user_options => \%user_options
-
-This optional argument provides a reference to a hash
-that contains a set of options that will control the filtering,
-processing and output of the GHCN modules.  This hash is typically
-created by the caller using Getopt::Long.
-
-The options provided can be any subset of the supported options.  Any
-option not provided will be added with an appropriate default value.
-The resulting combined option collection will be available as both as
-hash reference in the instance, and as a Hash::Wrap object reference
-in the instance via methods.
-
-If empty or undef, a list of all stations in the GHCN database will
-be generated, so it's best to at least provide some country or
-station id filtering, and absolutely necessary in order to produce
-other output such as daily or monthly weather data (by specifying
--report).
-
-See USER OPTIONS for a list of the options available.
-
-=item config_file => $config_filespec
-
-This optional argument specifies a file which will be used to set
-the configuration options.  The file must contain YAML specifications
-that describe the hash structure defined in section CONFIGURATION
-OPTIONS.
-
-This option is an alternative to config_options.  (If both options
-are specifed, then config_options  will take precedence.)
-
-If config_filespec is an empty string, then the filespec will default
-to $HOME\.ghcn_fetch.yaml (%UserProfile% on Windows).
-
-If config_filespec is undef, then an empty configuration will be
-used; i.e. there will be no cache and no aliases.
-
-=item config_options => \%config_options
-
-This optional argument is a reference to a hash containing
-configuration options as described in section CONFIGURATION OPTION.
-Alternatively, config_file can be used to specify a file containing
-the configuation specification in YAML format.
-
-=item stnid_filter => \%stnid_filter
-
-This optional argument should be a reference to a hash whose keys are
-the specific station id's which are to be fetched and processed.
-When this is used, many filtering options via %opt will be overridden
-(e.g. -country).
-
 =item timing_stats => $TimingStats_obj
 
 This optional argument should point to a TimingStats object that was
@@ -1302,77 +1263,59 @@ This optional argument should be a reference to a hash that was
 created by the caller and will be used to collect performance and
 memory statistics.
 
-=item return_list => <bool>
-
-By default, get methods return a tab-separated string of results.
-If return_list is set to true, then these methods will return a
-list (or list of lists).
-
 =back
 
 =cut
 
-method set_options (%arg) {
-    my $user_options;
-    my $config_options;
+method set_options (%user_options) {
 
-    my %valid;
-
-    if ( $arg{'user_options'} ) {
-        $valid{'user_options'}++;
-        $_ghcn_opt_obj //= Weather::GHCN::Options->new();
-        $user_options = $arg{'user_options'};
-        # combine user-specified options with the defaults
-        ($opt_href, $opt_obj) = $_ghcn_opt_obj->combine_options($user_options);
-        # update the combined options hash in the Options object
-        $_ghcn_opt_obj->opt_href = $opt_href;
-        # update the combined options object in the Options object
-        $_ghcn_opt_obj->opt_obj = $opt_obj;
-        # save the combined option object in a file-scoped lexical for use throughout this code
-        $Opt = $opt_obj;
+    if ( defined $user_options{'profile'} ) {
+        # save the expanded profile file path in the object
+        $_profile_file = path( $user_options{'profile'} )->absolute( $FindBin::Bin )->stringify;
+        $_profile_href = _get_profile_options($_profile_file);
     }
 
-    if ( $arg{'config_file'} ) {
-        $valid{'config_file'}++;
-        $config_file = $arg{'config_file'};
-        $config_href = _get_config_options($config_file);
-        # update the config options hash in the Options object
-        $_ghcn_opt_obj->config_href = $config_href;
+    $_ghcn_opt_obj //= Weather::GHCN::Options->new();
+    # combine user-specified options with the defaults
+    ($_opt_href, $_opt_obj) = $_ghcn_opt_obj->combine_options(\%user_options, $_profile_href);
+
+    if ( $_opt_href->{'cachedir'} ) {
+        $_cachedir = path( $_opt_href->{'cachedir'} )->absolute( $FindBin::Bin )->stringify;
+
+        $_cache_obj = Weather::GHCN::CacheURI->new($_cachedir, $_opt_obj->refresh);
+    } else {
+        $_cache_obj = Weather::GHCN::CacheURI->new($EMPTY, $_opt_obj->refresh);
     }
 
-    if ( $arg{'config_options'} ) {
-        $valid{'config_options'}++;
-        carp '*W* set_options: config_options override config_file'
-            if $valid{'config_file'};
-        $_ghcn_opt_obj //= Weather::GHCN::Options->new();
-        $config_options = $arg{'config_options'};
-        $config_href    = $arg{'config_options'};
-        # update the config options hash in the Options object
-        $_ghcn_opt_obj->config_href = $config_href;
-
-    }
-
-    if ( $arg{'stnid_filter'} ) {
-        $valid{'stnid_filter'}++;
-        $_stnid_filter   = $arg{'stnid_filter'} // {};
-    }
-
-    if ( $arg{'return_list'} ) {
-        $valid{'return_list'}++;
-        $_return_list = $arg{'return_list'};
-    }
-
-    foreach my $kw (keys %arg) {
-        croak '*E* set_options unrecognized argument: ' . $kw
-            unless exists $valid{$kw};
-    }
-
-    $_measures_obj = Weather::GHCN::Measures->new($opt_href)
-        if $user_options;
 
     my @errors = $_ghcn_opt_obj->validate();
 
-    return ($opt_obj, @errors);
+    if ( defined $_opt_href->{'aliases'} and defined $_opt_href->{'location'} ) {
+        # if the location matches an aliases, then pull the list of
+        # stations from the alias definition and assign it to the
+        # $_stnid_filter
+        my $stnid_string = $_opt_href->{'aliases'}->{ $_opt_href->{'location'} } // $EMPTY;
+        if ($stnid_string) {
+            my @stns = split m{ [,;\s] }xms, $stnid_string;
+            my %stnid_filter;
+            foreach my $stnid (@stns) {
+                $stnid_filter{$stnid} = $TRUE;
+            }
+            $_stnid_filter_href = \%stnid_filter;
+            $_opt_href->{'location'} = undef;
+        }
+    }
+
+    # update the combined options hash in the Options object
+    $_ghcn_opt_obj->opt_href = $_opt_href;
+    # update the combined options object in the Options object
+    $_ghcn_opt_obj->opt_obj = $_opt_obj;
+    # save the combined option object in a file-scoped lexical for use throughout this code
+    $Opt = $_opt_obj;
+
+    $_measures_obj = Weather::GHCN::Measures->new($_opt_href);
+
+    return ($_opt_obj, @errors);
 }
 
 =head2 summarize_data ()
@@ -1384,7 +1327,7 @@ according to the report option.
 
 =item option: report => 'daily|monthly|yearly'
 
-When the report option is 'id', no summarization is needed and the
+When the report option is 'detail', no summarization is needed and the
 method immediately returns undef.
 
 =back
@@ -1394,9 +1337,9 @@ method immediately returns undef.
 
 method summarize_data () {
 
-    # when an 'id' report is requested, we generate detail data only
+    # when an 'detail' report is requested, we generate detail data only
     # so there is no need to summarize data.
-    return if $Opt->report eq 'id';
+    return if $Opt->report eq 'detail';
 
     # We'll be replacing $_aggregate_href with this hash after we're
     # done, but we can't loop over $_aggregate_href and be changing
@@ -1573,6 +1516,7 @@ method _compute_baseline ($stn, $baseline) {
         return;
     }
 
+    ## no critic [ProhibitDoubleSigils]
     while ( my ($md,$elem_href) = each %baseline_data ) {
         while ( my ($elem, $aref) = each $elem_href->%* ) {
             my ($sum, $count) = $aref->@*;
@@ -1639,61 +1583,22 @@ method _compute_quality ($stn, $context_msg, $day_count, $range, $quality) {
     return $insufficient_quality;
 }
 
-method _fetch_url ($url, $cache, $timer_label=$EMPTY) {
+method _fetch_url ($url, $timer_label=$EMPTY) {
 
     $_tstats->start($timer_label) if $timer_label;
 
-    # $cache is a Cache::FileCache object.  URI::Fetch will use this
-    # object to designate the location of its page cache.
+    my ($from_cache, $content) = $_cache_obj->fetch($url);
 
-    # NoNetwork == 0:
-    #   If a page is in the cache, the origin HTTP server is always checked for
-    #   a fresher copy
-
-    # NoNetwork == 1:
-    #   The origin HTTP is never contacted, regardless of the page being in
-    #   cache or not. If the page is missing from cache, the fetch method will
-    #   return undef. If the page is in cache, that page will be returned, no
-    #   matter how old it is.
-
-    # NoNetwork > 1:
-    #   The origin HTTP server is not contacted if the page is in cache and the
-    #   cached page was inserted in the last N seconds.
-    #   If the cached copy is older than N seconds, a normal HTTP request (full
-    #   or cache check) is done.
-
-    # NoNetwork is set to the value of -nonetwork (when it was provided)
-    #   If the -nonetwork option is not given, then NoNetwork is set to the number
-    #   of seconds in the current year.
-
-    my $nonetwork = $Opt->nonetwork;
-
-    croak '*E* set_options must include cache options if the nonetwork option is > 0'
-        if $nonetwork > 0 and not $cache;
-
-    if ( !$Opt->defined('nonetwork') || $Opt->nonetwork < 0 ) {
-        ## no critic [ProhibitMagicNumbers]
-        my @t = localtime;
-        # set nonetwork to the number of seconds this year
-        # $t[7] is the day of the year (0..364/365)
-        $nonetwork = $t[7] * 24 * 60*60;
-    }
-
-
-    my %fetch_opt = ( NoNetwork => $nonetwork );
-
-    $fetch_opt{Cache} = $cache if $cache;
-
-    my $res = URI::Fetch->fetch( $url, %fetch_opt )
-                or croak '*E* unable to fetch data from ' . $url . ': ' .
-                         ( URI::Fetch->errstr // 'unknown error' ). "\n";
+    carp '*I* cache refresh is set to ' . $_cache_obj->refresh
+        unless $content;
+    croak '*E* unable to fetch data from ' . $url
+        unless $content;
 
     $_tstats->stop($timer_label) if $timer_label;
 
-    my $content = $res->is_success ? $res->content : $EMPTY;
-
     return $content;
 }
+
 
 method _filter_stations ($stations_href) {
     $_tstats->start('Filter_stn');
@@ -1701,6 +1606,7 @@ method _filter_stations ($stations_href) {
     my $opt_range_nrs  = rng_new( $Opt->range );
     my $opt_active_nrs = rng_new( $Opt->active );
 
+    ## no critic [ProhibitDoubleSigils]
     foreach my $stn (values $stations_href->%*) {
         my $stn_active_nrs = rng_new( $stn->active );
 
@@ -1764,6 +1670,7 @@ method _load_daily_data ($stn, $stn_content) {
 
     $self->_initialize_flag_cnts();
 
+    ## no critic [ProhibitDoubleSigils]
     ## no critic [ProhibitMagicNumbers]
 
     $_tstats->start('Load_daily_data');
@@ -1875,7 +1782,7 @@ method _load_daily_data ($stn, $stn_content) {
 
 method _load_station_inventories () {
 
-    my $inv_content = $self->_fetch_url($GHCN_STN_INVEN_URL, $_cache, 'URI::Fetch_inv');
+    my $inv_content = $self->_fetch_url($GHCN_STN_INVEN_URL, 'URI::Fetch_inv');
 
     # Now scan the station inventory list, to get the active range for each station
     # - note there are multiple records, one for each element and active range combo
@@ -1985,6 +1892,7 @@ method _report_gaps ($stn, $gaps_href) {
 
     $_tstats->start('Report_gaps');
 
+    ## no critic [ProhibitDoubleSigils]
     my @years = sort keys $gaps_href->%*;
 
     if ( $Opt->active ) {
@@ -1997,7 +1905,7 @@ method _report_gaps ($stn, $gaps_href) {
             my $iter = $gap_nrs->iterate_runs();
             while (my ( $from, $to ) = $iter->()) {
                 foreach my $yyyy ($from .. $to) {
-                    $missing_href->{$stn->id}{$yyyy}{$EMPTY}++;
+                    $_missing_href->{$stn->id}{$yyyy}{$EMPTY}++;
                 }
             }
         }
@@ -2015,13 +1923,15 @@ method _report_gaps ($stn, $gaps_href) {
             my $iter = $gap_nrs->iterate_runs();
             while (my ( $from, $to ) = $iter->()) {
                 foreach my $yyyy ($from .. $to) {
-                    $missing_href->{$stn->id}{$yyyy}{$EMPTY}++;
+                    $_missing_href->{$stn->id}{$yyyy}{$EMPTY}++;
                 }
             }
         }
     }
 
-    my ($this_yyyy, $this_mm) = _today();
+    my (undef, undef, undef , $mday, $mon, $year) = localtime time;
+    ## no critic [ValuesAndExpressions::ProhibitMagicNumbers]
+    my ($this_yyyy, $this_mm) = ($year+1900, $mon+1);
 
     foreach my $yyyy ( @years ) {
         # don't report gaps for years that aren't within -range (or -baseline if -anomalies)
@@ -2030,6 +1940,7 @@ method _report_gaps ($stn, $gaps_href) {
               or
                 $Opt->anomalies and not $opt_baseline_nrs->contains($yyyy) );
 
+        ## no critic [ProhibitDoubleSigils]
         ## no critic [ProhibitMagicNumbers]
         my $end_month = $yyyy == $this_yyyy
             ? $this_mm
@@ -2047,7 +1958,7 @@ method _report_gaps ($stn, $gaps_href) {
             my $gap_months = join $SPACE, _month_names($month_gap_nrs->as_array);
             my $msg = sprintf "%s\tmissing data: year %d months %s", $stn->id, $yyyy, $gap_months;
             $stn->add_note($WARN_MISS_MO, $msg, $Opt->verbose);
-            $missing_href->{$stn->id}{$yyyy}{$gap_months}++;
+            $_missing_href->{$stn->id}{$yyyy}{$gap_months}++;
         }
 
         my $opt_fday_nrs   = rng_new($Opt->fday);
@@ -2092,7 +2003,7 @@ method _report_gaps ($stn, $gaps_href) {
             my $msg = sprintf "%s\tmissing data: %d days %s", $stn->id, $yyyy, $gap_text;
             $stn->add_note($WARN_MISS_DY, $msg, $Opt->verbose);
             $gap_text =~ s{\A \s+ }{}xms;
-            $missing_href->{$stn->id}{$yyyy}{$gap_text}++;
+            $_missing_href->{$stn->id}{$yyyy}{$gap_text}++;
         }
     }
 
@@ -2105,7 +2016,7 @@ method _report_gaps ($stn, $gaps_href) {
 # Configuration Helper functions
 #----------------------------------------------------------------------
 
-sub _get_config_options ($config_file=$EMPTY) {
+sub _get_profile_options ($profile=$EMPTY) {
 
     #debug# use DDP;
     #debug# use Log::Dispatch;
@@ -2113,80 +2024,67 @@ sub _get_config_options ($config_file=$EMPTY) {
     #debug#     outputs => [
     #debug#         [ 'File',   min_level => 'debug', filename => 'c:/sandbox/log.log' ],
     #debug#         [ 'Screen', min_level => 'debug' ],
-    #debug#         
+    #debug#
     #debug#     ]
     #debug# );
 
-    my $config_href = {};
-    
+    my $profile_href = {};
+
     # passing undef will result in an empty config
-    return $config_href if not defined $config_file;
+    return $profile_href if not defined $profile;
 
     #debug# use FindBin;
     #debug# open my $fh, '>>', 'c:/sandbox/log.log' or die;
     #debug# $log->debug( 'program ' . $0                                   );
     #debug# $log->debug( 'caller ' . join(' | ', caller)                   );
-    #debug# $log->debug( 'received config_file:           ' . $config_file );
+    #debug# $log->debug( 'received profile_file:           ' . $_profile );
 
-    my $config_filespec = $config_file eq $EMPTY
-                        ? _get_default_config_filespec()
-                        : $config_file
-                        ;
+    my $profile_filespec = _get_profile_filespec($profile);
 
     my $yaml_struct;
     my $msg = $EMPTY;
 
     # uncoverable branch false
-    if (-e $config_filespec) {
+    if (-e $profile_filespec) {
         # uncoverable branch false
         try {
-            $yaml_struct = YAML::Tiny->read($config_filespec);
+            $yaml_struct = YAML::Tiny->read($profile_filespec);
         } catch {
-            $msg = '*W* no cache or aliases: failed reading YAML in ' . $config_filespec;
+            $msg = '*W* no cache or aliases: failed reading YAML in ' . $profile_filespec;
             carp $msg;
         }
     } else {
-        return $config_href;
+        return $profile_href;
     }
 
-    $config_href = $yaml_struct->[0]
+    $profile_href = $yaml_struct->[0]
         if $yaml_struct;
 
     #debug# $log->( 'yaml_struct length = ' . length $yaml_struct );
     #debug# $log->( "\n" );
-    #debug# $log->( 'config_filespec:                ' . $config_filespec );
+    #debug# $log->( 'profile_filespec:                ' . $profile_filespec );
     #debug# $log->( 'carp ' . $msg );
     #debug# $log->( 'FindBin::Bin                    ' . $FindBin::Bin );
     #debug# $log->( "\n");
-    #debug# $log->( 'config_href ' . np($config_href) );
+    #debug# $log->( 'profile_href ' . np($profile_href) );
     #debug# $log->( "\n" );
     #debug# $log->( "================" );
     #debug# $log->( "\n" );
     #debug# close $fh;
 
-    return $config_href;
+    return $profile_href;
 }
 
-sub _get_default_config_filespec () {
+sub _get_profile_filespec ($profile) {
 
-    # an EMPTY arg will default to $HOME/.ghcn_fetch.yaml
-    my $config_file ||= $CONFIG_FILE;
+    # an EMPTY arg will default to ~/.ghcn_fetch.yaml
+    $profile ||= $DEFAULT_PROFILE_FILE;
 
-    my $homedir = File::HomeDir->my_home;
-    #debug# say {$fh} 'homedir:                        ', $homedir;
-    
-    my $config_filespec = File::Spec->canonpath($config_file);
-    #debug# say {$fh} 'config_filespec (canon):        ', $config_filespec;
+    # Path::Tiny::path will replace ~ or ~username with the corresponding path
+    my $profile_filespec = path($profile);
+    #debug# say {$fh} 'profile_filespec (canon):        ', $profile_filespec;
 
-    $config_filespec =~ s{ \A \$HOME }{$homedir}xms;
-    #debug# say {$fh} 'config_filespec (s/$HOME/):     ', $config_filespec;
-
-    if ( not File::Spec->file_name_is_absolute($config_filespec) ) {
-        $config_filespec = File::Spec->catfile( $homedir, $config_filespec );       
-        #debug# say {$fh} 'config_filespec wasnt absolute: ', $config_filespec;
-    }
-    
-    return $config_filespec;
+    return $profile_filespec;
 }
 
 #----------------------------------------------------------------------
@@ -2233,6 +2131,30 @@ sub _get_kml_color ($color_opt) {
 }
 
 #----------------------------------------------------------------------
+# -gps Helper Functions
+#----------------------------------------------------------------------
+
+# Calculate geographic distances in kilometers between coordinates in
+# geodetic WGS84 format using the Haversine formula.
+
+sub _gis_distance ($lat1, $lon1, $lat2, $lon2) {
+    $lon1 = deg2rad($lon1);
+    $lat1 = deg2rad($lat1);
+    $lon2 = deg2rad($lon2);
+    $lat2 = deg2rad($lat2);
+
+    ## no critic [ProhibitParensWithBuiltins]
+    ## no critic [ProhibitMagicNumbers]
+
+    my $dlon = $lon2 - $lon1;
+    my $dlat = $lat2 - $lat1;
+    my $a = (sin($dlat/2)) ** 2 + cos($lat1) * cos($lat2) * (sin($dlon/2)) ** 2;
+    my $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+
+    return 6_371_640 * $c / 1000.0;
+}
+
+#----------------------------------------------------------------------
 # -location Helper Functions
 #----------------------------------------------------------------------
 
@@ -2275,7 +2197,7 @@ sub _parse_missing_text ( $s ) {
     my @mmdd;
     my @f = split m{ \s }xms, $s;
 
-    my $mmm_re    = qr{ [A-Z][a-z][a-z] }xms;
+    my $mmm_re    = qr{ [[:upper:]][[:lower:]][[:lower:]] }xms;
     my $nbr_rng   = qr{ \d+ ( [-] \d+)? }xms;
     my $rng_list  = qr{ $nbr_rng (, $nbr_rng)* }xms;
 
@@ -2387,11 +2309,8 @@ sub _days_in_month ($year, $month) {
 }
 
 sub _days_in_year ($year) {
-
-    $year += 0; # coerce to number
-
     ## no critic [ProhibitMagicNumbers]
-    return 365 + _is_leap_year($year);
+    return 365 + _is_leap_year( $year+0 );
 }
 
 sub _is_leap_year ($year) {
@@ -2426,25 +2345,6 @@ sub _month_names (@mm) {
     }
 
     return wantarray ? @result : shift @result;
-}
-
-sub _now () {
-
-    my @_now = localtime time;
-
-    return wantarray
-        ? iso_date_time(@_now)
-        : scalar iso_date_time(@_now)
-        ;
-}
-
-sub _today () {
-
-    my @ymdhms = _now();
-
-    return wantarray
-        ? @ymdhms[0..2]
-        : sprintf '%4d-%02d-%02d', @ymdhms[0..2];
 }
 
 # Seasonal decades are based on seasonal years.
@@ -2492,20 +2392,13 @@ sub _memsize ( $ref, $opt_performance ) {
   my $ghcn = Weather::GHCN::StationTable->new;
 
   my ($opt, @errors) = $ghcn->set_options(
-    user_options => {
-        country     => 'US',
-        state       => 'NY',
-        location    => 'New York',
-        active      => '2000-2022',
-        report      => 'yearly',
-        nonetwork   => -1,      # refresh cache if stale this year
-    },
-    config_options => {
-        cache => {
-            root => 'c:/ghcn_cache',
-            namespace => 'ghcn',
-        },
-    },
+    cachedir    => 'c:/ghcn_cache',
+    refresh     => 'always',
+    country     => 'US',
+    state       => 'NY',
+    location    => 'New York',
+    active      => '2000-2022',
+    report      => 'yearly',
   );
 
   die @errors if @errors;
@@ -2516,15 +2409,15 @@ sub _memsize ( $ref, $opt_performance ) {
   if ($opt->report) {
       say $ghcn->get_header;
 
-      # this also prints detailed station data if $opt->report eq 'id'
+      # this also prints detailed station data if $opt->report eq 'detail'
       $ghcn->load_data(
         # set a callback routine for printing progress messages
         progress_sub => sub { say {*STDERR} @_ },
-        # set a callback routine for capturing data rows when report => 'id'
+        # set a callback routine for capturing data rows when report => 'detail'
         row_sub      => sub { push @rows, $_[0] },
       );
 
-      # these only do something when $opt->report ne 'id'
+      # these only do something when $opt->report ne 'detail'
       $ghcn->summarize_data;
       say $ghcn->get_summary_data;
 
@@ -2535,7 +2428,7 @@ sub _memsize ( $ref, $opt_performance ) {
       say $ghcn->get_flag_statistics;
   }
 
-  # print data rows collected by row_sub callback (when report => 'id')
+  # print data rows collected by row_sub callback (when report => 'detail')
   foreach my $row_aref (@rows) {
       say join "\t", $row_aref->@*;
   }
@@ -2561,31 +2454,26 @@ sub _memsize ( $ref, $opt_performance ) {
 
   $ghcn->export_kml if $opt->kml;
 
-=head1 CONFIGURATION OPTIONS
+=head1 OPTIONS
 
-StationTable supports two kinds of options:  user and configuration.
-The main difference between the two is that configuration options
-are more suited to persistence; i.e. you'll most likely put them
-in a file that is used at every execution of StationTable.
+StationTable supports almost all the options documented in
+B<ghcn_fetch.pl>.  The only options not supported are ones that
+are listed in the Command-Line Only Options section of the POD, namely:
+-help, -usage, -readme, -gui, -optfile, and -outclip.
 
-=head2 Cache
+Options can be passed directly to the API via B<set_options()>.
 
-Cache options are used internally by StationTable when it calls
-URI::Fetch to get pages of data from the GHCN web respository.
+Options can also be defined in a file (called a B<profile>) that will
+be loaded at runtime and merged with the options passed to B<set_options>.
 
-=over 4
+Options passed to B<set_options()> must be defined as a perl hash
+structure. See B<ghcn_fetch.pl -help> for a list of all options in
+Getopts::Long format.  Simply translate the option to a hash
+key/value pair.  For example, B<-report detail> becomes B<report =>
+'detail'>.
 
-=item root
-
-This defines a path to a folder which will be used to cache web
-pages.  See the nonetwork user option for ways to control caching.
-
-=item namespace
-
-This defines the subfolder of root within which the cache files will
-reside.
-
-=back
+Options defined in a B<profile> file must be defined using
+YAML (see below).
 
 =head2 Aliases
 
@@ -2593,22 +2481,23 @@ Aliases are a convenience feature that allow you to define mnemonic
 shortcuts for specific stations.  GHCN station id's (like CA006106000)
 are difficult to remember and type, as can GHCN station names.
 Frequently-used station id's can be given easier alias names that
-can be use in the -location option for precise and reliable data
+can be used in the -location option for precise and reliable data
 retrieval.
 
 The entries within the aliases hash are simply keyword/value pairs
 that represent the mnemonic alias name and the station id (or id's)
 that are to be retrieved when that alias is used in -location.
 
+Aliases can only be defined via the B<set_options> API or in a B<profile>
+file.  There is no command-line option for defining them.
+
 =head2 YAML Example
 
-This is what the YAML content for a typical configuation file would
+This is what the YAML content for a typical profile file would
 look like:
 
     ---
-    cache:
-        root: C:/ghcn_cache_new
-        namespace: ghcn_new
+    cachedir: C:/ghcn_cache_new
 
     aliases:
         yow: CA006106000,CA006106001    # Ottawa airport
@@ -2616,44 +2505,39 @@ look like:
 
 =head2 Hash Example
 
-Here's what the typical config file would look like as a perl hash
-structure:
+Here's what the options would look like as a hash passed to the
+B<ste_options> API call:
 
-    config_options => {
-        cache => {
-            root        => 'C:/ghcn_cache_new',
-            namespace   => 'ghcn_new',
-        }
+    %options = (
+        cachedir => 'C:/ghcn_cache',
         aliases => {
             yow => 'CA006106000,CA006106001',    # Ottawa airport
             cda => 'CA006105976,CA006105978',    # Ottawa (CDA and CDA RCS)
         }
-    }
+    );
 
-=head1 USER OPTIONS
-
-See B<ghcn_fetch.pl -help> for a list of all user options in Getopts::Long
-format.  Simply translate to a hash key/value pair.  For example,
-B<-report id> becomes B<report => 'id'>.
+    my $ghcn->Weather::GHCN::StationTable->new();
+    $ghcn->set_options(%options);
 
 =head1 VERSIONING and COMPATIBILITY
 
 The version number scheme used for this module consists of a 3-part
-dot-delimited string such as v0.22.365.  This format was chosen for
+dot-delimited string such as v0.0.003.  This format was chosen for
 compatibility with Dist::Zilla version support, so that all modules
 in GHCN will get the same version number upon release.  See also
 L<https://metacpan.org/pod/version>.
 
-The first digit of the string is a major release numbers.  With the
-exception of v0 release, which should be considered experimental
-pre-production versions, the interface is intended to be upward
-compatible within a set of releases sharing the same major release
-number.  If an incompatible change becomes necessary, the major
-release number will be incremented.
+The first digit of the string is a major release numbers, and the
+second is the minor release number.  With the exception of v0.0
+releases, which should be considered experimental pre-production
+versions, the interface is intended to be upward compatible within a
+set of releases sharing the same major release number.  If an
+incompatible change becomes necessary, the major release number will
+be incremented.
 
-The other two strings are essentially the date of the release, in
-the format YY.DDD where YY is the year of the century and DDD is the
-day number within the year.
+An increment to the minor release number indicates significant new
+functionality, which usually mean new API's and options.  But, it should
+be upward compatible with the prior release.
 
 =head1 AUTHOR
 

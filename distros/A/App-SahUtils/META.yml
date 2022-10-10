@@ -19,7 +19,7 @@ name: App-SahUtils
 provides:
   App::SahUtils:
     file: lib/App/SahUtils.pm
-    version: '0.481'
+    version: '0.482'
 requires:
   Complete::Module: '0.262'
   Complete::Util: '0.608'
@@ -55,7 +55,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils
   homepage: https://metacpan.org/release/App-SahUtils
   repository: git://github.com/perlancar/perl-App-SahUtils.git
-version: '0.481'
+version: '0.482'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

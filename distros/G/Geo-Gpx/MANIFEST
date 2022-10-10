@@ -1,11 +1,13 @@
 Build.PL
 Changes
 inc/MyBuilder.pm
+INSTALL
 lib/Geo/Gpx.pm
+lib/Geo/Gpx/Point.pm
 Makefile.PL
-MANIFEST
-README
-t/0load.t
+MANIFEST			This list of files
+README.md
+t/00_load.t
 t/cmp_ver.t
 t/datetime.t
 t/gen-parse.t
@@ -15,4 +17,7 @@ t/legacy.t
 t/misc.t
 t/pod-coverage.t
 t/pod.t
-META.yml
+t/point.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

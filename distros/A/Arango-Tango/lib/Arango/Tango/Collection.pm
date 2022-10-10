@@ -1,6 +1,6 @@
 # ABSTRACT: ArangoDB Collection object
 package Arango::Tango::Collection;
-$Arango::Tango::Collection::VERSION = '0.015';
+$Arango::Tango::Collection::VERSION = '0.016';
 use warnings;
 use strict;
 
@@ -15,28 +15,9 @@ BEGIN {
             inject_properties => [ 'database', 'name' ],
             signature => ['key'],
             ## FIXME - Header parameters still not supported
-           },
-
-        replace => {
-            rest => [ put => '{{database}}_api/document/{name}/{key}' ],
-            inject_properties => [ 'database', 'name' ],
-            signature => ['key'],
-            require_document => 1,
-           },
+        },
 
         ## Collection Management
-
-        load => {
-            rest   => [ put => '{{database}}_api/collection/{name}/load'],
-            schema => { count => { type => 'integer' }},
-            inject_properties => [ 'database', 'name' ],
-        },
-
-        unload => {
-            rest   => [ put => '{{database}}_api/collection/{name}/unload'],
-            inject_properties => [ 'database', 'name' ],
-        },
-
         load_indexes => {
             rest => [ put => '{{database}}_api/collection/{name}/loadIndexesIntoMemory' ],
             inject_properties => [ 'database', 'name' ],
@@ -114,6 +95,15 @@ sub _new {
     return bless {%opts} => $class;
 }
 
+sub bulk_import {
+    my ($self, $documents) = @_;
+    return $self->{arango}->_api( bulk_import_list => {
+        database => $self->{database},
+        collection => $self->{name},
+        body => $documents
+    })
+}
+
 sub document_paths {
     my ($self) = @_;
     return $self->{arango}->_api( all_keys => { database => $self->{database}, collection => $self->{name}, type => "path"})->{result}
@@ -123,6 +113,12 @@ sub create_document {
     my ($self, $body) = @_;
     die "Arango::Tango | Refusing to store undefined body" unless defined($body);
     return $self->{arango}->_api( create_document => { database => $self->{database}, collection => $self->{name}, body => $body})
+}
+
+sub replace_document {
+    my ($self, $key, $body) = @_;
+    die "Arango::Tango | Refusing to store undefined body" unless defined($body);
+    return $self->{arango}->_api( replace_document => { database => $self->{database}, collection => $self->{name}, key => $key, body => $body})
 }
 
 sub get_access_level {
@@ -155,7 +151,7 @@ Arango::Tango::Collection - ArangoDB Collection object
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 USAGE
 
@@ -163,13 +159,6 @@ This class should not be created directly. The L<Arango::Tango> module is respon
 creating instances of this object.
 
 C<Arango::Tango::Collection> answers to the following methods:
-
-=head2 C<load>
-
-   $ans = $collection->load();
-   $ans = $collection->load( count => 0 );
-
-Loads a collection into memory.
 
 =head2 C<load_indexes>
 
@@ -179,12 +168,6 @@ This route tries to cache all index entries of this collection into
 the main memory.  Therefore it iterates over all indexes of the
 collection and stores the indexed values, not the entire document
 data, in memory.
-
-=head2 C<unload>
-
-   $ans = $collection->unload();
-
-Unloads a collection from memory.
 
 =head2 C<info>
 
@@ -248,6 +231,12 @@ has changed since the last revision check.
 
 Stores a document in specified collection
 
+=head2 C<replace_document>
+
+   $collection->replace_document( $key,  { 'Hello' => 'World' } );
+
+Replaces a document in specified collection
+
 =head2 C<truncate>
 
    $collection->truncate;
@@ -304,13 +293,19 @@ Sets the collection access level for a specific user.
 
 Clears the collection access level for a specific user.
 
+=head2 C<bulk_import>
+
+    $collection->bulk_import([{_key => "something"}, {_key => "something else"}])
+
+Imports a group of documents in a single call.
+
 =head1 AUTHOR
 
 Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2021 by Alberto Simões.
+This software is copyright (c) 2019-2022 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

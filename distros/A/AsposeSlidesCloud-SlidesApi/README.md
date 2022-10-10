@@ -3,7 +3,7 @@
 # Perl REST API to Process Presentation in Cloud
 This repository contains Aspose.Slides Cloud SDK for Perl source code. This SDK allows you to [process & manipulate PPT, PPTX, ODP, OTP](https://products.aspose.cloud/slides/perl) using Aspose.slides Cloud REST APIs in your Perl applications.
 
-You may want to check out Aspose free [PPT to PDF](https://products.aspose.app/slides/conversion), [PPT to Word](https://products.aspose.app/slides/conversion/ppt-to-word), and [PPT to JPG](https://products.aspose.app/slides/conversion/ppt-to-jpg) converters because they are live implementations of popular conversion processes.
+You may want to check out Aspose free [Powerpoint to PDF](https://products.aspose.app/slides/conversion), [Powerpoint to Word](https://products.aspose.app/slides/conversion/ppt-to-word), [Powerpoint to JPG](https://products.aspose.app/slides/conversion/ppt-to-jpg), [Powerpoint to PNG](https://products.aspose.app/slides/conversion/ppt-to-png), [PDF to Powerpoint](https://products.aspose.app/slides/import/pdf-to-powerpoint), [JPG to Powerpoint](https://products.aspose.app/slides/import/jpg-to-ppt), and [PNG to Powerpoint](https://products.aspose.app/slides/import/png-to-ppt) converters because they are live implementations of popular conversion processes.
 
 ## Presentation Processing Features
 
@@ -26,6 +26,16 @@ You may want to check out Aspose free [PPT to PDF](https://products.aspose.app/s
 **Images:** JPEG, PNG, BMP, TIFF, GIF, SVG
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
+
+## Enhancements in Version 22.9
+
+* Added new **ReplaceFont** and **ReplaceFontOnline** methods that allow replacing presentation fonts.
+* Added new **SetEmbeddedFontFromRequest** and **SetEmbeddedFontFromRequestOnline** that allow to embed fonts without uploading them to the storage.
+* Added an optional **fontsFolder** parameter to **SetEmbeddedFont** and **SetEmbeddedFontOnline** methods to enable using custom fonts with those methods.
+* Added **FontSubstRules** property to **ExportOptions** class to allow specifying font substitution rules in conversion methods.
+* Added an optional **group** parameter to **ImportImagesFromSvg** method to allow importing SVG images as a GroupShape.
+* Added new **CreateSmartArtNode** and  **DeleteSmartArtNode** methods to manage individual nodes in SmartArt shapes.
+* Added **FillFomat**, **LineFormat**, **EffectFormat** and  **ThreeDFormat** properties to **DataPoint** class that allow formatting individual chart data points.
 
 ## Enhancements in Version 22.8
 

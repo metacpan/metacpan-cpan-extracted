@@ -1,0 +1,49 @@
+1.0.2 (2022-10-10)
+
+    Enhancements:
+        - Documentation improvements.
+        - New "--do-nothing, -n" option
+
+1.0.1 (2022-10-05)
+
+    API / Behaviour Changes:
+        - rename "--no-update" to "--no-rev" for clarity.
+
+    New Features:
+        - Run Perl code with "--filter" for manual adjustments on the
+          fly.
+
+    Code Maintenance:
+        - Use new optargs() syntax
+        - Minor code tidyup
+
+    Packaging:
+        - Adjust to Github repository name change (removing p5- prefix).
+        - Hopefully an empty lib/App/vcardtidy.pm indexes this time in
+          CPAN.
+
+1.0.0 (2022-04-10)
+
+    No changes to version 1.0.0_3
+
+1.0.0_3 (2022-04-04)
+
+    Dependencies:
+        - Depend on Path::Tiny at configure time
+
+1.0.0_2 (2022-04-04)
+
+    Enhancements:
+        - Display usage message on no input
+        - Update REV value on tidy
+
+    Bug Fixes:
+        - Slurp files in as utf8
+        - Fix up multiple CATEGORIES
+
+    Packaging:
+        - Basic test added
+
+1.0.0_1 (2022-03-10)
+
+    Initial release

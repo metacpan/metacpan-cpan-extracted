@@ -1,7 +1,7 @@
 [![Actions Status](https://github.com/kaz-utashiro/greple-ical/workflows/test/badge.svg)](https://github.com/kaz-utashiro/greple-ical/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-ical.svg)](https://metacpan.org/release/App-Greple-ical)
 # NAME
 
-ical - Module to support Apple OS X Calendar data
+ical - Module to support Apple macOS Calendar data
 
 # SYNOPSIS
 
@@ -18,7 +18,7 @@ Exported functions
 
 # SAMPLES
 
-greple -Mical ...
+greple -Mical \[ -dnf \] ...
 
 greple -Mical --simple ...
 
@@ -28,14 +28,14 @@ greple -Mical --all --print print\_desc ...
 
 # DESCRIPTION
 
-Used without options, it will search all OS X Calendar files under
+Used without options, it will search all macOS Calendar files under
 user's home directory.
 
-With **--simple** option, summarize content in single line.
-Output is not sorted.
+With **--simple** option, summarize content in single line.  Output is
+not sorted.
 
-With **--detail** option, pirnt summrized line with description data if
-it is attached.  The result is sorted.
+With **--detail** option, print summarized line with description data
+if it is attached.  The result is sorted.
 
 Sample:
 
@@ -66,7 +66,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2017-2021 Kazumasa Utashiro.
+Copyright 2017-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

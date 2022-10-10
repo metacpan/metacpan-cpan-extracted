@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+# Perl core
+use v5.32;
+use strict;
+use warnings;
+use experimental "signatures";
+
+# Version
+our $VERSION = '0.01';
+
+# Perl bundled
+use Carp qw(cluck longmess shortmess);
+
+# Private local
+
+# Private remote
+
+# Community
+use Mojolicious::Lite -signatures;
+
+# Route with placeholder
+get '/:foo' => sub ($c) {
+    my $foo = $c->param('foo');
+    $c->render( text => "Hello from $foo." );
+};
+
+# Start the Mojolicious command system
+app->start;
+
+exit 0;

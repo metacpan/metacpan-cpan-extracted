@@ -37,7 +37,11 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::EffectFormat;
+use AsposeSlidesCloud::Object::FillFormat;
+use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::ScatterChartDataPoint;
+use AsposeSlidesCloud::Object::ThreeDFormat;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -176,6 +180,34 @@ __PACKAGE__->class_documentation({description => 'Bubble chart data point.',
 }                                 );
 
 __PACKAGE__->method_documentation({
+    'fill_format' => {
+    	datatype => 'FillFormat',
+    	base_name => 'FillFormat',
+    	description => 'Gets or sets the fill format.',
+    	format => '',
+    	read_only => '',
+    		},
+    'effect_format' => {
+    	datatype => 'EffectFormat',
+    	base_name => 'EffectFormat',
+    	description => 'Gets or sets the effect format.',
+    	format => '',
+    	read_only => '',
+    		},
+    'three_d_format' => {
+    	datatype => 'ThreeDFormat',
+    	base_name => 'ThreeDFormat',
+    	description => 'Gets or sets the 3D format',
+    	format => '',
+    	read_only => '',
+    		},
+    'line_format' => {
+    	datatype => 'LineFormat',
+    	base_name => 'LineFormat',
+    	description => 'Gets or sets the line format.',
+    	format => '',
+    	read_only => '',
+    		},
     'x_value' => {
     	datatype => 'double',
     	base_name => 'XValue',
@@ -200,12 +232,20 @@ __PACKAGE__->method_documentation({
 });
 
 __PACKAGE__->swagger_types( {
+    'fill_format' => 'FillFormat',
+    'effect_format' => 'EffectFormat',
+    'three_d_format' => 'ThreeDFormat',
+    'line_format' => 'LineFormat',
     'x_value' => 'double',
     'y_value' => 'double',
     'bubble_size' => 'double'
 } );
 
 __PACKAGE__->attribute_map( {
+    'fill_format' => 'FillFormat',
+    'effect_format' => 'EffectFormat',
+    'three_d_format' => 'ThreeDFormat',
+    'line_format' => 'LineFormat',
     'x_value' => 'XValue',
     'y_value' => 'YValue',
     'bubble_size' => 'BubbleSize'

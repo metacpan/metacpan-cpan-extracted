@@ -45,6 +45,7 @@
 1103 dark-green "dark-green"
 1104 blue-green "blue-green"
 1105 water "water"
+1106 ocean "ocean"
 1201 light-grey "light-grey"
 1202 grey "grey"
 1203 dark-grey "dark-grey"

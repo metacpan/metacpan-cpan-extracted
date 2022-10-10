@@ -19,10 +19,15 @@ my $builder = Module::Build->new(
         'Test::More' => '0',
     },
     requires => {
-
-        #'Foo::Bar::Module' => '5.0401',
+        'perl' => '5.010.1',
     },
     add_to_cleanup => ['Subs-Trace-*'],
+    meta_merge     => {
+        resources => {
+            bugtracker => 'https://github.com/poti1/subs-trace/issues',
+            repository => 'https://github.com/poti1/subs-trace',
+        },
+    },
 );
 
 $builder->create_build_script();

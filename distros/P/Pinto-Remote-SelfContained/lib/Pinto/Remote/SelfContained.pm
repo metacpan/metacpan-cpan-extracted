@@ -13,7 +13,7 @@ use Types::Standard qw(Bool InstanceOf Int Maybe Str);
 
 use namespace::clean;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 with qw(
     Pinto::Remote::SelfContained::HasHttptiny
@@ -88,11 +88,20 @@ sub load_class_for_action {
 }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Pinto::Remote::SelfContained - interact with a remote Pinto repository
+Pinto::Remote::SelfContained
+
+=head1 VERSION
+
+version 1.001
 
 =head1 DESCRIPTION
 
@@ -105,6 +114,18 @@ doesn't currently have the bandwidth to move away from it to any alternative,
 but wants something smaller than the whole of L<Pinto> for interacting with the
 remote repo.
 
+=head1 NAME
+
+Pinto::Remote::SelfContained
+
+=head1 VERSION
+
+version 1.001
+
+=head1 NAME
+
+Pinto::Remote::SelfContained - interact with a remote Pinto repository
+
 =head1 METHODS
 
 =head2 C<< run($action_name => %action_args) >>
@@ -116,7 +137,7 @@ back to the L<Pinto::Remote::SelfContained::Action> base class.
 
 =head1 AUTHOR
 
-Aaron Crane, E<lt>arc@cpan.orgE<gt>
+Aaron Crane E<lt>arc@cpan.orgE<gt>, Brad Lhotsky E<lt>brad@divisionbyzero.netE<gt>
 
 =head1 COPYRIGHT
 

@@ -10,9 +10,9 @@ use Perinci::To::POD;
 use Sub::Identify qw(sub_fullname);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-23'; # DATE
+our $DATE = '2022-07-24'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Rinci'; # DIST
-our $VERSION = '0.783'; # VERSION
+our $VERSION = '0.784'; # VERSION
 
 our $pa = Perinci::Access::Perl->new;
 
@@ -240,8 +240,13 @@ sub weave_section {
     if ($filename =~ m!^lib/(.+)\.pm$!) {
         $package = $1;
         $package =~ s!/!::!g;
+        my $re;
         if (defined $self->exclude_modules) {
-            my $re = $self->exclude_modules;
+            $re = $self->exclude_modules;
+        } elsif ($ENV{PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_MODULES}) {
+            $re = $ENV{PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_MODULES};
+        }
+        if ($re) {
             eval { $re = qr/$re/ };
             $@ and die "Invalid regex in exclude_modules: $re";
             if ($package =~ $re) {
@@ -270,7 +275,7 @@ Pod::Weaver::Plugin::Rinci - Insert stuffs to POD from Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.783 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2022-06-23.
+This document describes version 0.784 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2022-07-24.
 
 =head1 SYNOPSIS
 
@@ -408,6 +413,11 @@ configuration option.
 =head2 PERL_POD_WEAVER_PLUGIN_RINCI_FORCE_RELOAD
 
 Bool. Used to set the default for the C</force_reload> configuration option.
+
+=head2 PERL_POD_WEAVER_PLUGIN_RINCI_EXCLUDE_MODULES
+
+String (regex pattern). Used to set the default value for the
+C</exclude_modules> configuration option.
 
 =head1 HOMEPAGE
 

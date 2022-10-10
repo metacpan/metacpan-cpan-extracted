@@ -991,7 +991,7 @@ class TestCase::Sys::IO {
         return 0;
       }
       
-      warn "getcwd:$ret_buf";
+      warn "\n[Test Output]getcwd:$ret_buf";
     }
 
     {
@@ -1001,7 +1001,7 @@ class TestCase::Sys::IO {
         return 0;
       }
       
-      warn "getcwd(NULL, 0):$ret_buf";
+      warn "\n[Test Output]getcwd(NULL, 0):$ret_buf";
     }
     
     return 1;

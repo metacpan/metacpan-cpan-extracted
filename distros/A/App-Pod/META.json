@@ -38,15 +38,21 @@
    "provides" : {
       "App::Pod" : {
          "file" : "lib/App/Pod.pm",
-         "version" : "0.26"
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/poti1/app-pod/issues"
+      },
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/poti1/app-pod"
+      }
    },
-   "version" : "0.26",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.28",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

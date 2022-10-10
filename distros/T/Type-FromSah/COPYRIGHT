@@ -3,19 +3,22 @@ Upstream-Name: Type-FromSah
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Type-FromSah
 
+Files: README
+ lib/Type/FromSah.pm
+ t/01basic.t
+ t/02simple-usage.t
+ t/03type-default.t
+ t/04parent.t
+ t/05coercion.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: Changes
  META.json
  META.yml
  dist.ini
  doap.ttl
 Copyright: Copyright 2022 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: README
- lib/Type/FromSah.pm
- t/01basic.t
- t/02simple-usage.t
-Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT

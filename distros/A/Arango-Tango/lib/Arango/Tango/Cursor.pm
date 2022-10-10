@@ -1,6 +1,6 @@
 # ABSTRACT: ArangoDB Cursor object
 package Arango::Tango::Cursor;
-$Arango::Tango::Cursor::VERSION = '0.015';
+$Arango::Tango::Cursor::VERSION = '0.016';
 use warnings;
 use strict;
 
@@ -35,9 +35,11 @@ sub next {
 }
 
 sub finish {
-  my ($self) = @_;
-  $self->{arango}->_api('cursor_delete',  { database => $self->{database}, id => $self->{id} });
-  delete $self->{$_} for (keys %$self);
+    my ($self) = @_;
+    if (exists($self->{id})) {
+        $self->{arango}->_api('cursor_delete',  { database => $self->{database}, id => $self->{id} });
+    }
+    delete $self->{$_} for (keys %$self);
 }
 
 sub has_more {
@@ -59,12 +61,13 @@ Arango::Tango::Cursor - ArangoDB Cursor object
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 USAGE
 
-This class should not be created directly. The L<Arango::Tango> module is responsible for
-creating instances of this object.
+This class should not be created directly. The
+L<Arango::Tango::Database> module is responsible for creating
+instances of this object.
 
 C<Arango::Tango::Cursor> answers to the following methods:
 
@@ -94,7 +97,7 @@ Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2021 by Alberto Simões.
+This software is copyright (c) 2019-2022 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

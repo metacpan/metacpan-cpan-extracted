@@ -1,7 +1,11 @@
 Revision history for Perl extension Chemistry::File::CML.
 
+0.12  Mon Oct 10 2022
+        - Adjusted to read a wider variety of CML files.
+        - Prepared to read in some stereochemistry settings.
+
 0.11  Mon Aug 22 2022
-	- Specified dependency on XML::LibXML.
+        - Specified dependency on XML::LibXML.
 
 0.10  Fri Aug 19 2022
-	- First release
+        - First release

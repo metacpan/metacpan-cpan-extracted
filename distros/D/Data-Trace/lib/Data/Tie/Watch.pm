@@ -244,8 +244,8 @@ use 5.004_57;
 use Carp;
 use strict;
 use Scalar::Util qw( reftype );
-use subs qw/normalize_callbacks/;
-use vars qw/@array_callbacks @hash_callbacks @scalar_callbacks/;
+use subs         qw/normalize_callbacks/;
+use vars         qw/@array_callbacks @hash_callbacks @scalar_callbacks/;
 
 @array_callbacks = qw/-clear -delete -destroy -exists -extend -fetch
   -fetchsize -pop -push -shift -splice -store
@@ -268,7 +268,7 @@ sub new {
     croak "Data::Tie::Watch::new(): -variable is required."
       if not defined $variable;
 
-    my ( $type, $watch_obj ) = ( reftype($variable), undef );
+    my ( $type, $watch_obj ) = ( reftype( $variable ), undef );
     if ( $type =~ /(SCALAR|REF)/ ) {
         @arg_defaults{@scalar_callbacks} = (
             [ \&Data::Tie::Watch::Scalar::Destroy ],
@@ -368,7 +368,9 @@ sub Say {
     # $_[0] = self
     # $_[1] = value
 
-    defined $_[1] ? ( reftype( $_[1] ) ne '' ? $_[1] : "'$_[1]'" ) : "undefined";
+    defined $_[1]
+      ? ( reftype( $_[1] ) ne '' ? $_[1] : "'$_[1]'" )
+      : "undefined";
 
 }    # end Say
 
@@ -380,7 +382,7 @@ sub Unwatch {
     # $_[0] = self
 
     my $variable = $_[0]->{-variable};
-    my $type     = reftype($variable);
+    my $type     = reftype( $variable );
     my $copy;
     $copy = $_[0]->{-ptr} if $type !~ /(SCALAR|REF)/;
     my $shadow = $_[0]->{-shadow};
@@ -439,7 +441,7 @@ sub normalize_callbacks {
     foreach my $arg ( keys %$args_ref ) {
         next if $arg =~ /variable|debug|shadow/;
         $cb  = $args_ref->{$arg};
-        $ref = reftype($cb);
+        $ref = reftype( $cb );
         if ( $ref =~ /CODE/ ) {
             $args_ref->{$arg} = [$cb];
         }

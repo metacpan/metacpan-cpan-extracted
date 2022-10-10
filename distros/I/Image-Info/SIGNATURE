@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,19 +12,19 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
 SHA1 c82d6187bf83f92dcd4a4ba9ab8341c3edcc094a .gitignore
-SHA1 e3115e22a27fdd5134a59970fbc5e7529a5ddf3e CHANGES
+SHA1 10c316fcce180e5eff4d9821c3bcecb091c4e95f CHANGES
 SHA1 517bff80bcf518746150086148acaf8cfa37a17d CREDITS
 SHA1 5ca9bb45657728092eb1aa886e1e2b1826136c70 MANIFEST
 SHA1 7508fd127843a69e30ba4f58f4b4e769f20d49e2 MANIFEST.SKIP
-SHA1 30e7384a7dea93c40bd5f5dbb82dadc73e1302a8 META.json
-SHA1 e46bc208078209dc13f72b8cd6e1b4a53dad5a9b META.yml
+SHA1 c8a563bd0471afe68ae49cf21a69331d587a7087 META.json
+SHA1 cc712e850ee678e2cf32573642df3fb5ba9d3f42 META.yml
 SHA1 fd14642d591e132078fc91a8e54a4a4fed927f46 Makefile.PL
 SHA1 2223f7e51619714199f2d5cc232b5aa0e514364f README
 SHA1 36ea8eabe5ac80acc416411aae77b60e1480de1b TODO
-SHA1 d377efc30a865c1b5e811b383f7363abc92b1fb5 dev/Info.pm.tmpl
+SHA1 7d1e2c484d3107a0e90b43169a04701c713953bf dev/Info.pm.tmpl
 SHA1 c11e7408bd16d35b2116ee47eaac4f08266be902 dev/build.pl
 SHA1 38b386e67725abff64ea00abb8e92c46f38e2f59 exifdump
 SHA1 fdf710d6580548b5fe62be0fd9151bc196537c17 img/anim.webp
@@ -73,11 +73,11 @@ SHA1 222dd2400f89771096842e1a5b4264534aee5935 lib/Bundle/Image/Info/PNG.pm
 SHA1 e6fe98aa5a30dbd290668cffa515aebaf14828fa lib/Bundle/Image/Info/SVG.pm
 SHA1 fa3a601365ec108901e991a8148b62c2bf3dd62b lib/Bundle/Image/Info/XBM.pm
 SHA1 7ae5950ba4474e8099068ca6122e67cadce60842 lib/Bundle/Image/Info/XPM.pm
-SHA1 231dd1bff79a57b155571eb5b0b604616a890ed0 lib/Image/Info.pm
+SHA1 67252dd02f3c7cd3cac04b741c09ed9df54cc158 lib/Image/Info.pm
 SHA1 6991a957bacde9d3b873184d90d910d083f5f403 lib/Image/Info/BMP.pm
 SHA1 0996bffe073126dceb72c04dc5b3002c78c24d56 lib/Image/Info/GIF.pm
 SHA1 fb628cb66c566ab66a1b7953a1bb29cfde1c79c7 lib/Image/Info/ICO.pm
-SHA1 cb662c31e3429214bdc9f1e7b65fac2c4198f689 lib/Image/Info/JPEG.pm
+SHA1 b48eec84212c2665922f5dbf23e6083b1a818bfb lib/Image/Info/JPEG.pm
 SHA1 9aaff0bcddae56a1da3bc7dd04e5086760e5fe4c lib/Image/Info/PNG.pm
 SHA1 1b69276ab386d1795469773d6af70ff510c15feb lib/Image/Info/PPM.pm
 SHA1 badd075bff5f88975bcbff1eb2d4cdf84fe5a2ca lib/Image/Info/SVG.pm
@@ -88,7 +88,7 @@ SHA1 ed6fde11752d6450756c815b2dca25f9ad1740d9 lib/Image/Info/WBMP.pm
 SHA1 d4a5013ec81db219edd32f273d1be370b5cda9fd lib/Image/Info/WEBP.pm
 SHA1 5c896ca4cc89715527f4207bae3c1e3c7a26286a lib/Image/Info/XBM.pm
 SHA1 4a5050fdcef00704e7d1fa2ae8751aa34a866f63 lib/Image/Info/XPM.pm
-SHA1 e87d3595864dcd02e59c86fc6e8aa50fb7a283d1 lib/Image/TIFF.pm
+SHA1 5e1853b08e6d86cd6be55bb7eea71cd8bd6e7aac lib/Image/TIFF.pm
 SHA1 34e6def40374dc924ea7ef58c5aa04e04a783295 t/00_basics.t
 SHA1 38883a0d98f01e4e749168369848f3ab5b5c7660 t/bad_exif.t
 SHA1 aaf002b3e5103e15dad27d59bbf2ce7d84caf79e t/bmp.t
@@ -102,7 +102,7 @@ SHA1 79380e179b840468bef4ab231f1bc7ac93081ed2 t/png.t
 SHA1 cc217a37ee14356bb57e4ea32c1eda94d1a2d8c9 t/pod.t
 SHA1 ddac1596c132f80e81355cc048def2733163a9aa t/pod_cov.t
 SHA1 710bb49a5428b9b0301ec451f8d869b58937b746 t/string.t
-SHA1 2cf4f2b872c4217539c325173110d196ea7c3070 t/svg.t
+SHA1 456f4ac4ad5fc7eda6b08fca55db2bceb5b4e83a t/svg.t
 SHA1 1e8a42e9b7d911936853446ef907f8f74072d08f t/tiff.t
 SHA1 76e7e08522799dc0f39896c8925aff1d42b09da4 t/tiff_e.t
 SHA1 c08bf003a891603d6f5f098425a70680a699e31a t/tiff_segfault.t
@@ -116,13 +116,13 @@ SHA1 14f51fc143d06dad6d47a810596799652928221e xt/rt118099.t
 SHA1 6ef907e37bb4840f96f8d5b16b47991806f21f31 xt/strict.t
 SHA1 776c2c96e3155a622221cb1c4989579a652452d7 xt/synopsis.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJdqrESAAoJEN1GkmBlfE8/+O8H/3p3MDZNqc91mqBBEExjwDPv
-ifXolC7lea2ZXn5s6i3VJArYmCD7a1g3SCCxJnN0IXfQirNWgjTuX4k3+PVRX57p
-ce7zpGNxhklprIkdlJd077SSnTVcyzcoJKZ4Ym3bW4GrPotrco/FfDCuADoOwhmw
-DcfID/PEcvGLi6cRH1soaTHlhiNhmI4xfeCe7V0IF+Cz2v3XhSIiKh4AFaa2dZkZ
-9qOWZ6BgnHK5m2aQhZNvhiHfdWLoWxS243VcZ9IjEi9FLmN78FmbSag+zZ4FAgsZ
-90wosyPcs0i41u8gsnpN434yJkWqOYDeh9S567g/YzEZi3uQoD/7RGJoCm0mTy0=
-=T0QP
+iQEzBAEBCAAdFiEEhTWpz/sWDCQpAXAK3UaSYGV8Tz8FAmM7IXQACgkQ3UaSYGV8
+Tz8Rwgf/SVHdYPCv/6lxoS5gri8vv3n2DaTihCb87U8ryKs7WzK3uwTsCp4UODX/
+camM4w8ueF7Mm8GXQFetfVsDtyCSeclWyisFG4N0doP39F/pI4XHvlzHTZrSix3S
+W59ZUp7Cl+ea30p76CKBw+fKNvOyJB9HD8nYbFFDJkAPwLBW9Vmfomhi3sNDdphd
+oNRQFRhr2SI+ylLSR69daQf0KjCkc6UKQTIn3iApVA9yYTCXHM6YBllsxFUP3eqp
+aTQxWTiaOwMEbomHBY36a+dkO6ZWdLNbaO0zrD5oULvFYqXU2Se4HpuwFRMEZ9gv
+E1I/Io7NMniXD2RHr83Dzw1GpWptbg==
+=lveb
 -----END PGP SIGNATURE-----

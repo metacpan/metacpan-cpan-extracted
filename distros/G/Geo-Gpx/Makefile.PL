@@ -16,6 +16,8 @@ WriteMakefile(
   PREREQ_PM     => {
     'DateTime'                  => 0,
     'DateTime::Format::ISO8601' => 0,
+    'Geo::Calc'                 => 0,
+    'Geo::Coordinates::Transform' => 0,
     'HTML::Entities'            => 0,
     'Scalar::Util'              => 0,
     'Test::More'                => 0,

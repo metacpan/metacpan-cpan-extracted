@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.876';
+our $VERSION = '1.878';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -306,7 +306,7 @@ sub sort {
 
 ###############################################################################
 ## ----------------------------------------------------------------------------
-## Sugar API, mostly resembles http://redis.io/commands#string primitives.
+## Sugar API, mostly resembles https://redis.io/commands#string primitives.
 ##
 ###############################################################################
 
@@ -383,7 +383,7 @@ MCE::Shared::Array - Array helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Array version 1.876
+This document describes MCE::Shared::Array version 1.878
 
 =head1 DESCRIPTION
 
@@ -923,7 +923,7 @@ and C<get> explicitly. In shared context, the benefit is atomicity and
 reduction in inter-process communication.
 
 The API resembles a subset of the Redis primitives
-L<http://redis.io/commands#strings> with key representing the array index.
+L<https://redis.io/commands#strings> with key representing the array index.
 
 =head2 append ( key, string )
 

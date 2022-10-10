@@ -37,42 +37,42 @@ ok( join(", ", @names), 'sel, underline, hideable');
 
 # Contents Checks
 my $contents = $t->Contents();
-ok( $contents, $origContents."\n");
+ok( $contents, $origContents);
 $origContents = "This is some new text";
 $t->Contents($origContents);
 $contents = $t->Contents();
-ok( $contents, $origContents."\n");
+ok( $contents, $origContents);
 
 # Test deleteTextTaggedWith
 $t->insert("end", $origContents,'hideable');
 $t->DeleteTextTaggedWith('hideable');
-ok( $contents, $origContents."\n");
+ok( $contents, $origContents);
 
 # deleteSelected
 $t->selectAll();
 $t->deleteSelected();
 $contents = $t->Contents();
-ok( $contents, ''."\n");
+ok( $contents, '');
 
 # DeleteToEndOfLine
 $t->Contents("This is bogus, dude");
 $t->markSet('insert', "1.5");
 $t->deleteToEndofLine();
 $contents = $t->Contents();
-ok( $contents, 'This '."\n");
+ok( $contents, 'This ');
 
 # FindAll
 $t->Contents("This Really is bogus, dude Really");
 $t->FindAll(-exact, -nocase, 'Really');
 $t->deleteSelected();
 $contents = $t->Contents();
-ok( $contents, 'This  is bogus, dude '."\n");
+ok( $contents, 'This  is bogus, dude ');
 
 # Find and Replace All
 $t->Contents("This Really is bogus, dude Really");
 $t->FindAndReplaceAll(-exact, -nocase, 'Really', 'Not');
 $contents = $t->Contents();
-ok( $contents, 'This Not is bogus, dude Not'."\n");
+ok( $contents, 'This Not is bogus, dude Not');
 
 my $exists = $t->markExists('insert');
 ok( $exists, 1);
@@ -82,7 +82,7 @@ $t->Contents("This is bogus, dude");
 $t->markSet('insert', "1.5");
 $t->openLine();
 $contents = $t->Contents();
-ok( $contents, "This \nis bogus, dude"."\n");
+ok( $contents, "This \nis bogus, dude");
 
 # SetCursor
 $t->Contents("This is bogus, dude");
@@ -90,7 +90,7 @@ $t->markSet('insert', "0.0");
 $t->SetCursor("1.5");
 $t->deleteToEndofLine();
 $contents = $t->Contents();
-ok( $contents, 'This '."\n");
+ok( $contents, 'This ');
 
 # unselectAll
 $t->Contents("This is bogus, dude");
@@ -98,16 +98,6 @@ $t->selectAll();
 $t->unselectAll();
 $t->deleteSelected();
 $contents = $t->Contents();
-ok( $contents, 'This is bogus, dude'."\n");
+ok( $contents, 'This is bogus, dude');
 
-# Quit after two seconds
-$top->after(2000,
-        sub{
-                
-                $top->destroy;
-        });
-
-
-MainLoop;
-
-
+(@ARGV) ? MainLoop : $top->destroy;

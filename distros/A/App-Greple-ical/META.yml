@@ -1,5 +1,5 @@
 ---
-abstract: 'Module to support Apple OS X Calendar data'
+abstract: 'Module to support Apple macOS Calendar data'
 author:
   - 'Kazumasa Utashiro'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,17 +26,17 @@ no_index:
 provides:
   App::Greple::ical:
     file: lib/App/Greple/ical.pm
-    version: '0.01'
+    version: '0.02'
 requires:
-  App::Greple: '8.4301'
+  App::Greple: '8.58'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple-ical/issues
   homepage: https://github.com/kaz-utashiro/greple-ical
-  repository: git://github.com/kaz-utashiro/greple-ical.git
-version: '0.01'
+  repository: https://github.com/kaz-utashiro/greple-ical.git
+version: '0.02'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

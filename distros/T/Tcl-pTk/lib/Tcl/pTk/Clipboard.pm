@@ -3,7 +3,7 @@
 # modify it under the same terms as Perl itself.
 package Tcl::pTk::Clipboard;
 
-our ($VERSION) = ('1.09');
+our ($VERSION) = ('1.10');
 
 use warnings;
 use strict;

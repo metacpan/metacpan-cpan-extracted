@@ -3,6 +3,8 @@ package Geo::Gpx;
 use warnings;
 use strict;
 
+our $VERSION = '1.01';
+
 use Carp;
 use DateTime::Format::ISO8601;
 use DateTime;
@@ -10,14 +12,11 @@ use HTML::Entities qw( encode_entities encode_entities_numeric );
 use Scalar::Util qw( blessed );
 use Time::Local;
 use XML::Descent;
+use Geo::Gpx::Point;
 
 =head1 NAME
 
 Geo::Gpx - Create and parse GPX files.
-
-=head1 VERSION
-
-This document describes Geo::Gpx version 0.26
 
 =head1 SYNOPSIS
 
@@ -49,9 +48,6 @@ been extended to support general parsing and generation of GPX data. GPX
 1.0 and 1.1 are supported.
 
 =cut
-
-use vars qw ($VERSION);
-$VERSION = '0.26';
 
 # Values that are encoded as attributes
 my %AS_ATTR = (
@@ -90,7 +86,11 @@ my @ATTR;
 
 BEGIN {
   @META = qw( name desc author time keywords copyright link );
-  @ATTR = qw( waypoints tracks routes version );
+  @ATTR = qw( tracks routes version );
+  # @ATTR = qw( waypoints tracks routes version );
+  # TODO:
+  # . should probably create a sub as well for tracks and routes, look into it
+  # . add back any item we remove from @ATTR to the list in TO_JSON()
 
   # Generate accessors
   for my $attr ( @META, @ATTR ) {
@@ -284,7 +284,7 @@ sub _parse {
       my $parse_point = sub {
         my ( $elem, $attr ) = @_;
         my $pt = $parse_deep->( $elem, $attr );
-        return $self->{handler}->{create}->( %{$pt} );
+        return Geo::Gpx::Point->new( %{$pt} )
       };
 
       $p->on(
@@ -387,6 +387,16 @@ sub _parse {
   $p->walk();
 }
 
+sub waypoints {
+    my ($self, $aref) = @_;
+    return $self->{waypoints} unless $aref;
+    $self->{waypoints} = [];
+    for my $pt (@$aref) {
+        push @{ $self->{waypoints} }, Geo::Gpx::Point->new( %$pt )
+    }
+    return $self->{waypoints}
+}
+
 =head2 C<add_waypoint( waypoint ... )>
 
 Add one or more waypoints. Each waypoint must be a reference to a
@@ -438,7 +448,7 @@ sub add_waypoint {
     croak "'lat' and 'lon' keys are mandatory in waypoint hash"
      unless exists $wpt->{lon} && exists $wpt->{lat};
 
-    push @{ $self->{waypoints} }, $wpt;
+    push @{ $self->{waypoints} }, Geo::Gpx::Point->new( %$wpt );
   }
 }
 
@@ -621,6 +631,7 @@ sub _xml {
   my $name_map = shift || {};
 
   my $tag = $name_map->{$name} || $name;
+  my $is_geo_gpx_point = blessed $value and $value->isa('Geo::Gpx::Point');
 
   if ( blessed $value && $value->can( 'xml' ) ) {
     # Handles legacy Gpx::Cache objects that can
@@ -632,7 +643,7 @@ sub _xml {
   elsif ( defined( my $enc = $self->{encoder}->{$name} ) ) {
     return $enc->( $name, $value );
   }
-  elsif ( ref $value eq 'HASH' ) {
+  elsif ( ref $value eq 'HASH' or $is_geo_gpx_point ) {
     my $attr    = {};
     my @cont    = ( "\n" );
     my $as_attr = $AS_ATTR{$name};
@@ -810,7 +821,7 @@ With one difference: the keys will only be set if they are defined.
 sub TO_JSON {
   my $self = shift;
   my %json;    #= map {$_ => $self->$_} ...
-  for my $key ( @META, @ATTR ) {
+  for my $key ( @META, @ATTR, qw/ waypoints / ) {
     my $val = $self->$key;
     $json{$key} = $val if defined $val;
   }
@@ -835,7 +846,7 @@ sub gpx {
 
 =head2 C<loc>
 
-Provided for compatibility with version 0.10. 
+Provided for compatibility with version 0.10.
 
 =cut
 
@@ -858,7 +869,7 @@ sub loc {
 
 =head2 C<gpsdrive>
 
-Provided for compatibility with version 0.10. 
+Provided for compatibility with version 0.10.
 
 =cut
 
@@ -1162,29 +1173,27 @@ L<DateTime>,
 L<HTML::Entities>,
 L<Scalar::Util>,
 L<Time::Local>,
-L<XML::Descent> and optionally L<Geo::Cache>
-
-=head1 INCOMPATIBILITIES
-
-None reported.
+L<XML::Descent>
 
 =head1 SEE ALSO
 
-L<Geo::Cache>, L<JSON>
+L<JSON>
 
 =head1 BUGS AND LIMITATIONS
 
 No bugs have been reported.
 
-Please report any bugs or feature requests to
-C<bug-geo-gpx@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.
+Please report any bugs or feature requests to C<bug-geo-gpx@rt.cpan.org>, or through the web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
-Originally by Rich Bowen C<< <rbowen@rcbowen.com> >>.
+Originally by Rich Bowen C<< <rbowen@rcbowen.com> >> and Andy Armstrong  C<< <andy@hexten.net> >>.
 
-This version by Andy Armstrong  C<< <andy@hexten.net> >>.
+This version by Patrick Joly C<< <patjol@cpan.org> >>.
+
+=head1 VERSION
+
+$VERSION = '1.01'
 
 =head1 LICENCE AND COPYRIGHT
 

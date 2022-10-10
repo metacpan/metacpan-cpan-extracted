@@ -7,8 +7,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.06'; # VERSION
-my $LAST_UPDATE = '1.03'; # manually update whenever code is changed
+our $VERSION = '1.07'; # VERSION
+our $LAST_UPDATE = '1.07'; # manually update whenever code is changed
 
 # command line flags, mutually exclusive:
 # -raw   show full output of each t-test run

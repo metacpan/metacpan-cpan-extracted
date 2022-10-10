@@ -12,7 +12,7 @@ use File::Path qw(make_path);
 use Moo;
 use App::Sqitch::Types qw(Sqitch Target);
 
-our $VERSION = 'v1.3.0'; # VERSION
+our $VERSION = 'v1.3.1'; # VERSION
 
 use constant ENGINES => qw(
     pg

@@ -7,7 +7,7 @@ use Archive::Libarchive::Lib;
 use experimental qw( signatures );
 
 # ABSTRACT: Libarchive entry link resolver class
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 my $ffi = Archive::Libarchive::Lib->ffi;
 
@@ -40,7 +40,7 @@ Archive::Libarchive::EntryLinkResolver - Libarchive entry link resolver class
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

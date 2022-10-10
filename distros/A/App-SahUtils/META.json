@@ -78,7 +78,7 @@
    "provides" : {
       "App::SahUtils" : {
          "file" : "lib/App/SahUtils.pm",
-         "version" : "0.481"
+         "version" : "0.482"
       }
    },
    "release_status" : "stable",
@@ -93,7 +93,7 @@
          "web" : "https://github.com/perlancar/perl-App-SahUtils"
       }
    },
-   "version" : "0.481",
+   "version" : "0.482",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

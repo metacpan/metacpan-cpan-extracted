@@ -1,6 +1,6 @@
 ## MCE::Shared for Perl
 
-This document describes MCE::Shared version 1.876.
+This document describes MCE::Shared version 1.878.
 
 ### Description
 
@@ -135,8 +135,7 @@ The MCE::Shared module is described at https://metacpan.org/pod/MCE::Shared.
 
 The MCE::Hobo module is described at https://metacpan.org/pod/MCE::Hobo.
 
-See [MCE::Examples](https://metacpan.org/pod/MCE::Examples)
-and [MCE Cookbook](https://github.com/marioroy/mce-cookbook) for recipes.
+See also, [MCE::Examples](https://metacpan.org/pod/MCE::Examples).
 
 ### Copyright and Licensing
 
@@ -163,5 +162,5 @@ You should also have received a copy of the GNU General Public License
 along with this program in the file named "Copying". If not, write to the
 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 Boston, MA 02110-1301, USA or visit their web page on the internet at
-http://www.gnu.org/copyleft/gpl.html.
+https://www.gnu.org/copyleft/gpl.html.
 

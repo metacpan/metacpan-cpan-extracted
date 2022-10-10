@@ -96,7 +96,7 @@ sub _remove_timeout {
 
 A helper method for executing a callback in response to one of more
 C<$events> on the file handle C<$fd>. The C<$watch> number is the
-unique idenifier associated with the file descriptor. The C<$cb>
+unique identifier associated with the file descriptor. The C<$cb>
 and C<$opaque> parameters are the callback and data registered for
 the handle.
 

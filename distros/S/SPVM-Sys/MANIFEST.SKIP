@@ -13,3 +13,4 @@
 .tmp$
 .BAK$
 ^.git/
+cpanm

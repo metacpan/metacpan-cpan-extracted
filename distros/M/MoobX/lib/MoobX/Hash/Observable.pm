@@ -1,7 +1,7 @@
 package MoobX::Hash::Observable;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Observable role for MobX hashes
-$MoobX::Hash::Observable::VERSION = '0.1.0';
+$MoobX::Hash::Observable::VERSION = '0.1.2';
 
 use Moose::Role;
 
@@ -45,7 +45,7 @@ MoobX::Hash::Observable - Observable role for MobX hashes
 
 =head1 VERSION
 
-version 0.1.0
+version 0.1.2
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2022, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

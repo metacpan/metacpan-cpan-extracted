@@ -1,5 +1,11 @@
 Revision history for Perl extension App-ansicolumn
 
+1.24 2022-10-06T03:26:49Z
+
+    - add --parallel option implicitly enabled for multiple files
+    - add -w option as an alias for -c to set width
+    - make `box' as a default border-style
+
 1.23 2022-09-29T01:31:38Z
 
     - use Getopt::EX::RPN module

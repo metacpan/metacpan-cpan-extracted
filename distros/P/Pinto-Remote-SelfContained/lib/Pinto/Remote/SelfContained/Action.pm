@@ -151,7 +151,20 @@ sub _response_callback {
 }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Action
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Action
 
 =head1 NAME
 
@@ -164,7 +177,7 @@ sending a POST request to the server.
 
 =head1 AUTHOR
 
-Aaron Crane, E<lt>arc@cpan.orgE<gt>
+Aaron Crane E<lt>arc@cpan.orgE<gt>, Brad Lhotsky E<lt>brad@divisionbyzero.netE<gt>
 
 =head1 COPYRIGHT
 

@@ -1,0 +1,103 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Time::Duration::Concise::Localize
+at lib/Time/Duration/Concise/Localize.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Time::Duration::Concise::Localize - localize concise time duration string representation.
+
+=head1 DESCRIPTION
+
+Time::Duration::Concise provides localize concise time duration string representation.
+
+=head1 SYNOPSIS
+
+    use Time::Duration::Concise::Localize;
+
+    my $duration = Time::Duration::Concise::Localize->new(
+
+        # concise time interval
+        'interval' => '1.5h',
+
+        # Locale for translation
+        'locale' => 'en'
+    );
+
+    $duration->as_string;
+
+=head1 FIELDS
+
+=head2 interval (REQUIRED)
+
+concise interval string
+
+=head2 locale
+
+Get and set the locale for translation
+
+=head1 METHODS
+
+=head2 as_string
+
+Localized duration string
+
+=head2 new
+
+Object constructor
+
+=head1 AUTHOR
+
+Binary.com, C<< <perl at binary.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-time-duration-concise-localize at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Time-Duration-Concise-Localize>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Time::Duration::Concise::Localize
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Time-Duration-Concise-Localize>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Time-Duration-Concise-Localize>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Time-Duration-Concise-Localize>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Time-Duration-Concise-Localize/>
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Time::Duration::Concise>
+
+L<as_concise_string|Time::Duration::Concise/as_concise_string>, L<days|Time::Duration::Concise/days>, L<duration|Time::Duration::Concise/duration>, L<duration_array|Time::Duration::Concise/duration_array>, L<get_time_layout|Time::Duration::Concise/get_time_layout>, L<hours|Time::Duration::Concise/hours>, L<interval|Time::Duration::Concise/interval>, L<minimum_number_of|Time::Duration::Concise/minimum_number_of>, L<minutes|Time::Duration::Concise/minutes>, L<months|Time::Duration::Concise/months>, L<multiple_units_of|Time::Duration::Concise/multiple_units_of>, L<normalized_code|Time::Duration::Concise/normalized_code>, L<seconds|Time::Duration::Concise/seconds>, L<weeks|Time::Duration::Concise/weeks>
+
+=back
+

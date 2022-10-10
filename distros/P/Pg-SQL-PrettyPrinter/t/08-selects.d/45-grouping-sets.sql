@@ -1,0 +1,1 @@
+SELECT relkind, relhasindex, count(*) FROM pg_class GROUP BY GROUPING SETS( (), relkind, relhasindex, ( relkind, relhasindex ) ) 

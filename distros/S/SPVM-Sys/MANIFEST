@@ -6,7 +6,6 @@
 .github/workflows/windows-2019.yml
 .gitignore
 Changes
-cpanm
 lib/SPVM/Sys.c
 lib/SPVM/Sys.config
 lib/SPVM/Sys.pm
@@ -69,6 +68,10 @@ lib/SPVM/Sys/Socket/Addrinfo.c
 lib/SPVM/Sys/Socket/Addrinfo.config
 lib/SPVM/Sys/Socket/Addrinfo.pm
 lib/SPVM/Sys/Socket/Addrinfo.spvm
+lib/SPVM/Sys/Socket/AddrinfoLinkedList.c
+lib/SPVM/Sys/Socket/AddrinfoLinkedList.config
+lib/SPVM/Sys/Socket/AddrinfoLinkedList.pm
+lib/SPVM/Sys/Socket/AddrinfoLinkedList.spvm
 lib/SPVM/Sys/Socket/Constant.c
 lib/SPVM/Sys/Socket/Constant.config
 lib/SPVM/Sys/Socket/Constant.pm
@@ -145,6 +148,7 @@ t/lib/SPVM/TestCase/Sys/IO.spvm
 t/lib/SPVM/TestCase/Sys/Process.spvm
 t/lib/SPVM/TestCase/Sys/Socket.spvm
 t/lib/SPVM/TestCase/Sys/User.spvm
+t/lib/SPVM/TestUtil/SocketAutoClose.spvm
 t/print_hello.pl
 t/Sys.t
 t/Sys_FileTest.t

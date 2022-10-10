@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.22';
+$VERSION = '0.23';
 $VERSION = $VERSION;
 
 use strict;
@@ -1070,14 +1070,6 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use
   supported encodings:
     UTF-8(RFC3629), UTF-8(RFC2279), WTF8, RFC3629.ja_JP, and WTF8.ja_JP
 
-  supported operating systems:
-    Apple Inc. OS X,
-    Hewlett-Packard Development Company, L.P. HP-UX,
-    International Business Machines Corporation AIX,
-    Microsoft Corporation Windows,
-    Oracle Corporation Solaris,
-    and Other Systems
-
   supported perl versions:
     perl version 5.005_03 to newest perl
 
@@ -1132,85 +1124,135 @@ This software has the following features
 
 The encodings supported by this software and their range of octets are as follows.
 
-  ------------------------------------------------------------------------------
-  UTF-8 (RFC2279)
-             1st       2nd       3rd       4th
-             C2..DF    80..BF
-             E0..EF    80..BF    80..BF
-             F0..F4    80..BF    80..BF    80..BF
-             00..7F
-             https://www.ietf.org/rfc/rfc2279.txt
-             * needs no multibyte anchoring
-             * needs no escaping meta char of 2nd-4th octets
-             * safe US-ASCII casefolding of 2nd-4th octet
-             * allows encoding surrogate codepoints even if it is not pair
-  ------------------------------------------------------------------------------
-  UTF-8 (RFC3629)
-             1st       2nd       3rd       4th
-             C2..DF    80..BF
-             E0..E0    A0..BF    80..BF
-             E1..EC    80..BF    80..BF
-             ED..ED    80..9F    80..BF
-             EE..EF    80..BF    80..BF
-             F0..F0    90..BF    80..BF    80..BF
-             F1..F3    80..BF    80..BF    80..BF
-             F4..F4    80..8F    80..BF    80..BF
-             00..7F
-             https://en.wikipedia.org/wiki/UTF-8
-             * needs no multibyte anchoring
-             * needs no escaping meta char of 2nd-4th octets
-             * safe US-ASCII casefolding of 2nd-4th octet
-             * enforces surrogate codepoints must be paired
-  ------------------------------------------------------------------------------
-  WTF-8
-             1st       2nd       3rd       4th
-             C2..DF    80..BF
-             E0..E0    A0..BF    80..BF
-             E1..EF    80..BF    80..BF
-             F0..F0    90..BF    80..BF    80..BF
-             F1..F3    80..BF    80..BF    80..BF
-             F4..F4    80..8F    80..BF    80..BF
-             00..7F
-             http://simonsapin.github.io/wtf-8/
-             * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
-             * needs no multibyte anchoring
-             * needs no escaping meta char of 2nd-4th octets
-             * safe US-ASCII casefolding of 2nd-4th octet
-  ------------------------------------------------------------------------------
-  UTF-8 (RFC3629.ja_JP)
-             1st       2nd       3rd       4th
-             E1..EC    80..BF    80..BF
-             C2..DF    80..BF
-             EE..EF    80..BF    80..BF
-             F0..F0    90..BF    80..BF    80..BF
-             E0..E0    A0..BF    80..BF
-             ED..ED    80..9F    80..BF
-             F1..F3    80..BF    80..BF    80..BF
-             F4..F4    80..8F    80..BF    80..BF
-             00..7F
-             https://en.wikipedia.org/wiki/UTF-8
-             * needs no multibyte anchoring
-             * needs no escaping meta char of 2nd-4th octets
-             * safe US-ASCII casefolding of 2nd-4th octet
-             * enforces surrogate codepoints must be paired
-             * optimized for ja_JP
-  ------------------------------------------------------------------------------
-  WTF-8.ja_JP
-             1st       2nd       3rd       4th
-             E1..EF    80..BF    80..BF
-             C2..DF    80..BF
-             E0..E0    A0..BF    80..BF
-             F0..F0    90..BF    80..BF    80..BF
-             F1..F3    80..BF    80..BF    80..BF
-             F4..F4    80..8F    80..BF    80..BF
-             00..7F
-             http://simonsapin.github.io/wtf-8/
-             * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
-             * needs no multibyte anchoring
-             * needs no escaping meta char of 2nd-4th octets
-             * safe US-ASCII casefolding of 2nd-4th octet
-             * optimized for ja_JP
-  ------------------------------------------------------------------------------
+=head2 UTF-8 (RFC2279)
+
+  1st       2nd       3rd       4th
+  C2..DF    80..BF
+  E0..EF    80..BF    80..BF
+  F0..F4    80..BF    80..BF    80..BF
+  00..7F
+
+L<https://www.ietf.org/rfc/rfc2279.txt>
+
+=over 2
+
+=item * needs no multibyte anchoring
+
+=item * needs no escaping meta char of 2nd-4th octets
+
+=item * safe US-ASCII casefolding of 2nd-4th octet
+
+=item * allows encoding surrogate codepoints even if it is not pair
+
+=back
+
+=head2 UTF-8 (RFC3629)
+
+  1st       2nd       3rd       4th
+  C2..DF    80..BF
+  E0..E0    A0..BF    80..BF
+  E1..EC    80..BF    80..BF
+  ED..ED    80..9F    80..BF
+  EE..EF    80..BF    80..BF
+  F0..F0    90..BF    80..BF    80..BF
+  F1..F3    80..BF    80..BF    80..BF
+  F4..F4    80..8F    80..BF    80..BF
+  00..7F
+
+L<https://en.wikipedia.org/wiki/UTF-8>
+
+=over 2
+
+=item * needs no multibyte anchoring
+
+=item * needs no escaping meta char of 2nd-4th octets
+
+=item * safe US-ASCII casefolding of 2nd-4th octet
+
+=item * enforces surrogate codepoints must be paired
+
+=back
+
+=head2 WTF-8
+
+  1st       2nd       3rd       4th
+  C2..DF    80..BF
+  E0..E0    A0..BF    80..BF
+  E1..EF    80..BF    80..BF
+  F0..F0    90..BF    80..BF    80..BF
+  F1..F3    80..BF    80..BF    80..BF
+  F4..F4    80..8F    80..BF    80..BF
+  00..7F
+
+L<http://simonsapin.github.io/wtf-8/>
+
+=over 2
+
+=item * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
+
+=item * needs no multibyte anchoring
+
+=item * needs no escaping meta char of 2nd-4th octets
+
+=item * safe US-ASCII casefolding of 2nd-4th octet
+
+=back
+
+=head2 UTF-8 (RFC3629.ja_JP)
+
+  1st       2nd       3rd       4th
+  E1..EC    80..BF    80..BF
+  C2..DF    80..BF
+  EE..EF    80..BF    80..BF
+  F0..F0    90..BF    80..BF    80..BF
+  E0..E0    A0..BF    80..BF
+  ED..ED    80..9F    80..BF
+  F1..F3    80..BF    80..BF    80..BF
+  F4..F4    80..8F    80..BF    80..BF
+  00..7F
+
+L<https://en.wikipedia.org/wiki/UTF-8>
+
+=over 2
+
+=item * needs no multibyte anchoring
+
+=item * needs no escaping meta char of 2nd-4th octets
+
+=item * safe US-ASCII casefolding of 2nd-4th octet
+
+=item * enforces surrogate codepoints must be paired
+
+=item * optimized for ja_JP
+
+=back
+
+=head2 WTF-8.ja_JP
+
+  1st       2nd       3rd       4th
+  E1..EF    80..BF    80..BF
+  C2..DF    80..BF
+  E0..E0    A0..BF    80..BF
+  F0..F0    90..BF    80..BF    80..BF
+  F1..F3    80..BF    80..BF    80..BF
+  F4..F4    80..8F    80..BF    80..BF
+  00..7F
+
+L<http://simonsapin.github.io/wtf-8/>
+
+=over 2
+
+=item * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
+
+=item * needs no multibyte anchoring
+
+=item * needs no escaping meta char of 2nd-4th octets
+
+=item * safe US-ASCII casefolding of 2nd-4th octet
+
+=item * optimized for ja_JP
+
+=back
 
 =head1 UTF-8 subroutines provided by this software
 
@@ -1420,7 +1462,7 @@ When you need multibyte functionally, you need to use subroutines in the "UTF8::
 This UTF8::R2 module requires perl5.00503 or later to use. Also requires 'strict' module.
 It requires the 'warnings' module, too if perl 5.6 or later.
 
-=head1 Our Goals (and UTF8 Flag Considered Harmful)
+=head1 Our Goals
 
 P.401 See chapter 15: Unicode
 of ISBN 0-596-00027-8 Programming Perl Third Edition.
@@ -1428,13 +1470,34 @@ of ISBN 0-596-00027-8 Programming Perl Third Edition.
 Before the introduction of Unicode support in perl, The eq operator just compared the byte-strings represented by two scalars.
 Beginning with perl 5.8, eq compares two byte-strings with simultaneous consideration of the UTF8 flag.
 
+"I/O flow" L<https://metacpan.org/pod/perlunitut#I/O-flow-(the-actual-5-minute-tutorial)> shows us this
+
+  The typical input/output flow of a program is:
+  1. Receive and decode
+  2. Process
+  3. Encode and output
+
 -- we have been taught so for a long time.
 
-Perl is a powerful language for everyone, but UTF8 flag is a barrier for common beginners.
-Calling Encode::encode() and Encode::decode() in application program is not good way.
-Making one script for information processing, and other one for encoding conversion are better.
+However,
 
-"That's a small bit for someone, but the giant  bug on the Perl for mankind."
+  Every inside has
+    its inside that has
+    its inside that has
+    its inside that has ...
+  
+  Every outside has
+    its outside that has
+    its outside that has
+    its outside that has ...
+
+We know inside has its inside more, outside has its outside more.
+Inside is never only one and outside is never only one.
+So string model of Perl 5.8 cannot fit our common thinking.
+
+Spreading of EMOJI on MBCS encoding in today had remind us this idea is not bad.
+
+B<UTF8 flag is harmful.>
 
  /*
   * You are not expected to understand this.
@@ -1472,9 +1535,15 @@ Making one script for information processing, and other one for encoding convers
 
 Perl 5.8's string model will not be accepted by common people.
 
-Information processing model of UNIX/C-ism, 
-Information processing model of perl3 or later, and
-Information processing model of this software.
+=over 2
+
+=item * Information processing model of UNIX/C-ism
+
+=item * Information processing model of perl3 or later
+
+=item * Information processing model of this software
+
+=back
 
     +--------------------------------------------+
     |    Text string as Digital octet string     |

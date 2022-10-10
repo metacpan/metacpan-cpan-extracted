@@ -1,5 +1,8 @@
 Revision history for Sub-Call-Tail
 
+0.08      2022-10-02 00:33:19Z
+          - DynaLoader->XSLoader; a few tooling updates
+
 0.07      2022-09-25 01:58:23Z
           - update bundled version of ExtUtils::HasCompiler, for new new Apple
             include paths

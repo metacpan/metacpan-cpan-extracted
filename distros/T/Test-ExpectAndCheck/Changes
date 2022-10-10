@@ -1,10 +1,26 @@
 Revision history for Test-ExpectAndCheck
 
+0.05    2022-10-07
+        [CHANGES]
+         * Added `->whenever` for creating stub helper methods that assist the
+           code-under-test
+         * Added `->will_return_using` for dynamic result creation
+         * Added `$exp->indefinitely` for whenever expectations that outlive
+           calls to `->check_and_clear`
+
+0.04    2022-10-04
+        [CHANGES]
+         * Added entire new set of `->will_*` API methods, deprecating also
+           the previous set
+         * Added new `->will_also` and `->will_also_later` methods
+
 0.03    2021-07-14
         [CHANGES]
          * Print more detailed error message on expectation failure to give
            details about what the next expectation was
          * Set @CARP_NOT to get slightly better call location reporting
+         * Added ->remains_pending method to allow returned futures to not
+           complete at all
 
         [BUGFIXES]
          * Fix printable-or-not detection logic so it applies to all bytes

@@ -20,7 +20,7 @@ await $chip->mount(
 {
    # TODO: This only needs to read one of the bytes in practice
    $adapter->expect_write_then_read( "\x26", 3 )
-      ->returns( "\x00\x00\x00" );
+      ->will_done( "\x00\x00\x00" );
    $adapter->expect_write( "\x26" . "\x02" );
 
    await $chip->start_oneshot;
@@ -31,11 +31,11 @@ await $chip->mount(
 # busywait_oneshot
 {
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x02" );
+      ->will_done( "\x02" );
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x02" );
+      ->will_done( "\x02" );
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x00" );
+      ->will_done( "\x00" );
 
    await $chip->busywait_oneshot;
 
@@ -47,11 +47,11 @@ await $chip->mount(
    # CTRLREG is cached so no re-read here
    $adapter->expect_write( "\x26" . "\x02" );
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x02" );
+      ->will_done( "\x02" );
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x02" );
+      ->will_done( "\x02" );
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x00" );
+      ->will_done( "\x00" );
 
    await $chip->oneshot;
 

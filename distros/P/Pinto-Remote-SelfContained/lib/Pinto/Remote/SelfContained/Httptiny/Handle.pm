@@ -21,7 +21,20 @@ around write_request_header => sub {
 };
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Httptiny::Handle
+
+=head1 NAME
+
+Pinto::Remote::SelfContained::Httptiny::Handle
 
 =head1 NAME
 
@@ -29,7 +42,7 @@ Pinto::Remote::SelfContained::Httptiny::Handle - HTTP/1.0 handle subclass for HT
 
 =head1 AUTHOR
 
-Aaron Crane, E<lt>arc@cpan.orgE<gt>
+Aaron Crane E<lt>arc@cpan.orgE<gt>, Brad Lhotsky E<lt>brad@divisionbyzero.netE<gt>
 
 =head1 COPYRIGHT
 

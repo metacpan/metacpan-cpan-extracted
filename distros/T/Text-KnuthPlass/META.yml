@@ -1,5 +1,5 @@
 ---
-abstract: 'Breaks paragraphs into lines using the TeX algorithm'
+abstract: 'Breaks paragraphs into lines using the TeX (Knuth-Plass) algorithm'
 author:
   - 'Phil Perry'
 build_requires:
@@ -20,7 +20,7 @@ name: Text-KnuthPlass
 provides:
   Text::KnuthPlass:
     file: lib/Text/KnuthPlass.pm
-    version: '1.06'
+    version: '1.07'
   Text::KnuthPlass::Box:
     file: lib/Text/KnuthPlass.pm
   Text::KnuthPlass::Breakpoint:
@@ -37,5 +37,5 @@ resources:
   bugtracker: https://github.com/PhilterPaper/Text-KnuthPlass/issues
   homepage: https://metacpan.org/pod/Text::KnuthPlass
   repository: https://github.com/PhilterPaper/Text-KnuthPlass
-version: '1.06'
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -487,7 +487,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.88';
+our $VERSION = '1.91';
 our $DEBUG = 0;
 
 require Exporter;
@@ -495,7 +495,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw();
 my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox Google
-		IHeartRadio Odysee Podbean PodcastAddict RadioNet Rumble SermonAudio Spreaker 
+		IHeartRadio Odysee Podbean PodcastAddict RadioNet Rumble SermonAudio SoundCloud Spreaker
 		Tunein Vimeo Youtube));
 
 my %useit;
@@ -581,6 +581,9 @@ sub new
 	} elsif ($url =~ m#\bpodbean\.com\/# && $useit{'Podbean'}) {
 		eval { require 'StreamFinder/Podbean.pm'; $haveit = 1; };
 		return new StreamFinder::Podbean($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bsoundcloud\.# && $useit{'SoundCloud'}) {
+		eval { require 'StreamFinder/SoundCloud.pm'; $haveit = 1; };
+		return new StreamFinder::SoundCloud($url, @args)  if ($haveit);
 	} elsif ($useit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		eval { require 'StreamFinder/Youtube.pm'; $haveit = 1; };
 		if ($haveit) {

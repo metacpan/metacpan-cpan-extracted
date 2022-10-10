@@ -1,0 +1,11 @@
+BEGIN:VCARD
+FN:Test Contact
+N:Contact;Test;;;
+TEL;TYPE=VOICE:+11111111111
+EMAIL;TYPE=HOME:an@email.address
+BDAY:2001-01-01
+ADR;TYPE=HOME:;;Seasame Street;Maintown;;11111;
+CATEGORIES:Cat1,Cat2
+UID:2a0b84a5-6810-43dd-b43b-dadee4eff02f
+VERSION:3.0
+END:VCARD

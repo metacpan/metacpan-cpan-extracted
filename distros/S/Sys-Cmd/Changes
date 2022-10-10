@@ -1,3 +1,38 @@
+0.99.0 (2022-10-05)
+
+    Dependencies:
+        - (Internal) Convert to Class::Inline away from Mo
+
+0.99.0_2 (2022-02-08)
+
+    Enhancements:
+        - Set autoflush on actual output file handles (not sources)
+        - Minor documentation and code cleanups
+
+    Dependencies:
+        - Re-inlined Mo v0.40.
+
+0.99.0_1 (2021-12-22)
+
+    API / Behaviour Changes:
+        - None.
+
+    New Features:
+        - None.
+
+    Enhancements:
+        - Warn on uncollected STDERR output from child
+
+    Bug Fixes:
+        - [Security] Do not search in "." for matching executables
+        - Do not force "encoding($X)" to allow for things like :raw
+
+    Dependencies:
+        - None.
+
+    Packaging:
+        - Move to ExtUtils::MakeMaker away from Module::Build.
+
 0.85.4 (2016-06-06)
 
     Enhancements:

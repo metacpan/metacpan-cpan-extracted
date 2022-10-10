@@ -6,8 +6,9 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Test::Future::IO',
    requires => {
+      'Future::Buffer' => 0,
       'Future::IO' => 0,
-      'Test::ExpectAndCheck::Future' => 0,
+      'Test::ExpectAndCheck::Future' => '0.05',
       'Test::Deep' => 0,
    },
    configure_requires => {

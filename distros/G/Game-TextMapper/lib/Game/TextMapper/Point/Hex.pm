@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2021  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2009-2022  Alex Schroeder <alex@gnu.org>
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -67,45 +67,41 @@ sub corners {
   return @hex;
 }
 
+sub pixels {
+  my ($self, $offset, $add_x, $add_y) = @_;
+  my $x = $self->x;
+  my $y = $self->y;
+  my $z = $self->z;
+  $y += $offset->[$z] if defined $offset->[$z];
+  $add_x //= 0;
+  $add_y //= 0;
+  return $x * $dx * 3/2 + $add_x, $y * $dy - $x%2 * $dy/2 + $add_y;
+}
+
 sub svg_region {
   my ($self, $attributes, $offset) = @_;
   my $x = $self->x;
   my $y = $self->y;
   my $z = $self->z;
-  my $id = "hex$x$y$z";
-  $y += $offset->[$z];
-  my $points = join(" ", map {
-    sprintf("%.1f,%.1f",
-	    $x * $dx * 3/2 + $_->[0],
-	    $y * $dy - $self->x % 2 * $dy/2 + $_->[1]) } $self->corners());
+  my $id = "hex$x$y" . ($z != 0 ? $z : ''); # z-axis 0 means no z axis for the $id
+  my $points = join(" ", map { sprintf("%.1f,%.1f", $self->pixels($offset, @$_)) } $self->corners());
   return qq{    <polygon id="$id" $attributes points="$points" />\n}
 }
 
 sub svg {
   my ($self, $offset) = @_;
-  my $x = $self->x;
-  my $y = $self->y;
-  my $z = $self->z;
-  $y += $offset->[$z];
   my $data = '';
   for my $type (@{$self->type}) {
     $data .= sprintf(qq{    <use x="%.1f" y="%.1f" xlink:href="#%s" />\n},
-		     $x * $dx * 3/2, $y * $dy - $x%2 * $dy/2, $type);
+		     $self->pixels($offset), $type);
   }
   return $data;
 }
 
 sub svg_coordinates {
   my ($self, $offset) = @_;
-  my $x = $self->x;
-  my $y = $self->y;
-  my $z = $self->z;
-  $y += $offset->[$z];
-  my $data = '';
-  $data .= qq{    <text text-anchor="middle"};
-  $data .= sprintf(qq{ x="%.1f" y="%.1f"},
-		   $x * $dx * 3/2,
-		   $y * $dy - $x%2 * $dy/2 - $dy * 0.4);
+  my $data = qq{    <text text-anchor="middle"};
+  $data .= sprintf(qq{ x="%.1f" y="%.1f"}, $self->pixels($offset, 0, -$dy * 0.4));
   $data .= ' ';
   $data .= $self->map->text_attributes || '';
   $data .= '>';
@@ -124,21 +120,17 @@ sub svg_label {
     }
   }
   $url =~ s/\%s/url_escape(encode_utf8($self->label))/e or $url .= url_escape(encode_utf8($self->label)) if $url;
-  my $x = $self->x;
-  my $y = $self->y;
-  my $z = $self->z;
-  $y += $offset->[$z];
   my $data = sprintf(qq{    <g><text text-anchor="middle" x="%.1f" y="%.1f" %s %s>}
                      . $self->label
                      . qq{</text>},
-                     $x * $dx * 3/2, $y * $dy - $x%2 * $dy/2 + $dy * 0.4,
+                     $self->pixels($offset, 0, $dy * 0.4),
                      $attributes ||'',
 		     $self->map->glow_attributes ||'');
   $data .= qq{<a xlink:href="$url">} if $url;
   $data .= sprintf(qq{<text text-anchor="middle" x="%.1f" y="%.1f" %s>}
 		   . $self->label
 		   . qq{</text>},
-		   $x * $dx * 3/2, $y * $dy - $x%2 * $dy/2 + $dy * 0.4,
+		   $self->pixels($offset, 0, $dy * 0.4),
 		   $attributes ||'');
   $data .= qq{</a>} if $url;
   $data .= qq{</g>\n};

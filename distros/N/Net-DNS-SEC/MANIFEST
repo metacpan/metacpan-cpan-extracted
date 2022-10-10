@@ -15,7 +15,6 @@ lib/Net/DNS/SEC/Keyset.pm
 lib/Net/DNS/SEC/Private.pm
 lib/Net/DNS/SEC/DSA.pm
 lib/Net/DNS/SEC/ECDSA.pm
-lib/Net/DNS/SEC/ECCGOST.pm
 lib/Net/DNS/SEC/EdDSA.pm
 lib/Net/DNS/SEC/RSA.pm
 lib/Net/DNS/SEC/libcrypto.pod

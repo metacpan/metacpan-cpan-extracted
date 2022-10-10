@@ -6,7 +6,7 @@
 use v5.20;
 use Object::Pad 0.57;
 
-package Device::AVR::UPDI 0.11;
+package Device::AVR::UPDI 0.12;
 class Device::AVR::UPDI :strict(params);
 
 use Carp;

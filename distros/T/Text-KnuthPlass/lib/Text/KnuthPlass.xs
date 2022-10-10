@@ -33,9 +33,11 @@ typedef struct LinkedList_s {
     AV* to_free;
 } LinkedList;
 
+// overrides _computeCost() in Perl (note name difference!)
+//   a = $active, current_line = $currentLine in Perl
 NV _compute_cost(Text_KnuthPlass self, IV start, IV end, Breakpoint* a, 
     IV current_line, AV* nodes) {
-    IV  infinity   = ivHash(self, "infinity");
+    IV  infinity   = ivHash(self, "infinity");  // $self->{'infinity'}
     HV* sum = (HV*)SvRV(*hv_fetch((HV*)self, "sum", 3, FALSE));
     HV* totals = a->totals;
     NV width = nvHash(sum, "width") - nvHash(totals,"width");
@@ -45,16 +47,17 @@ NV _compute_cost(Text_KnuthPlass self, IV start, IV end, Breakpoint* a,
     NV stretch = 0;
     NV shrink = 0;
     NV linelength = SvNV(*av_fetch(linelengths, current_line <= ll ? current_line-1 : ll, 0));
-/*warn("Computing cost, ll=%i current_line=%i linelength=%i\n", ll, current_line, linelength);*/
 
     debug(warn("Computing cost from %i to %i\n", start, end));
     debug(warn("Sum width: %f\n", nvHash(sum, "width")));
     debug(warn("Total width: %f\n", nvHash(totals, "width")));
+
     if (isPenalty(*av_fetch(nodes, end, 0))) {
         debug(warn("Adding penalty width\n"));
         width += nvHash(SvRV(*av_fetch(nodes,end, 0)),"width");
     }
     debug(warn("Width %f, linelength %f\n", width, linelength));
+
     if (width < linelength) {
         stretch = nvHash(sum, "stretch") - nvHash(totals, "stretch");
         debug(warn("Stretch %f\n", stretch));
@@ -74,6 +77,7 @@ NV _compute_cost(Text_KnuthPlass self, IV start, IV end, Breakpoint* a,
     } else { return 0; }
 }
 
+// overrides _computeSum() in Perl (note name difference!)
 HV* _compute_sum(Text_KnuthPlass self, IV index, AV* nodes) {
     HV* result = newHV();
     HV* sum = (HV*)SvRV(*hv_fetch((HV*)self, "sum", 3, FALSE));
@@ -145,12 +149,13 @@ _init_nodelist(self)
     Text_KnuthPlass self
 
     CODE:
+    // overrides _init_nodelist() in Perl
     LinkedList* activelist;
     Newxz(activelist, 1, LinkedList);
     activelist->head = activelist->tail = _new_breakpoint();
     activelist->list_size = 1;
     activelist->to_free = newAV();
-    hv_stores((HV*)self, "activeNodes", ((IV)activelist));
+    hv_stores((HV*)self, "activeNodes", ((SV *)activelist));
 
 void _active_to_breaks(self)
     Text_KnuthPlass self
@@ -161,6 +166,7 @@ void _active_to_breaks(self)
     Breakpoint* best = NULL;
 
     PPCODE:
+    // overrides _active_to_breaks() in Perl
     activelist = (LinkedList*)(*hv_fetch((HV*)self, "activeNodes", 11, FALSE));
 
     for (b = activelist->head; b; b = b->next) {
@@ -178,6 +184,7 @@ void _cleanup(self)
     Text_KnuthPlass self
 
     CODE:
+    // overrides _cleanup() in Perl (which is a dummy stub) 
     Breakpoint* b;
     LinkedList* activelist;
     activelist = (LinkedList*)(*hv_fetch((HV*)self, "activeNodes", 11, FALSE));
@@ -197,7 +204,7 @@ void _cleanup(self)
         sv_free(pointer);
     } 
     sv_free((SV*)activelist->to_free);
-    //Safefree(activelist);
+    // Safefree(activelist);
 
 void
 _mainloop(self, node, index, nodes)
@@ -207,6 +214,7 @@ _mainloop(self, node, index, nodes)
     AV* nodes
 
     CODE:
+    // overrides _mainloop() in Perl 
     LinkedList* activelist = (LinkedList*)(*hv_fetch((HV*)self, "activeNodes", 11, FALSE));
     IV  tolerance  = ivHash(self, "tolerance");
     IV  infinity   = ivHash(self, "infinity");
@@ -241,6 +249,7 @@ _mainloop(self, node, index, nodes)
         candidates[2] = NULL; candidates[3] = NULL;
         debug(warn("Outer\n"));
         while (active) {
+
             next = active->next;
             IV position = active->position;
 
@@ -250,8 +259,11 @@ _mainloop(self, node, index, nodes)
 /*warn("_mainloop, current_line=%i\n", current_line);*/
             ratio = _compute_cost(self, position, index, active, current_line, nodes);
             debug(warn("Got a ratio of %f\n", ratio));
-            if (ratio < 1 || (isPenalty(node) && nodepenalty == -infinity))
+
+            if (ratio < 1 || (isPenalty(node) && nodepenalty == -infinity)) {
+                debug(warn("Dropping a node\n"));
                 _unlinkKP(activelist, active);
+            }
 
             if (-1 <= ratio && ratio <= tolerance) {
                 SV* nodeAtPos = *av_fetch(nodes, position, FALSE); 
@@ -271,10 +283,10 @@ _mainloop(self, node, index, nodes)
                         ivHash(SvRV(nodeAtPos), "flagged"));
                 }
 
-                if (ratio < -0.5)       current_class = 0;
-                else if (ratio <= 0.5)  current_class = 1;
-                else if (ratio <= 1)    current_class = 2;
-                else                    current_class = 3;
+                if      (ratio < -0.5)  current_class = 0; // tight
+                else if (ratio <= 0.5)  current_class = 1; // normal
+                else if (ratio <= 1)    current_class = 2; // loose
+                else                    current_class = 3; // very loose
 
                 if (abs(current_class - active->fitness_class) > 1) 
                     demerits += fitnessdemerits;
@@ -303,13 +315,13 @@ _mainloop(self, node, index, nodes)
                 Breakpoint* newnode = _new_breakpoint();
                 HV* tmpsum = _compute_sum(self, index, nodes);
                 newnode->position = index;
+                newnode->demerits = candidates[t]->demerits;
+                newnode->ratio = candidates[t]->ratio;
+                newnode->line = candidates[t]->active->line + 1;
                 newnode->fitness_class = t;
                 newnode->totals = tmpsum;
                 debug(warn("Setting previous to %p\n", candidates[t]->active));
                 newnode->previous = candidates[t]->active;
-                newnode->demerits = candidates[t]->demerits;
-                newnode->ratio = candidates[t]->ratio;
-                newnode->line = candidates[t]->line + 1;
                 if (active) {
                     debug(warn("Before\n"));
                     newnode->prev = active->prev;
@@ -333,6 +345,7 @@ _mainloop(self, node, index, nodes)
                 }
                 sv_free((SV*)candidates[t]->totals);
                 Safefree(candidates[t]);
-           }
-        }
-    }
+           } // demerits check (candidates[fitness class] > 0)
+        } // fitness class (t) 0..3 loop
+    } // while active loop
+

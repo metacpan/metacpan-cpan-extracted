@@ -1,5 +1,28 @@
 -*- Indented-text -*-
 
+1.43  2022-09-27
+	- readline-8.2 support
+	    new functions
+		rl_trim_arg_from_keyseq
+		rl_set_timeout
+		rl_clear_timeout
+		rl_timeout_remaining
+	    new variables
+		rl_eof_found
+		rl_timeout_event_hook
+	    new state values for rl_readline_state
+		RL_STATE_TIMEOUT
+		RL_STATE_EOF
+	- t/00checkver.t: check if $TERM is set properly [#11]
+	- Makefile.PL
+	    - warn if $TERM is not set properly [#11]
+	    - fix for MSYS2: take care of `\r\n` in the output of rlmalloc
+	    - guess_malloc_names(): simplify the control structure
+	- INSTALL: add a section for "MSYS2"
+	- Gnu.xs: no more non-ANSI C compiler support (remove PARAM macros)
+	- Gnu.pm, Gnu.xs, Gnu/XS.pm: expand tabs
+	- README.md, INSTALL.md: changed to Markdown
+
 1.42  2021-05-07
 	- Makefile.PL: force rlver to link with a terminal library
 	    - fix compile error on some of Cygwin environments and others. [#7]
@@ -8,35 +31,35 @@
 	      versions of ExtUtils::MakeMaker. [#8]
 
 1.41  2021-05-01
-        - Makefile.PL
+	- Makefile.PL
 	    - Search a terminal library only when it necessary. [#6]
 	    - whole refactoring
 
 1.40  2021-02-23
-        - Migrate the repository and the bug tracker to GitHub
+	- Migrate the repository and the bug tracker to GitHub
 
 1.39  2021-02-22
-        - Makefile.PL
-            - some more fix for Homebrew on macOS [rt.cpan.org #133846]
+	- Makefile.PL
+	    - some more fix for Homebrew on macOS [rt.cpan.org #133846]
 
 1.38  2021-02-22
-        - Makefile.PL
-            - run 'brew --prefix ncurses' internally to detect ncurses installed
-              by Homebrew on macOS [rt.cpan.org #133846]
-            - utilize ExtUtils::Liblist::ext() [rt.cpan.org #134408]
-              On macOS Big Sur or later 'perl Makefile.PL' may warn as
-                "Could not find neither libtermcap, libtinfo, libncurses, or libcurses."
-              You should be able to ignore this warning if you have Xcode installed. See
-                https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/381
-              for details. To suppress this message, use ExtUtils::MakeMaker 7.58 or later.
-            - can specify multiple directories on --prefix, --libdir, and
-              --includedir options by separating them with colons
-        - INSTALL
-            - update for changes above and so on.
+	- Makefile.PL
+	    - run 'brew --prefix ncurses' internally to detect ncurses installed
+	      by Homebrew on macOS [rt.cpan.org #133846]
+	    - utilize ExtUtils::Liblist::ext() [rt.cpan.org #134408]
+	      On macOS Big Sur or later 'perl Makefile.PL' may warn as
+		"Could not find neither libtermcap, libtinfo, libncurses, or libcurses."
+	      You should be able to ignore this warning if you have Xcode installed. See
+		https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/381
+	      for details. To suppress this message, use ExtUtils::MakeMaker 7.58 or later.
+	    - can specify multiple directories on --prefix, --libdir, and
+	      --includedir options by separating them with colons
+	- INSTALL
+	    - update for changes above and so on.
 
 1.37  2020-12-27
 	- readline-8.1 support
-	    new function
+	    new functions
 		rl_activate_mark
 		rl_deactivate_mark
 		rl_keep_mark_active
@@ -47,12 +70,12 @@
 	- ppport.h: update from version 3.31 to version 3.52.
 	- fixes to be more CPAN Testers friendly
 	  - Makefile.PL exits 0 when $TERM is not set properly. [rt.cpan.org #128806]
-        - update URLs of the GNU Readline Library manual website. [rt.cpan.org #131362]
-        - update URLs of soundgrab.
+	- update URLs of the GNU Readline Library manual website. [rt.cpan.org #131362]
+	- update URLs of soundgrab.
 
 1.36  2019-01-14
 	- readline-8.0 support
-	    new function
+	    new functions
 		rl_empty_keymap
 		rl_set_keymap_name
 		rl_check_signals
@@ -72,7 +95,7 @@
 
 1.35  2016-11-03
 	- readline-7.0 support
-	    new function
+	    new functions
 		rl_clear_visible_line
 		rl_tty_set_echoing
 		rl_pending_signal
@@ -96,36 +119,36 @@
 1.32  2016-06-06
 	- improve UTF-8 handling
 	  - UTF-8 decoding is done at the interface between Perl and
-            XS.  This makes it possible for UTF-8 strings to be get
-            from the GNU Readline Library functions and variables.
+	    XS.  This makes it possible for UTF-8 strings to be get
+	    from the GNU Readline Library functions and variables.
 	  - add enableUTF8() method
 	  - UTF-8 support is enabled when STDIN is in UTF-8 by the -C
 	    command-line switch, or PERL_UNICODE environment variable,
 	    or IN file handle has utf8 IO layer, or -enableUTF8 method
 	    is called.
 	  - pop IO layer only when stdio layer is pushed on utf8 layer
-            to support Perl 5.8.x
+	    to support Perl 5.8.x
 	- rl_save_state(), rl_restore_state(),
-          history_get_history_state(), and history_set_history_state()
-          are finally implemented.
+	  history_get_history_state(), and history_set_history_state()
+	  are finally implemented.
 	- update RL_STATE_* definitions
 	- fix rl_readline_state and history_length variable to be
-          writable
+	  writable
 	- fix rl_completion_quote_character and
-          rl_completion_found_quote variable to be read only
+	  rl_completion_found_quote variable to be read only
 	- update POD document
 	- t/*.t: use Test::More and improved
 	  - t/utf8_binary.t, t/utf8_text.t:
 	    - use en_US.UTF-8 instead of en_US.utf8 for locale
 	    - force the GNU Readline Library 8bit through
 	    - add variable access test, IO layer check, verbose mode,
-              etc.
+	      etc.
 	    - use camel characters instead of Japanese kanji
-              characters
+	      characters
 	  - t/utf8_binary.t: skip when PERL_UNICODE is
-            set. [rt.cpan.org #114185]
+	    set. [rt.cpan.org #114185]
 	  - t/utf8.txt: use camel characters instead of Japanese kanji
-            characters
+	    characters
 	  - t/callback.t: update comments and code clean-up
 	- use some modern Perl features (but still in 5.8 era)
 	  - use file handle references
@@ -135,7 +158,7 @@
 1.31  2016-03-06
 	- t/utf8_binary.t, t/utf_text.t: skip on non UTF-8 environment.
 	- t/readline.t: skip the cursor move test for an active CPAN
-          tester's environment
+	  tester's environment
 
 1.30  2016-03-02
 	- t/utf8_binary.t: add a fix to handle escape sequences which
@@ -143,9 +166,9 @@
 
 1.29  2016-02-28
 	- pop the stdio PerlIO layer only when utf8 layer is included
-          for remote debugging. [rt.cpan.org #110121]
+	  for remote debugging. [rt.cpan.org #110121]
 	- call utf8::decode() for a UTF8-enabled input filehandle.
-          [rt.cpan.org #104239]
+	  [rt.cpan.org #104239]
 	- call newTTY() any time to set filehandles.
 	- make use of 'our' instead of 'use vars'.
 	- add tests for UTF-8 handling.
@@ -155,7 +178,7 @@
 
 1.28  2015-09-21
 	- Makefile.PL: revert a change on 1.27 which causes fail on
-          the rlmalloc test. [rt.cpan.org #107201]
+	  the rlmalloc test. [rt.cpan.org #107201]
 	- t/readline.t, t/history.t: use LC_ALL instead of LANG.
 
 1.27  2015-09-06
@@ -164,11 +187,11 @@
 		rl_callback_sigcleanup
 	- improve POD documents
 	- Gnu.xs: not to use obsoleted typedefs which were obsoleted
-          by ReadLine 6.3
+	  by ReadLine 6.3
 	- fix a wrong fix on 1.21 to let completion_function do case
-          insensitive match. [rt.cpan.org #72378]
+	  insensitive match. [rt.cpan.org #72378]
 	- fix rl_display_match_list to show the first entry of the
-          array.  The bug caused segmentation fault with readline-7.0.
+	  array.  The bug caused segmentation fault with readline-7.0.
 	- some improvement of Makefile.PL:
 	  - add support homebrew on Mac OS X. [rt.cpan.org #104389]
 	  - print an error string when system() fails.
@@ -177,27 +200,27 @@
 
 1.26  2015-01-31
 	- call ornaments() after rl_initialize() to set tty before
-          calling rl_initialize() not to output some characters to
-          STDIO. [rt.cpan.org #96569, #101196]
+	  calling rl_initialize() not to output some characters to
+	  STDIO. [rt.cpan.org #96569, #101196]
 	- make handling of iostreams simple (make _rl_store_iostream()
-          return void and remove _rl_fetch_iostream()) [rt.cpan.org #101078]
+	  return void and remove _rl_fetch_iostream()) [rt.cpan.org #101078]
 	- fix the Prerequisites section to require Perl 5.8 (it was
-          required since TRG 1.23.).
+	  required since TRG 1.23.).
 	- t/callback.t: add some new Tk-tests from CPAN Testers' site.
 
 1.25  2014-12-13
 	- fix to call rl_initialize() after I/O stream
 	  setting. [rt.cpan.org #96569]
-	- t/readline.t: comment-out stty-command calls. 
+	- t/readline.t: comment-out stty-command calls.
 	- t/history.t, t/readline.t: print out the corresponding
-          section names in the manuals of the libraries.
+	  section names in the manuals of the libraries.
 	- eg/perlsh: use 'IO' instead of 'FILEHANDLE' which Perl 5.20
 	  warns. [rt.cpan.org #100883]
 	- fix copyright notices to use the year of first publication.
 
 1.24  2014-03-23
 	- fix not to make the PerlIO layer empty for Perl 5.8.9 or
-          before. [rt.cpan.org #59832]
+	  before. [rt.cpan.org #59832]
 	- update Pod document assuming the use of Pod::Simple::HTMLBatch.
 	- t/00checkver.t: not to use 'display-readline-version' and "use
 	  Test;"
@@ -224,14 +247,14 @@
 	  - use "use warnings"
 	- "make install" installs eg/perlsh
 	- Makefile.PL dies on the CPAN Test for OpenBSD temporarily
-          (hopefully).
+	  (hopefully).
 
 1.21  2014-03-02
 	- readline-6.3 support (Gnu Readline Library 6.3 requires this
 	  release or newers.)
 	    new function
 		rl_clear_history
-	    new variable
+	    new variables
 		rl_signal_event_hook
 		rl_input_available_hook
 		rl_executing_key
@@ -245,36 +268,36 @@
 	    new variable
 		rl_filename_rewrite_hook (now implemented)
 	- make the following variables read-only.: rl_executing_macro,
-          history_length, rl_readline_state, rl_explicit_arg,
+	  history_length, rl_readline_state, rl_explicit_arg,
 	  rl_numeric_arg, rl_editing_mode
 	- Improve backward compatibility variable and function definitions.
 	- Fix Term::ReadLine::Gnu::XS::_trp_completion_function not to
 	  perform a case-sensitive filter. [rt.cpan.org #72378]
 	- fix Gnu.xs:rl_initialize to be compiled with Perl 5.8.5 or
-          before. [rt.cpan.org #61626]
+	  before. [rt.cpan.org #61626]
 	- update Pod documents
 
 	- t/readline.t, t/history.t: add variable access tests.
 	- t/readline.t: consider .svn directory on filename
-          completion test and to set the standard tty setting before
-          re_initialize() being called.
+	  completion test and to set the standard tty setting before
+	  re_initialize() being called.
 	- eg/perlsh makes use of the deferred signal (safe signal)
-          feature.
+	  feature.
 
 	- Makefile.PL checks whether the xmalloc exported by readline
 	  is indeed called 'xmalloc' or whether it has been renamed to
 	  '_rl_malloc'. [rt.cpan.org #65973]
 	- Makefile.PL: add -DTRL_READLINE_VERSION to show GNU Readline
-          Library version in CPAN Tester Reports.
+	  Library version in CPAN Tester Reports.
 	- t/00checkver.t: let messages go to stdout.
 
 	- README: add project home page URL and remove out-of-date
-          descriptions.
+	  descriptions.
 	- INSTALL: add a section "Install on Mac OS X"
 
 1.20  2010-05-02
 	- Make a copy of the environment variable array to stop
-          segmentation faults on some systems (ex. FreeBSD)
+	  segmentation faults on some systems (ex. FreeBSD)
 	- t/readline.t skip the test of rl_readline_version for GNU
 	  Readline Library 6.1 which may return a wrong value [rt.cpan.org #54977]
 	- readline-6.1 support
@@ -285,7 +308,7 @@
 
 1.19  2009-03-21
 	- make sure the outstream fd inside the readline library is in
-          sync [rt.cpan.org #16440]
+	  sync [rt.cpan.org #16440]
 	- fixes to be more CPAN Testers friendly
 	  - t/readline.t does not use visible bell for "make test"
 	  - Makefile.PL requires perl 5.7.0 or later.  (Use
@@ -300,11 +323,11 @@
 	  on non-supported platform (for example one without GNU
 	  Readline Library).
 	- readline-6.0 support
-	    new function
+	    new functions
 		rl_save_state (not supported yet)
 		rl_restore_state (not supported yet)
 		rl_echo_signal_char
-	    new variable
+	    new variables
 		rl_display_prompt
 		rl_sort_completion_matches
 		rl_completion_invoking_key
@@ -313,17 +336,17 @@
 
 1.17  2008-02-07
 	- Unnecessary PerlIO_releaseFILE() calls are removed.  This
-          fix prevents `make test' from failing on Perl 5.10.
+	  fix prevents `make test' from failing on Perl 5.10.
 	- Makefile.PL now fails with the EditLine Library on MacOS X.
-          Use the GNU Readline Library. [rt.cpan.org #28523]
+	  Use the GNU Readline Library. [rt.cpan.org #28523]
 	- tested with readline-5.2 (which has no new feature to be
-          supported).
+	  supported).
 
 1.16  2006-04-02
 	- fix Makefile.PL to work with the latest Cygwin.
-         (Use 1.15 for old Cygwin.)
+	 (Use 1.15 for old Cygwin.)
 	- readline-5.1 support
-	    new function
+	    new functions
 		variable_value
 		reset_screen_size
 	    new variable
@@ -331,14 +354,14 @@
 
 1.15  2004-10-17
 	- readline-5.0 support
-	    new function
+	    new functions
 		bind_key_if_unbound
 		bind_keyseq
 		bind_keyseq_if_unbound
 		tty_unset_default_bindings
 		add_history_time
 		history_get_time
-	    new variable
+	    new variables
 		history_write_timestamps
 		completion_quote_character
 		completion_suppress_quote
@@ -349,9 +372,9 @@
 
 1.14  2003-03-16
 	- kludge not to cause segmentation fault on Perl 5.8.0
-          w/PerlIO and FileHandle (ex. CPAN.pm)
+	  w/PerlIO and FileHandle (ex. CPAN.pm)
 	- clean up Makefile.PL (use strict, fix for HPUX and FreeBSD,
-          fix typo, etc.)
+	  fix typo, etc.)
 
 1.13  2002-07-27
 	- readline-4.3 support
@@ -372,7 +395,7 @@
 	  setting.
 	- update documents
 	- improve coding style of Gnu.xs. (indentation style, more
-          typemap, etc.)
+	  typemap, etc.)
 
 1.11  2001-10-27
 	- fix bug of filename-list.  Now works with perldb.
@@ -439,9 +462,9 @@
 
 1.09  2000-04-04
 	- Perl-5.6 now does not warn without `POLLUTE=1' during `perl
-          Makefile.PL'.  (Thanks to PPPort.)
+	  Makefile.PL'.  (Thanks to PPPort.)
 	- change the default terminal escape sequence to stop
-          underline.
+	  underline.
 	- support rl_already_prompted and rl_on_new_line_with_prompt()
 	  which are introduced by readline-4.1-beta.
 	- support rl_funmap_names() and rl_last_func.
@@ -483,17 +506,17 @@
 		with this module.
 
 		search text of list_completion is quoted
-	
+
 	- add support of new variables and functions introduced by GNU
 	  Readline Library Version 4.0
-	    new variable
+	    new variables
 		rl_erase_empty_line
 		rl_catch_signals
 		rl_catch_sigwinch
 		rl_pre_input_hook
 		completion_display_matches_hook
 		history_inhibit_expansion_function
-	    new function
+	    new functions
 		rl_display_match_list()
 		rl_cleanup_after_signal()
 		rl_free_line_state()
@@ -501,7 +524,7 @@
 		rl_resize_terminal()
 		rl_set_signals()
 		rl_clear_signals()
-	
+
 	- add support of variables and function which were not supported
 	  yet
 		filename_quoting_function
@@ -510,7 +533,7 @@
 		ignore_some_completions_function
 		directory_completion_hook
 
-	  	rl_get_all_function_names()
+		rl_get_all_function_names()
 
 	- add support of functions which are specific to Term::ReadLine::Gnu
 		display_readline_version()
@@ -522,27 +545,27 @@
 		rl_unbind_command_in_map to rl_unbind_command
 
 	- `make test' is executed non-interactively and comprehensively
-	
+
 	- sample code improvement
 	  eg/perlsh
-	  	Perl symbol completion was rewritten and much more
+		Perl symbol completion was rewritten and much more
 		improved.
 		SIGINT clears the current line
 		add support \w (current working package) in the prompt
 		string
 		add support `afterinit' hook as Perl debugger.
-	
+
 	  eg/pftp
 		password input is now invisible.
 		displaying of completion candidates are improved by using
 		completion_display_matches_hook.
-	
+
 	- internal changes
 		Perl code for Term::ReadLine::Gnu::XS package are moved
 		into separate file Gnu/XS.pm and `AutoSplit'ed.
-	
+
 		replace operate_and_get_next() to one borrowed from bash.
-	
+
 1.04  1999-02-23
 	- fix a bug by which $if-$endif feature in ~/.inputrc was
 	  disabled.
@@ -658,7 +681,7 @@
 
 0.05  Sat Jan 25 00:06:56 1997
 	- Fix for Perl 5.002 and 5.003
-		escape from an strange Exporter's behavior 
+		escape from an strange Exporter's behavior
 		remove white spaces in prototype
 		add argument explicitly
 

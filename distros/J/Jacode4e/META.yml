@@ -3,8 +3,8 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Jacode4e
-version: 2.13.6.19
-abstract: jacode.pl-like program for enterprise
+version: 2.13.6.20
+abstract: Converts Character Encodings for Enterprise in Japan
 author:
   - ina <ina@cpan.org>
 license: perl

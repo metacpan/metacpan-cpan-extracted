@@ -1,0 +1,10 @@
+lib/SMS/Send/IN/NICSMS.pm
+Makefile.PL
+MANIFEST			This list of files
+t/checkloginpass.t
+t/compile.t
+t/liveaccttest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

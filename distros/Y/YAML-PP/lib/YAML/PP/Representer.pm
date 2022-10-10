@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Representer;
 
-our $VERSION = '0.034'; # VERSION
+our $VERSION = '0.035'; # VERSION
 
 use Scalar::Util qw/ reftype blessed refaddr /;
 
@@ -56,7 +56,7 @@ sub represent_node {
     if ($preserve_style or $preserve_alias) {
         if (ref $node->{value} eq 'YAML::PP::Preserve::Scalar') {
             my $value = $node->{value}->value;
-            if ($preserve_style and $node->{value}->style != YAML_FOLDED_SCALAR_STYLE) {
+            if ($preserve_style) {
                 $node->{style} = $node->{value}->style;
             }
 #            $node->{tag} = $node->{value}->tag;

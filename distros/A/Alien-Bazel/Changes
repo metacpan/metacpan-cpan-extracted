@@ -1,0 +1,5 @@
+Revision history for Alien-Bazel,
+
+0.01      2022-10-05 14:30:05-05:00 America/Chicago
+  - Initial version
+  - Support build-from-source AKA bootstrapping on Linux operating systems

@@ -1,0 +1,1 @@
+SELECT fun1( VARIADIC ( SELECT array_agg( i ) FROM generate_series( 1, 5 ) AS i ) ), fun2( VARIADIC ARRAY[ 1, 2 ] ), fun3( 'whatever', VARIADIC ARRAY[ 3, 4 ] ) 

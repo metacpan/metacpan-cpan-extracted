@@ -1,5 +1,5 @@
 package App::ansiexpand;
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 use 5.014;
 use warnings;
@@ -12,7 +12,9 @@ use Text::ANSI::Tabs qw(ansi_expand ansi_unexpand);
 
 our $DEFAULT_UNEXPAND;
 
-use Getopt::EX::Hashed 1.03; {
+use Getopt::EX::Hashed 1.05; {
+
+    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
 
     has unexpand  => ' u  !   ' , default => $DEFAULT_UNEXPAND;
     has ambiguous => '    =s  ' , any => [ qw(wide narrow) ];
@@ -24,7 +26,7 @@ use Getopt::EX::Hashed 1.03; {
     has version   => ' v      ' ;
 
     has '+tabstop' => sub {
-	$Text::ANSI::Tabs::tabstop = $_[1];
+	$_->{$_[0]} = $Text::ANSI::Tabs::tabstop = $_[1];
     };
 
     has [ qw(+tabhead +tabspace +tabstyle) ] => sub {
@@ -42,6 +44,20 @@ use Getopt::EX::Hashed 1.03; {
 	exit;
     };
 
+    has ARGV => default => [];
+    has '<>' => sub {
+	if ($_[0] =~ /^-([0-9]+)$/x) {
+	    $_->{tabstop} = $Text::ANSI::Tabs::tabstop = $1 or
+		die "$_[0]: invalid tabstop\n";
+	} else {
+	    if ($_[0] =~ /^-{1,2}+(.+)/) {
+		warn "Unknown option: $1\n";
+		pod2usage();
+	    }
+	    push @{$_->ARGV}, $_[0];
+	}
+    };
+
 } no Getopt::EX::Hashed;
 
 sub run {
@@ -50,10 +66,11 @@ sub run {
 
     use Getopt::EX::Long qw(:DEFAULT ExConfigure Configure);
     ExConfigure BASECLASS => [ __PACKAGE__, 'Getopt::EX' ];
-    Configure "bundling";
+    Configure qw(bundling pass_through);
     $app->getopt || pod2usage();
+    @ARGV = @{$app->ARGV};
 
-    my $action = $app->{unexpand} ? \&ansi_unexpand : \&ansi_expand;
+    my $action = $app->unexpand ? \&ansi_unexpand : \&ansi_expand;
 
     while (<>) {
 	print $action->($_);
@@ -73,7 +90,7 @@ ansiexpand, ansiunexpand - ANSI sequence aware tab expand/unexpand command
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 DESCRIPTION
 

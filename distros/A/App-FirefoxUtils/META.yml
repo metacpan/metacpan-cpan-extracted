@@ -19,12 +19,13 @@ name: App-FirefoxUtils
 provides:
   App::FirefoxUtils:
     file: lib/App/FirefoxUtils.pm
-    version: '0.018'
+    version: '0.020'
 requires:
-  App::BrowserUtils: '0.017'
+  App::BrowserUtils: '0.018'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
   Data::Sah::Coerce::perl::To_duration::From_float::seconds: '0'
   Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration: '0'
+  Data::Sah::Coerce::perl::To_duration::From_str::hms: '0'
   Data::Sah::Coerce::perl::To_duration::From_str::human: '0'
   Data::Sah::Coerce::perl::To_duration::From_str::iso8601: '0'
   Data::Sah::Compiler::perl::TH::any: '0.911'
@@ -50,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FirefoxUtils
   homepage: https://metacpan.org/release/App-FirefoxUtils
   repository: git://github.com/perlancar/perl-App-FirefoxUtils.git
-version: '0.018'
+version: '0.020'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -384,7 +385,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'

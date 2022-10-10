@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.033  2022-10-02
+
+ - (Addition) Add new Attean::SPARQLClient protocol implementation.
+ - (Update) Fixed handling of endpoint URLs containing query parameters.
+ - (Update) Protocol HTTP requests can now be signed by specifying a
+   'request_signer'.
+ - (Update) Update SERVICE evaluation classes to use Attean::SPARQLClient.
+
 0.032  2022-08-14
 
  - (Update) Fix for bug caused by newly added TermOrVariableOrTriplePattern

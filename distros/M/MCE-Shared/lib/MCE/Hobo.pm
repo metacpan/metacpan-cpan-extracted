@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.876';
+our $VERSION = '1.878';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -185,7 +185,7 @@ sub create {
       $_LIST->{ $mngd->{PKG} }, $mngd->{max_workers}, $mngd->{PKG}
    );
 
-   $_DATA->{"$pkg:id"} = 10000 if ( ( my $id = ++$_DATA->{"$pkg:id"} ) > 2e9 );
+   $_DATA->{"$pkg:id"} = 10000 if ( ( my $id = ++$_DATA->{"$pkg:id"} ) >= 2e9 );
 
    if ( $max_workers || $self->{IGNORE} ) {
       my $wrk_id; local $!;
@@ -958,7 +958,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.876
+This document describes MCE::Hobo version 1.878
 
 =head1 SYNOPSIS
 

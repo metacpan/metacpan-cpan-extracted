@@ -22,7 +22,7 @@ await $chip->mount(
 # precache config
 {
    $adapter->expect_write_then_read( "\x26", 3 )
-      ->returns( "\x00\x00\x00" );
+      ->will_done( "\x00\x00\x00" );
 
    await $chip->read_config;
 }
@@ -43,12 +43,12 @@ my %sensors = map { $_->name => $_ } @sensors;
    # Trigger oneshot
    $adapter->expect_write( "\x26" . "\x02" );
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x02" );
+      ->will_done( "\x02" );
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x00" );
+      ->will_done( "\x00" );
 
    $adapter->expect_write_then_read( "\x04", 2 )
-      ->returns( "\x16\x80" );
+      ->will_done( "\x16\x80" );
 
    is( $sensor->format( scalar await $sensor->read ), "22.50",
       'temperature $sensor->read+format' );
@@ -65,12 +65,12 @@ my %sensors = map { $_->name => $_ } @sensors;
    # Trigger oneshot
    $adapter->expect_write( "\x26" . "\x02" );
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x02" );
+      ->will_done( "\x02" );
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x00" );
+      ->will_done( "\x00" );
 
    $adapter->expect_write_then_read( "\x01", 3 )
-      ->returns( "\x62\xF3\x40" );
+      ->will_done( "\x62\xF3\x40" );
 
    is( $sensor->format( scalar await $sensor->read ), "101325",
       'pressure $sensor->read+format' );
@@ -83,14 +83,14 @@ my %sensors = map { $_->name => $_ } @sensors;
    # Expect just a single trigger oneshot
    $adapter->expect_write( "\x26" . "\x02" );
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x02" );
+      ->will_done( "\x02" );
    $adapter->expect_write_then_read( "\x26", 1 )
-      ->returns( "\x00" );
+      ->will_done( "\x00" );
 
    $adapter->expect_write_then_read( "\x04", 2 )
-      ->returns( "\x16\x80" );
+      ->will_done( "\x16\x80" );
    $adapter->expect_write_then_read( "\x01", 3 )
-      ->returns( "\x62\xF3\x40" );
+      ->will_done( "\x62\xF3\x40" );
 
    my $fT = $sensors{temperature}->read;
    my $fP = $sensors{pressure}->read;

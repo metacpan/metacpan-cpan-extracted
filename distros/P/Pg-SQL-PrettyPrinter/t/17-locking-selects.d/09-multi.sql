@@ -1,0 +1,1 @@
+SELECT * FROM pg_class AS c JOIN pg_namespace AS n ON c.relnamespace = n.oid ORDER BY c.oid ASC LIMIT 5 FOR UPDATE OF c NOWAIT FOR SHARE OF n SKIP LOCKED 

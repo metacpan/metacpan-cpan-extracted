@@ -36,15 +36,21 @@
    "provides" : {
       "Pod::Query" : {
          "file" : "lib/Pod/Query.pm",
-         "version" : "0.33"
+         "version" : "0.35"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/poti1/pod-query/issues"
+      },
       "license" : [
          "http://opensource.org/licenses/artistic-license-2.0.php"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/poti1/pod-query"
+      }
    },
-   "version" : "0.33",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.35",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

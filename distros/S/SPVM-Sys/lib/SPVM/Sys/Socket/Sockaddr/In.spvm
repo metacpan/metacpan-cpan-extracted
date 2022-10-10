@@ -16,7 +16,7 @@ class Sys::Socket::Sockaddr::In extends Sys::Socket::Sockaddr : pointer_t {
   
   native method set_sin_family : void ($family : byte);
   
-  native method sin_addr : Sys::Socket::In_addr ();
+  native method copy_sin_addr : Sys::Socket::In_addr ();
   
   native method set_sin_addr : void ($address : Sys::Socket::In_addr);
   
@@ -25,4 +25,14 @@ class Sys::Socket::Sockaddr::In extends Sys::Socket::Sockaddr : pointer_t {
   native method set_sin_port : void ($port : short);
 
   native method sizeof : int ();
+  
+  method clone : Sys::Socket::Sockaddr::In () {
+    my $clone = Sys::Socket::Sockaddr::In->new;
+
+    $clone->set_sin_family($self->sin_family);
+    $clone->set_sin_addr($self->copy_sin_addr);
+    $clone->set_sin_port($self->sin_port);
+
+    return $clone;
+  }
 }

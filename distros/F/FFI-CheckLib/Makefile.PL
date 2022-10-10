@@ -25,7 +25,8 @@ my %WriteMakefileArgs = (
     "lib/FFI/CheckLib.pm" => "\$(INST_LIB)/FFI/CheckLib.pm"
   },
   "PREREQ_PM" => {
-    "List::Util" => "1.33"
+    "File::Which" => 0,
+    "List::Util"  => "1.33"
   },
   "TEST_REQUIRES" => {
     "Test2::API"             => "1.302015",
@@ -33,13 +34,14 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000121",
     "Test2::V0"              => "0.000121"
   },
-  "VERSION" => "0.30",
+  "VERSION" => "0.31",
   "test"    => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
+  "File::Which"            => 0,
   "List::Util"             => "1.33",
   "Test2::API"             => "1.302015",
   "Test2::Require::EnvVar" => "0.000121",

@@ -49,4 +49,11 @@ class Foo {
   use MyKeyword;
 }
 
+role Foo {
+  # B module has the class function
+  use B;
+
+  use MyKeyword;
+}
+
 done_testing;

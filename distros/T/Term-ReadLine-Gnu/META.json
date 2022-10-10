@@ -49,6 +49,6 @@
          "url" : "https://github.com/hirooih/perl-trg.git"
       }
    },
-   "version" : "1.42",
+   "version" : "1.43",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

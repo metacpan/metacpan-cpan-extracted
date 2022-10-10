@@ -16,7 +16,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.3.0'; # VERSION
+our $VERSION = 'v1.3.1'; # VERSION
 
 sub destination {
     my $self = shift;
@@ -57,11 +57,13 @@ has _psql => (
 
         my %query_params = $uri->query_params;
         my @conninfo;
+        # Use _port instead of port so it's empty if no port is in the URI.
+        # https://github.com/sqitchers/sqitch/issues/675
         for my $spec (
             [ user   => $self->username ],
             [ dbname => $uri->dbname    ],
             [ host   => $uri->host      ],
-            [ port   => $uri->port      ],
+            [ port   => $uri->_port     ],
             map { [ $_ => $query_params{$_} ] }
                 sort keys %query_params,
         ) {

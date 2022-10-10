@@ -1,5 +1,9 @@
 Revision history for Device-Chip
 
+0.24    2022-10-04
+        [CHANGES]
+         * Update to Test::ExpectAndCheck::Future v0.04
+
 0.23    2022-09-01
         [CHANGES]
          * Define the concept of sanity-check bounds on sensor values, to

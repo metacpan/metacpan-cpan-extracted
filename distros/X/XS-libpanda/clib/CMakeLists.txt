@@ -71,9 +71,9 @@ target_link_libraries(${PROJECT_NAME}-tests PUBLIC ${PROJECT_NAME} ${CMAKE_THREA
 #executable should be MyTest to pass test exception.cc that checks "library" name
 include(CTest)
 enable_testing()
-add_executable(MyTest ${EXCLUDE_TEST} "tests/main.cc")
+add_executable(MyTest ${EXCLUDE_TEST} ${testSource})
 target_link_libraries(MyTest ${PROJECT_NAME}-tests Catch2::Catch2WithMain)
-add_test(test-all MyTest)
+add_test(${PROJECT_NAME} MyTest)
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS MyTest)
 
 ########################install#####################################

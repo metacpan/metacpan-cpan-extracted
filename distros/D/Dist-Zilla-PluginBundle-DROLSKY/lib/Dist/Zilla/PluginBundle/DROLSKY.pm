@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
@@ -864,7 +864,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 1.20
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -1168,7 +1168,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<https://www.urth.org/fs-donation.html>.
+button at L<https://houseabsolute.com/foss-donations/>.
 
 =head1 AUTHOR
 
@@ -1192,7 +1192,7 @@ Mark Fowler <mark@twoshortplanks.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2022 by Dave Rolsky.
 
 This is free software, licensed under:
 

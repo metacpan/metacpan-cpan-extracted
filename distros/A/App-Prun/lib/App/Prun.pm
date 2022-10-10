@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package App::Prun;
-$App::Prun::VERSION = '1.08';
+$App::Prun::VERSION = '1.11';
 use Moo;
 use Storable qw( freeze );  # to support testing
 use namespace::clean;
@@ -38,7 +38,7 @@ sub run_command {
     my $cmd = shift;
 
     chomp $cmd;
-    
+
     # Skip blank lines and comments
     return if (/^\s*(#|$)/);
 
@@ -73,26 +73,7 @@ App::Prun - Provides the prun script as a command line interface to L<Parallel::
 
 =head1 VERSION
 
-version 1.08
-
-=head1 DESCRIPTION
-
-B<prun> allows you to utilize multiple CPUs
-for some workloads from the shell more easily.
-
-prun takes a list of commands (stdin and/or from file(s)) and run the commands
-in parallel.
-
-prun is a CLI front end to L<Parallel::ForkManager>. It runs commands in
-parallel up to a maximum number of processes at once.
-
-=over
-
-=item * prun --help
-
-=item * L<Parallel::ForkManager>
-
-=back
+version 1.11
 
 =head1 SYNOPSYS
 
@@ -100,47 +81,23 @@ parallel up to a maximum number of processes at once.
 
     prun command_file_to_run_in_parallel
 
-=head1 EXAMPLES
-
-There are also examples available from the command line B<--help>.
-
-Run tkprof against all .trc files in the current directory, run 32
-of them at a time.
-
-  for F in *.trc; do echo "tkprof $F ${F%trc}txt"; done | prun -p 32
-
-Run all commands in a file (command_file), one command per line. Run
-the default number of processes in parallel ($def_processes).
-Ignore any failed processes, but do report to STDOUT any that fail.
-
-  prun -r command_file
-
-Test with the dummy_load script included in the contrib/ directory 
-of this distribution:
-
-  for F in `seq 1 100`; do echo "contrib/dummy_load"; done | prun
-
 =head1 SEE ALSO
 
 =over
 
-=item L<App::Prun::Scaled>
+=item L<prun>
 
-=item L<Parallel::ForkManager>
-
-=item L<Parallel::ForkManager::Scaled>
+=item prun --help
 
 =back
 
 =head1 REPOSITORY
 
-The mercurial repository for this module may be found here:
-
-  https://bitbucket.org/jmccarv/app-prun
+The source repository for this module may be found at https://github.com/jmccarv/App-Prun.git
 
 clone it:
 
-  hg clone https://bitbucket.org/jmccarv/app-prun
+  git clone https://github.com/jmccarv/App-Prun.git
 
 =head1 AUTHOR
 
@@ -148,7 +105,7 @@ Jason McCarver <slam@parasite.cc>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Jasno McCarver.
+This software is copyright (c) 2022 by Jason McCarver.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

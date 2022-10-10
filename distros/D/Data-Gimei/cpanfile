@@ -1,9 +1,9 @@
-requires 'perl', '5.022001';
+requires 'perl', 'v5.22.0';
 
 requires 'Class::Tiny';
 requires 'File::Share';
-requires 'Math::Random';
 requires 'YAML::XS';
+requires 'version';
 
 on configure => sub {
     requires 'Module::Build::Tiny';

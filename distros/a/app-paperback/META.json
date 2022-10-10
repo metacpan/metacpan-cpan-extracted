@@ -46,7 +46,7 @@
   "provides" : {
     "App::paperback" : {
       "file" : "lib/App/paperback.pm",
-      "version" : "1.36"
+      "version" : "1.37"
     }
   },
   "resources": {
@@ -61,7 +61,7 @@
     }
   },
   "release_status": "stable",
-  "version": "1.36",
+  "version": "1.37",
   "x_authority": "cpan:MONACCI",
   "x_serialization_backend": "JSON::PP version 4.07",
   "x_static_install": 0,

@@ -30,6 +30,7 @@ sub _find_CA_file {}
 sub can_reuse { 0 }
 sub close { 1 }
 sub connect { $_[0] }
+sub connected { 1 }
 sub start_ssl {}
 
 sub write_request {

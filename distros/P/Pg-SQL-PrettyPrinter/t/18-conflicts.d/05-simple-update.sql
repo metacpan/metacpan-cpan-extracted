@@ -1,0 +1,1 @@
+INSERT INTO t ( a, b, c ) VALUES ( 'aa', 'bb', 'cc' ) ON CONFLICT DO UPDATE SET c = excluded.fruit 

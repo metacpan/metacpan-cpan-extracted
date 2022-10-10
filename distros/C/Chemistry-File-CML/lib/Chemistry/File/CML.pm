@@ -1,6 +1,6 @@
 package Chemistry::File::CML;
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 # $Id$
 
 use base 'Chemistry::File';
@@ -53,20 +53,15 @@ sub parse_string {
     my $xp = XML::LibXML::XPathContext->new( $cml );
     $xp->registerNs( 'cml', 'http://www.xml-cml.org/schema' );
 
-    my @cml_molecules = $xp->findnodes( '/cml:cml/cml:molecule' );
-    if( !@cml_molecules ) {
-        @cml_molecules = $xp->findnodes( '/cml:molecule' ); # Somewhy some CMLs need this
-    }
-
     my @molecules;
-    for my $molecule (@cml_molecules) {
+    for my $molecule ($xp->findnodes( '//cml:molecule' )) {
         my $mol = $mol_class->new;
-        push @molecules, $mol;
-
         $mol->name( $molecule->getAttribute( 'id' ) ) if $molecule->hasAttribute( 'id' );
 
         my ($atomArray) = $molecule->getChildrenByTagName( 'atomArray' );
         next unless $atomArray; # Skip empty molecules
+
+        push @molecules, $mol;
 
         my %atom_by_name;
         my %hydrogens_by_id;
@@ -101,6 +96,23 @@ sub parse_string {
             }
         }
 
+        # Second pass through atoms to set chirality (if supported)
+        for my $element ($atomArray->getChildrenByTagName( 'atom' )) { # for each atom...
+            my( $atomParity ) = $element->getChildrenByTagName( 'atomParity' );
+            next unless $atomParity &&
+                        $atomParity->hasAttribute( 'atomRefs4' ) &&
+                        $atomParity->textContent =~ /^-?1$/;
+
+            next unless $element->hasAttribute( 'id' );
+            my $id = $element->getAttribute( 'id' );
+            my $atom = $atom_by_name{$id};
+            next unless $atom->can( 'chirality' );
+
+            my @atoms = map { $atom_by_name{$_} }
+                            split ' ', $atomParity->getAttribute( 'atomRefs4' );
+            $atom->chirality( @atoms, int $atomParity->textContent );
+        }
+
         my @bonds;
         my( $bondArray ) = $molecule->getChildrenByTagName( 'bondArray' );
         if( $bondArray ) {
@@ -111,12 +123,31 @@ sub parse_string {
         for my $bond (@bonds) { # for each bond...
             my $order = my $type = $bond->getAttribute( 'order' );
             $order = 1 unless $order =~ /^[123]$/;
-            $mol->new_bond(
+
+            my @atoms = map { $atom_by_name{$_} }
+                            split ' ', $bond->getAttribute( 'atomRefs2' );
+            my $mol_bond = $mol->new_bond(
                 type => $type, 
-                atoms => [map { $atom_by_name{$_} } split ' ', $bond->getAttribute( 'atomRefs2' )],
+                atoms => \@atoms,
                 order => $order,
                 ($type eq 'A' ? (aromatic => 1) : ()),
             );
+
+            my( $bondStereo ) = $bond->getChildrenByTagName( 'bondStereo' );
+            if( $mol_bond->can( 'cistrans' ) &&
+                $bondStereo &&
+                $bondStereo->hasAttribute( 'atomRefs4' ) &&
+                $bondStereo->textContent =~ /^[CT]$/ ) {
+                my @cistrans_atoms = map { $atom_by_name{$_} }
+                                         split ' ', $bondStereo->getAttribute( 'atomRefs4' );
+                if( $cistrans_atoms[1] ne $atoms[0] ) {
+                    ( $cistrans_atoms[0], $cistrans_atoms[3] ) =
+                        ( $cistrans_atoms[3], $cistrans_atoms[0] );
+                    $mol_bond->cistrans( $cistrans_atoms[0],
+                                         $cistrans_atoms[3],
+                                         $bondStereo->textContent eq 'C' ? 'cis' : 'trans' );
+                }
+            }
         }
 
         # calculate implicit hydrogens

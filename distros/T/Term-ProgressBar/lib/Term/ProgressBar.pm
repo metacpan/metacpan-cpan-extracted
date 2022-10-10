@@ -3,7 +3,7 @@ package Term::ProgressBar;
 use strict;
 use warnings;
 
-our $VERSION = '2.22';
+our $VERSION = '2.23';
 
 #XXX TODO Redo original test with count=20
 #         Amount Output
@@ -22,7 +22,7 @@ Term::ProgressBar - provide a progress meter on a standard terminal
 
 =head1 VERSION
 
-Version 2.22
+Version 2.23
 
 =head1 SYNOPSIS
 
@@ -827,10 +827,15 @@ sub update {
 	return 2**32-1;
   }
 
-  my $biggies     = $self->major_units * $so_far;
   my @chars = (' ') x $self->bar_width;
-  $chars[$_] = $self->major_char
-    for 0..$biggies-1;
+  if ( $so_far >= $target ) {
+    @chars = ($self->major_char) x $self->bar_width;
+  }
+  else {
+    my $biggies = $self->major_units * $so_far;
+    $chars[$_] = $self->major_char
+      for 0..$biggies-1;
+  }
 
   if ( $self->minor ) {
     my $smally      = $self->minor_units * $so_far % $self->bar_width;

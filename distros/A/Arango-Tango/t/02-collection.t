@@ -41,10 +41,6 @@ is $count->{count}, 0;
 my $figures = $collection->figures;
 is $figures->{count}, 0;
 
-my $ans = $collection->load;
-is $ans->{name}, "collection";
-is $ans->{type}, 2;
-
 my %ttl_idx_opts = (
     type => 'ttl',
     name => 'idx',
@@ -65,7 +61,7 @@ is $idxs->{indexes}->[0]->{type}, 'primary';
 is $idxs->{indexes}->[1]->{name}, 'idx';
 is $idxs->{indexes}->[1]->{type}, 'ttl';
 
-$ans = $collection->load_indexes;
+my $ans = $collection->load_indexes;
 ok $ans->{result};
 
 my $props = $collection->properties;
@@ -75,9 +71,6 @@ my $rev = $collection->revision;
 ok exists($rev->{revision});
 
 can_ok $collection, "rotate";
-
-$ans = $collection->unload;
-is $ans->{name}, "collection";
 
 $ans = $collection->set_properties(waitForSync => 0);
 ok !$ans->{waitForSync};

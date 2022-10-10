@@ -2,7 +2,7 @@ package Test2::Harness::UI::Sweeper;
 use strict;
 use warnings;
 
-our $VERSION = '0.000125';
+our $VERSION = '0.000127';
 
 use Test2::Harness::UI::Util::HashBase qw{
     <config
@@ -63,6 +63,13 @@ sub sweep {
             if ($params{events}) {
                 if ($params{subtests}) {
                     $job->reportings->update({event_id => undef});
+
+                    my $has_binary = $job->events->search({has_binary => 1});
+                    while (my $e = $has_binary->next()) {
+                        $has_binary->binaries->delete;
+                        $e->Delete;
+                    }
+
                     $job->events->delete;
                 }
                 else {

@@ -9,7 +9,7 @@ use POSIX qw(ceil);
 use Carp;
 use Tie::Hash::LRU;
 
-our $VERSION = '2.61';    ## VERSION
+our $VERSION = '2.62';    ## VERSION
 
 our %popular;
 our $lru = tie %popular, 'Tie::Hash::LRU', 100;
@@ -281,7 +281,7 @@ sub _duration_array {
 
             $value =~ s/\s+//ig;
 
-            $frame = '' if $value == 0;
+            $frame = ''   if $value == 0;
             $frame .= 's' if $value > 1;
 
             if ($frame) {
@@ -399,7 +399,7 @@ Object constructor
 =cut
 
 sub new {    ## no critic (RequireArgUnpacking)
-    my $class = shift;
+    my $class      = shift;
     my %params_ref = ref($_[0]) ? %{$_[0]} : @_;
 
     my $interval = $params_ref{'interval'};

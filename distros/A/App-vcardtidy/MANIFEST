@@ -1,0 +1,17 @@
+.gitattributes
+.perltidyrc
+.podtidy-opts
+.readme_from
+bin/vcardtidy
+Changes
+cpanfile
+lib/App/vcardtidy.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/clean.vcf
+t/dirty.vcf
+t/vcardtidy
+t/vcardtidy.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

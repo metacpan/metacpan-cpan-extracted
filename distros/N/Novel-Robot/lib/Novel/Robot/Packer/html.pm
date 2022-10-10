@@ -32,12 +32,11 @@ sub process_template {
         <html>
 
         <head>
+        <meta charset="UTF-8">
         <title> [% writer %] 《 [% book %] 》</title>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <style type="text/css">
 body {
 	font-size: large;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
 	margin: 1em 8em 1em 8em;
 	text-indent: 2em;
 	line-height: 145%;

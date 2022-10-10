@@ -79,11 +79,11 @@ passwords.
 
 =item Sys::Virt::DomainCheckpoint::XML_SIZE
 
-Inlude dynamic per-<disk> size information
+Include dynamic per-<disk> size information
 
 =item Sys::Virt::DomainCheckpoint::XML_NO_DOMAIN
 
-Supress <domain> sub-element
+Suppress <domain> sub-element
 
 =back
 
@@ -173,7 +173,7 @@ Only list non-leaf nodes in the checkpoint tree
 
 =item Sys::Virt::DomainCheckpoint::LIST_TOPOLOGICAL
 
-Sort list in topological order wrt to parent/child
+Sort list in topological order w.r.t. to parent/child
 relationships.
 
 =back

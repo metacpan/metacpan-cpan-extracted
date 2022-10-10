@@ -27,10 +27,10 @@ no_index:
 provides:
   App::ansiexpand:
     file: lib/App/ansiexpand.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   Encode: '0'
-  Getopt::EX::Hashed: '1.03'
+  Getopt::EX::Hashed: '1.05'
   Getopt::EX::Long: '0'
   Pod::Usage: '0'
   Text::ANSI::Tabs: '1.01'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/App-ansiexpand/issues
   homepage: https://github.com/kaz-utashiro/App-ansiexpand
   repository: https://github.com/kaz-utashiro/App-ansiexpand.git
-version: '1.01'
+version: '1.02'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

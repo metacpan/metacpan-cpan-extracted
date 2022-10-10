@@ -37,7 +37,7 @@ struct Test : AsyncTest {
     }
 };
 
-namespace sync {
+namespace test_sync {
 
 TEST_PREFIX("fs-sync: ", "[fs]");
 
@@ -438,7 +438,7 @@ TEST("mkstemp") {
 
 }
 
-namespace async {
+namespace test_async {
 
 TEST_PREFIX("fs-async: ", "[fs]");
 

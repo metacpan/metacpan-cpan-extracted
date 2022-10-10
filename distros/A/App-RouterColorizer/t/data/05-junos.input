@@ -1731,6 +1731,31 @@ pip0                    up    up
 tap                     up    up
 vme                     up    down
 vtep                    up    up
+ge-0/0/0                up    up
+ge-0/0/0.0              up    up   eth-switch
+gr-0/0/0                up    up
+ip-0/0/0                up    up
+lsq-0/0/0               up    up
+lt-0/0/0                up    up
+mt-0/0/0                up    up
+sp-0/0/0                up    up
+sp-0/0/0.0              up    up   inet
+                                   inet6
+sp-0/0/0.16383          up    up   inet     10.0.0.1            --> 10.0.0.16
+esi                     up    up
+fti0                    up    up
+fxp0                    up    down
+gre                     up    up
+ipip                    up    up
+irb                     up    up
+pime                    up    up
+pp0                     up    up
+ppd0                    up    up
+ppe0                    up    up        
+rbeb                    up    up
+st0                     up    up
+st0.1000                up    down inet     192.0.2.1/31 
+
 
 {master:0}
 foobar@xxxx.xxxxxx> exit 

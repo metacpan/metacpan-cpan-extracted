@@ -13,7 +13,7 @@
 # Modules and declarations
 ##############################################################################
 
-package Tie::ShadowHash 2.00;
+package Tie::ShadowHash 2.01;
 
 use 5.024;
 use autodie;
@@ -284,8 +284,9 @@ DBM Allbery
 =head1 SYNOPSIS
 
     use Tie::ShadowHash;
-    use DB_File;
-    tie(my %db, 'DB_File', 'file.db');
+    use AnyDBM_File;
+    use Fcntl qw(O_RDONLY);
+    tie(my %db, 'AnyDBM_File', 'file', O_RDONLY, oct('666'));
     my $obj = tie(my %hash, 'Tie::ShadowHash', \%db, 'otherdata.txt');
 
     # Accesses search %db first, then the hashed otherdata.txt.

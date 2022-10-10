@@ -1,14 +1,12 @@
 Changes
 Makefile.PL
+CONTRIBUTING.md
+LICENSE
 MANIFEST
 README.md
 lib/ExtUtils/MakeMaker/META_MERGE/GitHub.pm
 perl-ExtUtils-MakeMaker-META_MERGE-GitHub.spec
 t/001_load.t
-t/pod-coverage.t
-t/pod.t
-t/changes.t
-t/pod-spell.t
 scripts/perl-ExtUtils-MakeMaker-META_MERGE-GitHub.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

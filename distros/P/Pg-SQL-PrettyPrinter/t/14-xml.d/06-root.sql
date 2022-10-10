@@ -1,0 +1,1 @@
+SELECT XMLROOT( '<foo/>'::xml, VERSION NO VALUE, STANDALONE NO VALUE ), XMLROOT( '<foo/>'::xml, VERSION '1.0', STANDALONE YES ), XMLROOT( '<foo/>'::xml, VERSION '1.0', STANDALONE NO ), XMLROOT( '<foo/>'::xml, VERSION '1.0' ) 

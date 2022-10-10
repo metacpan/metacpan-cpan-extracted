@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 15;
+plan tests => 16;
 
 my @module_files = (
     'Weather/GHCN/App/Extremes.pm',
     'Weather/GHCN/App/Fetch.pm',
     'Weather/GHCN/App/StationCounts.pm',
+    'Weather/GHCN/CacheURI.pm',
     'Weather/GHCN/Common.pm',
     'Weather/GHCN/CountryCodes.pm',
     'Weather/GHCN/Fetch.pm',

@@ -1,0 +1,56 @@
+{
+   "abstract" : "communicate the SLÂµRM protocol over a serial port",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Device-Serial-SLuRM",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::CRC" : "0",
+            "Future::AsyncAwait" : "0",
+            "Future::Buffer" : "0.03",
+            "Future::IO" : "0",
+            "IO::Termios" : "0",
+            "Object::Pad" : "0.57",
+            "Syntax::Keyword::Match" : "0",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::ExpectAndCheck::Future" : "0.04",
+            "Test::Future::IO" : "0.05",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Device::Serial::SLuRM" : {
+         "file" : "lib/Device/Serial/SLuRM.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

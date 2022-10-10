@@ -1,0 +1,1 @@
+WITH q AS ( SELECT 1 AS z ) INSERT INTO t ( a ) SELECT z FROM q

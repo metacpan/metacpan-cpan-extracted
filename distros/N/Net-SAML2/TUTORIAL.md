@@ -15,26 +15,23 @@ In the case of Forwiki.org mentioned above it has a login function that is calle
 The metadata is provided by the Identity Provider (IdP).  Net::SAML2:IdP->new_from_url or Net::SAML2IdP->new_from_xml will take the metadata in the from specified and parse the metadata returning a Net::SAML2::IdP object
 
 ```
-    my $idp = Net::SAML2::IdP->new_from_url(
-        url => $metadata,	# URL where the xml is located
-        cacert => $cacert,	# Filename of the Identity Providers CACert
-        ssl_opts =>         # Optional options supported by LWP::Protocol::https
-            {
-                SSL_ca_file     => '/your/directory/cacert.pem',
-                SSL_ca_path     => '/etc/ssl/certs',
-                verify_hostname => 1,
-            }
+my $idp = Net::SAML2::IdP->new_from_url(
+    url => $metadata,   # URL where the xml is located
+    cacert => $cacert,  # Filename of the Identity Providers CACert
+    ssl_opts =>         # Optional options supported by LWP::Protocol::https
+    {
+        SSL_ca_file     => '/your/directory/cacert.pem',
+        SSL_ca_path     => '/etc/ssl/certs',
+        verify_hostname => 1,
+    }
+);
 
-    );
-```
+# or
 
-or
-
-```
-    my $idp = Net::SAML2::IdP->new_from_xml(
-        xml => $metadata_string,	# xml as a string
-        cacert => $cacert,  		# Filename of the Identity Providers CACert
-    );
+my $idp = Net::SAML2::IdP->new_from_xml(
+    xml => $metadata_string,    # xml as a string
+    cacert => $cacert,          # Filename of the Identity Providers CACert
+);
 ```
 
 The IdP object contains the Identity Providers settings that were parse from the metadata and are then used for the rest of the calls.
@@ -94,14 +91,14 @@ There are two methods to create the Authentication Request.
 However, it is better to use new() here because it makes tracking the AuthnRequest ID easier for later verification.
 
 ```
-    my $authnreq = Net::SAML2::Protocol::AuthnRequest->new(
-        issuer        => $issuer,
-        destination   => $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
-        provider_name => $provider_name,
-    );
+my $authnreq = Net::SAML2::Protocol::AuthnRequest->new(
+    issuer        => $issuer,
+    destination   => $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
+    provider_name => $provider_name,
+);
 
-    # Store the request's id for later verification
-    my saml_request_id = $authnreq->id
+# Store the request's id for later verification
+my saml_request_id = $authnreq->id
 ```
 
 The **issuer** is the identifier that the web application uses to identify itself to the SAML2 Identity Provider.  You will need to specify that identifier in the setup of your chosen Identity provider (GSuite, Azure, OneLogin, KeyCloak, etc)
@@ -113,16 +110,16 @@ The **destination** is set to the IdP's Single Sign-On Url that was parsed from 
 The Net::SAML2::Protocol::AuthnRequest contains:
 
 ```
-    $VAR1 = bless( {
-        'issue_instant' => '2021-02-06T20:04:33Z',
-        'RequestedAuthnContext_Comparison' => 'exact',
-        'issuer' => bless( do{\(my $o = 'http://localhost:3000')}, 'URI::http' ),
-        'id' => 'NETSAML2_2b0619fe11c985257aafeceec7de69b2',
-        'destination' => bless( do{\(my $o = 'http://sso.dev.venda.com/opensso')}, 'URI::http' ),
-        'AuthnContextClassRef' => [],
-        'nameidpolicy_format' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
-        'AuthnContextDeclRef' => []
-    }, 'Net::SAML2::Protocol::AuthnRequest' );
+$VAR1 = bless( {
+                'issue_instant' => '2021-02-06T20:04:33Z',
+                'RequestedAuthnContext_Comparison' => 'exact',
+                'issuer' => bless( do{\(my $o = 'http://localhost:3000')}, 'URI::http' ),
+                'id' => 'NETSAML2_2b0619fe11c985257aafeceec7de69b2',
+                'destination' => bless( do{\(my $o = 'http://sso.dev.venda.com/opensso')}, 'URI::http' ),
+                'AuthnContextClassRef' => [],
+                'nameidpolicy_format' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+                'AuthnContextDeclRef' => []
+               }, 'Net::SAML2::Protocol::AuthnRequest' );
 ```
 and produces the following XML:
 
@@ -167,13 +164,13 @@ The Net::SAML2::Binding::Redirect is used to create the redirect URL that will b
 In addition, it could be used to process a redirect from the IdP to process a LoginRequest or LogoutResponse.
 
 ```
-    my $redirect = Net::SAML2::Binding::Redirect->new(
-        key => $sp_signing_cert,
-        cert => $idp->cert('signing'),
-        param => 'SAMLRequest',
-        # The ssl_url destination for redirect
-        url => $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
-    );
+my $redirect = Net::SAML2::Binding::Redirect->new(
+    key => $sp_signing_cert,
+    cert => $idp->cert('signing'),
+    param => 'SAMLRequest',
+    # The ssl_url destination for redirect
+    url => $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
+);
 ```
 
 **Note:** This is an odd one.  The cert parameter here is the IdP's signing certificate.
@@ -185,12 +182,12 @@ In Net::SAML2::Binding::Redirect->Verify() the IdP's signing certificate is used
 the creation of the Net::SAML2::Binding::Redirect results in:
 
 ```
-    $VAR1 = bless( {
-        'param' => 'SAMLRequest',
-        'url' => bless( do{\(my $o = 'http://sso.dev.venda.com/opensso/SSORedirect/metaAlias/idp')}, 'URI::http' ),
-        'cert' => [
-            {
-                'signing' => '-----BEGIN CERTIFICATE-----
+$VAR1 = bless( {
+    'param' => 'SAMLRequest',
+    'url' => bless( do{\(my $o = 'http://sso.dev.venda.com/opensso/SSORedirect/metaAlias/idp')}, 'URI::http' ),
+    'cert' => [
+        {
+            'signing' => '-----BEGIN CERTIFICATE-----
 MIIDFTCCAf2gAwIBAgIBATANBgkqhkiG9w0BAQUFADA3MQswCQYDVQQGEwJVUzEO
 MAwGA1UECgwFbG9jYWwxCzAJBgNVBAsMAmN0MQswCQYDVQQDDAJDQTAeFw0xMDEw
 MDYxMjM4MTRaFw0xMTEwMDYxMjM4MTRaMFcxCzAJBgNVBAYTAlVTMQ4wDAYDVQQK
@@ -210,10 +207,10 @@ WPp/0bQqdAAUzkJZPpUGUN1sTXPJexYT6na7XvLd6mvO1g+WDk6aZnW/zcT3T9tL
 Iavyic/p4gZtXckweq+VTn9CdZp6ZTQtVw==
 -----END CERTIFICATE-----
 '
-            }
-                ],
-        'key' => 't/sign-nopw-cert.pem'
-    }, 'Net::SAML2::Binding::Redirect' );
+        }
+    ],
+    'key' => 't/sign-nopw-cert.pem'
+}, 'Net::SAML2::Binding::Redirect' );
 ```
 
 #### key
@@ -233,7 +230,7 @@ The **url** is the the Single Sign On URL that was specified in the Identity Pro
 The URL is created by calling the sign function of the Net::SAML2::Binding::Redirect object with the xml version of the AuthnRequest.
 
 ```
-    my $url = $redirect->sign($authnreq->as_xml);
+my $url = $redirect->sign($authnreq->as_xml);
 
 ```
 The signed URL is that results is:
@@ -249,18 +246,18 @@ At this point the web application needs to redirect the user's browser to the UR
 Using a browser add-on like **SAML Message Decoder** you should be able to view the fields in the SAML2 request that the browser sent.
 
 ```
-    <saml2p:AuthnRequest
-        Destination="http://sso.dev.venda.com/opensso"
-        IssueInstant="2021-02-06T20:07:01Z"
-        ID="NETSAML2_8b051f5fadfc747def3a8972df2c4984"
-        Version="2.0"
-        xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol"
-        xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">
-            <saml2:Issuer>http://localhost:3000</saml2:Issuer>
-            <saml2p:NameIDPolicy
-                Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
-            </saml2p:NameIDPolicy>
-    </saml2p:AuthnRequest>
+<saml2p:AuthnRequest
+    Destination="http://sso.dev.venda.com/opensso"
+    IssueInstant="2021-02-06T20:07:01Z"
+    ID="NETSAML2_8b051f5fadfc747def3a8972df2c4984"
+    Version="2.0"
+    xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol"
+    xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion">
+        <saml2:Issuer>http://localhost:3000</saml2:Issuer>
+        <saml2p:NameIDPolicy
+            Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
+        </saml2p:NameIDPolicy>
+</saml2p:AuthnRequest>
 ```
 
 At this stage it is important for you to have the Service Provider SAML2 settings at the Identity Provider set correctly to match the values sent in the **AuthnRequest**
@@ -308,9 +305,9 @@ The security of SAML2 responses depends on trust in the Identity Provider.  Trus
 ```
 this results in:
 ```
-    $VAR1 = bless( {
-        'cacert' => 't/cacert.pem'
-    }, 'Net::SAML2::Binding::POST' );
+$VAR1 = bless( {
+    'cacert' => 't/cacert.pem'
+}, 'Net::SAML2::Binding::POST' );
 ```
 
 ### Handle the response
@@ -327,7 +324,7 @@ The handle_response() of the Net::SAML2::Binding::POST object processes the resp
 
 handle_response is pretty short but does a couple of important things:
 
-1. Calls XML::Sig to verify the signatures in the $saml_response XML
+1. Calls Net::SAML2::XML::Sig (XML::Sig) to verify the signatures in the $saml_response XML
 2. Verifies that the certificate that signed the XML was signed by the $cacert
 
 ### Get the Assertion from the SAMLResponse XML
@@ -335,9 +332,9 @@ handle_response is pretty short but does a couple of important things:
 The SAMLResponse is base64 encoded XML.  The Net::SAML2::Protocol::Assertion->new_from_xml processes the full XML and create the Net::SAML2::Protocol::Assertion containing the assertion.
 
 ```
-    my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
-        xml => decode_base64($saml_response)
-    );
+my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
+    xml => decode_base64($saml_response)
+);
 ```
 
 ### Validating the Assertion
@@ -349,11 +346,11 @@ As it is a point in time assertion, you need to verify the validity of the NotBe
 For the $saml_request_id you need to retrieve it from wherever it was stored during the creation of the Net::SAML2::Protocol::AuthnRequest.  Foswiki.org SamlLoginContrib for instance had stored it in the user session.
 
 ```
-    my $issuer = $Foswiki::cfg{Saml}{issuer};
-    my $saml_request_id = $this->getAndClearSessionValue('saml_request_id');
+my $issuer = $Foswiki::cfg{Saml}{issuer};
+my $saml_request_id = $this->getAndClearSessionValue('saml_request_id');
 
-    # $assertion->valid() checks the dates and the audience
-    my $valid = $assertion->valid($issuer, $saml_request_id);
+# $assertion->valid() checks the dates and the audience
+my $valid = $assertion->valid($issuer, $saml_request_id);
 ```
 
 The call to $assertion->valid validates the following for the assertion:
@@ -376,24 +373,24 @@ The nameid is the Identity Providers canonical userid that can be considered to 
 An example assertion attributes returned by GSuite could look like:
 
 ```
-    $VAR1 = {
-        'title' => [
-            'Net::SAML2 Maintainer'
-        ],
-        'fname' => [
-            'Timothy'
-         ],
-        'lname' => [
-           'Legge'
-         ],
-        'Email' => [
-           'timlegge@cpan.org'
-         ],
-        'phone' => [
-           '4328675309',
-           '4325551212'
-         ]
-    };
+$VAR1 = {
+    'title' => [
+        'Net::SAML2 Maintainer'
+    ],
+    'fname' => [
+        'Timothy'
+    ],
+    'lname' => [
+        'Legge'
+    ],
+    'Email' => [
+        'timlegge@cpan.org'
+    ],
+    'phone' => [
+        '4328675309',
+        '4325551212'
+    ]
+};
 ```
 The assertion attributes are very specific to the combination of the Identity Provider and the SAML2 configuration.  It can include any user specific values that can be accessed or transformed during the setup.  It can also contain groups.
 
@@ -452,8 +449,6 @@ The following is from Foswiki's SamlLoginContrib function:
 ￼    my $idp = Net::SAML2::IdP->new_from_url(
 ￼        url     => $this->{Saml}{metadata},
 ￼        cacert  => $this->{Saml}{cacert},
-￼        sls_force_lcase_url_encoding => $this->{Saml}{sls_force_lcase_url_encoding},
-￼        sls_double_encoded_response => $this->{Saml}{sls_double_encoded_response}
 ￼    );
 
     my $redirect = Net::SAML2::Binding::Redirect->new(
@@ -461,8 +456,6 @@ The following is from Foswiki's SamlLoginContrib function:
         key => $this->{Saml}{sp_signing_key},
         cert => $idp->cert('signing'),
         param => 'SAMLResponse',
-        sls_force_lcase_url_encoding => $this->{Saml}{sls_force_lcase_url_encoding},
-        sls_double_encoded_response => $this->{Saml}{sls_double_encoded_response}
     );
 
     my ($response, $relaystate) = $redirect->verify($uri);
@@ -498,7 +491,7 @@ The SP needs to create the Net::SAML2::IdP object as is done above (in this case
     );
 
 ```
-Create the Net::SAML2::Binding::Redirect object.  Note the sls_force_lcase_url_encoding is used if the IdP sends a URL that has meen URL encoded with lower case characters %2f instead of %2F.
+Create the Net::SAML2::Binding::Redirect object.
 
 ```
     my $redirect = Net::SAML2::Binding::Redirect->new(
@@ -508,7 +501,6 @@ Create the Net::SAML2::Binding::Redirect object.  Note the sls_force_lcase_url_e
         param => 'SAMLRequest',
         # The ssl_url destination for redirect
         url => $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
-        #sls_force_lcase_url_encoding => 1,
     );
 ```
 Verify signature on the URL, decode the request and retrieve the XML request and RelayState.
@@ -616,7 +608,6 @@ this results in the following XML
           ISvnu1/xomsSS+aenG5toWmhoJIKFbfhQkpnBlgGD5+12Cxn2jHpgv15262ZZIJS
           WPp/0bQqdAAUzkJZPpUGUN1sTXPJexYT6na7XvLd6mvO1g+WDk6aZnW/zcT3T9tL
           Iavyic/p4gZtXckweq+VTn9CdZp6ZTQtVw==
-
           </ds:X509Certificate>
         </ds:X509Data>
       </ds:KeyInfo>
@@ -646,4 +637,3 @@ this results in the following XML
 </md:EntityDescriptor>
 
 ```
-

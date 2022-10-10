@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use namespace::autoclean -also => ['_exp'];
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 use Dist::Zilla::Plugin::PodWeaver;
-use List::Util qw( first );
+use List::Util      qw( first );
 use Module::Runtime qw( use_module );
-use PadWalker qw( peek_sub );
+use PadWalker       qw( peek_sub );
 use Pod::Elemental::Transformer::List;
 use Pod::Elemental::Transformer::Verbatim;
 use Pod::Weaver::Config::Assembler;
@@ -192,7 +192,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<https://www.urth.org/fs-donation.html>.
+button at L<https://houseabsolute.com/foss-donations/>.
 DONATIONS
             ]
         },
@@ -293,7 +293,7 @@ Pod::Weaver::PluginBundle::DROLSKY - A plugin bundle for pod woven by DROLSKY
 
 =head1 VERSION
 
-version 1.20
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -483,7 +483,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2022 by Dave Rolsky.
 
 This is free software, licensed under:
 

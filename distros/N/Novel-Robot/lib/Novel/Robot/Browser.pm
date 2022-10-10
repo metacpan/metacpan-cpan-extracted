@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 0.22;
+#our $VERSION = 0.22;
 
 #use Novel::Robot::Browser::CookieJar;
 use HTTP::CookieJar;
@@ -64,7 +64,7 @@ sub request_url_whole {
   my $html = $self->request_url( $url, $o{post_data} );
 
   my $info      = $o{info_sub}->( \$html )     || {};
-  print "\r$info->{writer}, $info->{book}, $url" if ( $o{verbose} );
+  print "\r$info->{writer}, $info->{book}, $url\n" if ( $o{verbose} );
   #print Dumper('info_sub', $info);
   my $data_list = $o{item_list} || $o{item_list_sub}->( \$html ) || [];
   #print Dumper('data_list_sub', $data_list);
@@ -106,9 +106,9 @@ sub request_url_whole {
 
   if ( $o{item_sub} ) {
     my $item_id = 0;
-  print "\n" if ( $o{verbose} );
+    print "\n\n" if ( $o{term_progress_bar} );
     my $progress;
-    $progress = Term::ProgressBar->new( { count => scalar(@$data_list) } ) if ( $o{verbose} );
+    $progress = Term::ProgressBar->new( { count => scalar(@$data_list) } ) if ( $o{term_progress_bar} );
     for my $r ( @$data_list ) {
       $r->{id} //= ++$item_id;
       $r->{url} = URI->new_abs( $r->{url}, $url )->as_string;
@@ -125,10 +125,11 @@ sub request_url_whole {
       }else{
           $r = $o{item_sub}->( $r );
       }
-           $progress->update( $item_id ) if ( $o{verbose} );
+           $progress->update( $item_id ) if ( $o{term_progress_bar} );
     }
-   $progress->update( scalar(@$data_list) ) if ( $o{verbose} ); 
+   $progress->update( scalar(@$data_list) ) if ( $o{term_progress_bar} ); 
   }
+  print "\n\n" if ( $o{term_progress_bar} );
   return ( $info, $data_list );
 } ## end sub request_url_whole
 

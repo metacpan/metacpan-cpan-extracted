@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Binding::POST;
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 use Moose;
 
@@ -11,6 +11,8 @@ use Moose;
 use Net::SAML2::XML::Sig;
 use MIME::Base64 qw/ decode_base64 /;
 use Crypt::OpenSSL::Verify;
+
+with 'Net::SAML2::Role::VerifyXML';
 
 
 has 'cert_text' => (isa => 'Str', is => 'ro');
@@ -22,27 +24,19 @@ sub handle_response {
 
     # unpack and check the signature
     my $xml = decode_base64($response);
-    my $xml_opts = { x509 => 1 };
-    $xml_opts->{ cert_text } = $self->cert_text if ($self->cert_text);
-    $xml_opts->{ exclusive } = 1;
-    $xml_opts->{ no_xml_declaration } = 1;
-    my $x = Net::SAML2::XML::Sig->new($xml_opts);
-    my $ret = $x->verify($xml);
-    die "signature check failed" unless $ret;
 
-    if ($self->cacert) {
-        my $cert = $x->signer_cert
-            or die "Certificate not provided and not in SAML Response, cannot validate";
+    $self->verify_xml(
+        $xml,
+        no_xml_declaration => 1,
+        $self->cert_text ? (
+            cert_text => $self->cert_text
+        ) : (),
+        $self->cacert ? (
+            cacert => $self->cacert
+        ) : (),
 
-        my $ca = Crypt::OpenSSL::Verify->new($self->cacert, { strict_certs => 0, });
-        if ($ca->verify($cert)) {
-            return sprintf("%s (verified)", $cert->subject);
-        } else {
-            return 0;
-        }
-    }
-
-    return 1;
+    );
+    return $xml;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -59,7 +53,7 @@ Net::SAML2::Binding::POST - Net::SAML2::Binding::POST - HTTP POST binding for SA
 
 =head1 VERSION
 
-version 0.59
+version 0.61
 
 =head1 SYNOPSIS
 

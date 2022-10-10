@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 99-cleanup.t 1815 2020-10-14 21:55:18Z willem $ -*-perl-*-
+# $Id: 99-cleanup.t 1880 2022-10-04 13:42:34Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -16,3 +16,4 @@ unlink("t/IPv6.disabled")   if ( -e "t/IPv6.disabled" );
 ok( 1, "Dummy" );
 
 
+exit;

@@ -27,16 +27,16 @@ no_index:
 provides:
   Date::ManipX::Almanac:
     file: lib/Date/ManipX/Almanac.pm
-    version: '0.002'
+    version: '0.003'
   Date::ManipX::Almanac::Date:
     file: lib/Date/ManipX/Almanac/Date.pm
-    version: '0.002'
+    version: '0.003'
   Date::ManipX::Almanac::Lang:
     file: lib/Date/ManipX/Almanac/Lang.pm
-    version: '0.002'
+    version: '0.003'
   Date::ManipX::Almanac::Lang::english:
     file: lib/Date/ManipX/Almanac/Lang/english.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Astro::Coord::ECI: '0.119'
   Astro::Coord::ECI::Moon: '0.119'
@@ -58,5 +58,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Date-ManipX-Almanac
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Date-ManipX-Almanac.git
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
