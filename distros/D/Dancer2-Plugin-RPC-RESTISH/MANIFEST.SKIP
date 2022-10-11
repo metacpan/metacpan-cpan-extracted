@@ -1,0 +1,10 @@
+\.git.*
+local/
+MYMETA\..+
+\.swp
+cpanfile.snapshot
+Makefile$
+blib/
+pm_to_blib
+cover_db/
+example/example\.

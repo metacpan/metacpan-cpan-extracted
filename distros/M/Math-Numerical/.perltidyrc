@@ -1,0 +1,61 @@
+# The reference for all the formatting options is at:
+# https://metacpan.org/pod/distribution/Perl-Tidy/bin/perltidy#FORMATTING-OPTIONS
+
+# Basic options
+
+--character-encoding=utf8
+--output-line-ending=unix
+
+# Code indentation
+
+--indent-columns=2
+--maximum-line-length=80
+# --variable-maximum-line-length
+--continuation-indentation=4
+--extended-continuation-indentation
+--nooutdent-long-lines                # Even long lines are indented.
+
+# Whitespace
+
+--paren-tightness=2                   # no spaces inside parens.
+--keyword-paren-inner-tightness=2     # no spaces inside parens even for specific keywords.
+--square-bracket-tightness=2          # no spaces inside square brackets [].
+--brace-tightness=2                   # spaces inside braces {} when they contain more than a single tocken.
+--block-brace-tightness=0             # always put spaces inside braces that contain code block.
+--nospace-for-semicolon               # no spaces before semicolons ; in for loops.
+--nofunction-paren-vertical-alignment # Useless without the --space-function-paren option, but in any case we would not want this.
+--space-prototype-paren=2             # Always put spaces before a function prototype (and, I guess, a function signature).
+--logical-padding                     # Possibly indent the first line of a multi-line operation.
+--trim-pod
+--minimum-space-to-comment=2
+--nowant-left-space="."               # No spaces before the '.' operator.
+--nowant-right-space="."              # No spaces after the '.' operator.
+--space-after-keyword="require defined"  # Add a space between these keywords and a following openning paren.
+
+# Comments
+
+--ignore-side-comment-lengths         # Do not break in the middle of a line of code, because of the length of a comment at the end of that line.
+--closing-side-comment-interval=15    # Don’t add closing side comment for blocks of less than 15 lines.
+--closing-side-comment-list="sub BEGIN END package" # Only add closing side comments for these types of blocks.
+--closing-side-comment-maximum-text=30
+
+# Line break
+
+--cuddled-else                        # 'else' are on the line of the previous closing brace.
+--noopening-brace-on-new-line         # Opening braces on the line of their keywords (this is actually the default).
+--opening-brace-always-on-right       # Opening braces at the right of the line even if there isn’t enough space for it.
+--opening-token-right                 # braces, parens, and brackets on the right after a comma.
+#--stack-opening-tokens          # ??? # Several opening tokens are on the same lines (can be controlled per type of tokens if needed).
+--comma-arrow-breakpoint=5            # Control how hash are indented. 5 is the default.
+--paren-vertical-tightness-closing=3  # Break before a closing paren except in a hash constructior.
+--square-bracket-vertical-tightness-closing=0  # Break before a closing square bracket.
+--brace-vertical-tightness-closing=0  # Break before a closing brace.
+# It might be interesting to play with -wn and -wnxl but creating a good config will probably be difficult.
+
+# Blank line
+--noblanks-before-comments            # No empty lines before a comment.
+
+# Vertical alignment
+# Unfortunately we can’t control vertical alignment depending on the context. So let’s disable it for now.
+# Feature request for more control: https://rt.cpan.org/Ticket/Display.html?id=136416
+-novalign

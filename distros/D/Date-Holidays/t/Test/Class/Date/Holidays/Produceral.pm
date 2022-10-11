@@ -6,7 +6,7 @@ use base qw(Test::Class);
 use Test::More;
 use Date::Holidays::Produceral qw(holidays is_holiday);
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 my $day   = 24;
 my $month = 12;

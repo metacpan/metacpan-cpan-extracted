@@ -3,7 +3,7 @@ package Geo::Gpx;
 use warnings;
 use strict;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Carp;
 use DateTime::Format::ISO8601;
@@ -43,7 +43,7 @@ Geo::Gpx - Create and parse GPX files.
 =head1 DESCRIPTION
 
 The original goal of this module was to produce GPX/XML files which were
-parseable by both GPX Spinner and EasyGPS. As of version 0.13 it has
+parsable by both GPX Spinner and EasyGPS. As of version 0.13 it has
 been extended to support general parsing and generation of GPX data. GPX
 1.0 and 1.1 are supported.
 
@@ -87,10 +87,6 @@ my @ATTR;
 BEGIN {
   @META = qw( name desc author time keywords copyright link );
   @ATTR = qw( tracks routes version );
-  # @ATTR = qw( waypoints tracks routes version );
-  # TODO:
-  # . should probably create a sub as well for tracks and routes, look into it
-  # . add back any item we remove from @ATTR to the list in TO_JSON()
 
   # Generate accessors
   for my $attr ( @META, @ATTR ) {
@@ -693,7 +689,7 @@ Generate GPX XML.
   my $gpx11 = $gpx->xml( '1.1' );
 
 If the version is omitted it defaults to the value of the C<version>
-attibute. Parsing a GPX document sets the version. If the C<version>
+attribute. Parsing a GPX document sets the version. If the C<version>
 attribute is unset defaults to 1.0.
 
 C<Geo::Gpx> version 0.10 used L<Geo::Cache> to render each of the
@@ -806,7 +802,7 @@ sub xml {
 
 =head2 C<TO_JSON>
 
-For compatability with L<JSON> modules. Converts this object to a hash
+For compatibility with L<JSON> modules. Converts this object to a hash
 with keys that correspond to the above methods. Generated ala:
 
   my %json = map { $_ => $self->$_ }
@@ -1069,7 +1065,7 @@ like this:
 
   $gpx->routes($routes);
 
-Each of the points in a route may have any of the atttibutes that are
+Each of the points in a route may have any of the attributes that are
 legal for a waypoint.
 
 =head2 C<tracks( [ $newtracks ] )>
@@ -1193,11 +1189,11 @@ This version by Patrick Joly C<< <patjol@cpan.org> >>.
 
 =head1 VERSION
 
-$VERSION = '1.01'
+1.02
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2007-2009, Andy Armstrong C<< <andy@hexten.net> >>. All
+Copyright (c) 2004-2022, Andy Armstrong C<< <andy@hexten.net> >>, Patrick Joly C<< patjol@cpan.org >>. All
 rights reserved.
 
 This module is free software; you can redistribute it and/or

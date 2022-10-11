@@ -1,0 +1,151 @@
+NAME
+    Org::To::ANSIText - Export Org document to text with ANSI color codes
+
+VERSION
+    This document describes version 0.001 of Org::To::ANSIText (from Perl
+    distribution Org-To-ANSIText), released on 2022-10-11.
+
+SYNOPSIS
+     use Org::To::ANSIText qw(org_to_ansi_text);
+
+     # non-OO interface
+     my $res = org_to_ansi_text(
+         source_file   => 'todo.org', # or source_str
+         #target_file  => 'todo.txt', # default is to return the text in $res->[2]
+         #include_tags => [...], # default exports all tags.
+         #exclude_tags => [...], # behavior mimics emacs's include/exclude rule
+     );
+     die "Failed" unless $res->[0] == 200;
+
+     # OO interface
+     my $oea = Org::To::ANSIText->new();
+     my $text = $oea->export($doc); # $doc is Org::Document object
+
+DESCRIPTION
+    Export Org format to ANSI text (text with ANSI escape codes). To
+    customize, you can subclass this module.
+
+    A command-line utility org-to-ansi-text is available in the distribution
+    App::OrgUtils.
+
+new(%args)
+  $exp->export_document($doc) => text
+    Export document to text.
+
+FUNCTIONS
+  org_to_ansi_text
+    Usage:
+
+     org_to_ansi_text(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Export Org document to text with ANSI color codes.
+
+    This is the non-OO interface. For more customization, consider
+    subclassing Org::To::ANSIText.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   exclude_tags => *array[str]*
+
+        Exclude trees that carry one of these tags.
+
+        If the whole document doesn't have any of these tags, then the whole
+        document will be exported. Otherwise, trees that do not carry one of
+        these tags will be excluded. If a selected tree is a subtree, the
+        heading hierarchy above it will also be selected for export, but not
+        the text below those headings.
+
+        exclude_tags is evaluated after include_tags.
+
+    *   ignore_unknown_settings => *bool*
+
+    *   include_tags => *array[str]*
+
+        Include trees that carry one of these tags.
+
+        Works like Org's 'org-export-select-tags' variable. If the whole
+        document doesn't have any of these tags, then the whole document
+        will be exported. Otherwise, trees that do not carry one of these
+        tags will be excluded. If a selected tree is a subtree, the heading
+        hierarchy above it will also be selected for export, but not the
+        text below those headings.
+
+    *   source_file => *str*
+
+        Source Org file to export.
+
+    *   source_str => *str*
+
+        Alternatively you can specify Org string directly.
+
+    *   target_file => *str*
+
+        Text file to write to.
+
+        If not specified, text string will be returned.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+ATTRIBUTES
+METHODS
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Org-To-ANSIText>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Org-To-ANSIText>.
+
+SEE ALSO
+    Org::Parser
+
+    org-to-ansi-text
+
+    Other Org exporters: Org::To::Text, Org::To::HTML, Org::To::VCF.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Org-To-ANSIText>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

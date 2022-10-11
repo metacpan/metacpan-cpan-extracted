@@ -21,7 +21,7 @@ on test => sub {
     requires 'Test::Class', 0;
     requires 'Test::More', 0;
     requires 'FindBin', 0;
-    requires 'Test::MockModule', 0;
+    requires 'Test::MockModule', '0.13';
     requires 'Test::Pod::Coverage', 0;
     requires 'Test::Kwalitee', '1.21';
     requires 'Test::Fatal', 0;

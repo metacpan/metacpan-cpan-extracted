@@ -404,11 +404,14 @@ sub Unwatch {
 
 }    # end Unwatch
 
-# Watch private methods.
+=head2 base_watch
+
+Watch base class constructor invoked by other Watch modules.
+
+=cut
 
 sub base_watch {
 
-    # Watch base class constructor invoked by other Watch modules.
 
     my ( $class, %args ) = @_;
     my $watch_obj = {%args};
@@ -416,17 +419,21 @@ sub base_watch {
 
 }    # end base_watch
 
-sub callback {
+=head2 callback
 
-    # Execute a Watch callback, either the default or user specified.
-    # Note that the arguments are those supplied by the tied method,
-    # not those (if any) specified by the user when the watch object
-    # was instantiated.  This is for performance reasons, and why the
-    # Args() method exists.
-    #
-    # $_[0] = self
-    # $_[1] = callback type
-    # $_[2] through $#_ = tied arguments
+ Execute a Watch callback, either the default or user specified.
+ Note that the arguments are those supplied by the tied method,
+ not those (if any) specified by the user when the watch object
+ was instantiated.  This is for performance reasons, and why the
+ Args() method exists.
+
+ $_[0] = self
+ $_[1] = callback type
+ $_[2] through $#_ = tied arguments
+
+=cut
+
+sub callback {
 
     &{ $_[0]->{ $_[1] }->[0] }( $_[0], @_[ 2 .. $#_ ] );
 

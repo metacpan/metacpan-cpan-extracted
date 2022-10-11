@@ -39,12 +39,12 @@ my %WriteMakefileArgs = (
     "Test::Class" => 0,
     "Test::Fatal" => 0,
     "Test::Kwalitee" => "1.21",
-    "Test::MockModule" => 0,
+    "Test::MockModule" => "0.13",
     "Test::More" => 0,
     "Test::Pod" => 0,
     "Test::Pod::Coverage" => 0
   },
-  "VERSION" => "1.33",
+  "VERSION" => "1.34",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,7 +69,7 @@ my %FallbackPrereqs = (
   "Test::Class" => 0,
   "Test::Fatal" => 0,
   "Test::Kwalitee" => "1.21",
-  "Test::MockModule" => 0,
+  "Test::MockModule" => "0.13",
   "Test::More" => 0,
   "Test::Pod" => 0,
   "Test::Pod::Coverage" => 0,

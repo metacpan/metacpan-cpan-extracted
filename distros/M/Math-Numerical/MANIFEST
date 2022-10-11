@@ -1,8 +1,14 @@
+.aspelldict
+.perlcriticrc
+.perltidyrc
 Changes
 lib/Math/Numerical.pm
 LICENSE
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
+t/00-perl-critic.t
+t/00-pod-syntax.t
+t/00-spelling.t
 t/bracket.t
 t/find_root.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -1,0 +1,16 @@
+#
+# Some MX servers are still allowing underscore inside of the domain part
+# of the email address.
+# Meanwhile, DNS servers forbidden usage of the underscore by default
+# nowadays.
+#
+# Until 09.10.2022 libeav had allowed underscores by default; now they
+# are forbidden. The behaviour may be changed at compile time by
+# passing the option LABELS_ALLOW_UNDERSCORE = ON|OFF to 'make' command.
+#
+# Note that the idnkit2's function
+#   idn_res_encodename(ctx, IDN_ENCODE_REGIST, ...)
+# does NOT allow underscores too, but libeav is using this function only
+# when RFC 6531 mode is on.
+#
+underscores@old_days.example.net

@@ -19,7 +19,7 @@ my %module_build_args = (
     "Jonas B. <jonasbn\@cpan.org>"
   ],
   "dist_name" => "Date-Holidays",
-  "dist_version" => "1.33",
+  "dist_version" => "1.34",
   "license" => "artistic_2",
   "module_name" => "Date::Holidays",
   "recursive_test_files" => 1,
@@ -43,7 +43,7 @@ my %module_build_args = (
     "Test::Class" => 0,
     "Test::Fatal" => 0,
     "Test::Kwalitee" => "1.21",
-    "Test::MockModule" => 0,
+    "Test::MockModule" => "0.13",
     "Test::More" => 0,
     "Test::Pod" => 0,
     "Test::Pod::Coverage" => 0
@@ -61,7 +61,7 @@ my %fallback_build_requires = (
   "Test::Class" => 0,
   "Test::Fatal" => 0,
   "Test::Kwalitee" => "1.21",
-  "Test::MockModule" => 0,
+  "Test::MockModule" => "0.13",
   "Test::More" => 0,
   "Test::Pod" => 0,
   "Test::Pod::Coverage" => 0

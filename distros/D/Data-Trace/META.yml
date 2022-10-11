@@ -19,12 +19,12 @@ provides:
     version: '1.302'
   Data::Trace:
     file: lib/Data/Trace.pm
-    version: '0.07'
+    version: '0.10'
 requires:
   Data::DPath: '0.58'
 resources:
   bugtracker: https://github.com/poti1/data-trace/issues
   license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: https://github.com/poti1/data-trace
-version: '0.07'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

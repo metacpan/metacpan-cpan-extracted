@@ -14,6 +14,19 @@ my $testnum = 0;
 my $eav = EAV::XS->new();
 ok (defined $eav, "new EAV::XS");
 
+
+# This is a workaround for libidn. It depends on CHARSET environment
+# variable ... no comments!!!
+if (!$eav->is_email('иван@иванов.рф') &&
+    $eav->get_error() eq 'Character encoding conversion error' &&
+    !(exists($ENV{'CHARSET'}) && $ENV{'CHARSET'})) {
+    diag('probably I have found libidn/CHARSET issue, trying to fix...');
+    $ENV{'CHARSET'} = 'utf-8';
+    $ENV{'CHARSET'} = 'UTF-8' if !$eav->is_email('иван@иванов.рф');
+    delete $ENV{'CHARSET'} if !$eav->is_email('иван@иванов.рф');
+}
+
+
 # valid emails
 {
     ok (open(my $fh, "<", 't/check-pass.txt'), "open t/check-pass.txt");

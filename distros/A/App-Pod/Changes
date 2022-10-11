@@ -1,5 +1,7 @@
 Revision history for App-pod
 
+0.29
+        Added new git flow.
 0.28    2022-10-01 - Updated Changes
 0.27    2022-10-01 - Added bugtracker resources.
         Removed File::HomeDir as a Build.PL dependancy.

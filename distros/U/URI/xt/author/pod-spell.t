@@ -31,6 +31,7 @@ Fiegehenn
 Fredric
 Förtsch
 Gisle
+Graham
 Herzog
 Heuristic
 Honma
@@ -49,6 +50,7 @@ Karen
 Karr
 Kenichi
 Kent
+Knop
 Koster
 Lawrence
 Mac
@@ -126,6 +128,7 @@ ftp
 gerard
 gisle
 gopher
+haarg
 happy
 hiratara
 http

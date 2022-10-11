@@ -19,6 +19,11 @@
             "Module::Build" : "0.4004"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "9.27"
+         }
+      },
       "test" : {
          "requires" : {
             "Test::More" : "0"
@@ -40,15 +45,21 @@
       },
       "TimTools" : {
          "file" : "lib/TimTools.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/poti1/timtools/issues"
+      },
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/poti1/timtools"
+      }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

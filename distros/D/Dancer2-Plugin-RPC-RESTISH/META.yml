@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - 'Abe Timmerman <abeltje@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::Simple: '0.88'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.5502'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-RPC-RESTISH
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer2::Plugin::RPC: 2.01_02
+  perl: '5.010001'
+resources:
+  homepage: https://github.com/abeltje/Dancer2-Plugin-RPC-RESTISH
+  repository: git://github.com:abeltje/Dancer2-Plugin-RPC-RESTISH.git
+version: '2.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

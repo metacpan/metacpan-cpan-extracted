@@ -2,9 +2,9 @@ bin/bashrc_pod
 bin/pod
 Build.PL
 Changes
-cpanfile
 lib/App/Pod.pm
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.json
 META.yml
 README

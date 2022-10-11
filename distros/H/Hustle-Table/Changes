@@ -1,5 +1,22 @@
 Revision history for Perl extension Hustle::Table
 
+0.5.5 	Wed 17 Aug 2022 15:14:43 AEST
+	- Added subroutine matching type. A CODE ref can be used to match the input.
+	  Called with the input as the first argument and a reference to the entry value
+	  as the second element
+
+	- Fixed bug where default matcher could not be updated with hash or array via
+	  the add method. An exuberant croak test/call prevented the adding of
+	  an entry when the matcher was 'undef'. An undef matcher actually
+	  represents the default matcher (match any). Prior to this fix only
+	  explicit set_default method would update default matcher.
+
+	- Fixed documentation around required elements when adding via array
+	  ref should take 3 elements. Was listed as 6
+
+	- Reduced scope creation for more performance improvements
+	
+
 0.5.4 	Thu 28 Jul 2022 21:40:32 AEST
 	- Performance improvements
 		- Dispatcher no longer returns an ref to an empty array

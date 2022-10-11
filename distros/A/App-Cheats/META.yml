@@ -16,10 +16,12 @@ name: App-Cheats
 provides:
   App::Cheats:
     file: lib/App/Cheats.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   TimTools: '0.04'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
-version: '0.05'
+  bugtracker: https://github.com/poti1/app-cheats/issues
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: https://github.com/poti1/app-cheats
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

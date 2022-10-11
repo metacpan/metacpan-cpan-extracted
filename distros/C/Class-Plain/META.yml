@@ -19,7 +19,7 @@ name: Class-Plain
 provides:
   Class::Plain:
     file: lib/Class/Plain.pm
-    version: '0.05'
+    version: '0.06'
   Class::Plain::Base:
     file: lib/Class/Plain/Base.pm
   Class::Plain::Document::Cookbook:
@@ -31,5 +31,5 @@ requires:
   perl: '5.016'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

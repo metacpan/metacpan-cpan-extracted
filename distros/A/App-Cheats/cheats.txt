@@ -6,6 +6,15 @@
 
 
 #############################################################
+## ADB - OnePlus
+#############################################################
+
+# Connect to phone and fix file permissions. (oneplus)
+adb shell
+su
+chmod 777 /data/data
+
+#############################################################
 ## Android
 #############################################################
 
@@ -1516,7 +1525,7 @@ h1::before {
 ## CSS - Debug
 #############################################################
 
-# Show the element placement/postion (css,color)
+# Show the element placement/position (css,color)
 # Debug html/table
 * { border: 1px dashed blue }
 
@@ -1798,6 +1807,59 @@ docker compose logs -f --tail 200
 #############################################################
 
 # FontForge program can update a .ttf file pixmap
+
+
+#############################################################
+## FTP Server/Client
+#############################################################
+
+# Create an ftp server on ubuntu.
+https://linuxconfig.org/how-to-setup-and-use-ftp-server-in-ubuntu-linux
+# 1. Install
+sudo apt install vsftpd
+#
+# 2. backup original /etc/vsftpd.conf
+#
+# 3. Update /etc/vsftpd.conf
+write_enable=YES                 # Dont forget THIS!
+local_root=/home/$USER           # Not needed?
+local_umask=002
+chroot_local_user=YES
+pasv_enable=Yes
+pasv_min_port=10000
+pasv_max_port=10100
+allow_writeable_chroot=YES
+#
+# 4. Allow ftp through firewall.
+#
+# 5. Restart ftp daemon.
+sudo systemctl restart vsftpd
+#
+# 6. Create a dedicated ftp user account.
+sudo useradd -m ftpuser
+sudo passwd ftpuser
+#
+# 7. Append group to current user
+sudo usermod -a -G ftpuser $USER
+#
+# 8. Apply new group.
+sudo su $USER
+
+# Test ftp client on ubuntu.
+sudo apt install ftp
+ftp://127.0.0.1/test.html
+
+# Check firewall rules (ubuntu).
+sudo ufw status verbose
+
+# Enable firewall (ubuntu).
+sudo ufw enable
+
+# Allow ftp through firewall.
+sudo ufw allow from any to any port 20,21,10000:10100 proto tcp
+
+# Monitor file transfer activity.
+sudo tail -f /var/log/vsftpd.log
 
 
 #############################################################
@@ -2164,7 +2226,12 @@ sudo apt-get purge --auto-remove <package>
 
 # Add packages to apt-get install list
 apt edit-sources		# similar to: vi /etc/apt/sources.list
+deb [trusted=yes] http://ftp2.de.debian.org/debian/ stable main contrib
 apt-get update
+
+# Apt update has many 404 errors.
+# Fix with:
+sudo apt dist-upgrade.
 
 
 #############################################################
@@ -2521,6 +2588,10 @@ find . -name "*.h" -printf '%h\n'
 find . -name "*.h" -exec dirname {} ';'
 find . -name "*.h" -exec dirname {} \;
 
+# Using a variable to define the find string.
+n="-name *.pm";   find . $n     # Works.
+n="-name '*.pm'"; find . $n     # Looks correct, but does NOT work!
+
 # Find all git directories from current location
 find . -name .git -type d | xargs -I{}  readlink -f {} | perl -ple 's#^/\w+##; s#/\.git$##'
 
@@ -2865,6 +2936,9 @@ asdf1234
 asdf1234
 sudo make -C /var/yp
 
+# Change root password
+sudo passwd root
+
 # Reset password in a script with no prompt (change)
 # Can only supply one user to "passwd"
 echo asdf1234 | sudo passwd xbe4092 --stdin; sudo make -C /var/yp
@@ -2998,6 +3072,29 @@ rsnapshot -t weekly
 
 # Copy/Sync entire directories
 rsync -avh FROM TO
+
+# Show what rsync would do with actually doing it.
+rsync -avh --dry-run FROM TO
+
+# Copy/Sync entire directories (OnePlus Backup)
+time rsync \
+   -ah \
+   --info="progress2" \
+   --stats \
+   --delete \
+   --delete-delay \
+   --delete-excluded \
+   --delay-updates \
+   --exclude=".tubemate/" \
+   --exclude="Android/" \
+   --exclude="Alarms/" \
+   --exclude="APK Extractor/" \
+   --exclude="Audiobooks/" \
+   --exclude="n7player/" \
+   --exclude="Movies/" \
+   --exclude="Pictures/.thumbnails/" \
+   --log-file="$new.log" \
+   "$src/" "$new/"
 
 # Copy/Sync entire directories including the folder structure
 rsync -R FROM TO
@@ -3213,6 +3310,9 @@ ls -1d [Ee]* | sort -f
 
 # View the number of hard links to a file or folder
 stat -c %h /run
+
+# View the group id (GID) of a file.
+stat -c %g ~/.vimrc
 
 
 #############################################################
@@ -3598,6 +3698,9 @@ sudo usermod -d /home4/xbe4092 -m xbe4092
 # Current user would need to log out and in again
 # for changes to take effect.
 sudo usermod -a -G GROUP_NAME USER
+#
+# A way to temporarily apply new group.
+sudo su $USER
 
 
 #############################################################
@@ -3853,6 +3956,7 @@ echo ~SOME_USER | perl -lne 'print for -M,-C,-A'
 # View how many processors are on a machine/bench
 cat proc/cpuinfo
 cat /proc/cpuinfo | perl -ln0777e "print ~~split qq(\n\n)"
+nproc
 
 # Find out the service tag code of a machine (Bob)
 # That is the same as the serial number
@@ -3861,6 +3965,9 @@ cat /proc/cpuinfo | perl -ln0777e "print ~~split qq(\n\n)"
 
 # Find out easily how many cpu there are (a command)
 lscpu
+
+# Check if using intel or AMD. (linux)
+lscpu | grep 'Vendor ID'
 
 # Add module to kernel (DES,UI,insert,library)
 insmod /lib/modules/2.6.11/kernel/fs/fat/fat.ko
@@ -3996,6 +4103,14 @@ lsb_release -a
 
 # Show which debian version name machine is (such as wheezy) (Added: 2017-10-05 11:26:48 AM)
 lsb_release -cs
+
+
+#############################################################
+# Linux Startup
+#############################################################
+
+# Prevent a program from starting on Ubuntu during boot.
+# Click on “Startup Application” and launch Startup Program Preference.
 
 
 #############################################################
@@ -4172,6 +4287,7 @@ figlet "svn update" -f slant -r -w 60
 #############################################################
 
 # Example of using autocompletion (tab)
+/usr/share/bash-completion/completions/perltidy
 /usr/share/bash-completion/completions/perl
 /usr/share/bash-completion/completions/ip
 
@@ -4234,6 +4350,9 @@ _otrs_module_install__tab(){
    # echo "COMPREPLY     = [${COMPREPLY[@]}]"
 }
 complete -F _otrs_module_install__tab otrs_module_install
+
+# Manually run bash tab completion
+compgen -W "abc abdd afg" -- ab
 
 
 #############################################################
@@ -4331,6 +4450,20 @@ if [[ ! -z $msg ]]; then echo "A"; fi
 # Read from either PIPE or from standard input STDIN (in Bash. 0 is STDIN)
 [ -t 0 ] && echo "A"
 cat file | [ -t 0 ] && echo "A"
+
+# Read from either PIPE or from standard input STDIN (in Bash. 0 is STDIN)
+if [ -t 0 ]; then    # RIGHT side
+    list=( "$@" )
+else                 # LEFT side (PIPE)
+    list=($(cat -))
+fi
+
+# Detect if piped result.
+local piped
+# Pipe (from grep).
+if [ -p /dev/stdin ]; then
+    piped=($(cat -))
+fi
 
 
 #############################################################
@@ -4786,16 +4919,19 @@ git rm -r folder1
 # Revert untracked changes
 git checkout -- *
 
+# Checkout a single file form another branch,
+git checkout MY_BRANCH -- MY_FILE
+
 # Remove untracked files and directories
 git clean -fd
 
 # Remove untracked files and directories (úsing not standard ignore rules)
 git clean -xfd
 
-# Stop tracking a certain file (will NOT remove file)
+# Stop tracking a certain file (will NOT remove file, forget)
 git rm --cached file1
 
-# Stop tracking a certain directory (will NOT remove directory)
+# Stop tracking a certain directory (will NOT remove directory, forget)
 git rm --cached -r directory1
 
 # fatal: Pathspec 'dir1' is in submodule 'dir2'
@@ -4836,6 +4972,13 @@ git diff :old new
 cat ~/junk/exceptions | while read n; do ls -l $n~ $n; done
 cat ~/junk/exceptions | while read n; do diff $n~ $n -qs; done
 cat ~/junk/exceptions | while read n; do git diff $n~ $n; done
+
+# Setup vimdiff as the default difftool
+git config --global diff.tool vimdiff
+git config --global difftool.prompt false
+
+# Use vimdiff for seeing changes in git
+git difftool commit1 commit2 file
 
 
 #############################################################
@@ -4990,6 +5133,16 @@ git push --no-verify --mirror
 
 # warning: There are too many unreachable loose objects; run 'git prune' to remove them.
 git gc
+
+# Clean the git repo removing large objects in the history.
+# Note: THIS IS DESTRUCTIVE!!!
+#
+# https://netdevops.me/2021/remove-binaries-and-big-files-from-git-repo/
+git filter-repo --strip-blobs-bigger-than 3M
+pip3 install git-filter-repo
+#
+# Need to set this again
+git remote add origin <PATH>
 
 
 #############################################################
@@ -5148,6 +5301,39 @@ git pull origin master
 
 
 #############################################################
+## GPG Encryption (PGP Key)
+#############################################################
+
+# Generate a PGP key
+gpg --gen-key
+
+# Create a PGP signed file
+gpg -ea -r "YOUR_NAME" > $HOME/.pause
+user USER
+password Pas$word
+
+# Show your PGP keys (list)
+gpg -k
+
+# Decrypt a PGP signed file.
+gpg -d ~/.pause
+
+# Cache password in agent.
+# Some reason this fixed caching.
+gpgconf --kill gpg-agent
+
+# Share GPG keys (export from one, import in another machine).
+gpg --export-secret-key -a > secretkey.asc
+gpg --import secretkey.asc
+
+# Warning: It is NOT certain that the key belongs to the person named.
+gpg --edit-ḱeys YOUR_NAME
+trust
+5
+yes
+
+
+#############################################################
 ## HTML Attribute - href
 #############################################################
 
@@ -5165,6 +5351,14 @@ git pull origin master
 	<h1>All details start here</h1>
 	<p>and continue till the end</p>
 </details>
+
+
+#############################################################
+## HTML Unicode
+#############################################################
+
+# HTML Unicode. ZERO WIDTH SPACE.
+&#8203;     // e2808b
 
 
 #############################################################
@@ -5197,6 +5391,14 @@ document.querySelector('#id').insertAdjacentHTML('beforeEnd', to_add)
 #
 # Use this to allow using script tags
 $(id).append(details_rc);
+
+# Stack trace in javascript (js).
+try {
+    // Code throwing an exception
+    throw new Error();
+} catch(e) {
+    console.log(e.stack);
+}
 
 
 #############################################################
@@ -5564,6 +5766,10 @@ elements.map((element) => {
 d = new Date();
 d.setHours( ... [8, 0] );
 d.setHours( ... '08:00'.split(':') )
+
+# Call a javascript function with the scope/this of
+an specific object.
+MyFunc.call(myObj)
 
 
 #############################################################
@@ -7803,6 +8009,43 @@ perl -MBenchmark=cmpthese -E 'my @n = 1..10000; cmpthese(10000, {string => sub{"
 # # Same as this:
 # cmpthese(100_000_000, $ways);
 
+# Example of benchmarking code in perl.
+# Comparing normal substitution to similar one, but with an eval (/e).
+# use warnings;
+# use strict;
+# use Benchmark qw(cmpthese);
+#
+# my $data=<<HERE;
+# Data1
+# Data2
+# START
+# skip
+# ok1
+# ok2
+# STOP
+# Data3
+# Data4
+# START
+# ok3
+# ok4
+# STOP
+# Data5
+# HERE
+#
+# my $ways = {
+#     normal => sub {
+#         $data =~ s{ ( ^ \s* START \n skip .+? STOP \s* ) }{}xmsgr,
+#     },
+#     eval => sub {
+#         $data =~ s{ ( ^ \s* START .*? STOP \s* \n ) }{
+#             local $_ = $1;
+#             /skip/ ? "" : $_;
+#         }xmsger,
+#     },
+# };
+#
+# cmpthese( 3_000_000, $ways);
+
 
 #############################################################
 ## Perl Bugs
@@ -7963,7 +8206,7 @@ cat /etc/passwd| perl -F: -ane 'print "@F"'
 # Print first argument (with debugging)
 echo "abc" | perl -MO=Deparse -le '<> =~ /(b)/; print $1'
 
-# Print first argument if match found 
+# Print first argument if match found
 echo "abc" | perl -lne 'print $1 if /(.b.)/'
 
 # Print first argument (with debugging. same but better)
@@ -7975,10 +8218,10 @@ echo "abc-def-hij" | perl -lne '@a=/\w+/g; print "@a[2,1,0]"'
 # Join all elements found with a different delimeter
 echo "abc-def-hij" | perl -lne '@a=/\w+/g; $"=","; print "@a[2,1,0]"'
 
-# Extract columns from PDF like format 
+# Extract columns from PDF like format
 cat data3.txt | perl -lpe 's/(?<=\()\s+//' | perl -alne 'print if @F == 3' | perl -lpe 's/\s+/,/g' > data3.csv
 
-# Sort columns by field 5 (who) 
+# Sort columns by field 5 (who)
 who | perl -le 'chomp(@a=<>); print for map{$_->[0]} sort{$a->[1] cmp $b->[1]} map{[$_,(split " ")[5]]} @a'
 who |sort -k 5
 
@@ -8193,7 +8436,19 @@ perl -le '($what,$where,$howmuch)=@ARGV; print unpack "x$where A$howmuch", $what
 
 
 #############################################################
-## Perl Regular Expressions
+## Perl PAUSE Account
+#############################################################
+
+# Upload to pause server without a browser.
+# 1. Need to file create a .pause file
+# 2. Install required modules:
+cpanm CPAN::Uploader
+cpanm Config::Identity
+cpan-upload my_module.tar.gz
+
+
+#############################################################
+## Perl Regular Expressions - General
 #############################################################
 
 # Match a number followed by an equal amount of another number
@@ -8235,22 +8490,170 @@ perl -E '$c = "\e[31mHERE\e[0m"; $c =~ s&\p{PosixCntrl}&*&g; say $c'
 # \p{PosixCntrl}  - ASCII-range Unicode.
 # \p{XPosixCntrl} - Full-range Unicode.
 
+# Named captures affect %+ and %+, but ALSO $1,$2
+perl -Mojo -E '"abc" =~ /(?<first>.)(?<second>.)(?<third>.)/; say r \%-; say r \%+; say "1:$1"; say "2:$2"; say "3:$3"'
+
+# Using /a flag to limit to ascii.
+perl -C -E 'say "\N{BENGALI DIGIT FOUR}"' # ৪
+perl -C -E 'say "\N{BENGALI DIGIT FOUR}" =~ /\d/' # 1
+perl -C -E 'say "\N{BENGALI DIGIT FOUR}" =~ /\d/a' # ""
+perl -C -E 'say 0+"\N{BENGALI DIGIT FOUR}"' # 0
+
+
+#############################################################
+## Perl Regular Expressions - Extended
+#############################################################
+
+# Inside (?{}) regex code, $_ is set to the string value.
+perl -E 'say 123 =~ /\d \d (?{ say "[$_] " . pos}) /x'
+[123] 2
+1
+
+
+#############################################################
+## Perl Regular Expressions - Lookaround
+#############################################################
+
+# variable length lookaround in any PCRE
+# http://www.drregex.com/2019/02/variable-length-lookbehinds-actually.html?m=1
+perl -E 'say "ABXXXCD" =~ /(?<=X+)/'
+Lookbehind longer than 255 not implemented in regex m/(?<=X+)/ at -e line 1.
+#
+# Workaround:
+perl -E '$r = qr/ (?=(?<a>[\s\S]*)) (?<b> X++ (?=\g{a}\z) | (?<= (?= x^ | (?&b) ) [\s\S] ) )/x; say "ABXXXCD" =~ $r'
+perl -E '$r = qr/ (?=(?<a>(?s:.*))) (?<b> X++ (?=\g{a}\z) | (?<= (?= x^ | (?&b) ) (?s:.) ) )/x; say "ABXXXCD" =~ $r'
+CD
+#
+# Explanation:
+(?=(?'a'[\s\S]*))  # Capture the rest of the string in "a"
+(?'b'
+  X(?=\k'a'\z)     # Match X followed by the contents of "a" to ensure
+                   # the emulated lookbehind stops at the correct point.
+  |                # OR
+  (?<=             # Look behind (one character) match either:
+    (?=
+      x^           # A contradiction; non-empty to appease the nanny
+      |            # OR
+      (?&b)        # Recurse (match X OR look behind (one character)) etc..
+    )
+    [\s\S]         # How far we go back each step: one single character
+  )
+)
+
+
+#############################################################
+## Perl Regular Expressions - Sets
+#############################################################
+
+# Any number but 5 (regex sets).
+perl -E 'say for map { "$_: " . /^ (?[ \d - [5] ])+ $/x } qw/ 12 15 18 /'
+perl -E 'say for map { "$_: " . /^ [0-46-9]+ $/x } qw/ 12 15 18 /'
+perl -E 'say for map { "$_: " . (/^\d+$/ && !/5/) } qw/ 12 15 18 /'
+12: 1
+15:
+18: 1
+
+
+#############################################################
+## Perl Regular Expressions - Subpatterns
+#############################################################
+
+# Create a subpattern using:
+# (?(DEFINE)
+#   (?<name>pattern)
+# )
+# It is recommended that for this usage you put the DEFINE
+# block at the end of the pattern, and that you name any
+# subpatterns defined within it.
+#
+# Then use it like:
+# (?&name)
+#
+# Example:
+perl -E '"look mk" =~ / (l (?&same_char) )k \s (.)k (?(DEFINE) (?<same_char> (.) \g{-1} ) ) /x; say "got: 1:$1, 2:$2, 3:$3, 4:$4"'
+
 
 #############################################################
 ## Perl Regular Expressions - Verbs
 #############################################################
 
-# Use atomic script runs to prevent named attacks. (paypal.com,perl regex verb ASR)
-perl -C -E 'say "\N{CYRILLIC SMALL LETTER ER}aypal.com" =~ /^\w+\.com$/'         # 1
-perl -C -E 'say "\N{CYRILLIC SMALL LETTER ER}aypal.com" =~ /(*asr:^\w+\.com$)/'  # 0
+# Perl regex verbs shoukd be benchmarked before
+# being used since the additional compilation time
+# might not justify the performance improvement.
+
+# Perl regex verb - ACCEPT (example)
+perl -E '"0aaab" =~ / (?{ say pos . ":" }) 0* a+ (*ACCEPT) b? (?{ say "  $&" }) (*FAIL) /x'
+0:
+
+# Perl regex verb - FAIL
+# (?=^) matches after a newline.
+perl -MEnglish -E 'qq(Aa\nBb\nCc) =~ / (?=^) (?{ say "|$PREMATCH<$MATCH>$POSTMATCH|\n" }) (*F) /smx'
+
+# Perl regex verb - FAIL (example)
+# Show all matches.
+# Show when shifting position.
+perl -E '"0aaab" =~ / (?{ say pos . ":" }) 0* a+ b? (?{ say "  $&" }) (*FAIL) /x'
+0:
+  0aaab
+  0aaa
+  0aa
+  0a
+1:
+  aaab
+  aaa
+  aa
+  a
+2:
+  aab
+  aa
+  a
+3:
+  ab
+  a
+
+# Perl regex verb - THEN (Level1,example)
+# Mainly to speed up alternations.
+# Otherwise it behaves like *PRUNE.
+# Appently not necessary in perl due to other optimizations.
+perl -E '"123ABC" =~ / 123 B | .{3} /x; say $&'
+perl -E '"123ABC" =~ / 123 (*THEN) B | .{3} /x; say $&'
+123
+
+# Perl regex verb - PRUNE (Level2, example)
+# Will not backtrack past that point.
+# Goes right to next position.
+# Similar to a possessive quantifier
+perl -E '"123ABC" =~ / 123 (*PRUNE) B |  .{3} /x; say $&'
+23A
+
+# Perl regex verb - SKIP (Level3, example)
+# Like *PRUNE, but also advances the string position to after the failure.
+perl -E '"123ABC" =~ / 123 (*SKIP) B | .{3} /x; say $&'
+ABC
+
+# Perl regex verb - COMMIT (Level4, example)
+# All or nothing.
+perl -E '"123ABC" =~ / 123 (*COMMIT) B | .{3} /x; say $&'
+perl -E '"123ABC" =~ / 1 (*COMMIT) 23 (*PRUNE) B | .{3} /x; say $&'
+# empty
+#
+# SKIP on right inhibits COMMIT.
+perl -E '"123ABC" =~ / 1 (*COMMIT) 23 (*SKIP) B | .{3} /x; say $&'
+ABC
+
+# Perl regex verb - MARK,SKIP
+perl -E '"123ABC456" =~ / 123 (*MARK:past_digits) [A-Z]+ (*SKIP) 9.. | .* /x; say $&'
+456
+perl -E '"123ABC456" =~ / 123 (*MARK:past_digits) [A-Z]+ (*SKIP:past_digits) 9.. | .* /x; say $&'
+ABC456
 
 # Perl regex verb - MARK
 perl -E '"1x2" =~ /(?:x(*MARK:x)|y(*MARK:y)|z(*MARK:z))/; say $^N'
 perl -E '"1x2" =~ /(?:x(*MARK:mx)|y(*MARK:my)|z(*MARK:mz))/; say $REGMARK'
 
-# Perl regex verb - FAIL
-# (?=^) matches after a newline.
-perl -MEnglish -E 'qq(Aa\nBb\nCc) =~ / (?=^) (?{ say "|$PREMATCH<$MATCH>$POSTMATCH|\n" }) (*F) /smx'
+# Use atomic script runs to prevent named attacks. (paypal.com,perl regex verb ASR)
+perl -C -E 'say "\N{CYRILLIC SMALL LETTER ER}aypal.com" =~ /^\w+\.com$/'         # 1
+perl -C -E 'say "\N{CYRILLIC SMALL LETTER ER}aypal.com" =~ /(*asr:^\w+\.com$)/'  # 0
 
 
 #############################################################
@@ -8271,6 +8674,58 @@ perl -MData::Dumper -le 'sub pr{print Data::Dumper->new(\@_)->Deparse(1)->Dump} 
 perl -le 'for my $s(qw/INT QUIT TERM PIPE ALRM HUP CHLD/){ $SIG{$s} = sub{die"\n$s\n"}} alarm 2; <> while 1'
 perl -le '$SIG{ALRM}=sub{die"\n\nEND OF TIME\n\n"}; alarm 1; <> while 1'
 
+# Perl signal handling (eval,die,exit)
+perl -E 'eval { exit 1 }; say $@; say "here"'         # Blank
+perl -E 'eval { exit 0 }; say $@; say "here"'         # Same
+perl -E 'eval { return 1 }; say $@; say "here"'       # Return early from an eval. ürints "here"
+perl -E 'eval { die }; say $@; say "here"'            # caught die,                prints "here"
+perl -E 'eval { exit 1 }; say $@; END {say "here"}'   # Run before final exit.     prints "here"
+perl -E 'eval { die }; say $@; END {say "here"}'      # Same.
+perl -E 'open FH, ">", "file"; say FH "123"; exit 1'  # File closed and contains "123"
+
+# Perl signal handling (eval,die,exit)
+# Avoid using $SIG{__DIE__}
+https://www.perlmonks.org/?node_id=1173708
+perl -E '$SIG{__DIE__} = sub { say "caught die!" }; die; say $@; say "here"'
+
+# Perl signal handling (eval,die,exit)
+# Catch exit command.
+perl -E 'BEGIN{ *CORE::GLOBAL::exit = sub(;$){die "EXIT_OVERRIDE: @_\n"} } eval { exit 1 }; print "caught error: $@" if $@; say "here"; exit 0'
+
+# Perl signal handling (eval,die,exit)
+# exit overrite snippet. Plus capture all signals.
+# exit overrite snippet. Plus capture all signals.
+our $ExitOverride = 1;
+BEGIN {
+    *CORE::GLOBAL::exit = sub {
+        die "EXIT_OVERRIDE:Caught: @_\n" if $ExitOverride;
+        CORE::exit(@_);
+    };
+}
+local %SIG = %SIG;
+KEY:
+for my $Key ( sort keys %SIG ) {
+    next KEY if $Key eq 'CHLD';
+    next KEY if $Key eq 'CLD';
+    next KEY if $Key eq '__DIE__';
+    next KEY if $Key eq '__WARN__';
+    $SIG{$Key} = sub { die $Key };    ## no critic
+}
+#
+# RUN CODE HERE
+#
+$ExitOverride = 0;
+
+# Perl signal handling (eval,die,__DIE__)
+# Capture STDOUT and STDERR.
+# Catch die and throw to STDOUT.
+perl -MApp::Pod -E '{ local *STDOUT; open STDOUT, ">", \$out or die $!; local *STDERR; open STDERR, ">>", \$err or die $!; print "print-out"; print STDERR "print-err"; local $SIG{__DIE__} = sub{ my $m = shift; chomp $m; print STDERR "<$m>" }; eval{die "die\n"}; print "print-out2" } say "\n[$out][$err]\n"' ojo2
+#
+# Use $@ to capture eval error.
+# Better than SIG{__DIE__} since sub calls may except an die
+# to stop something, like Pod::Simple, which is used by Pod::LOL).
+perl -Ilib -MApp::Pod -E '{ local *STDOUT; open STDOUT, ">", \$out or die $!; local *STDERR; open STDERR, ">>", \$err or die $!; print "print-out"; print STDERR "print-err"; eval{die "die\n"}; print STDERR "<$@>" if $@; print "print-out2" } say "\n[$out][$err]\n"' ojo2
+
 
 #############################################################
 ## Perl Symbol Table
@@ -8285,6 +8740,21 @@ delete $Cwd::{'abs_path'}
 # defined &abs_path will return 0
 # Still found in symbol table
 undef $Cwd::{'abs_path'}
+
+# Snippet to capture output in perl.
+# Capture output.
+my $output = "";
+{
+    local *STDOUT;
+    local *STDERR;
+    open STDOUT, ">",  \$output or die $!;
+    open STDERR, ">>", \$output or die $!;
+    eval { App::Pod->run };
+    if ( $@ ) {
+        $output = $@;
+        chomp $output;
+    }
+}
 
 
 #############################################################
@@ -8344,6 +8814,19 @@ perl -le "print for sort { $a  -  $b } 1,10,2,5,22"	  # Same !?
 
 # Binary sort and insert in perl
 perl -le "@a=(4,10,20); sub add{ my ($n) = @_; print qq(\nAdding: $n); if($n < $a[0]){ unshift @a, $n } elsif($n > $a[-1]){ push @a, $n }else{ my ($first,$last) = (0,$#a); my $mid; while($first < $last){ $mid = $first + int(($last-$first)/2); print qq($first - $mid - $last); if($n < $a[$mid]){ $last=$mid; print qq(LEFT: $first - $mid - $last) }else{ $first=$mid+1; print qq(RIGHT: $first - $mid - $last) } } $mid=$first + int(($last-$first)/2); print qq(mid=$mid); splice @a, $mid, 0, $n } print qq(@a) } add(3); add(30); add(25); add(5); add(15)"
+
+
+#############################################################
+## Perl Functions - system
+#############################################################
+
+# Using bash inside of a perl system call (plus source)
+# Source some reason is NOT recursive!
+system (
+   "bash",
+   "-c",
+   "source $ENV{HOME}/my/.bashrc; $command",
+);
 
 
 #############################################################
@@ -8420,7 +8903,12 @@ perl -le "use strict; use vars qw/$STOP/; INIT{ $STOP=3 }; print $STOP"
 perl -le "use strict; INIT{ $main::STOP=3 } print $main::STOP"
 perl -le "use strict; INIT{ $::STOP=3 } print $::STOP"
 
-# Perl typeglob adding a method to an object
+
+#############################################################
+## Perl Symbol Table
+#############################################################
+
+# Perl typeglob adding a method to an object (symbol table)
 perl -E 'package A { sub a{123} } $o = bless {}, "A"; *{(ref $o) . "::b"} = sub{345}; say $o->b'
 
 # Delete a perl function using (typeglob,symbol table)
@@ -8428,8 +8916,86 @@ perl -E 'package A { sub a{123} } $o = bless {}, "A"; *{(ref $o) . "::b"} = sub{
 delete $A::{a};
 delete ${"$pkg\::"}{a};
 #
-# Instead, just reassign the entire typeglob:
+# Instead, just reassign the entire typeglob: (symbol table)
 perl -E 'sub Pkg::Func{say 123} $o = bless {}, "Pkg"; {local *Pkg::Func = *Blank; } $o->Func'
+
+# Old school Moose (symbol table, typeglob)
+perl -E '
+    {
+        package ABC;
+        sub func{ say "func" }
+    }
+    {
+        my $Orig = \&ABC::func;
+        local *ABC::func = sub {
+            say "pre";
+            $Orig->();
+            say "post";
+        };
+        ABC->func;
+    };
+    say "\nreverted";
+    ABC->func
+'
+
+# Moose way to use around (symbol tyble, typeglob)
+# DO NOT USE!
+# It keeps wrapping the function.
+perl -MMoose -E '
+    {
+        package ABC;
+        use Moose;
+        sub func{ say "func" }
+    }
+    {
+        Moose::around "ABC", func => sub {
+            my ($Orig,$Self,%Param) = @_;
+            say "pre";
+            $Orig->($Self,%Param);
+            say "post";
+        };
+        ABC->func;
+    }
+    say "\nreverted";
+    ABC->func
+'
+
+# Sub::Override way to temporarily replace a function (symbol table, typeglob)
+perl -MSub::Override -E '
+    {
+        package ABC;
+        sub func{ say "func" }
+    }
+    for (1..3) {
+        my $sub = Sub::Override->new( "ABC::func" => sub {
+            say "pre";
+            say "post";
+        });
+        ABC->func;
+    };
+    say "\nreverted";
+    ABC->func
+'
+
+# Sub::Override way to temporarily replace a function (symbol table, typeglob)
+# Also gets the orignal sub name.
+perl -MSub::Override -E '
+    {
+        package ABC;
+        sub func{ say "func" }
+    }
+    for (1..3) {
+        my $sub;
+        $sub = Sub::Override->new( "ABC::func" => sub {
+            say "pre";
+            $sub->{"ABC::func"}->();
+            say "post";
+        });
+        ABC->func;
+    };
+    say "\nreverted";
+    ABC->func
+'
 
 
 #############################################################
@@ -8488,11 +9054,32 @@ perl -le "print $^T"
 
 
 #############################################################
+## Perl Variables - @{^CAPTURE}
+#############################################################
+
+# Get a list of all matches.
+perl -E '"abc" =~ /(.)(.)(.)/; say for $1,$2,$3'
+perl -E '"abc" =~ /(.)(.)(.)/; say for @{^CAPTURE}'
+a
+b
+c
+perl -E '"abc" =~ /(.)(.)(.)/; say for ${^CAPTURE[0]}'
+a
+
+
+#############################################################
 ## Perl Variables - %INC
 #############################################################
 
 # Find Perl library
 perl -le 'print "$_ -> $INC{$_}" for keys %INC'
+
+
+#############################################################
+## Perl Variables - @INC, $ENV{PERL5LIB}
+#############################################################
+
+# Can use PERL5LIB to automatically file in @INC.
 
 
 #############################################################
@@ -8625,7 +9212,7 @@ perltidy my_file
 
 # Perltidy configuration file
 vi .perltidyrc
--i=3 -mbl=2 -pt=0 -b -bext='/'
+-mbl=2 -pt=0 -b -bext='/' -blbs=1 -bom -bbb -nbl
 
 # Tell perltidy to ignore a line
 <STDIN>;    ## no critic
@@ -8633,6 +9220,9 @@ vi .perltidyrc
 # html
 sudo apt-get install tidy
 sudo apt-get install libhtml-tidy-perl    # Perl library
+
+# View current options when doing perltidy
+perltidy my_file -dop    # --dump-options
 
 
 #############################################################
@@ -8647,15 +9237,23 @@ perl -Mre=Debug,PARSE -e 'print if "aaa:bbb" =~ /\w+/'
 # Debug a regular expression (with some color)
 perl -Mre=debugcolor -le 'print "abc:def-hij"=~/\w+/'
 
-# Check if certain words are in order in a file 
+# Check if certain words are in order in a file
 echo "line1 line2" | perl -0777nlE 'INIT{-t and die; $a=join".*?",map{/\S+/g}<STDIN>; $r=qr/$a/s} say "$ARGV - " . (/$r/?"PASS":"FAIL") ' f1 f2
 echo "line1 line4" | perl -Mre=eval -0777ne 'INIT{-t and die; $a=join "",map qq[ (?{print"\\nTrying $_ - "}) (.*?(??{"$_"}) (?{print"pass"})) ],map{/\S+/g}<STDIN>; $r=qr/^$a/sx; print "\n\$r=qr$r\n\n"} print "\n# $ARGV"; print "\n".(/$r/?"PASS":"FAIL")."\n\n"' f1 f2
 echo "line1 line4" | perl -Mre=eval -0777ne 'INIT{-t and die; $a=join "",map qq[ (?{print"\\nTrying $_ - "}) (.*?(??{"$_"}) (?{print"pass"})) ],map{/\S+/g}<STDIN>; $r=qr/^$a/sx} print "\n# $ARGV"; print "\n".(/$r/?"PASS":"FAIL")."\n\n"' f1 f2
+
+# View optimizations done on a pattern.
+perl -Mre=optimization -Mojo -E 'say r optimization qr/^abc/'
 
 
 #############################################################
 ## Perl Modules - threads
 #############################################################
+
+# Error: This Perl not built to support threads
+# Check if perl binary supports threads.
+perl -V:useithreads
+perl -MConfig -E 'say $Config{useithreads}'
 
 # Simple thread example in perl
 # Threads start running already with threads->create()
@@ -8666,11 +9264,16 @@ perl -Mthreads -le '@t=map threads->create(sub{print "Im #$_"}), 1..10; $_->join
 # Uses a shared variable between threads
 perl -Mthreads -Mthreads::shared -le '$sum=0; share($sum); @t=map threads->create(sub{$sum += $_}), 1..10; print $_->join for @t; print "sum: $sum"'
 
-# async is an alias for threads->create
-perl -lMthreads -le '@t=map async(sub{print $_}), 1..3; $_->join for @t'
-
-# threads->new is an alias for threads->create
+# Aliases for threads->create.
 perl -lMthreads -le '@t=map threads->new(sub{print $_}), 1..3; $_->join for @t'
+perl -lMthreads -le '@t=map async(sub{print $_}), 1..3; $_->join for @t'
+perl -lMthreads -le '@t=map threads->new(sub{print $_}), 1..3; $_->join for @t'
+
+# If using a coderef, you must use threads->create.
+perl -lMthreads -le '$sub = sub{ print "123" }; @t=map threads->new( $sub ), 1..3; $_->join for @t'
+
+# If using a coderef, you must use threads->create (with arguments).
+perl -lMthreads -le '$sub = sub{ print "@_" }; @t=map threads->new( $sub, $_ ), 1..3; $_->join for @t'
 
 # Shared and non shared variables example
 perl -lMthreads -Mthreads::shared -le '$a=$b=1; share($a); async(sub{$a++; $b++})->join; print "a=$a, b=$b"'
@@ -8689,11 +9292,31 @@ perl -Mthreads -le 'my $a :shared; my $b :shared; push @t, async(sub{lock $a; sl
 # Alternate syntax 2
 perl -Mthreads -le 'my $a :shared; my $b :shared; push @t, threads->create(sub{lock $a; sleep 20; lock $b}); push @t, threads->create(sub{lock $b; sleep 20; lock $a}); $_->join for @t'
 
-# Thread safe queues. Passing Data Around
+# Thread safe queues. Passing data around
 perl -Mthreads -MThread::Queue -le 'my $q=Thread::Queue->new; $t=async(sub{ print "Popped $d off the queue" while $d=$q->dequeue  }); $q->enqueue(12); $q->enqueue(qw/A B C/); sleep 1; $q->enqueue(undef); $t->join'
+
+# Thread safe queues. Passing complex data around
+perl -Mthreads -MThread::Queue -le 'my $q=Thread::Queue->new; $t=async(sub{ print "Popped @$d off the queue" while $d=$q->dequeue  }); $q->enqueue([1..3]); $q->enqueue([qw/A B C/]); sleep 1; $q->enqueue(undef); $t->join'
 
 # Compute pi using parallel threading
 time perl -Mthreads -Mthreads::shared -le 'share $sum; $M=100_000_000; $T=6; $h=1/$M; sub sum { my $s; my($from,$to)=@_; for($from..$to){ my $x=$h*($_-0.5); $s += 4/(1+$x**2)}; $s } sub split_by { my($max,$by)=@_; my $from=1; my @l; while($to<$max){ $to=$from+(($max-$from+1)/$by--)-1; $to=int($to)+1 if $to != int($to); push @l, [$from,$to]; $from=$to+1 }; @l } @a=split_by($M,$T); @t=map {async sub{sum(@$_)}} @a; $sum += $_->join() for @t; $pi = $h * $sum; print $p'
+
+
+#############################################################
+## Perl Modules - Carp
+#############################################################
+
+# Show a stack trace in perl.
+perl -MCarp=longmess -E 'sub fun1{ fun2("TO FUN2") } sub fun2{ say longmess } fun1("TO FUN1")'
+
+# Show a stack trace in perl. (Carp uses a similar approach).
+# @DB::args is set (for a scope) when this command is run (some magic).
+{
+   package DB;
+   my @caller = caller($scope);
+   () = caller($scope);             # Same thing (to invoke LIST context).
+}
+perl -E 'sub fun1{ fun2("TO FUN2") } sub fun2{ my $scope = 0; while(my @caller = caller($scope)){ {package DB; () = caller($scope)} say "@caller[1,2,3,4] - (@DB::args)"; $scope++ }} fun1("TO FUN1")'
 
 
 #############################################################
@@ -8723,6 +9346,18 @@ perl -MCGI=ol,li -le 'print ol li [qw/red blue green/]'
 # Generate a sample html page
 perl -MCGI=:standard,:html3 -le 'print header(),start_html(),ol(li [qw/red blue green/]),end_html()' > my.html
 perl -MCGI=:standard,:html3 -le 'print header(),start_html(),td(Tr [qw/red blue green/]),end_html()' > my2.html
+
+
+#############################################################
+## Perl Modules - Class::Tiny
+#############################################################
+
+# Alternate to Mojo::Base has.
+perl -Mojo -E '{ package A; use Class::Tiny qw(name age color); sub new { bless {}, shift } } my $obj = A->new; $obj->name("bob"); $obj->color("blue"); say r $obj'
+bless( {
+  "color" => "blue",
+  "name" => "bob"
+}, 'A' )
 
 
 #############################################################
@@ -8763,6 +9398,47 @@ perl -MDateTime -E '$dt = DateTime->now; say $dt->truncate(to => "week" )->add(w
 
 
 #############################################################
+## Perl Modules - Data::DPath
+#############################################################
+
+# Recurse through a data structure and print matches.
+perl -MData::DPath -Mojo -E 'my $data = {a => [0, {complex => 1}]}; say "\nBefore:"; say r $data; for my $node ( grep {ref} Data::DPath->match($data, "//") ){ say "Tying: $node: " . r $node}'
+#
+# Before:
+# {
+#   "a" => [
+#     0,
+#     {
+#       "complex" => 1
+#     }
+#   ]
+# }
+# 
+# Tying: ARRAY(0xb400007e98818a28): [
+#   0,
+#   {
+#     "complex" => 1
+#   }
+# ]
+# 
+# Tying: HASH(0xb400007e98818698): {
+#   "complex" => 1
+# }
+# 
+# Tying: HASH(0xb400007e988291f0): {
+#   "a" => [
+#     0,
+#     {
+#       "complex" => 1
+#     }
+#   ]
+# }
+
+# Show where a complex data structure is being updated.
+perl -MData::DPath -MCarp=longmess -MTie::Watch -Mojo -E 'my $data = {a => [0, {complex => 1}]}; say "\nBefore:"; say r $data; for my $node ( grep {ref} Data::DPath->match($data, "//") ){ say "Tying: $node"; Tie::Watch->new( -variable => $node, -store => sub{ my($self,$v) = @_; $self->Store($v); say "Storing here:" . longmess() });} sub BadCall{ $data->{a}[0] = 1 } say ""; BadCall(); say "After:"; say r $data'
+
+
+#############################################################
 ## Perl Modules - Data::Dumper
 #############################################################
 
@@ -8774,12 +9450,27 @@ perl -MData::Dumper -le '$Data::Dumper::Deparse=1; sub add{my($a,$b)=@_; $a+$b};
 perl -MData::Dumper -le '$Data::Dumper::Deparse=1; $add=sub{my($a,$b)=@_; $a+$b}; print Dumper $add'
 
 # Data Dumper subroutine template
-sub pr{
-   require Data::Dumper;
-   my $d = Data::Dumper->new([@_]);
-    $d->Terse(1)->Indent(1)->Sortkeys(1)->Purity(1);
-   print $d->Dump, "\n";
+sub _dumper {
+    require Data::Dumper;
+    my $data = Data::Dumper
+      ->new( [@_] )
+      ->Indent( 1 )
+      ->Sortkeys( 1 )
+      ->Terse( 1 )
+      ->Useqq( 1 )
+      ->Dump;
+    return $data if defined wantarray;
+    say $data;
 }
+
+
+#############################################################
+## Perl Modules - Data::Trace
+#############################################################
+
+# Show where a complex data structure is being updated.
+cpanm Data::Trace
+perl -MData::Trace -Mojo -E 'my $data = {a => [0, {complex => 1}]}; say "\nBefore:"; say r $data; Data::Trace->Trace($data); sub BadCall{ $data->{a}[0] = 1 } say ""; BadCall(); say "After:"; say r $data'
 
 
 #############################################################
@@ -8791,6 +9482,11 @@ perl -MDBI -E '$dbh = DBI->connect("DBI:Pg:dbname=$db; host=127.0.0.1", "$user",
 
 # How to query information from a database using perl (postgres,sample,sql)
 perl -MDBI -E 'sub Die { die $DBI::errstr } $dbh = DBI->connect("DBI:Pg:$db=srto_8_0; host=127.0.0.1", "$user", "$pass", {RaiseError => 1}) or Die; $sth = $dbh->prepare(q(SELECT * from MyTable;)) or Die; $sth->execute() or Die; while(@row = $sth->fetchrow_array()){ say "@row" }
+
+# Fetchbdata from SQLite database.
+perl -MDBI -E 'my $dbh = DBI->connect("DBI:SQLite:kjv.bbl.mybible", '', '', {RaiseError => 1}); my $sth = $dbh->prepare("select * from Bible limit 3"); $sth->execute; while(my @row = $sth->fetchrow_array ){ say "@row" } $dbh->disconnect'
+perl -MDBI -E 'my $dbh = DBI->connect("DBI:SQLite:kjv.bbl.mybible", '', '', {RaiseError => 1}); my $all = $dbh->selectall_arrayref("select * from Bible limit 3"); for my $row ( @$all ){ say "@$row" } $dbh->disconnect'
+perl -MDBI -E 'my $dbh = DBI->connect("DBI:SQLite:kjv.bbl.mybible", '', '', {RaiseError => 1}); for my $row ( $dbh->selectall_array("select * from Bible limit 3") ){ say "@$row" } $dbh->disconnect'
 
 
 #############################################################
@@ -8859,11 +9555,42 @@ perl -MDevel::Peek -le '$a=15; print Dump($a)'
 
 
 #############################################################
+## Perl Modules - Email::Address::XS
+#############################################################
+
+# Example of using Email::Address::XS
+perl -Mojo -MEmail::Address::XS -E 'say r $_ for Email::Address::XS->parse("First Last email\@localhost")'
+bless( {
+  "comment" => undef,
+  "host" => undef,
+  "invalid" => 1,
+  "original" => "First ",
+  "phrase" => undef,
+  "user" => "First"
+}, 'Email::Address::XS' )
+
+
+#############################################################
 ## Perl Modules - Email::Outlook::Message
 #############################################################
 
 # Parse an outlook message .msg file
 perl -MEmail::Outlook::Message -le 'print Email::Outlook::Message->new(shift)->to_email_mime->as_string' "$m"
+
+
+#############################################################
+## Perl Modules - Encode
+#############################################################
+
+# Example of using Encode to show string in different supported encodings (broken).
+perl -C -MEncode -E '$s1="Ue: Ü"; $s2="Euro: \N{EURO SIGN}"; for ( encodings ) { printf "%-15s: [%-7s] [%s]\n", $_, encode($_,$s1), encode($_,$s2) }'
+
+# Why use Encode?
+perl -E 'say "\xe1"'    # �
+perl -C -E 'say "\xe1"' # á
+perl -MEncode -E 'say encode "UTF-8", "\xe1"' # á
+perl -MEncode -E 'use open ":std", ":encoding(UTF-8)"; say "\xe1"' # á
+perl -MEncode -E 'use open qw(:std :utf8); say "\xe1"' # á
 
 
 #############################################################
@@ -8990,6 +9717,9 @@ perl -MHook::LexWrap -le 'wrap 'abc', pre => sub{print "pre:  [@_[0..$#_-1]]"}, 
 # Wrap a subroutine and see the input and output. modify results
 perl -MHook::LexWrap -le 'wrap 'abc', post => sub{$_[-1] = 8}; sub abc{my($a,$b)=@_; $a+$b} print abc 2,3'
 
+# Wrap and unwrap all class functions. (idea)
+perl -MModule::Functions=get_full_functions -MHook::LexWrap -MB -E '$class = "MyClass"; my @unwrap = map wrap($_, pre => sub{ my @c=caller; say "[@c] " . B::svref_2object(__SUB__)->GV->NAME; my @c2 = CORE::caller; say "@c"; }), sort {$a cmp $b} map { "$class\::$_" } grep { UNIVERSAL::can("$class", $_) } grep { /[a-z]/ } get_full_functions $class; $_->() for@unwrap; say $class->abc("from main", "from main2");'
+
 
 #############################################################
 ## Perl Modules - HTML::Tree
@@ -9004,6 +9734,42 @@ perl -MHTML::Tree -le '$t=HTML::Tree->new_from_file("rakudo2.html"); $f=$t->find
 # Extract latest href download link from an html document
 perl -MHTML::Tree -le '$t=HTML::Tree->new_from_file("rakudo.html"); print $_->attr("href") for ($t->look_down(class => "ext-gz"))[0]'
 perl -MHTML::Tree -le '$t=HTML::Tree->new_from_file("rakudo.html"); print $t->look_down(class => "ext-gz")->attr("href")'
+
+
+#############################################################
+## Perl Modules - Inline::C
+#############################################################
+
+# Example of using Inline::C in perl
+use Inline "C";
+use Inline "NOCLEAN"; # Keep build library.
+print triple(5);
+__END__
+__C__
+int triple(int num) {
+   return num * 3;
+}
+
+# Inline::C oneliner
+perl -MInline='C,int triple(int num){ return num * 3; }' -E 'say triple 4'
+
+# Inline::C oneliner (Keep build library)
+perl -MInline=NOCLEAN -MInline='C,int triple(int num){ return num * 3; }' -E 'say triple 4'
+
+
+#############################################################
+## Perl Modules - IPC::Open2, IPC::Open3
+#############################################################
+
+# Simple example of capturing STDOUT and STDERR separately in perl.
+perl -MSymbol=gensym -MIPC::Open3 -E 'my $pid = open3( my $in_fh, my $out_fh, my $err_fh = gensym(), "echo OUT; echo ERR >&2" ); while(<$err_fh>){ chomp; say}'
+#
+# STDERR goes to the same place.
+perl -MIPC::Open3 -E '$pid = open3( $in_fh, $out_fh, ">&STDERR", "echo OUT; echo ERR >&2; exit 123" ); waitpid( $pid, 0 ); my $error = $? >> 8; say "error=$error"; if($error){ while(<$out_fh>){ print } }'
+perl -MIPC::Open2 -E '$pid = open2( $out_fh, $in_fh, "echo OUT; echo ERR >&2; exit 1" ); waitpid( $pid, 0 ); my $error = $? >> 8; say "error=$error"; if($error){ while(<$out_fh>){ print } }'
+
+# IPC::Open3 Bug?!
+perl -MFile::Temp=tempfile -MIPC::Open3 -E '($fh,$file)=tempfile(); print $fh "1234567890"x10000; close $fh; $pid = open3( $in_fh, $out_fh, ">&STDERR", "cat $file" ); waitpid( $pid, 0 ); say "DONE $file"'
 
 
 #############################################################
@@ -9075,6 +9841,31 @@ perl -MLWP::UserAgent -MData::Dumper -le '$u="http://www.google.com"; $ua=LWP::U
 
 
 #############################################################
+## Perl Modules - Mail::Address
+#############################################################
+
+# Example of using Mail::Address.
+perl -Mojo -MMail::Address -E 'say r $_ for Mail::Address->parse("First Last email\@localhost")'
+bless( [
+  "",
+  "First",
+  ""
+], 'Mail::Address' )
+
+bless( [
+  "",
+  "Last",
+  ""
+], 'Mail::Address' )
+
+bless( [
+  "",
+  "email\@localhost",
+  ""
+], 'Mail::Address' )
+
+
+#############################################################
 ## Perl Modules - Math::Combinatorics
 #############################################################
 
@@ -9091,6 +9882,25 @@ perl -MMath::Combinatorics=permute -lE 'say for map{"@$_"} permute(qw/a b c/)'
 
 # Factoring a number to get the prime numbers
 perl -MMath::Factoring=factor -E "say for factor 666"
+
+
+#############################################################
+## Perl Modules - Modern::Perl
+#############################################################
+
+# Modern::Perl defaults to v5.12 (bug!?)
+perl -E 'say $^V'
+v5.36.0
+perl -Modern::Perl -e 'say Modern::Perl::validate_date(2022)'
+:5.34
+perl -Modern::Perl -e 'say Modern::Perl::validate_date()'
+:5.12
+perl                    -E 'sub abc ($n) {$n}'
+perl -Modern::Perl=2022 -e 'sub abc ($n) {$n}'
+perl -Modern::Perl      -e 'sub abc ($n) {$n}'
+Illegal character in prototype for main::abc : $n at -e line 1.
+Global symbol "$n" requires explicit package name (did you forget to declare "my $n"?) at -e line 1.
+Execution of -e aborted due to compilation errors.
 
 
 #############################################################
@@ -9126,13 +9936,89 @@ perl -Mblib -MExample2 -E 'Example2::print_hello()'
 perl -Iblib/lib -Iblib/arch -MExample2 -e 'Example2b::print_hello'
 
 # Create a new distribution in perl.
-module-starter --module=App::pod --author="AUTHOR" --email="EMAIL" --mb --verbose
+module-starter --module=App::Pod --author="AUTHOR" --email="EMAIL" --mb --verbose
+
+# Additional folder preparation (module-starter)
+mv App-Pod/* .
+rmdir App-Pod
+mv ignore.txt .gitignore
+echo "*.swp" >> .gitignore
+chmod +x Build.PL
+# Remove MYMETA.* and META.*
 #
-perl Build.PL
-perl Build
-perl Build test
-perl Build disttest
-perl Build dist
+# Prepend to Build.PL
+"#!/bin/env perl
+"
+
+# Additional folder preparation (module-starter)
+# Add to Build.PL
+    meta_merge     => {
+        resources => {
+            bugtracker => 'https://github.com/poti1/data-trace/issues',
+            repository => 'https://github.com/poti1/data-trace',
+        },
+    },
+
+# Additional folder preparation (module-starter)
+# Create: .github/workflows/ci.yml
++ name: Perl
++ 
++ on:
++   push:
++   pull_request:
++ 
++ jobs:
++   test:
++     strategy:
++       fail-fast: false
++       matrix:
++         runner: [ubuntu-latest, macos-latest, windows-latest]
++         perl: [ '5.32' ]
++ 
++     runs-on: ${{matrix.runner}}
++     name: OS ${{matrix.runner}} Perl ${{matrix.perl}}
++ 
++     steps:
++     - uses: actions/checkout@v2
++ 
++     - name: Set up perl
++       uses: shogo82148/actions-setup-perl@v1
++       with:
++           perl-version: ${{ matrix.perl }}
++           distribution: ${{ ( startsWith( matrix.runner, 'windows-' ) && 'strawberry' ) || 'default' }}
++ 
++     - name: Show Perl Version
++       run: |
++         perl -v
++ 
++     - name: Install Modules
++       run: |
++         cpanm -v
++         cpanm --installdeps .
++         cpanm Test::CheckManifest Test::Pod::Coverage Test::Pod
++ 
++     - name: Run tests
++       env:
++         RELEASE_TESTING: 1
++       run: |
++         perl Build.PL
++         perl Build
++         perl Build test
+
+# Additional folder preparation (module-starter)
+# Add meta files.
+Build manifest
+Build manifest_skip
+Build distmeta
+Build distcheck
+
+# Build and run a perl distribution (module-starter)
+Build.PL
+Build       # Can use tab completion.
+Build test
+RELEASE_TESTING=1 Build test
+Build disttest
+Build dist
 
 
 #############################################################
@@ -9174,6 +10060,29 @@ plugin 'AutoReload';
 
 
 #############################################################
+## Perl Modules - Mojo::Base
+#############################################################
+
+# Create accessor methods (like Mojo::Base::attr)
+sub _has {
+    no strict 'refs';
+    for my $attr ( @_ ) {
+        *$attr = sub {
+            return $_[0]{$attr} if @_ == 1;    # Get: return $self-<{$attr}
+            $_[0]{$attr} = $_[1];              # Set: $self->{$attr} = $val
+            $_[0];                             # return $self
+        };
+    }
+}
+_has qw(
+  path
+  lol
+  tree
+  class_is_path
+);
+
+
+#############################################################
 ## Perl Modules - Mojo::DOM
 #############################################################
 
@@ -9212,6 +10121,24 @@ perl -Mojo -E 'my $dom = x(q(<ul class="clss"> <li>item1</li> <p>para</p> <li>it
 perl -Mojo -E 'my $dom = x(q(<ul class="clss"> <p>para1</p> <li>item1</li> <p>para2</p> <li>item2</li> </ul>)); say $dom->at("ul > :nth-of-type(2)")'
 <p>para2</p>
 
+# Xml to struct in perl
+#
++ #!/bin/env perl
++ use feature 'say';
++ use ojo;
++ my $x = x f( shift )->slurp;
++ my $contact = $x->at( "contact" );
++ my $struct = {
++     email      => $contact->at( "workplaceemailuri" )->text,
++     first_name => $contact->at( "givenname" )->text,
++     last_name  => $contact->at( "familyname" )->text,
++ };
++ say r $struct;
+
+# Get internal strings in html.
+perl -MMojo::DOM -E 'my $html_string = "<div><span>Hey </span><span>there!</span></div>"; my $html = Mojo::DOM->new($html_string); say $html->at("div")->all_text'
+Hey there!
+
 
 #############################################################
 ## Perl Modules - Mojo::File
@@ -9229,6 +10156,10 @@ package Mojo::File {
       $self->spurt( $pretty_json );
    }
 }
+
+# Find a path given a class name.
+# Alternative to "perldoc -l class".
+perl -MMojo::File=path -MMojo::Util=class_to_path -E '$p = class_to_path "Mojo::UserAgent"; for ( @INC ) { $p2 = path($_,$p); if(-e $p2){ say $p2; lat } }'
 
 
 #############################################################
@@ -9401,11 +10332,89 @@ Any
 
 
 #############################################################
+## Perl Modules - Net::SSLeay
+#############################################################
+
+# Installation is failing:
+cpanm Net::SSLeay
+# /usr/bin/ld: cannot find -lz: No such file or directory
+# Install:
+sudo apt install zlib1g-dev
+
+
+#############################################################
 ## Perl Modules - O::Xref
 #############################################################
 
 # Debug a perl script. Find all usage of subroutines and variables
 perl -MO=Xref fetch_excel.p | less
+
+
+#############################################################
+## Perl Modules - Object::Pad
+#############################################################
+
+# New perl OO example (with an without defaults).
+perl -MObject::Pad -E 'class Point { has $x :param = 0; has $y :param = 0; method move ($dX, $dY) { $x += $dX; $y += $dY } method describe {  say "A point at ($x,$y)" } } Point->new->describe'
+A point at (0,0)
+perl -MObject::Pad -E 'class Point { has $x :param = 0; has $y :param = 0; method move ($dX, $dY) { $x += $dX; $y += $dY } method describe {  say "A point at ($x,$y)" } } Point->new(x=>5, y=>6)->describe'
+A point at (5,6)
+
+# New perl OO example (BUILD phase, both)
+perl -MObject::Pad -Mojo -E 'class My{ has $x :param; method Say { say "Say(): [@_] self=$self,x=$x"} BUILD { say "BUILD(): [@_]"; qw(x from_build) } sub BUILDARGS { say "BUILDARGS(): [@_]"; qw(x from_buildargs) }} my $s = My->new(x => "new_arg"); $s->Say("say input"); say r $s'
+BUILDARGS(): [My x new_arg]
+BUILD(): [x from_buildargs]
+Say(): [say input] self=My=ARRAY(0xb400006faa2646b8),x=from_buildargs
+bless( [
+  "from_buildargs"
+], 'My' )
+
+# New perl OO example (BUILD phase,BUILDARGS)
+perl -MObject::Pad -Mojo -E 'class My{ has $x :param; method Say { say "Say(): [@_] self=$self,x=$x"} sub BUILDARGS { say "BUILDARGS(): [@_]"; qw(x from_buildargs) }} my $s = My->new(x => "new_arg"); $s->Say("say input"); say r $s'
+BUILDARGS(): [My x new_arg]
+Say(): [say input] self=My=ARRAY(0xb4000077e98fd6d8),x=from_buildargs
+bless( [
+  "from_buildargs"
+], 'My' )
+
+# New perl OO example (BUILD phase,BUILD)
+perl -MObject::Pad -Mojo -E 'class My{ has $x :param; method Say { say "Say(): [@_] self=$self,x=$x"} BUILD { say "BUILD(): [@_]"; qw(x from_build) } } my $s = My->new(x => "new_arg"); $s->Say("say input"); say r $s'                         BUILD(): [x new_arg]
+Say(): [say input] self=My=ARRAY(0xb4000079688b76d8),x=new_arg
+bless( [
+  "new_arg"
+], 'My' )
+
+# New perl OO example (BUILD ADJUST phases)
+perl -MObject::Pad -Mojo -E 'class My{ has $x :param; method Say { say "Say(): [@_] self=$self,x=$x"} BUILD { say "BUILD(): [@_]"; qw(x from_build) } sub BUILDARGS { say "BUILDARGS(): [@_]"; qw(x from_buildargs) } ADJUST { say "ADJUST(): [@_] self=$self"; qw(x from_adjust) } } my $s = My->new(x => "new_arg"); $s->Say("say input"); say r $s'                     BUILDARGS(): [My x new_arg]
+BUILD(): [x from_buildargs]
+ADJUST(): [HASH(0xb4000076ffc351f8)] self=My=ARRAY(0xb4000076ffc266d8)
+Say(): [say input] self=My=ARRAY(0xb4000076ffc266d8),x=from_buildargs
+bless( [
+  "from_buildargs"
+], 'My' )
+
+# New perl OO example (ADJUST strict phases)
+perl -MObject::Pad -Mojo -E 'class My :strict(params) { has $x :param; method Say { say "Say(): [@_] self=$self,x=$x"} ADJUST { say "ADJUST(): [@_] self=$self"; qw(x from_adjust) } } my $s = My->new(x => "new_arg", x2 => 2 ); $s->Say("say input"); say r $s'
+ADJUST(): [HASH(0xb400007a337fa2c0)] self=My=ARRAY(0xb400007a337e76b8)
+Unrecognised parameters for My constructor: x2 at -e line 1.
+
+
+#############################################################
+## Perl Modules - PerlIO
+#############################################################
+
+# View the encoding layers applied to a filehandle.
+perl -E 'say for PerlIO::get_layers(*STDOUT)'
+unix
+perlio
+perl -C -E 'say for PerlIO::get_layers(*STDOUT)'
+unix
+perlio
+utf8
+perl -CO -E 'say for PerlIO::get_layers(*STDOUT)'
+unix
+perlio
+utf8
 
 
 #############################################################
@@ -9417,6 +10426,24 @@ perl -MPod::Usage=pod2usage -E "pod2usage(-input => `perldoc -l ojo`, -verbose =
 
 # Pull out a sectin of perl documentation and store it in a variable
 perl -MPod::Usage=pod2usage -E "open my $fh, '>', \my $out or die $!; pod2usage(-input => `perldoc -l ojo`, -verbose => 99, -sections => '.*/x', -output => $fh, exitval => 'NOEXIT'); say qq([$out])"
+
+
+#############################################################
+## Perl Modules - Role::Tiny
+#############################################################
+
+# Light alternative to Mojo::Base -role
+package My::Role;
+use Role::Tiny;
+sub foo { ... }
+sub bar { ... }
+around baz => sub { ... };
+#
+package My::Class;
+use Role::Tiny::With;
+# bar gets imported, but not foo
+with 'My::Role';
+sub foo { ... }
 
 
 #############################################################
@@ -9447,6 +10474,21 @@ perl -MSafe -le '$comp=Safe->new; $comp->deny(qw(:default)); $comp->permit(qw(pa
 
 
 #############################################################
+## Perl Modules - Scalar::Util
+#############################################################
+
+# perl looks_like_number example.
+perl -MScalar::Util=looks_like_number -E 'printf("%s: %s\n", $_, looks_like_number($_)) for qw/ 1 cat bat 1.5 1e10 4.5 fat /'
+1: 1
+cat:
+bat:
+1.5: 1
+1e10: 1
+4.5: 1
+fat:
+
+
+#############################################################
 ## Perl Modules - Set::Scalar
 #############################################################
 
@@ -9464,6 +10506,50 @@ perl -MSet::Scalar -le '$s=Set::Scalar; $s1=$s->new(qw/1 2 3/); $s2=$s->new(qw/2
 
 # Create a deep clone of a reference.
 perl -MStorable=dclone -E 'my $h={a => [1..2]}; my $h2 = dclone($h); say $_, " ", $_->{a} for $h, $h2'
+
+
+#############################################################
+## Perl Modules - Subs::Trace
+#############################################################
+
+# WhoAmI to all functions in a class.
++ #!/usr/bin/perl
++ 
++ package Subs::Trace;
++ 
++ use v5.32;
++ 
++ sub import {
++   my $pkg = caller();
++ 
++   INIT {
++     no strict 'refs';
++ 
++     for my $func (sort keys %{"${pkg}::"}) {
++         my $code = ${"${pkg}::"}{$func}->*{CODE};
++         next if not $code;
++ 
++         ${"${pkg}::"}{$func}->** = sub {
++             say "-> $pkg\::$func";
++             &$code;
++         }
++     }
++   }
++ }
++ 
++ 
++ 1
+
+# Subs::Trace use case (example)
+perl -I. -E '{ package P; use Subs::Trace; sub F1{10} sub F2{20} } say P::F1() + P::F2()'
+
+# Subs::Trace cpan modules.
+cpanm Subs::Trace
+perl -E '{ package P; sub F1{10} sub F2{20} sub F4{40} use Subs::Trace; sub F3{30} } say P::F1() + P::F2() + P::F3() + P::F4()'
+-> P::F1
+-> P::F2
+-> P::F4
+100
 
 
 #############################################################
@@ -9547,6 +10633,16 @@ perl -l -MText::CSV -e '$csv=Text::CSV->new; open FH, "book1.csv"; while($a=$csv
 
 # CSV file into an array (Mike)
 perl -l -MText::CSV_XS -e '$csv=Text::CSV_XS->new; open FH, "a.csv"; $a=$csv->getline_all(FH); print $a->[1][3]'
+
+
+#############################################################
+## Perl Modules - Text::ParseWords
+#############################################################
+
+# Split a line by a character while honoring quotes
+# and backslashes. (perl)
+use Text::ParseWords qw/ parse_line /;
+parse_line( '/', 1, $string );
 
 
 #############################################################
@@ -9650,8 +10746,12 @@ perl -MTime::Piece -le '$now=localtime; $now+=$now->tzoffset; print $now;  $t=Ti
 # Compare the curent time to a string. Show direrence in seconds between times
 perl -MTime::Piece -le '$now=localtime; $now+=$now->tzoffset; $t=Time::Piece->strptime(shift,"%c"); print for $now,$t,$now-$t' "Mon Apr 17 14:36:02 2017"
 
-# Print current time in about YYYYMMDD
+# Print current time in format YYYYMMDD
 perl -MTime::Piece -le "print localtime()->strftime('%Y%m%d')"
+
+# Print current time in format YYYY-MM-DD HH::MM:SS
+perl -MTime::Piece -le "print localtime()->strftime('%Y-%m-%d %H:%M:%S')"
+2022-10-04 01:14:00
 
 # Storage format for transfering/saving  timestamp
 perl -MTime::Piece -E 'say localtime->strftime("%x %R")'
@@ -10128,6 +11228,163 @@ perl -MTryCatch -lE 'sub try_me{ try{1/0}catch{say "Caught [$@]"; return "AAA"};
 perl -Mcharnames=:full -CO -MUnicode::Normalize -E 'say charnames::viacode ord for split //, NFD "\N{LATIN CAPITAL LETTER A WITH ACUTE}"'
 # LATIN CAPITAL LETTER A
 # COMBINING ACUTE ACCENT
+
+# Get grapheme clusters.
+perl -MEncode -MUnicode::Normalize -E 'use open qw(:std :utf8); say for map{ /(\X)/g } NFD "\x{61}\x{301}"'
+á
+perl -MEncode -MUnicode::Normalize -E 'use open qw(:std :utf8); say for map{ /(.)/g } NFD "\x{61}\x{301}"'
+ ́
+a
+ ́
+
+# Get individual decomposed characters.
+perl -MEncode -MUnicode::Normalize -E 'use open qw(:std :utf8); say ord for map{ /(.)/g } NFD "\x{61}\x{301}"x2'
+97
+769
+97
+769
+# LATIN SMALL LETTER A   U+61  0x61   97
+# COMBINING ACUTE ACCENT U+301 0x301 769
+
+# Use unpack to get unicode codepoints.
+perl -MEncode -MUnicode::Normalize -E 'use open qw(:std :utf8); say for unpack "W*",NFD "\x{61}\x{301}"x2'
+97
+769
+97
+769
+perl -MEncode -MUnicode::Normalize -E 'use open qw(:std :utf8); say for unpack "W*",NFC "\x{61}\x{301}"x2'
+225
+225
+
+
+#############################################################
+## Perl Modules - utf8
+#############################################################
+
+# decode then encode.
+perl -MDevel::Peek -E 'my $v = "äöë"; sub c { say "#################"; say "is_utf8: " . utf8::is_utf8($v); say "valid:   " . utf8::valid($v); Dump $v } c; utf8::decode($v); c; utf8::encode($v); c'
+#################
+is_utf8:
+valid:   1
+SV = PV(0xb400007634f7a0b0) at 0xb400007634f89f98
+  REFCNT = 2
+  FLAGS = (POK,IsCOW,pPOK)
+  PV = 0xb4000074f4f80650 "\xC3\xA4\xC3\xB6\xC3\xAB"\0
+  CUR = 6
+  LEN = 10
+  COW_REFCNT = 1
+#################
+is_utf8: 1
+valid:   1
+SV = PV(0xb400007634f7a0b0) at 0xb400007634f89f98
+  REFCNT = 2
+  FLAGS = (POK,pPOK,UTF8)
+  PV = 0xb4000074f4f7fd30 "\xC3\xA4\xC3\xB6\xC3\xAB"\0 [UTF8 "\x{e4}\x{f6}\x{eb}"]
+  CUR = 6
+  LEN = 10
+#################
+is_utf8:
+valid:   1
+SV = PV(0xb400007634f7a0b0) at 0xb400007634f89f98
+  REFCNT = 2
+  FLAGS = (POK,pPOK)
+  PV = 0xb4000074f4f7fd30 "\xC3\xA4\xC3\xB6\xC3\xAB"\0
+  CUR = 6
+  LEN = 10
+
+# encode then decode.
+perl -MDevel::Peek -E 'my $v = "äöë"; sub c { say "#################"; say "is_utf8: " . utf8::is_utf8($v); say "valid:   " . utf8::valid($v); Dump $v } c; utf8::encode($v); c; utf8::decode($v); c'
+#################
+is_utf8:
+valid:   1
+SV = PV(0xb400007c1f6780e0) at 0xb400007c1f684f98
+  REFCNT = 2
+  FLAGS = (POK,IsCOW,pPOK)
+  PV = 0xb400007adf667750 "\xC3\xA4\xC3\xB6\xC3\xAB"\0
+  CUR = 6
+  LEN = 10
+  COW_REFCNT = 1
+#################
+is_utf8:
+valid:   1
+SV = PV(0xb400007c1f6780e0) at 0xb400007c1f684f98
+  REFCNT = 2
+  FLAGS = (POK,pPOK)
+  PV = 0xb400007aef66c2e0 "\xC3\x83\xC2\xA4\xC3\x83\xC2\xB6\xC3\x83\xC2\xAB"\0
+  CUR = 12
+  LEN = 24
+#################
+is_utf8: 1
+valid:   1
+SV = PV(0xb400007c1f6780e0) at 0xb400007c1f684f98
+  REFCNT = 2
+  FLAGS = (POK,pPOK,UTF8)
+  PV = 0xb400007aef66c2e0 "\xC3\x83\xC2\xA4\xC3\x83\xC2\xB6\xC3\x83\xC2\xAB"\0 [UTF8 "\x{c3}\x{a4}\x{c3}\x{b6}\x{c3}\x{ab}"]
+  CUR = 12
+  LEN = 24
+
+# upgrade then downgrade.
+perl -MDevel::Peek -E 'my $v = "äöë"; sub c { say "#################"; say "is_utf8: " . utf8::is_utf8($v); say "valid:   " . utf8::valid($v); Dump $v } c; utf8::upgrade($v); c; utf8::downgrade($v); c'
+#################
+is_utf8:
+valid:   1
+SV = PV(0xb4000076231fb0b0) at 0xb400007623207f68
+  REFCNT = 2
+  FLAGS = (POK,IsCOW,pPOK)
+  PV = 0xb4000074e31f46f0 "\xC3\xA4\xC3\xB6\xC3\xAB"\0
+  CUR = 6
+  LEN = 10
+  COW_REFCNT = 1
+#################
+is_utf8: 1
+valid:   1
+SV = PV(0xb4000076231fb0b0) at 0xb400007623207f68
+  REFCNT = 2
+  FLAGS = (POK,pPOK,UTF8)
+  PV = 0xb4000074f31f6910 "\xC3\x83\xC2\xA4\xC3\x83\xC2\xB6\xC3\x83\xC2\xAB"\0 [UTF8 "\x{c3}\x{a4}\x{c3}\x{b6}\x{c3}\x{ab}"]
+  CUR = 12
+  LEN = 24
+#################
+is_utf8:
+valid:   1
+SV = PV(0xb4000076231fb0b0) at 0xb400007623207f68
+  REFCNT = 2
+  FLAGS = (POK,pPOK)
+  PV = 0xb4000074f31f6910 "\xC3\xA4\xC3\xB6\xC3\xAB"\0
+  CUR = 6
+  LEN = 24
+
+# downgrade then upgrade.
+perl -MDevel::Peek -E 'my $v = "äöë"; sub c { say "#################"; say "is_utf8: " . utf8::is_utf8($v); say "valid:   " . utf8::valid($v); Dump $v } c; utf8::downgrade($v); c; utf8::upgrade($v); c'
+#################
+is_utf8:
+valid:   1
+SV = PV(0xb400007c578710d0) at 0xb400007c5787ef98
+  REFCNT = 2
+  FLAGS = (POK,IsCOW,pPOK)
+  PV = 0xb400007b17878890 "\xC3\xA4\xC3\xB6\xC3\xAB"\0
+  CUR = 6
+  LEN = 10
+  COW_REFCNT = 1
+#################
+is_utf8:
+valid:   1
+SV = PV(0xb400007c578710d0) at 0xb400007c5787ef98
+  REFCNT = 2
+  FLAGS = (POK,IsCOW,pPOK)
+  PV = 0xb400007b17878890 "\xC3\xA4\xC3\xB6\xC3\xAB"\0
+  CUR = 6
+  LEN = 10
+  COW_REFCNT = 1
+#################
+is_utf8: 1
+valid:   1
+SV = PV(0xb400007c578710d0) at 0xb400007c5787ef98
+  REFCNT = 2
+  FLAGS = (POK,pPOK,UTF8)
+  PV = 0xb400007b278693d0 "\xC3\x83\xC2\xA4\xC3\x83\xC2\xB6\xC3\x83\xC2\xAB"\0 [UTF8 "\x{c3}\x{a4}\x{c3}\x{b6}\x{c3}\x{ab}"]
+  CUR = 12
+  LEN = 24
 
 
 #############################################################
@@ -11152,6 +12409,21 @@ sudo systemctl start selenium.service
 curl -X POST http://localhost:4444/wd/hub/session -d '{ "desiredCapabilities": { "browserName": "chrome" } }'
 curl -X POST http://localhost:4444/wd/hub/session -d '{ "desiredCapabilities": { "browserName": "firefox" } }'
 
+# Type the Enter/Return key in Selenium.
+perl -C -E 'say "\N{U+E007}"'   
+perl -C -E 'say "\x{E007}"'     
+
+# Make sure to use the apt firefox and not snap
+# when seeing: Firefox profile not missing or not accessible.
+sudo snap remove firefox
+sudo add-apt-repository ppa:mozillateam/ppa
+ echo '
+Package: *
+Pin: release o=LP-PPA-mozillateam
+Pin-Priority: 1001
+' | sudo tee /etc/apt/preferences.d/mozilla-firefox
+echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:${distro_codename}";' | sudo tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox
+
 
 #############################################################
 ## SQLite3 Database
@@ -11293,6 +12565,9 @@ sudo pip install telegram-send
 #  2. The URL in parentheses.
 # With no space between ] and (
 [this](Trello)
+
+# Show card count in Trello.
+Filter: *
 
 
 #############################################################
@@ -11511,6 +12786,20 @@ Control + H
 # Useful is policykit-i is accidentally removed
 sudo dhclient -v usb0
 
+# Remove trash icon in Ubuntu left panel.
+gsettings get org.gnome.shell.extensions.dash-to-dock show-trash   # true
+gsettings set org.gnome.shell.extensions.dash-to-dock show-trash false
+
+
+#############################################################
+## Ubuntu - Shortcuts
+#############################################################
+
+# Screenshot (Ubuntu)
+Druck + Click and drag + Enter    # Snippet.
+Shift + Druck                     # Full screenshot.
+Control + Alt + Fn + (F1,F2..F12) # Switch display.
+
 
 #############################################################
 ## Ubuntu - Filesystem - ZFS
@@ -11551,6 +12840,9 @@ sudo zfs get 'mountpoint,mounted,canmount' brpool/USERDATA
 # zpool status is SUSPENDED
 sudo zpool clear brpool
 sudo zpool clear -nFX brpool	# Or this
+
+# Cleanup rpool space for zfs
+zfs list -t snapshot -o name | while read f; do sudo zfs destroy -r $f; done
 
 
 #############################################################
@@ -11642,7 +12934,7 @@ chrome://flags/#enable-webrtc-pipewire-capturer
 ## VBA Regex
 #############################################################
 
-# Regex for validating input on database 
+# Regex for validating input on database
 cat data | add_color -r '(?x) ^ (?! ^( (ALLENGINES|ASAPPLICABLE|PW\d+\w+-?\w+)(,|$))+ ((Except:)? (\d{6}-\d{6}|\d{6}) (,|$) )* $ ) .*'
 
 
@@ -12125,6 +13417,14 @@ $
 
 
 #############################################################
+## Vim Buffers
+#############################################################
+
+# View all opened buffers (files)
+:buffers
+
+
+#############################################################
 ## Vim Files
 #############################################################
 
@@ -12390,6 +13690,24 @@ set nofoldenable
 
 
 #############################################################
+## Vim Perl
+#############################################################
+
+# Help for perl syntax in vim.
+:h perl.vim
+
+
+#############################################################
+## Vim Profiling
+#############################################################
+
+# Check what is running slow in vim (profile).
+:syntime on
+# *** Do some slow actions ***
+:syntime report
+
+
+#############################################################
 ## Vim Multiple Screens (Window/Split)
 #############################################################
 
@@ -12442,6 +13760,13 @@ set nofoldenable
 
 # Run command in every buffer (Vim,multiple screens)
 :bufdo! %s/ABC/123/g
+
+" Saving .vimrc should reload the buffer.
+" Example of running multiple vim commands.
+augroup save_vimrc
+   autocmd!
+   autocmd bufwritepost $MYVIMRC source $MYVIMRC | bufdo call RemovePerlSyntax()
+augroup END
 
 # Close all other windows (Vim,multiple screens)
 :on
@@ -12721,15 +14046,59 @@ endfunction
 # Save here: ~/.vim/autoload/plug.vim
 
 # Using plugins in vimrc
+# Install vim-plug.
+sudo apt install nodejs
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+# Using plugins in vimrc
 # Prepend in vimrc
 #
 call plug#begin('~/.vim/bundle')
-Plug 'pbogut/fzf-mru.vim'
-Plug 'ycm-core/YouCompleteMe'
+"
+" Conquerer of Completion
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'bmeneg/coc-perl'
+"
+" Solarized - better colors.
+Plug 'altercation/vim-colors-solarized'
+"
+" Tagbar - Show functions.
+Plug 'majutsushi/tagbar'
+"
+" Git Fugitive
+Plug 'tpope/vim-fugitive'
+" Commands:
+"     :Gblame  - Who broke it?
+"
+" Git Gutter - git status on the left side.
+Plug 'airblade/vim-gitgutter'
+"
+" GV - A git commit browser.
+Plug 'junegunn/gv.vim'
+" Commands:
+"     :GV to open commit browser
+"     You can pass git log options to the command, e.g. :GV -S foobar -- plugins.
+"     :GV! will only list commits that affected the current file
+"     :GV? fills the location list with the revisions of the current file
+"     :GV or :GV? can be used in visual mode to track the changes in the selected lines.
+" Mappings
+"     o or <cr> on a commit to display the content of it
+"     o or <cr> on commits to display the diff in the range
+"     O opens a new tab instead
+"     gb for :GBrowse
+"     ]] and [[ to move between commits
+"     . to start command-line with :Git [CURSOR] SHA à la fugitive
+"     q or gq to close
+"
+" Fuzzy search for files mru (most recently used).
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all'  }
 Plug 'junegunn/fzf.vim',
+Plug 'pbogut/fzf-mru.vim'
+"
+" Vim Rooter - Change to project root on file open.
 Plug 'airblade/vim-rooter'
-Plug 'vim-perl/vim-perl', { 'for': 'perl', 'do': 'make clean carp dancer highlight-all-pragmas moose test-more try-tiny' }
+"
 call plug#end()
 
 # Install plugin in vimrc file
@@ -12737,6 +14106,24 @@ call plug#end()
 
 # Vim plugin - Fuzzy search
 :File
+
+# Installing YouCompleteMe (autocomplete for vim).
+#
+# Original:
+apt install build-essential cmake vim-nox python3-dev
+apt install mono-complete golang nodejs default-jdk npm
+cd ~/.vim/bundle/YouCompleteMe
+python3 install.py --all
+#
+# Tried:
+sudo apt install build-essential cmake python3-dev
+sudo apt install golang nodejs
+cd ~/.vim/bundle/YouCompleteMe
+python3 install.py --system-libclang --clang-completer
+:YcmdRestartServer
+#
+# YCM does not seem to work on android.
+# Use COC instead.
 
 
 #############################################################
@@ -12871,6 +14258,39 @@ For Each f In fso.GetFolder(inputString).Files
 Next
 MsgBox "Done Converting!"
 
+
+#############################################################
+## Visual Boy Advance (VBA)
+#############################################################
+
+# Install VBA
+# Add to: /etc/apt/sources.list
+deb [trusted=yes] http://ftp.de.debian.org/debian bullseye main
+# Install:
+sudo apt install visualboyadvance
+
+# Install VBA Dev environment:
+https://medium.com/@microaeris/getting-started-with-gba-development-on-linux-a2c17ea826ea
+sudo apt install devkitpro-pacman
+export DEVKITPRO=/opt/devkitpro
+export DEVKITARM=/opt/devkitpro/devkitARM
+#
+# wav2agb
+git clone https://github.com/ipatix/wav2agb
+export $HOME/git/wav2agb
+
+# Example VBA hello world.
+cp $DEVKITPRO/examples/gba/template/ my -r
+cd my
+make
+VisualBoyAdvance my.gba
+
+# Apply updates to VBA.
+perl -i -0777pe '$_ .= "ETERNATUS_ETERNAMAX\n" if not /ETERNATUS_ETERNAMAX/' src/tm_compatibility/*.txt src/tutor_compatibility/*.txt
+python3 scripts/make.py
+
+# Toggle level 100/255 (VBA)
+perl -i -lpe 's/ MAX_LEVEL ,? \s+ \K \d+ /100/x' $(grep_text_files 'MAX_LEVEL.*(255|100)' -l)
 
 
 #############################################################
@@ -13437,6 +14857,34 @@ sudo apt install libxml2-utils
 # xsl "<xsl:apply-templates />" with no selection
 # In the absence of a select attribute, the xsl:apply-templates instruction
 # processes all of the children of the current node, including text nodes
+
+# Run xslt on the command line
+# CANNOT handle version 2.0 (matches)
+xsltproc ToJson.xsl In.xml
+
+# XSLT Samples - Copy tag
+<?xml version="1.0"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:output method="xml"/>
+    <xsl:template match="/">
+        <Parameters>
+            <Element>123</Element>
+            <xsl:copy>
+                <xsl:copy-of select="/MY_XPATH"/>
+            </xsl:copy>
+        </Parameters>
+    </xsl:template>
+</xsl:stylesheet>
+
+# XSLT Samples - variable, condition, match, negation
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:output method="xml"/>
+    <xsl:template match="/">
+        <xsl:vriable name="MyVar" select="MyXPath"></xsl:variable>
+        <xsl:if test="matches($My, '^HEY$')">MATCHES</xsl:if> 
+        <xsl:if test="not(matches($My, '^HEY$'))">NOT MATCHES</xsl:if> 
+    </xsl:template>
+</xsl:stylesheet>
 
 
 #############################################################

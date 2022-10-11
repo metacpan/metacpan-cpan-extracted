@@ -1,0 +1,22 @@
+---
+
+port: 3333
+
+log: core
+logger: console
+
+plugins:
+    'RPC::RESTISH':
+        '/db':
+            'Example::API::MockDB':
+                'GET@person/:id':  get_person
+                'PUT@person':      create_person
+                'GET@persons':     get_all_persons
+                'POST@person/:id': update_person
+    'RPC::JSONRPC':
+        '/db':
+            'Example::API::MockDB':
+                'get_person':    get_person
+                'create_person': create_person
+                'get_persons':   get_all_persons
+                'update_person': update_person

@@ -1,0 +1,101 @@
+Changes on 2022-10-11 for repository at:
+  Fetch URL: git@github.com:abeltje/Dancer2-Plugin-RPC-RESTISH.git
+  Push  URL: git@github.com:abeltje/Dancer2-Plugin-RPC-RESTISH.git
+
+Enjoy!
+
+2.02 2022-10-11T10:51:13+02:00 (54a4c4b => Abe Timmerman)
+ - (Abe Timmerman, Tue, 11 Oct 2022 10:51:13 +0200) Autocommit for
+   distribution Dancer2::Plugin::RPC::RESTISH 2.02 (minor)
+
+2.01_02 2022-10-03T19:37:04+02:00 (6b87abe => Abe Timmerman)
+ - (Abe Timmerman, Mon, 3 Oct 2022 19:37:04 +0200) Autocommit for
+   distribution Dancer2::Plugin::RPC::RESTISH 2.01_02 (same)
+
+2.01_01 2022-09-27T11:36:19+02:00 (beb80dd => Abe Timmerman)
+ - (Abe Timmerman, Tue, 27 Sep 2022 11:36:19 +0200) Autocommit for
+   distribution Dancer2::Plugin::RPC::RESTISH 2.01_01 (test)
+
+ - (Abe Timmerman, Mon, 3 Oct 2022 11:18:05 +0200) Move the 'allow_origin'
+   to an attribute
+ -     The plugin-object is instantiated only once and not for every use of
+   the
+ -     keyword, so we need to do extra bookkeeping for things related to
+ -     different endpoints. The new allow_origin attribute is a HashRef
+   that
+ -     will keep the 'cors_allow_origin' per $endpoint, so we can have
+   diffent
+ -     allowed origins for different endpoints.
+
+ - (Abe Timmerman, Mon, 3 Oct 2022 19:31:59 +0200) Try to get the logging
+   the same as the other RPC plugins
+ -     Log the duration of handling the call.
+ -     Adjust the test suite so it isn't loud.
+
+0.00_00 2019-05-14T14:57:36+02:00 (9d6d295 => Abe Timmerman)
+ - (Abe Timmerman, Tue, 14 May 2019 14:57:36 +0200) Initial commit for
+   Dancer::Plugin::RPC::RESTISH
+ -     A new plugin for the Dancer::Plugin::RPC framework that enables one
+   to
+ -     also expose an existing API as a REST interface.
+
+ - (Abe Timmerman, Tue, 14 May 2019 15:10:24 +0200) Autocommit for
+   distribution Dancer::Plugin::RPC::RESTISH 0.99_01 (test)
+
+ - (Abe Timmerman, Thu, 27 Jun 2019 07:16:06 +0200) Basic support for CORS
+ -     By specifying 'cors_allow_origin' as an argument in the
+   configuration of
+ -     the 'restish' keyword, we try to handle preflight-requests an add
+   CORS
+ -     headers for (regular) requests that send the 'Origin' header.
+
+ - (Abe Timmerman, Thu, 27 Jun 2019 07:22:05 +0200) Autocommit for
+   distribution Dancer::Plugin::RPC::RESTISH 0.99_02 (same)
+
+ - (Abe Timmerman, Tue, 15 Oct 2019 21:37:20 +0200) Use the new
+   ErrorResponse from Dancer::Plugin::RPC
+ -     Now that we can link HTTP-response-status to RPC-error_code,
+   register
+ -     the rpc-error-code with HTTP-response map with the ErrorResponse
+   object.
+ -     No longer the need to set the HTTP-response from within the
+   software.
+ -     Also fix some regexen, to allow for dispatch-paths with a
+   path-parameter
+ -     as their first element (after the path)
+
+ - (Abe Timmerman, Tue, 15 Oct 2019 22:19:30 +0200) Autocommit for
+   distribution Dancer::Plugin::RPC::RESTISH 0.99_03 (same)
+
+ - (Abe Timmerman, Wed, 27 Nov 2019 15:40:49 +0100) Send non-references
+   as-is
+ -     One should be able to send plain-text or PDF from a RESTISH service.
+
+ - (Abe Timmerman, Wed, 27 Nov 2019 15:42:15 +0100) Autocommit for
+   distribution Dancer::Plugin::RPC::RESTISH 0.99_04 (same)
+
+ - (Abe Timmerman, Wed, 27 Nov 2019 15:46:59 +0100) Autocommit for
+   distribution Dancer::Plugin::RPC::RESTISH 1.00 (minor)
+
+ - (Abe Timmerman, Wed, 19 Feb 2020 10:36:45 +0100) Introduce
+   $Dancer::RPCPlugin::ROUTE_INFO
+ -     For RPC::RESTISH we want some extra information about the route.
+
+ - (Abe Timmerman, Wed, 19 Feb 2020 10:45:03 +0100) Autocommit for
+   distribution Dancer::Plugin::RPC::RESTISH 1.01 (same)
+
+ - (Abe Timmerman, Thu, 23 Jun 2022 17:41:04 +0200) Port the plugin to
+   Dancer2::Plugin::RPC
+ -     It now works with Dancer2::RPCPlugin
+
+ - (Abe Timmerman, Tue, 27 Sep 2022 10:35:17 +0200) Update the example app
+   to Dancer2
+
+ - (Abe Timmerman, Tue, 27 Sep 2022 10:40:46 +0200) Update to
+   t::Test::abeltje 1.07
+
+ - (Abe Timmerman, Tue, 27 Sep 2022 11:27:32 +0200) Rework for
+   Dancer2::Plugin::RPC
+ -     - Fix the test suite (Plack::Test, t::Test::abeltje)
+ -     - Tweaks to the CORS code (always return Access-Control-Allow-Origin
+ -	 header if an Origin header was in the request - even empty)

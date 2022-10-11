@@ -24,8 +24,12 @@ provides:
     file: lib/My/Role/ColoredHelp.pm
   TimTools:
     file: lib/TimTools.pm
-    version: '0.05'
+    version: '0.06'
+requires:
+  Mojolicious: '9.27'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
-version: '0.05'
+  bugtracker: https://github.com/poti1/timtools/issues
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: https://github.com/poti1/timtools
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

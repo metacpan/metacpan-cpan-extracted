@@ -1,3 +1,10 @@
+0.06 2022-10-11
+  [Document Improvement]
+    * Improved the layout of the document.
+  [Incompatible Changes]
+    * The class and role must have its block. 
+      This is because it turns out that the roll doesn't work properly if it can't recognize the end of the block.
+    * The role can't have the isa attribute. Because inheritance has no meaning to the role, inheritance is forbiddened.
 0.05 2022-10-10
   [New Features]
     * Support role syntax using Role::Tiny.

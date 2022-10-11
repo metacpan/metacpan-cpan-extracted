@@ -7,12 +7,12 @@ use warnings;
 use base qw(Test::Class);
 use Test::More; # done_testing
 use Test::Fatal qw(dies_ok);
-use Env qw($TEST_VERBOSE $EXTENDED_TESTING);
+use Env qw($TEST_VERBOSE $EXTENDED_TESTING $HOLIDAYS_EXTENDED_TESTING);
 use Locale::Country; # all_country_codes
 use Test::MockModule;
 use English qw(-no_match_vars);
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 #run prior and once per suite
 sub startup : Test(startup => 1) {
@@ -947,7 +947,7 @@ sub test_norway_and_denmark_combined : Test(6) {
 
 sub test_without_object : Test(1) {
     SKIP: {
-        skip 'Author test not enabled', 1 unless ($EXTENDED_TESTING);
+        skip 'Special author test not enabled', 1 unless ($HOLIDAYS_EXTENDED_TESTING);
         my $holidays_hashref;
 
         ok( $holidays_hashref = Date::Holidays->is_holiday(

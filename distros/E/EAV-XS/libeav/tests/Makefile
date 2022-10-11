@@ -72,7 +72,13 @@ check-domain: t-dash-domains.bin t-retired.bin
 	# domain tests
 	# =====================================================
 	./t-all-tlds-test.bin ../data/tld-domains.txt
-	./t-domain-length.bin 4 3 ../data/domain-length.txt
+ifeq (${_withidn},idnkit)
+	./t-domain-length.bin 4 5 ../data/domain-length.txt
+else ifeq ($(LABELS_ALLOW_UNDERSCORE),ON)
+	./t-domain-length.bin 6 3 ../data/domain-length.txt
+else
+	./t-domain-length.bin 4 5 ../data/domain-length.txt
+endif
 	./t-dash-domains.bin ../data/xn-dash-domains.txt
 	./t-retired.bin 2 2 ../data/retired.txt
 
@@ -321,6 +327,22 @@ endif
 endif
 endif
 	./t-result.bin 7 18 ../data/email-result-check.txt
+	#
+	# --- LABELS_ALLOW_UNDERSCORE test
+	#
+ifeq (${_withidn},idnkit)
+ifeq ($(LABELS_ALLOW_UNDERSCORE),ON)
+	./t-eav-all-modes.bin 3 2 ../data/underscore.txt
+else
+	./t-eav-all-modes.bin 0 5 ../data/underscore.txt
+endif
+else
+ifeq ($(LABELS_ALLOW_UNDERSCORE),ON)
+	./t-eav-all-modes.bin 5 0 ../data/underscore.txt
+else
+	./t-eav-all-modes.bin 0 5 ../data/underscore.txt
+endif
+endif
 
 .PHONY: all debug clean check
 

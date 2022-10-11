@@ -188,4 +188,10 @@ use Class::Plain;
   is($object->field, "field");
 }
 
+# The class doesn't have its block
+{
+  eval "class ClassNoBlock;";
+  like($@, qr|The ClassNoBlock class must have its block|);
+}
+
 done_testing;

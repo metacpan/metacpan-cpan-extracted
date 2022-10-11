@@ -1,0 +1,30 @@
+# We report any policy of level 2 or higher (there is far too much noise if we
+# go down to severity 1).
+severity =  2
+verbose = %f:%l: %m (%p, Severity: %s).\n
+# We still include some policies whose default severity is 1
+include = ValuesAndExpressions::ProhibitInterpolationOfLiterals CodeLayout::ProhibitTrailingWhitespace CodeLayout::RequireTidyCode
+
+# And we do disable some policies:
+
+# This policy confuses sub prototype with signatures.
+[-Subroutines::ProhibitSubroutinePrototypes]
+# This policy appears to also be confused by signatures.
+[-Subroutines::ProhibitManyArgs]
+# The code in this module is inherently complex, I’m not trying to simplify it.
+[-Subroutines::ProhibitExcessComplexity]
+# That performance issue has been fixed in Perl 5.18 and newer.
+[-Modules::RequireNoMatchVarsWithUseEnglish]
+# I like postfix control :-)
+[-ControlStructures::ProhibitPostfixControls]
+# All the sections that I want to include are there already.
+[-Documentation::RequirePodSections]
+
+# Signatures are nice, let’s use them.
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = experimental::signatures
+
+# Methods of at most 2 lines can directly use @_ without unpacking it first
+# (used here for performance reasons).
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 2

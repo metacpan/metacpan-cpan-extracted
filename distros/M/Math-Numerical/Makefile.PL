@@ -16,17 +16,28 @@ WriteMakefile(
       'ExtUtils::MakeMaker' => '0',
     },
     BUILD_REQUIRES => {
+      'Readonly' => '0',
     },
     PREREQ_PM => {
     },
     TEST_REQUIRES => {
-      'Test2::V0'    => 0,
+      'Test2::V0'             => 0,
+      'Test2::Tools::Compare' => 0,
     },
     NO_MYMETA => 1,
     META_MERGE => {
       'meta-spec' => { version => 2 },
       # Goes with NO_MYMETA (which would provide the dynamic config).
       dynamic_config => 0,
+      prereqs => {
+        tests => {
+          suggests => {
+            'Perl::Tidy'           => 0,
+            'Test::Pod'            => '1.00',
+            'Test2::Tools::PerlCritic'   => 0,
+          },
+        },
+      },
       keywords => [ qw(math numerical analysis root solver derivative integral) ],
       resources => {
         repository => {
@@ -43,3 +54,18 @@ WriteMakefile(
     clean => { FILES => 'Math-Numerical-*' },
 );
 
+sub MY::postamble {
+  return <<~"MAKE_FRAGMENT"
+    critic:
+    \tperlcritic lib
+
+    tidy:
+    \tperltidy -b lib/Math/Numerical.pm
+
+    spelling:
+    \tperl -Ilib t/00-spelling.t --interactive
+
+    alltest:
+    \tTEST_AUTHOR=1 make test
+    MAKE_FRAGMENT
+}

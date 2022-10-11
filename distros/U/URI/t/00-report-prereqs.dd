@@ -62,8 +62,10 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'File::Spec::Functions' => '0',
                                    'File::Temp' => '0',
+                                   'Test::Fatal' => '0',
                                    'Test::More' => '0.96',
                                    'Test::Needs' => '0',
+                                   'Test::Warnings' => '0',
                                    'utf8' => '0'
                                  }
                  }

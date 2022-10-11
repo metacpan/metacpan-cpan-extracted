@@ -1,6 +1,25 @@
+0.009   2022-10-11  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.007 and 0.007.2.
+
+
+0.008   2022-10-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Mark rows that have 'bottom_border' cell attribute with a class.
+
+        - Render 'align' cell attribute.
+
+
+0.007.2 2022-10-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Introduce raw_html in cell content to allow passing raw HTML.
+
+        - UPDATE: Rename release from 0.007 -> 0.007.2 due to conflict.
+
+
 0.007   2022-01-23  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
-	- [incompatible change] Rename 'title' option to 'caption'.
+        - [incompatible change] Rename 'title' option to 'caption'.
 
 
 0.006   2022-01-07  Released-By: PERLANCAR; Urgency: low

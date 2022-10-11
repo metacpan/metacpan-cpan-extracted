@@ -1,5 +1,11 @@
 Revision history for Perl module Math::Numerical
 
+0.03 2022-10-10
+
+ - More leniant handling of the input params.
+ - Modularized code
+ - More tests
+
 0.02 2022-10-05
 
  - Fix TEST_REQUIRES in Makefile.PL.

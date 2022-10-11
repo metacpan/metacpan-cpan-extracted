@@ -126,6 +126,27 @@ ok( $metrics, '$metrics is still true' );
    );
 }
 
+# full distributions
+{
+   Metrics::Any::Adapter::Test->clear;
+
+   Metrics::Any::Adapter::Test->use_full_distributions;
+
+   $metrics->make_distribution( fulldist => name => "the_full_distribution" );
+
+   $metrics->report_distribution( fulldist => 1 );
+   $metrics->report_distribution( fulldist => 2 );
+   $metrics->report_distribution( fulldist => 3 );
+
+   is( Metrics::Any::Adapter::Test->metrics,
+      "the_full_distribution[1] = 1\n" .
+      "the_full_distribution[2] = 1\n" .
+      "the_full_distribution[3] = 1\n" .
+      "the_full_distribution_count = 3\n",
+      'Metrics::Any::Adapter::Test->metrics after ->report_distribution on full distribution'
+   );
+}
+
 ok( $metrics, '$metrics is still true at EOF' );
 
 done_testing;

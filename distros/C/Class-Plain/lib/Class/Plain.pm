@@ -1,4 +1,4 @@
-package Class::Plain 0.05;
+package Class::Plain 0.06;
 
 use v5.16;
 use warnings;
@@ -111,21 +111,15 @@ See also L<Class Plain Cookbook|Class::Plain::Document::Cookbook>.
 
 This module provides a class syntax for the hash-based Perl OO.
 
-=head1 Keywords
+=head1 Class
 
-=head2 class
+=head2 class Keyword
 
 A class is defined by the C<class> keyword.
 
   class NAME { ... }
 
-  class NAME : ATTRS... {
-    ...
-  }
-
-  class NAME;
-
-  class NAME : ATTRS...;
+  class NAME : ATTRS... { ... }
 
 Behaves similarly to the C<package> keyword, but provides a package that
 defines a new class.
@@ -135,9 +129,11 @@ that block define the new class and the preceding package continues
 afterwards. If not, it sets the class as the package context of following
 keywords and definitions.
 
-The following class attributes are supported:
+=head2 Class Attribute
 
-=head3 isa Attribute
+The following class attributes are supported.
+
+=head3 isa Class Attribute
  
  # The single inheritance
  : isa(SUPER_CLASS)
@@ -158,29 +154,31 @@ If the the super class name doesn't exists in the Perl's symbol table, the super
 
 Otherwise if the super class doesn't have the C<new> method and doesn't have the class names in C<@ISA>, the super class is loaded.
 
-=head3 does Attribute
+=head3 does Class Attribute
  
- # The single inheritance
  : does(ROLE)
  
- # The multiple inheritance
  : does(ROLE1) does(ROLE2)
- 
+
 Specifies roles that this class does. This is the alias for L<Role::Tiny/"with">.
 
 See also L</"role">.
 
-=head2 field
-  
+=head1 Field
+
+=head2 field Keyword
+
+A field is defined by the C<field> keyword.
+
   field NAME;
   
   field NAME : ATTR ATTR...;
 
-Define fields.
-
 The following field attributes are supported:
 
-=head3 reader Attribute
+=head2 field Attribute
+
+=head3 reader Field Attribute
 
   : reader
   
@@ -200,7 +198,7 @@ The different method name can be specified.
 
   field x : reader(x_different_name);
 
-=head3 writer Attribute
+=head3 writer Field Attribute
 
   : writer
 
@@ -221,7 +219,7 @@ The different method name can be specified.
 
   field x : writer(set_x_different_name);
 
-=head3 rw Attribute
+=head3 rw Field Attribute
 
   : rw
 
@@ -245,7 +243,9 @@ The different method name can be specified.
 
   field x : rw(x_different_name);
 
-=head2 method
+=head1 Method
+
+=head2 method Keyword
 
   method NAME {
      ...
@@ -260,8 +260,6 @@ In addition, the method body will have a lexical called C<$self>
 which contains the invocant object directly; it will already have been shifted
 from the C<@_> array.
 
-The following method attributes are supported.
-
 B<Examples:>
   
   # An instance method
@@ -272,7 +270,11 @@ B<Examples:>
     return $string;
   }
 
-=head3 common Attribute
+=head2 Method Attribute
+
+The following method attributes are supported.
+
+=head3 common Method Attribute
   
   : common
 
@@ -292,25 +294,21 @@ B<Examples:>
     return $self;
   }
 
-=head2 role
+=head1 Role
+
+=head2 role Keyword
 
 A role is defined by the C<role> keyword.
 
   role NAME { ... }
 
-  role NAME : ATTRS... {
-    ...
-  }
-
-  role NAME;
-
-  role NAME : ATTRS...;
+  role NAME : ATTRS... { ... }
 
 C<Class::Plain> adopts the role features of L<Role::Tiny>. All features of L<Role::Tiny> can be used.
 
 B<Examples:>
 
-The SYNOPSYS of L<Role::Tiny> is rewritten to the following codes.
+The examples in the document of L<Role::Tiny> is rewritten to the following codes.
 
   use Class::Plain;
    
@@ -328,7 +326,17 @@ The SYNOPSYS of L<Role::Tiny> is rewritten to the following codes.
     method baz { ... }
   }
 
-=head3 Required Method
+=head2 Role Attribute
+
+=head3 does Role Attribute
+ 
+ : does(ROLE)
+ 
+ : does(ROLE1) does(ROLE2)
+
+The same as L</"does Class Attribute">.
+
+=head2 Required Method
 
 In roles, the required method for the composed class can be defined by omitting its method block.
 
@@ -338,7 +346,7 @@ This is alias for L<Role::Tiny/"requires">.
 
   requires "required_method";
 
-=head3 does Method
+=head2 does Method
 
   $object->does('Some::Role');
 
@@ -401,6 +409,10 @@ The C<class> and C<field> keywords are parsed by L<XS::Parse::Keyword>.
 =head2 XS::Parse::Sublike
 
 The C<method> keyword is parsed by L<XS::Parse::Sublike>.
+
+=head2 Role::Tiny
+
+L<Role::Tiny> is used to implement role features of C<Class::Plain>.
 
 =head1 Repository
 

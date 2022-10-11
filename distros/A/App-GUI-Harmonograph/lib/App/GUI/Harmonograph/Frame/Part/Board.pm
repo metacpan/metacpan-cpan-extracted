@@ -1,10 +1,15 @@
 use v5.12;
 use warnings;
+use utf8;
 use Wx;
 
 package App::GUI::Harmonograph::Frame::Part::Board;
 use base qw/Wx::Panel/;
 my $TAU = 6.283185307;
+my $PI  = 3.1415926535;
+my $PHI = 1.618033988;
+my $phi = 0.618033988;
+my $e   = 2.718281828;
 
 use Graphics::Toolkit::Color;
 
@@ -69,13 +74,46 @@ sub paint {
 
     my $cx = (defined $width) ? $width / 2 : $self->{'center'}{'x'};
     my $cy = (defined $height) ? $height / 2 : $self->{'center'}{'y'};
-    my $max_freq = abs $self->{'data'}{'x'}{'frequency'};
     my $raster_radius = (defined $height) ? (($width > $height ? $cy : $cx) - 25) : $self->{'hard_radius'};
+    my $fx = $self->{'data'}{'x'}{'frequency'};
+    my $fy = $self->{'data'}{'y'}{'frequency'};
+    my $fz = $self->{'data'}{'z'}{'frequency'};
+    my $fr = $self->{'data'}{'r'}{'frequency'};
     
+    $fx *= $fy  if $self->{'data'}{'x'}{'factor'} eq 'Y';
+    $fx *= $fz  if $self->{'data'}{'x'}{'factor'} eq 'Z';
+    $fx *= $fr  if $self->{'data'}{'x'}{'factor'} eq 'R';
+    $fx *= $e   if $self->{'data'}{'x'}{'factor'} eq 'e';
+    $fx *= $phi if $self->{'data'}{'x'}{'factor'} eq 'φ';
+    $fx *= $PHI if $self->{'data'}{'x'}{'factor'} eq 'Φ';
+    $fx *= $PI  if $self->{'data'}{'x'}{'factor'} eq 'π';
+    $fy *= $fx  if $self->{'data'}{'y'}{'factor'} eq 'X';
+    $fy *= $fz  if $self->{'data'}{'y'}{'factor'} eq 'Z';
+    $fy *= $fr  if $self->{'data'}{'y'}{'factor'} eq 'R';
+    $fy *= $e   if $self->{'data'}{'y'}{'factor'} eq 'e';
+    $fy *= $phi if $self->{'data'}{'y'}{'factor'} eq 'φ';
+    $fy *= $PHI if $self->{'data'}{'y'}{'factor'} eq 'Φ';
+    $fy *= $PI  if $self->{'data'}{'y'}{'factor'} eq 'π';
+    $fz *= $fx  if $self->{'data'}{'z'}{'factor'} eq 'X';
+    $fz *= $fy  if $self->{'data'}{'z'}{'factor'} eq 'Y';
+    $fz *= $fr  if $self->{'data'}{'z'}{'factor'} eq 'R';
+    $fz *= $e   if $self->{'data'}{'z'}{'factor'} eq 'e';
+    $fz *= $phi if $self->{'data'}{'z'}{'factor'} eq 'φ';
+    $fz *= $PHI if $self->{'data'}{'z'}{'factor'} eq 'Φ';
+    $fz *= $PI  if $self->{'data'}{'z'}{'factor'} eq 'π';
+    $fr *= $fx  if $self->{'data'}{'r'}{'factor'} eq 'X';
+    $fr *= $fy  if $self->{'data'}{'r'}{'factor'} eq 'Y';
+    $fr *= $fz  if $self->{'data'}{'r'}{'factor'} eq 'Z';
+    $fr *= $e   if $self->{'data'}{'r'}{'factor'} eq 'e';
+    $fr *= $phi if $self->{'data'}{'r'}{'factor'} eq 'φ';
+    $fr *= $PHI if $self->{'data'}{'r'}{'factor'} eq 'Φ';
+    $fr *= $PI  if $self->{'data'}{'r'}{'factor'} eq 'π';
 
-    $max_freq = abs $self->{'data'}{'y'}{'frequency'} if $max_freq < abs $self->{'data'}{'y'}{'frequency'};
-    $max_freq = abs $self->{'data'}{'z'}{'frequency'} if $max_freq < abs $self->{'data'}{'z'}{'frequency'};
-    $max_freq = abs $self->{'data'}{'r'}{'frequency'} if $max_freq < abs $self->{'data'}{'r'}{'frequency'};
+
+    my $max_freq = abs $fx;
+    $max_freq = abs $fy if $max_freq < abs $fy ;
+    $max_freq = abs $fz if $max_freq < abs $fz;
+    $max_freq = abs $fr if $max_freq < abs $fr;
     
     my $step_in_circle = exists $self->{'data'}{'sketch'} 
                        ? 300 * $max_freq
@@ -102,10 +140,10 @@ sub paint {
         $ry *= 2 * $self->{'data'}{'r'}{'radius'} / 3;
     }
     
-    my $dtx =   $self->{'data'}{'x'}{'frequency'} * $TAU / $step_in_circle;
-    my $dty =   $self->{'data'}{'y'}{'frequency'} * $TAU / $step_in_circle;
-    my $dtz =   $self->{'data'}{'z'}{'frequency'} * $TAU / $step_in_circle;
-    my $dtr = - $self->{'data'}{'r'}{'frequency'} * $TAU / $step_in_circle;
+    my $dtx =   $fx * $TAU / $step_in_circle;
+    my $dty =   $fy * $TAU / $step_in_circle;
+    my $dtz =   $fz * $TAU / $step_in_circle;
+    my $dtr = - $fr * $TAU / $step_in_circle;
     $dtx =      0 unless $self->{'data'}{'x'}{'on'};
     $dty =      0 unless $self->{'data'}{'y'}{'on'};
     $dtz =      0 unless $self->{'data'}{'z'}{'on'};

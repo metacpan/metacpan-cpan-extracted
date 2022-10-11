@@ -1,0 +1,93 @@
+NAME
+    Dancer::Plugin::RPC::RESTISH - Simple plugin to implement a restish
+    interface.
+
+SYNOPSIS
+    In the Controler-bit:
+
+        use Dancer::Plugin::RPC::RESTISH;
+        restish '/endpoint' => {
+            publish   => 'pod',
+            arguments => ['MyProject::Admin'],
+        };
+
+    and in the Model-bit (MyProject::Admin):
+
+        package MyProject::Admin;
+
+        =for restish GET@ability/:id rpc_get_ability_details
+
+        =cut
+
+        sub rpc_get_ability_details {
+            my %args = @_; # contains: {"id": 42}
+            return {
+                # datastructure
+            };
+        }
+        1;
+
+DESCRIPTION
+    RESTISH is an implementation of REST that lets you bind routes to code
+    in the style the rest of Dancer::Plugin::RPC modules do.
+
+    This version only supports JSON as data serialisation.
+
+  restish '/base_path' => \%publisher_arguments
+    See Dancer::Plugin::RPC, Dancer::Plugin::RPC::JSONRPC,
+    Dancer::Plugin::RPC::RESTRPC, Dancer::Plugin::RPC::XMLRPC for more
+    information about the %publisher_arguments.
+
+  Implement the routes for REST
+    The plugin registers Dancer-"any" route-handlers for the "base_path" +
+    "method_path" and the route-handler looks for a data-handler that
+    matches the path and HTTP-method.
+
+    Method-paths can contain colon-prefixed parameters native to Dancer.
+    These parameters will be merged with the content.
+
+    Method-paths are prefixed by a HTTP-method followed by @:
+
+    publisher => 'config'
+        plugins:
+            'RPC::RESTISH':
+                '/rest': 'MyProject::Admin':
+                    'GET@resources':       'get_all_resourses'
+                    'POST@resource':       'create_resource'
+                    'GET@resource/:id':    'get_resource'
+                    'PATCH@resource/:id':  'update_resource'
+                    'DELETE@resource/:id': 'delete_resource'
+
+    publisher => 'pod'
+            =for restish GET@resources       get_all_resources /rest
+            =for restish POST@resource       create_resource   /rest
+            =for restish GET@resource/:id    get_resource      /rest
+            =for restish PATCH@resource/:id  update_resource   /rest
+            =for restish DELETE@resource/:id delete_resource   /rest
+
+        The third argument (the base_path) is optional.
+
+INSTALLATION
+
+    $ perl Makefile.PL
+    $ make
+    $ make test
+    $ make install
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See:
+
+    *   <http://www.perl.com/perl/misc/Artistic.html>
+
+    *   <http://www.gnu.org/copyleft/gpl.html>
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+COPYRIGHT
+    (c) MMXIX - Abe Timmerman <abeltje@cpan.org>
+

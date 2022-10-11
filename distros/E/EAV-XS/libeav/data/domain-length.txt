@@ -1,5 +1,8 @@
 # PASS: label == 63 characters (ascii)
 PASSefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-0123456789.com
+# PASS: LABELS_ALLOW_UNDERSCORE=ON by default
+PASS_underscore.com
+PASS_юникод.рф
 # FAIL: label >= 64 chars
 FAILefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZover-63chars.com
 # PASS: domain == 253 characters (without ending period)

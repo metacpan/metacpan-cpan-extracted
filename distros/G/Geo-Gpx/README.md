@@ -27,7 +27,7 @@ Geo::Gpx - Create and parse GPX files.
 # DESCRIPTION
 
 The original goal of this module was to produce GPX/XML files which were
-parseable by both GPX Spinner and EasyGPS. As of version 0.13 it has
+parsable by both GPX Spinner and EasyGPS. As of version 0.13 it has
 been extended to support general parsing and generation of GPX data. GPX
 1.0 and 1.1 are supported.
 
@@ -150,7 +150,7 @@ Generate GPX XML.
     my $gpx11 = $gpx->xml( '1.1' );
 
 If the version is omitted it defaults to the value of the `version`
-attibute. Parsing a GPX document sets the version. If the `version`
+attribute. Parsing a GPX document sets the version. If the `version`
 attribute is unset defaults to 1.0.
 
 `Geo::Gpx` version 0.10 used [Geo::Cache](https://metacpan.org/pod/Geo%3A%3ACache) to render each of the
@@ -162,7 +162,7 @@ for new applications.
 
 ## `TO_JSON`
 
-For compatability with [JSON](https://metacpan.org/pod/JSON) modules. Converts this object to a hash
+For compatibility with [JSON](https://metacpan.org/pod/JSON) modules. Converts this object to a hash
 with keys that correspond to the above methods. Generated ala:
 
     my %json = map { $_ => $self->$_ }
@@ -364,7 +364,7 @@ like this:
 
     $gpx->routes($routes);
 
-Each of the points in a route may have any of the atttibutes that are
+Each of the points in a route may have any of the attributes that are
 legal for a waypoint.
 
 ## `tracks( [ $newtracks ] )`
@@ -484,11 +484,11 @@ This version by Patrick Joly `<patjol@cpan.org>`.
 
 # VERSION
 
-$VERSION = '1.00'
+1.02
 
 # LICENCE AND COPYRIGHT
 
-Copyright (c) 2007-2009, Andy Armstrong `<andy@hexten.net>`. All
+Copyright (c) 2004-2022, Andy Armstrong `<andy@hexten.net>`, Patrick Joly `patjol@cpan.org`. All
 rights reserved.
 
 This module is free software; you can redistribute it and/or

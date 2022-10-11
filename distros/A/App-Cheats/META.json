@@ -33,15 +33,21 @@
    "provides" : {
       "App::Cheats" : {
          "file" : "lib/App/Cheats.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/poti1/app-cheats/issues"
+      },
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/poti1/app-cheats"
+      }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

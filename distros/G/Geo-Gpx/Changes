@@ -1,13 +1,16 @@
 Revision history for Geo-Gpx
 
+1.02 [2022-10-10]
+    Switched to Dist::Zilla to manage and release the module
+
 1.01 [2022-10-08]
-    . fixed missing dependencies in Makefile.PL and Build.PL:
+    fixed missing dependencies in Makefile.PL and Build.PL:
         - Geo::Calc
         - Geo::Coordinates::Transform
 
 1.00 [2022-10-07]
-    . Added Geo/Gpx/Point.pm: a new class to store and edit GPX points
-    . Initialize points with Geo::Gpx::Point->new() objects
+    Added Geo/Gpx/Point.pm: a new class to store and edit GPX points
+    Initialize points with Geo::Gpx::Point->new() objects
 
 0.26    2009-05-26
         Move to GitHub
@@ -22,7 +25,7 @@ Revision history for Geo-Gpx
         Skip JSON tests if installed JSON is too old.
 
 0.22    2009-03-08
-        Always use UTC for timestamps. Refs #34463. 
+        Always use UTC for timestamps. Refs #34463.
         Make bounds work as documented. Add TO_JSON support for JSON
         encoding. Refs #34458. Thanks to Steve Purkis.
 
@@ -33,7 +36,7 @@ Revision history for Geo-Gpx
 
 0.19    2007-10-11
         Fixed wpt element ordering per #29909
-        
+
 0.18    2007-08-07
         Replaced AUTOLOAD with generated accessors.
         Added bd foy's suggested add_waypoint method.

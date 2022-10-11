@@ -161,6 +161,33 @@ within *local-part* (copy the **RFC 5321** behavior).
 
 See the code of [is_6531_local.c][7] file for details.
 
+### Underscores inside of the domain part
+
+According to "2.3.1. Preferred name syntax" of [RFC 1035][30], a mail domain
+should satisfy both the rules of the **RFC 1035** and those in [RFC 822][2].
+
+Historically, many MX servers do allow underscores in the domain part of an
+email addresses. The libeav is based on the code base of the [postfix][13],
+specifically, you may check this by looking at the file
+`src/util/valid_hostname.c` of the current **postfix** distribution.
+
+Since **libeav** 1.2.0 the new option was added:
+* `LABELS_ALLOW_UNDERSCORE` = ON | OFF (default OFF)
+
+Pass it to the `make` command, for instance:
+```
+% make FORCE_IDN=idn2 LABELS_ALLOW_UNDERSCORE=ON
+```
+
+Before this, **libeav** had allowed underscores inside of the domain part
+of the email addresses by default.
+
+Also should be noted that [idnkit][8] prohibits underscores within
+the domain part of the email addresses. I'm highly recommending using
+`LABELS_ALLOW_UNDERSCORE=OFF` along side with `idnkit`. At the moment,
+**libeav** calls **idnkit** functions to check the domain part
+only when `RFC6531` mode is on.
+
 ### Updating TLD database
 
 First, there are three files, which corresponds to IANA's
@@ -231,6 +258,19 @@ PASS: xxx.ipv6@[2001:db8:1:1:1:1:1:1]
 PASS: simple@test.com
 ```
 
+## Troubleshooting
+
+### libidn issues
+
+The `idn` command depends on the value of `CHARSET` environment variable.
+Also, this environment variable affects the behaviour of the **libidn**
+library.
+
+If you are getting `Character encoding conversion error`, then try to
+check and fix the `CHARSET` variable on your system. Depending on the
+type of the operating system, the correct value may be `utf-8` or
+`UTF-8`, please, refer to the documentation of your system.
+
 ## See also
 
 * [github: dertuxmalwieder/libvldmail][21]
@@ -276,3 +316,4 @@ This software is released under BSD 2-clause "Simplified" License.
 [27]: /src/auto_tld.c
 [28]: /include/eav/auto_tld.h
 [29]: https://metacpan.org/pod/Text::CSV
+[30]: https://tools.ietf.org/html/rfc1035

@@ -19,7 +19,7 @@ name: Test-Sah-Filter
 provides:
   Test::Sah::Filter:
     file: lib/Test/Sah/Filter.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Data::Cmp: '0.002'
   Data::Dump: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Sah-Filter
   homepage: https://metacpan.org/release/Test-Sah-Filter
   repository: git://github.com/perlancar/perl-Test-Sah-Filter.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -326,7 +326,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.783'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

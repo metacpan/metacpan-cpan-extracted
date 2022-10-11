@@ -6,7 +6,7 @@ use FindBin;
 
 package App::GUI::Harmonograph;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.45';
+our $VERSION = '0.50';
 
 use base qw/Wx::App/;
 use App::GUI::Harmonograph::Frame;
@@ -193,8 +193,18 @@ The second row lets you dial in the speed (frequency).
 For instance 2 means that the pendulum swings back and fourt twice 
 as fast. The second combo control adds decimals for more complex drawings.
 
-The third row has switches to invert (1/x) frequency or direction 
-and can also change the starting position.
+The third row starts with a selector that if maybe the most advanced
+setting. It defines an factor with which the previously set frequency
+gets multiplied. Default is one which does nothing at all. The next are
+math constant like Pi, Phi (gib and small) and eulars constant e. 
+After that are the names of the pendula. With that you can define relative
+frequencies. This is especially handy when brwosing the classic shapes 
+with three pendula. For these the frequency of X and Y has to be the same -
+which willl be ensure when you set the frequency factor of Y to X 
+(or vice versa) and keep the frequency of Y to one.
+
+After this are switches to invert (1/x) frequency or direction.
+The mext two switches change the starting position.
 2 = 180 degree offset, 4 = 90 degree (both can be combined). 
 The last slider adds an additional fine tuned offset between 0 and 90 degree.
 

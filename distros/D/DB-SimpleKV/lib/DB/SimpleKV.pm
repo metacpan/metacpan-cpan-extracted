@@ -1,8 +1,10 @@
 package DB::SimpleKV;
 
+
 use 5.006;
 use strict;
 use warnings;
+use Fcntl ':flock';
 
 =head1 NAME
 
@@ -10,118 +12,83 @@ DB::SimpleKV - Simple k/v interface to text configuration file
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 sub new {
   my $class = shift;
   my $file = shift || "/tmp/simplekv.db";
+  my $hash = {};
 
-  unless (-f $file) {
+  if (-f $file) {
+    open my $db,$file or die $!;
+    while(<$db>){
+      next if /^#|^$/;
+      my ($k,$v) = split/=/;
+      $k =~ s/^\s+|\s+$//g;
+      $v =~ s/^\s+|\s+$//g;
+      $hash->{$k} = $v;
+    }
+    close $db;
+
+  }else {
     open my $db,">",$file or die $!;
     close $db;
   }
 
-  bless { file=>$file }, $class;
+  bless { file=>$file, hash=>$hash }, $class;
 }
 
 sub exists {
   my $self = shift;
   my $key = shift;
-  my $found = 0;
 
-  open my $db, $self->{file} or die $!;
-  while(<$db>) {
-    my ($k,$v) = split/=/;
-    $k =~ s/^\s+|\s+$//g;
-    $v =~ s/^\s+|\s+$//g;
-    if ($k eq $key) {
-      $found =1;
-      last;
-    }
-  }
-  close $db;
+  exists $self->{hash}->{$key};
+}
 
-  return $found;
+sub get {
+  my $self = shift;
+  my $key = shift;
+
+  $self->{hash}->{$key};
 }
 
 sub set {
   my $self = shift;
   my $key = shift;
   my $value = shift;
-  my %hash;
 
-  open my $db, $self->{file} or die $!;
-  while(<$db>) {
-    my ($k,$v) = split/=/;
-    $k =~ s/^\s+|\s+$//g;
-    $v =~ s/^\s+|\s+$//g;
-    $hash{$k} = $v;
-  }
-  close $db;
-
-  $hash{$key} = $value;
-
-  open my $dbx, ">", $self->{file} or die $!;
-  for (sort keys %hash) {
-    print $dbx $_,"=",$hash{$_},"\n";
-  }
-  close $dbx;
+  $self->{hash}->{$key} = $value; 
 }
 
 sub delete {
   my $self = shift;
   my $key = shift;
-  my %hash;
 
-  open my $db, $self->{file} or die $!;
-  while(<$db>) {
-    my ($k,$v) = split/=/;
-    $k =~ s/^\s+|\s+$//g;
-    $v =~ s/^\s+|\s+$//g;
-    $hash{$k} = $v;
-  }
-  close $db;
+  delete $self->{hash}->{$key};
+}
 
-  delete $hash{$key};
+sub save {
+  my $self = shift;
 
   open my $dbx, ">", $self->{file} or die $!;
-  for (sort keys %hash) {
-    print $dbx $_,"=",$hash{$_},"\n";
+  flock($dbx, LOCK_EX) or die $!;
+
+  for (sort keys %{$self->{hash}} ) {
+    print $dbx $_,'=',$self->{hash}->{$_},"\n";
   }
-  close $dbx;
+  close $dbx or die $!;
 }
-
-sub get {
-  my $self = shift;
-  my $key = shift;
-  my $value = undef;
-
-  open my $db, $self->{file} or die $!;
-  while(<$db>) {
-    my ($k,$v) = split/=/;
-    $k =~ s/^\s+|\s+$//g;
-    $v =~ s/^\s+|\s+$//g;
-    if ($k eq $key) {
-      $value = $v;
-      last;
-    }
-  }
-  close $db;
-
-  return $value;
-}
-
 
 
 =head1 SYNOPSIS
 
-This module is mainly used to manipulate a configuration file like Postfix's main.cf
+This module is mainly used to manipulate a configuration file like Postfix's main.cf.
 
-It creates the default db file under "/tmp/simplekv.db".
+It creates the default db file "/tmp/simplekv.db" if you don't specify the file path.
 
     use DB::SimpleKV;
 
@@ -134,6 +101,8 @@ It creates the default db file under "/tmp/simplekv.db".
     print $db->get("provider"),"\n";
     $db->delete("netmask");
     print  "netmask exists? ", $db->exists("netmask") ? "yes" : "no", "\n";
+
+    $db->save;
 
 Or you can specify the existing file for manipulation, one configuration per line, with '=' as delimiter.
 
@@ -151,21 +120,37 @@ Or you can specify the existing file for manipulation, one configuration per lin
 
     my $db = DB::SimpleKV->new(...);
 
+If a file path was given, the delimiter in each line should be '='.
+
 =head2 get
 
     my $value = $db->get("key");
+
+Get the value by key.
 
 =head2 set
 
     $db->set("key","value");
 
+Set the key and value, either create them or update them.
+
 =head2 delete
 
     $db->delete("key");
 
+Delete the key and value.
+
 =head2 exists
 
-    my $exists = $db->exists("key");
+    if ($db->exists("key") ) {...}
+
+To check if there is a key existing while the value can be undefined.
+
+=head2 save
+
+    $db->save;
+
+If db has been changed, should be written to disk finally.
 
 
 =head1 AUTHOR

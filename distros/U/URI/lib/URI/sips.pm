@@ -3,7 +3,7 @@ package URI::sips;
 use strict;
 use warnings;
 
-our $VERSION = '5.13';
+our $VERSION = '5.15';
 
 use parent 'URI::sip';
 

@@ -1,10 +1,10 @@
 {
    "abstract" : "Create and parse GPX files.",
    "author" : [
-      "Andy Armstrong <andy@hexten.net>"
+      "Patrick Joly <patjol@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,21 +13,16 @@
       "version" : 2
    },
    "name" : "Geo-Gpx",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.28"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
          }
       },
       "runtime" : {
@@ -40,12 +35,29 @@
             "Scalar::Util" : "0",
             "Test::More" : "0",
             "Time::Local" : "0",
-            "XML::Descent" : "1.01",
+            "XML::Descent" : "0",
+            "perl" : "5.008",
             "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::PP version 4.11"
+   "resources" : {
+      "homepage" : "https://github.com/patjoly/geo-gpx",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/patjoly/geo-gpx.git",
+         "web" : "https://github.com/patjoly/geo-gpx"
+      }
+   },
+   "version" : "1.02",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
+

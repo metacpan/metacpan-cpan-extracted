@@ -1,5 +1,7 @@
 Revision history for Pod-Query
 
+0.36
+        Added new git flow.
 0.35
         2022-10-04 - Attempt to lower perl version.
 0.34    2022-10-01 - Added bugtracker resources.

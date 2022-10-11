@@ -1,3 +1,5 @@
+#!/bin/env perl
+
 use 5.006;
 use strict;
 use warnings;
@@ -20,6 +22,12 @@ my $builder = Module::Build->new(
          'TimTools' => '0.04',
     },
     add_to_cleanup     => [ 'App-Cheats-*' ],
+    meta_merge     => {
+        resources => {
+            bugtracker => 'https://github.com/poti1/app-cheats/issues',
+            repository => 'https://github.com/poti1/app-cheats',
+        },
+    },
 );
 
 $builder->create_build_script();

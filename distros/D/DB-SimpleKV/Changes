@@ -3,3 +3,11 @@ Revision history for DB-SimpleKV
 0.01    2022-10-10
         First version, released on ubuntu 20.04 linux.
 
+0.02    2022-10-10
+        Performance improvement
+
+0.03    2022-10-11
+        Bug fix
+
+0.04    2022-10-11
+        Add file lock

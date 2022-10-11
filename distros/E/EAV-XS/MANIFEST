@@ -26,6 +26,7 @@ libeav/data/punycode.csv
 libeav/data/raw.csv
 libeav/data/retired.txt
 libeav/data/tld-domains.txt
+libeav/data/underscore.txt
 libeav/data/xn-dash-domains.txt
 libeav/docs/libeav.3.gz
 libeav/docs/libeav.3.pod

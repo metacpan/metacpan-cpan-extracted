@@ -43,7 +43,7 @@
    "provides" : {
       "Class::Plain" : {
          "file" : "lib/Class/Plain.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Class::Plain::Base" : {
          "file" : "lib/Class/Plain/Base.pm"
@@ -58,6 +58,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

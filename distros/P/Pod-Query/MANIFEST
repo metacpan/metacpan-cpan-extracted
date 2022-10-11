@@ -2,6 +2,7 @@ Build.PL
 Changes
 lib/Pod/Query.pm
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.json
 META.yml
 README

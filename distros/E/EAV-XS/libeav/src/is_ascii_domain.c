@@ -54,7 +54,11 @@ is_ascii_domain (const char *start, const char *end)
      * Find bad characters or label lengths. Find adjacent delimiters.
      */
     for (cp = start; cp < end && (ch = *(unsigned char *) cp) != 0; cp++) {
+#ifdef LABELS_ALLOW_UNDERSCORE
         if (ISALNUM(ch) || ch == '_') {     /* grr.. */
+#else
+        if (ISALNUM(ch)) {
+#endif
             if (label_length == 0)
                 label_count++;
             label_length++;

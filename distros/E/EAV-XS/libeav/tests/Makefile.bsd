@@ -69,8 +69,18 @@ check-domain: t-dash-domains.bin t-retired.bin
 	# =====================================================
 	env LD_LIBRARY_PATH="${LIB_PATH}" \
 	./t-all-tlds-test.bin ../data/tld-domains.txt
+.if ${_withidn} == idnkit
 	env LD_LIBRARY_PATH="${LIB_PATH}" \
-	./t-domain-length.bin 4 3 ../data/domain-length.txt
+	./t-domain-length.bin 4 5 ../data/domain-length.txt
+.else
+.if ${LABELS_ALLOW_UNDERSCORE} == ON
+	env LD_LIBRARY_PATH="${LIB_PATH}" \
+	./t-domain-length.bin 6 3 ../data/domain-length.txt
+.else
+	env LD_LIBRARY_PATH="${LIB_PATH}" \
+	./t-domain-length.bin 4 5 ../data/domain-length.txt
+.endif
+.endif
 	env LD_LIBRARY_PATH="${LIB_PATH}" \
 	./t-dash-domains.bin ../data/xn-dash-domains.txt
 	env LD_LIBRARY_PATH="${LIB_PATH}" \
@@ -448,6 +458,25 @@ check-lib: t-eav.bin t-eav-all-modes.bin t-result.bin
 .endif
 	env LD_LIBRARY_PATH="${LIB_PATH}" \
 	./t-result.bin 7 18 ../data/email-result-check.txt
-
+	#
+	# --- LABELS_ALLOW_UNDERSCORE test
+	#
+.if ${_withidn} == idnkit
+.if ${LABELS_ALLOW_UNDERSCORE} == ON
+	env LD_LIBRARY_PATH="${LIB_PATH}" \
+	./t-eav-all-modes.bin 3 2 ../data/underscore.txt
+.else
+	env LD_LIBRARY_PATH="${LIB_PATH}" \
+	./t-eav-all-modes.bin 0 5 ../data/underscore.txt
+.endif
+.else
+.if ${LABELS_ALLOW_UNDERSCORE} == ON
+	env LD_LIBRARY_PATH="${LIB_PATH}" \
+	./t-eav-all-modes.bin 5 0 ../data/underscore.txt
+.else
+	env LD_LIBRARY_PATH="${LIB_PATH}" \
+	./t-eav-all-modes.bin 0 5 ../data/underscore.txt
+.endif
+.endif
 
 .PHONY: all debug clean check

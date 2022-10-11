@@ -1,11 +1,12 @@
 #!/usr/bin/perl -w
 use v5.12;
 use lib 'lib';
-use Test::More tests => 15;
+use Test::More tests => 16;
 
-use_ok( 'App::GUI::Harmonograph::Color::Value' );
-use_ok( 'App::GUI::Harmonograph::Color::Constant' );
-use_ok( 'App::GUI::Harmonograph::Color' );
+use_ok( 'App::GUI::Harmonograph::Dialog::About' );
+use_ok( 'App::GUI::Harmonograph::Dialog::Interface' );
+use_ok( 'App::GUI::Harmonograph::Dialog::Function' );
+use_ok( 'App::GUI::Harmonograph::ProgressBar' );
 use_ok( 'App::GUI::Harmonograph::ColorDisplay' );
 use_ok( 'App::GUI::Harmonograph::Settings' );
 use_ok( 'App::GUI::Harmonograph::Config' );

@@ -1,4 +1,6 @@
 Revision history for App-Cheats
 
-0.03 Added environmental variable: CHEAT_DIRS.
-0.01 First version, released on an unsuspecting world.
+0.06
+        Added new git flow.
+0.03    Added environmental variable: CHEAT_DIRS.
+0.01    First version, released on an unsuspecting world.

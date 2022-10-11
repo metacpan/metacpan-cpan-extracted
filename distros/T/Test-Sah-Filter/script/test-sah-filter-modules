@@ -8,9 +8,9 @@ use Getopt::Long qw(:config bundling no_ignore_case auto_help auto_version);
 use Test::Sah::Filter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-17'; # DATE
+our $DATE = '2022-07-24'; # DATE
 our $DIST = 'Test-Sah-Filter'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my %opts = (
     exclude_modules => [],
@@ -50,7 +50,7 @@ test-sah-filter-modules - Test all Data::Sah::Filter::* modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.003 of test-sah-filter-modules (from Perl distribution Test-Sah-Filter), released on 2022-07-17.
+This document describes version 0.004 of test-sah-filter-modules (from Perl distribution Test-Sah-Filter), released on 2022-07-24.
 
 =head1 SYNOPSIS
 
@@ -68,6 +68,10 @@ Examples:
 
  # only test a couple of modules
  % test-sah-filter-modules perl::Str::check js::Str::downcase
+
+ # do not test JS filters
+ % test-sah-filter-modules --notest-js
+ % test-sah-filter-modules --no-test-js-filters
 
 =head1 DESCRIPTION
 

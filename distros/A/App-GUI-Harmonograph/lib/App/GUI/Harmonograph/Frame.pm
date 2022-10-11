@@ -2,7 +2,8 @@ use v5.12;
 use warnings;
 use utf8;
 use Wx::AUI;
-# fast preview
+
+
 # modular conections
 # X Y sync ? , undo ?
 
@@ -192,13 +193,16 @@ sub new {
     my $line_attr    = $std_attr | &Wx::wxLEFT | &Wx::wxRIGHT ;
  
      my $pendulum_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
-    $pendulum_sizer->AddSpacer(15);
+    $pendulum_sizer->AddSpacer(5);
     $pendulum_sizer->Add( $self->{'pendulum'}{'x'},   0, $vert_attr| &Wx::wxLEFT, 15);
     $pendulum_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'pendulum'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
+    $pendulum_sizer->AddSpacer(5);
     $pendulum_sizer->Add( $self->{'pendulum'}{'y'},   0, $vert_attr| &Wx::wxLEFT, 15);
     $pendulum_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'pendulum'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
+    $pendulum_sizer->AddSpacer(5);
     $pendulum_sizer->Add( $self->{'pendulum'}{'z'},   0, $vert_attr| &Wx::wxLEFT, 15);
     $pendulum_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'pendulum'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
+    $pendulum_sizer->AddSpacer(5);
     $pendulum_sizer->Add( $self->{'pendulum'}{'r'},   0, $vert_attr| &Wx::wxLEFT, 15);
     $pendulum_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
     $self->{'tab'}{'pendulum'}->SetSizer( $pendulum_sizer );

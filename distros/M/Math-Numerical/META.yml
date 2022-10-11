@@ -3,6 +3,8 @@ abstract: 'Algorithms for numerical functions (solver, root findings, etc.)'
 author:
   - 'Mathias Kende <mathias@cpan.org>'
 build_requires:
+  Readonly: '0'
+  Test2::Tools::Compare: '0'
   Test2::V0: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -30,5 +32,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/math_numerical/issues
   repository: https://github.com/mkende/math_numerical
-version: 0.02
+version: 0.03
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

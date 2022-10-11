@@ -31,6 +31,10 @@ void ClassPlain_class_apply_attribute(pTHX_ ClassMeta *class, const char *name, 
   
   // The isa attribute
   if (strcmp(name, "isa") == 0) {
+    if(class->is_role) {
+      croak("The role can't have the isa attribute");
+    }
+    
     SV* super_class_name = value;
     
     if (value) {

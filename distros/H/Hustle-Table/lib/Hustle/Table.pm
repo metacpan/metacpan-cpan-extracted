@@ -1,14 +1,13 @@
 package Hustle::Table;
-use version; our $VERSION=version->declare("v0.5.4");
+use version; our $VERSION=version->declare("v0.5.5");
 
 use strict;
 use warnings;
 
 use Template::Plex;
 
-use feature "refaliasing";
+#use feature "refaliasing";
 no warnings "experimental";
-use feature "state";
 
 use Carp qw<carp croak>;
 
@@ -61,7 +60,7 @@ sub add {
 
 		}
 
-		croak "matcher not specified" unless defined $entry->[matcher_];
+		#croak "matcher not specified" unless defined $entry->[matcher_];
 
 		if(defined $entry->[matcher_]){
 			#Append to the end of the normal matching list 
@@ -105,18 +104,20 @@ sub _prepare_online_cached {
 		$cache={};
 	}
 
-	#\$entry=\$table->[$index];
-	#\$matcher=\$entry->[Hustle::Table::matcher_];
 	my $sub_template=
 	'	 
 	@{[do {
 		my $do_capture;
-		my $d="if";
+		my $d="";
 		for($item->[Hustle::Table::type_]){
                         if(ref($item->[Hustle::Table::matcher_]) eq "Regexp"){
-				$d.=\'($input=~$table->[\'. $index .\'][Hustle::Table::matcher_] )\';
+			$d.=\'(@$capture=$input=~$table->[\'. $index .\'][Hustle::Table::matcher_] )\';
 				$do_capture=1;
                         }
+			elsif(ref($item->[Hustle::Table::matcher_]) eq "CODE"){
+
+				$d.=\'($table->[\'.$index.\'][Hustle::Table::matcher_]->($input, ($table->[\'.$index.\'][1])))\';
+			}
                         elsif(/exact/){
 				$d.=\'($input eq "\'. $item->[Hustle::Table::matcher_]. \'")\';
                         }
@@ -137,48 +138,43 @@ sub _prepare_online_cached {
 				$d.=\'($input=~m{\' . $item->[Hustle::Table::matcher_].\'})\';
                         }
 		}
-		$d.=\'{ \';
 
-		$d.=\'$entry=$table->[\'.$index.\'];\';
-		$d.=\' $cache->{$input}=$entry;\';
 
 		if($do_capture){
-			$d.=\'return ($entry, [@{^CAPTURE}]);\';
+			$d.=\' and return ($cache->{$input}=$table->[\'.$index.\'], @{^CAPTURE}?$capture:());\';
 		}	
 		else {
-			$d.=\'return ($entry);\';
+			$d.=\' and return ($cache->{$input}=$table->[\'.$index.\']);\';
 
 		}
-
-
-		$d.=\'}\';
 		$d;
 	}]}
 	';
 
 	my $template=
-	' 
+	'
 	my \$input;
 	my \$entry;
+	my \$capture;
 	sub {
 		\$input=shift;
 		\$entry=\$cache->{\$input};
-
 		#Locate cached regex types, perform capture, and return
-		\$entry
-			and !(\$entry->[Hustle::Table::type_])
-			and \$input=~ \$entry->[Hustle::Table::matcher_]
-			and return \$entry, [\@{^CAPTURE}];
-
 		#Locate cached non regex types and return
-		\$entry and return \$entry;
+		#\$entry
+			\$entry->[Hustle::Table::type_]
+			? return \$entry
+			: (\@\$capture=\$input=~ \$entry->[Hustle::Table::matcher_])
+				and return (\$entry, \@{^CAPTURE}?\$capture:())
+
+
+			if \$entry;
 
 
 		#Build the logic for matcher entry in order of listing
 		@{[do {
 			my $index=0;
 			my $base={index=>0, item=>undef};
-
 			my $sub=$self->load([$sub], $base);
 			map {
 				$base->{index}=$_;
@@ -195,7 +191,7 @@ sub _prepare_online_cached {
 
 	my $top_level=Template::Plex->load([$template],{table=>$table, cache=>$cache, sub=>$sub_template});
 	my $s=$top_level->render;
-
+	#say STDERR $s;
 	#my $line=1;
 	#print map $_."\n", split "\n", $s;
 	my $ss=eval $s;

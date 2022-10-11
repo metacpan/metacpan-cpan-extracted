@@ -6,7 +6,7 @@ use base qw(Test::Class);
 use Test::More;
 use Env qw($HOLIDAYS_FILE);
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 #run prior and once per suite
 sub startup : Test(startup => 1) {

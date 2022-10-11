@@ -9,7 +9,7 @@
 
 
 /* how many times idn library should fail */
-#define IDN_ERRORS    (2)
+#define IDN_ERRORS    (4)
 
 
 static void

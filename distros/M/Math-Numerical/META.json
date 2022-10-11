@@ -30,7 +30,9 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "Readonly" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -44,7 +46,15 @@
       },
       "test" : {
          "requires" : {
+            "Test2::Tools::Compare" : "0",
             "Test2::V0" : "0"
+         }
+      },
+      "x_tests" : {
+         "suggests" : {
+            "Perl::Tidy" : 0,
+            "Test2::Tools::PerlCritic" : 0,
+            "Test::Pod" : "1.00"
          }
       }
    },
@@ -58,6 +68,6 @@
          "web" : "https://github.com/mkende/math_numerical"
       }
    },
-   "version" : 0.02,
+   "version" : 0.03,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,11 +1,16 @@
-0.04    2017-07-10 (PERLANCAR)
+0.050   2022-10-111  Released-By: PERLANCAR
+
+        - First implementation.
+
+
+0.04    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.03    2015-09-03 (PERLANCAR)
+0.03    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -14,14 +19,14 @@
 	  requirement.
 
 
-0.02    2015-08-18 (PERLANCAR)
+0.02    2015-08-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.001    2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.001    2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - [build] CLI scripts are now generated automatically using
            Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
@@ -30,6 +35,6 @@
          - Rename CLI script from export-org-to-text -> org-to-text.
 
 
-0.00    2011-09-07 (SHARYANTO)
+0.00    2011-09-07  Released-By: SHARYANTO
 
         - First release. Not yet implemented.

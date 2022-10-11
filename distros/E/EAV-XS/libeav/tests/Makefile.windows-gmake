@@ -61,7 +61,15 @@ check-domain: t-dash-domains.exe t-retired.exe
 	$(info # domain tests)
 	$(info # =====================================================)
 	./t-all-tlds-test.exe ../data/tld-domains.txt
-	./t-domain-length.exe 4 3 ../data/domain-length.txt
+ifeq (${_withidn},idnkit)
+	./t-domain-length.bin 4 5 ../data/domain-length.txt
+else
+ifeq ($(LABELS_ALLOW_UNDERSCORE),ON)
+	./t-domain-length.bin 6 3 ../data/domain-length.txt
+else
+	./t-domain-length.bin 4 5 ../data/domain-length.txt
+endif
+endif
 	./t-dash-domains.exe ../data/xn-dash-domains.txt
 	./t-retired.exe 2 2 ../data/retired.txt
 
@@ -327,3 +335,19 @@ endif
 endif
 endif
 	./t-result.exe 7 18 ../data/email-result-check.txt
+	$(info # =====================================================)
+	$(info # --- LABELS_ALLOW_UNDERSCORE test
+	$(info # =====================================================)
+ifeq (${_withidn},idnkit)
+ifeq ($(LABELS_ALLOW_UNDERSCORE),ON)
+	./t-eav-all-modes.exe 3 2 ../data/underscore.txt
+else
+	./t-eav-all-modes.exe 0 5 ../data/underscore.txt
+endif
+else
+ifeq ($(LABELS_ALLOW_UNDERSCORE),ON)
+	./t-eav-all-modes.exe 5 0 ../data/underscore.txt
+else
+	./t-eav-all-modes.exe 0 5 ../data/underscore.txt
+endif
+endif

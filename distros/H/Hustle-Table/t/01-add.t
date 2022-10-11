@@ -4,7 +4,7 @@ use warnings;
 use Hustle::Table;
 use Test::More;
 
-plan  tests=>6;
+plan  tests=>7;
 my $table=Hustle::Table->new;
 
 #add entries
@@ -44,6 +44,13 @@ ok eval {
 		{matcher=>"h", value=>sub {}}
 	);
 	1;
-}
+};
 
 
+
+ok eval {
+	my @id=$table->add(
+		[undef,sub {},"exact"],
+	);
+	1;
+}, "Added default";

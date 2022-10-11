@@ -63,9 +63,9 @@ my ($entry, $captures)=$dispatch->("thing to match");
 This module provides a class to construct a routing table and build a high
 performance dispatcher from it. 
 
-A table can have any combination of regex, exact string, begin string end
-string or numeric matching of entries. The order in which the entries are added
-defines their precedence. First in, first tested.
+A table can have any combination of regex, subroutine, exact string, begin
+string end string or numeric matching of entries. The order in which the
+entries are added defines their precedence. First in, first tested.
 
 In the case of no entries matching the input, a default/fallback entry always
 matches.
@@ -74,15 +74,16 @@ Once all the entries have been added to the table, a dispatcher is
 prepared/created. The dispatcher is an anonymous subroutine, which tests its
 argument against the matcher in each entry in the table.
 
-It returns a list containing the first entry that matched, and an anonymous
-array of any captures from regex  matching.
+It returns a list containing the first entry that matched, and if applicable,
+an anonymous array of any captures from regex matching.
 
 If more entries are required to be added to the table, the dispatcher must be
 prepared again.
 
 A cache (hash) is used to drastically improve table lookup performance. Entries
-are automatically added to the cache. However removal of cache entries is up to
-the user to implement on a application basis.
+are automatically added to the cache. A cache hit with a regex matcher will re
+execute the regexp to ensure the captures are returned as expected. Removal of
+cache entries is up to the user to implement on a application basis.
 
 ## API Change
 
@@ -136,10 +137,14 @@ An entry is an anonymous array containing the following elements:
 
 - matcher
 
-    `matcher` can be a regex, a string or a numeric value.
+    `matcher` can be a regex, a subroutine, a string or a numeric value.
 
     When `matcher` is a regex, any captures are returned as the second item when
     calling the dispatcher
+
+    When `matcher` is a subroutine,  it is called with input to test and a
+    reference to the `value` field in the entry as the two arguments. If it
+    returns a true value it matches. 
 
     When  `matcher` is string or numeric value, the last field `type` specifies
     how to perform the match. See `type` below.
@@ -157,28 +162,32 @@ An entry is an anonymous array containing the following elements:
     are:
 
     ```perl
-        undef   =>      matcher is always treated as a regex
-        "begin" =>      matches the begining of input string
-        "end"   =>      matches the end of input string
-        "exact" =>      string equality
-        "numeric" =>    numeric equality
+        undef   =>      matcher treated as a regex or subroutine if possible
+                        forces basic scalars to become a regexp
+
+        "begin" =>      matcher string matches the begining of input string
+        "end"   =>      matcher string matches the end of input string
+        "exact" =>      matcher string matches string equality
+        "numeric" =>    matcher number matches numeric equality
     ```
 
-    If `matcher` is a precompiled regex (i.e. `qr{}`), `type` is ignored. 
+    If `matcher` is a precompiled regex (i.e. `qr{}`), or a subroutine (i.e. CODE
+    reference), `type` is ignored. 
 
     If `matcher` is a string or number, it is treated as a regex unless `type` is
     as above.
 
 - default
 
-    This is a flag indicating if the entry was the default entry
+    This is a flag indicating if the entry was the default entry. This can not be
+    set
 
 ## Adding
 
 Entries are added in anonymous hash, anonymous array or flattened format, using
 the `add` method.
 
-Anonymous array entries must contain six elements, in the order of:
+Anonymous array entries must contain 3 elements, in the order of:
 
 ```
     $table->add([$matcher, $value, $type]);
@@ -212,18 +221,19 @@ Or add multiple at once using mixed formats together
     );
 ```
 
-In any case,`matcher` and `value` are the only items which must be defined.
+In any case,`matcher` and `value` are the only items which must be defined
+for subroutine and regex matchers. String matching will need the `type` also
+specified.
 
 ## Default Matcher
 
 Each list has a default matcher that will unconditionally match the input. This
-entry is specified by using `undef` as the matcher when adding an entry. When
-set this way only the array format can be used.
+entry is specified by using `undef` as the matcher when adding an entry. 
 
 To make it more explicit, the it can also be changed via the `set_default`
 method. 
 
-The default value of the 'default' entry is undef
+The default `value` of the 'default' entry is undef
 
 # PREPARING A DISPATCHER
 

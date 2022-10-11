@@ -1,5 +1,5 @@
 package Gherkin::Line;
-$Gherkin::Line::VERSION = '24.0.0';
+$Gherkin::Line::VERSION = '24.1.0';
 use strict;
 use warnings;
 

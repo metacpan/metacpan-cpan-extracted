@@ -16,7 +16,7 @@ name: App-Pod
 provides:
   App::Pod:
     file: lib/App/Pod.pm
-    version: '0.28'
+    version: '0.29'
 requires:
   File::HomeDir: '1.006'
   Module::Functions: v2.1.3
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/poti1/app-pod/issues
   license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: https://github.com/poti1/app-pod
-version: '0.28'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

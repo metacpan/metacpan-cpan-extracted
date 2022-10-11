@@ -42,6 +42,7 @@ my @email_fail = (
     'all-numeric@123.456',
     'admin@no-tld',
     'no-fqdn@com',
+    'underscore@old_days.com',
 );
 
 for my $email (@email_pass) {

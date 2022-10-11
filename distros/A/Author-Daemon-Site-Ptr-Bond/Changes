@@ -1,5 +1,16 @@
 Revision history for Author-Daemon-Site-Ptr-Bond
 
+0.008     2022-10-10 21:27:46 BST
+
+0.007     2022-10-10 21:19:20 BST
+    - Experimental test of Grinnz suggestion
+
+0.006     2022-10-10 21:12:40+01:00 Europe/London
+    - Experimental null bump to test @Git::VersionManager
+
+0.005     2022-10-10 02:40:51+01:00 Europe/London
+    - Experimental null bump to test BumpVersionAfterRelease::transitional
+
 0.004     2022-10-10 02:26:07+01:00 Europe/London
     - Experimental null bump to test BumpVersionAfterRelease
 

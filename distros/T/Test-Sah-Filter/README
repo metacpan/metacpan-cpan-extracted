@@ -2,8 +2,8 @@ NAME
     Test::Sah::Filter - Test Data::Sah::Filter::* modules in distribution
 
 VERSION
-    This document describes version 0.003 of Test::Sah::Filter (from Perl
-    distribution Test-Sah-Filter), released on 2022-07-17.
+    This document describes version 0.004 of Test::Sah::Filter (from Perl
+    distribution Test-Sah-Filter), released on 2022-07-24.
 
 SYNOPSIS
     To check a single Data::Sah::Filter::* module:

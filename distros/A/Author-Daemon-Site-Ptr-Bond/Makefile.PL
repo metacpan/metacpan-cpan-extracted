@@ -18,18 +18,23 @@ my %WriteMakefileArgs = (
   ],
   "LICENSE" => "bsd",
   "NAME" => "Author::Daemon::Site::Ptr::Bond",
-  "PREREQ_PM" => {
-    "Mojolicious" => "9.27"
+  "PREREQ_PM" => {},
+  "TEST_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec" => 0,
+    "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.008",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
-  "Mojolicious" => "9.27"
+  "ExtUtils::MakeMaker" => 0,
+  "File::Spec" => 0,
+  "Test::More" => 0
 );
 
 

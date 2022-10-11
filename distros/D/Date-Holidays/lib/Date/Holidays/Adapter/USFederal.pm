@@ -8,7 +8,7 @@ use Data::Dumper;
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.33';
+$VERSION = '1.34';
 
 # sub new {
 #     my $class = shift;
@@ -46,7 +46,7 @@ Date::Holidays::Adapter::USFederal - an adapter class for Date::Holidays::USFede
 
 =head1 VERSION
 
-This POD describes version 1.33 of Date::Holidays::Adapter::USFederal
+This POD describes version 1.34 of Date::Holidays::Adapter::USFederal
 
 =head1 DESCRIPTION
 

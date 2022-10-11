@@ -5,15 +5,17 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
 use Carp;
 use Config;
+use English;
 use Exporter 'import';
 use POSIX ();
+use Readonly;
 
 =pod
 
@@ -36,12 +38,17 @@ Numerical analysis and scientific computing related functions.
 =head1 DESCRIPTION
 
 This module offers functions to manipulate numerical functions such as root
-finding (solver), derivatives, etc. Most of the functions of this module can receive a
-C<$func> argument. This argument should always be a code reference (an anonymous
-sub or a reference to a named code block). And that referenced function should
-expect a single scalar (numeric) argument and return a single scalar (numeric)
-value. For efficiency reason, it is recommended to not name the argument of that
-function (see the L<example above|/SYNOPSIS>).
+finding (solver), derivatives, etc. Most of the functions of this module can
+receive a C<$func> argument. This argument should always be a code reference (an
+anonymous sub or a reference to a named code block). And that referenced
+function should expect a single scalar (numeric) argument and return a single
+scalar (numeric) value. For efficiency reason, it is recommended to not name the
+argument of that function (see the L<example above|/SYNOPSIS>).
+
+=head1 CONFIGURATION
+
+For now, this module has no global configuration available. All configuration
+must be directly passed to the individual functions.
 
 =head1 FUNCTIONS
 
@@ -50,23 +57,25 @@ be selectively imported or you can import them all with the tag C<:all>.
 
 =cut
 
-our @EXPORT = ();
-our @EXPORT_OK = qw(find_root bracket);
+our @EXPORT_OK = qw(find_root solve bracket);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 # This will need to be adapted if we start using bigfloat.
-use constant _EPS => $Config{uselongdouble} ? POSIX::LDBL_EPSILON : POSIX::DBL_EPSILON;
-use constant _DEFAULT_TOLERANCE => 0.00001;
+Readonly my $EPS => $Config{uselongdouble}
+    ? POSIX::LDBL_EPSILON
+    : POSIX::DBL_EPSILON;
+Readonly our $_DEFAULT_TOLERANCE => 0.00001;  # exposed for tests only.
+Readonly my $DEFAULT_MAX_ITERATIONS => 100;
 
 # Wraps the given numerical function in a way where we’re guaranteeing that it’s
 # called in a scalar context and where we’re trapping its errors.
-sub _wrap_func($func) {
+sub _wrap_func ($func) {
   croak "The passed $func is not a code reference" unless ref($func) eq 'CODE';
   return sub {
-    my $r = eval { &$func };
+    my $r = eval { &{$func} };
     return $r if defined $r;
-    croak "The function failed: $@" if $@;
-    croak "The function returned no value";
+    croak "The function failed: $EVAL_ERROR" if $EVAL_ERROR;
+    croak 'The function returned no value';
   }
 }
 
@@ -88,14 +97,16 @@ If the function is successful it returns the root found in scalar context or, in
 list context, a list with the root and the value of the function at that point
 (which may not be exactly C<0>).
 
-The current implementation of this function is based on the method C<zbrent>
-from the I<L<Numerical Recipes/NR>> book.
+The current implementation of this function is based on the Brent method
+described in the
+I<L<Numerical Recipes Third Edition|http://numerical.recipes/aboutNR3book.html>>
+book, section 9.3.
 
 The function supports the following parameters:
 
 =over
 
-=item C<max_iteration>
+=item C<max_iterations>
 
 How many iterations of our algorithm will be applied at most while trying to
 find a root for the given function. This gives an order of magnitude of the
@@ -103,19 +114,19 @@ number of times that C<$func> will be evaluated. Defaults to I<100>.
 
 =item C<do_bracket>
 
-Whether the C<L<bracket|/bracket>> function should be used to bracket a root of the
-function before finding the root. If this is set to a false value, then the
+Whether the C<L<bracket|/bracket>> function should be used to bracket a root of
+the function before finding the root. If this is set to a false value, then the
 passed C<$x1> and C<$x2> values must already form a bracket (that is, the
 function must take values of opposite sign at these two points). Note that, when
-they do, the C<L<bracket|/bracket>> function will immediately return these values. So,
-if C<find_root> return a result with C<do_bracket> set to a I<false> value, it
-will return the same result when C<do_bracket> is set to a I<true> value.
-However, if C<do_bracket> is set to a I<false> value, then C<find_root> will
-immediately C<L<croak|Carp>> if the starting interval does not form a bracket
-of a root of the function.
+they do, the C<L<bracket|/bracket>> function will immediately return these
+values. So, if C<find_root> return a result with C<do_bracket> set to a I<false>
+value, it will return the same result when C<do_bracket> is set to a I<true>
+value. However, if C<do_bracket> is set to a I<false> value, then C<find_root>
+will immediately C<L<croak|Carp>> if the starting interval does not form a
+bracket of a root of the function.
 
-When set to a I<true> value, the C<L<bracket|/bracket>> function is called with the
-same arguments as those given to C<find_root>, so any parameter supported by
+When set to a I<true> value, the C<L<bracket|/bracket>> function is called with
+the same arguments as those given to C<find_root>, so any parameter supported by
 C<L<bracket|/bracket>> can also be passed to C<find_root>.
 
 Defaults to I<1>.
@@ -132,72 +143,104 @@ forwarded to that function.
 
 =cut
 
-sub find_root($func, $x1, $x2, %params) {
-  my $do_bracket = $params{do_bracket} // 1;
-  my $tol = $params{tolerance} // _DEFAULT_TOLERANCE;
-  my $max_iter = $params{max_iteration} // 100;
-  my $f = _wrap_func($func);
-  my ($a, $b, $c, $d, $e);  # = ($x1, $x2, $x2);
-  my ($fa, $fb, $fc);  # = ($f->($a), $f->($b));
-  my ($p, $q, $r, $s, $tol1, $xm);
-  if ($do_bracket) {
-    ($a, $b, $fa, $fb) = bracket($func, $x1, $x2, %params);
-    croak "Can’t bracket a root of the function" unless defined $a;
-  } else {
-    ($a, $b) = ($x1, $x2);
-    ($fa, $fb) = ($f->($a), $f->($b));
-    croak "A root must be bracketed in [\$x1; \$x2]"
-      if ($fa > 0 && $fb > 0) || ($fa < 0 && $fb <0);
+sub _create_find_root_brent_state ($x1, $x2, $f1, $f2, %params) {
+  my $s = {};
+  $s->{tol} = $params{tolerance} // $_DEFAULT_TOLERANCE;
+  @{$s}{qw(a b c fa fb fc)} = ($x1, $x2, $x2, $f1, $f2, $f2);
+  @{$s}{qw(d e)} = (undef) x 2;
+  @{$s}{qw(p q r s tol1 xm)} = (undef) x 6;  ## no critic (ProhibitMagicNumbers)
+  return $s;
+}
+
+sub _do_find_root_brent ($f, $s) {
+  if (($s->{fb} > 0 && $s->{fc} > 0) || ($s->{fb} < 0 && $s->{fc} < 0)) {
+    @{$s}{'c', 'fc'} = @{$s}{'a', 'fa'};
+    $s->{e} = $s->{d} = $s->{b} - $s->{a};
   }
-  ($c, $fc) = ($b, $fb);
-  for my $i (1..$max_iter) {
-    if (($fb > 0 && $fc > 0) || ($fb < 0 && $fc < 0)) {
-      ($c, $fc) = ($a, $fa);
-      $e = $d = $b - $a;
-    }
-    if (abs($fc) < abs($fb)) {
-      ($a, $b, $c) = ($b, $c, $b);
-      ($fa, $fb, $fc) = ($fb, $fc, $fb);
-    }
-    $tol1 = 2 * _EPS * abs($b) + 0.5 * $tol;
-    $xm = 0.5 * ($c - $b);
-    return wantarray ? ($b, $fb) : $b if abs($xm) <= $tol1 || $fb == 0;
-    if (abs($e) >= $tol1 && abs($fa) > abs($fb)) {
-      $s = $fb / $fa;
-      if ($a == $c) {
-        $p = 2 * $xm *$s;
-        $q = 1 - $s;
-      } else {
-        $q = $fa / $fc;
-        $r = $fb / $fc;
-        $p = $s * (2 * $xm * $q * ($q - $r)- ($b - $a) * ($r - 1));
-        $q = ($q - 1) * ($r - 1) * ($s - 1);
-      }
-      $q = -$q if $p > 0;
-      $p = abs($p);
-      my $min1 = 3 * $xm * $q - abs($tol1 * $q);
-      my $min2 = abs($e* $q);
-      if (2 * $p < ($min1 < $min2 ? $min1 : $min2)) {
-        $e = $d;
-        $d = $p / $q;
-      } else {
-        $d = $xm;
-        $e = $d;
-      }
+  if (abs($s->{fc}) < abs($s->{fb})) {
+    @{$s}{'a', 'b', 'c'} = @{$s}{'b', 'c', 'b'};
+    @{$s}{'fa', 'fb', 'fc'} = @{$s}{'fb', 'fc', 'fb'};
+  }
+  $s->{tol1} = 2 * $EPS * abs($s->{b}) + $s->{tol} / 2;
+  $s->{xm} = ($s->{c} - $s->{b}) / 2;
+  if (abs($s->{xm}) <= $s->{tol1} || $s->{fb} == 0) {
+    $s->{ret} = [$s->{b}, $s->{fb}];
+    return 1;
+  }
+  if (abs($s->{e}) >= $s->{tol1} && abs($s->{fa}) > abs($s->{fb})) {
+    $s->{s} = $s->{fb} / $s->{fa};
+    if ($s->{a} == $s->{c}) {
+      $s->{p} = 2 * $s->{xm} * $s->{s};
+      $s->{q} = 1 - $s->{s};
     } else {
-      $d = $xm;
-      $e = $d;
+      $s->{q} = $s->{fa} / $s->{fc};
+      $s->{r} = $s->{fb} / $s->{fc};
+      $s->{p} =
+          $s->{s} *
+          (2 * $s->{xm} * $s->{q} * ($s->{q} - $s->{r}) -
+            ($s->{b} - $s->{a}) * ($s->{r} - 1));
+      $s->{q} = ($s->{q} - 1) * ($s->{r} - 1) * ($s->{s} - 1);
     }
-    ($a, $fa) = ($b, $fb);
-    if (abs($d) > $tol1) {
-      $b +=$d;
+    $s->{q} = -$s->{q} if $s->{p} > 0;
+    $s->{p} = abs($s->{p});
+    Readonly my $interp_coef => 3;
+    my $min1 = $interp_coef * $s->{xm} * $s->{q} - abs($s->{tol1} * $s->{q});
+    my $min2 = abs($s->{e} * $s->{q});
+    if (2 * $s->{p} < ($min1 < $min2 ? $min1 : $min2)) {
+      $s->{e} = $s->{d};
+      $s->{d} = $s->{p} / $s->{q};
     } else {
-      $b += _sign($tol1, $xm);
+      $s->{e} = $s->{d} = $s->{xm};
     }
-    $fb = $f->($b);
+  } else {
+    $s->{e} = $s->{d} = $s->{xm};
+  }
+  @{$s}{'a', 'fa'} = @{$s}{'b', 'fb'};
+  if (abs($s->{d}) > $s->{tol1}) {
+    $s->{b} += $s->{d};
+  } else {
+    $s->{b} += _sign($s->{tol1}, $s->{xm});
+  }
+  $s->{fb} = $f->($s->{b});
+  return 0;
+}
+
+sub find_root ($func, $x1, $x2, %params) {
+  my $do_bracket = $params{do_bracket} // 1;
+  my $max_iter = $params{max_iterations} // $DEFAULT_MAX_ITERATIONS;
+  my $f = _wrap_func($func);
+  my ($xa, $xb, $fa, $fb);
+  if ($do_bracket) {
+    ($xa, $xb, $fa, $fb) = bracket($func, $x1, $x2, %params);
+    croak 'Can’t bracket a root of the function' unless defined $xa;
+  } else {
+    ($xa, $xb) = ($x1, $x2);
+    ($fa, $fb) = ($f->($xa), $f->($xb));
+    croak 'A root must be bracketed in [\$x1; \$x2]'
+        if ($fa > 0 && $fb > 0) || ($fa < 0 && $fb < 0);
+  }
+
+  my $brent_state = _create_find_root_brent_state($xa, $xb, $fa, $fb, %params);
+
+  for my $i (1 .. $max_iter) {
+    if (defined $brent_state && _do_find_root_brent($f, $brent_state)) {
+      return wantarray ? @{$brent_state->{ret}} : $brent_state->{ret}[0];
+    }
   }
   return;
 }
+
+=head2 solve
+
+  solve($func, $x1, $x2, %params)
+
+This is an exact synonym of C<find_root($func, $x1, $x2, %params)> in case you
+prefer another name. See the documentation of the C<L<find_root|/find_root>>
+function for all the details.
+
+=cut
+
+sub solve { return find_root(@_) }
 
 =head2 bracket
 
@@ -209,20 +252,23 @@ has a root somewhere between these two points (the root is I<bracketed> by these
 points). The found points will be either inside or outside the starting
 interval.
 
-If the function is successful, it returns a list of four elements with the values
-C<$a> and C<$b> and then the values of function at these two points. Otherwise
-it returns an empty list.
+If the function is successful, it returns a list of four elements with the
+values C<$a> and C<$b> and then the values of function at these two points.
+Otherwise it returns an empty list.
 
-The function will C<L<croak|Carp>> if C<$x1> and C<$x2> are equal.
+If C<$x2> is omitted or equal to C<$x1> then a value slightly larger than C<$x1>
+will be used. Note that if it is omitted then C<%params> cannot be specified.
 
-The current implementation of this method is a mix of the methods C<zbrac> and
-C<zbrak> from the I<L<Numerical Recipes/NR>> book.
+The current implementation is a mix of the inward and outward bracketing
+approaches exposed in the
+I<L<Numerical Recipes Third Edition|http://numerical.recipes/aboutNR3book.html>>
+book, section 9.1.
 
 The function supports the following parameters:
 
 =over
 
-=item C<max_iteration>
+=item C<max_iterations>
 
 How many iterations of our algorithm will be applied at most while trying to
 bracket the given function. This gives an order of magnitude of the number of
@@ -237,6 +283,8 @@ one given by C<[$x1, $x2]>. Defaults to I<1>.
 
 Whether the function will try to bracket a root in an interval smaller than the
 one given by C<[$x1, $x2]>. Defaults to I<1>.
+
+One of C<do_inward> or C<do_outward> at least must be a  true value.
 
 =item C<inward_split>
 
@@ -266,53 +314,100 @@ take a different meaning in the future.
 
 =cut
 
-sub bracket ($func, $x1, $x2, %params) {
-  croak "\$x1 and \$x2 must be distinct in calls to Math::Numerical::bracket (${x1})" if $x1 == $x2;
-  my $max_iter = $params{max_iteration} // 100;
-  croak "max_iteration must be positive" unless $max_iter > 0;
-  my $do_outward = $params{do_outward} // 1;
-  my $do_inward = $params{do_inward} // 1;
-  croak "One of do_outward and do_inward at least should be true"
-    unless $do_outward || $do_inward;
-  my $inward_split = $params{inward_split} // 3;
-  croak "inward_split must be at least 2" unless $inward_split >= 2;
-  my $inward_factor = $params{inward_factor} // 3;
-  croak "inward_factor must be at least 2" unless $inward_factor >= 2;
-  my $outward_factor = $params{outward_factor} // 1.6;
-  croak "outward_factor must be larger than 1" unless $outward_factor > 1;
+Readonly my $DEFAULT_INWARD_SPLIT => 3;
+Readonly my $DEFAULT_INWARD_FACTOR => 3;
+Readonly my $DEFAULT_OUTWARD_FACTOR => 1.6;
+
+sub _create_bracket_inward_state ($x1, $x2, $f1, %params) {
+  my $s = {};
+  $s->{split} = $params{inward_split} // $DEFAULT_INWARD_SPLIT;
+  croak 'inward_split must be at least 2' if $s->{split} < 2;
+  $s->{factor} = $params{inward_factor} // $DEFAULT_INWARD_FACTOR;
+  croak 'inward_factor must be at least 2' if $s->{factor} < 2;
+  @{$s}{'x1', 'x2'} = ($x1, $x2);
+  $s->{f1} = $f1;
+  return $s;
+}
+
+sub _do_bracket_inward ($f, $s) {
+  my $dx = ($s->{x2} - $s->{x1}) / $s->{split};
+  my $xa = $s->{x1};
+  my ($fa, $fb) = ($s->{f1});
+  for my $j (1 .. $s->{split}) {
+    my $xb = $xa + $dx;
+    $fb = $f->($xb);
+    if ($fa * $fb < 0) {
+      $s->{ret} = [$xa, $xb, $fa, $fb];
+      return 1;
+    }
+    ($xa, $fa) = ($xb, $fb);
+  }
+  $s->{split} *= $s->{factor};
+  return 0;
+}
+
+sub _create_bracket_outward_state ($f, $x1, $x2, $f1, %params) {
+  my $s = {};
+  $s->{factor} = $params{outward_factor} // $DEFAULT_OUTWARD_FACTOR;
+  croak 'outward_factor must be larger than 1' if $s->{factor} <= 1;
+  @{$s}{'x1', 'x2'} = ($x1, $x2);
+  @{$s}{'f1', 'f2'} = ($f1, $f->($x2));
+  return $s;
+}
+
+sub _do_bracket_outward ($f, $s) {
+  if ($s->{f1} * $s->{f2} < 0) {
+    $s->{ret} = [@{$s}{'x1', 'x2', 'f1', 'f2'}];
+    return 1;
+  }
+  if (abs($s->{f1}) < abs($s->{f2})) {
+    $s->{x1} += $s->{factor} * ($s->{x1} - $s->{x2});
+    $s->{f1} = $f->($s->{x1});
+  } else {
+    $s->{x2} += $s->{factor} * ($s->{x2} - $s->{x1});
+    $s->{f2} = $f->($s->{x2});
+  }
+  return 0;
+}
+
+sub bracket ($func, $x1, $x2 = undef, %params) {
+  if (!defined $x2 || $x1 == $x2) {
+    Readonly my $LARGISH_FACTOR => 1000;
+    $x2 += $LARGISH_FACTOR * $EPS;
+  }
+  my $max_iter = $params{max_iterations} // $DEFAULT_MAX_ITERATIONS;
+  croak 'max_iterations must be positive' if $max_iter <= 0;
+
   my $f = _wrap_func($func);
-  my ($xl1, $xl2) = ($x1, $x2);
   my $f1 = $f->($x1);
-  my ($fl1, $fl2) = ($f1, $f->($xl2));
-  for my $i (1..$max_iter) {
+
+  my $inward_state;
+  if ($params{do_inward} // 1) {
+    $inward_state = _create_bracket_inward_state($x1, $x2, $f1, %params);
+  }
+  my $outward_state;
+  if ($params{do_outward} // 1) {
+    $outward_state = _create_bracket_outward_state($f, $x1, $x2, $f1, %params);
+  }
+
+  croak 'One of do_outward and do_inward at least must be true'
+      unless defined $outward_state || defined $inward_state;
+
+  for my $i (1 .. $max_iter) {
     # We start with outward because the first iteration does nothing and just
     # checks the bounds that were given by the user.
-    if ($do_outward) {
-      return ($xl1, $xl2, $fl1, $fl2) if $fl1 * $fl2 < 0;
-      if (abs($fl1) < abs($fl2)) {
-        $xl1 += $outward_factor * ($xl1 -$xl2);
-        $fl1 = $f->($xl1);
-      } else {
-        $xl2 += $outward_factor * ($xl2 -$xl1);
-        $fl2 = $f->($xl2);
-      }
+    if (defined $outward_state && _do_bracket_outward($f, $outward_state)) {
+      return @{$outward_state->{ret}};
     }
-    if ($do_inward) {
-      my $dx = ($x2 - $x1) / $inward_split;
-      my $a = $x1;
-      my ($fa, $fb) = ($f1);
-      for my $j (1..$inward_split) {
-        my $b = $a + $dx;
-        $fb = $f->($b);
-        return ($a, $b, $fa, $fb) if $fa * $fb < 0;
-        ($a, $fa) = ($b, $fb);
-      }
-      $inward_split *= $inward_factor;
+    if (defined $inward_state && _do_bracket_inward($f, $inward_state)) {
+      return @{$inward_state->{ret}};
     }
     # We stop doing the inward algorithm when the number of splits exceeds
     # max_iteration, to bound the number of times the function is executed to a
     # reasonable value.
-    $do_inward = 0 if $inward_split >= $max_iter;
+    if (defined $inward_state && $inward_state->{split} > $max_iter) {
+      undef $inward_state;
+    }
   }
   return;
 }
@@ -325,19 +420,28 @@ Mathias Kende
 
 Copyright 2022 Mathias Kende
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
 =over
 
-=item NR
-
-L<http://numerical.recipes/>
+=item L<Numerical Recipes Third Edition|http://numerical.recipes/aboutNR3book.html>
 
 =back
 
