@@ -487,6 +487,7 @@ Troll
 Truskett
 Tucuman
 Tunis
+Turkiye
 UA
 UG
 UIs

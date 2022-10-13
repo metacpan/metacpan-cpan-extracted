@@ -1,5 +1,10 @@
 Revision history for Perl module MooX::Role::CachedURL
 
+0.08 2022-10-11 NEILB
+    - Enabled GitHub actions for CI. PR from Gabor Szabo.
+    - The testsuite was failing because the Robots.txt file on cpan.org
+      is now older than 1000 days. Fixed GH#1, reported by Gabor Szabo.
+
 0.07 2015-11-04 NEILB
     - Updated github repo URL after changing my github username
     - Added [MetaJSON] to dist.ini, so releases will include META.json file

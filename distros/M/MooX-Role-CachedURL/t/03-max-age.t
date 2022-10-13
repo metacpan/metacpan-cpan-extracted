@@ -12,7 +12,7 @@ use autodie;
 use lib qw(t/lib);
 use CPAN::Robots;
 
-my $toucher = File::Touch->new(mtime => (time() - 1000 * 24 * 60 * 60));
+my $toucher = File::Touch->new(mtime => (time() - 2000 * 24 * 60 * 60));
 
 my $robots;
 my $cache_path = 't/cache-robots.txt';

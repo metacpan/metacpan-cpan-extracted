@@ -1,5 +1,8 @@
 Revision history for Perl module PAUSE::Packages
 
+0.18 2022-10-12 NEILB
+    - Fixed the SYNOPSIS in the doc. PR from Olaf Alders.
+
 0.17 2015-10-31 NEILB
     - After looking at CPAN Testers results, realised I was requiring
       Perl 5.10 needlessly. Have tested on 5.8.9, but set required to

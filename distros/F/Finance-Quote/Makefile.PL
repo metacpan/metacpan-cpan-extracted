@@ -36,6 +36,7 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IO::Uncompress::Unzip" => 0,
     "JSON" => 0,
+    "LWP::Protocol::https" => 0,
     "LWP::Simple" => 0,
     "LWP::UserAgent" => "6.48",
     "Module::Load" => 0,
@@ -73,7 +74,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "1.00",
     "feature" => 0
   },
-  "VERSION" => "1.53",
+  "VERSION" => "1.5301",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -106,6 +107,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IO::Uncompress::Unzip" => 0,
   "JSON" => 0,
+  "LWP::Protocol::https" => 0,
   "LWP::Simple" => 0,
   "LWP::UserAgent" => "6.48",
   "Module::Load" => 0,

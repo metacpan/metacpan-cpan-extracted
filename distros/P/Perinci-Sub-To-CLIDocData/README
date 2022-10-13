@@ -3,9 +3,9 @@ NAME
     structure convenient for producing CLI documentation (help/usage/POD)
 
 VERSION
-    This document describes version 0.301 of Perinci::Sub::To::CLIDocData
+    This document describes version 0.303 of Perinci::Sub::To::CLIDocData
     (from Perl distribution Perinci-Sub-To-CLIDocData), released on
-    2022-10-09.
+    2022-10-12.
 
 SYNOPSIS
      use Perinci::Sub::To::CLIDocData qw(gen_cli_doc_data_from_meta);
@@ -137,7 +137,7 @@ SYNOPSIS
              },
            },
            "usage_line" => "[[prog]] [--bool1|-z|--no-bool1|--nobool1] [--flag1|-f] -- <str1>",
-           "usage_line.alt.fmt.pod" => "B<[[prog]]> [B<--bool1>|B<-z>|B<--no-bool1>|B<--nobool1>] [B<--flag1>|B<-f>] -- E<lt>I<str1>E<gt>",
+           "usage_line.alt.fmt.pod" => "B<[[prog]]> [L<--bool1|/\"-z\">|L<-z|/\"-z\">|L<--no-bool1|/\"-z\">|L<--nobool1|/\"-z\">] [L<--flag1|/\"--flag1, -f\">|L<-f|/\"--flag1, -f\">] -- E<lt>L<str1|/\"--str1=s*\">E<gt>",
          },
        ];
        $a->[2]{"opts"}{"--bool1"}{tags} = $a->[2]{"opts"}{"--bool1"}{arg_spec}{tags};

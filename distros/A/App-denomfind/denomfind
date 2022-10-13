@@ -1,0 +1,198 @@
+#!/usr/bin/perl
+
+#
+# denomfind 
+#    小数がいくつか与えられたら、それはどんな(共通する)分母の分数であるかを推定する
+#   -- developed by 下野寿之 Toshiyuki Shimono in Tokyo, Japan, 
+#   -- first developed probably on 2016-06-20
+#   -- one debugging on -% and -c on 2022-10-11 
+#   -- heavy implementation added on 2022-10-12, 10-13.  
+#
+
+use 5.014 ; use strict ; use warnings ;  # s/のr修飾子は v5.14を要求
+use Getopt::Std ; getopts 'cD:fg:IQy:%2:' , \my%o ; 
+use POSIX qw[ ceil floor ] ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use Math::BigInt qw[ bgcd ] ; # -Qの指定時に必要となる。
+use List::Util qw [ reduce ] ;
+
+HELP_MESSAGE () unless @ARGV ; 
+$o{g} //= 20 ; # 取得する分母の個数の最大値 なお、コンマ区切りで、取得分母の開始値(最小値)も指定可能。
+do { pipe *STDIN , my $WH ; print {$WH} join "\n" , splice @ARGV , 0 } ;
+my @nums = & readNums ; 
+say STDERR BOLD FAINT "Given rates are " . scalar @nums . " pieces." if @nums > 1 && 0 ne ($o{2}//'') ;
+my $count = 0 ; # 出力行数
+my $start = do { $o{g} =~ s/(.+),// ; $1 } // 1 ; #　開始する分母の値
+& main () ; 
+exit 0 ;
+
+sub main ( ) { 
+  
+  my ( @nA , @nB ) ; # 区間の 閉じた端A と 開いた端B
+  do { my ( $A , $B ) = realInt ( $_ ) ; push @nA, $A ; push @nB, $B } for @nums ; 
+
+  do { # 出力の1行目
+    my @seq = 1 .. $#nums+1 ;
+    my @out = qw[denom fit] ; 
+    for ( @seq ) { 
+      push @out , CYAN "f$_:".$nums[$_-1] if exists $o{D} ;
+      push @out , "nu_$_" if $o{I} ; # unless $o{v} eq "0" ; 
+    }
+    push @out , "dividends" if $o{Q} ;
+    say join "\t" , map { UNDERLINE $_ } @out ;
+  } ;
+  
+  for ( my $denom = $start ; $count < $o{g} ; $denom ++ ) { # 無限大("Inf")を指定された場合も想定
+    my $kosu = 0 ; # 該当個数(こすう) 
+    my @out = () ; # 出力文字列
+    my @nu = () ; # numerators 分子の数の集まり
+    push @out , "$denom" ; # コロン(:)を以前付与していた
+    for my $i ( 0 .. $#nums ) { 
+      my ($mA,$mB) = ( "$nA[$i]" * "$denom" , "$nB[$i]" * "$denom" ) ; # 分子の数値に対応
+      my @int = numInts ( $mA , $mB ) ; #区間に含まれる整数の最小と最大。返値の要素数は1の場合も0の場合もある。
+      push @nu , $int[0]..$int[-1] if @int ;
+      $kosu ++ if @int ;
+      if ( exists $o{D} ) {
+        if ( @int == 0 ) { 
+          push @out , CYAN '-' if @int == 0 ;
+        } else { 
+          my $A = "$int[0]/$denom=" . (sprintf "%0.$o{D}f" , $int[0]/$denom ) =~ s/^0+//r ; 
+          my $B = "$int[-1]/$denom=" . (sprintf "%0.$o{D}f" , $int[0]/$denom ) =~ s/^0+//r ; # 無駄発生してる
+          push @out , CYAN $A if @int == 1 ; 
+          push @out , CYAN "$A;$B" if @int == 2 ; 
+        }
+      } # ifend $o{D}
+      if ( $o{I} ) {
+        my $str = $mA < $mB ? "[$mA $mB)" : "($mB $mA]" ; 
+        push @out , @int ? GREEN $str : $str ; 
+      } # ifend $o{I} 
+    }
+    next unless yfilter ( $kosu ) ; 
+    my $t = scalar @nums - $kosu ; 
+    $kosu = $t==0 ? BRIGHT_RED $kosu : $t==1 ? YELLOW $kosu : $t==2 ? $kosu : FAINT $kosu ; 
+    splice @out , 1 , 0 , $kosu ; # 出力配列文字列に、個数表記を挿入。
+    if ( $o{Q} ) {
+      my $str = reduce{$a=~/(\d+)$/;if($b-$1==1){$a=~s/~\d+$//;"$a~$b"}else{"$a,$b"} } @nu ;
+      if ( @nu >= 2 ) { 
+        my @t = map {$_ - $nu[0] } @nu [ 1 .. $#nu ] ;
+        my $gcd = bgcd @t ; # Math::BigInt::
+        my $rem = $nu[0] % $gcd ;
+        $str .= ' (' . "${gcd}q" . ($rem?"+$rem":'') . ')' if $gcd > 1 ; 
+      }
+      push @out, $str ;
+    }
+    say join "\t" , @out ; 
+    $count ++ ;
+  }
+}
+
+sub npack ( @ )  { 
+  #return reduce { $a =~ /(\d+)$/ ; if($b-$1==1){$a=~s/\d+$/$b/r}else{"$a:$b"} } @_ ;
+  return reduce { $a =~ /(\d+)$/ ; if($b-$1==1){"$a~$b"}else{"$a:$b"} } @_ ;
+}
+sub yfilter ( $ ) { 
+  state @y = exists $o{y} ? eval $o{y} : () ;
+  state @F = map { my $t = $_ ; ( grep { $y[$_] == $t } 0 .. $#y ) ? 1 : 0 } 0 .. scalar @nums ; 
+  return ! exists $o{y} || $F[ $_[0] ] ; 
+
+}
+
+# 半区間 [ $x , $y ) when $x<$y または ( $y , $x ] when $y<$x に、何個の整数が含まれるか。
+sub numInts ( $$ ) { 
+  my ( $x, $y ) = @_  ;
+  my $n =  $x < $y ? ceil($y) - ceil($x) : floor($x) - floor($y) ; #print STDERR RED $n ;
+  return () if $n == 0 ;
+  my @Z =  $x < $y ? (ceil($x) , ceil($x) + $n - 1 ) : ( floor($x) - $n + 1 , floor($x) ) ;
+  @Z = ( $Z[0] ) if $Z[0] == $Z[1] ;   #print STDERR RED "[@Z]";
+  return @Z ; 
+}
+
+sub decDig ( $ ) { # 「小数点以下に数が何桁あるか」を小数点の位置から算出して返す
+  my $pos = rindex $_[0] , '.' ; 
+  return $pos == -1 ? 0 : length ( $_[0] ) - ( $pos + 1 ) ; 
+}
+
+sub realInt ( $ ) { # 1個の数に対し、区間表記 [A,B) または B<Aなら(B,A] のつもりで、AとBの順に返す。<-- - 
+  my $e2 = "0.1" ** decDig $_[0] ; # 10進数文字列を使っている。これで、内部2進数の問題を回避。
+  # 変える長さ2の配列の要素は、意図する半開区間に対して、1番目は閉じた方であり、2番目は開いた方である。
+  return $_[0] , "$_[0]" - "$e2" if $o{c} ; # 切り上げの場合
+  return $_[0] , "$_[0]" + "$e2" if $o{f} ; # 切り捨ての場合
+  my $e1 = "$e2" * "0.5" ;   # 区間の半分の幅である。
+  return "$_[0]" - "$e1" , "$_[0]" + "$e1" ; # 四捨五入の場合
+}
+
+sub readNums ( ) { 
+  my @nums = () ; 
+  while ( <> ) { chomp ; push @nums , $_ } ; # 以前は既に使わないオプション-iで標準入力から読み取ることもしていた。
+  s/^-// for @nums ; # 負の値は、実質的に(-1)倍される。
+  if ( $o{'%'} ) { ## 百分率の場合の処理 
+    for ( @nums ) {
+      my $d = 2 + decDig $_ ;
+      $_ = "$_" * "0.01" ; 
+      $_ = sprintf "%0.${d}f" , $_ ;
+    }
+  } 
+  return @nums ; 
+}
+
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ;
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+
+=encoding utf8
+
+=head1
+
+ $0 
+
+   小数がA個与えられたら、それらがどんな共通する分母の、分数であったかの推定を
+   するための数値計算プログラム。切り捨てと切り上げも仮定できるが、未指定なら四捨五入を仮定。
+
+ 出力の読み方: 
+   1列目:  N  Nは共通する分母を表す
+   2列目:  B  Nが分母と仮定した場合の、分子が整数になり得る場合の個数を数える。4通りの色で着色(最大,最大-1,最大-2,それ以外)。
+   3列目以降: 
+     -D の指定により、各列は与えられた数値を近似する割り算の式である。候補が複数ある場合は最小と最大を;で区切って示す。
+     -I の指定により、分子になり得る数値の範囲を半区間表記で示す。整数を含む区間の場合は、緑色に着色する。
+     -Q の指定により、分子となる値を列挙する。-Dや-Iよりも簡便な表示となるが、情報が落ちる場合がある。
+
+ 使用例: 
+    $0 -g 50 0.25 0.33 
+     # 四捨五入して、0.25 と 0.33 になるような分数で同じ分母を持つものを見つける。
+     # 出力される各行の最終行が 2 となるものを探せば良い。
+
+ オプション: 
+
+  -c : 入力された数は、切り上げられた数であるとみなす。(ceil)
+  -f : 入力された数は、切り捨てられた数であると見なす。(floor)
+  -g num : 何個の出力を得るかの指定。未指定なら20。"Inf" も指定可能。(get, greatest)
+  -g start,num : コロンを使うと、分母をどの数から始めるかを指定が可能。
+  -y EVAL : fit値(整数を区間内に持つ対応する分子の個数)がどの場合に出力するかを指定する。EVALは,や..で指定可能。
+
+  -D num : 割り算の数式も出力。numは小数点以下の桁数。四捨五入で出力される。
+  -I : 分子の数値を知るべくその半区間を表示す。(Interval)
+  -Q : 分子の候補となる値を全て出す。簡便な表示となる。さらに 2q+1とか5q+3 などと出力(奇数とか1のくらいが3または8などが分かる。)
+  -2 0 : 二次情報の出力を抑制する。
+  -% : 入力された数はパーセンテージ表記(百分率)であると見なし、内部的には100分の1倍される。
+  --help : このヘルプを表示する。(ただしPod::PerldocJp を一度インストールすると perldoc $0 でも可能。)
+
+  補足 : 
+   * 半区間とは、数学的な区間[x,y)または(x,y]のような、それぞれ、x以上y未満、x超y以下のような数全体を表す。
+   * 負の数を入力に与えた場合は、その動作によく注意せよ。また 0 や 0.0 を与えた場合も動作に注意。要試行。
+
+  開発メモ: 
+     * ただ1個の小数点以下8桁の数が渡された場合の良いアルゴリズムを考えたい。
+     * -Qの指定による出力については、さらに洗練の余地がある。
+     * 最大公約数を計算するために、普段使わない Math::BigInt を用いている。
+
+=cut

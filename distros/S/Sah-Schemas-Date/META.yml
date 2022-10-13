@@ -3,7 +3,7 @@ abstract: 'Sah schemas related to date'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Sah::Coerce: '0.048'
+  Data::Sah::Coerce: '0.050'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -12,12 +12,127 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Sah-Schemas-Date
+provides:
+  Data::Sah::Coerce::perl::To_int::From_str::convert_en_dow_name_to_num:
+    file: lib/Data/Sah/Coerce/perl/To_int/From_str/convert_en_dow_name_to_num.pm
+    version: '0.018'
+  Data::Sah::Coerce::perl::To_int::From_str::convert_en_month_name_to_num:
+    file: lib/Data/Sah/Coerce/perl/To_int/From_str/convert_en_month_name_to_num.pm
+    version: '0.018'
+  Data::Sah::Coerce::perl::To_int::From_str::tz_offset_strings:
+    file: lib/Data/Sah/Coerce/perl/To_int/From_str/tz_offset_strings.pm
+    version: '0.018'
+  Perinci::Sub::XCompletion::date_dow_num:
+    file: lib/Perinci/Sub/XCompletion/date_dow_num.pm
+    version: '0.018'
+  Perinci::Sub::XCompletion::date_dow_nums:
+    file: lib/Perinci/Sub/XCompletion/date_dow_nums.pm
+    version: '0.018'
+  Perinci::Sub::XCompletion::date_month_num:
+    file: lib/Perinci/Sub/XCompletion/date_month_num.pm
+    version: '0.018'
+  Perinci::Sub::XCompletion::date_month_nums:
+    file: lib/Perinci/Sub/XCompletion/date_month_nums.pm
+    version: '0.018'
+  Sah::Schema::date::day:
+    file: lib/Sah/Schema/date/day.pm
+    version: '0.018'
+  Sah::Schema::date::dow_name::en:
+    file: lib/Sah/Schema/date/dow_name/en.pm
+    version: '0.018'
+  Sah::Schema::date::dow_num:
+    file: lib/Sah/Schema/date/dow_num.pm
+    version: '0.018'
+  Sah::Schema::date::dow_nums:
+    file: lib/Sah/Schema/date/dow_nums.pm
+    version: '0.018'
+  Sah::Schema::date::hour:
+    file: lib/Sah/Schema/date/hour.pm
+    version: '0.018'
+  Sah::Schema::date::minute:
+    file: lib/Sah/Schema/date/minute.pm
+    version: '0.018'
+  Sah::Schema::date::month::en:
+    file: lib/Sah/Schema/date/month/en.pm
+    version: '0.018'
+  Sah::Schema::date::month_name::en:
+    file: lib/Sah/Schema/date/month_name/en.pm
+    version: '0.018'
+  Sah::Schema::date::month_num:
+    file: lib/Sah/Schema/date/month_num.pm
+    version: '0.018'
+  Sah::Schema::date::month_nums:
+    file: lib/Sah/Schema/date/month_nums.pm
+    version: '0.018'
+  Sah::Schema::date::second:
+    file: lib/Sah/Schema/date/second.pm
+    version: '0.018'
+  Sah::Schema::date::tz_name:
+    file: lib/Sah/Schema/date/tz_name.pm
+    version: '0.018'
+  Sah::Schema::date::tz_offset:
+    file: lib/Sah/Schema/date/tz_offset.pm
+    version: '0.018'
+  Sah::Schema::date::tz_offset_lax:
+    file: lib/Sah/Schema/date/tz_offset_lax.pm
+    version: '0.018'
+  Sah::Schema::date::year:
+    file: lib/Sah/Schema/date/year.pm
+    version: '0.018'
+  Sah::SchemaR::date::day:
+    file: lib/Sah/SchemaR/date/day.pm
+    version: '0.018'
+  Sah::SchemaR::date::dow_name::en:
+    file: lib/Sah/SchemaR/date/dow_name/en.pm
+    version: '0.018'
+  Sah::SchemaR::date::dow_num:
+    file: lib/Sah/SchemaR/date/dow_num.pm
+    version: '0.018'
+  Sah::SchemaR::date::dow_nums:
+    file: lib/Sah/SchemaR/date/dow_nums.pm
+    version: '0.018'
+  Sah::SchemaR::date::hour:
+    file: lib/Sah/SchemaR/date/hour.pm
+    version: '0.018'
+  Sah::SchemaR::date::minute:
+    file: lib/Sah/SchemaR/date/minute.pm
+    version: '0.018'
+  Sah::SchemaR::date::month::en:
+    file: lib/Sah/SchemaR/date/month/en.pm
+    version: '0.018'
+  Sah::SchemaR::date::month_name::en:
+    file: lib/Sah/SchemaR/date/month_name/en.pm
+    version: '0.018'
+  Sah::SchemaR::date::month_num:
+    file: lib/Sah/SchemaR/date/month_num.pm
+    version: '0.018'
+  Sah::SchemaR::date::month_nums:
+    file: lib/Sah/SchemaR/date/month_nums.pm
+    version: '0.018'
+  Sah::SchemaR::date::second:
+    file: lib/Sah/SchemaR/date/second.pm
+    version: '0.018'
+  Sah::SchemaR::date::tz_name:
+    file: lib/Sah/SchemaR/date/tz_name.pm
+    version: '0.018'
+  Sah::SchemaR::date::tz_offset:
+    file: lib/Sah/SchemaR/date/tz_offset.pm
+    version: '0.018'
+  Sah::SchemaR::date::tz_offset_lax:
+    file: lib/Sah/SchemaR/date/tz_offset_lax.pm
+    version: '0.018'
+  Sah::SchemaR::date::year:
+    file: lib/Sah/SchemaR/date/year.pm
+    version: '0.018'
+  Sah::Schemas::Date:
+    file: lib/Sah/Schemas/Date.pm
+    version: '0.018'
 requires:
   Complete::Util: '0.608'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
@@ -28,7 +143,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Date
   homepage: https://metacpan.org/release/Sah-Schemas-Date
   repository: git://github.com/perlancar/perl-Sah-Schemas-Date.git
-version: '0.017'
+version: '0.018'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -48,7 +163,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000037'
           version: '0.006'
       name: Sah::Schemas
-      version: '0.027'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -65,66 +180,66 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR/@Filter/GatherDir'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR/@Filter/PruneCruft'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR/@Filter/ManifestSkip'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR/@Filter/MetaYAML'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR/@Filter/License'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR/@Filter/ExtraTests'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/@Filter/ExecDir'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR/@Filter/ShareDir'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR/@Filter/MakeMaker'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR/@Filter/Manifest'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.604'
+      version: '0.606'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -135,8 +250,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.064'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -164,7 +283,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.17.1
+          git_version: 2.25.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -174,19 +293,39 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.006'
+      version: '0.009'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.03'
+      version: '0.02'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
-      version: '6.023'
+      version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.024'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@Author::PERLANCAR/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::Authority
       name: '@Author::PERLANCAR/PERLANCAR::Authority'
@@ -214,55 +353,55 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Name
               name: '@Author::PERLANCAR/Name'
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Version
               name: '@Author::PERLANCAR/Version'
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/prelude'
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::PERLANCAR/Leftovers'
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/postlude'
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Completion::GetoptLongComplete
               name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
@@ -290,19 +429,23 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::PERLANCAR/Authors'
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Contributors
               name: '@Author::PERLANCAR/Contributors'
               version: '0.009'
             -
+              class: Pod::Weaver::Section::PERLANCAR::Contributing
+              name: '@Author::PERLANCAR/PERLANCAR/Contributing'
+              version: '0.293'
+            -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -314,7 +457,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Author::PERLANCAR/SingleEncoding'
-              version: '4.018'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
@@ -326,13 +469,13 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.068'
+              version: '0.071'
       name: '@Author::PERLANCAR/PodWeaver'
-      version: '4.009'
+      version: '4.008'
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR/PruneFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR/Pod2Readme'
@@ -380,7 +523,7 @@ x_Dist_Zilla:
             - ':InstallModules'
             - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.005
+      version: 3.001.006
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
@@ -408,7 +551,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.007'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
@@ -420,7 +563,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -428,7 +571,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -436,7 +579,7 @@ x_Dist_Zilla:
           phase: runtime
           type: suggests
       name: RuntimeSuggests
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -444,52 +587,56 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.023'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.023'
+      version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.024'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.023'
+    version: '6.024'
 x_authority: cpan:PERLANCAR
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

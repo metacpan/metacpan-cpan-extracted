@@ -1,0 +1,7 @@
+0.02 2022-10-12T00:48:17+02:00
+ - Add Data::Commons::Image to SEE ALSO section in doc.
+ - Fix minimal depenency for Mo::utils.
+ - Update example.
+
+0.01 2022-10-11T20:59:03+02:00
+ - First version.

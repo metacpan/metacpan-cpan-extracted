@@ -6,6 +6,13 @@ use warnings;
 use Test::More;
 use Test::Future::IO 0.05;
 
+use constant HAVE_TEST_METRICS_ANY => eval {
+   require Test::Metrics::Any;
+   require Metrics::Any::Adapter::Test and Metrics::Any::Adapter::Test->VERSION( '0.08' );
+
+   Metrics::Any::Adapter::Test->use_full_distributions;
+};
+
 use Future::AsyncAwait;
 
 use Device::Serial::SLuRM;
@@ -26,6 +33,12 @@ sub with_crc8
 {
    $controller->use_sysread_buffer( "DummyFH" );
 
+   # Auto-reset
+   $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
+   $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
+   $controller->expect_sysread( "DummyFH", 8192 )
+      ->will_done( "\x55" . with_crc8( with_crc8( "\x02\x01" ) . "\x00" ) );
+
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\x31\x03" ) . "req" ) )
       ->will_write_sysread_buffer_later( "DummyFH",
@@ -42,6 +55,15 @@ sub with_crc8
       '->request runs command and yields response' );
 
    ok( $retransmit_f->is_cancelled, 'Retransmit timer is cancelled' );
+
+   if( HAVE_TEST_METRICS_ANY ) {
+      Test::Metrics::Any::is_metrics( {
+         "slurm_packets_sent type:REQUEST"      => 1,
+         "slurm_packets_received type:RESPONSE" => 1,
+         "slurm_packets_sent type:ACK"          => 2,
+         "slurm_request_retries[0]"             => 1,
+      }, 'Request/response transaction increments metrics' );
+   }
 
    $controller->check_and_clear( '->request' );
 
@@ -95,6 +117,13 @@ sub with_crc8
    is( await $slurm->request( "req2" ), "res2",
       '->request runs command and yields response after retransmit' );
 
+   if( HAVE_TEST_METRICS_ANY ) {
+      Test::Metrics::Any::is_metrics( {
+         "slurm_retransmits" => 1,
+         "slurm_request_retries[1]" => 1,
+      }, 'Packet retransmit increments metrics' );
+   }
+
    $controller->check_and_clear( '->request for retransmit' );
 
    $slurm->stop;
@@ -119,8 +148,14 @@ sub with_crc8
 
    my $f = $slurm->request( "req3" );
    $f->await;
-   is( scalar $f->failure, "Request timed out after 3 attempts\n",
+   is_deeply( [ $f->failure ], [ "Request timed out after 3 attempts\n", slurm => undef ],
       'Eventual failure of ->request timeout' );
+
+   if( HAVE_TEST_METRICS_ANY ) {
+      Test::Metrics::Any::is_metrics( {
+         "slurm_timeouts" => 1,
+      }, 'Packet timeout increments metrics' );
+   }
 
    $controller->check_and_clear( '->request for timeout' );
 

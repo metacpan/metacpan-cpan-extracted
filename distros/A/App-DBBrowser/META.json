@@ -56,7 +56,7 @@
             "Term::Choose::Util" : "0.137",
             "Term::Form" : "0.552",
             "Term::Form::ReadLine" : "0.552",
-            "Term::TablePrint" : "0.151",
+            "Term::TablePrint" : "0.154",
             "Text::CSV" : "0",
             "bytes" : "0",
             "open" : "0",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.303",
+   "version" : "2.304",
    "x_bugtracker" : {
       "web" : "https://github.com/kuerbis/App-DBBrowser/issues"
    },

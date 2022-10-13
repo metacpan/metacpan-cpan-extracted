@@ -1,0 +1,53 @@
+Changes on 2022-10-12 for repository at:
+  Fetch URL: git@github.com:abeltje/Perl5-CoreSmokeDB-Schema.git
+  Push  URL: git@github.com:abeltje/Perl5-CoreSmokeDB-Schema.git
+
+Enjoy!
+
+1.08 2022-10-12T13:20:56+02:00 (d3931ae => Abe Timmerman)
+ - (Abe Timmerman, Wed, 12 Oct 2022 13:20:56 +0200) Autocommit for
+   distribution Perl5::CoreSmokeDB::Schema 1.08 (minor)
+
+1.07 2022-09-25T19:58:32+02:00 (d58714f => Abe Timmerman)
+ - (Abe Timmerman, Sun, 25 Sep 2022 19:58:32 +0200) Autocommit for
+   distribution Perl5::CoreSmokeDB::Schema 1.07 (same)
+
+ - (Abe Timmerman, Wed, 12 Oct 2022 13:11:17 +0200) Fix warning in result
+   classes
+ -     The classes with ->as_hashref as a method warned for the simple case
+ -     that '$is_full' was not passed.
+
+1.06 2022-09-25T18:41:54+02:00 (c1f5937 => Abe Timmerman)
+ - (Abe Timmerman, Sun, 25 Sep 2022 18:41:54 +0200) Autocommit for
+   distribution Perl5::CoreSmokeDB::Schema 1.06 (same)
+
+ - (Abe Timmerman, Sun, 25 Sep 2022 19:54:34 +0200) Rename the
+   Exception-classes the Schema throws
+ -     The Exception::Class exception were still called
+ -     'Test::Smoke::Gateway::*Exception', now that we've pulled the schema
+   out
+ -     of the CoreSmokeDB (Test::Smoke::Gateway) repository, better to
+   rename
+ -     the Exception classes to 'Perl5::CoreSmokeDB::Schea::*Exception'
+ -     Add a new test for the exceptions.
+
+0.00_00 2022-09-20T19:04:00+02:00 (43bac00 => Abe Timmerman)
+ - (Abe Timmerman, Tue, 20 Sep 2022 19:04:00 +0200) First commit
+ -     This module was split from the CoreSmokeDB/Test::Smoke::Gateway.
+ -     I want to write a new API server (next to the existing server), so I
+ -     don't want to maintain 2 versions of this Schema.
+
+ - (Abe Timmerman, Sun, 25 Sep 2022 18:20:12 +0200) Add the 'as_hashref'
+   method to most result classes
+ -     The 'as_hashref' method uses 'get_inflated_columns' and converts
+ -     DateTime objects into rfc3339 for 'Europe/Amsterdam'.
+ -     The objects with 'has_many' relations can also be rendered by
+   specifying
+ -     the 'full' parameter.
+ -     Having a HashRef is easier to work with than the list of key/value
+ -     pairs.
+ -     - we also set the application_name to 'perl5coresmokedb' for
+   Postgresql
+ -	 connections, that helps with identifying connections on the
+   database
+ -	 server.

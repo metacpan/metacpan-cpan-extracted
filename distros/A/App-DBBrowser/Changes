@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.304    2022-10-12
+        - Term::TablePrint minimum version is '0.154'.
+
 2.303    2022-07-22
         - Bugfix insert plain.
 

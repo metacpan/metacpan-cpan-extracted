@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.54';
+our $VERSION = '2.55';
 
 our @ALL =
 qw(
@@ -1866,7 +1866,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2022d' }
+sub OlsonVersion { '2022e' }
 
 
 1;
@@ -3276,7 +3276,7 @@ so that applications can easily present a list of timezones.
 
   Africa/Tunis
 
-=head3 Turkey (TR)
+=head3 Turkiye (TR)
 
   Europe/Istanbul
 

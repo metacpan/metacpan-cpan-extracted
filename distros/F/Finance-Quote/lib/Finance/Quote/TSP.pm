@@ -42,7 +42,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use POSIX;
 
-our $VERSION = '1.53'; # VERSION
+our $VERSION = '1.5301'; # VERSION
 
 # URLs of where to obtain information
 $TSP_URL      = 'https://www.tsp.gov/data/fund-price-history.csv';

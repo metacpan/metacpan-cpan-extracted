@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts '=' , \my %o ;
+
+my @p ; 
+while ( <> ) { 
+   do { print $_ ; next } if $. == 1 && $o{'='} ; 
+	chomp ; 
+	/(\d+)/ ; # 小数点以下および符号を無視できる。ただし、1.2e3 のような表記には対応していない。
+	my $n = $1 // $_ ; #( $_ + 0 ) ; 
+	unless  ( do { my $t = $n ;  grep { $t % $_ == 0 } @p } ) {
+		print "$_\n" ;
+		push @p, $n ;
+	}
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+コマンド :
+
+   primefind 
+
+動作 : 
+
+   標準入力の各行を数値を逐次読み取る。既に読み込んだ数の倍数になっていない行のみ標準出力に出力する。
+   なお、出力する場合は、読んだ入力の行全体を出力する。処理対象は各行の最初の整数値のみであることに注意。
+
+利用例 : 
+
+   seq 2 30 | primefind   # 2から30までの素数が出力される。
+
+オプションに関して :
+
+   -=  : 入力の1行目は、何も処理せずに、そのまま出力する。
+   --help : このヘルプを表示する。(ただしPod::PerldocJp を一度インストールすると perldoc $0 でも可能。)
+
+関連するコマンド : 
+
+   denomfind  
+     # 四捨五入された割合の数がいくつかある場合に、分母を推定するプログラム。下記の様に使う。
+     # denomfind -vm600 -\% 7.1  22.5 70.4  8.9 25.7 65.4| grep "*" | primefind
+
+その他メモ : 
+
+    入力する数の表記の仕方に柔軟性を持たせるためのオプションの設計は将来あり得る。
+    遅くとも2018年1月11日にこのコマンドの作成は開始された。
+    Mercurialのレポジトリの上では、2019年1月11日に denomind の名前で登録し、1月28日にヘルプの文章を作成している。
+
+
+=cut

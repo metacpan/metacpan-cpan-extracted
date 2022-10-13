@@ -10,7 +10,7 @@ use strict;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-our $VERSION = '1.53'; # VERSION
+our $VERSION = '1.5301'; # VERSION
 
 sub methods { return (deka => \&deka); }
 sub labels { return (deka => [qw/exchange name date isodate price method/]); }

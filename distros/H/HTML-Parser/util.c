@@ -72,15 +72,11 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 
     char *repl;
     STRLEN repl_len;
-#ifdef UNICODE_HTML_PARSER
     char buf[UTF8_MAXLEN];
     int repl_utf8;
     int high_surrogate = 0;
-#else
-    char buf[1];
-#endif
 
-#if defined(__GNUC__) && defined(UNICODE_HTML_PARSER)
+#if defined(__GNUC__)
     /* gcc -Wall reports this variable as possibly used uninitialized */
     repl_utf8 = 0;
 #endif
@@ -127,7 +123,6 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 		}
 	    }
 	    if (num && ok) {
-#ifdef UNICODE_HTML_PARSER
 		if (!SvUTF8(sv) && num <= 255) {
 		    buf[0] = (char) num;
 		    repl = buf;
@@ -169,13 +164,6 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 		    repl_len = tmp - buf;
 		    repl_utf8 = 1;
 		}
-#else
-		if (num <= 255) {
-		    buf[0] = (char) num & 0xFF;
-		    repl = buf;
-		    repl_len = 1;
-		}
-#endif
 	    }
 	}
 	else {
@@ -189,9 +177,7 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 		   )
 		{
 		    repl = SvPV(*svp, repl_len);
-#ifdef UNICODE_HTML_PARSER
 		    repl_utf8 = SvUTF8(*svp);
-#endif
 		}
 		else if (expand_prefix) {
 		    char *ss = s - 1;
@@ -199,9 +185,7 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 			svp = hv_fetch(entity2char, ent_name, ss - ent_name, 0);
 			if (svp) {
 			    repl = SvPV(*svp, repl_len);
-#ifdef UNICODE_HTML_PARSER
 			    repl_utf8 = SvUTF8(*svp);
-#endif
 			    s = ss;
 			    break;
 			}
@@ -209,9 +193,7 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 		    }
 		}
 	    }
-#ifdef UNICODE_HTML_PARSER
 	    high_surrogate = 0;
-#endif
 	}
 
 	if (repl) {
@@ -220,7 +202,6 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 		s++;
 	    t--;  /* '&' already copied, undo it */
 
-#ifdef UNICODE_HTML_PARSER
 	    if (*s != '&') {
 		high_surrogate = 0;
 	    }
@@ -246,7 +227,6 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 		repl = (char*)bytes_to_utf8((U8*)repl, &repl_len);
 		repl_allocated = repl;
 	    }
-#endif
 
 	    if (t + repl_len > s) {
 		/* need to grow the string */
@@ -272,7 +252,6 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
     return sv;
 }
 
-#ifdef UNICODE_HTML_PARSER
 static bool
 has_hibit(char *s, char *e)
 {
@@ -308,4 +287,3 @@ probably_utf8_chunk(pTHX_ char *s, STRLEN len)
 
     return is_utf8_string((U8*)s, e - s);
 }
-#endif

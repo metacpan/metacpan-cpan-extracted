@@ -1,4 +1,4 @@
-package Exception::FFI::ErrorCode 0.02 {
+package Exception::FFI::ErrorCode 0.03 {
 
   use warnings;
   use 5.020;
@@ -60,7 +60,7 @@ package Exception::FFI::ErrorCode 0.02 {
 
   __PACKAGE__->detect;
 
-  package Exception::FFI::ErrorCode::Base 0.02 {
+  package Exception::FFI::ErrorCode::Base 0.03 {
 
     sub _carp_always;
 
@@ -79,9 +79,9 @@ package Exception::FFI::ErrorCode 0.02 {
         },
         bool => sub { 1 }, fallback => 1;
 
-    sub throw ($proto, @rest)
+    sub throw ($proto, %rest)
     {
-      my($package, $filename, $line) = caller;
+      my($package, $filename, $line) = caller( delete $rest{frame} // 0 );
 
       my $self;
       if(is_blessed_ref $proto)
@@ -94,7 +94,7 @@ package Exception::FFI::ErrorCode 0.02 {
       else
       {
         $self = $proto->new(
-          @rest,
+          %rest,
           package  => $package,
           filename => $filename,
           line     => $line,
@@ -151,7 +151,7 @@ Exception::FFI::ErrorCode - Exception class based on integer error codes common 
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -178,7 +178,7 @@ Throwing:
 
 Defining error class without a strerror
 
- package Curl::<Error {
+ package Curl::Error {
    use Exception::FFI::ErrorCode
      code => {
        CURLE_OK                   => [ 0,  'no error'                        ],
@@ -282,10 +282,17 @@ The base class provides these attributes and methods:
 
 =head2 throw
 
- Exception::FFI::ErrorCode::Base->throw( code => $code );
+ Exception::FFI::ErrorCode::Base->throw( code => $code, %attr );
+ Exception::FFI::ErrorCode::Base->throw( code => $code, frame => $frame, %attr );
 
 Throws the exception with the given code.  Obviously you would throw the subclass, not the
 base class.
+
+If you have added additional attributes via L<Class::Tiny> you can provide them as
+C<%attr>.
+
+If you want the exception to appear to happen from a different frame then you can
+specify it with C<$frame>.
 
 =head2 strerror
 

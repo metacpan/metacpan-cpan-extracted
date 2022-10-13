@@ -1,12 +1,13 @@
+## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::date::tz_offset;
 
-our $DATE = '2021-08-04'; # DATE
-our $VERSION = '0.017'; # VERSION
+our $DATE = '2022-10-12'; # DATE
+our $VERSION = '0.018'; # VERSION
 
-our $rschema = do{my$var={base=>"int",clsets_after_base=>[{description=>"\nOnly timezone offsets that are known to exist are allowed. For example, 1 second\n(+00:00:01) is not allowed. See `date::tz_offset_lax` for a more relaxed\nvalidation.\n\nA coercion from these form of string is provided:\n\n    UTC\n\n    UTC-14 or UTC+12 or UTC+12:45 or UTC-00:25:21\n    -14 or +12, -1400 or +12:00\n\nA coercion from timezone name is also provided.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>0,value=>"UTC"},{valid=>1,validated_value=>3600,value=>3600},{valid=>1,validated_value=>-43200,value=>-43200},{valid=>1,validated_value=>-43200,value=>-12},{valid=>1,validated_value=>-43200,value=>-1200},{valid=>1,validated_value=>-43200,value=>"-12:00"},{valid=>1,validated_value=>-43200,value=>"UTC-12"},{valid=>1,validated_value=>-43200,value=>"UTC-1200"},{valid=>1,validated_value=>45900,value=>"UTC+12:45"},{valid=>0,value=>"UTC-13"},{summary=>"Unknown offset",valid=>0,value=>"UTC+12:01"}],in=>[-43200,-39600,-37800,-36000,-34200,-32400,-30600,-28800,-25200,-21600,-18000,-16200,-14400,-12600,-10800,-9000,-7200,-3600,-2640,-1521,0,0,1200,1800,3600,5040,5400,7200,9000,10800,12600,14400,16200,17460,18000,19800,20400,20700,21600,23400,25200,26400,27000,28800,30600,31500,32400,34200,35100,36000,37800,39600,41400,43200,45900,46800,49500,50400],summary=>"Timezone offset in seconds from UTC","x.completion"=>sub{package Sah::Schema::date::tz_offset;require Complete::TZ;require Complete::Util;my(%args) = @_;Complete::Util::combine_answers(Complete::TZ::complete_tz_offset('word', $args{'word'}), Complete::TZ::complete_tz_name('word', $args{'word'}))},"x.perl.coerce_rules"=>["From_str::tz_offset_strings"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["int"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"int",clsets_after_base=>[{description=>"\nOnly timezone offsets that are known to exist are allowed. For example, 1 second\n(+00:00:01) is not allowed. See `date::tz_offset_lax` for a more relaxed\nvalidation.\n\nA coercion from these form of string is provided:\n\n    UTC\n\n    UTC-14 or UTC+12 or UTC+12:45 or UTC-00:25:21\n    -14 or +12, -1400 or +12:00\n\nA coercion from timezone name is also provided.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>0,value=>"UTC"},{valid=>1,validated_value=>3600,value=>3600},{valid=>1,validated_value=>-43200,value=>-43200},{valid=>1,validated_value=>-43200,value=>-12},{valid=>1,validated_value=>-43200,value=>-1200},{valid=>1,validated_value=>-43200,value=>"-12:00"},{valid=>1,validated_value=>-43200,value=>"UTC-12"},{valid=>1,validated_value=>-43200,value=>"UTC-1200"},{valid=>1,validated_value=>45900,value=>"UTC+12:45"},{valid=>0,value=>"UTC-13"},{summary=>"Unknown offset",valid=>0,value=>"UTC+12:01"}],in=>[-43200,-39600,-37800,-36000,-34200,-32400,-30600,-28800,-25200,-21600,-18000,-16200,-14400,-12600,-10800,-9000,-7200,-3600,-2640,-1521,0,0,1200,1800,3600,5040,5400,7200,9000,10800,12600,14400,16200,17460,18000,19800,20400,20700,21600,23400,25200,26400,27000,28800,30600,31500,32400,34200,35100,36000,37800,39600,41400,43200,45900,46800,49500,50400,-43200,-39600,-37800,-36000,-34200,-32400,-30600,-28800,-25200,-21600,-18000,-16200,-14400,-12600,-10800,-9000,-7200,-3600,-2640,-1521,0,0,1200,1800,3600,5040,5400,7200,9000,10800,12600,14400,16200,17460,18000,19800,20400,20700,21600,23400,25200,26400,27000,28800,30600,31500,32400,34200,35100,36000,37800,39600,41400,43200,45900,46800,49500,50400],summary=>"Timezone offset in seconds from UTC (only known offsets are allowd, coercible from string), e.g. 25200 or \"+07:00\"","x.completion"=>sub{package Sah::Schema::date::tz_offset;use strict;require Complete::TZ;require Complete::Util;my(%args) = @_;Complete::Util::combine_answers(Complete::TZ::complete_tz_offset('word', $args{'word'}), Complete::TZ::complete_tz_name('word', $args{'word'}))},"x.perl.coerce_rules"=>["From_str::tz_offset_strings"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["int"],type=>"int",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
-# ABSTRACT: Timezone offset in seconds from UTC
+# ABSTRACT: Timezone offset in seconds from UTC (only known offsets are allowd, coercible from string), e.g. 25200 or "+07:00"
 
 __END__
 
@@ -16,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::date::tz_offset - Timezone offset in seconds from UTC
+Sah::SchemaR::date::tz_offset - Timezone offset in seconds from UTC (only known offsets are allowd, coercible from string), e.g. 25200 or "+07:00"
 
 =head1 VERSION
 
-This document describes version 0.017 of Sah::SchemaR::date::tz_offset (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
+This document describes version 0.018 of Sah::SchemaR::date::tz_offset (from Perl distribution Sah-Schemas-Date), released on 2022-10-12.
 
 =head1 DESCRIPTION
 
@@ -36,6 +37,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Date>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Date>
@@ -43,16 +73,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

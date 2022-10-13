@@ -2,8 +2,8 @@ NAME
     App::BPOMUtils - Utilities related to BPOM
 
 VERSION
-    This document describes version 0.002 of App::BPOMUtils (from Perl
-    distribution App-BPOMUtils), released on 2021-08-28.
+    This document describes version 0.007 of App::BPOMUtils (from Perl
+    distribution App-BPOMUtils), released on 2022-10-12.
 
 SYNOPSIS
      # Use via the included scripts
@@ -13,17 +13,27 @@ DESCRIPTION
     Obat dan Makanan, Indonesian equivalent of Food & Drug Administration
     authority).
 
-    *   bpom-list-jenis-pangan
+    *   bpom-daftar-jenis-pangan
+
+    *   bpom-daftar-kode-prefiks-reg
+
+    *   bpom-list-food-types
+
+    *   bpom-list-reg-code-prefixes
+
+    *   bpom-show-nutrition-facts
+
+    *   bpom-tampilkan-ing
 
 FUNCTIONS
-  bpom_list_jenis_pangan
+  bpom_list_food_types
     Usage:
 
-     bpom_list_jenis_pangan(%args) -> [$status_code, $reason, $payload, \%result_meta]
+     bpom_list_food_types(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List food types in BPOM processed food division.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -194,6 +204,437 @@ FUNCTIONS
 
     Return value: (any)
 
+  bpom_list_reg_code_prefixes
+    Usage:
+
+     bpom_list_reg_code_prefixes(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List known alphabetical prefixes in BPOM registered product codes.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code => *str*
+
+        Only return records where the 'code' field equals specified value.
+
+    *   code.contains => *str*
+
+        Only return records where the 'code' field contains specified text.
+
+    *   code.in => *array[str]*
+
+        Only return records where the 'code' field is in the specified
+        values.
+
+    *   code.is => *str*
+
+        Only return records where the 'code' field equals specified value.
+
+    *   code.isnt => *str*
+
+        Only return records where the 'code' field does not equal specified
+        value.
+
+    *   code.max => *str*
+
+        Only return records where the 'code' field is less than or equal to
+        specified value.
+
+    *   code.min => *str*
+
+        Only return records where the 'code' field is greater than or equal
+        to specified value.
+
+    *   code.not_contains => *str*
+
+        Only return records where the 'code' field does not contain
+        specified text.
+
+    *   code.not_in => *array[str]*
+
+        Only return records where the 'code' field is not in the specified
+        values.
+
+    *   code.xmax => *str*
+
+        Only return records where the 'code' field is less than specified
+        value.
+
+    *   code.xmin => *str*
+
+        Only return records where the 'code' field is greater than specified
+        value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   division => *str*
+
+        Only return records where the 'division' field equals specified
+        value.
+
+    *   division.contains => *str*
+
+        Only return records where the 'division' field contains specified
+        text.
+
+    *   division.in => *array[str]*
+
+        Only return records where the 'division' field is in the specified
+        values.
+
+    *   division.is => *str*
+
+        Only return records where the 'division' field equals specified
+        value.
+
+    *   division.isnt => *str*
+
+        Only return records where the 'division' field does not equal
+        specified value.
+
+    *   division.max => *str*
+
+        Only return records where the 'division' field is less than or equal
+        to specified value.
+
+    *   division.min => *str*
+
+        Only return records where the 'division' field is greater than or
+        equal to specified value.
+
+    *   division.not_contains => *str*
+
+        Only return records where the 'division' field does not contain
+        specified text.
+
+    *   division.not_in => *array[str]*
+
+        Only return records where the 'division' field is not in the
+        specified values.
+
+    *   division.xmax => *str*
+
+        Only return records where the 'division' field is less than
+        specified value.
+
+    *   division.xmin => *str*
+
+        Only return records where the 'division' field is greater than
+        specified value.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   summary_eng => *str*
+
+        Only return records where the 'summary_eng' field equals specified
+        value.
+
+    *   summary_eng.contains => *str*
+
+        Only return records where the 'summary_eng' field contains specified
+        text.
+
+    *   summary_eng.in => *array[str]*
+
+        Only return records where the 'summary_eng' field is in the
+        specified values.
+
+    *   summary_eng.is => *str*
+
+        Only return records where the 'summary_eng' field equals specified
+        value.
+
+    *   summary_eng.isnt => *str*
+
+        Only return records where the 'summary_eng' field does not equal
+        specified value.
+
+    *   summary_eng.max => *str*
+
+        Only return records where the 'summary_eng' field is less than or
+        equal to specified value.
+
+    *   summary_eng.min => *str*
+
+        Only return records where the 'summary_eng' field is greater than or
+        equal to specified value.
+
+    *   summary_eng.not_contains => *str*
+
+        Only return records where the 'summary_eng' field does not contain
+        specified text.
+
+    *   summary_eng.not_in => *array[str]*
+
+        Only return records where the 'summary_eng' field is not in the
+        specified values.
+
+    *   summary_eng.xmax => *str*
+
+        Only return records where the 'summary_eng' field is less than
+        specified value.
+
+    *   summary_eng.xmin => *str*
+
+        Only return records where the 'summary_eng' field is greater than
+        specified value.
+
+    *   summary_ind => *str*
+
+        Only return records where the 'summary_ind' field equals specified
+        value.
+
+    *   summary_ind.contains => *str*
+
+        Only return records where the 'summary_ind' field contains specified
+        text.
+
+    *   summary_ind.in => *array[str]*
+
+        Only return records where the 'summary_ind' field is in the
+        specified values.
+
+    *   summary_ind.is => *str*
+
+        Only return records where the 'summary_ind' field equals specified
+        value.
+
+    *   summary_ind.isnt => *str*
+
+        Only return records where the 'summary_ind' field does not equal
+        specified value.
+
+    *   summary_ind.max => *str*
+
+        Only return records where the 'summary_ind' field is less than or
+        equal to specified value.
+
+    *   summary_ind.min => *str*
+
+        Only return records where the 'summary_ind' field is greater than or
+        equal to specified value.
+
+    *   summary_ind.not_contains => *str*
+
+        Only return records where the 'summary_ind' field does not contain
+        specified text.
+
+    *   summary_ind.not_in => *array[str]*
+
+        Only return records where the 'summary_ind' field is not in the
+        specified values.
+
+    *   summary_ind.xmax => *str*
+
+        Only return records where the 'summary_ind' field is less than
+        specified value.
+
+    *   summary_ind.xmin => *str*
+
+        Only return records where the 'summary_ind' field is greater than
+        specified value.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  bpom_show_nutrition_facts
+    Usage:
+
+     bpom_show_nutrition_facts(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Round values and format them as nutrition fact table (ING - informasi
+    nilai gizi).
+
+    Examples:
+
+    *   An example, in linear text format (color/emphasis is shown with
+        markup):
+
+         bpom_show_nutrition_facts(
+           carbohydrate => 13.113,
+           color => "never",
+           fat => 0.223,
+           output_format => "linear_text",
+           package_size => 20,
+           protein => 0.99,
+           saturated_fat => 0.01,
+           serving_size => 175,
+           sodium => 0.223,
+           sugar => 7.173
+         );
+
+        Result:
+
+         [
+           200,
+           "OK",
+           "*INFORMASI NILAI GIZI*  *JUMLAH PER KEMASAN (20 g*) : *Energi total 10 kkal*, Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0% AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. /Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./\n",
+           { "cmdline.skip_format" => 1 },
+         ]
+
+    *   The same example in vetical HTML table format:
+
+         bpom_show_nutrition_facts(
+           carbohydrate => 13.113,
+           fat => 0.223,
+           output_format => "vertical_html_table",
+           package_size => 20,
+           protein => 0.99,
+           saturated_fat => 0.01,
+           serving_size => 175,
+           sodium => 0.223,
+           sugar => 7.173
+         );
+
+        Result:
+
+         [
+           200,
+           "OK",
+           "\n<style>\n  table { border-collapse: collapse; border: 1px solid; }\n  tr.has_bottom_border { border-bottom: 1pt solid black; }\n  // td:first-child { background: red; }\n</style>\n<table><colgroup><col style=\"width:16pt;\"><col style=\"width:200pt;\"><col style=\"width:48pt;\"><col style=\"width:48pt;\"><col style=\"width:36pt;\"></colgroup>\n<tr><td colspan=5 align=\"middle\"><b>INFORMASI NILAI GIZI</b></td></tr>\n<tbody>\n<tr><td colspan=5><b>JUMLAH PER KEMASAN (20 g</b>)</td></tr>\n<tr class=has_bottom_border><td colspan=5><b>Energi total 10 kkal</b></td></tr>\n<tr><td colspan=3></td><td colspan=2 align=\"middle\"><b>% AKG</b>*</td></tr>\n<tr><td colspan=2><b>Lemak total</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Lemak jenuh</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Protein</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Karbohidrat total</b></td><td align=\"right\"><b>3 g</b></td><td align=\"right\">1 %</td><td></td></tr>\n<tr><td colspan=2><b>Gula</b></td><td align=\"right\"><b>1 g</b></td><td></td><td></td></tr>\n<tr class=has_bottom_border><td colspan=2><b>Garam (Natrium)</b></td><td align=\"right\"><b>0 mg</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=5><i>*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah.</i></td></tr>\n</tbody>\n</table>\n",
+           { "cmdline.skip_format" => 1 },
+         ]
+
+    *   The same example, in vertical text format (color/emphasis is shown
+        with markup):
+
+         bpom_show_nutrition_facts(
+           carbohydrate => 13.113,
+           color => "never",
+           fat => 0.223,
+           output_format => "vertical_text_table",
+           package_size => 20,
+           protein => 0.99,
+           saturated_fat => 0.01,
+           serving_size => 175,
+           sodium => 0.223,
+           sugar => 7.173
+         );
+
+        Result:
+
+         [
+           200,
+           "OK",
+           ".---------------------------------------------------------------------------------------------------------------------.\n|                                               *INFORMASI NILAI GIZI*                                                |\n| *JUMLAH PER KEMASAN (20 g*)                                                                                         |\n| *Energi total 10 kkal*                                                                                              |\n+-----------------------|----------------------|-----------------------+----------------------|-----------------------+\n|                                                                      |                   *% AKG**                   |\n| *Lemak total*                                |                 *0 g* |                  0 % |                       |\n| *Lemak jenuh*                                |                 *0 g* |                  0 % |                       |\n| *Protein*                                    |                 *0 g* |                  0 % |                       |\n| *Karbohidrat total*                          |                 *3 g* |                  1 % |                       |\n| *Gula*                                       |                 *1 g* |                      |                       |\n| *Garam (Natrium)*                            |                *0 mg* |                  0 % |                       |\n+-----------------------|----------------------+-----------------------+----------------------+-----------------------+\n| /*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./ |\n`---------------------------------------------------------------------------------------------------------------------'\n",
+           { "cmdline.skip_format" => 1 },
+         ]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   browser => *true*
+
+        View output HTML in browser instead of returning it.
+
+    *   carbohydrate* => *ufloat*
+
+        Total carbohydrate, in g/100g.
+
+    *   color => *str* (default: "auto")
+
+    *   fat* => *ufloat*
+
+        Total fat, in g/100g.
+
+    *   name => *str*
+
+    *   output_format => *str* (default: "vertical_text_table")
+
+    *   package_size* => *ufloat*
+
+        Packaging size, in g.
+
+    *   protein* => *ufloat*
+
+        Protein, in g/100g.
+
+    *   saturated_fat* => *ufloat*
+
+        Saturated fat, in g/100g.
+
+    *   serving_size* => *ufloat*
+
+        Serving size, in g.
+
+    *   sodium* => *ufloat*
+
+        Sodium, in mg/100g.
+
+    *   sugar* => *ufloat*
+
+        Total sugar, in g/100g.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-BPOMUtils>.
@@ -221,13 +662,14 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

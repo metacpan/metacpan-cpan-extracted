@@ -1,6 +1,6 @@
 # Text::Table - Organize Data in Tables
 package Text::Table;
-$Text::Table::VERSION = '1.134';
+$Text::Table::VERSION = '1.135';
 use strict;
 use warnings;
 
@@ -892,7 +892,7 @@ Text::Table - Organize Data in Tables
 
 =head1 VERSION
 
-version 1.134
+version 1.135
 
 =head1 SYNOPSIS
 
@@ -1024,7 +1024,7 @@ if you allow warnings.  You can also turn warnings into fatal errors.
 
 =head1 VERSION
 
-version 1.134
+version 1.135
 
 =head1 SPECIFICATIONS
 
@@ -1483,7 +1483,14 @@ LICENSE file included with this module.
 
 =head1 SEE ALSO
 
-L<Text::Aligner>, L<perl(1)> .
+L<Text::Table::Tiny> supports a simple model for generating
+text tables, with some flexibility on the look of the table.
+
+L<Text::Table::Manifold> provides a much richer interface for
+defining tables. The SEE ALSO section of its documentation
+lists a lot more table modules on CPAN.
+
+L<Text::Aligner> can be used to align text on a line-by-line basis.
 
 =head1 EXAMPLES
 

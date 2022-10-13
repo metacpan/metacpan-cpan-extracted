@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
@@ -70,7 +70,8 @@ Readonly my $DEFAULT_MAX_ITERATIONS => 100;
 # Wraps the given numerical function in a way where we’re guaranteeing that it’s
 # called in a scalar context and where we’re trapping its errors.
 sub _wrap_func ($func) {
-  croak "The passed $func is not a code reference" unless ref($func) eq 'CODE';
+  croak "The passed \$func is not a code reference (${func})"
+      unless ref($func) eq 'CODE';
   return sub {
     my $r = eval { &{$func} };
     return $r if defined $r;

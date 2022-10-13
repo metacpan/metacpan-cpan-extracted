@@ -1,3 +1,13 @@
+0.303   2022-10-12  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] In generated POD usage line, link to option description.
+
+
+0.302   2022-10-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Fixes.
+
+
 0.301   2022-10-09  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] In generated POD usage line, link to appropriate Sah::Schema

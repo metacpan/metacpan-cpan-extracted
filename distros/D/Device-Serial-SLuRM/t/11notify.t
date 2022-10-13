@@ -6,6 +6,8 @@ use warnings;
 use Test::More;
 use Test::Future::IO;
 
+use constant HAVE_TEST_METRICS_ANY => eval { require Test::Metrics::Any };
+
 use Future::AsyncAwait;
 
 use Device::Serial::SLuRM;
@@ -46,9 +48,21 @@ sub notifications_received_for
 
 # Basic notification
 {
+   # Auto-reset
+   $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
+   $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
+   $controller->expect_sysread( "DummyFH", 8192 )
+      ->will_done( "\x55" . with_crc8( with_crc8( "\x02\x01" ) . "\x00" ) );
+
    my ( $notification ) = notifications_received_for
-      "\x55" . with_crc8( with_crc8( "\x10\x01" ) . "A" );
+      "\x55" . with_crc8( with_crc8( "\x11\x01" ) . "A" );
    is( $notification, "A", 'Received NOTIFY packet' );
+
+   if( HAVE_TEST_METRICS_ANY ) {
+      Test::Metrics::Any::is_metrics( {
+         "slurm_packets_received type:NOTIFY" => 1,
+      }, 'Received NOTIFY packet increments metrics' );
+   }
 
    $controller->check_and_clear( 'Receive NOTIFY packet' );
 }
@@ -56,8 +70,8 @@ sub notifications_received_for
 # Duplicates are suppressed
 {
    my @notifications = notifications_received_for
-      "\x55" . with_crc8( with_crc8( "\x11\x01" ) . "B" ) .
-      "\x55" . with_crc8( with_crc8( "\x11\x01" ) . "B" );
+      "\x55" . with_crc8( with_crc8( "\x12\x01" ) . "B" ) .
+      "\x55" . with_crc8( with_crc8( "\x12\x01" ) . "B" );
    is_deeply( \@notifications, [ "B" ], 'Received only one NOTIFY packet with duplicate' );
 
    $controller->check_and_clear( 'Receive NOTIFY packet with duplicate' );
@@ -66,8 +80,8 @@ sub notifications_received_for
 # Backwards steps are suppressed
 {
    my @notifications = notifications_received_for
-      "\x55" . with_crc8( with_crc8( "\x12\x01" ) . "C" ) .
-      "\x55" . with_crc8( with_crc8( "\x11\x01" ) . "B" );
+      "\x55" . with_crc8( with_crc8( "\x13\x01" ) . "C" ) .
+      "\x55" . with_crc8( with_crc8( "\x12\x01" ) . "B" );
    is_deeply( \@notifications, [ "C" ], 'Received only one NOTIFY packet with backstep' );
 
    $controller->check_and_clear( 'Receive NOTIFY packet with backstep' );
@@ -100,6 +114,12 @@ sub notifications_received_for
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x11\x02" ) . "A1" ) );
 
    await $slurm->send_notify( "A1" );
+
+   if( HAVE_TEST_METRICS_ANY ) {
+      Test::Metrics::Any::is_metrics( {
+         "slurm_packets_sent type:NOTIFY" => 2,
+      }, '->send_notify increments metrics' );
+   }
 
    $controller->check_and_clear( '->send_notify' );
 

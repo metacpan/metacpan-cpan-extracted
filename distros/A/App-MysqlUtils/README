@@ -2,8 +2,8 @@ NAME
     App::MysqlUtils - CLI utilities related to MySQL
 
 VERSION
-    This document describes version 0.020 of App::MysqlUtils (from Perl
-    distribution App-MysqlUtils), released on 2020-05-06.
+    This document describes version 0.021 of App::MysqlUtils (from Perl
+    distribution App-MysqlUtils), released on 2022-10-12.
 
 SYNOPSIS
     This distribution includes the following CLI utilities:
@@ -32,7 +32,7 @@ FUNCTIONS
   mysql_copy_rows_adjust_pk
     Usage:
 
-     mysql_copy_rows_adjust_pk(%args) -> [status, msg, payload, meta]
+     mysql_copy_rows_adjust_pk(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Copy rows from one table to another, adjust PK column if necessary.
 
@@ -131,19 +131,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   mysql_drop_all_tables
     Usage:
 
-     mysql_drop_all_tables(%args) -> [status, msg, payload, meta]
+     mysql_drop_all_tables(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Drop all tables in a MySQL database.
 
@@ -178,19 +181,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   mysql_drop_dbs
     Usage:
 
-     mysql_drop_dbs(%args) -> [status, msg, payload, meta]
+     mysql_drop_dbs(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Drop MySQL databases.
 
@@ -242,19 +248,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   mysql_drop_tables
     Usage:
 
-     mysql_drop_tables(%args) -> [status, msg, payload, meta]
+     mysql_drop_tables(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Drop tables in a MySQL database.
 
@@ -308,19 +317,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   mysql_fill_csv_columns_from_query
     Usage:
 
-     mysql_fill_csv_columns_from_query(%args) -> [status, msg, payload, meta]
+     mysql_fill_csv_columns_from_query(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Fill CSV columns with data from a query.
 
@@ -349,13 +361,20 @@ FUNCTIONS
 
     *   database* => *str*
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field in input CSV, will be
+        passed to Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
 
     *   header => *bool* (default: 1)
 
-        Whether CSV has a header row.
+        Whether input CSV has a header row.
 
         By default ("--header"), the first row of the CSV will be assumed to
         contain field names (and the second row contains the first data
@@ -373,10 +392,27 @@ FUNCTIONS
 
     *   query* => *str*
 
+    *   quote_char => *str*
+
+        Specify field quote character in input CSV, will be passed to
+        Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character in input CSV, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     *   username => *str*
 
@@ -390,19 +426,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   mysql_find_identical_rows
     Usage:
 
-     mysql_find_identical_rows(%args) -> [status, msg, payload, meta]
+     mysql_find_identical_rows(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List rows on one table that are identical on another table.
 
@@ -442,19 +481,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   mysql_query
     Usage:
 
-     mysql_query(%args) -> [status, msg, payload, meta]
+     mysql_query(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Run query and return table result.
 
@@ -502,19 +544,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   mysql_run_pl_files
     Usage:
 
-     mysql_run_pl_files(%args) -> [status, msg, payload, meta]
+     mysql_run_pl_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Run each .pl file, feed the output to `mysql` command and write result
     to .txt file.
@@ -548,19 +593,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   mysql_run_sql_files
     Usage:
 
-     mysql_run_sql_files(%args) -> [status, msg, payload, meta]
+     mysql_run_sql_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Feed each .sql file to `mysql` command and write result to .txt file.
 
@@ -590,19 +638,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   mysql_sql_dump_extract_tables
     Usage:
 
-     mysql_sql_dump_extract_tables(%args) -> [status, msg, payload, meta]
+     mysql_sql_dump_extract_tables(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Parse SQL dump and spit out tables to separate files.
 
@@ -630,12 +681,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -647,21 +701,37 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-MysqlUtils>.
 
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016 by
+    perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=App-MysqlUtils>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by
-    perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

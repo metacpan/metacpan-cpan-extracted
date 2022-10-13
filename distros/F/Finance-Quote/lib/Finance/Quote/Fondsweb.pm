@@ -23,7 +23,7 @@ use strict;
 use HTTP::Request::Common;
 use HTML::TreeBuilder::XPath;
 
-our $VERSION = '1.53'; # VERSION 
+our $VERSION = '1.5301'; # VERSION 
 
 our $FONDSWEB_URL = "https://www.fondsweb.com/de/";
 

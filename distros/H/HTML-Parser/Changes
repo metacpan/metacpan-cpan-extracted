@@ -1,5 +1,10 @@
 Change history for HTML-Parser
 
+3.79      2022-10-12
+  * Modernise XS (GH#32) (James Raspass)
+  * Skip threads on older perl versions, as they often segfault (GH#31) (Graham
+  * Knop)
+
 3.78      2022-03-28
   * Remove unused variable (GH#26) (Michal Josef Špaček)
 

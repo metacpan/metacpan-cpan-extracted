@@ -1,12 +1,14 @@
 package Sah::Schema::date::day;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-04'; # DATE
+our $DATE = '2022-10-12'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 our $schema = [int => {
-    summary => 'Day of month (1-31)',
+    summary => 'Day of month (1-31), e.g. 17',
     min     => 1,
     max     => 31,
     examples => [
@@ -19,7 +21,7 @@ our $schema = [int => {
 
 1;
 
-# ABSTRACT: Day of month (1-31)
+# ABSTRACT: Day of month (1-31), e.g. 17
 
 __END__
 
@@ -29,11 +31,11 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::date::day - Day of month (1-31)
+Sah::Schema::date::day - Day of month (1-31), e.g. 17
 
 =head1 VERSION
 
-This document describes version 0.017 of Sah::Schema::date::day (from Perl distribution Sah-Schemas-Date), released on 2021-08-04.
+This document describes version 0.018 of Sah::Schema::date::day (from Perl distribution Sah-Schemas-Date), released on 2022-10-12.
 
 =head1 SYNOPSIS
 
@@ -55,7 +57,7 @@ To check data against this schema (requires L<Data::Sah>):
  my $validator = gen_validator("date::day*");
  say $validator->($data) ? "valid" : "INVALID!";
 
-The above schema returns a boolean value (true if data is valid, false if
+The above schema returns a boolean result (true if data is valid, false if
 otherwise). To return an error message string instead (empty string if data is
 valid, a non-empty error message otherwise):
 
@@ -63,7 +65,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = 31;
+ $data = 1;
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -78,14 +80,14 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = 31;
- my $res = $validator->($data); # => ["",31]
+ $data = 1;
+ my $res = $validator->($data); # => ["",1]
  
  # a sample invalid data
  $data = 32;
  my $res = $validator->($data); # => ["Must be at most 31",32]
 
-Data::Sah can also create validator that returns a hash of detaild error
+Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
 JavaScript, from the same schema. Other things Data::Sah can do: show source
 code for validator, generate a validator code with debug comments and/or log
@@ -146,6 +148,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
 
  % ./myapp.pl --arg1 ...
 
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'DateDay')
+     );
+ }
+
+ use My::Types qw(DateDay);
+ DateDay->assert_valid($data);
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schemas-Date>.
@@ -154,6 +173,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Date>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Date>
@@ -161,16 +209,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

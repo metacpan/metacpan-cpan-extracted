@@ -793,6 +793,7 @@ C<configs> are also included in the resulting HashRef.
 sub as_hashref {
     my $self = shift;
     my ($is_full) = @_;
+    $is_full //= '';
 
     my $record = { $self->get_inflated_columns };
     $record->{smoke_date} = $self->smoke_date->rfc3339 if $self->smoke_date;

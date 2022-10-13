@@ -278,6 +278,8 @@ EOF
 
     return {
         LIBS => $libs,
+        INC => "-Ilibeav/include -I${idnkit_dir}/include",
+        DEFINE => '-DEAV_EXTRA -DHAVE_IDNKIT',
         macro => {
             LIBEAV_OPTIONS => join(" ", @options),
         },
@@ -288,6 +290,7 @@ EOF
 sub build_auto() {
     my $libs = "";
     my @options;
+    my $idn_define = "";
     my $result;
 
     eval {
@@ -299,6 +302,7 @@ sub build_auto() {
             my %pkg_info = ExtUtils::PkgConfig->find ($idnpkg);
             $libs = $pkg_info{'libs'};
             push @options, "FORCE_IDN=${idnname}";
+            $idn_define = '-DHAVE_LIB' . uc(${idnname});
             last;
         }
 
@@ -326,6 +330,7 @@ EOF
 
     return {
         LIBS => $libs,
+        DEFINE => "-DEAV_EXTRA $idn_define",
         macro => {
             LIBEAV_OPTIONS => join(" ", @options)
         },
@@ -336,6 +341,7 @@ EOF
 sub build_with_idnX($) {
     my ($idnname) = @_;
     my $idnpkg = "lib" . $idnname;
+    my $idn_define = '-DHAVE_LIB' . uc($idnname);
     my @options;
     my $libs;
 
@@ -358,6 +364,7 @@ sub build_with_idnX($) {
 
     return {
         LIBS => $libs,
+        DEFINE => "-DEAV_EXTRA $idn_define",
         macro => {
             LIBEAV_OPTIONS => join(" ", @options)
         },

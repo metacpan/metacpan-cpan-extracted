@@ -13,9 +13,6 @@ SYNOPSIS
           baud => 19200,
        );
     
-       $slurm->reset
-          ->await;
-    
        $slurm->run(
           on_notify => sub ($payload) {
              printf "NOTIFY: %v02X\n", $payload;
@@ -60,6 +57,39 @@ DESCRIPTION
     The contrib/ directory of this distribution contains a reference
     implementation in C for 8-bit microcontrollers, such as AVR ATtiny and
     ATmega chips.
+
+ Metrics
+
+    If Metrics::Any is available, this module additionally provides metrics
+    under the namespace prefix of slurm. The following metrics are
+    provided:
+
+    discards
+
+      An unlabelled counter tracking the number of times a received packet
+      is discarded due to failing CRC check.
+
+    packets_received
+
+      A counter, labelled by packet type, tracking the number of packets
+      received of each type.
+
+    packets_sent
+
+      A counter, labelled by packet type, tracking the number of packets
+      sent of each type.
+
+    retransmits
+
+      An unlabelled counter tracking the number of times a (REQUEST) packet
+      had to be retransmitted after the initial one timed out.
+
+    timeouts
+
+      An unlabelled counter tracking the number of times a request
+      transaction was abandoned entirely due to a timeout. This does not
+      count transactions that eventually succeeded after intermediate
+      timeouts and retransmissions.
 
 PARAMETERS
 
@@ -138,6 +168,8 @@ METHODS
 
       Optional. Invoked on receipt of a NOTIFY packet.
 
+    Will automatically "reset" first if required.
+
  stop
 
        $slurm->stop;
@@ -159,17 +191,36 @@ METHODS
 
     Resets the transmitter sequence number and sends a META-RESET packet.
 
+    It is not normally required to explicitly call this, as the first call
+    to "run", "send_notify" or "request" will do it if required.
+
  send_notify
 
        await $slurm->send_notify( $payload )
 
     Sends a NOTIFY packet.
 
+    Will automatically "reset" first if required.
+
  request
 
        $data_in = await $slurm->request( $data_out );
 
     Sends a REQUEST packet, and waits for a response to it.
+
+    If the peer responds with an ERR packet, the returned future will fail
+    with an error message, the category of slurm, and the payload body of
+    the ERR packet in the message details:
+
+       $f->fail( $message, slurm => $payload );
+
+    If the peer does not respond at all and all retransmit attempts end in
+    a timeout, the returned future will fail the same way but with undef as
+    the message details:
+
+       $f->fail( $message, slurm => undef );
+
+    Will automatically "reset" first if required.
 
 AUTHOR
 

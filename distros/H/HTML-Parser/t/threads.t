@@ -8,6 +8,8 @@ use Test::More;
 # Verify thread safety.
 BEGIN {
     plan(skip_all => "Not configured for threads") unless $Config{useithreads};
+    plan(skip_all => "Threads are not reliable on older perls")
+        unless "$]" >= 5.010001;
     plan(tests    => 1);
 }
 use threads;

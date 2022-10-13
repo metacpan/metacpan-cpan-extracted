@@ -28,9 +28,6 @@ sub print_hexdump ( $bytes, $width = length $bytes )
    print join "", map { $_ ge "\x20" && $_ lt "\x7F" ? $_ : "." } @bytes;
 }
 
-$slurm->reset
-   ->await;
-
 $slurm->run(
    on_notify => sub {
       my ( $payload ) = @_;

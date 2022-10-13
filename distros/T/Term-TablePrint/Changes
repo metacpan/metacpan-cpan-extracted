@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.154   2022-10-12
+        - Bugfix formatting scientific notations.
+
 0.153   2022-07-17
         - Code refactoring.
 

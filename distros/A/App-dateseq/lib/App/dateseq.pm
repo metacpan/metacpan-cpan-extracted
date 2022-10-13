@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-09-09'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.110'; # VERSION
+our $VERSION = '0.111'; # VERSION
 
 our %SPEC;
 
@@ -283,7 +283,7 @@ _
             summary => 'List non-holidays in 2015 (using Indonesian holidays)',
             description => <<'_',
 
-See also <prog:dateseq-id> as alternative.
+See also <prog:dateseq-idn> as alternative.
 
 _
             src => 'setop --diff <([[prog]] 2015-01-01 2015-12-31) <(list-idn-holidays --year 2015)',
@@ -294,7 +294,7 @@ _
             summary => 'List non-holidays business days in 2015 (using Indonesian holidays)',
             description => <<'_',
 
-See also <prog:dateseq-id> as alternative.
+See also <prog:dateseq-idn> as alternative.
 
 _
             src => 'setop --diff <([[prog]] 2015-01-01 2015-12-31 --business) <(list-idn-holidays --year 2015)',
@@ -334,7 +334,7 @@ _
     ],
     links => [
         {url=>'prog:durseq', summary=>'Produce sequence of date durations'},
-        {url=>'prog:dateseq-id', summary=>'A wrapper for dateseq, with built-in support for Indonesian holidays'},
+        {url=>'prog:dateseq-idn', summary=>'A wrapper for dateseq, with built-in support for Indonesian holidays'},
         {url=>'prog:seq'},
         {url=>'prog:seq-pl', summary=>'Perl variant of seq'},
     ],
@@ -524,7 +524,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.110 of App::dateseq (from Perl distribution App-dateseq), released on 2022-09-09.
+This document describes version 0.111 of App::dateseq (from Perl distribution App-dateseq), released on 2022-09-09.
 
 =head1 FUNCTIONS
 

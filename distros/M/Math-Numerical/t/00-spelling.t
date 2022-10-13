@@ -18,14 +18,15 @@ my $mode = (@ARGV && $ARGV[0] eq '--interactive') ? 'interactive' : 'list';
 my @base_cmd = ('aspell', '--encoding=utf-8', "--home-dir=${root}",
                 '--lang=en_GB-ise',  '--mode=perl', '-p',  '.aspelldict');
 
+BEGIN {
+  if ( not $ENV{TEST_AUTHOR} ) {
+    skip_all('Author test. Set $ENV{TEST_AUTHOR} to a true value to run.');
+  }
+}
+
 if (not $aspell) {
    my $msg = 'The aspell program is required in the path to check the spelling.';
    skip_all($msg);
-}
-
-if (!$ENV{TEST_AUTHOR} && $mode eq 'list') {
-    my $msg = 'Author test.  Set $ENV{TEST_AUTHOR} to a true value to run.';
-    skip_all($msg);
 }
 
 sub list_bad_words {

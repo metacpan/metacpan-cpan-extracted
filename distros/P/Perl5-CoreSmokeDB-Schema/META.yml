@@ -26,10 +26,11 @@ requires:
   DBIx::Class: '0.08271'
   DBIx::Class::Schema::Loader: '0.07049'
   DateTime::Format::Pg: '0.16013'
+  DateTime::Format::SQLite: '0.11'
   Exception::Class: '1.44'
   perl: '5.010001'
 resources:
   homepage: https://github.com/abeltje/Perl5-CoreSmokeDB-Schema.git
   repository: https://github.com:abeltje/Perl5-CoreSmokeDB-Schema.git
-version: 1.07
+version: 1.08
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

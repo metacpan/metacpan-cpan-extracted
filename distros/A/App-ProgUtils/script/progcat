@@ -1,8 +1,5 @@
 #!perl
 
-our $DATE = '2020-04-16'; # DATE
-our $VERSION = '0.202'; # VERSION
-
 use 5.010;
 use strict;
 use warnings;
@@ -10,7 +7,13 @@ use warnings;
 use App::ProgUtils;
 use Perinci::CmdLine::Any;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-09'; # DATE
+our $DIST = 'App-ProgUtils'; # DIST
+our $VERSION = '0.203'; # VERSION
+
 our %SPEC;
+
 $SPEC{progcat} = {
     v => 1.1,
     summary => 'Print command sources to stdout',
@@ -93,7 +96,7 @@ progcat - Print command sources to stdout
 
 =head1 VERSION
 
-This document describes version 0.202 of progcat (from Perl distribution App-ProgUtils), released on 2020-04-16.
+This document describes version 0.203 of progcat (from Perl distribution App-ProgUtils), released on 2022-08-09.
 
 =head1 SYNOPSIS
 
@@ -125,7 +128,11 @@ C<*> marks required options.
 
 See C<--program>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--program>=I<s@>*
+
+Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
@@ -143,6 +150,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -157,20 +170,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -230,6 +256,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ProgUt
 
 Source repository is at L<https://github.com/perlancar/perl-App-ProgUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProgUtils>
@@ -237,16 +291,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

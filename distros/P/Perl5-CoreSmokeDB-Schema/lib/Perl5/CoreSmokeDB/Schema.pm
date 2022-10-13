@@ -15,7 +15,7 @@ __PACKAGE__->load_namespaces;
 # Created by DBIx::Class::Schema::Loader v0.07049 @ 2022-09-06 09:15:22
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vCye+8pfvU4CmiRtdudyxw
 
-our $VERSION = 1.07;
+our $VERSION = 1.08;
 our $SCHEMAVERSION = 3;
 our $PGAPPNAME = 'Perl5CoreSmokeDB';
 

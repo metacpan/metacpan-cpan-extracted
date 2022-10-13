@@ -6,9 +6,9 @@ with 'Pod::Weaver::Role::AddTextToSection';
 with 'Pod::Weaver::Role::Section';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-08'; # DATE
+our $DATE = '2022-09-29'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.070'; # VERSION
+our $VERSION = '0.071'; # VERSION
 
 sub weave_section {
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -273,6 +273,27 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --arg1 ...
 
 _
+                    (my $type_name = $sch_name) =~ s/(\A\w)|(::|_)(\w)/defined($3) ? uc($3) : uc($1)/eg;
+
+                    push @pod, <<"_";
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('\$sch_name*', name=>'$type_name')
+     );
+ }
+
+ use My::Types qw($type_name);
+ $type_name->assert_valid(\$data);
+
+_
                 }
 
                 $self->add_text_to_section(
@@ -315,7 +336,7 @@ Pod::Weaver::Plugin::Sah::Schemas - Plugin to use when building Sah::Schemas::* 
 
 =head1 VERSION
 
-This document describes version 0.070 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2022-06-08.
+This document describes version 0.071 of Pod::Weaver::Plugin::Sah::Schemas (from Perl distribution Pod-Weaver-Plugin-Sah-Schemas), released on 2022-09-29.
 
 =head1 SYNOPSIS
 
@@ -385,9 +406,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

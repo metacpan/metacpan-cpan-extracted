@@ -1,10 +1,5 @@
 package App::MysqlUtils;
 
-## no critic (InputOutput::RequireBriefOpen)
-
-our $DATE = '2020-05-06'; # DATE
-our $VERSION = '0.020'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -15,6 +10,11 @@ use IPC::System::Options qw(system);
 use List::MoreUtils qw(firstidx);
 use Perinci::Object;
 use String::ShellQuote;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-12'; # DATE
+our $DIST = 'App-MysqlUtils'; # DIST
+our $VERSION = '0.021'; # VERSION
 
 our %SPEC;
 
@@ -151,7 +151,7 @@ sub _complete_database {
     my %args = @_;
 
     # only run under pericmd
-    my $cmdline = $args{cmdline} or return undef;
+    my $cmdline = $args{cmdline} or return;
     my $r = $args{r};
 
     # force read config file, because by default it is turned off when in
@@ -159,7 +159,7 @@ sub _complete_database {
     $r->{read_config} = 1;
     my $res = $cmdline->parse_argv($r);
 
-    my $dbh = _connect(%{ $res->[2] }, database=>undef) or return undef;
+    my $dbh = _connect(%{ $res->[2] }, database=>undef) or return;
 
     my @dbs;
     my $sth = $dbh->prepare("SHOW DATABASES");
@@ -178,7 +178,7 @@ sub _complete_table {
     my %args = @_;
 
     # only run under pericmd
-    my $cmdline = $args{cmdline} or return undef;
+    my $cmdline = $args{cmdline} or return;
     my $r = $args{r};
 
     # force read config file, because by default it is turned off when in
@@ -186,7 +186,7 @@ sub _complete_table {
     $r->{read_config} = 1;
     my $res = $cmdline->parse_argv($r);
 
-    my $dbh = _connect(%{ $res->[2] }) or return undef;
+    my $dbh = _connect(%{ $res->[2] }) or return;
 
     my @names = $dbh->tables(undef, undef, undef, undef);
     my @tables;
@@ -267,7 +267,7 @@ _
             schema => ['array*', of=>'str*'],
             element_completion => \&_complete_table,
             pos => 1,
-            greedy => 1,
+            slurpy => 1,
         },
         table_pattern => {
             schema => 're*',
@@ -354,8 +354,8 @@ _
             'x.name.singular' => 'db',
             schema => ['array*', of=>'str*'],
             element_completion => \&_complete_database,
-            pos => 1,
-            greedy => 1,
+            pos => 0,
+            slurpy => 1,
         },
         db_pattern => {
             schema => 're*',
@@ -554,7 +554,7 @@ sub mysql_sql_dump_extract_tables {
     if (defined $args{dir}) {
         unless (-d $args{dir}) {
             log_info "Creating directory '%s' ...", $args{dir};
-            mkdir $args{dir}, 0755 or return [500, "Can't create directory '$args{dir}': $!"];
+            mkdir $args{dir}, 0o755 or return [500, "Can't create directory '$args{dir}': $!"];
         }
     }
 
@@ -600,7 +600,7 @@ $SPEC{mysql_run_sql_files} = {
             schema => ['array*', of=>'filename*'],
             req => 1,
             pos => 0,
-            greedy => 1,
+            slurpy => 1,
         },
         %args_database,
         # XXX output_file_pattern
@@ -674,7 +674,7 @@ _
             schema => ['array*', of=>'filename*'],
             req => 1,
             pos => 0,
-            greedy => 1,
+            slurpy => 1,
         },
         %args_database,
         # XXX output_file_pattern
@@ -1124,7 +1124,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.020 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2020-05-06.
+This document describes version 0.021 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2022-10-12.
 
 =head1 SYNOPSIS
 
@@ -1161,7 +1161,7 @@ This distribution includes the following CLI utilities:
 
 Usage:
 
- mysql_copy_rows_adjust_pk(%args) -> [status, msg, payload, meta]
+ mysql_copy_rows_adjust_pk(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Copy rows from one table to another, adjust PK column if necessary.
 
@@ -1273,12 +1273,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1288,7 +1288,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_drop_all_tables(%args) -> [status, msg, payload, meta]
+ mysql_drop_all_tables(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Drop all tables in a MySQL database.
 
@@ -1333,12 +1333,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1348,7 +1348,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_drop_dbs(%args) -> [status, msg, payload, meta]
+ mysql_drop_dbs(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Drop MySQL databases.
 
@@ -1410,12 +1410,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1425,7 +1425,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_drop_tables(%args) -> [status, msg, payload, meta]
+ mysql_drop_tables(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Drop tables in a MySQL database.
 
@@ -1489,12 +1489,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1504,7 +1504,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_fill_csv_columns_from_query(%args) -> [status, msg, payload, meta]
+ mysql_fill_csv_columns_from_query(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Fill CSV columns with data from a query.
 
@@ -1535,13 +1535,19 @@ Instead of returning the CSV rows, just return the count of rows that get filled
 
 =item * B<database>* => I<str>
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -1559,9 +1565,24 @@ Will try to get default from C<~/.my.cnf>.
 
 =item * B<query>* => I<str>
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 =item * B<username> => I<str>
 
@@ -1582,12 +1603,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1597,7 +1618,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_find_identical_rows(%args) -> [status, msg, payload, meta]
+ mysql_find_identical_rows(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List rows on one table that are identical on another table.
 
@@ -1642,12 +1663,12 @@ Will try to get default from C<~/.my.cnf>.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1657,7 +1678,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_query(%args) -> [status, msg, payload, meta]
+ mysql_query(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run query and return table result.
 
@@ -1709,12 +1730,12 @@ Will try to get default from C<~/.my.cnf>.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1724,7 +1745,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_run_pl_files(%args) -> [status, msg, payload, meta]
+ mysql_run_pl_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run each .pl file, feed the output to `mysql` command and write result to .txt file.
 
@@ -1762,12 +1783,12 @@ always overwrite existing .txt file.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1777,7 +1798,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_run_sql_files(%args) -> [status, msg, payload, meta]
+ mysql_run_sql_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Feed each .sql file to `mysql` command and write result to .txt file.
 
@@ -1812,12 +1833,12 @@ always overwrite existing .txt file.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1827,7 +1848,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_sql_dump_extract_tables(%args) -> [status, msg, payload, meta]
+ mysql_sql_dump_extract_tables(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse SQL dump and spit out tables to separate files.
 
@@ -1860,12 +1881,12 @@ Directory to put the SQL files into.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1877,6 +1898,37 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-MysqlU
 
 Source repository is at L<https://github.com/perlancar/perl-App-MysqlUtils>.
 
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-MysqlUtils>
@@ -1884,18 +1936,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

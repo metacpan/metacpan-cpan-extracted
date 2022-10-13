@@ -3,14 +3,15 @@ package Perinci::Sub::To::CLIDocData;
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::Object;
 use Perinci::Sub::Util qw(err);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2022-10-12'; # DATE
 our $DIST = 'Perinci-Sub-To-CLIDocData'; # DIST
-our $VERSION = '0.301'; # VERSION
+our $VERSION = '0.303'; # VERSION
 
 our %SPEC;
 
@@ -186,12 +187,23 @@ sub gen_cli_doc_data_from_meta {
         example_categories => {},
     };
 
+    # a mapping from arg spec keys to %opts keys, so we can create a POD link
+    # from a positional argument in usage line to option, later when generating
+    # usage line
+    my %arg_spec_to_opts;
+
+    # a mapping from keys in func.specmeta (ospec) to %opts keys, so we can
+    # create a POD link from an option in usage line to option in Options
+    # section, later when generating usage line
+    my %ospec_to_opts;
+
     my %opts;
   GEN_LIST_OF_OPTIONS: {
         my $ospecs = $ggls_res->[3]{'func.specmeta'};
         # separate groupable aliases because they will be merged with the
         # argument options
         my (@k, @k_aliases);
+
       OSPEC1:
         for (sort keys %$ospecs) {
             my $ospec = $ospecs->{$_};
@@ -368,7 +380,9 @@ sub gen_cli_doc_data_from_meta {
             }
 
             $opts{$optkey} = $opt;
-        }
+            $arg_spec_to_opts{ $ospec->{arg} } = $optkey if $ospec->{arg};
+            $ospec_to_opts{$k} = $optkey;
+        } # while @k
 
         # link ungrouped alias to its main opt
       OPT1:
@@ -389,6 +403,9 @@ sub gen_cli_doc_data_from_meta {
 
     } # GEN_LIST_OF_OPTIONS
     $clidocdata->{opts} = \%opts;
+
+    #use DDC; dd \%arg_spec_to_opts;
+    #use DDC; dd \%ospec_to_opts;
 
   GEN_USAGE_LINE: {
         my @plain_args;
@@ -412,6 +429,7 @@ sub gen_cli_doc_data_from_meta {
             }
             $pos++;
             next unless defined($arg);
+            my $arg0 = $arg;
             if ($arg_spec->{slurpy} // $arg_spec->{greedy}) {
                 # try to find the singular form
                 $arg = $arg_spec->{'x.name.singular'}
@@ -420,10 +438,10 @@ sub gen_cli_doc_data_from_meta {
             }
             if ($arg_spec->{req}) {
                 push @plain_args, "<$arg>";
-                push @pod_args  , "E<lt>I<$arg>E<gt>";
+                push @pod_args  , qq#E<lt>L<$arg|/"$arg_spec_to_opts{$arg0}">E<gt>#;
             } else {
                 push @plain_args, "[$arg]";
-                push @pod_args  , "[I<$arg>]";
+                push @pod_args  , qq#[L<$arg|/"$arg_spec_to_opts{$arg0}">]#;
             }
             $plain_args[-1] .= " ..." if ($arg_spec->{slurpy} // $arg_spec->{greedy});
             $pod_args  [-1] .= " ..." if ($arg_spec->{slurpy} // $arg_spec->{greedy});
@@ -461,6 +479,7 @@ sub gen_cli_doc_data_from_meta {
                 ) {
                 $type = $argprop->{schema}[0];
                 $cset = $argprop->{schema}[1];
+                #log_trace "argprop=%s, type=%s", $argprop, $type;
                 if ($type eq 'array') {
                     if ($cset->{of} && ref $cset->{of} eq 'ARRAY') {
                         $caption_from_schema = $cset->{of}[0];
@@ -473,6 +492,11 @@ sub gen_cli_doc_data_from_meta {
                     $caption_from_schema = $type;
                 }
             }
+            #use DDC; dd $ospec; dd $ospecmeta;
+            my $opt_link =
+                defined $ospecmeta->{arg} ? $arg_spec_to_opts{ $ospecmeta->{arg} } :
+                defined $ospecmeta->{alias_for} ? $ospec_to_opts{ $ospecmeta->{alias_for} } :
+                $ospec_to_opts{$ospec};
             my $hres = Getopt::Long::Util::humanize_getopt_long_opt_spec({
                 extended=>1,
                 separator=>"|",
@@ -483,10 +507,11 @@ sub gen_cli_doc_data_from_meta {
                         ($argprop->{'x.cli.opt_value_label'} // $argprop->{caption} // $caption_from_schema) :
                         $copt->{value_label}
                 ),
+                opt_link => qq#/"$opt_link"#,
                 value_label_link=>(
                     $ospecmeta->{is_json} ? undef :
                     $ospecmeta->{is_yaml} ? undef :
-                    defined($type) && Module::Installed::Tiny::module_installed("Sah::Schema::$type") ? "Sah::Schema::$type" : undef
+                    defined($caption_from_schema) && Module::Installed::Tiny::module_installed("Sah::Schema::$caption_from_schema") ? "Sah::Schema::$caption_from_schema" : undef
                 ),
             }, $ospec);
             my $plain_opt = $hres->{plaintext};
@@ -598,7 +623,7 @@ Perinci::Sub::To::CLIDocData - From Rinci function metadata, generate structure 
 
 =head1 VERSION
 
-This document describes version 0.301 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2022-10-09.
+This document describes version 0.303 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2022-10-12.
 
 =head1 SYNOPSIS
 
@@ -731,7 +756,7 @@ Sample result:
          },
        },
        "usage_line" => "[[prog]] [--bool1|-z|--no-bool1|--nobool1] [--flag1|-f] -- <str1>",
-       "usage_line.alt.fmt.pod" => "B<[[prog]]> [B<--bool1>|B<-z>|B<--no-bool1>|B<--nobool1>] [B<--flag1>|B<-f>] -- E<lt>I<str1>E<gt>",
+       "usage_line.alt.fmt.pod" => "B<[[prog]]> [L<--bool1|/\"-z\">|L<-z|/\"-z\">|L<--no-bool1|/\"-z\">|L<--nobool1|/\"-z\">] [L<--flag1|/\"--flag1, -f\">|L<-f|/\"--flag1, -f\">] -- E<lt>L<str1|/\"--str1=s*\">E<gt>",
      },
    ];
    $a->[2]{"opts"}{"--bool1"}{tags} = $a->[2]{"opts"}{"--bool1"}{arg_spec}{tags};

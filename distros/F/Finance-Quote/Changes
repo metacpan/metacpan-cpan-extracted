@@ -1,4 +1,6 @@
-1.53      2022-10-08 12:26:55-07:00 America/Los_Angeles
+1.5301    2022-10-12 10:48:30-07:00 America/Los_Angeles
+
+1.53      2022-10-08 18:11:07-07:00 America/Los_Angeles
 	* dist.ini - changed bugtracker.web to
 	  https://github.com/finance-quote/finance-quote/issues
 	* DWS.pm - Set $info{$symbol, 'symbol'} to $symbol.

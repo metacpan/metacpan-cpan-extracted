@@ -1,0 +1,10 @@
+
+## INSTALL
+
+cpanm App::denomfind
+
+
+## UNINSTALL 
+
+cpanm -U App::denomfind
+

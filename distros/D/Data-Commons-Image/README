@@ -1,0 +1,223 @@
+NAME
+    Data::Commons::Image - Data object for Wikimedia Commons image.
+
+SYNOPSIS
+     use Data::Commons::Image;
+
+     my $obj = Data::Commons::Image->new(%params);
+     my $author = $obj->author;
+     my $comment = $obj->comment;
+     my $commons_name = $obj->commons_name;
+     my $dt_created = $obj->dt_created;
+     my $dt_uploaded = $obj->dt_uploaded;
+     my $height = $obj->height;
+     my $id = $obj->id;
+     my $size = $obj->size;
+     my $url = $obj->url;
+     my $url_cb = $obj->url_cb;
+     my $width = $obj->width;
+
+DESCRIPTION
+    Data object for Wikimedia Commons image. Inherits Data::Image common
+    object.
+
+METHODS
+  "new"
+     my $obj = Data::Commons::Image->new(%params);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "author"
+
+            Image author. It's optional. Default value is undef.
+
+    *       "comment"
+
+            Image comment. It's optional. Default value is undef.
+
+    *       "commons_name"
+
+            Image name in Wikimedia Commons. It's required.
+
+    *       "dt_created"
+
+            Date and time the image was created. Value must be DateTime
+            object. It's optional.
+
+    *       "dt_uploaded"
+
+            Date and time the image was uploaded to Wikimedia Commons. Value
+            must be DateTime object. It's optional.
+
+    *       "height"
+
+            Image height. It's optional. Default value is undef.
+
+    *       "id"
+
+            Image id. It's optional. Default value is undef.
+
+    *       "size"
+
+            Image size. It's optional. Default value is undef.
+
+    *       "url"
+
+            URL of image. It's optional. Default value is undef.
+
+    *       "url_cb"
+
+            URL callback. To get URL from code. It's optional. Default value
+            is undef.
+
+    *       "width"
+
+            Image width. It's optional. Default value is undef.
+
+  "author"
+     my $author = $obj->author;
+
+    Get image author.
+
+    Returns string.
+
+  "comment"
+     my $comment = $obj->comment;
+
+    Get image comment.
+
+    Returns string.
+
+  "commons_name"
+     my $commons_name = $obj->commons_name;
+
+    Get image name in Wikimedia Commons.
+
+    Returns string.
+
+  "dt_created"
+     my $dt_created = $obj->dt_created;
+
+    Get date and time the image was created.
+
+    Returns DateTime object.
+
+  "dt_uploaded"
+     my $dt_uploaded = $obj->dt_uploaded;
+
+    Get date and time the image was uploaded to Wikimedia Commons.
+
+    Returns DateTime object.
+
+  "height"
+     my $height = $obj->height;
+
+    Get image height.
+
+    Returns number.
+
+  "id"
+     my $id = $obj->id;
+
+    Get image id.
+
+    Returns number.
+
+  "size"
+     my $size = $obj->size;
+
+    Get image size.
+
+    Returns number.
+
+  "url"
+     my $url = $obj->url;
+
+    Get URL of image.
+
+    Returns string.
+
+  "url_cb"
+     my $url_cb = $obj->url_cb;
+
+    Get URL callback.
+
+    Returns code.
+
+  "width"
+     my $width = $obj->width;
+
+    Get image width.
+
+    Returns number.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Commons::Image;
+     use DateTime;
+
+     my $obj = Data::Commons::Image->new(
+             'author' => 'Zuzana Zonova',
+             'comment' => 'Michal from Czechia',
+             'commons_name' => 'Michal_from_Czechia.jpg',
+             'dt_created' => DateTime->new(
+                     'day' => 1,
+                     'month' => 1,
+                     'year' => 2022,
+             ),
+             'dt_uploaded' => DateTime->new(
+                     'day' => 14,
+                     'month' => 7,
+                     'year' => 2022,
+             ),
+             'height' => 2730,
+             'size' => 1040304,
+             'url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg',
+             'width' => 4096,
+     );
+
+     # Print out.
+     print 'Author: '.$obj->author."\n";
+     print 'Comment: '.$obj->comment."\n";
+     print 'Wikimedia Commons name: '.$obj->commons_name."\n";
+     print 'Height: '.$obj->height."\n";
+     print 'Size: '.$obj->size."\n";
+     print 'URL: '.$obj->url."\n";
+     print 'Width: '.$obj->width."\n";
+     print 'Date and time the photo was created: '.$obj->dt_created."\n";
+     print 'Date and time the photo was uploaded: '.$obj->dt_uploaded."\n";
+
+     # Output:
+     # Author: Zuzana Zonova
+     # Comment: Michal from Czechia
+     # Wikimedia Commons name: Michal_from_Czechia.jpg
+     # Height: 2730
+     # Size: 1040304
+     # URL: https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg
+     # Width: 4096
+     # Date and time the photo was created: 2022-01-01T00:00:00
+     # Date and time the photo was uploaded: 2022-07-14T00:00:00
+
+DEPENDENCIES
+    Data::Image, Mo, Mo::utils.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-Commons-Image>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

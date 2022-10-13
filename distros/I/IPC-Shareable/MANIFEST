@@ -9,6 +9,7 @@ CREDITS
 DISCLAIMER
 'docs/Shared Memory Configuration.txt'
 examples/new.pl
+ipc.pl
 lib/IPC/Shareable.pm
 lib/IPC/Shareable/SharedMem.pm
 Makefile.PL
@@ -45,6 +46,7 @@ t/67-exhaust_shm_slots.t
 t/75-graceful.t
 t/76-singleton.t
 t/77-singleton_warn.t
+t/78-singleton_class.t
 t/80-exceptions.t
 t/81-fork_dup_rand_keys.t
 t/82-sig_child_ignore.t

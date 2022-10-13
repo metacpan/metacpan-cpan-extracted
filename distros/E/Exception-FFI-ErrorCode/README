@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
 
@@ -32,7 +32,7 @@ SYNOPSIS
 
     Defining error class without a strerror
 
-     package Curl::<Error {
+     package Curl::Error {
        use Exception::FFI::ErrorCode
          code => {
            CURLE_OK                   => [ 0,  'no error'                        ],
@@ -139,10 +139,17 @@ Exception::FFI::ErrorCode::Base
 
  throw
 
-     Exception::FFI::ErrorCode::Base->throw( code => $code );
+     Exception::FFI::ErrorCode::Base->throw( code => $code, %attr );
+     Exception::FFI::ErrorCode::Base->throw( code => $code, frame => $frame, %attr );
 
     Throws the exception with the given code. Obviously you would throw the
     subclass, not the base class.
+
+    If you have added additional attributes via Class::Tiny you can provide
+    them as %attr.
+
+    If you want the exception to appear to happen from a different frame
+    then you can specify it with $frame.
 
  strerror
 

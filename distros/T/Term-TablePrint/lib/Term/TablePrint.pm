@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.153';
+our $VERSION = '0.154';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -519,10 +519,9 @@ sub __calc_avail_col_width {
             TRUNC_FRACT: while ( $sum > $avail_w ) {
                 my $prev_sum = $sum;
                 for my $col ( 0 .. $#$w_cols_calc ) {
-                    if (   $w_fract->[$col] && $w_fract->[$col] > 3
-                        # 3 == 1 decimal separator + 2 decimal places
-                       # && $w_int->[$col] + $w_fract->[$col] == $w_cols_calc->[$col]
-                       # # the column width could be larger than w_int + w_fract, if the column contains non-digit strings
+                    if (   $w_fract->[$col] && $w_fract->[$col] > 3 # 3 == 1 decimal separator + 2 decimal places
+                       #&& $w_int->[$col] + $w_fract->[$col] == $w_cols_calc->[$col] #
+                       ## the column width could be larger than w_int + w_fract, if the column contains non-digit strings
                     ) {
                         --$w_fract->[$col];
                         --$w_cols_calc->[$col];
@@ -537,7 +536,7 @@ sub __calc_avail_col_width {
                 }
             }
         }
-        my $min_col_width = $self->{min_col_width} < 2 ? 2 : $self->{min_col_width};
+        my $min_col_width = $self->{min_col_width} < 2 ? 2 : $self->{min_col_width}; # n
         my $percent = 4;
 
         TRUNC_COLS: while ( $sum > $avail_w ) {
@@ -568,7 +567,7 @@ sub __calc_avail_col_width {
             $sum = sum( @$w_cols_calc );
             if ( $sum == $prev_sum ) {
                 --$min_col_width;
-                if ( $min_col_width == 1 ) { # a character could have a print width of 2
+                if ( $min_col_width == 2 ) { # a character could have a print width of 2
                     $self->__print_term_not_wide_enough_message( $tbl_copy );
                     return;
                 }
@@ -636,8 +635,7 @@ sub __cols_to_string {
                     }
                     else {
                         # scientific notation, NaN, Inf, Infinity, '0 but true'
-                        $number = $tbl_copy->[$row][$col] + 0;
-                        # + 0: infinity -> Inf (else possible messed output)
+                        $number = $tbl_copy->[$row][$col];
                     }
                 }
                 else {
@@ -654,12 +652,14 @@ sub __cols_to_string {
                         $precision = $w_cols_calc->[$col] - ( $signed_1_precision_w - 1 );
                     }
                     $number = sprintf "%.*e", $precision, $number;
+                    # if $number is a scientific-notation-string which is to big for a conversation to a number
+                    # 'sprintf' returns 'Inf' instead of reducing the precision.
                     if ( length( $number ) > $w_cols_calc->[$col] ) {
                         $str = $str . ( '-' x $w_cols_calc->[$col] );
                     }
                     elsif ( length $number < $w_cols_calc->[$col] ) {
-                        # if $w_cols_calc->[$col] == zero_precision_w + 1
-                        $str = $str . ' ' . $number;
+                        # if $w_cols_calc->[$col] == zero_precision_w + 1 or if $number == Inf
+                        $str = $str . ' ' x ( $w_cols_calc->[$col] - length $number ) . $number;
                     }
                     else {
                         $str = $str . $number;
@@ -901,7 +901,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.153
+Version 0.154
 
 =cut
 
@@ -927,16 +927,7 @@ Version 0.153
 =head1 DESCRIPTION
 
 C<print_table> shows a table and lets the user interactively browse it. It provides a cursor which highlights the row
-on which it is located. The user can scroll through the table with the different cursor keys - see L</KEYS>.
-
-If the table has more rows than the terminal, the table is divided up on as many pages as needed automatically. If the
-cursor reaches the end of a page, the next page is shown automatically until the last page is reached. Also if the
-cursor reaches the topmost line, the previous page is shown automatically if it is not already the first one.
-
-If the terminal is too narrow to print the table, the columns are adjusted to the available width automatically.
-
-If the option L</table_expand> is enabled and a row is selected with C<Return>, each column of that row is output in its
-own line preceded by the column name.
+on which it is located. The user can scroll through the table with the different cursor keys.
 
 =head2 KEYS
 
@@ -991,6 +982,13 @@ least one column matches the entered pattern. See option L</search>.
 
 =head2 Output
 
+If the option L</table_expand> is enabled and a row is selected with C<Return>, each column of that row is output in its
+own line preceded by the column name.
+
+If the table has more rows than the terminal, the table is divided up on as many pages as needed automatically. If the
+cursor reaches the end of a page, the next page is shown automatically until the last page is reached. Also if the
+cursor reaches the topmost line, the previous page is shown automatically if it is not already the first page.
+
 For the output on the screen the table elements are modified. All the modifications are made on a copy of the original
 table data.
 
@@ -1023,7 +1021,7 @@ If an element looks like a number it is left-justified, else it is right-justifi
 
 =back
 
-If the terminal width is not wide enough to display all columns:
+If the terminal is too narrow to print the table, the columns are adjusted to the available width automatically.
 
 =over
 

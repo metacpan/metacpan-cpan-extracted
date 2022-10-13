@@ -28,7 +28,7 @@ use if DEBUG, 'Smart::Comments';
 use JSON;
 use Web::Scraper;
 
-our $VERSION = '1.53'; # VERSION
+our $VERSION = '1.5301'; # VERSION
 
 sub methods {
   return (aufunds => \&morningstarau, morningstarau => \&morningstarau,);

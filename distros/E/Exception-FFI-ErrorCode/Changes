@@ -1,5 +1,9 @@
 Revision history for Exception-FFI-ErrorCode
 
+0.03      2022-10-11 10:23:32 -0600
+  - Documentation improvements (gh#11)
+  - Added frame option to throw (gh#12)
+
 0.02      2022-10-06 13:35:58 -0600
   - Import will croak if you provide a bad option (gh#6, gh#7)
   - Documentation improvements (gh#5, gh#8)

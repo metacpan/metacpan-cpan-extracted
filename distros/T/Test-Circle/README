@@ -1,0 +1,19 @@
+NAME
+
+    Test::Circle - Module abstract
+
+SYNOPSIS
+
+        use Test::Circle;
+        my $instance = Test::Circle->new;
+
+DESCRIPTION
+
+METHODS
+
+SEE ALSO
+
+    Hello::World
+
+      * 
+

@@ -164,6 +164,9 @@ static void on_recv(uint8_t pktctrl, uint8_t b[], uint8_t len)
         rx.seqno = (b[0] & 0x0F) | 0x80;
         if(seqno == SLURM_PKT_META_RESETACK)
           break;
+
+        for(uint8_t i = 0; i < sizeof(cmdslots)/sizeof(cmdslots[0]); i++)
+          cmdslots[i].state = CMDSTATE_FREE;
         tx.need_send_resetack = 1;
         on_slurm_need_tasks();
         break;

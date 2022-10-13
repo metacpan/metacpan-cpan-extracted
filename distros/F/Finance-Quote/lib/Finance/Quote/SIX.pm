@@ -28,7 +28,7 @@ use JSON qw( decode_json );
 use String::Util qw(trim);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '1.53'; # VERSION
+our $VERSION = '1.5301'; # VERSION
 
 our @labels = qw/last date isodate/;
 

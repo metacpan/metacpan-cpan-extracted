@@ -216,6 +216,7 @@ C<results> are also included in the resulting HashRef.
 sub as_hashref {
     my $self = shift;
     my ($is_full) = @_;
+    $is_full //= '';
 
     my $record = { $self->get_inflated_columns };
     $record->{started} = $self->started->rfc3339;

@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate-1.7/lib/adler32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/adler32.c */
 
 
 /* #include "lib_common.h" */
@@ -38,253 +38,27 @@ SOFTWARE.
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -293,6 +67,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -308,87 +91,115 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -400,158 +211,401 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
-}
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
 #endif
+}
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
+static forceinline u32 bswap32(u32 v)
 {
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
 #endif
+}
 
 
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
+static forceinline u64 bswap64(u64 v)
 {
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
 }
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
 
 
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
 #endif
 
 
 
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
 
 
 
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
+static forceinline u16
+get_unaligned_le16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
 }
-#endif
 
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
+static forceinline u16
+get_unaligned_be16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
 }
-#endif
 
-static forceinline unsigned
-bsrw(machine_word_t n)
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsr32(n);
+		return get_unaligned_le32(p);
 	else
-		return bsr64(n);
+		return get_unaligned_le64(p);
 }
 
 
 
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
 	}
-	return i;
 }
-#endif
 
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
 	}
-	return i;
 }
-#endif
 
-static forceinline unsigned
-bsfw(machine_word_t n)
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsf32(n);
+		put_unaligned_le32(v, p);
 	else
-		return bsf64(n);
+		put_unaligned_le64(v, p);
 }
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
 
 #endif 
 
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
 
 void *libdeflate_malloc(size_t size);
 void libdeflate_free(void *ptr);
@@ -572,9 +626,24 @@ void *memmove(void *dest, const void *src, size_t n);
 
 int memcmp(const void *s1, const void *s2, size_t n);
 #define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
 #include <string.h>
 #endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
 
 #endif 
 
@@ -589,8 +658,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	7
-#define LIBDEFLATE_VERSION_STRING	"1.7"
+#define LIBDEFLATE_VERSION_MINOR	14
+#define LIBDEFLATE_VERSION_STRING	"1.14"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -607,21 +676,13 @@ extern "C" {
 #  define LIBDEFLATEEXPORT
 #endif
 
-#if defined(_WIN32) && !defined(_WIN64)
-#  define LIBDEFLATEAPI_ABI	__stdcall
-#else
-#  define LIBDEFLATEAPI_ABI
-#endif
-
 #if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
 	defined(_WIN32) && !defined(_WIN64)
     
-#  define LIBDEFLATEAPI_STACKALIGN	__attribute__((force_align_arg_pointer))
+#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
 #else
-#  define LIBDEFLATEAPI_STACKALIGN
+#  define LIBDEFLATEAPI
 #endif
-
-#define LIBDEFLATEAPI	LIBDEFLATEAPI_ABI LIBDEFLATEAPI_STACKALIGN
 
 
 
@@ -777,16 +838,51 @@ libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 #define DIVISOR 65521
 
 
-#define MAX_CHUNK_SIZE	5552
+#define MAX_CHUNK_LEN	5552
 
-typedef u32 (*adler32_func_t)(u32, const u8 *, size_t);
+static u32 MAYBE_UNUSED
+adler32_generic(u32 adler, const u8 *p, size_t len)
+{
+	u32 s1 = adler & 0xFFFF;
+	u32 s2 = adler >> 16;
+	const u8 * const end = p + len;
+
+	while (p != end) {
+		size_t chunk_len = MIN(end - p, MAX_CHUNK_LEN);
+		const u8 *chunk_end = p + chunk_len;
+		size_t num_unrolled_iterations = chunk_len / 4;
+
+		while (num_unrolled_iterations--) {
+			s1 += *p++;
+			s2 += s1;
+			s1 += *p++;
+			s2 += s1;
+			s1 += *p++;
+			s2 += s1;
+			s1 += *p++;
+			s2 += s1;
+		}
+		while (p != chunk_end) {
+			s1 += *p++;
+			s2 += s1;
+		}
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
+
+	return (s2 << 16) | s1;
+}
 
 
 #undef DEFAULT_IMPL
-#undef DISPATCH
+#undef arch_select_adler32_func
+typedef u32 (*adler32_func_t)(u32 adler, const u8 *p, size_t len);
 #if defined(__arm__) || defined(__aarch64__)
 /* #  include "arm/adler32_impl.h" */
 
+
+#ifndef LIB_ARM_ADLER32_IMPL_H
+#define LIB_ARM_ADLER32_IMPL_H
 
 /* #include "arm-cpu_features.h" */
 
@@ -807,253 +903,27 @@ typedef u32 (*adler32_func_t)(u32, const u8 *, size_t);
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -1062,6 +932,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -1077,87 +956,115 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -1169,158 +1076,401 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
-}
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
 #endif
+}
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
+static forceinline u32 bswap32(u32 v)
 {
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
 #endif
+}
 
 
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
+static forceinline u64 bswap64(u64 v)
 {
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
 }
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
 
 
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
 #endif
 
 
 
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
 
 
 
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
+static forceinline u16
+get_unaligned_le16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
 }
-#endif
 
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
+static forceinline u16
+get_unaligned_be16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
 }
-#endif
 
-static forceinline unsigned
-bsrw(machine_word_t n)
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsr32(n);
+		return get_unaligned_le32(p);
 	else
-		return bsr64(n);
+		return get_unaligned_le64(p);
 }
 
 
 
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
 	}
-	return i;
 }
-#endif
 
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
 	}
-	return i;
 }
-#endif
 
-static forceinline unsigned
-bsfw(machine_word_t n)
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsf32(n);
+		put_unaligned_le32(v, p);
 	else
-		return bsf64(n);
+		put_unaligned_le64(v, p);
 }
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
 
 #endif 
 
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
 
 void *libdeflate_malloc(size_t size);
 void libdeflate_free(void *ptr);
@@ -1341,40 +1491,179 @@ void *memmove(void *dest, const void *src, size_t n);
 
 int memcmp(const void *s1, const void *s2, size_t n);
 #define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
 #include <string.h>
 #endif
 
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
 #endif 
 
 
-#if (defined(__arm__) || defined(__aarch64__)) && \
-	defined(__linux__) && \
-	COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
-	!defined(FREESTANDING)
-#  define ARM_CPU_FEATURES_ENABLED 1
-#else
-#  define ARM_CPU_FEATURES_ENABLED 0
-#endif
+#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
 
-#if ARM_CPU_FEATURES_ENABLED
+#if defined(__arm__) || defined(__aarch64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
+	!defined(FREESTANDING) && \
+	(defined(__linux__) || \
+	 (defined(__aarch64__) && defined(__APPLE__)))
+#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
+#endif
 
 #define ARM_CPU_FEATURE_NEON		0x00000001
 #define ARM_CPU_FEATURE_PMULL		0x00000002
 #define ARM_CPU_FEATURE_CRC32		0x00000004
+#define ARM_CPU_FEATURE_SHA3		0x00000008
+#define ARM_CPU_FEATURE_DOTPROD		0x00000010
 
+#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
+#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
+#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
+#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
+#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
+
+#if HAVE_DYNAMIC_ARM_CPU_FEATURES
 #define ARM_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_arm_cpu_features;
 
-extern volatile u32 _cpu_features;
+void libdeflate_init_arm_cpu_features(void);
 
-void setup_cpu_features(void);
-
-static inline u32 get_cpu_features(void)
+static inline u32 get_arm_cpu_features(void)
 {
-	if (_cpu_features == 0)
-		setup_cpu_features();
-	return _cpu_features;
+	if (libdeflate_arm_cpu_features == 0)
+		libdeflate_init_arm_cpu_features();
+	return libdeflate_arm_cpu_features;
 }
+#else 
+static inline u32 get_arm_cpu_features(void) { return 0; }
+#endif 
+
+
+#ifdef __ARM_NEON
+#  define HAVE_NEON_NATIVE	1
+#else
+#  define HAVE_NEON_NATIVE	0
+#endif
+#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
+
+#if HAVE_NEON_NATIVE || \
+	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#  define HAVE_NEON_INTRIN	1
+#else
+#  define HAVE_NEON_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRYPTO
+#  define HAVE_PMULL_NATIVE	1
+#else
+#  define HAVE_PMULL_NATIVE	0
+#endif
+#define HAVE_PMULL_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
+
+#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
+	!(defined(__arm__) && defined(__clang__)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
+#else
+#  define HAVE_PMULL_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRC32
+#  define HAVE_CRC32_NATIVE	1
+#else
+#  define HAVE_CRC32_NATIVE	0
+#endif
+#define HAVE_CRC32_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+
+#define HAVE_CRC32_INTRIN \
+	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
+			       (!GCC_PREREQ(1, 0) || \
+				GCC_PREREQ(11, 3) || \
+				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_SHA3
+#    define HAVE_SHA3_NATIVE	1
+#  else
+#    define HAVE_SHA3_NATIVE	0
+#  endif
+#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+				 (GCC_PREREQ(8, 1)  || \
+				  CLANG_PREREQ(7, 0, 10010463) ))
+#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+				 (GCC_PREREQ(9, 1)  || \
+				  __has_builtin(__builtin_neon_veor3q_v)))
+#else
+#  define HAVE_SHA3_NATIVE	0
+#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3_INTRIN	0
+#endif
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_DOTPROD
+#    define HAVE_DOTPROD_NATIVE	1
+#  else
+#    define HAVE_DOTPROD_NATIVE	0
+#  endif
+#  define HAVE_DOTPROD_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
+#  define HAVE_DOTPROD_INTRIN \
+	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+#else
+#  define HAVE_DOTPROD_NATIVE	0
+#  define HAVE_DOTPROD_TARGET	0
+#  define HAVE_DOTPROD_INTRIN	0
+#endif
+
+
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  define __ARM_FEATURE_CRC32	1
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_SHA3	1
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_DOTPROD	1
+#endif
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  include <arm_acle.h>
+#  undef __ARM_FEATURE_CRC32
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_SHA3
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_DOTPROD
+#endif
 
 #endif 
 
@@ -1382,77 +1671,103 @@ static inline u32 get_cpu_features(void)
 
 
 
-#undef DISPATCH_NEON
-#if !defined(DEFAULT_IMPL) &&	\
-	(defined(__ARM_NEON) || (ARM_CPU_FEATURES_ENABLED &&	\
-				 COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS))
+#if HAVE_NEON_INTRIN && CPU_IS_LITTLE_ENDIAN()
+#  define adler32_neon		adler32_neon
 #  define FUNCNAME		adler32_neon
 #  define FUNCNAME_CHUNK	adler32_neon_chunk
 #  define IMPL_ALIGNMENT	16
-#  define IMPL_SEGMENT_SIZE	32
+#  define IMPL_SEGMENT_LEN	64
 
-#  define IMPL_MAX_CHUNK_SIZE	(32 * (0xFFFF / 0xFF))
-#  ifdef __ARM_NEON
+#  define IMPL_MAX_CHUNK_LEN	(64 * (0xFFFF / 0xFF))
+#  if HAVE_NEON_NATIVE
 #    define ATTRIBUTES
-#    define DEFAULT_IMPL	adler32_neon
 #  else
 #    ifdef __arm__
 #      define ATTRIBUTES	__attribute__((target("fpu=neon")))
 #    else
 #      define ATTRIBUTES	__attribute__((target("+simd")))
 #    endif
-#    define DISPATCH		1
-#    define DISPATCH_NEON	1
 #  endif
 #  include <arm_neon.h>
 static forceinline ATTRIBUTES void
 adler32_neon_chunk(const uint8x16_t *p, const uint8x16_t * const end,
 		   u32 *s1, u32 *s2)
 {
-	uint32x4_t v_s1 = (uint32x4_t) { 0, 0, 0, 0 };
-	uint32x4_t v_s2 = (uint32x4_t) { 0, 0, 0, 0 };
-	uint16x8_t v_byte_sums_a = (uint16x8_t) { 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint16x8_t v_byte_sums_b = (uint16x8_t) { 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint16x8_t v_byte_sums_c = (uint16x8_t) { 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint16x8_t v_byte_sums_d = (uint16x8_t) { 0, 0, 0, 0, 0, 0, 0, 0 };
+	const uint16x8_t mults_a = { 64, 63, 62, 61, 60, 59, 58, 57, };
+	const uint16x8_t mults_b = { 56, 55, 54, 53, 52, 51, 50, 49, };
+	const uint16x8_t mults_c = { 48, 47, 46, 45, 44, 43, 42, 41, };
+	const uint16x8_t mults_d = { 40, 39, 38, 37, 36, 35, 34, 33, };
+	const uint16x8_t mults_e = { 32, 31, 30, 29, 28, 27, 26, 25, };
+	const uint16x8_t mults_f = { 24, 23, 22, 21, 20, 19, 18, 17, };
+	const uint16x8_t mults_g = { 16, 15, 14, 13, 12, 11, 10,  9, };
+	const uint16x8_t mults_h = {  8,  7,  6,  5,  4,  3,  2,  1, };
+
+	uint32x4_t v_s1 = { 0, 0, 0, 0 };
+	uint32x4_t v_s2 = { 0, 0, 0, 0 };
+	
+	uint16x8_t v_byte_sums_a = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint16x8_t v_byte_sums_b = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint16x8_t v_byte_sums_c = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint16x8_t v_byte_sums_d = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint16x8_t v_byte_sums_e = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint16x8_t v_byte_sums_f = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint16x8_t v_byte_sums_g = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint16x8_t v_byte_sums_h = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	do {
+		
 		const uint8x16_t bytes1 = *p++;
 		const uint8x16_t bytes2 = *p++;
+		const uint8x16_t bytes3 = *p++;
+		const uint8x16_t bytes4 = *p++;
 		uint16x8_t tmp;
 
+		
 		v_s2 += v_s1;
 
 		
 		tmp = vpaddlq_u8(bytes1);
-
-		
-		tmp = vpadalq_u8(tmp, bytes2);
-
-		
-		v_s1 = vpadalq_u16(v_s1, tmp);
-
-		
 		v_byte_sums_a = vaddw_u8(v_byte_sums_a, vget_low_u8(bytes1));
 		v_byte_sums_b = vaddw_u8(v_byte_sums_b, vget_high_u8(bytes1));
+		tmp = vpadalq_u8(tmp, bytes2);
 		v_byte_sums_c = vaddw_u8(v_byte_sums_c, vget_low_u8(bytes2));
 		v_byte_sums_d = vaddw_u8(v_byte_sums_d, vget_high_u8(bytes2));
+		tmp = vpadalq_u8(tmp, bytes3);
+		v_byte_sums_e = vaddw_u8(v_byte_sums_e, vget_low_u8(bytes3));
+		v_byte_sums_f = vaddw_u8(v_byte_sums_f, vget_high_u8(bytes3));
+		tmp = vpadalq_u8(tmp, bytes4);
+		v_byte_sums_g = vaddw_u8(v_byte_sums_g, vget_low_u8(bytes4));
+		v_byte_sums_h = vaddw_u8(v_byte_sums_h, vget_high_u8(bytes4));
+		v_s1 = vpadalq_u16(v_s1, tmp);
 
 	} while (p != end);
 
 	
-	v_s2 = vqshlq_n_u32(v_s2, 5);
+#ifdef __arm__
+#  define umlal2(a, b, c)  vmlal_u16((a), vget_high_u16(b), vget_high_u16(c))
+#else
+#  define umlal2	   vmlal_high_u16
+#endif
+	v_s2 = vqshlq_n_u32(v_s2, 6);
+	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_a), vget_low_u16(mults_a));
+	v_s2 = umlal2(v_s2, v_byte_sums_a, mults_a);
+	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_b), vget_low_u16(mults_b));
+	v_s2 = umlal2(v_s2, v_byte_sums_b, mults_b);
+	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_c), vget_low_u16(mults_c));
+	v_s2 = umlal2(v_s2, v_byte_sums_c, mults_c);
+	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_d), vget_low_u16(mults_d));
+	v_s2 = umlal2(v_s2, v_byte_sums_d, mults_d);
+	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_e), vget_low_u16(mults_e));
+	v_s2 = umlal2(v_s2, v_byte_sums_e, mults_e);
+	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_f), vget_low_u16(mults_f));
+	v_s2 = umlal2(v_s2, v_byte_sums_f, mults_f);
+	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_g), vget_low_u16(mults_g));
+	v_s2 = umlal2(v_s2, v_byte_sums_g, mults_g);
+	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_h), vget_low_u16(mults_h));
+	v_s2 = umlal2(v_s2, v_byte_sums_h, mults_h);
+#undef umlal2
 
 	
-	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_a),  (uint16x4_t) { 32, 31, 30, 29 });
-	v_s2 = vmlal_u16(v_s2, vget_high_u16(v_byte_sums_a), (uint16x4_t) { 28, 27, 26, 25 });
-	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_b),  (uint16x4_t) { 24, 23, 22, 21 });
-	v_s2 = vmlal_u16(v_s2, vget_high_u16(v_byte_sums_b), (uint16x4_t) { 20, 19, 18, 17 });
-	v_s2 = vmlal_u16(v_s2, vget_low_u16(v_byte_sums_c),  (uint16x4_t) { 16, 15, 14, 13 });
-	v_s2 = vmlal_u16(v_s2, vget_high_u16(v_byte_sums_c), (uint16x4_t) { 12, 11, 10,  9 });
-	v_s2 = vmlal_u16(v_s2, vget_low_u16 (v_byte_sums_d), (uint16x4_t) {  8,  7,  6,  5 });
-	v_s2 = vmlal_u16(v_s2, vget_high_u16(v_byte_sums_d), (uint16x4_t) {  4,  3,  2,  1 });
-
 	*s1 += v_s1[0] + v_s1[1] + v_s1[2] + v_s1[3];
 	*s2 += v_s2[0] + v_s2[1] + v_s2[2] + v_s2[3];
 }
@@ -1461,17 +1776,16 @@ adler32_neon_chunk(const uint8x16_t *p, const uint8x16_t * const end,
 
 
 
-static u32 ATTRIBUTES
-FUNCNAME(u32 adler, const u8 *p, size_t size)
+static u32 ATTRIBUTES MAYBE_UNUSED
+FUNCNAME(u32 adler, const u8 *p, size_t len)
 {
+	const size_t max_chunk_len =
+		MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) -
+		(MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) % IMPL_SEGMENT_LEN);
 	u32 s1 = adler & 0xFFFF;
 	u32 s2 = adler >> 16;
-	const u8 * const end = p + size;
+	const u8 * const end = p + len;
 	const u8 *vend;
-	const size_t max_chunk_size =
-		MIN(MAX_CHUNK_SIZE, IMPL_MAX_CHUNK_SIZE) -
-		(MIN(MAX_CHUNK_SIZE, IMPL_MAX_CHUNK_SIZE) %
-		 IMPL_SEGMENT_SIZE);
 
 	
 	if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
@@ -1484,17 +1798,17 @@ FUNCNAME(u32 adler, const u8 *p, size_t size)
 	}
 
 	
-	STATIC_ASSERT(IMPL_SEGMENT_SIZE % IMPL_ALIGNMENT == 0);
-	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_SIZE);
+	STATIC_ASSERT(IMPL_SEGMENT_LEN % IMPL_ALIGNMENT == 0);
+	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_LEN);
 	while (p != vend) {
-		size_t chunk_size = MIN((size_t)(vend - p), max_chunk_size);
+		size_t chunk_len = MIN((size_t)(vend - p), max_chunk_len);
 
-		s2 += s1 * chunk_size;
+		s2 += s1 * chunk_len;
 
-		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_size),
+		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_len),
 			       &s1, &s2);
 
-		p += chunk_size;
+		p += chunk_len;
 		s1 %= DIVISOR;
 		s2 %= DIVISOR;
 	}
@@ -1516,28 +1830,189 @@ FUNCNAME(u32 adler, const u8 *p, size_t size)
 #undef FUNCNAME_CHUNK
 #undef ATTRIBUTES
 #undef IMPL_ALIGNMENT
-#undef IMPL_SEGMENT_SIZE
-#undef IMPL_MAX_CHUNK_SIZE
+#undef IMPL_SEGMENT_LEN
+#undef IMPL_MAX_CHUNK_LEN
 
 #endif 
 
-#ifdef DISPATCH
+
+#if HAVE_DOTPROD_INTRIN && CPU_IS_LITTLE_ENDIAN()
+#  define adler32_neon_dotprod	adler32_neon_dotprod
+#  define FUNCNAME		adler32_neon_dotprod
+#  define FUNCNAME_CHUNK	adler32_neon_dotprod_chunk
+#  define IMPL_ALIGNMENT	16
+#  define IMPL_SEGMENT_LEN	64
+#  define IMPL_MAX_CHUNK_LEN	MAX_CHUNK_LEN
+#  if HAVE_DOTPROD_NATIVE
+#    define ATTRIBUTES
+#  else
+#    ifdef __clang__
+#      define ATTRIBUTES  __attribute__((target("dotprod")))
+     
+#    elif defined(__ARM_FEATURE_JCVT)
+#      define ATTRIBUTES  __attribute__((target("+dotprod")))
+#    else
+#      define ATTRIBUTES  __attribute__((target("arch=armv8.2-a+dotprod")))
+#    endif
+#  endif
+#  include <arm_neon.h>
+static forceinline ATTRIBUTES void
+adler32_neon_dotprod_chunk(const uint8x16_t *p, const uint8x16_t * const end,
+			   u32 *s1, u32 *s2)
+{
+	const uint8x16_t mults_a = {
+		64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49,
+	};
+	const uint8x16_t mults_b = {
+		48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33,
+	};
+	const uint8x16_t mults_c = {
+		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17,
+	};
+	const uint8x16_t mults_d = {
+		16, 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
+	};
+	const uint8x16_t ones = {
+		 1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1 , 1,  1,
+	};
+	uint32x4_t v_s1_a = { 0, 0, 0, 0 };
+	uint32x4_t v_s1_b = { 0, 0, 0, 0 };
+	uint32x4_t v_s1_c = { 0, 0, 0, 0 };
+	uint32x4_t v_s1_d = { 0, 0, 0, 0 };
+	uint32x4_t v_s2_a = { 0, 0, 0, 0 };
+	uint32x4_t v_s2_b = { 0, 0, 0, 0 };
+	uint32x4_t v_s2_c = { 0, 0, 0, 0 };
+	uint32x4_t v_s2_d = { 0, 0, 0, 0 };
+	uint32x4_t v_s1_sums_a = { 0, 0, 0, 0 };
+	uint32x4_t v_s1_sums_b = { 0, 0, 0, 0 };
+	uint32x4_t v_s1_sums_c = { 0, 0, 0, 0 };
+	uint32x4_t v_s1_sums_d = { 0, 0, 0, 0 };
+	uint32x4_t v_s1;
+	uint32x4_t v_s2;
+
+	do {
+		uint8x16_t bytes_a = *p++;
+		uint8x16_t bytes_b = *p++;
+		uint8x16_t bytes_c = *p++;
+		uint8x16_t bytes_d = *p++;
+
+		v_s1_sums_a += v_s1_a;
+		v_s1_a = vdotq_u32(v_s1_a, bytes_a, ones);
+		v_s2_a = vdotq_u32(v_s2_a, bytes_a, mults_a);
+
+		v_s1_sums_b += v_s1_b;
+		v_s1_b = vdotq_u32(v_s1_b, bytes_b, ones);
+		v_s2_b = vdotq_u32(v_s2_b, bytes_b, mults_b);
+
+		v_s1_sums_c += v_s1_c;
+		v_s1_c = vdotq_u32(v_s1_c, bytes_c, ones);
+		v_s2_c = vdotq_u32(v_s2_c, bytes_c, mults_c);
+
+		v_s1_sums_d += v_s1_d;
+		v_s1_d = vdotq_u32(v_s1_d, bytes_d, ones);
+		v_s2_d = vdotq_u32(v_s2_d, bytes_d, mults_d);
+	} while (p != end);
+
+	v_s1 = v_s1_a + v_s1_b + v_s1_c + v_s1_d;
+	v_s2 = v_s2_a + v_s2_b + v_s2_c + v_s2_d +
+	       vqshlq_n_u32(v_s1_sums_a + v_s1_sums_b +
+			    v_s1_sums_c + v_s1_sums_d, 6);
+	*s1 += v_s1[0] + v_s1[1] + v_s1[2] + v_s1[3];
+	*s2 += v_s2[0] + v_s2[1] + v_s2[2] + v_s2[3];
+}
+/* #include "arm-../adler32_vec_template.h" */
+
+
+
+
+static u32 ATTRIBUTES MAYBE_UNUSED
+FUNCNAME(u32 adler, const u8 *p, size_t len)
+{
+	const size_t max_chunk_len =
+		MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) -
+		(MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) % IMPL_SEGMENT_LEN);
+	u32 s1 = adler & 0xFFFF;
+	u32 s2 = adler >> 16;
+	const u8 * const end = p + len;
+	const u8 *vend;
+
+	
+	if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
+		do {
+			s1 += *p++;
+			s2 += s1;
+		} while (p != end && (uintptr_t)p % IMPL_ALIGNMENT);
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
+
+	
+	STATIC_ASSERT(IMPL_SEGMENT_LEN % IMPL_ALIGNMENT == 0);
+	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_LEN);
+	while (p != vend) {
+		size_t chunk_len = MIN((size_t)(vend - p), max_chunk_len);
+
+		s2 += s1 * chunk_len;
+
+		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_len),
+			       &s1, &s2);
+
+		p += chunk_len;
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
+
+	
+	if (p != end) {
+		do {
+			s1 += *p++;
+			s2 += s1;
+		} while (p != end);
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
+
+	return (s2 << 16) | s1;
+}
+
+#undef FUNCNAME
+#undef FUNCNAME_CHUNK
+#undef ATTRIBUTES
+#undef IMPL_ALIGNMENT
+#undef IMPL_SEGMENT_LEN
+#undef IMPL_MAX_CHUNK_LEN
+
+#endif 
+
+#if defined(adler32_neon_dotprod) && HAVE_DOTPROD_NATIVE
+#define DEFAULT_IMPL	adler32_neon_dotprod
+#else
 static inline adler32_func_t
 arch_select_adler32_func(void)
 {
-	u32 features = get_cpu_features();
+	const u32 features MAYBE_UNUSED = get_arm_cpu_features();
 
-#ifdef DISPATCH_NEON
-	if (features & ARM_CPU_FEATURE_NEON)
+#ifdef adler32_neon_dotprod
+	if (HAVE_NEON(features) && HAVE_DOTPROD(features))
+		return adler32_neon_dotprod;
+#endif
+#ifdef adler32_neon
+	if (HAVE_NEON(features))
 		return adler32_neon;
 #endif
 	return NULL;
 }
+#define arch_select_adler32_func	arch_select_adler32_func
+#endif
+
 #endif 
 
 #elif defined(__i386__) || defined(__x86_64__)
 /* #  include "x86/adler32_impl.h" */
 
+
+#ifndef LIB_X86_ADLER32_IMPL_H
+#define LIB_X86_ADLER32_IMPL_H
 
 /* #include "x86-cpu_features.h" */
 
@@ -1558,253 +2033,27 @@ arch_select_adler32_func(void)
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -1813,6 +2062,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -1828,87 +2086,115 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -1920,158 +2206,401 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
-}
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
 #endif
+}
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
+static forceinline u32 bswap32(u32 v)
 {
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
 #endif
+}
 
 
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
+static forceinline u64 bswap64(u64 v)
 {
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
 }
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
 
 
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
 #endif
 
 
 
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
 
 
 
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
+static forceinline u16
+get_unaligned_le16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
 }
-#endif
 
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
+static forceinline u16
+get_unaligned_be16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
 }
-#endif
 
-static forceinline unsigned
-bsrw(machine_word_t n)
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsr32(n);
+		return get_unaligned_le32(p);
 	else
-		return bsr64(n);
+		return get_unaligned_le64(p);
 }
 
 
 
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
 	}
-	return i;
 }
-#endif
 
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
 	}
-	return i;
 }
-#endif
 
-static forceinline unsigned
-bsfw(machine_word_t n)
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsf32(n);
+		put_unaligned_le32(v, p);
 	else
-		return bsf64(n);
+		put_unaligned_le64(v, p);
 }
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
 
 #endif 
 
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
 
 void *libdeflate_malloc(size_t size);
 void libdeflate_free(void *ptr);
@@ -2092,41 +2621,146 @@ void *memmove(void *dest, const void *src, size_t n);
 
 int memcmp(const void *s1, const void *s2, size_t n);
 #define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
 #include <string.h>
 #endif
 
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
 #endif 
 
 
-#if (defined(__i386__) || defined(__x86_64__)) && \
-	COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define X86_CPU_FEATURES_ENABLED 1
-#else
-#  define X86_CPU_FEATURES_ENABLED 0
-#endif
+#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
 
-#if X86_CPU_FEATURES_ENABLED
+#if defined(__i386__) || defined(__x86_64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
+#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
+#endif
 
 #define X86_CPU_FEATURE_SSE2		0x00000001
 #define X86_CPU_FEATURE_PCLMUL		0x00000002
 #define X86_CPU_FEATURE_AVX		0x00000004
 #define X86_CPU_FEATURE_AVX2		0x00000008
 #define X86_CPU_FEATURE_BMI2		0x00000010
-#define X86_CPU_FEATURE_AVX512BW	0x00000020
 
+#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
+#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
+#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
+#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
+#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+
+#if HAVE_DYNAMIC_X86_CPU_FEATURES
 #define X86_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_x86_cpu_features;
 
-extern volatile u32 _cpu_features;
+void libdeflate_init_x86_cpu_features(void);
 
-void setup_cpu_features(void);
-
-static inline u32 get_cpu_features(void)
+static inline u32 get_x86_cpu_features(void)
 {
-	if (_cpu_features == 0)
-		setup_cpu_features();
-	return _cpu_features;
+	if (libdeflate_x86_cpu_features == 0)
+		libdeflate_init_x86_cpu_features();
+	return libdeflate_x86_cpu_features;
 }
+#else 
+static inline u32 get_x86_cpu_features(void) { return 0; }
+#endif 
+
+
+#define HAVE_TARGET_INTRINSICS \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
+
+
+#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
+	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
+	defined(__INTEL_COMPILER)
+typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
+typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
+typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
+typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
+typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
+typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
+typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
+typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
+#endif
+#ifdef __INTEL_COMPILER
+typedef int   __v16si __attribute__((__vector_size__(64)));
+typedef short __v32hi __attribute__((__vector_size__(64)));
+typedef char  __v64qi __attribute__((__vector_size__(64)));
+#endif
+
+
+#ifdef __SSE2__
+#  define HAVE_SSE2_NATIVE	1
+#else
+#  define HAVE_SSE2_NATIVE	0
+#endif
+#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
+#define HAVE_SSE2_INTRIN \
+	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __PCLMUL__
+#  define HAVE_PCLMUL_NATIVE	1
+#else
+#  define HAVE_PCLMUL_NATIVE	0
+#endif
+#define HAVE_PCLMUL_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
+#define HAVE_PCLMUL_INTRIN \
+	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX__
+#  define HAVE_AVX_NATIVE	1
+#else
+#  define HAVE_AVX_NATIVE	0
+#endif
+#define HAVE_AVX_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
+#define HAVE_AVX_INTRIN \
+	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX2__
+#  define HAVE_AVX2_NATIVE	1
+#else
+#  define HAVE_AVX2_NATIVE	0
+#endif
+#define HAVE_AVX2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
+#define HAVE_AVX2_INTRIN \
+	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __BMI2__
+#  define HAVE_BMI2_NATIVE	1
+#else
+#  define HAVE_BMI2_NATIVE	0
+#endif
+#define HAVE_BMI2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
+#define HAVE_BMI2_INTRIN \
+	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
 
 #endif 
 
@@ -2161,285 +2795,19 @@ static inline u32 get_cpu_features(void)
 	ADLER32_FINISH_VEC_CHUNK_128((s1), (s2), s1_128bit, s2_128bit);	    \
 }
 
-#define ADLER32_FINISH_VEC_CHUNK_512(s1, s2, v_s1, v_s2)		    \
-{									    \
-	__v8su s1_256bit, s2_256bit;					    \
-									    \
-							    \
-	s1_256bit = (__v8su)_mm512_extracti64x4_epi64((__m512i)(v_s1), 0) + \
-		    (__v8su)_mm512_extracti64x4_epi64((__m512i)(v_s1), 1);  \
-	s2_256bit = (__v8su)_mm512_extracti64x4_epi64((__m512i)(v_s2), 0) + \
-		    (__v8su)_mm512_extracti64x4_epi64((__m512i)(v_s2), 1);  \
-									    \
-	ADLER32_FINISH_VEC_CHUNK_256((s1), (s2), s1_256bit, s2_256bit);	    \
-}
 
-
-#undef DISPATCH_AVX512BW
-#if !defined(DEFAULT_IMPL) &&						\
-    									\
-    COMPILER_SUPPORTS_AVX512BW_TARGET &&				\
-    (defined(__AVX512BW__) || (X86_CPU_FEATURES_ENABLED &&		\
-			       COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS))
-#  define FUNCNAME		adler32_avx512bw
-#  define FUNCNAME_CHUNK	adler32_avx512bw_chunk
-#  define IMPL_ALIGNMENT	64
-#  define IMPL_SEGMENT_SIZE	64
-#  define IMPL_MAX_CHUNK_SIZE	MAX_CHUNK_SIZE
-#  ifdef __AVX512BW__
-#    define ATTRIBUTES
-#    define DEFAULT_IMPL	adler32_avx512bw
-#  else
-#    define ATTRIBUTES		__attribute__((target("avx512bw")))
-#    define DISPATCH		1
-#    define DISPATCH_AVX512BW	1
-#  endif
-#  include <immintrin.h>
-static forceinline ATTRIBUTES void
-adler32_avx512bw_chunk(const __m512i *p, const __m512i *const end,
-		       u32 *s1, u32 *s2)
-{
-	const __m512i zeroes = _mm512_setzero_si512();
-	const __v64qi multipliers = (__v64qi){
-		64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49,
-		48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33,
-		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17,
-		16, 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
-	};
-	const __v32hi ones = (__v32hi)_mm512_set1_epi16(1);
-	__v16si v_s1 = (__v16si)zeroes;
-	__v16si v_s1_sums = (__v16si)zeroes;
-	__v16si v_s2 = (__v16si)zeroes;
-
-	do {
-		
-		__m512i bytes = *p++;
-
-		
-		__v32hi sums = (__v32hi)_mm512_maddubs_epi16(
-						bytes, (__m512i)multipliers);
-
-		
-		v_s1_sums += v_s1;
-
-		
-		v_s1 += (__v16si)_mm512_sad_epu8(bytes, zeroes);
-
-		
-		v_s2 += (__v16si)_mm512_madd_epi16((__m512i)sums,
-						   (__m512i)ones);
-	} while (p != end);
-
-	
-	v_s2 += (__v16si)_mm512_slli_epi32((__m512i)v_s1_sums, 6);
-
-	
-	ADLER32_FINISH_VEC_CHUNK_512(s1, s2, v_s1, v_s2);
-}
-/* #include "adler32_vec_template.h" */
-
-
-
-
-static u32 ATTRIBUTES
-FUNCNAME(u32 adler, const u8 *p, size_t size)
-{
-	u32 s1 = adler & 0xFFFF;
-	u32 s2 = adler >> 16;
-	const u8 * const end = p + size;
-	const u8 *vend;
-	const size_t max_chunk_size =
-		MIN(MAX_CHUNK_SIZE, IMPL_MAX_CHUNK_SIZE) -
-		(MIN(MAX_CHUNK_SIZE, IMPL_MAX_CHUNK_SIZE) %
-		 IMPL_SEGMENT_SIZE);
-
-	
-	if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
-		do {
-			s1 += *p++;
-			s2 += s1;
-		} while (p != end && (uintptr_t)p % IMPL_ALIGNMENT);
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
-
-	
-	STATIC_ASSERT(IMPL_SEGMENT_SIZE % IMPL_ALIGNMENT == 0);
-	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_SIZE);
-	while (p != vend) {
-		size_t chunk_size = MIN((size_t)(vend - p), max_chunk_size);
-
-		s2 += s1 * chunk_size;
-
-		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_size),
-			       &s1, &s2);
-
-		p += chunk_size;
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
-
-	
-	if (p != end) {
-		do {
-			s1 += *p++;
-			s2 += s1;
-		} while (p != end);
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
-
-	return (s2 << 16) | s1;
-}
-
-#undef FUNCNAME
-#undef FUNCNAME_CHUNK
-#undef ATTRIBUTES
-#undef IMPL_ALIGNMENT
-#undef IMPL_SEGMENT_SIZE
-#undef IMPL_MAX_CHUNK_SIZE
-
-#endif 
-
-
-#undef DISPATCH_AVX2
-#if !defined(DEFAULT_IMPL) &&	\
-	(defined(__AVX2__) || (X86_CPU_FEATURES_ENABLED &&	\
-			       COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS))
-#  define FUNCNAME		adler32_avx2
-#  define FUNCNAME_CHUNK	adler32_avx2_chunk
-#  define IMPL_ALIGNMENT	32
-#  define IMPL_SEGMENT_SIZE	32
-#  define IMPL_MAX_CHUNK_SIZE	MAX_CHUNK_SIZE
-#  ifdef __AVX2__
-#    define ATTRIBUTES
-#    define DEFAULT_IMPL	adler32_avx2
-#  else
-#    define ATTRIBUTES		__attribute__((target("avx2")))
-#    define DISPATCH		1
-#    define DISPATCH_AVX2	1
-#  endif
-#  include <immintrin.h>
-static forceinline ATTRIBUTES void
-adler32_avx2_chunk(const __m256i *p, const __m256i *const end, u32 *s1, u32 *s2)
-{
-	const __m256i zeroes = _mm256_setzero_si256();
-	const __v32qu multipliers = (__v32qu){
-		32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17,
-		16, 15, 14, 13, 12, 11, 10,  9,  8,  7,  6,  5,  4,  3,  2,  1,
-	};
-	const __v16hu ones = (__v16hu)_mm256_set1_epi16(1);
-	__v8su v_s1 = (__v8su)zeroes;
-	__v8su v_s1_sums = (__v8su)zeroes;
-	__v8su v_s2 = (__v8su)zeroes;
-
-	do {
-		
-		__m256i bytes = *p++;
-
-		
-		__v16hu sums = (__v16hu)_mm256_maddubs_epi16(
-						bytes, (__m256i)multipliers);
-
-		
-		v_s1_sums += v_s1;
-
-		
-		v_s1 += (__v8su)_mm256_sad_epu8(bytes, zeroes);
-
-		
-		v_s2 += (__v8su)_mm256_madd_epi16((__m256i)sums, (__m256i)ones);
-	} while (p != end);
-
-	
-	v_s2 += (__v8su)_mm256_slli_epi32((__m256i)v_s1_sums, 5);
-
-	
-	ADLER32_FINISH_VEC_CHUNK_256(s1, s2, v_s1, v_s2);
-}
-/* #include "x86-../adler32_vec_template.h" */
-
-
-
-
-static u32 ATTRIBUTES
-FUNCNAME(u32 adler, const u8 *p, size_t size)
-{
-	u32 s1 = adler & 0xFFFF;
-	u32 s2 = adler >> 16;
-	const u8 * const end = p + size;
-	const u8 *vend;
-	const size_t max_chunk_size =
-		MIN(MAX_CHUNK_SIZE, IMPL_MAX_CHUNK_SIZE) -
-		(MIN(MAX_CHUNK_SIZE, IMPL_MAX_CHUNK_SIZE) %
-		 IMPL_SEGMENT_SIZE);
-
-	
-	if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
-		do {
-			s1 += *p++;
-			s2 += s1;
-		} while (p != end && (uintptr_t)p % IMPL_ALIGNMENT);
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
-
-	
-	STATIC_ASSERT(IMPL_SEGMENT_SIZE % IMPL_ALIGNMENT == 0);
-	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_SIZE);
-	while (p != vend) {
-		size_t chunk_size = MIN((size_t)(vend - p), max_chunk_size);
-
-		s2 += s1 * chunk_size;
-
-		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_size),
-			       &s1, &s2);
-
-		p += chunk_size;
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
-
-	
-	if (p != end) {
-		do {
-			s1 += *p++;
-			s2 += s1;
-		} while (p != end);
-		s1 %= DIVISOR;
-		s2 %= DIVISOR;
-	}
-
-	return (s2 << 16) | s1;
-}
-
-#undef FUNCNAME
-#undef FUNCNAME_CHUNK
-#undef ATTRIBUTES
-#undef IMPL_ALIGNMENT
-#undef IMPL_SEGMENT_SIZE
-#undef IMPL_MAX_CHUNK_SIZE
-
-#endif 
-
-
-#undef DISPATCH_SSE2
-#if !defined(DEFAULT_IMPL) &&	\
-	(defined(__SSE2__) || (X86_CPU_FEATURES_ENABLED &&	\
-			       COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS))
+#if HAVE_SSE2_INTRIN
+#  define adler32_sse2		adler32_sse2
 #  define FUNCNAME		adler32_sse2
 #  define FUNCNAME_CHUNK	adler32_sse2_chunk
 #  define IMPL_ALIGNMENT	16
-#  define IMPL_SEGMENT_SIZE	32
+#  define IMPL_SEGMENT_LEN	32
 
-#  define IMPL_MAX_CHUNK_SIZE	(32 * (0x7FFF / 0xFF))
-#  ifdef __SSE2__
+#  define IMPL_MAX_CHUNK_LEN	(32 * (0x7FFF / 0xFF))
+#  if HAVE_SSE2_NATIVE
 #    define ATTRIBUTES
-#    define DEFAULT_IMPL	adler32_sse2
 #  else
 #    define ATTRIBUTES		__attribute__((target("sse2")))
-#    define DISPATCH		1
-#    define DISPATCH_SSE2	1
 #  endif
 #  include <emmintrin.h>
 static forceinline ATTRIBUTES void
@@ -2493,22 +2861,21 @@ adler32_sse2_chunk(const __m128i *p, const __m128i *const end, u32 *s1, u32 *s2)
 	
 	ADLER32_FINISH_VEC_CHUNK_128(s1, s2, v_s1, v_s2);
 }
-/* #include "x86-../adler32_vec_template.h" */
+/* #include "adler32_vec_template.h" */
 
 
 
 
-static u32 ATTRIBUTES
-FUNCNAME(u32 adler, const u8 *p, size_t size)
+static u32 ATTRIBUTES MAYBE_UNUSED
+FUNCNAME(u32 adler, const u8 *p, size_t len)
 {
+	const size_t max_chunk_len =
+		MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) -
+		(MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) % IMPL_SEGMENT_LEN);
 	u32 s1 = adler & 0xFFFF;
 	u32 s2 = adler >> 16;
-	const u8 * const end = p + size;
+	const u8 * const end = p + len;
 	const u8 *vend;
-	const size_t max_chunk_size =
-		MIN(MAX_CHUNK_SIZE, IMPL_MAX_CHUNK_SIZE) -
-		(MIN(MAX_CHUNK_SIZE, IMPL_MAX_CHUNK_SIZE) %
-		 IMPL_SEGMENT_SIZE);
 
 	
 	if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
@@ -2521,17 +2888,17 @@ FUNCNAME(u32 adler, const u8 *p, size_t size)
 	}
 
 	
-	STATIC_ASSERT(IMPL_SEGMENT_SIZE % IMPL_ALIGNMENT == 0);
-	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_SIZE);
+	STATIC_ASSERT(IMPL_SEGMENT_LEN % IMPL_ALIGNMENT == 0);
+	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_LEN);
 	while (p != vend) {
-		size_t chunk_size = MIN((size_t)(vend - p), max_chunk_size);
+		size_t chunk_len = MIN((size_t)(vend - p), max_chunk_len);
 
-		s2 += s1 * chunk_size;
+		s2 += s1 * chunk_len;
 
-		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_size),
+		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_len),
 			       &s1, &s2);
 
-		p += chunk_size;
+		p += chunk_len;
 		s1 %= DIVISOR;
 		s2 %= DIVISOR;
 	}
@@ -2553,78 +2920,169 @@ FUNCNAME(u32 adler, const u8 *p, size_t size)
 #undef FUNCNAME_CHUNK
 #undef ATTRIBUTES
 #undef IMPL_ALIGNMENT
-#undef IMPL_SEGMENT_SIZE
-#undef IMPL_MAX_CHUNK_SIZE
+#undef IMPL_SEGMENT_LEN
+#undef IMPL_MAX_CHUNK_LEN
 
 #endif 
 
-#ifdef DISPATCH
-static inline adler32_func_t
-arch_select_adler32_func(void)
-{
-	u32 features = get_cpu_features();
 
-#ifdef DISPATCH_AVX512BW
-	if (features & X86_CPU_FEATURE_AVX512BW)
-		return adler32_avx512bw;
-#endif
-#ifdef DISPATCH_AVX2
-	if (features & X86_CPU_FEATURE_AVX2)
-		return adler32_avx2;
-#endif
-#ifdef DISPATCH_SSE2
-	if (features & X86_CPU_FEATURE_SSE2)
-		return adler32_sse2;
-#endif
-	return NULL;
+#if HAVE_AVX2_INTRIN
+#  define adler32_avx2		adler32_avx2
+#  define FUNCNAME		adler32_avx2
+#  define FUNCNAME_CHUNK	adler32_avx2_chunk
+#  define IMPL_ALIGNMENT	32
+#  define IMPL_SEGMENT_LEN	64
+#  define IMPL_MAX_CHUNK_LEN	(64 * (0x7FFF / 0xFF))
+#  if HAVE_AVX2_NATIVE
+#    define ATTRIBUTES
+#  else
+#    define ATTRIBUTES		__attribute__((target("avx2")))
+#  endif
+#  include <immintrin.h>
+static forceinline ATTRIBUTES void
+adler32_avx2_chunk(const __m256i *p, const __m256i *const end, u32 *s1, u32 *s2)
+{
+	const __m256i zeroes = _mm256_setzero_si256();
+	
+	const __v16hu mults_a = { 64, 63, 62, 61, 60, 59, 58, 57,
+				  48, 47, 46, 45, 44, 43, 42, 41, };
+	const __v16hu mults_b = { 56, 55, 54, 53, 52, 51, 50, 49,
+				  40, 39, 38, 37, 36, 35, 34, 33, };
+	const __v16hu mults_c = { 32, 31, 30, 29, 28, 27, 26, 25,
+				  16, 15, 14, 13, 12, 11, 10,  9, };
+	const __v16hu mults_d = { 24, 23, 22, 21, 20, 19, 18, 17,
+				  8,  7,  6,  5,  4,  3,  2,  1, };
+	__v8su v_s1 = (__v8su)zeroes;
+	__v8su v_s2 = (__v8su)zeroes;
+	__v16hu v_byte_sums_a = (__v16hu)zeroes;
+	__v16hu v_byte_sums_b = (__v16hu)zeroes;
+	__v16hu v_byte_sums_c = (__v16hu)zeroes;
+	__v16hu v_byte_sums_d = (__v16hu)zeroes;
+
+	do {
+		const __m256i bytes1 = *p++;
+		const __m256i bytes2 = *p++;
+
+		v_s2 += v_s1;
+		v_s1 += (__v8su)_mm256_sad_epu8(bytes1, zeroes);
+		v_s1 += (__v8su)_mm256_sad_epu8(bytes2, zeroes);
+		v_byte_sums_a += (__v16hu)_mm256_unpacklo_epi8(bytes1, zeroes);
+		v_byte_sums_b += (__v16hu)_mm256_unpackhi_epi8(bytes1, zeroes);
+		v_byte_sums_c += (__v16hu)_mm256_unpacklo_epi8(bytes2, zeroes);
+		v_byte_sums_d += (__v16hu)_mm256_unpackhi_epi8(bytes2, zeroes);
+	} while (p != end);
+
+	v_s2 = (__v8su)_mm256_slli_epi32((__m256i)v_s2, 6);
+	v_s2 += (__v8su)_mm256_madd_epi16((__m256i)v_byte_sums_a,
+					  (__m256i)mults_a);
+	v_s2 += (__v8su)_mm256_madd_epi16((__m256i)v_byte_sums_b,
+					  (__m256i)mults_b);
+	v_s2 += (__v8su)_mm256_madd_epi16((__m256i)v_byte_sums_c,
+					  (__m256i)mults_c);
+	v_s2 += (__v8su)_mm256_madd_epi16((__m256i)v_byte_sums_d,
+					  (__m256i)mults_d);
+	ADLER32_FINISH_VEC_CHUNK_256(s1, s2, v_s1, v_s2);
 }
-#endif 
-
-#endif
+/* #include "x86-../adler32_vec_template.h" */
 
 
-#ifndef DEFAULT_IMPL
-#define DEFAULT_IMPL adler32_generic
-static u32 adler32_generic(u32 adler, const u8 *p, size_t size)
+
+
+static u32 ATTRIBUTES MAYBE_UNUSED
+FUNCNAME(u32 adler, const u8 *p, size_t len)
 {
+	const size_t max_chunk_len =
+		MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) -
+		(MIN(MAX_CHUNK_LEN, IMPL_MAX_CHUNK_LEN) % IMPL_SEGMENT_LEN);
 	u32 s1 = adler & 0xFFFF;
 	u32 s2 = adler >> 16;
-	const u8 * const end = p + size;
+	const u8 * const end = p + len;
+	const u8 *vend;
 
-	while (p != end) {
-		size_t chunk_size = MIN(end - p, MAX_CHUNK_SIZE);
-		const u8 *chunk_end = p + chunk_size;
-		size_t num_unrolled_iterations = chunk_size / 4;
+	
+	if (p != end && (uintptr_t)p % IMPL_ALIGNMENT) {
+		do {
+			s1 += *p++;
+			s2 += s1;
+		} while (p != end && (uintptr_t)p % IMPL_ALIGNMENT);
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
 
-		while (num_unrolled_iterations--) {
+	
+	STATIC_ASSERT(IMPL_SEGMENT_LEN % IMPL_ALIGNMENT == 0);
+	vend = end - ((size_t)(end - p) % IMPL_SEGMENT_LEN);
+	while (p != vend) {
+		size_t chunk_len = MIN((size_t)(vend - p), max_chunk_len);
+
+		s2 += s1 * chunk_len;
+
+		FUNCNAME_CHUNK((const void *)p, (const void *)(p + chunk_len),
+			       &s1, &s2);
+
+		p += chunk_len;
+		s1 %= DIVISOR;
+		s2 %= DIVISOR;
+	}
+
+	
+	if (p != end) {
+		do {
 			s1 += *p++;
 			s2 += s1;
-			s1 += *p++;
-			s2 += s1;
-			s1 += *p++;
-			s2 += s1;
-			s1 += *p++;
-			s2 += s1;
-		}
-		while (p != chunk_end) {
-			s1 += *p++;
-			s2 += s1;
-		}
+		} while (p != end);
 		s1 %= DIVISOR;
 		s2 %= DIVISOR;
 	}
 
 	return (s2 << 16) | s1;
 }
+
+#undef FUNCNAME
+#undef FUNCNAME_CHUNK
+#undef ATTRIBUTES
+#undef IMPL_ALIGNMENT
+#undef IMPL_SEGMENT_LEN
+#undef IMPL_MAX_CHUNK_LEN
+
 #endif 
 
-#ifdef DISPATCH
-static u32 adler32_dispatch(u32, const u8 *, size_t);
+#if defined(adler32_avx2) && HAVE_AVX2_NATIVE
+#define DEFAULT_IMPL	adler32_avx2
+#else
+static inline adler32_func_t
+arch_select_adler32_func(void)
+{
+	const u32 features MAYBE_UNUSED = get_x86_cpu_features();
 
-static volatile adler32_func_t adler32_impl = adler32_dispatch;
+#ifdef adler32_avx2
+	if (HAVE_AVX2(features))
+		return adler32_avx2;
+#endif
+#ifdef adler32_sse2
+	if (HAVE_SSE2(features))
+		return adler32_sse2;
+#endif
+	return NULL;
+}
+#define arch_select_adler32_func	arch_select_adler32_func
+#endif
+
+#endif 
+
+#endif
+
+#ifndef DEFAULT_IMPL
+#  define DEFAULT_IMPL adler32_generic
+#endif
+
+#ifdef arch_select_adler32_func
+static u32 adler32_dispatch_adler32(u32 adler, const u8 *p, size_t len);
+
+static volatile adler32_func_t adler32_impl = adler32_dispatch_adler32;
 
 
-static u32 adler32_dispatch(u32 adler, const u8 *buffer, size_t size)
+static u32 adler32_dispatch_adler32(u32 adler, const u8 *p, size_t len)
 {
 	adler32_func_t f = arch_select_adler32_func();
 
@@ -2632,20 +3090,21 @@ static u32 adler32_dispatch(u32 adler, const u8 *buffer, size_t size)
 		f = DEFAULT_IMPL;
 
 	adler32_impl = f;
-	return adler32_impl(adler, buffer, size);
+	return f(adler, p, len);
 }
 #else
-#  define adler32_impl DEFAULT_IMPL 
+
+#define adler32_impl DEFAULT_IMPL
 #endif
 
 LIBDEFLATEEXPORT u32 LIBDEFLATEAPI
-libdeflate_adler32(u32 adler, const void *buffer, size_t size)
+libdeflate_adler32(u32 adler, const void *buffer, size_t len)
 {
 	if (buffer == NULL) 
 		return 1;
-	return adler32_impl(adler, buffer, size);
+	return adler32_impl(adler, buffer, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate-1.7/lib/crc32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/crc32.c */
 
 
 
@@ -2663,253 +3122,27 @@ libdeflate_adler32(u32 adler, const void *buffer, size_t size)
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -2918,6 +3151,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -2933,87 +3175,115 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -3025,158 +3295,401 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
-}
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
 #endif
+}
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
+static forceinline u32 bswap32(u32 v)
 {
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
 #endif
+}
 
 
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
+static forceinline u64 bswap64(u64 v)
 {
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
 }
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
 
 
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
 #endif
 
 
 
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
 
 
 
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
+static forceinline u16
+get_unaligned_le16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
 }
-#endif
 
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
+static forceinline u16
+get_unaligned_be16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
 }
-#endif
 
-static forceinline unsigned
-bsrw(machine_word_t n)
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsr32(n);
+		return get_unaligned_le32(p);
 	else
-		return bsr64(n);
+		return get_unaligned_le64(p);
 }
 
 
 
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
 	}
-	return i;
 }
-#endif
 
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
 	}
-	return i;
 }
-#endif
 
-static forceinline unsigned
-bsfw(machine_word_t n)
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsf32(n);
+		put_unaligned_le32(v, p);
 	else
-		return bsf64(n);
+		put_unaligned_le64(v, p);
 }
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
 
 #endif 
 
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
 
 void *libdeflate_malloc(size_t size);
 void libdeflate_free(void *ptr);
@@ -3197,9 +3710,24 @@ void *memmove(void *dest, const void *src, size_t n);
 
 int memcmp(const void *s1, const void *s2, size_t n);
 #define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
 #include <string.h>
 #endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
 
 #endif 
 
@@ -3214,8 +3742,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	7
-#define LIBDEFLATE_VERSION_STRING	"1.7"
+#define LIBDEFLATE_VERSION_MINOR	14
+#define LIBDEFLATE_VERSION_STRING	"1.14"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -3232,21 +3760,13 @@ extern "C" {
 #  define LIBDEFLATEEXPORT
 #endif
 
-#if defined(_WIN32) && !defined(_WIN64)
-#  define LIBDEFLATEAPI_ABI	__stdcall
-#else
-#  define LIBDEFLATEAPI_ABI
-#endif
-
 #if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
 	defined(_WIN32) && !defined(_WIN64)
     
-#  define LIBDEFLATEAPI_STACKALIGN	__attribute__((force_align_arg_pointer))
+#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
 #else
-#  define LIBDEFLATEAPI_STACKALIGN
+#  define LIBDEFLATEAPI
 #endif
-
-#define LIBDEFLATEAPI	LIBDEFLATEAPI_ABI LIBDEFLATEAPI_STACKALIGN
 
 
 
@@ -3397,1758 +3917,337 @@ libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 
 #endif 
 
-
-typedef u32 (*crc32_func_t)(u32, const u8 *, size_t);
-
-
-#undef CRC32_SLICE1
-#undef CRC32_SLICE4
-#undef CRC32_SLICE8
-#undef DEFAULT_IMPL
-#undef DISPATCH
-#if defined(__arm__) || defined(__aarch64__)
-/* #  include "arm/crc32_impl.h" */
+/* #include "crc32_multipliers.h" */
 
 
-/* #include "arm-cpu_features.h" */
+#define CRC32_1VECS_MULT_1 0xae689191 
+#define CRC32_1VECS_MULT_2 0xccaa009e 
+#define CRC32_1VECS_MULTS { CRC32_1VECS_MULT_1, CRC32_1VECS_MULT_2 }
+
+#define CRC32_2VECS_MULT_1 0xf1da05aa 
+#define CRC32_2VECS_MULT_2 0x81256527 
+#define CRC32_2VECS_MULTS { CRC32_2VECS_MULT_1, CRC32_2VECS_MULT_2 }
+
+#define CRC32_3VECS_MULT_1 0x3db1ecdc 
+#define CRC32_3VECS_MULT_2 0xaf449247 
+#define CRC32_3VECS_MULTS { CRC32_3VECS_MULT_1, CRC32_3VECS_MULT_2 }
+
+#define CRC32_4VECS_MULT_1 0x8f352d95 
+#define CRC32_4VECS_MULT_2 0x1d9513d7 
+#define CRC32_4VECS_MULTS { CRC32_4VECS_MULT_1, CRC32_4VECS_MULT_2 }
+
+#define CRC32_5VECS_MULT_1 0x1c279815 
+#define CRC32_5VECS_MULT_2 0xae0b5394 
+#define CRC32_5VECS_MULTS { CRC32_5VECS_MULT_1, CRC32_5VECS_MULT_2 }
+
+#define CRC32_6VECS_MULT_1 0xdf068dc2 
+#define CRC32_6VECS_MULT_2 0x57c54819 
+#define CRC32_6VECS_MULTS { CRC32_6VECS_MULT_1, CRC32_6VECS_MULT_2 }
+
+#define CRC32_7VECS_MULT_1 0x31f8303f 
+#define CRC32_7VECS_MULT_2 0x0cbec0ed 
+#define CRC32_7VECS_MULTS { CRC32_7VECS_MULT_1, CRC32_7VECS_MULT_2 }
+
+#define CRC32_8VECS_MULT_1 0x33fff533 
+#define CRC32_8VECS_MULT_2 0x910eeec1 
+#define CRC32_8VECS_MULTS { CRC32_8VECS_MULT_1, CRC32_8VECS_MULT_2 }
+
+#define CRC32_9VECS_MULT_1 0x26b70c3d 
+#define CRC32_9VECS_MULT_2 0x3f41287a 
+#define CRC32_9VECS_MULTS { CRC32_9VECS_MULT_1, CRC32_9VECS_MULT_2 }
+
+#define CRC32_10VECS_MULT_1 0xe3543be0 
+#define CRC32_10VECS_MULT_2 0x9026d5b1 
+#define CRC32_10VECS_MULTS { CRC32_10VECS_MULT_1, CRC32_10VECS_MULT_2 }
+
+#define CRC32_11VECS_MULT_1 0x5a1bb05d 
+#define CRC32_11VECS_MULT_2 0xd1df2327 
+#define CRC32_11VECS_MULTS { CRC32_11VECS_MULT_1, CRC32_11VECS_MULT_2 }
+
+#define CRC32_12VECS_MULT_1 0x596c8d81 
+#define CRC32_12VECS_MULT_2 0xf5e48c85 
+#define CRC32_12VECS_MULTS { CRC32_12VECS_MULT_1, CRC32_12VECS_MULT_2 }
+
+#define CRC32_FINAL_MULT 0xb8bc6765 
+#define CRC32_BARRETT_CONSTANT_1 0x00000001f7011641ULL 
+#define CRC32_BARRETT_CONSTANT_2 0x00000001db710641ULL 
+#define CRC32_BARRETT_CONSTANTS { CRC32_BARRETT_CONSTANT_1, CRC32_BARRETT_CONSTANT_2 }
+
+#define CRC32_NUM_CHUNKS 4
+#define CRC32_MIN_VARIABLE_CHUNK_LEN 128UL
+#define CRC32_MAX_VARIABLE_CHUNK_LEN 16384UL
 
 
-#ifndef LIB_ARM_CPU_FEATURES_H
-#define LIB_ARM_CPU_FEATURES_H
-
-/* #include "lib_common.h" */
-
-
-#ifndef LIB_LIB_COMMON_H
-#define LIB_LIB_COMMON_H
-
-#ifdef LIBDEFLATE_H
-#  error "lib_common.h must always be included before libdeflate.h"
-   
-#endif
-
-#define BUILDING_LIBDEFLATE
-
-/* #include "../common/common_defs.h" */
-
-
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
-
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
+static const u32 crc32_mults_for_chunklen[][CRC32_NUM_CHUNKS - 1] MAYBE_UNUSED = {
+	{ 0  },
 	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
-#include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
-#endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
-#endif
-
-
-
-
-
-#include <stddef.h> 
-
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
-
-
-typedef size_t machine_word_t;
-
-
-#define WORDBYTES	((int)sizeof(machine_word_t))
-
-
-#define WORDBITS	(8 * WORDBYTES)
-
-
-
-
-
-
-#ifndef LIBEXPORT
-#  define LIBEXPORT
-#endif
-
-
-#ifndef inline
-#  define inline
-#endif
-
-
-#ifndef forceinline
-#  define forceinline inline
-#endif
-
-
-#ifndef restrict
-#  define restrict
-#endif
-
-
-#ifndef likely
-#  define likely(expr)		(expr)
-#endif
-
-
-#ifndef unlikely
-#  define unlikely(expr)	(expr)
-#endif
-
-
-#ifndef prefetchr
-#  define prefetchr(addr)
-#endif
-
-
-#ifndef prefetchw
-#  define prefetchw(addr)
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
-
-
-
-
-
-#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
-#define MIN(a, b)		((a) <= (b) ? (a) : (b))
-#define MAX(a, b)		((a) >= (b) ? (a) : (b))
-#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
-#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
-#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
-
-
-
-
-
-
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
-{
-	union {
-		unsigned int v;
-		unsigned char b;
-	} u;
-	u.v = 1;
-	return u.b;
-}
-#endif
-
-
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
-{
-	return (n << 8) | (n >> 8);
-}
-#endif
-
-
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
-
-#ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
-#else
-#include <string.h>
-#endif
-
-#endif 
-
-
-#if (defined(__arm__) || defined(__aarch64__)) && \
-	defined(__linux__) && \
-	COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
-	!defined(FREESTANDING)
-#  define ARM_CPU_FEATURES_ENABLED 1
-#else
-#  define ARM_CPU_FEATURES_ENABLED 0
-#endif
-
-#if ARM_CPU_FEATURES_ENABLED
-
-#define ARM_CPU_FEATURE_NEON		0x00000001
-#define ARM_CPU_FEATURE_PMULL		0x00000002
-#define ARM_CPU_FEATURE_CRC32		0x00000004
-
-#define ARM_CPU_FEATURES_KNOWN		0x80000000
-
-extern volatile u32 _cpu_features;
-
-void setup_cpu_features(void);
-
-static inline u32 get_cpu_features(void)
-{
-	if (_cpu_features == 0)
-		setup_cpu_features();
-	return _cpu_features;
-}
-
-#endif 
-
-#endif 
-
-
-
-#undef DISPATCH_ARM
-#if !defined(DEFAULT_IMPL) && \
-    (defined(__ARM_FEATURE_CRC32) || \
-     (ARM_CPU_FEATURES_ENABLED && COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS))
-#  ifdef __ARM_FEATURE_CRC32
-#    define ATTRIBUTES
-#    define DEFAULT_IMPL	crc32_arm
-#  else
-#    ifdef __arm__
-#      ifdef __clang__
-#        define ATTRIBUTES	__attribute__((target("armv8-a,crc")))
-#      else
-#        define ATTRIBUTES	__attribute__((target("arch=armv8-a+crc")))
-#      endif
-#    else
-#      ifdef __clang__
-#        define ATTRIBUTES	__attribute__((target("crc")))
-#      else
-#        define ATTRIBUTES	__attribute__((target("+crc")))
-#      endif
-#    endif
-#    define DISPATCH		1
-#    define DISPATCH_ARM	1
-#  endif
-
-
-#ifndef __ARM_FEATURE_CRC32
-#  define __ARM_FEATURE_CRC32	1
-#endif
-#include <arm_acle.h>
-
-static u32 ATTRIBUTES
-crc32_arm(u32 remainder, const u8 *p, size_t size)
-{
-	while (size != 0 && (uintptr_t)p & 7) {
-		remainder = __crc32b(remainder, *p++);
-		size--;
-	}
-
-	while (size >= 32) {
-		remainder = __crc32d(remainder, le64_bswap(*((u64 *)p + 0)));
-		remainder = __crc32d(remainder, le64_bswap(*((u64 *)p + 1)));
-		remainder = __crc32d(remainder, le64_bswap(*((u64 *)p + 2)));
-		remainder = __crc32d(remainder, le64_bswap(*((u64 *)p + 3)));
-		p += 32;
-		size -= 32;
-	}
-
-	while (size >= 8) {
-		remainder = __crc32d(remainder, le64_bswap(*(u64 *)p));
-		p += 8;
-		size -= 8;
-	}
-
-	while (size != 0) {
-		remainder = __crc32b(remainder, *p++);
-		size--;
-	}
-
-	return remainder;
-}
-#undef ATTRIBUTES
-#endif 
-
-
-#undef DISPATCH_PMULL
-#if !defined(DEFAULT_IMPL) && \
-    (defined(__ARM_FEATURE_CRYPTO) ||	\
-     (ARM_CPU_FEATURES_ENABLED &&	\
-      COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS)) && \
-       \
-    (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#  define FUNCNAME		crc32_pmull
-#  define FUNCNAME_ALIGNED	crc32_pmull_aligned
-#  ifdef __ARM_FEATURE_CRYPTO
-#    define ATTRIBUTES
-#    define DEFAULT_IMPL	crc32_pmull
-#  else
-#    ifdef __arm__
-#      define ATTRIBUTES	__attribute__((target("fpu=crypto-neon-fp-armv8")))
-#    else
-#      ifdef __clang__
-#        define ATTRIBUTES	__attribute__((target("crypto")))
-#      else
-#        define ATTRIBUTES	__attribute__((target("+crypto")))
-#      endif
-#    endif
-#    define DISPATCH		1
-#    define DISPATCH_PMULL	1
-#  endif
-
-#include <arm_neon.h>
-
-static forceinline ATTRIBUTES uint8x16_t
-clmul_00(uint8x16_t a, uint8x16_t b)
-{
-	return (uint8x16_t)vmull_p64((poly64_t)vget_low_u8(a),
-				     (poly64_t)vget_low_u8(b));
-}
-
-static forceinline ATTRIBUTES uint8x16_t
-clmul_10(uint8x16_t a, uint8x16_t b)
-{
-	return (uint8x16_t)vmull_p64((poly64_t)vget_low_u8(a),
-				     (poly64_t)vget_high_u8(b));
-}
-
-static forceinline ATTRIBUTES uint8x16_t
-clmul_11(uint8x16_t a, uint8x16_t b)
-{
-	return (uint8x16_t)vmull_high_p64((poly64x2_t)a, (poly64x2_t)b);
-}
-
-static forceinline ATTRIBUTES uint8x16_t
-fold_128b(uint8x16_t dst, uint8x16_t src, uint8x16_t multipliers)
-{
-	return dst ^ clmul_00(src, multipliers) ^ clmul_11(src, multipliers);
-}
-
-static forceinline ATTRIBUTES u32
-crc32_pmull_aligned(u32 remainder, const uint8x16_t *p, size_t nr_segs)
-{
+	{ 0xd31343ea , 0xe95c1271 , 0x910eeec1 , },
 	
-	const uint8x16_t multipliers_4 =
-		(uint8x16_t)(uint64x2_t){ 0x8F352D95, 0x1D9513D7 };
-	const uint8x16_t multipliers_1 =
-		(uint8x16_t)(uint64x2_t){ 0xAE689191, 0xCCAA009E };
-	const uint8x16_t final_multiplier =
-		(uint8x16_t)(uint64x2_t){ 0xB8BC6765 };
-	const uint8x16_t mask32 = (uint8x16_t)(uint32x4_t){ 0xFFFFFFFF };
-	const uint8x16_t barrett_reduction_constants =
-			(uint8x16_t)(uint64x2_t){ 0x00000001F7011641,
-						  0x00000001DB710641 };
-	const uint8x16_t zeroes = (uint8x16_t){ 0 };
-
-	const uint8x16_t * const end = p + nr_segs;
-	const uint8x16_t * const end512 = p + (nr_segs & ~3);
-	uint8x16_t x0, x1, x2, x3;
-
-	x0 = *p++ ^ (uint8x16_t)(uint32x4_t){ remainder };
-	if (nr_segs >= 4) {
-		x1 = *p++;
-		x2 = *p++;
-		x3 = *p++;
-
-		
-		while (p != end512) {
-			x0 = fold_128b(*p++, x0, multipliers_4);
-			x1 = fold_128b(*p++, x1, multipliers_4);
-			x2 = fold_128b(*p++, x2, multipliers_4);
-			x3 = fold_128b(*p++, x3, multipliers_4);
-		}
-
-		
-		x1 = fold_128b(x1, x0, multipliers_1);
-		x2 = fold_128b(x2, x1, multipliers_1);
-		x0 = fold_128b(x3, x2, multipliers_1);
-	}
-
+	{ 0x1d6708a0 , 0x0c30f51d , 0xe95c1271 , },
 	
-	while (p != end)
-		x0 = fold_128b(*p++, x0, multipliers_1);
-
+	{ 0xdb3839f3 , 0x1d6708a0 , 0xd31343ea , },
 	
-	x0 = vextq_u8(x0, zeroes, 8) ^ clmul_10(x0, multipliers_1);
-
+	{ 0x1753ab84 , 0xbbf2f6d6 , 0x0c30f51d , },
 	
-	x0 = vextq_u8(x0, zeroes, 4) ^ clmul_00(x0 & mask32, final_multiplier);
-
+	{ 0x3796455c , 0xb8e0e4a8 , 0xc352f6de , },
 	
-	x1 = x0;
-	x0 = clmul_00(x0 & mask32, barrett_reduction_constants);
-	x0 = clmul_10(x0 & mask32, barrett_reduction_constants);
-	return vgetq_lane_u32((uint32x4_t)(x0 ^ x1), 1);
-}
-#define IMPL_ALIGNMENT		16
-#define IMPL_SEGMENT_SIZE	16
-/* #include "crc32_vec_template.h" */
-
-
-#define CRC32_SLICE1	1
-static u32 crc32_slice1(u32, const u8 *, size_t);
-
-
-static u32 ATTRIBUTES
-FUNCNAME(u32 remainder, const u8 *p, size_t size)
-{
-	if ((uintptr_t)p % IMPL_ALIGNMENT) {
-		size_t n = MIN(size, -(uintptr_t)p % IMPL_ALIGNMENT);
-
-		remainder = crc32_slice1(remainder, p, n);
-		p += n;
-		size -= n;
-	}
-	if (size >= IMPL_SEGMENT_SIZE) {
-		remainder = FUNCNAME_ALIGNED(remainder, (const void *)p,
-					     size / IMPL_SEGMENT_SIZE);
-		p += size - (size % IMPL_SEGMENT_SIZE);
-		size %= IMPL_SEGMENT_SIZE;
-	}
-	return crc32_slice1(remainder, p, size);
-}
-
-#undef FUNCNAME
-#undef FUNCNAME_ALIGNED
-#undef ATTRIBUTES
-#undef IMPL_ALIGNMENT
-#undef IMPL_SEGMENT_SIZE
-
-#endif 
-
-#ifdef DISPATCH
-static inline crc32_func_t
-arch_select_crc32_func(void)
-{
-	u32 features = get_cpu_features();
-
-#ifdef DISPATCH_ARM
-	if (features & ARM_CPU_FEATURE_CRC32)
-		return crc32_arm;
-#endif
-#ifdef DISPATCH_PMULL
-	if (features & ARM_CPU_FEATURE_PMULL)
-		return crc32_pmull;
-#endif
-	return NULL;
-}
-#endif 
-
-#elif defined(__i386__) || defined(__x86_64__)
-/* #  include "x86/crc32_impl.h" */
-
-
-/* #include "x86-cpu_features.h" */
-
-
-#ifndef LIB_X86_CPU_FEATURES_H
-#define LIB_X86_CPU_FEATURES_H
-
-/* #include "lib_common.h" */
-
-
-#ifndef LIB_LIB_COMMON_H
-#define LIB_LIB_COMMON_H
-
-#ifdef LIBDEFLATE_H
-#  error "lib_common.h must always be included before libdeflate.h"
-   
-#endif
-
-#define BUILDING_LIBDEFLATE
-
-/* #include "../common/common_defs.h" */
-
-
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
-
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
+	{ 0x3954de39 , 0x1753ab84 , 0x1d6708a0 , },
 	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
-#include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
-#endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
-#endif
-
-
-
-
-
-#include <stddef.h> 
-
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
-
-
-typedef size_t machine_word_t;
-
-
-#define WORDBYTES	((int)sizeof(machine_word_t))
-
-
-#define WORDBITS	(8 * WORDBYTES)
-
-
-
-
-
-
-#ifndef LIBEXPORT
-#  define LIBEXPORT
-#endif
-
-
-#ifndef inline
-#  define inline
-#endif
-
-
-#ifndef forceinline
-#  define forceinline inline
-#endif
-
-
-#ifndef restrict
-#  define restrict
-#endif
-
-
-#ifndef likely
-#  define likely(expr)		(expr)
-#endif
-
-
-#ifndef unlikely
-#  define unlikely(expr)	(expr)
-#endif
-
-
-#ifndef prefetchr
-#  define prefetchr(addr)
-#endif
-
-
-#ifndef prefetchw
-#  define prefetchw(addr)
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
-
-
-
-
-
-#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
-#define MIN(a, b)		((a) <= (b) ? (a) : (b))
-#define MAX(a, b)		((a) >= (b) ? (a) : (b))
-#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
-#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
-#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
-
-
-
-
-
-
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
-{
-	union {
-		unsigned int v;
-		unsigned char b;
-	} u;
-	u.v = 1;
-	return u.b;
-}
-#endif
-
-
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
-{
-	return (n << 8) | (n >> 8);
-}
-#endif
-
-
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
-
-#ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
-#else
-#include <string.h>
-#endif
-
-#endif 
-
-
-#if (defined(__i386__) || defined(__x86_64__)) && \
-	COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define X86_CPU_FEATURES_ENABLED 1
-#else
-#  define X86_CPU_FEATURES_ENABLED 0
-#endif
-
-#if X86_CPU_FEATURES_ENABLED
-
-#define X86_CPU_FEATURE_SSE2		0x00000001
-#define X86_CPU_FEATURE_PCLMUL		0x00000002
-#define X86_CPU_FEATURE_AVX		0x00000004
-#define X86_CPU_FEATURE_AVX2		0x00000008
-#define X86_CPU_FEATURE_BMI2		0x00000010
-#define X86_CPU_FEATURE_AVX512BW	0x00000020
-
-#define X86_CPU_FEATURES_KNOWN		0x80000000
-
-extern volatile u32 _cpu_features;
-
-void setup_cpu_features(void);
-
-static inline u32 get_cpu_features(void)
-{
-	if (_cpu_features == 0)
-		setup_cpu_features();
-	return _cpu_features;
-}
-
-#endif 
-
-#endif 
-
-
-
-#undef DISPATCH_PCLMUL_AVX
-#if !defined(DEFAULT_IMPL) && !defined(__AVX__) &&	\
-	X86_CPU_FEATURES_ENABLED && COMPILER_SUPPORTS_AVX_TARGET &&	\
-	(defined(__PCLMUL__) || COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS)
-#  define FUNCNAME		crc32_pclmul_avx
-#  define FUNCNAME_ALIGNED	crc32_pclmul_avx_aligned
-#  define ATTRIBUTES		__attribute__((target("pclmul,avx")))
-#  define DISPATCH		1
-#  define DISPATCH_PCLMUL_AVX	1
-/* #include "x86-crc32_pclmul_template.h" */
-
-
-#include <wmmintrin.h>
-
-
-static u32 ATTRIBUTES
-FUNCNAME_ALIGNED(u32 remainder, const __m128i *p, size_t nr_segs)
-{
+	{ 0x632d78c5 , 0x3fc33de4 , 0x9a1b53c8 , },
 	
-	const __v2di multipliers_4 = (__v2di){ 0x8F352D95, 0x1D9513D7 };
-	const __v2di multipliers_2 = (__v2di){ 0xF1DA05AA, 0x81256527 };
-	const __v2di multipliers_1 = (__v2di){ 0xAE689191, 0xCCAA009E };
-	const __v2di final_multiplier = (__v2di){ 0xB8BC6765 };
-	const __m128i mask32 = (__m128i)(__v4si){ 0xFFFFFFFF };
-	const __v2di barrett_reduction_constants =
-			(__v2di){ 0x00000001F7011641, 0x00000001DB710641 };
-
-	const __m128i * const end = p + nr_segs;
-	const __m128i * const end512 = p + (nr_segs & ~3);
-	__m128i x0, x1, x2, x3;
-
+	{ 0xa0decef3 , 0x7b4aa8b7 , 0xbbf2f6d6 , },
 	
-	x0 = *p++;
-	x0 ^= (__m128i)(__v4si){ remainder };
-
-	if (p > end512) 
-		goto _128_bits_at_a_time;
-	x1 = *p++;
-	x2 = *p++;
-	x3 = *p++;
-
+	{ 0xe9c09bb0 , 0x3954de39 , 0xdb3839f3 , },
 	
-	for (; p != end512; p += 4) {
-		__m128i y0, y1, y2, y3;
-
-		y0 = p[0];
-		y1 = p[1];
-		y2 = p[2];
-		y3 = p[3];
-
-		
-		y0 ^= _mm_clmulepi64_si128(x0, multipliers_4, 0x00);
-		y1 ^= _mm_clmulepi64_si128(x1, multipliers_4, 0x00);
-		y2 ^= _mm_clmulepi64_si128(x2, multipliers_4, 0x00);
-		y3 ^= _mm_clmulepi64_si128(x3, multipliers_4, 0x00);
-		y0 ^= _mm_clmulepi64_si128(x0, multipliers_4, 0x11);
-		y1 ^= _mm_clmulepi64_si128(x1, multipliers_4, 0x11);
-		y2 ^= _mm_clmulepi64_si128(x2, multipliers_4, 0x11);
-		y3 ^= _mm_clmulepi64_si128(x3, multipliers_4, 0x11);
-
-		x0 = y0;
-		x1 = y1;
-		x2 = y2;
-		x3 = y3;
-	}
-
+	{ 0xd51917a4 , 0xcae68461 , 0xb8e0e4a8 , },
 	
-	x2 ^= _mm_clmulepi64_si128(x0, multipliers_2, 0x00);
-	x3 ^= _mm_clmulepi64_si128(x1, multipliers_2, 0x00);
-	x2 ^= _mm_clmulepi64_si128(x0, multipliers_2, 0x11);
-	x3 ^= _mm_clmulepi64_si128(x1, multipliers_2, 0x11);
-	x3 ^= _mm_clmulepi64_si128(x2, multipliers_1, 0x00);
-	x3 ^= _mm_clmulepi64_si128(x2, multipliers_1, 0x11);
-	x0 = x3;
-
-_128_bits_at_a_time:
-	while (p != end) {
-		
-		x1 = *p++;
-		x1 ^= _mm_clmulepi64_si128(x0, multipliers_1, 0x00);
-		x1 ^= _mm_clmulepi64_si128(x0, multipliers_1, 0x11);
-		x0 = x1;
-	}
-
+	{ 0x154a8a62 , 0x41e7589c , 0x3e9a43cd , },
 	
-
+	{ 0xf196555d , 0xa0decef3 , 0x1753ab84 , },
 	
-	x0 = _mm_srli_si128(x0, 8) ^
-	     _mm_clmulepi64_si128(x0, multipliers_1, 0x10);
-
+	{ 0x8eec2999 , 0xefb0a128 , 0x6044fbb0 , },
 	
-	x0 = _mm_srli_si128(x0, 4) ^
-	     _mm_clmulepi64_si128(x0 & mask32, final_multiplier, 0x00);
-
-        
-	x1 = x0;
-	x0 = _mm_clmulepi64_si128(x0 & mask32, barrett_reduction_constants, 0x00);
-	x0 = _mm_clmulepi64_si128(x0 & mask32, barrett_reduction_constants, 0x10);
-	return _mm_cvtsi128_si32(_mm_srli_si128(x0 ^ x1, 4));
-}
-
-#define IMPL_ALIGNMENT		16
-#define IMPL_SEGMENT_SIZE	16
-/* #include "crc32_vec_template.h" */
-
-
-#define CRC32_SLICE1	1
-static u32 crc32_slice1(u32, const u8 *, size_t);
-
-
-static u32 ATTRIBUTES
-FUNCNAME(u32 remainder, const u8 *p, size_t size)
-{
-	if ((uintptr_t)p % IMPL_ALIGNMENT) {
-		size_t n = MIN(size, -(uintptr_t)p % IMPL_ALIGNMENT);
-
-		remainder = crc32_slice1(remainder, p, n);
-		p += n;
-		size -= n;
-	}
-	if (size >= IMPL_SEGMENT_SIZE) {
-		remainder = FUNCNAME_ALIGNED(remainder, (const void *)p,
-					     size / IMPL_SEGMENT_SIZE);
-		p += size - (size % IMPL_SEGMENT_SIZE);
-		size %= IMPL_SEGMENT_SIZE;
-	}
-	return crc32_slice1(remainder, p, size);
-}
-
-#undef FUNCNAME
-#undef FUNCNAME_ALIGNED
-#undef ATTRIBUTES
-#undef IMPL_ALIGNMENT
-#undef IMPL_SEGMENT_SIZE
-
-
-#endif
-
-
-#undef DISPATCH_PCLMUL
-#if !defined(DEFAULT_IMPL) &&	\
-	(defined(__PCLMUL__) || (X86_CPU_FEATURES_ENABLED &&	\
-				 COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS))
-#  define FUNCNAME		crc32_pclmul
-#  define FUNCNAME_ALIGNED	crc32_pclmul_aligned
-#  ifdef __PCLMUL__
-#    define ATTRIBUTES
-#    define DEFAULT_IMPL	crc32_pclmul
-#  else
-#    define ATTRIBUTES		__attribute__((target("pclmul")))
-#    define DISPATCH		1
-#    define DISPATCH_PCLMUL	1
-#  endif
-/* #include "x86-crc32_pclmul_template.h" */
-
-
-#include <wmmintrin.h>
-
-
-static u32 ATTRIBUTES
-FUNCNAME_ALIGNED(u32 remainder, const __m128i *p, size_t nr_segs)
-{
+	{ 0x27892abf , 0x48d72bb1 , 0x3fc33de4 , },
 	
-	const __v2di multipliers_4 = (__v2di){ 0x8F352D95, 0x1D9513D7 };
-	const __v2di multipliers_2 = (__v2di){ 0xF1DA05AA, 0x81256527 };
-	const __v2di multipliers_1 = (__v2di){ 0xAE689191, 0xCCAA009E };
-	const __v2di final_multiplier = (__v2di){ 0xB8BC6765 };
-	const __m128i mask32 = (__m128i)(__v4si){ 0xFFFFFFFF };
-	const __v2di barrett_reduction_constants =
-			(__v2di){ 0x00000001F7011641, 0x00000001DB710641 };
-
-	const __m128i * const end = p + nr_segs;
-	const __m128i * const end512 = p + (nr_segs & ~3);
-	__m128i x0, x1, x2, x3;
-
+	{ 0x77bc2419 , 0xd51917a4 , 0x3796455c , },
 	
-	x0 = *p++;
-	x0 ^= (__m128i)(__v4si){ remainder };
-
-	if (p > end512) 
-		goto _128_bits_at_a_time;
-	x1 = *p++;
-	x2 = *p++;
-	x3 = *p++;
-
+	{ 0xcea114a5 , 0x68c0a2c5 , 0x7b4aa8b7 , },
 	
-	for (; p != end512; p += 4) {
-		__m128i y0, y1, y2, y3;
-
-		y0 = p[0];
-		y1 = p[1];
-		y2 = p[2];
-		y3 = p[3];
-
-		
-		y0 ^= _mm_clmulepi64_si128(x0, multipliers_4, 0x00);
-		y1 ^= _mm_clmulepi64_si128(x1, multipliers_4, 0x00);
-		y2 ^= _mm_clmulepi64_si128(x2, multipliers_4, 0x00);
-		y3 ^= _mm_clmulepi64_si128(x3, multipliers_4, 0x00);
-		y0 ^= _mm_clmulepi64_si128(x0, multipliers_4, 0x11);
-		y1 ^= _mm_clmulepi64_si128(x1, multipliers_4, 0x11);
-		y2 ^= _mm_clmulepi64_si128(x2, multipliers_4, 0x11);
-		y3 ^= _mm_clmulepi64_si128(x3, multipliers_4, 0x11);
-
-		x0 = y0;
-		x1 = y1;
-		x2 = y2;
-		x3 = y3;
-	}
-
+	{ 0xa1077e85 , 0x188cc628 , 0x0c21f835 , },
 	
-	x2 ^= _mm_clmulepi64_si128(x0, multipliers_2, 0x00);
-	x3 ^= _mm_clmulepi64_si128(x1, multipliers_2, 0x00);
-	x2 ^= _mm_clmulepi64_si128(x0, multipliers_2, 0x11);
-	x3 ^= _mm_clmulepi64_si128(x1, multipliers_2, 0x11);
-	x3 ^= _mm_clmulepi64_si128(x2, multipliers_1, 0x00);
-	x3 ^= _mm_clmulepi64_si128(x2, multipliers_1, 0x11);
-	x0 = x3;
-
-_128_bits_at_a_time:
-	while (p != end) {
-		
-		x1 = *p++;
-		x1 ^= _mm_clmulepi64_si128(x0, multipliers_1, 0x00);
-		x1 ^= _mm_clmulepi64_si128(x0, multipliers_1, 0x11);
-		x0 = x1;
-	}
-
+	{ 0xc5ed75e1 , 0xf196555d , 0x3954de39 , },
 	
-
+	{ 0xca4fba3f , 0x0acfa26f , 0x6cb21510 , },
 	
-	x0 = _mm_srli_si128(x0, 8) ^
-	     _mm_clmulepi64_si128(x0, multipliers_1, 0x10);
-
+	{ 0xcf5bcdc4 , 0x4fae7fc0 , 0xcae68461 , },
 	
-	x0 = _mm_srli_si128(x0, 4) ^
-	     _mm_clmulepi64_si128(x0 & mask32, final_multiplier, 0x00);
+	{ 0xf36b9d16 , 0x27892abf , 0x632d78c5 , },
+	
+	{ 0xf76fd988 , 0xed5c39b1 , 0x41e7589c , },
+	
+	{ 0x6c45d92e , 0xff809fcd , 0x0c46baec , },
+	
+	{ 0x6116b82b , 0xcea114a5 , 0xa0decef3 , },
+	
+	{ 0x4d9899bb , 0x9f9d8d9c , 0x53deb236 , },
+	
+	{ 0x3e7c93b9 , 0x6666b805 , 0xefb0a128 , },
+	
+	{ 0x388b20ac , 0xc5ed75e1 , 0xe9c09bb0 , },
+	
+	{ 0x0956d953 , 0x97fbdb14 , 0x48d72bb1 , },
+	
+	{ 0x55cb4dfe , 0x1b37c832 , 0xc07331b3 , },
+	
+	{ 0x52222fea , 0xcf5bcdc4 , 0xd51917a4 , },
+	
+	{ 0x0603989b , 0xb03c8112 , 0x5e04b9a5 , },
+	
+	{ 0x4470c029 , 0x2339d155 , 0x68c0a2c5 , },
+	
+	{ 0xb6f35093 , 0xf76fd988 , 0x154a8a62 , },
+	
+	{ 0xc46805ba , 0x416f9449 , 0x188cc628 , },
+	
+	{ 0xc3876592 , 0x4b809189 , 0xc35cf6e7 , },
+	
+	{ 0x5b0c98b9 , 0x6116b82b , 0xf196555d , },
+	
+	{ 0x30d13e5f , 0x4c5a315a , 0x8c224466 , },
+	
+	{ 0x54afca53 , 0xbccfa2c1 , 0x0acfa26f , },
+	
+	{ 0x93102436 , 0x3e7c93b9 , 0x8eec2999 , },
+	
+	{ 0xbd2655a8 , 0x3e116c9d , 0x4fae7fc0 , },
+	
+	{ 0x70cd7f26 , 0x408e57f2 , 0x1691be45 , },
+	
+	{ 0x2d546c53 , 0x0956d953 , 0x27892abf , },
+	
+	{ 0xb53410a8 , 0x42ebf0ad , 0x161f3c12 , },
+	
+	{ 0x67a93f75 , 0xcf3233e4 , 0xed5c39b1 , },
+	
+	{ 0x9830ac33 , 0x52222fea , 0x77bc2419 , },
+	
+	{ 0xb0b6fc3e , 0x2fde73f8 , 0xff809fcd , },
+	
+	{ 0x84170f16 , 0xced90d99 , 0x30de0f98 , },
+	
+	{ 0xd7017a0c , 0x4470c029 , 0xcea114a5 , },
+	
+	{ 0xadb25de6 , 0x84f40beb , 0x2b7e0e1b , },
+	
+	{ 0x8282fddc , 0xec855937 , 0x9f9d8d9c , },
+	
+	{ 0x46362bee , 0xc46805ba , 0xa1077e85 , },
+	
+	{ 0xb9077a01 , 0xdf7a24ac , 0x6666b805 , },
+	
+	{ 0xf51d9bc6 , 0x2b52dc39 , 0x7e774cf6 , },
+	
+	{ 0x4ca19a29 , 0x5b0c98b9 , 0xc5ed75e1 , },
+	
+	{ 0xdc0fc3fc , 0xb939fcdf , 0x3678fed2 , },
+	
+	{ 0x63c3d167 , 0x70f9947d , 0x97fbdb14 , },
+	
+	{ 0x5851d254 , 0x54afca53 , 0xca4fba3f , },
+	
+	{ 0xfeacf2a1 , 0x7a3c0a6a , 0x1b37c832 , },
+	
+	{ 0x93b7edc8 , 0x1fea4d2a , 0x58fa96ee , },
+	
+	{ 0x5539e44a , 0xbd2655a8 , 0xcf5bcdc4 , },
+	
+	{ 0xde32a3d2 , 0x4ff61aa1 , 0x6a6a3694 , },
+	
+	{ 0xf0baeeb6 , 0x7ae2f6f4 , 0xb03c8112 , },
+	
+	{ 0xbe15887f , 0x2d546c53 , 0xf36b9d16 , },
+	
+	{ 0x64f34a05 , 0xe0ee5efe , 0x2339d155 , },
+	
+	{ 0x1b6d1aea , 0xfeafb67c , 0x4fb001a8 , },
+	
+	{ 0x82adb0b8 , 0x67a93f75 , 0xf76fd988 , },
+	
+	{ 0x694587c7 , 0x3b34408b , 0xeccb2978 , },
+	
+	{ 0xd2fc57c3 , 0x07fcf8c6 , 0x416f9449 , },
+	
+	{ 0x9dd6837c , 0xb0b6fc3e , 0x6c45d92e , },
+	
+	{ 0x3a9d1f97 , 0xefd033b2 , 0x4b809189 , },
+	
+	{ 0x1eee1d2a , 0xf2a6e46e , 0x55b4c814 , },
+	
+	{ 0xb57c7728 , 0xd7017a0c , 0x6116b82b , },
+	
+	{ 0xf2fc5d61 , 0x242aac86 , 0x05245cf0 , },
+	
+	{ 0x26387824 , 0xc15c4ca5 , 0x4c5a315a , },
+	
+	{ 0x8c151e77 , 0x8282fddc , 0x4d9899bb , },
+	
+	{ 0x8ea1f680 , 0xf5ff6cdd , 0xbccfa2c1 , },
+	
+	{ 0xe8cf3d2a , 0x338b1fb1 , 0xeda61f70 , },
+	
+	{ 0x21f15b59 , 0xb9077a01 , 0x3e7c93b9 , },
+	
+	{ 0x6f68d64a , 0x901b0161 , 0xb9fd3537 , },
+	
+	{ 0x71b74d95 , 0xf5ddd5ad , 0x3e116c9d , },
+	
+	{ 0x4c2e7261 , 0x4ca19a29 , 0x388b20ac , },
+	
+	{ 0x8a2d38e8 , 0xd27ee0a1 , 0x408e57f2 , },
+	
+	{ 0x7e58ca17 , 0x69dfedd2 , 0x3a76805e , },
+	
+	{ 0xf997967f , 0x63c3d167 , 0x0956d953 , },
+	
+	{ 0x48215963 , 0x71e1dfe0 , 0x42a6d410 , },
+	
+	{ 0xa704b94c , 0x679f198a , 0x42ebf0ad , },
+	
+	{ 0x1d699056 , 0xfeacf2a1 , 0x55cb4dfe , },
+	
+	{ 0x6800bcc5 , 0x16024f15 , 0xcf3233e4 , },
+	
+	{ 0x2d48e4ca , 0xbe61582f , 0x46026283 , },
+	
+	{ 0x4c4c2b55 , 0x5539e44a , 0x52222fea , },
+	
+	{ 0xd8ce94cb , 0xbc613c26 , 0x33776b4b , },
+	
+	{ 0xd0b5a02b , 0x490d3cc6 , 0x2fde73f8 , },
+	
+	{ 0xa223f7ec , 0xf0baeeb6 , 0x0603989b , },
+	
+	{ 0x58de337a , 0x3bf3d597 , 0xced90d99 , },
+	
+	{ 0x37f5d8f4 , 0x4d5b699b , 0xd7262e5f , },
+	
+	{ 0xfa8a435d , 0x64f34a05 , 0x4470c029 , },
+	
+	{ 0x238709fe , 0x52e7458f , 0x9a174cd3 , },
+	
+	{ 0x9e1ba6f5 , 0xef0272f7 , 0x84f40beb , },
+	
+	{ 0xcd8b57fa , 0x82adb0b8 , 0xb6f35093 , },
+	
+	{ 0x0aed142f , 0xb1650290 , 0xec855937 , },
+	
+	{ 0xd1f064db , 0x6e7340d3 , 0x5c28cb52 , },
+	
+	{ 0x464ac895 , 0xd2fc57c3 , 0xc46805ba , },
+	
+	{ 0xa0e6beea , 0xcfeec3d0 , 0x0225d214 , },
+	
+	{ 0x78703ce0 , 0xc60f6075 , 0xdf7a24ac , },
+	
+	{ 0xfea48165 , 0x3a9d1f97 , 0xc3876592 , },
+	
+	{ 0xdb89b8db , 0xa6172211 , 0x2b52dc39 , },
+	
+	{ 0x7ca03731 , 0x1db42849 , 0xc5df246e , },
+	
+	{ 0x8801d0aa , 0xb57c7728 , 0x5b0c98b9 , },
+	
+	{ 0xf89cd7f0 , 0xcc396a0b , 0xdb799c51 , },
+	
+	{ 0x1611a808 , 0xaeae6105 , 0xb939fcdf , },
+	
+	{ 0xe3cdb888 , 0x26387824 , 0x30d13e5f , },
+	
+	{ 0x552a4cf6 , 0xee2d04bb , 0x70f9947d , },
+	
+	{ 0x85e248e9 , 0x0a79663f , 0x53339cf7 , },
+	
+	{ 0x1c61c3e9 , 0x8ea1f680 , 0x54afca53 , },
+	
+	{ 0xb14cfc2b , 0x2e073302 , 0x10897992 , },
+	
+	{ 0x6ec444cc , 0x9e819f13 , 0x7a3c0a6a , },
+	
+	{ 0xe2fa5f80 , 0x21f15b59 , 0x93102436 , },
+	
+	{ 0x6d33f4c6 , 0x31a27455 , 0x1fea4d2a , },
+	
+	{ 0xb6dec609 , 0x4d437056 , 0x42eb1e2a , },
+	
+	{ 0x1846c518 , 0x71b74d95 , 0xbd2655a8 , },
+	
+	{ 0x9f947f8a , 0x2b501619 , 0xa4924b0e , },
+	
+	{ 0xb7442f4d , 0xba30a5d8 , 0x4ff61aa1 , },
+	
+	{ 0xe2c93242 , 0x8a2d38e8 , 0x70cd7f26 , },
+	
+	{ 0xcd6863df , 0x78fd88dc , 0x7ae2f6f4 , },
+	
+	{ 0xd512001d , 0xe6612dff , 0x5c4d0ca9 , },
+	
+	{ 0x4e8d6b6c , 0xf997967f , 0x2d546c53 , },
+	
+	{ 0xfa653ba1 , 0xc99014d4 , 0xa0c9fd27 , },
+	
+	{ 0x49893408 , 0x29c2448b , 0xe0ee5efe , },
+};
 
-        
-	x1 = x0;
-	x0 = _mm_clmulepi64_si128(x0 & mask32, barrett_reduction_constants, 0x00);
-	x0 = _mm_clmulepi64_si128(x0 & mask32, barrett_reduction_constants, 0x10);
-	return _mm_cvtsi128_si32(_mm_srli_si128(x0 ^ x1, 4));
-}
 
-#define IMPL_ALIGNMENT		16
-#define IMPL_SEGMENT_SIZE	16
-/* #include "crc32_vec_template.h" */
+#define CRC32_FIXED_CHUNK_LEN 32768UL
+#define CRC32_FIXED_CHUNK_MULT_1 0x29c2448b 
+#define CRC32_FIXED_CHUNK_MULT_2 0x4b912f53 
+#define CRC32_FIXED_CHUNK_MULT_3 0x454c93be 
+
+/* #include "crc32_tables.h" */
 
 
-#define CRC32_SLICE1	1
-static u32 crc32_slice1(u32, const u8 *, size_t);
-
-
-static u32 ATTRIBUTES
-FUNCNAME(u32 remainder, const u8 *p, size_t size)
-{
-	if ((uintptr_t)p % IMPL_ALIGNMENT) {
-		size_t n = MIN(size, -(uintptr_t)p % IMPL_ALIGNMENT);
-
-		remainder = crc32_slice1(remainder, p, n);
-		p += n;
-		size -= n;
-	}
-	if (size >= IMPL_SEGMENT_SIZE) {
-		remainder = FUNCNAME_ALIGNED(remainder, (const void *)p,
-					     size / IMPL_SEGMENT_SIZE);
-		p += size - (size % IMPL_SEGMENT_SIZE);
-		size %= IMPL_SEGMENT_SIZE;
-	}
-	return crc32_slice1(remainder, p, size);
-}
-
-#undef FUNCNAME
-#undef FUNCNAME_ALIGNED
-#undef ATTRIBUTES
-#undef IMPL_ALIGNMENT
-#undef IMPL_SEGMENT_SIZE
-
-
-#endif
-
-#ifdef DISPATCH
-static inline crc32_func_t
-arch_select_crc32_func(void)
-{
-	u32 features = get_cpu_features();
-
-#ifdef DISPATCH_PCLMUL_AVX
-	if ((features & X86_CPU_FEATURE_PCLMUL) &&
-	    (features & X86_CPU_FEATURE_AVX))
-		return crc32_pclmul_avx;
-#endif
-#ifdef DISPATCH_PCLMUL
-	if (features & X86_CPU_FEATURE_PCLMUL)
-		return crc32_pclmul;
-#endif
-	return NULL;
-}
-#endif 
-
-#endif
-
-
-
-#ifndef DEFAULT_IMPL
-#  define CRC32_SLICE8	1
-#  define DEFAULT_IMPL	crc32_slice8
-#endif
-
-#if defined(CRC32_SLICE1) || defined(CRC32_SLICE4) || defined(CRC32_SLICE8)
-/* #include "crc32_table.h" */
-
-
-#include <stdint.h>
-
-static const uint32_t crc32_table[] = {
+static const u32 crc32_slice1_table[] MAYBE_UNUSED = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
 	0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
 	0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
@@ -5213,7 +4312,73 @@ static const uint32_t crc32_table[] = {
 	0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf,
 	0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94,
 	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d,
-#if defined(CRC32_SLICE4) || defined(CRC32_SLICE8)
+};
+
+static const u32 crc32_slice8_table[] MAYBE_UNUSED = {
+	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
+	0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
+	0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
+	0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91,
+	0x1db71064, 0x6ab020f2, 0xf3b97148, 0x84be41de,
+	0x1adad47d, 0x6ddde4eb, 0xf4d4b551, 0x83d385c7,
+	0x136c9856, 0x646ba8c0, 0xfd62f97a, 0x8a65c9ec,
+	0x14015c4f, 0x63066cd9, 0xfa0f3d63, 0x8d080df5,
+	0x3b6e20c8, 0x4c69105e, 0xd56041e4, 0xa2677172,
+	0x3c03e4d1, 0x4b04d447, 0xd20d85fd, 0xa50ab56b,
+	0x35b5a8fa, 0x42b2986c, 0xdbbbc9d6, 0xacbcf940,
+	0x32d86ce3, 0x45df5c75, 0xdcd60dcf, 0xabd13d59,
+	0x26d930ac, 0x51de003a, 0xc8d75180, 0xbfd06116,
+	0x21b4f4b5, 0x56b3c423, 0xcfba9599, 0xb8bda50f,
+	0x2802b89e, 0x5f058808, 0xc60cd9b2, 0xb10be924,
+	0x2f6f7c87, 0x58684c11, 0xc1611dab, 0xb6662d3d,
+	0x76dc4190, 0x01db7106, 0x98d220bc, 0xefd5102a,
+	0x71b18589, 0x06b6b51f, 0x9fbfe4a5, 0xe8b8d433,
+	0x7807c9a2, 0x0f00f934, 0x9609a88e, 0xe10e9818,
+	0x7f6a0dbb, 0x086d3d2d, 0x91646c97, 0xe6635c01,
+	0x6b6b51f4, 0x1c6c6162, 0x856530d8, 0xf262004e,
+	0x6c0695ed, 0x1b01a57b, 0x8208f4c1, 0xf50fc457,
+	0x65b0d9c6, 0x12b7e950, 0x8bbeb8ea, 0xfcb9887c,
+	0x62dd1ddf, 0x15da2d49, 0x8cd37cf3, 0xfbd44c65,
+	0x4db26158, 0x3ab551ce, 0xa3bc0074, 0xd4bb30e2,
+	0x4adfa541, 0x3dd895d7, 0xa4d1c46d, 0xd3d6f4fb,
+	0x4369e96a, 0x346ed9fc, 0xad678846, 0xda60b8d0,
+	0x44042d73, 0x33031de5, 0xaa0a4c5f, 0xdd0d7cc9,
+	0x5005713c, 0x270241aa, 0xbe0b1010, 0xc90c2086,
+	0x5768b525, 0x206f85b3, 0xb966d409, 0xce61e49f,
+	0x5edef90e, 0x29d9c998, 0xb0d09822, 0xc7d7a8b4,
+	0x59b33d17, 0x2eb40d81, 0xb7bd5c3b, 0xc0ba6cad,
+	0xedb88320, 0x9abfb3b6, 0x03b6e20c, 0x74b1d29a,
+	0xead54739, 0x9dd277af, 0x04db2615, 0x73dc1683,
+	0xe3630b12, 0x94643b84, 0x0d6d6a3e, 0x7a6a5aa8,
+	0xe40ecf0b, 0x9309ff9d, 0x0a00ae27, 0x7d079eb1,
+	0xf00f9344, 0x8708a3d2, 0x1e01f268, 0x6906c2fe,
+	0xf762575d, 0x806567cb, 0x196c3671, 0x6e6b06e7,
+	0xfed41b76, 0x89d32be0, 0x10da7a5a, 0x67dd4acc,
+	0xf9b9df6f, 0x8ebeeff9, 0x17b7be43, 0x60b08ed5,
+	0xd6d6a3e8, 0xa1d1937e, 0x38d8c2c4, 0x4fdff252,
+	0xd1bb67f1, 0xa6bc5767, 0x3fb506dd, 0x48b2364b,
+	0xd80d2bda, 0xaf0a1b4c, 0x36034af6, 0x41047a60,
+	0xdf60efc3, 0xa867df55, 0x316e8eef, 0x4669be79,
+	0xcb61b38c, 0xbc66831a, 0x256fd2a0, 0x5268e236,
+	0xcc0c7795, 0xbb0b4703, 0x220216b9, 0x5505262f,
+	0xc5ba3bbe, 0xb2bd0b28, 0x2bb45a92, 0x5cb36a04,
+	0xc2d7ffa7, 0xb5d0cf31, 0x2cd99e8b, 0x5bdeae1d,
+	0x9b64c2b0, 0xec63f226, 0x756aa39c, 0x026d930a,
+	0x9c0906a9, 0xeb0e363f, 0x72076785, 0x05005713,
+	0x95bf4a82, 0xe2b87a14, 0x7bb12bae, 0x0cb61b38,
+	0x92d28e9b, 0xe5d5be0d, 0x7cdcefb7, 0x0bdbdf21,
+	0x86d3d2d4, 0xf1d4e242, 0x68ddb3f8, 0x1fda836e,
+	0x81be16cd, 0xf6b9265b, 0x6fb077e1, 0x18b74777,
+	0x88085ae6, 0xff0f6a70, 0x66063bca, 0x11010b5c,
+	0x8f659eff, 0xf862ae69, 0x616bffd3, 0x166ccf45,
+	0xa00ae278, 0xd70dd2ee, 0x4e048354, 0x3903b3c2,
+	0xa7672661, 0xd06016f7, 0x4969474d, 0x3e6e77db,
+	0xaed16a4a, 0xd9d65adc, 0x40df0b66, 0x37d83bf0,
+	0xa9bcae53, 0xdebb9ec5, 0x47b2cf7f, 0x30b5ffe9,
+	0xbdbdf21c, 0xcabac28a, 0x53b39330, 0x24b4a3a6,
+	0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf,
+	0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94,
+	0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d,
 	0x00000000, 0x191b3141, 0x32366282, 0x2b2d53c3,
 	0x646cc504, 0x7d77f445, 0x565aa786, 0x4f4196c7,
 	0xc8d98a08, 0xd1c2bb49, 0xfaefe88a, 0xe3f4d9cb,
@@ -5406,8 +4571,6 @@ static const uint32_t crc32_table[] = {
 	0x090481f0, 0xb1b8e695, 0xa30d497b, 0x1bb12e1e,
 	0x43d23e48, 0xfb6e592d, 0xe9dbf6c3, 0x516791a6,
 	0xccb0a91f, 0x740cce7a, 0x66b96194, 0xde0506f1,
-#endif 
-#if defined(CRC32_SLICE8)
 	0x00000000, 0x3d6029b0, 0x7ac05360, 0x47a07ad0,
 	0xf580a6c0, 0xc8e08f70, 0x8f40f5a0, 0xb220dc10,
 	0x30704bc1, 0x0d106271, 0x4ab018a1, 0x77d03111,
@@ -5664,128 +4827,67 @@ static const uint32_t crc32_table[] = {
 	0x7b211ab0, 0xb78b1a2e, 0x39041dcd, 0xf5ae1d53,
 	0x2c8e0fff, 0xe0240f61, 0x6eab0882, 0xa201081c,
 	0xa8c40105, 0x646e019b, 0xeae10678, 0x264b06e6,
-#endif 
 };
 
-static forceinline u32
-crc32_update_byte(u32 remainder, u8 next_byte)
+
+
+static u32 MAYBE_UNUSED
+crc32_slice8(u32 crc, const u8 *p, size_t len)
 {
-	return (remainder >> 8) ^ crc32_table[(u8)remainder ^ next_byte];
-}
-#endif
-
-#ifdef CRC32_SLICE1
-static u32
-crc32_slice1(u32 remainder, const u8 *buffer, size_t size)
-{
-	size_t i;
-
-	STATIC_ASSERT(ARRAY_LEN(crc32_table) >= 0x100);
-
-	for (i = 0; i < size; i++)
-		remainder = crc32_update_byte(remainder, buffer[i]);
-	return remainder;
-}
-#endif 
-
-#ifdef CRC32_SLICE4
-static u32
-crc32_slice4(u32 remainder, const u8 *buffer, size_t size)
-{
-	const u8 *p = buffer;
-	const u8 *end = buffer + size;
-	const u8 *end32;
-
-	STATIC_ASSERT(ARRAY_LEN(crc32_table) >= 0x400);
-
-	for (; ((uintptr_t)p & 3) && p != end; p++)
-		remainder = crc32_update_byte(remainder, *p);
-
-	end32 = p + ((end - p) & ~3);
-	for (; p != end32; p += 4) {
-		u32 v = le32_bswap(*(const u32 *)p);
-		remainder =
-		    crc32_table[0x300 + (u8)((remainder ^ v) >>  0)] ^
-		    crc32_table[0x200 + (u8)((remainder ^ v) >>  8)] ^
-		    crc32_table[0x100 + (u8)((remainder ^ v) >> 16)] ^
-		    crc32_table[0x000 + (u8)((remainder ^ v) >> 24)];
-	}
-
-	for (; p != end; p++)
-		remainder = crc32_update_byte(remainder, *p);
-
-	return remainder;
-}
-#endif 
-
-#ifdef CRC32_SLICE8
-static u32
-crc32_slice8(u32 remainder, const u8 *buffer, size_t size)
-{
-	const u8 *p = buffer;
-	const u8 *end = buffer + size;
+	const u8 * const end = p + len;
 	const u8 *end64;
 
-	STATIC_ASSERT(ARRAY_LEN(crc32_table) >= 0x800);
-
 	for (; ((uintptr_t)p & 7) && p != end; p++)
-		remainder = crc32_update_byte(remainder, *p);
+		crc = (crc >> 8) ^ crc32_slice8_table[(u8)crc ^ *p];
 
 	end64 = p + ((end - p) & ~7);
 	for (; p != end64; p += 8) {
 		u32 v1 = le32_bswap(*(const u32 *)(p + 0));
 		u32 v2 = le32_bswap(*(const u32 *)(p + 4));
-		remainder =
-		    crc32_table[0x700 + (u8)((remainder ^ v1) >>  0)] ^
-		    crc32_table[0x600 + (u8)((remainder ^ v1) >>  8)] ^
-		    crc32_table[0x500 + (u8)((remainder ^ v1) >> 16)] ^
-		    crc32_table[0x400 + (u8)((remainder ^ v1) >> 24)] ^
-		    crc32_table[0x300 + (u8)(v2 >>  0)] ^
-		    crc32_table[0x200 + (u8)(v2 >>  8)] ^
-		    crc32_table[0x100 + (u8)(v2 >> 16)] ^
-		    crc32_table[0x000 + (u8)(v2 >> 24)];
+
+		crc = crc32_slice8_table[0x700 + (u8)((crc ^ v1) >> 0)] ^
+		      crc32_slice8_table[0x600 + (u8)((crc ^ v1) >> 8)] ^
+		      crc32_slice8_table[0x500 + (u8)((crc ^ v1) >> 16)] ^
+		      crc32_slice8_table[0x400 + (u8)((crc ^ v1) >> 24)] ^
+		      crc32_slice8_table[0x300 + (u8)(v2 >> 0)] ^
+		      crc32_slice8_table[0x200 + (u8)(v2 >> 8)] ^
+		      crc32_slice8_table[0x100 + (u8)(v2 >> 16)] ^
+		      crc32_slice8_table[0x000 + (u8)(v2 >> 24)];
 	}
 
 	for (; p != end; p++)
-		remainder = crc32_update_byte(remainder, *p);
+		crc = (crc >> 8) ^ crc32_slice8_table[(u8)crc ^ *p];
 
-	return remainder;
+	return crc;
 }
-#endif 
-
-#ifdef DISPATCH
-static u32 crc32_dispatch(u32, const u8 *, size_t);
-
-static volatile crc32_func_t crc32_impl = crc32_dispatch;
 
 
-static u32 crc32_dispatch(u32 remainder, const u8 *buffer, size_t size)
+static forceinline u32 MAYBE_UNUSED
+crc32_slice1(u32 crc, const u8 *p, size_t len)
 {
-	crc32_func_t f = arch_select_crc32_func();
+	size_t i;
 
-	if (f == NULL)
-		f = DEFAULT_IMPL;
-
-	crc32_impl = f;
-	return crc32_impl(remainder, buffer, size);
+	for (i = 0; i < len; i++)
+		crc = (crc >> 8) ^ crc32_slice1_table[(u8)crc ^ p[i]];
+	return crc;
 }
-#else
-#  define crc32_impl DEFAULT_IMPL 
-#endif
-
-LIBDEFLATEEXPORT u32 LIBDEFLATEAPI
-libdeflate_crc32(u32 remainder, const void *buffer, size_t size)
-{
-	if (buffer == NULL) 
-		return 0;
-	return ~crc32_impl(~remainder, buffer, size);
-}
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate-1.7/lib/deflate_compress.c */
 
 
-/* #include "deflate_compress.h" */
-#ifndef LIB_DEFLATE_COMPRESS_H
-#define LIB_DEFLATE_COMPRESS_H
+#undef DEFAULT_IMPL
+#undef arch_select_crc32_func
+typedef u32 (*crc32_func_t)(u32 crc, const u8 *p, size_t len);
+#if defined(__arm__) || defined(__aarch64__)
+/* #  include "arm/crc32_impl.h" */
+
+
+#ifndef LIB_ARM_CRC32_IMPL_H
+#define LIB_ARM_CRC32_IMPL_H
+
+/* #include "arm-cpu_features.h" */
+
+
+#ifndef LIB_ARM_CPU_FEATURES_H
+#define LIB_ARM_CPU_FEATURES_H
 
 /* #include "lib_common.h" */
 
@@ -5800,253 +4902,27 @@ libdeflate_crc32(u32 remainder, const void *buffer, size_t size)
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -6055,6 +4931,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -6070,379 +4955,13 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
-#  define LIBEXPORT
-#endif
-
-
-#ifndef inline
-#  define inline
-#endif
-
-
-#ifndef forceinline
-#  define forceinline inline
-#endif
-
-
-#ifndef restrict
-#  define restrict
-#endif
-
-
-#ifndef likely
-#  define likely(expr)		(expr)
-#endif
-
-
-#ifndef unlikely
-#  define unlikely(expr)	(expr)
-#endif
-
-
-#ifndef prefetchr
-#  define prefetchr(addr)
-#endif
-
-
-#ifndef prefetchw
-#  define prefetchw(addr)
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
-
-
-
-
-
-#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
-#define MIN(a, b)		((a) <= (b) ? (a) : (b))
-#define MAX(a, b)		((a) >= (b) ? (a) : (b))
-#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
-#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
-#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
-
-
-
-
-
-
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
-{
-	union {
-		unsigned int v;
-		unsigned char b;
-	} u;
-	u.v = 1;
-	return u.b;
-}
-#endif
-
-
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
-{
-	return (n << 8) | (n >> 8);
-}
-#endif
-
-
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
-
-#ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
-#else
-#include <string.h>
-#endif
-
-#endif 
-
-
-
-
-struct libdeflate_compressor;
-
-unsigned int deflate_get_compression_level(struct libdeflate_compressor *c);
-
-#endif 
-
-/* #include "deflate_constants.h" */
-
-
-#ifndef LIB_DEFLATE_CONSTANTS_H
-#define LIB_DEFLATE_CONSTANTS_H
-
-
-#define DEFLATE_BLOCKTYPE_UNCOMPRESSED		0
-#define DEFLATE_BLOCKTYPE_STATIC_HUFFMAN	1
-#define DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN	2
-
-
-#define DEFLATE_MIN_MATCH_LEN			3
-#define DEFLATE_MAX_MATCH_LEN			258
-
-
-#define DEFLATE_MIN_MATCH_OFFSET		1
-#define DEFLATE_MAX_MATCH_OFFSET		32768
-
-#define DEFLATE_MAX_WINDOW_SIZE			32768
-
-
-#define DEFLATE_NUM_PRECODE_SYMS		19
-#define DEFLATE_NUM_LITLEN_SYMS			288
-#define DEFLATE_NUM_OFFSET_SYMS			32
-
-
-#define DEFLATE_MAX_NUM_SYMS			288
-
-
-#define DEFLATE_NUM_LITERALS			256
-#define DEFLATE_END_OF_BLOCK			256
-#define DEFLATE_NUM_LEN_SYMS			31
-
-
-#define DEFLATE_MAX_PRE_CODEWORD_LEN		7
-#define DEFLATE_MAX_LITLEN_CODEWORD_LEN		15
-#define DEFLATE_MAX_OFFSET_CODEWORD_LEN		15
-
-
-#define DEFLATE_MAX_CODEWORD_LEN		15
-
-
-#define DEFLATE_MAX_LENS_OVERRUN		137
-
-
-#define DEFLATE_MAX_EXTRA_LENGTH_BITS		5
-#define DEFLATE_MAX_EXTRA_OFFSET_BITS		14
-
-
-#define DEFLATE_MAX_MATCH_BITS	\
-	(DEFLATE_MAX_LITLEN_CODEWORD_LEN + DEFLATE_MAX_EXTRA_LENGTH_BITS + \
-	DEFLATE_MAX_OFFSET_CODEWORD_LEN + DEFLATE_MAX_EXTRA_OFFSET_BITS)
-
-#endif 
-
-/* #include "unaligned.h" */
-
-
-#ifndef LIB_UNALIGNED_H
-#define LIB_UNALIGNED_H
-
-/* #include "lib_common.h" */
-
-
-#ifndef LIB_LIB_COMMON_H
-#define LIB_LIB_COMMON_H
-
-#ifdef LIBDEFLATE_H
-#  error "lib_common.h must always be included before libdeflate.h"
-   
-#endif
-
-#define BUILDING_LIBDEFLATE
-
-/* #include "../common/common_defs.h" */
-
-
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
-
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
-
-
 #ifdef __clang__
 #  ifdef __apple_build_version__
 #    define CLANG_PREREQ(major, minor, apple_version)	\
@@ -6456,325 +4975,95 @@ unsigned int deflate_get_compression_level(struct libdeflate_compressor *c);
 #  define CLANG_PREREQ(major, minor, apple_version)	0
 #endif
 
+
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
 #endif
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
 
+
 #ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
 #else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
-#include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
-#endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
-#endif
-
-
-
-
-
-#include <stddef.h> 
-
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
-
-
-typedef size_t machine_word_t;
-
-
-#define WORDBYTES	((int)sizeof(machine_word_t))
-
-
-#define WORDBITS	(8 * WORDBYTES)
-
-
-
-
-
-
-#ifndef LIBEXPORT
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -6786,186 +5075,106 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
 }
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
 
 #ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+#  define MEMCOPY	__builtin_memcpy
 #else
-#include <string.h>
+#  define MEMCOPY	memcpy
 #endif
-
-#endif 
-
-
-
 
 
 
@@ -6974,20 +5183,23 @@ static forceinline type						\
 load_##type##_unaligned(const void *p)				\
 {								\
 	type v;							\
-	memcpy(&v, p, sizeof(v));				\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
 	return v;						\
 }								\
 								\
 static forceinline void						\
 store_##type##_unaligned(type v, void *p)			\
 {								\
-	memcpy(p, &v, sizeof(v));				\
+	MEMCOPY(p, &v, sizeof(v));				\
 }
 
 DEFINE_UNALIGNED_TYPE(u16)
 DEFINE_UNALIGNED_TYPE(u32)
 DEFINE_UNALIGNED_TYPE(u64)
 DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
 
 #define load_word_unaligned	load_machine_word_t_unaligned
 #define store_word_unaligned	store_machine_word_t_unaligned
@@ -7134,30 +5346,2803 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 
 
 
-static forceinline u32
-loaded_u32_to_u24(u32 v)
-{
-	if (CPU_IS_LITTLE_ENDIAN())
-		return v & 0xFFFFFF;
-	else
-		return v >> 8;
-}
 
 
-static forceinline u32
-load_u24_unaligned(const u8 *p)
+
+static forceinline unsigned
+bsr32(u32 v)
 {
-#if UNALIGNED_ACCESS_IS_FAST
-#  define LOAD_U24_REQUIRED_NBYTES 4
-	return loaded_u32_to_u24(load_u32_unaligned(p));
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
 #else
-#  define LOAD_U24_REQUIRED_NBYTES 3
-	if (CPU_IS_LITTLE_ENDIAN())
-		return ((u32)p[0] << 0) | ((u32)p[1] << 8) | ((u32)p[2] << 16);
-	else
-		return ((u32)p[2] << 0) | ((u32)p[1] << 8) | ((u32)p[0] << 16);
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
 #endif
 }
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
+
+#if defined(__arm__) || defined(__aarch64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
+	!defined(FREESTANDING) && \
+	(defined(__linux__) || \
+	 (defined(__aarch64__) && defined(__APPLE__)))
+#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
+#endif
+
+#define ARM_CPU_FEATURE_NEON		0x00000001
+#define ARM_CPU_FEATURE_PMULL		0x00000002
+#define ARM_CPU_FEATURE_CRC32		0x00000004
+#define ARM_CPU_FEATURE_SHA3		0x00000008
+#define ARM_CPU_FEATURE_DOTPROD		0x00000010
+
+#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
+#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
+#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
+#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
+#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
+
+#if HAVE_DYNAMIC_ARM_CPU_FEATURES
+#define ARM_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_arm_cpu_features;
+
+void libdeflate_init_arm_cpu_features(void);
+
+static inline u32 get_arm_cpu_features(void)
+{
+	if (libdeflate_arm_cpu_features == 0)
+		libdeflate_init_arm_cpu_features();
+	return libdeflate_arm_cpu_features;
+}
+#else 
+static inline u32 get_arm_cpu_features(void) { return 0; }
+#endif 
+
+
+#ifdef __ARM_NEON
+#  define HAVE_NEON_NATIVE	1
+#else
+#  define HAVE_NEON_NATIVE	0
+#endif
+#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
+
+#if HAVE_NEON_NATIVE || \
+	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#  define HAVE_NEON_INTRIN	1
+#else
+#  define HAVE_NEON_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRYPTO
+#  define HAVE_PMULL_NATIVE	1
+#else
+#  define HAVE_PMULL_NATIVE	0
+#endif
+#define HAVE_PMULL_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
+
+#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
+	!(defined(__arm__) && defined(__clang__)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
+#else
+#  define HAVE_PMULL_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRC32
+#  define HAVE_CRC32_NATIVE	1
+#else
+#  define HAVE_CRC32_NATIVE	0
+#endif
+#define HAVE_CRC32_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+
+#define HAVE_CRC32_INTRIN \
+	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
+			       (!GCC_PREREQ(1, 0) || \
+				GCC_PREREQ(11, 3) || \
+				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_SHA3
+#    define HAVE_SHA3_NATIVE	1
+#  else
+#    define HAVE_SHA3_NATIVE	0
+#  endif
+#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+				 (GCC_PREREQ(8, 1)  || \
+				  CLANG_PREREQ(7, 0, 10010463) ))
+#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+				 (GCC_PREREQ(9, 1)  || \
+				  __has_builtin(__builtin_neon_veor3q_v)))
+#else
+#  define HAVE_SHA3_NATIVE	0
+#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3_INTRIN	0
+#endif
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_DOTPROD
+#    define HAVE_DOTPROD_NATIVE	1
+#  else
+#    define HAVE_DOTPROD_NATIVE	0
+#  endif
+#  define HAVE_DOTPROD_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
+#  define HAVE_DOTPROD_INTRIN \
+	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+#else
+#  define HAVE_DOTPROD_NATIVE	0
+#  define HAVE_DOTPROD_TARGET	0
+#  define HAVE_DOTPROD_INTRIN	0
+#endif
+
+
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  define __ARM_FEATURE_CRC32	1
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_SHA3	1
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_DOTPROD	1
+#endif
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  include <arm_acle.h>
+#  undef __ARM_FEATURE_CRC32
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_SHA3
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_DOTPROD
+#endif
+
+#endif 
+
+#endif 
+
+
+
+#if HAVE_CRC32_INTRIN
+#  if HAVE_CRC32_NATIVE
+#    define ATTRIBUTES
+#  else
+#    ifdef __arm__
+#      ifdef __clang__
+#        define ATTRIBUTES	__attribute__((target("armv8-a,crc")))
+#      else
+#        define ATTRIBUTES	__attribute__((target("arch=armv8-a+crc")))
+#      endif
+#    else
+#      ifdef __clang__
+#        define ATTRIBUTES	__attribute__((target("crc")))
+#      else
+#        define ATTRIBUTES	__attribute__((target("+crc")))
+#      endif
+#    endif
+#  endif
+
+#include <arm_acle.h>
+
+
+static forceinline ATTRIBUTES u32
+combine_crcs_slow(u32 crc0, u32 crc1, u32 crc2, u32 crc3)
+{
+	u64 res0 = 0, res1 = 0, res2 = 0;
+	int i;
+
+	
+	for (i = 0; i < 32; i++) {
+		if (CRC32_FIXED_CHUNK_MULT_3 & (1U << i))
+			res0 ^= (u64)crc0 << i;
+		if (CRC32_FIXED_CHUNK_MULT_2 & (1U << i))
+			res1 ^= (u64)crc1 << i;
+		if (CRC32_FIXED_CHUNK_MULT_1 & (1U << i))
+			res2 ^= (u64)crc2 << i;
+	}
+	
+	return __crc32d(0, res0 ^ res1 ^ res2) ^ crc3;
+}
+
+#define crc32_arm_crc	crc32_arm_crc
+static u32 ATTRIBUTES MAYBE_UNUSED
+crc32_arm_crc(u32 crc, const u8 *p, size_t len)
+{
+	if (len >= 64) {
+		const size_t align = -(uintptr_t)p & 7;
+
+		
+		if (align) {
+			if (align & 1)
+				crc = __crc32b(crc, *p++);
+			if (align & 2) {
+				crc = __crc32h(crc, le16_bswap(*(u16 *)p));
+				p += 2;
+			}
+			if (align & 4) {
+				crc = __crc32w(crc, le32_bswap(*(u32 *)p));
+				p += 4;
+			}
+			len -= align;
+		}
+		
+		while (len >= CRC32_NUM_CHUNKS * CRC32_FIXED_CHUNK_LEN) {
+			const u64 *wp0 = (const u64 *)p;
+			const u64 * const wp0_end =
+				(const u64 *)(p + CRC32_FIXED_CHUNK_LEN);
+			u32 crc1 = 0, crc2 = 0, crc3 = 0;
+
+			STATIC_ASSERT(CRC32_NUM_CHUNKS == 4);
+			STATIC_ASSERT(CRC32_FIXED_CHUNK_LEN % (4 * 8) == 0);
+			do {
+				prefetchr(&wp0[64 + 0*CRC32_FIXED_CHUNK_LEN/8]);
+				prefetchr(&wp0[64 + 1*CRC32_FIXED_CHUNK_LEN/8]);
+				prefetchr(&wp0[64 + 2*CRC32_FIXED_CHUNK_LEN/8]);
+				prefetchr(&wp0[64 + 3*CRC32_FIXED_CHUNK_LEN/8]);
+				crc  = __crc32d(crc,  le64_bswap(wp0[0*CRC32_FIXED_CHUNK_LEN/8]));
+				crc1 = __crc32d(crc1, le64_bswap(wp0[1*CRC32_FIXED_CHUNK_LEN/8]));
+				crc2 = __crc32d(crc2, le64_bswap(wp0[2*CRC32_FIXED_CHUNK_LEN/8]));
+				crc3 = __crc32d(crc3, le64_bswap(wp0[3*CRC32_FIXED_CHUNK_LEN/8]));
+				wp0++;
+				crc  = __crc32d(crc,  le64_bswap(wp0[0*CRC32_FIXED_CHUNK_LEN/8]));
+				crc1 = __crc32d(crc1, le64_bswap(wp0[1*CRC32_FIXED_CHUNK_LEN/8]));
+				crc2 = __crc32d(crc2, le64_bswap(wp0[2*CRC32_FIXED_CHUNK_LEN/8]));
+				crc3 = __crc32d(crc3, le64_bswap(wp0[3*CRC32_FIXED_CHUNK_LEN/8]));
+				wp0++;
+				crc  = __crc32d(crc,  le64_bswap(wp0[0*CRC32_FIXED_CHUNK_LEN/8]));
+				crc1 = __crc32d(crc1, le64_bswap(wp0[1*CRC32_FIXED_CHUNK_LEN/8]));
+				crc2 = __crc32d(crc2, le64_bswap(wp0[2*CRC32_FIXED_CHUNK_LEN/8]));
+				crc3 = __crc32d(crc3, le64_bswap(wp0[3*CRC32_FIXED_CHUNK_LEN/8]));
+				wp0++;
+				crc  = __crc32d(crc,  le64_bswap(wp0[0*CRC32_FIXED_CHUNK_LEN/8]));
+				crc1 = __crc32d(crc1, le64_bswap(wp0[1*CRC32_FIXED_CHUNK_LEN/8]));
+				crc2 = __crc32d(crc2, le64_bswap(wp0[2*CRC32_FIXED_CHUNK_LEN/8]));
+				crc3 = __crc32d(crc3, le64_bswap(wp0[3*CRC32_FIXED_CHUNK_LEN/8]));
+				wp0++;
+			} while (wp0 != wp0_end);
+			crc = combine_crcs_slow(crc, crc1, crc2, crc3);
+			p += CRC32_NUM_CHUNKS * CRC32_FIXED_CHUNK_LEN;
+			len -= CRC32_NUM_CHUNKS * CRC32_FIXED_CHUNK_LEN;
+		}
+		
+		while (len >= 64) {
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 0)));
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 8)));
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 16)));
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 24)));
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 32)));
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 40)));
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 48)));
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 56)));
+			p += 64;
+			len -= 64;
+		}
+	}
+	if (len & 32) {
+		crc = __crc32d(crc, get_unaligned_le64(p + 0));
+		crc = __crc32d(crc, get_unaligned_le64(p + 8));
+		crc = __crc32d(crc, get_unaligned_le64(p + 16));
+		crc = __crc32d(crc, get_unaligned_le64(p + 24));
+		p += 32;
+	}
+	if (len & 16) {
+		crc = __crc32d(crc, get_unaligned_le64(p + 0));
+		crc = __crc32d(crc, get_unaligned_le64(p + 8));
+		p += 16;
+	}
+	if (len & 8) {
+		crc = __crc32d(crc, get_unaligned_le64(p));
+		p += 8;
+	}
+	if (len & 4) {
+		crc = __crc32w(crc, get_unaligned_le32(p));
+		p += 4;
+	}
+	if (len & 2) {
+		crc = __crc32h(crc, get_unaligned_le16(p));
+		p += 2;
+	}
+	if (len & 1)
+		crc = __crc32b(crc, *p);
+	return crc;
+}
+#undef ATTRIBUTES
+#endif 
+
+
+#if HAVE_CRC32_INTRIN && HAVE_PMULL_INTRIN && \
+	((HAVE_CRC32_NATIVE && HAVE_PMULL_NATIVE) || \
+	 (HAVE_CRC32_TARGET && HAVE_PMULL_TARGET))
+#  if HAVE_CRC32_NATIVE && HAVE_PMULL_NATIVE
+#    define ATTRIBUTES
+#  else
+#    ifdef __arm__
+#      define ATTRIBUTES	__attribute__((target("arch=armv8-a+crc,fpu=crypto-neon-fp-armv8")))
+#    else
+#      ifdef __clang__
+#        define ATTRIBUTES	__attribute__((target("crc,crypto")))
+#      else
+#        define ATTRIBUTES	__attribute__((target("+crc,+crypto")))
+#      endif
+#    endif
+#  endif
+
+#include <arm_acle.h>
+#include <arm_neon.h>
+
+
+static forceinline ATTRIBUTES u32
+combine_crcs_fast(u32 crc0, u32 crc1, u32 crc2, u32 crc3, size_t i)
+{
+	u64 res0 = vmull_p64(crc0, crc32_mults_for_chunklen[i][0]);
+	u64 res1 = vmull_p64(crc1, crc32_mults_for_chunklen[i][1]);
+	u64 res2 = vmull_p64(crc2, crc32_mults_for_chunklen[i][2]);
+
+	return __crc32d(0, res0 ^ res1 ^ res2) ^ crc3;
+}
+
+#define crc32_arm_crc_pmullcombine	crc32_arm_crc_pmullcombine
+static u32 ATTRIBUTES MAYBE_UNUSED
+crc32_arm_crc_pmullcombine(u32 crc, const u8 *p, size_t len)
+{
+	const size_t align = -(uintptr_t)p & 7;
+
+	if (len >= align + CRC32_NUM_CHUNKS * CRC32_MIN_VARIABLE_CHUNK_LEN) {
+		
+		if (align) {
+			if (align & 1)
+				crc = __crc32b(crc, *p++);
+			if (align & 2) {
+				crc = __crc32h(crc, le16_bswap(*(u16 *)p));
+				p += 2;
+			}
+			if (align & 4) {
+				crc = __crc32w(crc, le32_bswap(*(u32 *)p));
+				p += 4;
+			}
+			len -= align;
+		}
+		
+		while (len >= CRC32_NUM_CHUNKS * CRC32_MAX_VARIABLE_CHUNK_LEN) {
+			const u64 *wp0 = (const u64 *)p;
+			const u64 * const wp0_end =
+				(const u64 *)(p + CRC32_MAX_VARIABLE_CHUNK_LEN);
+			u32 crc1 = 0, crc2 = 0, crc3 = 0;
+
+			STATIC_ASSERT(CRC32_NUM_CHUNKS == 4);
+			STATIC_ASSERT(CRC32_MAX_VARIABLE_CHUNK_LEN % (4 * 8) == 0);
+			do {
+				prefetchr(&wp0[64 + 0*CRC32_MAX_VARIABLE_CHUNK_LEN/8]);
+				prefetchr(&wp0[64 + 1*CRC32_MAX_VARIABLE_CHUNK_LEN/8]);
+				prefetchr(&wp0[64 + 2*CRC32_MAX_VARIABLE_CHUNK_LEN/8]);
+				prefetchr(&wp0[64 + 3*CRC32_MAX_VARIABLE_CHUNK_LEN/8]);
+				crc  = __crc32d(crc,  le64_bswap(wp0[0*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc1 = __crc32d(crc1, le64_bswap(wp0[1*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc2 = __crc32d(crc2, le64_bswap(wp0[2*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc3 = __crc32d(crc3, le64_bswap(wp0[3*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				wp0++;
+				crc  = __crc32d(crc,  le64_bswap(wp0[0*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc1 = __crc32d(crc1, le64_bswap(wp0[1*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc2 = __crc32d(crc2, le64_bswap(wp0[2*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc3 = __crc32d(crc3, le64_bswap(wp0[3*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				wp0++;
+				crc  = __crc32d(crc,  le64_bswap(wp0[0*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc1 = __crc32d(crc1, le64_bswap(wp0[1*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc2 = __crc32d(crc2, le64_bswap(wp0[2*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc3 = __crc32d(crc3, le64_bswap(wp0[3*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				wp0++;
+				crc  = __crc32d(crc,  le64_bswap(wp0[0*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc1 = __crc32d(crc1, le64_bswap(wp0[1*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc2 = __crc32d(crc2, le64_bswap(wp0[2*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				crc3 = __crc32d(crc3, le64_bswap(wp0[3*CRC32_MAX_VARIABLE_CHUNK_LEN/8]));
+				wp0++;
+			} while (wp0 != wp0_end);
+			crc = combine_crcs_fast(crc, crc1, crc2, crc3,
+						ARRAY_LEN(crc32_mults_for_chunklen) - 1);
+			p += CRC32_NUM_CHUNKS * CRC32_MAX_VARIABLE_CHUNK_LEN;
+			len -= CRC32_NUM_CHUNKS * CRC32_MAX_VARIABLE_CHUNK_LEN;
+		}
+		
+		if (len >= CRC32_NUM_CHUNKS * CRC32_MIN_VARIABLE_CHUNK_LEN) {
+			const size_t i = len / (CRC32_NUM_CHUNKS *
+						CRC32_MIN_VARIABLE_CHUNK_LEN);
+			const size_t chunk_len =
+				i * CRC32_MIN_VARIABLE_CHUNK_LEN;
+			const u64 *wp0 = (const u64 *)(p + 0*chunk_len);
+			const u64 *wp1 = (const u64 *)(p + 1*chunk_len);
+			const u64 *wp2 = (const u64 *)(p + 2*chunk_len);
+			const u64 *wp3 = (const u64 *)(p + 3*chunk_len);
+			const u64 * const wp0_end = wp1;
+			u32 crc1 = 0, crc2 = 0, crc3 = 0;
+
+			STATIC_ASSERT(CRC32_NUM_CHUNKS == 4);
+			STATIC_ASSERT(CRC32_MIN_VARIABLE_CHUNK_LEN % (4 * 8) == 0);
+			do {
+				prefetchr(wp0 + 64);
+				prefetchr(wp1 + 64);
+				prefetchr(wp2 + 64);
+				prefetchr(wp3 + 64);
+				crc  = __crc32d(crc,  le64_bswap(*wp0++));
+				crc1 = __crc32d(crc1, le64_bswap(*wp1++));
+				crc2 = __crc32d(crc2, le64_bswap(*wp2++));
+				crc3 = __crc32d(crc3, le64_bswap(*wp3++));
+				crc  = __crc32d(crc,  le64_bswap(*wp0++));
+				crc1 = __crc32d(crc1, le64_bswap(*wp1++));
+				crc2 = __crc32d(crc2, le64_bswap(*wp2++));
+				crc3 = __crc32d(crc3, le64_bswap(*wp3++));
+				crc  = __crc32d(crc,  le64_bswap(*wp0++));
+				crc1 = __crc32d(crc1, le64_bswap(*wp1++));
+				crc2 = __crc32d(crc2, le64_bswap(*wp2++));
+				crc3 = __crc32d(crc3, le64_bswap(*wp3++));
+				crc  = __crc32d(crc,  le64_bswap(*wp0++));
+				crc1 = __crc32d(crc1, le64_bswap(*wp1++));
+				crc2 = __crc32d(crc2, le64_bswap(*wp2++));
+				crc3 = __crc32d(crc3, le64_bswap(*wp3++));
+			} while (wp0 != wp0_end);
+			crc = combine_crcs_fast(crc, crc1, crc2, crc3, i);
+			p += CRC32_NUM_CHUNKS * chunk_len;
+			len -= CRC32_NUM_CHUNKS * chunk_len;
+		}
+
+		while (len >= 32) {
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 0)));
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 8)));
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 16)));
+			crc = __crc32d(crc, le64_bswap(*(u64 *)(p + 24)));
+			p += 32;
+			len -= 32;
+		}
+	} else {
+		while (len >= 32) {
+			crc = __crc32d(crc, get_unaligned_le64(p + 0));
+			crc = __crc32d(crc, get_unaligned_le64(p + 8));
+			crc = __crc32d(crc, get_unaligned_le64(p + 16));
+			crc = __crc32d(crc, get_unaligned_le64(p + 24));
+			p += 32;
+			len -= 32;
+		}
+	}
+	if (len & 16) {
+		crc = __crc32d(crc, get_unaligned_le64(p + 0));
+		crc = __crc32d(crc, get_unaligned_le64(p + 8));
+		p += 16;
+	}
+	if (len & 8) {
+		crc = __crc32d(crc, get_unaligned_le64(p));
+		p += 8;
+	}
+	if (len & 4) {
+		crc = __crc32w(crc, get_unaligned_le32(p));
+		p += 4;
+	}
+	if (len & 2) {
+		crc = __crc32h(crc, get_unaligned_le16(p));
+		p += 2;
+	}
+	if (len & 1)
+		crc = __crc32b(crc, *p);
+	return crc;
+}
+#undef ATTRIBUTES
+#endif 
+
+
+#if HAVE_PMULL_INTRIN
+#  define crc32_arm_pmullx4	crc32_arm_pmullx4
+#  define SUFFIX			 _pmullx4
+#  if HAVE_PMULL_NATIVE
+#    define ATTRIBUTES
+#  else
+#    ifdef __arm__
+#      define ATTRIBUTES    __attribute__((target("fpu=crypto-neon-fp-armv8")))
+#    else
+#      ifdef __clang__
+#        define ATTRIBUTES  __attribute__((target("crypto")))
+#      else
+#        define ATTRIBUTES  __attribute__((target("+crypto")))
+#      endif
+#    endif
+#  endif
+#  define ENABLE_EOR3		0
+#include "arm-crc32_pmull_helpers.h"
+
+static u32 ATTRIBUTES MAYBE_UNUSED
+crc32_arm_pmullx4(u32 crc, const u8 *p, size_t len)
+{
+	const poly64x2_t multipliers_4 = (poly64x2_t)CRC32_4VECS_MULTS;
+	const poly64x2_t multipliers_2 = (poly64x2_t)CRC32_2VECS_MULTS;
+	const poly64x2_t multipliers_1 = (poly64x2_t)CRC32_1VECS_MULTS;
+	const uint8x16_t zeroes = (uint8x16_t){ 0 };
+	const uint8x16_t mask32 = (uint8x16_t)(uint32x4_t){ 0xFFFFFFFF };
+	uint8x16_t v0, v1, v2, v3;
+
+	if (len < 64 + 15) {
+		if (len < 16)
+			return crc32_slice1(crc, p, len);
+		v0 = vld1q_u8(p) ^ (uint8x16_t)(uint32x4_t){ crc };
+		p += 16;
+		len -= 16;
+		while (len >= 16) {
+			v0 = fold_vec(v0, vld1q_u8(p), multipliers_1);
+			p += 16;
+			len -= 16;
+		}
+	} else {
+		const size_t align = -(uintptr_t)p & 15;
+		const uint8x16_t *vp;
+
+		v0 = vld1q_u8(p) ^ (uint8x16_t)(uint32x4_t){ crc };
+		p += 16;
+		
+		if (align) {
+			v0 = fold_partial_vec(v0, p, align, multipliers_1);
+			p += align;
+			len -= align;
+		}
+		vp = (const uint8x16_t *)p;
+		v1 = *vp++;
+		v2 = *vp++;
+		v3 = *vp++;
+		while (len >= 64 + 64) {
+			v0 = fold_vec(v0, *vp++, multipliers_4);
+			v1 = fold_vec(v1, *vp++, multipliers_4);
+			v2 = fold_vec(v2, *vp++, multipliers_4);
+			v3 = fold_vec(v3, *vp++, multipliers_4);
+			len -= 64;
+		}
+		v0 = fold_vec(v0, v2, multipliers_2);
+		v1 = fold_vec(v1, v3, multipliers_2);
+		if (len & 32) {
+			v0 = fold_vec(v0, *vp++, multipliers_2);
+			v1 = fold_vec(v1, *vp++, multipliers_2);
+		}
+		v0 = fold_vec(v0, v1, multipliers_1);
+		if (len & 16)
+			v0 = fold_vec(v0, *vp++, multipliers_1);
+		p = (const u8 *)vp;
+		len &= 15;
+	}
+
+	
+	if (len)
+		v0 = fold_partial_vec(v0, p, len, multipliers_1);
+
+	
+	v0 = vextq_u8(v0, zeroes, 8) ^
+	     (uint8x16_t)vmull_p64((poly64_t)vget_low_u8(v0),
+				   CRC32_1VECS_MULT_2);
+
+	
+	v0 = vextq_u8(v0, zeroes, 4) ^
+		(uint8x16_t)vmull_p64((poly64_t)vget_low_u8(v0 & mask32),
+				      CRC32_FINAL_MULT);
+
+	
+	v1 = (uint8x16_t)vmull_p64((poly64_t)vget_low_u8(v0 & mask32),
+				   CRC32_BARRETT_CONSTANT_1);
+	v1 = (uint8x16_t)vmull_p64((poly64_t)vget_low_u8(v1 & mask32),
+				   CRC32_BARRETT_CONSTANT_2);
+	return ((uint32x4_t)(v0 ^ v1))[1];
+}
+#undef SUFFIX
+#undef ATTRIBUTES
+#undef ENABLE_EOR3
+#endif 
+
+
+#if defined(__aarch64__) && HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN && \
+	((HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE) || \
+	 (HAVE_PMULL_TARGET && HAVE_CRC32_TARGET))
+#  define crc32_arm_pmullx12_crc	crc32_arm_pmullx12_crc
+#  define SUFFIX				 _pmullx12_crc
+#  if HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE
+#    define ATTRIBUTES
+#  else
+#    ifdef __clang__
+#      define ATTRIBUTES  __attribute__((target("crypto,crc")))
+#    else
+#      define ATTRIBUTES  __attribute__((target("+crypto,+crc")))
+#    endif
+#  endif
+#  define ENABLE_EOR3	0
+#include "arm-crc32_pmull_wide.h"
+#endif
+
+
+#if defined(__aarch64__) && HAVE_PMULL_INTRIN && HAVE_CRC32_INTRIN && \
+	((HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE && HAVE_SHA3_NATIVE) || \
+	 (HAVE_PMULL_TARGET && HAVE_CRC32_TARGET && HAVE_SHA3_TARGET))
+#  define crc32_arm_pmullx12_crc_eor3	crc32_arm_pmullx12_crc_eor3
+#  define SUFFIX				 _pmullx12_crc_eor3
+#  if HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE && HAVE_SHA3_NATIVE
+#    define ATTRIBUTES
+#  else
+#    ifdef __clang__
+#      define ATTRIBUTES  __attribute__((target("crypto,crc,sha3")))
+     
+#    elif defined(__ARM_FEATURE_JCVT)
+#      define ATTRIBUTES  __attribute__((target("+crypto,+crc,+sha3")))
+#    else
+#      define ATTRIBUTES  __attribute__((target("arch=armv8.2-a+crypto+crc+sha3")))
+#    endif
+#  endif
+#  define ENABLE_EOR3	1
+#include "arm-crc32_pmull_wide.h"
+#endif
+
+
+#define PREFER_PMULL_TO_CRC	0
+#ifdef __APPLE__
+#  include <TargetConditionals.h>
+#  if TARGET_OS_OSX
+#    undef PREFER_PMULL_TO_CRC
+#    define PREFER_PMULL_TO_CRC	1
+#  endif
+#endif
+
+
+#if PREFER_PMULL_TO_CRC && defined(crc32_arm_pmullx12_crc_eor3) && \
+	HAVE_PMULL_NATIVE && HAVE_CRC32_NATIVE && HAVE_SHA3_NATIVE
+#  define DEFAULT_IMPL	crc32_arm_pmullx12_crc_eor3
+#elif !PREFER_PMULL_TO_CRC && defined(crc32_arm_crc_pmullcombine) && \
+	HAVE_CRC32_NATIVE && HAVE_PMULL_NATIVE
+#  define DEFAULT_IMPL	crc32_arm_crc_pmullcombine
+#else
+static inline crc32_func_t
+arch_select_crc32_func(void)
+{
+	const u32 features MAYBE_UNUSED = get_arm_cpu_features();
+
+#if PREFER_PMULL_TO_CRC && defined(crc32_arm_pmullx12_crc_eor3)
+	if (HAVE_PMULL(features) && HAVE_CRC32(features) && HAVE_SHA3(features))
+		return crc32_arm_pmullx12_crc_eor3;
+#endif
+#if PREFER_PMULL_TO_CRC && defined(crc32_arm_pmullx12_crc)
+	if (HAVE_PMULL(features) && HAVE_CRC32(features))
+		return crc32_arm_pmullx12_crc;
+#endif
+#ifdef crc32_arm_crc_pmullcombine
+	if (HAVE_CRC32(features) && HAVE_PMULL(features))
+		return crc32_arm_crc_pmullcombine;
+#endif
+#ifdef crc32_arm_crc
+	if (HAVE_CRC32(features))
+		return crc32_arm_crc;
+#endif
+#ifdef crc32_arm_pmullx4
+	if (HAVE_PMULL(features))
+		return crc32_arm_pmullx4;
+#endif
+	return NULL;
+}
+#define arch_select_crc32_func	arch_select_crc32_func
+#endif
+
+#endif 
+
+#elif defined(__i386__) || defined(__x86_64__)
+/* #  include "x86/crc32_impl.h" */
+
+
+#ifndef LIB_X86_CRC32_IMPL_H
+#define LIB_X86_CRC32_IMPL_H
+
+/* #include "x86-cpu_features.h" */
+
+
+#ifndef LIB_X86_CPU_FEATURES_H
+#define LIB_X86_CPU_FEATURES_H
+
+/* #include "lib_common.h" */
+
+
+#ifndef LIB_LIB_COMMON_H
+#define LIB_LIB_COMMON_H
+
+#ifdef LIBDEFLATE_H
+#  error "lib_common.h must always be included before libdeflate.h"
+   
+#endif
+
+#define BUILDING_LIBDEFLATE
+
+/* #include "../common_defs.h" */
+
+
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
+
+#include <stdbool.h>
+#include <stddef.h>	
+#include <stdint.h>
+#ifdef _MSC_VER
+#  include <stdlib.h>	
+#endif
+#ifndef FREESTANDING
+#  include <string.h>	
+#endif
+
+
+
+
+
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
+
+
+typedef size_t machine_word_t;
+
+
+#define WORDBYTES	((int)sizeof(machine_word_t))
+
+
+#define WORDBITS	(8 * WORDBYTES)
+
+
+
+
+
+
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
+#  define LIBEXPORT
+#endif
+
+
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
+#endif
+
+
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
+#endif
+
+
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
+#  define restrict
+#endif
+
+
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
+#  define likely(expr)		(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
+#  define unlikely(expr)	(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
+#  define prefetchr(addr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
+#  define prefetchw(addr)
+#endif
+
+
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#endif
+
+
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
+
+
+
+
+
+#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
+#define MIN(a, b)		((a) <= (b) ? (a) : (b))
+#define MAX(a, b)		((a) >= (b) ? (a) : (b))
+#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
+#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
+#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
+
+
+
+
+
+
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
+{
+	union {
+		u32 w;
+		u8 b;
+	} u;
+
+	u.w = 1;
+	return u.b;
+}
+#endif
+
+
+static forceinline u16 bswap16(u16 v)
+{
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
+}
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
+#endif
+
+
+
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
+#endif
+
+
+
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
+
+
+
+static forceinline u16
+get_unaligned_le16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
+}
+
+static forceinline u16
+get_unaligned_be16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
+}
+
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return get_unaligned_le32(p);
+	else
+		return get_unaligned_le64(p);
+}
+
+
+
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+	}
+}
+
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		put_unaligned_le32(v, p);
+	else
+		put_unaligned_le64(v, p);
+}
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
+
+#if defined(__i386__) || defined(__x86_64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
+#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
+#endif
+
+#define X86_CPU_FEATURE_SSE2		0x00000001
+#define X86_CPU_FEATURE_PCLMUL		0x00000002
+#define X86_CPU_FEATURE_AVX		0x00000004
+#define X86_CPU_FEATURE_AVX2		0x00000008
+#define X86_CPU_FEATURE_BMI2		0x00000010
+
+#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
+#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
+#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
+#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
+#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+
+#if HAVE_DYNAMIC_X86_CPU_FEATURES
+#define X86_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_x86_cpu_features;
+
+void libdeflate_init_x86_cpu_features(void);
+
+static inline u32 get_x86_cpu_features(void)
+{
+	if (libdeflate_x86_cpu_features == 0)
+		libdeflate_init_x86_cpu_features();
+	return libdeflate_x86_cpu_features;
+}
+#else 
+static inline u32 get_x86_cpu_features(void) { return 0; }
+#endif 
+
+
+#define HAVE_TARGET_INTRINSICS \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
+
+
+#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
+	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
+	defined(__INTEL_COMPILER)
+typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
+typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
+typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
+typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
+typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
+typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
+typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
+typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
+#endif
+#ifdef __INTEL_COMPILER
+typedef int   __v16si __attribute__((__vector_size__(64)));
+typedef short __v32hi __attribute__((__vector_size__(64)));
+typedef char  __v64qi __attribute__((__vector_size__(64)));
+#endif
+
+
+#ifdef __SSE2__
+#  define HAVE_SSE2_NATIVE	1
+#else
+#  define HAVE_SSE2_NATIVE	0
+#endif
+#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
+#define HAVE_SSE2_INTRIN \
+	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __PCLMUL__
+#  define HAVE_PCLMUL_NATIVE	1
+#else
+#  define HAVE_PCLMUL_NATIVE	0
+#endif
+#define HAVE_PCLMUL_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
+#define HAVE_PCLMUL_INTRIN \
+	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX__
+#  define HAVE_AVX_NATIVE	1
+#else
+#  define HAVE_AVX_NATIVE	0
+#endif
+#define HAVE_AVX_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
+#define HAVE_AVX_INTRIN \
+	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX2__
+#  define HAVE_AVX2_NATIVE	1
+#else
+#  define HAVE_AVX2_NATIVE	0
+#endif
+#define HAVE_AVX2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
+#define HAVE_AVX2_INTRIN \
+	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __BMI2__
+#  define HAVE_BMI2_NATIVE	1
+#else
+#  define HAVE_BMI2_NATIVE	0
+#endif
+#define HAVE_BMI2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
+#define HAVE_BMI2_INTRIN \
+	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+
+#endif 
+
+#endif 
+
+
+
+#if HAVE_PCLMUL_INTRIN
+#  define crc32_x86_pclmul	crc32_x86_pclmul
+#  define SUFFIX			 _pclmul
+#  if HAVE_PCLMUL_NATIVE
+#    define ATTRIBUTES
+#  else
+#    define ATTRIBUTES		__attribute__((target("pclmul")))
+#  endif
+#  define FOLD_PARTIAL_VECS	0
+/* #include "x86-crc32_pclmul_template.h" */
+
+
+
+
+#include <immintrin.h>
+
+#undef fold_vec
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_vec)(__m128i src, __m128i dst, __v2di multipliers)
+{
+	
+	return dst ^ _mm_clmulepi64_si128(src, multipliers, 0x00) ^
+		_mm_clmulepi64_si128(src, multipliers, 0x11);
+}
+#define fold_vec	ADD_SUFFIX(fold_vec)
+
+#if FOLD_PARTIAL_VECS
+
+#undef fold_partial_vec
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_partial_vec)(__m128i v, const u8 *p, size_t len,
+			     __v2di multipliers_1)
+{
+	
+	static const u8 shift_tab[48] = {
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	};
+	__m128i lshift = _mm_loadu_si128((const void *)&shift_tab[len]);
+	__m128i rshift = _mm_loadu_si128((const void *)&shift_tab[len + 16]);
+	__m128i x0, x1;
+
+	
+	x0 = _mm_shuffle_epi8(v, lshift);
+
+	
+	x1 = _mm_blendv_epi8(_mm_shuffle_epi8(v, rshift),
+			     _mm_loadu_si128((const void *)(p + len - 16)),
+			     
+			     rshift);
+
+	return fold_vec(x0, x1, multipliers_1);
+}
+#define fold_partial_vec	ADD_SUFFIX(fold_partial_vec)
+#endif 
+
+static u32 ATTRIBUTES MAYBE_UNUSED
+ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
+{
+	const __v2di multipliers_8 = (__v2di)CRC32_8VECS_MULTS;
+	const __v2di multipliers_4 = (__v2di)CRC32_4VECS_MULTS;
+	const __v2di multipliers_2 = (__v2di)CRC32_2VECS_MULTS;
+	const __v2di multipliers_1 = (__v2di)CRC32_1VECS_MULTS;
+	const __v2di final_multiplier = (__v2di){ CRC32_FINAL_MULT };
+	const __m128i mask32 = (__m128i)(__v4si){ 0xFFFFFFFF };
+	const __v2di barrett_reduction_constants = (__v2di)CRC32_BARRETT_CONSTANTS;
+	__m128i v0, v1, v2, v3, v4, v5, v6, v7;
+
+	
+	if (len < 1024) {
+		if (len < 16)
+			return crc32_slice1(crc, p, len);
+
+		v0 = _mm_loadu_si128((const void *)p) ^ (__m128i)(__v4si){crc};
+		p += 16;
+
+		if (len >= 64) {
+			v1 = _mm_loadu_si128((const void *)(p + 0));
+			v2 = _mm_loadu_si128((const void *)(p + 16));
+			v3 = _mm_loadu_si128((const void *)(p + 32));
+			p += 48;
+			while (len >= 64 + 64) {
+				v0 = fold_vec(v0, _mm_loadu_si128((const void *)(p + 0)),
+					      multipliers_4);
+				v1 = fold_vec(v1, _mm_loadu_si128((const void *)(p + 16)),
+					      multipliers_4);
+				v2 = fold_vec(v2, _mm_loadu_si128((const void *)(p + 32)),
+					      multipliers_4);
+				v3 = fold_vec(v3, _mm_loadu_si128((const void *)(p + 48)),
+					      multipliers_4);
+				p += 64;
+				len -= 64;
+			}
+			v0 = fold_vec(v0, v2, multipliers_2);
+			v1 = fold_vec(v1, v3, multipliers_2);
+			if (len & 32) {
+				v0 = fold_vec(v0, _mm_loadu_si128((const void *)(p + 0)),
+					      multipliers_2);
+				v1 = fold_vec(v1, _mm_loadu_si128((const void *)(p + 16)),
+					      multipliers_2);
+				p += 32;
+			}
+			v0 = fold_vec(v0, v1, multipliers_1);
+			if (len & 16) {
+				v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
+					      multipliers_1);
+				p += 16;
+			}
+		} else {
+			if (len >= 32) {
+				v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
+					      multipliers_1);
+				p += 16;
+				if (len >= 48) {
+					v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
+						      multipliers_1);
+					p += 16;
+				}
+			}
+		}
+	} else {
+		const size_t align = -(uintptr_t)p & 15;
+		const __m128i *vp;
+
+	#if FOLD_PARTIAL_VECS
+		v0 = _mm_loadu_si128((const void *)p) ^ (__m128i)(__v4si){crc};
+		p += 16;
+		
+		if (align) {
+			v0 = fold_partial_vec(v0, p, align, multipliers_1);
+			p += align;
+			len -= align;
+		}
+		vp = (const __m128i *)p;
+	#else
+		
+		if (align) {
+			crc = crc32_slice1(crc, p, align);
+			p += align;
+			len -= align;
+		}
+		vp = (const __m128i *)p;
+		v0 = *vp++ ^ (__m128i)(__v4si){crc};
+	#endif
+		v1 = *vp++;
+		v2 = *vp++;
+		v3 = *vp++;
+		v4 = *vp++;
+		v5 = *vp++;
+		v6 = *vp++;
+		v7 = *vp++;
+		do {
+			v0 = fold_vec(v0, *vp++, multipliers_8);
+			v1 = fold_vec(v1, *vp++, multipliers_8);
+			v2 = fold_vec(v2, *vp++, multipliers_8);
+			v3 = fold_vec(v3, *vp++, multipliers_8);
+			v4 = fold_vec(v4, *vp++, multipliers_8);
+			v5 = fold_vec(v5, *vp++, multipliers_8);
+			v6 = fold_vec(v6, *vp++, multipliers_8);
+			v7 = fold_vec(v7, *vp++, multipliers_8);
+			len -= 128;
+		} while (len >= 128 + 128);
+
+		v0 = fold_vec(v0, v4, multipliers_4);
+		v1 = fold_vec(v1, v5, multipliers_4);
+		v2 = fold_vec(v2, v6, multipliers_4);
+		v3 = fold_vec(v3, v7, multipliers_4);
+		if (len & 64) {
+			v0 = fold_vec(v0, *vp++, multipliers_4);
+			v1 = fold_vec(v1, *vp++, multipliers_4);
+			v2 = fold_vec(v2, *vp++, multipliers_4);
+			v3 = fold_vec(v3, *vp++, multipliers_4);
+		}
+
+		v0 = fold_vec(v0, v2, multipliers_2);
+		v1 = fold_vec(v1, v3, multipliers_2);
+		if (len & 32) {
+			v0 = fold_vec(v0, *vp++, multipliers_2);
+			v1 = fold_vec(v1, *vp++, multipliers_2);
+		}
+
+		v0 = fold_vec(v0, v1, multipliers_1);
+		if (len & 16)
+			v0 = fold_vec(v0, *vp++, multipliers_1);
+
+		p = (const u8 *)vp;
+	}
+	len &= 15;
+
+	
+#if FOLD_PARTIAL_VECS
+	if (len)
+		v0 = fold_partial_vec(v0, p, len, multipliers_1);
+#endif
+
+	
+	v0 = _mm_srli_si128(v0, 8) ^
+	     _mm_clmulepi64_si128(v0, multipliers_1, 0x10);
+
+	
+	v0 = _mm_srli_si128(v0, 4) ^
+	     _mm_clmulepi64_si128(v0 & mask32, final_multiplier, 0x00);
+
+	
+	v1 = _mm_clmulepi64_si128(v0 & mask32, barrett_reduction_constants, 0x00);
+	v1 = _mm_clmulepi64_si128(v1 & mask32, barrett_reduction_constants, 0x10);
+	crc = ((__v4si)(v0 ^ v1))[1];
+#if !FOLD_PARTIAL_VECS
+	
+	crc = crc32_slice1(crc, p, len);
+#endif
+	return crc;
+}
+
+#undef SUFFIX
+#undef ATTRIBUTES
+#undef FOLD_PARTIAL_VECS
+
+#endif
+
+
+#if HAVE_PCLMUL_INTRIN && HAVE_AVX_INTRIN && \
+	((HAVE_PCLMUL_NATIVE && HAVE_AVX_NATIVE) || \
+	 (HAVE_PCLMUL_TARGET && HAVE_AVX_TARGET))
+#  define crc32_x86_pclmul_avx	crc32_x86_pclmul_avx
+#  define SUFFIX			 _pclmul_avx
+#  if HAVE_PCLMUL_NATIVE && HAVE_AVX_NATIVE
+#    define ATTRIBUTES
+#  else
+#    define ATTRIBUTES		__attribute__((target("pclmul,avx")))
+#  endif
+#  define FOLD_PARTIAL_VECS	1
+/* #include "x86-crc32_pclmul_template.h" */
+
+
+
+
+#include <immintrin.h>
+
+#undef fold_vec
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_vec)(__m128i src, __m128i dst, __v2di multipliers)
+{
+	
+	return dst ^ _mm_clmulepi64_si128(src, multipliers, 0x00) ^
+		_mm_clmulepi64_si128(src, multipliers, 0x11);
+}
+#define fold_vec	ADD_SUFFIX(fold_vec)
+
+#if FOLD_PARTIAL_VECS
+
+#undef fold_partial_vec
+static forceinline ATTRIBUTES __m128i
+ADD_SUFFIX(fold_partial_vec)(__m128i v, const u8 *p, size_t len,
+			     __v2di multipliers_1)
+{
+	
+	static const u8 shift_tab[48] = {
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+	};
+	__m128i lshift = _mm_loadu_si128((const void *)&shift_tab[len]);
+	__m128i rshift = _mm_loadu_si128((const void *)&shift_tab[len + 16]);
+	__m128i x0, x1;
+
+	
+	x0 = _mm_shuffle_epi8(v, lshift);
+
+	
+	x1 = _mm_blendv_epi8(_mm_shuffle_epi8(v, rshift),
+			     _mm_loadu_si128((const void *)(p + len - 16)),
+			     
+			     rshift);
+
+	return fold_vec(x0, x1, multipliers_1);
+}
+#define fold_partial_vec	ADD_SUFFIX(fold_partial_vec)
+#endif 
+
+static u32 ATTRIBUTES MAYBE_UNUSED
+ADD_SUFFIX(crc32_x86)(u32 crc, const u8 *p, size_t len)
+{
+	const __v2di multipliers_8 = (__v2di)CRC32_8VECS_MULTS;
+	const __v2di multipliers_4 = (__v2di)CRC32_4VECS_MULTS;
+	const __v2di multipliers_2 = (__v2di)CRC32_2VECS_MULTS;
+	const __v2di multipliers_1 = (__v2di)CRC32_1VECS_MULTS;
+	const __v2di final_multiplier = (__v2di){ CRC32_FINAL_MULT };
+	const __m128i mask32 = (__m128i)(__v4si){ 0xFFFFFFFF };
+	const __v2di barrett_reduction_constants = (__v2di)CRC32_BARRETT_CONSTANTS;
+	__m128i v0, v1, v2, v3, v4, v5, v6, v7;
+
+	
+	if (len < 1024) {
+		if (len < 16)
+			return crc32_slice1(crc, p, len);
+
+		v0 = _mm_loadu_si128((const void *)p) ^ (__m128i)(__v4si){crc};
+		p += 16;
+
+		if (len >= 64) {
+			v1 = _mm_loadu_si128((const void *)(p + 0));
+			v2 = _mm_loadu_si128((const void *)(p + 16));
+			v3 = _mm_loadu_si128((const void *)(p + 32));
+			p += 48;
+			while (len >= 64 + 64) {
+				v0 = fold_vec(v0, _mm_loadu_si128((const void *)(p + 0)),
+					      multipliers_4);
+				v1 = fold_vec(v1, _mm_loadu_si128((const void *)(p + 16)),
+					      multipliers_4);
+				v2 = fold_vec(v2, _mm_loadu_si128((const void *)(p + 32)),
+					      multipliers_4);
+				v3 = fold_vec(v3, _mm_loadu_si128((const void *)(p + 48)),
+					      multipliers_4);
+				p += 64;
+				len -= 64;
+			}
+			v0 = fold_vec(v0, v2, multipliers_2);
+			v1 = fold_vec(v1, v3, multipliers_2);
+			if (len & 32) {
+				v0 = fold_vec(v0, _mm_loadu_si128((const void *)(p + 0)),
+					      multipliers_2);
+				v1 = fold_vec(v1, _mm_loadu_si128((const void *)(p + 16)),
+					      multipliers_2);
+				p += 32;
+			}
+			v0 = fold_vec(v0, v1, multipliers_1);
+			if (len & 16) {
+				v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
+					      multipliers_1);
+				p += 16;
+			}
+		} else {
+			if (len >= 32) {
+				v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
+					      multipliers_1);
+				p += 16;
+				if (len >= 48) {
+					v0 = fold_vec(v0, _mm_loadu_si128((const void *)p),
+						      multipliers_1);
+					p += 16;
+				}
+			}
+		}
+	} else {
+		const size_t align = -(uintptr_t)p & 15;
+		const __m128i *vp;
+
+	#if FOLD_PARTIAL_VECS
+		v0 = _mm_loadu_si128((const void *)p) ^ (__m128i)(__v4si){crc};
+		p += 16;
+		
+		if (align) {
+			v0 = fold_partial_vec(v0, p, align, multipliers_1);
+			p += align;
+			len -= align;
+		}
+		vp = (const __m128i *)p;
+	#else
+		
+		if (align) {
+			crc = crc32_slice1(crc, p, align);
+			p += align;
+			len -= align;
+		}
+		vp = (const __m128i *)p;
+		v0 = *vp++ ^ (__m128i)(__v4si){crc};
+	#endif
+		v1 = *vp++;
+		v2 = *vp++;
+		v3 = *vp++;
+		v4 = *vp++;
+		v5 = *vp++;
+		v6 = *vp++;
+		v7 = *vp++;
+		do {
+			v0 = fold_vec(v0, *vp++, multipliers_8);
+			v1 = fold_vec(v1, *vp++, multipliers_8);
+			v2 = fold_vec(v2, *vp++, multipliers_8);
+			v3 = fold_vec(v3, *vp++, multipliers_8);
+			v4 = fold_vec(v4, *vp++, multipliers_8);
+			v5 = fold_vec(v5, *vp++, multipliers_8);
+			v6 = fold_vec(v6, *vp++, multipliers_8);
+			v7 = fold_vec(v7, *vp++, multipliers_8);
+			len -= 128;
+		} while (len >= 128 + 128);
+
+		v0 = fold_vec(v0, v4, multipliers_4);
+		v1 = fold_vec(v1, v5, multipliers_4);
+		v2 = fold_vec(v2, v6, multipliers_4);
+		v3 = fold_vec(v3, v7, multipliers_4);
+		if (len & 64) {
+			v0 = fold_vec(v0, *vp++, multipliers_4);
+			v1 = fold_vec(v1, *vp++, multipliers_4);
+			v2 = fold_vec(v2, *vp++, multipliers_4);
+			v3 = fold_vec(v3, *vp++, multipliers_4);
+		}
+
+		v0 = fold_vec(v0, v2, multipliers_2);
+		v1 = fold_vec(v1, v3, multipliers_2);
+		if (len & 32) {
+			v0 = fold_vec(v0, *vp++, multipliers_2);
+			v1 = fold_vec(v1, *vp++, multipliers_2);
+		}
+
+		v0 = fold_vec(v0, v1, multipliers_1);
+		if (len & 16)
+			v0 = fold_vec(v0, *vp++, multipliers_1);
+
+		p = (const u8 *)vp;
+	}
+	len &= 15;
+
+	
+#if FOLD_PARTIAL_VECS
+	if (len)
+		v0 = fold_partial_vec(v0, p, len, multipliers_1);
+#endif
+
+	
+	v0 = _mm_srli_si128(v0, 8) ^
+	     _mm_clmulepi64_si128(v0, multipliers_1, 0x10);
+
+	
+	v0 = _mm_srli_si128(v0, 4) ^
+	     _mm_clmulepi64_si128(v0 & mask32, final_multiplier, 0x00);
+
+	
+	v1 = _mm_clmulepi64_si128(v0 & mask32, barrett_reduction_constants, 0x00);
+	v1 = _mm_clmulepi64_si128(v1 & mask32, barrett_reduction_constants, 0x10);
+	crc = ((__v4si)(v0 ^ v1))[1];
+#if !FOLD_PARTIAL_VECS
+	
+	crc = crc32_slice1(crc, p, len);
+#endif
+	return crc;
+}
+
+#undef SUFFIX
+#undef ATTRIBUTES
+#undef FOLD_PARTIAL_VECS
+
+#endif
+
+
+#if defined(crc32_x86_pclmul_avx) && HAVE_PCLMUL_NATIVE && HAVE_AVX_NATIVE
+#define DEFAULT_IMPL	crc32_x86_pclmul_avx
+#else
+static inline crc32_func_t
+arch_select_crc32_func(void)
+{
+	const u32 features MAYBE_UNUSED = get_x86_cpu_features();
+
+#ifdef crc32_x86_pclmul_avx
+	if (HAVE_PCLMUL(features) && HAVE_AVX(features))
+		return crc32_x86_pclmul_avx;
+#endif
+#ifdef crc32_x86_pclmul
+	if (HAVE_PCLMUL(features))
+		return crc32_x86_pclmul;
+#endif
+	return NULL;
+}
+#define arch_select_crc32_func	arch_select_crc32_func
+#endif
+
+#endif 
+
+#endif
+
+#ifndef DEFAULT_IMPL
+#  define DEFAULT_IMPL crc32_slice8
+#endif
+
+#ifdef arch_select_crc32_func
+static u32 crc32_dispatch_crc32(u32 crc, const u8 *p, size_t len);
+
+static volatile crc32_func_t crc32_impl = crc32_dispatch_crc32;
+
+
+static u32 crc32_dispatch_crc32(u32 crc, const u8 *p, size_t len)
+{
+	crc32_func_t f = arch_select_crc32_func();
+
+	if (f == NULL)
+		f = DEFAULT_IMPL;
+
+	crc32_impl = f;
+	return f(crc, p, len);
+}
+#else
+
+#define crc32_impl DEFAULT_IMPL
+#endif
+
+LIBDEFLATEEXPORT u32 LIBDEFLATEAPI
+libdeflate_crc32(u32 crc, const void *p, size_t len)
+{
+	if (p == NULL) 
+		return 0;
+	return ~crc32_impl(~crc, p, len);
+}
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/deflate_compress.c */
+
+
+/* #include "deflate_compress.h" */
+#ifndef LIB_DEFLATE_COMPRESS_H
+#define LIB_DEFLATE_COMPRESS_H
+
+/* #include "lib_common.h" */
+
+
+#ifndef LIB_LIB_COMMON_H
+#define LIB_LIB_COMMON_H
+
+#ifdef LIBDEFLATE_H
+#  error "lib_common.h must always be included before libdeflate.h"
+   
+#endif
+
+#define BUILDING_LIBDEFLATE
+
+/* #include "../common_defs.h" */
+
+
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
+
+#include <stdbool.h>
+#include <stddef.h>	
+#include <stdint.h>
+#ifdef _MSC_VER
+#  include <stdlib.h>	
+#endif
+#ifndef FREESTANDING
+#  include <string.h>	
+#endif
+
+
+
+
+
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
+
+
+typedef size_t machine_word_t;
+
+
+#define WORDBYTES	((int)sizeof(machine_word_t))
+
+
+#define WORDBITS	(8 * WORDBYTES)
+
+
+
+
+
+
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
+#  define LIBEXPORT
+#endif
+
+
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
+#endif
+
+
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
+#endif
+
+
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
+#  define restrict
+#endif
+
+
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
+#  define likely(expr)		(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
+#  define unlikely(expr)	(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
+#  define prefetchr(addr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
+#  define prefetchw(addr)
+#endif
+
+
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#endif
+
+
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
+
+
+
+
+
+#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
+#define MIN(a, b)		((a) <= (b) ? (a) : (b))
+#define MAX(a, b)		((a) >= (b) ? (a) : (b))
+#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
+#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
+#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
+
+
+
+
+
+
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
+{
+	union {
+		u32 w;
+		u8 b;
+	} u;
+
+	u.w = 1;
+	return u.b;
+}
+#endif
+
+
+static forceinline u16 bswap16(u16 v)
+{
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
+}
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
+#endif
+
+
+
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
+#endif
+
+
+
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
+
+
+
+static forceinline u16
+get_unaligned_le16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
+}
+
+static forceinline u16
+get_unaligned_be16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
+}
+
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return get_unaligned_le32(p);
+	else
+		return get_unaligned_le64(p);
+}
+
+
+
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+	}
+}
+
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		put_unaligned_le32(v, p);
+	else
+		put_unaligned_le64(v, p);
+}
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+
+
+struct libdeflate_compressor;
+
+unsigned int libdeflate_get_compression_level(struct libdeflate_compressor *c);
+
+#endif 
+
+/* #include "deflate_constants.h" */
+
+
+#ifndef LIB_DEFLATE_CONSTANTS_H
+#define LIB_DEFLATE_CONSTANTS_H
+
+
+#define DEFLATE_BLOCKTYPE_UNCOMPRESSED		0
+#define DEFLATE_BLOCKTYPE_STATIC_HUFFMAN	1
+#define DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN	2
+
+
+#define DEFLATE_MIN_MATCH_LEN			3
+#define DEFLATE_MAX_MATCH_LEN			258
+
+
+#define DEFLATE_MAX_MATCH_OFFSET		32768
+
+
+#define DEFLATE_WINDOW_ORDER			15
+
+
+#define DEFLATE_NUM_PRECODE_SYMS		19
+#define DEFLATE_NUM_LITLEN_SYMS			288
+#define DEFLATE_NUM_OFFSET_SYMS			32
+
+
+#define DEFLATE_MAX_NUM_SYMS			288
+
+
+#define DEFLATE_NUM_LITERALS			256
+#define DEFLATE_END_OF_BLOCK			256
+#define DEFLATE_FIRST_LEN_SYM			257
+
+
+#define DEFLATE_MAX_PRE_CODEWORD_LEN		7
+#define DEFLATE_MAX_LITLEN_CODEWORD_LEN		15
+#define DEFLATE_MAX_OFFSET_CODEWORD_LEN		15
+
+
+#define DEFLATE_MAX_CODEWORD_LEN		15
+
+
+#define DEFLATE_MAX_LENS_OVERRUN		137
+
+
+#define DEFLATE_MAX_EXTRA_LENGTH_BITS		5
+#define DEFLATE_MAX_EXTRA_OFFSET_BITS		13
 
 #endif 
 
@@ -7173,8 +8158,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	7
-#define LIBDEFLATE_VERSION_STRING	"1.7"
+#define LIBDEFLATE_VERSION_MINOR	14
+#define LIBDEFLATE_VERSION_STRING	"1.14"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -7191,21 +8176,13 @@ extern "C" {
 #  define LIBDEFLATEEXPORT
 #endif
 
-#if defined(_WIN32) && !defined(_WIN64)
-#  define LIBDEFLATEAPI_ABI	__stdcall
-#else
-#  define LIBDEFLATEAPI_ABI
-#endif
-
 #if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
 	defined(_WIN32) && !defined(_WIN64)
     
-#  define LIBDEFLATEAPI_STACKALIGN	__attribute__((force_align_arg_pointer))
+#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
 #else
-#  define LIBDEFLATEAPI_STACKALIGN
+#  define LIBDEFLATEAPI
 #endif
-
-#define LIBDEFLATEAPI	LIBDEFLATEAPI_ABI LIBDEFLATEAPI_STACKALIGN
 
 
 
@@ -7358,16 +8335,58 @@ libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 
 
 
-#define SUPPORT_NEAR_OPTIMAL_PARSING 1
 
 
-#define USE_FULL_OFFSET_SLOT_FAST	SUPPORT_NEAR_OPTIMAL_PARSING
 
 
-#define MATCHFINDER_WINDOW_ORDER	15
+#define SUPPORT_NEAR_OPTIMAL_PARSING	1
 
+
+#define MIN_BLOCK_LENGTH	5000
+
+
+#define SOFT_MAX_BLOCK_LENGTH	300000
+
+
+#define SEQ_STORE_LENGTH	50000
+
+
+#define FAST_SOFT_MAX_BLOCK_LENGTH	65535
+
+
+#define FAST_SEQ_STORE_LENGTH	8192
+
+
+#define MAX_LITLEN_CODEWORD_LEN		14
+#define MAX_OFFSET_CODEWORD_LEN		DEFLATE_MAX_OFFSET_CODEWORD_LEN
+#define MAX_PRE_CODEWORD_LEN		DEFLATE_MAX_PRE_CODEWORD_LEN
+
+#if SUPPORT_NEAR_OPTIMAL_PARSING
+
+
+
+
+#define BIT_COST	16
+
+
+#define LITERAL_NOSTAT_BITS	13
+#define LENGTH_NOSTAT_BITS	13
+#define OFFSET_NOSTAT_BITS	10
+
+
+#define MATCH_CACHE_LENGTH	(SOFT_MAX_BLOCK_LENGTH * 5)
+
+#endif 
+
+
+
+
+#define MATCHFINDER_WINDOW_ORDER	DEFLATE_WINDOW_ORDER
 /* #include "hc_matchfinder.h" */
 
+
+#ifndef LIB_HC_MATCHFINDER_H
+#define LIB_HC_MATCHFINDER_H
 
 /* #include "matchfinder_common.h" */
 
@@ -7388,253 +8407,27 @@ libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -7643,6 +8436,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -7658,314 +8460,13 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
-#  define LIBEXPORT
-#endif
-
-
-#ifndef inline
-#  define inline
-#endif
-
-
-#ifndef forceinline
-#  define forceinline inline
-#endif
-
-
-#ifndef restrict
-#  define restrict
-#endif
-
-
-#ifndef likely
-#  define likely(expr)		(expr)
-#endif
-
-
-#ifndef unlikely
-#  define unlikely(expr)	(expr)
-#endif
-
-
-#ifndef prefetchr
-#  define prefetchr(addr)
-#endif
-
-
-#ifndef prefetchw
-#  define prefetchw(addr)
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
-
-
-
-
-
-#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
-#define MIN(a, b)		((a) <= (b) ? (a) : (b))
-#define MAX(a, b)		((a) >= (b) ? (a) : (b))
-#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
-#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
-#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
-
-
-
-
-
-
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
-{
-	union {
-		unsigned int v;
-		unsigned char b;
-	} u;
-	u.v = 1;
-	return u.b;
-}
-#endif
-
-
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
-{
-	return (n << 8) | (n >> 8);
-}
-#endif
-
-
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
-
-#ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
-#else
-#include <string.h>
-#endif
-
-#endif 
-
-/* #include "unaligned.h" */
-
-
-#ifndef LIB_UNALIGNED_H
-#define LIB_UNALIGNED_H
-
-/* #include "lib_common.h" */
-
-
-#ifndef LIB_LIB_COMMON_H
-#define LIB_LIB_COMMON_H
-
-#ifdef LIBDEFLATE_H
-#  error "lib_common.h must always be included before libdeflate.h"
-   
-#endif
-
-#define BUILDING_LIBDEFLATE
-
-/* #include "../common/common_defs.h" */
-
-
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
-
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
-
-
 #ifdef __clang__
 #  ifdef __apple_build_version__
 #    define CLANG_PREREQ(major, minor, apple_version)	\
@@ -7979,325 +8480,95 @@ int memcmp(const void *s1, const void *s2, size_t n);
 #  define CLANG_PREREQ(major, minor, apple_version)	0
 #endif
 
+
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
 #endif
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
 
+
 #ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
 #else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
-#include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
-#endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
-#endif
-
-
-
-
-
-#include <stddef.h> 
-
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
-
-
-typedef size_t machine_word_t;
-
-
-#define WORDBYTES	((int)sizeof(machine_word_t))
-
-
-#define WORDBITS	(8 * WORDBYTES)
-
-
-
-
-
-
-#ifndef LIBEXPORT
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -8309,186 +8580,106 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
 }
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
 
 #ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+#  define MEMCOPY	__builtin_memcpy
 #else
-#include <string.h>
+#  define MEMCOPY	memcpy
 #endif
-
-#endif 
-
-
-
 
 
 
@@ -8497,20 +8688,23 @@ static forceinline type						\
 load_##type##_unaligned(const void *p)				\
 {								\
 	type v;							\
-	memcpy(&v, p, sizeof(v));				\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
 	return v;						\
 }								\
 								\
 static forceinline void						\
 store_##type##_unaligned(type v, void *p)			\
 {								\
-	memcpy(p, &v, sizeof(v));				\
+	MEMCOPY(p, &v, sizeof(v));				\
 }
 
 DEFINE_UNALIGNED_TYPE(u16)
 DEFINE_UNALIGNED_TYPE(u32)
 DEFINE_UNALIGNED_TYPE(u64)
 DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
 
 #define load_word_unaligned	load_machine_word_t_unaligned
 #define store_word_unaligned	store_machine_word_t_unaligned
@@ -8657,6 +8851,177 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 
 
 
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#ifndef MATCHFINDER_WINDOW_ORDER
+#  error "MATCHFINDER_WINDOW_ORDER must be defined!"
+#endif
+
+
 static forceinline u32
 loaded_u32_to_u24(u32 v)
 {
@@ -8671,23 +9036,14 @@ static forceinline u32
 load_u24_unaligned(const u8 *p)
 {
 #if UNALIGNED_ACCESS_IS_FAST
-#  define LOAD_U24_REQUIRED_NBYTES 4
 	return loaded_u32_to_u24(load_u32_unaligned(p));
 #else
-#  define LOAD_U24_REQUIRED_NBYTES 3
 	if (CPU_IS_LITTLE_ENDIAN())
 		return ((u32)p[0] << 0) | ((u32)p[1] << 8) | ((u32)p[2] << 16);
 	else
 		return ((u32)p[2] << 0) | ((u32)p[1] << 8) | ((u32)p[0] << 16);
 #endif
 }
-
-#endif 
-
-
-#ifndef MATCHFINDER_WINDOW_ORDER
-#  error "MATCHFINDER_WINDOW_ORDER must be defined!"
-#endif
 
 #define MATCHFINDER_WINDOW_SIZE (1UL << MATCHFINDER_WINDOW_ORDER)
 
@@ -8702,11 +9058,801 @@ typedef s16 mf_pos_t;
 #undef matchfinder_init
 #undef matchfinder_rebase
 #ifdef _aligned_attribute
+#  define MATCHFINDER_ALIGNED _aligned_attribute(MATCHFINDER_MEM_ALIGNMENT)
 #  if defined(__arm__) || defined(__aarch64__)
 /* #    include "arm/matchfinder_impl.h" */
 
 
+#ifndef LIB_ARM_MATCHFINDER_IMPL_H
+#define LIB_ARM_MATCHFINDER_IMPL_H
+
+/* #include "arm-cpu_features.h" */
+
+
+#ifndef LIB_ARM_CPU_FEATURES_H
+#define LIB_ARM_CPU_FEATURES_H
+
+/* #include "lib_common.h" */
+
+
+#ifndef LIB_LIB_COMMON_H
+#define LIB_LIB_COMMON_H
+
+#ifdef LIBDEFLATE_H
+#  error "lib_common.h must always be included before libdeflate.h"
+   
+#endif
+
+#define BUILDING_LIBDEFLATE
+
+/* #include "../common_defs.h" */
+
+
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
+
+#include <stdbool.h>
+#include <stddef.h>	
+#include <stdint.h>
+#ifdef _MSC_VER
+#  include <stdlib.h>	
+#endif
+#ifndef FREESTANDING
+#  include <string.h>	
+#endif
+
+
+
+
+
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
+
+
+typedef size_t machine_word_t;
+
+
+#define WORDBYTES	((int)sizeof(machine_word_t))
+
+
+#define WORDBITS	(8 * WORDBYTES)
+
+
+
+
+
+
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
+#  define LIBEXPORT
+#endif
+
+
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
+#endif
+
+
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
+#endif
+
+
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
+#  define restrict
+#endif
+
+
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
+#  define likely(expr)		(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
+#  define unlikely(expr)	(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
+#  define prefetchr(addr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
+#  define prefetchw(addr)
+#endif
+
+
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#endif
+
+
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
+
+
+
+
+
+#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
+#define MIN(a, b)		((a) <= (b) ? (a) : (b))
+#define MAX(a, b)		((a) >= (b) ? (a) : (b))
+#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
+#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
+#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
+
+
+
+
+
+
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
+{
+	union {
+		u32 w;
+		u8 b;
+	} u;
+
+	u.w = 1;
+	return u.b;
+}
+#endif
+
+
+static forceinline u16 bswap16(u16 v)
+{
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
+}
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
+#endif
+
+
+
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
+#endif
+
+
+
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
+
+
+
+static forceinline u16
+get_unaligned_le16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
+}
+
+static forceinline u16
+get_unaligned_be16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
+}
+
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return get_unaligned_le32(p);
+	else
+		return get_unaligned_le64(p);
+}
+
+
+
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+	}
+}
+
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		put_unaligned_le32(v, p);
+	else
+		put_unaligned_le64(v, p);
+}
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
+
+#if defined(__arm__) || defined(__aarch64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
+	!defined(FREESTANDING) && \
+	(defined(__linux__) || \
+	 (defined(__aarch64__) && defined(__APPLE__)))
+#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
+#endif
+
+#define ARM_CPU_FEATURE_NEON		0x00000001
+#define ARM_CPU_FEATURE_PMULL		0x00000002
+#define ARM_CPU_FEATURE_CRC32		0x00000004
+#define ARM_CPU_FEATURE_SHA3		0x00000008
+#define ARM_CPU_FEATURE_DOTPROD		0x00000010
+
+#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
+#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
+#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
+#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
+#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
+
+#if HAVE_DYNAMIC_ARM_CPU_FEATURES
+#define ARM_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_arm_cpu_features;
+
+void libdeflate_init_arm_cpu_features(void);
+
+static inline u32 get_arm_cpu_features(void)
+{
+	if (libdeflate_arm_cpu_features == 0)
+		libdeflate_init_arm_cpu_features();
+	return libdeflate_arm_cpu_features;
+}
+#else 
+static inline u32 get_arm_cpu_features(void) { return 0; }
+#endif 
+
+
 #ifdef __ARM_NEON
+#  define HAVE_NEON_NATIVE	1
+#else
+#  define HAVE_NEON_NATIVE	0
+#endif
+#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
+
+#if HAVE_NEON_NATIVE || \
+	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#  define HAVE_NEON_INTRIN	1
+#else
+#  define HAVE_NEON_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRYPTO
+#  define HAVE_PMULL_NATIVE	1
+#else
+#  define HAVE_PMULL_NATIVE	0
+#endif
+#define HAVE_PMULL_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
+
+#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
+	!(defined(__arm__) && defined(__clang__)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
+#else
+#  define HAVE_PMULL_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRC32
+#  define HAVE_CRC32_NATIVE	1
+#else
+#  define HAVE_CRC32_NATIVE	0
+#endif
+#define HAVE_CRC32_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+
+#define HAVE_CRC32_INTRIN \
+	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
+			       (!GCC_PREREQ(1, 0) || \
+				GCC_PREREQ(11, 3) || \
+				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_SHA3
+#    define HAVE_SHA3_NATIVE	1
+#  else
+#    define HAVE_SHA3_NATIVE	0
+#  endif
+#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+				 (GCC_PREREQ(8, 1)  || \
+				  CLANG_PREREQ(7, 0, 10010463) ))
+#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+				 (GCC_PREREQ(9, 1)  || \
+				  __has_builtin(__builtin_neon_veor3q_v)))
+#else
+#  define HAVE_SHA3_NATIVE	0
+#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3_INTRIN	0
+#endif
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_DOTPROD
+#    define HAVE_DOTPROD_NATIVE	1
+#  else
+#    define HAVE_DOTPROD_NATIVE	0
+#  endif
+#  define HAVE_DOTPROD_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
+#  define HAVE_DOTPROD_INTRIN \
+	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+#else
+#  define HAVE_DOTPROD_NATIVE	0
+#  define HAVE_DOTPROD_TARGET	0
+#  define HAVE_DOTPROD_INTRIN	0
+#endif
+
+
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  define __ARM_FEATURE_CRC32	1
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_SHA3	1
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_DOTPROD	1
+#endif
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  include <arm_acle.h>
+#  undef __ARM_FEATURE_CRC32
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_SHA3
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_DOTPROD
+#endif
+
+#endif 
+
+#endif 
+
+
+#if HAVE_NEON_NATIVE
 #  include <arm_neon.h>
 static forceinline void
 matchfinder_init_neon(mf_pos_t *data, size_t size)
@@ -8761,11 +9907,769 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 
 #endif 
 
+#endif 
+
 #  elif defined(__i386__) || defined(__x86_64__)
 /* #    include "x86/matchfinder_impl.h" */
 
 
+#ifndef LIB_X86_MATCHFINDER_IMPL_H
+#define LIB_X86_MATCHFINDER_IMPL_H
+
+/* #include "x86-cpu_features.h" */
+
+
+#ifndef LIB_X86_CPU_FEATURES_H
+#define LIB_X86_CPU_FEATURES_H
+
+/* #include "lib_common.h" */
+
+
+#ifndef LIB_LIB_COMMON_H
+#define LIB_LIB_COMMON_H
+
+#ifdef LIBDEFLATE_H
+#  error "lib_common.h must always be included before libdeflate.h"
+   
+#endif
+
+#define BUILDING_LIBDEFLATE
+
+/* #include "../common_defs.h" */
+
+
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
+
+#include <stdbool.h>
+#include <stddef.h>	
+#include <stdint.h>
+#ifdef _MSC_VER
+#  include <stdlib.h>	
+#endif
+#ifndef FREESTANDING
+#  include <string.h>	
+#endif
+
+
+
+
+
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
+
+
+typedef size_t machine_word_t;
+
+
+#define WORDBYTES	((int)sizeof(machine_word_t))
+
+
+#define WORDBITS	(8 * WORDBYTES)
+
+
+
+
+
+
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
+#  define LIBEXPORT
+#endif
+
+
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
+#endif
+
+
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
+#endif
+
+
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
+#  define restrict
+#endif
+
+
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
+#  define likely(expr)		(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
+#  define unlikely(expr)	(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
+#  define prefetchr(addr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
+#  define prefetchw(addr)
+#endif
+
+
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#endif
+
+
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
+
+
+
+
+
+#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
+#define MIN(a, b)		((a) <= (b) ? (a) : (b))
+#define MAX(a, b)		((a) >= (b) ? (a) : (b))
+#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
+#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
+#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
+
+
+
+
+
+
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
+{
+	union {
+		u32 w;
+		u8 b;
+	} u;
+
+	u.w = 1;
+	return u.b;
+}
+#endif
+
+
+static forceinline u16 bswap16(u16 v)
+{
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
+}
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
+#endif
+
+
+
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
+#endif
+
+
+
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
+
+
+
+static forceinline u16
+get_unaligned_le16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
+}
+
+static forceinline u16
+get_unaligned_be16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
+}
+
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return get_unaligned_le32(p);
+	else
+		return get_unaligned_le64(p);
+}
+
+
+
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+	}
+}
+
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		put_unaligned_le32(v, p);
+	else
+		put_unaligned_le64(v, p);
+}
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
+
+#if defined(__i386__) || defined(__x86_64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
+#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
+#endif
+
+#define X86_CPU_FEATURE_SSE2		0x00000001
+#define X86_CPU_FEATURE_PCLMUL		0x00000002
+#define X86_CPU_FEATURE_AVX		0x00000004
+#define X86_CPU_FEATURE_AVX2		0x00000008
+#define X86_CPU_FEATURE_BMI2		0x00000010
+
+#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
+#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
+#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
+#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
+#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+
+#if HAVE_DYNAMIC_X86_CPU_FEATURES
+#define X86_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_x86_cpu_features;
+
+void libdeflate_init_x86_cpu_features(void);
+
+static inline u32 get_x86_cpu_features(void)
+{
+	if (libdeflate_x86_cpu_features == 0)
+		libdeflate_init_x86_cpu_features();
+	return libdeflate_x86_cpu_features;
+}
+#else 
+static inline u32 get_x86_cpu_features(void) { return 0; }
+#endif 
+
+
+#define HAVE_TARGET_INTRINSICS \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
+
+
+#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
+	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
+	defined(__INTEL_COMPILER)
+typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
+typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
+typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
+typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
+typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
+typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
+typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
+typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
+#endif
+#ifdef __INTEL_COMPILER
+typedef int   __v16si __attribute__((__vector_size__(64)));
+typedef short __v32hi __attribute__((__vector_size__(64)));
+typedef char  __v64qi __attribute__((__vector_size__(64)));
+#endif
+
+
+#ifdef __SSE2__
+#  define HAVE_SSE2_NATIVE	1
+#else
+#  define HAVE_SSE2_NATIVE	0
+#endif
+#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
+#define HAVE_SSE2_INTRIN \
+	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __PCLMUL__
+#  define HAVE_PCLMUL_NATIVE	1
+#else
+#  define HAVE_PCLMUL_NATIVE	0
+#endif
+#define HAVE_PCLMUL_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
+#define HAVE_PCLMUL_INTRIN \
+	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX__
+#  define HAVE_AVX_NATIVE	1
+#else
+#  define HAVE_AVX_NATIVE	0
+#endif
+#define HAVE_AVX_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
+#define HAVE_AVX_INTRIN \
+	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+
+
 #ifdef __AVX2__
+#  define HAVE_AVX2_NATIVE	1
+#else
+#  define HAVE_AVX2_NATIVE	0
+#endif
+#define HAVE_AVX2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
+#define HAVE_AVX2_INTRIN \
+	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __BMI2__
+#  define HAVE_BMI2_NATIVE	1
+#else
+#  define HAVE_BMI2_NATIVE	0
+#endif
+#define HAVE_BMI2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
+#define HAVE_BMI2_INTRIN \
+	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+
+#endif 
+
+#endif 
+
+
+#if HAVE_AVX2_NATIVE
 #  include <immintrin.h>
 static forceinline void
 matchfinder_init_avx2(mf_pos_t *data, size_t size)
@@ -8810,7 +10714,7 @@ matchfinder_rebase_avx2(mf_pos_t *data, size_t size)
 }
 #define matchfinder_rebase matchfinder_rebase_avx2
 
-#elif defined(__SSE2__)
+#elif HAVE_SSE2_NATIVE
 #  include <emmintrin.h>
 static forceinline void
 matchfinder_init_sse2(mf_pos_t *data, size_t size)
@@ -8856,7 +10760,11 @@ matchfinder_rebase_sse2(mf_pos_t *data, size_t size)
 #define matchfinder_rebase matchfinder_rebase_sse2
 #endif 
 
+#endif 
+
 #  endif
+#else
+#  define MATCHFINDER_ALIGNED
 #endif
 
 
@@ -8882,21 +10790,15 @@ matchfinder_rebase(mf_pos_t *data, size_t size)
 
 	if (MATCHFINDER_WINDOW_SIZE == 32768) {
 		
+		for (i = 0; i < num_entries; i++)
+			data[i] = 0x8000 | (data[i] & ~(data[i] >> 15));
+	} else {
 		for (i = 0; i < num_entries; i++) {
-			u16 v = data[i];
-			u16 sign_bit = v & 0x8000;
-			v &= sign_bit - ((sign_bit >> 15) ^ 1);
-			v |= 0x8000;
-			data[i] = v;
+			if (data[i] >= 0)
+				data[i] -= (mf_pos_t)-MATCHFINDER_WINDOW_SIZE;
+			else
+				data[i] = (mf_pos_t)-MATCHFINDER_WINDOW_SIZE;
 		}
-		return;
-	}
-
-	for (i = 0; i < num_entries; i++) {
-		if (data[i] >= 0)
-			data[i] -= (mf_pos_t)-MATCHFINDER_WINDOW_SIZE;
-		else
-			data[i] = (mf_pos_t)-MATCHFINDER_WINDOW_SIZE;
 	}
 }
 #endif
@@ -8976,11 +10878,7 @@ struct hc_matchfinder {
 	
 	mf_pos_t next_tab[MATCHFINDER_WINDOW_SIZE];
 
-}
-#ifdef _aligned_attribute
-  _aligned_attribute(MATCHFINDER_MEM_ALIGNMENT)
-#endif
-;
+} MATCHFINDER_ALIGNED;
 
 
 static forceinline void
@@ -9002,15 +10900,15 @@ hc_matchfinder_slide_window(struct hc_matchfinder *mf)
 
 
 static forceinline u32
-hc_matchfinder_longest_match(struct hc_matchfinder * const restrict mf,
-			     const u8 ** const restrict in_base_p,
-			     const u8 * const restrict in_next,
+hc_matchfinder_longest_match(struct hc_matchfinder * const mf,
+			     const u8 ** const in_base_p,
+			     const u8 * const in_next,
 			     u32 best_len,
 			     const u32 max_len,
 			     const u32 nice_len,
 			     const u32 max_search_depth,
-			     u32 * const restrict next_hashes,
-			     u32 * const restrict offset_ret)
+			     u32 * const next_hashes,
+			     u32 * const offset_ret)
 {
 	u32 depth_remaining = max_search_depth;
 	const u8 *best_matchptr = in_next;
@@ -9154,13 +11052,13 @@ out:
 }
 
 
-static forceinline const u8 *
-hc_matchfinder_skip_positions(struct hc_matchfinder * const restrict mf,
-			      const u8 ** const restrict in_base_p,
-			      const u8 *in_next,
-			      const u8 * const in_end,
-			      const u32 count,
-			      u32 * const restrict next_hashes)
+static forceinline void
+hc_matchfinder_skip_bytes(struct hc_matchfinder * const mf,
+			  const u8 ** const in_base_p,
+			  const u8 *in_next,
+			  const u8 * const in_end,
+			  const u32 count,
+			  u32 * const next_hashes)
 {
 	u32 cur_pos;
 	u32 hash3, hash4;
@@ -9168,7 +11066,7 @@ hc_matchfinder_skip_positions(struct hc_matchfinder * const restrict mf,
 	u32 remaining = count;
 
 	if (unlikely(count + 5 > in_end - in_next))
-		return &in_next[count];
+		return;
 
 	cur_pos = in_next - *in_base_p;
 	hash3 = next_hashes[0];
@@ -9193,14 +11091,15 @@ hc_matchfinder_skip_positions(struct hc_matchfinder * const restrict mf,
 	prefetchw(&mf->hash4_tab[hash4]);
 	next_hashes[0] = hash3;
 	next_hashes[1] = hash4;
-
-	return in_next;
 }
 
-#if SUPPORT_NEAR_OPTIMAL_PARSING
-/* #  include "bt_matchfinder.h" */
+#endif 
+
+/* #include "ht_matchfinder.h" */
 
 
+#ifndef LIB_HT_MATCHFINDER_H
+#define LIB_HT_MATCHFINDER_H
 
 /* #include "matchfinder_common.h" */
 
@@ -9221,253 +11120,27 @@ hc_matchfinder_skip_positions(struct hc_matchfinder * const restrict mf,
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -9476,6 +11149,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -9491,314 +11173,13 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
-#  define LIBEXPORT
-#endif
-
-
-#ifndef inline
-#  define inline
-#endif
-
-
-#ifndef forceinline
-#  define forceinline inline
-#endif
-
-
-#ifndef restrict
-#  define restrict
-#endif
-
-
-#ifndef likely
-#  define likely(expr)		(expr)
-#endif
-
-
-#ifndef unlikely
-#  define unlikely(expr)	(expr)
-#endif
-
-
-#ifndef prefetchr
-#  define prefetchr(addr)
-#endif
-
-
-#ifndef prefetchw
-#  define prefetchw(addr)
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
-
-
-
-
-
-#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
-#define MIN(a, b)		((a) <= (b) ? (a) : (b))
-#define MAX(a, b)		((a) >= (b) ? (a) : (b))
-#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
-#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
-#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
-
-
-
-
-
-
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
-{
-	union {
-		unsigned int v;
-		unsigned char b;
-	} u;
-	u.v = 1;
-	return u.b;
-}
-#endif
-
-
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
-{
-	return (n << 8) | (n >> 8);
-}
-#endif
-
-
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
-
-#ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
-#else
-#include <string.h>
-#endif
-
-#endif 
-
-/* #include "unaligned.h" */
-
-
-#ifndef LIB_UNALIGNED_H
-#define LIB_UNALIGNED_H
-
-/* #include "lib_common.h" */
-
-
-#ifndef LIB_LIB_COMMON_H
-#define LIB_LIB_COMMON_H
-
-#ifdef LIBDEFLATE_H
-#  error "lib_common.h must always be included before libdeflate.h"
-   
-#endif
-
-#define BUILDING_LIBDEFLATE
-
-/* #include "../common/common_defs.h" */
-
-
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
-
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
-
-
 #ifdef __clang__
 #  ifdef __apple_build_version__
 #    define CLANG_PREREQ(major, minor, apple_version)	\
@@ -9812,325 +11193,95 @@ int memcmp(const void *s1, const void *s2, size_t n);
 #  define CLANG_PREREQ(major, minor, apple_version)	0
 #endif
 
+
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
 #endif
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
 
+
 #ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
 #else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
-#include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
-#endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
-#endif
-
-
-
-
-
-#include <stddef.h> 
-
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
-
-
-typedef size_t machine_word_t;
-
-
-#define WORDBYTES	((int)sizeof(machine_word_t))
-
-
-#define WORDBITS	(8 * WORDBYTES)
-
-
-
-
-
-
-#ifndef LIBEXPORT
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -10142,186 +11293,106 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
 }
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
 
 #ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+#  define MEMCOPY	__builtin_memcpy
 #else
-#include <string.h>
+#  define MEMCOPY	memcpy
 #endif
-
-#endif 
-
-
-
 
 
 
@@ -10330,20 +11401,23 @@ static forceinline type						\
 load_##type##_unaligned(const void *p)				\
 {								\
 	type v;							\
-	memcpy(&v, p, sizeof(v));				\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
 	return v;						\
 }								\
 								\
 static forceinline void						\
 store_##type##_unaligned(type v, void *p)			\
 {								\
-	memcpy(p, &v, sizeof(v));				\
+	MEMCOPY(p, &v, sizeof(v));				\
 }
 
 DEFINE_UNALIGNED_TYPE(u16)
 DEFINE_UNALIGNED_TYPE(u32)
 DEFINE_UNALIGNED_TYPE(u64)
 DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
 
 #define load_word_unaligned	load_machine_word_t_unaligned
 #define store_word_unaligned	store_machine_word_t_unaligned
@@ -10490,6 +11564,177 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 
 
 
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#ifndef MATCHFINDER_WINDOW_ORDER
+#  error "MATCHFINDER_WINDOW_ORDER must be defined!"
+#endif
+
+
 static forceinline u32
 loaded_u32_to_u24(u32 v)
 {
@@ -10504,23 +11749,14 @@ static forceinline u32
 load_u24_unaligned(const u8 *p)
 {
 #if UNALIGNED_ACCESS_IS_FAST
-#  define LOAD_U24_REQUIRED_NBYTES 4
 	return loaded_u32_to_u24(load_u32_unaligned(p));
 #else
-#  define LOAD_U24_REQUIRED_NBYTES 3
 	if (CPU_IS_LITTLE_ENDIAN())
 		return ((u32)p[0] << 0) | ((u32)p[1] << 8) | ((u32)p[2] << 16);
 	else
 		return ((u32)p[2] << 0) | ((u32)p[1] << 8) | ((u32)p[0] << 16);
 #endif
 }
-
-#endif 
-
-
-#ifndef MATCHFINDER_WINDOW_ORDER
-#  error "MATCHFINDER_WINDOW_ORDER must be defined!"
-#endif
 
 #define MATCHFINDER_WINDOW_SIZE (1UL << MATCHFINDER_WINDOW_ORDER)
 
@@ -10535,11 +11771,801 @@ typedef s16 mf_pos_t;
 #undef matchfinder_init
 #undef matchfinder_rebase
 #ifdef _aligned_attribute
+#  define MATCHFINDER_ALIGNED _aligned_attribute(MATCHFINDER_MEM_ALIGNMENT)
 #  if defined(__arm__) || defined(__aarch64__)
 /* #    include "arm/matchfinder_impl.h" */
 
 
+#ifndef LIB_ARM_MATCHFINDER_IMPL_H
+#define LIB_ARM_MATCHFINDER_IMPL_H
+
+/* #include "arm-cpu_features.h" */
+
+
+#ifndef LIB_ARM_CPU_FEATURES_H
+#define LIB_ARM_CPU_FEATURES_H
+
+/* #include "lib_common.h" */
+
+
+#ifndef LIB_LIB_COMMON_H
+#define LIB_LIB_COMMON_H
+
+#ifdef LIBDEFLATE_H
+#  error "lib_common.h must always be included before libdeflate.h"
+   
+#endif
+
+#define BUILDING_LIBDEFLATE
+
+/* #include "../common_defs.h" */
+
+
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
+
+#include <stdbool.h>
+#include <stddef.h>	
+#include <stdint.h>
+#ifdef _MSC_VER
+#  include <stdlib.h>	
+#endif
+#ifndef FREESTANDING
+#  include <string.h>	
+#endif
+
+
+
+
+
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
+
+
+typedef size_t machine_word_t;
+
+
+#define WORDBYTES	((int)sizeof(machine_word_t))
+
+
+#define WORDBITS	(8 * WORDBYTES)
+
+
+
+
+
+
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
+#  define LIBEXPORT
+#endif
+
+
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
+#endif
+
+
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
+#endif
+
+
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
+#  define restrict
+#endif
+
+
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
+#  define likely(expr)		(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
+#  define unlikely(expr)	(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
+#  define prefetchr(addr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
+#  define prefetchw(addr)
+#endif
+
+
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#endif
+
+
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
+
+
+
+
+
+#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
+#define MIN(a, b)		((a) <= (b) ? (a) : (b))
+#define MAX(a, b)		((a) >= (b) ? (a) : (b))
+#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
+#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
+#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
+
+
+
+
+
+
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
+{
+	union {
+		u32 w;
+		u8 b;
+	} u;
+
+	u.w = 1;
+	return u.b;
+}
+#endif
+
+
+static forceinline u16 bswap16(u16 v)
+{
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
+}
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
+#endif
+
+
+
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
+#endif
+
+
+
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
+
+
+
+static forceinline u16
+get_unaligned_le16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
+}
+
+static forceinline u16
+get_unaligned_be16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
+}
+
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return get_unaligned_le32(p);
+	else
+		return get_unaligned_le64(p);
+}
+
+
+
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+	}
+}
+
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		put_unaligned_le32(v, p);
+	else
+		put_unaligned_le64(v, p);
+}
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
+
+#if defined(__arm__) || defined(__aarch64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
+	!defined(FREESTANDING) && \
+	(defined(__linux__) || \
+	 (defined(__aarch64__) && defined(__APPLE__)))
+#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
+#endif
+
+#define ARM_CPU_FEATURE_NEON		0x00000001
+#define ARM_CPU_FEATURE_PMULL		0x00000002
+#define ARM_CPU_FEATURE_CRC32		0x00000004
+#define ARM_CPU_FEATURE_SHA3		0x00000008
+#define ARM_CPU_FEATURE_DOTPROD		0x00000010
+
+#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
+#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
+#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
+#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
+#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
+
+#if HAVE_DYNAMIC_ARM_CPU_FEATURES
+#define ARM_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_arm_cpu_features;
+
+void libdeflate_init_arm_cpu_features(void);
+
+static inline u32 get_arm_cpu_features(void)
+{
+	if (libdeflate_arm_cpu_features == 0)
+		libdeflate_init_arm_cpu_features();
+	return libdeflate_arm_cpu_features;
+}
+#else 
+static inline u32 get_arm_cpu_features(void) { return 0; }
+#endif 
+
+
 #ifdef __ARM_NEON
+#  define HAVE_NEON_NATIVE	1
+#else
+#  define HAVE_NEON_NATIVE	0
+#endif
+#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
+
+#if HAVE_NEON_NATIVE || \
+	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#  define HAVE_NEON_INTRIN	1
+#else
+#  define HAVE_NEON_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRYPTO
+#  define HAVE_PMULL_NATIVE	1
+#else
+#  define HAVE_PMULL_NATIVE	0
+#endif
+#define HAVE_PMULL_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
+
+#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
+	!(defined(__arm__) && defined(__clang__)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
+#else
+#  define HAVE_PMULL_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRC32
+#  define HAVE_CRC32_NATIVE	1
+#else
+#  define HAVE_CRC32_NATIVE	0
+#endif
+#define HAVE_CRC32_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+
+#define HAVE_CRC32_INTRIN \
+	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
+			       (!GCC_PREREQ(1, 0) || \
+				GCC_PREREQ(11, 3) || \
+				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_SHA3
+#    define HAVE_SHA3_NATIVE	1
+#  else
+#    define HAVE_SHA3_NATIVE	0
+#  endif
+#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+				 (GCC_PREREQ(8, 1)  || \
+				  CLANG_PREREQ(7, 0, 10010463) ))
+#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+				 (GCC_PREREQ(9, 1)  || \
+				  __has_builtin(__builtin_neon_veor3q_v)))
+#else
+#  define HAVE_SHA3_NATIVE	0
+#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3_INTRIN	0
+#endif
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_DOTPROD
+#    define HAVE_DOTPROD_NATIVE	1
+#  else
+#    define HAVE_DOTPROD_NATIVE	0
+#  endif
+#  define HAVE_DOTPROD_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
+#  define HAVE_DOTPROD_INTRIN \
+	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+#else
+#  define HAVE_DOTPROD_NATIVE	0
+#  define HAVE_DOTPROD_TARGET	0
+#  define HAVE_DOTPROD_INTRIN	0
+#endif
+
+
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  define __ARM_FEATURE_CRC32	1
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_SHA3	1
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_DOTPROD	1
+#endif
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  include <arm_acle.h>
+#  undef __ARM_FEATURE_CRC32
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_SHA3
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_DOTPROD
+#endif
+
+#endif 
+
+#endif 
+
+
+#if HAVE_NEON_NATIVE
 #  include <arm_neon.h>
 static forceinline void
 matchfinder_init_neon(mf_pos_t *data, size_t size)
@@ -10594,11 +12620,769 @@ matchfinder_rebase_neon(mf_pos_t *data, size_t size)
 
 #endif 
 
+#endif 
+
 #  elif defined(__i386__) || defined(__x86_64__)
 /* #    include "x86/matchfinder_impl.h" */
 
 
+#ifndef LIB_X86_MATCHFINDER_IMPL_H
+#define LIB_X86_MATCHFINDER_IMPL_H
+
+/* #include "x86-cpu_features.h" */
+
+
+#ifndef LIB_X86_CPU_FEATURES_H
+#define LIB_X86_CPU_FEATURES_H
+
+/* #include "lib_common.h" */
+
+
+#ifndef LIB_LIB_COMMON_H
+#define LIB_LIB_COMMON_H
+
+#ifdef LIBDEFLATE_H
+#  error "lib_common.h must always be included before libdeflate.h"
+   
+#endif
+
+#define BUILDING_LIBDEFLATE
+
+/* #include "../common_defs.h" */
+
+
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
+
+#include <stdbool.h>
+#include <stddef.h>	
+#include <stdint.h>
+#ifdef _MSC_VER
+#  include <stdlib.h>	
+#endif
+#ifndef FREESTANDING
+#  include <string.h>	
+#endif
+
+
+
+
+
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
+
+
+typedef size_t machine_word_t;
+
+
+#define WORDBYTES	((int)sizeof(machine_word_t))
+
+
+#define WORDBITS	(8 * WORDBYTES)
+
+
+
+
+
+
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
+#  define LIBEXPORT
+#endif
+
+
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
+#endif
+
+
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
+#endif
+
+
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
+#  define restrict
+#endif
+
+
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
+#  define likely(expr)		(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
+#  define unlikely(expr)	(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
+#  define prefetchr(addr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
+#  define prefetchw(addr)
+#endif
+
+
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#endif
+
+
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
+
+
+
+
+
+#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
+#define MIN(a, b)		((a) <= (b) ? (a) : (b))
+#define MAX(a, b)		((a) >= (b) ? (a) : (b))
+#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
+#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
+#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
+
+
+
+
+
+
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
+{
+	union {
+		u32 w;
+		u8 b;
+	} u;
+
+	u.w = 1;
+	return u.b;
+}
+#endif
+
+
+static forceinline u16 bswap16(u16 v)
+{
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
+}
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
+#endif
+
+
+
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
+#endif
+
+
+
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
+
+
+
+static forceinline u16
+get_unaligned_le16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
+}
+
+static forceinline u16
+get_unaligned_be16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
+}
+
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return get_unaligned_le32(p);
+	else
+		return get_unaligned_le64(p);
+}
+
+
+
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+	}
+}
+
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		put_unaligned_le32(v, p);
+	else
+		put_unaligned_le64(v, p);
+}
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
+
+#if defined(__i386__) || defined(__x86_64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
+#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
+#endif
+
+#define X86_CPU_FEATURE_SSE2		0x00000001
+#define X86_CPU_FEATURE_PCLMUL		0x00000002
+#define X86_CPU_FEATURE_AVX		0x00000004
+#define X86_CPU_FEATURE_AVX2		0x00000008
+#define X86_CPU_FEATURE_BMI2		0x00000010
+
+#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
+#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
+#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
+#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
+#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+
+#if HAVE_DYNAMIC_X86_CPU_FEATURES
+#define X86_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_x86_cpu_features;
+
+void libdeflate_init_x86_cpu_features(void);
+
+static inline u32 get_x86_cpu_features(void)
+{
+	if (libdeflate_x86_cpu_features == 0)
+		libdeflate_init_x86_cpu_features();
+	return libdeflate_x86_cpu_features;
+}
+#else 
+static inline u32 get_x86_cpu_features(void) { return 0; }
+#endif 
+
+
+#define HAVE_TARGET_INTRINSICS \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
+
+
+#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
+	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
+	defined(__INTEL_COMPILER)
+typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
+typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
+typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
+typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
+typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
+typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
+typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
+typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
+#endif
+#ifdef __INTEL_COMPILER
+typedef int   __v16si __attribute__((__vector_size__(64)));
+typedef short __v32hi __attribute__((__vector_size__(64)));
+typedef char  __v64qi __attribute__((__vector_size__(64)));
+#endif
+
+
+#ifdef __SSE2__
+#  define HAVE_SSE2_NATIVE	1
+#else
+#  define HAVE_SSE2_NATIVE	0
+#endif
+#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
+#define HAVE_SSE2_INTRIN \
+	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __PCLMUL__
+#  define HAVE_PCLMUL_NATIVE	1
+#else
+#  define HAVE_PCLMUL_NATIVE	0
+#endif
+#define HAVE_PCLMUL_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
+#define HAVE_PCLMUL_INTRIN \
+	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX__
+#  define HAVE_AVX_NATIVE	1
+#else
+#  define HAVE_AVX_NATIVE	0
+#endif
+#define HAVE_AVX_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
+#define HAVE_AVX_INTRIN \
+	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+
+
 #ifdef __AVX2__
+#  define HAVE_AVX2_NATIVE	1
+#else
+#  define HAVE_AVX2_NATIVE	0
+#endif
+#define HAVE_AVX2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
+#define HAVE_AVX2_INTRIN \
+	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __BMI2__
+#  define HAVE_BMI2_NATIVE	1
+#else
+#  define HAVE_BMI2_NATIVE	0
+#endif
+#define HAVE_BMI2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
+#define HAVE_BMI2_INTRIN \
+	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+
+#endif 
+
+#endif 
+
+
+#if HAVE_AVX2_NATIVE
 #  include <immintrin.h>
 static forceinline void
 matchfinder_init_avx2(mf_pos_t *data, size_t size)
@@ -10643,7 +13427,7 @@ matchfinder_rebase_avx2(mf_pos_t *data, size_t size)
 }
 #define matchfinder_rebase matchfinder_rebase_avx2
 
-#elif defined(__SSE2__)
+#elif HAVE_SSE2_NATIVE
 #  include <emmintrin.h>
 static forceinline void
 matchfinder_init_sse2(mf_pos_t *data, size_t size)
@@ -10689,7 +13473,11 @@ matchfinder_rebase_sse2(mf_pos_t *data, size_t size)
 #define matchfinder_rebase matchfinder_rebase_sse2
 #endif 
 
+#endif 
+
 #  endif
+#else
+#  define MATCHFINDER_ALIGNED
 #endif
 
 
@@ -10715,21 +13503,2676 @@ matchfinder_rebase(mf_pos_t *data, size_t size)
 
 	if (MATCHFINDER_WINDOW_SIZE == 32768) {
 		
+		for (i = 0; i < num_entries; i++)
+			data[i] = 0x8000 | (data[i] & ~(data[i] >> 15));
+	} else {
 		for (i = 0; i < num_entries; i++) {
-			u16 v = data[i];
-			u16 sign_bit = v & 0x8000;
-			v &= sign_bit - ((sign_bit >> 15) ^ 1);
-			v |= 0x8000;
-			data[i] = v;
+			if (data[i] >= 0)
+				data[i] -= (mf_pos_t)-MATCHFINDER_WINDOW_SIZE;
+			else
+				data[i] = (mf_pos_t)-MATCHFINDER_WINDOW_SIZE;
 		}
-		return;
+	}
+}
+#endif
+
+
+static forceinline u32
+lz_hash(u32 seq, unsigned num_bits)
+{
+	return (u32)(seq * 0x1E35A7BD) >> (32 - num_bits);
+}
+
+
+static forceinline unsigned
+lz_extend(const u8 * const strptr, const u8 * const matchptr,
+	  const unsigned start_len, const unsigned max_len)
+{
+	unsigned len = start_len;
+	machine_word_t v_word;
+
+	if (UNALIGNED_ACCESS_IS_FAST) {
+
+		if (likely(max_len - len >= 4 * WORDBYTES)) {
+
+		#define COMPARE_WORD_STEP				\
+			v_word = load_word_unaligned(&matchptr[len]) ^	\
+				 load_word_unaligned(&strptr[len]);	\
+			if (v_word != 0)				\
+				goto word_differs;			\
+			len += WORDBYTES;				\
+
+			COMPARE_WORD_STEP
+			COMPARE_WORD_STEP
+			COMPARE_WORD_STEP
+			COMPARE_WORD_STEP
+		#undef COMPARE_WORD_STEP
+		}
+
+		while (len + WORDBYTES <= max_len) {
+			v_word = load_word_unaligned(&matchptr[len]) ^
+				 load_word_unaligned(&strptr[len]);
+			if (v_word != 0)
+				goto word_differs;
+			len += WORDBYTES;
+		}
 	}
 
-	for (i = 0; i < num_entries; i++) {
-		if (data[i] >= 0)
-			data[i] -= (mf_pos_t)-MATCHFINDER_WINDOW_SIZE;
-		else
-			data[i] = (mf_pos_t)-MATCHFINDER_WINDOW_SIZE;
+	while (len < max_len && matchptr[len] == strptr[len])
+		len++;
+	return len;
+
+word_differs:
+	if (CPU_IS_LITTLE_ENDIAN())
+		len += (bsfw(v_word) >> 3);
+	else
+		len += (WORDBITS - 1 - bsrw(v_word)) >> 3;
+	return len;
+}
+
+#endif 
+
+
+#define HT_MATCHFINDER_HASH_ORDER	15
+#define HT_MATCHFINDER_BUCKET_SIZE	2
+
+#define HT_MATCHFINDER_MIN_MATCH_LEN	4
+
+#define HT_MATCHFINDER_REQUIRED_NBYTES	5
+
+struct ht_matchfinder {
+	mf_pos_t hash_tab[1UL << HT_MATCHFINDER_HASH_ORDER]
+			 [HT_MATCHFINDER_BUCKET_SIZE];
+} MATCHFINDER_ALIGNED;
+
+static forceinline void
+ht_matchfinder_init(struct ht_matchfinder *mf)
+{
+	STATIC_ASSERT(sizeof(*mf) % MATCHFINDER_SIZE_ALIGNMENT == 0);
+
+	matchfinder_init((mf_pos_t *)mf, sizeof(*mf));
+}
+
+static forceinline void
+ht_matchfinder_slide_window(struct ht_matchfinder *mf)
+{
+	matchfinder_rebase((mf_pos_t *)mf, sizeof(*mf));
+}
+
+
+static forceinline u32
+ht_matchfinder_longest_match(struct ht_matchfinder * const mf,
+			     const u8 ** const in_base_p,
+			     const u8 * const in_next,
+			     const u32 max_len,
+			     const u32 nice_len,
+			     u32 * const next_hash,
+			     u32 * const offset_ret)
+{
+	u32 best_len = 0;
+	const u8 *best_matchptr = in_next;
+	u32 cur_pos = in_next - *in_base_p;
+	const u8 *in_base;
+	mf_pos_t cutoff;
+	u32 hash;
+	u32 seq;
+	mf_pos_t cur_node;
+	const u8 *matchptr;
+#if HT_MATCHFINDER_BUCKET_SIZE > 1
+	mf_pos_t to_insert;
+	u32 len;
+#endif
+#if HT_MATCHFINDER_BUCKET_SIZE > 2
+	int i;
+#endif
+
+	
+	STATIC_ASSERT(HT_MATCHFINDER_MIN_MATCH_LEN == 4);
+
+	if (cur_pos == MATCHFINDER_WINDOW_SIZE) {
+		ht_matchfinder_slide_window(mf);
+		*in_base_p += MATCHFINDER_WINDOW_SIZE;
+		cur_pos = 0;
+	}
+	in_base = *in_base_p;
+	cutoff = cur_pos - MATCHFINDER_WINDOW_SIZE;
+
+	hash = *next_hash;
+	STATIC_ASSERT(HT_MATCHFINDER_REQUIRED_NBYTES == 5);
+	*next_hash = lz_hash(get_unaligned_le32(in_next + 1),
+			     HT_MATCHFINDER_HASH_ORDER);
+	seq = load_u32_unaligned(in_next);
+	prefetchw(&mf->hash_tab[*next_hash]);
+#if HT_MATCHFINDER_BUCKET_SIZE == 1
+	
+	cur_node = mf->hash_tab[hash][0];
+	mf->hash_tab[hash][0] = cur_pos;
+	if (cur_node <= cutoff)
+		goto out;
+	matchptr = &in_base[cur_node];
+	if (load_u32_unaligned(matchptr) == seq) {
+		best_len = lz_extend(in_next, matchptr, 4, max_len);
+		best_matchptr = matchptr;
+	}
+#elif HT_MATCHFINDER_BUCKET_SIZE == 2
+	
+	cur_node = mf->hash_tab[hash][0];
+	mf->hash_tab[hash][0] = cur_pos;
+	if (cur_node <= cutoff)
+		goto out;
+	matchptr = &in_base[cur_node];
+
+	to_insert = cur_node;
+	cur_node = mf->hash_tab[hash][1];
+	mf->hash_tab[hash][1] = to_insert;
+
+	if (load_u32_unaligned(matchptr) == seq) {
+		best_len = lz_extend(in_next, matchptr, 4, max_len);
+		best_matchptr = matchptr;
+		if (cur_node <= cutoff || best_len >= nice_len)
+			goto out;
+		matchptr = &in_base[cur_node];
+		if (load_u32_unaligned(matchptr) == seq &&
+		    load_u32_unaligned(matchptr + best_len - 3) ==
+		    load_u32_unaligned(in_next + best_len - 3)) {
+			len = lz_extend(in_next, matchptr, 4, max_len);
+			if (len > best_len) {
+				best_len = len;
+				best_matchptr = matchptr;
+			}
+		}
+	} else {
+		if (cur_node <= cutoff)
+			goto out;
+		matchptr = &in_base[cur_node];
+		if (load_u32_unaligned(matchptr) == seq) {
+			best_len = lz_extend(in_next, matchptr, 4, max_len);
+			best_matchptr = matchptr;
+		}
+	}
+#else
+	
+	to_insert = cur_pos;
+	for (i = 0; i < HT_MATCHFINDER_BUCKET_SIZE; i++) {
+		cur_node = mf->hash_tab[hash][i];
+		mf->hash_tab[hash][i] = to_insert;
+		if (cur_node <= cutoff)
+			goto out;
+		matchptr = &in_base[cur_node];
+		if (load_u32_unaligned(matchptr) == seq) {
+			len = lz_extend(in_next, matchptr, 4, max_len);
+			if (len > best_len) {
+				best_len = len;
+				best_matchptr = matchptr;
+				if (best_len >= nice_len)
+					goto out;
+			}
+		}
+		to_insert = cur_node;
+	}
+#endif
+out:
+	*offset_ret = in_next - best_matchptr;
+	return best_len;
+}
+
+static forceinline void
+ht_matchfinder_skip_bytes(struct ht_matchfinder * const mf,
+			  const u8 ** const in_base_p,
+			  const u8 *in_next,
+			  const u8 * const in_end,
+			  const u32 count,
+			  u32 * const next_hash)
+{
+	s32 cur_pos = in_next - *in_base_p;
+	u32 hash;
+	u32 remaining = count;
+	int i;
+
+	if (unlikely(count + HT_MATCHFINDER_REQUIRED_NBYTES > in_end - in_next))
+		return;
+
+	if (cur_pos + count - 1 >= MATCHFINDER_WINDOW_SIZE) {
+		ht_matchfinder_slide_window(mf);
+		*in_base_p += MATCHFINDER_WINDOW_SIZE;
+		cur_pos -= MATCHFINDER_WINDOW_SIZE;
+	}
+
+	hash = *next_hash;
+	do {
+		for (i = HT_MATCHFINDER_BUCKET_SIZE - 1; i > 0; i--)
+			mf->hash_tab[hash][i] = mf->hash_tab[hash][i - 1];
+		mf->hash_tab[hash][0] = cur_pos;
+
+		hash = lz_hash(get_unaligned_le32(++in_next),
+			       HT_MATCHFINDER_HASH_ORDER);
+		cur_pos++;
+	} while (--remaining);
+
+	prefetchw(&mf->hash_tab[hash]);
+	*next_hash = hash;
+}
+
+#endif 
+
+#if SUPPORT_NEAR_OPTIMAL_PARSING
+/* #  include "bt_matchfinder.h" */
+
+
+#ifndef LIB_BT_MATCHFINDER_H
+#define LIB_BT_MATCHFINDER_H
+
+/* #include "matchfinder_common.h" */
+
+
+#ifndef LIB_MATCHFINDER_COMMON_H
+#define LIB_MATCHFINDER_COMMON_H
+
+/* #include "lib_common.h" */
+
+
+#ifndef LIB_LIB_COMMON_H
+#define LIB_LIB_COMMON_H
+
+#ifdef LIBDEFLATE_H
+#  error "lib_common.h must always be included before libdeflate.h"
+   
+#endif
+
+#define BUILDING_LIBDEFLATE
+
+/* #include "../common_defs.h" */
+
+
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
+
+#include <stdbool.h>
+#include <stddef.h>	
+#include <stdint.h>
+#ifdef _MSC_VER
+#  include <stdlib.h>	
+#endif
+#ifndef FREESTANDING
+#  include <string.h>	
+#endif
+
+
+
+
+
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
+
+
+typedef size_t machine_word_t;
+
+
+#define WORDBYTES	((int)sizeof(machine_word_t))
+
+
+#define WORDBITS	(8 * WORDBYTES)
+
+
+
+
+
+
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
+#  define LIBEXPORT
+#endif
+
+
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
+#endif
+
+
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
+#endif
+
+
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
+#  define restrict
+#endif
+
+
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
+#  define likely(expr)		(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
+#  define unlikely(expr)	(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
+#  define prefetchr(addr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
+#  define prefetchw(addr)
+#endif
+
+
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#endif
+
+
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
+
+
+
+
+
+#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
+#define MIN(a, b)		((a) <= (b) ? (a) : (b))
+#define MAX(a, b)		((a) >= (b) ? (a) : (b))
+#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
+#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
+#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
+
+
+
+
+
+
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
+{
+	union {
+		u32 w;
+		u8 b;
+	} u;
+
+	u.w = 1;
+	return u.b;
+}
+#endif
+
+
+static forceinline u16 bswap16(u16 v)
+{
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
+}
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
+#endif
+
+
+
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
+#endif
+
+
+
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
+
+
+
+static forceinline u16
+get_unaligned_le16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
+}
+
+static forceinline u16
+get_unaligned_be16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
+}
+
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return get_unaligned_le32(p);
+	else
+		return get_unaligned_le64(p);
+}
+
+
+
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+	}
+}
+
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		put_unaligned_le32(v, p);
+	else
+		put_unaligned_le64(v, p);
+}
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#ifndef MATCHFINDER_WINDOW_ORDER
+#  error "MATCHFINDER_WINDOW_ORDER must be defined!"
+#endif
+
+
+static forceinline u32
+loaded_u32_to_u24(u32 v)
+{
+	if (CPU_IS_LITTLE_ENDIAN())
+		return v & 0xFFFFFF;
+	else
+		return v >> 8;
+}
+
+
+static forceinline u32
+load_u24_unaligned(const u8 *p)
+{
+#if UNALIGNED_ACCESS_IS_FAST
+	return loaded_u32_to_u24(load_u32_unaligned(p));
+#else
+	if (CPU_IS_LITTLE_ENDIAN())
+		return ((u32)p[0] << 0) | ((u32)p[1] << 8) | ((u32)p[2] << 16);
+	else
+		return ((u32)p[2] << 0) | ((u32)p[1] << 8) | ((u32)p[0] << 16);
+#endif
+}
+
+#define MATCHFINDER_WINDOW_SIZE (1UL << MATCHFINDER_WINDOW_ORDER)
+
+typedef s16 mf_pos_t;
+
+#define MATCHFINDER_INITVAL ((mf_pos_t)-MATCHFINDER_WINDOW_SIZE)
+
+
+#define MATCHFINDER_MEM_ALIGNMENT	32
+#define MATCHFINDER_SIZE_ALIGNMENT	128
+
+#undef matchfinder_init
+#undef matchfinder_rebase
+#ifdef _aligned_attribute
+#  define MATCHFINDER_ALIGNED _aligned_attribute(MATCHFINDER_MEM_ALIGNMENT)
+#  if defined(__arm__) || defined(__aarch64__)
+/* #    include "arm/matchfinder_impl.h" */
+
+
+#ifndef LIB_ARM_MATCHFINDER_IMPL_H
+#define LIB_ARM_MATCHFINDER_IMPL_H
+
+/* #include "arm-cpu_features.h" */
+
+
+#ifndef LIB_ARM_CPU_FEATURES_H
+#define LIB_ARM_CPU_FEATURES_H
+
+/* #include "lib_common.h" */
+
+
+#ifndef LIB_LIB_COMMON_H
+#define LIB_LIB_COMMON_H
+
+#ifdef LIBDEFLATE_H
+#  error "lib_common.h must always be included before libdeflate.h"
+   
+#endif
+
+#define BUILDING_LIBDEFLATE
+
+/* #include "../common_defs.h" */
+
+
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
+
+#include <stdbool.h>
+#include <stddef.h>	
+#include <stdint.h>
+#ifdef _MSC_VER
+#  include <stdlib.h>	
+#endif
+#ifndef FREESTANDING
+#  include <string.h>	
+#endif
+
+
+
+
+
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
+
+
+typedef size_t machine_word_t;
+
+
+#define WORDBYTES	((int)sizeof(machine_word_t))
+
+
+#define WORDBITS	(8 * WORDBYTES)
+
+
+
+
+
+
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
+#  define LIBEXPORT
+#endif
+
+
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
+#endif
+
+
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
+#endif
+
+
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
+#  define restrict
+#endif
+
+
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
+#  define likely(expr)		(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
+#  define unlikely(expr)	(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
+#  define prefetchr(addr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
+#  define prefetchw(addr)
+#endif
+
+
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#endif
+
+
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
+
+
+
+
+
+#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
+#define MIN(a, b)		((a) <= (b) ? (a) : (b))
+#define MAX(a, b)		((a) >= (b) ? (a) : (b))
+#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
+#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
+#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
+
+
+
+
+
+
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
+{
+	union {
+		u32 w;
+		u8 b;
+	} u;
+
+	u.w = 1;
+	return u.b;
+}
+#endif
+
+
+static forceinline u16 bswap16(u16 v)
+{
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
+}
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
+#endif
+
+
+
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
+#endif
+
+
+
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
+
+
+
+static forceinline u16
+get_unaligned_le16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
+}
+
+static forceinline u16
+get_unaligned_be16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
+}
+
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return get_unaligned_le32(p);
+	else
+		return get_unaligned_le64(p);
+}
+
+
+
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+	}
+}
+
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		put_unaligned_le32(v, p);
+	else
+		put_unaligned_le64(v, p);
+}
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
+
+#if defined(__arm__) || defined(__aarch64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
+	!defined(FREESTANDING) && \
+	(defined(__linux__) || \
+	 (defined(__aarch64__) && defined(__APPLE__)))
+#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
+#endif
+
+#define ARM_CPU_FEATURE_NEON		0x00000001
+#define ARM_CPU_FEATURE_PMULL		0x00000002
+#define ARM_CPU_FEATURE_CRC32		0x00000004
+#define ARM_CPU_FEATURE_SHA3		0x00000008
+#define ARM_CPU_FEATURE_DOTPROD		0x00000010
+
+#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
+#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
+#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
+#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
+#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
+
+#if HAVE_DYNAMIC_ARM_CPU_FEATURES
+#define ARM_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_arm_cpu_features;
+
+void libdeflate_init_arm_cpu_features(void);
+
+static inline u32 get_arm_cpu_features(void)
+{
+	if (libdeflate_arm_cpu_features == 0)
+		libdeflate_init_arm_cpu_features();
+	return libdeflate_arm_cpu_features;
+}
+#else 
+static inline u32 get_arm_cpu_features(void) { return 0; }
+#endif 
+
+
+#ifdef __ARM_NEON
+#  define HAVE_NEON_NATIVE	1
+#else
+#  define HAVE_NEON_NATIVE	0
+#endif
+#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
+
+#if HAVE_NEON_NATIVE || \
+	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#  define HAVE_NEON_INTRIN	1
+#else
+#  define HAVE_NEON_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRYPTO
+#  define HAVE_PMULL_NATIVE	1
+#else
+#  define HAVE_PMULL_NATIVE	0
+#endif
+#define HAVE_PMULL_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
+
+#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
+	!(defined(__arm__) && defined(__clang__)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
+#else
+#  define HAVE_PMULL_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRC32
+#  define HAVE_CRC32_NATIVE	1
+#else
+#  define HAVE_CRC32_NATIVE	0
+#endif
+#define HAVE_CRC32_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+
+#define HAVE_CRC32_INTRIN \
+	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
+			       (!GCC_PREREQ(1, 0) || \
+				GCC_PREREQ(11, 3) || \
+				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_SHA3
+#    define HAVE_SHA3_NATIVE	1
+#  else
+#    define HAVE_SHA3_NATIVE	0
+#  endif
+#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+				 (GCC_PREREQ(8, 1)  || \
+				  CLANG_PREREQ(7, 0, 10010463) ))
+#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+				 (GCC_PREREQ(9, 1)  || \
+				  __has_builtin(__builtin_neon_veor3q_v)))
+#else
+#  define HAVE_SHA3_NATIVE	0
+#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3_INTRIN	0
+#endif
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_DOTPROD
+#    define HAVE_DOTPROD_NATIVE	1
+#  else
+#    define HAVE_DOTPROD_NATIVE	0
+#  endif
+#  define HAVE_DOTPROD_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
+#  define HAVE_DOTPROD_INTRIN \
+	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+#else
+#  define HAVE_DOTPROD_NATIVE	0
+#  define HAVE_DOTPROD_TARGET	0
+#  define HAVE_DOTPROD_INTRIN	0
+#endif
+
+
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  define __ARM_FEATURE_CRC32	1
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_SHA3	1
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_DOTPROD	1
+#endif
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  include <arm_acle.h>
+#  undef __ARM_FEATURE_CRC32
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_SHA3
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_DOTPROD
+#endif
+
+#endif 
+
+#endif 
+
+
+#if HAVE_NEON_NATIVE
+#  include <arm_neon.h>
+static forceinline void
+matchfinder_init_neon(mf_pos_t *data, size_t size)
+{
+	int16x8_t *p = (int16x8_t *)data;
+	int16x8_t v = (int16x8_t) {
+		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
+		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
+		MATCHFINDER_INITVAL, MATCHFINDER_INITVAL,
+	};
+
+	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
+	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
+	STATIC_ASSERT(sizeof(mf_pos_t) == 2);
+
+	do {
+		p[0] = v;
+		p[1] = v;
+		p[2] = v;
+		p[3] = v;
+		p += 4;
+		size -= 4 * sizeof(*p);
+	} while (size != 0);
+}
+#define matchfinder_init matchfinder_init_neon
+
+static forceinline void
+matchfinder_rebase_neon(mf_pos_t *data, size_t size)
+{
+	int16x8_t *p = (int16x8_t *)data;
+	int16x8_t v = (int16x8_t) {
+		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
+		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
+		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
+		(u16)-MATCHFINDER_WINDOW_SIZE, (u16)-MATCHFINDER_WINDOW_SIZE,
+	};
+
+	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
+	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
+	STATIC_ASSERT(sizeof(mf_pos_t) == 2);
+
+	do {
+		p[0] = vqaddq_s16(p[0], v);
+		p[1] = vqaddq_s16(p[1], v);
+		p[2] = vqaddq_s16(p[2], v);
+		p[3] = vqaddq_s16(p[3], v);
+		p += 4;
+		size -= 4 * sizeof(*p);
+	} while (size != 0);
+}
+#define matchfinder_rebase matchfinder_rebase_neon
+
+#endif 
+
+#endif 
+
+#  elif defined(__i386__) || defined(__x86_64__)
+/* #    include "x86/matchfinder_impl.h" */
+
+
+#ifndef LIB_X86_MATCHFINDER_IMPL_H
+#define LIB_X86_MATCHFINDER_IMPL_H
+
+/* #include "x86-cpu_features.h" */
+
+
+#ifndef LIB_X86_CPU_FEATURES_H
+#define LIB_X86_CPU_FEATURES_H
+
+/* #include "lib_common.h" */
+
+
+#ifndef LIB_LIB_COMMON_H
+#define LIB_LIB_COMMON_H
+
+#ifdef LIBDEFLATE_H
+#  error "lib_common.h must always be included before libdeflate.h"
+   
+#endif
+
+#define BUILDING_LIBDEFLATE
+
+/* #include "../common_defs.h" */
+
+
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
+
+#include <stdbool.h>
+#include <stddef.h>	
+#include <stdint.h>
+#ifdef _MSC_VER
+#  include <stdlib.h>	
+#endif
+#ifndef FREESTANDING
+#  include <string.h>	
+#endif
+
+
+
+
+
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
+
+
+typedef size_t machine_word_t;
+
+
+#define WORDBYTES	((int)sizeof(machine_word_t))
+
+
+#define WORDBITS	(8 * WORDBYTES)
+
+
+
+
+
+
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
+#  define LIBEXPORT
+#endif
+
+
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
+#endif
+
+
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
+#endif
+
+
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
+#  define restrict
+#endif
+
+
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
+#  define likely(expr)		(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
+#  define unlikely(expr)	(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
+#  define prefetchr(addr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
+#  define prefetchw(addr)
+#endif
+
+
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#endif
+
+
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
+
+
+
+
+
+#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
+#define MIN(a, b)		((a) <= (b) ? (a) : (b))
+#define MAX(a, b)		((a) >= (b) ? (a) : (b))
+#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
+#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
+#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
+
+
+
+
+
+
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
+{
+	union {
+		u32 w;
+		u8 b;
+	} u;
+
+	u.w = 1;
+	return u.b;
+}
+#endif
+
+
+static forceinline u16 bswap16(u16 v)
+{
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
+}
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
+#endif
+
+
+
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
+#endif
+
+
+
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
+
+
+
+static forceinline u16
+get_unaligned_le16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
+}
+
+static forceinline u16
+get_unaligned_be16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
+}
+
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return get_unaligned_le32(p);
+	else
+		return get_unaligned_le64(p);
+}
+
+
+
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+	}
+}
+
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		put_unaligned_le32(v, p);
+	else
+		put_unaligned_le64(v, p);
+}
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
+
+#if defined(__i386__) || defined(__x86_64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
+#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
+#endif
+
+#define X86_CPU_FEATURE_SSE2		0x00000001
+#define X86_CPU_FEATURE_PCLMUL		0x00000002
+#define X86_CPU_FEATURE_AVX		0x00000004
+#define X86_CPU_FEATURE_AVX2		0x00000008
+#define X86_CPU_FEATURE_BMI2		0x00000010
+
+#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
+#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
+#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
+#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
+#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+
+#if HAVE_DYNAMIC_X86_CPU_FEATURES
+#define X86_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_x86_cpu_features;
+
+void libdeflate_init_x86_cpu_features(void);
+
+static inline u32 get_x86_cpu_features(void)
+{
+	if (libdeflate_x86_cpu_features == 0)
+		libdeflate_init_x86_cpu_features();
+	return libdeflate_x86_cpu_features;
+}
+#else 
+static inline u32 get_x86_cpu_features(void) { return 0; }
+#endif 
+
+
+#define HAVE_TARGET_INTRINSICS \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
+
+
+#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
+	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
+	defined(__INTEL_COMPILER)
+typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
+typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
+typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
+typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
+typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
+typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
+typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
+typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
+#endif
+#ifdef __INTEL_COMPILER
+typedef int   __v16si __attribute__((__vector_size__(64)));
+typedef short __v32hi __attribute__((__vector_size__(64)));
+typedef char  __v64qi __attribute__((__vector_size__(64)));
+#endif
+
+
+#ifdef __SSE2__
+#  define HAVE_SSE2_NATIVE	1
+#else
+#  define HAVE_SSE2_NATIVE	0
+#endif
+#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
+#define HAVE_SSE2_INTRIN \
+	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __PCLMUL__
+#  define HAVE_PCLMUL_NATIVE	1
+#else
+#  define HAVE_PCLMUL_NATIVE	0
+#endif
+#define HAVE_PCLMUL_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
+#define HAVE_PCLMUL_INTRIN \
+	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX__
+#  define HAVE_AVX_NATIVE	1
+#else
+#  define HAVE_AVX_NATIVE	0
+#endif
+#define HAVE_AVX_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
+#define HAVE_AVX_INTRIN \
+	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX2__
+#  define HAVE_AVX2_NATIVE	1
+#else
+#  define HAVE_AVX2_NATIVE	0
+#endif
+#define HAVE_AVX2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
+#define HAVE_AVX2_INTRIN \
+	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __BMI2__
+#  define HAVE_BMI2_NATIVE	1
+#else
+#  define HAVE_BMI2_NATIVE	0
+#endif
+#define HAVE_BMI2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
+#define HAVE_BMI2_INTRIN \
+	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+
+#endif 
+
+#endif 
+
+
+#if HAVE_AVX2_NATIVE
+#  include <immintrin.h>
+static forceinline void
+matchfinder_init_avx2(mf_pos_t *data, size_t size)
+{
+	__m256i *p = (__m256i *)data;
+	__m256i v = _mm256_set1_epi16(MATCHFINDER_INITVAL);
+
+	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
+	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
+	STATIC_ASSERT(sizeof(mf_pos_t) == 2);
+
+	do {
+		p[0] = v;
+		p[1] = v;
+		p[2] = v;
+		p[3] = v;
+		p += 4;
+		size -= 4 * sizeof(*p);
+	} while (size != 0);
+}
+#define matchfinder_init matchfinder_init_avx2
+
+static forceinline void
+matchfinder_rebase_avx2(mf_pos_t *data, size_t size)
+{
+	__m256i *p = (__m256i *)data;
+	__m256i v = _mm256_set1_epi16((u16)-MATCHFINDER_WINDOW_SIZE);
+
+	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
+	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
+	STATIC_ASSERT(sizeof(mf_pos_t) == 2);
+
+	do {
+		
+		p[0] = _mm256_adds_epi16(p[0], v);
+		p[1] = _mm256_adds_epi16(p[1], v);
+		p[2] = _mm256_adds_epi16(p[2], v);
+		p[3] = _mm256_adds_epi16(p[3], v);
+		p += 4;
+		size -= 4 * sizeof(*p);
+	} while (size != 0);
+}
+#define matchfinder_rebase matchfinder_rebase_avx2
+
+#elif HAVE_SSE2_NATIVE
+#  include <emmintrin.h>
+static forceinline void
+matchfinder_init_sse2(mf_pos_t *data, size_t size)
+{
+	__m128i *p = (__m128i *)data;
+	__m128i v = _mm_set1_epi16(MATCHFINDER_INITVAL);
+
+	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
+	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
+	STATIC_ASSERT(sizeof(mf_pos_t) == 2);
+
+	do {
+		p[0] = v;
+		p[1] = v;
+		p[2] = v;
+		p[3] = v;
+		p += 4;
+		size -= 4 * sizeof(*p);
+	} while (size != 0);
+}
+#define matchfinder_init matchfinder_init_sse2
+
+static forceinline void
+matchfinder_rebase_sse2(mf_pos_t *data, size_t size)
+{
+	__m128i *p = (__m128i *)data;
+	__m128i v = _mm_set1_epi16((u16)-MATCHFINDER_WINDOW_SIZE);
+
+	STATIC_ASSERT(MATCHFINDER_MEM_ALIGNMENT % sizeof(*p) == 0);
+	STATIC_ASSERT(MATCHFINDER_SIZE_ALIGNMENT % (4 * sizeof(*p)) == 0);
+	STATIC_ASSERT(sizeof(mf_pos_t) == 2);
+
+	do {
+		
+		p[0] = _mm_adds_epi16(p[0], v);
+		p[1] = _mm_adds_epi16(p[1], v);
+		p[2] = _mm_adds_epi16(p[2], v);
+		p[3] = _mm_adds_epi16(p[3], v);
+		p += 4;
+		size -= 4 * sizeof(*p);
+	} while (size != 0);
+}
+#define matchfinder_rebase matchfinder_rebase_sse2
+#endif 
+
+#endif 
+
+#  endif
+#else
+#  define MATCHFINDER_ALIGNED
+#endif
+
+
+#ifndef matchfinder_init
+static forceinline void
+matchfinder_init(mf_pos_t *data, size_t size)
+{
+	size_t num_entries = size / sizeof(*data);
+	size_t i;
+
+	for (i = 0; i < num_entries; i++)
+		data[i] = MATCHFINDER_INITVAL;
+}
+#endif
+
+
+#ifndef matchfinder_rebase
+static forceinline void
+matchfinder_rebase(mf_pos_t *data, size_t size)
+{
+	size_t num_entries = size / sizeof(*data);
+	size_t i;
+
+	if (MATCHFINDER_WINDOW_SIZE == 32768) {
+		
+		for (i = 0; i < num_entries; i++)
+			data[i] = 0x8000 | (data[i] & ~(data[i] >> 15));
+	} else {
+		for (i = 0; i < num_entries; i++) {
+			if (data[i] >= 0)
+				data[i] -= (mf_pos_t)-MATCHFINDER_WINDOW_SIZE;
+			else
+				data[i] = (mf_pos_t)-MATCHFINDER_WINDOW_SIZE;
+		}
 	}
 }
 #endif
@@ -10820,11 +16263,7 @@ struct bt_matchfinder {
 	
 	mf_pos_t child_tab[2UL * MATCHFINDER_WINDOW_SIZE];
 
-}
-#ifdef _aligned_attribute
-_aligned_attribute(MATCHFINDER_MEM_ALIGNMENT)
-#endif
-;
+} MATCHFINDER_ALIGNED;
 
 
 static forceinline void
@@ -10861,15 +16300,14 @@ bt_right_child(struct bt_matchfinder *mf, s32 node)
 
 
 static forceinline struct lz_match *
-bt_matchfinder_advance_one_byte(struct bt_matchfinder * const restrict mf,
-				const u8 * const restrict in_base,
+bt_matchfinder_advance_one_byte(struct bt_matchfinder * const mf,
+				const u8 * const in_base,
 				const ptrdiff_t cur_pos,
 				const u32 max_len,
 				const u32 nice_len,
 				const u32 max_search_depth,
-				u32 * const restrict next_hashes,
-				u32 * const restrict best_len_ret,
-				struct lz_match * restrict lz_matchptr,
+				u32 * const next_hashes,
+				struct lz_match *lz_matchptr,
 				const bool record_matches)
 {
 	const u8 *in_next = in_base + cur_pos;
@@ -10934,7 +16372,6 @@ bt_matchfinder_advance_one_byte(struct bt_matchfinder * const restrict mf,
 	if (cur_node <= cutoff) {
 		*pending_lt_ptr = MATCHFINDER_INITVAL;
 		*pending_gt_ptr = MATCHFINDER_INITVAL;
-		*best_len_ret = best_len;
 		return lz_matchptr;
 	}
 
@@ -10957,7 +16394,6 @@ bt_matchfinder_advance_one_byte(struct bt_matchfinder * const restrict mf,
 				if (len >= nice_len) {
 					*pending_lt_ptr = *bt_left_child(mf, cur_node);
 					*pending_gt_ptr = *bt_right_child(mf, cur_node);
-					*best_len_ret = best_len;
 					return lz_matchptr;
 				}
 			}
@@ -10982,7 +16418,6 @@ bt_matchfinder_advance_one_byte(struct bt_matchfinder * const restrict mf,
 		if (cur_node <= cutoff || !--depth_remaining) {
 			*pending_lt_ptr = MATCHFINDER_INITVAL;
 			*pending_gt_ptr = MATCHFINDER_INITVAL;
-			*best_len_ret = best_len;
 			return lz_matchptr;
 		}
 	}
@@ -10997,7 +16432,6 @@ bt_matchfinder_get_matches(struct bt_matchfinder *mf,
 			   u32 nice_len,
 			   u32 max_search_depth,
 			   u32 next_hashes[2],
-			   u32 *best_len_ret,
 			   struct lz_match *lz_matchptr)
 {
 	return bt_matchfinder_advance_one_byte(mf,
@@ -11007,21 +16441,19 @@ bt_matchfinder_get_matches(struct bt_matchfinder *mf,
 					       nice_len,
 					       max_search_depth,
 					       next_hashes,
-					       best_len_ret,
 					       lz_matchptr,
 					       true);
 }
 
 
 static forceinline void
-bt_matchfinder_skip_position(struct bt_matchfinder *mf,
-			     const u8 *in_base,
-			     ptrdiff_t cur_pos,
-			     u32 nice_len,
-			     u32 max_search_depth,
-			     u32 next_hashes[2])
+bt_matchfinder_skip_byte(struct bt_matchfinder *mf,
+			 const u8 *in_base,
+			 ptrdiff_t cur_pos,
+			 u32 nice_len,
+			 u32 max_search_depth,
+			 u32 next_hashes[2])
 {
-	u32 best_len;
 	bt_matchfinder_advance_one_byte(mf,
 					in_base,
 					cur_pos,
@@ -11029,69 +16461,93 @@ bt_matchfinder_skip_position(struct bt_matchfinder *mf,
 					nice_len,
 					max_search_depth,
 					next_hashes,
-					&best_len,
 					NULL,
 					false);
 }
 
-#endif
-
-
-#define MIN_BLOCK_LENGTH	10000
-
-
-#define SOFT_MAX_BLOCK_LENGTH	300000
-
-
-#define NUM_OBSERVATIONS_PER_BLOCK_CHECK       512
-
-
-#if SUPPORT_NEAR_OPTIMAL_PARSING
-
-
-
-#  define MAX_MATCHES_PER_POS	(DEFLATE_MAX_MATCH_LEN - DEFLATE_MIN_MATCH_LEN + 1)
-
-
-#  define CACHE_LENGTH      (SOFT_MAX_BLOCK_LENGTH * 5)
-
 #endif 
 
 
-#define MAX_LITLEN_CODEWORD_LEN		14
-#define MAX_OFFSET_CODEWORD_LEN		DEFLATE_MAX_OFFSET_CODEWORD_LEN
-#define MAX_PRE_CODEWORD_LEN		DEFLATE_MAX_PRE_CODEWORD_LEN
+#define MAX_MATCHES_PER_POS	\
+	(DEFLATE_MAX_MATCH_LEN - DEFLATE_MIN_MATCH_LEN + 1)
+#endif
+
+
+#define MAX_BLOCK_LENGTH	\
+	MAX(SOFT_MAX_BLOCK_LENGTH + MIN_BLOCK_LENGTH - 1,	\
+	    SOFT_MAX_BLOCK_LENGTH + 1 + DEFLATE_MAX_MATCH_LEN)
+
+static forceinline void
+check_buildtime_parameters(void)
+{
+	
+	STATIC_ASSERT(SOFT_MAX_BLOCK_LENGTH >= MIN_BLOCK_LENGTH);
+	STATIC_ASSERT(FAST_SOFT_MAX_BLOCK_LENGTH >= MIN_BLOCK_LENGTH);
+	STATIC_ASSERT(SEQ_STORE_LENGTH * DEFLATE_MIN_MATCH_LEN >=
+		      MIN_BLOCK_LENGTH);
+	STATIC_ASSERT(FAST_SEQ_STORE_LENGTH * HT_MATCHFINDER_MIN_MATCH_LEN >=
+		      MIN_BLOCK_LENGTH);
+#if SUPPORT_NEAR_OPTIMAL_PARSING
+	STATIC_ASSERT(MIN_BLOCK_LENGTH * MAX_MATCHES_PER_POS <=
+		      MATCH_CACHE_LENGTH);
+#endif
+
+	
+	STATIC_ASSERT(FAST_SOFT_MAX_BLOCK_LENGTH <= SOFT_MAX_BLOCK_LENGTH);
+
+	
+	STATIC_ASSERT(SEQ_STORE_LENGTH * DEFLATE_MIN_MATCH_LEN <=
+		      SOFT_MAX_BLOCK_LENGTH + MIN_BLOCK_LENGTH);
+	STATIC_ASSERT(FAST_SEQ_STORE_LENGTH * HT_MATCHFINDER_MIN_MATCH_LEN <=
+		      FAST_SOFT_MAX_BLOCK_LENGTH + MIN_BLOCK_LENGTH);
+
+	
+	STATIC_ASSERT(
+		MAX_LITLEN_CODEWORD_LEN <= DEFLATE_MAX_LITLEN_CODEWORD_LEN);
+	STATIC_ASSERT(
+		MAX_OFFSET_CODEWORD_LEN <= DEFLATE_MAX_OFFSET_CODEWORD_LEN);
+	STATIC_ASSERT(
+		MAX_PRE_CODEWORD_LEN <= DEFLATE_MAX_PRE_CODEWORD_LEN);
+	STATIC_ASSERT(
+		(1U << MAX_LITLEN_CODEWORD_LEN) >= DEFLATE_NUM_LITLEN_SYMS);
+	STATIC_ASSERT(
+		(1U << MAX_OFFSET_CODEWORD_LEN) >= DEFLATE_NUM_OFFSET_SYMS);
+	STATIC_ASSERT(
+		(1U << MAX_PRE_CODEWORD_LEN) >= DEFLATE_NUM_PRECODE_SYMS);
+}
+
+
 
 
 static const unsigned deflate_length_slot_base[] = {
-	3   , 4   , 5   , 6   , 7   , 8   , 9   , 10  ,
-	11  , 13  , 15  , 17  , 19  , 23  , 27  , 31  ,
-	35  , 43  , 51  , 59  , 67  , 83  , 99  , 115 ,
-	131 , 163 , 195 , 227 , 258 ,
+	3,    4,    5,    6,    7,    8,    9,    10,
+	11,   13,   15,   17,   19,   23,   27,   31,
+	35,   43,   51,   59,   67,   83,   99,   115,
+	131,  163,  195,  227,  258,
 };
 
 
 static const u8 deflate_extra_length_bits[] = {
-	0   , 0   , 0   , 0   , 0   , 0   , 0   , 0 ,
-	1   , 1   , 1   , 1   , 2   , 2   , 2   , 2 ,
-	3   , 3   , 3   , 3   , 4   , 4   , 4   , 4 ,
-	5   , 5   , 5   , 5   , 0   ,
+	0,    0,    0,    0,    0,    0,    0,    0,
+	1,    1,    1,    1,    2,    2,    2,    2,
+	3,    3,    3,    3,    4,    4,    4,    4,
+	5,    5,    5,    5,    0,
 };
 
 
 static const unsigned deflate_offset_slot_base[] = {
-	1    , 2    , 3    , 4     , 5     , 7     , 9     , 13    ,
-	17   , 25   , 33   , 49    , 65    , 97    , 129   , 193   ,
-	257  , 385  , 513  , 769   , 1025  , 1537  , 2049  , 3073  ,
-	4097 , 6145 , 8193 , 12289 , 16385 , 24577 ,
+	1,     2,     3,     4,     5,     7,     9,     13,
+	17,    25,    33,    49,    65,    97,    129,   193,
+	257,   385,   513,   769,   1025,  1537,  2049,  3073,
+	4097,  6145,  8193,  12289, 16385, 24577,
 };
 
 
 static const u8 deflate_extra_offset_bits[] = {
-	0    , 0    , 0    , 0     , 1     , 1     , 2     , 2     ,
-	3    , 3    , 4    , 4     , 5     , 5     , 6     , 6     ,
-	7    , 7    , 8    , 8     , 9     , 9     , 10    , 10    ,
-	11   , 11   , 12   , 12    , 13    , 13    ,
+	0,     0,     0,     0,     1,     1,     2,     2,
+	3,     3,     4,     4,     5,     5,     6,     6,
+	7,     7,     8,     8,     9,     9,     10,    10,
+	11,    11,    12,    12,    13,    13,
 };
 
 
@@ -11114,8 +16570,49 @@ static const u8 deflate_length_slot[DEFLATE_MAX_MATCH_LEN + 1] = {
 };
 
 
+static const u8 deflate_offset_slot[512] = {
+	0, 0, 1, 2, 3, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 7,
+	7, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9,
+	9, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+	10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
+	11, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
+	12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
+	12, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
+	13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13,
+	13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+	14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
+	14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+	15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+	15, 0, 16, 17, 18, 18, 19, 19, 20, 20, 20, 20, 21, 21, 21, 21,
+	22, 22, 22, 22, 22, 22, 22, 22, 23, 23, 23, 23, 23, 23, 23, 23,
+	24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
+	25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25,
+	26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
+	26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
+	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+	27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+	28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+	28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+	28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+	28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28,
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
+	29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29,
+};
+
+
 static const u8 deflate_precode_lens_permutation[DEFLATE_NUM_PRECODE_SYMS] = {
 	16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
+};
+
+
+static const u8 deflate_extra_precode_bits[DEFLATE_NUM_PRECODE_SYMS] = {
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7
 };
 
 
@@ -11142,6 +16639,21 @@ struct deflate_freqs {
 	u32 offset[DEFLATE_NUM_OFFSET_SYMS];
 };
 
+
+struct deflate_sequence {
+
+	
+#define SEQ_LENGTH_SHIFT 23
+#define SEQ_LITRUNLEN_MASK (((u32)1 << SEQ_LENGTH_SHIFT) - 1)
+	u32 litrunlen_and_length;
+
+	
+	u16 offset;
+
+	
+	u16 offset_slot;
+};
+
 #if SUPPORT_NEAR_OPTIMAL_PARSING
 
 
@@ -11156,34 +16668,6 @@ struct deflate_costs {
 	
 	u32 offset_slot[DEFLATE_NUM_OFFSET_SYMS];
 };
-
-
-#define COST_SHIFT	3
-
-
-#define LITERAL_NOSTAT_BITS	13
-#define LENGTH_NOSTAT_BITS	13
-#define OFFSET_NOSTAT_BITS	10
-
-#endif 
-
-
-struct deflate_sequence {
-
-	
-	u32 litrunlen_and_length;
-
-	
-	u16 offset;
-
-	
-	u8 offset_symbol;
-
-	
-	u8 length_slot;
-};
-
-#if SUPPORT_NEAR_OPTIMAL_PARSING
 
 
 struct deflate_optimum_node {
@@ -11202,7 +16686,9 @@ struct deflate_optimum_node {
 
 #define NUM_LITERAL_OBSERVATION_TYPES 8
 #define NUM_MATCH_OBSERVATION_TYPES 2
-#define NUM_OBSERVATION_TYPES (NUM_LITERAL_OBSERVATION_TYPES + NUM_MATCH_OBSERVATION_TYPES)
+#define NUM_OBSERVATION_TYPES (NUM_LITERAL_OBSERVATION_TYPES + \
+			       NUM_MATCH_OBSERVATION_TYPES)
+#define NUM_OBSERVATIONS_PER_BLOCK_CHECK 512
 struct block_split_stats {
 	u32 new_observations[NUM_OBSERVATION_TYPES];
 	u32 observations[NUM_OBSERVATION_TYPES];
@@ -11210,15 +16696,32 @@ struct block_split_stats {
 	u32 num_observations;
 };
 
+struct deflate_output_bitstream;
+
 
 struct libdeflate_compressor {
 
 	
-	size_t (*impl)(struct libdeflate_compressor *,
-		       const u8 *, size_t, u8 *, size_t);
+	void (*impl)(struct libdeflate_compressor *restrict c, const u8 *in,
+		     size_t in_nbytes, struct deflate_output_bitstream *os);
+
+	
+	unsigned compression_level;
+
+	
+	size_t max_passthrough_size;
+
+	
+	unsigned max_search_depth;
+
+	
+	unsigned nice_match_length;
 
 	
 	struct deflate_freqs freqs;
+
+	
+	struct block_split_stats split_stats;
 
 	
 	struct deflate_codes codes;
@@ -11227,36 +16730,25 @@ struct libdeflate_compressor {
 	struct deflate_codes static_codes;
 
 	
-	struct block_split_stats split_stats;
-
-	
-#if USE_FULL_OFFSET_SLOT_FAST
-	u8 offset_slot_fast[DEFLATE_MAX_MATCH_OFFSET + 1];
-#else
-	u8 offset_slot_fast[512];
-#endif
-
-	
-	unsigned nice_match_length;
-
-	
-	unsigned max_search_depth;
-
-	
-	unsigned compression_level;
-
-	
-	unsigned min_size_to_compress;
-
-	
-	u32 precode_freqs[DEFLATE_NUM_PRECODE_SYMS];
-	u8 precode_lens[DEFLATE_NUM_PRECODE_SYMS];
-	u32 precode_codewords[DEFLATE_NUM_PRECODE_SYMS];
-	unsigned precode_items[DEFLATE_NUM_LITLEN_SYMS + DEFLATE_NUM_OFFSET_SYMS];
-	unsigned num_litlen_syms;
-	unsigned num_offset_syms;
-	unsigned num_explicit_lens;
-	unsigned num_precode_items;
+	union {
+		
+		struct {
+			u32 freqs[DEFLATE_NUM_PRECODE_SYMS];
+			u32 codewords[DEFLATE_NUM_PRECODE_SYMS];
+			u8 lens[DEFLATE_NUM_PRECODE_SYMS];
+			unsigned items[DEFLATE_NUM_LITLEN_SYMS +
+				       DEFLATE_NUM_OFFSET_SYMS];
+			unsigned num_litlen_syms;
+			unsigned num_offset_syms;
+			unsigned num_explicit_lens;
+			unsigned num_items;
+		} precode;
+		
+		struct {
+			u32 codewords[DEFLATE_MAX_MATCH_LEN + 1];
+			u8 lens[DEFLATE_MAX_MATCH_LEN + 1];
+		} length;
+	} o;
 
 	union {
 		
@@ -11265,10 +16757,20 @@ struct libdeflate_compressor {
 			struct hc_matchfinder hc_mf;
 
 			
-			struct deflate_sequence sequences[
-				DIV_ROUND_UP(SOFT_MAX_BLOCK_LENGTH,
-					     DEFLATE_MIN_MATCH_LEN) + 1];
+			struct deflate_sequence sequences[SEQ_STORE_LENGTH + 1];
+
 		} g; 
+
+		
+		struct {
+			
+			struct ht_matchfinder ht_mf;
+
+			
+			struct deflate_sequence sequences[
+						FAST_SEQ_STORE_LENGTH + 1];
+
+		} f; 
 
 	#if SUPPORT_NEAR_OPTIMAL_PARSING
 		
@@ -11278,16 +16780,27 @@ struct libdeflate_compressor {
 			struct bt_matchfinder bt_mf;
 
 			
-			struct lz_match match_cache[CACHE_LENGTH +
+			struct lz_match match_cache[MATCH_CACHE_LENGTH +
 						    MAX_MATCHES_PER_POS +
 						    DEFLATE_MAX_MATCH_LEN - 1];
 
 			
-			struct deflate_optimum_node optimum_nodes[SOFT_MAX_BLOCK_LENGTH - 1 +
-								  DEFLATE_MAX_MATCH_LEN + 1];
+			struct deflate_optimum_node optimum_nodes[
+				MAX_BLOCK_LENGTH + 1];
 
 			
 			struct deflate_costs costs;
+
+			
+			u8 offset_slot_full[DEFLATE_MAX_MATCH_OFFSET + 1];
+
+			
+			u32 prev_observations[NUM_OBSERVATION_TYPES];
+			u32 prev_num_observations;
+
+			
+			u32 new_match_len_freqs[DEFLATE_MAX_MATCH_LEN + 1];
+			u32 match_len_freqs[DEFLATE_MAX_MATCH_LEN + 1];
 
 			unsigned num_optim_passes;
 		} n; 
@@ -11298,10 +16811,12 @@ struct libdeflate_compressor {
 
 
 typedef machine_word_t bitbuf_t;
-#define COMPRESS_BITBUF_NBITS	(8 * sizeof(bitbuf_t))
 
 
-#define CAN_BUFFER(n)	((n) <= COMPRESS_BITBUF_NBITS - 7)
+#define COMPRESS_BITBUF_NBITS	(8 * sizeof(bitbuf_t) - 1)
+
+
+#define CAN_BUFFER(n)	(7 + (n) <= COMPRESS_BITBUF_NBITS)
 
 
 struct deflate_output_bitstream {
@@ -11311,9 +16826,6 @@ struct deflate_output_bitstream {
 
 	
 	unsigned bitcount;
-
-	
-	u8 *begin;
 
 	
 	u8 *next;
@@ -11326,71 +16838,33 @@ struct deflate_output_bitstream {
 #define OUTPUT_END_PADDING	8
 
 
-static void
-deflate_init_output(struct deflate_output_bitstream *os,
-		    void *buffer, size_t size)
-{
-	os->bitbuf = 0;
-	os->bitcount = 0;
-	os->begin = buffer;
-	os->next = os->begin;
-	os->end = os->begin + size - OUTPUT_END_PADDING;
-}
+#define ADD_BITS(bits, n)			\
+do {						\
+	bitbuf |= (bitbuf_t)(bits) << bitcount;	\
+	bitcount += (n);			\
+	ASSERT(bitcount <= COMPRESS_BITBUF_NBITS);	\
+} while (0)
 
 
-static forceinline void
-deflate_add_bits(struct deflate_output_bitstream *os,
-		 const bitbuf_t bits, const unsigned num_bits)
-{
-	os->bitbuf |= bits << os->bitcount;
-	os->bitcount += num_bits;
-}
-
-
-static forceinline void
-deflate_flush_bits(struct deflate_output_bitstream *os)
-{
-	if (UNALIGNED_ACCESS_IS_FAST) {
-		
-		put_unaligned_leword(os->bitbuf, os->next);
-		os->bitbuf >>= os->bitcount & ~7;
-		os->next += MIN(os->end - os->next, os->bitcount >> 3);
-		os->bitcount &= 7;
-	} else {
-		
-		while (os->bitcount >= 8) {
-			*os->next = os->bitbuf;
-			if (os->next != os->end)
-				os->next++;
-			os->bitcount -= 8;
-			os->bitbuf >>= 8;
-		}
-	}
-}
-
-
-static forceinline void
-deflate_align_bitstream(struct deflate_output_bitstream *os)
-{
-	os->bitcount += -os->bitcount & 7;
-	deflate_flush_bits(os);
-}
-
-
-static size_t
-deflate_flush_output(struct deflate_output_bitstream *os)
-{
-	if (os->next == os->end) 
-		return 0;
-
-	while ((int)os->bitcount > 0) {
-		*os->next++ = os->bitbuf;
-		os->bitcount -= 8;
-		os->bitbuf >>= 8;
-	}
-
-	return os->next - os->begin;
-}
+#define FLUSH_BITS()							\
+do {									\
+	if (UNALIGNED_ACCESS_IS_FAST) {					\
+				\
+		put_unaligned_leword(bitbuf, out_next);			\
+		bitbuf >>= bitcount & ~7;				\
+		out_next += MIN(out_end - out_next, bitcount >> 3);	\
+		bitcount &= 7;						\
+	} else {							\
+						\
+		while (bitcount >= 8) {					\
+			*out_next = bitbuf;				\
+			if (out_next != out_end)			\
+				out_next++;				\
+			bitcount -= 8;					\
+			bitbuf >>= 8;					\
+		}							\
+	}								\
+} while (0)
 
 
 static void
@@ -11433,6 +16907,7 @@ heap_sort(u32 A[], unsigned length)
 
 	while (length >= 2) {
 		u32 tmp = A[length];
+
 		A[length] = A[1];
 		A[1] = tmp;
 		length--;
@@ -11441,13 +16916,15 @@ heap_sort(u32 A[], unsigned length)
 }
 
 #define NUM_SYMBOL_BITS 10
-#define SYMBOL_MASK ((1 << NUM_SYMBOL_BITS) - 1)
+#define NUM_FREQ_BITS	(32 - NUM_SYMBOL_BITS)
+#define SYMBOL_MASK	((1 << NUM_SYMBOL_BITS) - 1)
+#define FREQ_MASK	(~SYMBOL_MASK)
 
-#define GET_NUM_COUNTERS(num_syms)	((((num_syms) + 3 / 4) + 3) & ~3)
+#define GET_NUM_COUNTERS(num_syms)	(num_syms)
+
 
 static unsigned
-sort_symbols(unsigned num_syms, const u32 freqs[restrict],
-	     u8 lens[restrict], u32 symout[restrict])
+sort_symbols(unsigned num_syms, const u32 freqs[], u8 lens[], u32 symout[])
 {
 	unsigned sym;
 	unsigned i;
@@ -11469,6 +16946,7 @@ sort_symbols(unsigned num_syms, const u32 freqs[restrict],
 	num_used_syms = 0;
 	for (i = 1; i < num_counters; i++) {
 		unsigned count = counters[i];
+
 		counters[i] = num_used_syms;
 		num_used_syms += count;
 	}
@@ -11476,6 +16954,7 @@ sort_symbols(unsigned num_syms, const u32 freqs[restrict],
 	
 	for (sym = 0; sym < num_syms; sym++) {
 		u32 freq = freqs[sym];
+
 		if (freq != 0) {
 			symout[counters[MIN(freq, num_counters - 1)]++] =
 				sym | (freq << NUM_SYMBOL_BITS);
@@ -11495,6 +16974,8 @@ sort_symbols(unsigned num_syms, const u32 freqs[restrict],
 static void
 build_tree(u32 A[], unsigned sym_count)
 {
+	const unsigned last_idx = sym_count - 1;
+
 	
 	unsigned i = 0;
 
@@ -11505,39 +16986,39 @@ build_tree(u32 A[], unsigned sym_count)
 	unsigned e = 0;
 
 	do {
-		unsigned m, n;
-		u32 freq_shifted;
+		u32 new_freq;
 
 		
-
-		if (i != sym_count &&
-		    (b == e || (A[i] >> NUM_SYMBOL_BITS) <= (A[b] >> NUM_SYMBOL_BITS)))
-			m = i++;
-		else
-			m = b++;
-
-		if (i != sym_count &&
-		    (b == e || (A[i] >> NUM_SYMBOL_BITS) <= (A[b] >> NUM_SYMBOL_BITS)))
-			n = i++;
-		else
-			n = b++;
-
+		if (i + 1 <= last_idx &&
+		    (b == e || (A[i + 1] & FREQ_MASK) <= (A[b] & FREQ_MASK))) {
+			
+			new_freq = (A[i] & FREQ_MASK) + (A[i + 1] & FREQ_MASK);
+			i += 2;
+		} else if (b + 2 <= e &&
+			   (i > last_idx ||
+			    (A[b + 1] & FREQ_MASK) < (A[i] & FREQ_MASK))) {
+			
+			new_freq = (A[b] & FREQ_MASK) + (A[b + 1] & FREQ_MASK);
+			A[b] = (e << NUM_SYMBOL_BITS) | (A[b] & SYMBOL_MASK);
+			A[b + 1] = (e << NUM_SYMBOL_BITS) |
+				   (A[b + 1] & SYMBOL_MASK);
+			b += 2;
+		} else {
+			
+			new_freq = (A[i] & FREQ_MASK) + (A[b] & FREQ_MASK);
+			A[b] = (e << NUM_SYMBOL_BITS) | (A[b] & SYMBOL_MASK);
+			i++;
+			b++;
+		}
+		A[e] = new_freq | (A[e] & SYMBOL_MASK);
 		
-
-		freq_shifted = (A[m] & ~SYMBOL_MASK) + (A[n] & ~SYMBOL_MASK);
-
-		A[m] = (A[m] & SYMBOL_MASK) | (e << NUM_SYMBOL_BITS);
-		A[n] = (A[n] & SYMBOL_MASK) | (e << NUM_SYMBOL_BITS);
-		A[e] = (A[e] & SYMBOL_MASK) | freq_shifted;
-		e++;
-	} while (sym_count - e > 1);
-		
+	} while (++e < last_idx);
 }
 
 
 static void
-compute_length_counts(u32 A[restrict], unsigned root_idx,
-		      unsigned len_counts[restrict], unsigned max_codeword_len)
+compute_length_counts(u32 A[], unsigned root_idx, unsigned len_counts[],
+		      unsigned max_codeword_len)
 {
 	unsigned len;
 	int node;
@@ -11558,30 +17039,80 @@ compute_length_counts(u32 A[restrict], unsigned root_idx,
 		unsigned parent = A[node] >> NUM_SYMBOL_BITS;
 		unsigned parent_depth = A[parent] >> NUM_SYMBOL_BITS;
 		unsigned depth = parent_depth + 1;
-		unsigned len = depth;
 
 		
-
 		A[node] = (A[node] & SYMBOL_MASK) | (depth << NUM_SYMBOL_BITS);
 
 		
-		if (len >= max_codeword_len) {
-			len = max_codeword_len;
+		if (depth >= max_codeword_len) {
+			depth = max_codeword_len;
 			do {
-				len--;
-			} while (len_counts[len] == 0);
+				depth--;
+			} while (len_counts[depth] == 0);
 		}
 
 		
-		len_counts[len]--;
-		len_counts[len + 1] += 2;
+		len_counts[depth]--;
+		len_counts[depth + 1] += 2;
 	}
 }
 
 
+
+#ifdef rbit32
+static forceinline u32 reverse_codeword(u32 codeword, u8 len)
+{
+	return rbit32(codeword) >> ((32 - len) & 31);
+}
+#else
+
+static const u8 bitreverse_tab[256] = {
+	0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0,
+	0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
+	0x08, 0x88, 0x48, 0xc8, 0x28, 0xa8, 0x68, 0xe8,
+	0x18, 0x98, 0x58, 0xd8, 0x38, 0xb8, 0x78, 0xf8,
+	0x04, 0x84, 0x44, 0xc4, 0x24, 0xa4, 0x64, 0xe4,
+	0x14, 0x94, 0x54, 0xd4, 0x34, 0xb4, 0x74, 0xf4,
+	0x0c, 0x8c, 0x4c, 0xcc, 0x2c, 0xac, 0x6c, 0xec,
+	0x1c, 0x9c, 0x5c, 0xdc, 0x3c, 0xbc, 0x7c, 0xfc,
+	0x02, 0x82, 0x42, 0xc2, 0x22, 0xa2, 0x62, 0xe2,
+	0x12, 0x92, 0x52, 0xd2, 0x32, 0xb2, 0x72, 0xf2,
+	0x0a, 0x8a, 0x4a, 0xca, 0x2a, 0xaa, 0x6a, 0xea,
+	0x1a, 0x9a, 0x5a, 0xda, 0x3a, 0xba, 0x7a, 0xfa,
+	0x06, 0x86, 0x46, 0xc6, 0x26, 0xa6, 0x66, 0xe6,
+	0x16, 0x96, 0x56, 0xd6, 0x36, 0xb6, 0x76, 0xf6,
+	0x0e, 0x8e, 0x4e, 0xce, 0x2e, 0xae, 0x6e, 0xee,
+	0x1e, 0x9e, 0x5e, 0xde, 0x3e, 0xbe, 0x7e, 0xfe,
+	0x01, 0x81, 0x41, 0xc1, 0x21, 0xa1, 0x61, 0xe1,
+	0x11, 0x91, 0x51, 0xd1, 0x31, 0xb1, 0x71, 0xf1,
+	0x09, 0x89, 0x49, 0xc9, 0x29, 0xa9, 0x69, 0xe9,
+	0x19, 0x99, 0x59, 0xd9, 0x39, 0xb9, 0x79, 0xf9,
+	0x05, 0x85, 0x45, 0xc5, 0x25, 0xa5, 0x65, 0xe5,
+	0x15, 0x95, 0x55, 0xd5, 0x35, 0xb5, 0x75, 0xf5,
+	0x0d, 0x8d, 0x4d, 0xcd, 0x2d, 0xad, 0x6d, 0xed,
+	0x1d, 0x9d, 0x5d, 0xdd, 0x3d, 0xbd, 0x7d, 0xfd,
+	0x03, 0x83, 0x43, 0xc3, 0x23, 0xa3, 0x63, 0xe3,
+	0x13, 0x93, 0x53, 0xd3, 0x33, 0xb3, 0x73, 0xf3,
+	0x0b, 0x8b, 0x4b, 0xcb, 0x2b, 0xab, 0x6b, 0xeb,
+	0x1b, 0x9b, 0x5b, 0xdb, 0x3b, 0xbb, 0x7b, 0xfb,
+	0x07, 0x87, 0x47, 0xc7, 0x27, 0xa7, 0x67, 0xe7,
+	0x17, 0x97, 0x57, 0xd7, 0x37, 0xb7, 0x77, 0xf7,
+	0x0f, 0x8f, 0x4f, 0xcf, 0x2f, 0xaf, 0x6f, 0xef,
+	0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff,
+};
+
+static forceinline u32 reverse_codeword(u32 codeword, u8 len)
+{
+	STATIC_ASSERT(DEFLATE_MAX_CODEWORD_LEN <= 16);
+	codeword = ((u32)bitreverse_tab[codeword & 0xff] << 8) |
+		   bitreverse_tab[codeword >> 8];
+	return codeword >> (16 - len);
+}
+#endif 
+
+
 static void
-gen_codewords(u32 A[restrict], u8 lens[restrict],
-	      const unsigned len_counts[restrict],
+gen_codewords(u32 A[], u8 lens[], const unsigned len_counts[],
 	      unsigned max_codeword_len, unsigned num_syms)
 {
 	u32 next_codewords[DEFLATE_MAX_CODEWORD_LEN + 1];
@@ -11592,6 +17123,7 @@ gen_codewords(u32 A[restrict], u8 lens[restrict],
 	
 	for (i = 0, len = max_codeword_len; len >= 1; len--) {
 		unsigned count = len_counts[len];
+
 		while (count--)
 			lens[A[i++] & SYMBOL_MASK] = len;
 	}
@@ -11603,23 +17135,25 @@ gen_codewords(u32 A[restrict], u8 lens[restrict],
 		next_codewords[len] =
 			(next_codewords[len - 1] + len_counts[len - 1]) << 1;
 
-	for (sym = 0; sym < num_syms; sym++)
-		A[sym] = next_codewords[lens[sym]]++;
+	for (sym = 0; sym < num_syms; sym++) {
+		
+		A[sym] = reverse_codeword(next_codewords[lens[sym]]++,
+					  lens[sym]);
+	}
 }
 
 
 static void
-make_canonical_huffman_code(unsigned num_syms, unsigned max_codeword_len,
-			    const u32 freqs[restrict],
-			    u8 lens[restrict], u32 codewords[restrict])
+deflate_make_huffman_code(unsigned num_syms, unsigned max_codeword_len,
+			  const u32 freqs[], u8 lens[], u32 codewords[])
 {
 	u32 *A = codewords;
 	unsigned num_used_syms;
 
 	STATIC_ASSERT(DEFLATE_MAX_NUM_SYMS <= 1 << NUM_SYMBOL_BITS);
+	STATIC_ASSERT(MAX_BLOCK_LENGTH <= ((u32)1 << NUM_FREQ_BITS) - 1);
 
 	
-
 	num_used_syms = sort_symbols(num_syms, freqs, lens, A);
 
 	
@@ -11666,50 +17200,10 @@ deflate_reset_symbol_frequencies(struct libdeflate_compressor *c)
 }
 
 
-static u32
-deflate_reverse_codeword(u32 codeword, u8 len)
-{
-	
-	STATIC_ASSERT(DEFLATE_MAX_CODEWORD_LEN <= 16);
-
-	
-	codeword = ((codeword & 0x5555) << 1) | ((codeword & 0xAAAA) >> 1);
-
-	
-	codeword = ((codeword & 0x3333) << 2) | ((codeword & 0xCCCC) >> 2);
-
-	
-	codeword = ((codeword & 0x0F0F) << 4) | ((codeword & 0xF0F0) >> 4);
-
-	
-	codeword = ((codeword & 0x00FF) << 8) | ((codeword & 0xFF00) >> 8);
-
-	
-	return codeword >> (16 - len);
-}
-
-
-static void
-deflate_make_huffman_code(unsigned num_syms, unsigned max_codeword_len,
-			  const u32 freqs[], u8 lens[], u32 codewords[])
-{
-	unsigned sym;
-
-	make_canonical_huffman_code(num_syms, max_codeword_len,
-				    freqs, lens, codewords);
-
-	for (sym = 0; sym < num_syms; sym++)
-		codewords[sym] = deflate_reverse_codeword(codewords[sym], lens[sym]);
-}
-
-
 static void
 deflate_make_huffman_codes(const struct deflate_freqs *freqs,
 			   struct deflate_codes *codes)
 {
-	STATIC_ASSERT(MAX_LITLEN_CODEWORD_LEN <= DEFLATE_MAX_LITLEN_CODEWORD_LEN);
-	STATIC_ASSERT(MAX_OFFSET_CODEWORD_LEN <= DEFLATE_MAX_OFFSET_CODEWORD_LEN);
-
 	deflate_make_huffman_code(DEFLATE_NUM_LITLEN_SYMS,
 				  MAX_LITLEN_CODEWORD_LEN,
 				  freqs->litlen,
@@ -11746,33 +17240,25 @@ deflate_init_static_codes(struct libdeflate_compressor *c)
 
 
 static forceinline unsigned
-deflate_get_offset_slot(struct libdeflate_compressor *c, unsigned offset)
+deflate_get_offset_slot(unsigned offset)
 {
-#if USE_FULL_OFFSET_SLOT_FAST
-	return c->offset_slot_fast[offset];
-#else
+#if 1
 	if (offset <= 256)
-		return c->offset_slot_fast[offset - 1];
+		return deflate_offset_slot[offset];
 	else
-		return c->offset_slot_fast[256 + ((offset - 1) >> 7)];
+		return deflate_offset_slot[256 + ((offset - 1) >> 7)];
+#else 
+	u32 i1 = offset;
+	u32 i2 = 256 + ((offset - 1) >> 7);
+	u32 is_small = (s32)(offset - 257) >> 31;
+
+	return deflate_offset_slot[(i1 & is_small) ^ (i2 & ~is_small)];
 #endif
 }
 
-
-static void
-deflate_write_block_header(struct deflate_output_bitstream *os,
-			   bool is_final_block, unsigned block_type)
-{
-	deflate_add_bits(os, is_final_block, 1);
-	deflate_add_bits(os, block_type, 2);
-	deflate_flush_bits(os);
-}
-
 static unsigned
-deflate_compute_precode_items(const u8 lens[restrict],
-			      const unsigned num_lens,
-			      u32 precode_freqs[restrict],
-			      unsigned precode_items[restrict])
+deflate_compute_precode_items(const u8 lens[], const unsigned num_lens,
+			      u32 precode_freqs[], unsigned precode_items[])
 {
 	unsigned *itemptr;
 	unsigned run_start;
@@ -11802,7 +17288,8 @@ deflate_compute_precode_items(const u8 lens[restrict],
 
 			
 			while ((run_end - run_start) >= 11) {
-				extra_bits = MIN((run_end - run_start) - 11, 0x7F);
+				extra_bits = MIN((run_end - run_start) - 11,
+						 0x7F);
 				precode_freqs[18]++;
 				*itemptr++ = 18 | (extra_bits << 5);
 				run_start += 11 + extra_bits;
@@ -11810,7 +17297,8 @@ deflate_compute_precode_items(const u8 lens[restrict],
 
 			
 			if ((run_end - run_start) >= 3) {
-				extra_bits = MIN((run_end - run_start) - 3, 0x7);
+				extra_bits = MIN((run_end - run_start) - 3,
+						 0x7);
 				precode_freqs[17]++;
 				*itemptr++ = 17 | (extra_bits << 5);
 				run_start += 3 + extra_bits;
@@ -11825,7 +17313,8 @@ deflate_compute_precode_items(const u8 lens[restrict],
 				*itemptr++ = len;
 				run_start++;
 				do {
-					extra_bits = MIN((run_end - run_start) - 3, 0x3);
+					extra_bits = MIN((run_end - run_start) -
+							 3, 0x3);
 					precode_freqs[16]++;
 					*itemptr++ = 16 | (extra_bits << 5);
 					run_start += 3 + extra_bits;
@@ -11852,375 +17341,189 @@ deflate_precompute_huffman_header(struct libdeflate_compressor *c)
 {
 	
 
-	for (c->num_litlen_syms = DEFLATE_NUM_LITLEN_SYMS;
-	     c->num_litlen_syms > 257;
-	     c->num_litlen_syms--)
-		if (c->codes.lens.litlen[c->num_litlen_syms - 1] != 0)
+	for (c->o.precode.num_litlen_syms = DEFLATE_NUM_LITLEN_SYMS;
+	     c->o.precode.num_litlen_syms > 257;
+	     c->o.precode.num_litlen_syms--)
+		if (c->codes.lens.litlen[c->o.precode.num_litlen_syms - 1] != 0)
 			break;
 
-	for (c->num_offset_syms = DEFLATE_NUM_OFFSET_SYMS;
-	     c->num_offset_syms > 1;
-	     c->num_offset_syms--)
-		if (c->codes.lens.offset[c->num_offset_syms - 1] != 0)
+	for (c->o.precode.num_offset_syms = DEFLATE_NUM_OFFSET_SYMS;
+	     c->o.precode.num_offset_syms > 1;
+	     c->o.precode.num_offset_syms--)
+		if (c->codes.lens.offset[c->o.precode.num_offset_syms - 1] != 0)
 			break;
 
 	
-
 	STATIC_ASSERT(offsetof(struct deflate_lens, offset) ==
 		      DEFLATE_NUM_LITLEN_SYMS);
-
-	if (c->num_litlen_syms != DEFLATE_NUM_LITLEN_SYMS) {
-		memmove((u8 *)&c->codes.lens + c->num_litlen_syms,
+	if (c->o.precode.num_litlen_syms != DEFLATE_NUM_LITLEN_SYMS) {
+		memmove((u8 *)&c->codes.lens + c->o.precode.num_litlen_syms,
 			(u8 *)&c->codes.lens + DEFLATE_NUM_LITLEN_SYMS,
-			c->num_offset_syms);
+			c->o.precode.num_offset_syms);
 	}
 
 	
-	c->num_precode_items =
+	c->o.precode.num_items =
 		deflate_compute_precode_items((u8 *)&c->codes.lens,
-					      c->num_litlen_syms +
-							c->num_offset_syms,
-					      c->precode_freqs,
-					      c->precode_items);
+					      c->o.precode.num_litlen_syms +
+					      c->o.precode.num_offset_syms,
+					      c->o.precode.freqs,
+					      c->o.precode.items);
 
 	
-	STATIC_ASSERT(MAX_PRE_CODEWORD_LEN <= DEFLATE_MAX_PRE_CODEWORD_LEN);
 	deflate_make_huffman_code(DEFLATE_NUM_PRECODE_SYMS,
 				  MAX_PRE_CODEWORD_LEN,
-				  c->precode_freqs, c->precode_lens,
-				  c->precode_codewords);
+				  c->o.precode.freqs, c->o.precode.lens,
+				  c->o.precode.codewords);
 
 	
-	for (c->num_explicit_lens = DEFLATE_NUM_PRECODE_SYMS;
-	     c->num_explicit_lens > 4;
-	     c->num_explicit_lens--)
-		if (c->precode_lens[deflate_precode_lens_permutation[
-						c->num_explicit_lens - 1]] != 0)
+	for (c->o.precode.num_explicit_lens = DEFLATE_NUM_PRECODE_SYMS;
+	     c->o.precode.num_explicit_lens > 4;
+	     c->o.precode.num_explicit_lens--)
+		if (c->o.precode.lens[deflate_precode_lens_permutation[
+				c->o.precode.num_explicit_lens - 1]] != 0)
 			break;
 
 	
-	if (c->num_litlen_syms != DEFLATE_NUM_LITLEN_SYMS) {
+	if (c->o.precode.num_litlen_syms != DEFLATE_NUM_LITLEN_SYMS) {
 		memmove((u8 *)&c->codes.lens + DEFLATE_NUM_LITLEN_SYMS,
-			(u8 *)&c->codes.lens + c->num_litlen_syms,
-			c->num_offset_syms);
+			(u8 *)&c->codes.lens + c->o.precode.num_litlen_syms,
+			c->o.precode.num_offset_syms);
 	}
 }
 
 
 static void
-deflate_write_huffman_header(struct libdeflate_compressor *c,
-			     struct deflate_output_bitstream *os)
+deflate_compute_full_len_codewords(struct libdeflate_compressor *c,
+				   const struct deflate_codes *codes)
 {
-	unsigned i;
+	unsigned len;
 
-	deflate_add_bits(os, c->num_litlen_syms - 257, 5);
-	deflate_add_bits(os, c->num_offset_syms - 1, 5);
-	deflate_add_bits(os, c->num_explicit_lens - 4, 4);
-	deflate_flush_bits(os);
+	STATIC_ASSERT(MAX_LITLEN_CODEWORD_LEN +
+		      DEFLATE_MAX_EXTRA_LENGTH_BITS <= 32);
 
+	for (len = DEFLATE_MIN_MATCH_LEN; len <= DEFLATE_MAX_MATCH_LEN; len++) {
+		unsigned slot = deflate_length_slot[len];
+		unsigned litlen_sym = DEFLATE_FIRST_LEN_SYM + slot;
+		u32 extra_bits = len - deflate_length_slot_base[slot];
+
+		c->o.length.codewords[len] =
+			codes->codewords.litlen[litlen_sym] |
+			(extra_bits << codes->lens.litlen[litlen_sym]);
+		c->o.length.lens[len] = codes->lens.litlen[litlen_sym] +
+					deflate_extra_length_bits[slot];
+	}
+}
+
+
+#define WRITE_MATCH(c_, codes_, length_, offset_, offset_slot_)		\
+do {									\
+	const struct libdeflate_compressor *c__ = (c_);			\
+	const struct deflate_codes *codes__ = (codes_);			\
+	unsigned length__ = (length_);					\
+	unsigned offset__ = (offset_);					\
+	unsigned offset_slot__ = (offset_slot_);			\
+									\
+				\
+	STATIC_ASSERT(CAN_BUFFER(MAX_LITLEN_CODEWORD_LEN +		\
+				 DEFLATE_MAX_EXTRA_LENGTH_BITS));	\
+	ADD_BITS(c__->o.length.codewords[length__],			\
+		 c__->o.length.lens[length__]);				\
+									\
+	if (!CAN_BUFFER(MAX_LITLEN_CODEWORD_LEN +			\
+			DEFLATE_MAX_EXTRA_LENGTH_BITS +			\
+			MAX_OFFSET_CODEWORD_LEN +			\
+			DEFLATE_MAX_EXTRA_OFFSET_BITS))			\
+		FLUSH_BITS();						\
+									\
+							\
+	ADD_BITS(codes__->codewords.offset[offset_slot__],		\
+		 codes__->lens.offset[offset_slot__]);			\
+									\
+	if (!CAN_BUFFER(MAX_OFFSET_CODEWORD_LEN +			\
+			DEFLATE_MAX_EXTRA_OFFSET_BITS))			\
+		FLUSH_BITS();						\
+									\
+							\
+	ADD_BITS(offset__ - deflate_offset_slot_base[offset_slot__],	\
+		 deflate_extra_offset_bits[offset_slot__]);		\
+									\
+	FLUSH_BITS();							\
+} while (0)
+
+
+static void
+deflate_flush_block(struct libdeflate_compressor *c,
+		    struct deflate_output_bitstream *os,
+		    const u8 *block_begin, u32 block_length,
+		    const struct deflate_sequence *sequences,
+		    bool is_final_block)
+{
 	
-	for (i = 0; i < c->num_explicit_lens; i++) {
-		deflate_add_bits(os, c->precode_lens[
-				       deflate_precode_lens_permutation[i]], 3);
-		deflate_flush_bits(os);
-	}
-
-	
-	for (i = 0; i < c->num_precode_items; i++) {
-		unsigned precode_item = c->precode_items[i];
-		unsigned precode_sym = precode_item & 0x1F;
-		deflate_add_bits(os, c->precode_codewords[precode_sym],
-				 c->precode_lens[precode_sym]);
-		if (precode_sym >= 16) {
-			if (precode_sym == 16)
-				deflate_add_bits(os, precode_item >> 5, 2);
-			else if (precode_sym == 17)
-				deflate_add_bits(os, precode_item >> 5, 3);
-			else
-				deflate_add_bits(os, precode_item >> 5, 7);
-		}
-		STATIC_ASSERT(CAN_BUFFER(DEFLATE_MAX_PRE_CODEWORD_LEN + 7));
-		deflate_flush_bits(os);
-	}
-}
-
-static void
-deflate_write_sequences(struct deflate_output_bitstream * restrict os,
-			const struct deflate_codes * restrict codes,
-			const struct deflate_sequence sequences[restrict],
-			const u8 * restrict in_next)
-{
-	const struct deflate_sequence *seq = sequences;
-
-	for (;;) {
-		u32 litrunlen = seq->litrunlen_and_length & 0x7FFFFF;
-		unsigned length = seq->litrunlen_and_length >> 23;
-		unsigned length_slot;
-		unsigned litlen_symbol;
-		unsigned offset_symbol;
-
-		if (litrunlen) {
-		#if 1
-			while (litrunlen >= 4) {
-				unsigned lit0 = in_next[0];
-				unsigned lit1 = in_next[1];
-				unsigned lit2 = in_next[2];
-				unsigned lit3 = in_next[3];
-
-				deflate_add_bits(os, codes->codewords.litlen[lit0],
-						 codes->lens.litlen[lit0]);
-				if (!CAN_BUFFER(2 * MAX_LITLEN_CODEWORD_LEN))
-					deflate_flush_bits(os);
-
-				deflate_add_bits(os, codes->codewords.litlen[lit1],
-						 codes->lens.litlen[lit1]);
-				if (!CAN_BUFFER(4 * MAX_LITLEN_CODEWORD_LEN))
-					deflate_flush_bits(os);
-
-				deflate_add_bits(os, codes->codewords.litlen[lit2],
-						 codes->lens.litlen[lit2]);
-				if (!CAN_BUFFER(2 * MAX_LITLEN_CODEWORD_LEN))
-					deflate_flush_bits(os);
-
-				deflate_add_bits(os, codes->codewords.litlen[lit3],
-						 codes->lens.litlen[lit3]);
-				deflate_flush_bits(os);
-				in_next += 4;
-				litrunlen -= 4;
-			}
-			if (litrunlen-- != 0) {
-				deflate_add_bits(os, codes->codewords.litlen[*in_next],
-						 codes->lens.litlen[*in_next]);
-				if (!CAN_BUFFER(3 * MAX_LITLEN_CODEWORD_LEN))
-					deflate_flush_bits(os);
-				in_next++;
-				if (litrunlen-- != 0) {
-					deflate_add_bits(os, codes->codewords.litlen[*in_next],
-							 codes->lens.litlen[*in_next]);
-					if (!CAN_BUFFER(3 * MAX_LITLEN_CODEWORD_LEN))
-						deflate_flush_bits(os);
-					in_next++;
-					if (litrunlen-- != 0) {
-						deflate_add_bits(os, codes->codewords.litlen[*in_next],
-								 codes->lens.litlen[*in_next]);
-						if (!CAN_BUFFER(3 * MAX_LITLEN_CODEWORD_LEN))
-							deflate_flush_bits(os);
-						in_next++;
-					}
-				}
-				if (CAN_BUFFER(3 * MAX_LITLEN_CODEWORD_LEN))
-					deflate_flush_bits(os);
-			}
-		#else
-			do {
-				unsigned lit = *in_next++;
-				deflate_add_bits(os, codes->codewords.litlen[lit],
-						 codes->lens.litlen[lit]);
-				deflate_flush_bits(os);
-			} while (--litrunlen);
-		#endif
-		}
-
-		if (length == 0)
-			return;
-
-		in_next += length;
-
-		length_slot = seq->length_slot;
-		litlen_symbol = 257 + length_slot;
-
-		
-		deflate_add_bits(os, codes->codewords.litlen[litlen_symbol],
-				 codes->lens.litlen[litlen_symbol]);
-
-		
-		STATIC_ASSERT(CAN_BUFFER(MAX_LITLEN_CODEWORD_LEN +
-					 DEFLATE_MAX_EXTRA_LENGTH_BITS));
-		deflate_add_bits(os, length - deflate_length_slot_base[length_slot],
-				 deflate_extra_length_bits[length_slot]);
-
-		if (!CAN_BUFFER(MAX_LITLEN_CODEWORD_LEN +
-				DEFLATE_MAX_EXTRA_LENGTH_BITS +
-				MAX_OFFSET_CODEWORD_LEN +
-				DEFLATE_MAX_EXTRA_OFFSET_BITS))
-			deflate_flush_bits(os);
-
-		
-		offset_symbol = seq->offset_symbol;
-		deflate_add_bits(os, codes->codewords.offset[offset_symbol],
-				 codes->lens.offset[offset_symbol]);
-
-		if (!CAN_BUFFER(MAX_OFFSET_CODEWORD_LEN +
-				DEFLATE_MAX_EXTRA_OFFSET_BITS))
-			deflate_flush_bits(os);
-
-		
-		deflate_add_bits(os, seq->offset - deflate_offset_slot_base[offset_symbol],
-				 deflate_extra_offset_bits[offset_symbol]);
-
-		deflate_flush_bits(os);
-
-		seq++;
-	}
-}
-
-#if SUPPORT_NEAR_OPTIMAL_PARSING
-
-static void
-deflate_write_item_list(struct deflate_output_bitstream *os,
-			const struct deflate_codes *codes,
-			struct libdeflate_compressor *c,
-			u32 block_length)
-{
-	struct deflate_optimum_node *cur_node = &c->p.n.optimum_nodes[0];
-	struct deflate_optimum_node * const end_node = &c->p.n.optimum_nodes[block_length];
-	do {
-		unsigned length = cur_node->item & OPTIMUM_LEN_MASK;
-		unsigned offset = cur_node->item >> OPTIMUM_OFFSET_SHIFT;
-		unsigned litlen_symbol;
-		unsigned length_slot;
-		unsigned offset_slot;
-
-		if (length == 1) {
-			
-			litlen_symbol = offset;
-			deflate_add_bits(os, codes->codewords.litlen[litlen_symbol],
-					 codes->lens.litlen[litlen_symbol]);
-			deflate_flush_bits(os);
-		} else {
-			
-			length_slot = deflate_length_slot[length];
-			litlen_symbol = 257 + length_slot;
-			deflate_add_bits(os, codes->codewords.litlen[litlen_symbol],
-					 codes->lens.litlen[litlen_symbol]);
-
-			deflate_add_bits(os, length - deflate_length_slot_base[length_slot],
-					 deflate_extra_length_bits[length_slot]);
-
-			if (!CAN_BUFFER(MAX_LITLEN_CODEWORD_LEN +
-					DEFLATE_MAX_EXTRA_LENGTH_BITS +
-					MAX_OFFSET_CODEWORD_LEN +
-					DEFLATE_MAX_EXTRA_OFFSET_BITS))
-				deflate_flush_bits(os);
-
-
-			
-			offset_slot = deflate_get_offset_slot(c, offset);
-			deflate_add_bits(os, codes->codewords.offset[offset_slot],
-					 codes->lens.offset[offset_slot]);
-
-			if (!CAN_BUFFER(MAX_OFFSET_CODEWORD_LEN +
-					DEFLATE_MAX_EXTRA_OFFSET_BITS))
-				deflate_flush_bits(os);
-
-			deflate_add_bits(os, offset - deflate_offset_slot_base[offset_slot],
-					 deflate_extra_offset_bits[offset_slot]);
-
-			deflate_flush_bits(os);
-		}
-		cur_node += length;
-	} while (cur_node != end_node);
-}
-#endif 
-
-
-static void
-deflate_write_end_of_block(struct deflate_output_bitstream *os,
-			   const struct deflate_codes *codes)
-{
-	deflate_add_bits(os, codes->codewords.litlen[DEFLATE_END_OF_BLOCK],
-			 codes->lens.litlen[DEFLATE_END_OF_BLOCK]);
-	deflate_flush_bits(os);
-}
-
-static void
-deflate_write_uncompressed_block(struct deflate_output_bitstream *os,
-				 const u8 *data, u16 len,
-				 bool is_final_block)
-{
-	deflate_write_block_header(os, is_final_block,
-				   DEFLATE_BLOCKTYPE_UNCOMPRESSED);
-	deflate_align_bitstream(os);
-
-	if (4 + (u32)len >= os->end - os->next) {
-		os->next = os->end;
-		return;
-	}
-
-	put_unaligned_le16(len, os->next);
-	os->next += 2;
-	put_unaligned_le16(~len, os->next);
-	os->next += 2;
-	memcpy(os->next, data, len);
-	os->next += len;
-}
-
-static void
-deflate_write_uncompressed_blocks(struct deflate_output_bitstream *os,
-				  const u8 *data, size_t data_length,
-				  bool is_final_block)
-{
-	do {
-		u16 len = MIN(data_length, UINT16_MAX);
-
-		deflate_write_uncompressed_block(os, data, len,
-					is_final_block && len == data_length);
-		data += len;
-		data_length -= len;
-	} while (data_length != 0);
-}
-
-
-static void
-deflate_flush_block(struct libdeflate_compressor * restrict c,
-		    struct deflate_output_bitstream * restrict os,
-		    const u8 * restrict block_begin, u32 block_length,
-		    bool is_final_block, bool use_item_list)
-{
-	static const u8 deflate_extra_precode_bits[DEFLATE_NUM_PRECODE_SYMS] = {
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7,
-	};
-
+	const u8 *in_next = block_begin;
+	const u8 * const in_end = block_begin + block_length;
+	bitbuf_t bitbuf = os->bitbuf;
+	unsigned bitcount = os->bitcount;
+	u8 *out_next = os->next;
+	u8 * const out_end = os->end;
 	
 	u32 dynamic_cost = 0;
 	u32 static_cost = 0;
 	u32 uncompressed_cost = 0;
+	u32 best_cost;
 	struct deflate_codes *codes;
-	int block_type;
 	unsigned sym;
 
-	
-	c->freqs.litlen[DEFLATE_END_OF_BLOCK]++;
+	ASSERT(block_length >= MIN_BLOCK_LENGTH || is_final_block);
+	ASSERT(block_length <= MAX_BLOCK_LENGTH);
+	ASSERT(bitcount <= 7);
+	ASSERT((bitbuf & ~(((bitbuf_t)1 << bitcount) - 1)) == 0);
+	ASSERT(out_next <= out_end);
 
-	
-	deflate_make_huffman_codes(&c->freqs, &c->codes);
+	if (sequences != NULL  ||
+	    !SUPPORT_NEAR_OPTIMAL_PARSING) {
+		
+		c->freqs.litlen[DEFLATE_END_OF_BLOCK]++;
+
+		
+		deflate_make_huffman_codes(&c->freqs, &c->codes);
+	} 
 
 	
 	deflate_precompute_huffman_header(c);
-	dynamic_cost += 5 + 5 + 4 + (3 * c->num_explicit_lens);
+
+	
+	dynamic_cost += 5 + 5 + 4 + (3 * c->o.precode.num_explicit_lens);
 	for (sym = 0; sym < DEFLATE_NUM_PRECODE_SYMS; sym++) {
 		u32 extra = deflate_extra_precode_bits[sym];
-		dynamic_cost += c->precode_freqs[sym] *
-				(extra + c->precode_lens[sym]);
+
+		dynamic_cost += c->o.precode.freqs[sym] *
+				(extra + c->o.precode.lens[sym]);
 	}
 
 	
-	for (sym = 0; sym < 256; sym++) {
+	for (sym = 0; sym < 144; sym++) {
 		dynamic_cost += c->freqs.litlen[sym] *
 				c->codes.lens.litlen[sym];
-	}
-	for (sym = 0; sym < 144; sym++)
 		static_cost += c->freqs.litlen[sym] * 8;
-	for (; sym < 256; sym++)
+	}
+	for (; sym < 256; sym++) {
+		dynamic_cost += c->freqs.litlen[sym] *
+				c->codes.lens.litlen[sym];
 		static_cost += c->freqs.litlen[sym] * 9;
+	}
 
 	
-	dynamic_cost += c->codes.lens.litlen[256];
+	dynamic_cost += c->codes.lens.litlen[DEFLATE_END_OF_BLOCK];
 	static_cost += 7;
 
 	
-	for (sym = 257; sym < 257 + ARRAY_LEN(deflate_extra_length_bits); sym++) {
-		u32 extra = deflate_extra_length_bits[sym - 257];
+	for (sym = DEFLATE_FIRST_LEN_SYM;
+	     sym < DEFLATE_FIRST_LEN_SYM + ARRAY_LEN(deflate_extra_length_bits);
+	     sym++) {
+		u32 extra = deflate_extra_length_bits[
+					sym - DEFLATE_FIRST_LEN_SYM];
+
 		dynamic_cost += c->freqs.litlen[sym] *
 				(extra + c->codes.lens.litlen[sym]);
 		static_cost += c->freqs.litlen[sym] *
@@ -12230,87 +17533,222 @@ deflate_flush_block(struct libdeflate_compressor * restrict c,
 	
 	for (sym = 0; sym < ARRAY_LEN(deflate_extra_offset_bits); sym++) {
 		u32 extra = deflate_extra_offset_bits[sym];
+
 		dynamic_cost += c->freqs.offset[sym] *
 				(extra + c->codes.lens.offset[sym]);
 		static_cost += c->freqs.offset[sym] * (extra + 5);
 	}
 
 	
-	uncompressed_cost += (-(os->bitcount + 3) & 7) + 32 +
+	uncompressed_cost += (-(bitcount + 3) & 7) + 32 +
 			     (40 * (DIV_ROUND_UP(block_length,
 						 UINT16_MAX) - 1)) +
 			     (8 * block_length);
 
 	
-	if (dynamic_cost < MIN(static_cost, uncompressed_cost)) {
-		block_type = DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN;
+	best_cost = MIN(static_cost, uncompressed_cost);
+	if (dynamic_cost < best_cost) {
+		const unsigned num_explicit_lens = c->o.precode.num_explicit_lens;
+		const unsigned num_precode_items = c->o.precode.num_items;
+		unsigned precode_sym, precode_item;
+		unsigned i;
+
+		
+
+		best_cost = dynamic_cost;
 		codes = &c->codes;
+		STATIC_ASSERT(CAN_BUFFER(1 + 2 + 5 + 5 + 4 + 3));
+		ADD_BITS(is_final_block, 1);
+		ADD_BITS(DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN, 2);
+		ADD_BITS(c->o.precode.num_litlen_syms - 257, 5);
+		ADD_BITS(c->o.precode.num_offset_syms - 1, 5);
+		ADD_BITS(num_explicit_lens - 4, 4);
+
+		
+		if (CAN_BUFFER(3 * (DEFLATE_NUM_PRECODE_SYMS - 1))) {
+			
+			precode_sym = deflate_precode_lens_permutation[0];
+			ADD_BITS(c->o.precode.lens[precode_sym], 3);
+			FLUSH_BITS();
+			i = 1; 
+			do {
+				precode_sym =
+					deflate_precode_lens_permutation[i];
+				ADD_BITS(c->o.precode.lens[precode_sym], 3);
+			} while (++i < num_explicit_lens);
+			FLUSH_BITS();
+		} else {
+			FLUSH_BITS();
+			i = 0;
+			do {
+				precode_sym =
+					deflate_precode_lens_permutation[i];
+				ADD_BITS(c->o.precode.lens[precode_sym], 3);
+				FLUSH_BITS();
+			} while (++i < num_explicit_lens);
+		}
+
+		
+		i = 0;
+		do {
+			precode_item = c->o.precode.items[i];
+			precode_sym = precode_item & 0x1F;
+			STATIC_ASSERT(CAN_BUFFER(MAX_PRE_CODEWORD_LEN + 7));
+			ADD_BITS(c->o.precode.codewords[precode_sym],
+				 c->o.precode.lens[precode_sym]);
+			ADD_BITS(precode_item >> 5,
+				 deflate_extra_precode_bits[precode_sym]);
+			FLUSH_BITS();
+		} while (++i < num_precode_items);
 	} else if (static_cost < uncompressed_cost) {
-		block_type = DEFLATE_BLOCKTYPE_STATIC_HUFFMAN;
+		
 		codes = &c->static_codes;
+		ADD_BITS(is_final_block, 1);
+		ADD_BITS(DEFLATE_BLOCKTYPE_STATIC_HUFFMAN, 2);
+		FLUSH_BITS();
 	} else {
-		block_type = DEFLATE_BLOCKTYPE_UNCOMPRESSED;
+		
+		do {
+			u8 bfinal = 0;
+			size_t len = UINT16_MAX;
+
+			if (in_end - in_next <= UINT16_MAX) {
+				bfinal = is_final_block;
+				len = in_end - in_next;
+			}
+			if (out_end - out_next <
+			    (bitcount + 3 + 7) / 8 + 4 + len) {
+				
+				out_next = out_end;
+				goto out;
+			}
+			
+			STATIC_ASSERT(DEFLATE_BLOCKTYPE_UNCOMPRESSED == 0);
+			*out_next++ = (bfinal << bitcount) | bitbuf;
+			if (bitcount > 5)
+				*out_next++ = 0;
+			bitbuf = 0;
+			bitcount = 0;
+			
+			put_unaligned_le16(len, out_next);
+			out_next += 2;
+			put_unaligned_le16(~len, out_next);
+			out_next += 2;
+			memcpy(out_next, in_next, len);
+			out_next += len;
+			in_next += len;
+		} while (in_next != in_end);
+		
+		goto out;
 	}
 
 	
+	ASSERT(bitcount <= 7);
+	deflate_compute_full_len_codewords(c, codes);
+#if SUPPORT_NEAR_OPTIMAL_PARSING
+	if (sequences == NULL) {
+		
+		struct deflate_optimum_node *cur_node =
+			&c->p.n.optimum_nodes[0];
+		struct deflate_optimum_node * const end_node =
+			&c->p.n.optimum_nodes[block_length];
+		do {
+			unsigned length = cur_node->item & OPTIMUM_LEN_MASK;
+			unsigned offset = cur_node->item >>
+					  OPTIMUM_OFFSET_SHIFT;
+			if (length == 1) {
+				
+				ADD_BITS(codes->codewords.litlen[offset],
+					 codes->lens.litlen[offset]);
+				FLUSH_BITS();
+			} else {
+				
+				WRITE_MATCH(c, codes, length, offset,
+					    c->p.n.offset_slot_full[offset]);
+			}
+			cur_node += length;
+		} while (cur_node != end_node);
+	} else
+#endif 
+	{
+		
+		const struct deflate_sequence *seq;
 
-	if (block_type == DEFLATE_BLOCKTYPE_UNCOMPRESSED) {
-		
-		deflate_write_uncompressed_blocks(os, block_begin, block_length,
-						  is_final_block);
-	} else {
-		
-		deflate_write_block_header(os, is_final_block, block_type);
+		for (seq = sequences; ; seq++) {
+			u32 litrunlen = seq->litrunlen_and_length &
+					SEQ_LITRUNLEN_MASK;
+			unsigned length = seq->litrunlen_and_length >>
+					  SEQ_LENGTH_SHIFT;
+			unsigned lit;
 
-		
-		if (block_type == DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN)
-			deflate_write_huffman_header(c, os);
+			
+			if (CAN_BUFFER(4 * MAX_LITLEN_CODEWORD_LEN)) {
+				for (; litrunlen >= 4; litrunlen -= 4) {
+					lit = *in_next++;
+					ADD_BITS(codes->codewords.litlen[lit],
+						 codes->lens.litlen[lit]);
+					lit = *in_next++;
+					ADD_BITS(codes->codewords.litlen[lit],
+						 codes->lens.litlen[lit]);
+					lit = *in_next++;
+					ADD_BITS(codes->codewords.litlen[lit],
+						 codes->lens.litlen[lit]);
+					lit = *in_next++;
+					ADD_BITS(codes->codewords.litlen[lit],
+						 codes->lens.litlen[lit]);
+					FLUSH_BITS();
+				}
+				if (litrunlen-- != 0) {
+					lit = *in_next++;
+					ADD_BITS(codes->codewords.litlen[lit],
+						 codes->lens.litlen[lit]);
+					if (litrunlen-- != 0) {
+						lit = *in_next++;
+						ADD_BITS(codes->codewords.litlen[lit],
+							 codes->lens.litlen[lit]);
+						if (litrunlen-- != 0) {
+							lit = *in_next++;
+							ADD_BITS(codes->codewords.litlen[lit],
+								 codes->lens.litlen[lit]);
+						}
+					}
+					FLUSH_BITS();
+				}
+			} else {
+				while (litrunlen--) {
+					lit = *in_next++;
+					ADD_BITS(codes->codewords.litlen[lit],
+						 codes->lens.litlen[lit]);
+					FLUSH_BITS();
+				}
+			}
 
-		
-	#if SUPPORT_NEAR_OPTIMAL_PARSING
-		if (use_item_list)
-			deflate_write_item_list(os, codes, c, block_length);
-		else
-	#endif
-			deflate_write_sequences(os, codes, c->p.g.sequences,
-						block_begin);
-		deflate_write_end_of_block(os, codes);
+			if (length == 0) { 
+				ASSERT(in_next == in_end);
+				break;
+			}
+
+			
+			WRITE_MATCH(c, codes, length, seq->offset,
+				    seq->offset_slot);
+			in_next += length;
+		}
 	}
-}
 
-static forceinline void
-deflate_choose_literal(struct libdeflate_compressor *c, unsigned literal,
-		       u32 *litrunlen_p)
-{
-	c->freqs.litlen[literal]++;
-	++*litrunlen_p;
-}
+	
+	ASSERT(bitcount <= 7);
+	ADD_BITS(codes->codewords.litlen[DEFLATE_END_OF_BLOCK],
+		 codes->lens.litlen[DEFLATE_END_OF_BLOCK]);
+	FLUSH_BITS();
+out:
+	ASSERT(bitcount <= 7);
+	
+	ASSERT(8 * (out_next - os->next) + bitcount - os->bitcount ==
+	       3 + best_cost || out_next == out_end);
 
-static forceinline void
-deflate_choose_match(struct libdeflate_compressor *c,
-		     unsigned length, unsigned offset,
-		     u32 *litrunlen_p, struct deflate_sequence **next_seq_p)
-{
-	struct deflate_sequence *seq = *next_seq_p;
-	unsigned length_slot = deflate_length_slot[length];
-	unsigned offset_slot = deflate_get_offset_slot(c, offset);
-
-	c->freqs.litlen[257 + length_slot]++;
-	c->freqs.offset[offset_slot]++;
-
-	seq->litrunlen_and_length = ((u32)length << 23) | *litrunlen_p;
-	seq->offset = offset;
-	seq->length_slot = length_slot;
-	seq->offset_symbol = offset_slot;
-
-	*litrunlen_p = 0;
-	*next_seq_p = seq + 1;
-}
-
-static forceinline void
-deflate_finish_sequence(struct deflate_sequence *seq, u32 litrunlen)
-{
-	seq->litrunlen_and_length = litrunlen; 
+	os->bitbuf = bitbuf;
+	os->bitcount = bitcount;
+	os->next = out_next;
 }
 
 
@@ -12343,40 +17781,71 @@ observe_literal(struct block_split_stats *stats, u8 lit)
 static forceinline void
 observe_match(struct block_split_stats *stats, unsigned length)
 {
-	stats->new_observations[NUM_LITERAL_OBSERVATION_TYPES + (length >= 9)]++;
+	stats->new_observations[NUM_LITERAL_OBSERVATION_TYPES +
+				(length >= 9)]++;
 	stats->num_new_observations++;
+}
+
+static void
+merge_new_observations(struct block_split_stats *stats)
+{
+	int i;
+
+	for (i = 0; i < NUM_OBSERVATION_TYPES; i++) {
+		stats->observations[i] += stats->new_observations[i];
+		stats->new_observations[i] = 0;
+	}
+	stats->num_observations += stats->num_new_observations;
+	stats->num_new_observations = 0;
 }
 
 static bool
 do_end_block_check(struct block_split_stats *stats, u32 block_length)
 {
-	int i;
-
 	if (stats->num_observations > 0) {
-
 		
 		u32 total_delta = 0;
+		u32 num_items;
+		u32 cutoff;
+		int i;
+
 		for (i = 0; i < NUM_OBSERVATION_TYPES; i++) {
-			u32 expected = stats->observations[i] * stats->num_new_observations;
-			u32 actual = stats->new_observations[i] * stats->num_observations;
+			u32 expected = stats->observations[i] *
+				       stats->num_new_observations;
+			u32 actual = stats->new_observations[i] *
+				     stats->num_observations;
 			u32 delta = (actual > expected) ? actual - expected :
 							  expected - actual;
+
 			total_delta += delta;
 		}
 
+		num_items = stats->num_observations +
+			    stats->num_new_observations;
 		
-		if (total_delta + (block_length / 4096) * stats->num_observations >=
-		    NUM_OBSERVATIONS_PER_BLOCK_CHECK * 200 / 512 * stats->num_observations)
+		cutoff = stats->num_new_observations * 200 / 512 *
+			 stats->num_observations;
+		
+		if (block_length < 10000 && num_items < 8192)
+			cutoff += (u64)cutoff * (8192 - num_items) / 8192;
+
+		
+		if (total_delta +
+		    (block_length / 4096) * stats->num_observations >= cutoff)
 			return true;
 	}
-
-	for (i = 0; i < NUM_OBSERVATION_TYPES; i++) {
-		stats->num_observations += stats->new_observations[i];
-		stats->observations[i] += stats->new_observations[i];
-		stats->new_observations[i] = 0;
-	}
-	stats->num_new_observations = 0;
+	merge_new_observations(stats);
 	return false;
+}
+
+static forceinline bool
+ready_to_check_block(const struct block_split_stats *stats,
+		     const u8 *in_block_begin, const u8 *in_next,
+		     const u8 *in_end)
+{
+	return stats->num_new_observations >= NUM_OBSERVATIONS_PER_BLOCK_CHECK
+		&& in_next - in_block_begin >= MIN_BLOCK_LENGTH
+		&& in_end - in_next >= MIN_BLOCK_LENGTH;
 }
 
 static forceinline bool
@@ -12384,9 +17853,7 @@ should_end_block(struct block_split_stats *stats,
 		 const u8 *in_block_begin, const u8 *in_next, const u8 *in_end)
 {
 	
-	if (stats->num_new_observations < NUM_OBSERVATIONS_PER_BLOCK_CHECK ||
-	    in_next - in_block_begin < MIN_BLOCK_LENGTH ||
-	    in_end - in_next < MIN_BLOCK_LENGTH)
+	if (!ready_to_check_block(stats, in_block_begin, in_next, in_end))
 		return false;
 
 	return do_end_block_check(stats, in_next - in_block_begin);
@@ -12394,223 +17861,528 @@ should_end_block(struct block_split_stats *stats,
 
 
 
-
-static size_t
-deflate_compress_none(struct libdeflate_compressor * restrict c,
-		      const u8 * restrict in, size_t in_nbytes,
-		      u8 * restrict out, size_t out_nbytes_avail)
+static void
+deflate_begin_sequences(struct libdeflate_compressor *c,
+			struct deflate_sequence *first_seq)
 {
-	struct deflate_output_bitstream os;
+	deflate_reset_symbol_frequencies(c);
+	first_seq->litrunlen_and_length = 0;
+}
 
-	deflate_init_output(&os, out, out_nbytes_avail);
+static forceinline void
+deflate_choose_literal(struct libdeflate_compressor *c, unsigned literal,
+		       bool gather_split_stats, struct deflate_sequence *seq)
+{
+	c->freqs.litlen[literal]++;
 
-	deflate_write_uncompressed_blocks(&os, in, in_nbytes, true);
+	if (gather_split_stats)
+		observe_literal(&c->split_stats, literal);
 
-	return deflate_flush_output(&os);
+	STATIC_ASSERT(MAX_BLOCK_LENGTH <= SEQ_LITRUNLEN_MASK);
+	seq->litrunlen_and_length++;
+}
+
+static forceinline void
+deflate_choose_match(struct libdeflate_compressor *c,
+		     unsigned length, unsigned offset, bool gather_split_stats,
+		     struct deflate_sequence **seq_p)
+{
+	struct deflate_sequence *seq = *seq_p;
+	unsigned length_slot = deflate_length_slot[length];
+	unsigned offset_slot = deflate_get_offset_slot(offset);
+
+	c->freqs.litlen[DEFLATE_FIRST_LEN_SYM + length_slot]++;
+	c->freqs.offset[offset_slot]++;
+	if (gather_split_stats)
+		observe_match(&c->split_stats, length);
+
+	seq->litrunlen_and_length |= (u32)length << SEQ_LENGTH_SHIFT;
+	seq->offset = offset;
+	seq->offset_slot = offset_slot;
+
+	seq++;
+	seq->litrunlen_and_length = 0;
+	*seq_p = seq;
+}
+
+
+static forceinline void
+adjust_max_and_nice_len(unsigned *max_len, unsigned *nice_len, size_t remaining)
+{
+	if (unlikely(remaining < DEFLATE_MAX_MATCH_LEN)) {
+		*max_len = remaining;
+		*nice_len = MIN(*nice_len, *max_len);
+	}
+}
+
+
+static unsigned
+choose_min_match_len(unsigned num_used_literals, unsigned max_search_depth)
+{
+	
+	static const u8 min_lens[] = {
+		9, 9, 9, 9, 9, 9, 8, 8, 7, 7, 6, 6, 6, 6, 6, 6,
+		5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+		5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 4, 4,
+		4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+		4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+		
+	};
+	unsigned min_len;
+
+	STATIC_ASSERT(DEFLATE_MIN_MATCH_LEN <= 3);
+	STATIC_ASSERT(ARRAY_LEN(min_lens) <= DEFLATE_NUM_LITERALS + 1);
+
+	if (num_used_literals >= ARRAY_LEN(min_lens))
+		return 3;
+	min_len = min_lens[num_used_literals];
+	
+	if (max_search_depth < 16) {
+		if (max_search_depth < 5)
+			min_len = MIN(min_len, 4);
+		else if (max_search_depth < 10)
+			min_len = MIN(min_len, 5);
+		else
+			min_len = MIN(min_len, 7);
+	}
+	return min_len;
+}
+
+static unsigned
+calculate_min_match_len(const u8 *data, size_t data_len,
+			unsigned max_search_depth)
+{
+	u8 used[256] = { 0 };
+	unsigned num_used_literals = 0;
+	size_t i;
+
+	
+	data_len = MIN(data_len, 4096);
+	for (i = 0; i < data_len; i++)
+		used[data[i]] = 1;
+	for (i = 0; i < 256; i++)
+		num_used_literals += used[i];
+	return choose_min_match_len(num_used_literals, max_search_depth);
+}
+
+
+static unsigned
+recalculate_min_match_len(const struct deflate_freqs *freqs,
+			  unsigned max_search_depth)
+{
+	u32 literal_freq = 0;
+	u32 cutoff;
+	unsigned num_used_literals = 0;
+	int i;
+
+	for (i = 0; i < DEFLATE_NUM_LITERALS; i++)
+		literal_freq += freqs->litlen[i];
+
+	cutoff = literal_freq >> 10; 
+
+	for (i = 0; i < DEFLATE_NUM_LITERALS; i++) {
+		if (freqs->litlen[i] > cutoff)
+			num_used_literals++;
+	}
+	return choose_min_match_len(num_used_literals, max_search_depth);
+}
+
+static forceinline const u8 *
+choose_max_block_end(const u8 *in_block_begin, const u8 *in_end,
+		     size_t soft_max_len)
+{
+	if (in_end - in_block_begin < soft_max_len + MIN_BLOCK_LENGTH)
+		return in_end;
+	return in_block_begin + soft_max_len;
 }
 
 
 static size_t
-deflate_compress_greedy(struct libdeflate_compressor * restrict c,
-			const u8 * restrict in, size_t in_nbytes,
-			u8 * restrict out, size_t out_nbytes_avail)
+deflate_compress_none(const u8 *in, size_t in_nbytes,
+		      u8 *out, size_t out_nbytes_avail)
+{
+	const u8 *in_next = in;
+	const u8 * const in_end = in + in_nbytes;
+	u8 *out_next = out;
+	u8 * const out_end = out + out_nbytes_avail;
+
+	
+	if (unlikely(in_nbytes == 0)) {
+		if (out_nbytes_avail < 5)
+			return 0;
+		
+		*out_next++ = 1 | (DEFLATE_BLOCKTYPE_UNCOMPRESSED << 1);
+		
+		put_unaligned_le32(0xFFFF0000, out_next);
+		return 5;
+	}
+
+	do {
+		u8 bfinal = 0;
+		size_t len = UINT16_MAX;
+
+		if (in_end - in_next <= UINT16_MAX) {
+			bfinal = 1;
+			len = in_end - in_next;
+		}
+		if (out_end - out_next < 5 + len)
+			return 0;
+		
+		*out_next++ = bfinal | (DEFLATE_BLOCKTYPE_UNCOMPRESSED << 1);
+
+		
+		put_unaligned_le16(len, out_next);
+		out_next += 2;
+		put_unaligned_le16(~len, out_next);
+		out_next += 2;
+		memcpy(out_next, in_next, len);
+		out_next += len;
+		in_next += len;
+	} while (in_next != in_end);
+
+	return out_next - out;
+}
+
+
+static void
+deflate_compress_fastest(struct libdeflate_compressor * restrict c,
+			 const u8 *in, size_t in_nbytes,
+			 struct deflate_output_bitstream *os)
 {
 	const u8 *in_next = in;
 	const u8 *in_end = in_next + in_nbytes;
-	struct deflate_output_bitstream os;
 	const u8 *in_cur_base = in_next;
 	unsigned max_len = DEFLATE_MAX_MATCH_LEN;
 	unsigned nice_len = MIN(c->nice_match_length, max_len);
-	u32 next_hashes[2] = {0, 0};
+	u32 next_hash = 0;
 
-	deflate_init_output(&os, out, out_nbytes_avail);
-	hc_matchfinder_init(&c->p.g.hc_mf);
+	ht_matchfinder_init(&c->p.f.ht_mf);
 
 	do {
 		
 
 		const u8 * const in_block_begin = in_next;
-		const u8 * const in_max_block_end =
-			in_next + MIN(in_end - in_next, SOFT_MAX_BLOCK_LENGTH);
-		u32 litrunlen = 0;
-		struct deflate_sequence *next_seq = c->p.g.sequences;
+		const u8 * const in_max_block_end = choose_max_block_end(
+				in_next, in_end, FAST_SOFT_MAX_BLOCK_LENGTH);
+		struct deflate_sequence *seq = c->p.f.sequences;
 
-		init_block_split_stats(&c->split_stats);
-		deflate_reset_symbol_frequencies(c);
+		deflate_begin_sequences(c, seq);
 
 		do {
 			u32 length;
 			u32 offset;
+			size_t remaining = in_end - in_next;
 
-			
-			if (unlikely(max_len > in_end - in_next)) {
-				max_len = in_end - in_next;
+			if (unlikely(remaining < DEFLATE_MAX_MATCH_LEN)) {
+				max_len = remaining;
+				if (max_len < HT_MATCHFINDER_REQUIRED_NBYTES) {
+					do {
+						deflate_choose_literal(c,
+							*in_next++, false, seq);
+					} while (--max_len);
+					break;
+				}
 				nice_len = MIN(nice_len, max_len);
 			}
-
-			length = hc_matchfinder_longest_match(&c->p.g.hc_mf,
+			length = ht_matchfinder_longest_match(&c->p.f.ht_mf,
 							      &in_cur_base,
 							      in_next,
-							      DEFLATE_MIN_MATCH_LEN - 1,
 							      max_len,
 							      nice_len,
-							      c->max_search_depth,
-							      next_hashes,
+							      &next_hash,
 							      &offset);
-
-			if (length >= DEFLATE_MIN_MATCH_LEN) {
+			if (length) {
 				
-				deflate_choose_match(c, length, offset,
-						     &litrunlen, &next_seq);
-				observe_match(&c->split_stats, length);
-				in_next = hc_matchfinder_skip_positions(&c->p.g.hc_mf,
-									&in_cur_base,
-									in_next + 1,
-									in_end,
-									length - 1,
-									next_hashes);
+				deflate_choose_match(c, length, offset, false,
+						     &seq);
+				ht_matchfinder_skip_bytes(&c->p.f.ht_mf,
+							  &in_cur_base,
+							  in_next + 1,
+							  in_end,
+							  length - 1,
+							  &next_hash);
+				in_next += length;
 			} else {
 				
-				deflate_choose_literal(c, *in_next, &litrunlen);
-				observe_literal(&c->split_stats, *in_next);
-				in_next++;
+				deflate_choose_literal(c, *in_next++, false,
+						       seq);
 			}
 
 			
 		} while (in_next < in_max_block_end &&
-			 !should_end_block(&c->split_stats, in_block_begin, in_next, in_end));
+			 seq < &c->p.f.sequences[FAST_SEQ_STORE_LENGTH]);
 
-		deflate_finish_sequence(next_seq, litrunlen);
-		deflate_flush_block(c, &os, in_block_begin,
+		deflate_flush_block(c, os, in_block_begin,
 				    in_next - in_block_begin,
-				    in_next == in_end, false);
+				    c->p.f.sequences, in_next == in_end);
 	} while (in_next != in_end);
-
-	return deflate_flush_output(&os);
 }
 
 
-static size_t
-deflate_compress_lazy(struct libdeflate_compressor * restrict c,
-		      const u8 * restrict in, size_t in_nbytes,
-		      u8 * restrict out, size_t out_nbytes_avail)
+static void
+deflate_compress_greedy(struct libdeflate_compressor * restrict c,
+			const u8 *in, size_t in_nbytes,
+			struct deflate_output_bitstream *os)
 {
 	const u8 *in_next = in;
 	const u8 *in_end = in_next + in_nbytes;
-	struct deflate_output_bitstream os;
 	const u8 *in_cur_base = in_next;
 	unsigned max_len = DEFLATE_MAX_MATCH_LEN;
 	unsigned nice_len = MIN(c->nice_match_length, max_len);
 	u32 next_hashes[2] = {0, 0};
 
-	deflate_init_output(&os, out, out_nbytes_avail);
 	hc_matchfinder_init(&c->p.g.hc_mf);
 
 	do {
 		
 
 		const u8 * const in_block_begin = in_next;
-		const u8 * const in_max_block_end =
-			in_next + MIN(in_end - in_next, SOFT_MAX_BLOCK_LENGTH);
-		u32 litrunlen = 0;
-		struct deflate_sequence *next_seq = c->p.g.sequences;
+		const u8 * const in_max_block_end = choose_max_block_end(
+				in_next, in_end, SOFT_MAX_BLOCK_LENGTH);
+		struct deflate_sequence *seq = c->p.g.sequences;
+		unsigned min_len;
 
 		init_block_split_stats(&c->split_stats);
-		deflate_reset_symbol_frequencies(c);
+		deflate_begin_sequences(c, seq);
+		min_len = calculate_min_match_len(in_next,
+						  in_max_block_end - in_next,
+						  c->max_search_depth);
+		do {
+			u32 length;
+			u32 offset;
 
+			adjust_max_and_nice_len(&max_len, &nice_len,
+						in_end - in_next);
+			length = hc_matchfinder_longest_match(
+						&c->p.g.hc_mf,
+						&in_cur_base,
+						in_next,
+						min_len - 1,
+						max_len,
+						nice_len,
+						c->max_search_depth,
+						next_hashes,
+						&offset);
+
+			if (length >= min_len &&
+			    (length > DEFLATE_MIN_MATCH_LEN ||
+			     offset <= 4096)) {
+				
+				deflate_choose_match(c, length, offset, true,
+						     &seq);
+				hc_matchfinder_skip_bytes(&c->p.g.hc_mf,
+							  &in_cur_base,
+							  in_next + 1,
+							  in_end,
+							  length - 1,
+							  next_hashes);
+				in_next += length;
+			} else {
+				
+				deflate_choose_literal(c, *in_next++, true,
+						       seq);
+			}
+
+			
+		} while (in_next < in_max_block_end &&
+			 seq < &c->p.g.sequences[SEQ_STORE_LENGTH] &&
+			 !should_end_block(&c->split_stats,
+					   in_block_begin, in_next, in_end));
+
+		deflate_flush_block(c, os, in_block_begin,
+				    in_next - in_block_begin,
+				    c->p.g.sequences, in_next == in_end);
+	} while (in_next != in_end);
+}
+
+static forceinline void
+deflate_compress_lazy_generic(struct libdeflate_compressor * restrict c,
+			      const u8 *in, size_t in_nbytes,
+			      struct deflate_output_bitstream *os, bool lazy2)
+{
+	const u8 *in_next = in;
+	const u8 *in_end = in_next + in_nbytes;
+	const u8 *in_cur_base = in_next;
+	unsigned max_len = DEFLATE_MAX_MATCH_LEN;
+	unsigned nice_len = MIN(c->nice_match_length, max_len);
+	u32 next_hashes[2] = {0, 0};
+
+	hc_matchfinder_init(&c->p.g.hc_mf);
+
+	do {
+		
+
+		const u8 * const in_block_begin = in_next;
+		const u8 * const in_max_block_end = choose_max_block_end(
+				in_next, in_end, SOFT_MAX_BLOCK_LENGTH);
+		const u8 *next_recalc_min_len =
+			in_next + MIN(in_end - in_next, 10000);
+		struct deflate_sequence *seq = c->p.g.sequences;
+		unsigned min_len;
+
+		init_block_split_stats(&c->split_stats);
+		deflate_begin_sequences(c, seq);
+		min_len = calculate_min_match_len(in_next,
+						  in_max_block_end - in_next,
+						  c->max_search_depth);
 		do {
 			unsigned cur_len;
 			unsigned cur_offset;
 			unsigned next_len;
 			unsigned next_offset;
 
-			if (unlikely(in_end - in_next < DEFLATE_MAX_MATCH_LEN)) {
-				max_len = in_end - in_next;
-				nice_len = MIN(nice_len, max_len);
+			
+			if (in_next >= next_recalc_min_len) {
+				min_len = recalculate_min_match_len(
+						&c->freqs,
+						c->max_search_depth);
+				next_recalc_min_len +=
+					MIN(in_end - next_recalc_min_len,
+					    in_next - in_block_begin);
 			}
 
 			
-			cur_len = hc_matchfinder_longest_match(&c->p.g.hc_mf,
-							       &in_cur_base,
-							       in_next,
-							       DEFLATE_MIN_MATCH_LEN - 1,
-							       max_len,
-							       nice_len,
-							       c->max_search_depth,
-							       next_hashes,
-							       &cur_offset);
-			in_next += 1;
-
-			if (cur_len < DEFLATE_MIN_MATCH_LEN) {
+			adjust_max_and_nice_len(&max_len, &nice_len,
+						in_end - in_next);
+			cur_len = hc_matchfinder_longest_match(
+						&c->p.g.hc_mf,
+						&in_cur_base,
+						in_next,
+						min_len - 1,
+						max_len,
+						nice_len,
+						c->max_search_depth,
+						next_hashes,
+						&cur_offset);
+			if (cur_len < min_len ||
+			    (cur_len == DEFLATE_MIN_MATCH_LEN &&
+			     cur_offset > 8192)) {
 				
-				deflate_choose_literal(c, *(in_next - 1), &litrunlen);
-				observe_literal(&c->split_stats, *(in_next - 1));
+				deflate_choose_literal(c, *in_next++, true,
+						       seq);
 				continue;
 			}
+			in_next++;
 
-		have_cur_match:
-			observe_match(&c->split_stats, cur_len);
-
-			
-
+have_cur_match:
 			
 			if (cur_len >= nice_len) {
 				deflate_choose_match(c, cur_len, cur_offset,
-						     &litrunlen, &next_seq);
-				in_next = hc_matchfinder_skip_positions(&c->p.g.hc_mf,
-									&in_cur_base,
-									in_next,
-									in_end,
-									cur_len - 1,
-									next_hashes);
+						     true, &seq);
+				hc_matchfinder_skip_bytes(&c->p.g.hc_mf,
+							  &in_cur_base,
+							  in_next,
+							  in_end,
+							  cur_len - 1,
+							  next_hashes);
+				in_next += cur_len - 1;
 				continue;
 			}
 
 			
-			if (unlikely(in_end - in_next < DEFLATE_MAX_MATCH_LEN)) {
-				max_len = in_end - in_next;
-				nice_len = MIN(nice_len, max_len);
-			}
-			next_len = hc_matchfinder_longest_match(&c->p.g.hc_mf,
-								&in_cur_base,
-								in_next,
-								cur_len,
-								max_len,
-								nice_len,
-								c->max_search_depth / 2,
-								next_hashes,
-								&next_offset);
-			in_next += 1;
-
-			if (next_len > cur_len) {
+			adjust_max_and_nice_len(&max_len, &nice_len,
+						in_end - in_next);
+			next_len = hc_matchfinder_longest_match(
+						&c->p.g.hc_mf,
+						&in_cur_base,
+						in_next++,
+						cur_len - 1,
+						max_len,
+						nice_len,
+						c->max_search_depth >> 1,
+						next_hashes,
+						&next_offset);
+			if (next_len >= cur_len &&
+			    4 * (int)(next_len - cur_len) +
+			    ((int)bsr32(cur_offset) -
+			     (int)bsr32(next_offset)) > 2) {
 				
-				deflate_choose_literal(c, *(in_next - 2), &litrunlen);
+				deflate_choose_literal(c, *(in_next - 2), true,
+						       seq);
 				cur_len = next_len;
 				cur_offset = next_offset;
 				goto have_cur_match;
 			}
 
-			
-			deflate_choose_match(c, cur_len, cur_offset,
-					     &litrunlen, &next_seq);
-			in_next = hc_matchfinder_skip_positions(&c->p.g.hc_mf,
-								&in_cur_base,
-								in_next,
-								in_end,
-								cur_len - 2,
-								next_hashes);
-
+			if (lazy2) {
+				
+				adjust_max_and_nice_len(&max_len, &nice_len,
+							in_end - in_next);
+				next_len = hc_matchfinder_longest_match(
+						&c->p.g.hc_mf,
+						&in_cur_base,
+						in_next++,
+						cur_len - 1,
+						max_len,
+						nice_len,
+						c->max_search_depth >> 2,
+						next_hashes,
+						&next_offset);
+				if (next_len >= cur_len &&
+				    4 * (int)(next_len - cur_len) +
+				    ((int)bsr32(cur_offset) -
+				     (int)bsr32(next_offset)) > 6) {
+					
+					deflate_choose_literal(
+						c, *(in_next - 3), true, seq);
+					deflate_choose_literal(
+						c, *(in_next - 2), true, seq);
+					cur_len = next_len;
+					cur_offset = next_offset;
+					goto have_cur_match;
+				}
+				
+				deflate_choose_match(c, cur_len, cur_offset,
+						     true, &seq);
+				if (cur_len > 3) {
+					hc_matchfinder_skip_bytes(&c->p.g.hc_mf,
+								  &in_cur_base,
+								  in_next,
+								  in_end,
+								  cur_len - 3,
+								  next_hashes);
+					in_next += cur_len - 3;
+				}
+			} else { 
+				
+				deflate_choose_match(c, cur_len, cur_offset,
+						     true, &seq);
+				hc_matchfinder_skip_bytes(&c->p.g.hc_mf,
+							  &in_cur_base,
+							  in_next,
+							  in_end,
+							  cur_len - 2,
+							  next_hashes);
+				in_next += cur_len - 2;
+			}
 			
 		} while (in_next < in_max_block_end &&
-			 !should_end_block(&c->split_stats, in_block_begin, in_next, in_end));
+			 seq < &c->p.g.sequences[SEQ_STORE_LENGTH] &&
+			 !should_end_block(&c->split_stats,
+					   in_block_begin, in_next, in_end));
 
-		deflate_finish_sequence(next_seq, litrunlen);
-		deflate_flush_block(c, &os, in_block_begin,
+		deflate_flush_block(c, os, in_block_begin,
 				    in_next - in_block_begin,
-				    in_next == in_end, false);
+				    c->p.g.sequences, in_next == in_end);
 	} while (in_next != in_end);
+}
 
-	return deflate_flush_output(&os);
+
+static void
+deflate_compress_lazy(struct libdeflate_compressor * restrict c,
+		      const u8 *in, size_t in_nbytes,
+		      struct deflate_output_bitstream *os)
+{
+	deflate_compress_lazy_generic(c, in, in_nbytes, os, false);
+}
+
+
+static void
+deflate_compress_lazy2(struct libdeflate_compressor * restrict c,
+		       const u8 *in, size_t in_nbytes,
+		       struct deflate_output_bitstream *os)
+{
+	deflate_compress_lazy_generic(c, in, in_nbytes, os, true);
 }
 
 #if SUPPORT_NEAR_OPTIMAL_PARSING
@@ -12620,7 +18392,9 @@ static void
 deflate_tally_item_list(struct libdeflate_compressor *c, u32 block_length)
 {
 	struct deflate_optimum_node *cur_node = &c->p.n.optimum_nodes[0];
-	struct deflate_optimum_node *end_node = &c->p.n.optimum_nodes[block_length];
+	struct deflate_optimum_node *end_node =
+		&c->p.n.optimum_nodes[block_length];
+
 	do {
 		unsigned length = cur_node->item & OPTIMUM_LEN_MASK;
 		unsigned offset = cur_node->item >> OPTIMUM_OFFSET_SHIFT;
@@ -12630,11 +18404,15 @@ deflate_tally_item_list(struct libdeflate_compressor *c, u32 block_length)
 			c->freqs.litlen[offset]++;
 		} else {
 			
-			c->freqs.litlen[257 + deflate_length_slot[length]]++;
-			c->freqs.offset[deflate_get_offset_slot(c, offset)]++;
+			c->freqs.litlen[DEFLATE_FIRST_LEN_SYM +
+					deflate_length_slot[length]]++;
+			c->freqs.offset[c->p.n.offset_slot_full[offset]]++;
 		}
 		cur_node += length;
 	} while (cur_node != end_node);
+
+	
+	c->freqs.litlen[DEFLATE_END_OF_BLOCK]++;
 }
 
 
@@ -12646,98 +18424,310 @@ deflate_set_costs_from_codes(struct libdeflate_compressor *c,
 
 	
 	for (i = 0; i < DEFLATE_NUM_LITERALS; i++) {
-		u32 bits = (lens->litlen[i] ? lens->litlen[i] : LITERAL_NOSTAT_BITS);
-		c->p.n.costs.literal[i] = bits << COST_SHIFT;
+		u32 bits = (lens->litlen[i] ?
+			    lens->litlen[i] : LITERAL_NOSTAT_BITS);
+
+		c->p.n.costs.literal[i] = bits * BIT_COST;
 	}
 
 	
 	for (i = DEFLATE_MIN_MATCH_LEN; i <= DEFLATE_MAX_MATCH_LEN; i++) {
 		unsigned length_slot = deflate_length_slot[i];
-		unsigned litlen_sym = 257 + length_slot;
-		u32 bits = (lens->litlen[litlen_sym] ? lens->litlen[litlen_sym] : LENGTH_NOSTAT_BITS);
+		unsigned litlen_sym = DEFLATE_FIRST_LEN_SYM + length_slot;
+		u32 bits = (lens->litlen[litlen_sym] ?
+			    lens->litlen[litlen_sym] : LENGTH_NOSTAT_BITS);
+
 		bits += deflate_extra_length_bits[length_slot];
-		c->p.n.costs.length[i] = bits << COST_SHIFT;
+		c->p.n.costs.length[i] = bits * BIT_COST;
 	}
 
 	
 	for (i = 0; i < ARRAY_LEN(deflate_offset_slot_base); i++) {
-		u32 bits = (lens->offset[i] ? lens->offset[i] : OFFSET_NOSTAT_BITS);
+		u32 bits = (lens->offset[i] ?
+			    lens->offset[i] : OFFSET_NOSTAT_BITS);
+
 		bits += deflate_extra_offset_bits[i];
-		c->p.n.costs.offset_slot[i] = bits << COST_SHIFT;
+		c->p.n.costs.offset_slot[i] = bits * BIT_COST;
 	}
 }
 
-static forceinline u32
-deflate_default_literal_cost(unsigned literal)
+
+static const struct {
+	u8 used_lits_to_lit_cost[257];
+	u8 len_sym_cost;
+} default_litlen_costs[] = {
+	{ 
+		.used_lits_to_lit_cost = {
+			6, 6, 22, 32, 38, 43, 48, 51,
+			54, 57, 59, 61, 64, 65, 67, 69,
+			70, 72, 73, 74, 75, 76, 77, 79,
+			80, 80, 81, 82, 83, 84, 85, 85,
+			86, 87, 88, 88, 89, 89, 90, 91,
+			91, 92, 92, 93, 93, 94, 95, 95,
+			96, 96, 96, 97, 97, 98, 98, 99,
+			99, 99, 100, 100, 101, 101, 101, 102,
+			102, 102, 103, 103, 104, 104, 104, 105,
+			105, 105, 105, 106, 106, 106, 107, 107,
+			107, 108, 108, 108, 108, 109, 109, 109,
+			109, 110, 110, 110, 111, 111, 111, 111,
+			112, 112, 112, 112, 112, 113, 113, 113,
+			113, 114, 114, 114, 114, 114, 115, 115,
+			115, 115, 115, 116, 116, 116, 116, 116,
+			117, 117, 117, 117, 117, 118, 118, 118,
+			118, 118, 118, 119, 119, 119, 119, 119,
+			120, 120, 120, 120, 120, 120, 121, 121,
+			121, 121, 121, 121, 121, 122, 122, 122,
+			122, 122, 122, 123, 123, 123, 123, 123,
+			123, 123, 124, 124, 124, 124, 124, 124,
+			124, 125, 125, 125, 125, 125, 125, 125,
+			125, 126, 126, 126, 126, 126, 126, 126,
+			127, 127, 127, 127, 127, 127, 127, 127,
+			128, 128, 128, 128, 128, 128, 128, 128,
+			128, 129, 129, 129, 129, 129, 129, 129,
+			129, 129, 130, 130, 130, 130, 130, 130,
+			130, 130, 130, 131, 131, 131, 131, 131,
+			131, 131, 131, 131, 131, 132, 132, 132,
+			132, 132, 132, 132, 132, 132, 132, 133,
+			133, 133, 133, 133, 133, 133, 133, 133,
+			133, 134, 134, 134, 134, 134, 134, 134,
+			134,
+		},
+		.len_sym_cost = 109,
+	}, { 
+		.used_lits_to_lit_cost = {
+			16, 16, 32, 41, 48, 53, 57, 60,
+			64, 66, 69, 71, 73, 75, 76, 78,
+			80, 81, 82, 83, 85, 86, 87, 88,
+			89, 90, 91, 92, 92, 93, 94, 95,
+			96, 96, 97, 98, 98, 99, 99, 100,
+			101, 101, 102, 102, 103, 103, 104, 104,
+			105, 105, 106, 106, 107, 107, 108, 108,
+			108, 109, 109, 110, 110, 110, 111, 111,
+			112, 112, 112, 113, 113, 113, 114, 114,
+			114, 115, 115, 115, 115, 116, 116, 116,
+			117, 117, 117, 118, 118, 118, 118, 119,
+			119, 119, 119, 120, 120, 120, 120, 121,
+			121, 121, 121, 122, 122, 122, 122, 122,
+			123, 123, 123, 123, 124, 124, 124, 124,
+			124, 125, 125, 125, 125, 125, 126, 126,
+			126, 126, 126, 127, 127, 127, 127, 127,
+			128, 128, 128, 128, 128, 128, 129, 129,
+			129, 129, 129, 129, 130, 130, 130, 130,
+			130, 130, 131, 131, 131, 131, 131, 131,
+			131, 132, 132, 132, 132, 132, 132, 133,
+			133, 133, 133, 133, 133, 133, 134, 134,
+			134, 134, 134, 134, 134, 134, 135, 135,
+			135, 135, 135, 135, 135, 135, 136, 136,
+			136, 136, 136, 136, 136, 136, 137, 137,
+			137, 137, 137, 137, 137, 137, 138, 138,
+			138, 138, 138, 138, 138, 138, 138, 139,
+			139, 139, 139, 139, 139, 139, 139, 139,
+			140, 140, 140, 140, 140, 140, 140, 140,
+			140, 141, 141, 141, 141, 141, 141, 141,
+			141, 141, 141, 142, 142, 142, 142, 142,
+			142, 142, 142, 142, 142, 142, 143, 143,
+			143, 143, 143, 143, 143, 143, 143, 143,
+			144,
+		},
+		.len_sym_cost = 93,
+	}, { 
+		.used_lits_to_lit_cost = {
+			32, 32, 48, 57, 64, 69, 73, 76,
+			80, 82, 85, 87, 89, 91, 92, 94,
+			96, 97, 98, 99, 101, 102, 103, 104,
+			105, 106, 107, 108, 108, 109, 110, 111,
+			112, 112, 113, 114, 114, 115, 115, 116,
+			117, 117, 118, 118, 119, 119, 120, 120,
+			121, 121, 122, 122, 123, 123, 124, 124,
+			124, 125, 125, 126, 126, 126, 127, 127,
+			128, 128, 128, 129, 129, 129, 130, 130,
+			130, 131, 131, 131, 131, 132, 132, 132,
+			133, 133, 133, 134, 134, 134, 134, 135,
+			135, 135, 135, 136, 136, 136, 136, 137,
+			137, 137, 137, 138, 138, 138, 138, 138,
+			139, 139, 139, 139, 140, 140, 140, 140,
+			140, 141, 141, 141, 141, 141, 142, 142,
+			142, 142, 142, 143, 143, 143, 143, 143,
+			144, 144, 144, 144, 144, 144, 145, 145,
+			145, 145, 145, 145, 146, 146, 146, 146,
+			146, 146, 147, 147, 147, 147, 147, 147,
+			147, 148, 148, 148, 148, 148, 148, 149,
+			149, 149, 149, 149, 149, 149, 150, 150,
+			150, 150, 150, 150, 150, 150, 151, 151,
+			151, 151, 151, 151, 151, 151, 152, 152,
+			152, 152, 152, 152, 152, 152, 153, 153,
+			153, 153, 153, 153, 153, 153, 154, 154,
+			154, 154, 154, 154, 154, 154, 154, 155,
+			155, 155, 155, 155, 155, 155, 155, 155,
+			156, 156, 156, 156, 156, 156, 156, 156,
+			156, 157, 157, 157, 157, 157, 157, 157,
+			157, 157, 157, 158, 158, 158, 158, 158,
+			158, 158, 158, 158, 158, 158, 159, 159,
+			159, 159, 159, 159, 159, 159, 159, 159,
+			160,
+		},
+		.len_sym_cost = 84,
+	},
+};
+
+
+static void
+deflate_choose_default_litlen_costs(struct libdeflate_compressor *c,
+				    const u8 *block_begin, u32 block_length,
+				    u32 *lit_cost, u32 *len_sym_cost)
 {
-	STATIC_ASSERT(COST_SHIFT == 3);
+	unsigned num_used_literals = 0;
+	u32 literal_freq = block_length;
+	u32 match_freq = 0;
+	u32 cutoff;
+	u32 i;
+
 	
-	return 66;
+	memset(c->freqs.litlen, 0,
+	       DEFLATE_NUM_LITERALS * sizeof(c->freqs.litlen[0]));
+	cutoff = literal_freq >> 11; 
+	for (i = 0; i < block_length; i++)
+		c->freqs.litlen[block_begin[i]]++;
+	for (i = 0; i < DEFLATE_NUM_LITERALS; i++) {
+		if (c->freqs.litlen[i] > cutoff)
+			num_used_literals++;
+	}
+	if (num_used_literals == 0)
+		num_used_literals = 1;
+
+	
+	match_freq = 0;
+	i = choose_min_match_len(num_used_literals, c->max_search_depth);
+	for (; i < ARRAY_LEN(c->p.n.match_len_freqs); i++) {
+		match_freq += c->p.n.match_len_freqs[i];
+		literal_freq -= i * c->p.n.match_len_freqs[i];
+	}
+	if ((s32)literal_freq < 0) 
+		literal_freq = 0;
+
+	if (match_freq > literal_freq)
+		i = 2; 
+	else if (match_freq * 4 > literal_freq)
+		i = 1; 
+	else
+		i = 0; 
+
+	STATIC_ASSERT(BIT_COST == 16);
+	*lit_cost = default_litlen_costs[i].used_lits_to_lit_cost[
+							num_used_literals];
+	*len_sym_cost = default_litlen_costs[i].len_sym_cost;
 }
 
 static forceinline u32
-deflate_default_length_slot_cost(unsigned length_slot)
+deflate_default_length_cost(unsigned len, u32 len_sym_cost)
 {
-	STATIC_ASSERT(COST_SHIFT == 3);
-	
-	return 60 + ((u32)deflate_extra_length_bits[length_slot] << COST_SHIFT);
+	unsigned slot = deflate_length_slot[len];
+	u32 num_extra_bits = deflate_extra_length_bits[slot];
+
+	return len_sym_cost + (num_extra_bits * BIT_COST);
 }
 
 static forceinline u32
-deflate_default_offset_slot_cost(unsigned offset_slot)
+deflate_default_offset_slot_cost(unsigned slot)
 {
-	STATIC_ASSERT(COST_SHIFT == 3);
+	u32 num_extra_bits = deflate_extra_offset_bits[slot];
 	
-	return 39 + ((u32)deflate_extra_offset_bits[offset_slot] << COST_SHIFT);
+	u32 offset_sym_cost = 4*BIT_COST + (907*BIT_COST)/1000;
+
+	return offset_sym_cost + (num_extra_bits * BIT_COST);
 }
 
 
 static void
-deflate_set_default_costs(struct libdeflate_compressor *c)
+deflate_set_default_costs(struct libdeflate_compressor *c,
+			  u32 lit_cost, u32 len_sym_cost)
 {
 	unsigned i;
 
 	
 	for (i = 0; i < DEFLATE_NUM_LITERALS; i++)
-		c->p.n.costs.literal[i] = deflate_default_literal_cost(i);
+		c->p.n.costs.literal[i] = lit_cost;
 
 	
 	for (i = DEFLATE_MIN_MATCH_LEN; i <= DEFLATE_MAX_MATCH_LEN; i++)
-		c->p.n.costs.length[i] = deflate_default_length_slot_cost(
-						deflate_length_slot[i]);
+		c->p.n.costs.length[i] =
+			deflate_default_length_cost(i, len_sym_cost);
 
 	
 	for (i = 0; i < ARRAY_LEN(deflate_offset_slot_base); i++)
-		c->p.n.costs.offset_slot[i] = deflate_default_offset_slot_cost(i);
+		c->p.n.costs.offset_slot[i] =
+			deflate_default_offset_slot_cost(i);
 }
 
 static forceinline void
-deflate_adjust_cost(u32 *cost_p, u32 default_cost)
+deflate_adjust_cost(u32 *cost_p, u32 default_cost, int change_amount)
 {
-	*cost_p += ((s32)default_cost - (s32)*cost_p) >> 1;
+	if (change_amount == 0)
+		
+		*cost_p = (default_cost + 3 * *cost_p) / 4;
+	else if (change_amount == 1)
+		*cost_p = (default_cost + *cost_p) / 2;
+	else if (change_amount == 2)
+		*cost_p = (5 * default_cost + 3 * *cost_p) / 8;
+	else
+		
+		*cost_p = (3 * default_cost + *cost_p) / 4;
 }
 
-
-static void
-deflate_adjust_costs(struct libdeflate_compressor *c)
+static forceinline void
+deflate_adjust_costs_impl(struct libdeflate_compressor *c,
+			  u32 lit_cost, u32 len_sym_cost, int change_amount)
 {
 	unsigned i;
 
 	
 	for (i = 0; i < DEFLATE_NUM_LITERALS; i++)
-		deflate_adjust_cost(&c->p.n.costs.literal[i],
-				    deflate_default_literal_cost(i));
+		deflate_adjust_cost(&c->p.n.costs.literal[i], lit_cost,
+				    change_amount);
 
 	
 	for (i = DEFLATE_MIN_MATCH_LEN; i <= DEFLATE_MAX_MATCH_LEN; i++)
 		deflate_adjust_cost(&c->p.n.costs.length[i],
-				    deflate_default_length_slot_cost(
-						deflate_length_slot[i]));
+				    deflate_default_length_cost(i,
+								len_sym_cost),
+				    change_amount);
 
 	
 	for (i = 0; i < ARRAY_LEN(deflate_offset_slot_base); i++)
 		deflate_adjust_cost(&c->p.n.costs.offset_slot[i],
-				    deflate_default_offset_slot_cost(i));
+				    deflate_default_offset_slot_cost(i),
+				    change_amount);
+}
+
+
+static void
+deflate_adjust_costs(struct libdeflate_compressor *c,
+		     u32 lit_cost, u32 len_sym_cost)
+{
+	u64 total_delta = 0;
+	u64 cutoff;
+	int i;
+
+	
+	for (i = 0; i < NUM_OBSERVATION_TYPES; i++) {
+		u64 prev = (u64)c->p.n.prev_observations[i] *
+			    c->split_stats.num_observations;
+		u64 cur = (u64)c->split_stats.observations[i] *
+			  c->p.n.prev_num_observations;
+
+		total_delta += prev > cur ? prev - cur : cur - prev;
+	}
+	cutoff = ((u64)c->p.n.prev_num_observations *
+		  c->split_stats.num_observations * 200) / 512;
+
+	if (4 * total_delta > 9 * cutoff)
+		deflate_adjust_costs_impl(c, lit_cost, len_sym_cost, 3);
+	else if (2 * total_delta > 3 * cutoff)
+		deflate_adjust_costs_impl(c, lit_cost, len_sym_cost, 2);
+	else if (2 * total_delta > cutoff)
+		deflate_adjust_costs_impl(c, lit_cost, len_sym_cost, 1);
+	else
+		deflate_adjust_costs_impl(c, lit_cost, len_sym_cost, 0);
 }
 
 
@@ -12746,7 +18736,8 @@ deflate_find_min_cost_path(struct libdeflate_compressor *c,
 			   const u32 block_length,
 			   const struct lz_match *cache_ptr)
 {
-	struct deflate_optimum_node *end_node = &c->p.n.optimum_nodes[block_length];
+	struct deflate_optimum_node *end_node =
+		&c->p.n.optimum_nodes[block_length];
 	struct deflate_optimum_node *cur_node = end_node;
 
 	cur_node->cost_to_end = 0;
@@ -12780,15 +18771,18 @@ deflate_find_min_cost_path(struct libdeflate_compressor *c,
 			len = DEFLATE_MIN_MATCH_LEN;
 			do {
 				offset = match->offset;
-				offset_slot = deflate_get_offset_slot(c, offset);
-				offset_cost = c->p.n.costs.offset_slot[offset_slot];
+				offset_slot = c->p.n.offset_slot_full[offset];
+				offset_cost =
+					c->p.n.costs.offset_slot[offset_slot];
 				do {
 					cost_to_end = offset_cost +
-						      c->p.n.costs.length[len] +
-						      (cur_node + len)->cost_to_end;
+						c->p.n.costs.length[len] +
+						(cur_node + len)->cost_to_end;
 					if (cost_to_end < best_cost_to_end) {
 						best_cost_to_end = cost_to_end;
-						cur_node->item = ((u32)offset << OPTIMUM_OFFSET_SHIFT) | len;
+						cur_node->item = len |
+							((u32)offset <<
+							 OPTIMUM_OFFSET_SHIFT);
 					}
 				} while (++len <= match->length);
 			} while (++match != cache_ptr);
@@ -12800,24 +18794,30 @@ deflate_find_min_cost_path(struct libdeflate_compressor *c,
 
 
 static void
-deflate_optimize_block(struct libdeflate_compressor *c, u32 block_length,
-		       const struct lz_match *cache_ptr, bool is_first_block)
+deflate_optimize_block(struct libdeflate_compressor *c,
+		       const u8 *block_begin, u32 block_length,
+		       const struct lz_match *cache_ptr, bool is_first_block,
+		       bool is_final_block)
 {
 	unsigned num_passes_remaining = c->p.n.num_optim_passes;
+	u32 lit_cost, len_sym_cost;
 	u32 i;
 
 	
-	for (i = block_length; i <= MIN(block_length - 1 + DEFLATE_MAX_MATCH_LEN,
-					ARRAY_LEN(c->p.n.optimum_nodes) - 1); i++)
+	for (i = block_length;
+	     i <= MIN(block_length - 1 + DEFLATE_MAX_MATCH_LEN,
+		      ARRAY_LEN(c->p.n.optimum_nodes) - 1); i++)
 		c->p.n.optimum_nodes[i].cost_to_end = 0x80000000;
 
 	
+	deflate_choose_default_litlen_costs(c, block_begin, block_length,
+					    &lit_cost, &len_sym_cost);
 	if (is_first_block)
-		deflate_set_default_costs(c);
+		deflate_set_default_costs(c, lit_cost, len_sym_cost);
 	else
-		deflate_adjust_costs(c);
+		deflate_adjust_costs(c, lit_cost, len_sym_cost);
 
-	for (;;) {
+	do {
 		
 		deflate_find_min_cost_path(c, block_length, cache_ptr);
 
@@ -12825,84 +18825,133 @@ deflate_optimize_block(struct libdeflate_compressor *c, u32 block_length,
 		deflate_reset_symbol_frequencies(c);
 		deflate_tally_item_list(c, block_length);
 
-		if (--num_passes_remaining == 0)
-			break;
-
 		
 		deflate_make_huffman_codes(&c->freqs, &c->codes);
-		deflate_set_costs_from_codes(c, &c->codes.lens);
+
+		
+		if (--num_passes_remaining || !is_final_block)
+			deflate_set_costs_from_codes(c, &c->codes.lens);
+	} while (num_passes_remaining);
+}
+
+static void
+deflate_near_optimal_init_stats(struct libdeflate_compressor *c)
+{
+	init_block_split_stats(&c->split_stats);
+	memset(c->p.n.new_match_len_freqs, 0,
+	       sizeof(c->p.n.new_match_len_freqs));
+	memset(c->p.n.match_len_freqs, 0, sizeof(c->p.n.match_len_freqs));
+}
+
+static void
+deflate_near_optimal_merge_stats(struct libdeflate_compressor *c)
+{
+	unsigned i;
+
+	merge_new_observations(&c->split_stats);
+	for (i = 0; i < ARRAY_LEN(c->p.n.match_len_freqs); i++) {
+		c->p.n.match_len_freqs[i] += c->p.n.new_match_len_freqs[i];
+		c->p.n.new_match_len_freqs[i] = 0;
 	}
 }
 
 
-static size_t
+static void
+deflate_near_optimal_save_stats(struct libdeflate_compressor *c)
+{
+	int i;
+
+	for (i = 0; i < NUM_OBSERVATION_TYPES; i++)
+		c->p.n.prev_observations[i] = c->split_stats.observations[i];
+	c->p.n.prev_num_observations = c->split_stats.num_observations;
+}
+
+static void
+deflate_near_optimal_clear_old_stats(struct libdeflate_compressor *c)
+{
+	int i;
+
+	for (i = 0; i < NUM_OBSERVATION_TYPES; i++)
+		c->split_stats.observations[i] = 0;
+	c->split_stats.num_observations = 0;
+	memset(c->p.n.match_len_freqs, 0, sizeof(c->p.n.match_len_freqs));
+}
+
+
+static void
 deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
-			      const u8 * restrict in, size_t in_nbytes,
-			      u8 * restrict out, size_t out_nbytes_avail)
+			      const u8 *in, size_t in_nbytes,
+			      struct deflate_output_bitstream *os)
 {
 	const u8 *in_next = in;
+	const u8 *in_block_begin = in_next;
 	const u8 *in_end = in_next + in_nbytes;
-	struct deflate_output_bitstream os;
 	const u8 *in_cur_base = in_next;
-	const u8 *in_next_slide = in_next + MIN(in_end - in_next, MATCHFINDER_WINDOW_SIZE);
+	const u8 *in_next_slide =
+		in_next + MIN(in_end - in_next, MATCHFINDER_WINDOW_SIZE);
 	unsigned max_len = DEFLATE_MAX_MATCH_LEN;
 	unsigned nice_len = MIN(c->nice_match_length, max_len);
+	struct lz_match *cache_ptr = c->p.n.match_cache;
 	u32 next_hashes[2] = {0, 0};
 
-	deflate_init_output(&os, out, out_nbytes_avail);
 	bt_matchfinder_init(&c->p.n.bt_mf);
+	deflate_near_optimal_init_stats(c);
 
 	do {
 		
-
-		struct lz_match *cache_ptr = c->p.n.match_cache;
-		const u8 * const in_block_begin = in_next;
-		const u8 * const in_max_block_end =
-			in_next + MIN(in_end - in_next, SOFT_MAX_BLOCK_LENGTH);
+		const u8 * const in_max_block_end = choose_max_block_end(
+				in_block_begin, in_end, SOFT_MAX_BLOCK_LENGTH);
+		const u8 *prev_end_block_check = NULL;
+		bool change_detected = false;
 		const u8 *next_observation = in_next;
-
-		init_block_split_stats(&c->split_stats);
+		unsigned min_len;
 
 		
-		do {
+		min_len = calculate_min_match_len(
+					in_block_begin,
+					in_max_block_end - in_block_begin,
+					c->max_search_depth);
+
+		
+		for (;;) {
 			struct lz_match *matches;
 			unsigned best_len;
+			size_t remaining = in_end - in_next;
 
 			
 			if (in_next == in_next_slide) {
 				bt_matchfinder_slide_window(&c->p.n.bt_mf);
 				in_cur_base = in_next;
-				in_next_slide = in_next + MIN(in_end - in_next,
-							      MATCHFINDER_WINDOW_SIZE);
-			}
-
-			
-			if (unlikely(max_len > in_end - in_next)) {
-				max_len = in_end - in_next;
-				nice_len = MIN(nice_len, max_len);
+				in_next_slide = in_next +
+					MIN(remaining, MATCHFINDER_WINDOW_SIZE);
 			}
 
 			
 			matches = cache_ptr;
 			best_len = 0;
+			adjust_max_and_nice_len(&max_len, &nice_len, remaining);
 			if (likely(max_len >= BT_MATCHFINDER_REQUIRED_NBYTES)) {
-				cache_ptr = bt_matchfinder_get_matches(&c->p.n.bt_mf,
-								       in_cur_base,
-								       in_next - in_cur_base,
-								       max_len,
-								       nice_len,
-								       c->max_search_depth,
-								       next_hashes,
-								       &best_len,
-								       matches);
+				cache_ptr = bt_matchfinder_get_matches(
+						&c->p.n.bt_mf,
+						in_cur_base,
+						in_next - in_cur_base,
+						max_len,
+						nice_len,
+						c->max_search_depth,
+						next_hashes,
+						matches);
+				if (cache_ptr > matches)
+					best_len = cache_ptr[-1].length;
 			}
-
 			if (in_next >= next_observation) {
-				if (best_len >= 4) {
-					observe_match(&c->split_stats, best_len);
+				if (best_len >= min_len) {
+					observe_match(&c->split_stats,
+						      best_len);
 					next_observation = in_next + best_len;
+					c->p.n.new_match_len_freqs[best_len]++;
 				} else {
-					observe_literal(&c->split_stats, *in_next);
+					observe_literal(&c->split_stats,
+							*in_next);
 					next_observation = in_next + 1;
 				}
 			}
@@ -12913,26 +18962,31 @@ deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
 			cache_ptr++;
 
 			
-			if (best_len >= DEFLATE_MIN_MATCH_LEN && best_len >= nice_len) {
+			if (best_len >= DEFLATE_MIN_MATCH_LEN &&
+			    best_len >= nice_len) {
 				--best_len;
 				do {
+					remaining = in_end - in_next;
 					if (in_next == in_next_slide) {
-						bt_matchfinder_slide_window(&c->p.n.bt_mf);
+						bt_matchfinder_slide_window(
+							&c->p.n.bt_mf);
 						in_cur_base = in_next;
-						in_next_slide = in_next + MIN(in_end - in_next,
-									      MATCHFINDER_WINDOW_SIZE);
+						in_next_slide = in_next +
+							MIN(remaining,
+							    MATCHFINDER_WINDOW_SIZE);
 					}
-					if (unlikely(max_len > in_end - in_next)) {
-						max_len = in_end - in_next;
-						nice_len = MIN(nice_len, max_len);
-					}
-					if (max_len >= BT_MATCHFINDER_REQUIRED_NBYTES) {
-						bt_matchfinder_skip_position(&c->p.n.bt_mf,
-									     in_cur_base,
-									     in_next - in_cur_base,
-									     nice_len,
-									     c->max_search_depth,
-									     next_hashes);
+					adjust_max_and_nice_len(&max_len,
+								&nice_len,
+								remaining);
+					if (max_len >=
+					    BT_MATCHFINDER_REQUIRED_NBYTES) {
+						bt_matchfinder_skip_byte(
+							&c->p.n.bt_mf,
+							in_cur_base,
+							in_next - in_cur_base,
+							nice_len,
+							c->max_search_depth,
+							next_hashes);
 					}
 					cache_ptr->length = 0;
 					cache_ptr->offset = *in_next;
@@ -12940,55 +18994,96 @@ deflate_compress_near_optimal(struct libdeflate_compressor * restrict c,
 					cache_ptr++;
 				} while (--best_len);
 			}
-		} while (in_next < in_max_block_end &&
-			 cache_ptr < &c->p.n.match_cache[CACHE_LENGTH] &&
-			 !should_end_block(&c->split_stats, in_block_begin, in_next, in_end));
-
+			
+			if (in_next >= in_max_block_end)
+				break;
+			
+			if (cache_ptr >=
+			    &c->p.n.match_cache[MATCH_CACHE_LENGTH])
+				break;
+			
+			if (!ready_to_check_block(&c->split_stats,
+						  in_block_begin, in_next,
+						  in_end))
+				continue;
+			
+			if (do_end_block_check(&c->split_stats,
+					       in_next - in_block_begin)) {
+				change_detected = true;
+				break;
+			}
+			
+			deflate_near_optimal_merge_stats(c);
+			prev_end_block_check = in_next;
+		}
 		
-		deflate_optimize_block(c, in_next - in_block_begin, cache_ptr,
-				       in_block_begin == in);
-		deflate_flush_block(c, &os, in_block_begin, in_next - in_block_begin,
-				    in_next == in_end, true);
+		if (change_detected && prev_end_block_check != NULL) {
+			
+			struct lz_match *orig_cache_ptr = cache_ptr;
+			const u8 *in_block_end = prev_end_block_check;
+			u32 block_length = in_block_end - in_block_begin;
+			bool is_first = (in_block_begin == in);
+			bool is_final = false;
+			u32 num_bytes_to_rewind = in_next - in_block_end;
+			size_t cache_len_rewound;
+
+			
+			do {
+				cache_ptr--;
+				cache_ptr -= cache_ptr->length;
+			} while (--num_bytes_to_rewind);
+			cache_len_rewound = orig_cache_ptr - cache_ptr;
+
+			deflate_optimize_block(c, in_block_begin, block_length,
+					       cache_ptr, is_first, is_final);
+			deflate_flush_block(c, os, in_block_begin, block_length,
+					    NULL, is_final);
+			memmove(c->p.n.match_cache, cache_ptr,
+				cache_len_rewound * sizeof(*cache_ptr));
+			cache_ptr = &c->p.n.match_cache[cache_len_rewound];
+			deflate_near_optimal_save_stats(c);
+			
+			deflate_near_optimal_clear_old_stats(c);
+			in_block_begin = in_block_end;
+		} else {
+			
+			u32 block_length = in_next - in_block_begin;
+			bool is_first = (in_block_begin == in);
+			bool is_final = (in_next == in_end);
+
+			deflate_near_optimal_merge_stats(c);
+			deflate_optimize_block(c, in_block_begin, block_length,
+					       cache_ptr, is_first, is_final);
+			deflate_flush_block(c, os, in_block_begin, block_length,
+					    NULL, is_final);
+			cache_ptr = &c->p.n.match_cache[0];
+			deflate_near_optimal_save_stats(c);
+			deflate_near_optimal_init_stats(c);
+			in_block_begin = in_next;
+		}
 	} while (in_next != in_end);
-
-	return deflate_flush_output(&os);
 }
-
-#endif 
 
 
 static void
-deflate_init_offset_slot_fast(struct libdeflate_compressor *c)
+deflate_init_offset_slot_full(struct libdeflate_compressor *c)
 {
 	unsigned offset_slot;
 	unsigned offset;
 	unsigned offset_end;
 
-	for (offset_slot = 0;
-	     offset_slot < ARRAY_LEN(deflate_offset_slot_base);
-	     offset_slot++)
-	{
+	for (offset_slot = 0; offset_slot < ARRAY_LEN(deflate_offset_slot_base);
+	     offset_slot++) {
 		offset = deflate_offset_slot_base[offset_slot];
-	#if USE_FULL_OFFSET_SLOT_FAST
-		offset_end = offset + (1 << deflate_extra_offset_bits[offset_slot]);
+		offset_end = offset +
+			     (1 << deflate_extra_offset_bits[offset_slot]);
 		do {
-			c->offset_slot_fast[offset] = offset_slot;
+			c->p.n.offset_slot_full[offset] = offset_slot;
 		} while (++offset != offset_end);
-	#else
-		if (offset <= 256) {
-			offset_end = offset + (1 << deflate_extra_offset_bits[offset_slot]);
-			do {
-				c->offset_slot_fast[offset - 1] = offset_slot;
-			} while (++offset != offset_end);
-		} else {
-			offset_end = offset + (1 << deflate_extra_offset_bits[offset_slot]);
-			do {
-				c->offset_slot_fast[256 + ((offset - 1) >> 7)] = offset_slot;
-			} while ((offset += (1 << 7)) != offset_end);
-		}
-	#endif
 	}
 }
+
+#endif 
 
 LIBDEFLATEEXPORT struct libdeflate_compressor * LIBDEFLATEAPI
 libdeflate_alloc_compressor(int compression_level)
@@ -12996,18 +19091,22 @@ libdeflate_alloc_compressor(int compression_level)
 	struct libdeflate_compressor *c;
 	size_t size = offsetof(struct libdeflate_compressor, p);
 
+	check_buildtime_parameters();
+
 	if (compression_level < 0 || compression_level > 12)
 		return NULL;
 
 #if SUPPORT_NEAR_OPTIMAL_PARSING
-	if (compression_level >= 8)
+	if (compression_level >= 10)
 		size += sizeof(c->p.n);
-	else if (compression_level >= 1)
-		size += sizeof(c->p.g);
-#else
-	if (compression_level >= 1)
-		size += sizeof(c->p.g);
+	else
 #endif
+	{
+		if (compression_level >= 2)
+			size += sizeof(c->p.g);
+		else if (compression_level == 1)
+			size += sizeof(c->p.f);
+	}
 
 	c = libdeflate_aligned_malloc(MATCHFINDER_MEM_ALIGNMENT, size);
 	if (!c)
@@ -13016,16 +19115,17 @@ libdeflate_alloc_compressor(int compression_level)
 	c->compression_level = compression_level;
 
 	
-	c->min_size_to_compress = 56 - (compression_level * 4);
+	c->max_passthrough_size = 55 - (compression_level * 4);
 
 	switch (compression_level) {
 	case 0:
-		c->impl = deflate_compress_none;
+		c->max_passthrough_size = SIZE_MAX;
+		c->impl = NULL; 
 		break;
 	case 1:
-		c->impl = deflate_compress_greedy;
-		c->max_search_depth = 2;
-		c->nice_match_length = 8;
+		c->impl = deflate_compress_fastest;
+		
+		c->nice_match_length = 32;
 		break;
 	case 2:
 		c->impl = deflate_compress_greedy;
@@ -13039,17 +19139,17 @@ libdeflate_alloc_compressor(int compression_level)
 		break;
 	case 4:
 		c->impl = deflate_compress_greedy;
-		c->max_search_depth = 24;
-		c->nice_match_length = 24;
+		c->max_search_depth = 16;
+		c->nice_match_length = 30;
 		break;
 	case 5:
 		c->impl = deflate_compress_lazy;
-		c->max_search_depth = 20;
+		c->max_search_depth = 16;
 		c->nice_match_length = 30;
 		break;
 	case 6:
 		c->impl = deflate_compress_lazy;
-		c->max_search_depth = 40;
+		c->max_search_depth = 35;
 		c->nice_match_length = 65;
 		break;
 	case 7:
@@ -13057,52 +19157,45 @@ libdeflate_alloc_compressor(int compression_level)
 		c->max_search_depth = 100;
 		c->nice_match_length = 130;
 		break;
-#if SUPPORT_NEAR_OPTIMAL_PARSING
 	case 8:
-		c->impl = deflate_compress_near_optimal;
-		c->max_search_depth = 12;
-		c->nice_match_length = 20;
-		c->p.n.num_optim_passes = 1;
+		c->impl = deflate_compress_lazy2;
+		c->max_search_depth = 300;
+		c->nice_match_length = DEFLATE_MAX_MATCH_LEN;
 		break;
 	case 9:
-		c->impl = deflate_compress_near_optimal;
-		c->max_search_depth = 16;
-		c->nice_match_length = 26;
-		c->p.n.num_optim_passes = 2;
+#if !SUPPORT_NEAR_OPTIMAL_PARSING
+	default:
+#endif
+		c->impl = deflate_compress_lazy2;
+		c->max_search_depth = 600;
+		c->nice_match_length = DEFLATE_MAX_MATCH_LEN;
 		break;
+#if SUPPORT_NEAR_OPTIMAL_PARSING
 	case 10:
 		c->impl = deflate_compress_near_optimal;
-		c->max_search_depth = 30;
-		c->nice_match_length = 50;
+		c->max_search_depth = 35;
+		c->nice_match_length = 75;
 		c->p.n.num_optim_passes = 2;
+		deflate_init_offset_slot_full(c);
 		break;
 	case 11:
 		c->impl = deflate_compress_near_optimal;
-		c->max_search_depth = 60;
-		c->nice_match_length = 80;
+		c->max_search_depth = 70;
+		c->nice_match_length = 150;
 		c->p.n.num_optim_passes = 3;
+		deflate_init_offset_slot_full(c);
 		break;
+	case 12:
 	default:
 		c->impl = deflate_compress_near_optimal;
-		c->max_search_depth = 100;
-		c->nice_match_length = 133;
-		c->p.n.num_optim_passes = 4;
-		break;
-#else
-	case 8:
-		c->impl = deflate_compress_lazy;
 		c->max_search_depth = 150;
-		c->nice_match_length = 200;
-		break;
-	default:
-		c->impl = deflate_compress_lazy;
-		c->max_search_depth = 200;
 		c->nice_match_length = DEFLATE_MAX_MATCH_LEN;
+		c->p.n.num_optim_passes = 4;
+		deflate_init_offset_slot_full(c);
 		break;
-#endif
+#endif 
 	}
 
-	deflate_init_offset_slot_fast(c);
 	deflate_init_static_codes(c);
 
 	return c;
@@ -13113,20 +19206,28 @@ libdeflate_deflate_compress(struct libdeflate_compressor *c,
 			    const void *in, size_t in_nbytes,
 			    void *out, size_t out_nbytes_avail)
 {
-	if (unlikely(out_nbytes_avail < OUTPUT_END_PADDING))
-		return 0;
+	struct deflate_output_bitstream os;
 
 	
-	if (unlikely(in_nbytes < c->min_size_to_compress)) {
-		struct deflate_output_bitstream os;
-		deflate_init_output(&os, out, out_nbytes_avail);
-		if (in_nbytes == 0)
-			in = &os; 
-		deflate_write_uncompressed_block(&os, in, in_nbytes, true);
-		return deflate_flush_output(&os);
-	}
+	if (unlikely(in_nbytes <= c->max_passthrough_size))
+		return deflate_compress_none(in, in_nbytes,
+					     out, out_nbytes_avail);
 
-	return (*c->impl)(c, in, in_nbytes, out, out_nbytes_avail);
+	
+	if (unlikely(out_nbytes_avail <= OUTPUT_END_PADDING))
+		return 0;
+	os.bitbuf = 0;
+	os.bitcount = 0;
+	os.next = out;
+	os.end = os.next + out_nbytes_avail - OUTPUT_END_PADDING;
+	(*c->impl)(c, in, in_nbytes, &os);
+	
+	if (os.next >= os.end)
+		return 0;
+	ASSERT(os.bitcount <= 7);
+	if (os.bitcount)
+		*os.next++ = os.bitbuf;
+	return os.next - (u8 *)out;
 }
 
 LIBDEFLATEEXPORT void LIBDEFLATEAPI
@@ -13136,7 +19237,7 @@ libdeflate_free_compressor(struct libdeflate_compressor *c)
 }
 
 unsigned int
-deflate_get_compression_level(struct libdeflate_compressor *c)
+libdeflate_get_compression_level(struct libdeflate_compressor *c)
 {
 	return c->compression_level;
 }
@@ -13145,76 +19246,30 @@ LIBDEFLATEEXPORT size_t LIBDEFLATEAPI
 libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 				  size_t in_nbytes)
 {
+	size_t bound = 0;
+	size_t max_blocks;
+
 	
-	size_t max_num_blocks = MAX(DIV_ROUND_UP(in_nbytes, MIN_BLOCK_LENGTH), 1);
-	return (5 * max_num_blocks) + in_nbytes + 1 + OUTPUT_END_PADDING;
+
+	
+	STATIC_ASSERT(2 * MIN_BLOCK_LENGTH <= UINT16_MAX);
+	max_blocks = MAX(DIV_ROUND_UP(in_nbytes, MIN_BLOCK_LENGTH), 1);
+
+	
+	bound += 5 * max_blocks;
+
+	
+	bound += in_nbytes;
+
+	
+	bound += 1 + OUTPUT_END_PADDING;
+
+	return bound;
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate-1.7/lib/deflate_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/deflate_decompress.c */
 
 
 #include <limits.h>
-
-/* #include "deflate_constants.h" */
-
-
-#ifndef LIB_DEFLATE_CONSTANTS_H
-#define LIB_DEFLATE_CONSTANTS_H
-
-
-#define DEFLATE_BLOCKTYPE_UNCOMPRESSED		0
-#define DEFLATE_BLOCKTYPE_STATIC_HUFFMAN	1
-#define DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN	2
-
-
-#define DEFLATE_MIN_MATCH_LEN			3
-#define DEFLATE_MAX_MATCH_LEN			258
-
-
-#define DEFLATE_MIN_MATCH_OFFSET		1
-#define DEFLATE_MAX_MATCH_OFFSET		32768
-
-#define DEFLATE_MAX_WINDOW_SIZE			32768
-
-
-#define DEFLATE_NUM_PRECODE_SYMS		19
-#define DEFLATE_NUM_LITLEN_SYMS			288
-#define DEFLATE_NUM_OFFSET_SYMS			32
-
-
-#define DEFLATE_MAX_NUM_SYMS			288
-
-
-#define DEFLATE_NUM_LITERALS			256
-#define DEFLATE_END_OF_BLOCK			256
-#define DEFLATE_NUM_LEN_SYMS			31
-
-
-#define DEFLATE_MAX_PRE_CODEWORD_LEN		7
-#define DEFLATE_MAX_LITLEN_CODEWORD_LEN		15
-#define DEFLATE_MAX_OFFSET_CODEWORD_LEN		15
-
-
-#define DEFLATE_MAX_CODEWORD_LEN		15
-
-
-#define DEFLATE_MAX_LENS_OVERRUN		137
-
-
-#define DEFLATE_MAX_EXTRA_LENGTH_BITS		5
-#define DEFLATE_MAX_EXTRA_OFFSET_BITS		14
-
-
-#define DEFLATE_MAX_MATCH_BITS	\
-	(DEFLATE_MAX_LITLEN_CODEWORD_LEN + DEFLATE_MAX_EXTRA_LENGTH_BITS + \
-	DEFLATE_MAX_OFFSET_CODEWORD_LEN + DEFLATE_MAX_EXTRA_OFFSET_BITS)
-
-#endif 
-
-/* #include "unaligned.h" */
-
-
-#ifndef LIB_UNALIGNED_H
-#define LIB_UNALIGNED_H
 
 /* #include "lib_common.h" */
 
@@ -13229,253 +19284,27 @@ libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -13484,6 +19313,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -13499,87 +19337,115 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -13591,186 +19457,106 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
 }
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
 
 #ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+#  define MEMCOPY	__builtin_memcpy
 #else
-#include <string.h>
+#  define MEMCOPY	memcpy
 #endif
-
-#endif 
-
-
-
 
 
 
@@ -13779,20 +19565,23 @@ static forceinline type						\
 load_##type##_unaligned(const void *p)				\
 {								\
 	type v;							\
-	memcpy(&v, p, sizeof(v));				\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
 	return v;						\
 }								\
 								\
 static forceinline void						\
 store_##type##_unaligned(type v, void *p)			\
 {								\
-	memcpy(p, &v, sizeof(v));				\
+	MEMCOPY(p, &v, sizeof(v));				\
 }
 
 DEFINE_UNALIGNED_TYPE(u16)
 DEFINE_UNALIGNED_TYPE(u32)
 DEFINE_UNALIGNED_TYPE(u64)
 DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
 
 #define load_word_unaligned	load_machine_word_t_unaligned
 #define store_word_unaligned	store_machine_word_t_unaligned
@@ -13939,30 +19728,219 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 
 
 
-static forceinline u32
-loaded_u32_to_u24(u32 v)
-{
-	if (CPU_IS_LITTLE_ENDIAN())
-		return v & 0xFFFFFF;
-	else
-		return v >> 8;
-}
 
 
-static forceinline u32
-load_u24_unaligned(const u8 *p)
+
+static forceinline unsigned
+bsr32(u32 v)
 {
-#if UNALIGNED_ACCESS_IS_FAST
-#  define LOAD_U24_REQUIRED_NBYTES 4
-	return loaded_u32_to_u24(load_u32_unaligned(p));
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
 #else
-#  define LOAD_U24_REQUIRED_NBYTES 3
-	if (CPU_IS_LITTLE_ENDIAN())
-		return ((u32)p[0] << 0) | ((u32)p[1] << 8) | ((u32)p[2] << 16);
-	else
-		return ((u32)p[2] << 0) | ((u32)p[1] << 8) | ((u32)p[0] << 16);
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
 #endif
 }
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+/* #include "deflate_constants.h" */
+
+
+#ifndef LIB_DEFLATE_CONSTANTS_H
+#define LIB_DEFLATE_CONSTANTS_H
+
+
+#define DEFLATE_BLOCKTYPE_UNCOMPRESSED		0
+#define DEFLATE_BLOCKTYPE_STATIC_HUFFMAN	1
+#define DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN	2
+
+
+#define DEFLATE_MIN_MATCH_LEN			3
+#define DEFLATE_MAX_MATCH_LEN			258
+
+
+#define DEFLATE_MAX_MATCH_OFFSET		32768
+
+
+#define DEFLATE_WINDOW_ORDER			15
+
+
+#define DEFLATE_NUM_PRECODE_SYMS		19
+#define DEFLATE_NUM_LITLEN_SYMS			288
+#define DEFLATE_NUM_OFFSET_SYMS			32
+
+
+#define DEFLATE_MAX_NUM_SYMS			288
+
+
+#define DEFLATE_NUM_LITERALS			256
+#define DEFLATE_END_OF_BLOCK			256
+#define DEFLATE_FIRST_LEN_SYM			257
+
+
+#define DEFLATE_MAX_PRE_CODEWORD_LEN		7
+#define DEFLATE_MAX_LITLEN_CODEWORD_LEN		15
+#define DEFLATE_MAX_OFFSET_CODEWORD_LEN		15
+
+
+#define DEFLATE_MAX_CODEWORD_LEN		15
+
+
+#define DEFLATE_MAX_LENS_OVERRUN		137
+
+
+#define DEFLATE_MAX_EXTRA_LENGTH_BITS		5
+#define DEFLATE_MAX_EXTRA_OFFSET_BITS		13
 
 #endif 
 
@@ -13978,8 +19956,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	7
-#define LIBDEFLATE_VERSION_STRING	"1.7"
+#define LIBDEFLATE_VERSION_MINOR	14
+#define LIBDEFLATE_VERSION_STRING	"1.14"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -13996,21 +19974,13 @@ extern "C" {
 #  define LIBDEFLATEEXPORT
 #endif
 
-#if defined(_WIN32) && !defined(_WIN64)
-#  define LIBDEFLATEAPI_ABI	__stdcall
-#else
-#  define LIBDEFLATEAPI_ABI
-#endif
-
 #if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
 	defined(_WIN32) && !defined(_WIN64)
     
-#  define LIBDEFLATEAPI_STACKALIGN	__attribute__((force_align_arg_pointer))
+#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
 #else
-#  define LIBDEFLATEAPI_STACKALIGN
+#  define LIBDEFLATEAPI
 #endif
-
-#define LIBDEFLATEAPI	LIBDEFLATEAPI_ABI LIBDEFLATEAPI_STACKALIGN
 
 
 
@@ -14171,140 +20141,116 @@ libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 #endif
 
 
-#define PRECODE_TABLEBITS	7
-#define LITLEN_TABLEBITS	10
-#define OFFSET_TABLEBITS	8
-
-
-#define PRECODE_ENOUGH		128	
-#define LITLEN_ENOUGH		1334	
-#define OFFSET_ENOUGH		402	
-
-
-typedef u8 libdeflate_len_t;
-
-
-struct libdeflate_decompressor {
-
-	
-
-	union {
-		libdeflate_len_t precode_lens[DEFLATE_NUM_PRECODE_SYMS];
-
-		struct {
-			libdeflate_len_t lens[DEFLATE_NUM_LITLEN_SYMS +
-				   DEFLATE_NUM_OFFSET_SYMS +
-				   DEFLATE_MAX_LENS_OVERRUN];
-
-			u32 precode_decode_table[PRECODE_ENOUGH];
-		} l;
-
-		u32 litlen_decode_table[LITLEN_ENOUGH];
-	} u;
-
-	u32 offset_decode_table[OFFSET_ENOUGH];
-
-	
-	u16 sorted_syms[DEFLATE_MAX_NUM_SYMS];
-
-	bool static_codes_loaded;
-};
-
-
 
 
 
 
 /* typedef machine_word_t bitbuf_t; */
+#define DECOMPRESS_BITBUF_NBITS	(8 * (int)sizeof(bitbuf_t))
 
 
-#define DECOMPRESS_BITBUF_NBITS	(8 * sizeof(bitbuf_t) - 1)
+#define BITMASK(n)	(((bitbuf_t)1 << (n)) - 1)
 
 
-#define MAX_ENSURE	(DECOMPRESS_BITBUF_NBITS - 7)
+#define MAX_BITSLEFT	\
+	(UNALIGNED_ACCESS_IS_FAST ? DECOMPRESS_BITBUF_NBITS - 1 : DECOMPRESS_BITBUF_NBITS)
 
 
-#define CAN_ENSURE(n)	((n) <= MAX_ENSURE)
+#define CONSUMABLE_NBITS	(MAX_BITSLEFT - 7)
 
 
-#define FILL_BITS_BYTEWISE()					\
-do {								\
-	if (likely(in_next != in_end))				\
-		bitbuf |= (bitbuf_t)*in_next++ << bitsleft;	\
-	else							\
-		overrun_count++;				\
-	bitsleft += 8;						\
-} while (bitsleft <= DECOMPRESS_BITBUF_NBITS - 8)
+#define FASTLOOP_PRELOADABLE_NBITS	\
+	(UNALIGNED_ACCESS_IS_FAST ? DECOMPRESS_BITBUF_NBITS : CONSUMABLE_NBITS)
 
 
-#define FILL_BITS_WORDWISE()					\
-do {								\
-		\
-	STATIC_ASSERT((DECOMPRESS_BITBUF_NBITS & (DECOMPRESS_BITBUF_NBITS + 1)) == 0);\
-								\
-	bitbuf |= get_unaligned_leword(in_next) << bitsleft;	\
-	in_next += (bitsleft ^ DECOMPRESS_BITBUF_NBITS) >> 3;		\
-	bitsleft |= DECOMPRESS_BITBUF_NBITS & ~7;				\
+#define PRELOAD_SLACK	MAX(0, FASTLOOP_PRELOADABLE_NBITS - MAX_BITSLEFT)
+
+
+#define CAN_CONSUME(n)	(CONSUMABLE_NBITS >= (n))
+
+
+#define CAN_CONSUME_AND_THEN_PRELOAD(consume_nbits, preload_nbits)	\
+	(CONSUMABLE_NBITS >= (consume_nbits) &&				\
+	 FASTLOOP_PRELOADABLE_NBITS >= (consume_nbits) + (preload_nbits))
+
+
+#define REFILL_BITS_BRANCHLESS()					\
+do {									\
+	bitbuf |= get_unaligned_leword(in_next) << (u8)bitsleft;	\
+	in_next += sizeof(bitbuf_t) - 1;				\
+	in_next -= (bitsleft >> 3) & 0x7;				\
+	bitsleft |= MAX_BITSLEFT & ~7;					\
 } while (0)
 
 
-#define HAVE_BITS(n) (bitsleft >= (n))
+#define REFILL_BITS()							\
+do {									\
+	if (UNALIGNED_ACCESS_IS_FAST &&					\
+	    likely(in_end - in_next >= sizeof(bitbuf_t))) {		\
+		REFILL_BITS_BRANCHLESS();				\
+	} else {							\
+		while ((u8)bitsleft < CONSUMABLE_NBITS) {		\
+			if (likely(in_next != in_end)) {		\
+				bitbuf |= (bitbuf_t)*in_next++ <<	\
+					  (u8)bitsleft;			\
+			} else {					\
+				overread_count++;			\
+				SAFETY_CHECK(overread_count <=		\
+					     sizeof(bitbuf_t));		\
+			}						\
+			bitsleft += 8;					\
+		}							\
+	}								\
+} while (0)
 
 
-#define ENSURE_BITS(n)						\
-if (!HAVE_BITS(n)) {						\
-	if (CPU_IS_LITTLE_ENDIAN() &&				\
-	    UNALIGNED_ACCESS_IS_FAST &&				\
-	    likely(in_end - in_next >= sizeof(bitbuf_t)))	\
-		FILL_BITS_WORDWISE();				\
-	else							\
-		FILL_BITS_BYTEWISE();				\
+#define REFILL_BITS_IN_FASTLOOP()					\
+do {									\
+	STATIC_ASSERT(UNALIGNED_ACCESS_IS_FAST ||			\
+		      FASTLOOP_PRELOADABLE_NBITS == CONSUMABLE_NBITS);	\
+	if (UNALIGNED_ACCESS_IS_FAST) {					\
+		REFILL_BITS_BRANCHLESS();				\
+	} else {							\
+		while ((u8)bitsleft < CONSUMABLE_NBITS) {		\
+			bitbuf |= (bitbuf_t)*in_next++ << (u8)bitsleft;	\
+			bitsleft += 8;					\
+		}							\
+	}								\
+} while (0)
+
+
+#define FASTLOOP_MAX_BYTES_WRITTEN	\
+	(2 + DEFLATE_MAX_MATCH_LEN + (5 * WORDBYTES) - 1)
+
+
+#define FASTLOOP_MAX_BYTES_READ					\
+	(DIV_ROUND_UP(MAX_BITSLEFT + (2 * LITLEN_TABLEBITS) +	\
+		      LENGTH_MAXBITS + OFFSET_MAXBITS, 8) +	\
+	 sizeof(bitbuf_t))
+
+
+
+
+
+
+
+#define PRECODE_TABLEBITS	7
+#define PRECODE_ENOUGH		128	
+#define LITLEN_TABLEBITS	11
+#define LITLEN_ENOUGH		2342	
+#define OFFSET_TABLEBITS	8
+#define OFFSET_ENOUGH		402	
+
+
+static forceinline u32
+make_decode_table_entry(const u32 decode_results[], u32 sym, u32 len)
+{
+	return decode_results[sym] + (len << 8) + len;
 }
 
 
-#define BITS(n) ((u32)bitbuf & (((u32)1 << (n)) - 1))
-
-
-#define REMOVE_BITS(n) (bitbuf >>= (n), bitsleft -= (n))
-
-
-#define POP_BITS(n) (tmp32 = BITS(n), REMOVE_BITS(n), tmp32)
-
-
-#define ALIGN_INPUT()							\
-do {									\
-	SAFETY_CHECK(overrun_count <= (bitsleft >> 3));			\
-	in_next -= (bitsleft >> 3) - overrun_count;			\
-	overrun_count = 0;						\
-	bitbuf = 0;							\
-	bitsleft = 0;							\
-} while(0)
-
-
-#define READ_U16() (tmp16 = get_unaligned_le16(in_next), in_next += 2, tmp16)
-
-
-
-
-
-
-#define HUFFDEC_SUBTABLE_POINTER	0x80000000
-
-
-#define HUFFDEC_LITERAL			0x40000000
-
-
-#define HUFFDEC_LENGTH_MASK		0xFF
-
-
-#define HUFFDEC_RESULT_SHIFT		8
-
-
-#define HUFFDEC_RESULT_ENTRY(result)	((u32)(result) << HUFFDEC_RESULT_SHIFT)
-
-
-static const u32 precode_decode_results[DEFLATE_NUM_PRECODE_SYMS] = {
-#define ENTRY(presym)	HUFFDEC_RESULT_ENTRY(presym)
+static const u32 precode_decode_results[] = {
+#define ENTRY(presym)	((u32)presym << 16)
 	ENTRY(0)   , ENTRY(1)   , ENTRY(2)   , ENTRY(3)   ,
 	ENTRY(4)   , ENTRY(5)   , ENTRY(6)   , ENTRY(7)   ,
 	ENTRY(8)   , ENTRY(9)   , ENTRY(10)  , ENTRY(11)  ,
@@ -14314,10 +20260,30 @@ static const u32 precode_decode_results[DEFLATE_NUM_PRECODE_SYMS] = {
 };
 
 
-static const u32 litlen_decode_results[DEFLATE_NUM_LITLEN_SYMS] = {
+
+
+#define HUFFDEC_LITERAL			0x80000000
+
+
+#define HUFFDEC_EXCEPTIONAL		0x00008000
+
+
+#define HUFFDEC_SUBTABLE_POINTER	0x00004000
+
+
+#define HUFFDEC_END_OF_BLOCK		0x00002000
+
+
+#define LENGTH_MAXBITS		(DEFLATE_MAX_LITLEN_CODEWORD_LEN + \
+				 DEFLATE_MAX_EXTRA_LENGTH_BITS)
+#define LENGTH_MAXFASTBITS	(LITLEN_TABLEBITS  + \
+				 DEFLATE_MAX_EXTRA_LENGTH_BITS)
+
+
+static const u32 litlen_decode_results[] = {
 
 	
-#define ENTRY(literal)	(HUFFDEC_LITERAL | HUFFDEC_RESULT_ENTRY(literal))
+#define ENTRY(literal)	(HUFFDEC_LITERAL | ((u32)literal << 16))
 	ENTRY(0)   , ENTRY(1)   , ENTRY(2)   , ENTRY(3)   ,
 	ENTRY(4)   , ENTRY(5)   , ENTRY(6)   , ENTRY(7)   ,
 	ENTRY(8)   , ENTRY(9)   , ENTRY(10)  , ENTRY(11)  ,
@@ -14384,17 +20350,12 @@ static const u32 litlen_decode_results[DEFLATE_NUM_LITLEN_SYMS] = {
 	ENTRY(252) , ENTRY(253) , ENTRY(254) , ENTRY(255) ,
 #undef ENTRY
 
-#define HUFFDEC_EXTRA_LENGTH_BITS_MASK	0xFF
-#define HUFFDEC_LENGTH_BASE_SHIFT	8
-#define HUFFDEC_END_OF_BLOCK_LENGTH	0
-
-#define ENTRY(length_base, num_extra_bits)	HUFFDEC_RESULT_ENTRY(	\
-	((u32)(length_base) << HUFFDEC_LENGTH_BASE_SHIFT) | (num_extra_bits))
+	
+	HUFFDEC_EXCEPTIONAL | HUFFDEC_END_OF_BLOCK,
 
 	
-	ENTRY(HUFFDEC_END_OF_BLOCK_LENGTH, 0),
-
-	
+#define ENTRY(length_base, num_extra_bits)	\
+	(((u32)(length_base) << 16) | (num_extra_bits))
 	ENTRY(3  , 0) , ENTRY(4  , 0) , ENTRY(5  , 0) , ENTRY(6  , 0),
 	ENTRY(7  , 0) , ENTRY(8  , 0) , ENTRY(9  , 0) , ENTRY(10 , 0),
 	ENTRY(11 , 1) , ENTRY(13 , 1) , ENTRY(15 , 1) , ENTRY(17 , 1),
@@ -14407,14 +20368,15 @@ static const u32 litlen_decode_results[DEFLATE_NUM_LITLEN_SYMS] = {
 };
 
 
-static const u32 offset_decode_results[DEFLATE_NUM_OFFSET_SYMS] = {
+#define OFFSET_MAXBITS		(DEFLATE_MAX_OFFSET_CODEWORD_LEN + \
+				 DEFLATE_MAX_EXTRA_OFFSET_BITS)
+#define OFFSET_MAXFASTBITS	(OFFSET_TABLEBITS  + \
+				 DEFLATE_MAX_EXTRA_OFFSET_BITS)
 
-#define HUFFDEC_EXTRA_OFFSET_BITS_SHIFT 16
-#define HUFFDEC_OFFSET_BASE_MASK (((u32)1 << HUFFDEC_EXTRA_OFFSET_BITS_SHIFT) - 1)
 
-#define ENTRY(offset_base, num_extra_bits)	HUFFDEC_RESULT_ENTRY(	\
-		((u32)(num_extra_bits) << HUFFDEC_EXTRA_OFFSET_BITS_SHIFT) | \
-		(offset_base))
+static const u32 offset_decode_results[] = {
+#define ENTRY(offset_base, num_extra_bits)	\
+	(((u32)(offset_base) << 16) | (num_extra_bits))
 	ENTRY(1     , 0)  , ENTRY(2     , 0)  , ENTRY(3     , 0)  , ENTRY(4     , 0)  ,
 	ENTRY(5     , 1)  , ENTRY(7     , 1)  , ENTRY(9     , 2)  , ENTRY(13    , 2) ,
 	ENTRY(17    , 3)  , ENTRY(25    , 3)  , ENTRY(33    , 4)  , ENTRY(49    , 4)  ,
@@ -14422,19 +20384,48 @@ static const u32 offset_decode_results[DEFLATE_NUM_OFFSET_SYMS] = {
 	ENTRY(257   , 7)  , ENTRY(385   , 7)  , ENTRY(513   , 8)  , ENTRY(769   , 8)  ,
 	ENTRY(1025  , 9)  , ENTRY(1537  , 9)  , ENTRY(2049  , 10) , ENTRY(3073  , 10) ,
 	ENTRY(4097  , 11) , ENTRY(6145  , 11) , ENTRY(8193  , 12) , ENTRY(12289 , 12) ,
-	ENTRY(16385 , 13) , ENTRY(24577 , 13) , ENTRY(32769 , 14) , ENTRY(49153 , 14) ,
+	ENTRY(16385 , 13) , ENTRY(24577 , 13) , ENTRY(24577 , 13) , ENTRY(24577 , 13) ,
 #undef ENTRY
+};
+
+
+struct libdeflate_decompressor {
+
+	
+
+	union {
+		u8 precode_lens[DEFLATE_NUM_PRECODE_SYMS];
+
+		struct {
+			u8 lens[DEFLATE_NUM_LITLEN_SYMS +
+				DEFLATE_NUM_OFFSET_SYMS +
+				DEFLATE_MAX_LENS_OVERRUN];
+
+			u32 precode_decode_table[PRECODE_ENOUGH];
+		} l;
+
+		u32 litlen_decode_table[LITLEN_ENOUGH];
+	} u;
+
+	u32 offset_decode_table[OFFSET_ENOUGH];
+
+	
+	u16 sorted_syms[DEFLATE_MAX_NUM_SYMS];
+
+	bool static_codes_loaded;
+	unsigned litlen_tablebits;
 };
 
 
 static bool
 build_decode_table(u32 decode_table[],
-		   const libdeflate_len_t lens[],
+		   const u8 lens[],
 		   const unsigned num_syms,
 		   const u32 decode_results[],
-		   const unsigned table_bits,
-		   const unsigned max_codeword_len,
-		   u16 *sorted_syms)
+		   unsigned table_bits,
+		   unsigned max_codeword_len,
+		   u16 *sorted_syms,
+		   unsigned *table_bits_ret)
 {
 	unsigned len_counts[DEFLATE_MAX_CODEWORD_LEN + 1];
 	unsigned offsets[DEFLATE_MAX_CODEWORD_LEN + 1];
@@ -14453,6 +20444,14 @@ build_decode_table(u32 decode_table[],
 		len_counts[len] = 0;
 	for (sym = 0; sym < num_syms; sym++)
 		len_counts[lens[sym]]++;
+
+	
+	while (max_codeword_len > 1 && len_counts[max_codeword_len] == 0)
+		max_codeword_len--;
+	if (table_bits_ret != NULL) {
+		table_bits = MIN(table_bits, max_codeword_len);
+		*table_bits_ret = table_bits;
+	}
 
 	
 
@@ -14492,13 +20491,14 @@ build_decode_table(u32 decode_table[],
 			
 
 			
-			entry = decode_results[0] | 1;
+			entry = make_decode_table_entry(decode_results, 0, 1);
 		} else {
 			
 			if (codespace_used != (1U << (max_codeword_len - 1)) ||
 			    len_counts[1] != 1)
 				return false;
-			entry = decode_results[*sorted_syms] | 1;
+			entry = make_decode_table_entry(decode_results,
+							*sorted_syms, 1);
 		}
 		
 		for (i = 0; i < (1U << table_bits); i++)
@@ -14519,7 +20519,8 @@ build_decode_table(u32 decode_table[],
 
 			
 			decode_table[codeword] =
-				decode_results[*sorted_syms++] | len;
+				make_decode_table_entry(decode_results,
+							*sorted_syms++, len);
 
 			if (codeword == cur_table_end - 1) {
 				
@@ -14575,13 +20576,15 @@ build_decode_table(u32 decode_table[],
 
 			
 			decode_table[subtable_prefix] =
+				((u32)subtable_start << 16) |
+				HUFFDEC_EXCEPTIONAL |
 				HUFFDEC_SUBTABLE_POINTER |
-				HUFFDEC_RESULT_ENTRY(subtable_start) |
-				subtable_bits;
+				(subtable_bits << 8) | table_bits;
 		}
 
 		
-		entry = decode_results[*sorted_syms++] | (len - table_bits);
+		entry = make_decode_table_entry(decode_results, *sorted_syms++,
+						len - table_bits);
 		i = subtable_start + (codeword >> table_bits);
 		stride = 1U << (len - table_bits);
 		do {
@@ -14608,13 +20611,17 @@ build_precode_decode_table(struct libdeflate_decompressor *d)
 	
 	STATIC_ASSERT(PRECODE_TABLEBITS == 7 && PRECODE_ENOUGH == 128);
 
+	STATIC_ASSERT(ARRAY_LEN(precode_decode_results) ==
+		      DEFLATE_NUM_PRECODE_SYMS);
+
 	return build_decode_table(d->u.l.precode_decode_table,
 				  d->u.precode_lens,
 				  DEFLATE_NUM_PRECODE_SYMS,
 				  precode_decode_results,
 				  PRECODE_TABLEBITS,
 				  DEFLATE_MAX_PRE_CODEWORD_LEN,
-				  d->sorted_syms);
+				  d->sorted_syms,
+				  NULL);
 }
 
 
@@ -14623,7 +20630,10 @@ build_litlen_decode_table(struct libdeflate_decompressor *d,
 			  unsigned num_litlen_syms, unsigned num_offset_syms)
 {
 	
-	STATIC_ASSERT(LITLEN_TABLEBITS == 10 && LITLEN_ENOUGH == 1334);
+	STATIC_ASSERT(LITLEN_TABLEBITS == 11 && LITLEN_ENOUGH == 2342);
+
+	STATIC_ASSERT(ARRAY_LEN(litlen_decode_results) ==
+		      DEFLATE_NUM_LITLEN_SYMS);
 
 	return build_decode_table(d->u.litlen_decode_table,
 				  d->u.l.lens,
@@ -14631,7 +20641,8 @@ build_litlen_decode_table(struct libdeflate_decompressor *d,
 				  litlen_decode_results,
 				  LITLEN_TABLEBITS,
 				  DEFLATE_MAX_LITLEN_CODEWORD_LEN,
-				  d->sorted_syms);
+				  d->sorted_syms,
+				  &d->litlen_tablebits);
 }
 
 
@@ -14642,33 +20653,17 @@ build_offset_decode_table(struct libdeflate_decompressor *d,
 	
 	STATIC_ASSERT(OFFSET_TABLEBITS == 8 && OFFSET_ENOUGH == 402);
 
+	STATIC_ASSERT(ARRAY_LEN(offset_decode_results) ==
+		      DEFLATE_NUM_OFFSET_SYMS);
+
 	return build_decode_table(d->offset_decode_table,
 				  d->u.l.lens + num_litlen_syms,
 				  num_offset_syms,
 				  offset_decode_results,
 				  OFFSET_TABLEBITS,
 				  DEFLATE_MAX_OFFSET_CODEWORD_LEN,
-				  d->sorted_syms);
-}
-
-static forceinline machine_word_t
-repeat_byte(u8 b)
-{
-	machine_word_t v;
-
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-
-	v = b;
-	v |= v << 8;
-	v |= v << 16;
-	v |= v << ((WORDBITS == 64) ? 32 : 0);
-	return v;
-}
-
-static forceinline void
-copy_word_unaligned(const void *src, void *dst)
-{
-	store_word_unaligned(load_word_unaligned(src), dst);
+				  d->sorted_syms,
+				  NULL);
 }
 
 
@@ -14679,10 +20674,617 @@ typedef enum libdeflate_result (*decompress_func_t)
 	 void * restrict out, size_t out_nbytes_avail,
 	 size_t *actual_in_nbytes_ret, size_t *actual_out_nbytes_ret);
 
+#define FUNCNAME deflate_decompress_default
+#undef ATTRIBUTES
+#undef EXTRACT_VARBITS
+#undef EXTRACT_VARBITS8
+/* #include "decompress_template.h" */
+
+
+
+
+#ifndef ATTRIBUTES
+#  define ATTRIBUTES
+#endif
+#ifndef EXTRACT_VARBITS
+#  define EXTRACT_VARBITS(word, count)	((word) & BITMASK(count))
+#endif
+#ifndef EXTRACT_VARBITS8
+#  define EXTRACT_VARBITS8(word, count)	((word) & BITMASK((u8)(count)))
+#endif
+
+static enum libdeflate_result ATTRIBUTES MAYBE_UNUSED
+FUNCNAME(struct libdeflate_decompressor * restrict d,
+	 const void * restrict in, size_t in_nbytes,
+	 void * restrict out, size_t out_nbytes_avail,
+	 size_t *actual_in_nbytes_ret, size_t *actual_out_nbytes_ret)
+{
+	u8 *out_next = out;
+	u8 * const out_end = out_next + out_nbytes_avail;
+	u8 * const out_fastloop_end =
+		out_end - MIN(out_nbytes_avail, FASTLOOP_MAX_BYTES_WRITTEN);
+
+	
+	const u8 *in_next = in;
+	const u8 * const in_end = in_next + in_nbytes;
+	const u8 * const in_fastloop_end =
+		in_end - MIN(in_nbytes, FASTLOOP_MAX_BYTES_READ);
+	bitbuf_t bitbuf = 0;
+	bitbuf_t saved_bitbuf;
+	u32 bitsleft = 0;
+	size_t overread_count = 0;
+
+	bool is_final_block;
+	unsigned block_type;
+	unsigned num_litlen_syms;
+	unsigned num_offset_syms;
+	bitbuf_t litlen_tablemask;
+	u32 entry;
+
+next_block:
+	
+	;
+
+	STATIC_ASSERT(CAN_CONSUME(1 + 2 + 5 + 5 + 4 + 3));
+	REFILL_BITS();
+
+	
+	is_final_block = bitbuf & BITMASK(1);
+
+	
+	block_type = (bitbuf >> 1) & BITMASK(2);
+
+	if (block_type == DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN) {
+
+		
+
+		
+		static const u8 deflate_precode_lens_permutation[DEFLATE_NUM_PRECODE_SYMS] = {
+			16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
+		};
+
+		unsigned num_explicit_precode_lens;
+		unsigned i;
+
+		
+
+		STATIC_ASSERT(DEFLATE_NUM_LITLEN_SYMS == 257 + BITMASK(5));
+		num_litlen_syms = 257 + ((bitbuf >> 3) & BITMASK(5));
+
+		STATIC_ASSERT(DEFLATE_NUM_OFFSET_SYMS == 1 + BITMASK(5));
+		num_offset_syms = 1 + ((bitbuf >> 8) & BITMASK(5));
+
+		STATIC_ASSERT(DEFLATE_NUM_PRECODE_SYMS == 4 + BITMASK(4));
+		num_explicit_precode_lens = 4 + ((bitbuf >> 13) & BITMASK(4));
+
+		d->static_codes_loaded = false;
+
+		
+		STATIC_ASSERT(DEFLATE_MAX_PRE_CODEWORD_LEN == (1 << 3) - 1);
+		if (CAN_CONSUME(3 * (DEFLATE_NUM_PRECODE_SYMS - 1))) {
+			d->u.precode_lens[deflate_precode_lens_permutation[0]] =
+				(bitbuf >> 17) & BITMASK(3);
+			bitbuf >>= 20;
+			bitsleft -= 20;
+			REFILL_BITS();
+			i = 1;
+			do {
+				d->u.precode_lens[deflate_precode_lens_permutation[i]] =
+					bitbuf & BITMASK(3);
+				bitbuf >>= 3;
+				bitsleft -= 3;
+			} while (++i < num_explicit_precode_lens);
+		} else {
+			bitbuf >>= 17;
+			bitsleft -= 17;
+			i = 0;
+			do {
+				if ((u8)bitsleft < 3)
+					REFILL_BITS();
+				d->u.precode_lens[deflate_precode_lens_permutation[i]] =
+					bitbuf & BITMASK(3);
+				bitbuf >>= 3;
+				bitsleft -= 3;
+			} while (++i < num_explicit_precode_lens);
+		}
+		for (; i < DEFLATE_NUM_PRECODE_SYMS; i++)
+			d->u.precode_lens[deflate_precode_lens_permutation[i]] = 0;
+
+		
+		SAFETY_CHECK(build_precode_decode_table(d));
+
+		
+		i = 0;
+		do {
+			unsigned presym;
+			u8 rep_val;
+			unsigned rep_count;
+
+			if ((u8)bitsleft < DEFLATE_MAX_PRE_CODEWORD_LEN + 7)
+				REFILL_BITS();
+
+			
+			STATIC_ASSERT(PRECODE_TABLEBITS == DEFLATE_MAX_PRE_CODEWORD_LEN);
+
+			
+			entry = d->u.l.precode_decode_table[
+				bitbuf & BITMASK(DEFLATE_MAX_PRE_CODEWORD_LEN)];
+			bitbuf >>= (u8)entry;
+			bitsleft -= entry; 
+			presym = entry >> 16;
+
+			if (presym < 16) {
+				
+				d->u.l.lens[i++] = presym;
+				continue;
+			}
+
+			
+
+			
+			STATIC_ASSERT(DEFLATE_MAX_LENS_OVERRUN == 138 - 1);
+
+			if (presym == 16) {
+				
+				SAFETY_CHECK(i != 0);
+				rep_val = d->u.l.lens[i - 1];
+				STATIC_ASSERT(3 + BITMASK(2) == 6);
+				rep_count = 3 + (bitbuf & BITMASK(2));
+				bitbuf >>= 2;
+				bitsleft -= 2;
+				d->u.l.lens[i + 0] = rep_val;
+				d->u.l.lens[i + 1] = rep_val;
+				d->u.l.lens[i + 2] = rep_val;
+				d->u.l.lens[i + 3] = rep_val;
+				d->u.l.lens[i + 4] = rep_val;
+				d->u.l.lens[i + 5] = rep_val;
+				i += rep_count;
+			} else if (presym == 17) {
+				
+				STATIC_ASSERT(3 + BITMASK(3) == 10);
+				rep_count = 3 + (bitbuf & BITMASK(3));
+				bitbuf >>= 3;
+				bitsleft -= 3;
+				d->u.l.lens[i + 0] = 0;
+				d->u.l.lens[i + 1] = 0;
+				d->u.l.lens[i + 2] = 0;
+				d->u.l.lens[i + 3] = 0;
+				d->u.l.lens[i + 4] = 0;
+				d->u.l.lens[i + 5] = 0;
+				d->u.l.lens[i + 6] = 0;
+				d->u.l.lens[i + 7] = 0;
+				d->u.l.lens[i + 8] = 0;
+				d->u.l.lens[i + 9] = 0;
+				i += rep_count;
+			} else {
+				
+				STATIC_ASSERT(11 + BITMASK(7) == 138);
+				rep_count = 11 + (bitbuf & BITMASK(7));
+				bitbuf >>= 7;
+				bitsleft -= 7;
+				memset(&d->u.l.lens[i], 0,
+				       rep_count * sizeof(d->u.l.lens[i]));
+				i += rep_count;
+			}
+		} while (i < num_litlen_syms + num_offset_syms);
+
+	} else if (block_type == DEFLATE_BLOCKTYPE_UNCOMPRESSED) {
+		u16 len, nlen;
+
+		
+
+		bitsleft -= 3; 
+
+		
+		bitsleft = (u8)bitsleft;
+		SAFETY_CHECK(overread_count <= (bitsleft >> 3));
+		in_next -= (bitsleft >> 3) - overread_count;
+		overread_count = 0;
+		bitbuf = 0;
+		bitsleft = 0;
+
+		SAFETY_CHECK(in_end - in_next >= 4);
+		len = get_unaligned_le16(in_next);
+		nlen = get_unaligned_le16(in_next + 2);
+		in_next += 4;
+
+		SAFETY_CHECK(len == (u16)~nlen);
+		if (unlikely(len > out_end - out_next))
+			return LIBDEFLATE_INSUFFICIENT_SPACE;
+		SAFETY_CHECK(len <= in_end - in_next);
+
+		memcpy(out_next, in_next, len);
+		in_next += len;
+		out_next += len;
+
+		goto block_done;
+
+	} else {
+		unsigned i;
+
+		SAFETY_CHECK(block_type == DEFLATE_BLOCKTYPE_STATIC_HUFFMAN);
+
+		
+
+		bitbuf >>= 3; 
+		bitsleft -= 3;
+
+		if (d->static_codes_loaded)
+			goto have_decode_tables;
+
+		d->static_codes_loaded = true;
+
+		STATIC_ASSERT(DEFLATE_NUM_LITLEN_SYMS == 288);
+		STATIC_ASSERT(DEFLATE_NUM_OFFSET_SYMS == 32);
+
+		for (i = 0; i < 144; i++)
+			d->u.l.lens[i] = 8;
+		for (; i < 256; i++)
+			d->u.l.lens[i] = 9;
+		for (; i < 280; i++)
+			d->u.l.lens[i] = 7;
+		for (; i < 288; i++)
+			d->u.l.lens[i] = 8;
+
+		for (; i < 288 + 32; i++)
+			d->u.l.lens[i] = 5;
+
+		num_litlen_syms = 288;
+		num_offset_syms = 32;
+	}
+
+	
+
+	SAFETY_CHECK(build_offset_decode_table(d, num_litlen_syms, num_offset_syms));
+	SAFETY_CHECK(build_litlen_decode_table(d, num_litlen_syms, num_offset_syms));
+have_decode_tables:
+	litlen_tablemask = BITMASK(d->litlen_tablebits);
+
+	
+	if (in_next >= in_fastloop_end || out_next >= out_fastloop_end)
+		goto generic_loop;
+	REFILL_BITS_IN_FASTLOOP();
+	entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+	do {
+		u32 length, offset, lit;
+		const u8 *src;
+		u8 *dst;
+
+		
+		saved_bitbuf = bitbuf;
+		bitbuf >>= (u8)entry;
+		bitsleft -= entry; 
+
+		
+		if (entry & HUFFDEC_LITERAL) {
+			
+			if (
+			    CAN_CONSUME_AND_THEN_PRELOAD(2 * LITLEN_TABLEBITS +
+							 LENGTH_MAXBITS,
+							 OFFSET_TABLEBITS) &&
+			    
+			    CAN_CONSUME_AND_THEN_PRELOAD(2 * LITLEN_TABLEBITS +
+							 DEFLATE_MAX_LITLEN_CODEWORD_LEN,
+							 LITLEN_TABLEBITS)) {
+				
+				lit = entry >> 16;
+				entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+				saved_bitbuf = bitbuf;
+				bitbuf >>= (u8)entry;
+				bitsleft -= entry;
+				*out_next++ = lit;
+				if (entry & HUFFDEC_LITERAL) {
+					
+					lit = entry >> 16;
+					entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+					saved_bitbuf = bitbuf;
+					bitbuf >>= (u8)entry;
+					bitsleft -= entry;
+					*out_next++ = lit;
+					if (entry & HUFFDEC_LITERAL) {
+						
+						lit = entry >> 16;
+						entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+						REFILL_BITS_IN_FASTLOOP();
+						*out_next++ = lit;
+						continue;
+					}
+				}
+			} else {
+				
+				STATIC_ASSERT(CAN_CONSUME_AND_THEN_PRELOAD(
+						LITLEN_TABLEBITS, LITLEN_TABLEBITS));
+				lit = entry >> 16;
+				entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+				REFILL_BITS_IN_FASTLOOP();
+				*out_next++ = lit;
+				continue;
+			}
+		}
+
+		
+		if (unlikely(entry & HUFFDEC_EXCEPTIONAL)) {
+			
+
+			if (unlikely(entry & HUFFDEC_END_OF_BLOCK))
+				goto block_done;
+
+			
+			entry = d->u.litlen_decode_table[(entry >> 16) +
+				EXTRACT_VARBITS(bitbuf, (entry >> 8) & 0x3F)];
+			saved_bitbuf = bitbuf;
+			bitbuf >>= (u8)entry;
+			bitsleft -= entry;
+
+			
+			if (!CAN_CONSUME_AND_THEN_PRELOAD(DEFLATE_MAX_LITLEN_CODEWORD_LEN,
+							  LITLEN_TABLEBITS) ||
+			    !CAN_CONSUME_AND_THEN_PRELOAD(LENGTH_MAXBITS,
+							  OFFSET_TABLEBITS))
+				REFILL_BITS_IN_FASTLOOP();
+			if (entry & HUFFDEC_LITERAL) {
+				
+				lit = entry >> 16;
+				entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+				REFILL_BITS_IN_FASTLOOP();
+				*out_next++ = lit;
+				continue;
+			}
+			if (unlikely(entry & HUFFDEC_END_OF_BLOCK))
+				goto block_done;
+			
+		}
+
+		
+		length = entry >> 16;
+		length += EXTRACT_VARBITS8(saved_bitbuf, entry) >> (u8)(entry >> 8);
+
+		
+		STATIC_ASSERT(CAN_CONSUME_AND_THEN_PRELOAD(LENGTH_MAXFASTBITS,
+							   OFFSET_TABLEBITS));
+		entry = d->offset_decode_table[bitbuf & BITMASK(OFFSET_TABLEBITS)];
+		if (CAN_CONSUME_AND_THEN_PRELOAD(OFFSET_MAXBITS,
+						 LITLEN_TABLEBITS)) {
+			
+			if (unlikely(entry & HUFFDEC_EXCEPTIONAL)) {
+				
+				if (unlikely((u8)bitsleft < OFFSET_MAXBITS +
+					     LITLEN_TABLEBITS - PRELOAD_SLACK))
+					REFILL_BITS_IN_FASTLOOP();
+				bitbuf >>= OFFSET_TABLEBITS;
+				bitsleft -= OFFSET_TABLEBITS;
+				entry = d->offset_decode_table[(entry >> 16) +
+					EXTRACT_VARBITS(bitbuf, (entry >> 8) & 0x3F)];
+			} else if (unlikely((u8)bitsleft < OFFSET_MAXFASTBITS +
+					    LITLEN_TABLEBITS - PRELOAD_SLACK))
+				REFILL_BITS_IN_FASTLOOP();
+		} else {
+			
+			REFILL_BITS_IN_FASTLOOP();
+			if (unlikely(entry & HUFFDEC_EXCEPTIONAL)) {
+				
+				bitbuf >>= OFFSET_TABLEBITS;
+				bitsleft -= OFFSET_TABLEBITS;
+				entry = d->offset_decode_table[(entry >> 16) +
+					EXTRACT_VARBITS(bitbuf, (entry >> 8) & 0x3F)];
+				REFILL_BITS_IN_FASTLOOP();
+				
+				STATIC_ASSERT(CAN_CONSUME(
+					OFFSET_MAXBITS - OFFSET_TABLEBITS));
+			} else {
+				
+				STATIC_ASSERT(CAN_CONSUME(OFFSET_MAXFASTBITS));
+			}
+		}
+		saved_bitbuf = bitbuf;
+		bitbuf >>= (u8)entry;
+		bitsleft -= entry; 
+		offset = entry >> 16;
+		offset += EXTRACT_VARBITS8(saved_bitbuf, entry) >> (u8)(entry >> 8);
+
+		
+		SAFETY_CHECK(offset <= out_next - (const u8 *)out);
+		src = out_next - offset;
+		dst = out_next;
+		out_next += length;
+
+		
+		if (!CAN_CONSUME_AND_THEN_PRELOAD(
+			MAX(OFFSET_MAXBITS - OFFSET_TABLEBITS,
+			    OFFSET_MAXFASTBITS),
+			LITLEN_TABLEBITS) &&
+		    unlikely((u8)bitsleft < LITLEN_TABLEBITS - PRELOAD_SLACK))
+			REFILL_BITS_IN_FASTLOOP();
+		entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+		REFILL_BITS_IN_FASTLOOP();
+
+		
+		if (UNALIGNED_ACCESS_IS_FAST && offset >= WORDBYTES) {
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += WORDBYTES;
+			dst += WORDBYTES;
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += WORDBYTES;
+			dst += WORDBYTES;
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += WORDBYTES;
+			dst += WORDBYTES;
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += WORDBYTES;
+			dst += WORDBYTES;
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += WORDBYTES;
+			dst += WORDBYTES;
+			while (dst < out_next) {
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += WORDBYTES;
+				dst += WORDBYTES;
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += WORDBYTES;
+				dst += WORDBYTES;
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += WORDBYTES;
+				dst += WORDBYTES;
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += WORDBYTES;
+				dst += WORDBYTES;
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += WORDBYTES;
+				dst += WORDBYTES;
+			}
+		} else if (UNALIGNED_ACCESS_IS_FAST && offset == 1) {
+			machine_word_t v;
+
+			
+			v = (machine_word_t)0x0101010101010101 * src[0];
+			store_word_unaligned(v, dst);
+			dst += WORDBYTES;
+			store_word_unaligned(v, dst);
+			dst += WORDBYTES;
+			store_word_unaligned(v, dst);
+			dst += WORDBYTES;
+			store_word_unaligned(v, dst);
+			dst += WORDBYTES;
+			while (dst < out_next) {
+				store_word_unaligned(v, dst);
+				dst += WORDBYTES;
+				store_word_unaligned(v, dst);
+				dst += WORDBYTES;
+				store_word_unaligned(v, dst);
+				dst += WORDBYTES;
+				store_word_unaligned(v, dst);
+				dst += WORDBYTES;
+			}
+		} else if (UNALIGNED_ACCESS_IS_FAST) {
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += offset;
+			dst += offset;
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += offset;
+			dst += offset;
+			do {
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += offset;
+				dst += offset;
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += offset;
+				dst += offset;
+			} while (dst < out_next);
+		} else {
+			*dst++ = *src++;
+			*dst++ = *src++;
+			do {
+				*dst++ = *src++;
+			} while (dst < out_next);
+		}
+	} while (in_next < in_fastloop_end && out_next < out_fastloop_end);
+
+	
+generic_loop:
+	for (;;) {
+		u32 length, offset;
+		const u8 *src;
+		u8 *dst;
+
+		REFILL_BITS();
+		entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+		saved_bitbuf = bitbuf;
+		bitbuf >>= (u8)entry;
+		bitsleft -= entry;
+		if (unlikely(entry & HUFFDEC_SUBTABLE_POINTER)) {
+			entry = d->u.litlen_decode_table[(entry >> 16) +
+					EXTRACT_VARBITS(bitbuf, (entry >> 8) & 0x3F)];
+			saved_bitbuf = bitbuf;
+			bitbuf >>= (u8)entry;
+			bitsleft -= entry;
+		}
+		length = entry >> 16;
+		if (entry & HUFFDEC_LITERAL) {
+			if (unlikely(out_next == out_end))
+				return LIBDEFLATE_INSUFFICIENT_SPACE;
+			*out_next++ = length;
+			continue;
+		}
+		if (unlikely(entry & HUFFDEC_END_OF_BLOCK))
+			goto block_done;
+		length += EXTRACT_VARBITS8(saved_bitbuf, entry) >> (u8)(entry >> 8);
+		if (unlikely(length > out_end - out_next))
+			return LIBDEFLATE_INSUFFICIENT_SPACE;
+
+		if (!CAN_CONSUME(LENGTH_MAXBITS + OFFSET_MAXBITS))
+			REFILL_BITS();
+		entry = d->offset_decode_table[bitbuf & BITMASK(OFFSET_TABLEBITS)];
+		if (unlikely(entry & HUFFDEC_EXCEPTIONAL)) {
+			bitbuf >>= OFFSET_TABLEBITS;
+			bitsleft -= OFFSET_TABLEBITS;
+			entry = d->offset_decode_table[(entry >> 16) +
+					EXTRACT_VARBITS(bitbuf, (entry >> 8) & 0x3F)];
+			if (!CAN_CONSUME(OFFSET_MAXBITS))
+				REFILL_BITS();
+		}
+		offset = entry >> 16;
+		offset += EXTRACT_VARBITS8(bitbuf, entry) >> (u8)(entry >> 8);
+		bitbuf >>= (u8)entry;
+		bitsleft -= entry;
+
+		SAFETY_CHECK(offset <= out_next - (const u8 *)out);
+		src = out_next - offset;
+		dst = out_next;
+		out_next += length;
+
+		STATIC_ASSERT(DEFLATE_MIN_MATCH_LEN == 3);
+		*dst++ = *src++;
+		*dst++ = *src++;
+		do {
+			*dst++ = *src++;
+		} while (dst < out_next);
+	}
+
+block_done:
+	
+
+	if (!is_final_block)
+		goto next_block;
+
+	
+
+	bitsleft = (u8)bitsleft;
+
+	
+	SAFETY_CHECK(overread_count <= (bitsleft >> 3));
+
+	
+	if (actual_in_nbytes_ret) {
+		
+		in_next -= (bitsleft >> 3) - overread_count;
+
+		*actual_in_nbytes_ret = in_next - (u8 *)in;
+	}
+
+	
+	if (actual_out_nbytes_ret) {
+		*actual_out_nbytes_ret = out_next - (u8 *)out;
+	} else {
+		if (out_next != out_end)
+			return LIBDEFLATE_SHORT_OUTPUT;
+	}
+	return LIBDEFLATE_SUCCESS;
+}
+
+#undef FUNCNAME
+#undef ATTRIBUTES
+#undef EXTRACT_VARBITS
+#undef EXTRACT_VARBITS8
+
+
+
 #undef DEFAULT_IMPL
-#undef DISPATCH
+#undef arch_select_decompress_func
 #if defined(__i386__) || defined(__x86_64__)
 /* #  include "x86/decompress_impl.h" */
+#ifndef LIB_X86_DECOMPRESS_IMPL_H
+#define LIB_X86_DECOMPRESS_IMPL_H
+
 /* #include "x86-cpu_features.h" */
 
 
@@ -14702,253 +21304,27 @@ typedef enum libdeflate_result (*decompress_func_t)
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -14957,6 +21333,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -14972,1154 +21357,13 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
-#  define LIBEXPORT
-#endif
-
-
-#ifndef inline
-#  define inline
-#endif
-
-
-#ifndef forceinline
-#  define forceinline inline
-#endif
-
-
-#ifndef restrict
-#  define restrict
-#endif
-
-
-#ifndef likely
-#  define likely(expr)		(expr)
-#endif
-
-
-#ifndef unlikely
-#  define unlikely(expr)	(expr)
-#endif
-
-
-#ifndef prefetchr
-#  define prefetchr(addr)
-#endif
-
-
-#ifndef prefetchw
-#  define prefetchw(addr)
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
-
-
-
-
-
-#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
-#define MIN(a, b)		((a) <= (b) ? (a) : (b))
-#define MAX(a, b)		((a) >= (b) ? (a) : (b))
-#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
-#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
-#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
-
-
-
-
-
-
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
-{
-	union {
-		unsigned int v;
-		unsigned char b;
-	} u;
-	u.v = 1;
-	return u.b;
-}
-#endif
-
-
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
-{
-	return (n << 8) | (n >> 8);
-}
-#endif
-
-
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
-
-#ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
-#else
-#include <string.h>
-#endif
-
-#endif 
-
-
-#if (defined(__i386__) || defined(__x86_64__)) && \
-	COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define X86_CPU_FEATURES_ENABLED 1
-#else
-#  define X86_CPU_FEATURES_ENABLED 0
-#endif
-
-#if X86_CPU_FEATURES_ENABLED
-
-#define X86_CPU_FEATURE_SSE2		0x00000001
-#define X86_CPU_FEATURE_PCLMUL		0x00000002
-#define X86_CPU_FEATURE_AVX		0x00000004
-#define X86_CPU_FEATURE_AVX2		0x00000008
-#define X86_CPU_FEATURE_BMI2		0x00000010
-#define X86_CPU_FEATURE_AVX512BW	0x00000020
-
-#define X86_CPU_FEATURES_KNOWN		0x80000000
-
-extern volatile u32 _cpu_features;
-
-void setup_cpu_features(void);
-
-static inline u32 get_cpu_features(void)
-{
-	if (_cpu_features == 0)
-		setup_cpu_features();
-	return _cpu_features;
-}
-
-#endif 
-
-#endif 
-
-
-
-#undef DISPATCH_BMI2
-#if !defined(__BMI2__) && X86_CPU_FEATURES_ENABLED && \
-	COMPILER_SUPPORTS_BMI2_TARGET
-#  define FUNCNAME	deflate_decompress_bmi2
-#  define ATTRIBUTES	__attribute__((target("bmi2")))
-#  define DISPATCH	1
-#  define DISPATCH_BMI2	1
-/* #include "decompress_template.h" */
-
-
-
-
-static enum libdeflate_result ATTRIBUTES
-FUNCNAME(struct libdeflate_decompressor * restrict d,
-	 const void * restrict in, size_t in_nbytes,
-	 void * restrict out, size_t out_nbytes_avail,
-	 size_t *actual_in_nbytes_ret, size_t *actual_out_nbytes_ret)
-{
-	u8 *out_next = out;
-	u8 * const out_end = out_next + out_nbytes_avail;
-	const u8 *in_next = in;
-	const u8 * const in_end = in_next + in_nbytes;
-	bitbuf_t bitbuf = 0;
-	unsigned bitsleft = 0;
-	size_t overrun_count = 0;
-	unsigned i;
-	unsigned is_final_block;
-	unsigned block_type;
-	u16 len;
-	u16 nlen;
-	unsigned num_litlen_syms;
-	unsigned num_offset_syms;
-	u16 tmp16;
-	u32 tmp32;
-
-next_block:
-	
-	;
-
-	STATIC_ASSERT(CAN_ENSURE(1 + 2 + 5 + 5 + 4));
-	ENSURE_BITS(1 + 2 + 5 + 5 + 4);
-
-	
-	is_final_block = POP_BITS(1);
-
-	
-	block_type = POP_BITS(2);
-
-	if (block_type == DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN) {
-
-		
-
-		
-		static const u8 deflate_precode_lens_permutation[DEFLATE_NUM_PRECODE_SYMS] = {
-			16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
-		};
-
-		unsigned num_explicit_precode_lens;
-
-		
-
-		STATIC_ASSERT(DEFLATE_NUM_LITLEN_SYMS == ((1 << 5) - 1) + 257);
-		num_litlen_syms = POP_BITS(5) + 257;
-
-		STATIC_ASSERT(DEFLATE_NUM_OFFSET_SYMS == ((1 << 5) - 1) + 1);
-		num_offset_syms = POP_BITS(5) + 1;
-
-		STATIC_ASSERT(DEFLATE_NUM_PRECODE_SYMS == ((1 << 4) - 1) + 4);
-		num_explicit_precode_lens = POP_BITS(4) + 4;
-
-		d->static_codes_loaded = false;
-
-		
-		STATIC_ASSERT(DEFLATE_MAX_PRE_CODEWORD_LEN == (1 << 3) - 1);
-		for (i = 0; i < num_explicit_precode_lens; i++) {
-			ENSURE_BITS(3);
-			d->u.precode_lens[deflate_precode_lens_permutation[i]] = POP_BITS(3);
-		}
-
-		for (; i < DEFLATE_NUM_PRECODE_SYMS; i++)
-			d->u.precode_lens[deflate_precode_lens_permutation[i]] = 0;
-
-		
-		SAFETY_CHECK(build_precode_decode_table(d));
-
-		
-		for (i = 0; i < num_litlen_syms + num_offset_syms; ) {
-			u32 entry;
-			unsigned presym;
-			u8 rep_val;
-			unsigned rep_count;
-
-			ENSURE_BITS(DEFLATE_MAX_PRE_CODEWORD_LEN + 7);
-
-			
-			STATIC_ASSERT(PRECODE_TABLEBITS == DEFLATE_MAX_PRE_CODEWORD_LEN);
-
-			
-			entry = d->u.l.precode_decode_table[BITS(DEFLATE_MAX_PRE_CODEWORD_LEN)];
-			REMOVE_BITS(entry & HUFFDEC_LENGTH_MASK);
-			presym = entry >> HUFFDEC_RESULT_SHIFT;
-
-			if (presym < 16) {
-				
-				d->u.l.lens[i++] = presym;
-				continue;
-			}
-
-			
-
-			
-			STATIC_ASSERT(DEFLATE_MAX_LENS_OVERRUN == 138 - 1);
-
-			if (presym == 16) {
-				
-				SAFETY_CHECK(i != 0);
-				rep_val = d->u.l.lens[i - 1];
-				STATIC_ASSERT(3 + ((1 << 2) - 1) == 6);
-				rep_count = 3 + POP_BITS(2);
-				d->u.l.lens[i + 0] = rep_val;
-				d->u.l.lens[i + 1] = rep_val;
-				d->u.l.lens[i + 2] = rep_val;
-				d->u.l.lens[i + 3] = rep_val;
-				d->u.l.lens[i + 4] = rep_val;
-				d->u.l.lens[i + 5] = rep_val;
-				i += rep_count;
-			} else if (presym == 17) {
-				
-				STATIC_ASSERT(3 + ((1 << 3) - 1) == 10);
-				rep_count = 3 + POP_BITS(3);
-				d->u.l.lens[i + 0] = 0;
-				d->u.l.lens[i + 1] = 0;
-				d->u.l.lens[i + 2] = 0;
-				d->u.l.lens[i + 3] = 0;
-				d->u.l.lens[i + 4] = 0;
-				d->u.l.lens[i + 5] = 0;
-				d->u.l.lens[i + 6] = 0;
-				d->u.l.lens[i + 7] = 0;
-				d->u.l.lens[i + 8] = 0;
-				d->u.l.lens[i + 9] = 0;
-				i += rep_count;
-			} else {
-				
-				STATIC_ASSERT(11 + ((1 << 7) - 1) == 138);
-				rep_count = 11 + POP_BITS(7);
-				memset(&d->u.l.lens[i], 0,
-				       rep_count * sizeof(d->u.l.lens[i]));
-				i += rep_count;
-			}
-		}
-	} else if (block_type == DEFLATE_BLOCKTYPE_UNCOMPRESSED) {
-
-		
-
-		ALIGN_INPUT();
-
-		SAFETY_CHECK(in_end - in_next >= 4);
-
-		len = READ_U16();
-		nlen = READ_U16();
-
-		SAFETY_CHECK(len == (u16)~nlen);
-		if (unlikely(len > out_end - out_next))
-			return LIBDEFLATE_INSUFFICIENT_SPACE;
-		SAFETY_CHECK(len <= in_end - in_next);
-
-		memcpy(out_next, in_next, len);
-		in_next += len;
-		out_next += len;
-
-		goto block_done;
-
-	} else {
-		SAFETY_CHECK(block_type == DEFLATE_BLOCKTYPE_STATIC_HUFFMAN);
-
-		
-
-		if (d->static_codes_loaded)
-			goto have_decode_tables;
-
-		d->static_codes_loaded = true;
-
-		STATIC_ASSERT(DEFLATE_NUM_LITLEN_SYMS == 288);
-		STATIC_ASSERT(DEFLATE_NUM_OFFSET_SYMS == 32);
-
-		for (i = 0; i < 144; i++)
-			d->u.l.lens[i] = 8;
-		for (; i < 256; i++)
-			d->u.l.lens[i] = 9;
-		for (; i < 280; i++)
-			d->u.l.lens[i] = 7;
-		for (; i < 288; i++)
-			d->u.l.lens[i] = 8;
-
-		for (; i < 288 + 32; i++)
-			d->u.l.lens[i] = 5;
-
-		num_litlen_syms = 288;
-		num_offset_syms = 32;
-	}
-
-	
-
-	SAFETY_CHECK(build_offset_decode_table(d, num_litlen_syms, num_offset_syms));
-	SAFETY_CHECK(build_litlen_decode_table(d, num_litlen_syms, num_offset_syms));
-have_decode_tables:
-
-	
-	for (;;) {
-		u32 entry;
-		u32 length;
-		u32 offset;
-		const u8 *src;
-		u8 *dst;
-
-		
-		ENSURE_BITS(DEFLATE_MAX_LITLEN_CODEWORD_LEN);
-		entry = d->u.litlen_decode_table[BITS(LITLEN_TABLEBITS)];
-		if (entry & HUFFDEC_SUBTABLE_POINTER) {
-			
-			REMOVE_BITS(LITLEN_TABLEBITS);
-			entry = d->u.litlen_decode_table[
-				((entry >> HUFFDEC_RESULT_SHIFT) & 0xFFFF) +
-				BITS(entry & HUFFDEC_LENGTH_MASK)];
-		}
-		REMOVE_BITS(entry & HUFFDEC_LENGTH_MASK);
-		if (entry & HUFFDEC_LITERAL) {
-			
-			if (unlikely(out_next == out_end))
-				return LIBDEFLATE_INSUFFICIENT_SPACE;
-			*out_next++ = (u8)(entry >> HUFFDEC_RESULT_SHIFT);
-			continue;
-		}
-
-		
-
-		entry >>= HUFFDEC_RESULT_SHIFT;
-		ENSURE_BITS(MAX_ENSURE);
-
-		
-		length = (entry >> HUFFDEC_LENGTH_BASE_SHIFT) +
-			 POP_BITS(entry & HUFFDEC_EXTRA_LENGTH_BITS_MASK);
-
-		
-		STATIC_ASSERT(HUFFDEC_END_OF_BLOCK_LENGTH == 0);
-		if (unlikely((size_t)length - 1 >= out_end - out_next)) {
-			if (unlikely(length != HUFFDEC_END_OF_BLOCK_LENGTH))
-				return LIBDEFLATE_INSUFFICIENT_SPACE;
-			goto block_done;
-		}
-
-		
-
-		entry = d->offset_decode_table[BITS(OFFSET_TABLEBITS)];
-		if (entry & HUFFDEC_SUBTABLE_POINTER) {
-			
-			REMOVE_BITS(OFFSET_TABLEBITS);
-			entry = d->offset_decode_table[
-				((entry >> HUFFDEC_RESULT_SHIFT) & 0xFFFF) +
-				BITS(entry & HUFFDEC_LENGTH_MASK)];
-		}
-		REMOVE_BITS(entry & HUFFDEC_LENGTH_MASK);
-		entry >>= HUFFDEC_RESULT_SHIFT;
-
-		STATIC_ASSERT(CAN_ENSURE(DEFLATE_MAX_EXTRA_LENGTH_BITS +
-					 DEFLATE_MAX_OFFSET_CODEWORD_LEN) &&
-			      CAN_ENSURE(DEFLATE_MAX_EXTRA_OFFSET_BITS));
-		if (!CAN_ENSURE(DEFLATE_MAX_EXTRA_LENGTH_BITS +
-				DEFLATE_MAX_OFFSET_CODEWORD_LEN +
-				DEFLATE_MAX_EXTRA_OFFSET_BITS))
-			ENSURE_BITS(DEFLATE_MAX_EXTRA_OFFSET_BITS);
-
-		
-		offset = (entry & HUFFDEC_OFFSET_BASE_MASK) +
-			 POP_BITS(entry >> HUFFDEC_EXTRA_OFFSET_BITS_SHIFT);
-
-		
-		SAFETY_CHECK(offset <= out_next - (const u8 *)out);
-
-		
-
-		src = out_next - offset;
-		dst = out_next;
-		out_next += length;
-
-		if (UNALIGNED_ACCESS_IS_FAST &&
-		    
-		    likely(out_end - out_next >=
-			   3 * WORDBYTES - DEFLATE_MIN_MATCH_LEN)) {
-			if (offset >= WORDBYTES) { 
-				copy_word_unaligned(src, dst);
-				src += WORDBYTES;
-				dst += WORDBYTES;
-				copy_word_unaligned(src, dst);
-				src += WORDBYTES;
-				dst += WORDBYTES;
-				do {
-					copy_word_unaligned(src, dst);
-					src += WORDBYTES;
-					dst += WORDBYTES;
-				} while (dst < out_next);
-			} else if (offset == 1) {
-				
-				machine_word_t v = repeat_byte(*src);
-
-				store_word_unaligned(v, dst);
-				dst += WORDBYTES;
-				store_word_unaligned(v, dst);
-				dst += WORDBYTES;
-				do {
-					store_word_unaligned(v, dst);
-					dst += WORDBYTES;
-				} while (dst < out_next);
-			} else {
-				*dst++ = *src++;
-				*dst++ = *src++;
-				do {
-					*dst++ = *src++;
-				} while (dst < out_next);
-			}
-		} else {
-			STATIC_ASSERT(DEFLATE_MIN_MATCH_LEN == 3);
-			*dst++ = *src++;
-			*dst++ = *src++;
-			do {
-				*dst++ = *src++;
-			} while (dst < out_next);
-		}
-	}
-
-block_done:
-	
-
-	if (!is_final_block)
-		goto next_block;
-
-	
-
-	
-	ALIGN_INPUT();
-
-	
-	if (actual_in_nbytes_ret)
-		*actual_in_nbytes_ret = in_next - (u8 *)in;
-
-	
-	if (actual_out_nbytes_ret) {
-		*actual_out_nbytes_ret = out_next - (u8 *)out;
-	} else {
-		if (out_next != out_end)
-			return LIBDEFLATE_SHORT_OUTPUT;
-	}
-	return LIBDEFLATE_SUCCESS;
-}
-
-#undef FUNCNAME
-#undef ATTRIBUTES
-
-#endif
-
-#ifdef DISPATCH
-static inline decompress_func_t
-arch_select_decompress_func(void)
-{
-	u32 features = get_cpu_features();
-
-#ifdef DISPATCH_BMI2
-	if (features & X86_CPU_FEATURE_BMI2)
-		return deflate_decompress_bmi2;
-#endif
-	return NULL;
-}
-#endif 
-
-#endif
-
-#ifndef DEFAULT_IMPL
-#  define FUNCNAME deflate_decompress_default
-#  define ATTRIBUTES
-/* #  include "decompress_template.h" */
-
-
-
-
-static enum libdeflate_result ATTRIBUTES
-FUNCNAME(struct libdeflate_decompressor * restrict d,
-	 const void * restrict in, size_t in_nbytes,
-	 void * restrict out, size_t out_nbytes_avail,
-	 size_t *actual_in_nbytes_ret, size_t *actual_out_nbytes_ret)
-{
-	u8 *out_next = out;
-	u8 * const out_end = out_next + out_nbytes_avail;
-	const u8 *in_next = in;
-	const u8 * const in_end = in_next + in_nbytes;
-	bitbuf_t bitbuf = 0;
-	unsigned bitsleft = 0;
-	size_t overrun_count = 0;
-	unsigned i;
-	unsigned is_final_block;
-	unsigned block_type;
-	u16 len;
-	u16 nlen;
-	unsigned num_litlen_syms;
-	unsigned num_offset_syms;
-	u16 tmp16;
-	u32 tmp32;
-
-next_block:
-	
-	;
-
-	STATIC_ASSERT(CAN_ENSURE(1 + 2 + 5 + 5 + 4));
-	ENSURE_BITS(1 + 2 + 5 + 5 + 4);
-
-	
-	is_final_block = POP_BITS(1);
-
-	
-	block_type = POP_BITS(2);
-
-	if (block_type == DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN) {
-
-		
-
-		
-		static const u8 deflate_precode_lens_permutation[DEFLATE_NUM_PRECODE_SYMS] = {
-			16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
-		};
-
-		unsigned num_explicit_precode_lens;
-
-		
-
-		STATIC_ASSERT(DEFLATE_NUM_LITLEN_SYMS == ((1 << 5) - 1) + 257);
-		num_litlen_syms = POP_BITS(5) + 257;
-
-		STATIC_ASSERT(DEFLATE_NUM_OFFSET_SYMS == ((1 << 5) - 1) + 1);
-		num_offset_syms = POP_BITS(5) + 1;
-
-		STATIC_ASSERT(DEFLATE_NUM_PRECODE_SYMS == ((1 << 4) - 1) + 4);
-		num_explicit_precode_lens = POP_BITS(4) + 4;
-
-		d->static_codes_loaded = false;
-
-		
-		STATIC_ASSERT(DEFLATE_MAX_PRE_CODEWORD_LEN == (1 << 3) - 1);
-		for (i = 0; i < num_explicit_precode_lens; i++) {
-			ENSURE_BITS(3);
-			d->u.precode_lens[deflate_precode_lens_permutation[i]] = POP_BITS(3);
-		}
-
-		for (; i < DEFLATE_NUM_PRECODE_SYMS; i++)
-			d->u.precode_lens[deflate_precode_lens_permutation[i]] = 0;
-
-		
-		SAFETY_CHECK(build_precode_decode_table(d));
-
-		
-		for (i = 0; i < num_litlen_syms + num_offset_syms; ) {
-			u32 entry;
-			unsigned presym;
-			u8 rep_val;
-			unsigned rep_count;
-
-			ENSURE_BITS(DEFLATE_MAX_PRE_CODEWORD_LEN + 7);
-
-			
-			STATIC_ASSERT(PRECODE_TABLEBITS == DEFLATE_MAX_PRE_CODEWORD_LEN);
-
-			
-			entry = d->u.l.precode_decode_table[BITS(DEFLATE_MAX_PRE_CODEWORD_LEN)];
-			REMOVE_BITS(entry & HUFFDEC_LENGTH_MASK);
-			presym = entry >> HUFFDEC_RESULT_SHIFT;
-
-			if (presym < 16) {
-				
-				d->u.l.lens[i++] = presym;
-				continue;
-			}
-
-			
-
-			
-			STATIC_ASSERT(DEFLATE_MAX_LENS_OVERRUN == 138 - 1);
-
-			if (presym == 16) {
-				
-				SAFETY_CHECK(i != 0);
-				rep_val = d->u.l.lens[i - 1];
-				STATIC_ASSERT(3 + ((1 << 2) - 1) == 6);
-				rep_count = 3 + POP_BITS(2);
-				d->u.l.lens[i + 0] = rep_val;
-				d->u.l.lens[i + 1] = rep_val;
-				d->u.l.lens[i + 2] = rep_val;
-				d->u.l.lens[i + 3] = rep_val;
-				d->u.l.lens[i + 4] = rep_val;
-				d->u.l.lens[i + 5] = rep_val;
-				i += rep_count;
-			} else if (presym == 17) {
-				
-				STATIC_ASSERT(3 + ((1 << 3) - 1) == 10);
-				rep_count = 3 + POP_BITS(3);
-				d->u.l.lens[i + 0] = 0;
-				d->u.l.lens[i + 1] = 0;
-				d->u.l.lens[i + 2] = 0;
-				d->u.l.lens[i + 3] = 0;
-				d->u.l.lens[i + 4] = 0;
-				d->u.l.lens[i + 5] = 0;
-				d->u.l.lens[i + 6] = 0;
-				d->u.l.lens[i + 7] = 0;
-				d->u.l.lens[i + 8] = 0;
-				d->u.l.lens[i + 9] = 0;
-				i += rep_count;
-			} else {
-				
-				STATIC_ASSERT(11 + ((1 << 7) - 1) == 138);
-				rep_count = 11 + POP_BITS(7);
-				memset(&d->u.l.lens[i], 0,
-				       rep_count * sizeof(d->u.l.lens[i]));
-				i += rep_count;
-			}
-		}
-	} else if (block_type == DEFLATE_BLOCKTYPE_UNCOMPRESSED) {
-
-		
-
-		ALIGN_INPUT();
-
-		SAFETY_CHECK(in_end - in_next >= 4);
-
-		len = READ_U16();
-		nlen = READ_U16();
-
-		SAFETY_CHECK(len == (u16)~nlen);
-		if (unlikely(len > out_end - out_next))
-			return LIBDEFLATE_INSUFFICIENT_SPACE;
-		SAFETY_CHECK(len <= in_end - in_next);
-
-		memcpy(out_next, in_next, len);
-		in_next += len;
-		out_next += len;
-
-		goto block_done;
-
-	} else {
-		SAFETY_CHECK(block_type == DEFLATE_BLOCKTYPE_STATIC_HUFFMAN);
-
-		
-
-		if (d->static_codes_loaded)
-			goto have_decode_tables;
-
-		d->static_codes_loaded = true;
-
-		STATIC_ASSERT(DEFLATE_NUM_LITLEN_SYMS == 288);
-		STATIC_ASSERT(DEFLATE_NUM_OFFSET_SYMS == 32);
-
-		for (i = 0; i < 144; i++)
-			d->u.l.lens[i] = 8;
-		for (; i < 256; i++)
-			d->u.l.lens[i] = 9;
-		for (; i < 280; i++)
-			d->u.l.lens[i] = 7;
-		for (; i < 288; i++)
-			d->u.l.lens[i] = 8;
-
-		for (; i < 288 + 32; i++)
-			d->u.l.lens[i] = 5;
-
-		num_litlen_syms = 288;
-		num_offset_syms = 32;
-	}
-
-	
-
-	SAFETY_CHECK(build_offset_decode_table(d, num_litlen_syms, num_offset_syms));
-	SAFETY_CHECK(build_litlen_decode_table(d, num_litlen_syms, num_offset_syms));
-have_decode_tables:
-
-	
-	for (;;) {
-		u32 entry;
-		u32 length;
-		u32 offset;
-		const u8 *src;
-		u8 *dst;
-
-		
-		ENSURE_BITS(DEFLATE_MAX_LITLEN_CODEWORD_LEN);
-		entry = d->u.litlen_decode_table[BITS(LITLEN_TABLEBITS)];
-		if (entry & HUFFDEC_SUBTABLE_POINTER) {
-			
-			REMOVE_BITS(LITLEN_TABLEBITS);
-			entry = d->u.litlen_decode_table[
-				((entry >> HUFFDEC_RESULT_SHIFT) & 0xFFFF) +
-				BITS(entry & HUFFDEC_LENGTH_MASK)];
-		}
-		REMOVE_BITS(entry & HUFFDEC_LENGTH_MASK);
-		if (entry & HUFFDEC_LITERAL) {
-			
-			if (unlikely(out_next == out_end))
-				return LIBDEFLATE_INSUFFICIENT_SPACE;
-			*out_next++ = (u8)(entry >> HUFFDEC_RESULT_SHIFT);
-			continue;
-		}
-
-		
-
-		entry >>= HUFFDEC_RESULT_SHIFT;
-		ENSURE_BITS(MAX_ENSURE);
-
-		
-		length = (entry >> HUFFDEC_LENGTH_BASE_SHIFT) +
-			 POP_BITS(entry & HUFFDEC_EXTRA_LENGTH_BITS_MASK);
-
-		
-		STATIC_ASSERT(HUFFDEC_END_OF_BLOCK_LENGTH == 0);
-		if (unlikely((size_t)length - 1 >= out_end - out_next)) {
-			if (unlikely(length != HUFFDEC_END_OF_BLOCK_LENGTH))
-				return LIBDEFLATE_INSUFFICIENT_SPACE;
-			goto block_done;
-		}
-
-		
-
-		entry = d->offset_decode_table[BITS(OFFSET_TABLEBITS)];
-		if (entry & HUFFDEC_SUBTABLE_POINTER) {
-			
-			REMOVE_BITS(OFFSET_TABLEBITS);
-			entry = d->offset_decode_table[
-				((entry >> HUFFDEC_RESULT_SHIFT) & 0xFFFF) +
-				BITS(entry & HUFFDEC_LENGTH_MASK)];
-		}
-		REMOVE_BITS(entry & HUFFDEC_LENGTH_MASK);
-		entry >>= HUFFDEC_RESULT_SHIFT;
-
-		STATIC_ASSERT(CAN_ENSURE(DEFLATE_MAX_EXTRA_LENGTH_BITS +
-					 DEFLATE_MAX_OFFSET_CODEWORD_LEN) &&
-			      CAN_ENSURE(DEFLATE_MAX_EXTRA_OFFSET_BITS));
-		if (!CAN_ENSURE(DEFLATE_MAX_EXTRA_LENGTH_BITS +
-				DEFLATE_MAX_OFFSET_CODEWORD_LEN +
-				DEFLATE_MAX_EXTRA_OFFSET_BITS))
-			ENSURE_BITS(DEFLATE_MAX_EXTRA_OFFSET_BITS);
-
-		
-		offset = (entry & HUFFDEC_OFFSET_BASE_MASK) +
-			 POP_BITS(entry >> HUFFDEC_EXTRA_OFFSET_BITS_SHIFT);
-
-		
-		SAFETY_CHECK(offset <= out_next - (const u8 *)out);
-
-		
-
-		src = out_next - offset;
-		dst = out_next;
-		out_next += length;
-
-		if (UNALIGNED_ACCESS_IS_FAST &&
-		    
-		    likely(out_end - out_next >=
-			   3 * WORDBYTES - DEFLATE_MIN_MATCH_LEN)) {
-			if (offset >= WORDBYTES) { 
-				copy_word_unaligned(src, dst);
-				src += WORDBYTES;
-				dst += WORDBYTES;
-				copy_word_unaligned(src, dst);
-				src += WORDBYTES;
-				dst += WORDBYTES;
-				do {
-					copy_word_unaligned(src, dst);
-					src += WORDBYTES;
-					dst += WORDBYTES;
-				} while (dst < out_next);
-			} else if (offset == 1) {
-				
-				machine_word_t v = repeat_byte(*src);
-
-				store_word_unaligned(v, dst);
-				dst += WORDBYTES;
-				store_word_unaligned(v, dst);
-				dst += WORDBYTES;
-				do {
-					store_word_unaligned(v, dst);
-					dst += WORDBYTES;
-				} while (dst < out_next);
-			} else {
-				*dst++ = *src++;
-				*dst++ = *src++;
-				do {
-					*dst++ = *src++;
-				} while (dst < out_next);
-			}
-		} else {
-			STATIC_ASSERT(DEFLATE_MIN_MATCH_LEN == 3);
-			*dst++ = *src++;
-			*dst++ = *src++;
-			do {
-				*dst++ = *src++;
-			} while (dst < out_next);
-		}
-	}
-
-block_done:
-	
-
-	if (!is_final_block)
-		goto next_block;
-
-	
-
-	
-	ALIGN_INPUT();
-
-	
-	if (actual_in_nbytes_ret)
-		*actual_in_nbytes_ret = in_next - (u8 *)in;
-
-	
-	if (actual_out_nbytes_ret) {
-		*actual_out_nbytes_ret = out_next - (u8 *)out;
-	} else {
-		if (out_next != out_end)
-			return LIBDEFLATE_SHORT_OUTPUT;
-	}
-	return LIBDEFLATE_SUCCESS;
-}
-
-#undef FUNCNAME
-#undef ATTRIBUTES
-
-#  define DEFAULT_IMPL deflate_decompress_default
-#endif
-
-#ifdef DISPATCH
-static enum libdeflate_result
-dispatch(struct libdeflate_decompressor * restrict d,
-	 const void * restrict in, size_t in_nbytes,
-	 void * restrict out, size_t out_nbytes_avail,
-	 size_t *actual_in_nbytes_ret, size_t *actual_out_nbytes_ret);
-
-static volatile decompress_func_t decompress_impl = dispatch;
-
-
-static enum libdeflate_result
-dispatch(struct libdeflate_decompressor * restrict d,
-	 const void * restrict in, size_t in_nbytes,
-	 void * restrict out, size_t out_nbytes_avail,
-	 size_t *actual_in_nbytes_ret, size_t *actual_out_nbytes_ret)
-{
-	decompress_func_t f = arch_select_decompress_func();
-
-	if (f == NULL)
-		f = DEFAULT_IMPL;
-
-	decompress_impl = f;
-	return (*f)(d, in, in_nbytes, out, out_nbytes_avail,
-		    actual_in_nbytes_ret, actual_out_nbytes_ret);
-}
-#else
-#  define decompress_impl DEFAULT_IMPL 
-#endif
-
-
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress_ex(struct libdeflate_decompressor * restrict d,
-				 const void * restrict in, size_t in_nbytes,
-				 void * restrict out, size_t out_nbytes_avail,
-				 size_t *actual_in_nbytes_ret,
-				 size_t *actual_out_nbytes_ret)
-{
-	return decompress_impl(d, in, in_nbytes, out, out_nbytes_avail,
-			       actual_in_nbytes_ret, actual_out_nbytes_ret);
-}
-
-LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
-libdeflate_deflate_decompress(struct libdeflate_decompressor * restrict d,
-			      const void * restrict in, size_t in_nbytes,
-			      void * restrict out, size_t out_nbytes_avail,
-			      size_t *actual_out_nbytes_ret)
-{
-	return libdeflate_deflate_decompress_ex(d, in, in_nbytes,
-						out, out_nbytes_avail,
-						NULL, actual_out_nbytes_ret);
-}
-
-LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
-libdeflate_alloc_decompressor(void)
-{
-	
-	struct libdeflate_decompressor *d = libdeflate_malloc(sizeof(*d));
-
-	if (d == NULL)
-		return NULL;
-	memset(d, 0, sizeof(*d));
-	return d;
-}
-
-LIBDEFLATEEXPORT void LIBDEFLATEAPI
-libdeflate_free_decompressor(struct libdeflate_decompressor *d)
-{
-	libdeflate_free(d);
-}
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate-1.7/lib/gzip_compress.c */
-
-
-/* #include "deflate_compress.h" */
-#ifndef LIB_DEFLATE_COMPRESS_H
-#define LIB_DEFLATE_COMPRESS_H
-
-/* #include "lib_common.h" */
-
-
-#ifndef LIB_LIB_COMMON_H
-#define LIB_LIB_COMMON_H
-
-#ifdef LIBDEFLATE_H
-#  error "lib_common.h must always be included before libdeflate.h"
-   
-#endif
-
-#define BUILDING_LIBDEFLATE
-
-/* #include "../common/common_defs.h" */
-
-
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
-
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
-
-
 #ifdef __clang__
 #  ifdef __apple_build_version__
 #    define CLANG_PREREQ(major, minor, apple_version)	\
@@ -16133,938 +21377,95 @@ libdeflate_free_decompressor(struct libdeflate_decompressor *d)
 #  define CLANG_PREREQ(major, minor, apple_version)	0
 #endif
 
+
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
 #endif
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
 
+
 #ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
 #else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
-#include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
-#endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
-#endif
-
-
-
-
-
-#include <stddef.h> 
-
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
-
-
-typedef size_t machine_word_t;
-
-
-#define WORDBYTES	((int)sizeof(machine_word_t))
-
-
-#define WORDBITS	(8 * WORDBYTES)
-
-
-
-
-
-
-#ifndef LIBEXPORT
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
-#endif
-
-
-#ifndef forceinline
-#  define forceinline inline
-#endif
-
-
-#ifndef restrict
-#  define restrict
-#endif
-
-
-#ifndef likely
-#  define likely(expr)		(expr)
-#endif
-
-
-#ifndef unlikely
-#  define unlikely(expr)	(expr)
-#endif
-
-
-#ifndef prefetchr
-#  define prefetchr(addr)
-#endif
-
-
-#ifndef prefetchw
-#  define prefetchw(addr)
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
-
-
-
-
-
-#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
-#define MIN(a, b)		((a) <= (b) ? (a) : (b))
-#define MAX(a, b)		((a) >= (b) ? (a) : (b))
-#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
-#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
-#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
-
-
-
-
-
-
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
-{
-	union {
-		unsigned int v;
-		unsigned char b;
-	} u;
-	u.v = 1;
-	return u.b;
-}
-#endif
-
-
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
-{
-	return (n << 8) | (n >> 8);
-}
-#endif
-
-
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
+#ifdef _MSC_VER
+#  define inline		__inline
 #endif 
 
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
-
-#ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
-#else
-#include <string.h>
-#endif
-
-#endif 
-
-
-
-
-struct libdeflate_compressor;
-
-unsigned int deflate_get_compression_level(struct libdeflate_compressor *c);
-
-#endif 
-
-/* #include "gzip_constants.h" */
-
-
-#ifndef LIB_GZIP_CONSTANTS_H
-#define LIB_GZIP_CONSTANTS_H
-
-#define GZIP_MIN_HEADER_SIZE	10
-#define GZIP_FOOTER_SIZE	8
-#define GZIP_MIN_OVERHEAD	(GZIP_MIN_HEADER_SIZE + GZIP_FOOTER_SIZE)
-
-#define GZIP_ID1		0x1F
-#define GZIP_ID2		0x8B
-
-#define GZIP_CM_DEFLATE		8
-
-#define GZIP_FTEXT		0x01
-#define GZIP_FHCRC		0x02
-#define GZIP_FEXTRA		0x04
-#define GZIP_FNAME		0x08
-#define GZIP_FCOMMENT		0x10
-#define GZIP_FRESERVED		0xE0
-
-#define GZIP_MTIME_UNAVAILABLE	0
-
-#define GZIP_XFL_SLOWEST_COMPRESSION	0x02
-#define GZIP_XFL_FASTEST_COMPRESSION	0x04
-
-#define GZIP_OS_FAT		0
-#define GZIP_OS_AMIGA		1
-#define GZIP_OS_VMS		2
-#define GZIP_OS_UNIX		3
-#define GZIP_OS_VM_CMS		4
-#define GZIP_OS_ATARI_TOS	5
-#define GZIP_OS_HPFS		6
-#define GZIP_OS_MACINTOSH	7
-#define GZIP_OS_Z_SYSTEM	8
-#define GZIP_OS_CP_M		9
-#define GZIP_OS_TOPS_20		10
-#define GZIP_OS_NTFS		11
-#define GZIP_OS_QDOS		12
-#define GZIP_OS_RISCOS		13
-#define GZIP_OS_UNKNOWN		255
-
-#endif 
-
-/* #include "unaligned.h" */
-
-
-#ifndef LIB_UNALIGNED_H
-#define LIB_UNALIGNED_H
-
-/* #include "lib_common.h" */
-
-
-#ifndef LIB_LIB_COMMON_H
-#define LIB_LIB_COMMON_H
-
-#ifdef LIBDEFLATE_H
-#  error "lib_common.h must always be included before libdeflate.h"
-   
-#endif
-
-#define BUILDING_LIBDEFLATE
-
-/* #include "../common/common_defs.h" */
-
-
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
 
 #ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
 #else
-#  define GCC_PREREQ(major, minor)	0
+#  define forceinline		inline
 #endif
 
 
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
+#endif
+
+
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
 #  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#    define restrict
 #  endif
 #else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
-#include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
-#endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
-#endif
-
-
-
-
-
-#include <stddef.h> 
-
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
-
-
-typedef size_t machine_word_t;
-
-
-#define WORDBYTES	((int)sizeof(machine_word_t))
-
-
-#define WORDBITS	(8 * WORDBYTES)
-
-
-
-
-
-
-#ifndef LIBEXPORT
-#  define LIBEXPORT
-#endif
-
-
-#ifndef inline
-#  define inline
-#endif
-
-
-#ifndef forceinline
-#  define forceinline inline
-#endif
-
-
-#ifndef restrict
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -17076,186 +21477,106 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
 }
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
 
 #ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+#  define MEMCOPY	__builtin_memcpy
 #else
-#include <string.h>
+#  define MEMCOPY	memcpy
 #endif
-
-#endif 
-
-
-
 
 
 
@@ -17264,20 +21585,23 @@ static forceinline type						\
 load_##type##_unaligned(const void *p)				\
 {								\
 	type v;							\
-	memcpy(&v, p, sizeof(v));				\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
 	return v;						\
 }								\
 								\
 static forceinline void						\
 store_##type##_unaligned(type v, void *p)			\
 {								\
-	memcpy(p, &v, sizeof(v));				\
+	MEMCOPY(p, &v, sizeof(v));				\
 }
 
 DEFINE_UNALIGNED_TYPE(u16)
 DEFINE_UNALIGNED_TYPE(u32)
 DEFINE_UNALIGNED_TYPE(u64)
 DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
 
 #define load_word_unaligned	load_machine_word_t_unaligned
 #define store_word_unaligned	store_machine_word_t_unaligned
@@ -17424,30 +21748,1687 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 
 
 
-static forceinline u32
-loaded_u32_to_u24(u32 v)
-{
-	if (CPU_IS_LITTLE_ENDIAN())
-		return v & 0xFFFFFF;
-	else
-		return v >> 8;
-}
 
 
-static forceinline u32
-load_u24_unaligned(const u8 *p)
+
+static forceinline unsigned
+bsr32(u32 v)
 {
-#if UNALIGNED_ACCESS_IS_FAST
-#  define LOAD_U24_REQUIRED_NBYTES 4
-	return loaded_u32_to_u24(load_u32_unaligned(p));
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
 #else
-#  define LOAD_U24_REQUIRED_NBYTES 3
-	if (CPU_IS_LITTLE_ENDIAN())
-		return ((u32)p[0] << 0) | ((u32)p[1] << 8) | ((u32)p[2] << 16);
-	else
-		return ((u32)p[2] << 0) | ((u32)p[1] << 8) | ((u32)p[0] << 16);
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
 #endif
 }
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
+
+#if defined(__i386__) || defined(__x86_64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
+#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
+#endif
+
+#define X86_CPU_FEATURE_SSE2		0x00000001
+#define X86_CPU_FEATURE_PCLMUL		0x00000002
+#define X86_CPU_FEATURE_AVX		0x00000004
+#define X86_CPU_FEATURE_AVX2		0x00000008
+#define X86_CPU_FEATURE_BMI2		0x00000010
+
+#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
+#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
+#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
+#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
+#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+
+#if HAVE_DYNAMIC_X86_CPU_FEATURES
+#define X86_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_x86_cpu_features;
+
+void libdeflate_init_x86_cpu_features(void);
+
+static inline u32 get_x86_cpu_features(void)
+{
+	if (libdeflate_x86_cpu_features == 0)
+		libdeflate_init_x86_cpu_features();
+	return libdeflate_x86_cpu_features;
+}
+#else 
+static inline u32 get_x86_cpu_features(void) { return 0; }
+#endif 
+
+
+#define HAVE_TARGET_INTRINSICS \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
+
+
+#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
+	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
+	defined(__INTEL_COMPILER)
+typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
+typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
+typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
+typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
+typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
+typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
+typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
+typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
+#endif
+#ifdef __INTEL_COMPILER
+typedef int   __v16si __attribute__((__vector_size__(64)));
+typedef short __v32hi __attribute__((__vector_size__(64)));
+typedef char  __v64qi __attribute__((__vector_size__(64)));
+#endif
+
+
+#ifdef __SSE2__
+#  define HAVE_SSE2_NATIVE	1
+#else
+#  define HAVE_SSE2_NATIVE	0
+#endif
+#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
+#define HAVE_SSE2_INTRIN \
+	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __PCLMUL__
+#  define HAVE_PCLMUL_NATIVE	1
+#else
+#  define HAVE_PCLMUL_NATIVE	0
+#endif
+#define HAVE_PCLMUL_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
+#define HAVE_PCLMUL_INTRIN \
+	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX__
+#  define HAVE_AVX_NATIVE	1
+#else
+#  define HAVE_AVX_NATIVE	0
+#endif
+#define HAVE_AVX_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
+#define HAVE_AVX_INTRIN \
+	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX2__
+#  define HAVE_AVX2_NATIVE	1
+#else
+#  define HAVE_AVX2_NATIVE	0
+#endif
+#define HAVE_AVX2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
+#define HAVE_AVX2_INTRIN \
+	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __BMI2__
+#  define HAVE_BMI2_NATIVE	1
+#else
+#  define HAVE_BMI2_NATIVE	0
+#endif
+#define HAVE_BMI2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
+#define HAVE_BMI2_INTRIN \
+	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
+
+#endif 
+
+#endif 
+
+
+
+#if HAVE_BMI2_INTRIN
+#  define deflate_decompress_bmi2	deflate_decompress_bmi2
+#  define FUNCNAME			deflate_decompress_bmi2
+#  if !HAVE_BMI2_NATIVE
+#    define ATTRIBUTES			__attribute__((target("bmi2")))
+#  endif
+   
+#  ifndef __clang__
+#    include <immintrin.h>
+#    ifdef __x86_64__
+#      define EXTRACT_VARBITS(word, count)  _bzhi_u64((word), (count))
+#      define EXTRACT_VARBITS8(word, count) _bzhi_u64((word), (count))
+#    else
+#      define EXTRACT_VARBITS(word, count)  _bzhi_u32((word), (count))
+#      define EXTRACT_VARBITS8(word, count) _bzhi_u32((word), (count))
+#    endif
+#  endif
+/* #include "decompress_template.h" */
+
+
+
+
+#ifndef ATTRIBUTES
+#  define ATTRIBUTES
+#endif
+#ifndef EXTRACT_VARBITS
+#  define EXTRACT_VARBITS(word, count)	((word) & BITMASK(count))
+#endif
+#ifndef EXTRACT_VARBITS8
+#  define EXTRACT_VARBITS8(word, count)	((word) & BITMASK((u8)(count)))
+#endif
+
+static enum libdeflate_result ATTRIBUTES MAYBE_UNUSED
+FUNCNAME(struct libdeflate_decompressor * restrict d,
+	 const void * restrict in, size_t in_nbytes,
+	 void * restrict out, size_t out_nbytes_avail,
+	 size_t *actual_in_nbytes_ret, size_t *actual_out_nbytes_ret)
+{
+	u8 *out_next = out;
+	u8 * const out_end = out_next + out_nbytes_avail;
+	u8 * const out_fastloop_end =
+		out_end - MIN(out_nbytes_avail, FASTLOOP_MAX_BYTES_WRITTEN);
+
+	
+	const u8 *in_next = in;
+	const u8 * const in_end = in_next + in_nbytes;
+	const u8 * const in_fastloop_end =
+		in_end - MIN(in_nbytes, FASTLOOP_MAX_BYTES_READ);
+	bitbuf_t bitbuf = 0;
+	bitbuf_t saved_bitbuf;
+	u32 bitsleft = 0;
+	size_t overread_count = 0;
+
+	bool is_final_block;
+	unsigned block_type;
+	unsigned num_litlen_syms;
+	unsigned num_offset_syms;
+	bitbuf_t litlen_tablemask;
+	u32 entry;
+
+next_block:
+	
+	;
+
+	STATIC_ASSERT(CAN_CONSUME(1 + 2 + 5 + 5 + 4 + 3));
+	REFILL_BITS();
+
+	
+	is_final_block = bitbuf & BITMASK(1);
+
+	
+	block_type = (bitbuf >> 1) & BITMASK(2);
+
+	if (block_type == DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN) {
+
+		
+
+		
+		static const u8 deflate_precode_lens_permutation[DEFLATE_NUM_PRECODE_SYMS] = {
+			16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
+		};
+
+		unsigned num_explicit_precode_lens;
+		unsigned i;
+
+		
+
+		STATIC_ASSERT(DEFLATE_NUM_LITLEN_SYMS == 257 + BITMASK(5));
+		num_litlen_syms = 257 + ((bitbuf >> 3) & BITMASK(5));
+
+		STATIC_ASSERT(DEFLATE_NUM_OFFSET_SYMS == 1 + BITMASK(5));
+		num_offset_syms = 1 + ((bitbuf >> 8) & BITMASK(5));
+
+		STATIC_ASSERT(DEFLATE_NUM_PRECODE_SYMS == 4 + BITMASK(4));
+		num_explicit_precode_lens = 4 + ((bitbuf >> 13) & BITMASK(4));
+
+		d->static_codes_loaded = false;
+
+		
+		STATIC_ASSERT(DEFLATE_MAX_PRE_CODEWORD_LEN == (1 << 3) - 1);
+		if (CAN_CONSUME(3 * (DEFLATE_NUM_PRECODE_SYMS - 1))) {
+			d->u.precode_lens[deflate_precode_lens_permutation[0]] =
+				(bitbuf >> 17) & BITMASK(3);
+			bitbuf >>= 20;
+			bitsleft -= 20;
+			REFILL_BITS();
+			i = 1;
+			do {
+				d->u.precode_lens[deflate_precode_lens_permutation[i]] =
+					bitbuf & BITMASK(3);
+				bitbuf >>= 3;
+				bitsleft -= 3;
+			} while (++i < num_explicit_precode_lens);
+		} else {
+			bitbuf >>= 17;
+			bitsleft -= 17;
+			i = 0;
+			do {
+				if ((u8)bitsleft < 3)
+					REFILL_BITS();
+				d->u.precode_lens[deflate_precode_lens_permutation[i]] =
+					bitbuf & BITMASK(3);
+				bitbuf >>= 3;
+				bitsleft -= 3;
+			} while (++i < num_explicit_precode_lens);
+		}
+		for (; i < DEFLATE_NUM_PRECODE_SYMS; i++)
+			d->u.precode_lens[deflate_precode_lens_permutation[i]] = 0;
+
+		
+		SAFETY_CHECK(build_precode_decode_table(d));
+
+		
+		i = 0;
+		do {
+			unsigned presym;
+			u8 rep_val;
+			unsigned rep_count;
+
+			if ((u8)bitsleft < DEFLATE_MAX_PRE_CODEWORD_LEN + 7)
+				REFILL_BITS();
+
+			
+			STATIC_ASSERT(PRECODE_TABLEBITS == DEFLATE_MAX_PRE_CODEWORD_LEN);
+
+			
+			entry = d->u.l.precode_decode_table[
+				bitbuf & BITMASK(DEFLATE_MAX_PRE_CODEWORD_LEN)];
+			bitbuf >>= (u8)entry;
+			bitsleft -= entry; 
+			presym = entry >> 16;
+
+			if (presym < 16) {
+				
+				d->u.l.lens[i++] = presym;
+				continue;
+			}
+
+			
+
+			
+			STATIC_ASSERT(DEFLATE_MAX_LENS_OVERRUN == 138 - 1);
+
+			if (presym == 16) {
+				
+				SAFETY_CHECK(i != 0);
+				rep_val = d->u.l.lens[i - 1];
+				STATIC_ASSERT(3 + BITMASK(2) == 6);
+				rep_count = 3 + (bitbuf & BITMASK(2));
+				bitbuf >>= 2;
+				bitsleft -= 2;
+				d->u.l.lens[i + 0] = rep_val;
+				d->u.l.lens[i + 1] = rep_val;
+				d->u.l.lens[i + 2] = rep_val;
+				d->u.l.lens[i + 3] = rep_val;
+				d->u.l.lens[i + 4] = rep_val;
+				d->u.l.lens[i + 5] = rep_val;
+				i += rep_count;
+			} else if (presym == 17) {
+				
+				STATIC_ASSERT(3 + BITMASK(3) == 10);
+				rep_count = 3 + (bitbuf & BITMASK(3));
+				bitbuf >>= 3;
+				bitsleft -= 3;
+				d->u.l.lens[i + 0] = 0;
+				d->u.l.lens[i + 1] = 0;
+				d->u.l.lens[i + 2] = 0;
+				d->u.l.lens[i + 3] = 0;
+				d->u.l.lens[i + 4] = 0;
+				d->u.l.lens[i + 5] = 0;
+				d->u.l.lens[i + 6] = 0;
+				d->u.l.lens[i + 7] = 0;
+				d->u.l.lens[i + 8] = 0;
+				d->u.l.lens[i + 9] = 0;
+				i += rep_count;
+			} else {
+				
+				STATIC_ASSERT(11 + BITMASK(7) == 138);
+				rep_count = 11 + (bitbuf & BITMASK(7));
+				bitbuf >>= 7;
+				bitsleft -= 7;
+				memset(&d->u.l.lens[i], 0,
+				       rep_count * sizeof(d->u.l.lens[i]));
+				i += rep_count;
+			}
+		} while (i < num_litlen_syms + num_offset_syms);
+
+	} else if (block_type == DEFLATE_BLOCKTYPE_UNCOMPRESSED) {
+		u16 len, nlen;
+
+		
+
+		bitsleft -= 3; 
+
+		
+		bitsleft = (u8)bitsleft;
+		SAFETY_CHECK(overread_count <= (bitsleft >> 3));
+		in_next -= (bitsleft >> 3) - overread_count;
+		overread_count = 0;
+		bitbuf = 0;
+		bitsleft = 0;
+
+		SAFETY_CHECK(in_end - in_next >= 4);
+		len = get_unaligned_le16(in_next);
+		nlen = get_unaligned_le16(in_next + 2);
+		in_next += 4;
+
+		SAFETY_CHECK(len == (u16)~nlen);
+		if (unlikely(len > out_end - out_next))
+			return LIBDEFLATE_INSUFFICIENT_SPACE;
+		SAFETY_CHECK(len <= in_end - in_next);
+
+		memcpy(out_next, in_next, len);
+		in_next += len;
+		out_next += len;
+
+		goto block_done;
+
+	} else {
+		unsigned i;
+
+		SAFETY_CHECK(block_type == DEFLATE_BLOCKTYPE_STATIC_HUFFMAN);
+
+		
+
+		bitbuf >>= 3; 
+		bitsleft -= 3;
+
+		if (d->static_codes_loaded)
+			goto have_decode_tables;
+
+		d->static_codes_loaded = true;
+
+		STATIC_ASSERT(DEFLATE_NUM_LITLEN_SYMS == 288);
+		STATIC_ASSERT(DEFLATE_NUM_OFFSET_SYMS == 32);
+
+		for (i = 0; i < 144; i++)
+			d->u.l.lens[i] = 8;
+		for (; i < 256; i++)
+			d->u.l.lens[i] = 9;
+		for (; i < 280; i++)
+			d->u.l.lens[i] = 7;
+		for (; i < 288; i++)
+			d->u.l.lens[i] = 8;
+
+		for (; i < 288 + 32; i++)
+			d->u.l.lens[i] = 5;
+
+		num_litlen_syms = 288;
+		num_offset_syms = 32;
+	}
+
+	
+
+	SAFETY_CHECK(build_offset_decode_table(d, num_litlen_syms, num_offset_syms));
+	SAFETY_CHECK(build_litlen_decode_table(d, num_litlen_syms, num_offset_syms));
+have_decode_tables:
+	litlen_tablemask = BITMASK(d->litlen_tablebits);
+
+	
+	if (in_next >= in_fastloop_end || out_next >= out_fastloop_end)
+		goto generic_loop;
+	REFILL_BITS_IN_FASTLOOP();
+	entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+	do {
+		u32 length, offset, lit;
+		const u8 *src;
+		u8 *dst;
+
+		
+		saved_bitbuf = bitbuf;
+		bitbuf >>= (u8)entry;
+		bitsleft -= entry; 
+
+		
+		if (entry & HUFFDEC_LITERAL) {
+			
+			if (
+			    CAN_CONSUME_AND_THEN_PRELOAD(2 * LITLEN_TABLEBITS +
+							 LENGTH_MAXBITS,
+							 OFFSET_TABLEBITS) &&
+			    
+			    CAN_CONSUME_AND_THEN_PRELOAD(2 * LITLEN_TABLEBITS +
+							 DEFLATE_MAX_LITLEN_CODEWORD_LEN,
+							 LITLEN_TABLEBITS)) {
+				
+				lit = entry >> 16;
+				entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+				saved_bitbuf = bitbuf;
+				bitbuf >>= (u8)entry;
+				bitsleft -= entry;
+				*out_next++ = lit;
+				if (entry & HUFFDEC_LITERAL) {
+					
+					lit = entry >> 16;
+					entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+					saved_bitbuf = bitbuf;
+					bitbuf >>= (u8)entry;
+					bitsleft -= entry;
+					*out_next++ = lit;
+					if (entry & HUFFDEC_LITERAL) {
+						
+						lit = entry >> 16;
+						entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+						REFILL_BITS_IN_FASTLOOP();
+						*out_next++ = lit;
+						continue;
+					}
+				}
+			} else {
+				
+				STATIC_ASSERT(CAN_CONSUME_AND_THEN_PRELOAD(
+						LITLEN_TABLEBITS, LITLEN_TABLEBITS));
+				lit = entry >> 16;
+				entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+				REFILL_BITS_IN_FASTLOOP();
+				*out_next++ = lit;
+				continue;
+			}
+		}
+
+		
+		if (unlikely(entry & HUFFDEC_EXCEPTIONAL)) {
+			
+
+			if (unlikely(entry & HUFFDEC_END_OF_BLOCK))
+				goto block_done;
+
+			
+			entry = d->u.litlen_decode_table[(entry >> 16) +
+				EXTRACT_VARBITS(bitbuf, (entry >> 8) & 0x3F)];
+			saved_bitbuf = bitbuf;
+			bitbuf >>= (u8)entry;
+			bitsleft -= entry;
+
+			
+			if (!CAN_CONSUME_AND_THEN_PRELOAD(DEFLATE_MAX_LITLEN_CODEWORD_LEN,
+							  LITLEN_TABLEBITS) ||
+			    !CAN_CONSUME_AND_THEN_PRELOAD(LENGTH_MAXBITS,
+							  OFFSET_TABLEBITS))
+				REFILL_BITS_IN_FASTLOOP();
+			if (entry & HUFFDEC_LITERAL) {
+				
+				lit = entry >> 16;
+				entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+				REFILL_BITS_IN_FASTLOOP();
+				*out_next++ = lit;
+				continue;
+			}
+			if (unlikely(entry & HUFFDEC_END_OF_BLOCK))
+				goto block_done;
+			
+		}
+
+		
+		length = entry >> 16;
+		length += EXTRACT_VARBITS8(saved_bitbuf, entry) >> (u8)(entry >> 8);
+
+		
+		STATIC_ASSERT(CAN_CONSUME_AND_THEN_PRELOAD(LENGTH_MAXFASTBITS,
+							   OFFSET_TABLEBITS));
+		entry = d->offset_decode_table[bitbuf & BITMASK(OFFSET_TABLEBITS)];
+		if (CAN_CONSUME_AND_THEN_PRELOAD(OFFSET_MAXBITS,
+						 LITLEN_TABLEBITS)) {
+			
+			if (unlikely(entry & HUFFDEC_EXCEPTIONAL)) {
+				
+				if (unlikely((u8)bitsleft < OFFSET_MAXBITS +
+					     LITLEN_TABLEBITS - PRELOAD_SLACK))
+					REFILL_BITS_IN_FASTLOOP();
+				bitbuf >>= OFFSET_TABLEBITS;
+				bitsleft -= OFFSET_TABLEBITS;
+				entry = d->offset_decode_table[(entry >> 16) +
+					EXTRACT_VARBITS(bitbuf, (entry >> 8) & 0x3F)];
+			} else if (unlikely((u8)bitsleft < OFFSET_MAXFASTBITS +
+					    LITLEN_TABLEBITS - PRELOAD_SLACK))
+				REFILL_BITS_IN_FASTLOOP();
+		} else {
+			
+			REFILL_BITS_IN_FASTLOOP();
+			if (unlikely(entry & HUFFDEC_EXCEPTIONAL)) {
+				
+				bitbuf >>= OFFSET_TABLEBITS;
+				bitsleft -= OFFSET_TABLEBITS;
+				entry = d->offset_decode_table[(entry >> 16) +
+					EXTRACT_VARBITS(bitbuf, (entry >> 8) & 0x3F)];
+				REFILL_BITS_IN_FASTLOOP();
+				
+				STATIC_ASSERT(CAN_CONSUME(
+					OFFSET_MAXBITS - OFFSET_TABLEBITS));
+			} else {
+				
+				STATIC_ASSERT(CAN_CONSUME(OFFSET_MAXFASTBITS));
+			}
+		}
+		saved_bitbuf = bitbuf;
+		bitbuf >>= (u8)entry;
+		bitsleft -= entry; 
+		offset = entry >> 16;
+		offset += EXTRACT_VARBITS8(saved_bitbuf, entry) >> (u8)(entry >> 8);
+
+		
+		SAFETY_CHECK(offset <= out_next - (const u8 *)out);
+		src = out_next - offset;
+		dst = out_next;
+		out_next += length;
+
+		
+		if (!CAN_CONSUME_AND_THEN_PRELOAD(
+			MAX(OFFSET_MAXBITS - OFFSET_TABLEBITS,
+			    OFFSET_MAXFASTBITS),
+			LITLEN_TABLEBITS) &&
+		    unlikely((u8)bitsleft < LITLEN_TABLEBITS - PRELOAD_SLACK))
+			REFILL_BITS_IN_FASTLOOP();
+		entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+		REFILL_BITS_IN_FASTLOOP();
+
+		
+		if (UNALIGNED_ACCESS_IS_FAST && offset >= WORDBYTES) {
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += WORDBYTES;
+			dst += WORDBYTES;
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += WORDBYTES;
+			dst += WORDBYTES;
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += WORDBYTES;
+			dst += WORDBYTES;
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += WORDBYTES;
+			dst += WORDBYTES;
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += WORDBYTES;
+			dst += WORDBYTES;
+			while (dst < out_next) {
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += WORDBYTES;
+				dst += WORDBYTES;
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += WORDBYTES;
+				dst += WORDBYTES;
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += WORDBYTES;
+				dst += WORDBYTES;
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += WORDBYTES;
+				dst += WORDBYTES;
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += WORDBYTES;
+				dst += WORDBYTES;
+			}
+		} else if (UNALIGNED_ACCESS_IS_FAST && offset == 1) {
+			machine_word_t v;
+
+			
+			v = (machine_word_t)0x0101010101010101 * src[0];
+			store_word_unaligned(v, dst);
+			dst += WORDBYTES;
+			store_word_unaligned(v, dst);
+			dst += WORDBYTES;
+			store_word_unaligned(v, dst);
+			dst += WORDBYTES;
+			store_word_unaligned(v, dst);
+			dst += WORDBYTES;
+			while (dst < out_next) {
+				store_word_unaligned(v, dst);
+				dst += WORDBYTES;
+				store_word_unaligned(v, dst);
+				dst += WORDBYTES;
+				store_word_unaligned(v, dst);
+				dst += WORDBYTES;
+				store_word_unaligned(v, dst);
+				dst += WORDBYTES;
+			}
+		} else if (UNALIGNED_ACCESS_IS_FAST) {
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += offset;
+			dst += offset;
+			store_word_unaligned(load_word_unaligned(src), dst);
+			src += offset;
+			dst += offset;
+			do {
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += offset;
+				dst += offset;
+				store_word_unaligned(load_word_unaligned(src), dst);
+				src += offset;
+				dst += offset;
+			} while (dst < out_next);
+		} else {
+			*dst++ = *src++;
+			*dst++ = *src++;
+			do {
+				*dst++ = *src++;
+			} while (dst < out_next);
+		}
+	} while (in_next < in_fastloop_end && out_next < out_fastloop_end);
+
+	
+generic_loop:
+	for (;;) {
+		u32 length, offset;
+		const u8 *src;
+		u8 *dst;
+
+		REFILL_BITS();
+		entry = d->u.litlen_decode_table[bitbuf & litlen_tablemask];
+		saved_bitbuf = bitbuf;
+		bitbuf >>= (u8)entry;
+		bitsleft -= entry;
+		if (unlikely(entry & HUFFDEC_SUBTABLE_POINTER)) {
+			entry = d->u.litlen_decode_table[(entry >> 16) +
+					EXTRACT_VARBITS(bitbuf, (entry >> 8) & 0x3F)];
+			saved_bitbuf = bitbuf;
+			bitbuf >>= (u8)entry;
+			bitsleft -= entry;
+		}
+		length = entry >> 16;
+		if (entry & HUFFDEC_LITERAL) {
+			if (unlikely(out_next == out_end))
+				return LIBDEFLATE_INSUFFICIENT_SPACE;
+			*out_next++ = length;
+			continue;
+		}
+		if (unlikely(entry & HUFFDEC_END_OF_BLOCK))
+			goto block_done;
+		length += EXTRACT_VARBITS8(saved_bitbuf, entry) >> (u8)(entry >> 8);
+		if (unlikely(length > out_end - out_next))
+			return LIBDEFLATE_INSUFFICIENT_SPACE;
+
+		if (!CAN_CONSUME(LENGTH_MAXBITS + OFFSET_MAXBITS))
+			REFILL_BITS();
+		entry = d->offset_decode_table[bitbuf & BITMASK(OFFSET_TABLEBITS)];
+		if (unlikely(entry & HUFFDEC_EXCEPTIONAL)) {
+			bitbuf >>= OFFSET_TABLEBITS;
+			bitsleft -= OFFSET_TABLEBITS;
+			entry = d->offset_decode_table[(entry >> 16) +
+					EXTRACT_VARBITS(bitbuf, (entry >> 8) & 0x3F)];
+			if (!CAN_CONSUME(OFFSET_MAXBITS))
+				REFILL_BITS();
+		}
+		offset = entry >> 16;
+		offset += EXTRACT_VARBITS8(bitbuf, entry) >> (u8)(entry >> 8);
+		bitbuf >>= (u8)entry;
+		bitsleft -= entry;
+
+		SAFETY_CHECK(offset <= out_next - (const u8 *)out);
+		src = out_next - offset;
+		dst = out_next;
+		out_next += length;
+
+		STATIC_ASSERT(DEFLATE_MIN_MATCH_LEN == 3);
+		*dst++ = *src++;
+		*dst++ = *src++;
+		do {
+			*dst++ = *src++;
+		} while (dst < out_next);
+	}
+
+block_done:
+	
+
+	if (!is_final_block)
+		goto next_block;
+
+	
+
+	bitsleft = (u8)bitsleft;
+
+	
+	SAFETY_CHECK(overread_count <= (bitsleft >> 3));
+
+	
+	if (actual_in_nbytes_ret) {
+		
+		in_next -= (bitsleft >> 3) - overread_count;
+
+		*actual_in_nbytes_ret = in_next - (u8 *)in;
+	}
+
+	
+	if (actual_out_nbytes_ret) {
+		*actual_out_nbytes_ret = out_next - (u8 *)out;
+	} else {
+		if (out_next != out_end)
+			return LIBDEFLATE_SHORT_OUTPUT;
+	}
+	return LIBDEFLATE_SUCCESS;
+}
+
+#undef FUNCNAME
+#undef ATTRIBUTES
+#undef EXTRACT_VARBITS
+#undef EXTRACT_VARBITS8
+
+#endif 
+
+#if defined(deflate_decompress_bmi2) && HAVE_BMI2_NATIVE
+#define DEFAULT_IMPL	deflate_decompress_bmi2
+#else
+static inline decompress_func_t
+arch_select_decompress_func(void)
+{
+#ifdef deflate_decompress_bmi2
+	if (HAVE_BMI2(get_x86_cpu_features()))
+		return deflate_decompress_bmi2;
+#endif
+	return NULL;
+}
+#define arch_select_decompress_func	arch_select_decompress_func
+#endif
+
+#endif 
+
+#endif
+
+#ifndef DEFAULT_IMPL
+#  define DEFAULT_IMPL deflate_decompress_default
+#endif
+
+#ifdef arch_select_decompress_func
+static enum libdeflate_result
+dispatch_decomp(struct libdeflate_decompressor *d,
+		const void *in, size_t in_nbytes,
+		void *out, size_t out_nbytes_avail,
+		size_t *actual_in_nbytes_ret, size_t *actual_out_nbytes_ret);
+
+static volatile decompress_func_t decompress_impl = dispatch_decomp;
+
+
+static enum libdeflate_result
+dispatch_decomp(struct libdeflate_decompressor *d,
+		const void *in, size_t in_nbytes,
+		void *out, size_t out_nbytes_avail,
+		size_t *actual_in_nbytes_ret, size_t *actual_out_nbytes_ret)
+{
+	decompress_func_t f = arch_select_decompress_func();
+
+	if (f == NULL)
+		f = DEFAULT_IMPL;
+
+	decompress_impl = f;
+	return f(d, in, in_nbytes, out, out_nbytes_avail,
+		 actual_in_nbytes_ret, actual_out_nbytes_ret);
+}
+#else
+
+#  define decompress_impl DEFAULT_IMPL
+#endif
+
+
+LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
+libdeflate_deflate_decompress_ex(struct libdeflate_decompressor *d,
+				 const void *in, size_t in_nbytes,
+				 void *out, size_t out_nbytes_avail,
+				 size_t *actual_in_nbytes_ret,
+				 size_t *actual_out_nbytes_ret)
+{
+	return decompress_impl(d, in, in_nbytes, out, out_nbytes_avail,
+			       actual_in_nbytes_ret, actual_out_nbytes_ret);
+}
+
+LIBDEFLATEEXPORT enum libdeflate_result LIBDEFLATEAPI
+libdeflate_deflate_decompress(struct libdeflate_decompressor *d,
+			      const void *in, size_t in_nbytes,
+			      void *out, size_t out_nbytes_avail,
+			      size_t *actual_out_nbytes_ret)
+{
+	return libdeflate_deflate_decompress_ex(d, in, in_nbytes,
+						out, out_nbytes_avail,
+						NULL, actual_out_nbytes_ret);
+}
+
+LIBDEFLATEEXPORT struct libdeflate_decompressor * LIBDEFLATEAPI
+libdeflate_alloc_decompressor(void)
+{
+	
+	struct libdeflate_decompressor *d = libdeflate_malloc(sizeof(*d));
+
+	if (d == NULL)
+		return NULL;
+	memset(d, 0, sizeof(*d));
+	return d;
+}
+
+LIBDEFLATEEXPORT void LIBDEFLATEAPI
+libdeflate_free_decompressor(struct libdeflate_decompressor *d)
+{
+	libdeflate_free(d);
+}
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/gzip_compress.c */
+
+
+/* #include "deflate_compress.h" */
+#ifndef LIB_DEFLATE_COMPRESS_H
+#define LIB_DEFLATE_COMPRESS_H
+
+/* #include "lib_common.h" */
+
+
+#ifndef LIB_LIB_COMMON_H
+#define LIB_LIB_COMMON_H
+
+#ifdef LIBDEFLATE_H
+#  error "lib_common.h must always be included before libdeflate.h"
+   
+#endif
+
+#define BUILDING_LIBDEFLATE
+
+/* #include "../common_defs.h" */
+
+
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
+
+#include <stdbool.h>
+#include <stddef.h>	
+#include <stdint.h>
+#ifdef _MSC_VER
+#  include <stdlib.h>	
+#endif
+#ifndef FREESTANDING
+#  include <string.h>	
+#endif
+
+
+
+
+
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
+
+
+typedef size_t machine_word_t;
+
+
+#define WORDBYTES	((int)sizeof(machine_word_t))
+
+
+#define WORDBITS	(8 * WORDBYTES)
+
+
+
+
+
+
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
+#  define LIBEXPORT
+#endif
+
+
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
+#endif
+
+
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
+#endif
+
+
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
+#  define restrict
+#endif
+
+
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
+#  define likely(expr)		(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
+#  define unlikely(expr)	(expr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
+#  define prefetchr(addr)
+#endif
+
+
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
+#  define prefetchw(addr)
+#endif
+
+
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
+#endif
+
+
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
+
+
+
+
+
+#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
+#define MIN(a, b)		((a) <= (b) ? (a) : (b))
+#define MAX(a, b)		((a) >= (b) ? (a) : (b))
+#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
+#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
+#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
+
+
+
+
+
+
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
+{
+	union {
+		u32 w;
+		u8 b;
+	} u;
+
+	u.w = 1;
+	return u.b;
+}
+#endif
+
+
+static forceinline u16 bswap16(u16 v)
+{
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
+}
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
+#endif
+
+
+
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
+#endif
+
+
+
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
+
+
+
+static forceinline u16
+get_unaligned_le16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
+}
+
+static forceinline u16
+get_unaligned_be16(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
+}
+
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return get_unaligned_le32(p);
+	else
+		return get_unaligned_le64(p);
+}
+
+
+
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+	}
+}
+
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		put_unaligned_le32(v, p);
+	else
+		put_unaligned_le64(v, p);
+}
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+
+
+struct libdeflate_compressor;
+
+unsigned int libdeflate_get_compression_level(struct libdeflate_compressor *c);
+
+#endif 
+
+/* #include "gzip_constants.h" */
+
+
+#ifndef LIB_GZIP_CONSTANTS_H
+#define LIB_GZIP_CONSTANTS_H
+
+#define GZIP_MIN_HEADER_SIZE	10
+#define GZIP_FOOTER_SIZE	8
+#define GZIP_MIN_OVERHEAD	(GZIP_MIN_HEADER_SIZE + GZIP_FOOTER_SIZE)
+
+#define GZIP_ID1		0x1F
+#define GZIP_ID2		0x8B
+
+#define GZIP_CM_DEFLATE		8
+
+#define GZIP_FTEXT		0x01
+#define GZIP_FHCRC		0x02
+#define GZIP_FEXTRA		0x04
+#define GZIP_FNAME		0x08
+#define GZIP_FCOMMENT		0x10
+#define GZIP_FRESERVED		0xE0
+
+#define GZIP_MTIME_UNAVAILABLE	0
+
+#define GZIP_XFL_SLOWEST_COMPRESSION	0x02
+#define GZIP_XFL_FASTEST_COMPRESSION	0x04
+
+#define GZIP_OS_FAT		0
+#define GZIP_OS_AMIGA		1
+#define GZIP_OS_VMS		2
+#define GZIP_OS_UNIX		3
+#define GZIP_OS_VM_CMS		4
+#define GZIP_OS_ATARI_TOS	5
+#define GZIP_OS_HPFS		6
+#define GZIP_OS_MACINTOSH	7
+#define GZIP_OS_Z_SYSTEM	8
+#define GZIP_OS_CP_M		9
+#define GZIP_OS_TOPS_20		10
+#define GZIP_OS_NTFS		11
+#define GZIP_OS_QDOS		12
+#define GZIP_OS_RISCOS		13
+#define GZIP_OS_UNKNOWN		255
 
 #endif 
 
@@ -17463,8 +23444,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	7
-#define LIBDEFLATE_VERSION_STRING	"1.7"
+#define LIBDEFLATE_VERSION_MINOR	14
+#define LIBDEFLATE_VERSION_STRING	"1.14"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -17481,21 +23462,13 @@ extern "C" {
 #  define LIBDEFLATEEXPORT
 #endif
 
-#if defined(_WIN32) && !defined(_WIN64)
-#  define LIBDEFLATEAPI_ABI	__stdcall
-#else
-#  define LIBDEFLATEAPI_ABI
-#endif
-
 #if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
 	defined(_WIN32) && !defined(_WIN64)
     
-#  define LIBDEFLATEAPI_STACKALIGN	__attribute__((force_align_arg_pointer))
+#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
 #else
-#  define LIBDEFLATEAPI_STACKALIGN
+#  define LIBDEFLATEAPI
 #endif
-
-#define LIBDEFLATEAPI	LIBDEFLATEAPI_ABI LIBDEFLATEAPI_STACKALIGN
 
 
 
@@ -17673,7 +23646,7 @@ libdeflate_gzip_compress(struct libdeflate_compressor *c,
 	out_next += 4;
 	
 	xfl = 0;
-	compression_level = deflate_get_compression_level(c);
+	compression_level = libdeflate_get_compression_level(c);
 	if (compression_level < 2)
 		xfl |= GZIP_XFL_FASTEST_COMPRESSION;
 	else if (compression_level >= 8)
@@ -17707,59 +23680,8 @@ libdeflate_gzip_compress_bound(struct libdeflate_compressor *c,
 	return GZIP_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate-1.7/lib/gzip_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/gzip_decompress.c */
 
-
-/* #include "gzip_constants.h" */
-
-
-#ifndef LIB_GZIP_CONSTANTS_H
-#define LIB_GZIP_CONSTANTS_H
-
-#define GZIP_MIN_HEADER_SIZE	10
-#define GZIP_FOOTER_SIZE	8
-#define GZIP_MIN_OVERHEAD	(GZIP_MIN_HEADER_SIZE + GZIP_FOOTER_SIZE)
-
-#define GZIP_ID1		0x1F
-#define GZIP_ID2		0x8B
-
-#define GZIP_CM_DEFLATE		8
-
-#define GZIP_FTEXT		0x01
-#define GZIP_FHCRC		0x02
-#define GZIP_FEXTRA		0x04
-#define GZIP_FNAME		0x08
-#define GZIP_FCOMMENT		0x10
-#define GZIP_FRESERVED		0xE0
-
-#define GZIP_MTIME_UNAVAILABLE	0
-
-#define GZIP_XFL_SLOWEST_COMPRESSION	0x02
-#define GZIP_XFL_FASTEST_COMPRESSION	0x04
-
-#define GZIP_OS_FAT		0
-#define GZIP_OS_AMIGA		1
-#define GZIP_OS_VMS		2
-#define GZIP_OS_UNIX		3
-#define GZIP_OS_VM_CMS		4
-#define GZIP_OS_ATARI_TOS	5
-#define GZIP_OS_HPFS		6
-#define GZIP_OS_MACINTOSH	7
-#define GZIP_OS_Z_SYSTEM	8
-#define GZIP_OS_CP_M		9
-#define GZIP_OS_TOPS_20		10
-#define GZIP_OS_NTFS		11
-#define GZIP_OS_QDOS		12
-#define GZIP_OS_RISCOS		13
-#define GZIP_OS_UNKNOWN		255
-
-#endif 
-
-/* #include "unaligned.h" */
-
-
-#ifndef LIB_UNALIGNED_H
-#define LIB_UNALIGNED_H
 
 /* #include "lib_common.h" */
 
@@ -17774,253 +23696,27 @@ libdeflate_gzip_compress_bound(struct libdeflate_compressor *c,
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -18029,6 +23725,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -18044,87 +23749,115 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -18136,186 +23869,106 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
 }
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
 
 #ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+#  define MEMCOPY	__builtin_memcpy
 #else
-#include <string.h>
+#  define MEMCOPY	memcpy
 #endif
-
-#endif 
-
-
-
 
 
 
@@ -18324,20 +23977,23 @@ static forceinline type						\
 load_##type##_unaligned(const void *p)				\
 {								\
 	type v;							\
-	memcpy(&v, p, sizeof(v));				\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
 	return v;						\
 }								\
 								\
 static forceinline void						\
 store_##type##_unaligned(type v, void *p)			\
 {								\
-	memcpy(p, &v, sizeof(v));				\
+	MEMCOPY(p, &v, sizeof(v));				\
 }
 
 DEFINE_UNALIGNED_TYPE(u16)
 DEFINE_UNALIGNED_TYPE(u32)
 DEFINE_UNALIGNED_TYPE(u64)
 DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
 
 #define load_word_unaligned	load_machine_word_t_unaligned
 #define store_word_unaligned	store_machine_word_t_unaligned
@@ -18484,30 +24140,213 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 
 
 
-static forceinline u32
-loaded_u32_to_u24(u32 v)
-{
-	if (CPU_IS_LITTLE_ENDIAN())
-		return v & 0xFFFFFF;
-	else
-		return v >> 8;
-}
 
 
-static forceinline u32
-load_u24_unaligned(const u8 *p)
+
+static forceinline unsigned
+bsr32(u32 v)
 {
-#if UNALIGNED_ACCESS_IS_FAST
-#  define LOAD_U24_REQUIRED_NBYTES 4
-	return loaded_u32_to_u24(load_u32_unaligned(p));
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
 #else
-#  define LOAD_U24_REQUIRED_NBYTES 3
-	if (CPU_IS_LITTLE_ENDIAN())
-		return ((u32)p[0] << 0) | ((u32)p[1] << 8) | ((u32)p[2] << 16);
-	else
-		return ((u32)p[2] << 0) | ((u32)p[1] << 8) | ((u32)p[0] << 16);
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
 #endif
 }
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+/* #include "gzip_constants.h" */
+
+
+#ifndef LIB_GZIP_CONSTANTS_H
+#define LIB_GZIP_CONSTANTS_H
+
+#define GZIP_MIN_HEADER_SIZE	10
+#define GZIP_FOOTER_SIZE	8
+#define GZIP_MIN_OVERHEAD	(GZIP_MIN_HEADER_SIZE + GZIP_FOOTER_SIZE)
+
+#define GZIP_ID1		0x1F
+#define GZIP_ID2		0x8B
+
+#define GZIP_CM_DEFLATE		8
+
+#define GZIP_FTEXT		0x01
+#define GZIP_FHCRC		0x02
+#define GZIP_FEXTRA		0x04
+#define GZIP_FNAME		0x08
+#define GZIP_FCOMMENT		0x10
+#define GZIP_FRESERVED		0xE0
+
+#define GZIP_MTIME_UNAVAILABLE	0
+
+#define GZIP_XFL_SLOWEST_COMPRESSION	0x02
+#define GZIP_XFL_FASTEST_COMPRESSION	0x04
+
+#define GZIP_OS_FAT		0
+#define GZIP_OS_AMIGA		1
+#define GZIP_OS_VMS		2
+#define GZIP_OS_UNIX		3
+#define GZIP_OS_VM_CMS		4
+#define GZIP_OS_ATARI_TOS	5
+#define GZIP_OS_HPFS		6
+#define GZIP_OS_MACINTOSH	7
+#define GZIP_OS_Z_SYSTEM	8
+#define GZIP_OS_CP_M		9
+#define GZIP_OS_TOPS_20		10
+#define GZIP_OS_NTFS		11
+#define GZIP_OS_QDOS		12
+#define GZIP_OS_RISCOS		13
+#define GZIP_OS_UNKNOWN		255
 
 #endif 
 
@@ -18523,8 +24362,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	7
-#define LIBDEFLATE_VERSION_STRING	"1.7"
+#define LIBDEFLATE_VERSION_MINOR	14
+#define LIBDEFLATE_VERSION_STRING	"1.14"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -18541,21 +24380,13 @@ extern "C" {
 #  define LIBDEFLATEEXPORT
 #endif
 
-#if defined(_WIN32) && !defined(_WIN64)
-#  define LIBDEFLATEAPI_ABI	__stdcall
-#else
-#  define LIBDEFLATEAPI_ABI
-#endif
-
 #if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
 	defined(_WIN32) && !defined(_WIN64)
     
-#  define LIBDEFLATEAPI_STACKALIGN	__attribute__((force_align_arg_pointer))
+#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
 #else
-#  define LIBDEFLATEAPI_STACKALIGN
+#  define LIBDEFLATEAPI
 #endif
-
-#define LIBDEFLATEAPI	LIBDEFLATEAPI_ABI LIBDEFLATEAPI_STACKALIGN
 
 
 
@@ -18821,7 +24652,7 @@ libdeflate_gzip_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate-1.7/lib/utils.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/utils.c */
 
 
 /* #include "lib_common.h" */
@@ -18837,253 +24668,27 @@ libdeflate_gzip_decompress(struct libdeflate_decompressor *d,
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -19092,6 +24697,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -19107,87 +24721,115 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -19199,158 +24841,401 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
-}
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
 #endif
+}
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
+static forceinline u32 bswap32(u32 v)
 {
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
 #endif
+}
 
 
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
+static forceinline u64 bswap64(u64 v)
 {
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
 }
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
 
 
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
 #endif
 
 
 
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
 
 
 
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
+static forceinline u16
+get_unaligned_le16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
 }
-#endif
 
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
+static forceinline u16
+get_unaligned_be16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
 }
-#endif
 
-static forceinline unsigned
-bsrw(machine_word_t n)
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsr32(n);
+		return get_unaligned_le32(p);
 	else
-		return bsr64(n);
+		return get_unaligned_le64(p);
 }
 
 
 
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
 	}
-	return i;
 }
-#endif
 
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
 	}
-	return i;
 }
-#endif
 
-static forceinline unsigned
-bsfw(machine_word_t n)
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsf32(n);
+		put_unaligned_le32(v, p);
 	else
-		return bsf64(n);
+		put_unaligned_le64(v, p);
 }
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
 
 #endif 
 
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
 
 void *libdeflate_malloc(size_t size);
 void libdeflate_free(void *ptr);
@@ -19371,9 +25256,24 @@ void *memmove(void *dest, const void *src, size_t n);
 
 int memcmp(const void *s1, const void *s2, size_t n);
 #define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
 #include <string.h>
 #endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
 
 #endif 
 
@@ -19389,8 +25289,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	7
-#define LIBDEFLATE_VERSION_STRING	"1.7"
+#define LIBDEFLATE_VERSION_MINOR	14
+#define LIBDEFLATE_VERSION_STRING	"1.14"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -19407,21 +25307,13 @@ extern "C" {
 #  define LIBDEFLATEEXPORT
 #endif
 
-#if defined(_WIN32) && !defined(_WIN64)
-#  define LIBDEFLATEAPI_ABI	__stdcall
-#else
-#  define LIBDEFLATEAPI_ABI
-#endif
-
 #if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
 	defined(_WIN32) && !defined(_WIN64)
     
-#  define LIBDEFLATEAPI_STACKALIGN	__attribute__((force_align_arg_pointer))
+#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
 #else
-#  define LIBDEFLATEAPI_STACKALIGN
+#  define LIBDEFLATEAPI
 #endif
-
-#define LIBDEFLATEAPI	LIBDEFLATEAPI_ABI LIBDEFLATEAPI_STACKALIGN
 
 
 
@@ -19625,7 +25517,8 @@ libdeflate_set_memory_allocator(void *(*malloc_func)(size_t),
 
 #ifdef FREESTANDING
 #undef memset
-void *memset(void *s, int c, size_t n)
+void * __attribute__((weak))
+memset(void *s, int c, size_t n)
 {
 	u8 *p = s;
 	size_t i;
@@ -19636,7 +25529,8 @@ void *memset(void *s, int c, size_t n)
 }
 
 #undef memcpy
-void *memcpy(void *dest, const void *src, size_t n)
+void * __attribute__((weak))
+memcpy(void *dest, const void *src, size_t n)
 {
 	u8 *d = dest;
 	const u8 *s = src;
@@ -19648,7 +25542,8 @@ void *memcpy(void *dest, const void *src, size_t n)
 }
 
 #undef memmove
-void *memmove(void *dest, const void *src, size_t n)
+void * __attribute__((weak))
+memmove(void *dest, const void *src, size_t n)
 {
 	u8 *d = dest;
 	const u8 *s = src;
@@ -19663,7 +25558,8 @@ void *memmove(void *dest, const void *src, size_t n)
 }
 
 #undef memcmp
-int memcmp(const void *s1, const void *s2, size_t n)
+int __attribute__((weak))
+memcmp(const void *s1, const void *s2, size_t n)
 {
 	const u8 *p1 = s1;
 	const u8 *p2 = s2;
@@ -19676,7 +25572,18 @@ int memcmp(const void *s1, const void *s2, size_t n)
 	return 0;
 }
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate-1.7/lib/zlib_compress.c */
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+#include <stdio.h>
+#include <stdlib.h>
+void
+libdeflate_assertion_failed(const char *expr, const char *file, int line)
+{
+	fprintf(stderr, "Assertion failed: %s at %s:%d\n", expr, file, line);
+	abort();
+}
+#endif 
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/zlib_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -19696,253 +25603,27 @@ int memcmp(const void *s1, const void *s2, size_t n)
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -19951,6 +25632,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -19966,323 +25656,13 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
-#  define LIBEXPORT
-#endif
-
-
-#ifndef inline
-#  define inline
-#endif
-
-
-#ifndef forceinline
-#  define forceinline inline
-#endif
-
-
-#ifndef restrict
-#  define restrict
-#endif
-
-
-#ifndef likely
-#  define likely(expr)		(expr)
-#endif
-
-
-#ifndef unlikely
-#  define unlikely(expr)	(expr)
-#endif
-
-
-#ifndef prefetchr
-#  define prefetchr(addr)
-#endif
-
-
-#ifndef prefetchw
-#  define prefetchw(addr)
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
-
-
-
-
-
-#define ARRAY_LEN(A)		(sizeof(A) / sizeof((A)[0]))
-#define MIN(a, b)		((a) <= (b) ? (a) : (b))
-#define MAX(a, b)		((a) >= (b) ? (a) : (b))
-#define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
-#define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
-#define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
-
-
-
-
-
-
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
-{
-	union {
-		unsigned int v;
-		unsigned char b;
-	} u;
-	u.v = 1;
-	return u.b;
-}
-#endif
-
-
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
-{
-	return (n << 8) | (n >> 8);
-}
-#endif
-
-
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
-
-#ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
-#else
-#include <string.h>
-#endif
-
-#endif 
-
-
-
-
-struct libdeflate_compressor;
-
-unsigned int deflate_get_compression_level(struct libdeflate_compressor *c);
-
-#endif 
-
-/* #include "unaligned.h" */
-
-
-#ifndef LIB_UNALIGNED_H
-#define LIB_UNALIGNED_H
-
-/* #include "lib_common.h" */
-
-
-#ifndef LIB_LIB_COMMON_H
-#define LIB_LIB_COMMON_H
-
-#ifdef LIBDEFLATE_H
-#  error "lib_common.h must always be included before libdeflate.h"
-   
-#endif
-
-#define BUILDING_LIBDEFLATE
-
-/* #include "../common/common_defs.h" */
-
-
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
-
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
 #  define GCC_PREREQ(major, minor)		\
 	(__GNUC__ > (major) ||			\
 	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else
 #  define GCC_PREREQ(major, minor)	0
 #endif
-
-
 #ifdef __clang__
 #  ifdef __apple_build_version__
 #    define CLANG_PREREQ(major, minor, apple_version)	\
@@ -20296,325 +25676,95 @@ unsigned int deflate_get_compression_level(struct libdeflate_compressor *c);
 #  define CLANG_PREREQ(major, minor, apple_version)	0
 #endif
 
+
 #ifndef __has_attribute
 #  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
 #endif
 #ifndef __has_builtin
 #  define __has_builtin(builtin)	0
 #endif
 
+
 #ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
 #else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
-#include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
-#endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
-#endif
-
-
-
-
-
-#include <stddef.h> 
-
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
-
-
-typedef size_t machine_word_t;
-
-
-#define WORDBYTES	((int)sizeof(machine_word_t))
-
-
-#define WORDBITS	(8 * WORDBYTES)
-
-
-
-
-
-
-#ifndef LIBEXPORT
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -20626,186 +25776,106 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
 }
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
 
 #ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+#  define MEMCOPY	__builtin_memcpy
 #else
-#include <string.h>
+#  define MEMCOPY	memcpy
 #endif
-
-#endif 
-
-
-
 
 
 
@@ -20814,20 +25884,23 @@ static forceinline type						\
 load_##type##_unaligned(const void *p)				\
 {								\
 	type v;							\
-	memcpy(&v, p, sizeof(v));				\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
 	return v;						\
 }								\
 								\
 static forceinline void						\
 store_##type##_unaligned(type v, void *p)			\
 {								\
-	memcpy(p, &v, sizeof(v));				\
+	MEMCOPY(p, &v, sizeof(v));				\
 }
 
 DEFINE_UNALIGNED_TYPE(u16)
 DEFINE_UNALIGNED_TYPE(u32)
 DEFINE_UNALIGNED_TYPE(u64)
 DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
 
 #define load_word_unaligned	load_machine_word_t_unaligned
 #define store_word_unaligned	store_machine_word_t_unaligned
@@ -20974,30 +26047,177 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 
 
 
-static forceinline u32
-loaded_u32_to_u24(u32 v)
-{
-	if (CPU_IS_LITTLE_ENDIAN())
-		return v & 0xFFFFFF;
-	else
-		return v >> 8;
-}
 
 
-static forceinline u32
-load_u24_unaligned(const u8 *p)
+
+static forceinline unsigned
+bsr32(u32 v)
 {
-#if UNALIGNED_ACCESS_IS_FAST
-#  define LOAD_U24_REQUIRED_NBYTES 4
-	return loaded_u32_to_u24(load_u32_unaligned(p));
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
 #else
-#  define LOAD_U24_REQUIRED_NBYTES 3
-	if (CPU_IS_LITTLE_ENDIAN())
-		return ((u32)p[0] << 0) | ((u32)p[1] << 8) | ((u32)p[2] << 16);
-	else
-		return ((u32)p[2] << 0) | ((u32)p[1] << 8) | ((u32)p[0] << 16);
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
 #endif
 }
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
+#endif 
+
+
+
+
+struct libdeflate_compressor;
+
+unsigned int libdeflate_get_compression_level(struct libdeflate_compressor *c);
 
 #endif 
 
@@ -21034,8 +26254,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	7
-#define LIBDEFLATE_VERSION_STRING	"1.7"
+#define LIBDEFLATE_VERSION_MINOR	14
+#define LIBDEFLATE_VERSION_STRING	"1.14"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -21052,21 +26272,13 @@ extern "C" {
 #  define LIBDEFLATEEXPORT
 #endif
 
-#if defined(_WIN32) && !defined(_WIN64)
-#  define LIBDEFLATEAPI_ABI	__stdcall
-#else
-#  define LIBDEFLATEAPI_ABI
-#endif
-
 #if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
 	defined(_WIN32) && !defined(_WIN64)
     
-#  define LIBDEFLATEAPI_STACKALIGN	__attribute__((force_align_arg_pointer))
+#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
 #else
-#  define LIBDEFLATEAPI_STACKALIGN
+#  define LIBDEFLATEAPI
 #endif
-
-#define LIBDEFLATEAPI	LIBDEFLATEAPI_ABI LIBDEFLATEAPI_STACKALIGN
 
 
 
@@ -21234,7 +26446,7 @@ libdeflate_zlib_compress(struct libdeflate_compressor *c,
 
 	
 	hdr = (ZLIB_CM_DEFLATE << 8) | (ZLIB_CINFO_32K_WINDOW << 12);
-	compression_level = deflate_get_compression_level(c);
+	compression_level = libdeflate_get_compression_level(c);
 	if (compression_level < 2)
 		level_hint = ZLIB_FASTEST_COMPRESSION;
 	else if (compression_level < 6)
@@ -21270,14 +26482,8 @@ libdeflate_zlib_compress_bound(struct libdeflate_compressor *c,
 	return ZLIB_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate-1.7/lib/zlib_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/zlib_decompress.c */
 
-
-/* #include "unaligned.h" */
-
-
-#ifndef LIB_UNALIGNED_H
-#define LIB_UNALIGNED_H
 
 /* #include "lib_common.h" */
 
@@ -21292,253 +26498,27 @@ libdeflate_zlib_compress_bound(struct libdeflate_compressor *c,
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -21547,6 +26527,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -21562,87 +26551,115 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -21654,186 +26671,106 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
+#endif
 }
+
+
+static forceinline u32 bswap32(u32 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
+#endif
+}
+
+
+static forceinline u64 bswap64(u64 v)
+{
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
+}
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
-{
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
-#endif
-
-
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
-{
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
-}
-#endif
-
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
-
-
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
-#endif
-
-
-
-
-
-
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
-{
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsrw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsr32(n);
-	else
-		return bsr64(n);
-}
-
-
-
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
-{
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
-	}
-	return i;
-}
-#endif
-
-static forceinline unsigned
-bsfw(machine_word_t n)
-{
-	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
-	if (WORDBITS == 32)
-		return bsf32(n);
-	else
-		return bsf64(n);
-}
-
-#endif 
-
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
-
-void *libdeflate_malloc(size_t size);
-void libdeflate_free(void *ptr);
-
-void *libdeflate_aligned_malloc(size_t alignment, size_t size);
-void libdeflate_aligned_free(void *ptr);
 
 #ifdef FREESTANDING
-
-void *memset(void *s, int c, size_t n);
-#define memset(s, c, n)		__builtin_memset((s), (c), (n))
-
-void *memcpy(void *dest, const void *src, size_t n);
-#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
-
-void *memmove(void *dest, const void *src, size_t n);
-#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
-
-int memcmp(const void *s1, const void *s2, size_t n);
-#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+#  define MEMCOPY	__builtin_memcpy
 #else
-#include <string.h>
+#  define MEMCOPY	memcpy
 #endif
-
-#endif 
-
-
-
 
 
 
@@ -21842,20 +26779,23 @@ static forceinline type						\
 load_##type##_unaligned(const void *p)				\
 {								\
 	type v;							\
-	memcpy(&v, p, sizeof(v));				\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
 	return v;						\
 }								\
 								\
 static forceinline void						\
 store_##type##_unaligned(type v, void *p)			\
 {								\
-	memcpy(p, &v, sizeof(v));				\
+	MEMCOPY(p, &v, sizeof(v));				\
 }
 
 DEFINE_UNALIGNED_TYPE(u16)
 DEFINE_UNALIGNED_TYPE(u32)
 DEFINE_UNALIGNED_TYPE(u64)
 DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
 
 #define load_word_unaligned	load_machine_word_t_unaligned
 #define store_word_unaligned	store_machine_word_t_unaligned
@@ -22002,30 +26942,168 @@ put_unaligned_leword(machine_word_t v, u8 *p)
 
 
 
-static forceinline u32
-loaded_u32_to_u24(u32 v)
-{
-	if (CPU_IS_LITTLE_ENDIAN())
-		return v & 0xFFFFFF;
-	else
-		return v >> 8;
-}
 
 
-static forceinline u32
-load_u24_unaligned(const u8 *p)
+
+static forceinline unsigned
+bsr32(u32 v)
 {
-#if UNALIGNED_ACCESS_IS_FAST
-#  define LOAD_U24_REQUIRED_NBYTES 4
-	return loaded_u32_to_u24(load_u32_unaligned(p));
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
 #else
-#  define LOAD_U24_REQUIRED_NBYTES 3
-	if (CPU_IS_LITTLE_ENDIAN())
-		return ((u32)p[0] << 0) | ((u32)p[1] << 8) | ((u32)p[2] << 16);
-	else
-		return ((u32)p[2] << 0) | ((u32)p[1] << 8) | ((u32)p[0] << 16);
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
 #endif
 }
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
+
+#endif 
+
+
+void *libdeflate_malloc(size_t size);
+void libdeflate_free(void *ptr);
+
+void *libdeflate_aligned_malloc(size_t alignment, size_t size);
+void libdeflate_aligned_free(void *ptr);
+
+#ifdef FREESTANDING
+
+void *memset(void *s, int c, size_t n);
+#define memset(s, c, n)		__builtin_memset((s), (c), (n))
+
+void *memcpy(void *dest, const void *src, size_t n);
+#define memcpy(dest, src, n)	__builtin_memcpy((dest), (src), (n))
+
+void *memmove(void *dest, const void *src, size_t n);
+#define memmove(dest, src, n)	__builtin_memmove((dest), (src), (n))
+
+int memcmp(const void *s1, const void *s2, size_t n);
+#define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
+#else
+#include <string.h>
+#endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
 
 #endif 
 
@@ -22062,8 +27140,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	7
-#define LIBDEFLATE_VERSION_STRING	"1.7"
+#define LIBDEFLATE_VERSION_MINOR	14
+#define LIBDEFLATE_VERSION_STRING	"1.14"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -22080,21 +27158,13 @@ extern "C" {
 #  define LIBDEFLATEEXPORT
 #endif
 
-#if defined(_WIN32) && !defined(_WIN64)
-#  define LIBDEFLATEAPI_ABI	__stdcall
-#else
-#  define LIBDEFLATEAPI_ABI
-#endif
-
 #if defined(BUILDING_LIBDEFLATE) && defined(__GNUC__) && \
 	defined(_WIN32) && !defined(_WIN64)
     
-#  define LIBDEFLATEAPI_STACKALIGN	__attribute__((force_align_arg_pointer))
+#  define LIBDEFLATEAPI	__attribute__((force_align_arg_pointer))
 #else
-#  define LIBDEFLATEAPI_STACKALIGN
+#  define LIBDEFLATEAPI
 #endif
-
-#define LIBDEFLATEAPI	LIBDEFLATEAPI_ABI LIBDEFLATEAPI_STACKALIGN
 
 
 
@@ -22320,16 +27390,27 @@ libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate-1.7/lib/arm/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/arm/cpu_features.c */
 
 
 
+
+#ifdef __APPLE__
+#undef _ANSI_SOURCE
+#define _DARWIN_C_SOURCE 
+#endif
 
 /* #include "cpu_features_common.h" */
 
 
+#ifndef LIB_CPU_FEATURES_COMMON_H
+#define LIB_CPU_FEATURES_COMMON_H
+
 #if defined(TEST_SUPPORT__DO_NOT_USE) && !defined(FREESTANDING)
-#  define _GNU_SOURCE 1 
+#  undef _ANSI_SOURCE	
+#  ifndef __APPLE__
+#    define _GNU_SOURCE 1
+#  endif
 #  include <stdio.h>
 #  include <stdlib.h>
 #  include <string.h>
@@ -22348,253 +27429,27 @@ libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -22603,6 +27458,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -22618,87 +27482,115 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -22710,158 +27602,401 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
-}
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
 #endif
+}
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
+static forceinline u32 bswap32(u32 v)
 {
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
 #endif
+}
 
 
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
+static forceinline u64 bswap64(u64 v)
 {
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
 }
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
 
 
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
 #endif
 
 
 
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
 
 
 
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
+static forceinline u16
+get_unaligned_le16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
 }
-#endif
 
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
+static forceinline u16
+get_unaligned_be16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
 }
-#endif
 
-static forceinline unsigned
-bsrw(machine_word_t n)
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsr32(n);
+		return get_unaligned_le32(p);
 	else
-		return bsr64(n);
+		return get_unaligned_le64(p);
 }
 
 
 
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
 	}
-	return i;
 }
-#endif
 
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
 	}
-	return i;
 }
-#endif
 
-static forceinline unsigned
-bsfw(machine_word_t n)
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsf32(n);
+		put_unaligned_le32(v, p);
 	else
-		return bsf64(n);
+		put_unaligned_le64(v, p);
 }
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
 
 #endif 
 
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
 
 void *libdeflate_malloc(size_t size);
 void libdeflate_free(void *ptr);
@@ -22882,9 +28017,24 @@ void *memmove(void *dest, const void *src, size_t n);
 
 int memcmp(const void *s1, const void *s2, size_t n);
 #define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
 #include <string.h>
 #endif
+
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
 
 #endif 
 
@@ -22936,6 +28086,8 @@ disable_cpu_features_for_testing(u32 *features,
 {
 }
 #endif 
+
+#endif 
  
 /* #include "arm-cpu_features.h" */
 
@@ -22956,253 +28108,27 @@ disable_cpu_features_for_testing(u32 *features,
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -23211,6 +28137,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -23226,87 +28161,115 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -23318,158 +28281,401 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
-}
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
 #endif
+}
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
+static forceinline u32 bswap32(u32 v)
 {
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
 #endif
+}
 
 
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
+static forceinline u64 bswap64(u64 v)
 {
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
 }
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
 
 
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
 #endif
 
 
 
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
 
 
 
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
+static forceinline u16
+get_unaligned_le16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
 }
-#endif
 
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
+static forceinline u16
+get_unaligned_be16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
 }
-#endif
 
-static forceinline unsigned
-bsrw(machine_word_t n)
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsr32(n);
+		return get_unaligned_le32(p);
 	else
-		return bsr64(n);
+		return get_unaligned_le64(p);
 }
 
 
 
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
 	}
-	return i;
 }
-#endif
 
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
 	}
-	return i;
 }
-#endif
 
-static forceinline unsigned
-bsfw(machine_word_t n)
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsf32(n);
+		put_unaligned_le32(v, p);
 	else
-		return bsf64(n);
+		put_unaligned_le64(v, p);
 }
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
 
 #endif 
 
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
 
 void *libdeflate_malloc(size_t size);
 void libdeflate_free(void *ptr);
@@ -23490,47 +28696,189 @@ void *memmove(void *dest, const void *src, size_t n);
 
 int memcmp(const void *s1, const void *s2, size_t n);
 #define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
 #include <string.h>
 #endif
 
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
 #endif 
 
 
-#if (defined(__arm__) || defined(__aarch64__)) && \
-	defined(__linux__) && \
-	COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
-	!defined(FREESTANDING)
-#  define ARM_CPU_FEATURES_ENABLED 1
-#else
-#  define ARM_CPU_FEATURES_ENABLED 0
-#endif
+#define HAVE_DYNAMIC_ARM_CPU_FEATURES	0
 
-#if ARM_CPU_FEATURES_ENABLED
+#if defined(__arm__) || defined(__aarch64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE && \
+	!defined(FREESTANDING) && \
+	(defined(__linux__) || \
+	 (defined(__aarch64__) && defined(__APPLE__)))
+#  undef HAVE_DYNAMIC_ARM_CPU_FEATURES
+#  define HAVE_DYNAMIC_ARM_CPU_FEATURES	1
+#endif
 
 #define ARM_CPU_FEATURE_NEON		0x00000001
 #define ARM_CPU_FEATURE_PMULL		0x00000002
 #define ARM_CPU_FEATURE_CRC32		0x00000004
+#define ARM_CPU_FEATURE_SHA3		0x00000008
+#define ARM_CPU_FEATURE_DOTPROD		0x00000010
 
+#define HAVE_NEON(features)	(HAVE_NEON_NATIVE    || ((features) & ARM_CPU_FEATURE_NEON))
+#define HAVE_PMULL(features)	(HAVE_PMULL_NATIVE   || ((features) & ARM_CPU_FEATURE_PMULL))
+#define HAVE_CRC32(features)	(HAVE_CRC32_NATIVE   || ((features) & ARM_CPU_FEATURE_CRC32))
+#define HAVE_SHA3(features)	(HAVE_SHA3_NATIVE    || ((features) & ARM_CPU_FEATURE_SHA3))
+#define HAVE_DOTPROD(features)	(HAVE_DOTPROD_NATIVE || ((features) & ARM_CPU_FEATURE_DOTPROD))
+
+#if HAVE_DYNAMIC_ARM_CPU_FEATURES
 #define ARM_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_arm_cpu_features;
 
-extern volatile u32 _cpu_features;
+void libdeflate_init_arm_cpu_features(void);
 
-void setup_cpu_features(void);
-
-static inline u32 get_cpu_features(void)
+static inline u32 get_arm_cpu_features(void)
 {
-	if (_cpu_features == 0)
-		setup_cpu_features();
-	return _cpu_features;
+	if (libdeflate_arm_cpu_features == 0)
+		libdeflate_init_arm_cpu_features();
+	return libdeflate_arm_cpu_features;
 }
+#else 
+static inline u32 get_arm_cpu_features(void) { return 0; }
+#endif 
+
+
+#ifdef __ARM_NEON
+#  define HAVE_NEON_NATIVE	1
+#else
+#  define HAVE_NEON_NATIVE	0
+#endif
+#define HAVE_NEON_TARGET	HAVE_DYNAMIC_ARM_CPU_FEATURES
+
+#if HAVE_NEON_NATIVE || \
+	(HAVE_NEON_TARGET && GCC_PREREQ(6, 1) && defined(__ARM_FP))
+#  define HAVE_NEON_INTRIN	1
+#else
+#  define HAVE_NEON_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRYPTO
+#  define HAVE_PMULL_NATIVE	1
+#else
+#  define HAVE_PMULL_NATIVE	0
+#endif
+#define HAVE_PMULL_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(6, 1) || __has_builtin(__builtin_neon_vmull_p64)))
+
+#if HAVE_NEON_INTRIN && (HAVE_PMULL_NATIVE || HAVE_PMULL_TARGET) && \
+	!(defined(__arm__) && defined(__clang__)) && \
+	CPU_IS_LITTLE_ENDIAN() 
+#  define HAVE_PMULL_INTRIN	1
+#else
+#  define HAVE_PMULL_INTRIN	0
+#endif
+
+
+#ifdef __ARM_FEATURE_CRC32
+#  define HAVE_CRC32_NATIVE	1
+#else
+#  define HAVE_CRC32_NATIVE	0
+#endif
+#define HAVE_CRC32_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || __has_builtin(__builtin_arm_crc32b)))
+
+#define HAVE_CRC32_INTRIN \
+	(HAVE_CRC32_NATIVE || (HAVE_CRC32_TARGET && \
+			       (!GCC_PREREQ(1, 0) || \
+				GCC_PREREQ(11, 3) || \
+				(GCC_PREREQ(10, 4) && !GCC_PREREQ(11, 0)) || \
+				(GCC_PREREQ(9, 5) && !GCC_PREREQ(10, 0)))))
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_SHA3
+#    define HAVE_SHA3_NATIVE	1
+#  else
+#    define HAVE_SHA3_NATIVE	0
+#  endif
+#  define HAVE_SHA3_TARGET	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+				 (GCC_PREREQ(8, 1)  || \
+				  CLANG_PREREQ(7, 0, 10010463) ))
+#  define HAVE_SHA3_INTRIN	((HAVE_SHA3_NATIVE || HAVE_SHA3_TARGET) && \
+				 (GCC_PREREQ(9, 1)  || \
+				  __has_builtin(__builtin_neon_veor3q_v)))
+#else
+#  define HAVE_SHA3_NATIVE	0
+#  define HAVE_SHA3_TARGET	0
+#  define HAVE_SHA3_INTRIN	0
+#endif
+
+
+#ifdef __aarch64__
+#  ifdef __ARM_FEATURE_DOTPROD
+#    define HAVE_DOTPROD_NATIVE	1
+#  else
+#    define HAVE_DOTPROD_NATIVE	0
+#  endif
+#  define HAVE_DOTPROD_TARGET \
+	(HAVE_DYNAMIC_ARM_CPU_FEATURES && \
+	 (GCC_PREREQ(8, 1) || __has_builtin(__builtin_neon_vdotq_v)))
+#  define HAVE_DOTPROD_INTRIN \
+	(HAVE_NEON_INTRIN && (HAVE_DOTPROD_NATIVE || HAVE_DOTPROD_TARGET))
+#else
+#  define HAVE_DOTPROD_NATIVE	0
+#  define HAVE_DOTPROD_TARGET	0
+#  define HAVE_DOTPROD_INTRIN	0
+#endif
+
+
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  define __ARM_FEATURE_CRC32	1
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_SHA3	1
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  define __ARM_FEATURE_DOTPROD	1
+#endif
+#if HAVE_CRC32_INTRIN && !HAVE_CRC32_NATIVE && \
+	(defined(__clang__) || defined(__arm__))
+#  include <arm_acle.h>
+#  undef __ARM_FEATURE_CRC32
+#endif
+#if HAVE_SHA3_INTRIN && !HAVE_SHA3_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_SHA3
+#endif
+#if HAVE_DOTPROD_INTRIN && !HAVE_DOTPROD_NATIVE && defined(__clang__)
+#  include <arm_neon.h>
+#  undef __ARM_FEATURE_DOTPROD
+#endif
 
 #endif 
 
 #endif 
 
 
-#if ARM_CPU_FEATURES_ENABLED
+#if HAVE_DYNAMIC_ARM_CPU_FEATURES
+
+#ifdef __linux__
+
 
 #include <errno.h>
 #include <fcntl.h>
@@ -23539,8 +28887,6 @@ static inline u32 get_cpu_features(void)
 
 #define AT_HWCAP	16
 #define AT_HWCAP2	26
-
-volatile u32 _cpu_features = 0;
 
 static void scan_auxv(unsigned long *hwcap, unsigned long *hwcap2)
 {
@@ -23584,13 +28930,7 @@ out:
 	close(fd);
 }
 
-static const struct cpu_feature arm_cpu_feature_table[] = {
-	{ARM_CPU_FEATURE_NEON,		"neon"},
-	{ARM_CPU_FEATURE_PMULL,		"pmull"},
-	{ARM_CPU_FEATURE_CRC32,		"crc32"},
-};
-
-void setup_cpu_features(void)
+static u32 query_arm_cpu_features(void)
 {
 	u32 features = 0;
 	unsigned long hwcap = 0;
@@ -23614,16 +28954,75 @@ void setup_cpu_features(void)
 		features |= ARM_CPU_FEATURE_PMULL;
 	if (hwcap & (1 << 7))	
 		features |= ARM_CPU_FEATURE_CRC32;
+	if (hwcap & (1 << 17))	
+		features |= ARM_CPU_FEATURE_SHA3;
+	if (hwcap & (1 << 20))	
+		features |= ARM_CPU_FEATURE_DOTPROD;
 #endif
+	return features;
+}
+
+#elif defined(__APPLE__)
+
+
+#include <sys/types.h>
+#include <sys/sysctl.h>
+
+static const struct {
+	const char *name;
+	u32 feature;
+} feature_sysctls[] = {
+	{ "hw.optional.neon",		  ARM_CPU_FEATURE_NEON },
+	{ "hw.optional.AdvSIMD",	  ARM_CPU_FEATURE_NEON },
+	{ "hw.optional.arm.FEAT_PMULL",	  ARM_CPU_FEATURE_PMULL },
+	{ "hw.optional.armv8_crc32",	  ARM_CPU_FEATURE_CRC32 },
+	{ "hw.optional.armv8_2_sha3",	  ARM_CPU_FEATURE_SHA3 },
+	{ "hw.optional.arm.FEAT_SHA3",	  ARM_CPU_FEATURE_SHA3 },
+	{ "hw.optional.arm.FEAT_DotProd", ARM_CPU_FEATURE_DOTPROD },
+};
+
+static u32 query_arm_cpu_features(void)
+{
+	u32 features = 0;
+	size_t i;
+
+	for (i = 0; i < ARRAY_LEN(feature_sysctls); i++) {
+		const char *name = feature_sysctls[i].name;
+		u32 val = 0;
+		size_t valsize = sizeof(val);
+
+		if (sysctlbyname(name, &val, &valsize, NULL, 0) == 0 &&
+		    valsize == sizeof(val) && val == 1)
+			features |= feature_sysctls[i].feature;
+	}
+	return features;
+}
+#else
+#error "unhandled case"
+#endif
+
+static const struct cpu_feature arm_cpu_feature_table[] = {
+	{ARM_CPU_FEATURE_NEON,		"neon"},
+	{ARM_CPU_FEATURE_PMULL,		"pmull"},
+	{ARM_CPU_FEATURE_CRC32,		"crc32"},
+	{ARM_CPU_FEATURE_SHA3,		"sha3"},
+	{ARM_CPU_FEATURE_DOTPROD,	"dotprod"},
+};
+
+volatile u32 libdeflate_arm_cpu_features = 0;
+
+void libdeflate_init_arm_cpu_features(void)
+{
+	u32 features = query_arm_cpu_features();
 
 	disable_cpu_features_for_testing(&features, arm_cpu_feature_table,
 					 ARRAY_LEN(arm_cpu_feature_table));
 
-	_cpu_features = features | ARM_CPU_FEATURES_KNOWN;
+	libdeflate_arm_cpu_features = features | ARM_CPU_FEATURES_KNOWN;
 }
 
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate-1.7/lib/x86/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.14/lib/x86/cpu_features.c */
 
 
 /* #include "cpu_features_common.h" - no include guard */ 
@@ -23646,253 +29045,27 @@ void setup_cpu_features(void)
 
 #define BUILDING_LIBDEFLATE
 
-/* #include "../common/common_defs.h" */
+/* #include "../common_defs.h" */
 
 
-#ifndef COMMON_COMMON_DEFS_H
-#define COMMON_COMMON_DEFS_H
+#ifndef COMMON_DEFS_H
+#define COMMON_DEFS_H
 
-#ifdef __GNUC__
-/* #  include "compiler_gcc.h" */
-
-
-#if !defined(__clang__) && !defined(__INTEL_COMPILER)
-#  define GCC_PREREQ(major, minor)		\
-	(__GNUC__ > (major) ||			\
-	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
-#else
-#  define GCC_PREREQ(major, minor)	0
-#endif
-
-
-#ifdef __clang__
-#  ifdef __apple_build_version__
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__apple_build_version__ >= (apple_version))
-#  else
-#    define CLANG_PREREQ(major, minor, apple_version)	\
-	(__clang_major__ > (major) ||			\
-	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
-#  endif
-#else
-#  define CLANG_PREREQ(major, minor, apple_version)	0
-#endif
-
-#ifndef __has_attribute
-#  define __has_attribute(attribute)	0
-#endif
-#ifndef __has_feature
-#  define __has_feature(feature)	0
-#endif
-#ifndef __has_builtin
-#  define __has_builtin(builtin)	0
-#endif
-
-#ifdef _WIN32
-#  define LIBEXPORT __declspec(dllexport)
-#else
-#  define LIBEXPORT __attribute__((visibility("default")))
-#endif
-
-#define inline			inline
-#define forceinline		inline __attribute__((always_inline))
-#define restrict		__restrict__
-#define likely(expr)		__builtin_expect(!!(expr), 1)
-#define unlikely(expr)		__builtin_expect(!!(expr), 0)
-#define prefetchr(addr)		__builtin_prefetch((addr), 0)
-#define prefetchw(addr)		__builtin_prefetch((addr), 1)
-#define _aligned_attribute(n)	__attribute__((aligned(n)))
-
-#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE	\
-	(GCC_PREREQ(4, 4) || __has_attribute(target))
-
-#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-
-#  if defined(__i386__) || defined(__x86_64__)
-
-#    define COMPILER_SUPPORTS_PCLMUL_TARGET	\
-	(GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128))
-
-#    define COMPILER_SUPPORTS_AVX_TARGET	\
-	(GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256))
-
-#    define COMPILER_SUPPORTS_BMI2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di))
-
-#    define COMPILER_SUPPORTS_AVX2_TARGET	\
-	(GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256))
-
-#    define COMPILER_SUPPORTS_AVX512BW_TARGET	\
-	(GCC_PREREQ(5, 1) || __has_builtin(__builtin_ia32_psadbw512))
-
-	
-#    if GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)
-#      define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS	1
-#      define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_PCLMUL_TARGET
-#      define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX2_TARGET
-#      define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS	\
-		COMPILER_SUPPORTS_AVX512BW_TARGET
-#    endif
-
-#  elif defined(__arm__) || defined(__aarch64__)
-
-    
-#    if (GCC_PREREQ(6, 1) && defined(__ARM_FP)) || \
-        (defined(__clang__) && defined(__ARM_NEON))
-#      define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 1
-       
-#      if defined(__clang__) && defined(__arm__)
-#        undef __ARM_FEATURE_CRYPTO
-#      elif __has_builtin(__builtin_neon_vmull_p64) || !defined(__clang__)
-#        define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 1
-#      endif
-#    endif
-
-     
-#    if GCC_PREREQ(10, 1) || \
-        (GCC_PREREQ(9, 3) && !GCC_PREREQ(10, 0)) || \
-        (GCC_PREREQ(8, 4) && !GCC_PREREQ(9, 0)) || \
-        (defined(__clang__) && __has_builtin(__builtin_arm_crc32b))
-#      define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 1
-#    endif
-
-#  endif 
-
-#endif 
-
-
-#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
-    (defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000))
-typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
-typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
-typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
-typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
-typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
-typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
-typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
-typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
-#endif
-
-
-#ifdef __BYTE_ORDER__
-#  define CPU_IS_LITTLE_ENDIAN() (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#endif
-
-#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
-#  define bswap16	__builtin_bswap16
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
-#  define bswap32	__builtin_bswap32
-#endif
-
-#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
-#  define bswap64	__builtin_bswap64
-#endif
-
-#if defined(__x86_64__) || defined(__i386__) || defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__)
-#  define UNALIGNED_ACCESS_IS_FAST 1
-#endif
-
-#define bsr32(n)	(31 - __builtin_clz(n))
-#define bsr64(n)	(63 - __builtin_clzll(n))
-#define bsf32(n)	__builtin_ctz(n)
-#define bsf64(n)	__builtin_ctzll(n)
-
-#elif defined(_MSC_VER)
-/* #  include "compiler_msc.h" */
-
-
+#include <stdbool.h>
+#include <stddef.h>	
 #include <stdint.h>
-#include <stdlib.h> 
-
-#define LIBEXPORT	__declspec(dllexport)
-
-
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined 1
-
-
-#ifdef _WIN64
-typedef long long ssize_t;
-#else
-typedef int ssize_t;
+#ifdef _MSC_VER
+#  include <stdlib.h>	
 #endif
-
-
-#define CPU_IS_LITTLE_ENDIAN()		1
-#define UNALIGNED_ACCESS_IS_FAST	1
-
-
-#define restrict
-
-
-#define inline		__inline
-#define forceinline	__forceinline
-
-
-#define bswap16	_byteswap_ushort
-#define bswap32	_byteswap_ulong
-#define bswap64	_byteswap_uint64
-
-
-
-static forceinline unsigned
-bsr32(uint32_t n)
-{
-	_BitScanReverse(&n, n);
-	return n;
-}
-#define bsr32 bsr32
-
-static forceinline unsigned
-bsf32(uint32_t n)
-{
-	_BitScanForward(&n, n);
-	return n;
-}
-#define bsf32 bsf32
-
-#ifdef _M_X64 
-
-static forceinline unsigned
-bsr64(uint64_t n)
-{
-	_BitScanReverse64(&n, n);
-	return n;
-}
-#define bsr64 bsr64
-
-static forceinline unsigned
-bsf64(uint64_t n)
-{
-	_BitScanForward64(&n, n);
-	return n;
-}
-#define bsf64 bsf64
-
-#endif 
-
-#else
-#  pragma message("Unrecognized compiler.  Please add a header file for your compiler.  Compilation will proceed, but performance may suffer!")
+#ifndef FREESTANDING
+#  include <string.h>	
 #endif
 
 
 
 
 
-#include <stddef.h> 
 
-#ifndef __bool_true_false_are_defined
-#  include <stdbool.h> 
-#endif
-
-
-#include <stdint.h>
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -23901,6 +29074,15 @@ typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
+
+
+#ifdef _MSC_VER
+#  ifdef _WIN64
+     typedef long long ssize_t;
+#  else
+     typedef long ssize_t;
+#  endif
+#endif
 
 
 typedef size_t machine_word_t;
@@ -23916,87 +29098,115 @@ typedef size_t machine_word_t;
 
 
 
-#ifndef LIBEXPORT
+#if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
+#  define GCC_PREREQ(major, minor)		\
+	(__GNUC__ > (major) ||			\
+	 (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#else
+#  define GCC_PREREQ(major, minor)	0
+#endif
+#ifdef __clang__
+#  ifdef __apple_build_version__
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__apple_build_version__ >= (apple_version))
+#  else
+#    define CLANG_PREREQ(major, minor, apple_version)	\
+	(__clang_major__ > (major) ||			\
+	 (__clang_major__ == (major) && __clang_minor__ >= (minor)))
+#  endif
+#else
+#  define CLANG_PREREQ(major, minor, apple_version)	0
+#endif
+
+
+#ifndef __has_attribute
+#  define __has_attribute(attribute)	0
+#endif
+#ifndef __has_builtin
+#  define __has_builtin(builtin)	0
+#endif
+
+
+#ifdef _WIN32
+#  define LIBEXPORT		__declspec(dllexport)
+#elif defined(__GNUC__)
+#  define LIBEXPORT		__attribute__((visibility("default")))
+#else
 #  define LIBEXPORT
 #endif
 
 
-#ifndef inline
-#  define inline
+#ifdef _MSC_VER
+#  define inline		__inline
+#endif 
+
+
+#ifdef __GNUC__
+#  define forceinline		inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#  define forceinline		__forceinline
+#else
+#  define forceinline		inline
 #endif
 
 
-#ifndef forceinline
-#  define forceinline inline
+#ifdef __GNUC__
+#  define MAYBE_UNUSED		__attribute__((unused))
+#else
+#  define MAYBE_UNUSED
 #endif
 
 
-#ifndef restrict
+#ifdef __GNUC__
+#  define restrict		__restrict__
+#elif defined(_MSC_VER)
+    
+#  if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#    define restrict		restrict
+#  else
+#    define restrict
+#  endif
+#else
 #  define restrict
 #endif
 
 
-#ifndef likely
+#ifdef __GNUC__
+#  define likely(expr)		__builtin_expect(!!(expr), 1)
+#else
 #  define likely(expr)		(expr)
 #endif
 
 
-#ifndef unlikely
+#ifdef __GNUC__
+#  define unlikely(expr)	__builtin_expect(!!(expr), 0)
+#else
 #  define unlikely(expr)	(expr)
 #endif
 
 
-#ifndef prefetchr
+#ifdef __GNUC__
+#  define prefetchr(addr)	__builtin_prefetch((addr), 0)
+#else
 #  define prefetchr(addr)
 #endif
 
 
-#ifndef prefetchw
+#ifdef __GNUC__
+#  define prefetchw(addr)	__builtin_prefetch((addr), 1)
+#else
 #  define prefetchw(addr)
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE 0
+#undef _aligned_attribute
+#ifdef __GNUC__
+#  define _aligned_attribute(n)	__attribute__((aligned(n)))
 #endif
 
 
-#ifndef COMPILER_SUPPORTS_BMI2_TARGET
-#  define COMPILER_SUPPORTS_BMI2_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX_TARGET
-#  define COMPILER_SUPPORTS_AVX_TARGET 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET 0
-#endif
-
-
-#ifndef COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_SSE2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PCLMUL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX2_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_AVX512BW_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_NEON_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_PMULL_TARGET_INTRINSICS 0
-#endif
-#ifndef COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS
-#  define COMPILER_SUPPORTS_CRC32_TARGET_INTRINSICS 0
-#endif
-
-
-#ifndef _aligned_attribute
-#endif
+#define COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE \
+	(GCC_PREREQ(4, 4) || __has_attribute(target))
 
 
 
@@ -24008,158 +29218,401 @@ typedef size_t machine_word_t;
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 #define STATIC_ASSERT(expr)	((void)sizeof(char[1 - 2 * !(expr)]))
 #define ALIGN(n, a)		(((n) + (a) - 1) & ~((a) - 1))
+#define ROUND_UP(n, d)		((d) * DIV_ROUND_UP((n), (d)))
 
 
 
 
 
 
-#ifndef CPU_IS_LITTLE_ENDIAN
-static forceinline int CPU_IS_LITTLE_ENDIAN(void)
+#if defined(__BYTE_ORDER__) 
+#  define CPU_IS_LITTLE_ENDIAN()  (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#elif defined(_MSC_VER)
+#  define CPU_IS_LITTLE_ENDIAN()  true
+#else
+static forceinline bool CPU_IS_LITTLE_ENDIAN(void)
 {
 	union {
-		unsigned int v;
-		unsigned char b;
+		u32 w;
+		u8 b;
 	} u;
-	u.v = 1;
+
+	u.w = 1;
 	return u.b;
 }
 #endif
 
 
-#ifndef bswap16
-static forceinline u16 bswap16(u16 n)
+static forceinline u16 bswap16(u16 v)
 {
-	return (n << 8) | (n >> 8);
-}
+#if GCC_PREREQ(4, 8) || __has_builtin(__builtin_bswap16)
+	return __builtin_bswap16(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ushort(v);
+#else
+	return (v << 8) | (v >> 8);
 #endif
+}
 
 
-#ifndef bswap32
-static forceinline u32 bswap32(u32 n)
+static forceinline u32 bswap32(u32 v)
 {
-	return ((n & 0x000000FF) << 24) |
-	       ((n & 0x0000FF00) << 8) |
-	       ((n & 0x00FF0000) >> 8) |
-	       ((n & 0xFF000000) >> 24);
-}
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap32)
+	return __builtin_bswap32(v);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(v);
+#else
+	return ((v & 0x000000FF) << 24) |
+	       ((v & 0x0000FF00) << 8) |
+	       ((v & 0x00FF0000) >> 8) |
+	       ((v & 0xFF000000) >> 24);
 #endif
+}
 
 
-#ifndef bswap64
-static forceinline u64 bswap64(u64 n)
+static forceinline u64 bswap64(u64 v)
 {
-	return ((n & 0x00000000000000FF) << 56) |
-	       ((n & 0x000000000000FF00) << 40) |
-	       ((n & 0x0000000000FF0000) << 24) |
-	       ((n & 0x00000000FF000000) << 8) |
-	       ((n & 0x000000FF00000000) >> 8) |
-	       ((n & 0x0000FF0000000000) >> 24) |
-	       ((n & 0x00FF000000000000) >> 40) |
-	       ((n & 0xFF00000000000000) >> 56);
+#if GCC_PREREQ(4, 3) || __has_builtin(__builtin_bswap64)
+	return __builtin_bswap64(v);
+#elif defined(_MSC_VER)
+	return _byteswap_uint64(v);
+#else
+	return ((v & 0x00000000000000FF) << 56) |
+	       ((v & 0x000000000000FF00) << 40) |
+	       ((v & 0x0000000000FF0000) << 24) |
+	       ((v & 0x00000000FF000000) << 8) |
+	       ((v & 0x000000FF00000000) >> 8) |
+	       ((v & 0x0000FF0000000000) >> 24) |
+	       ((v & 0x00FF000000000000) >> 40) |
+	       ((v & 0xFF00000000000000) >> 56);
+#endif
 }
+
+#define le16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap16(v))
+#define le32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap32(v))
+#define le64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? (v) : bswap64(v))
+#define be16_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap16(v) : (v))
+#define be32_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap32(v) : (v))
+#define be64_bswap(v) (CPU_IS_LITTLE_ENDIAN() ? bswap64(v) : (v))
+
+
+
+
+
+
+#if defined(__GNUC__) && \
+	(defined(__x86_64__) || defined(__i386__) || \
+	 defined(__ARM_FEATURE_UNALIGNED) || defined(__powerpc64__) || \
+	  defined(__wasm__))
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#elif defined(_MSC_VER)
+#  define UNALIGNED_ACCESS_IS_FAST	1
+#else
+#  define UNALIGNED_ACCESS_IS_FAST	0
 #endif
 
-#define le16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap16(n))
-#define le32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap32(n))
-#define le64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? (n) : bswap64(n))
-#define be16_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap16(n) : (n))
-#define be32_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap32(n) : (n))
-#define be64_bswap(n) (CPU_IS_LITTLE_ENDIAN() ? bswap64(n) : (n))
 
 
-
-
-
-
-#ifndef UNALIGNED_ACCESS_IS_FAST
-#  define UNALIGNED_ACCESS_IS_FAST 0
+#ifdef FREESTANDING
+#  define MEMCOPY	__builtin_memcpy
+#else
+#  define MEMCOPY	memcpy
 #endif
 
 
 
+#define DEFINE_UNALIGNED_TYPE(type)				\
+static forceinline type						\
+load_##type##_unaligned(const void *p)				\
+{								\
+	type v;							\
+								\
+	MEMCOPY(&v, p, sizeof(v));				\
+	return v;						\
+}								\
+								\
+static forceinline void						\
+store_##type##_unaligned(type v, void *p)			\
+{								\
+	MEMCOPY(p, &v, sizeof(v));				\
+}
+
+DEFINE_UNALIGNED_TYPE(u16)
+DEFINE_UNALIGNED_TYPE(u32)
+DEFINE_UNALIGNED_TYPE(u64)
+DEFINE_UNALIGNED_TYPE(machine_word_t)
+
+#undef MEMCOPY
+
+#define load_word_unaligned	load_machine_word_t_unaligned
+#define store_word_unaligned	store_machine_word_t_unaligned
 
 
 
-
-#ifndef bsr32
-static forceinline unsigned
-bsr32(u32 n)
+static forceinline u16
+get_unaligned_le16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[1] << 8) | p[0];
 }
-#endif
 
-#ifndef bsr64
-static forceinline unsigned
-bsr64(u64 n)
+static forceinline u16
+get_unaligned_be16(const u8 *p)
 {
-	unsigned i = 0;
-	while ((n >>= 1) != 0)
-		i++;
-	return i;
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be16_bswap(load_u16_unaligned(p));
+	else
+		return ((u16)p[0] << 8) | p[1];
 }
-#endif
 
-static forceinline unsigned
-bsrw(machine_word_t n)
+static forceinline u32
+get_unaligned_le32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[3] << 24) | ((u32)p[2] << 16) |
+			((u32)p[1] << 8) | p[0];
+}
+
+static forceinline u32
+get_unaligned_be32(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return be32_bswap(load_u32_unaligned(p));
+	else
+		return ((u32)p[0] << 24) | ((u32)p[1] << 16) |
+			((u32)p[2] << 8) | p[3];
+}
+
+static forceinline u64
+get_unaligned_le64(const u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST)
+		return le64_bswap(load_u64_unaligned(p));
+	else
+		return ((u64)p[7] << 56) | ((u64)p[6] << 48) |
+			((u64)p[5] << 40) | ((u64)p[4] << 32) |
+			((u64)p[3] << 24) | ((u64)p[2] << 16) |
+			((u64)p[1] << 8) | p[0];
+}
+
+static forceinline machine_word_t
+get_unaligned_leword(const u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsr32(n);
+		return get_unaligned_le32(p);
 	else
-		return bsr64(n);
+		return get_unaligned_le64(p);
 }
 
 
 
-#ifndef bsf32
-static forceinline unsigned
-bsf32(u32 n)
+static forceinline void
+put_unaligned_le16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(le16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
 	}
-	return i;
 }
-#endif
 
-#ifndef bsf64
-static forceinline unsigned
-bsf64(u64 n)
+static forceinline void
+put_unaligned_be16(u16 v, u8 *p)
 {
-	unsigned i = 0;
-	while ((n & 1) == 0) {
-		i++;
-		n >>= 1;
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u16_unaligned(be16_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 8);
+		p[1] = (u8)(v >> 0);
 	}
-	return i;
 }
-#endif
 
-static forceinline unsigned
-bsfw(machine_word_t n)
+static forceinline void
+put_unaligned_le32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(le32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+	}
+}
+
+static forceinline void
+put_unaligned_be32(u32 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u32_unaligned(be32_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 24);
+		p[1] = (u8)(v >> 16);
+		p[2] = (u8)(v >> 8);
+		p[3] = (u8)(v >> 0);
+	}
+}
+
+static forceinline void
+put_unaligned_le64(u64 v, u8 *p)
+{
+	if (UNALIGNED_ACCESS_IS_FAST) {
+		store_u64_unaligned(le64_bswap(v), p);
+	} else {
+		p[0] = (u8)(v >> 0);
+		p[1] = (u8)(v >> 8);
+		p[2] = (u8)(v >> 16);
+		p[3] = (u8)(v >> 24);
+		p[4] = (u8)(v >> 32);
+		p[5] = (u8)(v >> 40);
+		p[6] = (u8)(v >> 48);
+		p[7] = (u8)(v >> 56);
+	}
+}
+
+static forceinline void
+put_unaligned_leword(machine_word_t v, u8 *p)
 {
 	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
 	if (WORDBITS == 32)
-		return bsf32(n);
+		put_unaligned_le32(v, p);
 	else
-		return bsf64(n);
+		put_unaligned_le64(v, p);
 }
+
+
+
+
+
+
+
+static forceinline unsigned
+bsr32(u32 v)
+{
+#ifdef __GNUC__
+	return 31 - __builtin_clz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanReverse(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsr64(u64 v)
+{
+#ifdef __GNUC__
+	return 63 - __builtin_clzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanReverse64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	while ((v >>= 1) != 0)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsrw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsr32(v);
+	else
+		return bsr64(v);
+}
+
+
+
+static forceinline unsigned
+bsf32(u32 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctz(v);
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	_BitScanForward(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsf64(u64 v)
+{
+#ifdef __GNUC__
+	return __builtin_ctzll(v);
+#elif defined(_MSC_VER) && defined(_WIN64)
+	unsigned long i;
+
+	_BitScanForward64(&i, v);
+	return i;
+#else
+	unsigned i = 0;
+
+	for (; (v & 1) == 0; v >>= 1)
+		i++;
+	return i;
+#endif
+}
+
+static forceinline unsigned
+bsfw(machine_word_t v)
+{
+	STATIC_ASSERT(WORDBITS == 32 || WORDBITS == 64);
+	if (WORDBITS == 32)
+		return bsf32(v);
+	else
+		return bsf64(v);
+}
+
+
+#undef rbit32
+#if defined(__GNUC__) && defined(__arm__) && \
+	(__ARM_ARCH >= 7 || (__ARM_ARCH == 6 && defined(__ARM_ARCH_6T2__)))
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %0, %1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#elif defined(__GNUC__) && defined(__aarch64__)
+static forceinline u32
+rbit32(u32 v)
+{
+	__asm__("rbit %w0, %w1" : "=r" (v) : "r" (v));
+	return v;
+}
+#define rbit32 rbit32
+#endif
 
 #endif 
 
-
-
-#define SYM_FIXUP(sym)			_libdeflate_##sym
-#define deflate_get_compression_level	SYM_FIXUP(deflate_get_compression_level)
-#define _cpu_features			SYM_FIXUP(_cpu_features)
-#define setup_cpu_features		SYM_FIXUP(setup_cpu_features)
 
 void *libdeflate_malloc(size_t size);
 void libdeflate_free(void *ptr);
@@ -24180,50 +29633,153 @@ void *memmove(void *dest, const void *src, size_t n);
 
 int memcmp(const void *s1, const void *s2, size_t n);
 #define memcmp(s1, s2, n)	__builtin_memcmp((s1), (s2), (n))
+
+#undef LIBDEFLATE_ENABLE_ASSERTIONS
 #else
 #include <string.h>
 #endif
 
+
+#ifdef LIBDEFLATE_ENABLE_ASSERTIONS
+void libdeflate_assertion_failed(const char *expr, const char *file, int line);
+#define ASSERT(expr) { if (unlikely(!(expr))) \
+	libdeflate_assertion_failed(#expr, __FILE__, __LINE__); }
+#else
+#define ASSERT(expr) (void)(expr)
+#endif
+
+#define CONCAT_IMPL(a, b)	a##b
+#define CONCAT(a, b)		CONCAT_IMPL(a, b)
+#define ADD_SUFFIX(name)	CONCAT(name, SUFFIX)
+
 #endif 
 
 
-#if (defined(__i386__) || defined(__x86_64__)) && \
-	COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
-#  define X86_CPU_FEATURES_ENABLED 1
-#else
-#  define X86_CPU_FEATURES_ENABLED 0
-#endif
+#define HAVE_DYNAMIC_X86_CPU_FEATURES	0
 
-#if X86_CPU_FEATURES_ENABLED
+#if defined(__i386__) || defined(__x86_64__)
+
+#if COMPILER_SUPPORTS_TARGET_FUNCTION_ATTRIBUTE
+#  undef HAVE_DYNAMIC_X86_CPU_FEATURES
+#  define HAVE_DYNAMIC_X86_CPU_FEATURES	1
+#endif
 
 #define X86_CPU_FEATURE_SSE2		0x00000001
 #define X86_CPU_FEATURE_PCLMUL		0x00000002
 #define X86_CPU_FEATURE_AVX		0x00000004
 #define X86_CPU_FEATURE_AVX2		0x00000008
 #define X86_CPU_FEATURE_BMI2		0x00000010
-#define X86_CPU_FEATURE_AVX512BW	0x00000020
 
+#define HAVE_SSE2(features)	(HAVE_SSE2_NATIVE     || ((features) & X86_CPU_FEATURE_SSE2))
+#define HAVE_PCLMUL(features)	(HAVE_PCLMUL_NATIVE   || ((features) & X86_CPU_FEATURE_PCLMUL))
+#define HAVE_AVX(features)	(HAVE_AVX_NATIVE      || ((features) & X86_CPU_FEATURE_AVX))
+#define HAVE_AVX2(features)	(HAVE_AVX2_NATIVE     || ((features) & X86_CPU_FEATURE_AVX2))
+#define HAVE_BMI2(features)	(HAVE_BMI2_NATIVE     || ((features) & X86_CPU_FEATURE_BMI2))
+
+#if HAVE_DYNAMIC_X86_CPU_FEATURES
 #define X86_CPU_FEATURES_KNOWN		0x80000000
+extern volatile u32 libdeflate_x86_cpu_features;
 
-extern volatile u32 _cpu_features;
+void libdeflate_init_x86_cpu_features(void);
 
-void setup_cpu_features(void);
-
-static inline u32 get_cpu_features(void)
+static inline u32 get_x86_cpu_features(void)
 {
-	if (_cpu_features == 0)
-		setup_cpu_features();
-	return _cpu_features;
+	if (libdeflate_x86_cpu_features == 0)
+		libdeflate_init_x86_cpu_features();
+	return libdeflate_x86_cpu_features;
 }
+#else 
+static inline u32 get_x86_cpu_features(void) { return 0; }
+#endif 
+
+
+#define HAVE_TARGET_INTRINSICS \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 9) || CLANG_PREREQ(3, 8, 7030000)))
+
+
+#if (GCC_PREREQ(4, 0) && !GCC_PREREQ(5, 1)) || \
+	(defined(__clang__) && !CLANG_PREREQ(3, 9, 8020000)) || \
+	defined(__INTEL_COMPILER)
+typedef unsigned long long  __v2du __attribute__((__vector_size__(16)));
+typedef unsigned int        __v4su __attribute__((__vector_size__(16)));
+typedef unsigned short      __v8hu __attribute__((__vector_size__(16)));
+typedef unsigned char      __v16qu __attribute__((__vector_size__(16)));
+typedef unsigned long long  __v4du __attribute__((__vector_size__(32)));
+typedef unsigned int        __v8su __attribute__((__vector_size__(32)));
+typedef unsigned short     __v16hu __attribute__((__vector_size__(32)));
+typedef unsigned char      __v32qu __attribute__((__vector_size__(32)));
+#endif
+#ifdef __INTEL_COMPILER
+typedef int   __v16si __attribute__((__vector_size__(64)));
+typedef short __v32hi __attribute__((__vector_size__(64)));
+typedef char  __v64qi __attribute__((__vector_size__(64)));
+#endif
+
+
+#ifdef __SSE2__
+#  define HAVE_SSE2_NATIVE	1
+#else
+#  define HAVE_SSE2_NATIVE	0
+#endif
+#define HAVE_SSE2_TARGET	HAVE_DYNAMIC_X86_CPU_FEATURES
+#define HAVE_SSE2_INTRIN \
+	(HAVE_SSE2_NATIVE || (HAVE_SSE2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __PCLMUL__
+#  define HAVE_PCLMUL_NATIVE	1
+#else
+#  define HAVE_PCLMUL_NATIVE	0
+#endif
+#define HAVE_PCLMUL_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 4) || __has_builtin(__builtin_ia32_pclmulqdq128)))
+#define HAVE_PCLMUL_INTRIN \
+	(HAVE_PCLMUL_NATIVE || (HAVE_PCLMUL_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX__
+#  define HAVE_AVX_NATIVE	1
+#else
+#  define HAVE_AVX_NATIVE	0
+#endif
+#define HAVE_AVX_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 6) || __has_builtin(__builtin_ia32_maxps256)))
+#define HAVE_AVX_INTRIN \
+	(HAVE_AVX_NATIVE || (HAVE_AVX_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __AVX2__
+#  define HAVE_AVX2_NATIVE	1
+#else
+#  define HAVE_AVX2_NATIVE	0
+#endif
+#define HAVE_AVX2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_psadbw256)))
+#define HAVE_AVX2_INTRIN \
+	(HAVE_AVX2_NATIVE || (HAVE_AVX2_TARGET && HAVE_TARGET_INTRINSICS))
+
+
+#ifdef __BMI2__
+#  define HAVE_BMI2_NATIVE	1
+#else
+#  define HAVE_BMI2_NATIVE	0
+#endif
+#define HAVE_BMI2_TARGET \
+	(HAVE_DYNAMIC_X86_CPU_FEATURES && \
+	 (GCC_PREREQ(4, 7) || __has_builtin(__builtin_ia32_pdep_di)))
+#define HAVE_BMI2_INTRIN \
+	(HAVE_BMI2_NATIVE || (HAVE_BMI2_TARGET && HAVE_TARGET_INTRINSICS))
 
 #endif 
 
 #endif 
 
 
-#if X86_CPU_FEATURES_ENABLED
-
-volatile u32 _cpu_features = 0;
+#if HAVE_DYNAMIC_X86_CPU_FEATURES
 
 
 #if defined(__i386__) && defined(__PIC__)
@@ -24273,18 +29829,18 @@ static const struct cpu_feature x86_cpu_feature_table[] = {
 	{X86_CPU_FEATURE_AVX,		"avx"},
 	{X86_CPU_FEATURE_AVX2,		"avx2"},
 	{X86_CPU_FEATURE_BMI2,		"bmi2"},
-	{X86_CPU_FEATURE_AVX512BW,	"avx512bw"},
 };
 
+volatile u32 libdeflate_x86_cpu_features = 0;
 
-void setup_cpu_features(void)
+
+void libdeflate_init_x86_cpu_features(void)
 {
 	u32 features = 0;
 	u32 dummy1, dummy2, dummy3, dummy4;
 	u32 max_function;
 	u32 features_1, features_2, features_3, features_4;
 	bool os_avx_support = false;
-	bool os_avx512_support = false;
 
 	
 	cpuid(0, 0, &max_function, &dummy2, &dummy3, &dummy4);
@@ -24306,13 +29862,6 @@ void setup_cpu_features(void)
 		os_avx_support = IS_ALL_SET(xcr0,
 					    XCR0_BIT_SSE |
 					    XCR0_BIT_AVX);
-
-		os_avx512_support = IS_ALL_SET(xcr0,
-					       XCR0_BIT_SSE |
-					       XCR0_BIT_AVX |
-					       XCR0_BIT_OPMASK |
-					       XCR0_BIT_ZMM_HI256 |
-					       XCR0_BIT_HI16_ZMM);
 	}
 
 	if (os_avx_support && IS_SET(features_2, 28))
@@ -24330,14 +29879,11 @@ void setup_cpu_features(void)
 	if (IS_SET(features_3, 8))
 		features |= X86_CPU_FEATURE_BMI2;
 
-	if (os_avx512_support && IS_SET(features_3, 30))
-		features |= X86_CPU_FEATURE_AVX512BW;
-
 out:
 	disable_cpu_features_for_testing(&features, x86_cpu_feature_table,
 					 ARRAY_LEN(x86_cpu_feature_table));
 
-	_cpu_features = features | X86_CPU_FEATURES_KNOWN;
+	libdeflate_x86_cpu_features = features | X86_CPU_FEATURES_KNOWN;
 }
 
 #endif 

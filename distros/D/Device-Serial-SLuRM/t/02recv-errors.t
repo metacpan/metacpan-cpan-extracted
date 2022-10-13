@@ -6,6 +6,8 @@ use warnings;
 use Test::More;
 use Test::Future::IO;
 
+use constant HAVE_TEST_METRICS_ANY => eval { require Test::Metrics::Any };
+
 use Future::AsyncAwait;
 
 use Device::Serial::SLuRM;
@@ -68,6 +70,12 @@ my $expect = [ 0x11, "OK" ];
    is_deeply( [ await $slurm->recv_packet ], $expect,
       'Packet received by ->recv_packet after corrupted header' );
 
+   if( HAVE_TEST_METRICS_ANY ) {
+      Test::Metrics::Any::is_metrics( {
+         "slurm_discards" => 1,
+      }, 'Corrupted header CRC increments metrics' );
+   }
+
    $controller->check_and_clear( '->recv_packet after corrupted header' );
 }
 
@@ -81,6 +89,12 @@ my $expect = [ 0x11, "OK" ];
 
    is_deeply( [ await $slurm->recv_packet ], $expect,
       'Packet received by ->recv_packet after corrupted payload CRC' );
+
+   if( HAVE_TEST_METRICS_ANY ) {
+      Test::Metrics::Any::is_metrics( {
+         "slurm_discards" => 2,
+      }, 'Corrupted body CRC increments metrics' );
+   }
 
    $controller->check_and_clear( '->recv_packet after corrupted payload CRC' );
 }

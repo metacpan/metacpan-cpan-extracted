@@ -1,3 +1,10 @@
+0.111   2022-09-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Update mention to renamed script dateseq-id -> dateseq-idn.
+
+
 0.110   2022-09-09  Released-By: PERLANCAR; Urgency: high
 
         - [bugfix] Fix a couple of bug fixes.

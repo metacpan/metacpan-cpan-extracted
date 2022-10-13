@@ -15,9 +15,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2022-10-12'; # DATE
 our $DIST = 'Getopt-Long-Util'; # DIST
-our $VERSION = '0.897'; # VERSION
+our $VERSION = '0.898'; # VERSION
 
 our %SPEC;
 
@@ -173,6 +173,9 @@ _
             schema => 'str*',
             default => 'key',
         },
+        opt_link => {
+            schema => 'str*', # XXX url? podlink?
+        },
         value_label => {
             schema => 'str*',
         },
@@ -208,14 +211,14 @@ sub humanize_getopt_long_opt_spec {
         my $opt_pod_res   = '';
         if ($parse->{is_neg} && length($_) > 1) {
             $opt_plain_res .= "--(no)$_";
-            $opt_pod_res   .= "B<--(no)$_>";
+            $opt_pod_res   .= defined($opts->{opt_link}) ? "L<--(no)$_|$opts->{opt_link}>" : "B<--(no)$_>";
         } else {
             if (length($_) > 1) {
                 $opt_plain_res .= "--$_";
-                $opt_pod_res   .= "B<--$_>";
+                $opt_pod_res   .= defined($opts->{opt_link}) ? "L<--$_|$opts->{opt_link}>" : "B<--$_>";
             } else {
                 $opt_plain_res .= "-$_";
-                $opt_pod_res   .= "B<-$_>";
+                $opt_pod_res   .= defined($opts->{opt_link}) ? "L<-$_|$opts->{opt_link}>" : "B<-$_>";
             }
             if ($i==1 && ($parse->{type} || $parse->{opttype})) {
                 # show value label
@@ -495,7 +498,7 @@ Getopt::Long::Util - Utilities for Getopt::Long
 
 =head1 VERSION
 
-This document describes version 0.897 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2022-10-09.
+This document describes version 0.898 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2022-10-12.
 
 =head1 FUNCTIONS
 
@@ -670,6 +673,8 @@ Arguments ('*' denotes required arguments):
 If set to true, will return a hash of multiple formats instead of a single plaintext format.
 
 =item * B<key_label> => I<str> (default: "key")
+
+=item * B<opt_link> => I<str>
 
 =item * B<$optspec>* => I<str>
 

@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "HTTP::Message",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Compress::Raw::Bzip2" => 0,
     "Compress::Raw::Zlib" => 0,
     "Encode" => "3.01",
     "Encode::Locale" => 1,
@@ -53,7 +54,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "overload" => 0
   },
-  "VERSION" => "6.39",
+  "VERSION" => "6.41",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +63,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Compress::Raw::Bzip2" => 0,
   "Compress::Raw::Zlib" => 0,
   "Encode" => "3.01",
   "Encode::Locale" => 1,

@@ -1,19 +1,20 @@
 package App::ProgUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-16'; # DATE
-our $DIST = 'App-ProgUtils'; # DIST
-our $VERSION = '0.202'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-09'; # DATE
+our $DIST = 'App-ProgUtils'; # DIST
+our $VERSION = '0.203'; # VERSION
 
 our %SPEC;
 
 our $_complete_program = sub {
     require Complete::File;
     require Complete::Program;
+    require Complete::Util;
     require List::MoreUtils;
 
     my %args = @_;
@@ -21,14 +22,18 @@ our $_complete_program = sub {
     my $word = $args{word} // '';
 
     # combine all executables (including dirs) and programs in PATH
-    my $c1 = Complete::File::complete_file(
-        word   => $word,
-        filter => sub { -x $_[0] },
-        #ci    => 1, # convenience, not yet supported by C::U
+    my $c1 = Complete::Util::arrayify_answer(
+        Complete::File::complete_file(
+            word   => $word,
+            filter => sub { -x $_[0] },
+            #ci    => 1, # convenience, not yet supported by C::U
+        ),
     );
-    my $c2 = Complete::Program::complete_program(
-        word => $word,
-        ci   => 1, # convenience
+    my $c2 = Complete::Util::arrayify_answer(
+        Complete::Program::complete_program(
+            word => $word,
+            ci   => 1, # convenience
+        ),
     );
 
     {
@@ -96,7 +101,7 @@ App::ProgUtils - Command line to manipulate programs in PATH
 
 =head1 VERSION
 
-This document describes version 0.202 of App::ProgUtils (from Perl distribution App-ProgUtils), released on 2020-04-16.
+This document describes version 0.203 of App::ProgUtils (from Perl distribution App-ProgUtils), released on 2022-08-09.
 
 =head1 SYNOPSIS
 
@@ -132,7 +137,7 @@ The main feature of these utilities is tab completion.
 
 Usage:
 
- list_all_programs_in_path(%args) -> [status, msg, payload, meta]
+ list_all_programs_in_path(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List all programs in PATH.
 
@@ -149,12 +154,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -177,14 +182,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ProgUt
 
 Source repository is at L<https://github.com/perlancar/perl-App-ProgUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProgUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 Below is the list of distributions that provide CLI utilities for various
@@ -200,6 +197,8 @@ L<App::IODUtils>, utilities related to L<IOD> configuration files.
 
 L<App::LedgerUtils>, utilities related to Ledger CLI files.
 
+L<App::PerlReleaseUtils>, utilities related to Perl distribution releases.
+
 L<App::PlUtils>, utilities related to Perl scripts.
 
 L<App::PMUtils>, utilities related to Perl modules.
@@ -214,11 +213,42 @@ L<Complete::Program>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProgUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

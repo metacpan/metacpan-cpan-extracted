@@ -2,8 +2,8 @@ NAME
     Getopt::Long::Util - Utilities for Getopt::Long
 
 VERSION
-    This document describes version 0.897 of Getopt::Long::Util (from Perl
-    distribution Getopt-Long-Util), released on 2022-10-09.
+    This document describes version 0.898 of Getopt::Long::Util (from Perl
+    distribution Getopt-Long-Util), released on 2022-10-12.
 
 FUNCTIONS
   array_getopt_long_spec_to_hash
@@ -149,6 +149,8 @@ FUNCTIONS
         single plaintext format.
 
     *   key_label => *str* (default: "key")
+
+    *   opt_link => *str*
 
     *   $optspec* => *str*
 

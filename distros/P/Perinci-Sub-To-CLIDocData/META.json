@@ -36,7 +36,8 @@
          "requires" : {
             "Exporter" : "5.57",
             "Getopt::Long::Negate::EN" : "0.060",
-            "Getopt::Long::Util" : "0.897",
+            "Getopt::Long::Util" : "0.898",
+            "Log::ger" : "0.038",
             "Module::Installed::Tiny" : "0.011",
             "Perinci::Object" : "0.311",
             "Perinci::Sub::ConvertArgs::Argv" : "0",
@@ -61,7 +62,7 @@
    "provides" : {
       "Perinci::Sub::To::CLIDocData" : {
          "file" : "lib/Perinci/Sub/To/CLIDocData.pm",
-         "version" : "0.301"
+         "version" : "0.303"
       }
    },
    "release_status" : "stable",
@@ -76,7 +77,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-To-CLIOptSpec"
       }
    },
-   "version" : "0.301",
+   "version" : "0.303",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

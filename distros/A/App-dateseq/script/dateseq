@@ -12,7 +12,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-09-09'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.110'; # VERSION
+our $VERSION = '0.111'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/dateseq/dateseq",
@@ -38,7 +38,7 @@ dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.110 of dateseq (from Perl distribution App-dateseq), released on 2022-09-09.
+This document describes version 0.111 of dateseq (from Perl distribution App-dateseq), released on 2022-09-09.
 
 =head1 SYNOPSIS
 
@@ -483,7 +483,7 @@ For fish and zsh, install L<shcompgen> as described above.
  2015-12-30
  2015-12-31
 
-See also L<dateseq-id> as alternative.
+See also L<dateseq-idn> as alternative.
 
 
 =head2 List non-holidays business days in 2015 (using Indonesian holidays)
@@ -500,7 +500,7 @@ See also L<dateseq-id> as alternative.
  2015-12-30
  2015-12-31
 
-See also L<dateseq-id> as alternative.
+See also L<dateseq-idn> as alternative.
 
 
 =head2 Use with fsql
@@ -542,11 +542,11 @@ See also L<dateseq-id> as alternative.
 =head2 Generate 100 random dates between a certain range
 
  % dateseq --random --from "1 year ago" --to "1 year from now" --limit 100
- 2022-11-11T23:08:56
- 2022-05-08T17:02:55
+ 2022-05-06T20:46:43
+ 2022-11-03T01:13:45
  ... 96 more lines ...
- 2021-10-21T19:09:29
- 2023-08-28T14:07:55
+ 2023-01-30T06:56:27
+ 2023-07-31T17:33:44
 
 =head1 HOMEPAGE
 
@@ -560,7 +560,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-dateseq>.
 
 L<durseq>. Produce sequence of date durations.
 
-L<dateseq-id>. A wrapper for dateseq, with built-in support for Indonesian holidays.
+L<dateseq-idn>. A wrapper for dateseq, with built-in support for Indonesian holidays.
 
 L<seq>.
 

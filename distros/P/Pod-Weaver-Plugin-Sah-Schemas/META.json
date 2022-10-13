@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Dmp" : "0.241",
+            "Data::Dmp" : "0.242",
             "Data::Sah" : "0.911",
             "Markdown::To::POD" : "0",
             "Module::List" : "0",
@@ -56,7 +56,7 @@
    "provides" : {
       "Pod::Weaver::Plugin::Sah::Schemas" : {
          "file" : "lib/Pod/Weaver/Plugin/Sah/Schemas.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-Pod-Weaver-Plugin-Sah-Schemas"
       }
    },
-   "version" : "0.070",
+   "version" : "0.071",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -423,7 +423,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
@@ -433,7 +433,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.780"
+                        "version" : "0.784"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

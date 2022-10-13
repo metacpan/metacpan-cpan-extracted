@@ -83,7 +83,7 @@
    "provides" : {
       "App::dateseq" : {
          "file" : "lib/App/dateseq.pm",
-         "version" : "0.110"
+         "version" : "0.111"
       }
    },
    "release_status" : "stable",
@@ -98,7 +98,7 @@
          "web" : "https://github.com/perlancar/perl-App-dateseq"
       }
    },
-   "version" : "0.110",
+   "version" : "0.111",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

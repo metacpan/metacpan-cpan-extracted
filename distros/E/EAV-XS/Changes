@@ -1,5 +1,8 @@
 Revision history for Perl extension EAV::XS.
 
+0.7.1  Wed Oct 12 08:35:52 UTC 2022
+	- fixed XS.c has generating with incorrect compiler options
+
 0.7.0  Tue Oct 11 13:02:30 UTC 2022
 	- update to libeav 1.2.0
 	- underscores are prohibited inside of domain part

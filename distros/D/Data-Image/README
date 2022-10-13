@@ -1,0 +1,167 @@
+NAME
+    Data::Image - Data object for image.
+
+SYNOPSIS
+     use Data::Image;
+
+     my $obj = Data::Image->new(%params);
+     my $author = $obj->author;
+     my $comment = $obj->comment;
+     my $height = $obj->height;
+     my $id = $obj->id;
+     my $size = $obj->size;
+     my $url = $obj->url;
+     my $url_cb = $obj->url_cb;
+     my $width = $obj->width;
+
+METHODS
+  "new"
+     my $obj = Data::Image->new(%params);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "author"
+
+            Image author. It's optional. Default value is undef.
+
+    *       "comment"
+
+            Image comment. It's optional. Default value is undef.
+
+    *       "height"
+
+            Image height. It's optional. Default value is undef.
+
+    *       "id"
+
+            Image id. It's optional. Default value is undef.
+
+    *       "size"
+
+            Image size. It's optional. Default value is undef.
+
+    *       "url"
+
+            URL of image. It's optional. Default value is undef.
+
+    *       "url_cb"
+
+            URL callback. To get URL from code. It's optional. Default value
+            is undef.
+
+    *       "width"
+
+            Image width. It's optional. Default value is undef.
+
+  "author"
+     my $author = $obj->author;
+
+    Get image author.
+
+    Returns string.
+
+  "comment"
+     my $comment = $obj->comment;
+
+    Get image comment.
+
+    Returns string.
+
+  "height"
+     my $height = $obj->height;
+
+    Get image height.
+
+    Returns number.
+
+  "id"
+     my $id = $obj->id;
+
+    Get image id.
+
+    Returns number.
+
+  "size"
+     my $size = $obj->size;
+
+    Get image size.
+
+    Returns number.
+
+  "url"
+     my $url = $obj->url;
+
+    Get URL of image.
+
+    Returns string.
+
+  "url_cb"
+     my $url_cb = $obj->url_cb;
+
+    Get URL callback.
+
+    Returns code.
+
+  "width"
+     my $width = $obj->width;
+
+    Get image width.
+
+    Returns number.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Image;
+
+     my $obj = Data::Image->new(
+             'author' => 'Zuzana Zonova',
+             'comment' => 'Michal from Czechia',
+             'height' => 2730,
+             'size' => 1040304,
+             'url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg',
+             'width' => 4096,
+     );
+
+     # Print out.
+     print 'Author: '.$obj->author."\n";
+     print 'Comment: '.$obj->comment."\n";
+     print 'Height: '.$obj->height."\n";
+     print 'Size: '.$obj->size."\n";
+     print 'URL: '.$obj->url."\n";
+     print 'Width: '.$obj->width."\n";
+
+     # Output:
+     # Author: Zuzana Zonova
+     # Comment: Michal from Czechia
+     # Height: 2730
+     # Size: 1040304
+     # URL: https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg
+     # Width: 4096
+
+DEPENDENCIES
+    Mo, Mo::utils.
+
+SEE ALSO
+    Data::Commons::Image
+        Data object for Wikimedia Commons image.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-Image>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

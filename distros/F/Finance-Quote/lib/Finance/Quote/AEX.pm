@@ -29,7 +29,7 @@ use LWP::UserAgent;
 use Web::Scraper;
 use String::Util qw(trim);
 
-our $VERSION = '1.53'; # VERSION
+our $VERSION = '1.5301'; # VERSION
 
 sub methods { 
   return (dutch => \&aex,

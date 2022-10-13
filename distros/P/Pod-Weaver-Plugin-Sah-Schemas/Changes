@@ -1,3 +1,9 @@
+0.071   2022-09-29  Released-By: PERLANCAR; Urgency: medium
+
+        - In generated Synopsis, show example on using with Type::Tiny
+          using Type::FromSah.
+
+
 0.070   2022-06-08  Released-By: PERLANCAR; Urgency: medium
 
         - Also show example's summary for valid examples.

@@ -1,5 +1,5 @@
 package MooX::Role::CachedURL;
-$MooX::Role::CachedURL::VERSION = '0.07';
+$MooX::Role::CachedURL::VERSION = '0.08';
 use 5.006;
 use Moo::Role;
 use File::HomeDir;

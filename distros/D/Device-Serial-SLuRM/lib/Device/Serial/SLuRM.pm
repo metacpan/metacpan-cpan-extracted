@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57 ':experimental(init_expr)';
 
-package Device::Serial::SLuRM 0.01;
+package Device::Serial::SLuRM 0.02;
 class Device::Serial::SLuRM;
 
 use Carp;
@@ -50,9 +50,6 @@ C<Device::Serial::SLuRM> - communicate the SLµRM protocol over a serial port
       dev  => "/dev/ttyUSB0",
       baud => 19200,
    );
-
-   $slurm->reset
-      ->await;
 
    $slurm->run(
       on_notify => sub ($payload) {
@@ -98,6 +95,90 @@ implementation in C for 8-bit microcontrollers, such as AVR ATtiny and ATmega
 chips.
 
 =cut
+
+=head2 Metrics
+
+If L<Metrics::Any> is available, this module additionally provides metrics
+under the namespace prefix of C<slurm>. The following metrics are provided:
+
+=over 4
+
+=item discards
+
+An unlabelled counter tracking the number of times a received packet is
+discarded due to failing CRC check.
+
+=item packets_received
+
+A counter, labelled by packet type, tracking the number of packets received of
+each type.
+
+=item packets_sent
+
+A counter, labelled by packet type, tracking the number of packets sent of
+each type.
+
+=item retransmits
+
+An unlabelled counter tracking the number of times a (REQUEST) packet had to
+be retransmitted after the initial one timed out.
+
+=item timeouts
+
+An unlabelled counter tracking the number of times a request transaction was
+abandoned entirely due to a timeout. This does I<not> count transactions that
+eventually succeeded after intermediate timeouts and retransmissions.
+
+=back
+
+=cut
+
+# Metrics support is entirely optional
+our $METRICS;
+eval {
+   require Metrics::Any and Metrics::Any->VERSION( '0.05' ) and
+      Metrics::Any->import( '$METRICS', name_prefix => [ 'slurm' ] );
+};
+
+my %PKTTYPE_NAME;
+
+if( defined $METRICS ) {
+   $METRICS->make_counter( discards =>
+      description => "Number of received packets discarded due to CRC check",
+   );
+
+   $METRICS->make_counter( packets_received =>
+      description => "Number of SLµRM packets received, by type",
+      labels => [qw( type )],
+   );
+
+   $METRICS->make_counter( packets_sent =>
+      description => "Number of SLµRM packets sent, by type",
+      labels => [qw( type )],
+   );
+
+   $METRICS->make_distribution( request_retries =>
+      description => "How many requests eventually succeeded after a given number of retries",
+      buckets => [ 0 .. 2 ],
+   );
+   $METRICS->make_counter( retransmits =>
+      description => "Number of retransmits of packets",
+   );
+
+   $METRICS->make_counter( timeouts =>
+      description => "Number of transactions that were abandoned due to eventual timeout",
+   );
+
+   %PKTTYPE_NAME = map { __PACKAGE__->can( "SLURM_PKTCTRL_$_" )->() => $_ }
+      qw( META NOTIFY REQUEST RESPONSE ERR ACK );
+
+   # Keep prometheus increase() happy by initialising all the counters to zero
+   $METRICS->inc_counter_by( discards => 0 );
+   $METRICS->inc_counter_by( packets_received => 0, { type => $_ } ) for values %PKTTYPE_NAME;
+   $METRICS->inc_counter_by( packets_sent     => 0, { type => $_ } ) for values %PKTTYPE_NAME;
+   $METRICS->inc_counter_by( retransmits => 0 );
+   $METRICS->inc_counter_by( timeouts => 0 );
+}
 
 =head1 PARAMETERS
 
@@ -177,6 +258,8 @@ field $_retransmit_count :param { 2 };
 
 field $_on_notify;
 
+field $_did_reset;
+
 field $_seqno_tx { 0 };
 field $_seqno_rx :reader(_seqno_rx); # :reader just for unit-test purposes
 
@@ -209,6 +292,9 @@ async method recv_packet
 
       if( crc8( $pkt ) != 0 ) {
          # Header checksum failed
+         $METRICS and
+            $METRICS->inc_counter( discards => );
+
          $_recv_buffer->unread( $pkt ) if $pkt =~ m/\x55/;
          redo PACKET;
       }
@@ -217,6 +303,9 @@ async method recv_packet
 
       if( crc8( $pkt ) != 0 ) {
          # Body checksum failed
+         $METRICS and
+            $METRICS->inc_counter( discards => );
+
          $_recv_buffer->unread( $pkt ) if $pkt =~ m/\x55/;
          redo PACKET;
       }
@@ -225,6 +314,9 @@ async method recv_packet
 
       printf STDERR "SLuRM <-RX {%02X/%v02X}\n", $pktctrl, $payload
          if DEBUG > 1;
+
+      $METRICS and
+         $METRICS->inc_counter( packets_received => { type => $PKTTYPE_NAME{ $pktctrl & 0xF0 } // "UNKNOWN" } );
 
       return $pktctrl, $payload;
    }
@@ -306,6 +398,9 @@ async method _run
             }
             $slot->{retransmit_f}->cancel;
 
+            $METRICS and
+               $METRICS->report_distribution( request_retries => $_retransmit_count - $slot->{retransmit_count} );
+
             undef $_pending_slots[$seqno];
 
             printf STDERR "SLuRM tx-ACK(%d)\n", $seqno
@@ -350,11 +445,16 @@ Optional. Invoked on receipt of a NOTIFY packet.
 
 =back
 
+Will automatically L</reset> first if required.
+
 =cut
 
 async method run ( %args )
 {
    $_on_notify = $args{on_notify}; # TODO: save old, restore on exit?
+
+   $_did_reset or
+      await $self->reset;
 
    await $self->_start
       ->on_cancel( sub { undef $_on_notify } );
@@ -397,6 +497,9 @@ async method send_packet ( $pktctrl, $payload )
    $bytes .= $payload;
    $bytes .= pack( "C", crc8( $bytes ) );
 
+   $METRICS and
+      $METRICS->inc_counter( packets_sent => { type => $PKTTYPE_NAME{ $pktctrl & 0xF0 } // "UNKNOWN" } );
+
    return await Future::IO->syswrite_exactly( $_fh, "\x55" . $bytes );
 }
 
@@ -413,6 +516,9 @@ async method send_packet_twice ( $pktctrl, $payload )
 
 Resets the transmitter sequence number and sends a META-RESET packet.
 
+It is not normally required to explicitly call this, as the first call to
+L</run>, L</send_notify> or L</request> will do it if required.
+
 =cut
 
 async method reset
@@ -420,6 +526,7 @@ async method reset
    $_seqno_tx = 0;
 
    await $self->send_packet_twice( SLURM_PKTCTRL_META_RESET, pack "C", $_seqno_tx );
+   $_did_reset = 1;
 
    $self->_start;
 
@@ -434,10 +541,15 @@ async method reset
 
 Sends a NOTIFY packet.
 
+Will automatically L</reset> first if required.
+
 =cut
 
 async method send_notify ( $payload )
 {
+   $_did_reset or
+      await $self->reset;
+
    ( $_seqno_tx += 1 ) &= 0x0F;
    my $pktctrl = SLURM_PKTCTRL_NOTIFY | $_seqno_tx;
 
@@ -450,10 +562,27 @@ async method send_notify ( $payload )
 
 Sends a REQUEST packet, and waits for a response to it.
 
+If the peer responds with an ERR packet, the returned future will fail with
+an error message, the category of C<slurm>, and the payload body of the ERR
+packet in the message details:
+
+   $f->fail( $message, slurm => $payload );
+
+If the peer does not respond at all and all retransmit attempts end in a
+timeout, the returned future will fail the same way but with C<undef> as the
+message details:
+
+   $f->fail( $message, slurm => undef );
+
+Will automatically L</reset> first if required.
+
 =cut
 
 async method request ( $payload )
 {
+   $_did_reset or
+      await $self->reset;
+
    ( $_seqno_tx += 1 ) &= 0x0F;
    my $seqno = $_seqno_tx;
 
@@ -498,14 +627,20 @@ method _set_retransmit ( $seqno )
                ->on_done( sub {
                   $self->_set_retransmit( $seqno );
                } );
+
+            $METRICS and
+               $METRICS->inc_counter( retransmits => );
          }
          else {
             printf STDERR "SLuRM timeout REQUEST(%d)\n", $seqno
                if DEBUG;
 
-            $slot->{response_f}->fail(
-               sprintf "Request timed out after %d attempts\n", 1 + $_retransmit_count
-            );
+            my $message = sprintf "Request timed out after %d attempts\n", 1 + $_retransmit_count;
+            $slot->{response_f}->fail( $message, slurm => undef );
+
+            $METRICS and
+               $METRICS->inc_counter( timeouts => );
+
             undef $_pending_slots[$seqno];
          }
       });

@@ -34,7 +34,10 @@ t/http-config.t
 t/lib/Secret.pm
 t/message-brotli.t
 t/message-charset.t
+t/message-decode-brotlibomb.t
+t/message-decode-bzipbomb.t
 t/message-decode-xml.t
+t/message-decode-zipbomb.t
 t/message-old.t
 t/message-parts.t
 t/message.t

@@ -132,11 +132,7 @@ report_event(PSTATE* p_state,
     STRLEN line;
     STRLEN column;
 
-#ifdef UNICODE_HTML_PARSER
     #define CHR_DIST(a,b) (utf8 ? utf8_distance((U8*)(a),(U8*)(b)) : (a) - (b))
-#else
-    #define CHR_DIST(a,b) ((a) - (b))
-#endif
 
     /* some events might still fire after a handler has signaled eof
      * so suppress them here.
@@ -304,11 +300,10 @@ report_event(PSTATE* p_state,
 	    p_state->pend_text_line = line;
 	    p_state->pend_text_column = column;
 	    p_state->pend_text_is_cdata = p_state->is_cdata;
-	    sv_setpvn(p_state->pend_text, "", 0);
+	    sv_setpvs(p_state->pend_text, "");
 	    if (!utf8)
 		SvUTF8_off(p_state->pend_text);
 	}
-#ifdef UNICODE_HTML_PARSER
 	if (utf8 && !SvUTF8(p_state->pend_text))
 	    sv_utf8_upgrade(p_state->pend_text);
 	if (utf8 || !SvUTF8(p_state->pend_text)) {
@@ -320,9 +315,6 @@ report_event(PSTATE* p_state,
 	    sv_catsv(p_state->pend_text, tmp);
 	    SvREFCNT_dec(tmp);
 	}
-#else
-	sv_catpvn(p_state->pend_text, beg, end - beg);
-#endif
 	return;
     }
     else if (p_state->pend_text && SvOK(p_state->pend_text)) {
@@ -463,12 +455,10 @@ report_event(PSTATE* p_state,
 			if (utf8)
 			    SvUTF8_on(attrval);
 			if (!p_state->attr_encoded) {
-#ifdef UNICODE_HTML_PARSER
 			    if (p_state->utf8_mode) {
 				sv_utf8_decode(attrval);
                                 sv_utf8_upgrade(attrval);
                             }
-#endif
 			    decode_entities(aTHX_ attrval, p_state->entity2char, 0);
 			    if (p_state->utf8_mode)
 				SvUTF8_off(attrval);
@@ -497,8 +487,8 @@ report_event(PSTATE* p_state,
 			    av_push(array, attrval);
 			}
 			else {
-			    XPUSHs(sv_2mortal(attrname));
-			    XPUSHs(sv_2mortal(attrval));
+			    mXPUSHs(attrname);
+			    mXPUSHs(attrval);
 			}
 		    }
 		}
@@ -537,12 +527,10 @@ report_event(PSTATE* p_state,
 		if (utf8)
 		    SvUTF8_on(arg);
 		if (!p_state->is_cdata) {
-#ifdef UNICODE_HTML_PARSER
 		    if (p_state->utf8_mode) {
 			sv_utf8_decode(arg);
                         sv_utf8_upgrade(arg);
                     }
-#endif
 		    decode_entities(aTHX_ arg, p_state->entity2char, 1);
 		    if (p_state->utf8_mode)
 			SvUTF8_off(arg);
@@ -558,7 +546,7 @@ report_event(PSTATE* p_state,
 
         case ARG_SKIPPED_TEXT:
 	    arg = sv_2mortal(p_state->skipped_text);
-	    p_state->skipped_text = newSVpvn("", 0);
+	    p_state->skipped_text = newSVpvs("");
             break;
 
 	case ARG_OFFSET:
@@ -630,10 +618,10 @@ report_event(PSTATE* p_state,
 
 	if ((enum argcode)*argspec == ARG_SELF && !SvROK(h->cb)) {
 	    char *method = SvPV(h->cb, my_na);
-	    perl_call_method(method, G_DISCARD | G_EVAL | G_VOID);
+	    call_method(method, G_DISCARD | G_EVAL | G_VOID);
 	}
 	else {
-	    perl_call_sv(h->cb, G_DISCARD | G_EVAL | G_VOID);
+	    call_sv(h->cb, G_DISCARD | G_EVAL | G_VOID);
 	}
 
 	if (SvTRUE(ERRSV)) {
@@ -651,13 +639,10 @@ IGNORE_EVENT:
     if (p_state->skipped_text) {
 	if (event != E_TEXT && p_state->pend_text && SvOK(p_state->pend_text))
 	    flush_pending_text(p_state, self);
-#ifdef UNICODE_HTML_PARSER
 	if (utf8 && !SvUTF8(p_state->skipped_text))
 	    sv_utf8_upgrade(p_state->skipped_text);
 	if (utf8 || !SvUTF8(p_state->skipped_text)) {
-#endif
 	    sv_catpvn(p_state->skipped_text, beg, end - beg);
-#ifdef UNICODE_HTML_PARSER
 	}
 	else {
 	    SV *tmp = newSVpvn(beg, end - beg);
@@ -665,7 +650,6 @@ IGNORE_EVENT:
 	    sv_catsv(p_state->skipped_text, tmp);
 	    SvREFCNT_dec(tmp);
 	}
-#endif
     }
 #undef CHR_DIST
     return;
@@ -676,7 +660,7 @@ EXTERN SV*
 argspec_compile(SV* src, PSTATE* p_state)
 {
     dTHX;
-    SV* argspec = newSVpvn("", 0);
+    SV* argspec = newSVpvs("");
     STRLEN len;
     char *s = SvPV(src, len);
     char *end = s + len;
@@ -727,7 +711,7 @@ argspec_compile(SV* src, PSTATE* p_state)
 		}
 		if (a == ARG_SKIPPED_TEXT) {
 		    if (!p_state->skipped_text) {
-			p_state->skipped_text = newSVpvn("", 0);
+			p_state->skipped_text = newSVpvs("");
                     }
                 }
 		if (a == ARG_ATTR || a == ARG_ATTRARR) {
@@ -1074,7 +1058,7 @@ FIND_NAMES:
 
 	if (!tokens) {
 	    tokens = newAV();
-	    av_push(tokens, newSVpvn("include", 7));
+	    av_push(tokens, newSVpvs("include"));
 	}
 
 	if (!p_state->ms_stack)
@@ -1823,10 +1807,8 @@ parse(pTHX_
 	return;
     }
 
-#ifdef UNICODE_HTML_PARSER
     if (p_state->utf8_mode)
 	sv_utf8_downgrade(chunk, 0);
-#endif
 
     if (p_state->buf && SvOK(p_state->buf)) {
 	sv_catsv(p_state->buf, chunk);
@@ -1838,7 +1820,6 @@ parse(pTHX_
 	utf8 = SvUTF8(chunk);
 	if (p_state->offset == 0 && DOWARN) {
 	    /* Print warnings if we find unexpected Unicode BOM forms */
-#ifdef UNICODE_HTML_PARSER
 	    if (p_state->argspec_entity_decode &&
 		!(p_state->attr_encoded && p_state->argspec_entity_decode == ARG_ATTR) &&
 		!p_state->utf8_mode && (
@@ -1853,7 +1834,6 @@ parse(pTHX_
 	    if (utf8 && len >= 2 && strnEQ(beg, "\xFF\xFE", 2)) {
 		warn("Parsing string decoded with wrong endianness");
 	    }
-#endif
 	    if (!utf8 && len >= 4 &&
 		(strnEQ(beg, "\x00\x00\xFE\xFF", 4) ||
 		 strnEQ(beg, "\xFE\xFF\x00\x00", 4))

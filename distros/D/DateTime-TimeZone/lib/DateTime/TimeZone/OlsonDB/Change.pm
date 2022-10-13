@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.54';
+our $VERSION = '2.55';
 
 sub new {
     my $class = shift;

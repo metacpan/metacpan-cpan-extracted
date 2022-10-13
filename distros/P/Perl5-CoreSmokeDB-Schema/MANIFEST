@@ -23,6 +23,7 @@ support/upgradedb_2_to_3.sql
 t/00-basic.t
 t/10-persistent-sqlite.t
 t/20-exceptions.t
+t/30-not-full.t
 t/data/report1.json
 t/Test/abeltje.pm
 xt/00-manifest.t

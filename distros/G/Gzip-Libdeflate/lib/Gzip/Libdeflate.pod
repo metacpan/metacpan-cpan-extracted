@@ -25,13 +25,13 @@ produces output
     ABCDEFGABCDEFG
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Libdeflate-0.03/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Libdeflate-0.04/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.03 of Gzip-Libdeflate
-corresponding to L<git commit 67596aabf1b6c377a362f04c4c78e2f2dbd66fcf|https://github.com/benkasminbullock/gzip-libdeflate/commit/67596aabf1b6c377a362f04c4c78e2f2dbd66fcf> released on Tue Feb 23 15:05:49 2021 +0900. This
+This documents version 0.04 of Gzip-Libdeflate
+corresponding to L<git commit 13319557abdc44b51c289c175428fc89b025cdf5|https://github.com/benkasminbullock/gzip-libdeflate/commit/13319557abdc44b51c289c175428fc89b025cdf5> released on Thu Oct 13 18:56:37 2022 +0900. This
 distribution also includes libdeflate version 1.7. 
 
 =head1 DESCRIPTION
@@ -164,6 +164,10 @@ up to headers.
 
 =back
 
+=head1 ERROR HANDLING
+
+Errors are handled by warning and then returning an undefined value.
+
 =head1 DEPENDENCIES
 
 =over
@@ -210,7 +214,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2021
+2021-2022
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

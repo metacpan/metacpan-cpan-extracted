@@ -1,5 +1,9 @@
 Revision history for Perl module Gzip::Libdeflate
 
+0.04 2022-10-13
+
+- Update libdeflate to 1.14
+
 0.03 2021-02-23
 
 - Add convenience functions compress_file and decompress_file

@@ -1,5 +1,13 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.13    2022-10-11
+    - In singleton(), do a check whether class was sent in. There was a shifting
+      issue if called with IPC::Shareable::singleton() as opposed to
+      IPC::Shareable->singleton()
+    - When an exclusive collision occurs and both 'graceful' and 'warn' are set,
+      the warning thrown now includes the segment/semaphore key in use. This
+      makes it easier to clean things up with 'ipcrm'
+
 1.12    2022-03-13
     - Add tests in t/07-new.t to test how using tied() against a dereferenced
       variable returned from new() allows access to the underlying

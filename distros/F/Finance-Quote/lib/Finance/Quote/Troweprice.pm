@@ -38,7 +38,7 @@ use LWP::UserAgent;
 use Time::Piece;
 use Try::Tiny;
 
-our $VERSION = '1.53'; # VERSION
+our $VERSION = '1.5301'; # VERSION
 
 # URLs of where to obtain information.
 

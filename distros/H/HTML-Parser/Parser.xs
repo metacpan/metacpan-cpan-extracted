@@ -6,101 +6,14 @@
  * modify it under the same terms as Perl itself.
  */
 
-
-/*
- * Standard XS greeting.
- */
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define PERL_NO_GET_CONTEXT     /* we want efficiency */
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#ifdef __cplusplus
-}
-#endif
+#include "ppport.h"
 
-
-
-/*
- * Some perl version compatibility gruff.
- */
-#include "patchlevel.h"
-#if PATCHLEVEL <= 4 /* perl5.004_XX */
-
-#ifndef PL_sv_undef
-   #define PL_sv_undef sv_undef
-   #define PL_sv_yes   sv_yes
-#endif
-
-#ifndef PL_hexdigit
-   #define PL_hexdigit hexdigit
-#endif
-
-#ifndef ERRSV
-   #define ERRSV GvSV(errgv)
-#endif
-
-#if (PATCHLEVEL == 4 && SUBVERSION <= 4)
-/* The newSVpvn function was introduced in perl5.004_05 */
-static SV *
-newSVpvn(char *s, STRLEN len)
-{
-    register SV *sv = newSV(0);
-    sv_setpvn(sv,s,len);
-    return sv;
-}
-#endif /* not perl5.004_05 */
-#endif /* perl5.004_XX */
-
-#ifndef dNOOP
-   #define dNOOP extern int errno
-#endif
-#ifndef dTHX
-   #define dTHX dNOOP
-   #define pTHX_
-   #define aTHX_
-#endif
-
-#ifndef MEMBER_TO_FPTR
-   #define MEMBER_TO_FPTR(x) (x)
-#endif
-
-#ifndef INT2PTR
-   #define INT2PTR(any,d)  (any)(d)
-   #define PTR2IV(p)       (IV)(p)
-#endif
-
-
-#if PATCHLEVEL > 6 || (PATCHLEVEL == 6 && SUBVERSION > 0)
-   #define RETHROW	   croak(Nullch)
-#else
-   #define RETHROW    { STRLEN my_na; croak("%s", SvPV(ERRSV, my_na)); }
-#endif
-
-#if PATCHLEVEL < 8
-   /* No useable Unicode support */
-   /* Make these harmless if present */
-   #undef SvUTF8
-   #undef SvUTF8_on
-   #undef SvUTF8_off
-   #define SvUTF8(sv)      0
-   #define SvUTF8_on(sv)   0
-   #define SvUTF8_off(sv)  0
-#else
-   #define UNICODE_HTML_PARSER
-#endif
-
-#ifdef G_WARN_ON
-   #define DOWARN (PL_dowarn & G_WARN_ON)
-#else
-   #define DOWARN PL_dowarn
-#endif
-
-#ifndef CLONEf_JOIN_IN
-   #define CLONEf_JOIN_IN 0
-#endif
+#define DOWARN  (PL_dowarn & G_WARN_ON)
+#define RETHROW croak(Nullch)
 
 /*
  * Include stuff.  We include .c files instead of linking them,
@@ -142,9 +55,6 @@ static PSTATE*
 get_pstate_iv(pTHX_ SV* sv)
 {
     PSTATE *p;
-#if PATCHLEVEL < 8
-    p = INT2PTR(PSTATE*, SvIV(sv));
-#else
     MAGIC *mg = SvMAGICAL(sv) ? mg_find(sv, '~') : NULL;
 
     if (!mg)
@@ -152,7 +62,6 @@ get_pstate_iv(pTHX_ SV* sv)
     p = (PSTATE *)mg->mg_ptr;
     if (!p)
 	croak("Lost parser state magic");
-#endif
     if (p->signature != P_SIGNATURE)
 	croak("Bad signature in parser state object at %p", p);
     return p;
@@ -169,7 +78,7 @@ get_pstate_hv(pTHX_ SV* sv)                               /* used by XS typemap 
     if (!sv || SvTYPE(sv) != SVt_PVHV)
 	croak("Not a reference to a hash");
     hv = (HV*)sv;
-    svp = hv_fetch(hv, "_hparser_xs_state", 17, 0);
+    svp = hv_fetchs(hv, "_hparser_xs_state", 0);
     if (svp) {
 	if (SvROK(*svp))
 	    return get_pstate_iv(aTHX_ SvRV(*svp));
@@ -211,15 +120,11 @@ free_pstate(pTHX_ PSTATE* pstate)
 static int
 magic_free_pstate(pTHX_ SV *sv, MAGIC *mg)
 {
-#if PATCHLEVEL < 8
-    free_pstate(aTHX_ get_pstate_iv(aTHX_ sv));
-#else
     free_pstate(aTHX_ (PSTATE *)mg->mg_ptr);
-#endif
     return 0;
 }
 
-#if defined(USE_ITHREADS) && PATCHLEVEL >= 8
+#if defined(USE_ITHREADS)
 
 static PSTATE *
 dup_pstate(pTHX_ PSTATE *pstate, CLONE_PARAMS *params)
@@ -294,7 +199,7 @@ dup_pstate(pTHX_ PSTATE *pstate, CLONE_PARAMS *params)
 
     if (params->flags & CLONEf_JOIN_IN) {
 	pstate2->entity2char =
-	    perl_get_hv("HTML::Entities::entity2char", TRUE);
+	    get_hv("HTML::Entities::entity2char", GV_ADD);
     } else {
 	pstate2->entity2char = (HV *)sv_dup((SV *)pstate->entity2char, params);
     }
@@ -319,7 +224,7 @@ const MGVTBL vtbl_pstate =
     0,
     0,
     MEMBER_TO_FPTR(magic_free_pstate),
-#if defined(USE_ITHREADS) && PATCHLEVEL >= 8
+#if defined(USE_ITHREADS)
     0,
     MEMBER_TO_FPTR(magic_dup_pstate),
 #endif
@@ -351,24 +256,20 @@ _alloc_pstate(self)
 
 	Newz(56, pstate, 1, PSTATE);
 	pstate->signature = P_SIGNATURE;
-	pstate->entity2char = perl_get_hv("HTML::Entities::entity2char", TRUE);
+	pstate->entity2char = get_hv("HTML::Entities::entity2char", GV_ADD);
 	pstate->tmp = NEWSV(0, 20);
 
 	sv = newSViv(PTR2IV(pstate));
-#if PATCHLEVEL < 8
-	sv_magic(sv, 0, '~', 0, 0);
-#else
 	sv_magic(sv, 0, '~', (char *)pstate, 0);
-#endif
 	mg = mg_find(sv, '~');
         assert(mg);
         mg->mg_virtual = (MGVTBL*)&vtbl_pstate;
-#if defined(USE_ITHREADS) && PATCHLEVEL >= 8
+#if defined(USE_ITHREADS)
         mg->mg_flags |= MGf_DUP;
 #endif
 	SvREADONLY_on(sv);
 
-	hv_store(hv, "_hparser_xs_state", 17, newRV_noinc(sv), 0);
+	hv_stores(hv, "_hparser_xs_state", newRV_noinc(sv));
 
 void
 parse(self, chunk)
@@ -387,7 +288,7 @@ parse(self, chunk)
 	    do {
                 int count;
 		PUSHMARK(SP);
-	        count = perl_call_sv(generator, G_SCALAR|G_EVAL);
+	        count = call_sv(generator, G_SCALAR|G_EVAL);
 		SPAGAIN;
 		chunk = count ? POPs : 0;
 	        PUTBACK;
@@ -473,11 +374,7 @@ strict_comment(pstate,...)
 	case  7: attr = &pstate->case_sensitive;       break;
 	case  8: attr = &pstate->strict_end;           break;
 	case  9: attr = &pstate->closing_plaintext;    break;
-#ifdef UNICODE_HTML_PARSER
         case 10: attr = &pstate->utf8_mode;            break;
-#else
-	case 10: croak("The utf8_mode does not work with this perl; perl-5.8 or better required");
-#endif
 	case 11: attr = &pstate->empty_element_tags;   break;
         case 12: attr = &pstate->xml_pic;              break;
 	case 13: attr = &pstate->backquote;            break;
@@ -538,8 +435,8 @@ ignore_tags(pstate,...)
 		    if (SvTYPE(sv) == SVt_PVAV) {
 			AV* av = (AV*)sv;
 			STRLEN j;
-			STRLEN len = av_len(av) + 1;
-			for (j = 0; j < len; j++) {
+			STRLEN top = av_top_index(av);
+			for (j = 0; j <= top; j++) {
 			    SV**svp = av_fetch(av, j, 0);
 			    if (svp) {
 				hv_store_ent(*attr, *svp, newSViv(0), 0);
@@ -611,7 +508,7 @@ void
 decode_entities(...)
     PREINIT:
         int i;
-	HV *entity2char = perl_get_hv("HTML::Entities::entity2char", FALSE);
+	HV *entity2char = get_hv("HTML::Entities::entity2char", 0);
     PPCODE:
 	if (GIMME_V == G_SCALAR && items > 1)
             items = 1;
@@ -662,14 +559,9 @@ _probably_utf8_chunk(string)
         STRLEN len;
         char *s;
     CODE:
-#ifdef UNICODE_HTML_PARSER
         sv_utf8_downgrade(string, 0);
 	s = SvPV(string, len);
         RETVAL = probably_utf8_chunk(aTHX_ s, len);
-#else
-        RETVAL = 0; /* avoid never initialized complains from compiler */
-	croak("_probably_utf8_chunk() only works for Unicode enabled perls");
-#endif
     OUTPUT:
         RETVAL
 
@@ -677,11 +569,7 @@ int
 UNICODE_SUPPORT()
     PROTOTYPE:
     CODE:
-#ifdef UNICODE_HTML_PARSER
        RETVAL = 1;
-#else
-       RETVAL = 0;
-#endif
     OUTPUT:
        RETVAL
 

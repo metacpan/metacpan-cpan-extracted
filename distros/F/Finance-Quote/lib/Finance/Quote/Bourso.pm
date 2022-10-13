@@ -81,7 +81,7 @@ use Encode qw(decode);
 use JSON qw( decode_json );
 use utf8;
 
-our $VERSION = '1.53'; # VERSION
+our $VERSION = '1.5301'; # VERSION
 
 my $Bourso_URL = 'https://www.boursorama.com/cours/';
 

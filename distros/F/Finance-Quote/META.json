@@ -87,6 +87,7 @@
             "IO::Handle" : "0",
             "IO::Uncompress::Unzip" : "0",
             "JSON" : "0",
+            "LWP::Protocol::https" : "0",
             "LWP::Simple" : "0",
             "LWP::UserAgent" : "6.48",
             "Module::Load" : "0",
@@ -141,7 +142,7 @@
          "web" : "https://github.com/finance-quote/finance-quote"
       }
    },
-   "version" : "1.53",
+   "version" : "1.5301",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "GPL-2.0-only"
