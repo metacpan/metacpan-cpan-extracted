@@ -2,7 +2,9 @@ package Geo::Gpx::Point;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -32,12 +34,18 @@ $possible_attr{$_} = 1 for @attr;
 
 =over 4
 
-=item new( lat => $lat, lon => $lon, ele => $ele, desc => $desc, ... )
+=item new( lat => $lat, lon => $lon [, ele => $ele, desc => $desc, … ] )
 
-Creates and returns a new GPX Point as per the fields provided. These can be any of C<lat lon ele time magvar geoidheight name cmt desc src link sym type fix sat hdop vdop pdop ageofdgpsdata dgpsid>.
+Create and return a new point as per the fields provided, which can be any of C<lat lon ele time magvar geoidheight name cmt desc src link sym type fix sat hdop vdop pdop ageofdgpsdata dgpsid>. Most expect numberial values except: C<name>, C<cmt>, C<desc>, C<src>, C<sym>, C<type>, C<fix> that can contain strings.
 
-  %point_fields = ( lat => 47.0871, lon => 70.9318, ele => 808.000, name => 'MSA', desc => 'A nice view of the River at the top');
-  $pt = Geo::Gpx::Point->new( %point_fields );
+C<lat> and C<lon> are required, all others keys are optional.
+
+  %fields = ( lat => 47.0871, lon => 70.9318, ele => 808.000, name => 'MSA', desc => 'A nice view of the River at the top');
+  $pt = Geo::Gpx::Point->new( %fields );
+
+The C<link> field is expected to be structured as:
+
+  link => { href => 'http://hexten.net/', text => 'Hexten', type => 'Blah' },
 
 =back
 
@@ -176,6 +184,25 @@ sub to_geocalc {
 
 =over 4
 
+=item to_tcx()
+
+Returns a point as a basic L<Geo::TCX::Trackpoint> object, i.e. a point with only Position information. (Requires the L<Geo::TCX> module.)
+
+=back
+
+=cut
+
+sub to_tcx {
+    require 'Geo::TCX';
+    my $pt = shift;
+    croak "to_tcx() takes no arguments" if @_;
+    my $xml = '<Position><LatitudeDegrees>'  . $pt->lat . '</LatitudeDegrees>' .
+                        '<LongitudeDegrees>' . $pt->lon . '</LongitudeDegrees></Position';
+    return Geo::TCX::Trackpoint->new( $xml )
+}
+
+=over 4
+
 =item summ()
 
 For debugging purposes mostly. Summarizes the fields of point by printing to screen. Returns nothing.
@@ -227,7 +254,7 @@ Patrick Joly C<< <patjol@cpan.org> >>.
 
 =head1 VERSION
 
-1.02
+1.03
 
 =head1 SEE ALSO
 

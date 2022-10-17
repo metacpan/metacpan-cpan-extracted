@@ -13,8 +13,8 @@ my $file = 'data/f003.fits';
 # find the image in the haystack
 eval {
 
-    rdfits( $file, { hdutype => 'image'  } );
+    rdfits( $file, { hdutype => 'image' } );
 };
-ok ( ! $@, "find image extension" ) or diag( $@ );
+ok( !$@, "find image extension" ) or diag( $@ );
 
 done_testing;

@@ -1,3 +1,8 @@
+1.000 Oct 16 2022
+	- stable release
+	- improve the way the module handles arrays of attributes
+	- add a way to disable shortcut expanding
+
 0.002 Aug 11 2022
 	- fix optional tests with Moo
 

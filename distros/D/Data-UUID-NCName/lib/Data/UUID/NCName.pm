@@ -86,11 +86,11 @@ Data::UUID::NCName - Make valid NCName tokens which are also UUIDs
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 

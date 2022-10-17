@@ -75,25 +75,25 @@ HERE
 
 =head1 NAME
 
-Getopt::App::Complete - Add autocompletion to you Getopt::App script
+Getopt::App::Complete - Add auto-completion to you Getopt::App script
 
 =head1 SYNOPSIS
 
   use Getopt::App -complete;
 
   run(
-    'h                      # Print help',
-    'bash-completion-script # Print autocomplete script',
+    'h                 # Print help',
+    'completion-script # Print autocomplete script',
     sub {
       my ($app, @args) = @_;
-      return print generate_completion_script() if $app->{'bash-completion-script'};
+      return print generate_completion_script() if $app->{'completion-script'};
       return print extract_usage()              if $app->{h};
     },
   );
 
 =head1 DESCRIPTION
 
-L<Getopt::App::Complete> contains helper functions for adding autocompletion to
+L<Getopt::App::Complete> contains helper functions for adding auto-completion to
 your L<Getopt::App> powered script.
 
 This module is currently EXPERIMENTAL.

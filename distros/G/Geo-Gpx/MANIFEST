@@ -12,6 +12,8 @@ dist.ini
 lib/Geo/Gpx.pm
 lib/Geo/Gpx/Point.pm
 t/00_load.t
+t/01_main.t
+t/Larose.gpx
 t/cmp_ver.t
 t/datetime.t
 t/gen-parse.t
@@ -22,3 +24,5 @@ t/misc.t
 t/pod-coverage.t
 t/pod.t
 t/point.t
+t/set.t
+t/test.gpx

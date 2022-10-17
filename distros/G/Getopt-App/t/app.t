@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
 
 my $methods_app  = methods_app();
 my $synopsis_app = synopsis_app();
@@ -15,9 +13,9 @@ subtest import => sub {
 
 subtest constructor => sub {
   ok +My::Script->new->isa('My::Script'), 'isa';
-  is_deeply +My::Script->new,             {}, 'empty';
-  is_deeply +My::Script->new(foo => 1),   {foo => 1}, 'list';
-  is_deeply +My::Script->new({foo => 1}), {foo => 1}, 'ref';
+  is +My::Script->new,             {}, 'empty';
+  is +My::Script->new(foo => 1),   {foo => 1}, 'list';
+  is +My::Script->new({foo => 1}), {foo => 1}, 'ref';
 };
 
 subtest run => sub {
@@ -35,12 +33,12 @@ subtest run => sub {
 subtest post_process_argv => sub {
   use Getopt::App -capture;
   my $post_process_argv_app = post_process_argv_app();
-  is $post_process_argv_app->([]), 3, 'empty exit';
-  is_deeply [@main::POST_PROGRESS], [[], {valid => 1}], 'empty args';
+  is $post_process_argv_app->([]), 3,                  'empty exit';
+  is [@main::POST_PROGRESS],       [[], {valid => 1}], 'empty args';
 
-  is_deeply capture($post_process_argv_app, [qw(-x)]), ["", "Option x requires an argument\n", 1],
+  is capture($post_process_argv_app, [qw(-x)]), ["", "Option x requires an argument\n", 1],
     'invalid exit';
-  is_deeply [@main::POST_PROGRESS], [[], {valid => 0}], 'invalid args';
+  is [@main::POST_PROGRESS], [[], {valid => 0}], 'invalid args';
 };
 
 subtest methods => sub {

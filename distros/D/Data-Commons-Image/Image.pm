@@ -4,11 +4,11 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils qw(check_isa check_length check_required);
+use Mo::utils qw(check_isa check_length check_number check_required);
 
 extends 'Data::Image';
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 has commons_name => (
 	is => 'ro',
@@ -19,6 +19,14 @@ has dt_created => (
 );
 
 has dt_uploaded => (
+	is => 'ro',
+);
+
+has license => (
+	is => 'ro',
+);
+
+has page_id => (
 	is => 'ro',
 );
 
@@ -34,6 +42,9 @@ sub BUILD {
 
 	# Check date uploaded.
 	check_isa($self, 'dt_uploaded', 'DateTime');
+
+	# Check page_id.
+	check_number($self, 'page_id');
 
 	return;
 }
@@ -62,6 +73,8 @@ Data::Commons::Image - Data object for Wikimedia Commons image.
  my $dt_uploaded = $obj->dt_uploaded;
  my $height = $obj->height;
  my $id = $obj->id;
+ my $license = $obj->license;
+ my $page_id = $obj->page_id;
  my $size = $obj->size;
  my $url = $obj->url;
  my $url_cb = $obj->url_cb;
@@ -121,6 +134,19 @@ Default value is undef.
 =item * C<id>
 
 Image id.
+It's optional.
+Default value is undef.
+
+=item * C<license>
+
+Image license.
+It's optional.
+Default value is undef.
+
+=item * C<page_id>
+
+Image page id on Wikimedia Commons.
+It's used for structured data with 'M' prefix.
 It's optional.
 Default value is undef.
 
@@ -206,6 +232,22 @@ Get image id.
 
 Returns number.
 
+=head2 C<license>
+
+ my $license = $obj->license;
+
+Get image license.
+
+Returns string.
+
+=head2 C<page_id>
+
+ my $page_id = $obj->page_id;
+
+Get image page id.
+
+Returns number.
+
 =head2 C<size>
 
  my $size = $obj->size;
@@ -263,6 +305,8 @@ Returns number.
                  'year' => 2022,
          ),
          'height' => 2730,
+         'license' => 'cc-by-sa-4.0',
+         'page_id' => '95648152',
          'size' => 1040304,
          'url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg',
          'width' => 4096,
@@ -276,6 +320,8 @@ Returns number.
  print 'Size: '.$obj->size."\n";
  print 'URL: '.$obj->url."\n";
  print 'Width: '.$obj->width."\n";
+ print 'License: '.$obj->license."\n";
+ print 'Page id: '.$obj->page_id."\n";
  print 'Date and time the photo was created: '.$obj->dt_created."\n";
  print 'Date and time the photo was uploaded: '.$obj->dt_uploaded."\n";
 
@@ -287,6 +333,8 @@ Returns number.
  # Size: 1040304
  # URL: https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg
  # Width: 4096
+ # License: cc-by-sa-4.0
+ # Page id: 95648152
  # Date and time the photo was created: 2022-01-01T00:00:00
  # Date and time the photo was uploaded: 2022-07-14T00:00:00
 
@@ -314,6 +362,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut

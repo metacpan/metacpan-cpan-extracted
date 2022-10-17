@@ -1,18 +1,17 @@
 package Ubuntu::Releases;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-06'; # DATE
-our $DIST = 'Ubuntu-Releases'; # DIST
-our $VERSION = '20210115.2'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
+use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
-use Exporter;
-our @ISA = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-17'; # DATE
+our $DIST = 'Ubuntu-Releases'; # DIST
+our $VERSION = '20221017.0'; # VERSION
+
 our @EXPORT_OK = qw(
                        list_ubuntu_releases
                );
@@ -47,7 +46,7 @@ our $meta = {
 
 our $data = do {
     no warnings 'void';
-    [];
+
  [
    {
      animal               => "warthog",
@@ -613,7 +612,7 @@ our $data = do {
      bash_version         => "5.0",
      code_name            => "focal",
      eoldate              => "2025-04",
-     linux_version        => "5.4.0",
+     linux_version        => 5.4,
      mariadb_version      => "--",
      mysql_version        => "8.0.19",
      nginx_version        => undef,
@@ -631,7 +630,7 @@ our $data = do {
      bash_version         => "5.0",
      code_name            => "groovy",
      eoldate              => "2021-07",
-     linux_version        => "5.8.0",
+     linux_version        => 5.8,
      mariadb_version      => "--",
      mysql_version        => "--",
      nginx_version        => undef,
@@ -642,6 +641,60 @@ our $data = do {
      reldate              => "2020-10-22",
      ruby_version         => undef,
      version              => "20.10",
+   },
+   {
+     animal               => "hippo",
+     apache_httpd_version => "--",
+     bash_version         => 5.1,
+     code_name            => "hirsute",
+     eoldate              => "2022-01",
+     linux_version        => 5.11,
+     mariadb_version      => "--",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.32.1",
+     php_version          => "--",
+     postgresql_version   => "--",
+     python_version       => "3.9.4",
+     reldate              => "2021-04-22",
+     ruby_version         => undef,
+     version              => 21.04,
+   },
+   {
+     animal               => "indri",
+     apache_httpd_version => "--",
+     bash_version         => 5.1,
+     code_name            => "impish",
+     eoldate              => "2022-07",
+     linux_version        => 5.13,
+     mariadb_version      => "--",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.32.1",
+     php_version          => "--",
+     postgresql_version   => "--",
+     python_version       => "3.9.4",
+     reldate              => "2021-10-14",
+     ruby_version         => undef,
+     version              => "21.10",
+   },
+   {
+     animal               => "jellyfish",
+     apache_httpd_version => "--",
+     bash_version         => 5.1,
+     code_name            => "jammy",
+     eoldate              => "2027-04",
+     linux_version        => "5.15.0",
+     mariadb_version      => "--",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.34.0",
+     php_version          => "--",
+     postgresql_version   => "--",
+     python_version       => "3.10.4",
+     reldate              => "2022-04-21",
+     ruby_version         => undef,
+     version              => 22.04,
    },
  ]
 };
@@ -669,7 +722,7 @@ Ubuntu::Releases - List Ubuntu releases
 
 =head1 VERSION
 
-This document describes version 20210115.2 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2021-08-06.
+This document describes version 20221017.0 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2022-10-17.
 
 =head1 SYNOPSIS
 
@@ -684,12 +737,6 @@ L<https://github.com/sharyanto/gudangdata-distrowatch> (table/ubuntu_release)
 which in turn is retrieved from L<http://distrowatch.com>. Additional data
 source: L<https://github.com/sharyanto/gudangdata>
 (table/ubuntu_release_animal).
-
-=head1 CONTRIBUTOR
-
-=for stopwords Steven Haryanto
-
-Steven Haryanto <sharyanto@cpan.org>
 
 =head1 FUNCTIONS
 
@@ -1465,14 +1512,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Ubuntu-Rel
 
 Source repository is at L<https://github.com/perlancar/perl-Ubuntu-Releases>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Ubuntu-Releases>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Debian::Releases>
@@ -1481,11 +1520,43 @@ L<Debian::Releases>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Ubuntu-Releases>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

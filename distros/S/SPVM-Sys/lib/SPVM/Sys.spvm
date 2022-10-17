@@ -7,10 +7,3 @@ class Sys {
 
   native static method unsetenv : int ($name : string);
 }
-
-=pod
-
-exit
-EXIT_FAILURE
-
-=cut

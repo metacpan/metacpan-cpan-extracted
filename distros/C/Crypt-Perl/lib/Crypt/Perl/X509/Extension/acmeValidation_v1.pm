@@ -7,6 +7,8 @@ use warnings;
 
 =head1 NAME
 
+Crypt::Perl::X509::Extension::acmeValidation_v1
+
 =head1 SYNOPSIS
 
 See L<Crypt::Perl::X509v3> for a more useful syntax for instantiating

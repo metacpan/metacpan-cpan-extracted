@@ -1,0 +1,29 @@
+Chemistry/File/OPTIMADE version 0.10
+====================================
+
+This module reads OPTIMADE structure files.
+
+For more information about OPTIMADE, see OPTIMADE Home Page at
+https://www.optimade.org
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Chemistry::Mol      0.35
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2022 Andrius Merkys <merkys@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

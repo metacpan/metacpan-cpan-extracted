@@ -10,7 +10,7 @@ use Data::HTML::Form;
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -269,9 +269,6 @@ sub _tags_textarea {
 			['a', 'name', $object->id],
 			['a', 'id', $object->id],
 		) : (),
-		defined $object->value ? (
-			['a', 'value', $object->value],
-		) : (),
 		defined $object->placeholder ? (
 			['a', 'placeholder', $object->placeholder],
 		) : (),
@@ -286,6 +283,9 @@ sub _tags_textarea {
 		) : (),
 		defined $object->rows ? (
 			['a', 'rows', $object->rows],
+		) : (),
+		defined $object->value ? (
+			['d', $object->value],
 		) : (),
 		['e', 'textarea'],
 	);
@@ -383,6 +383,7 @@ Returns undef.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
          From Tags::HTML::new():
+                 Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
          Parameter 'form' is required.
          Parameter 'form' must be a 'Data::HTML::Form' instance.
@@ -394,7 +395,11 @@ Returns undef.
  process():
          From Tags::HTML::process():
                  Parameter 'tags' isn't defined.
-                 Form item must be a 'Data::HTML::Form::Input' instance.
+         Form item must be a 'Data::HTML::Form::Input' instance.
+
+ process_css():
+         From Tags::HTML::process_css():
+                 Parameter 'css' isn't defined.
 
 =head1 EXAMPLE
 
@@ -415,7 +420,7 @@ Returns undef.
          'tags' => $tags,
  );
 
- # Process pager.
+ # Process form.
  $obj->process;
  $obj->process_css;
 
@@ -491,6 +496,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

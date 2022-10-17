@@ -70,10 +70,19 @@ my @parts = split '/', $test_uri;
 my $test_file = $parts[-1];
 my ($stnid) = $test_file =~ m{ (\w+) [.]dly }xms;
 
-# head returns ($content_type, $document_length, $modified_time, $expires, $server)
-my $remote_mtime = ( head($test_uri) )[2];
+# check to see if we have an internet connection
+# (we could use Test::Internet, but that's another dependency and this is sufficient)
+my @hdr = head($test_uri);
+my $NO_INTERNET = @hdr > 0 ? $FALSE : $TRUE;
 
-ok $remote_mtime, "got $test_uri header";
+# head returns ($content_type, $document_length, $modified_time, $expires, $server)
+my $remote_mtime = $hdr[2] // time;
+
+if ($NO_INTERNET) {
+    ok $NO_INTERNET, 'no internet detected -- mocking remote tests';
+} else {
+    ok @hdr, "got $test_uri header";
+}
 
 # diag $cachedir;
 
@@ -142,11 +151,18 @@ subtest 'key methods' => sub {
 
 subtest 'fetch - refresh never' => sub {
     # fetch a daily page, but with an empty cache and refresh 'never' it will fail
+    # (this test is safe to perform even when we don't have an internet connection)
     ($from_cache, $content) = $cache_uri_obj->fetch( $test_uri );
     is $content, undef, 'fetch with refresh never and empty cache';
 };
 
+# The tests below this line rely on an intenet connection.
+
 subtest 'fetch - refresh always' => sub {
+
+    plan skip_all => 'no internet detected' if $NO_INTERNET;
+
+    skip 'no internet detected', 5 if $NO_INTERNET;
     # instantiate a tempdir object, which will cause the old cache to be deleted
     ($cachedir_obj, $cachedir) = create_tempdir_cache('ghcn_15_cacheURI_test_XXXXXX');
 
@@ -175,6 +191,9 @@ subtest 'fetch - refresh always' => sub {
 };
 
 subtest 'fetch - refresh yearly' => sub {
+
+    plan skip_all => 'no internet detected' if $NO_INTERNET;
+
     # instantiate a tempdir object, which will cause the old cache to be deleted
     ($cachedir_obj, $cachedir) = create_tempdir_cache('ghcn_15_cacheURI_test_XXXXXX');
 
@@ -213,12 +232,21 @@ subtest 'fetch - refresh yearly' => sub {
 };
 
 subtest 'clean cache methods' => sub {
+
     my $cache_path_obj = path($cachedir);
     my $stn_file = 'ghcnd-stations.txt';
     my $inv_file = 'ghcnd-inventory.txt';
     # create these files
     $cache_path_obj->child($stn_file)->touch;
     $cache_path_obj->child($inv_file)->touch;
+    
+    if ($NO_INTERNET) {
+        # without internet, previous tests would have been skipped so
+        # the cache won't have the test file.  This creates the test
+        # file so the subsequent test for it will succeed.  Essentially.
+        # we are simulating the success of the skipped tests.
+        $cache_path_obj->child($test_file)->touch;
+    }
 
     ok $cache_path_obj->child($test_file)->exists, 'file ' . $test_file . ' is in the cache';
     $cache_uri_obj->clean_data_cache;

@@ -3,7 +3,7 @@ package Plack::Middleware::XSRFBlock;
 {
   $Plack::Middleware::XSRFBlock::DIST = 'Plack-Middleware-XSRFBlock';
 }
-$Plack::Middleware::XSRFBlock::VERSION = '0.0.16';
+$Plack::Middleware::XSRFBlock::VERSION = '0.0.17';
 use strict;
 use warnings;
 use parent 'Plack::Middleware';
@@ -30,7 +30,6 @@ use Plack::Util::Accessor qw(
     parameter_name
     header_name
     secret
-    _token_generator
 );
 
 sub prepare_app {
@@ -70,19 +69,6 @@ sub prepare_app {
 
     # default to a cookie life of three hours
     $self->cookie_expiry_seconds( $self->cookie_expiry_seconds || (3 * 60 * 60) );
-
-    $self->_token_generator(sub{
-        my $data    = rand() . $$ . {} . time;
-        my $key     = "@INC";
-        my $digest  = hmac_sha1_hex($data, $key);
-
-        if (defined $self->secret) {
-            my $sig = hmac_sha1_hex($digest, $self->secret);
-            $digest .= "--$sig";
-        }
-
-        return $digest;
-    });
 }
 
 
@@ -168,8 +154,17 @@ sub generate_token {
     my ($self, $request, $env, $res) = @_;
 
     my $token = $request->cookies->{$self->cookie_name};
-    $token = $self->_token_generator->()
-        if !$token or $self->token_per_request->( $self, $request, $env );
+
+    return $token if $token && !$self->token_per_request->( $self, $request, $env );
+
+    my $data    = rand() . $$ . {} . time;
+    my $key     = "@INC";
+    $token      = hmac_sha1_hex($data, $key);
+
+    if (defined $self->secret) {
+        my $sig = hmac_sha1_hex($token, $self->secret);
+        $token .= "--$sig";
+    }
 
     return $token;
 }
@@ -345,7 +340,7 @@ sub xsrf_detected {
         ? sprintf('XSRF detected [%s]', $args->{msg})
         : 'XSRF detected';
 
-    $self->log(error => 'XSRF detected, returning HTTP_FORBIDDEN');
+    $self->log(error => "$msg, returning HTTP_FORBIDDEN");
 
     if (my $app_for_blocked = $self->blocked) {
         return $app_for_blocked->($env, $msg, app => $self->app);
@@ -398,7 +393,7 @@ Plack::Middleware::XSRFBlock - Block XSRF Attacks with minimal changes to your a
 
 =head1 VERSION
 
-version 0.0.16
+version 0.0.17
 
 =head1 SYNOPSIS
 
@@ -586,20 +581,13 @@ returns true if the response should be filtered by this middleware
 
 =head2 generate_token($self, $request, $env, $res)
 
-returns the token value to use for this response.  Gets the token value from:
+Returns the token value to use for this response.
 
-=over
+If the cookie is already set, and we do not want a different token for
+each request, returns the cookie's value.
 
-=item *
-
-the cookie value, if it's already set
-
-=item *
-
-from the generator, if the cookie is not set, or if we want a
-different token for each request
-
-=back
+Otherwise, generates a new value based on some random data. If
+C<secret> is set, the value is also signed.
 
 =head2 cookie_handler($self, $request, $env, $res, $token)
 
@@ -743,9 +731,13 @@ the same terms as the Perl 5 programming language system itself.
 
 =head1 CONTRIBUTORS
 
-=for stopwords Chisel Daniel Perrett Gianni Ceccarelli Karen Etheridge Matthew Ryall Matthias Zeichmann Michael Kröll Sebastian Willert Sterling Hanenkamp William Wolf
+=for stopwords Andrey Khozov Chisel Daniel Perrett Gianni Ceccarelli Karen Etheridge Matthew Ryall Matthias Zeichmann Michael Kröll Sebastian Willert Sterling Hanenkamp William Wolf
 
 =over 4
+
+=item *
+
+Andrey Khozov <andrey@rydlab.ru>
 
 =item *
 
@@ -754,6 +746,10 @@ Chisel <chisel.wright@net-a-porter.com>
 =item *
 
 Daniel Perrett <dp13@sanger.ac.uk>
+
+=item *
+
+Gianni Ceccarelli <dakkar@thenautilus.net>
 
 =item *
 

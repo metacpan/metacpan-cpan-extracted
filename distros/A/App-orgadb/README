@@ -2,10 +2,15 @@ NAME
     App::orgadb - An opinionated Org addressbook toolset
 
 VERSION
-    This document describes version 0.010 of App::orgadb (from Perl
-    distribution App-orgadb), released on 2022-10-09.
+    This document describes version 0.014 of App::orgadb (from Perl
+    distribution App-orgadb), released on 2022-10-17.
 
 SYNOPSIS
+DESCRIPTION
+    This distribution includes the following CLI's:
+
+    *   orgadb-sel
+
 FUNCTIONS
   select
     Usage:
@@ -22,29 +27,117 @@ FUNCTIONS
 
         Find entry by string or regex search against the category title.
 
+    *   clipboard => *str*
+
+        Whether to copy matching field values to clipboard.
+
+        If set to "tee", then will display matching fields to terminal as
+        well as copy matching field values to clipboard.
+
+        If set to "only", then will not display matching fields to terminal
+        and will only copy matching field values to clipboard.
+
+        Mnemonic for short option "-y" and "-Y": *y*ank as in Emacs ("C-y").
+
     *   color => *str* (default: "auto")
 
         Whether to use color.
 
     *   color_theme => *perl::colortheme::modname_with_optional_args*
 
+        (No description)
+
     *   count => *true*
 
         Return just the number of matching entries instead of showing them.
 
-    *   default_formatter_rules => *array[any]*
-
-        Specify conditional default formatters. This is for convenience and
-        best specified in the configuration as opposed to on the
-        command-line option. An example:
-
-         default_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i","formatters":[ ["Phone::format_phone_idn"] ]}
-
     *   detail => *bool*
+
+        Instead of showing matching field values, display the whole entry.
+
+        Mnemonic for shortcut option "-l": the option "-l" is usually used
+        for the short version of "--detail", as in *ls* Unix command.
 
     *   entry => *str_or_re*
 
         Find entry by string or regex search against its title.
+
+    *   field_value_formatter_rules => *array[hash]*
+
+        Specify field value formatters to use when conditions are met,
+        specified as an array of hashes. Each element is a rule that is as a
+        hash containing condition keys and formatters keys. If all
+        conditions are met then the formatters will be applied. The rules
+        will be tested when each field is about to be outputted. Multiple
+        rules can match and the matching rules' formatters are all applied
+        in succession.
+
+        Note that this option will be overridden by the
+        "--field-value-formatter" ("-fvfmt") or the
+        "--no-field-value-formatters" ("-F") option.
+
+        The rules are best specified in the configuration as opposed to on
+        the command-line option. An example (the lines below are writen in
+        configuration file in IOD syntax, as rows of JSON hashes):
+
+         ; remove all comments in field values when 'hide_field_name' option is set
+         ; (which usually means we want to copy paste things)
+ 
+         field_value_formatter_rules={"hide_field_name":true, "formatters":[ ["Str::remove_comment"] ]}
+ 
+         ; normalize phone numbers using Phone::format + Str::remove_whitespace when
+         ; 'hide_field_name' option is set (which usually means we want to copy paste
+         ; things). e.g. '0812-1234-5678' becomes '+6281212345678'.
+ 
+         field_value_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i", "hide_field_name":true, "formatters":[ ["Phone::format", "Str::remove_whitespace"] ]}
+ 
+         ; but if 'hide_field_name' field is not set, normalize phone numbers using
+         ; Phone::format without removing whitespaces, which is easier to see (e.g.
+         ; '+62 812 1234 5678').
+ 
+         field_value_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i", "hide_field_name":false, "formatters":[ ["Phone::format"] ]}
+
+        Condition keys:
+
+        *   "field_name_matches" (value: str/re): Check if field name
+            matches a regex pattern.
+
+        *   "hide_field_name" (value: bool): Check if "--hide-field-name"
+            ("-N") option is set (true) or unset (false).
+
+        Formatter keys:
+
+        *   "formatters": an array of formatters, to be applied. Each
+            formatter is a name of perl Sah filter rule, or a two-element
+            array of perl Sah filter rule name followed by hash containing
+            arguments. See "--formatter" for more detais on specifying
+            formatter.
+
+    *   field_value_formatters => *array[str]*
+
+        Add one or more formatters to display field value.
+
+        Specify one or more formatters to apply to the field value before
+        displaying.
+
+        A formatter is name of "Data::Sah::Filter::perl::*" module, without
+        the prefix. For example: "Str::uc" will convert the field value to
+        uppercase. Another formatter, "Str::remove_comment" can remove
+        comment.
+
+        A formatter can have arguments, which is specified using this
+        format:
+
+         [FORMATTER_NAME, {ARG1NAME => ARG1VAL, ...}]
+
+        If formatter name begins with "[" character, it will be parsed as
+        JSON. Example:
+
+         ['Str::remove_comment', {'style':'cpp'}]
+
+        Note that this option overrides "--field-value-formatter-rules" but
+        is overridden by the "--no-field-value-formatters"
+        ("--raw-field-values", "-F") option.
 
     *   fields => *array[str_or_re]*
 
@@ -71,31 +164,6 @@ FUNCTIONS
         field name, and optionally also search for a string ("str2") or
         regex ("re2") in the field value.
 
-    *   formatters => *array[str]*
-
-        Add one or more formatters to display field value.
-
-        Specify one or more formatters to apply to the field value before
-        displaying.
-
-        A formatter is name of "Data::Sah::Filter::perl::*" module, without
-        the prefix. For example: "Str::uc" will convert the field value to
-        uppercase. Another formatter, "Str::remove_comment" can remove
-        comment.
-
-        A formatter can have arguments, which is specified using this
-        format:
-
-         [FORMATTER_NAME, {ARG1NAME => ARG1VAL, ...}]
-
-        If formatter name begins with "[" character, it will be parsed as
-        JSON. Example:
-
-         ['Str::remove_comment', {'style':'cpp'}]
-
-        Overrides "--default_formatter_rule" but overridden by the
-        "--no-formatters" ("--raw-field-values", "-F") option.
-
     *   hide_category => *true*
 
         Do not show category.
@@ -108,10 +176,17 @@ FUNCTIONS
 
         Do not show field names, just show field values.
 
-    *   no_formatters => *true*
+        Mnemonic for short option "-N": field *N*ame (uppercase letter
+        usually means /no/).
 
-        Do not apply any formatters to field value (overrides --formatter
-        option).
+    *   no_field_value_formatters => *true*
+
+        Do not apply formatters for field value (overrides
+        --field-value-formatter option).
+
+        Note that this option has higher precedence than
+        "--default-field-value-formatter-rules" or the
+        "--field-value-formatter" ("--fvfmt") option.
 
     *   num_entries => *uint*
 
@@ -124,7 +199,11 @@ FUNCTIONS
 
     *   reload_files_on_change => *bool* (default: 1)
 
+        (No description)
+
     *   shell => *true*
+
+        (No description)
 
     Returns an enveloped result (an array).
 

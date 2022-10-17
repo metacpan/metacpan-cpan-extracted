@@ -12,11 +12,11 @@ use PDL::Core;
 
 # workaround for A::F::C v 1.02
 BEGIN {
-  use Astro::FITS::CFITSIO qw/ :constants/;
-  eval { LONGLONG_IMG() };
+    use Astro::FITS::CFITSIO qw/ :constants/;
+    eval { LONGLONG_IMG() };
 
-  *LONGLONG_IMG = sub { 64 }
-    if $@;
+    *LONGLONG_IMG = sub { 64 }
+      if $@;
 }
 
 require Exporter;
@@ -30,11 +30,13 @@ our @ISA = qw(Exporter);
 # This allows declaration       use Astro::FITS::CFITSIO::PDL ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-  pdl2cfitsio
-  fits2pdl_coltype
-  fits2pdl_imgtype
-) ] );
+our %EXPORT_TAGS = (
+    'all' => [ qw(
+          pdl2cfitsio
+          fits2pdl_coltype
+          fits2pdl_imgtype
+          my_badvalue
+        ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
@@ -42,47 +44,46 @@ our @EXPORT = qw(
 
 );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
-our %PDL2CFITSIO =
-  (
-   float  => [ TDOUBLE, TFLOAT ],
-   double => [ TDOUBLE, TFLOAT ],
-   short  => [ TSHORT, TINT, TLONG ],
-   long   => [ TSHORT, TINT, TLONG  ],
-   ushort => [ TBYTE, TUSHORT, TUINT, TULONG ],
-   byte   => [ TBYTE, TUSHORT, TUINT, TULONG ],
-  );
+our %PDL2CFITSIO = (
+    float  => [ TDOUBLE, TFLOAT ],
+    double => [ TDOUBLE, TFLOAT ],
+    short  => [ TSHORT,  TINT,    TLONG ],
+    long   => [ TSHORT,  TINT,    TLONG ],
+    ushort => [ TBYTE,   TUSHORT, TUINT, TULONG ],
+    byte   => [ TBYTE,   TUSHORT, TUINT, TULONG ],
+);
 
-sub pdl2cfitsio
-{
-  my ( $arg ) = @_;
+sub pdl2cfitsio {
+    my ( $arg ) = @_;
 
-  my $pdl_type;
+    my $pdl_type;
 
-  if (UNIVERSAL::isa($arg,'PDL')) {
-    $pdl_type = $arg->type;
+    if ( UNIVERSAL::isa( $arg, 'PDL' ) ) {
+        $pdl_type = $arg->type;
 
-  } elsif (UNIVERSAL::isa($arg,'PDL::Type')) {
-    $pdl_type = $arg;
+    }
+    elsif ( UNIVERSAL::isa( $arg, 'PDL::Type' ) ) {
+        $pdl_type = $arg;
 
-  } else {
-    die "argument should be a PDL object or PDL::Type token\n";
-  }
+    }
+    else {
+        die "argument should be a PDL object or PDL::Type token\n";
+    }
 
-  # test for real datatypes
-  exists $PDL2CFITSIO{ $pdl_type } or
-    die "PDL type $pdl_type not supported";
+    # test for real datatypes
+    exists $PDL2CFITSIO{$pdl_type}
+      or die "PDL type $pdl_type not supported";
 
 
-  my $pdl_size = PDL::Core::howbig($pdl_type);
+    my $pdl_size = PDL::Core::howbig( $pdl_type );
 
-  foreach ( @{$PDL2CFITSIO{ $pdl_type }} )
-  {
-    return $_ if $pdl_size == Astro::FITS::CFITSIO::sizeof_datatype( $_ );
-  }
+    foreach ( @{ $PDL2CFITSIO{$pdl_type} } ) {
+        return $_ if $pdl_size == Astro::FITS::CFITSIO::sizeof_datatype( $_ );
+    }
 
-  die "no CFITSIO type for PDL type $pdl_type\n";
+    die "no CFITSIO type for PDL type $pdl_type\n";
 }
 
 
@@ -93,59 +94,58 @@ sub pdl2cfitsio
 
 
 
-our %FITS2CFITSIO_COL =
-  (
-   'X' => TBIT,
-   'B' => TBYTE,
-   'L' => TLOGICAL,
-   'A' => TSTRING,
-   'I' => TSHORT,
-   'J' => TLONG,
-   'E' => TFLOAT,
-   'D' => TDOUBLE,
-   'C' => TCOMPLEX,
-   'M' => TDBLCOMPLEX,
-   'S' => TSBYTE,
-#   'K' => TLONGLONG,
-  );
+our %FITS2CFITSIO_COL = (
+    'X' => TBIT,
+    'B' => TBYTE,
+    'L' => TLOGICAL,
+    'A' => TSTRING,
+    'I' => TSHORT,
+    'J' => TLONG,
+    'E' => TFLOAT,
+    'D' => TDOUBLE,
+    'C' => TCOMPLEX,
+    'M' => TDBLCOMPLEX,
+    'S' => TSBYTE,
+    #   'K' => TLONGLONG,
+);
 
-our %CFITSIO2PDL_COL =
-  (
-   TSTRING()    => undef,   # A
-   TUSHORT()    => ushort,  #
-   TSHORT()     => short,   # I
-   TLONG()      => long,    # J
-   TINT()       => long,    # J
-   TUINT()      => long,    # incorrect, but gotta do something!
-   TULONG()     => long,    # incorrect, but gotta do something!
-   TFLOAT()     => float,   # E
-   TDOUBLE()    => double,  # D
-   TBIT()       => byte,    # X
-   TLOGICAL()   => byte,    # L
-   TBYTE()      => byte,    # B
-   TSBYTE()     => byte,    # S
+our %CFITSIO2PDL_COL = (
+    TSTRING()  => undef,     # A
+    TUSHORT()  => ushort,    #
+    TSHORT()   => short,     # I
+    TLONG()    => long,      # J
+    TINT()     => long,      # J
+    TUINT()    => long,      # incorrect, but gotta do something!
+    TULONG()   => long,      # incorrect, but gotta do something!
+    TFLOAT()   => float,     # E
+    TDOUBLE()  => double,    # D
+    TBIT()     => byte,      # X
+    TLOGICAL() => byte,      # L
+    TBYTE()    => byte,      # B
+    TSBYTE()   => byte,      # S
 #   TLONGLONG()  => longlong #
-  );
+);
 
 # we don't support these (yet?)
-  #define TCOMPLEX     83  /* complex (pair of floats)   'C' */
-  #define TDBLCOMPLEX 163  /* double complex (2 doubles) 'M' */
-  #define TUINT        30  /* unsigned int                   */
-  #define TULONG       40  /* unsigned long                  */
+#define TCOMPLEX     83  /* complex (pair of floats)   'C' */
+#define TDBLCOMPLEX 163  /* double complex (2 doubles) 'M' */
+#define TUINT        30  /* unsigned int                   */
+#define TULONG       40  /* unsigned long                  */
 
 sub fits2pdl_coltype {
 
-  my ( $fits_type ) = @_;
+    my ( $fits_type ) = @_;
 
-  my $nfits_type =
-    exists $FITS2CFITSIO_COL{$fits_type} ?
-      $FITS2CFITSIO_COL{$fits_type} : $fits_type;
+    my $nfits_type
+      = exists $FITS2CFITSIO_COL{$fits_type}
+      ? $FITS2CFITSIO_COL{$fits_type}
+      : $fits_type;
 
-  croak( "unsupported CFITSIO/FITS type: $fits_type\n" )
-    unless exists $CFITSIO2PDL_COL{$nfits_type};
+    croak( "unsupported CFITSIO/FITS type: $fits_type\n" )
+      unless exists $CFITSIO2PDL_COL{$nfits_type};
 
 
-  return $CFITSIO2PDL_COL{$nfits_type};
+    return $CFITSIO2PDL_COL{$nfits_type};
 }
 
 
@@ -154,27 +154,34 @@ sub fits2pdl_coltype {
 # Images
 
 
-our %CFITSIO2PDL_IMG =
-  (
-   BYTE_IMG()   => byte,
-   SHORT_IMG()  => short,
-   LONG_IMG()   => long,
-   FLOAT_IMG()  => float,
-   DOUBLE_IMG() => double
-  );
+our %CFITSIO2PDL_IMG = (
+    BYTE_IMG()   => byte,
+    SHORT_IMG()  => short,
+    LONG_IMG()   => long,
+    FLOAT_IMG()  => float,
+    DOUBLE_IMG() => double
+);
 
 # we don't support these (yet?)
 #define LONGLONG_IMG  64
 
 sub fits2pdl_imgtype {
 
-  my ( $fits_type ) = @_;
+    my ( $fits_type ) = @_;
 
-  croak( "unsupported Image CFITSIO/FITS type: $fits_type\n" )
-    unless exists $CFITSIO2PDL_IMG{$fits_type};
+    croak( "unsupported Image CFITSIO/FITS type: $fits_type\n" )
+      unless exists $CFITSIO2PDL_IMG{$fits_type};
 
-  $CFITSIO2PDL_IMG{$fits_type};
+    $CFITSIO2PDL_IMG{$fits_type};
 }
+
+# PDL >= 2.039 badvalue returns an ndarray, not a Perl scalar.
+
+
+
+
+*my_badvalue
+  = PDL->VERSION < 2.039 ? \&PDL::badvalue : sub { PDL::badvalue( @_ )->sclr };
 
 #
 # This file is part of Astro-FITS-CFITSIO-Simple
@@ -201,7 +208,7 @@ Astro::FITS::CFITSIO::Simple::PDL - support routines for using CFITSIO and PDL
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -255,6 +262,8 @@ It B<croak()'s> if the passed type is not supported.
 =head2 EXPORT
 
 None by default.
+
+=for Pod::Coverage my_badvalue
 
 =head1 SUPPORT
 

@@ -354,5 +354,6 @@ readline default
         [ '??',       # see 04-extra.t
         [ 'for-qw',   # see 04-extra.t
         [ '@_=split', # see 04-extra.t
+        [ 'no-sigil', # see 04-extra.t
 =cut
 

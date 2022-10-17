@@ -30,30 +30,24 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Synopsis' => '0',
                                       'Test::Vars' => '0.014',
-                                      'Test::Version' => '1'
+                                      'Test::Version' => '1',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'runtime' => {
                       'requires' => {
                                       'Data::Dumper' => '0',
-                                      'File::Basename' => '0',
-                                      'HTTP::Headers' => '0',
                                       'IO::CaptureOutput' => '0',
                                       'JSON::MaybeXS' => '0',
                                       'JSON::Path' => '0',
-                                      'LWP::Protocol::https' => '0',
+                                      'LWP::Protocol::https' => '6.10',
                                       'MIME::Base64' => '0',
                                       'Moo' => '2.002004',
-                                      'Scalar::Util' => '0',
-                                      'Try::Tiny' => '0',
                                       'Types::Standard' => '0',
-                                      'URI' => '0',
-                                      'URI::Escape' => '0',
                                       'WWW::Mechanize' => '0',
                                       'XML::Simple' => '0',
-                                      'perl' => '5.006',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'perl' => '5.010'
                                     }
                     },
        'test' => {
@@ -63,9 +57,13 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'LWP::UserAgent' => '0',
                                    'Test::More' => '0',
                                    'Test::RequiresInternet' => '0',
-                                   'perl' => '5.006'
+                                   'Try::Tiny' => '0',
+                                   'perl' => '5.010',
+                                   'strict' => '0',
+                                   'warnings' => '0'
                                  }
                  }
      };

@@ -9,6 +9,11 @@ pod_spelling_system:
     - Etheridge
     - PL
     - dist
+    - Mughal
+    - Zaki
+    - zmughal
+    - GoMod
+    - lang
 
 pod_coverage:
   skip: 0

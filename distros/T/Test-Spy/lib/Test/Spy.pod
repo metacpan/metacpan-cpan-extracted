@@ -1,0 +1,262 @@
+=head1 NAME
+
+Test::Spy - build mocked interfaces and examine call data easily
+
+=head1 SYNOPSIS
+
+	use Test::More;
+	use Test::Spy;
+
+	# create a spy
+	my $spy = Test::Spy->new;
+
+	# add a method
+	$spy->add_method('mocked_method')
+		->should_return('return value');
+
+	# create an object, execute the test
+	my $object = $spy->object;
+	print $object->mocked_method('argument'); # 'return value'
+
+	# examine the results
+	my $method = $spy->method('mocked_method');
+	ok $method->was_called;
+	is_deeply $method->called_with, ['argument'];
+
+	# examine the results - with context
+	$spy->set_context('mocked_method');
+	ok $spy->was_called;
+	is_deeply $spy->called_with, ['argument'];
+
+	done_testing;
+
+=head1 DESCRIPTION
+
+Test::Spy is a simple package for creating OO interface mocks, which can be
+verified on a per-method basis after the calls have been made.
+
+This module will not replace methods in packages for you. It requires you to
+inject the generated object into your code with dependency injection.
+
+B<Beta quality>: interface is not yet stable before version 1.000.
+
+=head2 Properties
+
+=head3 interface
+
+Strictness of the object interface. Can be any of:
+
+=over
+
+=item * C<'strict'> (default) - methods which were not mocked don't exist (exception)
+
+=item * C<'lax'> - non-mocked methods are autoloaded and return C<undef>
+
+=item * C<'warn'> - same as C<'lax'>, but a warning is issued
+
+=back
+
+I<optional on the constructor with name:> C<interface>
+
+=head3 object
+
+The actual object with mocked interface. Its gets cached after generation, so
+you will always get the same reference, but adding methods after you've called
+this method will not update already existing objects - those will have to be
+generated again.
+
+The workflow is always: call C<< ->object >> after adding new methods.
+
+=head3 context
+
+String - name of the method which you are currently testing. Can be utilized if
+you're currently focusing on a specific method, or have mocked just one. This allows
+calling L</Call history methods> without using an intermediate variable for it.
+
+Can be passed to the constructor or set with the writer. The method does not
+have to exist during setting its name - the code will throw exception only when
+you try to actually test it.
+
+I<optional on the constructor with name:> C<context>
+
+I<writer:> C<set_context>
+
+I<predicate:> C<has_context>
+
+I<clearer:> C<clear_context>
+
+=head2 General methods
+
+=head3 new
+
+Typical L<Moose>-flavored constructor. See property list above for details on
+hash keys it handles.
+
+=head3 add_method
+
+	# add a method
+	my $method = $spy->add_method($name, @returns)
+
+	# call it
+	$spy->object->$name;
+
+Adds a new method with name C<$name> to the object.
+
+C<@returns> array is optional and specifies the return value of the new method.
+If not present, method will return C<undef>. See
+L<Test::Spy::Method/should_return> for more details.
+
+Return value is an object of L<Test::Spy::Method>.
+
+=head3 method
+
+	my $method = $spy->method($name);
+
+Returns an object of L<Test::Spy::Method> that was added with L</add_method> as
+C<$name>.
+
+Throws an exception if there is no such method.
+
+=head3 clear_all
+
+Calls C<< ->clear >> on all registered methods and C<< ->clear_context >>. Can
+be used to run a test again without re-creating the spy.
+
+=head2 Call history methods
+
+These methods are also found in L<Test::Spy::Method>'s interface. When called
+on L<Test::Spy>, these methods will execute on the method which name is
+currently in L</context>. If there is no context, these methods will throw an
+exception.
+
+=head3 call_history
+
+Returns the entire call history - array reference of array references:
+
+	[
+		# first method call
+		['first method argument', 'second method argument', ...],
+
+		# second method call
+		['first method argument', 'second method argument', ...],
+
+		...
+	]
+
+This data is very raw, so its often better to use helpers specified below.
+
+=head3 called_times
+
+Returns a non-negative integer number - the number of times the method was called.
+
+=head3 was_called
+
+Returns a boolean - whether the method was called at least once.
+
+If passed an argument, returns whether the method was called B<exactly> as many times:
+
+	$object->method;
+	$object->method;
+
+	$spy->set_context('method');
+
+	$spy->was_called;    # true
+	$spy->was_called(1); # false
+	$spy->was_called(2); # true
+	$spy->was_called(3); # false
+
+=head3 wasnt_called
+
+A shortcut for C<< $spy->was_called(0) >> - see above.
+
+=head3 was_called_once
+
+A shortcut for C<< $spy->was_called(1) >> - see above.
+
+=head3 first_called_with
+
+Returns an array reference - the arguments of the first (oldest) method call.
+
+In addition, sets the internal method iterator to the beginning for L</next_called_with>.
+
+If there were no calls at all, returns C<undef>.
+
+The behavior of the iterator functions are showcased below:
+
+	$object->method(1);
+	$object->method(2);
+
+	$spy->set_context('method');
+
+	$spy->first_called_with; # [1]
+	$spy->called_with;       # [1]
+	$spy->next_called_with;  # [2]
+	$spy->next_called_with;  # undef
+	$spy->last_called_with;  # [2]
+
+	$object->method(3, 4);
+
+	$spy->called_with;       # [2]
+	$spy->next_called_with;  # [3, 4]
+	$spy->first_called_with; # [1]
+
+	$object->method;
+
+	$spy->last_called_with;  # []
+
+=head3 next_called_with
+
+Returns an array reference - the arguments of the next (newer) method call.
+
+The internal iterator of the method is increased by C<1> as a result.
+
+If there were no more calls, returns C<undef>.
+
+=head3 last_called_with
+
+Returns an array reference - the arguments of the last (newest) method call.
+
+In addition, sets the internal method iterator to the end for L</next_called_with>.
+
+If there were no calls at all, returns C<undef>.
+
+=head3 called_with
+
+Returns an array reference - the arguments of the current method call. If there
+was no other C<X_called_with> call before, acts the same as
+L</first_called_with>.
+
+The internal iterator of the method is not altered, unless it was not set at
+all, in which case it is set to the beginning.
+
+Can return C<undef> if there was no such call data.
+
+=head3 clear
+
+Clears all call and iterator data B<from the method>.
+
+=head1 TODO
+
+=over
+
+=item * Mimic given class interface
+
+=item * Proper handling of can, does and isa
+
+=back
+
+=head1 SEE ALSO
+
+L<Test::MockObject>
+
+=head1 AUTHOR
+
+Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022 by Bartosz Jarzyna
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

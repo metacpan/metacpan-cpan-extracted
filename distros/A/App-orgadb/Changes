@@ -1,3 +1,52 @@
+0.014   2022-10-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Tweak doc, add shortcut options: --remove-nondigits,
+          --remove-comments, --remove-whitespaces, --format-phone.
+
+        - [bugfix] Non-simple headings (e.g. containing timestamp) were not
+          matched.
+
+        - [doc] Add mnenomic note for -N, -l.
+
+        - [ux] Add shortcut option -y for --clipboard=tee, and -Y for
+          --clipboard=only.
+
+
+0.013   2022-10-16  Released-By: PERLANCAR; Backward-Incompatible: yes
+
+        [cli orgadb-sel]
+
+        - [incompatible change] Rename --formatter to --field-value-formatter
+          (alias --fvfmt) to avoid ambiguity with --format. Also,
+          --no-formatters becomes --no-field-value-formatters,
+          --default-formatter-rules becomes --field-value-formatter-rules.
+
+        - [bugfix][doc] Usage line didn't yet include common options.
+
+        - Doc tweaks & typos.
+
+
+0.012   2022-10-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Fix typos in documentation.
+
+        - [build] Rebuild to improve generated POD.
+
+
+0.011   2022-10-15  Released-By: PERLANCAR; Urgency: medium
+
+        [cli orgadb-sel]
+
+        - Add --clipboard option.
+
+        - [doc] Show complete usage line in POD.
+
+        - Improve default formatting rules: add condition key 'hide_field_name',
+          all rules are now evaluated and all formatters from matching, expand
+          docs.
+
 0.010   2022-10-09  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] We were repeatedly forming regex from string

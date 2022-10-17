@@ -1,5 +1,11 @@
 Revision history for App-Env
 
+1.02      2022-10-15 12:44:10-04:00 America/New_York
+
+  [BUGFIX]
+
+    * previous conversion from die to croak wasn't complete
+
 1.01      2022-07-06 18:59:44-04:00 America/New_York
 
   [BUGFIX]

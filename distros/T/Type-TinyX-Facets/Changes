@@ -1,5 +1,27 @@
 Revision history for Type-TinyX-Facets
 
+1.2       2022-10-15 12:00:18-04:00 America/New_York
+
+  [BUG FIX]
+
+    * fallback code (from v 1.0) for older versions of Type::Tiny was
+      broken.
+
+
+1.1       2022-10-05 17:18:37-04:00 America/New_York (TRIAL RELEASE)
+
+  [DISTRIBUTION FIX]
+
+    * no code changes; remove extraneous cruft in distribution
+      uploaded to CPAN
+
+
+1.0       2022-10-05 17:05:06-04:00 America/New_York (TRIAL RELEASE)
+
+  [ API CHANGE ]
+
+    * deprecate 'facetize', introduce replacement 'with_facets'
+    
 0.03      2019-01-18 16:11:06-05:00 America/New_York
   [ DISTRIBUTION FIX ]
     * remove extraneous Makefile.PL from the distribution

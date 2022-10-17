@@ -35,7 +35,7 @@ my ( $main_module ) = map { s!-!/!g; s!^!lib/! if -d 'lib'; -f "$_.pod" ? "$_.po
 ) }me;
 
 die unless -e 'Makefile.PL';
-$file{'README'} = Pod::Readme::Brief->new( $file{ $main_module } )->render( installer => 'eumm' );
+$file{'README'} = Pod::Readme::Brief->new( $file{ $main_module } )->render( installer => 'eumm', width => 72 );
 
 my @manifest = split /\n/, slurp 'MANIFEST';
 my %manifest = map /\A([^\s#]+)()/, @manifest;

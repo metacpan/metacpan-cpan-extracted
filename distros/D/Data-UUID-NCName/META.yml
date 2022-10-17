@@ -20,13 +20,14 @@ no_index:
     - inc
     - t
 requires:
-  Encode::Base58: '0.01'
+  Encode::Base58::BigInt: '0.03'
   MIME::Base32: '1.303'
   MIME::Base64: '3.15'
+  Math::BigInt: '1.999811'
   Type::Tiny: '1.002002'
   UUID::Tiny: '1.04'
   perl: 5.12.0
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
   repository: https://github.com/doriantaylor/p5-data-uuid-ncname
-version: '0.06'
+version: '0.07'

@@ -14,7 +14,38 @@ env:
   PERL_CARTON_PATH: $GITHUB_WORKSPACE/local
 
 jobs:
-  linux:
+  linux-redhat:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os:
+          - image: fedora
+            rpms: ''
+          - image: almalinux:9
+            rpms: gmp-devel
+
+    container:
+      image: ${{ matrix.os.image }}
+
+    steps:
+      - uses: actions/checkout@main
+
+      # Omit GMP so we test pure-Perl:
+      - run: dnf -y install perl-App-cpanminus openssl ${{ matrix.os.rpms }}
+
+      - name: perl -V
+        run: perl -V
+      - name: Install Dependencies
+        run: cpanm --verbose --notest --installdeps --with-configure --with-recommends .
+      - name: perl Makefile.PL
+        run: perl Makefile.PL
+      - name: make
+        run: make
+      - name: Run Tests
+        run: prove -wlvmb t
+
+  linux-ubuntu:
 
     runs-on: ubuntu-latest
 
@@ -22,6 +53,7 @@ jobs:
       fail-fast: false
       matrix:
         perl-version:
+          - '5.36'
           - '5.34'
           - '5.32'
           - '5.30'
@@ -42,6 +74,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - run: apt install -y libgmp3-dev openssl
       - name: perl -V
         run: perl -V
       - name: Install Dependencies
@@ -59,13 +92,13 @@ jobs:
     runs-on: macOS-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@main
       - name: Set up Perl
-        run: brew install perl
+        run: brew install perl cpanminus
       - name: perl -V
         run: perl -V
       - name: Install dependencies
-        run: curl -L https://cpanmin.us | perl - --notest --installdeps --with-configure --with-recommends .
+        run: cpanm --notest --installdeps --with-configure --with-recommends .
       - name: perl Makefile.PL
         run: perl Makefile.PL
       - name: make
@@ -105,7 +138,7 @@ jobs:
 
     steps:
       - name: Set up Cygwin
-        uses: egor-tensin/setup-cygwin@v3
+        uses: egor-tensin/setup-cygwin@master
         with:
             platform: x64
             packages: perl_base perl-ExtUtils-MakeMaker make gcc-g++ libcrypt-devel libgmp-devel bash

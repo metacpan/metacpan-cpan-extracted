@@ -1,6 +1,6 @@
 use strict; use warnings;
 use Memoize;
-use Test::More tests => 16;
+use Test::More tests => 17;
 
 # here we test whether memoization actually has the desired effect
 
@@ -83,3 +83,21 @@ is_deeply \%CALLS, {1=>2,2=>1,3=>1}, 'amount of calls per arg after expiring 1 a
 delete @underlying{1,2};
 is_deeply [map scalar(id($_)), @$arg], $arg, 'memoized function sanity check';
 is_deeply \%CALLS, {1=>3,2=>2,3=>1}, 'amount of calls per arg after expiring 1 & 2 as expected';
+
+########################################################################
+
+my $fail;
+$SIG{__WARN__} = sub { if ( $_[0] =~ /^Deep recursion/ ) { $fail = 1 } else { warn $_[0] } };
+
+my $limit;
+sub deep_probe { deep_probe() if ++$limit < 100_000 and not $fail }
+sub deep_test { no warnings "recursion"; deep_test() if $limit-- > 0 }
+memoize "deep_test";
+
+SKIP: {
+	deep_probe();
+	skip "no warning after $limit recursive calls (maybe PERL_SUB_DEPTH_WARN was raised?)", 1 if not $fail;
+	undef $fail;
+	deep_test();
+	ok !$fail, 'no recursion warning thrown from Memoize';
+}

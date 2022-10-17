@@ -1,19 +1,27 @@
 package Hash::Subset;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
-our $DIST = 'Hash-Subset'; # DIST
-our $VERSION = '0.006'; # VERSION
-
 use strict;
 use warnings;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-07-27'; # DATE
+our $DIST = 'Hash-Subset'; # DIST
+our $VERSION = '0.007'; # VERSION
+
 our @EXPORT_OK = qw(
                        hash_subset
                        hashref_subset
                        hash_subset_without
                        hashref_subset_without
+
+                       merge_hash_subset
+                       merge_overwrite_hash_subset
+                       merge_ignore_hash_subset
+                       merge_hash_subset_without
+                       merge_overwrite_hash_subset_without
+                       merge_ignore_hash_subset_without
                );
 
 sub _routine {
@@ -47,6 +55,16 @@ sub _routine {
                     $subset{$_} = $hash->{$_} if exists $hash->{$_};
                 }
             }
+        } elsif ($ref eq 'Regexp') {
+            if ($reverse) {
+                for (keys %subset) {
+                    delete $subset{$_} if $_ =~ $keys_src;
+                }
+            } else {
+                for (keys %$hash) {
+                    $subset{$_} = $hash->{$_} if $_ =~ $keys_src;
+                }
+            }
         } elsif ($ref eq 'CODE') {
             if ($reverse) {
                 for (keys %$hash) {
@@ -58,7 +76,7 @@ sub _routine {
                 }
             }
         } else {
-            die "Key source ($keys_src) must be a hashref/arrayref/coderef";
+            die "Key source ($keys_src) must be a hashref/arrayref/Regexp/coderef";
         }
     } # for $keys_src
 
@@ -73,6 +91,58 @@ sub hash_subset    { _routine('hash_subset'   , @_) }
 sub hashref_subset { _routine('hashref_subset', @_) }
 sub hash_subset_without    { _routine('hash_subset_without'   , @_) }
 sub hashref_subset_without { _routine('hashref_subset_without', @_) }
+
+sub merge_hash_subset {
+    my ($h1, $h2, @keys_src) = @_;
+    my %subset = hash_subset($h2, @keys_src);
+    for my $key (keys %subset) {
+        die "Duplicate key when merging hash subset key '$key'" if exists $h1->{$key};
+        $h1->{$key} = $subset{$key};
+    }
+}
+
+sub merge_hash_subset_without {
+    my ($h1, $h2, @keys_src) = @_;
+    my %subset = hash_subset_without($h2, @keys_src);
+    for my $key (keys %subset) {
+        die "Duplicate key when merging hash subset key '$key'" if exists $h1->{$key};
+        $h1->{$key} = $subset{$key};
+    }
+}
+
+sub merge_overwrite_hash_subset {
+    my ($h1, $h2, @keys_src) = @_;
+    my %subset = hash_subset($h2, @keys_src);
+    for my $key (keys %subset) {
+        $h1->{$key} = $subset{$key};
+    }
+}
+
+sub merge_overwrite_hash_subset_without {
+    my ($h1, $h2, @keys_src) = @_;
+    my %subset = hash_subset_without($h2, @keys_src);
+    for my $key (keys %subset) {
+        $h1->{$key} = $subset{$key};
+    }
+}
+
+sub merge_ignore_hash_subset {
+    my ($h1, $h2, @keys_src) = @_;
+    my %subset = hash_subset($h2, @keys_src);
+    for my $key (keys %subset) {
+        next if exists $h1->{$key};
+        $h1->{$key} = $subset{$key};
+    }
+}
+
+sub merge_ignore_hash_subset_without {
+    my ($h1, $h2, @keys_src) = @_;
+    my %subset = hash_subset_without($h2, @keys_src);
+    for my $key (keys %subset) {
+        next if exists $h1->{$key};
+        $h1->{$key} = $subset{$key};
+    }
+}
 
 1;
 # ABSTRACT: Produce subset of a hash
@@ -89,7 +159,7 @@ Hash::Subset - Produce subset of a hash
 
 =head1 VERSION
 
-This document describes version 0.006 of Hash::Subset (from Perl distribution Hash-Subset), released on 2020-06-11.
+This document describes version 0.007 of Hash::Subset (from Perl distribution Hash-Subset), released on 2022-07-27.
 
 =head1 SYNOPSIS
 
@@ -98,6 +168,13 @@ This document describes version 0.006 of Hash::Subset (from Perl distribution Ha
      hashref_subset
      hash_subset_without
      hashref_subset_without
+
+     merge_hash_subset
+     merge_overwrite_hash_subset
+     merge_ignore_hash_subset
+     merge_hash_subset_without
+     merge_overwrite_hash_subset_without
+     merge_ignore_hash_subset_without
  );
 
  # using keys specified in an array
@@ -175,9 +252,15 @@ If you use L<Rinci> metadata in your code, this will come in handy, for example:
      ...
  }
 
+Merging subset to another hash:
+
+ my %target = (a=>1, b=>2);
+ merge_hash_subset(\%target, {foo=>1, bar=>2, baz=>3}, qr/ba/); # %target becomes (a=>1, b=>2, bar=>2, baz=>3)
+ merge_hash_subset_without(\%target, {foo=>1, bar=>2, baz=>3}, qr/ba/); # %target becomes (a=>1, b=>2, foo=>1)
+
 =head1 DESCRIPTION
 
-Keywords: hash arguments, hash picking, hash grep, hash filtering
+Keywords: hash arguments, hash picking, hash grep, hash filtering, hash merging
 
 =head1 FUNCTIONS
 
@@ -190,8 +273,9 @@ Usage:
  my %subset  = hash_subset   (\%hash, @keys_srcs);
  my $subset  = hashref_subset(\%hash, @keys_srcs);
 
-Where @keys_src elements can be arrayref, hashref, or coderef. Coderef will be
-called with args($key, $value) and return true when key should be included.
+Where each @keys_src element can either be an arrayref, a hashref, a Regexp
+object, or a coderef. Coderef will be called with args($key, $value) and return
+true when key should be included.
 
 Produce subset of C<%hash>, returning the subset hash (or hashref, in the case
 of C<hashref_subset> function).
@@ -213,7 +297,8 @@ So basically C<hash_subset> is equivalent to:
  my %subset = %hash{grep {exists $hash{$_}} "b","c","d"}; # => (b=>2, c=>3)
 
 and available for perl earlier than 5.20. In addition to that, hash_subset()
-accepts arrayref as well as hashref/coderef, and several of them.
+accepts arrayref & Regexp object as well as hashref/coderef, and several of
+them.
 
 =head2 hashref_subset
 
@@ -222,11 +307,72 @@ See L</hash_subset>.
 =head2 hash_subset_without
 
 Like L</hash_subset>, but reverses the logic: will create subset that only
-includes keys not in the specified arrays/hashes/coderefs.
+includes keys not in the specified arrays/hashes/Regexps/coderefs.
 
 =head2 hashref_subset_without
 
 See L</hash_subset_without>.
+
+=head2 merge_hash_subset
+
+Usage:
+
+  merge_hash_subset          (\%h1, \%h2, @keys_src);
+  merge_overwrite_hash_subset(\%h1, \%h2, @keys_src);
+  merge_ignore_hash_subset   (\%h1, \%h2, @keys_src);
+
+C<merge_hash_subset> selects a subset of hash C<%h2> (using C<@keys_src>, just
+like in L</hash_subset>) and merge the subset to hash C<%h1>. This is basically
+a convenience shortcut for:
+
+ my %subset = hash_subset(\%h2, @keys_src);
+ for my $key (keys %subset) {
+     die "Duplicate key when merging subset: $key" if exists $h1{$key];
+     $h1{$key} = $subset{$key};
+ }
+
+while C<merge_overwrite_hash_subset> does something like this:
+
+ my %subset = hash_subset(\%h2, @keys_src);
+ for my $key (keys %subset) {
+     $h1{$key} = $subset{$key};
+ }
+
+and C<merge_ignore_hash_subset> does something like this:
+
+ my %subset = hash_subset(\%h2, @keys_src);
+ for my $key (keys %subset) {
+     next if exists $h1{$key};
+     $h1{$key} = $subset{$key};
+ }
+
+=head2 merge_overwrite_hash_subset
+
+See L</merge_hash_subset>.
+
+=head2 merge_ignore_hash_subset
+
+See L</merge_hash_subset>.
+
+=head2 merge_hash_subset_without
+
+Usage:
+
+  merge_hash_subset_without          (\%h1, \%h2, @keys_src);
+  merge_overwrite_hash_subset_without(\%h1, \%h2, @keys_src);
+  merge_ignore_hash_subset_without   (\%h1, \%h2, @keys_src);
+
+These are like L</merge_hash_subset>, L</merge_overwrite_hash_subset>, and
+L</merge_ignore_hash_subset> except these routines will merge subset from C<%h2>
+that do I<not> contain keys specified by C<@keys_src>.
+
+=head2 merge_overwrite_hash_subset_without
+
+See L</merge_hash_subset_without>.
+
+=head2 merge_ignore_hash_subset_without
+
+See L</merge_hash_subset_without>.
 
 =head1 HOMEPAGE
 
@@ -235,14 +381,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Hash-Subse
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Hash-Subset>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Subset>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -266,11 +404,36 @@ See some benchmarks in L<Bencher::Scenarios::HashPicking>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Subset>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

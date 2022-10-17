@@ -1,0 +1,8 @@
+0.002 Oct 17 2022
+	- add clear_all method to Test::Spy
+	- add wasnt_called method to testing interface
+	- fix a bug on calling ->clear on Test::Spy
+
+0.001 Oct 16 2022
+	- first version
+

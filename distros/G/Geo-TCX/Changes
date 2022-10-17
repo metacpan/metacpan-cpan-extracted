@@ -1,4 +1,10 @@
 Revision history for Geo-TCX
 
+1.01 [2022-10-13]
+    Fixed bug in 01_main.t test file
+    Changed time- and distance-related methods in Geo::GPX::Trackpoint
+        - new Time() and time_datetime() accessors
+        - most time-related functions rename time_*
+
 1.00 [2022-10-10]
     Added module to CPAN

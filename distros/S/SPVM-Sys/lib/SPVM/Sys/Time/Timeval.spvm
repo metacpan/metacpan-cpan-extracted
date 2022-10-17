@@ -1,0 +1,12 @@
+class Sys::Time::Timeval : pointer_t {
+  
+  native static method new : Sys::Time::Timeval ();
+
+  native method DESTROY : void ();
+  
+  native method tv_sec : long ();
+  native method tv_usec : long ();
+
+  native method set_tv_sec : void ($tv_sec : long);
+  native method set_tv_usec : void ($tv_usec : long);
+}

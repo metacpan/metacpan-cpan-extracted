@@ -939,6 +939,30 @@ METHODS ON CONVERGENT FUTURES
     component futures. In scalar context, each will yield the number of
     such component futures.
 
+SUBCLASSING METHODS
+
+    These methods are not intended for end-users of Future instances, but
+    instead provided for authors of classes that subclass from Future
+    itself.
+
+ set_udata
+
+       $future = $future->set_udata( $name, $value )
+
+    Stores a Perl value within the instance, under the given name.
+    Subclasses can use this to store extra data that the implementation may
+    require.
+
+    This is a safer version of attempting to use the $future instance
+    itself as a hash reference.
+
+ udata
+
+       $value = $future->get_udata( $name )
+
+    Returns a Perl value from the instance that was previously set with
+    "set_udata".
+
 TRACING METHODS
 
  set_label

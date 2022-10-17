@@ -3,39 +3,29 @@ NAME
     ported from (or inspired by) Ruby libraries
 
 VERSION
-    This document describes version 0.008 of
+    This document describes version 0.009 of
     Acme::CPANModules::PortedFrom::Ruby (from Perl distribution
-    Acme-CPANModules-PortedFrom-Ruby), released on 2022-06-04.
+    Acme-CPANModules-PortedFrom-Ruby), released on 2022-10-17.
 
 DESCRIPTION
-  SEE ALSO
-    Acme::CPANModules::PortedFrom::Python and other
-    "Acme::CPANModules::PortedFrom::*" modules.
-
     If you know of others, please drop me a message.
 
 ACME::CPANMODULES ENTRIES
-    *   App::Sass - sass command-line tool modeled after the ruby's version
-
+    App::Sass
         Author: WWOLF <https://metacpan.org/author/WWOLF>
 
-    *   Data::Gimei - a Perl port of Ruby's gimei generates fake data in
-        Japanese.
-
+    Data::Gimei
         Author: YOUPONG <https://metacpan.org/author/YOUPONG>
 
-    *   Scientist
+        Ruby project's gem: <https://rubygems.org/gems/gimei>
 
+    Scientist
         Author: LANCEW <https://metacpan.org/author/LANCEW>
 
-    *   HTTP::Server::Brick - Simple pure perl http server for prototyping
-        "in the style of" Ruby's WEBrick
-
+    HTTP::Server::Brick
         Author: AUFFLICK <https://metacpan.org/author/AUFFLICK>
 
-    *   Plack - Perl Superglue for Web frameworks and Web Servers (PSGI
-        toolkit)
-
+    Plack
         Author: MIYAGAWA <https://metacpan.org/author/MIYAGAWA>
 
         From Plack's documentation: "Plack is like Ruby's Rack or Python's
@@ -43,6 +33,28 @@ ACME::CPANMODULES ENTRIES
         were inspired by both Python's WSGI specification (hence the dual
         specification-implementation split) and Ruby's Rack (hence the
         name).
+
+        Ruby project's gem: <https://rubygems.org/gems/rack>
+
+        Ruby project's website: <https://rack.github.io/>
+
+        Ruby project's GitHub: <https://github.com/rack/rack>
+
+    Squatting
+        Author: BEPPU <https://metacpan.org/author/BEPPU>
+
+        Ruby project's gem: <https://rubygems.org/gems/camping>
+
+        Ruby project's website: <http://www.ruby-camping.com/>
+
+    Valiant
+        Inspired by the data validation style in Ruby on Rails.
+
+        Author: JJNAPIORK <https://metacpan.org/author/JJNAPIORK>
+
+        Ruby project's gem: <https://rubygems.org/gems/rails>
+
+        Ruby project's website: <https://rubyonrails.org/>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -86,6 +98,11 @@ SOURCE
     <https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Ruby>.
 
 SEE ALSO
+    Acme::CPANModules::PortedFrom::Python and other
+    "Acme::CPANModules::PortedFrom::*" modules.
+
+    Acme::CPANModules::Interop::Ruby to interact with Ruby things.
+
     Acme::CPANModules - about the Acme::CPANModules namespace
 
     cpanmodules - CLI tool to let you browse/view the lists
@@ -104,10 +121,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022, 2021, 2020, 2018 by perlancar

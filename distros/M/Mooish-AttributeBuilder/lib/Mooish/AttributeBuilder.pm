@@ -1,5 +1,5 @@
 package Mooish::AttributeBuilder;
-$Mooish::AttributeBuilder::VERSION = '0.002';
+$Mooish::AttributeBuilder::VERSION = '1.000';
 use v5.10;
 use strict;
 use warnings;
@@ -67,7 +67,15 @@ sub extended
 {
 	my ($name, %args) = @_;
 
-	return ("+$name", expand_shortcuts($name, %args));
+	my $extended_name;
+	if (ref $name eq 'ARRAY') {
+		$extended_name = [map { "+$_" } @{$name}];
+	}
+	else {
+		$extended_name = "+$name";
+	}
+
+	return ($extended_name, expand_shortcuts($name, %args));
 }
 
 # Helpers - not part of the interface
@@ -76,19 +84,67 @@ sub check_and_replace
 {
 	my ($hash_ref, $name, $key, $value) = @_;
 
-	croak "$key already exists for $name"
+	croak "Could not expand shortcut: $key already exists for $name"
 		if exists $hash_ref->{$key};
 
 	$hash_ref->{$key} = $value;
 }
 
+sub get_normalized_name
+{
+	my ($name, $for) = @_;
+
+	croak "Could not use attribute shortcut with array fields: $for is not supported"
+		if ref $name;
+
+	$name =~ s/^_//;
+	return $name;
+}
+
+sub expand_method_names
+{
+	my ($name, %args) = @_;
+
+	# initialized lazily
+	my $normalized_name;
+	my $protected_field;
+
+	# inflate names from shortcuts
+	for my $method_type (keys %METHOD_PREFIXES) {
+		next unless defined $args{$method_type};
+		next if ref $args{$method_type};
+		next unless grep { $_ eq $args{$method_type} } '1', -public, -hidden;
+
+		$normalized_name //= get_normalized_name($name, $method_type);
+		$protected_field //= $name ne $normalized_name;
+
+		my $is_protected =
+			$args{$method_type} eq -hidden
+			|| (
+				$args{$method_type} eq '1'
+				&& ($protected_field || $PROTECTED_METHODS{$method_type})
+			);
+
+		$args{$method_type} = join '_', grep { defined }
+			($is_protected ? $PROTECTED_PREFIX : undef),
+			$METHOD_PREFIXES{$method_type},
+			$normalized_name;
+	}
+
+	# special treatment for trigger
+	if ($args{trigger} && !ref $args{trigger}) {
+		my $trigger = $args{trigger};
+		$args{trigger} = sub {
+			return shift->$trigger(@_);
+		};
+	}
+
+	return %args;
+}
+
 sub expand_shortcuts
 {
 	my ($name, %args) = @_;
-	my $normalized_name = $name;
-	$normalized_name =~ s/^_//;
-
-	my $protected_field = $name ne $normalized_name;
 
 	# merge lazy + default / lazy + builder
 	if ($args{lazy}) {
@@ -114,31 +170,14 @@ sub expand_shortcuts
 		delete $args{required};
 	}
 
-	# inflate names from shortcuts
-	for my $method_type (keys %METHOD_PREFIXES) {
-		next unless defined $args{$method_type};
-		next if ref $args{$method_type};
-		next unless grep { $_ eq $args{$method_type} } '1', -public, -hidden;
+	# method names from shortcuts
+	%args = expand_method_names($name, %args);
 
-		my $is_protected =
-			$args{$method_type} eq -hidden
-			|| (
-				$args{$method_type} eq '1'
-				&& ($protected_field || $PROTECTED_METHODS{$method_type})
-			);
-
-		$args{$method_type} = join '_', grep { defined }
-			($is_protected ? $PROTECTED_PREFIX : undef),
-			$METHOD_PREFIXES{$method_type},
-			$normalized_name;
-	}
-
-	# special treatment for trigger
-	if ($args{trigger} && !ref $args{trigger}) {
-		my $trigger = $args{trigger};
-		$args{trigger} = sub {
-			return shift->$trigger(@_);
-		};
+	# literal parameters (prepended with -)
+	for my $literal (keys %args) {
+		if ($literal =~ m{\A - (.+) \z}x) {
+			$args{$1} = delete $args{$literal};
+		}
 	}
 
 	return %args;

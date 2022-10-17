@@ -12,6 +12,7 @@ SYNOPSIS
      my $dt_uploaded = $obj->dt_uploaded;
      my $height = $obj->height;
      my $id = $obj->id;
+     my $license = $obj->license;
      my $size = $obj->size;
      my $url = $obj->url;
      my $url_cb = $obj->url_cb;
@@ -58,6 +59,10 @@ METHODS
     *       "id"
 
             Image id. It's optional. Default value is undef.
+
+    *       "license"
+
+            Image license. It's optional. Default value is undef.
 
     *       "size"
 
@@ -125,6 +130,13 @@ METHODS
 
     Returns number.
 
+  "license"
+     my $license = $obj->license;
+
+    Get image license.
+
+    Returns string.
+
   "size"
      my $size = $obj->size;
 
@@ -175,6 +187,7 @@ EXAMPLE
                      'year' => 2022,
              ),
              'height' => 2730,
+             'license' => 'cc-by-sa-4.0',
              'size' => 1040304,
              'url' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg',
              'width' => 4096,
@@ -188,6 +201,7 @@ EXAMPLE
      print 'Size: '.$obj->size."\n";
      print 'URL: '.$obj->url."\n";
      print 'Width: '.$obj->width."\n";
+     print 'License: '.$obj->license."\n";
      print 'Date and time the photo was created: '.$obj->dt_created."\n";
      print 'Date and time the photo was uploaded: '.$obj->dt_uploaded."\n";
 
@@ -199,6 +213,7 @@ EXAMPLE
      # Size: 1040304
      # URL: https://upload.wikimedia.org/wikipedia/commons/a/a4/Michal_from_Czechia.jpg
      # Width: 4096
+     # License: cc-by-sa-4.0
      # Date and time the photo was created: 2022-01-01T00:00:00
      # Date and time the photo was uploaded: 2022-07-14T00:00:00
 
@@ -219,5 +234,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.05
 

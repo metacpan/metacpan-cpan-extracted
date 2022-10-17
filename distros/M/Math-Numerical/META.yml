@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   IPC::Run3: '0'
-  Test2::Tools::Compare: '0'
+  Test2::Tools::Compare: '0.000081'
   Test2::V0: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -37,5 +37,5 @@ requires:
 resources:
   bugtracker: https://github.com/mkende/math_numerical/issues
   repository: https://github.com/mkende/math_numerical
-version: 0.04
+version: 0.05
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

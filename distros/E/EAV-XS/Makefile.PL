@@ -69,8 +69,15 @@ EOF
         exit 3;
     }
 
-    my $rfc_opts = join(" ", &set_rfc_options());
-    $cfg->{'macro'}->{'LIBEAV_OPTIONS'} .= " ${rfc_opts}";
+    my @rfc_opts = &set_rfc_options();
+    my $rfc_list = join(" ", @rfc_opts);
+    my $rfc_defs = "";
+    for my $opt (@rfc_opts) {
+        $opt =~ s/\=ON//;
+        $rfc_defs .= " -D${opt}";
+    }
+    $cfg->{'DEFINE'} .= $rfc_defs;
+    $cfg->{'macro'}->{'LIBEAV_OPTIONS'} .= " ${rfc_list}";
 
     if ($^O =~ /^(free|net)bsd$/i) {
         $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.bsd";

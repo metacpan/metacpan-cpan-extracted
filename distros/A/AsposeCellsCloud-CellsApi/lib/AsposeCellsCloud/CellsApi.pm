@@ -35593,6 +35593,276 @@ sub post_convert_workbook_to_png {
 }
 
 #
+# post_convert_workbook_to_pptx
+#
+# 
+# 
+# @param string $workbook File to upload (required)
+# @param string $password  (optional)
+# @param boolean $check_excel_restriction  (optional, default to true)
+{
+    my $params = {
+    'workbook' => {
+        data_type => 'string',
+        description => 'File to upload',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_pptx' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+        };
+}
+# @return FileInfo
+#
+sub post_convert_workbook_to_pptx {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'workbook' is set
+    unless (exists $args{'workbook'}) {
+      croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_pptx");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/convert/pptx';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if ( exists $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    # if ( exists $args{'workbook'}) {
+    #     $_body_data = $args{'workbook'};
+    # }
+    if ( exists $args{'workbook'} ) {   
+        $form_params->{'file'} = [ $args{'workbook'} ,'file','application/octet-stream'];
+    }
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
+# post_convert_workbook_to_html
+#
+# 
+# 
+# @param string $workbook File to upload (required)
+# @param string $password  (optional)
+# @param boolean $check_excel_restriction  (optional, default to true)
+{
+    my $params = {
+    'workbook' => {
+        data_type => 'string',
+        description => 'File to upload',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_html' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+        };
+}
+# @return FileInfo
+#
+sub post_convert_workbook_to_html {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'workbook' is set
+    unless (exists $args{'workbook'}) {
+      croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_html");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/convert/html';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if ( exists $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    # if ( exists $args{'workbook'}) {
+    #     $_body_data = $args{'workbook'};
+    # }
+    if ( exists $args{'workbook'} ) {   
+        $form_params->{'file'} = [ $args{'workbook'} ,'file','application/octet-stream'];
+    }
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
+# post_convert_workbook_to_markdown
+#
+# 
+# 
+# @param string $workbook File to upload (required)
+# @param string $password  (optional)
+# @param boolean $check_excel_restriction  (optional, default to true)
+{
+    my $params = {
+    'workbook' => {
+        data_type => 'string',
+        description => 'File to upload',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_convert_workbook_to_markdown' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+        };
+}
+# @return FileInfo
+#
+sub post_convert_workbook_to_markdown {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'workbook' is set
+    unless (exists $args{'workbook'}) {
+      croak("Missing the required parameter 'workbook' when calling post_convert_workbook_to_markdown");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/convert/markdown';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if ( exists $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    # if ( exists $args{'workbook'}) {
+    #     $_body_data = $args{'workbook'};
+    # }
+    if ( exists $args{'workbook'} ) {   
+        $form_params->{'file'} = [ $args{'workbook'} ,'file','application/octet-stream'];
+    }
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
 # storage_exists
 #
 # Check if storage exists

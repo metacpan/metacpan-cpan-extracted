@@ -14,7 +14,7 @@ DESCRIPTION
     will happen, and I'll be able to remove this abomination from the CPAN.
     :-)
 
-    Version 0.001 of Alt::Lexical::Var::ButSupportModernPerl includes version
+    Version 0.002 of Alt::Lexical::Var::ButSupportModernPerl includes version
     0.009 of Lexical::Var.
 
 SEE ALSO

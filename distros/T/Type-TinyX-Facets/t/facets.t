@@ -3,108 +3,129 @@
 use Test2::V0;
 use Test::Lib;
 
-use My::Types -types;
+no warnings 'deprecated';
 
-subtest 'MinMax' => sub {
+use My::Types;
+use My::DeprecatedTypes;
 
-    my $type;
-    ok(
-        lives {
-            $type = MinMax( [ min => -3, max => 5 ] );
-        },
-        'construct MinMax type with valid parameters'
-    );
+for my $class ( 'My::Types', 'My::DeprecatedTypes' ) {
 
-    ok( !$type->check( -3.1 ), 'too small' );
-    ok( !$type->check( 5.1 ),  'too big' );
-    ok( $type->check( 0 ),     'just right' );
+    subtest $class => sub {
 
-    ok(
-        lives {
-            $type = MinMax( [ min => -3 ] );
-        },
-        'construct MinMax type with single facet out of several'
-    );
+        my $TYPE;
 
-    like(
-        dies {
-            $type = MinMax( [ positive => 1 ] );
-        },
-        qr/unrecogni[sz]ed parameter.*positive.*/,
-        'construct MinMax type with unknown parameter'
-    );
+        $TYPE = 'MinMax';
+        subtest $TYPE => sub {
 
-    like(
-        dies {
-            $type = MinMax( [ min => 'huh?' ] );
-        },
-        qr/must be a number/,
-        'construct MinMax type with illegal parameter value'
-    );
+            my $gen = \&{"$class\::$TYPE"};
 
-};
+            my $type;
+            ok(
+                lives {
+                    $type = &$gen( [ min => -3, max => 5 ] );
+                },
+                "construct $TYPE type with valid parameters"
+            );
 
-subtest 'Bounds' => sub {
+            ok( !$type->check( -3.1 ), 'too small' );
+            ok( !$type->check( 5.1 ),  'too big' );
+            ok( $type->check( 0 ),     'just right' );
 
-    my $type;
-    ok(
-        lives {
-            $type = Bounds( [ min => -3, max => 5 ] );
-        },
-        'construct Bounds type with valid parameters'
-    ) or diag $@;
+            ok(
+                lives {
+                    $type = &$gen( [ min => -3 ] );
+                },
+                "construct $TYPE type with single facet out of several"
+            );
 
-    ok( !$type->check( -3.1 ), 'too small' );
-    ok( !$type->check( 5.1 ),  'too big' );
-    ok( $type->check( 0 ),     'just right' );
+            like(
+                dies {
+                    $type = &$gen( [ positive => 1 ] );
+                },
+                qr/unrecogni[sz]ed parameter.*positive.*/,
+                "construct $TYPE type with unknown parameter"
+            );
 
-    ok(
-        lives {
-            $type = Bounds( [ min => -3 ] );
-        },
-        'construct Bounds type with single facet out of several'
-    );
+            like(
+                dies {
+                    $type = &$gen( [ min => 'huh?' ] );
+                },
+                qr/must be a number/,
+                "construct $TYPE type with illegal parameter value"
+            );
 
-    like(
-        dies {
-            $type = Bounds( [ positive => 1 ] );
-        },
-        qr/unrecogni[sz]ed parameter.*positive.*/,
-        'construct Bounds type with unknown parameter'
-    );
+        };
 
-    like(
-        dies {
-            $type = Bounds( [ min => 5, max => 3 ] );
-        },
-        qr/constraint fails condition/,
-        'construct Bounds type with illegal conditions'
-    );
+        $TYPE = 'Bounds';
+        subtest $TYPE => sub {
 
-    like(
-        dies {
-            $type = Bounds( [ min => 'huh?' ] );
-        },
-        qr/must be a number/,
-        'construct Bounds type with illegal parameter value'
-    );
+            my $gen = \&{"$class\::$TYPE"};
 
-};
+            my $type;
+            ok(
+                lives {
+                    $type = &$gen( [ min => -3, max => 5 ] );
+                },
+                "construct $TYPE type with valid parameters"
+            ) or diag $@;
 
-subtest 'Positive' => sub {
-    my $type;
-    ok(
-        lives {
-            $type = Positive( [ min => -3, max => 5, positive => 1 ] );
-        },
-        'construct Positive type with valid parameters'
-    );
+            ok( !$type->check( -3.1 ), 'too small' );
+            ok( !$type->check( 5.1 ),  'too big' );
+            ok( $type->check( 0 ),     'just right' );
 
-    ok( !$type->check( -1 ),  'negative' );
-    ok( !$type->check( 0 ),   'zero' );
-    ok( !$type->check( 5.1 ), 'too big' );
-    ok( $type->check( 0.1 ),  'just right' );
+            ok(
+                lives {
+                    $type = &$gen( [ min => -3 ] );
+                },
+                "construct $TYPE type with single facet out of several"
+            );
 
-};
+            like(
+                dies {
+                    $type = &$gen( [ positive => 1 ] );
+                },
+                qr/unrecogni[sz]ed parameter.*positive.*/,
+                "construct $TYPE type with unknown parameter"
+            );
 
+            like(
+                dies {
+                    $type = &$gen( [ min => 5, max => 3 ] );
+                },
+                qr/constraint fails condition/,
+                "construct $TYPE type with illegal conditions"
+            );
+
+            like(
+                dies {
+                    $type = &$gen( [ min => 'huh?' ] );
+                },
+                qr/must be a number/,
+                "construct $TYPE type with illegal parameter value"
+            );
+
+        };
+
+        $TYPE = 'Positive';
+        subtest $TYPE => sub {
+            my $gen = \&{"$class\::$TYPE"};
+
+            my $type;
+            ok(
+                lives {
+                    $type = &$gen( [ min => -3, max => 5, positive => 1 ] );
+                },
+                "construct $TYPE type with valid parameters"
+            );
+
+            ok( !$type->check( -1 ),  'negative' );
+            ok( !$type->check( 0 ),   'zero' );
+            ok( !$type->check( 5.1 ), 'too big' );
+            ok( $type->check( 0.1 ),  'just right' );
+
+        };
+
+    };
+
+}
 done_testing;

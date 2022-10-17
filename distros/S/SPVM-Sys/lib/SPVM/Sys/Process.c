@@ -2,7 +2,6 @@
 
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -13,7 +12,6 @@
 #else
 #include <sys/resource.h>
 #include <sys/wait.h>
-#include <sys/times.h>
 #endif
 
 const char* FILE_NAME = "Sys/Process.c";
@@ -376,33 +374,6 @@ int32_t SPVM__Sys__Process__execv(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Sys__Process__times(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "times is not supported on this system", FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
-#else
-  void* obj_st_tms = stack[0].oval;
-  
-  if (!obj_st_tms) {
-    return env->die(env, stack, "The buffer must be defined", FILE_NAME, __LINE__);
-  }
-  
-  struct tms* st_tms = env->get_pointer(env, stack, obj_st_tms);
-  
-  errno = 0;
-  int64_t clock_tick = times(st_tms);
-  
-  if (errno != 0) {
-    env->die(env, stack, "[System Error]times failed:%s.", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
-    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
-  }
-  
-  stack[0].lval = clock_tick;
-  
-  return 0;
-#endif
-}
-
 int32_t SPVM__Sys__Process__WIFEXITED(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 #ifdef WCONTINUED
@@ -498,3 +469,42 @@ int32_t SPVM__Sys__Process__WIFCONTINUED(SPVM_ENV* env, SPVM_VALUE* stack) {
 #endif
 
 }
+
+int32_t SPVM__Sys__Process__usleep(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int64_t usec = stack[0].lval;
+  
+  int32_t status = usleep(usec);
+
+  if (status == -1) {
+    env->die(env, stack, "[System Error]usleep failed", FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  }
+
+  stack[0].ival = status;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Process__ualarm(SPVM_ENV* env, SPVM_VALUE* stack) {
+#ifdef _WIN32
+  env->die(env, stack, "ualarm is not supported on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#else
+  (void)env;
+  (void)stack;
+  
+  int64_t usecs = stack[0].lval;
+
+  int64_t interval = stack[1].lval;
+  
+  int32_t rest_usecs = ualarm(usecs, interval);
+  
+  stack[0].lval = rest_usecs;
+  
+  return 0;
+#endif
+}
+

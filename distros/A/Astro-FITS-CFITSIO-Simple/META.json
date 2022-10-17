@@ -5,7 +5,7 @@
       "Pete Ratzlaff"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -126,39 +126,39 @@
    "provides" : {
       "Astro::FITS::CFITSIO::Simple" : {
          "file" : "lib/Astro/FITS/CFITSIO/Simple.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::FITS::CFITSIO::Simple::Cleanup" : {
          "file" : "lib/Astro/FITS/CFITSIO/Simple.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::FITS::CFITSIO::Simple::Image" : {
          "file" : "lib/Astro/FITS/CFITSIO/Simple/Image.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::FITS::CFITSIO::Simple::PDL" : {
          "file" : "lib/Astro/FITS/CFITSIO/Simple/PDL.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::FITS::CFITSIO::Simple::PrintStatus" : {
          "file" : "lib/Astro/FITS/CFITSIO/Simple/PrintStatus.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::FITS::CFITSIO::Simple::PrintStatusCode" : {
          "file" : "lib/Astro/FITS/CFITSIO/Simple/PrintStatus.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::FITS::CFITSIO::Simple::PrintStatusObj" : {
          "file" : "lib/Astro/FITS/CFITSIO/Simple/PrintStatus.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::FITS::CFITSIO::Simple::PrintStatusProgressBar" : {
          "file" : "lib/Astro/FITS/CFITSIO/Simple/PrintStatus.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Astro::FITS::CFITSIO::Simple::Table" : {
          "file" : "lib/Astro/FITS/CFITSIO/Simple/Table.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -173,9 +173,9 @@
          "web" : "https://gitlab.com/djerius/astro-fits-cfitsio-simple"
       }
    },
-   "version" : "0.19",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17",
+   "version" : "0.20",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

@@ -5,154 +5,149 @@ package Astro::FITS::CFITSIO::Simple::PrintStatus;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
-sub new
-{
-  my ( $class, $what, $nrows ) = @_;
+sub new {
+    my ( $class, $what, $nrows ) = @_;
 
-  # if a boolean (i.e. scalar)
-  if ( ! ref $what )
-  {
-    # if its false, return undef
-    return unless $what;
+    # if a boolean (i.e. scalar)
+    if ( !ref $what ) {
+        # if its false, return undef
+        return unless $what;
 
-    # if its true, try to use Term::ProgressBar if it's available, else fall back
-    # to our primitive efforts
-    unless ( -1 == $what )
-    {
-      eval { require Term::ProgressBar }
-        && return Astro::FITS::CFITSIO::Simple::PrintStatusProgressBar->new( $nrows );
+   # if its true, try to use Term::ProgressBar if it's available, else fall back
+   # to our primitive efforts
+        unless ( -1 == $what ) {
+            eval { require Term::ProgressBar }
+              && return Astro::FITS::CFITSIO::Simple::PrintStatusProgressBar
+              ->new( $nrows );
+        }
+
+        # no, piggy back on glob support
+        $what = \*STDERR;
     }
 
-    # no, piggy back on glob support
-    $what = \*STDERR;
-  }
+    # if a GLOB, create an IO::File object and use that
+    if ( 'GLOB' eq ref $what ) {
+        require IO::File;
+        my $fh = IO::File->new;
+        $fh->fdopen( fileno( $what ), 'w' )
+          or die( "unable to connect to status filehandle!\n" );
 
-  # if a GLOB, create an IO::File object and use that
-  if ( 'GLOB' eq ref $what )
-  {
-    require IO::File;
-    my $fh = IO::File->new;
-    $fh->fdopen( fileno($what), 'w' )
-      or die( "unable to connect to status filehandle!\n" );
+        return Astro::FITS::CFITSIO::Simple::PrintStatusObj->new( $fh, $nrows );
+    }
 
-    return Astro::FITS::CFITSIO::Simple::PrintStatusObj->new( $fh, $nrows );
-  }
+    # if it's a subroutine
+    elsif ( 'CODE' eq ref $what ) {
+        return Astro::FITS::CFITSIO::Simple::PrintStatusCode->new( $what,
+            $nrows );
+    }
 
-  # if it's a subroutine
-  elsif ( 'CODE' eq ref $what )
-  {
-    return Astro::FITS::CFITSIO::Simple::PrintStatusCode->new( $what, $nrows );
-  }
-
-  # according to the validate rules, this must be an object
-  # with print and flush capabilities.
-  else
-  {
-    return Astro::FITS::CFITSIO::Simple::PrintStatusObj->new( $what, $nrows );
-  }
+    # according to the validate rules, this must be an object
+    # with print and flush capabilities.
+    else {
+        return Astro::FITS::CFITSIO::Simple::PrintStatusObj->new( $what,
+            $nrows );
+    }
 }
 
-sub start {}
+sub start { }
 
-sub finish {}
+sub finish { }
 
-sub next_update
-{
-  my ( $self, $rows ) = @_;
+sub next_update {
+    my ( $self, $rows ) = @_;
 
-  my $pct_done = 100 * $rows / $self->{nrows};
-  my $next = int( ( $pct_done + 1) / 100 * $self->{nrows} + 0.5 );
+    my $pct_done = 100 * $rows / $self->{nrows};
+    my $next     = int( ( $pct_done + 1 ) / 100 * $self->{nrows} + 0.5 );
 
-  $next = $self->{nrows}
-    if $next > $self->{nrows};
+    $next = $self->{nrows}
+      if $next > $self->{nrows};
 
-  $next;
+    $next;
 
 }
 
-sub update
-{
-  my ( $self, $rows_done ) = @_;
+sub update {
+    my ( $self, $rows_done ) = @_;
 
-  $self->output( $rows_done, $self->{nrows} );
+    $self->output( $rows_done, $self->{nrows} );
 }
 
 
 {
-  package Astro::FITS::CFITSIO::Simple::PrintStatusObj;
-  our @ISA = qw/Astro::FITS::CFITSIO::Simple::PrintStatus/;
+    package Astro::FITS::CFITSIO::Simple::PrintStatusObj;
+    our @ISA = qw/Astro::FITS::CFITSIO::Simple::PrintStatus/;
 
-  sub new { bless {fh => $_[1], nrows => $_[2]}, $_[0] }
+    sub new { bless { fh => $_[1], nrows => $_[2] }, $_[0] }
 
 
-  sub start { my $self = shift;
-              $self->{fh}->print( sprintf( "    " , shift) );
-              $self->{fh}->flush;
-            }
+    sub start {
+        my $self = shift;
+        $self->{fh}->print( sprintf( "    ", shift ) );
+        $self->{fh}->flush;
+    }
 
-  sub output { my ( $self, $rows ) = @_;
-               my $pct_done = int( 100 * $rows / $self->{nrows} );
-               $self->{fh}->print( sprintf( "\b\b\b\b%3d%" , $pct_done) );
-               $self->{fh}->flush;
-               $self->next_update( $rows );
-             }
+    sub output {
+        my ( $self, $rows ) = @_;
+        my $pct_done = int( 100 * $rows / $self->{nrows} );
+        $self->{fh}->print( sprintf( "\b\b\b\b%3d%", $pct_done ) );
+        $self->{fh}->flush;
+        $self->next_update( $rows );
+    }
 
-  sub finish { my $self = shift;
-               $self->output( $self->{nrows}, $self->{nrows} );
-               $self->{fh}->print( "\n" );
-               $self->{fh}->flush;
-             }
+    sub finish {
+        my $self = shift;
+        $self->output( $self->{nrows}, $self->{nrows} );
+        $self->{fh}->print( "\n" );
+        $self->{fh}->flush;
+    }
 }
 
 {
-  package Astro::FITS::CFITSIO::Simple::PrintStatusCode;
-  our @ISA = qw/Astro::FITS::CFITSIO::Simple::PrintStatus/;
+    package Astro::FITS::CFITSIO::Simple::PrintStatusCode;
+    our @ISA = qw/Astro::FITS::CFITSIO::Simple::PrintStatus/;
 
-  sub new { bless {coderef => $_[1], nrows => $_[2]}, $_[0] }
+    sub new { bless { coderef => $_[1], nrows => $_[2] }, $_[0] }
 
-  sub output { my ( $self, $rows, $nrows )  = @_;
-               $self->{coderef}->($rows, $nrows);
-               $self->next_update( $rows );
-             };
+    sub output {
+        my ( $self, $rows, $nrows ) = @_;
+        $self->{coderef}->( $rows, $nrows );
+        $self->next_update( $rows );
+    }
 }
 
 {
-  package Astro::FITS::CFITSIO::Simple::PrintStatusProgressBar;
-  our @ISA = qw/Astro::FITS::CFITSIO::Simple::PrintStatus/;
+    package Astro::FITS::CFITSIO::Simple::PrintStatusProgressBar;
+    our @ISA = qw/Astro::FITS::CFITSIO::Simple::PrintStatus/;
 
-  sub new { bless {nrows => $_[1]}, $_[0] }
+    sub new { bless { nrows => $_[1] }, $_[0] }
 
-  sub start
-  {
-    my $self = shift;
+    sub start {
+        my $self = shift;
 
-    require Term::ProgressBar;
+        require Term::ProgressBar;
 
-    $self->{progress} =
-      Term::ProgressBar->new( { count => $self->{nrows},
-                                ETA => 'linear',
-                              } )
-      or die( "unable to create ProgressBar\n" );
+        $self->{progress} = Term::ProgressBar->new( {
+                count => $self->{nrows},
+                ETA   => 'linear',
+            } ) or die( "unable to create ProgressBar\n" );
 
-    $self->{progress}->minor(0);
-    $self->{next_update} = 0;
-  }
+        $self->{progress}->minor( 0 );
+        $self->{next_update} = 0;
+    }
 
-  sub output
-  {
-    my ( $self, $row, $nrows ) = @_;
+    sub output {
+        my ( $self, $row, $nrows ) = @_;
 
-    $self->{progress}->update( $row );
-  }
+        $self->{progress}->update( $row );
+    }
 
-  sub finish
-  {
-    my $self = shift;
+    sub finish {
+        my $self = shift;
 
-    $self->{progress}->update( $self->{nrows} );
-  }
+        $self->{progress}->update( $self->{nrows} );
+    }
 }
 
 #
@@ -179,7 +174,7 @@ Astro::FITS::CFITSIO::Simple::PrintStatus - generate a progress status update
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 DESCRIPTION
 

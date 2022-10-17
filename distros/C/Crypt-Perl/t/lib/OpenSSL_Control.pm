@@ -71,6 +71,26 @@ sub can_ecdsa {
     return !$_ecdsa_test_err;
 }
 
+sub can_sign_with_key {
+    my $pem = shift or die 'need key';
+
+    my $bin = openssl_bin() or die 'No OpenSSL; shouldn’t get here!';
+
+    my ($fh, $keypath) = File::Temp::tempfile( CLEANUP => 1 );
+    print {$fh} $pem;
+    close $fh;
+
+    my ($mfh, $msgpath) = File::Temp::tempfile( CLEANUP => 1 );
+    print {$mfh} rand;
+    close $mfh;
+
+    open my $rdr, '-|', $bin, 'dgst', '-sign', $keypath, $msgpath or die $!;
+    my $out = do { local $/; <$rdr> };
+    close $rdr;
+
+    return !$?;
+}
+
 my $_can_ed25519;
 sub can_ed25519 {
     my ($self) = @_;

@@ -477,6 +477,26 @@ sub new
 				return undef  unless ($html);
 			}
 		}
+	} elsif ($url2fetch =~ m#\/embed\/#) {  #WE'RE AN EMBEDDED BITCHUTE PAGE (https://www.bitchute.com/embed/<id>):
+		print STDERR "i:We're an embed url.\n"  if ($DEBUG);
+		if ($html =~ m#\<link\s+rel\=\"canonical\"\s+href\=\"([^\"]+)#) {
+			$url2fetch = $1;
+			$url2fetch = 'https://' . $url2fetch  unless ($url2fetch =~ /^https?\:/);
+			print STDERR "i:We got the canonical URL from it!\n";
+		} else {
+			$url2fetch =~ s#\/embed\/#\/video\/#;
+			print STDERR "w:No canonical URL found, try converting embed url to fallback video url.\n";
+		}
+		#WE CAN STILL GO AHEAD AND GRAB THE TITLE & COVER-ART ICON HERE:
+		$self->{'title'} = $1  if ($html =~ m#\<title\>([^\<]+)\<#s);
+		$self->{'iconurl'} = $1  if ($html =~ m#\bposter\=\"(https\:\/\/[^\"]+)#s);
+		print STDERR "i:Converted embed URL to ($url2fetch).\n"  if ($DEBUG);
+		my $response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line . "\ne:Invalid embed URL reference, but scrape what we have.\n"  if ($DEBUG);
+		}
 	}
 
 	$html =~ s/\\\"/\&quot\;/gs;
@@ -557,18 +577,19 @@ sub new
 		my $genre = ($genredata =~ m#\bclass\=\"spa\"\>([^\<]+)#s) ? $1 : '';
 		$self->{'genre'} = $genre  if ($genre =~ /\w+/ && $genre !~ /^\s*none/i);
 	}
-	$self->{'title'} = ($html =~ m#\<title\>([^\<]+)\<#s) ? $1 : '';
+	$self->{'title'} = $1  if ($html =~ m#\<title\>([^\<]+)\<#s);
 	$self->{'title'} ||= $1  if ($html =~ m#\<h1\s+id\=\"video\-title\"\s+class\=\"page\-title\"\>([^\<]+)\<#i);
 	$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"#);
 	$self->{'description'} = $1  if ($html =~ m#\<div\s+class\=\"full\s+hidden\"\>(.+?)\<\/div\>#s);
 	$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"#);
 	$self->{'description'} ||= $self->{'title'};
 
-	$self->{'iconurl'} = ($html =~ m#\"og\:image\:secure_url\"\s+content\=\"([^\"]+)#) ? $1 : '';
+	$self->{'iconurl'} = $1  if ($html =~ m#\"og\:image\:secure_url\"\s+content\=\"([^\"]+)#);
 #	$self->{'iconurl'} ||= $1  if ($html =~ m#\<img\s+class\=\"image\s+lazyload\"\s+src="[^\"]*"\s+data\-src\=\"([^\"]+)#);
 	if ($html =~ m#\<img\s+class\=\"image\s+lazyload([^\>]+)#) {
 		my $icondata = $1;
 		$self->{'articonurl'} = $1  if ($icondata =~ m#\bdata\-src\=\"([^\"]+)#);
+		print STDERR "--FOUND ARTICON URL=".$self->{'articonurl'}."=\n"  if ($DEBUG);
 	}
 	$self->{'imageurl'} = ($html =~ m# poster\=\"([^\"]+)#) ? $1 : $self->{'iconurl'};
 

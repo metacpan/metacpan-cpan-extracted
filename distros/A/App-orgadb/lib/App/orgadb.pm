@@ -8,9 +8,9 @@ use Log::ger;
 use App::orgadb::Common;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2022-10-17'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our %SPEC;
 
@@ -40,15 +40,17 @@ sub _select_single {
     my $tree_filenames = $args{_tree_filenames};
 
     my $res = [200, "OK", ""];
+    my @outputted_field_values;
 
-    my @parsed_default_formatter_rules;
+    my @parsed_field_value_formatter_rules;
 
-    my ($formatter, @filter_names);
-  SET_FORMATTERS:
+    my $field_value_formatter_from_args;
+  SET_FIELD_VALUE_FORMATTERS_FROM_ARGS:
     {
-        last if $args{no_formatters};
-        last unless $args{formatters} && @{ $args{formatters} };
-        for my $f (@{ $args{formatters} }) {
+        last if $args{no_field_value_formatters};
+        last unless $args{field_value_formatters} && @{ $args{field_value_formatters} };
+        my @filter_names;
+        for my $f (@{ $args{field_value_formatters} }) {
             if ($f =~ /\A\[/) {
                 require JSON::PP;
                 $f = JSON::PP::decode_json($f);
@@ -66,7 +68,7 @@ sub _select_single {
             push @filter_names, $f;
         }
         require Data::Sah::Filter;
-        $formatter = Data::Sah::Filter::gen_filter(
+        $field_value_formatter_from_args = Data::Sah::Filter::gen_filter(
             filter_names => \@filter_names,
             return_type => 'str_errmsg+val',
         );
@@ -81,7 +83,7 @@ sub _select_single {
         my $expr = '';
 
         if (defined $args{category}) {
-            $expr .= 'Headline[level=1][title.text';
+            $expr .= 'Headline[level=1][title.as_string';
             if (ref $args{category} eq 'Regexp') {
                 $re_category = $args{category};
             } else {
@@ -93,7 +95,7 @@ sub _select_single {
 
         $expr .= (length $expr ? " " : "") . 'Headline[level=2]';
         if (defined $args{entry}) {
-            $expr .= '[title.text';
+            $expr .= '[title.as_string';
             if (ref $args{entry} eq 'Regexp') {
                 $re_entry = $args{entry};
             } else {
@@ -205,12 +207,12 @@ sub _select_single {
                     $res->[2] .= _highlight(
                         $clrtheme_obj,
                         $re_category,
-                        $entry->parent->title->text) . "/";
+                        $entry->parent->title->as_string) . "/";
                 }
                 $res->[2] .= _highlight(
                     $clrtheme_obj,
                     $re_entry,
-                    $entry->title->text,
+                    $entry->title->as_string,
                 );
                 $res->[2] .= "\n";
             }
@@ -234,17 +236,23 @@ sub _select_single {
                             $re_field,
                             $field->bullet . ' ' . $field_name0,
                         ) . " ::";
-                        $res->[2] .= $field_name;
+                        unless ($args{clipboard} && $args{clipboard} eq 'only') {
+                            $res->[2] .= $field_name;
+                        }
                     }
 
-                    my ($default_formatter);
-                  SET_DEFAULT_FORMATTERS:
+                    my $field_value_formatter_from_rules;
+                  SET_FIELD_VALUE_FORMATTERS_FROM_RULES:
                     {
-                        last if $args{no_formatters};
-                        last if $formatter;
-                        last unless $args{default_formatter_rules} && @{ $args{default_formatter_rules} };
-                        unless (@parsed_default_formatter_rules) {
-                            for my $r0 (@{ $args{default_formatter_rules} }) {
+                        last if $args{no_field_value_formatters};
+                        last if $field_value_formatter_from_args;
+                        last unless $args{field_value_formatter_rules} && @{ $args{field_value_formatter_rules} };
+
+                        my $field_value_formatters_from_rules = [];
+                        unless (@parsed_field_value_formatter_rules) {
+                            my $i = -1;
+                            for my $r0 (@{ $args{field_value_formatter_rules} }) {
+                                $i++;
                                 my $r;
                                 if (!ref($r0) && $r0 =~ /\A\{/) {
                                     require JSON::PP;
@@ -260,7 +268,7 @@ sub _select_single {
                                 }
 
                                 if ($r->{formatters} && @{ $r->{formatters} }) {
-                                    my @filter_names2;
+                                    my @filter_names;
                                     for my $f (@{ $r->{formatters} }) {
                                         if ($f =~ /\A\[/) {
                                             require JSON::PP;
@@ -276,52 +284,91 @@ sub _select_single {
                                                 $f =~ s!/!::!g;
                                             }
                                         }
-                                        push @filter_names2, $f;
+                                        push @filter_names, $f;
                                     }
                                     require Data::Sah::Filter;
                                     $r->{formatter} = Data::Sah::Filter::gen_filter(
-                                        filter_names => \@filter_names2,
+                                        filter_names => \@filter_names,
                                         return_type => 'str_errmsg+val',
                                     );
+                                } else {
+                                    die "Field value formatting rules [$i] does not have non-empty formatters: %s", $r;
                                 }
-                                push @parsed_default_formatter_rules, $r;
+                                push @parsed_field_value_formatter_rules, $r;
                             }
-                            #log_error "parsed_default_formatter_rules=%s", \@parsed_default_formatter_rules;
-                        } # set @parsed_default_formatter_rules
+                            #log_error "parsed_field_value_formatter_rules=%s", \@parsed_field_value_formatter_rules;
+                        } # set @parsed_field_value_formatter_rules
 
                         # do the filtering
                         my $i = -1;
                       RULE:
-                        for my $r (@parsed_default_formatter_rules) {
+                        for my $r (@parsed_field_value_formatter_rules) {
                             $i++;
                             my $matches = 1;
                             if (defined $r->{field_name_matches}) {
                                 $field_name0 =~ $r->{field_name_matches} or do {
                                     $matches = 0;
-                                    log_trace "Skipping default_formatter_rules[%d]: field_name_matches %s doesn't match %s", $i, $r->{field_name_matches}, $field_name0;
+                                    log_trace "Skipping field_value_formatter_rules[%d]: field_name_matches %s doesn't match %s", $i, $r->{field_name_matches}, $field_name0;
                                     next RULE;
                                 };
                             }
-                            log_trace "Using formatters from default_formatter_rules[%d] (%s) for field name %s", $i, $r->{formatters}, $field_name0;
-                            $default_formatter = $r->{formatter};
-                            last RULE;
+                            if (defined $r->{hide_field_name}) {
+                                if ($args{hide_field_name} xor $r->{hide_field_name}) {
+                                    $matches = 0;
+                                    log_trace "Skipping field_value_formatter_rules[%d]: hide_field_name condition (%s) doesn't match actual hide_field_name option (%s)", $i, ($r->{hide_field_name} ? 'true':'false'), ($args{hide_field_name} ? 'true':'false');
+                                    next RULE;
+                                }
+                            }
+                            log_trace "Adding field value formatters from field_value_formatter_rules[%d] (%s) for field name %s", $i, $r->{formatters}, $field_name0;
+                            push @$field_value_formatters_from_rules, $r->{formatter};
                         }
-                    } # SET_DEFAULT_FORMATTERS
+                        # combine default formatters
+                        last unless @$field_value_formatters_from_rules;
+                        if (@$field_value_formatters_from_rules > 1) {
+                            $field_value_formatter_from_rules = sub {
+                                my $val = shift;
+                                my $res;
+                                for my $i (0 .. $#{$field_value_formatters_from_rules}) {
+                                    $res = $field_value_formatters_from_rules->[$i]->($val);
+                                    return $res if $res->[0];
+                                    $val = $res->[1];
+                                }
+                                $res;
+                            };
+                        } else {
+                            $field_value_formatter_from_rules = $field_value_formatters_from_rules->[0];
+                        }
+                    } # SET_FIELD_VALUE_FORMATTERS_FROM_RULES
 
                     my $field_value0 = $field->children_as_string;
                     my ($prefix, $field_value, $suffix) = $field_value0 =~ /\A(\s+)(.*?)(\s*)\z/s;
-                    if ($formatter || $default_formatter) {
-                        my ($ferr, $fres) = @{ ($formatter || $default_formatter)->($field_value) };
+                    if ($field_value_formatter_from_args || $field_value_formatter_from_rules) {
+                        my ($ferr, $fres) = @{ ($field_value_formatter_from_args || $field_value_formatter_from_rules)->($field_value) };
                         if ($ferr) {
-                            log_warn "Formatting error: field value=%s, formatters=%s, errmsg=%s", $field_value, \@filter_names, $ferr;
+                            log_warn "Field value formatting error: field value=%s, errmsg=%s", $field_value, $ferr;
                             $field_value = "$field_value # CAN'T FORMAT: $ferr";
                         } else {
                             $field_value = $fres;
                         }
                     }
-                    $res->[2] .= ($args{hide_field_name} ? "" : $prefix) . $field_value . $suffix;
+                    unless ($args{clipboard} && $args{clipboard} eq 'only') {
+                        $res->[2] .= ($args{hide_field_name} ? "" : $prefix) . $field_value . $suffix;
+                    }
+                    push @outputted_field_values, $field_value;
                 }
             }
+        }
+    }
+
+  COPY_TO_CLIPBOARD: {
+        last unless $args{clipboard};
+        last unless @outputted_field_values;
+        require Clipboard::Any;
+        log_info "Copying matching field values to clipboard ...";
+        my $res = Clipboard::Any::add_clipboard_content(content => join "\n", @outputted_field_values);
+        if ($res->[0] != 200) {
+            log_warn "Cannot copy to clipboard: $res->[0] - $res->[1]";
+            last;
         }
     }
 
@@ -431,9 +478,19 @@ App::orgadb - An opinionated Org addressbook toolset
 
 =head1 VERSION
 
-This document describes version 0.010 of App::orgadb (from Perl distribution App-orgadb), released on 2022-10-09.
+This document describes version 0.014 of App::orgadb (from Perl distribution App-orgadb), released on 2022-10-17.
 
 =head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This distribution includes the following CLI's:
+
+=over
+
+=item * L<orgadb-sel>
+
+=back
 
 =head1 FUNCTIONS
 
@@ -456,29 +513,117 @@ Arguments ('*' denotes required arguments):
 
 Find entry by string or regex search against the category title.
 
+=item * B<clipboard> => I<str>
+
+Whether to copy matching field values to clipboard.
+
+If set to C<tee>, then will display matching fields to terminal as well as copy
+matching field values to clipboard.
+
+If set to C<only>, then will not display matching fields to terminal and will
+only copy matching field values to clipboard.
+
+Mnemonic for short option C<-y> and C<-Y>: I<y>ank as in Emacs (C<C-y>).
+
 =item * B<color> => I<str> (default: "auto")
 
 Whether to use color.
 
 =item * B<color_theme> => I<perl::colortheme::modname_with_optional_args>
 
+(No description)
+
 =item * B<count> => I<true>
 
 Return just the number of matching entries instead of showing them.
 
-=item * B<default_formatter_rules> => I<array[any]>
-
-Specify conditional default formatters. This is for convenience and best
-specified in the configuration as opposed to on the command-line option.
-An example:
-
- default_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i","formatters":[ ["Phone::format_phone_idn"] ]}
-
 =item * B<detail> => I<bool>
+
+Instead of showing matching field values, display the whole entry.
+
+Mnemonic for shortcut option C<-l>: the option C<-l> is usually used for the short
+version of C<--detail>, as in I<ls> Unix command.
 
 =item * B<entry> => I<str_or_re>
 
 Find entry by string or regex search against its title.
+
+=item * B<field_value_formatter_rules> => I<array[hash]>
+
+Specify field value formatters to use when conditions are met, specified as an
+array of hashes. Each element is a rule that is as a hash containing condition
+keys and formatters keys. If all conditions are met then the formatters will be
+applied. The rules will be tested when each field is about to be outputted.
+Multiple rules can match and the matching rules' formatters are all applied in
+succession.
+
+Note that this option will be overridden by the C<--field-value-formatter>
+(C<-fvfmt>) or the C<--no-field-value-formatters> (C<-F>) option.
+
+The rules are best specified in the configuration as opposed to on the
+command-line option. An example (the lines below are writen in configuration
+file in IOD syntax, as rows of JSON hashes):
+
+ ; remove all comments in field values when 'hide_field_name' option is set
+ ; (which usually means we want to copy paste things)
+ 
+ field_value_formatter_rules={"hide_field_name":true, "formatters":[ ["Str::remove_comment"] ]}
+ 
+ ; normalize phone numbers using Phone::format + Str::remove_whitespace when
+ ; 'hide_field_name' option is set (which usually means we want to copy paste
+ ; things). e.g. '0812-1234-5678' becomes '+6281212345678'.
+ 
+ field_value_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i", "hide_field_name":true, "formatters":[ ["Phone::format", "Str::remove_whitespace"] ]}
+ 
+ ; but if 'hide_field_name' field is not set, normalize phone numbers using
+ ; Phone::format without removing whitespaces, which is easier to see (e.g.
+ ; '+62 812 1234 5678').
+ 
+ field_value_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i", "hide_field_name":false, "formatters":[ ["Phone::format"] ]}
+
+Condition keys:
+
+=over
+
+=item * C<field_name_matches> (value: str/re): Check if field name matches a regex pattern.
+
+=item * C<hide_field_name> (value: bool): Check if C<--hide-field-name> (C<-N>) option is
+set (true) or unset (false).
+
+=back
+
+Formatter keys:
+
+=over
+
+=item * C<formatters>: an array of formatters, to be applied. Each formatter is a name
+of perl Sah filter rule, or a two-element array of perl Sah filter rule name
+followed by hash containing arguments. See C<--formatter> for more detais on
+specifying formatter.
+
+=back
+
+=item * B<field_value_formatters> => I<array[str]>
+
+Add one or more formatters to display field value.
+
+Specify one or more formatters to apply to the field value before displaying.
+
+A formatter is name of C<Data::Sah::Filter::perl::*> module, without the prefix.
+For example: C<Str::uc> will convert the field value to uppercase. Another
+formatter, C<Str::remove_comment> can remove comment.
+
+A formatter can have arguments, which is specified using this format:
+
+ [FORMATTER_NAME, {ARG1NAME => ARG1VAL, ...}]
+
+If formatter name begins with C<[> character, it will be parsed as JSON. Example:
+
+ ['Str::remove_comment', {'style':'cpp'}]
+
+Note that this option overrides C<--field-value-formatter-rules> but is
+overridden by the C<--no-field-value-formatters> (C<--raw-field-values>, C<-F>)
+option.
 
 =item * B<fields> => I<array[str_or_re]>
 
@@ -505,27 +650,6 @@ That is, it can search for a string (C<str>) or regex (C<re>) in the field name,
 and optionally also search for a string (C<str2>) or regex (C<re2>) in the field
 value.
 
-=item * B<formatters> => I<array[str]>
-
-Add one or more formatters to display field value.
-
-Specify one or more formatters to apply to the field value before displaying.
-
-A formatter is name of C<Data::Sah::Filter::perl::*> module, without the prefix.
-For example: C<Str::uc> will convert the field value to uppercase. Another
-formatter, C<Str::remove_comment> can remove comment.
-
-A formatter can have arguments, which is specified using this format:
-
- [FORMATTER_NAME, {ARG1NAME => ARG1VAL, ...}]
-
-If formatter name begins with C<[> character, it will be parsed as JSON. Example:
-
- ['Str::remove_comment', {'style':'cpp'}]
-
-Overrides C<--default_formatter_rule> but overridden by the C<--no-formatters>
-(C<--raw-field-values>, C<-F>) option.
-
 =item * B<hide_category> => I<true>
 
 Do not show category.
@@ -538,9 +662,16 @@ Do not show entry headline.
 
 Do not show field names, just show field values.
 
-=item * B<no_formatters> => I<true>
+Mnemonic for short option C<-N>: field I<N>ame (uppercase letter usually means
+/no/).
 
-Do not apply any formatters to field value (overrides --formatter option).
+=item * B<no_field_value_formatters> => I<true>
+
+Do not apply formatters for field value (overrides --field-value-formatter option).
+
+Note that this option has higher precedence than
+C<--default-field-value-formatter-rules> or the C<--field-value-formatter>
+(C<--fvfmt>) option.
 
 =item * B<num_entries> => I<uint>
 
@@ -552,7 +683,11 @@ Specify maximum number of fields (per entry) to return (0 means unlimited).
 
 =item * B<reload_files_on_change> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<shell> => I<true>
+
+(No description)
 
 
 =back

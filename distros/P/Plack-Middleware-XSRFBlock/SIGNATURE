@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,45 +12,45 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 c2901582f5e0fe63b5a33c5bdbf3925768d44153 Changes
-SHA1 6cdfb385ffe721014248eaebfae0409fd2c2c514 LICENSE
-SHA1 8b2ef2fd96aab035cf480663123ca6bcd854ce0e MANIFEST
-SHA1 9c71a980df3acb05200a2c374393a0749b3959d9 META.json
-SHA1 29af63418a0cce8335f3b306941500770dd10d7b META.yml
-SHA1 99d7add2bccd109b1ee059dc679b8dad0e012722 Makefile.PL
-SHA1 c8328befd33306c9ec357a97e7faeafd6f05eac8 README.mkdn
-SHA1 f45974b85af540f21f0a917af7180c5c31b28ede dist.ini
-SHA1 f4a3335430843fead958ced5ee449bd7351e376e lib/Plack/Middleware/XSRFBlock.pm
-SHA1 d4426c3a7150a7a522cb0617b5e0b6c806995b5e script/buildkite/dzil-authordeps
-SHA1 7872b53eabda8b053bc1e540724da4dd721a3751 script/buildkite/dzil-distrodeps
-SHA1 e68ecb276d56454d75134d2afb1176550fcfd378 script/buildkite/dzil-install
-SHA1 176466926452610b5b7b808082e3603ed77215ad script/buildkite/dzil-tests-basic
-SHA1 ef72d3dd2bdde3b4eabeedb9ff49c0c3678d45ff script/buildkite/dzil-tests-full
-SHA1 49517961df86d76537175dc72211fc4bb9c1d5cf script/buildkite/perlbrew-install
-SHA1 0f841effbeb886bcbe1d88f8a7e2c29974c2a8e0 script/buildkite/perlbrew-setup
-SHA1 86cd488198ef1835477613f6a2256994986660aa t/00-load.t
-SHA1 637ced0fa3c9aa4d5d05107aa2da3f52d9eeafa3 t/01.basic.t
-SHA1 2e66df9491f80ffd07d7f4dae4ce9581d60eb38c t/02.content.t
-SHA1 4841d3a41a01bc1ef8dbc38dbf021e5e9d58dc16 t/03.blocked.t
-SHA1 259f1d716c429b31057069889e7b25b0a4cda990 t/03.meta_tag.t
-SHA1 8776dce1ceeebdd138ca5bdb8916e2a82bc3531c t/03.request_header.t
-SHA1 591d9d0ac8e072edbafa49e46d210bf9a84b1a89 t/03.token_per_request.t
-SHA1 da7652a71789bed307555e28147172cf2b44ea67 t/04.cookie_options.t
-SHA1 145463568426af903049f4ca671d9378142f2027 t/05.not-html.t
-SHA1 c6a4f8615e170b6984a4d21962a93b434b6282aa t/author-no-tabs.t
-SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
-SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
-SHA1 66bfe8be526fd24544bc5004af9c5adcf40780dc t/lib/Plack/Test/MockHTTP.pm
-SHA1 d5917d5039e63d33ddf49738e0198f958d272649 t/lib/Test/XSRFBlock/App.pm
-SHA1 3b8f77fe01a8f9345d58b87018c90f54d708494d t/lib/Test/XSRFBlock/Util.pm
-SHA1 d527491e13186274d2947c0d9f4b7a8a8d227616 t/release-kwalitee.t
-SHA1 91bacb1498d0fb115ed2f1130ffbe8d593931a2d weaver.ini
+SHA256 ad1feb9e015f18f3b37e008beb031f1225bc1947fc5cacbf66e992c7ea59d75a Changes
+SHA256 167ebda651a777abf9c67b417bfabb1e0159185201b62c8e3282aa0b57d2e84f LICENSE
+SHA256 0ed007e877d95e03d5af9f0f778ca60d09a339aeae9940edd99bd13b1fe979b9 MANIFEST
+SHA256 d13b22061ce6a862a6bafe35ba818beb0645757c6739386d9d96b7fd4e8b93b5 META.json
+SHA256 d9307b29d1165bf324e7e162ac8e09c2dec93b10b634febe01d508fe32a258e0 META.yml
+SHA256 4cbe4fa4fd25efad4606759a035c6e4636449f58210abdc9adb66a803b6285a2 Makefile.PL
+SHA256 c5d15e780195f4b571314fa635dcc924be4f7acfd01067263f2c8941a96592c4 README.mkdn
+SHA256 d2c13988a5a48011580133bf0a126a4a06c496b23b27f5e70897eeb6d92b97c5 dist.ini
+SHA256 43169883946cbf5625988b5236c73f9ffa02359a885404dc721fbd13e25bb786 lib/Plack/Middleware/XSRFBlock.pm
+SHA256 d18d165474080f78a8d0551558b9be1d4528d4bbaf3dd449a1740c0c8bdc4c14 script/buildkite/dzil-authordeps
+SHA256 e0fc2caf330308b007ffacf8dc85e037c6c02d0bb55cf7329bae1908d60cdddd script/buildkite/dzil-distrodeps
+SHA256 5b32e8fdbec625a4bebefb3877dff4c88b585b96caaed5cf6d32376616f08a1f script/buildkite/dzil-install
+SHA256 9b2814cbe35609cd6ecae81a523ce895ac3f667d1cb61992de8fbabac4c1ec99 script/buildkite/dzil-tests-basic
+SHA256 3ae15fc257e7e2daada66d0eb1fba7a5cbcbeb25f0d08781a578aa6d100726c3 script/buildkite/dzil-tests-full
+SHA256 7968150fd2fc9a07ca43fdb608c8748c4706012ee0726a677ae671ffaa915731 script/buildkite/perlbrew-install
+SHA256 7069bfb3de8e58980f70e5c7498c59cf68e313bc2c9999e92f489306cbb36e2e script/buildkite/perlbrew-setup
+SHA256 12ba3ca01b39ddd47a2c7a5d943b395d12cc2e2eaee2ae4ce38c6073a7ce4c8f t/00-load.t
+SHA256 2698ba31ba39800d88c8a0d362d4815cb759aaca0c1b6bbb8f87bd6ceafef8d9 t/01.basic.t
+SHA256 82b24f6d1a5a2a727979baf15e28ac2c7658f71cef416fdaaac926f0b72871a0 t/02.content.t
+SHA256 fa813547678de912eaffce0346e84a7d2ac9849d0ee3c54f284c18201c8710bd t/03.blocked.t
+SHA256 acbe774823a6fda1098ad5d60a48f88be795683b74180d035cd6078412f47bcd t/03.meta_tag.t
+SHA256 fc1b2740124b01a84af5ed36ff9dfb22c4785fc4672a084dc054f0a4661f2baa t/03.request_header.t
+SHA256 440e5cbe8cbec7ea4c7d960839596773b16f86c6ab5b8b8aa33a4b86ea9b202e t/03.token_per_request.t
+SHA256 3f0199679ef39d70608253b8ac9f11d87aeb99e9bb83eab0b27eaeab98ceee94 t/04.cookie_options.t
+SHA256 0fc66133dcce8c6da48a4ff43b0b08b481db9c1ebd671742f7688b8d25278630 t/05.not-html.t
+SHA256 52f4020478c250f727181bb14a575f66beba7689535d9c854be34265ea8fd66e t/05.not-html.t~
+SHA256 dfd3b04728075063764041035a1f737086d2daa2bac838c7ae5e67f64790a94b t/author-no-tabs.t
+SHA256 8a96a1b54dca225db0ffc545d4e0d58b3fd1605bece1d3e434ba1d988d479473 t/author-pod-coverage.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 7957c1d5a8c299880eee6e80d361108b85f86b0e45a494e7beb89937cb20c5c8 t/lib/Plack/Test/MockHTTP.pm
+SHA256 b493e8c3090c8cb40c674ebf994ae87f902a4e82c21472ea4b55f140490405a8 t/lib/Test/XSRFBlock/App.pm
+SHA256 311ee8ed138bb9e7ead1e3f9c7499b3289b407385fe6ed505a33a5e775569cc8 t/lib/Test/XSRFBlock/Util.pm
+SHA256 3e60d6abbee303709a8c178512c985bca115d83750235db24fcdc02dd98d5e08 t/release-kwalitee.t
+SHA256 9b29c12eedb613f3d7931c5069619d399bc03c92510baf29a9cf51032b163a71 weaver.ini
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAltYed0ACgkQh4j7xTiFuxGsEgCdEeoY9Gij6N1D0UbdXOUp/bfY
-rTwAn3h+uKdtdC88nfI69DtKDPZhQKv7
-=bOkH
+iF0EAREDAB0WIQSgceYY3SxZAZV0b+JA6piDdRk/iAUCY00m9gAKCRBA6piDdRk/
+iN4wAJwLSnhDUK2a2qJ4bb/+f+ZyPFjmXgCeLtuhj/8S/fDNWYcds7vrUJEaYws=
+=QFJH
 -----END PGP SIGNATURE-----

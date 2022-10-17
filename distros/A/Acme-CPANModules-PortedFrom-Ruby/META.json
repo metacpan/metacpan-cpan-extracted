@@ -49,7 +49,9 @@
             "Data::Gimei" : "0",
             "HTTP::Server::Brick" : "0",
             "Plack" : "0",
-            "Scientist" : "0"
+            "Scientist" : "0",
+            "Squatting" : "0",
+            "Valiant" : "0"
          }
       },
       "x_mentions" : {
@@ -58,14 +60,16 @@
             "Data::Gimei" : "0",
             "HTTP::Server::Brick" : "0",
             "Plack" : "0",
-            "Scientist" : "0"
+            "Scientist" : "0",
+            "Squatting" : "0",
+            "Valiant" : "0"
          }
       }
    },
    "provides" : {
       "Acme::CPANModules::PortedFrom::Ruby" : {
          "file" : "lib/Acme/CPANModules/PortedFrom/Ruby.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -80,7 +84,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Ruby"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -437,7 +441,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
@@ -447,7 +451,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.780"
+                        "version" : "0.784"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
@@ -472,7 +476,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Acme::CPANModules",
                         "name" : "-Acme::CPANModules",
-                        "version" : "0.012"
+                        "version" : "0.013"
                      }
                   ]
                }

@@ -1,3 +1,10 @@
+0.007   2022-07-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Allow Regexp object to be a key source.
+
+        - Add routines: merge{,_overwrite,_ignore}_hash_subset{,_without}.
+
+
 0.006   2020-06-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Allow multiple keys sources to include/exclude.

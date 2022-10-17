@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.50';
+$VERSION = '0.51';
 $VERSION = $VERSION;
 
 # internal use
@@ -5497,9 +5497,12 @@ The encodings supported by this software and their range of octets are as follow
 
 =head2 big5 (Big5)
 
+  -------------------------------------
   1st       2nd
+  -------------------------------------
   81..FE    00..FF
   00..7F
+  -------------------------------------
 
 L<https://en.wikipedia.org/wiki/Big5>
 
@@ -5527,9 +5530,12 @@ L<https://en.wikipedia.org/wiki/Big5>
 
 =head2 big5hkscs (Big5-HKSCS)
 
+  -------------------------------------
   1st       2nd
+  -------------------------------------
   81..FE    00..FF
   00..7F
+  -------------------------------------
 
 L<https://en.wikipedia.org/wiki/Hong_Kong_Supplementary_Character_Set>
 
@@ -5557,9 +5563,12 @@ L<https://en.wikipedia.org/wiki/Hong_Kong_Supplementary_Character_Set>
 
 =head2 eucjp (EUC-JP)
 
+  -------------------------------------
   1st       2nd
+  -------------------------------------
   A1..FE    00..FF
   00..7F
+  -------------------------------------
 
 L<https://en.wikipedia.org/wiki/Extended_Unix_Code#EUC-JP>
 
@@ -5575,10 +5584,13 @@ L<https://en.wikipedia.org/wiki/Extended_Unix_Code#EUC-JP>
 
 =head2 gb18030 (GB18030)
 
+  -------------------------------------
   1st       2nd       3rd       4th
+  -------------------------------------
   81..FE    30..39    81..FE    30..39
   81..FE    00..FF
   00..7F
+  -------------------------------------
 
 L<https://en.wikipedia.org/wiki/GB_18030>
 
@@ -5606,9 +5618,12 @@ L<https://en.wikipedia.org/wiki/GB_18030>
 
 =head2 gbk (GBK)
 
+  -------------------------------------
   1st       2nd
+  -------------------------------------
   81..FE    00..FF
   00..7F
+  -------------------------------------
 
 L<https://en.wikipedia.org/wiki/GBK_(character_encoding)>
 
@@ -5636,11 +5651,14 @@ L<https://en.wikipedia.org/wiki/GBK_(character_encoding)>
 
 =head2 rfc2279 (UTF-8 RFC2279)
 
+  -------------------------------------
   1st       2nd       3rd       4th
+  -------------------------------------
   C2..DF    80..BF
   E0..EF    80..BF    80..BF
   F0..F4    80..BF    80..BF    80..BF
   00..7F
+  -------------------------------------
 
 L<https://www.ietf.org/rfc/rfc2279.txt>
 
@@ -5658,11 +5676,14 @@ L<https://www.ietf.org/rfc/rfc2279.txt>
 
 =head2 sjis (Shift_JIS-like encodings, ex. cp932)
 
+  -------------------------------------
   1st       2nd
+  -------------------------------------
   81..9F    00..FF
   E0..FC    00..FF
   80..FF
   00..7F
+  -------------------------------------
 
 L<https://en.wikipedia.org/wiki/Shift_JIS>
 
@@ -5690,9 +5711,12 @@ L<https://en.wikipedia.org/wiki/Shift_JIS>
 
 =head2 uhc (UHC)
 
+  -------------------------------------
   1st       2nd
+  -------------------------------------
   81..FE    00..FF
   00..7F
+  -------------------------------------
 
 L<https://en.wikipedia.org/wiki/Unified_Hangul_Code>
 
@@ -5708,7 +5732,9 @@ L<https://en.wikipedia.org/wiki/Unified_Hangul_Code>
 
 =head2 utf8 (UTF-8 RFC3629)
 
+  -------------------------------------
   1st       2nd       3rd       4th
+  -------------------------------------
   E1..EC    80..BF    80..BF
   C2..DF    80..BF
   EE..EF    80..BF    80..BF
@@ -5718,6 +5744,7 @@ L<https://en.wikipedia.org/wiki/Unified_Hangul_Code>
   F1..F3    80..BF    80..BF    80..BF
   F4..F4    80..8F    80..BF    80..BF
   00..7F
+  -------------------------------------
 
 L<https://en.wikipedia.org/wiki/UTF-8>
 
@@ -5735,7 +5762,9 @@ L<https://en.wikipedia.org/wiki/UTF-8>
 
 =head2 wtf8 (WTF-8)
 
+  -------------------------------------
   1st       2nd       3rd       4th
+  -------------------------------------
   E1..EF    80..BF    80..BF
   C2..DF    80..BF
   E0..E0    A0..BF    80..BF
@@ -5743,6 +5772,7 @@ L<https://en.wikipedia.org/wiki/UTF-8>
   F1..F3    80..BF    80..BF    80..BF
   F4..F4    80..8F    80..BF    80..BF
   00..7F
+  -------------------------------------
 
 L<http://simonsapin.github.io/wtf-8/>
 
@@ -7403,20 +7433,21 @@ value, you can use mb::tr().
   $var3 = 'AAA';
   $got = mb::tr($var3,'A','1','s'); # works as $got = mb::tr($var3,'A','1','s');
     GOOD ==> got 3
+
+Usage of mb::tr()
+
+  $transliterated_codepoint_count =
+  mb::tr($MBCS_string, $searchlist, $replacementlist, $modifier);
   
-  Transliteration routine
-  
-  $return = mb::tr($MBCS_string, $searchlist, $replacementlist, $modifier);
-  $return = mb::tr($MBCS_string, $searchlist, $replacementlist);
-  
-  This subroutine is a runtime routine to implement tr/// operator for MBCS
-  codepoint. This subroutine scans an $MBCS_string by codepoint and replaces all
-  occurrences of the codepoint found in $searchlist with the corresponding
-  codepoint in $replacementlist. It returns the number of codepoint replaced or
-  deleted except on /s modifier used.
-  
-  $modifier are:
-  
+  $transliterated_codepoint_count =
+  mb::tr($MBCS_string, $searchlist, $replacementlist);
+
+mb::tr() is a runtime routine to implement tr/// operator for MBCS codepoint.
+This subroutine scans an $MBCS_string by codepoint and replaces all occurrences of the codepoint found in $searchlist with the corresponding codepoint in $replacementlist.
+It returns count of codepoint transliterated or deleted except on /s modifier used.
+
+$modifier are:
+
   ---------------------------------------------------------------------------
   Modifier   Meaning
   ---------------------------------------------------------------------------
@@ -7425,9 +7456,9 @@ value, you can use mb::tr().
   s          Squash duplicate replaced characters.
   r          Return transliteration and leave the original string untouched.
   ---------------------------------------------------------------------------
-  
-  To use with a read-only value without raising an exception, use the /r modifier.
-  
+
+To use with a read-only value without raising an exception, use the /r modifier.
+
   print mb::tr('bookkeeper','boep','peob','r'); # prints 'peekkoobor'
 
 =item * mb::substr as Lvalue
@@ -7595,12 +7626,8 @@ Spreading of EMOJI on MBCS encoding in today had remind us this idea is not bad.
 
 B<UTF8 flag is harmful.>
 
- /*
-  * You are not expected to understand this.
-  */
- 
-  Information processing model beginning with perl 5.8
- 
+Information processing model beginning with perl 5.8
+
     +----------------------+---------------------+
     |     Text strings     |                     |
     +----------+-----------|    Binary strings   |
@@ -7609,15 +7636,23 @@ B<UTF8 flag is harmful.>
     | UTF8     |            Not UTF8             |
     | Flagged  |            Flagged              |
     +--------------------------------------------+
-    http://perl-users.jp/articles/advent-calendar/2010/casual/4
 
-  Confusion of Perl string model is made from double meanings of "Binary string."
-  Meanings of "Binary string" are
-  1. Non-Text string
-  2. Digital octet string
+L<http://perl-users.jp/articles/advent-calendar/2010/casual/4>
 
-  Let's draw again using those term.
- 
+Since double meanings of "Binary string", Perl string model has some confusing.
+
+It's following two meanings:
+
+=over 2
+
+=item * Non-Text string
+
+=item * Digital octet string
+
+=back
+
+Let's write again using them.
+
     +----------------------+---------------------+
     |     Text strings     |                     |
     +----------+-----------|   Non-Text strings  |
@@ -7849,7 +7884,7 @@ Description of combinations
   encoding
   O-I-S     description
   ----------------------------------------------------------------------
-  S-S-S     Best choice when I/O is Sjis  encoding
+  S-S-S     Best choice when I/O is Sjis encoding
   S-S-U     
   S-U-S     
   S-U-U     Better choice when I/O is UTF-8 encoding, since not so slow

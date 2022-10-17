@@ -6,7 +6,7 @@ use FindBin;
 
 my %count;
 BEGIN {
-    %count = (constructs => 89, old => 3, removed => 6);
+    %count = (constructs => 90, old => 4, removed => 7);
 }
 
 use Test::More tests => 5;

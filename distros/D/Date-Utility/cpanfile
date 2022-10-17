@@ -7,7 +7,7 @@ requires 'Tie::Hash::LRU';
 requires 'Time::Duration::Concise::Localize', '2.5';
 requires 'Time::Local';
 requires 'Time::Piece';
-requires 'Try::Tiny';
+requires 'Syntax::Keyword::Try';
 
 on configure => sub {
     requires 'ExtUtils::MakeMaker', '6.48';

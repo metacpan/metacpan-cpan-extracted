@@ -60,7 +60,7 @@
       "test" : {
          "requires" : {
             "IPC::Run3" : "0",
-            "Test2::Tools::Compare" : "0",
+            "Test2::Tools::Compare" : "0.000081",
             "Test2::V0" : "0"
          },
          "suggests" : {
@@ -80,6 +80,6 @@
          "web" : "https://github.com/mkende/math_numerical"
       }
    },
-   "version" : 0.04,
+   "version" : 0.05,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

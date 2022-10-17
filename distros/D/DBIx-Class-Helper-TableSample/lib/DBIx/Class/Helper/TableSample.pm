@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_arrayref is_plain_hashref is_plain_scalarref /;
 
 use namespace::clean;
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.3.2';
 
 
 sub _resolved_attrs {
@@ -84,7 +84,7 @@ DBIx::Class::Helper::TableSample - Add support for tablesample clauses
 
 =head1 VERSION
 
-version v0.3.1
+version v0.3.2
 
 =head1 SYNOPSIS
 
@@ -113,7 +113,7 @@ Using the resultset:
 
 This generates the SQL
 
-  SELECT me.id, me.name FROM artist me TABLESAMPLE SYSTEM (0.5)
+  SELECT me.id, me.name FROM table me TABLESAMPLE SYSTEM (0.5)
 
 =head1 DESCRIPTION
 
@@ -174,7 +174,7 @@ as an equivalent of
 
 to generate
 
-  SELECT me.id FROM artist me TABLESAMPLE (5)
+  SELECT me.id FROM table me TABLESAMPLE (5)
 
 If your database supports or requires a sampling method, you can
 specify it, e.g. C<system> or C<bernoulli>.
@@ -192,9 +192,9 @@ specify it, e.g. C<system> or C<bernoulli>.
 
 will generate
 
-  SELECT me.id FROM artist me TABLESAMPLE SYSTEM (5)
+  SELECT me.id FROM table me TABLESAMPLE SYSTEM (5)
 
-See your database documentation for the allowable methods.
+See your database documentation for the allowable methods.  Note that some databases require it.
 
 Prior to version 0.3.0, this was called C<type>. It is supported for
 backwards compatability.
@@ -217,7 +217,7 @@ e.g.
 
 to generate
 
-  SELECT me.id FROM artist me TABLESAMPLE (5) REPEATABLE (123456)
+  SELECT me.id FROM table me TABLESAMPLE (5) REPEATABLE (123456)
 
 Scalar references are dereferenced, and expressions or
 database-specific extensions should be specified has scalar
@@ -225,13 +225,13 @@ references.
 
 =back
 
+=head1 KNOWN ISSUES
+
 Resultsets with joins or inner queries are not supported.
 
 Delete and update queries are not supported.
 
-=head1 CAVEATS
-
-This module is experimental.
+Oracle has a non-standard table sampling syntax, so is not yet supported.
 
 Not all databases support table sampling, and those that do may have
 different restrictions.  You should consult your database

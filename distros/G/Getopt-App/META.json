@@ -16,12 +16,16 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -31,12 +35,12 @@
       "runtime" : {
          "requires" : {
             "Getopt::Long" : "2.00",
-            "perl" : "v5.16.0"
+            "perl" : "5.016"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0.000145"
          }
       }
    },
@@ -46,13 +50,20 @@
          "web" : "https://github.com/jhthorsen/getopt-app/issues"
       },
       "homepage" : "https://github.com/jhthorsen/getopt-app",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jhthorsen/getopt-app.git",
          "web" : "https://github.com/jhthorsen/getopt-app"
+      },
+      "x_IRC" : {
+         "url" : "irc://irc.libera.chat/#convos",
+         "web" : "https://web.libera.chat/#convos"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],

@@ -25,7 +25,7 @@
 ########################################################################
 use v5.18;  # minimum for Object::Pad
 
-our $VERSION = 'v0.0.005';
+our $VERSION = 'v0.0.006';
 
 use Weather::GHCN::App::Fetch;
 
@@ -42,7 +42,7 @@ ghcn_fetch.pl - Fetch station and weather data from the NOAA GHCN repository
 
 =head1 VERSION
 
-version v0.0.005
+version v0.0.006
 
 =head1 SYNOPSIS
 

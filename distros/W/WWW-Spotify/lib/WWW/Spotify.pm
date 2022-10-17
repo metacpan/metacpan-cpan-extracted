@@ -1,24 +1,15 @@
-use strict;
-use warnings;
-
 package WWW::Spotify;
-our $VERSION = '0.010';
+
 use Moo 2.002004;
 
-use Data::Dumper;
-use File::Basename;
-use HTTP::Headers;
-use IO::CaptureOutput qw( capture qxx qxy );
-use JSON::Path;
-use JSON::MaybeXS qw( decode_json );
-use LWP::Protocol::https ();
-use MIME::Base64;
-use Scalar::Util;
-use Try::Tiny qw( catch try );
-use Types::Standard qw( Bool InstanceOf Int Str );
-use URI;
-use URI::Escape;
-use WWW::Mechanize;
+our $VERSION = '0.011';
+
+use Data::Dumper      qw( Dumper );
+use IO::CaptureOutput qw( capture );
+use JSON::Path        ();
+use JSON::MaybeXS     qw( decode_json );
+use MIME::Base64      qw( encode_base64 );
+use Types::Standard   qw( Bool InstanceOf Int Str );
 
 has 'oauth_authorize_url' => (
     is      => 'rw',
@@ -41,25 +32,25 @@ has 'oauth_redirect_uri' => (
 has 'oauth_client_id' => (
     is      => 'rw',
     isa     => Str,
-    default => $ENV{SPOTIFY_CLIENT_ID} || ''
+    default => $ENV{SPOTIFY_CLIENT_ID} || q{}
 );
 
 has 'oauth_client_secret' => (
     is      => 'rw',
     isa     => Str,
-    default => $ENV{SPOTIFY_CLIENT_SECRET} || ''
+    default => $ENV{SPOTIFY_CLIENT_SECRET} || q{}
 );
 
 has 'current_oath_code' => (
     is      => 'rw',
     isa     => Str,
-    default => ''
+    default => q{}
 );
 
 has 'current_access_token' => (
     is      => 'rw',
     isa     => Str,
-    default => ''
+    default => q{}
 );
 
 has 'result_format' => (
@@ -95,7 +86,7 @@ has 'uri_scheme' => (
 has 'current_client_credentials' => (
     is      => 'rw',
     isa     => Str,
-    default => ''
+    default => q{}
 );
 
 has 'force_client_auth' => (
@@ -159,14 +150,16 @@ has problem => (
 
 has ua => (
     is      => 'ro',
-    isa     => InstanceOf ['WWW::Mechanize'],
+    isa     => InstanceOf ['LWP::UserAgent'],
     handles => { _mech => 'clone' },
     lazy    => 1,
-    default => sub { WWW::Mechanize->new( autocheck => 0 ) },
+    default => sub {
+        require WWW::Mechanize;
+        WWW::Mechanize->new( autocheck => 0 );
+    },
 );
 
 my %api_call_options = (
-
     '/v1/albums/{id}' => {
         info   => 'Get an album',
         type   => 'GET',
@@ -181,39 +174,39 @@ my %api_call_options = (
     },
 
     '/v1/albums/{id}/tracks' => {
-        info   => "Get an album's tracks",
+        info   => q{Get an album's tracks},
         type   => 'GET',
         method => 'albums_tracks'
     },
 
     '/v1/artists/{id}' => {
-        info   => "Get an artist",
+        info   => 'Get an artist',
         type   => 'GET',
         method => 'artist'
     },
 
     '/v1/artists?ids={ids}' => {
-        info   => "Get several artists",
+        info   => 'Get several artists',
         type   => 'GET',
         method => 'artists'
     },
 
     '/v1/artists/{id}/albums' => {
-        info   => "Get an artist's albums",
+        info   => q{Get an artist's albums},
         type   => 'GET',
         method => 'artist_albums',
         params => [ 'limit', 'offset', 'country', 'album_type' ]
     },
 
     '/v1/artists/{id}/top-tracks?country={country}' => {
-        info   => "Get an artist's top tracks",
+        info   => q{Get an artist's top tracks},
         type   => 'GET',
         method => 'artist_top_tracks',
         params => ['country']
     },
 
     '/v1/artists/{id}/related-artists' => {
-        info   => "Get an artist's top tracks",
+        info   => q{Get an artist's top tracks},
         type   => 'GET',
         method => 'artist_related_artists',
 
@@ -222,84 +215,83 @@ my %api_call_options = (
 
     # adding q and type to url unlike example since they are both required
     '/v1/search?q={q}&type={type}' => {
-        info   => "Search for an item",
+        info   => 'Search for an item',
         type   => 'GET',
         method => 'search',
         params => [ 'limit', 'offset', 'q', 'type' ]
     },
 
     '/v1/tracks/{id}' => {
-        info   => "Get a track",
+        info   => 'Get a track',
         type   => 'GET',
         method => 'track'
     },
 
     '/v1/tracks?ids={ids}' => {
-        info   => "Get several tracks",
+        info   => 'Get several tracks',
         type   => 'GET',
         method => 'tracks'
     },
 
     '/v1/users/{user_id}' => {
-        info   => "Get a user's profile",
+        info   => q{Get a user's profile},
         type   => 'GET',
         method => 'user'
     },
 
     '/v1/me' => {
-
-        info   => "Get current user's profile",
+        info   => q{Get current user's profile},
         type   => 'GET',
         method => 'me'
     },
 
     '/v1/users/{user_id}/playlists' => {
-        info   => "Get a list of a user's playlists",
+        info   => q{Get a list of a user's playlists},
         type   => 'GET',
         method => 'user_playlist'
     },
 
     '/v1/users/{user_id}/playlists/{playlist_id}' => {
-        info   => "Get a playlist",
+        info   => 'Get a playlist',
         type   => 'GET',
-        method => ''
+        method => q{}
     },
 
     '/v1/browse/featured-playlists' => {
-        info   => "Get a list of featured playlists",
+        info   => 'Get a list of featured playlists',
         type   => 'GET',
         method => 'browse_featured_playlists'
     },
 
     '/v1/browse/new-releases' => {
-        info   => "Get a list of new releases",
+        info   => 'Get a list of new releases',
         type   => 'GET',
         method => 'browse_new_releases'
     },
 
     '/v1/users/{user_id}/playlists/{playlist_id}/tracks' => {
-        info   => "Get a playlist's tracks",
+        info   => q{Get a playlist's tracks},
         type   => 'POST',
-        method => ''
+        method => q{}
     },
 
     '/v1/users/{user_id}/playlists' => {
         info   => 'Create a playlist',
         type   => 'POST',
-        method => ''
+        method => q{}
     },
 
     '/v1/users/{user_id}/playlists/{playlist_id}/tracks' => {
         info   => 'Add tracks to a playlist',
         type   => 'POST',
-        method => ''
+        method => q{}
     }
 );
 
 my %method_to_uri = ();
 
 foreach my $key ( keys %api_call_options ) {
-    next if $api_call_options{$key}->{method} eq '';
+    next if $api_call_options{$key}->{method} eq q{};
     $method_to_uri{ $api_call_options{$key}->{method} } = $key;
 }
 
@@ -318,7 +310,7 @@ sub send_get_request {
 
     my $attributes = shift;
 
-    my $uri_params = '';
+    my $uri_params = q{};
 
     if ( defined $attributes->{extras}
         and ref $attributes->{extras} eq 'HASH' ) {
@@ -346,7 +338,7 @@ sub send_get_request {
         $url = $self->uri_scheme();
 
         # the ://
-        $url .= "://";
+        $url .= '://';
 
         # the domain
         $url .= $self->uri_hostname();
@@ -405,7 +397,7 @@ sub send_get_request {
     if (   $attributes->{client_auth_required}
         || $self->force_client_auth() != 0 ) {
 
-        if ( $self->current_access_token() eq '' ) {
+        if ( $self->current_access_token() eq q{} ) {
             warn "Needed to get access token\n" if $self->debug();
             $self->get_client_credentials();
         }
@@ -467,7 +459,6 @@ sub format_results {
 }
 
 sub get_oauth_authorize {
-
     my $self = shift;
 
     if ( $self->current_oath_code() ) {
@@ -489,7 +480,7 @@ sub get_oauth_authorize {
     $parts[1] = 'redirect_uri=' . $self->oauth_redirect_uri;
 
     my $params = join( '&', @parts );
-    $url = $url . "?client_id=" . $self->oauth_client_id() . "&$params";
+    $url = $url . '?client_id=' . $self->oauth_client_id() . "&$params";
 
     $self->ua->get($url);
 
@@ -500,10 +491,10 @@ sub get_client_credentials {
     my $self  = shift;
     my $scope = shift;
 
-    if ( $self->current_access_token() ne '' ) {
+    if ( $self->current_access_token() ne q{} ) {
         return $self->current_access_token();
     }
-    if ( $self->oauth_client_id() eq '' ) {
+    if ( $self->oauth_client_id() eq q{} ) {
         die "need to set the client oauth parameters\n";
     }
 
@@ -574,7 +565,7 @@ sub get_access_token {
 
             # clear the scope, it doesn't
             # look valid
-            $scope = '';
+            $scope = q{};
         }
 
     }
@@ -673,14 +664,14 @@ sub build_url_base {
     my $url = $self->uri_scheme();
 
     # the ://
-    $url .= "://";
+    $url .= '://';
 
     # the domain
     $url .= $self->uri_hostname();
 
     # the path
     if ( $self->uri_domain_path() ) {
-        $url .= "/" . $self->uri_domain_path();
+        $url .= '/' . $self->uri_domain_path();
     }
 
     return $url;
@@ -886,7 +877,6 @@ sub track {
             params => { 'id' => $id }
         }
     );
-
 }
 
 sub browse_featured_playlists {
@@ -986,11 +976,11 @@ WWW::Spotify - Spotify Web API Wrapper
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
-    use WWW::Spotify;
+    use WWW::Spotify ();
 
     my $spotify = WWW::Spotify->new();
 
@@ -1074,18 +1064,18 @@ of the screen as you mouse over an element.
 
 =head2 ua
 
-You may provide your own L<WWW::Mechanize> object to the constructor.  You may
-want to set autocheck off.  To get extra debugging information, you can do
-something like this:
+You may provide your own user agent object to the constructor.  This should be
+a L<LWP:UserAgent> or a subclass of it, like L<WWW::Mechanize>. If you are
+using L<WWW::Mechanize>, you may want to set autocheck off.  To get extra
+debugging information, you can do something like this:
 
     use LWP::ConsoleLogger::Easy qw( debug_ua );
-    use WWW::Mechanize;
-    use WWW::Spotify;
+    use WWW::Mechanize ();
+    use WWW::Spotify ();
 
     my $mech = WWW::Mechanize->new( autocheck => 0 );
     debug_ua( $mech );
-
-    my $ua = WWW::Mechanize->new( ua => $ua );
+    my $spotify = WWW::Spotify->new( ua => $mech )
 
 =head1 METHODS
 

@@ -29,9 +29,10 @@ our @ISA = qw(Exporter);
 # This allows declaration       use Astro::FITS::CFITSIO::Table ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-  _rdfitsImage
-) ] );
+our %EXPORT_TAGS = (
+    'all' => [ qw(
+          _rdfitsImage
+        ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
@@ -39,68 +40,70 @@ our @EXPORT = qw(
 
 );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 # this must be called ONLY from rdfits.  it makes assumptions about
 # the validity of arguments that have been verified by rdfits.
 
-sub _rdfitsImage
-{
+sub _rdfitsImage {
 
-  my $opts = 'HASH' eq ref $_[-1] ? pop : {};
+    my $opts = 'HASH' eq ref $_[-1] ? pop : {};
 
-  # first arg is fitsfilePtr
-  # second is cleanup object; must keep around until we're done,
-  # so it'll cleanup at the correct time.
-  my $fptr = shift;
+    # first arg is fitsfilePtr
+    # second is cleanup object; must keep around until we're done,
+    # so it'll cleanup at the correct time.
+    my $fptr = shift;
 
-  # we don't expect any more arguments; complain if we do...
-  croak( "unexpected extra arguments in call to rdfitsImage\n" )
-    if @_;
+    # we don't expect any more arguments; complain if we do...
+    croak( "unexpected extra arguments in call to rdfitsImage\n" )
+      if @_;
 
-  my %opt =
-    validate_with( params => [ $opts ],
-                   normalize_keys => sub{ lc $_[0] },
-                   spec => {
-                            nullval => { type => SCALAR, optional => 1 },
-                            dtype  => { isa => 'PDL::Type', optional => 1 },
-                           },
-                 );
+    my %opt = validate_with(
+        params         => [$opts],
+        normalize_keys => sub { lc $_[0] },
+        spec           => {
+            nullval => { type => SCALAR,      optional => 1 },
+            dtype   => { isa  => 'PDL::Type', optional => 1 },
+        },
+    );
 
-  tie my $status, 'Astro::FITS::CFITSIO::CheckStatus';
+    tie my $status, 'Astro::FITS::CFITSIO::CheckStatus';
 
-  # get image type and size
-  $fptr->get_img_equivtype( my $btype, $status );
-  $fptr->get_img_size( \my @naxes, $status );
+    # get image type and size
+    $fptr->get_img_equivtype( my $btype, $status );
+    $fptr->get_img_size( \my @naxes, $status );
 
-  # what's the PDL type that encompasses the CFITSIO type?
-  my $ptype = $opt{dtype} ? $opt{dtype} : fits2pdl_imgtype( $btype );
-  my $data  = PDL->new_from_specification( $ptype, @naxes );
+    # what's the PDL type that encompasses the CFITSIO type?
+    my $ptype = $opt{dtype} ? $opt{dtype} : fits2pdl_imgtype( $btype );
+    my $data  = PDL->new_from_specification( $ptype, @naxes );
 
-  # grab header, delete scaling keywords, stuff it into piddle
-  my $hdr = Astro::FITS::Header::CFITSIO->new( fitsID => $fptr );
-  tie my %hdr, 'Astro::FITS::Header', $hdr;
-  delete @hdr{ qw/ BSCALE BZERO / };
-  $data->sethdr( \%hdr );
+    # grab header, delete scaling keywords, stuff it into piddle
+    my $hdr = Astro::FITS::Header::CFITSIO->new( fitsID => $fptr );
+    tie my %hdr, 'Astro::FITS::Header', $hdr;
+    delete @hdr{qw/ BSCALE BZERO /};
+    $data->sethdr( \%hdr );
 
-  # what we tell CFITSIO that we're reading. some deception,
-  # as all we care about is the size of the data type
-  my $ctype = pdl2cfitsio($ptype);
+    # what we tell CFITSIO that we're reading. some deception,
+    # as all we care about is the size of the data type
+    my $ctype = pdl2cfitsio( $ptype );
 
-  # How to handle null pixels.  A nullval of zero signals CFITSIO to
-  # ignore null pixels
-  my $nullval = exists $opt{nullval}   ? $opt{nullval}
-              : $PDL::Bad::Status      ? badvalue( $ptype )
-              :                          0;
+    # How to handle null pixels.  A nullval of zero signals CFITSIO to
+    # ignore null pixels
+    my $nullval
+      = exists $opt{nullval} ? $opt{nullval}
+      : $PDL::Bad::Status    ? my_badvalue( $ptype )
+      :                        0;
 
-  $fptr->read_pix( $ctype, [ (1) x @naxes ],
-                   $data->nelem, $nullval, ${$data->get_dataref},
-                   my $anynul, $status );
-  $data->upd_data;
+    $fptr->read_pix(
+        $ctype,       [ ( 1 ) x @naxes ],
+        $data->nelem, $nullval, ${ $data->get_dataref },
+        my $anynul,   $status
+    );
+    $data->upd_data;
 
-  $data->badflag($anynul) if $PDL::Bad::Status;
+    $data->badflag( $anynul ) if $PDL::Bad::Status;
 
-  $data;
+    $data;
 }
 
 1;
@@ -127,7 +130,7 @@ Astro::FITS::CFITSIO::Simple::Image - Read FITS Images
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SUPPORT
 

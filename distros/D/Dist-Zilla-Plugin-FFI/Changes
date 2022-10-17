@@ -1,9 +1,21 @@
 Revision history for Dist-Zilla-Plugin-FFI
 
+1.07      2022-10-16 04:37:01 -0600
+  - Removed mostly harmless warning (gh#10)
+  - Fix bug where some files aren't being pruned that should (gh#10)
+
+1.06      2022-10-15 19:53:30 -0600
+  - Drop required Perl to 5.20
+  - Added lang and build properties to [FFI::Build] plugin (gh#9)
+
 1.05      2022-02-22 09:32:27 -0700
   - Bump required Perl to 5.24
     (required by indirect dependency App::Cmd anyway)
   - Move to PerlFFI GitHub org.
+  - Added alien and try_linker_script options to [FFI::CheckLib]
+    plugin (gh#6, ZMUGHAL++)
+  - [FFI::CheckLib] plugin now makes FFI::CheckLib 0.28
+    a configure time prereq (gh#6)
 
 1.04      2019-08-13 13:58:33 -0400
   - [FFI::Build] will prune ffi/_build files which you

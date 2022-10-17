@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
 use File::Spec::Functions qw(catfile rel2abs);
 use Getopt::App -capture;
 use Getopt::App::Complete qw(generate_completion_script complete_reply);
@@ -41,5 +39,5 @@ sub test_complete_reply {
   note "COMP_LINE='$ENV{COMP_LINE}' ($ENV{COMP_POINT})";
   my ($exp, $desc) = @_;
   my $res = capture($app);
-  is_deeply [split /\n/, $res->[0]], $exp, $desc || 'complete_reply' or diag "ERR: $res->[1]";
+  is [split /\n/, $res->[0]], $exp, $desc || 'complete_reply' or diag "ERR: $res->[1]";
 }

@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc;
 # ABSTRACT: Chargeur Koha par Tamil
-$Koha::Contrib::Sudoc::VERSION = '2.38';
+$Koha::Contrib::Sudoc::VERSION = '2.39';
 use Moose;
 use Modern::Perl;
 use YAML qw( LoadFile Dump );
@@ -238,7 +238,7 @@ Koha::Contrib::Sudoc - Chargeur Koha par Tamil
 
 =head1 VERSION
 
-version 2.38
+version 2.39
 
 =head1 DESCRIPTION
 

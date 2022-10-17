@@ -38,7 +38,7 @@ my ( $fit, @values ) = $pso->getParticleBestPos ($best);
 my $iters            = $pso->getIterationCount();
 
 
-ok ( $fit > 100, 'Computations');
+ok ( $fit > 0, 'Computations');
 
 
 sub calcFit {

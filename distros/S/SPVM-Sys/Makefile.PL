@@ -19,8 +19,11 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => '',
-        web  => '',
+        url  => 'https://github.com/yuki-kimoto/SPVM-Sys.git',
+        web  => 'https://github.com/yuki-kimoto/SPVM-Sys',
+      },
+      bugtracker => {
+        web => "https://github.com/yuki-kimoto/SPVM-Sys/issues",
       },
     },
   },
@@ -48,7 +51,6 @@ sub MY::postamble {
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::PollfdArray');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Process');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Process::Constant');
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Process::Tms');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::User');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::User::Passwd');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::User::Group');
@@ -65,6 +67,13 @@ sub MY::postamble {
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Ipv6_mreq');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Ip_mreq_source');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Socket::Ip_mreq');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Constant');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Timeval');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Timespec');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Timezone');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Itimerval');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Tms');
   
   return $make_rule;
 }

@@ -1,5 +1,11 @@
 Revision history for Astro-FITS-CFITSIO-Simple
 
+0.20      2022-10-14 22:26:24-04:00 America/New_York
+
+  [BUG FIX]
+
+    * make compatible with PDL >= 2.039
+
 0.19      2021-10-21 14:07:04-04:00 America/New_York
 
   [BUILD]

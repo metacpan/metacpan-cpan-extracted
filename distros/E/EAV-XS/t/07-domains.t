@@ -5,7 +5,7 @@ use Test::More;
 # This is a workaround in case if the locale is not utf-8 compatable.
 use POSIX qw(locale_h);
 use locale;
-setlocale(LC_ALL, "en_US.UTF-8") or die "setlocale";
+setlocale(LC_ALL, "en_US.UTF-8"); # no critic: see t/06-utf8.t
 
 
 my $testnum = 0;

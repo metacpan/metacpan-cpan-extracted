@@ -8,7 +8,7 @@ Weather::GHCN::CacheURI - URI page fetch with file-based caching
 
 =head1 VERSION
 
-version v0.0.005
+version v0.0.006
 
 =head1 SYNOPSIS
 
@@ -66,12 +66,12 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::CacheURI;
 class   Weather::GHCN::CacheURI;
 
-our $VERSION = 'v0.0.005';
+our $VERSION = 'v0.0.006';
 
 
 use Carp                    qw(carp croak);
 use Const::Fast;
-use Fcntl qw( :DEFAULT );
+use Fcntl                   qw( :DEFAULT );
 use File::stat;
 use Path::Tiny;
 use Try::Tiny;

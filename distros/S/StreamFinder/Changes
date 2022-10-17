@@ -460,3 +460,10 @@ Revision history for StreamFinder
         - StreamFinder::Anystream - Handle extended M3U (HLS) playlist URLs.
 1.91    2022/10/04
         - Add StreamFinder::SoundCloud to MANIFEST file.
+1.92    2022/10/13
+        - StreamFinder::Bitchute - Handle "embedded" Bitchute pages, ie. 
+        https://www.bitchute.com/embed/[id]
+        - StreamFinder::BrandNewTube - Fix some UGetube.com sites not fetching 
+        artist or albumartist.  NOTE:  May get renamed to StreamFinder::UGetube 
+        in future, as it appears that BrandNewTube.com seems to be withering.
+        - StreamFinder::SoundCloud - Fix up documentation a bit.

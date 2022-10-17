@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 use v5.12;
 use lib 'lib', '../lib';
+#@INC = ('lib', '../lib');
 use App::GUI::Harmonograph;
 
 App::GUI::Harmonograph->new->MainLoop( );

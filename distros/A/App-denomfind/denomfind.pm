@@ -1,12 +1,12 @@
 package App::denomfind ;  
-our $VERSION = '0.252' ; 
-our $DATE = '2022-10-13T23:28+09:00' ; 
+our $VERSION = '0.258' ; 
+our $DATE = '2022-10-17T18:55+09:00' ; 
 
 =encoding utf8
 
 =head1 NAME
 
-App::denomfind -- finding the common denominator for multiple approximated quotients in decimal.
+App::denomfind -- Finding the common denominator for multiple approximated quotients in decimal.
 
    1. denomfind -- 複数の四捨五入などされた数値を、共通した1個の分母を持つ整数比と見なして、その分母を総当たりで探索する。
    2. primefind -- 1行ずつ整数を逐次読み取り、ある数が既に読んだどの数の倍数でなければ、出力する。

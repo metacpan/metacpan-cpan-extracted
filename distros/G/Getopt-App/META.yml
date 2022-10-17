@@ -3,7 +3,8 @@ abstract: 'Write and test your script with ease'
 author:
   - 'Jan Henning Thorsen <jan.henning@thorsen.pm>'
 build_requires:
-  Test::More: '0.88'
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0.000145'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -17,14 +18,20 @@ no_index:
   directory:
     - t
     - inc
+    - examples
+    - t
 requires:
   Getopt::Long: '2.00'
-  perl: v5.16.0
+  perl: '5.016'
 resources:
+  IRC:
+    url: irc://irc.libera.chat/#convos
+    web: https://web.libera.chat/#convos
   bugtracker: https://github.com/jhthorsen/getopt-app/issues
   homepage: https://github.com/jhthorsen/getopt-app
+  license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/getopt-app.git
-version: '0.08'
+version: '0.09'
 x_contributors:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

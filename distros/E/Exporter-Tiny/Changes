@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Exporter-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-exporter-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.004004	2022-10-15
+
+ [ Documentation ]
+ - Minor corrections to QuickStart page in the manual.
+
 1.004003	2022-09-30
 
  [ Bug Fixes ]

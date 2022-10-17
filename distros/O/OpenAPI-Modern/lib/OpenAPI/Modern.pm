@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.032-3-g53dadc7
+package OpenAPI::Modern; # git description: v0.033-3-gf2ff940
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 
 use 5.020;
 use Moo;
@@ -539,19 +539,7 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   return if not defined $schema;
 
   $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
-  my $result = $self->_evaluate_subschema($content_ref->$*, $schema, $state);
-
-  return if not is_ref($result);  # empty + valid result
-
-  my $type = (split('/', $state->{data_path}, 3))[1];
-  my $keyword = $type eq 'request' ? 'readOnly' : $type eq 'response' ? 'writeOnly' : die "unknown type $type";
-
-  foreach my $annotation (grep $_->keyword eq $keyword && $_->annotation, $result->annotations) {
-    push $state->{errors}->@*, JSON::Schema::Modern::Error->new(
-      (map +($_ => $annotation->$_), qw(keyword instance_location keyword_location absolute_keyword_location)),
-      error => ($keyword =~ s/O/-o/r).' value is present',
-    );
-  }
+  $self->_evaluate_subschema($content_ref->$*, $schema, $state);
 }
 
 # wrap a result object around the errors
@@ -696,7 +684,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.033
+version 0.034
 
 =head1 SYNOPSIS
 

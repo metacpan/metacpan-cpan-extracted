@@ -71,6 +71,6 @@
          "web" : "https://github.com/FGasper/p5-Crypt-Perl"
       }
    },
-   "version" : "0.37",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

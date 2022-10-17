@@ -4,13 +4,13 @@ use strict;
 use warnings;
 use utf8;
 
-use Carp qw(croak);
+use Carp         qw(croak);
 use Getopt::Long ();
-use List::Util qw(first);
+use List::Util   qw(first);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
-our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMANDS, %APPS) = (qr{\s+\#\s+});
+our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMAND, $SUBCOMMANDS, %APPS) = (qr{\s+\#\s+});
 
 our $call_maybe = sub {
   my ($app, $m) = (shift, shift);
@@ -99,11 +99,10 @@ sub extract_usage {
 
   $usage //= '';
   $usage =~ s!^(.*?)\n!!s if $pod2usage{'-sections'};
-  $usage =~ s!^Usage:\n\s+([A-Z])!$1!s;    # Remove "Usage" header if SYNOPSIS has a description
+  $usage =~ s!^Usage:\n\s+([A-Z])!$1!s;                 # Remove "Usage" header if SYNOPSIS has a description
   $usage =~ s!^    !!gm;
 
-  return join '', $usage, _usage_for_subcommands($SUBCOMMANDS || []),
-    _usage_for_options($OPTIONS || []);
+  return join '', $usage, _usage_for_subcommands($SUBCOMMANDS || []), _usage_for_options($OPTIONS || []);
 }
 
 sub import {
@@ -122,8 +121,7 @@ sub import {
     }
     elsif ($flag eq '-complete') {
       require Getopt::App::Complete;
-      *{"$caller\::generate_completion_script"}
-        = \&Getopt::App::Complete::generate_completion_script;
+      *{"$caller\::generate_completion_script"} = \&Getopt::App::Complete::generate_completion_script;
     }
     elsif ($flag eq '-signatures') {
       require experimental;
@@ -160,8 +158,7 @@ sub run {
   @rules = map {s!$OPT_COMMENT_RE.*$!!r} @rules;
 
   my $app = $class->new;
-  return $app->$call_maybe('getopt_complete_reply')
-    if defined $ENV{COMP_POINT} and defined $ENV{COMP_LINE};
+  return $app->$call_maybe('getopt_complete_reply') if defined $ENV{COMP_POINT} and defined $ENV{COMP_LINE};
 
   $app->$call_maybe(getopt_pre_process_argv => $argv);
 
@@ -210,7 +207,7 @@ sub _getopt_unknown_subcommand {
 sub _subcommand_run {
   my ($app, $subcommand, $argv) = @_;
   local $Getopt::App::APP_CLASS;
-  local $0 = $subcommand->[1];
+  local $Getopt::App::SUBCOMMAND = $subcommand;
   unless ($APPS{$subcommand->[1]}) {
     $APPS{$subcommand->[1]} = $app->$call_maybe(getopt_load_subcommand => $subcommand, $argv);
     croak "$subcommand->[0] did not return a code ref" unless ref $APPS{$subcommand->[1]} eq 'CODE';
@@ -235,8 +232,7 @@ sub _usage_for_options {
   for (@$rules) {
     my @o = split $OPT_COMMENT_RE, $_, 2;
     $o[0] =~ s/(=[si][@%]?|\!|\+)$//;
-    $o[0] = join ', ',
-      map { length($_) == 1 ? "-$_" : "--$_" } sort { length($b) <=> length($a) } split /\|/, $o[0];
+    $o[0] = join ', ', map { length($_) == 1 ? "-$_" : "--$_" } sort { length($b) <=> length($a) } split /\|/, $o[0];
     $o[1] //= '';
 
     my $l = length $o[0];
@@ -325,6 +321,37 @@ The example script above can be run like any other script:
 
   done_testing;
 
+=head2 Subcommands
+
+  #!/usr/bin/env perl
+  # Define a package to avoid mixing methods after loading the subcommand script
+  package My::App::main;
+  use Getopt::App -complete;
+
+  # getopt_subcommands() is called by Getopt::App
+  sub getopt_subcommands {
+    my $app = shift;
+
+    return [
+      ['find',   '/path/to/subcommand/find.pl',   'Find things'],
+      ['update', '/path/to/subcommand/update.pl', 'Update things'],
+    ];
+  }
+
+  # run() is only called if there are no matching sub commands
+  run(
+    'h                 # Print help',
+    'completion-script # Print autocomplete script',
+    sub {
+      my ($app, @args) = @_;
+      return print generate_completion_script() if $app->{'completion-script'};
+      return print extract_usage();
+    }
+  );
+
+See L</getopt_subcommands> and L<https://github.com/jhthorsen/getopt-app/tree/main/example>
+for more details.
+
 =head1 DESCRIPTION
 
 L<Getopt::App> is a module that helps you structure your scripts and integrates
@@ -349,7 +376,7 @@ This method will be called instead of the L</run> callback when the
 C<COMP_LINE> and C<COMP_POINT> environment variables are set. The default
 implementation will call L<Getopt::App::Complete/complete_reply>.
 
-See also L</Complete>.
+See also "Completion" under L</import>.
 
 =head2 getopt_configure
 
@@ -364,7 +391,7 @@ The default return value is currently EXPERIMENTAL.
 
 =head2 getopt_load_subcommand
 
-  $code = $app->getopt_subcommand($subcommand, [@ARGV]);
+  $code = $app->getopt_load_subcommand($subcommand, [@ARGV]);
 
 Takes the subcommand found in the L</getopt_subcommands> list and the command
 line arguments and must return a CODE block. The default implementation is
@@ -430,6 +457,9 @@ argument passed to the script, and when matched the "sub-command-script" will
 be sourced and run inside the same perl process. The sub command script must
 also use L<Getopt::App> for this to work properly.
 
+The sub-command will have C<$Getopt::App::SUBCOMMAND> set to the item found in
+the list.
+
 See L<https://github.com/jhthorsen/getopt-app/tree/main/example> for a working
 example.
 
@@ -442,7 +472,7 @@ match an item in the list. Default behavior is to C<die> with an error message:
 
   Unknown subcommand: $argv->[0]\n
 
-Returning C<undef> instead of dieing or a number (0-255) will cause the L</run>
+Returning C<undef> instead of dying or a number (0-255) will cause the L</run>
 callback to be called.
 
 =head1 EXPORTED FUNCTIONS
@@ -534,7 +564,7 @@ In the example above, C<@extra> gets populated, since there is a non-flag value
 
 This method can be used to combine L<Getopt::App> and C<$path_to_script> into a
 a single script that does not need to have L<Getopt::App> installed from CPAN.
-This is for example useful for sysadmin scripts that otherwize only depends on
+This is for example useful for sysadmin scripts that otherwise only depends on
 core Perl modules.
 
 The script will be printed to C<$fh>, which defaults to C<STDOUT>.
@@ -569,7 +599,7 @@ it will also import the following:
   use Getopt::App -complete;
 
 Same as L</Default>, but will also load L<Getopt::App::Complete> and import
-L<Getopt::App::Complete/generate_completion_script>.
+L<generate_completion_script()|Getopt::App::Complete/generate_completion_script>.
 
 =item * Signatures
 

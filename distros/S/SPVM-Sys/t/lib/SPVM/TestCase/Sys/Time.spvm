@@ -1,0 +1,200 @@
+class TestCase::Sys::Time {
+  use Sys::Time;
+  use Sys::Time::Timeval;
+  use Sys::Time::Timezone;
+  use Sys::Time::Timespec;
+  use Sys::Time::Constant as TIME;
+  use Sys::Time::Itimerval;
+  use Time;
+  
+  static method gettimeofday : int () {
+    
+    my $tv = Sys::Time::Timeval->new;
+    my $tz = Sys::Time::Timezone->new;
+    
+    my $status = Sys::Time->gettimeofday($tv, $tz);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    unless ($tv->tv_sec > 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method clock : int () {
+    
+    my $tv = Sys::Time::Timeval->new;
+    my $tz = Sys::Time::Timezone->new;
+    
+    my $cpu_time = Sys::Time->clock;
+    
+    unless ($cpu_time >= 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method clock_gettime : int () {
+    
+    my $tp = Sys::Time::Timespec->new;
+    
+    my $status = Sys::Time->clock_gettime(TIME->CLOCK_REALTIME, $tp);
+    
+    unless ($status >= 0) {
+      return 0;
+    }
+    
+    unless ($tp->tv_sec >= 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method clock_getres : int () {
+    
+    my $tp = Sys::Time::Timespec->new;
+    
+    my $status = Sys::Time->clock_getres(TIME->CLOCK_REALTIME, $tp);
+    
+    unless ($status >= 0) {
+      return 0;
+    }
+    
+    unless ($tp->tv_sec >= 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+
+  static method setitimer : int () {
+    
+    my $new_tv = Sys::Time::Timeval->new;
+    $new_tv->set_tv_sec(1);
+    
+    my $new_value = Sys::Time::Itimerval->new;
+    $new_value->set_it_interval($new_tv);
+
+    my $old_value = Sys::Time::Itimerval->new;
+    
+    my $status = Sys::Time->setitimer(TIME->ITIMER_REAL, $new_value, $old_value);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method getitimer : int () {
+    
+    my $curr_value = Sys::Time::Itimerval->new;
+    
+    my $status = Sys::Time->getitimer(TIME->ITIMER_REAL, $curr_value);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method times : int () {
+    
+    my $buffer = Sys::Time::Tms->new;
+    
+    my $tick = Sys::Time->times($buffer);
+    
+    warn $tick;
+    
+    unless ($tick >= 0) {
+      return 0;
+    }
+
+    warn $buffer->tms_utime;
+    
+    unless ($buffer->tms_utime > 0) {
+      return 0;
+    }
+    
+    warn $buffer->tms_stime;
+    
+    unless ($buffer->tms_stime >= 0) {
+      return 0;
+    }
+    
+    warn $buffer->tms_cutime;
+    
+    unless ($buffer->tms_cutime >= 0) {
+      return 0;
+    }
+    
+    warn $buffer->tms_cstime;
+    
+    unless ($buffer->tms_cstime >= 0) {
+      return 0;
+    }
+    
+    # The fields of the Sys::Time::Tms class
+    {
+      $buffer->set_tms_utime(0);
+      $buffer->set_tms_stime(0);
+      $buffer->set_tms_cutime(0);
+      $buffer->set_tms_cstime(0);
+    }
+    
+    return 1;
+  }
+
+
+  static method clock_nanosleep : int () {
+    
+    my $start = Time->time;
+    
+    my $request = Sys::Time::Timespec->new;
+    $request->set_tv_sec(1);
+    $request->set_tv_nsec(100_000_000);
+
+    my $remain = Sys::Time::Timespec->new;
+    
+    my $status = Sys::Time->clock_nanosleep(TIME->CLOCK_REALTIME, 0, $request, $remain);
+    
+    unless ($status  == 0) {
+      return 0;
+    }
+    
+    unless (Time->time - $start >= 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method nanosleep : int () {
+    
+    my $start = Time->time;
+    
+    my $ts = Sys::Time::Timespec->new;
+    $ts->set_tv_sec(1);
+    $ts->set_tv_nsec(100_000_000);
+    
+    my $status = Sys::Time->nanosleep($ts, undef);
+    
+    unless ($status  == 0) {
+      return 0;
+    }
+    
+    unless (Time->time - $start >= 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+}

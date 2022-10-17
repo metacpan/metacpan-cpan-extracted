@@ -19,7 +19,7 @@ name: Perinci-CmdLine-POD
 provides:
   Perinci::CmdLine::POD:
     file: lib/Perinci/CmdLine/POD.pm
-    version: '0.032'
+    version: '0.033'
 requires:
   Data::Dmp: '0.241'
   Data::Sah::Terse: '0'
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-POD
   homepage: https://metacpan.org/release/Perinci-CmdLine-POD
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-POD.git
-version: '0.032'
+version: '0.033'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -330,7 +330,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.783'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

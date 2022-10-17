@@ -1,5 +1,12 @@
 Revision history for perl distribution Getopt-App
 
+0.09 2022-10-14T12:03:24
+ - Fix not setting $0
+ - Add $Getopt::App::SUBCOMMAND
+ - Improved documentation for subcommands
+ - Specified Perl version
+ - Updated basic repository files
+
 0.08 2022-06-16T07:28:47+0900
  - Add support for getopt_complete_reply()
 

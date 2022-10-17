@@ -1,0 +1,38 @@
+---
+abstract: 'represents a financial stock exchange object.'
+author:
+  - 'binary.com <cpan@binary.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Exception: '0'
+  Test::FailWarnings: '0.008'
+  Test::More: '0.98'
+  Test::Most: '0.34'
+  perl: '5.010000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Exchange
+requires:
+  Clone: '0'
+  File::ShareDir: '0'
+  Moose: '0'
+  Time::Duration::Concise::Localize: '0'
+  YAML::XS: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Finance-Exchange/issues
+  repository: git://github.com/binary-com/perl-Finance-Exchange.git
+version: '0.01'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

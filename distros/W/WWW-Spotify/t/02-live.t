@@ -1,6 +1,6 @@
 use strict;
 
-use Data::Dumper;
+use Data::Dumper qw( Dumper );
 
 use Test::More;
 use Test::RequiresInternet (
@@ -8,7 +8,7 @@ use Test::RequiresInternet (
     'api.spotify.com'      => 443,
     'www.spotify.com'      => 80,
 );
-use WWW::Spotify;
+use WWW::Spotify ();
 
 SKIP: {
     skip 'No SPOTIFY_CLIENT_ID', 5 unless $ENV{SPOTIFY_CLIENT_ID};

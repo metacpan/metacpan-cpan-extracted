@@ -5,10 +5,10 @@ use FindBin;
 
 my $plan;
 BEGIN {
-    my %count = (constructs => 89,
-                 removed    => 6,
+    my %count = (constructs => 90,
+                 removed    => 7,
                  aliases    => 75,
-                 old        => 3);
+                 old        => 4);
     $plan = 5 * $count{constructs} + 3 * $count{removed}
           + 5 * $count{aliases} + $count{old} + 1;
 }

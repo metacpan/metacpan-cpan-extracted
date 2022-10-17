@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="MapSource 6.16.3" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+
+  <metadata>
+    <link href="http://www.garmin.com">
+      <text>Garmin International</text>
+    </link>
+    <time>2021-06-11T14:27:22Z</time>
+    <bounds maxlat="45.404692031443119" maxlon="-75.140401963144541" minlat="45.373264001682401" minlon="-75.242366977035999"/>
+  </metadata>
+
+  <wpt lat="45.376138994470239" lon="-75.242366977035999">
+    <ele>73</ele>
+    <name>LP1</name>
+    <cmt>Larose P1 - Limoges</cmt>
+    <desc>Larose P1 - Limoges</desc>
+    <sym>Flag, Green</sym>
+    <extensions>
+      <gpxx:WaypointExtension xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3">
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="45.404692031443119" lon="-75.140401963144541">
+    <ele>-105</ele>
+    <name>LP4</name>
+    <cmt>Larose P4 - Bourget</cmt>
+    <desc>Larose P4 - Bourget</desc>
+    <sym>Flag, Green</sym>
+    <extensions>
+      <gpxx:WaypointExtension xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3">
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+    </extensions>
+  </wpt>
+
+  <wpt lat="45.373264001682401" lon="-75.23972500115633">
+    <ele>99</ele>
+    <name>LP7</name>
+    <cmt>Larose P7 - Limoges</cmt>
+    <desc>Larose P7 - Limoges</desc>
+    <sym>Flag, Green</sym>
+    <extensions>
+      <gpxx:WaypointExtension xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3">
+        <gpxx:DisplayMode>SymbolAndName</gpxx:DisplayMode>
+      </gpxx:WaypointExtension>
+    </extensions>
+  </wpt>
+
+</gpx>

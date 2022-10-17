@@ -1,7 +1,7 @@
 package Mojo::Run3;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp qw(croak);
+use Carp  qw(croak);
 use Errno qw(EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK EIO);
 use IO::Handle;
 use IO::Pty;
@@ -9,13 +9,13 @@ use Mojo::IOLoop::ReadWriteFork::SIGCHLD;
 use Mojo::IOLoop;
 use Mojo::Util qw(term_escape);
 use Mojo::Promise;
-use POSIX qw(sysconf _SC_OPEN_MAX);
+use POSIX        qw(sysconf _SC_OPEN_MAX);
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG        => $ENV{MOJO_RUN3_DEBUG} && 1;
 use constant MAX_OPEN_FDS => sysconf(_SC_OPEN_MAX);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our @SAFE_SIG
   = grep { !m!^(NUM\d+|__[A-Z0-9]+__|ALL|CATCHALL|DEFER|HOLD|IGNORE|MAX|PAUSE|RTMAX|RTMIN|SEGV|SETS)$! } keys %SIG;

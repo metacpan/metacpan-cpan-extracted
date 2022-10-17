@@ -1,6 +1,6 @@
 =head1 NAME
 
-StreamFinder::SoundCloud - Fetch actual raw streamable URLs from radio-station websites on SoundCloud.com
+StreamFinder::SoundCloud - Fetch actual raw streamable URLs from song-entry websites on SoundCloud.com
 
 =head1 AUTHOR
 
@@ -46,7 +46,7 @@ file.
 	
 	my $songID = $song->getID();
 
-	print "Station ID=$songID\n";
+	print "Song-ID ID=$songID\n";
 	
 	my $genre = $song->{'genre'};
 
@@ -70,7 +70,7 @@ file.
 
 		my ($image_ext, $icon_image) = $song->getIconData();
 
-		if ($icon_image && open IMGOUT, ">/tmp/${stationID}.$image_ext") {
+		if ($icon_image && open IMGOUT, ">/tmp/${SongID}.$image_ext") {
 
 			binmode IMGOUT;
 
@@ -105,7 +105,7 @@ cookies, trackers, web-bugs, and other crapware that can come with that method
 of play.  The author uses his own custom all-purpose media player called 
 "fauxdacious" (his custom hacked version of the open-source "audacious" 
 audio player).  "fauxdacious" can incorporate this module to decode and play 
-SoundCloud.com streams.  One or more streams can be returned for each station.  
+SoundCloud.com streams.  One or more streams can be returned for each song.  
 
 WARNING:  SoundCloud streams usually EXPIRE VERY QUICKLY, ie. A FEW MINUTES, 
 and become unplayable (403 ERRORS), requiring recording during first play, or 
@@ -113,10 +113,10 @@ repeatedly readding to your playlist!
 
 NOTE:  SoundCloud REQUIRES youtube-dl / yt-dlp (StreamFinder::Youtube) to 
 extract the actual stream and only returns a SINGLE valid stream URL for a 
-song based on a boilerplate URL based on the station's ID.  However, 
+song based on a boilerplate URL based on the author's + song's ID.  However, 
 youtube-dl does NOT return the metadata, which we're able to extract here.  
 This may or may NOT work for a given song (particularly non-free / 
-subscription-required stations, ymmv)!  NOTE:  If just an artist-ID is 
+subscription-required songs, ymmv)!  NOTE:  If just an artist-ID is 
 specified, then the first (latest?) song for that artist will be returned.  
 
 StreamFinder::SoundCloud is not capable of returning multisong playlists.  
@@ -134,8 +134,7 @@ such as yt-dlp.
 
 =over 4
 
-=item B<new>(I<ID>|I<ID/ID>|I<url> [, I<-notrim> [ => 0|1 ]]
-[, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
+=item B<new>(I<ID>|I<ID/ID>|I<url> [, I<-debug> [ => 0|1|2 ]])
 
 Accepts a soundcloud.com valid artist-ID/song-ID, artist-ID, or URL and creates 
 and returns a new song object, or I<undef> if the URL is not a valid SoundCloud 
@@ -143,11 +142,6 @@ song or artist, or no streams are found.  The URL can be the full URL,
 ie. https://soundcloud.com/B<artist-id>/B<song-id>, 
 https://soundcloud.com/B<artist-id>, 
 or just I<artist-id> or I<artist-id>/I<song-id>.
-
-The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
-then only secure ("https://") streams will be returned.
-
-DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
 Additional options:
 
@@ -187,11 +181,11 @@ the first valid stream found.
 
 =item $song->B<count>()
 
-Returns the number of streams found for the station.
+Returns the number of streams found for the song.
 
 =item $song->B<getTitle>(['desc'])
 
-Returns the station's title, or (long description).  
+Returns the song's title, or (long description).  
 
 =item $song->B<getIconURL>(['artist'])
 
@@ -212,7 +206,7 @@ art image, but most artists DO.
 =item $song->B<getImageData>(['artist'])
 
 Returns a two-element array consisting of the extension (ie. "png", 
-"gif", "jpeg", etc.) and the actual station's banner image (binary data).
+"gif", "jpeg", etc.) and the actual artist's banner image (binary data).
 
 =item $song->B<getType>()
 

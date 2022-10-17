@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
 use Getopt::App -capture;
 
 subtest import => sub {
@@ -10,7 +8,7 @@ subtest import => sub {
 
 subtest capture => sub {
   my $res = capture(\&demo, ["foo bar"]);
-  is_deeply $res, ["foo bar\n", "some warning\n", 42], 'foo bar';
+  is $res, ["foo bar\n", "some warning\n", 42], 'foo bar';
 };
 
 done_testing;

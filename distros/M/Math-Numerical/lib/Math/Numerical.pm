@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
@@ -14,6 +14,7 @@ use Carp;
 use Config;
 use English;
 use Exporter 'import';
+use Hash::Util 'lock_keys';
 use POSIX ();
 use Readonly;
 
@@ -96,7 +97,9 @@ starting interval.
 
 If the function is successful it returns the root found in scalar context or, in
 list context, a list with the root and the value of the function at that point
-(which may not be exactly C<0>).
+(which may not be exactly C<0>). Some options can control the precision of the
+returned root. Note that, for discontinuous or pathological functions, the
+returned value may not be a root at all.
 
 The current implementation of this function is based on the Brent method
 described in the
@@ -134,6 +137,10 @@ Defaults to I<1>.
 
 =item C<tolerance>
 
+The tolerance of the root found on the x-axis. That is, the returned value or,
+in list context, the first returned value will not be further away from the
+actual root than this value.
+
 Defaults to I<0.00001>.
 
 =back
@@ -145,11 +152,12 @@ forwarded to that function.
 =cut
 
 sub _create_find_root_brent_state ($x1, $x2, $f1, $f2, %params) {
-  my $s = {};
+  my $s = {ret => undef};
   $s->{tol} = $params{tolerance} // $_DEFAULT_TOLERANCE;
   @{$s}{qw(a b c fa fb fc)} = ($x1, $x2, $x2, $f1, $f2, $f2);
   @{$s}{qw(d e)} = (undef) x 2;
   @{$s}{qw(p q r s tol1 xm)} = (undef) x 6;  ## no critic (ProhibitMagicNumbers)
+  lock_keys(%{$s});
   return $s;
 }
 
@@ -320,13 +328,14 @@ Readonly my $DEFAULT_INWARD_FACTOR => 3;
 Readonly my $DEFAULT_OUTWARD_FACTOR => 1.6;
 
 sub _create_bracket_inward_state ($x1, $x2, $f1, %params) {
-  my $s = {};
+  my $s = {ret => undef};
   $s->{split} = $params{inward_split} // $DEFAULT_INWARD_SPLIT;
   croak 'inward_split must be at least 2' if $s->{split} < 2;
   $s->{factor} = $params{inward_factor} // $DEFAULT_INWARD_FACTOR;
   croak 'inward_factor must be at least 2' if $s->{factor} < 2;
   @{$s}{'x1', 'x2'} = ($x1, $x2);
   $s->{f1} = $f1;
+  lock_keys(%{$s});
   return $s;
 }
 
@@ -348,11 +357,12 @@ sub _do_bracket_inward ($f, $s) {
 }
 
 sub _create_bracket_outward_state ($f, $x1, $x2, $f1, %params) {
-  my $s = {};
+  my $s = {ret => undef};
   $s->{factor} = $params{outward_factor} // $DEFAULT_OUTWARD_FACTOR;
   croak 'outward_factor must be larger than 1' if $s->{factor} <= 1;
   @{$s}{'x1', 'x2'} = ($x1, $x2);
   @{$s}{'f1', 'f2'} = ($f1, $f->($x2));
+  lock_keys(%{$s});
   return $s;
 }
 

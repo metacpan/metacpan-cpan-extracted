@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/tabledata/tabledata
-# and generated automatically using Perinci::CmdLine::Gen version 0.500
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-28'; # DATE
+our $DATE = '2022-10-15'; # DATE
 our $DIST = 'App-tabledata'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/tabledata/tabledata",
@@ -39,13 +39,15 @@ tabledata - Show content of TableData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.002 of tabledata (from Perl distribution App-tabledata), released on 2021-09-28.
+This document describes version 0.004 of tabledata (from Perl distribution App-tabledata), released on 2022-10-15.
 
 =head1 SYNOPSIS
 
-Usage:
+B<tabledata> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
 
-% B<tabledata> [B<--action>=I<str>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--num>=I<posint>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<-H>|B<-L>|B<-R>|B<--actions>] [B<-n>=I<posint>] -- [I<module>]
+B<tabledata> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+
+B<tabledata> [L<--action|/"--actions">=I<str>|L<-H|/"--actions">|L<-L|/"--actions">|L<-R|/"--actions">|L<-S|/"--actions">|L<--actions|/"--actions">] [L<--config-path|/"--config-path=s, -c">=I<path>|L<-c|/"--config-path=s, -c">|L<--no-config|/"--no-config, -C">|L<-C|/"--no-config, -C">] [L<--config-profile|/"--config-profile=s, -P">=I<profile>|L<-P|/"--config-profile=s, -P">] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--(no)naked-res|/"--naked-res">] [L<--no-env|/"--no-env">] [L<--num|/"--num=s, -n">=L<posint|Sah::Schema::posint>|L<-n|/"--num=s, -n">=L<posint|Sah::Schema::posint>] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] -- [L<module|/"--module=s">]
 
 =head1 OPTIONS
 
@@ -63,7 +65,7 @@ Default value:
 
 Valid values:
 
- ["list_actions","list_installed","dump_as_aoaos","dump_as_aohos","dump_as_csv","list_columns","count_rows","pick_rows","head"]
+ ["list_actions","list_installed","dump_as_aoaos","dump_as_aohos","dump_as_csv","list_columns","count_rows","pick_rows","head","stat"]
 
 =item B<--actions>
 
@@ -73,7 +75,19 @@ See C<--action>.
 
 =item B<--detail>, B<-l>
 
-=item B<--module>=I<s>, B<-m>
+(No description)
+
+
+=item B<--module-json>=I<s>, B<-m>
+
+See C<--module>.
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--module>=I<s>
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -103,6 +117,12 @@ Pick random rows from an TableData module.
 
 See C<--action>.
 
+=item B<-S>
+
+Show information & statistics about the TableData module.
+
+See C<--action>.
+
 =back
 
 =head2 Configuration options
@@ -113,13 +133,37 @@ See C<--action>.
 
 Set path to configuration file.
 
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
 =item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
 =item B<--no-config>, B<-C>
 
 Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
 
 =back
 
@@ -130,6 +174,10 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
 
 =back
 
@@ -144,6 +192,17 @@ Shortcut for --log-level=debug.
 =item B<--log-level>=I<s>
 
 Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--quiet>
 
@@ -171,6 +230,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -185,24 +250,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -258,7 +332,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/tabledata.conf>, F<~/tabledata.conf>, or F</etc/tabledata.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/tabledata.conf>, F</home/u1/tabledata.conf>, or F</etc/tabledata.conf>.
 
 All found files will be read and merged.
 
@@ -297,17 +371,17 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 TABLEDATA_OPT => str
+=head2 TABLEDATA_OPT
 
-Specify additional command-line options.
+String. Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/tabledata.conf>
+=head2 /home/u1/.config/tabledata.conf
 
-F<~/tabledata.conf>
+=head2 /home/u1/tabledata.conf
 
-F</etc/tabledata.conf>
+=head2 /etc/tabledata.conf
 
 =head1 HOMEPAGE
 
@@ -334,13 +408,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

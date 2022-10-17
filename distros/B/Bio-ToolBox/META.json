@@ -16,41 +16,41 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "recommends" : {
-            "Bio::DB::USeq" : "0.23",
+            "Bio::DB::USeq" : "0.25",
             "Net::FTP" : "0",
             "Parallel::ForkManager" : "1.02",
-            "Set::IntSpan::Fast::XS" : "0",
+            "Set::IntSpan::Fast" : "1.15",
             "Set::IntervalTree" : "0.1"
          },
          "requires" : {
             "Bio::DB::Big" : "1",
             "Bio::DB::HTS" : "2.1",
-            "Bio::Root::Root" : "0",
+            "Bio::Root::Version" : "1.006924",
             "Config::Simple" : "4.58",
-            "File::Which" : "0",
+            "File::Which" : "1.17",
             "Getopt::Long" : "2.24",
-            "List::MoreUtils" : "0",
-            "List::Util" : "0",
-            "Module::Load" : "0",
+            "List::MoreUtils" : "0.4",
+            "List::Util" : "1.45",
+            "Module::Load" : "0.32",
             "Statistics::Descriptive" : "3",
             "Statistics::Lite" : "3.2"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "1.302"
          }
       }
    },
    "provides" : {
       "Bio::ToolBox" : {
          "file" : "lib/Bio/ToolBox.pm",
-         "version" : "1.69"
+         "version" : "1.691"
       },
       "Bio::ToolBox::Data" : {
          "file" : "lib/Bio/ToolBox/Data.pm",
@@ -58,7 +58,7 @@
       },
       "Bio::ToolBox::Data::Feature" : {
          "file" : "lib/Bio/ToolBox/Data/Feature.pm",
-         "version" : "1.69"
+         "version" : "1.691"
       },
       "Bio::ToolBox::Data::Iterator" : {
          "file" : "lib/Bio/ToolBox/Data.pm"
@@ -169,6 +169,6 @@
          "url" : "https://github.com/tjparnell/biotoolbox"
       }
    },
-   "version" : "1.69",
+   "version" : "1.691",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

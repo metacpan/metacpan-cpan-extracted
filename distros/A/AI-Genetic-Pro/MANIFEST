@@ -780,6 +780,8 @@ REPORTING BUGS
     A small script which yields the problem will probably be of help.
 
 THANKS
+    Mario Roy for suggestions about efficiency.
+
     Miles Gould for suggestions and some fixes (even in this documentation!
     :-).
 

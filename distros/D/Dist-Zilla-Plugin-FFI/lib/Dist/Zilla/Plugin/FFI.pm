@@ -1,8 +1,8 @@
-package Dist::Zilla::Plugin::FFI 1.05 {
+package Dist::Zilla::Plugin::FFI 1.07 {
 
   use strict;
   use warnings;
-  use 5.024;
+  use 5.020;
 
   # ABSTRACT: FFI related Dist::Zilla plugins
 
@@ -23,7 +23,7 @@ Dist::Zilla::Plugin::FFI - FFI related Dist::Zilla plugins
 
 =head1 VERSION
 
-version 1.05
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -50,11 +50,15 @@ Add L<FFI::CheckLib> checks into your C<Makefile.PL>.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Zaki Mughal (zmughal)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

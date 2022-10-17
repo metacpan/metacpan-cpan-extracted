@@ -42,79 +42,97 @@ The destructor.
 
   method st_dev : int ();
 
-Get C<st_dev>.
+Gets C<st_dev>.
 
 =head2 st_ino
 
   method st_ino : int ();
 
-Get C<st_ino>.
+Gets C<st_ino>.
 
 =head2 st_mode
 
   method st_mode : int ();
 
-Get C<st_mode>.
+Gets C<st_mode>.
 
 =head2 st_nlink
 
   method st_nlink : int ();
 
-Get C<st_nlink>.
+Gets C<st_nlink>.
 
 =head2 st_uid
 
   method st_uid : int ();
 
-Get C<st_uid>.
+Gets C<st_uid>.
 
 =head2 st_gid
 
   method st_gid : int ();
 
-Get C<st_gid>.
+Gets C<st_gid>.
 
 =head2 st_rdev
 
   method st_rdev : int ();
 
-Get C<st_rdev>.
+Gets C<st_rdev>.
 
 =head2 st_size
 
   method st_size : long ();
 
-Get C<st_size>.
+Gets C<st_size>.
 
 =head2 st_blksize
 
   method st_blksize : long ();
 
-Get C<st_blksize>.
+Gets C<st_blksize>.
 
 =head2 st_blocks
 
   method st_blocks : long ();
 
-Get C<st_blocks>.
+Gets C<st_blocks>.
 
 =head2 st_mtime
 
   method st_mtime : long ();
 
-Get C<st_mtime>.
+Gets C<st_mtime>.
 
 =head2 st_atime
 
   method st_atime : long ();
 
-Get C<st_atime>.
+Gets C<st_atime>.
 
 =head2 st_ctime
 
   method st_ctime : long ();
 
-Get C<st_ctime>.
+Gets C<st_ctime>.
+
+=head2 st_mtim_tv_nsec
+
+  method st_mtim_tv_nsec : long ();
+
+Gets C<st_mtim.tv_nsec>.
+
+=head2 st_atim_tv_nsec
+
+  method st_atim_tv_nsec : long ();
+
+Gets C<st_atim.tv_nsec>.
+
+=head2 st_ctim_tv_nsec
+
+  method st_ctim_tv_nsec : long ();
+
+Gets C<st_ctim.tv_nsec>.
 
 =head1 Copyright & License
 

@@ -3,7 +3,7 @@
 
 use v5.18;  # minimum for Object::Pad
 
-our $VERSION = 'v0.0.005';
+our $VERSION = 'v0.0.006';
 
 use Weather::GHCN::App::Extremes;
 
@@ -20,7 +20,7 @@ ghcn_extremes.pl - Report temperature extremes from ghcn_fetch.pl output
 
 =head1 VERSION
 
-version v0.0.005
+version v0.0.006
 
 =head1 SYNOPSIS
 

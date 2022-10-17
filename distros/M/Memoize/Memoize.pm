@@ -10,7 +10,7 @@
 use strict; use warnings;
 
 package Memoize;
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 use Carp;
 use Config;                     # Dammit.
@@ -55,8 +55,8 @@ sub memoize {
   my $info;
   my $wrapper = 
       $Config{usethreads} 
-        ? eval "sub $proto { &_memoizer(\$info, \@_); }"
-        : eval "sub $proto { unshift \@_, \$info; goto &_memoizer; }";
+        ? eval "no warnings 'recursion'; sub $proto { &_memoizer(\$info, \@_); }"
+        : eval "no warnings 'recursion'; sub $proto { unshift \@_, \$info; goto &_memoizer; }";
 
   my $normalizer = $options{NORMALIZER};
   if (defined $normalizer  && ! ref $normalizer) {
@@ -197,7 +197,7 @@ sub _memoizer {
     if (exists $cache->{$argstr}) {
       return @{$cache->{$argstr}};
     } else {
-      my @q = &{$info->{U}};
+      my @q = do { no warnings 'recursion'; &{$info->{U}} };
       $cache->{$argstr} = \@q;
       @q;
     }
@@ -208,7 +208,7 @@ sub _memoizer {
       return $info->{MERGED}
         ? $cache->{$argstr}[0] : $cache->{$argstr};
     } else {
-      my $val = &{$info->{U}};
+      my $val = do { no warnings 'recursion'; &{$info->{U}} };
       # Scalars are considered to be lists; store appropriately
       if ($info->{MERGED}) {
 	$cache->{$argstr} = [$val];

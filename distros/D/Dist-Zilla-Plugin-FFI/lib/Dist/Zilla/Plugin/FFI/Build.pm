@@ -1,6 +1,6 @@
-package Dist::Zilla::Plugin::FFI::Build 1.05 {
+package Dist::Zilla::Plugin::FFI::Build 1.07 {
 
-  use 5.024;
+  use 5.020;
   use Moose;
   use List::Util qw( first );
 
@@ -45,6 +45,16 @@ EOF2
   my $comment_begin = "# BEGIN code inserted by @{[ __PACKAGE__ ]}\n";
   my $comment_end   = "# END code inserted by @{[ __PACKAGE__ ]}\n";
 
+  has lang => (
+    is  => 'ro',
+    isa => 'Maybe[Str]',
+  );
+
+  has build => (
+    is => 'ro',
+    isa => 'Maybe[Str]',
+  );
+
   sub munge_files
   {
     my($self) = @_;
@@ -67,6 +77,27 @@ EOF2
       },
       'FFI::Build::MM' => '0.83',
     );
+
+    if($self->lang)
+    {
+      $self->zilla->register_prereqs( +{
+          phase => 'runtime',
+          type  => 'requires',
+        },
+        "FFI::Platypus::Lang::@{[ $self->lang ]}" => 0,
+      );
+    }
+
+    if($self->build)
+    {
+      $self->zilla->register_prereqs( +{
+          phase => 'configure',
+          type  => 'requires',
+        },
+        "FFI::Build::File::@{[ $self->build ]}" => 0,,
+      );
+    }
+
   }
 
   sub metadata
@@ -80,12 +111,25 @@ EOF2
   {
     my($self) = @_;
 
-    foreach my $file (@{ $self->zilla->files })
+    my $lang = $self->lang;
+
+    foreach my $file ((), @{ $self->zilla->files })
     {
-      next unless $file->name =~ m!^ffi/_build/!;
-      $self->log_debug([ 'pruning %s', $file->name ]);
-      $self->zilla->prune_file($file);
+      my $name = $file->name;
+      my $prune = 0;
+      $prune = 1 if $name =~ m!^ffi/_build/!;
+      $prune = 1 if defined $lang && $lang eq 'Rust' && $name =~ m!^(t/|)ffi/target/!;
+      if($prune)
+      {
+        $self->log([ 'pruning %s', $name ]);
+        $self->zilla->prune_file($file);
+      }
+      else
+      {
+        $self->log_debug([ 'NOT pruning %s', $name ]);
+      }
     }
+
   }
 
   __PACKAGE__->meta->make_immutable;
@@ -105,7 +149,7 @@ Dist::Zilla::Plugin::FFI::Build - Add FFI::Build to your Makefile.PL
 
 =head1 VERSION
 
-version 1.05
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -142,13 +186,51 @@ an FFI module using the bundle interface.
 This plugin adds the appropriate hooks for L<FFI::Build::MM> into your
 C<Makefile.PL>.  It does not work with L<Module::Build>.
 
+=head1 PROPERTIES
+
+=head2 lang
+
+If you are using a L<language plugin|FFI::Platypus::Lang> then you can
+specify it here.  It will add it as a prereq.  This should be the "short"
+name of the plugin, without the C<FFI::Platypus::Lang> prefix.  So for
+example for L<FFI::Platypus::Lang::Rust> you would just set this to
+C<Rust>.
+
+In addition setting these C<lang> to these languages will have the following
+additional affects:
+
+=over 4
+
+=item C<Rust>
+
+The paths C<ffi/target> and C<t/ffi/target> will be pruned when building
+the dist.  This is usually what you want.
+
+=back
+
+=head2 build
+
+If you need a language specific builder this is where you specify it.
+These are classes that live in the C<FFI::Build::File::> namespace.
+For example for Rust you would specify L<Cargo|FFI::Build::File::Cargo>
+and for Go you would specify L<GoMod|FFI::Build::File::GoMod>.
+
+Setting this property will add the appropriate module as a configure
+time prereq.
+
+You do not usually need this for the C programming language.
+
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Zaki Mughal (zmughal)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

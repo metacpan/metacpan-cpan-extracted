@@ -4,7 +4,7 @@ Plack::Middleware::XSRFBlock - Block XSRF Attacks with minimal changes to your a
 
 # VERSION
 
-version 0.0.16
+version 0.0.17
 
 # SYNOPSIS
 
@@ -178,11 +178,13 @@ returns true if the response should be filtered by this middleware
 
 ## generate\_token($self, $request, $env, $res)
 
-returns the token value to use for this response.  Gets the token value from:
+Returns the token value to use for this response.
 
-- the cookie value, if it's already set
-- from the generator, if the cookie is not set, or if we want a
-different token for each request
+If the cookie is already set, and we do not want a different token for
+each request, returns the cookie's value.
+
+Otherwise, generates a new value based on some random data. If
+`secret` is set, the value is also signed.
 
 ## cookie\_handler($self, $request, $env, $res, $token)
 
@@ -304,8 +306,10 @@ the same terms as the Perl 5 programming language system itself.
 
 # CONTRIBUTORS
 
+- Andrey Khozov <andrey@rydlab.ru>
 - Chisel <chisel.wright@net-a-porter.com>
 - Daniel Perrett <dp13@sanger.ac.uk>
+- Gianni Ceccarelli <dakkar@thenautilus.net>
 - Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>
 - Karen Etheridge <ether@cpan.org>
 - Matthew Ryall <matt.ryall@gmail.com>

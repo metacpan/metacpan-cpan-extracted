@@ -13,10 +13,10 @@ subtest 'bash' => sub {
   $run3->on(pty    => sub { $read{pty}    .= $_[1] });
   $run3->on(stderr => sub { $read{stderr} .= $_[1] });
   $run3->on(stdout => sub { $read{stdout} .= $_[1] });
-  $run3->write("ls -F -l / && exit\n");
+  $run3->write("echo cool beans && exit\n");
   $run3->run_p(sub { exec qw(bash -i) })->wait;
   ok $run3->pid > 0, 'pid';
-  like $read{stdout}, qr{\bdev/$}m, 'stdout';
+  like $read{stdout}, qr{cool beans\n$}m, 'stdout';
 };
 
 subtest 'close stdin' => sub {

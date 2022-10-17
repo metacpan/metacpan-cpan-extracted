@@ -48,11 +48,11 @@
    "provides" : {
       "Exporter::Shiny" : {
          "file" : "lib/Exporter/Shiny.pm",
-         "version" : "1.004003"
+         "version" : "1.004004"
       },
       "Exporter::Tiny" : {
          "file" : "lib/Exporter/Tiny.pm",
-         "version" : "1.004003"
+         "version" : "1.004004"
       }
    },
    "release_status" : "stable",
@@ -72,6 +72,6 @@
       "x_IRC" : "irc://irc.perl.org/#moops",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/project"
    },
-   "version" : "1.004003",
+   "version" : "1.004004",
    "x_serialization_backend" : "JSON::PP version 4.09"
 }

@@ -1,5 +1,8 @@
 Revision history for Date-Utility
 
+1.11      2022-10-17 14:32:15+00:00 UTC
+    - Replace Try::Tiny with Syntax::Keyword::Try
+
 1.10      2021-11-23 09:10:32+00:00 UTC
         Correct typo in _parse_datetime_parm method pod. Changed it to _parse_datetime_param.
         Add alias for earlier private methods _plus_years, _minus_years, _plus_months, _minus_months, _create_trimmed_date
@@ -13,21 +16,27 @@ Revision history for Date-Utility
 1.07      2017-03-17 01:06:18+00:00 UTC
           remove signature module
 
-1.06    13/12/2016
+1.06    2016-12-13 09:10:32+00:00 UTC
+
         Fix version to be in sync with pause
 
-1.05    08/12/2015
+1.05    2015-08-12 09:10:32+00:00 UTC
+
         Change quarter to quarter_of_year
 
-1.04    01/12/2015
+1.04    2015-01-12 09:10:32+00:00 UTC
+
         include quarter sub
 
-1.03    25/10/2015
+1.03    2015-10-25 09:10:32+00:00 UTC
+
         Added move_to_nth_dow method
 
-1.02	22/10/2015
+1.02	2015-10-22 09:10:32+00:00 UTC
+
 	Corrected a number of cases where tests failed
 	Bumping min perl version up to 5.10
 
-1.00    09/04/2015
+1.00    2015-09-04 09:10:32+00:00 UTC
+
         First version, released on an unsuspecting world.

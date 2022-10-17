@@ -123,9 +123,8 @@ easy to do.
    use Exporter::Shiny qw( frobnicate );
    
    sub _generate_frobnicate {
-      my $me     = shift;
-      my $caller = caller;
-      my ($name, $args) = @_;
+      my ( $me, $name, $args, $globals ) = @_;
+      my $caller = $globals->{into};
       
       return sub {
           ...;  # your code here
@@ -137,7 +136,8 @@ easy to do.
 The parameter C<< $me >> here is a string containing the package name
 which is being imported from; C<< $caller >> is the destination package;
 C<< $name >> is the name of the sub (in this case "frobnicate"); and
-C<< $args >> is a hashref of custom arguments for this function.
+C<< $args >> is a custom argument for this function. (By convention,
+C<< $args >> is normally a hashref.)
 
    # The hashref { foo => 42 } is $args above.
    #
@@ -165,7 +165,7 @@ The example in the synopsis could have been written as:
 What Exporter::Shiny does is mostly just to set C<< @EXPORT_OK >> for
 you and set up inheritance from the base class (Exporter::Tiny).
 
-Exporter::Shiny also sets C<< $INC{'MyUtils.pm} >> for you, which in
+Exporter::Shiny also sets C<< $INC{'MyUtils.pm'} >> for you, which in
 usually makes little difference, but is useful in some edge cases.
 
 =head1 SEE ALSO

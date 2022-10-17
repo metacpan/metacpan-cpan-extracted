@@ -1,5 +1,9 @@
 Release history for Memoize
 
+1.14  Sun 16 Oct 2022
+  * No recursion depth warning from the Memoize wrapper function.
+    This was a backcompat breakage in 1.09
+
 1.13  Tue 30 Aug 2022
   * No functional changes
   * Further test fixes

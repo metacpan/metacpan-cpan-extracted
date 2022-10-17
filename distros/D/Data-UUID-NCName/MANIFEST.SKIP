@@ -7,3 +7,4 @@
 ^MYMETA.yml$
 blib/.*
 ^pm_to_blib$
+^Data-UUID-NCName-.*

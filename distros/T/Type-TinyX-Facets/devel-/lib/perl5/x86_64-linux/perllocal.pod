@@ -1,0 +1,22 @@
+=head2 Sat Oct 15 15:49:34 2022: C<Module> L<Type::Tiny|Type::Tiny>
+
+=over 4
+
+=item *
+
+C<installed into: /home/dj/Work/Type-TinyX-Facets/devel/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.016000>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

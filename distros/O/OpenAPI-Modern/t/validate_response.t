@@ -644,18 +644,8 @@ YAML
     (my $result = $openapi->validate_response(
       response(200, [ 'Content-Type' => 'application/json', A => 1, B => 2 ], '{"c":1,"d":2}'),
       { path_template => '/foo', method => 'post' }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/response/body/c',
-          keywordLocation => jsonp(qw(/paths /foo post responses 200 content application/json schema properties c writeOnly)),
-          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 200 content application/json schema properties c writeOnly)))->to_string,
-          error => 'write-only value is present',
-        },
-      ],
-    },
-    'the response is valid, except for the presence of writeOnly values',
+    { valid => true },
+    'writeOnly values are still valid in a response',
   );
 };
 

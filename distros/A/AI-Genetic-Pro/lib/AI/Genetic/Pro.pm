@@ -2,7 +2,7 @@ package AI::Genetic::Pro;
 
 use vars qw($VERSION);
 
-$VERSION = 1.005;
+$VERSION = 1.006;
 #---------------
 
 use warnings;
@@ -1510,6 +1510,8 @@ is different.
 A small script which yields the problem will probably be of help. 
 
 =head1 THANKS
+
+Mario Roy for suggestions about efficiency.
 
 Miles Gould for suggestions and some fixes (even in this documentation! :-).
 

@@ -1,5 +1,10 @@
 Revision history for Geo-Gpx
 
+1.03 [2022-10-16]
+    new()'s 'input' key now accepts a filename as argument and a work_dir key can be specified to set the instance's working directory. Has no effect on the caller's current working directory.
+
+    Added methods set_filename(), set_wd() and save().
+
 1.02 [2022-10-10]
     Switched to Dist::Zilla to manage and release the module
 

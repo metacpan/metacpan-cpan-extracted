@@ -7,6 +7,7 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+Makefile.bak
 README.md
 dist.ini
 lib/Geo/TCX.pm

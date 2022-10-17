@@ -1,0 +1,25 @@
+---
+abstract: 'OPTIMADE reader'
+author:
+  - 'Andrius Merkys <merkys@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chemistry-File-OPTIMADE
+requires:
+  Chemistry::Mol: '0.35'
+  JSON: '0'
+  URL::Encode: '0'
+resources:
+  homepage: https://search.cpan.org/dist/Chemistry-File-OPTIMADE
+  repository: git://github.com/perlmol/chemistry-file-optimade.git
+version: '0.10'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -4,7 +4,7 @@ use warnings;
 package Alt::Lexical::Var::ButSupportModernPerl;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 1;
 
@@ -26,7 +26,7 @@ This is an alternative distribution of Lexical::Var, allowing use on Perl 5.21.7
 
 Hopefully an official release of Lexical::Var with support for modern Perl will happen, and I'll be able to remove this abomination from the CPAN. :-)
 
-Version 0.001 of Alt::Lexical::Var::ButSupportModernPerl includes version 0.009 of Lexical::Var.
+Version 0.002 of Alt::Lexical::Var::ButSupportModernPerl includes version 0.009 of Lexical::Var.
 
 =head1 SEE ALSO
 

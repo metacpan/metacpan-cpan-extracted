@@ -6,7 +6,7 @@ use FindBin;
 
 package App::GUI::Harmonograph;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.50';
+our $VERSION = '0.55';
 
 use base qw/Wx::App/;
 use App::GUI::Harmonograph::Frame;
@@ -164,50 +164,61 @@ These are divided into two tabs - roughly devided in form and decoration.
 
 =item 3
 
-The lower left side contains buttons which are a few commands, 
-but most are in the main menu.
+The lower left side contains buttons which are a few commands,
+mostly for mass productions of image files, but most commands are in 
+the main menu.
 
 =back
 
 Please mind the tool tips - short help texts which appear if the mouse
 stands still over a button or slider. Also helpful are messages in the
 status bar at the bottom: on left regarding images and right about settings.
-When holting the Alt key you can see which Alt + letter combinations
-trigger which button.
-
+When brwosing the main menu, a help texts about the highlighted item
+also appears in the status bar. The Menu can completely navigated with
+the keyboard. Just hold Alt and use the direction keys (up, down, left
+and right) or the highlighted letters. When holding the Alt key you can
+also see which Alt + letter combinations trigger which button.
 
 =head2 Pendulum
 
-The content of the first tab are the settings that define the properties
-of the 4 pendula (X, Y, Z and R), which determine the shape of the drawing.
-X moves the pen left - right (on the x axis), Y moves up - down,
-Z does a circling movement, R is a rotation ( around Z's axis).
-Each pendulum has the same three rows of controls. 
+The first tab contains the settings that define the properties
+of the pendula (X and Y), which move along the x and y axis in a lateral
+manner. On the second Tab are identical controls for the Pendula Z and R
+which together with X and Y determine the shape of the drawing.
+Z does a circling movement, R is a rotation (around Z's axis or origin).
 
-The first row contains from left to ritght an on/off switch.
-After that follows the pendulum's amplitude and damping.
-Amplitudes define the size of the drawing and damping just means:
-the drawings will spiral toward the center with time (line length).
+All controls from top to bottom and left to right are:
+an on/off switch which activates the whole pendulum with all settings.
+After that follows the pendulum's amplitude (here called radius).
+This determines the size in the direction the pendulum moves.
+Below that follows amplitude damping, which reduces the amplitude over time,
+so that the drawing will spiral toward the center. Since this is all
+computed, time refers to the line length. Damping can take place in a steady
+(minus '-') or in a slowing, procentual manner ('*').
+The third row is labeled acceleration, which refers to an additional
+dynamic of the amplitude damping.
 
-The second row lets you dial in the speed (frequency).
-For instance 2 means that the pendulum swings back and fourt twice 
-as fast. The second combo control adds decimals for more complex drawings.
-
-The third row starts with a selector that if maybe the most advanced
-setting. It defines an factor with which the previously set frequency
-gets multiplied. Default is one which does nothing at all. The next are
-math constant like Pi, Phi (gib and small) and eulars constant e. 
-After that are the names of the pendula. With that you can define relative
-frequencies. This is especially handy when brwosing the classic shapes 
+The forth row lets you dial in the speed (frequency). This is the most
+fundamental to the shape. For instance 2 means that the pendulum swings
+back and fourth twice as fast. To the right you can choose an additional
+factor the frequency gets multiplied with. This can be a constant like
+Pi or Phi or the frequency of another pendulum or just simply one.
+This is especially handy when browsing the classic shapes 
 with three pendula. For these the frequency of X and Y has to be the same -
-which willl be ensure when you set the frequency factor of Y to X 
+which will be ensured when you set the frequency factor of Y to X 
 (or vice versa) and keep the frequency of Y to one.
+The next combo control below adds decimals  to the frequency value 
+for more complex rotating drawings. Behind that are two check boxes to
+invert the final frequency value to 1/x or to flip the direction of
+the pendulum. Below that follows a frequency damping, which works
+the same as the second row only with slightly different optical results.
 
-After this are switches to invert (1/x) frequency or direction.
-The mext two switches change the starting position.
-2 = 180 degree offset, 4 = 90 degree (both can be combined). 
-The last slider adds an additional fine tuned offset between 0 and 90 degree.
-
+The last row starts with a slider to fine tune the starting point of the
+pendulum. It can be chosen between zero and a quater rotation. This can 
+have great effects on the shape. Because of the special desirability
+offsets of an half (180 degree) or quarter (90 degree) rotation can be
+activated by checkbox (to the right of the slider). The final offset is
+the sum of the checked.
 
 =head2 Line
 
@@ -297,12 +308,12 @@ L<App::GUI::Dynagraph>
 
 Herbert Breunung (lichtkind@cpan.org)
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT & LICENSE
 
 Copyright(c) 2022 by Herbert Breunung
 
 All rights reserved. 
-This program is free software and can be used and distributed
+This program is free software and can be used, changed and distributed
 under the GPL 3 licence.
 
 =cut

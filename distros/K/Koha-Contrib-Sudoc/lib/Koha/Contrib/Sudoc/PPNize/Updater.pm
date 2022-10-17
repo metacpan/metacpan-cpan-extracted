@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::PPNize::Updater;
 # ABSTRACT: Mise à jour des PPN dans notices existantes
-$Koha::Contrib::Sudoc::PPNize::Updater::VERSION = '2.38';
+$Koha::Contrib::Sudoc::PPNize::Updater::VERSION = '2.39';
 use Moose;
 use Log::Dispatch;
 use Log::Dispatch::Screen;
@@ -107,7 +107,7 @@ Koha::Contrib::Sudoc::PPNize::Updater - Mise à jour des PPN dans notices exista
 
 =head1 VERSION
 
-version 2.38
+version 2.39
 
 =head1 AUTHOR
 

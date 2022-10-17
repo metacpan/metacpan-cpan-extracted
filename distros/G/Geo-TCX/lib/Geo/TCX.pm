@@ -2,7 +2,7 @@ package Geo::TCX;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =encoding utf-8
 
@@ -17,6 +17,8 @@ Geo::TCX - Parse and edit and TCX activity and course files from GPS training de
 =head1 DESCRIPTION
 
 C<Geo::TCX> enables the parsing and editing of TCX activity and course files. TCX files follow an XML schema developed by Garmin and common to its GPS sports devices. Among other methods, the module enables laps from an activity to be saved as individual *.tcx files, split into separate laps based on a given point, merged, or converted to courses to plan a future activity.
+
+The module supports files containing a single Activity or Course. Database files consisting of multiple activities or courses are not supported.
 
 The documentation regarding TCX files in general uses the terms history and activity quite interchangeably, including in the user guides such as the one for the Garmin Edge device the author of this module is using. In C<Geo::TCX>, the terms Activity/Activities are used to refer to tracks recorded by a device (consistently with the XML mark-up) and Course/Courses refer to planned tracks meant to be followed during an activity (i.e. the term history is seldomly used).
 
@@ -532,7 +534,7 @@ sub save {
     }
 
     # Flatten the course tracks into a a single track
-    $str_course_tracks =~ s,</Track>\s*<Track>,,s;
+    $str_course_tracks =~ s,</Track>\s*<Track>,,gs if $str_course_tracks;
 
     if ($o->is_course) {  $str .= $str_course_laps . $str_course_tracks }
     else {                $str .= $str_activity_laps }
@@ -855,7 +857,7 @@ Patrick Joly
 
 =head1 VERSION
 
-1.00
+1.01
 
 =head1 LICENCE AND COPYRIGHT
 

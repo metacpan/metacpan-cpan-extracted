@@ -1,5 +1,13 @@
 Revision history for DBIx-Class-Helper-TableSample:
 
+v0.3.2    2022-10-13 22:08:00+01:00 Europe/London
+  [Documentation]
+  - Fixed typos.
+
+  - Added explicit note that some databases require a sampling method.
+
+  - Renamed CAVEATS to KNOWN ISSUES.
+
 v0.3.1    2022-07-26 15:17:48+01:00 Europe/London
   [Documentation]
   - Fixed typos.
@@ -16,7 +24,7 @@ v0.3.0    2022-07-26 10:08:26+01:00 Europe/London
 
   - Bump copyright year.
 
-  - Fix encoding of links in README
+  - Fixed encoding of links in README.
 
   [Toolchain]
   - Updated MANIFEST.SKIP.

@@ -4,9 +4,11 @@ use warnings;
 use Data::HTML::Button;
 use Data::HTML::Form;
 use Data::HTML::Form::Input;
+use English;
+use Error::Pure::Utils qw(clean);
 use Tags::HTML::Form;
 use Tags::Output::Structure;
-use Test::More 'tests' => 6;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 
 # Test.
@@ -156,3 +158,24 @@ is_deeply(
 	],
 	'Form HTML code (checkbox with submit button).',
 );
+
+# Test.
+$obj = Tags::HTML::Form->new;
+eval {
+	$obj->process;
+};
+is($EVAL_ERROR, "Parameter 'tags' isn't defined.\n",
+	"Parameter 'tags' isn't defined.");
+clean();
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::Form->new(
+	'tags' => $tags,
+);
+eval {
+	$obj->process('bad');
+};
+is($EVAL_ERROR, "Form item must be a 'Data::HTML::Form::Input' instance.\n",
+	"Form item must be a 'Data::HTML::Form::Input' instance.");
+clean();

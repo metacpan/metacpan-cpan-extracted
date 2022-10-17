@@ -1,5 +1,11 @@
 Revision history for OpenAPI-Modern
 
+0.034     2022-10-15 20:15:34Z
+          - removed validation of readOnly properties in request bodies and
+            writeOnly values in response bodies
+          - bundled OAS v3.1 schemas have been updated to the 2022-10-07
+            edition
+
 0.033     2022-09-18 23:10:04Z
           - bump dependency on JSON::Schema::Modern, to pick up changes to
             error output when an openapi document is invalid

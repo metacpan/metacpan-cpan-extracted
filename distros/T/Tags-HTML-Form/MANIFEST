@@ -1,7 +1,9 @@
 Changes
 CONCEPT
+examples/create_and_print_input.pl
 examples/default_form.pl
 Form.pm
+Form/Input.pm
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -19,10 +21,17 @@ MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
+t/Tags-HTML-Form-Input/01-use.t
+t/Tags-HTML-Form-Input/02-version.t
+t/Tags-HTML-Form-Input/03-new.t
+t/Tags-HTML-Form-Input/04-process.t
+t/Tags-HTML-Form-Input/05-process_css.t
 t/Tags-HTML-Form/01-use.t
 t/Tags-HTML-Form/02-version.t
 t/Tags-HTML-Form/03-new.t
 t/Tags-HTML-Form/04-process.t
 t/Tags-HTML-Form/05-process_css.t
+xt/Tags-HTML-Form-Input/01-pod_coverage.t
+xt/Tags-HTML-Form-Input/02-pod.t
 xt/Tags-HTML-Form/01-pod_coverage.t
 xt/Tags-HTML-Form/02-pod.t

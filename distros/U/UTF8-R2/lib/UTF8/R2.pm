@@ -5,13 +5,13 @@ package UTF8::R2;
 #
 # http://search.cpan.org/dist/UTF8-R2/
 #
-# Copyright (c) 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2020, 2021, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.23';
+$VERSION = '0.24';
 $VERSION = $VERSION;
 
 use strict;
@@ -1126,11 +1126,14 @@ The encodings supported by this software and their range of octets are as follow
 
 =head2 UTF-8 (RFC2279)
 
+  -------------------------------------
   1st       2nd       3rd       4th
+  -------------------------------------
   C2..DF    80..BF
   E0..EF    80..BF    80..BF
   F0..F4    80..BF    80..BF    80..BF
   00..7F
+  -------------------------------------
 
 L<https://www.ietf.org/rfc/rfc2279.txt>
 
@@ -1148,7 +1151,9 @@ L<https://www.ietf.org/rfc/rfc2279.txt>
 
 =head2 UTF-8 (RFC3629)
 
+  -------------------------------------
   1st       2nd       3rd       4th
+  -------------------------------------
   C2..DF    80..BF
   E0..E0    A0..BF    80..BF
   E1..EC    80..BF    80..BF
@@ -1158,6 +1163,7 @@ L<https://www.ietf.org/rfc/rfc2279.txt>
   F1..F3    80..BF    80..BF    80..BF
   F4..F4    80..8F    80..BF    80..BF
   00..7F
+  -------------------------------------
 
 L<https://en.wikipedia.org/wiki/UTF-8>
 
@@ -1175,7 +1181,9 @@ L<https://en.wikipedia.org/wiki/UTF-8>
 
 =head2 WTF-8
 
+  -------------------------------------
   1st       2nd       3rd       4th
+  -------------------------------------
   C2..DF    80..BF
   E0..E0    A0..BF    80..BF
   E1..EF    80..BF    80..BF
@@ -1183,6 +1191,7 @@ L<https://en.wikipedia.org/wiki/UTF-8>
   F1..F3    80..BF    80..BF    80..BF
   F4..F4    80..8F    80..BF    80..BF
   00..7F
+  -------------------------------------
 
 L<http://simonsapin.github.io/wtf-8/>
 
@@ -1200,7 +1209,9 @@ L<http://simonsapin.github.io/wtf-8/>
 
 =head2 UTF-8 (RFC3629.ja_JP)
 
+  -------------------------------------
   1st       2nd       3rd       4th
+  -------------------------------------
   E1..EC    80..BF    80..BF
   C2..DF    80..BF
   EE..EF    80..BF    80..BF
@@ -1210,6 +1221,7 @@ L<http://simonsapin.github.io/wtf-8/>
   F1..F3    80..BF    80..BF    80..BF
   F4..F4    80..8F    80..BF    80..BF
   00..7F
+  -------------------------------------
 
 L<https://en.wikipedia.org/wiki/UTF-8>
 
@@ -1229,7 +1241,9 @@ L<https://en.wikipedia.org/wiki/UTF-8>
 
 =head2 WTF-8.ja_JP
 
+  -------------------------------------
   1st       2nd       3rd       4th
+  -------------------------------------
   E1..EF    80..BF    80..BF
   C2..DF    80..BF
   E0..E0    A0..BF    80..BF
@@ -1237,6 +1251,7 @@ L<https://en.wikipedia.org/wiki/UTF-8>
   F1..F3    80..BF    80..BF    80..BF
   F4..F4    80..8F    80..BF    80..BF
   00..7F
+  -------------------------------------
 
 L<http://simonsapin.github.io/wtf-8/>
 
@@ -1472,10 +1487,17 @@ Beginning with perl 5.8, eq compares two byte-strings with simultaneous consider
 
 "I/O flow" L<https://metacpan.org/pod/perlunitut#I/O-flow-(the-actual-5-minute-tutorial)> shows us this
 
-  The typical input/output flow of a program is:
-  1. Receive and decode
-  2. Process
-  3. Encode and output
+The typical input/output flow of a program is:
+
+=over 2
+
+=item 1. Receive and decode
+
+=item 2. Process
+
+=item 3. Encode and output
+
+=back
 
 -- we have been taught so for a long time.
 
@@ -1499,12 +1521,8 @@ Spreading of EMOJI on MBCS encoding in today had remind us this idea is not bad.
 
 B<UTF8 flag is harmful.>
 
- /*
-  * You are not expected to understand this.
-  */
- 
-  Information processing model beginning with perl 5.8
- 
+Information processing model beginning with perl 5.8
+
     +----------------------+---------------------+
     |     Text strings     |                     |
     +----------+-----------|    Binary strings   |
@@ -1513,15 +1531,23 @@ B<UTF8 flag is harmful.>
     | UTF8     |            Not UTF8             |
     | Flagged  |            Flagged              |
     +--------------------------------------------+
-    http://perl-users.jp/articles/advent-calendar/2010/casual/4
 
-  Confusion of Perl string model is made from double meanings of "Binary string."
-  Meanings of "Binary string" are
-  1. Non-Text string
-  2. Digital octet string
+L<http://perl-users.jp/articles/advent-calendar/2010/casual/4>
 
-  Let's draw again using those term.
- 
+Since double meanings of "Binary string", Perl string model has some confusing.
+
+It's following two meanings:
+
+=over 2
+
+=item * Non-Text string
+
+=item * Digital octet string
+
+=back
+
+Let's write again using them.
+
     +----------------------+---------------------+
     |     Text strings     |                     |
     +----------+-----------|   Non-Text strings  |
@@ -1727,7 +1753,7 @@ Description of combinations
   encoding
   O-I-S     description
   ----------------------------------------------------------------------
-  S-S-S     Best choice when I/O is Sjis  encoding
+  S-S-S     Best choice when I/O is Sjis encoding
   S-S-U     
   S-U-S     
   S-U-U     Better choice when I/O is UTF-8 encoding, since not so slow

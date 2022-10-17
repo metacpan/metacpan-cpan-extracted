@@ -1486,18 +1486,8 @@ YAML
     [ 'Content-Type' => 'application/json' ], '{"c":1,"d":2}');
   cmp_deeply(
     (my $result = $openapi->validate_request($request))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/body/c',
-          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties c readOnly)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties c readOnly)))->to_string,
-          error => 'read-only value is present',
-        },
-      ],
-    },
-    'the request is valid, except for the presence of readOnly values',
+    { valid => true },
+    'readOnly values are still valid in a request',
   );
 
   cmp_deeply(

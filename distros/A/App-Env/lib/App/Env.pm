@@ -15,7 +15,7 @@ use Params::Validate ();
 # and one which has compile errors.
 use Module::Find qw( );
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use overload
   '%{}'    => '_envhash',
@@ -858,6 +858,8 @@ use Digest;
 use strict;
 use warnings;
 
+*_croak = \&App::Env::_croak;
+
 # new( pid => $pid, app => $app, opt => \%opt )
 # new( pid => $pid, env => \%env, module => $module, cacheid => $cacheid )
 sub new {
@@ -1036,7 +1038,7 @@ App::Env - manage application specific environments
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 

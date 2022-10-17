@@ -53,7 +53,7 @@ int32_t SPVM__Sys__IO__Utimbuf__set_actime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_utimbuf = stack[0].oval;
   
-  int32_t actime = stack[1].lval;
+  int64_t actime = stack[1].lval;
   
   struct utimbuf* st_buffer = env->get_pointer(env, stack, obj_utimbuf);
   
@@ -77,7 +77,7 @@ int32_t SPVM__Sys__IO__Utimbuf__set_modtime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_utimbuf = stack[0].oval;
   
-  int32_t modtime = stack[1].lval;
+  int64_t modtime = stack[1].lval;
   
   struct utimbuf* st_buffer = env->get_pointer(env, stack, obj_utimbuf);
   

@@ -429,8 +429,10 @@ sub new
 
 			if ($html =~ m#<div class="publisher-name(.+?)\/div\>#s) {
 				my $publisherHtml = $1;
-				$self->{'artist'} = $1  if ($publisherHtml =~ m#\>([^\<]+)\<\/a#s);
-				$self->{'albumartist'} = $1  if ($publisherHtml =~ m#\<a\s+href\=\"([^\"]+)#s);
+				if ($publisherHtml =~ m#\<a\s+href\=\"([^\"]+)\"\>([^\<]+)#s) {
+					$self->{'albumartist'} = $1;
+					$self->{'artist'} = $2;
+				}
 				if ($publisherHtml =~ m#\<span\s+title="Published on\s+([^\"]+)#s) {
 					$self->{'created'} = $1;
 					$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)$/);

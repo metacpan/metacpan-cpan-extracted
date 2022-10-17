@@ -9,14 +9,14 @@ SPVM::Sys::Process - Process System Call
 =head1 Usage
   
   use Sys::Process;
-  use Sys::Process::Constant as Proc;
+  use Sys::Process::Constant as Process;
   
   # exit
-  Sys::Process->exit(Proc->EXIT_FAILURE);
+  Sys::Process->exit(Process->EXIT_FAILURE);
   
   # waitpid
   my $wstatus;
-  my $changed_process_id = Sys::Process->waitpid($process_id, \$wstatus, Proc->WNOHANG);
+  my $changed_process_id = Sys::Process->waitpid($process_id, \$wstatus, Process->WNOHANG);
   
   # getpid
   my $process_id = Sys::Process->getpid;
@@ -26,7 +26,7 @@ SPVM::Sys::Process - Process System Call
 
 =head1 Description
 
-C<Sys::Process> is the class for the process manipulation.
+C<Sys::Process> provides the methods to call the system call for the process manipulation.
 
 =head1 Class Methods
 
@@ -168,14 +168,6 @@ The execv(), execvp(), and execvpe() functions provide an array of pointers to n
 
 See the detail of the L<https://linux.die.net/man/3/execv> function in the case of Linux.
 
-=head2 times
-
-  static method times : long ($buffer : Sys::Process::Tms);
-
-times() stores the current process times in the struct tms that buf points to. The struct tms is as defined in <sys/times.h>:
-
-See the detail of the L<times|https://linux.die.net/man/2/times> function in the case of Linux.
-
 =head2 Waiting Status Checking Methods
 
 =head3 WIFEXITED
@@ -209,4 +201,20 @@ See the detail of the L<times|https://linux.die.net/man/2/times> function in the
 =head3 WIFCONTINUED
 
   static method WIFCONTINUED : int ($wstatus : int);
+
+=head2 usleep
+
+  static method usleep : int ($usec : int);
+
+The usleep() function suspends execution of the calling thread for (at least) usec microseconds. The sleep may be lengthened slightly by any system activity or by the time spent processing the call or by the granularity of system timers.
+
+See the detail of the L<usleep|https://linux.die.net/man/3/usleep> function in the case of Linux.
+
+=head2 ualarm
+
+  static method ualarm : long ($usecs : long, $interval : long);
+
+The ualarm() function causes the signal SIGALRM to be sent to the invoking process after (not less than) usecs microseconds. The delay may be lengthened slightly by any system activity or by the time spent processing the call or by the granularity of system timers.
+
+See the detail of the L<https://linux.die.net/man/3/ualarm> function in the case of Linux.
 

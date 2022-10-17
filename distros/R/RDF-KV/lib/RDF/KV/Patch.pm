@@ -17,11 +17,11 @@ RDF::KV::Patch - Representation of RDF statements to be added or removed
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -330,6 +330,44 @@ patch.
 sub dont_remove_this {
     my $self = shift;
     my ($s, $p, $o, $g) = _validate(@_);
+}
+
+=head2 to_add
+
+In list context, returns an array of statements to add to the
+graph. In scalar context, returns an L<RDF::Trine::Iterator>.
+
+=cut
+
+sub to_add {
+    my $self = shift;
+    my @out;
+    _traverse($self->_pos, sub {
+                  my $stmt = defined $_[3] ?
+                      RDF::Trine::Statement::Quad->new(@_)
+                        : RDF::Trine::Statement->new(@_[0..2]);
+                  push @out, $stmt;
+              });
+    wantarray ? @out : RDF::Trine::Iterator->new(\@out, 'graph');
+}
+
+=head2 to_remove
+
+In list context, returns an array of statements to remove from the
+graph. In scalar context, returns an L<RDF::Trine::Iterator>.
+
+=cut
+
+sub to_remove {
+    my $self = shift;
+    my @out;
+    _traverse($self->_neg, sub {
+                  my $stmt = defined $_[3] ?
+                      RDF::Trine::Statement::Quad->new(@_)
+                        : RDF::Trine::Statement->new(@_[0..2]);
+                  push @out, $stmt;
+              });
+    wantarray ? @out : RDF::Trine::Iterator->new(\@out, 'bindings');
 }
 
 =head2 apply { $model | $remove, $add }

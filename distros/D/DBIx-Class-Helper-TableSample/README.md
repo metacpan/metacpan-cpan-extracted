@@ -4,7 +4,7 @@ DBIx::Class::Helper::TableSample - Add support for tablesample clauses
 
 # VERSION
 
-version v0.3.1
+version v0.3.2
 
 # SYNOPSIS
 
@@ -38,7 +38,7 @@ my $rs = $schema->resultset('Wobbles')->search_rs(
 This generates the SQL
 
 ```
-SELECT me.id, me.name FROM artist me TABLESAMPLE SYSTEM (0.5)
+SELECT me.id, me.name FROM table me TABLESAMPLE SYSTEM (0.5)
 ```
 
 # DESCRIPTION
@@ -105,7 +105,7 @@ reference:
     to generate
 
     ```
-    SELECT me.id FROM artist me TABLESAMPLE (5)
+    SELECT me.id FROM table me TABLESAMPLE (5)
     ```
 
     If your database supports or requires a sampling method, you can
@@ -127,10 +127,10 @@ reference:
     will generate
 
     ```
-    SELECT me.id FROM artist me TABLESAMPLE SYSTEM (5)
+    SELECT me.id FROM table me TABLESAMPLE SYSTEM (5)
     ```
 
-    See your database documentation for the allowable methods.
+    See your database documentation for the allowable methods.  Note that some databases require it.
 
     Prior to version 0.3.0, this was called `type`. It is supported for
     backwards compatability.
@@ -156,20 +156,20 @@ reference:
     to generate
 
     ```
-    SELECT me.id FROM artist me TABLESAMPLE (5) REPEATABLE (123456)
+    SELECT me.id FROM table me TABLESAMPLE (5) REPEATABLE (123456)
     ```
 
     Scalar references are dereferenced, and expressions or
     database-specific extensions should be specified has scalar
     references.
 
+# KNOWN ISSUES
+
 Resultsets with joins or inner queries are not supported.
 
 Delete and update queries are not supported.
 
-# CAVEATS
-
-This module is experimental.
+Oracle has a non-standard table sampling syntax, so is not yet supported.
 
 Not all databases support table sampling, and those that do may have
 different restrictions.  You should consult your database

@@ -1,0 +1,66 @@
+=head1 NAME
+
+Test::Spy::Method - mocked method metadata
+
+=head1 SYNOPSIS
+
+	my $method = $spy->add_method('method_name');
+
+	$method->should_call(sub {
+		print 'called!';
+	});
+
+	ok !$method->was_called;
+
+=head1 DESCRIPTION
+
+This class objects let you set return values and examine call data of a specific method.
+
+=head2 Method call result methods
+
+The final method will return on throw whatever was last specified. Calling
+C<should_return> will remove the exception throwing, if it was set up with
+C<should_throw>, and vice versa.
+
+=head3 should_return
+
+	$method->should_return(@returns);
+
+Sets up the return value of the method as specified in C<@returns>.
+
+If it consists of just one element, method will return it as scalar. Otherwise,
+it will return the entire C<@returns> array as a list.
+
+Returns C<$self>, for chaining.
+
+=head3 should_call
+
+	$method->should_call(sub { ... });
+
+Sets up the method to call the subroutine reference argument.
+
+This subroutine will get all the regular method parameters, including C<$self>.
+The subroutine should return whatever the actual method should return.
+
+Returns C<$self>, for chaining.
+
+=head3 should_throw
+
+	$method->should_throw('text exception');
+	$method->should_throw($exception_object);
+
+Instead of returning a specific value or calling a subroutine, the method can
+be set to always throw a given exception (a scalar value).
+
+Returns C<$self>, for chaining.
+
+=head2 Call history methods
+
+These methods are the same as documented in L<Test::Spy/Call history methods>,
+but when called on this class objects, you don't need to setup
+L<Test::Spy/context>.
+
+=head1 SEE ALSO
+
+L<Test::Spy>
+

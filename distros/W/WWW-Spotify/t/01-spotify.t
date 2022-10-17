@@ -1,6 +1,6 @@
 use strict;
 
-use Data::Dumper;
+use Data::Dumper  qw( Dumper );
 use JSON::MaybeXS qw( decode_json );
 use Test::More;
 use Test::RequiresInternet (
@@ -8,7 +8,7 @@ use Test::RequiresInternet (
     'api.spotify.com'      => 443,
     'www.spotify.com'      => 80,
 );
-use Try::Tiny qw( catch try );
+use Try::Tiny    qw( catch try );
 use WWW::Spotify ();
 
 my $obj = WWW::Spotify->new();
@@ -54,7 +54,7 @@ ok( is_valid_json($result), 'search' );
 
 $result = $obj->album('0sNOF9WDwhWunNAHPD3Baj');
 
-ok( is_valid_json( $result, 'album' ), "album" );
+ok( is_valid_json( $result, 'album' ), 'album' );
 
 show_and_pause($result);
 
@@ -63,7 +63,7 @@ show_and_pause($result);
 $result = $obj->albums(
     '41MnTivkwTO3UUJ8DrqEJJ,6JWc4iAiJ9FjyK0B59ABb4,6UXCm6bOO4gFlDQZV5yL37');
 
-ok( is_valid_json( $result, 'albums' ), "albums (multiple ids)" );
+ok( is_valid_json( $result, 'albums' ), 'albums (multiple ids)' );
 
 show_and_pause($result);
 

@@ -4,7 +4,7 @@ use Wx;
 
 package App::GUI::Harmonograph::Frame::Part::ColorFlow;
 use base qw/Wx::Panel/;
-use App::GUI::Harmonograph::SliderCombo;
+use App::GUI::Harmonograph::Widget::SliderCombo;
 
 sub new {
     my ( $class, $parent, $frame ) = @_;
@@ -17,8 +17,8 @@ sub new {
     $self->{'dynlabel'} = Wx::StaticText->new( $self, -1, 'Dynamics');
     $self->{'dynamic'}  = Wx::ComboBox->new( $self, -1, 1, [-1,-1],[65, -1], [1,2,3,4,5,6,7,8, 9, 10], 1);
     $self->{'dynamic'}->SetToolTip('dynamics of linear and alternating color change (1 = equal distanced colors change,\n larger = starting with slow color change becoming faster - or vice versa when dir activated)');
-    $self->{'stepsize'}  = App::GUI::Harmonograph::SliderCombo->new( $self,  94, 'Step Size','after how many circles does color change', 1, 100, 1);
-    $self->{'period'}    = App::GUI::Harmonograph::SliderCombo->new( $self, 100, 'Period','amount of steps from start to end color', 2, 50, 10);
+    $self->{'stepsize'}  = App::GUI::Harmonograph::Widget::SliderCombo->new( $self,  94, 'Step Size','after how many circles does color change', 1, 100, 1);
+    $self->{'period'}    = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, 'Period','amount of steps from start to end color', 2, 50, 10);
     $self->{'direction'} = Wx::CheckBox->new( $self, -1, ' Dir.');
     $self->{'direction'}->SetToolTip('if on color change starts fast getting slower, if odd starting slow ...');
 

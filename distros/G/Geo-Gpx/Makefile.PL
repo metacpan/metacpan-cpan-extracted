@@ -7,7 +7,7 @@ use 5.008;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Create and parse GPX files.",
+  "ABSTRACT" => "Create and parse GPX files",
   "AUTHOR" => "Patrick Joly <patjol\@cpan.org>",
   "BUILD_REQUIRES" => {
     "Module::Build" => "0.28"
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "1.02",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }

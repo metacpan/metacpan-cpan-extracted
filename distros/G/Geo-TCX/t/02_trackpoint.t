@@ -2,19 +2,22 @@
 use strict;
 use warnings;
 
-use Test::More tests => 31;
+use Test::More tests => 35;
 use Geo::TCX::Trackpoint;
 
 # Section A - new() constructor
 
-my $basic_str = '<Position><LatitudeDegrees>45.304996</LatitudeDegrees><LongitudeDegrees>-72.637243</LongitudeDegrees></Position>';
+my $basic_str = '<Position><LatitudeDegrees>45.30296</LatitudeDegrees><LongitudeDegrees>-72.64125</LongitudeDegrees></Position>';
 my $full_str  = '<Trackpoint><Time>2014-08-11T10:25:26Z</Time><Position><LatitudeDegrees>45.304996</LatitudeDegrees><LongitudeDegrees>-72.637243</LongitudeDegrees></Position><AltitudeMeters>211.082</AltitudeMeters><DistanceMeters>13.030</DistanceMeters><HeartRateBpm><Value>80</Value></HeartRateBpm></Trackpoint>';
+my $full_str2 = '<Trackpoint><Time>2014-08-11T10:25:51Z</Time><Position><LatitudeDegrees>45.304450</LatitudeDegrees><LongitudeDegrees>-72.637330</LongitudeDegrees></Position><AltitudeMeters>209.562</AltitudeMeters><DistanceMeters>97.855</DistanceMeters><HeartRateBpm><Value>84</Value></HeartRateBpm></Trackpoint>';
 
 my $tp_basic = Geo::TCX::Trackpoint->new( $basic_str );
 isa_ok ($tp_basic, 'Geo::TCX::Trackpoint');
 isnt ($tp_basic, 'Geo::TCX::Trackpoint::Full');
 
-my $tp = Geo::TCX::Trackpoint::Full->new( $full_str );
+my ($tp, $tp2);
+$tp  = Geo::TCX::Trackpoint::Full->new( $full_str );
+$tp2 = Geo::TCX::Trackpoint::Full->new( $full_str2 );
 isa_ok ($tp, 'Geo::TCX::Trackpoint');
 isa_ok ($tp, 'Geo::TCX::Trackpoint::Full');
 
@@ -25,10 +28,12 @@ is($tp->LatitudeDegrees,  '45.304996',  "    LatitudeDegrees, AUTOLOAD method");
 is($tp->LongitudeDegrees, '-72.637243', "    LongitudeDegrees, AUTOLOAD method");
 is($tp->AltitudeMeters, '211.082',      "    AltitudeMeters, AUTOLOAD method");
 is($tp->DistanceMeters, '13.030',       "    DistanceMeters, AUTOLOAD method");
-is($tp->Time, '2014-08-11T10:25:26Z',   "    Time, AUTOLOAD method");
 is($tp->HeartRateBpm, 80,               "    HeartRateBpm, AUTOLOAD method");
 is($tp->Cadence, undef,                 "    Cadence, AUTOLOAD method");
 is($tp->SensorState, undef,             "    SensorState, AUTOLOAD method");
+
+# Time method is now defined (no longer AUTOLOAD, to prevent setting it)
+is($tp->Time, '2014-08-11T10:25:26Z',   "    Time, AUTOLOAD method");
 
 #
 # to_gpx()
@@ -61,33 +66,35 @@ my $clone = $tp->clone;
 isa_ok ($clone, 'Geo::TCX::Trackpoint');
 
 #
-# distance_to(), distance_meters(), localtime, time_add, time_epoch, xml_string()
+# distance_to()
+
+my $dist1  = $tp->distance_to( $tp_basic );
+my $dist2  = $tp_basic->distance_to( $tp );
+my $dist3  = $tp->distance_to( $tp2 );
+is ( $dist1,  386.597957,   "   distance_to(): comparing distance between basic trackpoint and full trackpoint");
+is ( $dist2,  386.60708,    "   distance_to(): comparing distance between full trackpoint and basic trackpoint");
+# interesting that distance is not identical. Close enough to one decimal point. Really, good enough. Could round the return value of distance_to() too.
+is ( $dist3,  61.092501,    "   distance_to(): comparing distance between full trackpoints");
 
 #
-# time_add()
-my ($tpc, $dt, $dtc);
-$tpc = $tp->clone;
-$dtc = $tpc->time_add( seconds => 45 );
-is ( ($tpc->time_epoch - $tp->time_epoch), '45',    "   time_add(): checking that internal date fields are updated");
-isa_ok ($dtc, 'DateTime');
+# time_add(), time_subtract()
 
-# strange that the stringification of the DateTime objects return by time() and time_add() is different. Look into that, although it is not an issue, I have no use for that string (but I mainly use to view the date in human form sometimes)
-$dt = $tp->time;
-is ($dtc, 'Mon Aug 11 06:26:11 2014',               "   time_add()");
-# this one fails
-# is ($dt,  'Mon Aug 11 06:25:26 2014',               "   time_add()");
-# print( $dt) 
-# would return '2014-08-11T10:25:26'
-# ahhh seems to be a timezone thing, look into it, see the four hour difference, it seems to be localtime
+my $c = $tp->clone;
+$c->time_add( seconds => 45 );
+is ( ($c->time_epoch - $tp->time_epoch), '45',    "   time_add(): checking that internal date fields are updated");
+$c->time_subtract( seconds => 45 );
+is ( ($c->time_epoch - $tp->time_epoch), 0,       "   time_sutract(): checking that time_add() and time_subtract() by the same amount, provide the same time");
 
-$dtc = $tpc->time_subtract( seconds => 45 );
-is ( ($tpc->time_epoch - $tp->time_epoch), 0,    "   time_sutract(): checking that time_add() and time_subtract() by the same amount, provide the same time");
+is ($tp->Time, '2014-08-11T10:25:26Z',             "   test Time before time_subtract()");
 
-#
-# time_subtract()
+TODO: {
+    local $TODO = "time_local() will fail across timezone given that, by design, it always returns local time from the caller's perspecitive. Design different tests or ignore";
 
-$dt = $tp->time_subtract( days => 2, hours => 3, , minutes => 59, seconds => 20 );
-is ($dt, 'Sat Aug  9 02:26:06 2014',    "   test time_subtract()");
+    is ($tp->time_local, 'Mon Aug 11 06:25:26 2014',    "   test time_local before time_subtract()");
+    $tp->time_subtract( days => 2, hours => 3, , minutes => 59, seconds => 20 );
+    is ($tp->time_local, 'Sat Aug  9 02:26:06 2014',    "   test time_local after time_subtract()")
+}
+is ($tp->Time, '2014-08-09T06:26:06Z',             "   test Time after time_subtract()");
 
 #
 # time_duration()

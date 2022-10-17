@@ -2,7 +2,7 @@ package MooseX::Role::Registry;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # ABSTRACT: MooseX::Role::Registry watches a file which describes a hashref of objects in yml format
 
@@ -51,7 +51,7 @@ the result.
 use Moose::Role;
 use namespace::autoclean;
 use Carp;
-use Try::Tiny;
+use Syntax::Keyword::Try;
 use YAML::XS qw(LoadFile);
 
 =head1 REQUIRED SUBCLASS METHODS
@@ -108,7 +108,7 @@ Returns a list of all of the (lookup) keys of objects currently registered in $s
 
 sub keys    ## no critic (ProhibitBuiltinHomonyms)
 {
-    my $self = shift;
+    my $self   = shift;
     my @result = sort { $a cmp $b } (keys %{$self->_registry});
     return @result;
 }
@@ -159,10 +159,9 @@ sub _build__registry {
         if (not $reg_defn_type or ($reg_defn_type eq 'HASH')) {
             try {
                 $registry->{$key} = $self->build_registry_object($key, $reg_defn);
+            } catch ($e) {
+                Carp::croak("Unable to convert entry $key in " . $self->config_file . " into a registry entry : $e");
             }
-            catch {
-                Carp::croak("Unable to convert entry $key in " . $self->config_file . " into a registry entry : $_");
-            };
         } else {
             Carp::croak("Invalid entry $key in " . $self->config_file . ", not a hash");
         }
@@ -193,7 +192,7 @@ __END__
 
 =item L<namespace::autoclean>
 
-=item L<Try::Tiny>
+=item L<Syntax::Keyword::Try>
 
 =item L<YAML::XS>
 

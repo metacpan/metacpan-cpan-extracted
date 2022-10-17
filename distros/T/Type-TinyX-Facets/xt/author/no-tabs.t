@@ -12,8 +12,8 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/facets.t',
-    't/lib/My/Types.pm',
-    't/lib/My/Types.pm.orig'
+    't/lib/My/DeprecatedTypes.pm',
+    't/lib/My/Types.pm'
 );
 
 notabs_ok($_) foreach @files;

@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,15 +22,16 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.024"
+            "perl" : "5.020"
          }
       },
       "develop" : {
          "recommends" : {
+            "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
             "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
-            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.62",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.69",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidGrep" : "0",
@@ -113,7 +114,7 @@
             "List::Util" : "0",
             "Moose" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.024"
+            "perl" : "5.020"
          }
       },
       "test" : {
@@ -123,7 +124,7 @@
             "Path::Tiny" : "0",
             "Test2::V0" : "0.000121",
             "Test::DZil" : "0",
-            "perl" : "5.024"
+            "perl" : "5.020"
          }
       }
    },
@@ -140,9 +141,13 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.05",
-   "x_generated_by_perl" : "v5.35.9",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "1.07",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Zaki Mughal (zmughal)"
+   ],
+   "x_generated_by_perl" : "v5.37.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

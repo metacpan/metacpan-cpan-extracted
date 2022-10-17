@@ -1,5 +1,10 @@
 Revision history for Perl module libary Windows-GHCN-Fetch
 
+v0.0.006       2022-10-16
+  - fix for ticket 144693 "Can't open ghcn_fetch.pl"
+  - fixes for test failures in CacheURI.t arising on systems without internet access
+
+
 v0.0.005       2022-10-09
   - always allow -gui, even when Tk/Tk::Getopt is not installed, but die if it's requested
   - always allow -outclip, even when Win32::Clipboard is not installed, but die if it's requested

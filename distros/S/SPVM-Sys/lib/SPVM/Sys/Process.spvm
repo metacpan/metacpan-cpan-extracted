@@ -1,7 +1,6 @@
 class Sys::Process {
   
   use Sys::Process::Constant;
-  use Sys::Process::Tms;
   
   native static method alarm : int ($seconds : int);
   native static method fork : int ();
@@ -19,7 +18,6 @@ class Sys::Process {
   native static method getpid : int ();
   native static method getppid : int ();
   native static method execv : int ($path : string, $args : string[]);
-  native static method times : long ($buffer : Sys::Process::Tms);
 
   native static method WIFEXITED : int ($wstatus : int);
   native static method WEXITSTATUS : int ($wstatus : int);
@@ -29,4 +27,8 @@ class Sys::Process {
   native static method WIFSTOPPED : int ($wstatus : int);
   native static method WSTOPSIG : int ($wstatus : int);
   native static method WIFCONTINUED : int ($wstatus : int);
+
+  native static method usleep : int ($usec : long);
+  
+  native static method ualarm : long ($usecs : long, $interval : long);
 }

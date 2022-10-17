@@ -2,8 +2,10 @@ use strict;
 use warnings;
 
 use CSS::Struct::Output::Structure;
+use English;
+use Error::Pure::Utils qw(clean);
 use Tags::HTML::Form;
-use Test::More 'tests' => 2;
+use Test::More 'tests' => 3;
 use Test::NoWarnings;
 
 # Test.
@@ -51,5 +53,14 @@ is_deeply(
 		['d', 'color', 'red'],
 		['e'],
 	],
-	'Pager CSS code (stub).',
+	'Form CSS code (stub).',
 );
+
+# Test.
+$obj = Tags::HTML::Form->new;
+eval {
+	$obj->process_css;
+};
+is($EVAL_ERROR, "Parameter 'css' isn't defined.\n",
+	"Parameter 'css' isn't defined.");
+clean();

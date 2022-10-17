@@ -13,9 +13,9 @@ use String::ShellQuote;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-03'; # DATE
+our $DATE = '2022-07-29'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.033'; # VERSION
 
 our @EXPORT_OK = qw(gen_pod_for_pericmd_script);
 
@@ -1017,6 +1017,20 @@ _
         push @pod, "=head1 ENVIRONMENT\n\n", @sectpod;
     }
 
+
+  X_DOC_FAQ: {
+        my @sectpod;
+
+        my $meta = $metas{ defined $gen_sc ? $gen_sc : '' };
+        last unless $meta->{'x.doc.faq'};
+
+        require Markdown::To::POD;
+        push @sectpod, Markdown::To::POD::markdown_to_pod($meta->{'x.doc.faq'}), "\n\n";
+
+        push @{ $resmeta->{'func.sections'} }, {name=>'FAQ', content=>join("", @sectpod)};
+        push @pod, "=head1 FAQ\n\n", @sectpod;
+    }
+
     # section: SEE ALSO
     {
         my @sectpod;
@@ -1070,7 +1084,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.032 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-07-03.
+This document describes version 0.033 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-07-29.
 
 =head1 SYNOPSIS
 

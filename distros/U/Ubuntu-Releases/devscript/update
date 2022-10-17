@@ -1,2 +1,9 @@
 #!/usr/bin/env perl
-print "Just dzli build\n";
+print <<'_';
+1. Update gudangdata-distrowatch by running its update script.
+
+2. Update gudangdata/table/ubuntu_release_animal/data.csv by hand because
+   distrowatch data does not include animal name.
+
+3. dzil build
+_

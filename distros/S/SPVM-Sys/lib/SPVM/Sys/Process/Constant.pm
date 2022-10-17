@@ -4,7 +4,7 @@ package SPVM::Sys::Process::Constant;
 
 =head1 Name
 
-SPVM::Sys::Process::Constant - Sys::Process::Constant is a SPVM module
+SPVM::Sys::Process::Constant - Constant Values for Process
 
 =head1 Usage
 
@@ -14,7 +14,7 @@ SPVM::Sys::Process::Constant - Sys::Process::Constant is a SPVM module
   
 =head1 Description
 
-C<Sys::Process::Constant> is a L<SPVM> module.
+C<Sys::Process::Constant> provides the methods for the constant values for the process manipulation.
 
 =head1 Class Methods
 

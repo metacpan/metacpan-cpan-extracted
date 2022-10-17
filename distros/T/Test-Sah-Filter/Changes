@@ -1,3 +1,11 @@
+0.005   2022-10-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Observe filter module's meta properties: before_test_examples,
+          after_test_examples.
+
+        - Observe example spec's properties: before_test & after_test.
+
+
 0.004   2022-07-24  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

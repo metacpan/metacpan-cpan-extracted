@@ -14,12 +14,12 @@ my %module_build_args = (
     "ExtUtils::MakeMaker" => 0,
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "Create and parse GPX files.",
+  "dist_abstract" => "Create and parse GPX files",
   "dist_author" => [
     "Patrick Joly <patjol\@cpan.org>"
   ],
   "dist_name" => "Geo-Gpx",
-  "dist_version" => "1.02",
+  "dist_version" => "1.03",
   "license" => "perl",
   "module_name" => "Geo::Gpx",
   "recursive_test_files" => 1,

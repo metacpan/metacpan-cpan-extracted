@@ -15,16 +15,14 @@ my $file = 'data/f001.fits';
 
 tie my $status, 'Astro::FITS::CFITSIO::CheckStatus';
 
-my $fptr = Astro::FITS::CFITSIO::open_file($file, READONLY,
-                            $status = "could not open FITS file '$file'");
+my $fptr = Astro::FITS::CFITSIO::open_file( $file, READONLY,
+    $status = "could not open FITS file '$file'" );
 
 my %data;
-eval {
-     %data = rdfits( $fptr, '-rt_x' );
-};
+eval { %data = rdfits( $fptr, '-rt_x' ); };
 
-ok( ! $@, "accepted subtractive field" );
+ok( !$@, "accepted subtractive field" );
 
-ok( ! exists $data{rt_x}, "subtracted field" );
+ok( !exists $data{rt_x}, "subtracted field" );
 
 done_testing;

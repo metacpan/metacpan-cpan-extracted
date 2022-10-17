@@ -12,9 +12,6 @@
 #include <XSUB.h>
 #include <embed.h>
 
-
-#define MIN_PERL_VERSION_FOR_COW  20
-
 #if defined(SV_COW_REFCNT_MAX)
 #   define B_CAN_COW 1
 #else
@@ -25,6 +22,8 @@
 #define myCowREFCNT(sv)   ((SvLEN(sv)>0) ? CowREFCNT(sv) : 0)
 
 MODULE = B__COW       PACKAGE = B::COW
+
+PROTOTYPES: DISABLE
 
 SV*
 can_cow()

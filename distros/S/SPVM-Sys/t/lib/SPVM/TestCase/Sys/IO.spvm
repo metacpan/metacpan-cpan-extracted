@@ -3,6 +3,7 @@ class TestCase::Sys::IO {
   use Sys::IO::Constant as IO;
   use Sys::FileTest;
   use Fn;
+  use Sys::IO::Stat;
 
   static method open : int ($test_dir : string, $tmp_dir : string) {
     
@@ -1274,5 +1275,27 @@ class TestCase::Sys::IO {
     
     return 1;
   }
-
+  
+  static method sys_io_stat : int ($test_dir : string) {
+    my $stat = Sys::IO::Stat->new;
+    
+    $stat->st_dev;
+    $stat->st_ino;
+    $stat->st_mode;
+    $stat->st_nlink;
+    $stat->st_uid;
+    $stat->st_gid;
+    $stat->st_rdev;
+    $stat->st_size;
+    $stat->st_blksize;
+    $stat->st_blocks;
+    $stat->st_mtime;
+    $stat->st_atime;
+    $stat->st_ctime;
+    $stat->st_mtim_tv_nsec;
+    $stat->st_atim_tv_nsec;
+    $stat->st_ctim_tv_nsec;
+    
+    return 1;
+  }
 }

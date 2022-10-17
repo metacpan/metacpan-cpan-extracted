@@ -1,4 +1,7 @@
 
+9.28  2022-09-12
+  - Fixed a bug where async/await use could result in unhandled promise warnings. (batman)
+
 9.27  2022-09-10
   - Added support for static assets.
   - Added support for JSON and plain text exceptions.

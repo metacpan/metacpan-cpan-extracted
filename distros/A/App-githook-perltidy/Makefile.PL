@@ -16,7 +16,7 @@ WriteMakefile(
     NAME       => 'App::githook::perltidy',
     ABSTRACT   => 'run perltidy and podtidy before Git commits',
     AUTHOR     => 'Mark Lawrence <nomad@null.net>',
-    VERSION    => '0.12.3',
+    VERSION    => '1.0.1',
     LICENSE    => 'gpl_3',
     EXE_FILES  => ['bin/githook-perltidy'],
     test       => { RECURSIVE_TEST_FILES => 1, },
@@ -26,8 +26,10 @@ WriteMakefile(
             package => [
                 qw(
                   App::githook::perltidy::install
+                  App::githook::perltidy::install_CI
                   App::githook::perltidy::pre_commit
-                  App::githook::perltidy::post_commit
+                  App::githook::perltidy::pre_commit_CI
+                  App::githook::perltidy_CI
                   )
             ],
         },
@@ -58,6 +60,8 @@ sub create_t_scripts {
     my $share = $root->child('share');
     my $t     = $root->child('t');
 
+    mkdir $t;
+
     my @scripts = @_ ? @_ : $bin->children;
 
     foreach my $script (@scripts) {
@@ -72,11 +76,10 @@ BEGIN {
     \$ENV{SHARE_DIR} //= "$share";
 }
 use lib "$lib";
-### Original file continues from here ###
-
+my \$ret = do "$script";
+die \$@ if \$@;
+\$ret;
 EOF
-
-        $t_script->append_utf8( $script->slurp_utf8 );
         $t_script->chmod('a+x');
     }
 }

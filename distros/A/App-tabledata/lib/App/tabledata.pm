@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-28'; # DATE
+our $DATE = '2022-10-15'; # DATE
 our $DIST = 'App-tabledata'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our %SPEC;
 
@@ -65,7 +65,7 @@ $SPEC{tabledata} = {
                 'count_rows',
                 'pick_rows',
                 'head',
-                #'stat',
+                'stat',
             ]}],
             default => 'dump_as_aoaos',
             cmdline_aliases => {
@@ -94,11 +94,11 @@ $SPEC{tabledata} = {
                     is_flag => 1,
                     code => sub { my $args=shift; $args->{action} = 'pick_rows' },
                 },
-                #S => {
-                #    summary=>'Show statistics contained in the TableData module',
-                #    is_flag => 1,
-                #    code => sub { my $args=shift; $args->{action} = 'stat' },
-                #},
+                S => {
+                    summary=>'Show information & statistics about the TableData module',
+                    is_flag => 1,
+                    code => sub { my $args=shift; $args->{action} = 'stat' },
+                },
             },
         },
         detail => {
@@ -181,10 +181,27 @@ sub tabledata {
         }];
     }
 
-    # dump_as_aoaos
-    return [200, "OK", [$obj->get_all_rows_arrayref], {
-        'table.fields'=>[$obj->get_column_names],
-    }];
+    if ($action eq 'dump_as_aoaos') {
+        return [200, "OK", [$obj->get_all_rows_arrayref], {
+            'table.fields'=>[$obj->get_column_names],
+        }];
+    }
+
+    if ($action eq 'stat') {
+        my %stat;
+        my $mod = "TableData::$args{module}";
+
+        $stat{module} = $mod;
+        require Module::Abstract;
+        $stat{module_abstract} = Module::Abstract::module_abstract($mod);
+
+        $stat{row_count} = $obj->get_row_count;
+        $stat{column_count} = $obj->get_column_count;
+
+        return [200, "OK", \%stat];
+    }
+
+    return [400, "Unknown action '$action'"];
 }
 
 1;
@@ -202,7 +219,7 @@ App::tabledata - Show content of TableData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.002 of App::tabledata (from Perl distribution App-tabledata), released on 2021-09-28.
+This document describes version 0.004 of App::tabledata (from Perl distribution App-tabledata), released on 2022-10-15.
 
 =head1 SYNOPSIS
 
@@ -227,9 +244,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<action> => I<str> (default: "dump_as_aoaos")
 
+(No description)
+
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<module> => I<perl::tabledata::modname_with_optional_args>
+
+(No description)
 
 =item * B<num> => I<posint> (default: 1)
 
@@ -280,13 +303,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

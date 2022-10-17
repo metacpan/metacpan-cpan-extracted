@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -ex
+
+cip pkg rust
+
+cip exec dzil-cpanm -n FFI::Platypus::Lang::Rust Dist::Zilla::Plugin::FFI::Build
+cip exec cpanm -n FFI::Platypus::Lang::Rust

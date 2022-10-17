@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2022-10-17'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 sub _heading_from_line {
     my $heading = shift;
@@ -284,60 +284,125 @@ our %argspecopt1_field = (
 );
 
 our %argspecs_select = (
+
     %argspecopt0_entry,
-    %argspecopt1_field,
+
     %argspecopt_category,
+
+    %argspecopt1_field,
+    %argspecopt_filter_entry_by_fields,
+
     hide_category => {
         summary => 'Do not show category',
         schema => 'true*',
         cmdline_aliases => {C=>{}},
-        tags => ['category:display'],
+        tags => ['category:output'],
     },
     hide_entry => {
         summary => 'Do not show entry headline',
         schema => 'true*',
         cmdline_aliases => {E=>{}},
-        tags => ['category:display'],
+        tags => ['category:output'],
     },
     hide_field_name => {
         summary => 'Do not show field names, just show field values',
         schema => 'true*',
         cmdline_aliases => {N=>{}},
-        tags => ['category:display'],
+        tags => ['category:output'],
+        description => <<'_',
+
+Mnemonic for short option `-N`: field *N*ame (uppercase letter usually means
+/no/).
+
+_
     },
     detail => {
         schema => 'bool*',
         cmdline_aliases => {l=>{}},
-        tags => ['category:display'],
+        tags => ['category:output'],
+        description => <<'_',
+
+Instead of showing matching field values, display the whole entry.
+
+Mnemonic for shortcut option `-l`: the option `-l` is usually used for the short
+version of `--detail`, as in *ls* Unix command.
+
+_
     },
     count => {
         summary => 'Return just the number of matching entries instead of showing them',
         schema => 'true*',
     },
-    no_formatters => {
-        summary => 'Do not apply any formatters to field value (overrides --formatter option)',
+    no_field_value_formatters => {
+        summary => 'Do not apply formatters for field value (overrides --field-value-formatter option)',
         schema => 'true*',
-        cmdline_aliases => {raw_field_values=>{}, F=>{}},
-        tags => ['category:display'],
-    },
-    default_formatter_rules => {
-        'x.name.is_plural' => 1,
-        'x.name.singular' => 'default_formatter_rule',
-        schema => ['array*', of=>'any*'],
         description => <<'_',
 
-Specify conditional default formatters. This is for convenience and best
-specified in the configuration as opposed to on the command-line option.
-An example:
-
-    default_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i","formatters":[ ["Phone::format_phone_idn"] ]}
+Note that this option has higher precedence than
+`--default-field-value-formatter-rules` or the `--field-value-formatter`
+(`--fvfmt`) option.
 
 _
-        tags => ['category:display'],
+        cmdline_aliases => {raw_field_values=>{}, F=>{}},
+        tags => ['category:output'],
     },
-    formatters => {
+    field_value_formatter_rules => {
         'x.name.is_plural' => 1,
-        'x.name.singular' => 'formatter',
+        'x.name.singular' => 'default_field_value_formatter_rule',
+        schema => ['array*', of=>'hash*'],
+        description => <<'_',
+
+Specify field value formatters to use when conditions are met, specified as an
+array of hashes. Each element is a rule that is as a hash containing condition
+keys and formatters keys. If all conditions are met then the formatters will be
+applied. The rules will be tested when each field is about to be outputted.
+Multiple rules can match and the matching rules' formatters are all applied in
+succession.
+
+Note that this option will be overridden by the `--field-value-formatter`
+(`-fvfmt`) or the `--no-field-value-formatters` (`-F`) option.
+
+The rules are best specified in the configuration as opposed to on the
+command-line option. An example (the lines below are writen in configuration
+file in IOD syntax, as rows of JSON hashes):
+
+    ; remove all comments in field values when 'hide_field_name' option is set
+    ; (which usually means we want to copy paste things)
+
+    field_value_formatter_rules={"hide_field_name":true, "formatters":[ ["Str::remove_comment"] ]}
+
+    ; normalize phone numbers using Phone::format + Str::remove_whitespace when
+    ; 'hide_field_name' option is set (which usually means we want to copy paste
+    ; things). e.g. '0812-1234-5678' becomes '+6281212345678'.
+
+    field_value_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i", "hide_field_name":true, "formatters":[ ["Phone::format", "Str::remove_whitespace"] ]}
+
+    ; but if 'hide_field_name' field is not set, normalize phone numbers using
+    ; Phone::format without removing whitespaces, which is easier to see (e.g.
+    ; '+62 812 1234 5678').
+
+    field_value_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i", "hide_field_name":false, "formatters":[ ["Phone::format"] ]}
+
+Condition keys:
+
+* `field_name_matches` (value: str/re): Check if field name matches a regex pattern.
+
+* `hide_field_name` (value: bool): Check if `--hide-field-name` (`-N`) option is
+  set (true) or unset (false).
+
+Formatter keys:
+
+* `formatters`: an array of formatters, to be applied. Each formatter is a name
+  of perl Sah filter rule, or a two-element array of perl Sah filter rule name
+  followed by hash containing arguments. See `--formatter` for more detais on
+  specifying formatter.
+
+_
+        tags => ['category:output'],
+    },
+    field_value_formatters => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'field_value_formatter',
         summary => 'Add one or more formatters to display field value',
         #schema => ['array*', of=>'perl::perl_sah_filter::modname_with_optional_args*'], ## doesn't work yet with Perinci::Sub::GetArgs::Argv
         schema => ['array*', of=>'str*'],
@@ -349,8 +414,15 @@ _
                 ns_prefix => 'Data::Sah::Filter::perl',
             );
         },
-        cmdline_aliases => {f=>{}},
-        tags => ['category:display'],
+        cmdline_aliases => {
+            fvfmt=>{},
+            f=>{},
+            remove_nondigits   => {is_flag=>1, summary=>'Shortcut for --field-value-formatter Str::remove_nondigit'   , code=>sub { $_[0]{field_value_formatters} //= []; push @{ $_[0]{field_value_formatters} }, 'Str::remove_nondigit'   } },
+            remove_comments    => {is_flag=>1, summary=>'Shortcut for --field-value-formatter Str::remove_comment'    , code=>sub { $_[0]{field_value_formatters} //= []; push @{ $_[0]{field_value_formatters} }, 'Str::remove_comment'    } },
+            remove_whitespaces => {is_flag=>1, summary=>'Shortcut for --field-value-formatter Str::remove_whitespaces', code=>sub { $_[0]{field_value_formatters} //= []; push @{ $_[0]{field_value_formatters} }, 'Str::remove_whitespace' } },
+            format_phone       => {is_flag=>1, summary=>'Shortcut for --field-value-formatter Phone::format'          , code=>sub { $_[0]{field_value_formatters} //= []; push @{ $_[0]{field_value_formatters} }, 'Phone::format'          } },
+        },
+        tags => ['category:output'],
         description => <<'_',
 
 Specify one or more formatters to apply to the field value before displaying.
@@ -367,8 +439,9 @@ If formatter name begins with `[` character, it will be parsed as JSON. Example:
 
  ['Str::remove_comment', {'style':'cpp'}]
 
-Overrides `--default_formatter_rule` but overridden by the `--no-formatters`
-(`--raw-field-values`, `-F`) option.
+Note that this option overrides `--field-value-formatter-rules` but is
+overridden by the `--no-field-value-formatters` (`--raw-field-values`, `-F`)
+option.
 
 _
     },
@@ -376,15 +449,35 @@ _
     num_entries => {
         summary => 'Specify maximum number of entries to return (0 means unlimited)',
         schema => 'uint*',
-        tags => ['category:result'],
+        tags => ['category:output'],
     },
     num_fields => {
         summary => 'Specify maximum number of fields (per entry) to return (0 means unlimited)',
         schema => 'uint*',
-        tags => ['category:result'],
+        tags => ['category:output'],
     },
 
-    %argspecopt_filter_entry_by_fields,
+    clipboard => {
+        summary => 'Whether to copy matching field values to clipboard',
+        schema => ['str*', in=>[qw/tee only/]],
+        description => <<'_',
+
+If set to `tee`, then will display matching fields to terminal as well as copy
+matching field values to clipboard.
+
+If set to `only`, then will not display matching fields to terminal and will
+only copy matching field values to clipboard.
+
+Mnemonic for short option `-y` and `-Y`: *y*ank as in Emacs (`C-y`).
+
+_
+        cmdline_aliases => {
+            clipboard_only => {is_flag=>1, summary=>'Shortcut for --clipboard=only', code=>sub { $_[0]{clipboard} = 'only' }},
+            y => {is_flag=>1, summary=>'Shortcut for --clipboard=tee', code=>sub { $_[0]{clipboard} = 'tee' }},
+            Y => {is_flag=>1, summary=>'Shortcut for --clipboard=only', code=>sub { $_[0]{clipboard} = 'only' }},
+        },
+        tags => ['category:output'],
+    },
 );
 
 1;
@@ -402,7 +495,7 @@ App::orgadb::Common
 
 =head1 VERSION
 
-This document describes version 0.010 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2022-10-09.
+This document describes version 0.014 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2022-10-17.
 
 =head1 HOMEPAGE
 

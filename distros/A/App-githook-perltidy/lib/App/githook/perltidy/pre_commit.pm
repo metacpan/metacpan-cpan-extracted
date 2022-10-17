@@ -2,13 +2,34 @@ package App::githook::perltidy::pre_commit;
 use strict;
 use warnings;
 use feature 'state';
-use parent 'App::githook::perltidy';
-use File::Copy;
+use App::githook::perltidy::pre_commit_CI
+  isa => 'App::githook::perltidy',
+  has => {};
+use OptArgs2::StatusLine '$status', '$v_status', 'RS';
 use Path::Tiny;
 
-our $VERSION = '0.12.3';
+our $VERSION = '1.0.1';
 
-my $temp_dir;
+sub BUILD {
+    my $self = shift;
+    my @hook = $self->pre_commit->slurp;
+    unless (grep( /NO_GITHOOK_PERLTIDY/, @hook )
+        and grep( /PERL5LIB/, @hook ) )
+    {
+        my $loc = $self->pre_commit->relative( $self->repo );
+        warn qq{githook-perltidy: You have an old "$loc" hook.\n}
+          . qq{githook-perltidy: Consider using }
+          . qq{"githook-perltidy install --force" to rebuild\n};
+    }
+}
+
+our $temp_dir;
+
+sub sys {
+    my $self = shift;
+    $v_status = join( ' ', map { defined $_ ? $_ : '*UNDEF*' } @_ ) . "\n";
+    system(@_) == 0 or Carp::croak "@_ failed: $?";
+}
 
 sub tmp_sys {
     my $self = shift;
@@ -16,59 +37,51 @@ sub tmp_sys {
     $self->sys(@_);
 }
 
-sub perl_tidy {
+sub tidy_perl {
     my $self     = shift;
-    my $tmp_file = shift || die 'perl_tidy($TMP_FILE, $file)';
-    my $file     = shift || die 'perl_tidy($tmp_file, $FILE)';
+    my $tmp_file = shift || die 'tidy_perl($TMP_FILE, $file)';
+    my $file     = shift || die 'tidy_perl($tmp_file, $FILE)';
     my $where    = shift;
 
-    die ".perltidyrc not in repository.\n" unless $self->{perltidyrc};
-
-    print "  $self->{me}: perltidy $file ($where)\n"
-      if $self->{opts}->{verbose};
-
-    state $junk = do {
-        if ( $self->{sweetened} ) {
+    state $req = do {
+        no strict 'refs';
+        if ( $self->sweetened ) {
             require Perl::Tidy::Sweetened;
-            $self->{perltidy} = \&Perl::Tidy::Sweetened::perltidy;
+            *perltidy = \&Perl::Tidy::Sweetened::perltidy;
         }
         else {
             require Perl::Tidy;
-            $self->{perltidy} = \&Perl::Tidy::perltidy;
+            *perltidy = \&Perl::Tidy::perltidy;
         }
-        undef;
     };
 
-    my $errormsg;
+    $status = "(perltidy) ($where)";
 
-    my $error = $self->{perltidy}->(
+    my $errormsg;
+    my $error = perltidy(
         argv       => [ qw{-nst -b -bext=/}, "$tmp_file" ],
         errorfile  => \$errormsg,
-        perltidyrc => $self->{perltidyrc}->stringify,
+        perltidyrc => $self->perltidyrc->stringify,
     );
 
     if ( length($errormsg) ) {
-        $self->lprint('');
-        die $self->{me} . ': ' . $file . ":\n" . $errormsg;
+        $status .= ":\n";
+        die $errormsg;
     }
     elsif ($error) {
-        $self->lprint('');
-        die $self->{me} . ': ' . $file . ":\n"
-          . "An unknown perltidy error occurred.";
+        $status .= ":\n";
+        die "An unknown perltidy error occurred.";
     }
 }
 
-sub pod_tidy {
+sub tidy_pod {
     my $self     = shift;
-    my $tmp_file = shift || die 'pod_tidy($TMP_FILE, $file)';
-    my $file     = shift || die 'pod_tidy($tmp_file, $FILE)';
+    my $tmp_file = shift || die 'tidy_pod($TMP_FILE, $file)';
+    my $file     = shift || die 'tidy_pod($tmp_file, $FILE)';
     my $where    = shift;
 
-    die ".podtidy-opts not in repository.\n" unless $self->{podtidyrc};
-
-    state $junk = require Pod::Tidy;
-
-    print "  $self->{me}: podtidy $file ($where)\n" if $self->{opts}->{verbose};
+    state $req = require Pod::Tidy;
+    $status = "(podtidy) ($where)";
 
     Pod::Tidy::tidy_files(
         files     => [$tmp_file],
@@ -77,44 +90,36 @@ sub pod_tidy {
         inplace   => 1,
         nobackup  => 1,
         columns   => 72,
-        %{ $self->{podtidyrc_opts} },
+        %{ $self->podtidyrc_opts },
     );
 }
 
-sub perl_critic {
+sub critic_perl {
     my $self     = shift;
-    my $tmp_file = shift || die 'perl_critic($TMP_FILE, $file)';
-    my $file     = shift || die 'perl_critic($tmp_file, $FILE)';
+    my $tmp_file = shift || die 'critic_perl($TMP_FILE, $file)';
+    my $file     = shift || die 'critic_perl($tmp_file, $FILE)';
     my $where    = shift;
 
-    die ".perlcriticrc not in repository.\n" unless $self->{perlcriticrc};
-
-    state $junk = require Perl::Critic;
-
-    print "  $self->{me}: perlcritic $file ($where)\n"
-      if $self->{opts}->{verbose};
+    state $req = require Perl::Critic;
+    $status = "(perlcritic) ($where)";
 
     my @violations =
-      Perl::Critic::critique( { -profile => $self->{perlcriticrc}->stringify },
+      Perl::Critic::critique( { -profile => $self->perlcriticrc->stringify },
         $tmp_file->stringify );
 
     if (@violations) {
-        $self->lprint('');
-        die $self->{me} . ': ' . $file . ":\n" . join( '', @violations );
+        $status .= ":\n";
+        die join( '', @violations );
     }
 }
 
-sub readme_from {
+sub convert_readme {
     my $self = shift;
-    my $file = shift || die 'readme_from($FILE)';
+    my $file = shift || die 'convert_readme($FILE)';
 
-    print "  $self->{me}: $file -> README\n"
-      if $self->{opts}->{verbose};
+    $status = '-> README';
 
-    my $width =
-      exists $self->{podtidy_opts}->{columns}
-      ? $self->{podtidy_opts}->{columns}
-      : 72;
+    my $width = $self->podtidyrc_opts->{columns} // 72;
 
     require Pod::Text;
     Pod::Text->new( sentence => 0, width => $width )
@@ -130,13 +135,16 @@ sub run {
     my @perlfiles = ();
     my %partial   = ();
 
+    untie $v_status unless $self->verbose;
+
     return if $ENV{NO_GITHOOK_PERLTIDY};
     $temp_dir = Path::Tiny->tempdir('githook-perltidy-XXXXXXXX');
 
-    print "  $self->{me}: TMP=$temp_dir\n" if $self->{opts}->{verbose};
+    $v_status = "TMP=$temp_dir\n";
 
     my @index;
     my $force_readme = 0;
+    my $readme_from  = $self->readme_from // '';
 
     # Use the -z flag to get clean filenames with no escaping or quoting
     # "lines" are separated with NUL, so set input record separator
@@ -154,19 +162,19 @@ sub run {
             $partial{$file} = $wtree eq 'M';
 
             $force_readme++ if $file eq '.readme_from';
-            $force_readme-- if $file eq $self->{readme_from};
+            $force_readme-- if $file eq $readme_from;
         }
     }
 
     if ( $force_readme > 0 ) {
-        print "  $self->{me}: force .readme_from $self->{readme_from}\n"
-          if $self->{opts}->{verbose};
-        push( @index, $self->{readme_from} );
+        $v_status = "force .readme_from " . $self->readme_from . "\n"
+          if $self->verbose;
+        push( @index, $self->readme_from );
     }
 
     unless (@index) {
-        $self->lprint("$self->{me}: (0)\n");
-        exit 0;
+        $status = "(0)\n";
+        return 0;
     }
 
     $self->tmp_sys( qw/git checkout-index/, @index );
@@ -179,100 +187,90 @@ sub run {
               or $first =~ m/^#!.*\.plenv/;
         }
 
-        push( @perlfiles, $file );
+        push( @perlfiles, path($file) );
     }
 
     unless (@perlfiles) {
-        $self->lprint("$self->{me}: (0)\n");
+        $status = "files touched: 0\n";
         exit 0;
     }
 
-    print "  $self->{me}: no .podtidy-opts - skipping podtidy calls\n"
-      if $self->{opts}->{verbose} and not $self->{podtidyrc};
+    $v_status = "no .podtidy-opts - skipping podtidy calls\n"
+      if not $self->podtidyrc;
 
     my $i     = 1;
     my $total = scalar @perlfiles;
     foreach my $file (@perlfiles) {
+        my $base = $file->basename;
+        $status = $v_status = '';
+        local $status = local $v_status = "$status ($i/$total) $base " . RS;
+
         my $tmp_file = $temp_dir->child($file);
 
         # If the README conversion is forced then we don't need to tidy
         # the source file
-        if ( $file eq $self->{readme_from} and $force_readme > 0 ) {
-            $self->readme_from($tmp_file);
+        if ( $file eq $readme_from and $force_readme > 0 ) {
+            $self->convert_readme($tmp_file);
             $force_readme--;
             next;
         }
 
         # Critique first to avoid unecessary tidying
-        if ( $self->{perlcriticrc} ) {
-            $self->lprint( $self->{me} . ': ('
-                  . $i . '/'
-                  . $total . ') '
-                  . $file
-                  . ' (perlcritic)' );
-
-            $self->perl_critic( $tmp_file, $file, 'INDEX' );
+        if ( $self->perlcriticrc ) {
+            $self->critic_perl( $tmp_file, $file, 'INDEX' );
         }
 
         unless ( $file =~ m/\.pod$/i ) {
-            $self->lprint( $self->{me} . ': ('
-                  . $i . '/'
-                  . $total . ') '
-                  . $file
-                  . ' (perltidy)' );
-            $self->perl_tidy( $tmp_file, $file, 'INDEX' );
+            $self->tidy_perl( $tmp_file, $file, 'INDEX' );
         }
 
-        if ( $self->{podtidyrc} ) {
-            $self->lprint( $self->{me} . ': ('
-                  . $i . '/'
-                  . $total . ') '
-                  . $file
-                  . ' (podtidy)' );
-            $self->pod_tidy( $tmp_file, $file, 'INDEX' );
+        if ( $self->podtidyrc ) {
+            $self->tidy_pod( $tmp_file, $file, 'INDEX' );
         }
 
-        if ( $file eq $self->{readme_from} ) {
-            $self->readme_from($tmp_file);
+        if ( $file eq $readme_from ) {
+            $self->convert_readme($tmp_file);
         }
 
         $i++;
     }
 
-    warn "Failed to convert to README: $self->{force_readme}\n"
+    warn "Failed to convert to README: $readme_from\n"
       unless $force_readme <= 0;
 
     $self->tmp_sys( qw/git add /, @perlfiles );
 
+    $i = 1;
     foreach my $file (@perlfiles) {
+        my $base = $file->basename;
+        $status = $v_status = '';
+        local $status = local $v_status = "$status ($i/$total) $base " . RS;
+
         my $tmp_file = $temp_dir->child($file);
 
         # Redo the whole thing again for partially modified files
         if ( $partial{$file} ) {
-            print "  $self->{me}: copy $file TMP\n"
-              if $self->{opts}->{verbose};
-            copy $file, $tmp_file;
+            $v_status = "copy to TMP\n";
+            $file->copy($tmp_file);
 
             unless ( $file =~ m/\.pod$/i ) {
-                $self->lprint( $self->{me} . ': ' . $file . ' (perltidy)' );
-                $self->perl_tidy( $tmp_file, $file, 'WORK_TREE' );
+                $self->tidy_perl( $tmp_file, $file, 'WORK_TREE' );
             }
 
-            if ( $self->{podtidyrc} ) {
-                $self->lprint( $self->{me} . ': ' . $file . ' (podtidy)' );
-                $self->pod_tidy( $tmp_file, $file, 'INDEX' );
-                $self->pod_tidy( $tmp_file, $file, 'WORK_TREE' );
+            if ( $self->podtidyrc ) {
+                $self->tidy_pod( $tmp_file, $file, 'INDEX' );
+                $self->tidy_pod( $tmp_file, $file, 'WORK_TREE' );
             }
         }
 
         # Move the tidied file back to the real working directory
-        print "  $self->{me}: move TMP/$file .\n"
-          if $self->{opts}->{verbose};
-        $self->lprint( $self->{me} . ': ' . $file . ' (mv)' );
-        move $tmp_file, $file;
+        $status = 'move TMP to REPO';
+        my $mtime = $file->stat->mtime;
+        $tmp_file->move($file);
+        utime $file->stat->atime, $mtime, $file;
     }
 
-    $self->lprint("githook-perltidy: ($total)\n");
+    $status = "files touched: $total\n";
 }
 
 1;
@@ -284,7 +282,7 @@ App::githook::perltidy::pre_commit - git pre-commit hook
 
 =head1 VERSION
 
-0.12.3 (2018-11-22)
+1.0.1 (2022-10-14)
 
 =head1 SEE ALSO
 
@@ -296,10 +294,11 @@ Mark Lawrence E<lt>nomad@null.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2011-2018 Mark Lawrence <nomad@null.net>
+Copyright 2011-2022 Mark Lawrence <nomad@null.net>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
 Free Software Foundation; either version 3 of the License, or (at your
 option) any later version.
+
 

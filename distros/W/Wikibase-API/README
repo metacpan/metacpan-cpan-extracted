@@ -1,0 +1,181 @@
+NAME
+    Wikibase::API - Class for API to Wikibase (Wikibase) system.
+
+SYNOPSIS
+     use Wikibase::API;
+
+     my $obj = Wikibase::API->new(%params);
+     my $res = $obj->create_item($item_obj);
+     my $item_obj = $obj->get_item($id);
+
+METHODS
+  "new"
+     my $obj = Wikibase::API->new(%params);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "mediawiki_api"
+
+            MediaWiki::API object.
+
+            Default value is MediaWiki::API->new.
+
+    *       "mediawiki_site"
+
+            MediaWiki site.
+
+            Default value is 'test.wikidata.org'.
+
+    *       "login_name"
+
+            Login name.
+
+            Default value is undef.
+
+    *       "login_password"
+
+            Login password.
+
+            Default value is undef.
+
+  "create_item"
+     my $res = $obj->create_item($item_obj)
+
+    Create item in system. $item_obj is Wikibase::Datatype::Item instance.
+
+    Returns reference to hash like this:
+
+     {
+             'entity' => {
+                     ...
+             },
+             'success' => __STATUS_CODE__,
+     }
+
+  "get_item"
+     my $item_obj = $obj->get_item($id);
+
+    Get item from system.
+
+    Returns Wikibase::Datatype::Item instance.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             Cannot login.
+                     Error code: %s
+                     Error details: %s
+             Cannot get token.
+                     Error code: %s
+                     Error details: %s
+
+     create_item():
+             Bad data. Must be 'Wikibase::Datatype::Item' object.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Data::Printer;
+     use Wikibase::API;
+     use Wikibase::Datatype::Item;
+
+     # API object.
+     my $api = Wikibase::API->new;
+
+     # Wikibase::Datatype::Item blank object.
+     my $item_obj = Wikibase::Datatype::Item->new;
+
+     # Create item.
+     my $res = $api->create_item($item_obj);
+
+     # Dump response structure.
+     p $res;
+
+     # Output like:
+     # \ {
+     #     entity    {
+     #         aliases        {},
+     #         claims         {},
+     #         descriptions   {},
+     #         id             "Q213698",
+     #         labels         {},
+     #         lastrevid      535146,
+     #         sitelinks      {},
+     #         type           "item"
+     #     },
+     #     success   1
+     # }
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Data::Printer;
+     use Wikibase::API;
+
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 id\n";
+             exit 1;
+     }
+     my $id = $ARGV[0];
+
+     # API object.
+     my $api = Wikibase::API->new;
+
+     # Get item.
+     my $item_obj = $api->get_item($id);
+
+     # Dump response structure.
+     p $item_obj;
+
+     # Output for Q213698 argument like:
+     # Wikibase::Datatype::Item  {
+     #     Parents       Mo::Object
+     #     public methods (9) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), check_array_object (Mo::utils), check_number (Mo::utils), check_number_of_items (Mo::utils), isa (UNIVERSAL), VERSION (UNIVERSAL)
+     #     private methods (1) : __ANON__ (Mo::is)
+     #     internals: {
+     #         aliases        [],
+     #         descriptions   [],
+     #         id             "Q213698",
+     #         labels         [],
+     #         lastrevid      535146,
+     #         modified       "2020-12-11T22:26:06Z",
+     #         ns             0,
+     #         page_id        304259,
+     #         sitelinks      [],
+     #         statements     [],
+     #         title          "Q213698"
+     #     }
+     # }
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, JSON::XS, MediaWiki::API, Unicode::UTF8,
+    Wikibase::Datatype::Item.
+
+SEE ALSO
+    Wikibase::Datatype
+        Wikibase datatypes.
+
+    Wikibase::Datatype::Struct
+        Wikibase structure serialization.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Wikibase-API>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2020-2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

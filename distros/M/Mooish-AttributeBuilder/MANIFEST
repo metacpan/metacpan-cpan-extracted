@@ -11,10 +11,12 @@ lib/Mooish/AttributeBuilder.pm
 lib/Mooish/AttributeBuilder.pod
 t/01-base.t
 t/02-public-or-hidden.t
+t/03-arrays.t
 t/10-lazy.t
 t/11-init_arg.t
 t/12-trigger.t
 t/13-coerce.t
+t/14-literal.t
 t/20-methods.t
 t/50-Moo.t
 t/author-pod-syntax.t

@@ -27,7 +27,7 @@ facet 'max', sub {
     sprintf( '%s <= %s', $var, delete $o->{max} );
 };
 
-facetize qw[min max], declare MinMax, as Num;
+declare MinMax, as Num, with_facets [ 'min', 'max' ];
 
 # related facets
 facet bounds => sub {
@@ -53,17 +53,18 @@ facet bounds => sub {
     return join( ' and ', @code );
 };
 
-facetize qw[bounds], declare Bounds, as Num;
+declare Bounds, as Num, with_facets ['bounds'];
 
 
 # on-the-fly creation of a facet
-facetize positive => sub {
-    my ( $o, $var ) = @_;
-    return unless exists $o->{positive};
-    delete $o->{positive};
-    sprintf( '%s > 0', $var );
-  },
-  qw[ min max ],
-  declare Positive, as Num;
+declare Positive, as Num, with_facets [
+    'min', 'max',
+    positive => sub {
+        my ( $o, $var ) = @_;
+        return unless exists $o->{positive};
+        delete $o->{positive};
+        sprintf( '%s > 0', $var );
+    },
+];
 
 1;

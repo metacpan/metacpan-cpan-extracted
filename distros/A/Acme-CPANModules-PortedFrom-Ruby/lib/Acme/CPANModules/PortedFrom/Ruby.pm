@@ -1,11 +1,12 @@
 package Acme::CPANModules::PortedFrom::Ruby;
 
 use strict;
+#use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-04'; # DATE
+our $DATE = '2022-10-17'; # DATE
 our $DIST = 'Acme-CPANModules-PortedFrom-Ruby'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $LIST = {
     summary => "Modules/applications that are ported from (or inspired by) ".
@@ -18,8 +19,8 @@ _
     entries => [
         {
             module => 'App::Sass',
-            #ruby_package => undef',
             tags => ['web'],
+            #ruby_package => undef,
         },
         {
             module => 'Data::Gimei',
@@ -28,18 +29,17 @@ _
         },
         {
             module => 'Scientist',
-            #ruby_package => undef',
-            #tags => [''],
+            #tags => [],
+            #ruby_package => undef,
         },
         {
             module => 'HTTP::Server::Brick',
-            #ruby_package => undef',
             tags => ['web'],
+            #ruby_package => undef,
         },
         {
             module => 'Plack',
-            ruby_package => 'rack',
-            tags => ['web'],
+            tags => ['web', 'framework'],
             description => <<'_',
 
 From Plack's documentation: "Plack is like Ruby's Rack or Python's Paste for
@@ -48,6 +48,22 @@ Python's WSGI specification (hence the dual specification-implementation split)
 and Ruby's Rack (hence the name).
 
 _
+            ruby_package => 'rack',
+            ruby_website_url => 'https://rack.github.io/',
+            ruby_github_url => 'https://github.com/rack/rack',
+        },
+        {
+            module => 'Squatting',
+            tags => ['web', 'framework'],
+            ruby_package => 'camping',
+            ruby_website_url => 'http://www.ruby-camping.com/',
+        },
+        {
+            module => 'Valiant',
+            summary => 'Inspired by the data validation style in Ruby on Rails',
+            tags => ['validation', 'framework'],
+            ruby_package => 'rails',
+            ruby_website_url => 'https://rubyonrails.org/',
         },
     ],
 };
@@ -67,14 +83,9 @@ Acme::CPANModules::PortedFrom::Ruby - Modules/applications that are ported from 
 
 =head1 VERSION
 
-This document describes version 0.008 of Acme::CPANModules::PortedFrom::Ruby (from Perl distribution Acme-CPANModules-PortedFrom-Ruby), released on 2022-06-04.
+This document describes version 0.009 of Acme::CPANModules::PortedFrom::Ruby (from Perl distribution Acme-CPANModules-PortedFrom-Ruby), released on 2022-10-17.
 
 =head1 DESCRIPTION
-
-=head2 SEE ALSO
-
-L<Acme::CPANModules::PortedFrom::Python> and other
-C<Acme::CPANModules::PortedFrom::*> modules.
 
 If you know of others, please drop me a message.
 
@@ -82,23 +93,25 @@ If you know of others, please drop me a message.
 
 =over
 
-=item * L<App::Sass> - sass command-line tool modeled after the ruby's version
+=item L<App::Sass>
 
 Author: L<WWOLF|https://metacpan.org/author/WWOLF>
 
-=item * L<Data::Gimei> - a Perl port of Ruby's gimei generates fake data in Japanese.
+=item L<Data::Gimei>
 
 Author: L<YOUPONG|https://metacpan.org/author/YOUPONG>
 
-=item * L<Scientist>
+Ruby project's gem: L<https://rubygems.org/gems/gimei>
+
+=item L<Scientist>
 
 Author: L<LANCEW|https://metacpan.org/author/LANCEW>
 
-=item * L<HTTP::Server::Brick> - Simple pure perl http server for prototyping "in the style of" Ruby's WEBrick
+=item L<HTTP::Server::Brick>
 
 Author: L<AUFFLICK|https://metacpan.org/author/AUFFLICK>
 
-=item * L<Plack> - Perl Superglue for Web frameworks and Web Servers (PSGI toolkit)
+=item L<Plack>
 
 Author: L<MIYAGAWA|https://metacpan.org/author/MIYAGAWA>
 
@@ -107,6 +120,30 @@ WSGI." Plack and PSGI were created by MIYAGAWA in 2009 and were inspired by both
 Python's WSGI specification (hence the dual specification-implementation split)
 and Ruby's Rack (hence the name).
 
+
+Ruby project's gem: L<https://rubygems.org/gems/rack>
+
+Ruby project's website: L<https://rack.github.io/>
+
+Ruby project's GitHub: L<https://github.com/rack/rack>
+
+=item L<Squatting>
+
+Author: L<BEPPU|https://metacpan.org/author/BEPPU>
+
+Ruby project's gem: L<https://rubygems.org/gems/camping>
+
+Ruby project's website: L<http://www.ruby-camping.com/>
+
+=item L<Valiant>
+
+Inspired by the data validation style in Ruby on Rails.
+
+Author: L<JJNAPIORK|https://metacpan.org/author/JJNAPIORK>
+
+Ruby project's gem: L<https://rubygems.org/gems/rails>
+
+Ruby project's website: L<https://rubyonrails.org/>
 
 =back
 
@@ -155,6 +192,11 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-Por
 
 =head1 SEE ALSO
 
+L<Acme::CPANModules::PortedFrom::Python> and other
+C<Acme::CPANModules::PortedFrom::*> modules.
+
+L<Acme::CPANModules::Interop::Ruby> to interact with Ruby things.
+
 L<Acme::CPANModules> - about the Acme::CPANModules namespace
 
 L<cpanmodules> - CLI tool to let you browse/view the lists
@@ -176,9 +218,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

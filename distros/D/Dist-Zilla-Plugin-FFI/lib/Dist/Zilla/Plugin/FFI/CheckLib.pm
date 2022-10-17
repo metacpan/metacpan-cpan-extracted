@@ -1,8 +1,8 @@
-package Dist::Zilla::Plugin::FFI::CheckLib 1.05 {
+package Dist::Zilla::Plugin::FFI::CheckLib 1.07 {
 
   use strict;
   use warnings;
-  use 5.024;
+  use 5.020;
 
   # ABSTRACT: FFI::CheckLib alternative to Dist::Zilla::Plugin::CheckLib
 
@@ -152,7 +152,7 @@ Dist::Zilla::Plugin::FFI::CheckLib - FFI::CheckLib alternative to Dist::Zilla::P
 
 =head1 VERSION
 
-version 1.05
+version 1.07
 
 =head1 SYNOPSIS
 
@@ -257,11 +257,15 @@ L<Devel::AssertOS> and L<Dist::Zilla::Plugin::AssertOS>
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Zaki Mughal (zmughal)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

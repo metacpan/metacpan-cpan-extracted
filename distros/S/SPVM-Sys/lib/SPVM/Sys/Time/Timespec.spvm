@@ -1,0 +1,12 @@
+class Sys::Time::Timespec : pointer_t {
+  
+  native static method new : Sys::Time::Timespec ();
+
+  native method DESTROY : void ();
+  
+  native method tv_sec : long ();
+  native method tv_nsec : long ();
+
+  native method set_tv_sec : void ($tv_sec : long);
+  native method set_tv_nsec : void ($tv_nsec : long);
+}

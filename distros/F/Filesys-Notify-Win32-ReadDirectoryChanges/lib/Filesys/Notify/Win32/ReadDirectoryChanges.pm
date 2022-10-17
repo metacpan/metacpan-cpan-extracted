@@ -12,7 +12,7 @@ use threads; # we launch a thread for each watched tree to keep the logic simple
 use Thread::Queue;
 use Encode 'decode';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $is_cygwin = $^O eq 'cygwin';
 
 =head1 NAME

@@ -36,6 +36,8 @@ BEGIN {
 	has field 'rw_trigger' => (
 		writer => 1,
 	);
+
+	has field ['extends1', 'extends2'];
 }
 
 {
@@ -49,6 +51,10 @@ BEGIN {
 
 	has extended 'rw_trigger' => (
 		trigger => 1,
+	);
+
+	has extended ['extends1', 'extends2'] => (
+		lazy => 0,
 	);
 
 	sub _trigger_rw_trigger

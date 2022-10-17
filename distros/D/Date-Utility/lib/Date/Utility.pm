@@ -11,7 +11,7 @@ Date::Utility - A class that represents a datetime in various format
 
 =cut
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 =head1 SYNOPSIS
 
@@ -36,12 +36,12 @@ A class that represents a datetime in various format
 =cut
 
 use Moose;
-use Carp qw( confess croak );
-use POSIX qw( floor );
+use Carp         qw( confess croak );
+use POSIX        qw( floor );
 use Scalar::Util qw(looks_like_number);
 use Tie::Hash::LRU;
 use Time::Local qw(timegm);
-use Try::Tiny;
+use Syntax::Keyword::Try;
 use Time::Duration::Concise::Localize;
 use POSIX qw(floor);
 
@@ -96,7 +96,7 @@ has [qw(
         seconds_after_midnight
         is_a_weekend
         is_a_weekday
-        )
+    )
 ] => (
     is         => 'ro',
     lazy_build => 1,
@@ -415,6 +415,7 @@ Returns a Date::Utility object.
 
 =cut
 
+## no critic (ProhibitNewMethod)
 sub new {
     my ($self, $params_ref) = @_;
     my $new_params = {};
@@ -925,10 +926,10 @@ sub _move_time_interval {
             return $ti ? $new_date->_move_time_interval($ti, $dir) : $new_date;
         }
         try { $ti = Time::Duration::Concise::Localize->new(interval => $ti) }
-        catch {
+        catch ($e) {
             $ti //= 'undef';
-            confess "Couldn't create a TimeInterval from the code '$ti': $_";
-        };
+            confess "Couldn't create a TimeInterval from the code '$ti': $e";
+        }
     }
     my $sec = $ti->seconds;
     return ($sec == 0) ? $self : Date::Utility->new($self->{epoch} + $dir * $sec);
@@ -986,7 +987,8 @@ sub move_to_nth_dow {
     my $dow_first = (7 - ($self->day_of_month - 1 - $self->day_of_week)) % 7;
     my $dom       = ($dow + 7 - $dow_first) % 7 + ($nth - 1) * 7 + 1;
 
-    return try { Date::Utility->new(join '-', $self->year, $self->month, $dom) };
+    ## no critic (RequireCheckingReturnValueOfEval)
+    return eval { Date::Utility->new(join '-', $self->year, $self->month, $dom) };
 }
 
 =head1 STATIC METHODS
@@ -1324,7 +1326,7 @@ __END__
 
 =item L<Time::Local>
 
-=item L<Try::Tiny>
+=item L<Syntax::Keyword::Try>
 
 =back
 

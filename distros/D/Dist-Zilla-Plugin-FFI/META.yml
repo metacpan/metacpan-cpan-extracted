@@ -8,12 +8,12 @@ build_requires:
   Path::Tiny: '0'
   Test2::V0: '0.000121'
   Test::DZil: '0'
-  perl: '5.024'
+  perl: '5.020'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.024'
+  perl: '5.020'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,14 +31,17 @@ requires:
   List::Util: '0'
   Moose: '0'
   namespace::autoclean: '0'
-  perl: '5.024'
+  perl: '5.020'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/PerlFFI/Dist-Zilla-Plugin-FFI/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::FFI
   repository: git://github.com/PerlFFI/Dist-Zilla-Plugin-FFI.git
-version: '1.05'
-x_generated_by_perl: v5.35.9
+version: '1.07'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Zaki Mughal (zmughal)'
+x_generated_by_perl: v5.37.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

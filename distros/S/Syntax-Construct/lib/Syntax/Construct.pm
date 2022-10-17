@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.028';
+our $VERSION = '1.030';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.036' => [qw[
@@ -67,13 +67,14 @@ my %introduces = do { no warnings 'qw';
                                  s-utf8-delimiters-hack
                               ]],
                    old => [qw[
-                                 ?? for-qw @_=split
+                                 ?? for-qw @_=split no-sigil
                           ]],
                  )};
 
 my %removed = ( 'auto-deref'             => '5.024',
                 'lexical-$_'             => '5.024',
                 '??'                     => '5.022',
+                'no-sigil'               => '5.022',
                 's-utf8-delimiters-hack' => '5.020',
                 'for-qw'                 => '5.018',
                 '@_=split'               => '5.012',
@@ -275,7 +276,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.028
+Version 1.030
 
 =head1 SYNOPSIS
 
@@ -394,7 +395,8 @@ Same as C<introduced>, but for removed constructs (e.g. auto-deref in
 
 =head3 s-utf8-delimiters-hack
 
-See below. The hack doesn't seem to work in 5.008 and older. Removed in 5.020.
+See L<s-utf8-delimiters>. The hack doesn't seem to work in 5.008
+and older. Removed in 5.020.
 
 =head2 5.010
 
@@ -906,6 +908,15 @@ that were introduced before 5.008001.
 
 Removed in 5.022. See L<perl5220delta/Support for ?PATTERN? without
 explicit operator has been removed>.
+
+=head3 no-sigil
+
+Removed in 5.022, not documented. Before that, if the first argument
+to C<shift>, C<unshift>, C<pop>, C<push>, C<splice>, C<keys>,
+C<values>, and C<each> was a global variable, it was possible to omit
+its sigil, e.g.
+
+  push arr, 12;  # same as push @arr, 12
 
 =head3 for-qw
 

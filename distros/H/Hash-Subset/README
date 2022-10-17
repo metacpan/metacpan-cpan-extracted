@@ -2,8 +2,8 @@ NAME
     Hash::Subset - Produce subset of a hash
 
 VERSION
-    This document describes version 0.006 of Hash::Subset (from Perl
-    distribution Hash-Subset), released on 2020-06-11.
+    This document describes version 0.007 of Hash::Subset (from Perl
+    distribution Hash-Subset), released on 2022-07-27.
 
 SYNOPSIS
      use Hash::Subset qw(
@@ -11,6 +11,13 @@ SYNOPSIS
          hashref_subset
          hash_subset_without
          hashref_subset_without
+
+         merge_hash_subset
+         merge_overwrite_hash_subset
+         merge_ignore_hash_subset
+         merge_hash_subset_without
+         merge_overwrite_hash_subset_without
+         merge_ignore_hash_subset_without
      );
 
      # using keys specified in an array
@@ -89,8 +96,15 @@ SYNOPSIS
          ...
      }
 
+    Merging subset to another hash:
+
+     my %target = (a=>1, b=>2);
+     merge_hash_subset(\%target, {foo=>1, bar=>2, baz=>3}, qr/ba/); # %target becomes (a=>1, b=>2, bar=>2, baz=>3)
+     merge_hash_subset_without(\%target, {foo=>1, bar=>2, baz=>3}, qr/ba/); # %target becomes (a=>1, b=>2, foo=>1)
+
 DESCRIPTION
-    Keywords: hash arguments, hash picking, hash grep, hash filtering
+    Keywords: hash arguments, hash picking, hash grep, hash filtering, hash
+    merging
 
 FUNCTIONS
     None exported by default.
@@ -101,9 +115,9 @@ FUNCTIONS
      my %subset  = hash_subset   (\%hash, @keys_srcs);
      my $subset  = hashref_subset(\%hash, @keys_srcs);
 
-    Where @keys_src elements can be arrayref, hashref, or coderef. Coderef
-    will be called with args($key, $value) and return true when key should
-    be included.
+    Where each @keys_src element can either be an arrayref, a hashref, a
+    Regexp object, or a coderef. Coderef will be called with args($key,
+    $value) and return true when key should be included.
 
     Produce subset of %hash, returning the subset hash (or hashref, in the
     case of "hashref_subset" function).
@@ -125,18 +139,73 @@ FUNCTIONS
      my %subset = %hash{grep {exists $hash{$_}} "b","c","d"}; # => (b=>2, c=>3)
 
     and available for perl earlier than 5.20. In addition to that,
-    hash_subset() accepts arrayref as well as hashref/coderef, and several
-    of them.
+    hash_subset() accepts arrayref & Regexp object as well as
+    hashref/coderef, and several of them.
 
   hashref_subset
     See "hash_subset".
 
   hash_subset_without
     Like "hash_subset", but reverses the logic: will create subset that only
-    includes keys not in the specified arrays/hashes/coderefs.
+    includes keys not in the specified arrays/hashes/Regexps/coderefs.
 
   hashref_subset_without
     See "hash_subset_without".
+
+  merge_hash_subset
+    Usage:
+
+      merge_hash_subset          (\%h1, \%h2, @keys_src);
+      merge_overwrite_hash_subset(\%h1, \%h2, @keys_src);
+      merge_ignore_hash_subset   (\%h1, \%h2, @keys_src);
+
+    "merge_hash_subset" selects a subset of hash %h2 (using @keys_src, just
+    like in "hash_subset") and merge the subset to hash %h1. This is
+    basically a convenience shortcut for:
+
+     my %subset = hash_subset(\%h2, @keys_src);
+     for my $key (keys %subset) {
+         die "Duplicate key when merging subset: $key" if exists $h1{$key];
+         $h1{$key} = $subset{$key};
+     }
+
+    while "merge_overwrite_hash_subset" does something like this:
+
+     my %subset = hash_subset(\%h2, @keys_src);
+     for my $key (keys %subset) {
+         $h1{$key} = $subset{$key};
+     }
+
+    and "merge_ignore_hash_subset" does something like this:
+
+     my %subset = hash_subset(\%h2, @keys_src);
+     for my $key (keys %subset) {
+         next if exists $h1{$key};
+         $h1{$key} = $subset{$key};
+     }
+
+  merge_overwrite_hash_subset
+    See "merge_hash_subset".
+
+  merge_ignore_hash_subset
+    See "merge_hash_subset".
+
+  merge_hash_subset_without
+    Usage:
+
+      merge_hash_subset_without          (\%h1, \%h2, @keys_src);
+      merge_overwrite_hash_subset_without(\%h1, \%h2, @keys_src);
+      merge_ignore_hash_subset_without   (\%h1, \%h2, @keys_src);
+
+    These are like "merge_hash_subset", "merge_overwrite_hash_subset", and
+    "merge_ignore_hash_subset" except these routines will merge subset from
+    %h2 that do *not* contain keys specified by @keys_src.
+
+  merge_overwrite_hash_subset_without
+    See "merge_hash_subset_without".
+
+  merge_ignore_hash_subset_without
+    See "merge_hash_subset_without".
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -144,13 +213,6 @@ HOMEPAGE
 
 SOURCE
     Source repository is at <https://github.com/perlancar/perl-Hash-Subset>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Subset>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Hash::MoreUtils provides various ways to create hash subset ("slice")
@@ -172,9 +234,33 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2020, 2019 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Subset>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

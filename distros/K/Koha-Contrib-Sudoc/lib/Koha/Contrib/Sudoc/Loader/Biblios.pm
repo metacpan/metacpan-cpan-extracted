@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader::Biblios;
 # ABSTRACT: Chargeur de notices biblio
-$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.38';
+$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.39';
 use Moose;
 
 extends 'Koha::Contrib::Sudoc::Loader';
@@ -140,7 +140,7 @@ sub handle_record {
             $self->log->warning( "erreur pendant l'ajout de l'exemplaire :\n" . Dump($errors_ref) )
                 if @$errors_ref;
             C4::Biblio::_strip_item_fields($marc, $framework);
-            ModBiblioMarc($marc, $biblionumber, $framework);
+            ModBiblioMarc($marc, $biblionumber);
         }
         $self->converter->biblio_add($record, $biblionumber, $framework);
     }
@@ -161,7 +161,7 @@ Koha::Contrib::Sudoc::Loader::Biblios - Chargeur de notices biblio
 
 =head1 VERSION
 
-version 2.38
+version 2.39
 
 =head1 AUTHOR
 

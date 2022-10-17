@@ -1,5 +1,10 @@
 Revision history for Perl module Math::Numerical
 
+0.05 2022-10-15
+
+ - Update requirements for the Test2::Tools::Compare dist to 0.000081 which has
+   the `float` method.
+
 0.04 2022-10-11
 
  - Fixed the Makefile.PL declared dependencies.

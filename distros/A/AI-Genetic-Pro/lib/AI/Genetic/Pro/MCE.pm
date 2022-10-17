@@ -54,9 +54,16 @@ sub _init_pop {
 sub _calculate_fitness_all {
 	my ($self) = @_;
 	
-	my %fit = mce_map {
+	# Faster version. Thanks to Mario Roy :-)
+	my %fit = mce_map_s {
 			$_ => $self->fitness()->( $self, $self->chromosomes->[ $_ ] )
-		} 0 .. $#{ $self->chromosomes };
+		} 0, $#{ $self->chromosomes };
+
+	# The old one
+	#my %fit = mce_map {
+	#		$_ => $self->fitness()->( $self, $self->chromosomes->[ $_ ] )
+	#	} 0 .. $#{ $self->chromosomes };
+
 	$self->_fitness( \%fit );
 	
 	return;
@@ -72,6 +79,7 @@ sub _init_mce {
 	MCE::Map->init(
 		chunk_size 	=> q[auto], 
 		max_workers => $self->workers,
+		posix_exit => 1,					# Thanks Roy :-)
 	);
 	
 	#-------------------------------------------------------------------

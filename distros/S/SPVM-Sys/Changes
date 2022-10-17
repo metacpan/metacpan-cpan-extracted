@@ -1,3 +1,47 @@
+0.10 2022-10-14
+  [New Features]
+    * Added the Sys::Time::Timeval class.
+    * Added the Sys::Time::Timezone class.
+    * Added the following methods to the Sys::Process class.
+    
+      static method usleep : int ($usec : int)
+      static method ualarm : long ($usecs : long, $interval : long)
+    
+    * Added the following methods to the Sys::Time class.
+      
+      static method gettimeofday ($tv : Sys::Time::Timeval, $tz : Sys::Time::Timezone)
+      static method clock : long ()
+      static method clock_gettime : int ($clk_id : int, $tp : Sys::Time::Timespec)
+      static method clock_getres : int ($clk_id : int, $res : Sys::Time::Timespec)
+      static method getitimer : int ($which : int, $curr_value : Sys::Time::Itimerval);
+      static method setitimer : int ($which : int, $new_value : Sys::Time::Itimerval, $old_value : Sys::Time::Itimerval);
+      static method clock_nanosleep : int ($clockid : int, $flags : int, $request : Sys::Time::Timespec, $remain : Sys::Time::Timespec)
+      static method nanosleep : int ($rqtp : Sys::Time::Timespec, $rmtp : Sys::Time::Timespec)
+      
+    * Added the Sys::Time::Timespec class.
+    * Added the Sys::Time::Itimerval class.
+    * Added the following methods to the Sys::IO::Stat class
+
+      method st_mtim_tv_nsec : long ()
+      method st_atim_tv_nsec : long ()
+      method st_ctim_tv_nsec : long ()
+      
+    * Added the Sys::Time::Constant class.
+  [Bug Fix]
+    * Fixed the bug that the internally integral type is wrong. 32bit is fixed to64bit.
+      SPVM::Sys::IO::Utimbuf->set_actime
+      Sys::IO::Utimbuf->set_modtime
+      Sys::Process->usleep
+      Sys::Process->ualarm
+      Sys::Time::Timespec->set_tv_sec
+      Sys::Time::Timespec->set_tv_nsec
+      Sys::Time::Timeval->set_tv_sec
+      Sys::Time::Timeval->set_tv_usec
+  [Incompativle Changes]
+    * The times method is moved from SYS::Process to Sys::Time.
+    * The Sys::Process::Tms is renamed to Sys::Time::Tms.
+  [Document Improvement]
+    * Added the doc of the Sys::Time::Tms.
 0.09 2022-10-07
   [New Features]
    * Add the clone method to the Sys::Socket::Sockaddr class.

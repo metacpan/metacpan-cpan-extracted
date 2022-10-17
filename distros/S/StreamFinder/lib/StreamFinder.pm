@@ -136,8 +136,8 @@ iheartradio.com (L<StreamFinder::IHeartRadio>),
 odysee.com (L<StreamFinder::Odysee>), podbean.com (L<StreamFinder::Podbean>), 
 podcastaddict.com (L<StreamFinder::PodcastAddict>), 
 radio.net (L<StreamFinder::RadioNet>), rumble.com (L<StreamFinder::Rumble>),
-sermonaudio.com (L<StreamFinder::SermonAudio>), 
-spreaker.com podcasts (L<StreamFinder::Spreaker>), 
+sermonaudio.com (L<StreamFinder::SermonAudio>), soundcloud.com 
+(L<StreamFinder::SoundCloud>), spreaker.com podcasts (L<StreamFinder::Spreaker>), 
 tunein.com (L<StreamFinder::Tunein>), vimeo.com (L<StreamFinder::Vimeo>), 
 (youtube.com, et. al and other sites that youtube-dl supports) 
 (L<StreamFinder::Youtube>), and L<StreamFinder::Anystream> - search any (other) 
@@ -487,7 +487,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.91';
+our $VERSION = '1.92';
 our $DEBUG = 0;
 
 require Exporter;

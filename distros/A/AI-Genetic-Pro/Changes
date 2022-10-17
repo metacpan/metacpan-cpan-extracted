@@ -1,5 +1,8 @@
 Revision history for Perl extension AI::Genetic::Pro.
 
+1.006 Sun, 16 Oct 2022 15:02:03 +0200
+	- Improvements in a range of efficiency (thanks to Mario Roy :-)
+
 1.005 Tue, 08 Dec 2020 21:32:15 +0100
 	- Fixed some bugs in a documentation.
 

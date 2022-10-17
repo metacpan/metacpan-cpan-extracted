@@ -1,5 +1,9 @@
 Revision history for Perl extension EAV::XS.
 
+0.7.2  Sat Oct 15 13:50:26 UTC 2022
+	- skip return value check of setlocale in tests
+	- fixed passing RFC options when generating XS.c
+
 0.7.1  Wed Oct 12 08:35:52 UTC 2022
 	- fixed XS.c has generating with incorrect compiler options
 

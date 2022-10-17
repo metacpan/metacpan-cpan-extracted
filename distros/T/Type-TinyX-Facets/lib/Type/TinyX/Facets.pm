@@ -5,15 +5,32 @@ package Type::TinyX::Facets;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '1.2';
 
-use B qw(perlstring);
-use base 'Exporter::Tiny';
-use Exporter::Tiny qw(mkopt);
-use Carp;
+use B              ();
+use Exporter::Tiny ();
+use Eval::TypeTiny ();
 use Safe::Isa;
 
-our @EXPORT = qw'facet facetize';
+use parent 'Exporter::Tiny';
+our @EXPORT = qw( with_facets facet facetize );
+
+# handle both generations of Type::Tiny interfaces to create library
+# subs. only used by facetize.
+my $type_to_coderef
+  = exists &Eval::TypeTiny::type_to_coderef
+  ? \&Eval::TypeTiny::type_to_coderef
+  : do {
+    require Type::Library;
+    exists &Type::Library::_mksub;
+  }
+  ? sub { $_[0]->library->_mksub( $_[0] ) }
+  : _croak( "can't find type-to-coderef function?" );
+
+sub _croak {
+    require Carp;
+    goto &Carp::croak;
+}
 
 my %FACET;
 
@@ -48,11 +65,90 @@ sub facet {
 
     my ( $name, $coderef ) = @_;
 
-    my $caller = caller;
+    my $caller = caller();
 
     $FACET{$caller} ||= {};
     $FACET{$caller}{$name} = $coderef;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub with_facets {
+    _with_facets( scalar caller(), @_ );
+}
+
+
+sub _with_facets {
+
+    my ( $caller, $facets ) = ( shift, shift );
+
+    my $FACET = $FACET{$caller};
+
+    my @facets = map {
+        my ( $facet, $sub ) = @{$_};
+        $sub ||= $FACET->{$facet} || _croak( "unknown facet: $facet" );
+        [ $facet, $sub ];
+    } @{ Exporter::Tiny::mkopt( $facets ) };
+
+
+    # so blithely stolen from Type::XSD::Lite.  Thanks TOBYINK!
+    my %return;
+    my $IG = $return{inline_generator} = sub {
+        my %p_not_destroyed = @_;
+        return sub {
+            my %p   = %p_not_destroyed;    # copy;
+            my $var = $_[1];
+            my @r   = map $_->[1]->( \%p, $var, $_->[0] ), @facets;
+            _croak sprintf(
+                'Attempt to parameterize type "%s" with unrecognised parameter%s %s',
+                $_[0]->name,
+                scalar( keys %p ) == 1 ? '' : 's',
+                Type::Utils::english_list( map( qq["$_"], sort keys %p ) ),
+            ) if keys %p;
+            return ( undef, @r );
+        };
+    };
+
+    $return{constraint_generator} = sub {
+        my $base   = do { no warnings 'once'; $Type::Tiny::parameterize_type };
+        my %params = @_ or return $base;
+        my @checks = $IG->( %params )->( $base, '$_[0]' );
+        $checks[0] = $base->inline_check( '$_[0]' );
+        my $sub = sprintf( 'sub { %s }', join( ' and ', map "($_)", @checks ), );
+        ## no critic (ProhibitStringyEval)
+        eval( $sub ) or _croak "could not build sub: $@\n\nCODE: $sub\n";
+    };
+
+    $return{name_generator} = sub {
+        my ( $s, %a ) = @_;
+        sprintf( '%s[%s]', $s, join q[,], map sprintf( "%s=>%s", $_, B::perlstring $a{$_} ), sort keys %a );
+    };
+
+    return ( %return, @_ );
+}
+
+
+
+
 
 
 
@@ -83,67 +179,30 @@ sub facet {
 
 sub facetize {
 
+    # maybe at some later date, just to annoy.
+    # warnings::warnif( 'deprecated',
+    #                     q{'facetize' is deprecated; use 'with_facets' instead.} );
+
     # type may be first or last parameter
     my $self
       = $_[-1]->$_isa( 'Type::Tiny' )
       ? pop
-      : croak( "type object must be last parameter\n" );
+      : _croak( "type object must be last parameter\n" );
 
-    my $FACET = $FACET{ caller() };
+    my %args = _with_facets( scalar caller(), \@_ );
 
-    my @facets = map {
-        my ( $facet, $sub ) = @{$_};
-        $sub ||= $FACET->{$facet} || croak( "unknown facet: $facet" );
-        [ $facet, $sub ];
-    } @{ mkopt( \@_ ) };
-
-
-    my $name = "$self";
-
-    my $inline_generator = sub {
-        my %p_not_destroyed = @_;
-        return sub {
-            my %p   = %p_not_destroyed;    # copy;
-            my $var = $_[1];
-            my $r   = sprintf(
-                '(%s)',
-                join( ' and ',
-                    $self->inline_check( $var ),
-                    map { $_->[1]->( \%p, $var, $_->[0] ) } @facets ),
-            );
-
-            croak sprintf(
-                'Attempt to parameterize type "%s" with unrecognised parameter%s %s',
-                $name,
-                scalar( keys %p ) == 1 ? '' : 's',
-                join( ", ", map( qq["$_"], sort keys %p ) ),
-            ) if keys %p;
-            return $r;
-        };
-    };
-
-    $self->{inline_generator}     = $inline_generator;
-    $self->{constraint_generator} = sub {
-        my $sub = sprintf( 'sub { %s }',
-            $inline_generator->( @_ )->( $self, '$_[0]' ),
-        );
-        ## no critic( ProhibitStringyEval )
-        eval( $sub ) or croak "could not build sub: $@\n\nCODE: $sub\n";
-    };
-    $self->{name_generator} = sub {
-        my ( $s, %a ) = @_;
-        sprintf( '%s[%s]',
-            $s, join q[,],
-            map sprintf( "%s=>%s", $_, perlstring $a{$_} ),
-            sort keys %a );
-    };
+    # old skool poke at the guts. need to do this in-place, and
+    # Type::Tiny objects are pretty immutable, e.g. there is no
+    # defined API to modify them after they're creaed.  which is why
+    # this approach is deprecated.
+    $self->{$_} = $args{$_} for keys %args;
 
     return if $self->is_anon;
 
     ## no critic( ProhibitNoStrict )
     no strict qw( refs );
     no warnings qw( redefine prototype );
-    *{ $self->library . '::' . $self->name } = $self->library->_mksub( $self );
+    *{ $self->library . '::' . $self->name } = $type_to_coderef->( $self );
 }
 
 
@@ -172,7 +231,7 @@ Type::TinyX::Facets - Easily create a facet parameterized Type::Tiny type
 
 =head1 VERSION
 
-version 0.03
+version 1.2
 
 =head1 SYNOPSIS
 
@@ -205,7 +264,7 @@ version 0.03
      sprintf( '%s <= %s', $var, delete $o->{max} );
  };
  
- facetize qw[min max], declare MinMax, as Num;
+ declare MinMax, as Num, with_facets [ 'min', 'max' ];
  
  # related facets
  facet bounds => sub {
@@ -231,18 +290,19 @@ version 0.03
      return join( ' and ', @code );
  };
  
- facetize qw[bounds], declare Bounds, as Num;
+ declare Bounds, as Num, with_facets ['bounds'];
  
  
  # on-the-fly creation of a facet
- facetize positive => sub {
-     my ( $o, $var ) = @_;
-     return unless exists $o->{positive};
-     delete $o->{positive};
-     sprintf( '%s > 0', $var );
-   },
-   qw[ min max ],
-   declare Positive, as Num;
+ declare Positive, as Num, with_facets [
+     'min', 'max',
+     positive => sub {
+         my ( $o, $var ) = @_;
+         return unless exists $o->{positive};
+         delete $o->{positive};
+         sprintf( '%s > 0', $var );
+     },
+ ];
  
  1;
 
@@ -318,7 +378,31 @@ For example, to implement a minimum value check:
           sprintf('%s >= %s', $var, delete $o->{min} );
       };
 
+=head2 with_facets
+
+   ..., with_facets \@facets, ...
+
+Add a facet to the type being declared.  C<with_facets> takes an
+arrayref of one or more facet names or coderefs to apply to the type,
+e.g.
+
+   declare BoundedEvenInt, as Int,
+   with_facets [ 'min', 'max',
+      even => sub {  my ($o, $var) = @_;
+                     return unless exists $o->{even};
+                     delete $o->{even};
+                     "! ( ${var} % 2 )";
+                  },
+   ],
+   message { "This failed" }
+   ;
+
 =head2 facetize( @facets, $type )
+
+B<DEPRECATED>. This function currently pokes at L</Type::Tiny>'s innards, and future
+compatibility cannot be guaranteed.
+
+Use L</with_facets> instead.
 
 Add the specified facets to the given type.  The type should not have
 any constraints other than through inheritance from a parent type.
@@ -361,14 +445,21 @@ Any bugs are definitely mine.
 
 The development version is on GitLab at L<https://gitlab.com/djerius/type-tinyx-facets>.
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Type-TinyX-Facets>
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to   or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Type-TinyX-Facets
+
+=head2 Source
+
+Source is available at 
+
+  https://gitlab.com/djerius/type-tinyx-facets
+
+and may be cloned from
+
+  https://gitlab.com/djerius/type-tinyx-facets.git
 
 =head1 AUTHOR
 

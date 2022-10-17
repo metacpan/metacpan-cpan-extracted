@@ -8,7 +8,7 @@ use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::Fetch;
 
-our $VERSION = 'v0.0.005';
+our $VERSION = 'v0.0.006';
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ Weather::GHCN::Fetch - Access the NOAA GHCN Global Historical Climatology Networ
 
 =head1 VERSION
 
-version v0.0.005
+version v0.0.006
 
 =head1 DESCRIPTION
 

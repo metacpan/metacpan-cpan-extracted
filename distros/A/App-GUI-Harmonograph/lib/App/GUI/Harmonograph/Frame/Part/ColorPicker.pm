@@ -4,7 +4,7 @@ use Wx;
 
 package App::GUI::Harmonograph::Frame::Part::ColorPicker;
 use base qw/Wx::Panel/;
-use App::GUI::Harmonograph::ColorDisplay;
+use App::GUI::Harmonograph::Widget::ColorDisplay;
 
 sub new {
     my ( $class, $parent, $frame, $label, $data, $length, $space ) = @_;
@@ -29,7 +29,7 @@ sub new {
     $self->{'load'} = Wx::Button->new( $self, -1, 'Load',    [-1,-1], [$btnw, $btnh] );
     $self->{'del'}  = Wx::Button->new( $self, -1, 'Del',     [-1,-1], [$btnw, $btnh] );
     $self->{'save'} = Wx::Button->new( $self, -1, 'Save',    [-1,-1], [$btnw, $btnh] );
-    $self->{'display'} = App::GUI::Harmonograph::ColorDisplay->new( $self, 25, 10, $self->current_color );
+    $self->{'display'} = App::GUI::Harmonograph::Widget::ColorDisplay->new( $self, 25, 10, $self->current_color );
     
     $self->{'label'}->SetToolTip("access to internal color storage for $self->{'target'} color");
     $self->{'select'}->SetToolTip("select color in list directly");

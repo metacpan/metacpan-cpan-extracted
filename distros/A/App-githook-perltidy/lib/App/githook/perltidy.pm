@@ -1,132 +1,119 @@
 package App::githook::perltidy;
 use strict;
-use Carp 'croak';
-use File::Basename;
-use OptArgs2;
 use Path::Tiny;
+use App::githook::perltidy_CI
+  abstract => 1,
+  has      => {
+    repo => {
+        init_arg => undef,
+        default  => sub { path( $ENV{GIT_DIR} )->absolute->parent },
+    },
+    pre_commit => {
+        init_arg => undef,
+        default  => sub { $_[0]->repo->child( '.git', 'hooks', 'pre-commit' ) },
+    },
+    skip_list => {
+        init_arg => undef,
+        default  => sub {
+            my $self     = shift;
+            my $skipfile = $self->repo->child('MANIFEST.SKIP');
+            [ map { chomp; $_ } $skipfile->exists ? $skipfile->lines : () ];
+        },
+    },
+    perlcriticrc => {
+        init_arg => undef,
+        lazy     => 0,
+        default  => sub {
+            my $self = shift;
+            $self->have_committed( $self->repo->child('.perlcriticrc') );
+        },
+    },
+    perltidyrc => {
+        init_arg => undef,
+        lazy     => 0,
+        default  => sub {
+            my $self = shift;
+            $self->have_committed( $self->repo->child('.perltidyrc.sweetened') )
+              // $self->have_committed( $self->repo->child('.perltidyrc') );
+        },
+    },
+    podtidyrc => {
+        init_arg => undef,
+        lazy     => 0,
+        default  => sub {
+            my $self = shift;
+            $self->have_committed( $self->repo->child('.podtidy-opts') );
+        },
+    },
+    podtidyrc_opts => {
+        init_arg => undef,
+        default  => sub {
+            my $self     = shift;
+            my $pod_opts = {};
 
-our $VERSION = '0.12.3';
-
-cmd 'App::githook::perltidy' => (
-    name    => 'githook-perltidy',
-    comment => 'tidy perl and pod files before Git commits',
-    optargs => sub {
-        arg command => (
-            isa      => 'SubCmd',
-            comment  => '',
-            required => 1,
-        );
-
-        opt help => (
-            isa     => 'Flag',
-            alias   => 'h',
-            comment => 'print help message and exit',
-            trigger => sub {
-                my ( $cmd, $value ) = @_;
-                die $cmd->usage(OptArgs2::STYLE_FULL);
+            if ( my $rc = $self->podtidyrc ) {
+                foreach my $line ( $rc->lines ) {
+                    chomp $line;
+                    $line =~ s/^--//;
+                    my ( $opt, $arg ) = split / /, $line;
+                    $pod_opts->{$opt} = $arg;
+                }
             }
-        );
 
-        opt verbose => (
-            isa     => 'Flag',
-            comment => 'be explicit about underlying actions',
-            alias   => 'v',
-            default => sub { $ENV{GITHOOK_PERLTIDY_VERBOSE} },
-        );
-
-        opt version => (
-            isa     => 'Flag',
-            comment => 'print version and exit',
-            alias   => 'V',
-            trigger => sub { die basename($0) . ' version ' . $VERSION . "\n" },
-        );
+            $pod_opts;
+        },
     },
-);
+    readme_from => {
+        init_arg => undef,
+        lazy     => 0,
+        default  => sub {
+            my $self = shift;
+            my $rf = $self->have_committed( $self->repo->child('.readme_from') )
+              // return;
 
-subcmd 'App::githook::perltidy::install' => (
-    comment => 'install a Git pre-commit hook',
-    optargs => sub {
-        opt force => (
-            isa     => 'Bool',
-            comment => 'Overwrite existing git commit hooks',
-            alias   => 'f',
-        );
+            ($rf) = $rf->lines_utf8( { chomp => 1, count => 1, } );
+
+            die ".readme_from appears to be empty?\n" unless $rf;
+
+            $self->have_committed( path($rf), 0 )
+              // die ".readme_from points to a missing file: $rf\n";
+        },
     },
-);
+    sweetened => {
+        init_arg => undef,
+        default  => sub {
+            my $self = shift;
+            $self->perltidyrc =~ m/\.sweetened$/;
+        },
+    },
+    verbose => {},
+  };
 
-subcmd 'App::githook::perltidy::pre_commit' =>
-  ( comment => 'tidy Perl and POD files in the Git index', );
+our $VERSION = '1.0.1';
 
-sub new {
-    my $proto = shift;
-    my $class = ref $proto || $proto;
-
-    die OptArgs2::usage(__PACKAGE__) if $class eq __PACKAGE__;
-
-    my $opts = shift || die "usage: $class->new(\$opts)";
-    my $self = bless { opts => $opts }, $class;
-
-    $self->{me} //= basename($0);
-
+BEGIN {
     # Both of these start out as relative which breaks when we want to
     # modify the repo and index from a different working tree
-    $ENV{GIT_DIR} = path( $ENV{GIT_DIR} || '.git' )->absolute;
+    $ENV{GIT_DIR}        = path( $ENV{GIT_DIR} || '.git' )->absolute;
     $ENV{GIT_INDEX_FILE} = path( $ENV{GIT_INDEX_FILE} )->absolute->stringify
       if $ENV{GIT_INDEX_FILE};
+}
 
-    my $repo          = path( $ENV{GIT_DIR} )->parent;
-    my $manifest_skip = $repo->child('MANIFEST.SKIP');
-    my $perltidyrc    = $repo->child('.perltidyrc');
-    my $perltidyrc_s  = $repo->child('.perltidyrc.sweetened');
-    my $podtidyrc     = $repo->child('.podtidy-opts');
-    my $perlcriticrc  = $repo->child('.perlcriticrc');
-    my $readme_from   = $repo->child('.readme_from');
+sub BUILD {
+    my $self = shift;
 
-    $self->{manifest_skip} =
-      [ map { chomp; $_ } $manifest_skip->exists ? $manifest_skip->lines : () ];
+    die ".perltidyrc[.sweetened] missing from repository.\n"
+      unless $self->perltidyrc;
 
-    if ( $self->have_committed($perltidyrc) ) {
-        $self->{perltidyrc} = $perltidyrc;
-
-        die ".perltidyrc and .perltidyrc.sweetened are incompatible\n"
-          if $self->have_committed($perltidyrc_s);
-    }
-    elsif ( $self->have_committed($perltidyrc_s) ) {
-        $self->{perltidyrc} = $perltidyrc_s;
-        $self->{sweetened}  = 1;
-    }
-
-    if ( $self->have_committed($podtidyrc) ) {
-        $self->{podtidyrc} = $podtidyrc;
-        my $pod_opts = {};
-
-        foreach my $line ( $self->{podtidyrc}->lines ) {
-            chomp $line;
-            $line =~ s/^--//;
-            my ( $opt, $arg ) = split / /, $line;
-            $pod_opts->{$opt} = $arg;
-        }
-
-        $self->{podtidyrc_opts} = $pod_opts;
-    }
-
-    $self->{readme_from} = '';
-    if ( $self->have_committed($readme_from) ) {
-
-        ( $self->{readme_from} ) =
-          path($readme_from)->lines( { chomp => 1, count => 1 } );
-    }
-
-    if ( $self->have_committed($perlcriticrc) ) {
-        $self->{perlcriticrc} = $perlcriticrc;
-    }
-
-    $self;
+    die ".perltidyrc and .perltidyrc.sweetened are incompatible\n"
+      if $self->sweetened
+      and $self->have_committed( $self->repo->child('.perltidyrc') );
 }
 
 sub have_committed {
-    my $self = shift;
-    my $file = shift;
+    my $self           = shift;
+    my $file           = shift;
+    my $manifest_check = shift // 1;
 
     if ( -e $file ) {
         my $basename = $file->basename;
@@ -135,67 +122,16 @@ sub have_committed {
             'git ls-files --error-unmatch "' . $file . '" > /dev/null 2>&1' )
           == 0;
 
-        if ( my @manifest_skip = @{ $self->{manifest_skip} } ) {
-            $self->lprint(
-                "githook-perltidy: MANIFEST.SKIP does not cover $basename\n")
-              unless grep { $basename =~ m/$_/ } @manifest_skip;
+        if ( $manifest_check and my @skip_list = @{ $self->skip_list } ) {
+            warn "githook-perltidy: MANIFEST.SKIP does not cover $basename\n"
+              unless grep { $basename =~ m/$_/ } @skip_list;
         }
 
-        return 1;
+        return $file;
     }
 
-    return 0;
+    return;
 }
-
-my $old = '';
-
-sub lprint {
-    my $self = shift;
-    my $msg  = shift;
-
-    if ( $self->{opts}->{verbose} or !-t select ) {
-        if ( $msg eq "\n" ) {
-            print $old, "\n";
-            $old = '';
-            return;
-        }
-        elsif ( $msg =~ m/\n/ ) {
-            $old = '';
-            return print $msg;
-        }
-        $old = $msg;
-        return;
-    }
-
-    local $| ||= 1;
-
-    my $chars;
-    if ( $msg eq "\n" ) {
-        $chars = print $old, "\n";
-    }
-    else {
-        $chars = print ' ' x length($old), "\b" x length($old), $msg, "\r";
-    }
-
-    $old = $msg =~ m/\n/ ? '' : $msg;
-
-    return $chars;
-}
-
-sub sys {
-    my $self = shift;
-    print '  '
-      . $self->{me} . ': '
-      . join( ' ', map { defined $_ ? $_ : '*UNDEF*' } @_ ) . "\n"
-      if $self->{opts}->{verbose};
-    system(@_) == 0 or Carp::croak "@_ failed: $?";
-}
-
-1;
-
-package App::githook_perltidy;
-
-our $VERSION = '0.12.3';
 
 1;
 
@@ -203,23 +139,16 @@ __END__
 
 =head1 NAME
 
-App::githook::perltidy - implementation guts of githook-perltidy.
-
-App::githook_perltidy - legacy package for dependencies
+App::githook::perltidy - core implementation of githook-perltidy.
 
 =head1 VERSION
 
-0.12.3 (2018-11-22)
+1.0.1 (2022-10-14)
 
 =head1 DESCRIPTION
 
 The B<App::githook::perltidy> module contains the implementation of the
 L<githook-perltidy> script.
-
-The B<App::githook_perltidy> module only exists for backwards
-compatibility so that authors who have 'recommended' or 'required' it
-in a cpanfile or Makefile.PL or Build.PL get the new
-B<App::githook::perltidy> version.
 
 =head1 SEE ALSO
 
@@ -231,7 +160,7 @@ Mark Lawrence E<lt>nomad@null.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2011-2018 Mark Lawrence <nomad@null.net>
+Copyright 2011-2022 Mark Lawrence <nomad@null.net>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

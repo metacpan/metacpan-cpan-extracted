@@ -43,18 +43,18 @@ Files: COPYRIGHT
 Copyright: Copyright 1970 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/14lexical.t
- t/15nonhashvalue.t
- t/gh-8.t
- t/gh-9.t
-Copyright: This software is copyright (c) 2022 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: Changes
  META.json
  META.yml
  doap.ttl
 Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/14lexical.t
+ t/15nonhashvalue.t
+ t/gh-8.t
+ t/gh-9.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/11noncode.t
@@ -63,9 +63,9 @@ Files: t/11noncode.t
 Copyright: This software is copyright (c) 2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: dist.ini
- examples/Example/Exporter.pm
-Copyright: Copyright 2013 Toby Inkster.
+Files: inc/archaic/Test/More.pm
+ inc/archaic/Test/Simple.pm
+Copyright: Copyright 2001-2008 by Michael G Schwern <schwern@pobox.com>.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: README
@@ -73,23 +73,23 @@ Files: README
 Copyright: This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: inc/archaic/Test/More.pm
- inc/archaic/Test/Simple.pm
-Copyright: Copyright 2001-2008 by Michael G Schwern <schwern@pobox.com>.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: SIGNATURE
-Copyright: None
-License: public-domain
-
-Files: inc/archaic/Test/Builder.pm
-Copyright: Copyright 2002-2008 by chromatic <chromatic@wgz.org> and.
+Files: dist.ini
+ examples/Example/Exporter.pm
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/archaic/Test/Builder/IO/Scalar.pm
 Copyright: Copyright (c) 1996 by Eryq.  All rights reserved.
  Copyright (c) 1999,2001 by ZeeGee Software Inc.  All rights reserved.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/archaic/Test/Builder.pm
+Copyright: Copyright 2002-2008 by chromatic <chromatic@wgz.org> and.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: SIGNATURE
+Copyright: None
+License: public-domain
 
 License: Artistic-1.0
  This software is Copyright (c) 2022 by the copyright holder(s).

@@ -2,7 +2,7 @@ package Geo::TCX::Track;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =encoding utf-8
 
@@ -217,26 +217,22 @@ sub reverse {
     my $t = $orig_t->clone;
     my $n_points = $t->trackpoints;
     $t->{Points} = [];
-    my ($previous_pt, $previous_pt_distance_elapsed, $previous_pt_time_elapsed);
+    my ($previous_pt, $previous_pt_orig);
 
     for my $i (1 .. $n_points) {
         my $pt = $orig_t->trackpoint($n_points - $i + 1)->clone;
-        my $dist_meters;
 
         if ($i == 1) {
-            $dist_meters = 0;
-            $pt->time( $orig_t->trackpoint(1)->Time )
+            $pt->_reset_distance( 0 );
+            $pt->_reset_time( $orig_t->trackpoint(1)->Time )
         } else {
-            $dist_meters   = $previous_pt->DistanceMeters + $previous_pt_distance_elapsed;
-            $pt->time_epoch( $previous_pt->time_epoch     + $previous_pt_time_elapsed )
+            $pt->_reset_distance( $previous_pt->DistanceMeters + $previous_pt_orig->distance_elapsed, $previous_pt );
+            $pt->_reset_time_from_epoch( $previous_pt->time_epoch + $previous_pt_orig->time_elapsed,  $previous_pt)
         }
-        # we need to capture the following before they get modified by _set_* below
-        $previous_pt_distance_elapsed = $pt->distance_elapsed;
-        $previous_pt_time_elapsed = $pt->time_elapsed;
 
-        $pt = $pt->_set_time(     $pt->Time,    $previous_pt );
-        $pt = $pt->_set_distance( $dist_meters, $previous_pt );
         $previous_pt = $pt;
+        $previous_pt_orig = $orig_t->trackpoint($n_points - $i + 1)->clone;
+        # need copy of the original previous pt bcs elapsed fields of $pt got updated above
         push @{$t->{Points}}, $pt
     }
     return $t
@@ -324,7 +320,7 @@ sub distance_add {
     my ($t, $meters) = (shift, shift);
     for my $i (0 .. $#{$t->{Points}}) {
         my $tp = $t->{Points}[$i];
-        $tp->distance( $tp->DistanceMeters + $meters )
+        $tp->_set_distance_keys( $tp->DistanceMeters + $meters )
     }
     return 1
 }
@@ -514,7 +510,7 @@ Patrick Joly
 
 =head1 VERSION
 
-1.00
+1.01
 
 =head1 SEE ALSO
 

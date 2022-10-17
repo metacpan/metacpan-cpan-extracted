@@ -17,4 +17,7 @@ class Sys::IO::Stat : pointer_t {
   native method st_mtime : long ();
   native method st_atime : long ();
   native method st_ctime : long ();
+  native method st_mtim_tv_nsec : long ();
+  native method st_atim_tv_nsec : long ();
+  native method st_ctim_tv_nsec : long ();
 }

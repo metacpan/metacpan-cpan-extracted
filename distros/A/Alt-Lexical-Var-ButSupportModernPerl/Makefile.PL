@@ -27,7 +27,7 @@ my $meta = {
                                        conflicts => { "B::Hooks::OP::Check" => "< 0.19" },
                                        requires  => {
                                                       "Lexical::SealRequireHints" => 0.006,
-                                                      "perl" => 5.008001,
+                                                      "perl" => "5.018000",
                                                       "strict" => 0,
                                                       "warnings" => 0,
                                                       "XSLoader" => 0,
@@ -37,11 +37,11 @@ my $meta = {
   "provides"       => {
                         "Alt::Lexical::Var::ButSupportModernPerl" => {
                           file => "lib/Alt/Lexical/Var/ButSupportModernPerl.pm",
-                          version => 0.001,
+                          version => 0.002,
                         },
                       },
   "release_status" => "stable",
-  "version"        => 0.001,
+  "version"        => 0.002,
 };
 
 my %dynamic_config;

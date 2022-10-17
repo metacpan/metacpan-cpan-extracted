@@ -13,9 +13,9 @@ use Test::Builder;
 use Test::More ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2022-10-17'; # DATE
 our $DIST = 'Test-Sah-Filter'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my $Test = Test::Builder->new;
 
@@ -129,6 +129,12 @@ sub sah_filter_module_ok {
 
           TEST_EXAMPLES: {
                 last unless $opts{test_examples};
+
+                if ($meta->{before_test_examples}) {
+                    log_trace "Executing before_test_examples hook ...";
+                    $meta->{before_test_examples}->();
+                }
+
                 unless ($meta->{examples} && @{ $meta->{examples} }) {
                     $Test->ok(1);
                     $Test->diag("There are no examples");
@@ -152,6 +158,12 @@ sub sah_filter_module_ok {
                     $Test->subtest(
                         "example #$i",
                         sub {
+
+                            if ($eg->{before_test}) {
+                                log_trace "Executing before_test example hook ...";
+                                $eg->{before_test}->();
+                            }
+
                             my $filter_rule = [$filter_name1, $eg->{filter_args} // {}];
                             my $filter_code = $gen_filter->(
                                 filter_names=>[$filter_rule],
@@ -184,9 +196,21 @@ sub sah_filter_module_ok {
                                     $Test->ok(0, "filtering should fail but succeeds");
                                 }
                             }
+
+                            if ($eg->{after_test}) {
+                                log_trace "Executing after_test example hook ...";
+                                $eg->{after_test}->();
+                            }
+
                         },
                     ); # subtest example #$i
                 } # for $eg
+
+                if ($meta->{after_test_examples}) {
+                    log_trace "Executing after_test_examples hook ...";
+                    $meta->{after_test_examples}->();
+                }
+
             } # TEST_EXAMPLES
             $ok;
         } # subtest
@@ -324,7 +348,7 @@ Test::Sah::Filter - Test Data::Sah::Filter::* modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.004 of Test::Sah::Filter (from Perl distribution Test-Sah-Filter), released on 2022-07-24.
+This document describes version 0.005 of Test::Sah::Filter (from Perl distribution Test-Sah-Filter), released on 2022-10-17.
 
 =head1 SYNOPSIS
 
@@ -423,9 +447,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

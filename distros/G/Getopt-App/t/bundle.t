@@ -1,7 +1,5 @@
-use strict;
-use warnings;
+use Test2::V0;
 use File::Spec::Functions qw(catdir catfile rel2abs);
-use Test::More;
 use Getopt::App ();
 
 my $script = rel2abs(catfile qw(example bin bundle));
@@ -50,8 +48,8 @@ subtest bundle => sub {
   ok Test::Cool->can('new'), 'Test::Cool loaded';
 
   my @ok;
-  push @ok, is ref $app,          'CODE', 'compiled';
-  push @ok, is_deeply \@warnings, [],     'no warnings';
+  push @ok, is ref $app,   'CODE', 'compiled';
+  push @ok, is \@warnings, [],     'no warnings';
 
   unless (@ok == grep $_, @ok) {
     my $i = 0;

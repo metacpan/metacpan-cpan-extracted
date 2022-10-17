@@ -68,6 +68,7 @@ ERRORS
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
              From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                      Parameter 'tags' must be a 'Tags::Output::*' class.
              Parameter 'form' is required.
              Parameter 'form' must be a 'Data::HTML::Form' instance.
@@ -79,7 +80,11 @@ ERRORS
      process():
              From Tags::HTML::process():
                      Parameter 'tags' isn't defined.
-                     Form item must be a 'Data::HTML::Form::Input' instance.
+             Form item must be a 'Data::HTML::Form::Input' instance.
+
+     process_css():
+             From Tags::HTML::process_css():
+                     Parameter 'css' isn't defined.
 
 EXAMPLE
      use strict;
@@ -97,7 +102,7 @@ EXAMPLE
              'tags' => $tags,
      );
 
-     # Process pager.
+     # Process form.
      $obj->process;
      $obj->process_css;
 
@@ -164,5 +169,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

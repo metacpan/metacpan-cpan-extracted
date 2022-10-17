@@ -56,10 +56,6 @@ lib/SPVM/Sys/Process/Constant.c
 lib/SPVM/Sys/Process/Constant.config
 lib/SPVM/Sys/Process/Constant.pm
 lib/SPVM/Sys/Process/Constant.spvm
-lib/SPVM/Sys/Process/Tms.c
-lib/SPVM/Sys/Process/Tms.config
-lib/SPVM/Sys/Process/Tms.pm
-lib/SPVM/Sys/Process/Tms.spvm
 lib/SPVM/Sys/Socket.c
 lib/SPVM/Sys/Socket.config
 lib/SPVM/Sys/Socket.pm
@@ -119,6 +115,34 @@ lib/SPVM/Sys/Socket/Sockaddr/Un.c
 lib/SPVM/Sys/Socket/Sockaddr/Un.config
 lib/SPVM/Sys/Socket/Sockaddr/Un.pm
 lib/SPVM/Sys/Socket/Sockaddr/Un.spvm
+lib/SPVM/Sys/Time.c
+lib/SPVM/Sys/Time.config
+lib/SPVM/Sys/Time.pm
+lib/SPVM/Sys/Time.spvm
+lib/SPVM/Sys/Time/Constant.c
+lib/SPVM/Sys/Time/Constant.config
+lib/SPVM/Sys/Time/Constant.pm
+lib/SPVM/Sys/Time/Constant.spvm
+lib/SPVM/Sys/Time/Itimerval.c
+lib/SPVM/Sys/Time/Itimerval.config
+lib/SPVM/Sys/Time/Itimerval.pm
+lib/SPVM/Sys/Time/Itimerval.spvm
+lib/SPVM/Sys/Time/Timespec.c
+lib/SPVM/Sys/Time/Timespec.config
+lib/SPVM/Sys/Time/Timespec.pm
+lib/SPVM/Sys/Time/Timespec.spvm
+lib/SPVM/Sys/Time/Timeval.c
+lib/SPVM/Sys/Time/Timeval.config
+lib/SPVM/Sys/Time/Timeval.pm
+lib/SPVM/Sys/Time/Timeval.spvm
+lib/SPVM/Sys/Time/Timezone.c
+lib/SPVM/Sys/Time/Timezone.config
+lib/SPVM/Sys/Time/Timezone.pm
+lib/SPVM/Sys/Time/Timezone.spvm
+lib/SPVM/Sys/Time/Tms.c
+lib/SPVM/Sys/Time/Tms.config
+lib/SPVM/Sys/Time/Tms.pm
+lib/SPVM/Sys/Time/Tms.spvm
 lib/SPVM/Sys/User.c
 lib/SPVM/Sys/User.config
 lib/SPVM/Sys/User.pm
@@ -147,6 +171,7 @@ t/lib/SPVM/TestCase/Sys/FileTest.spvm
 t/lib/SPVM/TestCase/Sys/IO.spvm
 t/lib/SPVM/TestCase/Sys/Process.spvm
 t/lib/SPVM/TestCase/Sys/Socket.spvm
+t/lib/SPVM/TestCase/Sys/Time.spvm
 t/lib/SPVM/TestCase/Sys/User.spvm
 t/lib/SPVM/TestUtil/SocketAutoClose.spvm
 t/print_hello.pl
@@ -155,6 +180,7 @@ t/Sys_FileTest.t
 t/Sys_IO.t
 t/Sys_Process.t
 t/Sys_Socket.t
+t/Sys_Time.t
 t/Sys_User.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

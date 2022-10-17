@@ -28,9 +28,11 @@ t/Data-Commons-Image/06-dt_created.t
 t/Data-Commons-Image/07-dt_uploaded.t
 t/Data-Commons-Image/08-height.t
 t/Data-Commons-Image/09-id.t
-t/Data-Commons-Image/10-size.t
-t/Data-Commons-Image/11-url.t
-t/Data-Commons-Image/12-url_cb.t
-t/Data-Commons-Image/13-width.t
+t/Data-Commons-Image/10-license.t
+t/Data-Commons-Image/11-page_id.t
+t/Data-Commons-Image/12-size.t
+t/Data-Commons-Image/13-url.t
+t/Data-Commons-Image/14-url_cb.t
+t/Data-Commons-Image/15-width.t
 xt/Data-Commons-Image/01-pod_coverage.t
 xt/Data-Commons-Image/02-pod.t

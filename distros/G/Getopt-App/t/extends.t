@@ -3,9 +3,7 @@ sub getopt_post_process_argv { die join ' / ', __PACKAGE__, ref $_[0] }
 $INC{'My/Script/Base.pm'} = 1;
 
 package main;
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
 
 subtest invalid => sub {
   eval q(package main; use Getopt::App 'My::Class';1);

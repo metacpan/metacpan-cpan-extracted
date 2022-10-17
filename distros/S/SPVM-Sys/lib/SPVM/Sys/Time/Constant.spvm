@@ -1,0 +1,61 @@
+class Sys::Time::Constant {
+  native static method CLOCKS_PER_SEC : int ();
+
+  native static method CLOCK_BOOTTIME : int ();
+
+  native static method CLOCK_HIGHRES : int ();
+
+  native static method CLOCK_MONOTONIC : int ();
+
+  native static method CLOCK_MONOTONIC_COARSE : int ();
+
+  native static method CLOCK_MONOTONIC_FAST : int ();
+
+  native static method CLOCK_MONOTONIC_PRECISE : int ();
+
+  native static method CLOCK_MONOTONIC_RAW : int ();
+
+  native static method CLOCK_PROCESS_CPUTIME_ID : int ();
+
+  native static method CLOCK_PROF : int ();
+
+  native static method CLOCK_REALTIME : int ();
+
+  native static method CLOCK_REALTIME_COARSE : int ();
+
+  native static method CLOCK_REALTIME_FAST : int ();
+
+  native static method CLOCK_REALTIME_PRECISE : int ();
+
+  native static method CLOCK_REALTIME_RAW : int ();
+
+  native static method CLOCK_SECOND : int ();
+
+  native static method CLOCK_SOFTTIME : int ();
+
+  native static method CLOCK_THREAD_CPUTIME_ID : int ();
+
+  native static method CLOCK_TIMEOFDAY : int ();
+
+  native static method CLOCK_UPTIME : int ();
+
+  native static method CLOCK_UPTIME_COARSE : int ();
+
+  native static method CLOCK_UPTIME_FAST : int ();
+
+  native static method CLOCK_UPTIME_PRECISE : int ();
+
+  native static method CLOCK_UPTIME_RAW : int ();
+
+  native static method CLOCK_VIRTUAL : int ();
+
+  native static method ITIMER_PROF : int ();
+
+  native static method ITIMER_REAL : int ();
+
+  native static method ITIMER_REALPROF : int ();
+
+  native static method ITIMER_VIRTUAL : int ();
+
+  native static method TIMER_ABSTIME : int ();
+}

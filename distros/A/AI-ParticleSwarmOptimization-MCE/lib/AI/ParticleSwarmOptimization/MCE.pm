@@ -23,7 +23,7 @@ __PACKAGE__->mk_accessors( qw(
 $Storable::Deparse 	= 1;
 $Storable::Eval 	= 1;
 #-----------------------------------------------------------------------
-$AI::ParticleSwarmOptimization::MCE::VERSION = '1.001';
+$AI::ParticleSwarmOptimization::MCE::VERSION = '1.002';
 #=======================================================================
 sub new {
     my ($class, %params) = @_;
@@ -81,8 +81,10 @@ sub _init_mce {
 	
 	#-------------------------------------------------------------------
 	MCE::Map->init(
-		chunk_size 	=> q[auto], 
+		chunk_size 	=> 1,				# Thanks Roy :-)
+		#chunk_size => q[auto],			# The old one. Currently it should be the same... 
 		max_workers => $self->_wrk,
+		posix_exit  => 1,				# Thanks Roy :-)
 	);
 	
 	#-------------------------------------------------------------------
@@ -552,6 +554,10 @@ If any: A small script which yields the problem will probably be of help.
 =head1 SEE ALSO
 
 http://en.wikipedia.org/wiki/Particle_swarm_optimization
+
+=head1 THANKS
+
+Mario Roy for suggestions about efficiency.
 
 =head1 AUTHOR
 

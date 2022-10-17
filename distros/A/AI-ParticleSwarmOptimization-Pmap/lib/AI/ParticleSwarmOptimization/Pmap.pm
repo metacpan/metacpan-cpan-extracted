@@ -9,7 +9,7 @@ use base qw(
 use List::Util 					qw( min );
 use Parallel::parallel_map;
 #-----------------------------------------------------------------------
-$AI::ParticleSwarmOptimization::Pmap::VERSION = '1.002';
+$AI::ParticleSwarmOptimization::Pmap::VERSION = '1.005';
 #=======================================================================
 sub _initParticles {
     my ($self) = @_;
@@ -19,6 +19,19 @@ sub _initParticles {
 		$self->_initParticle( \%prt );
 		\%prt;
 	} 0 .. $self->{ numParticles } - 1;
+}
+#=======================================================================
+# Thanks Mario :-)
+my $_pid = $$;
+my $_srn = 0;
+#-----------------------------------------------------------------------
+sub _randInRange {
+    my ($self, $min, $max) = @_;
+    if( $$ != $_pid and not $_srn ){
+        $self->{ rndGen }->set_seed( abs( $$ ) );
+        $_srn = 1;
+    }
+    return $min + $self->{ rndGen }->rand( $max - $min );
 }
 #=======================================================================
 sub _moveParticles {

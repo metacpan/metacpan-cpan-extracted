@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 44;
+use Test::More tests => 53;
 use Geo::TCX;
 
 #
@@ -108,19 +108,16 @@ is($t6->trackpoints, 3,                             "   merge(): test that the t
 # clone(), xml_string()
 
 my $c = $t->clone;
-# I don't have an easy way to compare the two objects, I can test whether the xm_string() from the clone
-# is the same as the original $track_string above.  That tests both xml_string() and clone() at once though
-is($c->trackpoints, $t->trackpoints,            "    test that clone returns a clone with same # of points");
-my $clone_xml = $c->xml_string;
-is($clone_xml, $track_string,                   "    test that xml_string() reproduces the original string");
+# is_deeply( $c, $t,                " clone(): test that the data structures");
+# is_deeply does not work because of operator overloading
+is($c->xml_string, $track_string, "   xml_string(): reproduces the original string, indirect way to test clone()");
 
 #
 # time_add() -- add 1 day and 5 seconds to all points, check return values (should be nothing)
 
-my $what = $c->time_add( days => 1, seconds => 5 );
-is($c->trackpoint(4)->Time, '2014-08-12T10:25:34Z', "   check one of the Time values to see if has been incremented properly");
-is($what, 1,                                        "   what date_time() returns which should be true");
-
+my $ret_val = $c->time_add( days => 1, seconds => 5 );
+is($c->trackpoint(4)->Time, '2014-08-12T10:25:34Z', "   time_add(): picked one point, has Time been incremented properly?");
+is($ret_val, 1,                                     "   time_add(): return value");
 
 #
 # point_closest_to()
@@ -137,13 +134,26 @@ isa_ok ($closest_pt, 'Geo::TCX::Trackpoint');
 is ($pt_no,  14,                 "   point_closest_to(): test which point is the closest one");
 is ($meters, 76.000892,          "   point_closest_to(): test meters from the point");
 
-
 #
-# B - Laps.pm
+# reverse()
 
-# TODO: test xml_string(), time_add(), merge()
-# my $merge = $l2 + $l3;
+my ($t_shorter, $t_rest) = $t->split(5);
+my $rev = $t_shorter->reverse;
+my $t_shorter_clone = $t_shorter->clone;
 
+is ($rev->trackpoint(2)->distance_elapsed,  11.261,   "   reverse(): expected elapsed distance between 2nd and 1st point");
+is ($rev->trackpoint(3)->distance_elapsed,  2.697,    "   reverse(): expected elapsed distance between 3rd and 2nd point");
+is ($rev->trackpoint(2)->time_elapsed,  4,            "   reverse(): expected elapsed distance between 2nd and 1st point");
+is ($rev->trackpoint(3)->time_elapsed,  1,            "   reverse(): expected elapsed distance between 3rd and 2nd point");
+is ($rev->trackpoint(4)->time_elapsed,  2,            "   reverse(): expected elapsed distance between 3rd and 2nd point");
+# is_deeply( $t_shorter, $t_shorter_clone,             "   reverse(): test that original track is left intact");
+# - is_deeply does not work because of operator overloading
+# - testing by comparing a few points instead:
+is ($t_shorter_clone->trackpoint(5)->distance_elapsed,  11.261,   "   reverse(): test that original track is left intact");
+is ($t_shorter_clone->trackpoint(4)->distance_elapsed,  2.697,    "   reverse(): test that original track is left intact");
+is ($t_shorter_clone->trackpoint(5)->time_elapsed,  4,            "   reverse(): test that original track is left intact");
+is ($t_shorter_clone->trackpoint(4)->time_elapsed,  1,            "   reverse(): test that original track is left intact");
+is ($t_shorter_clone->trackpoint(3)->time_elapsed,  2,            "   reverse(): test that original track is left intact");
 
 print "so debugger doesn't exit\n";
 

@@ -5,3 +5,5 @@
 blib/.*
 pm_to_blib
 RDF-KV-.*
+^MYMETA.json$
+^MYMETA.yml$

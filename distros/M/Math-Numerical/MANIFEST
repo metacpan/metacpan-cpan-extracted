@@ -6,6 +6,7 @@ lib/Math/Numerical.pm
 LICENSE
 Makefile.PL
 MANIFEST
+README.pod
 t/00-perl-critic.t
 t/00-pod-syntax.t
 t/00-spelling.t

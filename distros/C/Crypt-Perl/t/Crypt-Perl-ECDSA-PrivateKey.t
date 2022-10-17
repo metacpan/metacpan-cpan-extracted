@@ -271,9 +271,17 @@ sub test_sign : Tests() {
                                 skip 'Your OpenSSL can’t ECDSA!', 1;
                             }
 
-                            if (!OpenSSL_Control::can_load_private_pem($ecdsa->to_pem_with_explicit_curve())) {
-                                $SKIPPED{$curve_label} = '!can_load_private_pem';
-                                skip 'Your OpenSSL can’t load this key!', 1;
+                            my $explicit_pem = $ecdsa->to_pem_with_explicit_curve();
+
+                            # Some OpenSSLs (e.g. RHEL 9’s) can load
+                            # explicit-curve keys but refuse to work with them.
+                            # To detect that we have OpenSSL create a dummy
+                            # signature before using it to verify a
+                            # Crypt::Perl-generated signature.
+                            #
+                            if (!OpenSSL_Control::can_sign_with_key($explicit_pem)) {
+                                $SKIPPED{$curve_label} = '!can_sign_with_key';
+                                skip 'Your OpenSSL can’t sign with this key!', 1;
                             }
 
                             if (OpenSSL_Control::has_ecdsa_verify_private_bug()) {
@@ -282,7 +290,7 @@ sub test_sign : Tests() {
                             }
 
                             my $ok = OpenSSL_Control::verify_private(
-                                $ecdsa->to_pem_with_explicit_curve(),
+                                $explicit_pem,
                                 $msg,
                                 $digest_alg,
                                 $signature,
@@ -296,7 +304,7 @@ sub test_sign : Tests() {
         }
     }
 
-    diag explain \%SKIPPED;
+    diag explain \%SKIPPED if %SKIPPED;
 
     return;
 }

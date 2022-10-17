@@ -139,7 +139,7 @@ sub BEGIN {
 
 $support_jcode_package_too = 1;
 
-$VERSION = '2.13.4.27';
+$VERSION = '2.13.4.28';
 $VERSION = $VERSION;
 $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
 
@@ -284,7 +284,7 @@ END
         if (s/^f(.*)//) {
             ($eol = $1 || shift) =~ tr/A-Z/a-z/;
             unless (defined($eol) && defined($eol{$eol})) {
-                die("Usage:\n$usage");
+                die "Usage:\n$usage";
             }
             next;
         }
@@ -1324,15 +1324,9 @@ sub getcode {
     local ( $matched, $encoding );
 
     # not Japanese
-    if ( $s !~ /[\e\x80-\xff]/ ) {
+    if ( $s =~ /^[\x00-\x1a\x1c-\x7f]*$/ ) {
         $matched  = 0;
         $encoding = undef;
-    }
-
-    # 'jis'
-    elsif ( $s =~ /$re_esc_jp|$re_esc_asc|$re_esc_kana/o ) {
-        $matched  = 1;
-        $encoding = 'jis';
     }
 
     # 'binary'
@@ -1341,171 +1335,261 @@ sub getcode {
         $encoding = 'binary';
     }
 
-    # should be 'euc' or 'sjis' or 'utf8'
-    else {
-        local ( $sjis, $euc, $utf8 ) = ( 0, 0, 0 );
+    # 1 octet character should be 'sjis', 'binary', or not Japanese
+    elsif ( length($s) == 1 ) {
 
-        # Id: getcode.pl,v 0.01 1998/03/17 gama Exp
-        # http://www2d.biglobe.ne.jp/~gama/cgi/jcode/jcode.htm
-
-        while ( $s =~ /(($re_sjis_c|$re_sjis_ank)+)/go ) {
-            $sjis += length($1);
-        }
-        while ( $s =~ /(($re_euc_c|$re_euc_kana|$re_ascii|$re_euc_0212)+)/go ) {
-            $euc += length($1);
+        # not Japanese
+        if ( $s =~ /\x1b/ ) {
+            $matched  = 0;
+            $encoding = undef;
         }
 
-        # 2011/12/06 Improvement proposal from Hanada Masaaki
-        # before: while ( $s =~ /(($re_utf8_c)+)/go ) {
-
-        while ( $s =~ /(($re_utf8_c|$re_ascii)+)/go ) {
-            $utf8 += length($1);
+        # 'sjis'
+        elsif ( $s =~ /$re_sjis_ank/o ) {
+            $matched  = 1;
+            $encoding = 'sjis';
         }
 
-        if ( $sjis > $euc ) {
-            if ( $sjis > $utf8 ) {
-                $matched  = $sjis;
-                $encoding = 'sjis';
-            }
-            elsif ( $sjis == $utf8 ) {
-                $matched = $sjis;
-                if ( $s =~ /^($re_utf8_c|$re_ascii)+$/o ) {
-                    $encoding = 'utf8';
-                }
-                elsif ( $s =~ /^($re_sjis_c|$re_sjis_ank)+$/o ) {
-                    $encoding = 'sjis';
-                }
-                elsif ( ( length($s) >= 30 ) && ( $matched >= 15 ) ) {
-                    $encoding = 'utf8';
-                }
-                else {
-                    $encoding = undef;
-                }
-            }
-            else {
-                $matched  = $utf8;
-                $encoding = 'utf8';
-            }
-        }
-        elsif ( $sjis == $euc ) {
-            if ( $sjis > $utf8 ) {
-                $matched = $sjis;
-
-# http://www.srekcah.org/jcode/2.13.3/
-#
-#! ;; $rcsid = q$Id: jcode.pl,v 2.13.3.2 2002/04/07 08:13:57 utashiro Exp $;
-# *** 370,375 ****
-# --- 370,390 ----
-#   elsif ($s =~ /$re_bin/o) { # 'binary'
-#       $matched = 0;
-#       $code = 'binary';
-#+  }
-#+  elsif ($s =~ /[\201-\215\220-\240]/) {
-#+      $code = 'sjis';
-#+  }
-#+  elsif ($s =~ /\216[^\241-\337]/) {
-#+    $code = 'sjis';
-#+  }
-#+  elsif ($s =~ /\217[^\241-\376]/) {
-#+      $code = 'sjis';
-#+  }
-#+  elsif ($s =~ /\217[\241-\376][^\241-\376]/) {
-#+      $code = 'sjis';
-#+  }
-#+  elsif ($s =~ /(^|[\000-\177])[\241-\374]((\216[\241-\374]){2})*([\000-\177]|$)/) {
-#+      $code = 'sjis';
-#   }
-#   else { # should be 'euc' or 'sjis'
-#       local($sjis, $euc) = (0, 0);
-
-# jcodeg.diff by Gappai
-# http://www.vector.co.jp/soft/win95/prog/se347514.html
-
-# Id: getcode.pl,v 0.01 1998/03/17 gama Exp
-# http://www2d.biglobe.ne.jp/~gama/cgi/jcode/jcode.htm
-
-                if ( $s =~ /[\x80-\x8d\x90-\xa0]/ ) {
-                    $encoding = 'sjis';
-                }
-                elsif ( $s =~ /\x8e[^\xa1-\xdf]/ ) {
-                    $encoding = 'sjis';
-                }
-                elsif ( $s =~ /\x8f[^\xa1-\xfe]/ ) {
-                    $encoding = 'sjis';
-                }
-                elsif ( $s =~ /\x8f[\xa1-\xfe][^\xa1-\xfe]/ ) {
-                    $encoding = 'sjis';
-                }
-                elsif ( $s =~
-/(^|[^\x81-\x9f\xa1-\xdf\xe0-\xfc])[\xa1-\xdf]([\xa1-\xdf][\xa1-\xdf])*([^\xa1-\xdf]|$)/
-                  )
-                {
-                    $encoding = 'sjis';
-                }
-
-                # Perl memo by OHZAKI Hiroki
-                # http://www.din.or.jp/~ohzaki/perl.htm#JP_Code
-
-                elsif ( $s =~
-/^([\x81-\x9f\xe0-\xfc][\x40-\x7e\x80-\xfc]|[\xa1-\xdf]|[\x00-\x7f])*$/
-                  )
-                {
-                    if ( $s !~
-/^([\xa1-\xfe][\xa1-\xfe]|\x8e[\xa1-\xdf]|\x8f[\xa1-\xfe][\xa1-\xfe]|[\x00-\x7f])*$/
-                      )
-                    {
-                        $encoding = 'sjis';
-                    }
-                    else {
-                        $encoding = 'euc';
-                    }
-                }
-                else {
-                    $encoding = 'euc';
-                }
-            }
-            elsif ( $sjis == $utf8 ) {
-                $matched = $sjis;
-                if ( $s =~ /^($re_utf8_c|$re_ascii)+$/o ) {
-                    $encoding = 'utf8';
-                }
-                elsif ( $s =~ /^($re_sjis_c|$re_sjis_ank)+$/o ) {
-                    $encoding = 'sjis';
-                }
-                elsif ( ( length($s) >= 30 ) && ( $matched >= 15 ) ) {
-                    $encoding = 'utf8';
-                }
-                else {
-                    $encoding = undef;
-                }
-            }
-            else {
-                $matched  = $utf8;
-                $encoding = 'utf8';
-            }
-        }
+        # 'binary'
         else {
-            if ( $euc > $utf8 ) {
-                $matched  = $euc;
-                $encoding = 'euc';
-            }
-            elsif ( $euc == $utf8 ) {
-                $matched = $euc;
-                if ( ( length($s) >= 30 ) && ( $matched >= 15 ) ) {
-                    $encoding = 'utf8';
-                }
-                else {
-                    $encoding = undef;
-                }
-            }
-            else {
-                $matched  = $utf8;
-                $encoding = 'utf8';
-            }
+            $matched  = 0;
+            $encoding = 'binary';
         }
     }
 
+    # 2 octet character should be 'utf8', 'euc', 'sjis', or 'binary'
+    elsif ( length($s) == 2 ) {
+
+        # 'utf8' popular codepoints
+        if (
+            $s =~ /^\xc2[\xa7\xb1\xb6]$/ ||
+            $s =~ /^\xc3\x97$/
+        ) {
+            $matched  = 2;
+            $encoding = 'utf8';
+        }
+
+        # 'euc' popular codepoints
+        elsif (
+            $s =~ /^\xb1[\xb3\xbf\xc4\xc6\xc7\xca\xd1\xd2\xd8\xdb]$/                                                         ||
+            $s =~ /^\xb2[\xb5\xb6\xb9\xbb\xbc\xbd\xbe\xbf\xc1\xc3\xc4\xc6\xc7\xc8\xca\xcb\xcc\xce\xcf\xd0\xd6\xd9\xda\xdd]$/ ||
+            $s =~ /^\xb3[\xb2\xb9\xc6\xc8\xca\xce\xd0\xd1\xd8\xda\xdb]$/                                                     ||
+            $s =~ /^\xb4[\xb1\xb3\xb4\xb6\xc0\xc4\xc5\xc6\xc9\xca\xd6\xd8\xda\xdb\xdd]$/                                     ||
+            $s =~ /^\xb5[\xb4\xbb\xc1\xc4\xc8\xd2\xd5\xd7\xd9\xdb\xdc]$/                                                     ||
+            $s =~ /^\xb6[\xb2\xb5\xb6\xbb\xbd\xc1\xc8\xc9\xca\xcb\xcc\xd0\xd8\xda]$/                                         ||
+            $s =~ /^\xb7[\xb3\xb8\xbb\xbf\xc1\xc3\xc7\xc8\xca\xcf\xd0\xd1\xd2\xd7\xd9\xda\xdd]$/                             ||
+            $s =~ /^\xb8[\xb5\xb6\xb7\xba\xbb\xbd\xc0\xc2\xc4\xc5\xc6\xca\xcb\xcd\xce]$/                                     ||
+            $s =~ /^\xb9[\xb6\xb9\xbb\xbd\xbe\xc1\xc6\xcd\xd3\xd4\xd6\xd8]$/                                                 ||
+            $s =~ /^\xba[\xb4\xb8\xb9\xc2\xc6\xc7\xcd\xd0\xd1\xd2\xd7\xd9\xda\xdc]$/                                         ||
+            $s =~ /^\xbb[\xb2\xb3\xb6\xba\xbb\xc4\xc8\xc9\xca\xcb\xcd\xce\xcf\xd0\xd1\xd2\xd4\xd5\xd6\xd7\xd8\xd9\xdc]$/     ||
+            $s =~ /^\xbc[\xba\xbc\xc1\xc2\xcc\xce\xd2\xd4\xd5\xd6\xda]$/                                                     ||
+            $s =~ /^\xbd[\xb5\xb8\xbb\xbc\xbd\xc2\xc5\xc9\xcb\xd0\xd5]$/                                                     ||
+            $s =~ /^\xbe[\xbe\xc3\xc6\xc8\xc9\xca\xcf\xd0\xda\xdc\xdd]$/                                                     ||
+            $s =~ /^\xbf[\xb2\xb4\xb6\xb7\xb9\xbc\xbd\xbf\xc0\xc6\xc7\xc9\xca\xcc\xcd]$/                                     ||
+            $s =~ /^\xc0[\xb1\xb2\xb5\xb6\xb8\xb9\xba\xbc\xbd\xbe\xc1\xc4\xc5\xc7\xca\xce\xd0\xd1\xd5\xd6\xda\xdc]$/         ||
+            $s =~ /^\xc1[\xb1\xb4\xc7\xc8\xdb]$/                                                                             ||
+            $s =~ /^\xc2[\xb2\xb3\xb4\xbc\xbe\xbf\xc0\xc7\xce\xd0\xd3\xd4\xd8]$/                                             ||
+            $s =~ /^\xc3[\xb1\xb5\xbb\xbc\xc2\xc6\xc7\xc8\xca\xcb\xcc\xcd\xce\xcf\xd1\xd3\xd7\xd9]$/                         ||
+            $s =~ /^\xc4[\xb4\xb6\xb9\xba\xbb\xbe\xc5\xc9\xcb\xcc]$/                                                         ||
+            $s =~ /^\xc5[\xb4\xb5\xb7\xb8\xb9\xbe\xc0\xc1\xc4\xc5\xcf\xd0\xd4\xd9\xda\xdc\xdd]$/                             ||
+            $s =~ /^\xc6[\xb1\xb2\xbb\xc0\xc3\xc8\xc9\xcd\xcf]$/                                                             ||
+            $s =~ /^\xc7[\xb3\xba\xbc\xbd\xbe\xc0\xc8\xc9\xcb\xcf\xd4\xd5\xd8\xdb\xdc]$/                                     ||
+            $s =~ /^\xc8[\xb1\xb4\xbd\xbe\xbf\xc4\xc7\xc8\xcc\xce\xd3\xd5\xd6\xdd]$/                                         ||
+            $s =~ /^\xc9[\xb4\xb8\xbc\xbd\xbe\xc1\xc2\xca\xcd\xd4\xd5\xd7\xd8\xd9\xdb\xdc\xdd]$/                             ||
+            $s =~ /^\xca[\xb4\xb8\xb9\xbc\xbf\xc2\xc4\xc6\xcc\xd1\xd2\xd4\xd5\xd6\xd8\xd9\xdb\xdd]$/                         ||
+            $s =~ /^\xcb[\xba\xbd\xbe\xc9\xcc\xcd\xdc]$/                                                                     ||
+            $s =~ /^\xcc[\xb1\xb2\xb4\xb5\xbc\xbe\xbf\xc0\xc2\xc4\xcc\xd1\xd3\xda\xdc]$/                                     ||
+            $s =~ /^\xcd[\xb5\xb7\xbc\xbd\xbe\xc4\xc6\xc9\xcb\xcd\xce\xd1\xd5\xd7\xdb]$/                                     ||
+            $s =~ /^\xce[\xb1\xb9\xbe\xc1\xc5\xc9\xcc\xcf\xd3\xd9]$/                                                         ||
+            $s =~ /^\xcf[\xbf\xc0\xc2\xc3\xc8]$/
+        ) {
+            $matched  = 2;
+            $encoding = 'euc';
+        }
+
+        # 'sjis' halfwidth KATAKANA
+        elsif (
+            $s =~ /^[\xb1-\xdc][\xb1-\xdd]$/
+        ) {
+            $matched  = 2;
+            $encoding = 'sjis';
+        }
+
+        # 'euc' popular codepoints
+        elsif (
+            $s =~ /^[\xa1-\xdf][\xa1-\xfe]$/                                 ||
+            $s =~ /^\xe0[\xa5\xa8\xc4\xd0\xdd\xe1\xea\xf1\xfa]$/             ||
+            $s =~ /^\xe1[\xb4\xc6\xd6\xd7\xda\xdb\xdc\xe2\xe3\xe7\xfb]$/     ||
+            $s =~ /^\xe2[\xa2\xa4\xb2\xc1\xc3\xcb\xcc\xd4\xd6\xd7\xdb\xf9]$/ ||
+            $s =~ /^\xe3[\xaa\xab\xae\xb1\xb7\xd2\xd6\xde\xe0\xfe]$/         ||
+            $s =~ /^\xe4[\xa3\xb5\xb6\xc6]$/                                 ||
+            $s =~ /^\xe5[\xab\xb0\xba\xcc\xe0\xe1\xe2\xe3\xe7]$/             ||
+            $s =~ /^\xe6[\xab\xb7\xbd\xc6\xc7\xea\xf9\xfa\xfe]$/             ||
+            $s =~ /^\xe7[\xa5\xa7\xb4\xd0\xd3\xd6\xe7\xf5\xfd]$/             ||
+            $s =~ /^\xe8[\xa7\xba\xbc\xbd\xc4\xdf\xe7\xea]$/                 ||
+            $s =~ /^\xe9[\xa1\xac\xae\xaf\xb2\xba\xda\xe1\xe6\xe7\xf0]$/     ||
+            $s =~ /^\xea[\xa4\xa6\xaf\xb5\xb8\xe3\xee\xf4\xf8]$/             ||
+            $s =~ /^[\xeb-\xec][\xa1-\xfe]$/                                 ||
+            $s =~ /^[\xef-\xf3][\xa1-\xfe]$/                                 ||
+            $s =~ /^\xf4[\xa1-\xa6]$/
+        ) {
+            $matched  = 2;
+            $encoding = 'euc';
+        }
+
+        # 'sjis'
+        elsif (
+            $s =~ /^$re_sjis_c$/o
+        ) {
+            $matched  = 2;
+            $encoding = 'sjis';
+        }
+
+        # 'binary'
+        else {
+            $matched  = 0;
+            $encoding = 'binary';
+        }
+    }
+
+    # 'jis'
+    elsif ( $s =~ /$re_esc_jp|$re_esc_asc|$re_esc_kana/o ) {
+        $matched  = 1;
+        $encoding = 'jis';
+    }
+
+    # 3 or more octet character should be 'utf8', 'sjis', 'euc', or 'binary'
+    else {
+        local (%parsee) = ( 'binary', $s );
+        $parsee{'binary'} =~ s/^[\x00-\x7f]+//;
+        $parsee{'sjis'  } =
+        $parsee{'euc'   } =
+        $parsee{'utf8'  } = $parsee{'binary'};
+
+        # parsing "$s" in each encoding little by little, to find out the winning encoding
+        # in many cases, 16 characters are enough to detect encoding
+        while (
+            (     $parsee{'sjis'} =~ s/^($re_sjis_c|$re_sjis_ank){1,16}//o
+                + $parsee{'euc'}  =~ s/^($re_euc_c|$re_ascii|$re_euc_kana|$re_euc_0212){1,16}//o
+                + $parsee{'utf8'} =~ s/^($re_utf8_c|$re_ascii){1,16}//o
+            ) >= 2
+        ) {
+        }
+
+        # priority definition in case of same score
+        local (%priority) = reverse (
+            1, 'binary', # if not matched in any encoding
+            2, 'utf8',
+            3, 'sjis',
+            4, 'euc'
+        );
+
+        # detect encoding
+        ($encoding) = sort {
+
+            # which is shorter remaining $parsee{...} or
+            (
+                length($parsee{$a})
+                <=>
+                length($parsee{$b})
+            )
+
+            # less character's type or
+            || (
+                &count_ctype($a, substr($parsee{'binary'}, 0, length($parsee{'binary'})-length($parsee{$a})))
+                <=>
+                &count_ctype($b, substr($parsee{'binary'}, 0, length($parsee{'binary'})-length($parsee{$b})))
+            )
+
+            # high priority
+            || (
+                $priority{$a}
+                <=>
+                $priority{$b}
+            )
+
+        } (keys %parsee);
+
+        # 8E..8E..8E.. may be 'euc' halfwidth KATAKANA
+        if ( $encoding eq 'sjis' ) {
+            if ( length($parsee{'sjis'}) == length($parsee{'euc'}) ) {
+
+                # 8E..8E..8E..
+                if ( $parsee{'binary'} =~ /(\x8e[\xb1-\xdd]){3,}/ ) {
+                    $encoding = 'euc';
+                }
+
+                # 8E..8E.. (only two 8E.. by not popular sjis codepoints)
+                elsif ( $parsee{'binary'} =~ /(\x8e[\xb1\xb2\xb3\xb4\xb6\xb9\xbb\xbd\xbe\xc1\xc2\xc3\xc4\xc6\xc7\xc8\xcd\xce\xd1\xd5\xd6\xd9\xda\xdb\xdc\xdd]){2}/ ) {
+                    $encoding = 'euc';
+                }
+            }
+        }
+
+        # matched length is original length minus remaining length
+        $matched = length($s) - length($parsee{$encoding});
+    }
+
     return wantarray ? ( $matched, $encoding ) : $encoding;
+}
+
+#---------------------------------------------------------------------
+# Count ctype of string
+#---------------------------------------------------------------------
+sub count_ctype {
+    local ( $encoding, $_ ) = @_;
+    local ($count_ctype) = 0;
+
+    if ( $encoding eq 'sjis' ) {
+        while (
+            s/^($re_ascii)+//       || # ASCII
+            s/^([\xb1-\xdd])+//     || # halfwidth KATAKANA
+            s/^(\x82[\x4f-\x58])+// || # fullwidth numeric
+            s/^(\x82[\x60-\x9a])+// || # fullwidth alphabet
+            s/^(\x82[\x9f-\xf1])+// || # fullwidth HIRAGANA
+            s/^(\x83[\x40-\x96])+// || # fullwidth KATAKANA
+            s/^($re_sjis_c)+//      || # other all
+            s/^[\x00-\xff]//
+        ) {
+            $count_ctype++;
+        }
+    }
+    elsif ( $encoding eq 'euc' ) {
+        while (
+            s/^($re_ascii)+//              || # ASCII
+            s/^($re_euc_kana)+//           || # halfwidth KATAKANA
+            s/^(\xa3[\xb0-\xb9])+//        || # fullwidth numeric
+            s/^(\xa3[\xc1-\xfa])+//        || # fullwidth alphabet
+            s/^(\xa4[\xa1-\xf3])+//        || # fullwidth HIRAGANA
+            s/^(\xa5[\xa1-\xf6])+//        || # fullwidth KATAKANA
+            s/^($re_euc_c|$re_euc_0212)+// || # other all
+            s/^[\x00-\xff]//
+        ) {
+            $count_ctype++;
+        }
+    }
+    elsif ( $encoding eq 'utf8' ) {
+        while (
+            s/^($re_ascii)+//                               || # ASCII
+            s/^($re_utf8_kana)+//                           || # halfwidth KATAKANA
+            s/^(\xef\xbc[\x90-\x99])+//                     || # fullwidth numeric
+            s/^(\xef\xbc[\xa1-\xba]|\xef\xbd[\x81-\x9a])+// || # fullwidth alphabet
+            s/^(\xe3\x81[\x81-\xbf]|\xe3\x82[\x80-\x93])+// || # fullwidth HIRAGANA
+            s/^(\xe3\x82[\xa1-\xbf]|\xe3\x83[\x80-\xb6])+// || # fullwidth KATAKANA
+            s/^($re_utf8_c)+//                              || # other all
+            s/^[\x00-\xff]//
+        ) {
+            $count_ctype++;
+        }
+    }
+    elsif ( $encoding eq 'binary' ) {
+        $count_ctype = length($_);
+    }
+    else {
+        die "unknown encoding '$encoding'.";
+    }
+
+    return $count_ctype;
 }
 
 #---------------------------------------------------------------------

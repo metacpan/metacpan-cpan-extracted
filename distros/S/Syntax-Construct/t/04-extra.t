@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 use Syntax::Construct ();
 
 {   # Hack: match-once in string eval causes 5.10.0 to throw
@@ -37,5 +37,14 @@ use Syntax::Construct ();
 
     } else {
         is_deeply($r, [1, 2], 'no @_=split');
+    }
+}
+
+{   my $r = eval q{ no strict "vars"; @arr = (12); push arr, 13; [@arr] };
+    if(eval { 'Syntax::Construct'->import('no-sigil'); 1}) {
+        is_deeply($r, [12, 13], 'no-sigil');
+
+    } else {
+        is_deeply($r, undef, 'no no-sigil');
     }
 }

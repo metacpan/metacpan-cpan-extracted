@@ -12,7 +12,6 @@ bin/harmonograph
 cpanfile
 dist.ini
 lib/App/GUI/Harmonograph.pm
-lib/App/GUI/Harmonograph/ColorDisplay.pm
 lib/App/GUI/Harmonograph/Config.pm
 lib/App/GUI/Harmonograph/Dialog/About.pm
 lib/App/GUI/Harmonograph/Dialog/Function.pm
@@ -24,7 +23,8 @@ lib/App/GUI/Harmonograph/Frame/Part/ColorFlow.pm
 lib/App/GUI/Harmonograph/Frame/Part/ColorPicker.pm
 lib/App/GUI/Harmonograph/Frame/Part/PenLine.pm
 lib/App/GUI/Harmonograph/Frame/Part/Pendulum.pm
-lib/App/GUI/Harmonograph/ProgressBar.pm
 lib/App/GUI/Harmonograph/Settings.pm
-lib/App/GUI/Harmonograph/SliderCombo.pm
+lib/App/GUI/Harmonograph/Widget/ColorDisplay.pm
+lib/App/GUI/Harmonograph/Widget/ProgressBar.pm
+lib/App/GUI/Harmonograph/Widget/SliderCombo.pm
 t/01_load.t

@@ -58,7 +58,7 @@ eval q{
 	use Lexical::Var '$foo' => \(my $x=undef);
 	$foo = 456;
 };
-like $@, qr/\ADied /;
+like $@, qr/\A(Died|Can't modify) /;
 
 # test that non-constant undef $foo does not participate in constant folding
 eval q{
@@ -66,7 +66,7 @@ eval q{
 	use Lexical::Var '$foo' => \(my $x=undef);
 	!$foo = 456;
 };
-like $@, qr/\ACan't modify not /;
+like $@, qr/\ACan't modify /;
 
 is eval q{
 	use Lexical::Var '$foo' => \undef;

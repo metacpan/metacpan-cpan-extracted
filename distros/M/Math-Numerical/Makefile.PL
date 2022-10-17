@@ -21,7 +21,7 @@ WriteMakefile(
     TEST_REQUIRES => {
       'IPC::Run3'             => 0,
       'Test2::V0'             => 0,
-      'Test2::Tools::Compare' => 0,
+      'Test2::Tools::Compare' => '0.000081',
     },
     # We don’t really need a MYMETA file, but then cpanm can’t correctly find
     # our dependencies. CPAN works correctly either way.

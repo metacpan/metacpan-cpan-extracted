@@ -1,7 +1,27 @@
+0.55  2022-10-15  lichtkind
+-------
+    * = feature enhancement and refinement
+    * * draw lines (connect dots) (good vor vector graphics)
+    * + radius damping acceleration
+    * + independent frequency damping
+    * + added Gamma(1/2) to frequency factor constants
+    * ~ change dot density to quadratic behaviour
+    * / ranemed all damping related setting keys
+    * " separate linear and circular pendula in two tabs
+    * " cleaner GUI
+    * ! fixed tests srezic++
+    * ! bug in rotation matrix
+
+0.51  2022-10-14  lichtkind
+-------
+    * = maintenance
+    * / put custom widgets in own name space
+    * ! crash when using image size menu
+
 0.50  2022-10-10  lichtkind
 -------
     * = maintenance and one planned major feature
-    * * frequency base factors for relative values to other pendula and natural constants
+    * * frequency base factors for relative values to other pendula and math constants
     * ? added and rewrote some docs
     * ! save frequency decimals in INI
     * ! fixed tests srezic++
@@ -49,6 +69,6 @@
     *   - offset, checks for 90 and 180 degree
     * + line length, dot denisty and dot size
     * + color flow: no, linear, alternating, circular
-    * save images as SVG, JPEG and PNG
-    * save and load settings in INI files
-    * quick save of images and settings for series of files
+    * + save images as SVG, JPEG and PNG
+    * + save and load settings in INI files
+    * + quick save of images and settings for series of files

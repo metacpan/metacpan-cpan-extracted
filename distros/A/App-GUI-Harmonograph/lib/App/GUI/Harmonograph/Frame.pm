@@ -3,10 +3,6 @@ use warnings;
 use utf8;
 use Wx::AUI;
 
-
-# modular conections
-# X Y sync ? , undo ?
-
 package App::GUI::Harmonograph::Frame;
 use base qw/Wx::Frame/;
 use App::GUI::Harmonograph::Frame::Part::Pendulum;
@@ -15,10 +11,10 @@ use App::GUI::Harmonograph::Frame::Part::ColorBrowser;
 use App::GUI::Harmonograph::Frame::Part::ColorPicker;
 use App::GUI::Harmonograph::Frame::Part::PenLine;
 use App::GUI::Harmonograph::Frame::Part::Board;
+use App::GUI::Harmonograph::Widget::ProgressBar;
 use App::GUI::Harmonograph::Dialog::Function;
 use App::GUI::Harmonograph::Dialog::Interface;
 use App::GUI::Harmonograph::Dialog::About;
-use App::GUI::Harmonograph::ProgressBar;
 use App::GUI::Harmonograph::Settings;
 use App::GUI::Harmonograph::Config;
 
@@ -35,15 +31,17 @@ sub new {
 
     # create GUI parts
     $self->{'tabs'}             = Wx::AuiNotebook->new($self, -1, [-1,-1], [-1,-1], &Wx::wxAUI_NB_TOP );
-    $self->{'tab'}{'pendulum'}  = Wx::Panel->new($self->{'tabs'});
+    $self->{'tab'}{'linear'}    = Wx::Panel->new($self->{'tabs'});
+    $self->{'tab'}{'circular'}  = Wx::Panel->new($self->{'tabs'});
     $self->{'tab'}{'pen'}       = Wx::Panel->new($self->{'tabs'});
-    $self->{'tabs'}->AddPage( $self->{'tab'}{'pendulum'}, 'Pendulum Settings');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'linear'},   'Lateral Pendulum Settings');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'circular'}, 'Rotary Pendulum Settings');
     $self->{'tabs'}->AddPage( $self->{'tab'}{'pen'},      'Pen Settings');
 
-    $self->{'pendulum'}{'x'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'pendulum'}, 'x','pendulum in x direction (left to right)', 1, 30);
-    $self->{'pendulum'}{'y'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'pendulum'}, 'y','pendulum in y direction (left to right)', 1, 30);
-    $self->{'pendulum'}{'z'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'pendulum'}, 'z','circular pendulum',        0, 30);
-    $self->{'pendulum'}{'r'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'pendulum'}, 'R','rotating pendulum',        0, 30);
+    $self->{'pendulum'}{'x'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'linear'}, 'x','pendulum in x direction (left to right)', 1, 100);
+    $self->{'pendulum'}{'y'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'linear'}, 'y','pendulum in y direction (left to right)', 1, 100);
+    $self->{'pendulum'}{'z'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'circular'}, 'z','circular pendulum',        0, 100);
+    $self->{'pendulum'}{'r'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'circular'}, 'R','rotating pendulum',        0, 100);
     $self->{'pendulum'}{$_}->SetCallBack( sub { $self->sketch( ) } ) for qw/x y z r/;
                                 
     $self->{'color'}{'start'}   = App::GUI::Harmonograph::Frame::Part::ColorBrowser->new( $self->{'tab'}{'pen'}, 'start', { red => 20, green => 20, blue => 110 } );
@@ -55,7 +53,7 @@ sub new {
     $self->{'color_flow'}       = App::GUI::Harmonograph::Frame::Part::ColorFlow->new( $self->{'tab'}{'pen'}, $self );
     $self->{'line'}             = App::GUI::Harmonograph::Frame::Part::PenLine->new( $self->{'tab'}{'pen'} );
                                
-    $self->{'progress'}            = App::GUI::Harmonograph::ProgressBar->new( $self, 450, 10, { red => 20, green => 20, blue => 110 });
+    $self->{'progress'}            = App::GUI::Harmonograph::Widget::ProgressBar->new( $self, 450, 10, { red => 20, green => 20, blue => 110 });
     $self->{'board'}               = App::GUI::Harmonograph::Frame::Part::Board->new( $self , 600, 600 );
     $self->{'dialog'}{'about'}     = App::GUI::Harmonograph::Dialog::About->new();
     $self->{'dialog'}{'interface'} = App::GUI::Harmonograph::Dialog::Interface->new();
@@ -138,7 +136,6 @@ sub new {
         Wx::Event::EVT_MENU( $self, 12100 + $_, sub { 
             my $size = 100 * ($_[1]->GetId - 12100); 
             $self->{'config'}->set_value('image_size', $size);
-            $self->{'board'}->set_size( $size );
         });
         
     }
@@ -192,20 +189,23 @@ sub new {
     my $all_attr    = $std_attr | &Wx::wxALL;
     my $line_attr    = $std_attr | &Wx::wxLEFT | &Wx::wxRIGHT ;
  
-     my $pendulum_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
-    $pendulum_sizer->AddSpacer(5);
-    $pendulum_sizer->Add( $self->{'pendulum'}{'x'},   0, $vert_attr| &Wx::wxLEFT, 15);
-    $pendulum_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'pendulum'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
-    $pendulum_sizer->AddSpacer(5);
-    $pendulum_sizer->Add( $self->{'pendulum'}{'y'},   0, $vert_attr| &Wx::wxLEFT, 15);
-    $pendulum_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'pendulum'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
-    $pendulum_sizer->AddSpacer(5);
-    $pendulum_sizer->Add( $self->{'pendulum'}{'z'},   0, $vert_attr| &Wx::wxLEFT, 15);
-    $pendulum_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'pendulum'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
-    $pendulum_sizer->AddSpacer(5);
-    $pendulum_sizer->Add( $self->{'pendulum'}{'r'},   0, $vert_attr| &Wx::wxLEFT, 15);
-    $pendulum_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
-    $self->{'tab'}{'pendulum'}->SetSizer( $pendulum_sizer );
+     my $linear_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
+    $linear_sizer->AddSpacer(5);
+    $linear_sizer->Add( $self->{'pendulum'}{'x'},   0, $vert_attr| &Wx::wxLEFT, 15);
+    $linear_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'linear'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
+    $linear_sizer->AddSpacer(5);
+    $linear_sizer->Add( $self->{'pendulum'}{'y'},   0, $vert_attr| &Wx::wxLEFT, 15);
+    $linear_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+    $self->{'tab'}{'linear'}->SetSizer( $linear_sizer );
+
+     my $circular_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
+    $circular_sizer->AddSpacer(5);
+    $circular_sizer->Add( $self->{'pendulum'}{'z'},   0, $vert_attr| &Wx::wxLEFT, 15);
+    $circular_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'circular'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
+    $circular_sizer->AddSpacer(5);
+    $circular_sizer->Add( $self->{'pendulum'}{'r'},   0, $vert_attr| &Wx::wxLEFT, 15);
+    $circular_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+    $self->{'tab'}{'circular'}->SetSizer( $circular_sizer );
 
     my $pen_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
     $pen_sizer->AddSpacer(5);

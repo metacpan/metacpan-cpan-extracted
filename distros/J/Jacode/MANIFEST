@@ -927,3 +927,9 @@ t/5453_utf8_by_utf8_z_5of8.t
 t/5454_utf8_by_utf8_z_6of8.t
 t/5455_utf8_by_utf8_z_7of8.t
 t/5456_utf8_by_utf8_z_8of8.t
+t/6001_getcode_1oct.t
+t/6002_getcode_2oct.t
+t/6003_getcode_jis.t
+t/6004_getcode_sjis.t
+t/6005_getcode_euc.t
+t/6006_getcode_utf8.t

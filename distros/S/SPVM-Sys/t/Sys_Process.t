@@ -138,14 +138,6 @@ else {
   }
 }
 
-if ($^O eq 'MSWin32') {
-  eval { SPVM::Sys::Process->times(undef) };
-  like($@, qr/not supported/);
-}
-else {
-  ok(SPVM::TestCase::Sys::Process->times);
-}
-
 # The exit status
 unless ($^O eq 'MSWin32') {
 
@@ -159,6 +151,17 @@ unless ($^O eq 'MSWin32') {
   # Non-POSIX
   SPVM::Sys::Process->WIFCONTINUED(0);
   SPVM::Sys::Process->WCOREDUMP(0);
+}
+
+ok(SPVM::TestCase::Sys::Process->usleep);
+
+if ($^O eq 'MSWin32') {
+  eval { SPVM::Sys::Process->ualarm(0, 0) };
+  like($@, qr/not supported/);
+}
+else {
+  local $SIG{ALRM} = sub {};
+  ok(SPVM::TestCase::Sys::Process->ualarm);
 }
 
 SPVM::set_exception(undef);

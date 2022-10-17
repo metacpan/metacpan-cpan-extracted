@@ -64,7 +64,7 @@
          "web" : "https://github.com/Corion/Filesys-Notify-Win32-ReadDirectoryChanges"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

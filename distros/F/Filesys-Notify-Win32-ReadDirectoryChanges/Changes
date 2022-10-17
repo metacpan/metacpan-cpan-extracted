@@ -1,3 +1,8 @@
+0.04 2022-10-17
+    * Actually bail out on Windows XP and Cygwin, instead of just writing
+      a function to do so
+    * No functional changes, no need to upgrade
+
 0.03 2022-10-05
     * We explicitly don't support Windows XP and bail out in the Makefile.PL
       when run under XP
