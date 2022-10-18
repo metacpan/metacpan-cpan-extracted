@@ -1,7 +1,7 @@
 ---
 abstract: 'Chronicle storage system'
 author:
-  - 'binary.com <BINARY@cpan.org>'
+  - 'DERIV <DERIV@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -10,18 +10,45 @@ build_requires:
   RedisDB: '0'
   Test::CheckDeps: '0.010'
   Test::Exception: '0'
+  Test::MockModule: '0'
   Test::More: '0.94'
   Test::NoWarnings: '0'
-  perl: '5.014000'
+  utf8: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-Chronicle
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Data::Chronicle:
+    file: lib/Data/Chronicle.pm
+    version: '0.21'
+  Data::Chronicle::Mock:
+    file: lib/Data/Chronicle/Mock.pm
+    version: '0.21'
+  Data::Chronicle::Mock::Connector:
+    file: lib/Data/Chronicle/Mock.pm
+    version: '0.21'
+  Data::Chronicle::Reader:
+    file: lib/Data/Chronicle/Reader.pm
+    version: '0.21'
+  Data::Chronicle::Subscriber:
+    file: lib/Data/Chronicle/Subscriber.pm
+    version: '0.21'
+  Data::Chronicle::Writer:
+    file: lib/Data/Chronicle/Writer.pm
+    version: '0.21'
 requires:
   DBD::Pg: '0'
   DBIx::Connector: '0'
@@ -29,11 +56,35 @@ requires:
   JSON::MaybeUTF8: '0'
   Moose: '0'
   Test::Mock::Redis: '0'
+  Test::MockModule: '0'
   Test::PostgreSQL: '0'
-  perl: '5.014000'
+  parent: '0'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/binary-com/perl-Data-Chronicle/issues
-  repository: git://github.com/binary-com/perl-Data-Chronicle.git
-version: '0.20'
-x_generated_by_perl: v5.30.0
+  homepage: https://github.com/binary-com/perl-Data-Chronicle
+  repository: https://github.com/binary-com/perl-Data-Chronicle.git
+version: '0.21'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Mahdi Mohammadi <mm@binary.com>'
+  - 'Chylli <chylli@binary.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+  - 'Torsten Förtsch <torsten@binary.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Jun Bon <junbon@binary.com>'
+  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+  - 'Sasha Murzin <sasha@binary.com>'
+  - 'Boris Blinov <boris.blinov@binary.com>'
+  - 'CraigLawrence <craig@live.com.au>'
+  - 'Ivan Baidakou <ivan@binary.com>'
+  - 'Kaveh Mousavi Zamani <kavehmz@gmail.com>'
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'limchengyang <45479072+limchengyang@users.noreply.github.com>'
+  - 'Omar Sabek <48001122+omar-binary@users.noreply.github.com>'
+  - 'Zak B. Elep <zakame@zakame.net>'
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

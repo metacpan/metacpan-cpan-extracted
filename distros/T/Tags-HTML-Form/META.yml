@@ -36,11 +36,11 @@ requires:
   Data::HTML::Form: 0.04
   Error::Pure: 0
   Scalar::Util: 0
-  Tags::HTML: 0
+  Tags::HTML: 0.04
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Tags-HTML-Form/issues
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Form
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Form
-version: '0.03'
+version: '0.04'

@@ -1,7 +1,17 @@
 Revision history for Perl module libary Windows-GHCN-Fetch
 
+
+v0.0.007       2022-10-17
+  - replaced -kml <file> with -report kml and user-directed stdout
+  - added report types kml, id (just station id's), stn (station tsv only), url, curl
+  - renamed -color to -kmlcolor
+  - removed -label
+  - added #!/usr/bin/perl to ghch_fetch.pl
+  - removed the file extension in the bin scripts for proper Windows and *nix deployment
+  - (hopefully) fixed "Failed test -help at t/91_ghcn_fetch.t" caused when PERLDOC=-MPod::Perldoc::ToTextOverstrike
+  
 v0.0.006       2022-10-16
-  - fix for ticket 144693 "Can't open ghcn_fetch.pl"
+  - fix for ticket 144693 "Can't open ghcn_fetch"
   - fixes for test failures in CacheURI.t arising on systems without internet access
 
 

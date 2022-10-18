@@ -9,9 +9,9 @@ use Data::Sah::FilterCommon;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2022-10-18'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 our @EXPORT_OK = qw(gen_filter);
 
@@ -60,18 +60,16 @@ sub gen_filter {
         my $has_defined_tmp;
         for my $rule (@$rules) {
             if ($rule->{meta}{might_fail}) {
+                $code_filter .= "    my \$tmp;\n" unless $has_defined_tmp++;
+                $code_filter .= "    \$tmp = $rule->{expr_filter};\n";
                 if ($rt eq 'val') {
-                    $code_filter .= "    my \$tmp; " unless $has_defined_tmp++;
-                    $code_filter .= "    \$tmp = $rule->{expr_filter}; return undef if \$tmp->[0]; ";
+                    $code_filter .= "    return undef if \$tmp->[0];\n";
                 } else {
-                    $code_filter .= "    \$data = $rule->{expr_filter}; return \$data if \$data->[0]; ";
+                    $code_filter .= "    return \$tmp if \$tmp->[0];\n";
                 }
+                $code_filter .= "    \$data = \$tmp->[1];\n";
             } else {
-                if ($rt eq 'val') {
-                    $code_filter .= "    \$data = $rule->{expr_filter}; ";
-                } else {
-                    $code_filter .= "    \$data = [undef, $rule->{expr_filter}]; ";
-                }
+                $code_filter .= "    \$data = $rule->{expr_filter};\n";
             }
         }
 
@@ -81,12 +79,10 @@ sub gen_filter {
             "sub {\n",
             "    my \$data = shift;\n",
             "    unless (defined \$data) {\n",
-            "        ", ($rt eq 'val' ? "return undef;" :
-                             "return [undef, undef];" # str_errmsg+val
-                         ), "\n",
+            "        return ", ($rt eq 'val' ? "undef" : "[undef, undef]"), "\n",
             "    }\n",
             $code_filter, "\n",
-            "    \$data;\n",
+            "    ", ($rt eq 'val' ? "\$data" : "[undef, \$data]"), ";\n",
             "}",
         );
     } else {
@@ -123,7 +119,7 @@ Data::Sah::Filter - Filtering for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.013 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2022-07-24.
+This document describes version 0.015 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2022-10-18.
 
 =head1 SYNOPSIS
 
@@ -219,6 +215,8 @@ code):
    return $data;
  }
 
+=for Pod::Coverage ^(.+)$
+
 =head1 VARIABLES
 
 =head2 $Log_Filter_Code => bool (default: from ENV or 0)
@@ -229,35 +227,6 @@ something like:
 
  % TRACE=1 perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
      -MData::Sah::Filter=gen_filter -E'my $c = gen_filter(...)'
-
-=head1 FUNCTIONS
-
-
-=head2 gen_filter
-
-Usage:
-
- gen_filter(%args) -> any
-
-Generate filter code.
-
-This is mostly for testing. Normally the filter rules will be used from
-L<Data::Sah>.
-
-This function is not exported by default, but exportable.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<filter_names>* => I<array[str]>
-
-=item * B<return_type> => I<str> (default: "val")
-
-
-=back
-
-Return value:  (any)
 
 =head1 ENVIRONMENT
 
@@ -304,9 +273,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -234,30 +234,11 @@ class Sys::IO::Constant {
   native static method S_IXOTH : int ();
   native static method S_IXUSR : int ();
 
-  native static method POLLERR : int ();
-
-  native static method POLLHUP : int ();
-
-  native static method POLLIN : int ();
-
-  native static method POLLNVAL : int ();
-
-  native static method POLLOUT : int ();
-
-  native static method POLLPRI : int ();
-
-  native static method POLLRDBAND : int ();
-
-  native static method POLLRDNORM : int ();
-
-  native static method POLLWRBAND : int ();
-
-  native static method POLLWRNORM : int ();
-
   native static method LOCK_SH : int ();
 
   native static method LOCK_EX : int ();
 
   native static method LOCK_UN : int ();
 
+  native static method AT_EACCESS : int ();
 }

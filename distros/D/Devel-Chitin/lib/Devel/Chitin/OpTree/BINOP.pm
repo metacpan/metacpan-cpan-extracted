@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::BINOP;
 use base 'Devel::Chitin::OpTree::UNOP';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use strict;
 use warnings;
@@ -17,11 +17,22 @@ sub last {
 
 sub pp_sassign {
     my($self, %params) = @_;
-    # normally, the args are ordered: value, variable
-    my($var, $value) = $params{is_swapped}
-                        ? ($self->first->deparse, $self->last->deparse)
-                        : ($self->last->deparse, $self->first->deparse);
-    return join(' = ', $var, $value);
+
+    if ($self->is_null
+        and
+        $self->first->op->name eq 'undef'
+        and
+        ( $self->last->is_null and $self->last->_ex_name eq 'pp_padsv')
+    ) {
+        # This is an optimised undef-assignment
+        $self->first->deparse();
+    } else {
+        # normally, the args are ordered: value, variable
+        my($var, $value) = $params{is_swapped}
+                            ? ($self->first->deparse, $self->last->deparse)
+                            : ($self->last->deparse, $self->first->deparse);
+        return join(' = ', $var, $value);
+    }
 }
 
 sub pp_aassign {

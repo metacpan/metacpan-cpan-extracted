@@ -14,7 +14,7 @@ Data::Chronicle::Subscriber - Provides callback subscriptions to an efficient da
 
 =cut
 
-our $VERSION = '0.20';    ## VERSION
+our $VERSION = '0.21';    ## VERSION
 
 =head1 DESCRIPTION
 
@@ -117,6 +117,7 @@ sub _generate_key {
 }
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 =head1 AUTHOR
 

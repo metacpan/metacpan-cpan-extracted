@@ -327,15 +327,6 @@ else {
 ok(SPVM::TestCase::Sys::Socket->setsockopt_int($port));
 ok(SPVM::TestCase::Sys::Socket->getsockopt_int($port));
 
-if ($^O eq 'MSWin32') {
-  ok(SPVM::TestCase::Sys::Socket->ioctlsocket($port));
-}
-else {
-  my $num = 0;
-  eval { SPVM::Sys::Socket->ioctlsocket(0, 0, \$num) };
-  like($@, qr/not supported/);
-}
-
 unless ($^O eq 'MSWin32') {
   ok(SPVM::TestCase::Sys::Socket->sockaddr_un);
 }
@@ -345,23 +336,6 @@ ok(SPVM::TestCase::Sys::Socket->sockaddr_strage);
 ok(SPVM::TestCase::Sys::Socket->getaddrinfo);
 
 ok(SPVM::TestCase::Sys::Socket->getnameinfo);
-
-# poll
-{
-  my $process_id = fork;
-
-  # Child
-  if ($process_id == 0) {
-    &start_echo_server($port);
-  }
-  else {
-    &wait_port_prepared($port);
-    
-    ok(SPVM::TestCase::Sys::Socket->poll($port));
-    
-    kill_term_and_wait $process_id;
-  }
-}
 
 SPVM::set_exception(undef);
 

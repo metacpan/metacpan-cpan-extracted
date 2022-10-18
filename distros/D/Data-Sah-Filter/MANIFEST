@@ -22,6 +22,7 @@ lib/Data/Sah/Filter/js/Str/uppercase.pm
 lib/Data/Sah/Filter/perl/Array/remove_undef.pm
 lib/Data/Sah/Filter/perl/Array/uniq.pm
 lib/Data/Sah/Filter/perl/Array/uniqnum.pm
+lib/Data/Sah/Filter/perl/Array/uniqstr.pm
 lib/Data/Sah/Filter/perl/Float/ceil.pm
 lib/Data/Sah/Filter/perl/Float/check_has_fraction.pm
 lib/Data/Sah/Filter/perl/Float/check_int.pm
@@ -40,6 +41,7 @@ lib/Data/Sah/Filter/perl/Str/remove_whitespace.pm
 lib/Data/Sah/Filter/perl/Str/replace_map.pm
 lib/Data/Sah/Filter/perl/Str/rtrim.pm
 lib/Data/Sah/Filter/perl/Str/trim.pm
+lib/Data/Sah/Filter/perl/Str/try_center.pm
 lib/Data/Sah/Filter/perl/Str/uc.pm
 lib/Data/Sah/Filter/perl/Str/ucfirst.pm
 lib/Data/Sah/Filter/perl/Str/upcase.pm
@@ -48,6 +50,7 @@ lib/Data/Sah/Filter/perl/Str/wrap.pm
 lib/Data/Sah/FilterCommon.pm
 lib/Data/Sah/FilterJS.pm
 t/00-compile.t
+t/01-basic.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

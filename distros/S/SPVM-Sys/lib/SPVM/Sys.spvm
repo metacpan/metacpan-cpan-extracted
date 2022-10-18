@@ -1,5 +1,33 @@
 class Sys {
-  native static method is_D_WIN32 : int ();
+  native static method defined : int ($macro_name : string, $value = undef : object of Int|Long|Double);
+  
+  static method get_osname : string () {
+    my $osname : string;
+    
+    if (&defined("__linux__")) {
+      $osname = "linux";
+    }
+    elsif (&defined("_WIN32")) {
+      $osname = "MSWin32";
+    }
+    elsif (&defined("__FreeBSD__")) {
+      $osname = "freebsd";
+    }
+    elsif (&defined("__OpenBSD__")) {
+      $osname = "openbsd";
+    }
+    elsif (&defined("__solaris")) {
+      $osname = "solaris";
+    }
+    elsif (&defined("__APPLE__")) {
+      $osname = "darwin";
+    }
+    else {
+      die "The get_osname method is not supported this os";
+    }
+    
+    return $osname;
+  }
 
   native static method getenv : string ($name : string);
 

@@ -55,7 +55,7 @@ use Weather::GHCN::StationTable;
 package Weather::GHCN::StationTable;
 
 
-use Test::More tests => 17;
+use Test::More tests => 16;
 use Test::Exception;
 
 use Const::Fast;
@@ -73,7 +73,7 @@ const my $PROFILE => path($Bin)->child('ghcn_fetch.yaml')->stringify;
 my $Cachedir = path($Bin,'ghcn_cache')->stringify;
 
 if (not -d $Cachedir) {
-    BAIL_OUT "*E* cached folder is missing";
+    BAIL_OUT '*E* cache folder is missing: ' . $Cachedir;
 }
 
 my $Refresh;       # control caching
@@ -181,10 +181,10 @@ subtest 'station list (-report "")' => sub {
     @kept = $ghcn->get_stations( list => 1, kept => 0, no_header => 1 );
     is @kept, 9, 'kept=>0 nine stations kept';
 
-    my @kml = $ghcn->export_kml( list => 1 );
+    my @kml = $ghcn->report_kml( list => 1 );
     my $count = grep { m{ kml | NEW \s YORK \s WB }xms } @kml;
     # 5 is the number of times NEW YORK WB occurs in the output
-    is $count, 5, 'export_kml output looks good';
+    is $count, 5, 'report_kml output looks good';
 };
 
 subtest 'station-level data (-report detail)' => sub {
@@ -500,37 +500,6 @@ subtest 'reload with new options' => sub {
     is @rows, 1, '-report yearly -precip';
 
 };
-
-subtest "station list (-kml '<tempfile>')" => sub {
-
-    $ghcn = new_ok 'Weather::GHCN::StationTable';
-
-    my $kmlfile = Path::Tiny->tempfile('__temp_ghcn_kmlfile_XXXXX');
-
-    my ($opt, @errors) = $ghcn->set_options(
-                %test_opts,
-                country     => 'US',
-                state       => 'NY',
-                location    => 'New York',
-                active      => '1900-1910',
-                report      => '',
-                kml         => $kmlfile,
-        );
-
-    like ref $opt, qr/ \A Hash::Wrap::Class /xms, 'set_options returned a Hash::Wrap';
-
-    is @errors, 0, 'set_options returned no errors';
-
-    my $stn_href = $ghcn->load_stations;
-    my @kept = $ghcn->get_stations( list => 1, kept => 1, no_header => 1 );
-    is @kept, 2, 'two stations kept';
-
-    $ghcn->export_kml();
-
-    is -r $kmlfile, $TRUE, 'export_kml file is readable';
-    ok -s $kmlfile > 0, ,  'export_kml file has non-zero size';
-};
-
 
 subtest 'station list (-gps "40.7789 -73.9692" -radius 12)' => sub {
     $ghcn = new_ok 'Weather::GHCN::StationTable';

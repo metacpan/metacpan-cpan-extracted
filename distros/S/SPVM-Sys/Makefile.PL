@@ -48,7 +48,6 @@ sub MY::postamble {
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::Dirent');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::Utimbuf');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::Flock');
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::IO::PollfdArray');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Process');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Process::Constant');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::User');
@@ -74,6 +73,12 @@ sub MY::postamble {
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Timezone');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Itimerval');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Time::Tms');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Select');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Select::Fd_set');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Poll');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Poll::PollfdArray');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Ioctl');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Sys::Ioctl::Constant');
   
   return $make_rule;
 }

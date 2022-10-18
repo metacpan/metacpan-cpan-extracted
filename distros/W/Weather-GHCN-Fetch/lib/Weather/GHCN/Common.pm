@@ -8,7 +8,7 @@ Weather::GHCN::Common - common functions for GHCN scripts and modules
 
 =head1 VERSION
 
-version v0.0.006
+version v0.0.007
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::Common;
 
-our $VERSION = 'v0.0.006';
+our $VERSION = 'v0.0.007';
 
 
 use feature 'signatures';

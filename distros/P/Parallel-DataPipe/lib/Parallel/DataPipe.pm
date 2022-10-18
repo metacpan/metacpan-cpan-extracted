@@ -1,6 +1,6 @@
 package Parallel::DataPipe;
 
-our $VERSION='0.11';
+our $VERSION='0.12';
 use 5.8.0;
 use strict;
 use warnings;
@@ -229,7 +229,7 @@ sub _put_data {
 }
 
 sub _fork_data_processor {
-    my ($data_processor_callback) = @_;
+    my ($data_processor_callback, $init_data_processor) = @_;
     # create processor as fork
     my $pid = fork();
     unless (defined $pid) {
@@ -242,6 +242,7 @@ sub _fork_data_processor {
         }; # exit silently from data processors
         # data processor is eternal loop which wait for raw data on pipe from main
         # data processor is killed when it's not needed anymore by _kill_data_processors
+        $init_data_processor->() if ref($init_data_processor) && ref($init_data_processor) eq 'CODE';
         $data_processor_callback->() while (1);
         exit;
     }
@@ -249,7 +250,7 @@ sub _fork_data_processor {
 }
 
 sub _create_data_processor {
-    my ($self,$process_data_callback) = @_;
+    my ($self,$process_data_callback, $init_data_processor) = @_;
 
     # parent <=> child pipes
     my ($parent_read, $parent_write) = pipely();
@@ -266,7 +267,7 @@ sub _create_data_processor {
 
     # return data processor record
     return {
-        pid => _fork_data_processor($data_processor),  # needed to kill processor when there is no more data to process
+        pid => _fork_data_processor($data_processor,$init_data_processor),  # needed to kill processor when there is no more data to process
         child_write => $child_write,                 # pipe to write raw data from main to data processor
         parent_read => $parent_read,                 # pipe to write raw data from main to data processor
     };
@@ -280,11 +281,12 @@ sub extract_param {
 sub create_data_processors {
     my ($self,$param) = @_;
     my $process_data_callback = extract_param($param,qw(process_data process processor map));
+    my $init_data_processor = extract_param($param,qw(init_data_processor));
     my $number_of_data_processors = extract_param($param,qw(number_of_data_processors number_of_processors));
     $number_of_data_processors = $self->number_of_cpu_cores unless $number_of_data_processors;
     die "process_data parameter should be code ref" unless ref($process_data_callback) eq 'CODE';
 	die "\$number_of_data_processors:undefined" unless defined($number_of_data_processors);
-    return [map $self->_create_data_processor($process_data_callback,$_), 0..$number_of_data_processors-1];
+    return [map $self->_create_data_processor($process_data_callback, $init_data_processor, $_), 0..$number_of_data_processors-1];
 }
 
 sub load_data_processor {

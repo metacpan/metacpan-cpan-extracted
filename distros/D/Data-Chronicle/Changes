@@ -1,5 +1,8 @@
 Revision history for Data-Chronicle
 
+0.21      2022-10-18 01:25:25+00:00 UTC
+       - Improve Data::Chronicle::Mock
+
 0.20      2019-07-23 17:18:31+08:00 Asia/Manila
         - Fix possible connection errors on mset() by pinging cache writer
         - Enable testing via CircleCI
@@ -37,19 +40,20 @@ Revision history for Data-Chronicle
 
 0.11      2017-02-21 01:48:57+00:00 UTC
         Switch to dzil
-0.10
-0.09    January 9, 2017
+0.10    2017-02-21 01:48:57+00:00 UTC
+
+0.09    2017-01-09 01:48:57+00:00 UTC
         Fixes a test plan issue in the usage of Test::NoWarnings in the previous release.
-0.08    January 9, 2017
+0.08    2017-01-09 01:48:57+00:00 UTC
         Added ttl - optional attribute to Data::Chronicle::Writer, used to set TTL for data stored in Redis
         Adding support for in-memory, hashref-based storage
-0.05    May 25, 2016
+0.05    2016-05-25 01:48:57+00:00 UTC
         Produce better error message in case there is no DB connection and request received for historical information
-0.04    Feb 10, 2016
+0.04    2016-02-10 01:48:57+00:00 UTC
         Check required libraries before running unit tests
-0.03    Feb 4, 2016
+0.03    2016-02-04 01:48:57+00:00 UTC
         CPAN related fix
-0.02    Jan 28, 2016
+0.02    2016-01-28 01:48:57+00:00 UTC
         CPAN related fix
-0.01    Jan 26, 2016
+0.01    2016-01-26 01:48:57+00:00 UTC
         Initial version

@@ -4,13 +4,13 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Email-Simple-Markdown",
    "prereqs" : {
@@ -52,6 +52,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test2::V0" : "0",
             "Test::More" : "0",
             "perl" : "5.006"
          }
@@ -60,11 +61,11 @@
    "provides" : {
       "Email::Simple::Markdown" : {
          "file" : "lib/Email/Simple/Markdown.pm",
-         "version" : "v0.7.2"
+         "version" : "v0.7.3"
       },
       "Email::Simple::Markdown::Stuffer" : {
          "file" : "lib/Email/Simple/Markdown/Stuffer.pm",
-         "version" : "v0.7.2"
+         "version" : "v0.7.3"
       }
    },
    "release_status" : "stable",
@@ -79,14 +80,20 @@
          "web" : "https://github.com/yanick/Email-Simple-Markdown"
       }
    },
-   "version" : "0.7.2",
+   "version" : "0.7.3",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
    "x_contributors" : [
       "Alessandro Ranellucci <aar@cpan.org>",
       "Gavin Carr <gavin@openfusion.com.au>"
-   ]
+   ],
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

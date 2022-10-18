@@ -1,0 +1,4 @@
+class Sys::Ioctl {
+
+  native static method ioctl : int ($fd : int, $request : int, $request_arg = undef : object of Byte|Short|Int|Long|Float|Double|object);
+}

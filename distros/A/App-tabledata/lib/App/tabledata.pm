@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-15'; # DATE
+our $DATE = '2022-10-18'; # DATE
 our $DIST = 'App-tabledata'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
@@ -116,6 +116,11 @@ $SPEC{tabledata} = {
         #    summary => 'Use local CPAN mirror first when available (for -C)',
         #},
     },
+    links => [
+        {url=>'prog:td'},
+        {url=>'prog:arraydata'},
+        {url=>'prog:hashdata'},
+    ],
     examples => [
     ],
 };
@@ -219,11 +224,11 @@ App::tabledata - Show content of TableData modules (plus a few other things)
 
 =head1 VERSION
 
-This document describes version 0.004 of App::tabledata (from Perl distribution App-tabledata), released on 2022-10-15.
+This document describes version 0.005 of App::tabledata (from Perl distribution App-tabledata), released on 2022-10-18.
 
 =head1 SYNOPSIS
 
-See the included script L<arraydata>.
+See the included script L<tabledata>.
 
 =head1 FUNCTIONS
 
@@ -285,6 +290,8 @@ Source repository is at L<https://github.com/perlancar/perl-App-tabledata>.
 =head1 SEE ALSO
 
 L<ArrayData> and C<ArrayData::*> modules.
+
+L<HashData> and C<HashData::*> modules.
 
 =head1 AUTHOR
 

@@ -3,20 +3,21 @@ abstract: 'map in parallel using all CPU cores'
 author:
   - 'Oleksandr Kharchenko <okharch@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Parallel-parallel_map
 no_index:
   directory:
     - t
     - inc
 requires:
-  Parallel::DataPipe: 0.08
-version: 0.02
+  Parallel::DataPipe: '0.12'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

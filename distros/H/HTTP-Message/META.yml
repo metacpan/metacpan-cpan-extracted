@@ -64,7 +64,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTTP-Message/issues
   homepage: https://github.com/libwww-perl/HTTP-Message
   repository: https://github.com/libwww-perl/HTTP-Message.git
-version: '6.41'
+version: '6.42'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -453,7 +453,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.41
+          tag: v6.42
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

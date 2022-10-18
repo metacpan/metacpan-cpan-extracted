@@ -2,9 +2,9 @@
 use strict;
 use warnings;
 
-use 5.014000;
+use 5.006;
 
-use ExtUtils::MakeMaker 6.48;
+use ExtUtils::MakeMaker 7.64;
 
 use File::ShareDir::Install;
 $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
@@ -14,35 +14,41 @@ install_share dist => "share";
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Miscellaneous routines to do with manipulating with strings and numbers!",
-  "AUTHOR" => "binary.com <BINARY\@cpan.org>",
+  "AUTHOR" => "DERIV <DERIV\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.48",
+    "ExtUtils::MakeMaker" => "7.64",
     "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Format-Util",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014000",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Format::Util",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Encode" => 0,
+    "Exporter" => 0,
     "File::ShareDir" => 0,
     "Math::BigFloat" => 0,
     "Math::BigInt" => 0,
     "POSIX" => 0,
     "Scalar::Util" => 0,
-    "YAML::XS" => 0
+    "YAML::XS" => 0,
+    "base" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Math::BigInt" => 0,
     "Test::CheckDeps" => "0.010",
     "Test::Exception" => 0,
     "Test::More" => "0.94",
     "Test::NoWarnings" => 0
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.17",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +56,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Encode" => 0,
+  "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::ShareDir" => 0,
   "File::Spec" => 0,
@@ -64,7 +72,10 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => "0.94",
   "Test::NoWarnings" => 0,
-  "YAML::XS" => 0
+  "YAML::XS" => 0,
+  "base" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

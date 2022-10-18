@@ -1,5 +1,9 @@
 Revision history for Feed::Find
 
+0.13  2022.10.18
+    - Increment version of action/checkout
+    - Attempt to add bugtracker info
+
 0.12  2021.10.22
     - Add GitHub info to Makefile.PL
 

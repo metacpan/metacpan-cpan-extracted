@@ -1,7 +1,7 @@
 package Email::Simple::Markdown::Stuffer;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: use Email::Simple::Markdown with Email::Stuffer
-$Email::Simple::Markdown::Stuffer::VERSION = '0.7.2';
+$Email::Simple::Markdown::Stuffer::VERSION = '0.7.3';
 
 use strict;
 use warnings;
@@ -68,7 +68,7 @@ Email::Simple::Markdown::Stuffer - use Email::Simple::Markdown with Email::Stuff
 
 =head1 VERSION
 
-version 0.7.2
+version 0.7.3
 
 =head1 SYNOPSIS
 
@@ -123,7 +123,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2022, 2017, 2014, 2013, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

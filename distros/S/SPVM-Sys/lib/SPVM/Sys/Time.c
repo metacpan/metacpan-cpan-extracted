@@ -5,7 +5,7 @@
 #include <errno.h>
 
 #ifndef _WIN32
-#  include <sys/times.h>
+  #include <sys/times.h>
 #endif
 
 static const char* FILE_NAME = "Sys/Time.c";

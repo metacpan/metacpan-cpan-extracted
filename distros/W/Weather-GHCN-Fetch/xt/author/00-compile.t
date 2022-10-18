@@ -24,9 +24,9 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/ghcn_extremes.pl',
-    'bin/ghcn_fetch.pl',
-    'bin/ghcn_station_counts.pl'
+    'bin/ghcn_extremes',
+    'bin/ghcn_fetch',
+    'bin/ghcn_station_counts'
 );
 
 # no fake home requested

@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.24";
+our $VERSION = "1.25";
 
 use v5.14;
 use warnings;
@@ -21,6 +21,11 @@ use Text::ANSI::Printf qw(ansi_printf ansi_sprintf);
 use App::ansicolumn::Util;
 use App::ansicolumn::Border;
 use Getopt::EX::RPN qw(rpn_calc);
+
+my %DEFAULT_COLORMAP = (
+    BORDER => '',
+    TEXT   => '',
+    );
 
 use Getopt::EX::Hashed 1.05; {
 
@@ -46,6 +51,7 @@ use Getopt::EX::Hashed 1.05; {
     has paragraph           => ' !  p    ' ;
     has height              => ' =s      ' , default => 0 ;
     has column_unit         => ' =i   cu ' , min => 1, default => 8 ;
+    has margin              => ' =i      ' , min => 0, default => 1 ;
     has tabstop             => ' =i      ' , min => 1, default => 8 ;
     has tabhead             => ' =s      ' ;
     has tabspace            => ' =s      ' ;
@@ -132,7 +138,7 @@ use Getopt::EX::Hashed 1.05; {
     };
 
     has TERM_SIZE           => ;
-    has COLORHASH           => default => {};
+    has COLORHASH           => default => { %DEFAULT_COLORMAP };
     has COLORLIST           => default => [];
     has COLOR               => ;
     has BORDER              => ;
@@ -170,7 +176,7 @@ sub setup_options {
     ## --parallel or @ARGV > 1
     if ($obj->parallel //= @ARGV > 1) {
 	$obj->linestyle ||= 'wrap';
-	$obj->widen = 1;
+	$obj->widen //= 1;
 	$obj->border //= '';
     }
 
@@ -232,6 +238,11 @@ sub setup_options {
     }
 
     $obj;
+}
+
+sub color {
+    my $obj = shift;
+    $obj->{COLOR}->(@_);
 }
 
 sub parallel_out {
@@ -306,7 +317,7 @@ sub set_horizontal {
 
     use integer;
     my $width = $obj->get_width - $obj->border_width(qw(left right));
-    my $unit = $obj->column_unit || 1;
+    my $unit = $obj->column_unit // 1;
 
     my $span;
     my $panes;
@@ -316,7 +327,7 @@ sub set_horizontal {
 	$span = ($width + $obj->border_width('center')) / $panes;
     } else {
 	$span = $obj->pane_width ||
-	    roundup($max_data_length + ($obj->border_width('center') || 1),
+	    roundup($max_data_length + ($obj->border_width('center') || $obj->margin),
 		    $unit);
 	$panes = $obj->pane || $width / $span || 1;
     }
@@ -335,8 +346,8 @@ sub set_contents {
 	and die "Not enough space.\n";
     # Fold long lines
     if ($obj->linestyle and $obj->linestyle ne 'none') {
-	my $sub = $obj->foldsub($cell_width) or die;
-	@$dp = map { $sub->($_) } @$dp;
+	my $fold = $obj->foldsub($cell_width) or die;
+	@$dp = map { $fold->($_) } @$dp;
     }
     return $obj;
 }
@@ -369,9 +380,18 @@ sub page_out {
     return $obj;
 }
 
+sub color_border {
+    my $obj = shift;
+    $obj->color('BORDER', $obj->get_border(@_));
+}
+
 sub column_out {
     my $obj = shift;
-    my($bdr_top, $bdr_btm) = map { $obj->get_border($_) x $obj->span } qw(top bottom);
+    my($bdr_top, $bdr_btm) = do {
+	map { $obj->color('BORDER', $_) }
+	map { $obj->get_border($_) x $obj->span }
+	qw(top bottom);
+    };
     map { unshift @$_, $bdr_top } @_ if $bdr_top;
     map { push    @$_, $bdr_btm } @_ if $bdr_btm;
     my $max = max(map { int @$_ } @_) - 1;
@@ -380,9 +400,10 @@ sub column_out {
 	my @panes = map {
 	    @$_ ? ansi_sprintf("%-$obj->{span}s", shift @$_) : ();
 	} @_;
-	print      $obj->get_border('left',   $pos, $obj->current_page);
-	print join $obj->get_border('center', $pos, $obj->current_page), @panes;
-	print      $obj->get_border('right',  $pos, $obj->current_page);
+	print      $obj->color_border('left',   $pos, $obj->current_page);
+	print join $obj->color_border('center', $pos, $obj->current_page),
+	    map { $obj->color('TEXT', $_) } @panes;
+	print      $obj->color_border('right',  $pos, $obj->current_page);
 	print      "\n";
     }
     return $obj;

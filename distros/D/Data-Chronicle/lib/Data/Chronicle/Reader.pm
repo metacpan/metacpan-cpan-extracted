@@ -14,7 +14,7 @@ Data::Chronicle::Reader - Provides reading from an efficient data storage for vo
 
 =cut
 
-our $VERSION = '0.20';    ## VERSION
+our $VERSION = '0.21';    ## VERSION
 
 =head1 DESCRIPTION
 
@@ -243,6 +243,7 @@ sub get_history {
 }
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 =head1 AUTHOR
 

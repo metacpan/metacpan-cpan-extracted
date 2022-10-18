@@ -1,7 +1,7 @@
 package Parallel::parallel_map;
 
 use 5.008;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use strict;
 use warnings;
@@ -13,6 +13,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = qw(parallel_map);
 
+our $INIT_DATA_PROCESSOR; # has to be code ref
 
 sub parallel_map(&@) {
     my ($code,@input) = @_;
@@ -23,6 +24,7 @@ sub parallel_map(&@) {
     Parallel::DataPipe::run {
         input => \@input,
         process => $code,
+        init_data_processor => $INIT_DATA_PROCESSOR, # this behaviour is introduced at 0.03
         @output,
     };
     return wantarray?@result:();
@@ -39,6 +41,7 @@ Parallel::parallel_map - map in parallel using all CPU cores
 =head1 SYNOPSIS
 
   use Parallel::parallel_map;
+  $Parallel::parallel_map::INIT_DATA_PROCESSOR = \&srand; # seed random generator for each process
   my @m2 = parallel_map {$_*2} 1..10000000;
 
 =head1 DESCRIPTION
@@ -55,9 +58,9 @@ It is implemented using Parallel::DataPipe.
 
 =head2 EXPORT
 
-parallel_map the same as map, but in parallel
+parallel_map 
 
-=head2 BENCHMARKS
+=head1 BENCHMARKS
 
 I have found Parallel::Iterator module at CPAN which basically does the same thing.
 But it has much bigger overhead on IPC than this module.

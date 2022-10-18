@@ -7,20 +7,19 @@
 #include <assert.h>
 
 #ifdef _WIN32
-# include <ws2tcpip.h>
-# include <winsock2.h>
-# include <io.h>
+  #include <ws2tcpip.h>
+  #include <winsock2.h>
+  #include <io.h>
 #else
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <netinet/ip.h>
-# include <netinet/tcp.h>
-# include <netinet/udp.h>
-# include <sys/un.h>
-# include <arpa/inet.h>
-# include <netdb.h>
-# include <poll.h>
+  #include <sys/types.h>
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/ip.h>
+  #include <netinet/tcp.h>
+  #include <netinet/udp.h>
+  #include <sys/un.h>
+  #include <arpa/inet.h>
+  #include <netdb.h>
 #endif
 
 static const char* FILE_NAME = "Sys/Socket/Constant.c";
@@ -321,18 +320,6 @@ int32_t SPVM__Sys__Socket__Constant__AF_XDP(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 #else
   env->die(env, stack, "AF_XDP is not defined on this system", FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
-#endif
-  
-}
-
-int32_t SPVM__Sys__Socket__Constant__FIONBIO(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-#ifdef FIONBIO
-  stack[0].ival = FIONBIO;
-  return 0;
-#else
-  env->die(env, stack, "FIONBIO is not defined on this system", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #endif
   

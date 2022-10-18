@@ -1,7 +1,7 @@
 package Email::Simple::Markdown;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: simple email creation with auto text and html multipart body
-$Email::Simple::Markdown::VERSION = '0.7.2';
+$Email::Simple::Markdown::VERSION = '0.7.3';
 use strict;
 use warnings;
 
@@ -179,7 +179,7 @@ Email::Simple::Markdown - simple email creation with auto text and html multipar
 
 =head1 VERSION
 
-version 0.7.2
+version 0.7.3
 
 =head1 SYNOPSIS
 
@@ -301,7 +301,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2022, 2017, 2014, 2013, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

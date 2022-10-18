@@ -51,8 +51,6 @@ class Sys::Socket::Constant {
 
   native static method AF_XDP : int ();
 
-  native static method FIONBIO : int ();
-
   native static method INADDR_ANY : int ();
 
   native static method INADDR_BROADCAST : int ();

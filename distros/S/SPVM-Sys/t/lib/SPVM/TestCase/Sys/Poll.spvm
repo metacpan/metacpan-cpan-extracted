@@ -1,0 +1,245 @@
+class TestCase::Sys::Poll {
+  use Sys::Poll::PollfdArray;
+  use Sys::Poll::Constant as POLL;
+  use Sys::Socket;
+  use Sys::Socket::Constant as SOCKET;
+  use Sys::Socket::Sockaddr;
+  use Sys::Socket::Sockaddr::In;
+  use Sys::Process;
+  
+  use TestUtil::SocketAutoClose;
+  
+  static method poll : int ($port : int) {
+    {
+      # Socket
+      my $no0_socket = Sys::Socket->socket(SOCKET->AF_INET, SOCKET->SOCK_STREAM, 0);
+
+      unless ($no0_socket> 0) {
+        return 0;
+      }
+      
+      # Close socket at the end of this scope
+      my $no0_socket_auto_close = TestUtil::SocketAutoClose->new($no0_socket);
+      
+      # IPv4 address
+      my $no0_address = Sys::Socket::Sockaddr::In->new;
+      $no0_address->set_sin_family((byte)SOCKET->AF_INET);
+      $no0_address->set_sin_port(Sys::Socket->htons((short)$port));
+      my $no0_sin_addr = $no0_address->copy_sin_addr;
+      Sys::Socket->inet_pton(SOCKET->AF_INET, "127.0.0.1", $no0_sin_addr);
+      $no0_address->set_sin_addr($no0_sin_addr);
+      
+      my $no0_status_connect = Sys::Socket->connect($no0_socket, $no0_address, $no0_address->sizeof);
+      
+      unless ($no0_status_connect == 0) {
+        Sys::Socket->close($no0_socket);
+        return 0;
+      }
+
+      # Socket
+      my $no1_socket = Sys::Socket->socket(SOCKET->AF_INET, SOCKET->SOCK_STREAM, 0);
+
+      unless ($no1_socket> 0) {
+        return 0;
+      }
+      
+      # Close socket at the end of this scope
+      my $no1_socket_auto_close = TestUtil::SocketAutoClose->new($no1_socket);
+      
+      # IPv4 address
+      my $no1_address = Sys::Socket::Sockaddr::In->new;
+      $no1_address->set_sin_family((byte)SOCKET->AF_INET);
+      $no1_address->set_sin_port(Sys::Socket->htons((short)$port));
+      my $no1_sin_addr = $no1_address->copy_sin_addr;
+      Sys::Socket->inet_pton(SOCKET->AF_INET, "127.0.0.1", $no1_sin_addr);
+      $no1_address->set_sin_addr($no1_sin_addr);
+      
+      my $no1_status_connect = Sys::Socket->connect($no1_socket, $no1_address, $no1_address->sizeof);
+      
+      unless ($no1_status_connect == 0) {
+        Sys::Socket->close($no1_socket);
+        return 0;
+      }
+      
+      {
+        my $fds_legnth = 2;
+        my $fds = Sys::Poll::PollfdArray->new($fds_legnth);
+        
+        $fds->set_fd(0, $no0_socket);
+        $fds->set_events(0, (short)(POLL->POLLOUT));
+
+        $fds->set_fd(1, $no1_socket);
+        $fds->set_events(1, (short)(POLL->POLLOUT));
+        
+        my $timeout = -1;
+        
+        my $ready_count_out = Sys::Poll->poll($fds, $fds->length, $timeout);
+        
+        unless ($ready_count_out == 2) {
+          return 0;
+        }
+        
+        unless ($fds->revents(0) & POLL->POLLOUT) {
+          return 0;
+        }
+        unless ($fds->revents(1) & POLL->POLLOUT) {
+          return 0;
+        }
+      }
+      
+      {
+        my $no0_send_buffer = "abcd";
+        
+        my $no0_send_length = Sys::Socket->send($no0_socket, $no0_send_buffer, length $no0_send_buffer, 0);
+        
+        unless ($no0_send_length == 4) {
+          return 0;
+        }
+      }
+      
+      {
+        my $no0_send_buffer = "ef";
+        
+        my $no0_send_length = Sys::Socket->send($no0_socket, $no0_send_buffer, length $no0_send_buffer, 0);
+        
+        unless ($no0_send_length == 2) {
+          return 0;
+        }
+      }
+      
+      my $no0_status_shutdown = Sys::Socket->shutdown($no0_socket, SOCKET->SHUT_WR);
+      
+      unless ($no0_status_shutdown == 0) {
+        return 0;
+      }
+
+      {
+        my $no1_send_buffer = "abcd";
+        
+        my $no1_send_length = Sys::Socket->send($no1_socket, $no1_send_buffer, length $no1_send_buffer, 0);
+        
+        unless ($no1_send_length == 4) {
+          return 0;
+        }
+      }
+      
+      {
+        my $no1_send_buffer = "ef";
+        
+        my $no1_send_length = Sys::Socket->send($no1_socket, $no1_send_buffer, length $no1_send_buffer, 0);
+        
+        unless ($no1_send_length == 2) {
+          return 0;
+        }
+      }
+      
+      my $no1_status_shutdown = Sys::Socket->shutdown($no1_socket, SOCKET->SHUT_WR);
+      
+      unless ($no1_status_shutdown == 0) {
+        return 0;
+      }
+      
+      # Wait a little for the server
+      Sys::Process->sleep(1);
+      
+      {
+        my $fds_legnth = 2;
+        my $fds = Sys::Poll::PollfdArray->new($fds_legnth);
+        
+        $fds->set_fd(0, $no0_socket);
+        $fds->set_events(0, (short)(POLL->POLLIN));
+        
+        $fds->set_fd(1, $no1_socket);
+        $fds->set_events(1, (short)(POLL->POLLIN));
+        
+        my $timeout = -1;
+        
+        my $ready_count_in = Sys::Poll->poll($fds, $fds->length, $timeout);
+        
+        unless ($ready_count_in == 2) {
+          return 0;
+        }
+        
+        unless ($fds->revents(0) & POLL->POLLIN) {
+          return 0;
+        }
+        
+        unless ($fds->revents(1) & POLL->POLLIN) {
+          return 0;
+        }
+      }
+      
+      {
+        my $no0_recv_buffer = (mutable string)new_string_len 3;
+        my $no0_recv_length = Sys::Socket->recv($no0_socket, $no0_recv_buffer, length $no0_recv_buffer, 0);
+        
+        unless ($no0_recv_length == 3) {
+          return 0;
+        }
+        
+        unless ($no0_recv_buffer eq "abc") {
+          return 0;
+        }
+      }
+      
+      {
+        my $no0_recv_buffer = (mutable string)new_string_len 3;
+        my $no0_recv_length = Sys::Socket->recv($no0_socket, $no0_recv_buffer, length $no0_recv_buffer, 0);
+        
+        unless ($no0_recv_length == 3) {
+          return 0;
+        }
+        
+        unless ($no0_recv_buffer eq "def") {
+          return 0;
+        }
+      }
+
+      {
+        my $no0_recv_buffer = (mutable string)new_string_len 3;
+        my $no0_recv_length = Sys::Socket->recv($no0_socket, $no0_recv_buffer, length $no0_recv_buffer, 0);
+        
+        unless ($no0_recv_length == 0) {
+          return 0;
+        }
+      }
+      
+      {
+        my $no1_recv_buffer = (mutable string)new_string_len 3;
+        my $no1_recv_length = Sys::Socket->recv($no1_socket, $no1_recv_buffer, length $no1_recv_buffer, 0);
+        
+        unless ($no1_recv_length == 3) {
+          return 0;
+        }
+        
+        unless ($no1_recv_buffer eq "abc") {
+          return 0;
+        }
+      }
+      
+      {
+        my $no1_recv_buffer = (mutable string)new_string_len 3;
+        my $no1_recv_length = Sys::Socket->recv($no1_socket, $no1_recv_buffer, length $no1_recv_buffer, 0);
+        
+        unless ($no1_recv_length == 3) {
+          return 0;
+        }
+        
+        unless ($no1_recv_buffer eq "def") {
+          return 0;
+        }
+      }
+
+      {
+        my $no1_recv_buffer = (mutable string)new_string_len 3;
+        my $no1_recv_length = Sys::Socket->recv($no1_socket, $no1_recv_buffer, length $no1_recv_buffer, 0);
+        
+        unless ($no1_recv_length == 0) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+}

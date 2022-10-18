@@ -16,9 +16,6 @@
 
 #ifdef _WIN32
   #include <direct.h>
-#else
-  #include <poll.h>
-  #include <sys/ioctl.h>
 #endif
 
 const char* FILE_NAME = "Sys/IO.c";
@@ -1200,26 +1197,80 @@ int32_t SPVM__Sys__IO__utime(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Sys__IO__access(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__IO__access_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  void* obj_path = stack[0].oval;
+  void* obj_pathname = stack[0].oval;
   
-  if (!obj_path) {
-    return env->die(env, stack, "The path must be defined", FILE_NAME, __LINE__);
+  if (!obj_pathname) {
+    return env->die(env, stack, "The $pathname must be defined", FILE_NAME, __LINE__);
   }
   
-  const char* path = env->get_chars(env, stack, obj_path);
+  const char* pathname = env->get_chars(env, stack, obj_pathname);
   
   int32_t mode = stack[1].ival;
   
-  int32_t status = access(path, mode);
+  int32_t status = access(pathname, mode);
   
   stack[0].ival = status;
   
   return 0;
 }
 
-int32_t SPVM__Sys__IO__stat(SPVM_ENV* env, SPVM_VALUE* stack) {
+int32_t SPVM__Sys__IO__access(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  SPVM__Sys__IO__access_raw(env, stack);
+  
+  int32_t status = stack[0].ival;
+
+  if (status == -1) {
+    env->die(env, stack, "[System Error]access failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__IO__faccessat_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
+#ifdef _WIN32
+  return env->die(env, stack, "faccessat is not supported on this system", FILE_NAME, __LINE__);
+#else
+  int32_t dirfd = stack[0].ival;
+
+  void* obj_pathname = stack[1].oval;
+  
+  if (!obj_pathname) {
+    return env->die(env, stack, "The $pathname must be defined", FILE_NAME, __LINE__);
+  }
+  
+  const char* pathname = env->get_chars(env, stack, obj_pathname);
+  
+  int32_t mode = stack[2].ival;
+
+  int32_t flags = stack[3].ival;
+  
+  int32_t status = faccessat(dirfd, pathname, mode, flags);
+  
+  stack[0].ival = status;
+  
+  return 0;
+#endif
+}
+
+int32_t SPVM__Sys__IO__faccessat(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  SPVM__Sys__IO__faccessat_raw(env, stack);
+  
+  int32_t status = stack[0].ival;
+  
+  if (status == -1) {
+    env->die(env, stack, "[System Error]faccessat failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__IO__stat_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   int32_t e = 0;
   
@@ -1240,17 +1291,27 @@ int32_t SPVM__Sys__IO__stat(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t status = stat(path, stat_buf);
 
-  if (status == -1) {
-    env->die(env, stack, "[System Error]stat failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
-    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
-  }
-  
   stack[0].ival = status;
   
   return 0;
 }
 
-int32_t SPVM__Sys__IO__lstat(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+int32_t SPVM__Sys__IO__stat(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+  SPVM__Sys__IO__stat_raw(env, stack);
+  
+  int32_t status = stack[0].ival;
+
+  if (status == -1) {
+    env->die(env, stack, "[System Error]stat failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__IO__lstat_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
   return env->die(env, stack, "lstat is not supported on this system", FILE_NAME, __LINE__);
 #else
@@ -1274,15 +1335,24 @@ int32_t SPVM__Sys__IO__lstat(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t status = lstat(path, stat_buf);
   
+  stack[0].ival = status;
+  
+  return 0;
+#endif
+}
+
+int32_t SPVM__Sys__IO__lstat(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+  SPVM__Sys__IO__lstat_raw(env, stack);
+  
+  int32_t status = stack[0].ival;
+
   if (status == -1) {
     env->die(env, stack, "[System Error]lstat failed:%s", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
-  stack[0].ival = status;
-  
   return 0;
-#endif
 }
 
 int32_t SPVM__Sys__IO__fcntl(SPVM_ENV* env, SPVM_VALUE* stack) {
@@ -1386,141 +1456,6 @@ int32_t SPVM__Sys__IO__fcntl(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   stack[0].ival = ret;
-  
-  return 0;
-#endif
-}
-
-int32_t SPVM__Sys__IO__ioctl(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-#ifdef _WIN32
-  env->die(env, stack, "ioctl is not supported on this system", FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
-#else
-  
-  int32_t e = 0;
-  
-  int32_t items = env->get_args_stack_length(env, stack);
-  
-  int32_t fd = stack[0].ival;
-  
-  int32_t request = stack[1].ival;
-  
-  int32_t ret;
-  
-  void* obj_request_arg;
-  if (items <= 2) {
-    ret = ioctl(fd, request);
-  }
-  else {
-    void* obj_request_arg = stack[2].oval;
-    
-    if (!obj_request_arg) {
-      ret = ioctl(fd, request, NULL);
-    }
-    else {
-      int32_t request_arg_basic_type_id = env->get_object_basic_type_id(env, stack, obj_request_arg);
-      int32_t request_arg_type_dimension = env->get_object_type_dimension(env, stack, obj_request_arg);
-      
-      // Byte
-      if (request_arg_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_CLASS && request_arg_type_dimension == 0) {
-        int8_t request_arg_int8 = env->get_field_byte_by_name(env, stack, obj_request_arg, "Byte", "value", &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-        
-        ret = ioctl(fd, request, &request_arg_int8);
-
-        env->set_field_byte_by_name(env, stack, obj_request_arg, "Byte", "value", request_arg_int8, &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-      }
-      // Short
-      else if (request_arg_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_CLASS && request_arg_type_dimension == 0) {
-        int16_t request_arg_int16 = env->get_field_short_by_name(env, stack, obj_request_arg, "Short", "value", &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-        
-        ret = ioctl(fd, request, &request_arg_int16);
-
-        env->set_field_short_by_name(env, stack, obj_request_arg, "Short", "value", request_arg_int16, &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-      }
-      // Int
-      else if (request_arg_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT_CLASS && request_arg_type_dimension == 0) {
-        int32_t request_arg_int32 = env->get_field_int_by_name(env, stack, obj_request_arg, "Int", "value", &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-        
-        ret = ioctl(fd, request, &request_arg_int32);
-
-        env->set_field_int_by_name(env, stack, obj_request_arg, "Int", "value", request_arg_int32, &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-      }
-      // Long
-      else if (request_arg_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_CLASS && request_arg_type_dimension == 0) {
-        int64_t request_arg_int64 = env->get_field_long_by_name(env, stack, obj_request_arg, "Long", "value", &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-        
-        ret = ioctl(fd, request, &request_arg_int64);
-
-        env->set_field_long_by_name(env, stack, obj_request_arg, "Long", "value", request_arg_int64, &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-      }
-      // Float
-      else if (request_arg_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_CLASS && request_arg_type_dimension == 0) {
-        float request_arg_float = env->get_field_float_by_name(env, stack, obj_request_arg, "Float", "value", &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-        
-        ret = ioctl(fd, request, &request_arg_float);
-
-        env->set_field_float_by_name(env, stack, obj_request_arg, "Float", "value", request_arg_float, &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-      }
-      // Double
-      else if (request_arg_basic_type_id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS && request_arg_type_dimension == 0) {
-        double request_arg_double = env->get_field_double_by_name(env, stack, obj_request_arg, "Double", "value", &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-        
-        ret = ioctl(fd, request, &request_arg_double);
-
-        env->set_field_double_by_name(env, stack, obj_request_arg, "Double", "value", request_arg_double, &e, FILE_NAME, __LINE__);
-        if (e) { return e; }
-      }
-      // A pointer class
-      else if (env->is_pointer_class(env, stack, obj_request_arg)) {
-        void* request_arg = env->get_pointer(env, stack, obj_request_arg);
-        ret = ioctl(fd, request, request_arg);
-      }
-      else {
-        return env->die(env, stack, "The request argument must be an Byte/Short/Int/Long/Float/Double object or the object that is a pointer class", FILE_NAME, __LINE__);
-      }
-    }
-  }
-  
-  stack[0].ival = ret;
-  
-  return 0;
-#endif
-}
-
-int32_t SPVM__Sys__IO__poll(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifdef _WIN32
-  env->die(env, stack, "The \"poll\" method in the class \"Sys::IO\" is not supported on this system", FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
-#else
-  
-  void* obj_fds = stack[0].oval;
-  
-  struct pollfd* fds = env->get_pointer(env, stack, obj_fds);
-  
-  int32_t nfds = stack[1].ival;
-  
-  int32_t timeout = stack[2].ival;
-  
-  int32_t ready_count = poll(fds, nfds, timeout);
-  
-  if (ready_count == -1) {
-    env->die(env, stack, "[System Error]poll failed:%s.", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
-    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
-  }
-  
-  stack[0].ival = ready_count;
   
   return 0;
 #endif

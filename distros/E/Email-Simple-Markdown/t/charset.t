@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Email::Simple::Markdown;
 
@@ -26,4 +26,4 @@ isa_ok $email->with_markdown, 'Email::Abstract';
 
 like $text, qr#<em>amazing</em>#, 'html is present';
 
-like $text => qr#Content-Type: text/plain; charset="utf8"\s*\n#, "content type is utf8";
+like $text => qr#Content-Type: text/plain; charset="?utf8"?\s*\n#, "content type is utf8";

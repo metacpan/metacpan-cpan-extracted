@@ -1,3 +1,7 @@
+0.20      2022-10-17 15:44:26-05:00 America/Chicago
+    * Support deparsing new OPs pp_padsv_store and pp_aelemfastlex_store
+    * Support deparsing new undef-OP related optimizations
+
 0.19      2022-03-08 16:39:39-06:00 America/Chicago
     * Fix dual-var deparse bug exposed in 5.35.10
 

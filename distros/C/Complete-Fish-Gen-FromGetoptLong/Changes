@@ -1,44 +1,48 @@
-Revision history for Complete-Fish-Gen-FromGetoptLong
+0.100   2022-08-11  Released-By: PERLANCAR; Urgency: medium
 
-0.09    2016-10-27 (PERLANCAR)
+        - Update to Getopt::Long::Dump 0.112+ (spec now dumped as array not
+          hash).
+
+
+0.09    2016-10-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Note about supporting Getopt::Long::Complete too.
 
 
-0.08    2016-10-27 (PERLANCAR)
+0.08    2016-10-27  Released-By: PERLANCAR
 
 	- Add option opt_desc to allow setting descriptions.
 
 
-0.07    2016-10-27 (PERLANCAR)
+0.07    2016-10-27  Released-By: PERLANCAR
 
 	- Add skip_detect option to
 	  gen_fish_complete_from_getopt_long_script().
 
 
-0.06    2016-10-22 (PERLANCAR)
+0.06    2016-10-22  Released-By: PERLANCAR
 
 	- [Bugfix] By default do not use cmdname/compname to complete
 	  argument value, unless script is Getopt::Long::Complete-based.
 
 
-0.05    2016-10-21 (PERLANCAR)
+0.05    2016-10-21  Released-By: PERLANCAR
 
 	- Add function: gen_fish_complete_from_getopt_long_script.
 
 	- Support completing argument (<>).
 
 
-0.04    2016-10-21 (PERLANCAR)
+0.04    2016-10-21  Released-By: PERLANCAR
 
         - Add option: compname to allow it be different than cmdname.
 
         - Some tweaking.
 
 
-0.03    2015-09-09 (PERLANCAR)
+0.03    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -47,7 +51,7 @@ Revision history for Complete-Fish-Gen-FromGetoptLong
 	  requirement.
 
 
-0.02    2015-09-03 (PERLANCAR)
+0.02    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -56,6 +60,6 @@ Revision history for Complete-Fish-Gen-FromGetoptLong
 	  requirement.
 
 
-0.01     2014-11-29 (PERLANCAR)
+0.01     2014-11-29  Released-By: PERLANCAR
 
          - First release.

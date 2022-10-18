@@ -29,7 +29,7 @@ const my $PROFILE => path($Bin)->child('ghcn_fetch.yaml')->stringify;
 my $Cachedir = path($Bin,'ghcn_cache')->stringify;
 
 if (not -d $Cachedir) {
-    BAIL_OUT "*E* cached folder is missing";
+    BAIL_OUT '*E* cache folder is missing: ' . $Cachedir;
 }
 
 my $Refresh;       # control caching
@@ -51,7 +51,7 @@ BAIL_OUT "\n*E* test profile not found or unreadable: " . $PROFILE
     if not -r $PROFILE;
 
 
-my $ghcn_fetch = path($Bin, '../bin', 'ghcn_fetch.pl')->stringify;
+my $ghcn_fetch = path($Bin, '../bin', 'ghcn_fetch')->stringify;
 
 my @cmd = (
     'perl',
@@ -129,8 +129,8 @@ subtest 'output to clipboard' => sub {
 
 subtest 'kml and color options' => sub {
     my @args = (
-        '-kml',         '',
-        '-color',       'azure',
+        '-report',      'kml',
+        '-kmlcolor',    'azure',
         '-location',    'CA006105976,CA006105978',
         '-refresh',     'never',
         '-profile',     $PROFILE,
@@ -142,18 +142,6 @@ subtest 'kml and color options' => sub {
     };
 
     like $stdout, qr/xml.*kml/ms, 'kml "" to stdout';
-
-    my $tempfile = Path::Tiny->tempfile( TEMPLATE => '91_ghcn_fetch_t_XXXXXX', SUFFIX => '.tmp' );
-
-    $args[1] = $tempfile->stringify;
-
-    ($stdout, $stderr) = capture {
-        Weather::GHCN::App::Fetch->run( \@args );
-    };
-
-    my $kml = $tempfile->slurp;
-
-    like $kml, qr/xml.*kml/ms, 'kml <file>';
 };
 
 subtest 'station ids from file' => sub {
@@ -314,7 +302,7 @@ subtest 'options readme, usage and help' => sub {
     ($stdout, $stderr) = capture {
         Weather::GHCN::App::Fetch->run( \@args )
     };
-    like $stdout, qr/NAME/, $args[0];
+    like $stdout, qr/Fetch station and weather data/, $args[0];
 };
 
 # DO NOT ADD TEST HERE!

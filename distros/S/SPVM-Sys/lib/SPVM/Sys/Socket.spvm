@@ -8,7 +8,8 @@ class Sys::Socket {
   use Sys::Socket::Sockaddr;
   use Sys::Socket::In_addr;
   use Sys::Socket::In6_addr;
-  use Sys::IO::PollfdArray;
+  
+  use Sys::Socket::Error::InetInvalidNetworkAddress;
 
   native static method htonl : int ($hostlong : int);
   
@@ -56,13 +57,6 @@ class Sys::Socket {
 
   native static method getsockopt_int : int ($sockfd : int, $level : int, $optname : int, $optval_ref : int*);
   
-  native static method ioctlsocket : int ($s : int, $cmd : int, $argp : int*);
-
-  native static method closesocket : int ($fd : int);
-  
-  native static method WSAPoll : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int);
-
-
   native static method getaddrinfo_raw : int ($node : string, $service : string,
                 $hints : Sys::Socket::Addrinfo,
                 $res : Sys::Socket::AddrinfoLinkedList[]);
@@ -81,23 +75,7 @@ class Sys::Socket {
 
   native static method gai_strerror : string ($errcode : int);
 
-  static method poll : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int) {
-    if (Sys->is_D_WIN32) {
-      return Sys::Socket->WSAPoll($fds, $nfds, $timeout);
-    }
-    else {
-      return Sys::IO->poll($fds, $nfds, $timeout);
-    }
-  }
-  
-  static method close : int ($fd : int) {
-    if (Sys->is_D_WIN32) {
-      return Sys::Socket->closesocket($fd);
-    }
-    else {
-      return Sys::IO->close($fd);
-    }
-  }
+  native static method close : int ($fd : int);
 
   native static method socket_errno : int ();
   native static method socket_strerror : string ($errno : int, $length : int);

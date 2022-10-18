@@ -7,7 +7,7 @@ use warnings;
 use Test::Shared::Fixture::Wikibase::Datatype::MediainfoStatement::Commons::Depicts::Human;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.20;
+our $VERSION = 0.21;
 
 sub new {
 	my $class = shift;

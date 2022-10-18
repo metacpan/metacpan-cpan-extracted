@@ -169,13 +169,6 @@ Get the constant value of C<AF_X25>. If the system doesn't define this constant,
 
 Get the constant value of C<AF_XDP>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
-=head2 FIONBIO
-
-  static method FIONBIO : int ();
-
-Get the constant value of C<FIONBIO>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
-
-
 =head2 INADDR_ANY
 
   static method INADDR_ANY : int ();

@@ -7,9 +7,9 @@ use warnings FATAL => 'all';
 use base 'Exporter';
 our @EXPORT_OK = qw/commas to_monetary_number_format roundnear roundcommon financialrounding formatnumber get_min_unit/;
 
-use Carp qw(cluck);
+use Carp         qw(cluck);
 use Scalar::Util qw(looks_like_number);
-use POSIX qw(ceil);
+use POSIX        qw(ceil);
 use YAML::XS;
 use File::ShareDir;
 use Math::BigFloat lib => 'Calc';
@@ -20,7 +20,7 @@ Format::Util::Numbers - Miscellaneous routines to do with manipulating number fo
 
 =cut
 
-our $VERSION = '0.16';    ## VERSION
+our $VERSION = '0.17';    ## VERSION
 
 =head1 SYNOPSIS
 

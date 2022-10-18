@@ -14,4 +14,13 @@ test_requires 'Test::LWP::UserAgent';
 author_tests('xt');
 auto_set_repository;
 githubmeta;
+makemaker_args(
+  META_MERGE => {
+    resources => {
+      bugtracker => {
+        web => 'https://github.com/davorg/File-Find/issues',
+      },
+    },
+  },
+);
 WriteAll;

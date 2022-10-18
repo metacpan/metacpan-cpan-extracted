@@ -26,8 +26,12 @@ no_index:
 requires:
   Class::Utils: 0.03
   Error::Pure: 0.15
+  File::Spec::Functions: 0
+  IO::Barf: 0
   JSON::XS: 0
   MediaWiki::API: 0
+  Perl6::Slurp: 0
+  Readonly: 0
   Unicode::UTF8: 0
   Wikibase::Datatype: 0.03
   Wikibase::Datatype::Struct::Item: 0
@@ -39,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-API
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-API
-version: '0.01'
+version: '0.02'

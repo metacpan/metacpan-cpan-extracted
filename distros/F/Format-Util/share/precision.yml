@@ -156,6 +156,7 @@ price:
   TRY: 2
   TTD: 2
   TUSD: 2
+  tUSDT: 2
   TWD: 2
   TZS: 2
   UAH: 2
@@ -340,6 +341,7 @@ amount:
   TRY: 2
   TTD: 2
   TUSD: 2
+  tUSDT: 2
   TWD: 2
   TZS: 2
   UAH: 2

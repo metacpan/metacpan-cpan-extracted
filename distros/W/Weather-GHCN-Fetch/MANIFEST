@@ -8,9 +8,9 @@ META.yml
 Makefile.PL
 README
 README.md
-bin/ghcn_extremes.pl
-bin/ghcn_fetch.pl
-bin/ghcn_station_counts.pl
+bin/ghcn_extremes
+bin/ghcn_fetch
+bin/ghcn_station_counts
 lib/Weather/GHCN/App/Extremes.pm
 lib/Weather/GHCN/App/Fetch.pm
 lib/Weather/GHCN/App/StationCounts.pm

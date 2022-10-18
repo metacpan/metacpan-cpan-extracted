@@ -20,8 +20,12 @@ readme_from 'API.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.03;
 requires 'Error::Pure' => 0.15;
+requires 'File::Spec::Functions' => 0;
 requires 'MediaWiki::API' => 0;
+requires 'IO::Barf' => 0;
 requires 'JSON::XS' => 0;
+requires 'Perl6::Slurp' => 0;
+requires 'Readonly' => 0;
 requires 'Unicode::UTF8' => 0;
 requires 'Wikibase::Datatype' => 0.03;
 requires 'Wikibase::Datatype::Struct::Item' => 0;
@@ -34,7 +38,7 @@ test_requires 'English' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

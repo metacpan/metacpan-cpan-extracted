@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Data::Sah::Filter",
   "PREREQ_PM" => {
-    "Data::Dmp" => "0.241",
+    "Data::Dmp" => "0.242",
     "Exporter" => "5.57",
     "File::Temp" => "0.2307",
     "IPC::System::Options" => "0.339",
@@ -31,9 +31,9 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0
+    "Test::More" => "0.98"
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Dmp" => "0.241",
+  "Data::Dmp" => "0.242",
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "File::Temp" => "0.2307",
@@ -51,7 +51,7 @@ my %FallbackPrereqs = (
   "JSON" => 0,
   "Log::ger" => "0.038",
   "Nodejs::Util" => "0.007",
-  "Test::More" => 0,
+  "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0
 );

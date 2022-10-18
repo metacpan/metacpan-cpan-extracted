@@ -23,11 +23,10 @@ is($result,undef,'parallel_map does not want result context');
 sub test2x2 {
     print "***Testing school 2x2\n";
     for my $n (4,16,64,256,1024) {
-    my @data = 1..$n;
-    my @result = parallel_map {$_*2} @data;
-    ok(@result == $n,"n*2[$n] length");
-    my $expected = join(",",map $_*2,1..$n);
-    my $got = join(",",@result);
-    is($got,$expected,"n*2[$n] values");
+        my @data = 1..$n;
+        my $result = [parallel_map {$_*2} @data];
+        ok(@$result == $n,"n*2[$n] length");
+        my $expected = [map $_*2,1..$n];
+        is_deeply($result,$expected,"n*2[$n] values");
 	}
 }

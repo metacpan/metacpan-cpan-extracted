@@ -15,7 +15,7 @@ Stations that failed to meet range or quality criteria:
 US1NYNY0074	US	NY		40.7969	-73.933	6.1	NEW YORK 8.8 N	[2]	9	40.8N 73.9W
 
 Options:
-	-baseline 1971-2000  -color red  -country US  -location "New York"  -nonetwork -1  -quality 90  -radius 50  -state NY
+	-baseline 1971-2000  -kmlcolor red  -country US  -location "New York"  -nonetwork -1  -quality 90  -radius 50  -state NY
 
 	Note that quality is a percentage; radius in km
 	Note that nonetwork values mean the following:
@@ -24,5 +24,5 @@ Options:
 	  1 do not contact the server, just use what is cached
 
 Script:
-	C:\Users\jgpuckering\MyScripts\MyPerl\bin\ghcn_fetch.pl
+	C:\Users\jgpuckering\MyScripts\MyPerl\bin\ghcn_fetch
 	Last modified 2022-09-07 14:05:06

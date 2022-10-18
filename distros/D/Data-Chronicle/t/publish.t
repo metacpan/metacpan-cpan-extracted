@@ -53,7 +53,7 @@ subtest "enabled publish_on_set" => sub {
     $writer->set('namespace', 'category', $data, Date::Utility->new, 0);
     ok $cache->cache->{"set::namespace::category"},     "data have been set";
     ok $cache->cache->{"publish::namespace::category"}, "data have been published";
-    is $cache->cache->{"set::namespace::category"},     $cache->cache->{"publish::namespace::category"}, "set and published data are identical";
+    is $cache->cache->{"set::namespace::category"}, $cache->cache->{"publish::namespace::category"}, "set and published data are identical";
 };
 
 subtest "disabled publish_on_set (default)" => sub {
@@ -64,7 +64,7 @@ subtest "disabled publish_on_set (default)" => sub {
         ttl => 86400
     );
     $writer->set('namespace', 'category', $data, Date::Utility->new, 0);
-    ok $cache->cache->{"set::namespace::category"}, "data have been set";
+    ok $cache->cache->{"set::namespace::category"},             "data have been set";
     ok !exists $cache->cache->{"publish::namespace::category"}, "data have NOT been published";
 };
 

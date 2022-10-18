@@ -1,10 +1,10 @@
 {
    "abstract" : "Chronicle storage system",
    "author" : [
-      "binary.com <BINARY@cpan.org>"
+      "DERIV <DERIV@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,27 +13,38 @@
       "version" : 2
    },
    "name" : "Data-Chronicle",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "perl" : "5.014000"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "7.64"
          }
       },
       "develop" : {
          "requires" : {
-            "Pod::Coverage::TrustPod" : "0",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::PerlTidy" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::PluginBundle::Author::DERIV" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
             "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
-            "Test::More" : "0.88",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08",
-            "Test::Synopsis" : "0",
+            "Test::Portability::Files" : "0",
             "Test::Version" : "1"
          }
       },
@@ -45,8 +56,12 @@
             "JSON::MaybeUTF8" : "0",
             "Moose" : "0",
             "Test::Mock::Redis" : "0",
+            "Test::MockModule" : "0",
             "Test::PostgreSQL" : "0",
-            "perl" : "5.014000"
+            "parent" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -61,9 +76,37 @@
             "RedisDB" : "0",
             "Test::CheckDeps" : "0.010",
             "Test::Exception" : "0",
+            "Test::MockModule" : "0",
             "Test::More" : "0.94",
-            "Test::NoWarnings" : "0"
+            "Test::NoWarnings" : "0",
+            "utf8" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Data::Chronicle" : {
+         "file" : "lib/Data/Chronicle.pm",
+         "version" : "0.21"
+      },
+      "Data::Chronicle::Mock" : {
+         "file" : "lib/Data/Chronicle/Mock.pm",
+         "version" : "0.21"
+      },
+      "Data::Chronicle::Mock::Connector" : {
+         "file" : "lib/Data/Chronicle/Mock.pm",
+         "version" : "0.21"
+      },
+      "Data::Chronicle::Reader" : {
+         "file" : "lib/Data/Chronicle/Reader.pm",
+         "version" : "0.21"
+      },
+      "Data::Chronicle::Subscriber" : {
+         "file" : "lib/Data/Chronicle/Subscriber.pm",
+         "version" : "0.21"
+      },
+      "Data::Chronicle::Writer" : {
+         "file" : "lib/Data/Chronicle/Writer.pm",
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -71,14 +114,35 @@
       "bugtracker" : {
          "web" : "https://github.com/binary-com/perl-Data-Chronicle/issues"
       },
+      "homepage" : "https://github.com/binary-com/perl-Data-Chronicle",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/binary-com/perl-Data-Chronicle.git",
+         "url" : "https://github.com/binary-com/perl-Data-Chronicle.git",
          "web" : "https://github.com/binary-com/perl-Data-Chronicle"
       }
    },
-   "version" : "0.20",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "version" : "0.21",
+   "x_authority" : "cpan:DERIV",
+   "x_contributors" : [
+      "Mahdi Mohammadi <mm@binary.com>",
+      "Chylli <chylli@binary.com>",
+      "Tom Molesworth <tom@binary.com>",
+      "Torsten F\u00f6rtsch <torsten@binary.com>",
+      "Jean-Yves Sireau <jy@binary.com>",
+      "Jun Bon <junbon@binary.com>",
+      "Raunak Kathuria <raunakkathuria@gmail.com>",
+      "Sasha Murzin <sasha@binary.com>",
+      "Boris Blinov <boris.blinov@binary.com>",
+      "CraigLawrence <craig@live.com.au>",
+      "Ivan Baidakou <ivan@binary.com>",
+      "Kaveh Mousavi Zamani <kavehmz@gmail.com>",
+      "Chylli <chylli.email@gmail.com>",
+      "limchengyang <45479072+limchengyang@users.noreply.github.com>",
+      "Omar Sabek <48001122+omar-binary@users.noreply.github.com>",
+      "Zak B. Elep <zakame@zakame.net>"
+   ],
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -3,11 +3,11 @@ NAME
     things)
 
 VERSION
-    This document describes version 0.004 of App::tabledata (from Perl
-    distribution App-tabledata), released on 2022-10-15.
+    This document describes version 0.005 of App::tabledata (from Perl
+    distribution App-tabledata), released on 2022-10-18.
 
 SYNOPSIS
-    See the included script arraydata.
+    See the included script tabledata.
 
 FUNCTIONS
   tabledata
@@ -62,6 +62,8 @@ SOURCE
 
 SEE ALSO
     ArrayData and "ArrayData::*" modules.
+
+    HashData and "HashData::*" modules.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

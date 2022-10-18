@@ -30,6 +30,7 @@ ansicolumn \[options\] \[file ...\]
 
     --height=#           page height
     --column-unit=#      column unit (default 8)
+    --margin=#           column margin width (default 1)
     --linestyle=#        folding style (none|truncate|wrap|wordwrap)
     --boundary=#         line-end boundary
     --linebreak=#        line-break mode (none|all|runin|runout)
@@ -48,7 +49,7 @@ ansicolumn \[options\] \[file ...\]
 
 # VERSION
 
-Version 1.24
+Version 1.25
 
 # DESCRIPTION
 
@@ -150,7 +151,7 @@ default, from the standard input.
 
         optex -Mtextconv ansicolumn -DPC3 foo.docx | less
 
-- **-V**, \[**--no-**\]**parallel**
+- **-V**, **--**\[**no-**\]**parallel**
 
     Parallel view mode.  Implicitly enabled when multiple files are
     specified.  Use **--no-parallel** to disable.
@@ -175,8 +176,8 @@ default, from the standard input.
 
 - **-S**#, **--pane-width**=#, **--pw**=#
 
-    Specify pane width.  This includes border spaces.  See ["CALCULATION"](#calculation)
-    section.
+    Specify the span of each pane.  This includes border spaces.  See
+    ["CALCULATION"](#calculation) section.
 
 - **-W**, **--widen**
 
@@ -212,6 +213,12 @@ default, from the standard input.
 
     Each column is placed at the unit of 8 by default.  This option
     changes the number of the unit.
+
+- **--margin**=#
+
+    Each column has at least single character margin on the right side so
+    that they are not placed back-to-back.  This option specifies the
+    margin width.
 
 - **--linestyle**=`none`|`truncate`|`wrap`|`wordwrap`, **--ls**=`...`
 
@@ -252,7 +259,8 @@ default, from the standard input.
 - **--border-style**=_style_, **--bs**=...
 
     Set the border style.  Current default style is `box`, which enclose
-    each pane with box drawing graphic characters.
+    each pane with box drawing graphic characters.  Special style
+    `random` choose random style.
 
     Sample styles:
     none,
@@ -265,12 +273,12 @@ default, from the standard input.
     c-box,
     box, heavy-box, fat-box, very-fat-box,
     dash-box, heavy-dash-box,
-    round-box, heavy-round-box,
+    round-box,
     frame, heavy-frame, fat-frame, very-fat-frame,
     dash-frame, heavy-dash-frame,
     page-frame, heavy-page-frame,
-    shadow,
-    shadow-box, heavy-shadow-box,
+    shadow, shin-shadow,
+    shadow-box, shin-shadow-box, heavy-shadow-box,
     comb, heavy-comb,
     rake, heavy-rake,
     mesh, heavy-mesh,

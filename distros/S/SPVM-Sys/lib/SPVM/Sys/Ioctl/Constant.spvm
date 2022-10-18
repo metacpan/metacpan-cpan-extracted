@@ -1,0 +1,3 @@
+class Sys::Ioctl::Constant {
+  native static method FIONBIO : int ();
+}

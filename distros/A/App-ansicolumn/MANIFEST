@@ -16,7 +16,9 @@ t/02_yamanashi.sh
 t/02_yamanashi.t
 t/App/cdif/Command.pm
 t/App/cdif/Tmpfile.pm
-t/YAMANASHI.txt
 t/ac.pm
+t/sorekara-new.txt
+t/sorekara-old.txt
+t/yamanashi.txt
 META.yml
 MANIFEST

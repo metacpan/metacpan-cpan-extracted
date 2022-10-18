@@ -14,7 +14,7 @@ Data::Chronicle::Writer - Provides writing to an efficient data storage for vola
 
 =cut
 
-our $VERSION = '0.20';    ## VERSION
+our $VERSION = '0.21';    ## VERSION
 
 =head1 DESCRIPTION
 
@@ -204,7 +204,7 @@ sub mset {
 sub _validate_value {
     my ($self, $category, $name, $value) = @_;
     die "Cannot store an undefined value for ${category}::${name} in Chronicle!" unless defined $value;
-    die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
+    die "You can only store hash-ref or array-ref in Chronicle!"                 unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
     return;
 }
 
@@ -242,6 +242,7 @@ SQL
 }
 
 no Moose;
+__PACKAGE__->meta->make_immutable;
 
 =head1 AUTHOR
 

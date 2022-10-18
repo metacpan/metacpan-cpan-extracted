@@ -1,16 +1,16 @@
 package Progress::Any;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-15'; # DATE
-our $DIST = 'Progress-Any'; # DIST
-our $VERSION = '0.219'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Time::Duration qw();
 use Time::HiRes qw(time);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-18'; # DATE
+our $DIST = 'Progress-Any'; # DIST
+our $VERSION = '0.220'; # VERSION
 
 sub import {
     my ($self, @args) = @_;
@@ -19,7 +19,7 @@ sub import {
         if ($_ eq '$progress') {
             my $progress = $self->get_indicator(task => '');
             {
-                no strict 'refs';
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
                 my $v = "$caller\::progress";
                 *$v = \$progress;
             }
@@ -131,7 +131,7 @@ for my $an (keys %attrs) {
             $self->{$an};
         };
     }
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
     *{$an} = $code;
 }
 
@@ -168,7 +168,7 @@ sub total_target {
     my $t = $self->{task};
 
     my $res = $self->{target};
-    return undef unless defined($res);
+    return unless defined($res);
 
     for (keys %indicators) {
         if ($t eq '') {
@@ -176,7 +176,7 @@ sub total_target {
         } else {
             next unless index($_, "$t.") == 0;
         }
-        return undef unless defined $indicators{$_}{target};
+        return unless defined $indicators{$_}{target};
         $res += $indicators{$_}{target};
     }
     $res;
@@ -188,7 +188,7 @@ sub percent_complete {
     my $total_pos    = $self->total_pos;
     my $total_target = $self->total_target;
 
-    return undef unless defined($total_target);
+    return unless defined($total_target);
     if ($total_target == 0) {
         if ($self->{state} eq 'finished') {
             return 100;
@@ -219,7 +219,7 @@ sub remaining {
                     $self->elapsed;
             }
         } else {
-            return undef;
+            return;
         }
     }
 }
@@ -230,7 +230,7 @@ sub total_remaining {
     my $t = $self->{task};
 
     my $res = $self->remaining;
-    return undef unless defined $res;
+    return unless defined $res;
 
     for (keys %indicators) {
         if ($t eq '') {
@@ -239,7 +239,7 @@ sub total_remaining {
             next unless index($_, "$t.") == 0;
         }
         my $res2 = $indicators{$_}->remaining;
-        return undef unless defined $res2;
+        return unless defined $res2;
         $res += $res2;
     }
     $res;
@@ -611,12 +611,13 @@ Progress::Any - Record progress to any output
 
 =head1 VERSION
 
-This document describes version 0.219 of Progress::Any (from Perl distribution Progress-Any), released on 2020-08-15.
+This document describes version 0.220 of Progress::Any (from Perl distribution Progress-Any), released on 2022-10-18.
 
 =head1 SYNOPSIS
 
 Example of using in a script with terminal progress bar as output (progress bar
-will be cleared on C<finish()>):
+will be cleared on C<finish()>) (you'll need to install
+L<Progress::Any::Output::TermProgressBarColor> as well):
 
  use Progress::Any '$progress';
  use Progress::Any::Output 'TermProgressBarColor';
@@ -665,7 +666,7 @@ Example of using in a module as well as script:
      my @urls = @_;
      return unless @urls;
      my $progress = Progress::Any->get_indicator(
-         task => "download", pos=>0, target=>~~@urls);
+         task => "download", pos=>0, target=>scalar @urls);
      for my $url (@urls) {
          # download the $url ...
          $progress->update(message => "Downloaded $url");
@@ -733,7 +734,7 @@ C<-progress>:
      opendir my($dh), $dir;
      my @ent = readdir($dh);
      $progress->pos(0);
-     $progress->target(~~@ent);
+     $progress->target(scalar @ent);
      for (@ent) {
          # do the check ...
          $progress->update(message => $_);
@@ -758,9 +759,10 @@ remaining time, and percentage of completion. One or more output modules
 
 In your modules, you typically only need to use Progress::Any, get one or more
 indicators, set target and update it during work. In your application, you use
-Progress::Any::Output and set/add one or more outputs to display the progress.
-By setting output only in the application and not in modules, you separate the
-formatting/display concern from the logic.
+L<Progress::Any::Output> and set/add one or more outputs to display the progress
+(you'll need to install one of the output modules as they are not included in
+this minimal distribution). By setting output only in the application and not in
+modules, you separate the formatting/display concern from the logic.
 
 Screenshots:
 
@@ -1118,7 +1120,7 @@ A literal C<%> sign.
 
 =head2 PROGRESS
 
-Boolean. Default 1. Can be set to 0 to display progress output.
+Boolean. Default 1. Can be set to 0 to supress display progress output.
 
 =head1 HOMEPAGE
 
@@ -1128,14 +1130,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Progress-A
 
 Source repository is at L<https://github.com/perlancar/perl-Progress-Any>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Progress::Any::Examples> distribution contains example scripts.
@@ -1143,7 +1137,9 @@ L<Progress::Any::Examples> distribution contains example scripts.
 Other progress modules on CPAN: L<Term::ProgressBar>,
 L<Term::ProgressBar::Simple>, L<Time::Progress>, among others.
 
-Output modules: C<Progress::Any::Output::*>
+Output modules: C<Progress::Any::Output::*>. You need to install at least one
+module to actually see progress being outputted/displayed somewhere, e.g. <> to
+L<Progress::Any::Output::TermProgressBarColor>.
 
 See examples on how Progress::Any is used by other modules: L<Perinci::CmdLine>
 (supplying progress object to functions), L<Git::Bunch> (using progress object).
@@ -1152,11 +1148,43 @@ See examples on how Progress::Any is used by other modules: L<Perinci::CmdLine>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2018, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

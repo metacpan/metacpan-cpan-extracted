@@ -116,12 +116,12 @@ subtest 'financialrounding' => sub {
     cmp_ok financialrounding('amount', 'BTC', 10),               '==', 10,        'BTC 10 -> 10.00000000';
     cmp_ok financialrounding('amount', 'BTC', 10.000001),        '==', 10.000001, 'BTC 10.000001 -> 10.00000100';
     cmp_ok financialrounding('amount', 'BTC', 10.0000000000001), '==', 10,        'BTC 10.0000000000001 -> 10.00000000';
-    cmp_ok financialrounding('amount', 'BTC', 0.0000000650001),  '==', 0.00000007,
+    cmp_ok financialrounding('amount', 'BTC', 0.0000000650001), '==', 0.00000007,
         'BTC 0.000000065 -> 0.00000007 changed the number to higher value, need to be careful with this';
     cmp_ok financialrounding('amount', 'ETH', 10),               '==', 10,        'ETH 10 -> 10.00000000';
     cmp_ok financialrounding('amount', 'ETH', 10.000001),        '==', 10.000001, 'ETH 10.000001 -> 10.00000100';
     cmp_ok financialrounding('amount', 'ETH', 10.0000000000001), '==', 10,        'ETH 10.0000000000001 -> 10.00000000';
-    cmp_ok financialrounding('amount', 'ETH', 0.0000000650001),  '==', 0.00000007,
+    cmp_ok financialrounding('amount', 'ETH', 0.0000000650001), '==', 0.00000007,
         'ETH 0.000000065 -> 0.00000007 changed the number to higher value, need to be careful with this';
     cmp_ok(financialrounding('amount', 'USD', 0.025),  '==', 0.03,  'Correct rounding, round away from zero');
     cmp_ok(financialrounding('amount', 'USD', -0.025), '==', -0.03, 'Correct rounding, round away from zero');

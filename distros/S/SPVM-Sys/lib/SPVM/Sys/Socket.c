@@ -7,18 +7,18 @@
 #include <assert.h>
 
 #ifdef _WIN32
-# include <ws2tcpip.h>
-# include <winsock2.h>
-# include <io.h>
-# include <winerror.h>
+  #include <ws2tcpip.h>
+  #include <winsock2.h>
+  #include <io.h>
+  #include <winerror.h>
 #else
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <netinet/ip.h>
-# include <netdb.h>
-# include <arpa/inet.h>
-# include <poll.h>
+  #include <unistd.h>
+  #include <sys/types.h>
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/ip.h>
+  #include <netdb.h>
+  #include <arpa/inet.h>
 #endif
 
 static const char* FILE_NAME = "Sys/Socket.c";
@@ -724,84 +724,23 @@ int32_t SPVM__Sys__Socket__shutdown(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Sys__Socket__ioctlsocket(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-#ifndef _WIN32
-  env->die(env, stack, "ioctlsocket is not supported on this system", FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
-#else
-  
-  int32_t e = 0;
-  
+int32_t SPVM__Sys__Socket__close(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t s = stack[0].ival;
   
-  int32_t cmd = stack[1].ival;
-  
-  int32_t* argp = stack[2].iref;
-  
-  u_long arg_u_long = (long)*argp;
-  
-  int32_t status = ioctlsocket(s, cmd, &arg_u_long);
-
-  if (!(status == 0)) {
-    env->die(env, stack, "[System Error]ioctlsocket failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
-    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
-  }
-  
-  *argp = arg_u_long;
-  
-  stack[0].ival = status;
-  
-  return 0;
-#endif
-}
-
-int32_t SPVM__Sys__Socket__closesocket(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifndef _WIN32
-  env->die(env, stack, "The \"closesocket\" method in the class \"Sys::Socket\" is not supported on this system", FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
-#else
-  
-  int32_t s = stack[0].ival;
-  
+#ifdef _WIN32
   int32_t status = closesocket(s);
-  
+#else
+  int32_t status = close(s);
+#endif
+
   if (!(status == 0)) {
-    env->die(env, stack, "[System Error]closesocket failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]close failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
   stack[0].ival = status;
   
   return 0;
-#endif
-}
-
-int32_t SPVM__Sys__Socket__WSAPoll(SPVM_ENV* env, SPVM_VALUE* stack) {
-#ifndef _WIN32
-  env->die(env, stack, "The \"WSAPoll\" method in the class \"Sys::Socket\" is not supported on this system", FILE_NAME, __LINE__);
-  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
-#else
-  
-  void* obj_fds = stack[0].oval;
-  
-  struct pollfd* fds = env->get_pointer(env, stack, obj_fds);
-  
-  int32_t nfds = stack[1].ival;
-  
-  int32_t timeout = stack[2].ival;
-  
-  int32_t ready_count = WSAPoll(fds, nfds, timeout);
-
-  if (ready_count == SOCKET_ERROR) {
-    env->die(env, stack, "[System Error]WSAPoll failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
-    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
-  }
-  
-  stack[0].ival = ready_count;
-  
-  return 0;
-#endif
 }
 
 int32_t SPVM__Sys__Socket__gai_strerror(SPVM_ENV* env, SPVM_VALUE* stack) {

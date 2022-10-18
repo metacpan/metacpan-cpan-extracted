@@ -12,7 +12,7 @@ use Wikibase::Datatype::Struct::Item;
 use Wikibase::Datatype::Struct::Lexeme;
 use Wikibase::Datatype::Struct::Mediainfo;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -84,6 +84,9 @@ sub get_item {
 	my ($self, $id, $opts_hr) = @_;
 
 	my $struct_hr = $self->get_item_raw($id, $opts_hr);
+	if (! exists $struct_hr->{'type'}) {
+		return;
+	}
 
 	my $item_obj;
 	if ($struct_hr->{'type'} eq 'item') {
@@ -371,6 +374,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

@@ -8,7 +8,7 @@ Weather::GHCN::StationTable - collect station objects and weather data
 
 =head1 VERSION
 
-version v0.0.006
+version v0.0.007
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::StationTable;
 class   Weather::GHCN::StationTable;
 
-our $VERSION = 'v0.0.006';
+our $VERSION = 'v0.0.007';
 
 # directly used by this module
 use Carp                qw( carp croak );
@@ -268,92 +268,6 @@ Create a new StationTable object.
 BUILD {
     %_hstats = ();
     $_tstats = Weather::GHCN::TimingStats->new();
-}
-
-=head2 export_kml( list => 0 )
-
-Output the coordinates of the station collection as a KML file, for
-import into Google Earth as placemarks.  The active range of each
-station will be included as timespans so that you can view the
-placemarks across time.
-
-=over 4
-
-=item argument: list
-
-If the argument list contains the 'list' keyword and a true value,
-then export_kml will return a string with the kml output as lines of
-text rather than writing it to the file specified by the kml option.
-
-=item option: kml <filespec>
-
-Write the kml output to the file designated by <filespec>.  If <filespec>
-is an empty string, no file is written.
-
-=item option: color <str>
-
-A color name, one of blue, green, azure, purple, red, white or yellow.
-Only the first character is recognized, so 'b' and 'bob' both result
-in blue.  All colors are given an opacity of 50 (the range is 00 to ff).
-
-=back
-
-=cut
-
-method export_kml ( %arg ) {
-    my $return_list = $arg{list} // $_return_list;
-    my $filespec = $Opt->kml;
-
-    my $kml_color = _get_kml_color( $Opt->color );
-    my @output;
-
-    push @output, '<?xml version="1.0" encoding="UTF-8"?>';
-    push @output, '<kml xmlns="http://www.opengps.net/kml/2.2">';
-    push @output, '<Document>';
-    push @output, '  <Style id="mypin">';
-    push @output, '  <IconStyle>';
-    push @output, '  <color>' . $kml_color . '</color>';
-    push @output, '  <Icon>';
-    # push @output, '    <href>http://maps.google.com/mapfiles/kml/pushpin/' . $color . '-pushpin.png</href>';
-    push @output, '    <href>http://maps.google.com/mapfiles/kml/shapes/donut.png</href>';
-    push @output, '  </Icon>';
-    push @output, '  </IconStyle>';
-    push @output, '  </Style>';
-
-    foreach my $stn ( values %_station ) {
-        next if $stn->error_count;
-        # TODO:  use ->sets to get a list of spans and use the first span instead of splitting run_list
-        my ($start, $end) = split m{ [-] }xms, $stn->active;
-
-        my $desc = $stn->description();
-
-        push @output,         '  <Placemark>';
-        push @output,         '    <styleUrl>#mypin</styleUrl>';
-        push @output, sprintf '    <name>%s</name>', encode_entities($stn->name);
-        push @output, sprintf '    <description>%s</description>', encode_entities($desc);
-        push @output,         '    <TimeSpan>';
-        push @output, sprintf '      <begin>%s-01-01T00:00:00Z</begin>', $start;
-        push @output, sprintf '        <end>%s-12-31T23:59:59Z</end>', $end;
-        push @output,         '    </TimeSpan>';
-        push @output, sprintf '    <Point><coordinates>%f, %f, %f</coordinates></Point>', $stn->long, $stn->lat, $stn->elev;
-        push @output,         '  </Placemark>';
-    }
-
-    push @output, '</Document>';
-    push @output, '</kml>';
-
-    if ($filespec) {
-        # uncoverable branch true
-        # uncoverable branch false
-        open my $fh, '>', $filespec
-            or croak "*E* unable to open $filespec for write\n";
-        say {$fh} join $NL, @output;
-        # uncoverable branch true
-        # uncoverable branch false
-        close $fh or croak "*E* unable to close kml output\n";;
-    }
-
-    return $return_list ? @output : tsv(\@output);
 }
 
 =head2 flag_counts ()
@@ -1224,6 +1138,128 @@ method load_stations () {
     $_stn_filtered_count = $self->_load_station_inventories();
 
     return \%_station;
+}
+
+=head2 report_kml( list => 0 )
+
+Output the coordinates of the station collection in KML format, for
+import into Google Earth as placemarks.  The active range of each
+station will be included as timespans so that you can view the
+placemarks across time.
+
+=over 4
+
+=item argument: list
+
+If the argument list contains the 'list' keyword and a true value,
+then a perl list is returned.  Otherwise, a string consisting of lines 
+of text is returned.
+
+=item option: kml
+
+Print KML on stdout.
+
+=item option: kmlcolor <str>
+
+A color name, one of blue, green, azure, purple, red, white or yellow.
+Only the first character is recognized, so 'b' and 'bob' both result
+in blue.  All colors are given an opacity of 50 (the range is 00 to ff).
+
+=back
+
+=cut
+
+method report_kml ( %arg ) {
+    my $return_list = $arg{list} // $_return_list;
+
+    my $kml_color = _get_kml_color( $Opt->kmlcolor );
+    my @output;
+
+    push @output, '<?xml version="1.0" encoding="UTF-8"?>';
+    push @output, '<kml xmlns="http://www.opengps.net/kml/2.2">';
+    push @output, '<Document>';
+    push @output, '  <Style id="mypin">';
+    push @output, '  <IconStyle>';
+    push @output, '  <color>' . $kml_color . '</color>';
+    push @output, '  <Icon>';
+    # push @output, '    <href>http://maps.google.com/mapfiles/kml/pushpin/' . $kmlcolor . '-pushpin.png</href>';
+    push @output, '    <href>http://maps.google.com/mapfiles/kml/shapes/donut.png</href>';
+    push @output, '  </Icon>';
+    push @output, '  </IconStyle>';
+    push @output, '  </Style>';
+
+    foreach my $stn ( values %_station ) {
+        next if $stn->error_count;
+        # TODO:  use ->sets to get a list of spans and use the first span instead of splitting run_list
+        my ($start, $end) = split m{ [-] }xms, $stn->active;
+
+        my $desc = $stn->description();
+
+        push @output,         '  <Placemark>';
+        push @output,         '    <styleUrl>#mypin</styleUrl>';
+        push @output, sprintf '    <name>%s</name>', encode_entities($stn->name);
+        push @output, sprintf '    <description>%s</description>', encode_entities($desc);
+        push @output,         '    <TimeSpan>';
+        push @output, sprintf '      <begin>%s-01-01T00:00:00Z</begin>', $start;
+        push @output, sprintf '        <end>%s-12-31T23:59:59Z</end>', $end;
+        push @output,         '    </TimeSpan>';
+        push @output, sprintf '    <Point><coordinates>%f, %f, %f</coordinates></Point>', $stn->long, $stn->lat, $stn->elev;
+        push @output,         '  </Placemark>';
+    }
+
+    push @output, '</Document>';
+    push @output, '</kml>';
+
+    return $return_list ? @output : tsv(\@output);
+}
+
+=head2 report_urls( list => 0, curl => 0 )
+
+Output the URL of the .dly (daily weather data) file for each of the
+stations that meet the selection criteria.
+
+=over 4
+
+=item argument: list
+
+If the argument list contains the 'list' keyword and a true value,
+then a perl list is returned.  Otherwise, a string consisting of lines 
+of text is returned.
+
+=item argument: curl
+
+If the argument list contains the 'curl' keyword and a true value,
+then the output will be a set of lines that can be saved in a file
+for subsequent input to the B<curl> program using the B<-K> option.  
+This facilitates bulk fetching of .dly files into the cache.
+
+=back
+
+=cut
+
+method report_urls ( %arg ) {
+    my $return_list = $arg{list} // $_return_list;
+
+    my @output;
+
+    push @output, "# Use curl -K <this_file> to download these URL's"
+        if $arg{curl};
+        
+    foreach my $stn ( values %_station ) {
+        next if $stn->error_count;
+        # TODO:  use ->sets to get a list of spans and use the first span instead of splitting run_list
+        my ($start, $end) = split m{ [-] }xms, $stn->active;
+        
+        if ( $arg{curl} ) {
+            my @parts = split '/', $stn->url;
+            push @output, 'output = ' . $parts[-1];
+            push @output, 'url = ' . $stn->url;
+        } else {
+            push @output, $stn->url;
+        }
+    }
+
+    return $return_list ? @output : tsv(\@output);
 }
 
 =head2 ($opt, @errors) = set_options ( %args )
@@ -2457,7 +2493,7 @@ sub _memsize ( $ref, $opt_performance ) {
 =head1 OPTIONS
 
 StationTable supports almost all the options documented in
-B<ghcn_fetch.pl>.  The only options not supported are ones that
+B<ghcn_fetch>.  The only options not supported are ones that
 are listed in the Command-Line Only Options section of the POD, namely:
 -help, -usage, -readme, -gui, -optfile, and -outclip.
 
@@ -2467,7 +2503,7 @@ Options can also be defined in a file (called a B<profile>) that will
 be loaded at runtime and merged with the options passed to B<set_options>.
 
 Options passed to B<set_options()> must be defined as a perl hash
-structure. See B<ghcn_fetch.pl -help> for a list of all options in
+structure. See B<ghcn_fetch -help> for a list of all options in
 Getopts::Long format.  Simply translate the option to a hash
 key/value pair.  For example, B<-report detail> becomes B<report =>
 'detail'>.

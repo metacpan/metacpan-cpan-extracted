@@ -1,0 +1,3 @@
+class Sys::Select::Constant {
+  native static method FD_SETSIZE : int ();
+}

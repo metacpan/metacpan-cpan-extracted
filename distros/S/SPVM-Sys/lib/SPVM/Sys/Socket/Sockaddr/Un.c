@@ -3,11 +3,12 @@
 #include <assert.h>
 
 #ifdef _WIN32
-# include <ws2tcpip.h>
-# include <io.h>
+  #include <ws2tcpip.h>
+  #include <io.h>
 #else
-#include <sys/socket.h>
-#include <sys/un.h>
+  #include <sys/types.h>
+  #include <sys/socket.h>
+  #include <sys/un.h>
 #endif
 
 const char* FILE_NAME = "Sys/Socket/Sockaddr/Un.c";

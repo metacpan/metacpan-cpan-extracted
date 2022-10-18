@@ -5,9 +5,9 @@ use strict 'subs', 'vars';
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2022-10-18'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 our %SPEC;
 
@@ -90,7 +90,7 @@ Data::Sah::FilterCommon - Common stuffs for Data::Sah::Filter and Data::Sah::Fil
 
 =head1 VERSION
 
-This document describes version 0.013 of Data::Sah::FilterCommon (from Perl distribution Data-Sah-Filter), released on 2022-07-24.
+This document describes version 0.015 of Data::Sah::FilterCommon (from Perl distribution Data-Sah-Filter), released on 2022-10-18.
 
 =head1 FUNCTIONS
 
@@ -111,9 +111,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<compiler>* => I<str>
 
+(No description)
+
 =item * B<data_term>* => I<str>
 
+(No description)
+
 =item * B<filter_names>* => I<array[str]>
+
+(No description)
 
 
 =back
@@ -154,9 +160,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -6,8 +6,7 @@ class Sys::IO {
   use Sys::IO::Dirent;
   use Sys::IO::Utimbuf;
   use Sys::IO::Flock;
-  use Sys::IO::PollfdArray;
-  use Sys::IO::Constant;
+  use Sys::IO::Constant as IO;
   
   native static method open : int ($path : string, $flags : int, $mode = 0 : int);
   
@@ -93,15 +92,31 @@ class Sys::IO {
   
   native static method utime : int ($filename : string, $times : Sys::IO::Utimbuf);
   
-  native static method access : int ($path : string, $mode : int);
+  native static method access_raw : int ($pathname : string, $mode : int);
+  
+  native static method access : int ($pathname : string, $mode : int);
+  
+  native static method faccessat_raw : int ($dirfd : int, $pathname : string, $mode : int, $flags : int);
+  
+  native static method faccessat : int ($dirfd : int, $pathname : string, $mode : int, $flags : int);
+  
+  static method eaccess_emulate_raw : int ($pathname : string, $mode : int) {
+    my $status = &faccessat_raw(IO->AT_FDCWD, $pathname, $mode, IO->AT_EACCESS);
+    return $status;
+  }
+  
+  static method eaccess_emulate : int ($pathname : string, $mode : int) {
+    my $status = &faccessat(IO->AT_FDCWD, $pathname, $mode, IO->AT_EACCESS);
+    return $status;
+  }
+  
+  native static method stat_raw : int ($path : string, $stat : Sys::IO::Stat);
   
   native static method stat : int ($path : string, $stat : Sys::IO::Stat);
+  
+  native static method lstat_raw : int ($path : string, $stat : Sys::IO::Stat);
   
   native static method lstat : int ($path : string, $stat : Sys::IO::Stat);
   
   native static method fcntl : int ($fd : int, $command : int, $command_arg = undef : object of Byte|Short|Int|Long|Float|Double|Sys::IO::Flock|object);
-  
-  native static method ioctl : int ($fd : int, $request : int, $request_arg = undef : object of Byte|Short|Int|Long|Float|Double|object);
-  
-  native static method poll : int ($fds : Sys::IO::PollfdArray, $nfds : int, $timeout : int);
 }

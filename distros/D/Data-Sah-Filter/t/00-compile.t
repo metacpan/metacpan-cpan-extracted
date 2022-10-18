@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 40 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 42 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Filter.pm',
@@ -24,6 +24,7 @@ my @module_files = (
     'Data/Sah/Filter/perl/Array/remove_undef.pm',
     'Data/Sah/Filter/perl/Array/uniq.pm',
     'Data/Sah/Filter/perl/Array/uniqnum.pm',
+    'Data/Sah/Filter/perl/Array/uniqstr.pm',
     'Data/Sah/Filter/perl/Float/ceil.pm',
     'Data/Sah/Filter/perl/Float/check_has_fraction.pm',
     'Data/Sah/Filter/perl/Float/check_int.pm',
@@ -42,6 +43,7 @@ my @module_files = (
     'Data/Sah/Filter/perl/Str/replace_map.pm',
     'Data/Sah/Filter/perl/Str/rtrim.pm',
     'Data/Sah/Filter/perl/Str/trim.pm',
+    'Data/Sah/Filter/perl/Str/try_center.pm',
     'Data/Sah/Filter/perl/Str/uc.pm',
     'Data/Sah/Filter/perl/Str/ucfirst.pm',
     'Data/Sah/Filter/perl/Str/upcase.pm',

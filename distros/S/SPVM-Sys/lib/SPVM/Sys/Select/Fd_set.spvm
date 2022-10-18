@@ -1,0 +1,7 @@
+class Sys::Select::Fd_set {
+  # Class methods
+  native static method new : Sys::Select::Fd_set ();
+  
+  # Instance methods
+  native method DESTROY : void ();
+}

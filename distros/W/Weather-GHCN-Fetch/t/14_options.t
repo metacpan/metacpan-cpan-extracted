@@ -12,7 +12,7 @@ use lib $Bin . '/../lib';
 
 use Weather::GHCN::Measures;
 
-use Test::More tests => 21;
+use Test::More tests => 20;
 use Test::Exception;
 
 use Const::Fast;
@@ -180,7 +180,7 @@ subtest 'country validation' => sub {
 subtest 'options_as_string' => sub {
     my %user_opt;
 
-    my $user_options = '-location Ottawa -country CA -state ON -range 2000-2010 -gsn -kml ""';
+    my $user_options = '-location Ottawa -country CA -state ON -range 2000-2010 -gsn';
     GetOptionsFromString($user_options, \%user_opt, @all_options);
 
     my ($opt_href, $opt_obj) = $opt->combine_options( \%user_opt );
@@ -195,8 +195,8 @@ subtest 'options_as_string' => sub {
     $count = grep { $_ =~ m{ -baseline \s \d{4}-\d{4} }xms } @opt_list;
     is $count, 1, , '-baseline found';
 
-    $count = grep { $_ =~ m{-color \s red }xms } @opt_list;
-    is $count, 1, , '-color found';
+    $count = grep { $_ =~ m{-kmlcolor \s red }xms } @opt_list;
+    is $count, 1, , '-kmlcolor found';
 
     $count = grep { $_ =~ m{-country \s CA }xms } @opt_list;
     is $count, 1, , '-country found';
@@ -222,10 +222,6 @@ subtest 'options_as_string' => sub {
     my @r = grep { $_ =~ m{ -gsn }xms } @opt_list;
     is @r, 1, , "-gsn found (boolean option)";
     is $r[0], '-gsn', '-gsn formatted without a value';
-
-    @r = grep { $_ =~ m{ -kml \s "" }xms } @opt_list;
-    is @r, 1, '-kml found (with empty string)';
-    is $r[0], '-kml ""', '-kml value formatted as ""';
 };
 
 subtest 'validate - values for range and active' => sub {
@@ -360,6 +356,11 @@ subtest 'validate - report' => sub {
         [ q/ -report daily   /, 1 ],
         [ q/ -report monthly /, 1 ],
         [ q/ -report yearly  /, 1 ],
+        [ q/ -report kml     /, 1 ],
+        [ q/ -report id      /, 1 ],
+        [ q/ -report stn     /, 1 ],
+        [ q/ -report url     /, 1 ],
+        [ q/ -report curl    /, 1 ],
         [ q/ -report XXX     /, 0 ],
     );
 
@@ -377,16 +378,16 @@ subtest 'validate - report' => sub {
 
 subtest 'validate - color' => sub {
     my @testopts = (
-        [ q/ -color blue     /, 1 ],
-        [ q/ -color green    /, 1 ],
-        [ q/ -color azure    /, 1 ],
-        [ q/ -color purple   /, 1 ],
-        [ q/ -color red      /, 1 ],
-        [ q/ -color white    /, 1 ],
-        [ q/ -color yellow   /, 1 ],
-        [ q/ -color orange   /, 0 ],
-        [ q/ -color zzz      /, 0 ],
-        [ q/ -color ""       /, 0 ],
+        [ q/ -kmlcolor blue     /, 1 ],
+        [ q/ -kmlcolor green    /, 1 ],
+        [ q/ -kmlcolor azure    /, 1 ],
+        [ q/ -kmlcolor purple   /, 1 ],
+        [ q/ -kmlcolor red      /, 1 ],
+        [ q/ -kmlcolor white    /, 1 ],
+        [ q/ -kmlcolor yellow   /, 1 ],
+        [ q/ -kmlcolor orange   /, 0 ],
+        [ q/ -kmlcolor zzz      /, 0 ],
+        [ q/ -kmlcolor ""       /, 0 ],
     );
 
     foreach my $aref (@testopts) {
@@ -394,33 +395,12 @@ subtest 'validate - color' => sub {
 
         @errors = init_and_validate ($profile_href, $opt, $uo);
         if ( $is_valid ) {
-            ok !@errors, "validate color $uo";
+            ok !@errors, "validate kmlcolor: $uo";
         } else {
             my $err = shift @errors;
             # uncoverable branch false
             $err = $err ? $err : $EMPTY;
-            like $err, qr/invalid -color value/, "validate invalid color $uo";
-        }
-    }
-};
-
-subtest 'validate - label with kml' => sub {
-    my @testopts = (
-        [ q/ -kml "myfilespec" -label   /, 1 ],
-        [ q/ -kml "myfilespec" -nolabel /, 1 ],
-        [ q/ -kml "myfilespec"          /, 1 ],
-        [ q/ -label                     /, 0 ],
-        [ q/ -nolabel                   /, 0 ],
-    );
-
-    foreach my $aref (@testopts) {
-        my ($uo, $is_valid) = $aref->@*;
-
-        @errors = init_and_validate ($profile_href, $opt, $uo);
-        if ( $is_valid ) {
-            ok !@errors, "validate label $uo";
-        } else {
-            like $errors[0], qr|-label/-nolabel only allowed if -kml|, "validate invalid label $uo";
+            like $err, qr/invalid -kmlcolor value/, "validate invalid kmlcolor: $uo";
         }
     }
 };
@@ -484,7 +464,7 @@ subtest 'validate - fday' => sub {
 
 subtest 'validate - _get_boolean_options' => sub {
     my @bool_opts = qw(
-        anomalies gsn label nogaps partial performance precip tavg
+        anomalies gsn nogaps partial performance precip tavg
     );
 
     my $tk_opt_table = Weather::GHCN::Options->get_tk_options_table();
@@ -494,7 +474,7 @@ subtest 'validate - _get_boolean_options' => sub {
     foreach my $o (@bool_opts) {
         ok $is_bool_href->{$o}, "option $o is boolean";
     }
-
+    
     note '     *I* update this test when new boolean options are added';
 };
 

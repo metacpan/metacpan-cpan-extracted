@@ -3,7 +3,7 @@ package Devel::Chitin::OpTree;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp;
 use Scalar::Util qw(blessed reftype weaken refaddr);
@@ -479,10 +479,16 @@ foreach my $d ( [ pp_chdir => 'chdir' ],
     *$pp_name = $sub;
 }
 
+sub pp_undef {
+    my $self = shift;
+
+    my $target = $self->_maybe_targmy;
+    "${target}undef";
+}
+
 sub pp_enter { '' }
 sub pp_stub { ';' }
 sub pp_unstack { '' }
-sub pp_undef { 'undef' }
 sub pp_wantarray { 'wantarray' }
 sub pp_dump { 'CORE::dump' }
 sub pp_next { 'next' }

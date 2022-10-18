@@ -32,6 +32,10 @@ my $ok = eval { $name = find_device(); 1 };
     };
 };
 
+my @http_message_641 = $HTTP::Message::VERSION >= 6.41
+                     ? ('_max_body_size' => undef)
+                     : ();
+
 my $stale_count;
 
 my $s = Sniffer::HTTP->new(
@@ -50,6 +54,7 @@ $s->run_file($fn,"tcp port 80");
 
 my $request1 = bless({
                  '_protocol' => 'HTTP/1.1',
+                 @http_message_641,
                  '_content' => '',
                  '_uri' => bless( do{\(my $o = 'http://corion.net/does_not_exists')}, 'URI::http' ),
 

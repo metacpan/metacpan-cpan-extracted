@@ -14,9 +14,9 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Weather-GHCN-Fetch",
   "EXE_FILES" => [
-    "bin/ghcn_extremes.pl",
-    "bin/ghcn_fetch.pl",
-    "bin/ghcn_station_counts.pl"
+    "bin/ghcn_extremes",
+    "bin/ghcn_fetch",
+    "bin/ghcn_station_counts"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.018000",
@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "Time::Local" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.0.006",
+  "VERSION" => "v0.0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }

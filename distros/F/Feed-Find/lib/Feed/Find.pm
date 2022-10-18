@@ -10,7 +10,7 @@ use URI;
 use Carp;
 
 use vars qw( $VERSION $ua );
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 use constant FEED_MIME_TYPES => [
     'application/x.atom+xml',

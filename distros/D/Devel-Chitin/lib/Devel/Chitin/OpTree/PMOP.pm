@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::PMOP;
 use base 'Devel::Chitin::OpTree::LISTOP';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use B qw(PMf_CONTINUE PMf_ONCE PMf_GLOBAL PMf_MULTILINE PMf_KEEP PMf_SINGLELINE
          PMf_EXTENDED PMf_FOLD OPf_KIDS);

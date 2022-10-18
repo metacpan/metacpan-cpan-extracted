@@ -1,0 +1,7 @@
+class Sys::Poll {
+
+  use Sys::Poll::PollfdArray;
+  use Sys::Poll::Constant;
+  
+  native static method poll : int ($fds : Sys::Poll::PollfdArray, $nfds : int, $timeout : int);
+}

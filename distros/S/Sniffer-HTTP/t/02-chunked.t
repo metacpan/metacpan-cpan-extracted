@@ -62,8 +62,13 @@ for (@packets) {
   $s->handle_tcp_packet($tcp);
 };
 
+my @http_message_641 = $HTTP::Message::VERSION >= 6.41
+                     ? ('_max_body_size' => undef)
+                     : ();
+
 my $request = bless( {
                    '_protocol' => 'HTTP/1.1',
+                   @http_message_641,
                    '_content' => '',
                    '_uri' => bless( do{\(my $o = 'http://www.corion.net/does_not_exist')}, 'URI::http' ),
                    '_headers' => bless( {

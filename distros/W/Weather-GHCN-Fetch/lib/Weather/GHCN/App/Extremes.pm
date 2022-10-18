@@ -8,7 +8,7 @@ Weather::GHCN::App::Extremes - Report temperature extremes from Weather::GHCN::F
 
 =head1 VERSION
 
-version v0.0.006
+version v0.0.007
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ use warnings;
 
 package Weather::GHCN::App::Extremes;
 
-our $VERSION = 'v0.0.006';
+our $VERSION = 'v0.0.007';
 
 use feature 'signatures';
 no warnings 'experimental::signatures';

@@ -23,7 +23,7 @@ requires 'Data::HTML::Button' => 0.04;
 requires 'Data::HTML::Form' => 0.04;
 requires 'Error::Pure' => 0;
 requires 'Scalar::Util' => 0;
-requires 'Tags::HTML' => 0;
+requires 'Tags::HTML' => 0.04;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Tags-HTML-Form/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Tags-HTML-Form';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Tags-HTML-Form';
@@ -38,7 +38,7 @@ test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

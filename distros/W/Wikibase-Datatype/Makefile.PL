@@ -25,7 +25,6 @@ requires 'Mo' => 0;
 requires 'Mo::utils' => 0.03;
 requires 'List::MoreUtils' => 0;
 requires 'List::Util' => 1.33;
-requires 'Locale::Language' => 0;
 requires 'Readonly' => 0;
 requires 'Unicode::UTF8' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Wikibase-Datatype/issues',
@@ -37,7 +36,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.20';
+version '0.21';
 
 # Run.
 WriteAll();

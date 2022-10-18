@@ -16,13 +16,30 @@ use Test::Mock::Redis;
 use Data::Chronicle::Reader;
 use Data::Chronicle::Writer;
 
+our $VERSION = '0.21';    ## VERSION
+
+{
+    # We need to store the Test::PostgreSQL handle somewhere to prevent
+    # premature destruction of the database.
+    package Data::Chronicle::Mock::Connector;    ## no critic
+    use strict;
+    use warnings;
+    use parent qw/DBIx::Connector/;
+
+    sub testdb {
+        my $self = shift;
+        if (@_) {
+            $self->{' p g s q l '} = shift;
+        }
+        return $self->{' p g s q l '};
+    }
+}
+
 # This is to resolve a compatibility issue between Test::Mock::Redis (where mget returns an array)
 #   and RedisDB (where mget returns an arrayref).
 use Test::MockModule;
 my $mocked_mock_redis = Test::MockModule->new('Test::Mock::Redis');
 $mocked_mock_redis->mock('mget', sub { return [$mocked_mock_redis->original('mget')->(@_)] });
-
-our $VERSION = '0.20';    ## VERSION
 
 =head3 C<< my $ch = get_mocked_chronicle(); >>
 
@@ -34,7 +51,8 @@ sub get_mocked_chronicle {
     my $redis = Test::Mock::Redis->new(server => 'whatever');
 
     my $pgsql = Test::PostgreSQL->new();
-    my $dbic  = DBIx::Connector->new($pgsql->dsn);
+    my $dbic  = Data::Chronicle::Mock::Connector->new($pgsql->dsn);
+    $dbic->testdb($pgsql);
     $dbic->mode('ping');
     my $stmt = qq(CREATE TABLE chronicle (
       id bigserial,
@@ -61,21 +79,6 @@ sub get_mocked_chronicle {
         dbic         => $dbic,
         ttl          => 86400
     );
-
-    #we need to store a reference to $pgsql or else, as soon as this method
-    #is returned, it will be destroyed and connection will be lost.
-    $chronicle_r->meta->add_attribute(
-        dummy => (
-            accessor => 'dummy',
-        ));
-
-    $chronicle_w->meta->add_attribute(
-        dummy => (
-            accessor => 'dummy',
-        ));
-
-    $chronicle_r->dummy($pgsql);
-    $chronicle_w->dummy($pgsql);
 
     return ($chronicle_r, $chronicle_w);
 }

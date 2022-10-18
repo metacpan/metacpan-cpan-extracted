@@ -31,7 +31,7 @@ use utf8;
 use Data::Dumper;
 
 my %template = (
-    DEFAULT => 'space',
+    __DEFAULT__ => 'space',
     space => {
 	top    => '',
 	left   => '',
@@ -189,7 +189,7 @@ my %template = (
 		    "┘"  ],
 	bottom =>    "─",
     },
-    shadow => {
+    thin_shadow => {
 	top    =>   "",
 	left   => [ " "  ,
 		    " "  ,
@@ -200,6 +200,19 @@ my %template = (
 	right  => [ " ▖" ,
 		    " ▌" ,
 		    "▀▘" ],
+	bottom =>   "▀",
+    },
+    shadow => {
+	top    =>   "",
+	left   => [ " "  ,
+		    " "  ,
+		    " " ],
+	center => [ " ▄ " ,
+		    " █ " ,
+		    "▀▀ " ],
+	right  => [ " ▄" ,
+		    " █" ,
+		    "▀▀" ],
 	bottom =>   "▀",
     },
     thin_shadow_box => {
@@ -353,7 +366,7 @@ my %template = (
 
 use Clone qw(clone);
 
-for my $style (qw(line vbar box dash_box round_box shadow_box frame dash_frame page_frame comb rake mesh
+for my $style (qw(line vbar box dash_box shadow_box frame dash_frame page_frame comb rake mesh
 		  dumbbell ribbon)) {
     $template{$style} // next;
     my $new = $template{"heavy_$style"} = clone $template{$style};
@@ -377,30 +390,41 @@ for my $style (keys %template) {
 
 sub new {
     my $class = shift;
-    my $style = @_ ? shift : 'DEFAULT';
+    my $style = @_ ? shift : '__DEFAULT__';
     (bless { %template }, $class)->style($style);
+}
+
+sub styles {
+    my $obj = shift;
+    grep { $_ !~ /^__/ } sort keys %$obj;
 }
 
 sub style {
     my $obj = shift;
     my $style = do {
 	if (@_) {
-	    $obj->{__STYLE__} = +shift =~ tr[-][_]r;
+	    my $s = shift;
+	    if ($s =~ /^random$/i) {
+		my @styles = $obj->styles;
+		$styles[rand @styles];
+	    } else {
+		$obj->{__STYLE__} = $s =~ tr[-][_]r;
+	    }
 	} else {
 	    return $obj->{__STYLE__};
 	}
     };
     $obj->{$style} or return undef;
-    $obj->{CURRENT} //= {};
-    # %{$obj->{CURRENT}} = %{$obj->{$style}}
-    %{$obj->{CURRENT}} =
+    $obj->{__CURRENT__} //= {};
+    # %{$obj->{__CURRENT__}} = %{$obj->{$style}}
+    %{$obj->{__CURRENT__}} =
 	map { $_ => $obj->{$style}->{$_} } keys %{$obj->{$style}};
     $obj;
 }
 
 sub get {
     my $obj = shift;
-    $obj->get_by_style('CURRENT', @_) // $obj->get_by_style('DEFAULT', @_)
+    $obj->get_by_style('__CURRENT__', @_) // $obj->get_by_style('__DEFAULT__', @_)
 	// die;
 }
 

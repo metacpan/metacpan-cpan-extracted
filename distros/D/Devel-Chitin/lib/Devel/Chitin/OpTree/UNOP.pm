@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::UNOP;
 use base 'Devel::Chitin::OpTree';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use strict;
 use warnings;
@@ -262,9 +262,16 @@ sub pp_readline {
 sub pp_undef {
     #'undef(' . shift->first->deparse . ')'
     my $self = shift;
-    my $arg = $self->first->deparse;
-    if ($arg =~ m/::/) {
+
+    my $arg;
+    if ($self->first->is_null and $self->op->private & B::OPpTARGET_MY) {
+        # This is an optimized undef($myvar)
+        $arg = $self->_padname_sv->PV;
+    } else {
         $arg = $self->first->deparse;
+        if ($arg =~ m/::/) {
+            $arg = $self->first->deparse;
+        }
     }
     "undef($arg)";
 }
@@ -475,6 +482,23 @@ sub pp_require {
     # that'll do all the work for us
     shift->first->deparse;
 };
+
+sub pp_padsv_store {
+    my $self = shift;
+
+    my $var = $self->_padname_sv->PV;
+    my $value = $self->first->deparse;
+    join(' = ', $var, $value);
+}
+
+sub pp_aelemfastlex_store {
+    my $self = shift;
+    my $var = $self->_padname_sv->PV;
+    my $idx = $self->op->private;
+    my $value = $self->first->deparse;
+    substr($var, 0, 1) = '$';
+    "${var}[${idx}] = $value";
+}
 
 sub pp_sassign {
     my $self = shift;

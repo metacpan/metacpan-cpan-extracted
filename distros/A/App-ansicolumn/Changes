@@ -1,5 +1,10 @@
 Revision history for Perl extension App-ansicolumn
 
+1.25 2022-10-18T03:26:34Z
+
+    - add --border-style=random
+    - introduce --margin option, and implement --cm (undocumented yet)
+
 1.24 2022-10-06T03:26:49Z
 
     - add --parallel option implicitly enabled for multiple files

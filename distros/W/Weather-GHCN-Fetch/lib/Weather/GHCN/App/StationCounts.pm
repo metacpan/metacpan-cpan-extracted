@@ -1,4 +1,4 @@
-# ghcn_station_counts.pl - Count stations in ghcn_fetch.pl station output
+# ghcn_station_counts - Count stations in ghcn_fetch station output
 
 ## no critic (Documentation::RequirePodAtEnd)
 
@@ -8,7 +8,7 @@ Weather::GHCN::App::StationCounts - Count stations in Weather::GHCN::Fetch stati
 
 =head1 VERSION
 
-version v0.0.006
+version v0.0.007
 
 =head1 SYNOPSIS
 
@@ -16,7 +16,7 @@ version v0.0.006
 
     Weather::GHCN::App::StationCounts->run( \@ARGV );
 
-See ghcn_station_counts.pl -help for details.
+See ghcn_station_counts -help for details.
 
 =cut
 
@@ -32,7 +32,7 @@ use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::App::StationCounts;
 
-our $VERSION = 'v0.0.006';
+our $VERSION = 'v0.0.007';
 
 use feature 'signatures';
 no  warnings 'experimental::signatures';
@@ -113,7 +113,7 @@ then call:
 
     Weather::GHCN::App::StationCounts->run( \@ARGV );
 
-See ghcn_station_counts.pl -help for details.
+See ghcn_station_counts -help for details.
 
 =cut
 

@@ -1,4 +1,4 @@
-package   # CPAN, don't undex
+package   # CPAN, don't index
     Devel::NullDB;
 
 use base 'Devel::Chitin';

@@ -1,3 +1,16 @@
+0.015   2022-10-18  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix broken filter.
+
+        - Add some tests.
+
+
+0.014   2022-10-17  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix constructing filter code with multiple filters with
+          might_fail.
+
+
 0.013   2022-07-24  Released-By: PERLANCAR; Urgency: medium
 
         - Add perl filter: Str::remove_whitespace.

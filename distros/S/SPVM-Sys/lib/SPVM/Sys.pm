@@ -1,6 +1,6 @@
 package SPVM::Sys;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 1;
 
@@ -38,12 +38,6 @@ C<Sys> is the class for system calls such as file IO, user manipulation, process
 
 =head1 Class Methods
 
-=head2 is_D_WIN32
-
-  static method is_D_WIN32 : int ()
-
-If C<_WIN32> in C<C language> is defined, return C<1>. Otherwize return C<0>.
-
 =head2 getenv
 
   static method getenv : string ($name : string);
@@ -67,6 +61,98 @@ See the detail of the L<setenv|https://linux.die.net/man/3/setenv> function in t
 The unsetenv() function deletes the variable name from the environment. If name does not exist in the environment, then the function succeeds, and the environment is unchanged.
 
 See the detail of the L<unsetenv|https://linux.die.net/man/3/unsetenv> function in the case of Linux.
+
+=head2 defined
+
+  static method defined : int ($macro_name : string, $value = undef : object of Int|Long|Double);
+
+Checks if the macro in C<C langauge> is defined. If the macro is defined, returns C<1>. Otherwise returns C<0>.
+
+If C<$value> is specifed and C<$macro_name> is defined, the macro value converted to the given type is set to C<$value>.
+
+Supports the following macro names.
+
+=over 2
+
+=item * __GNUC__
+
+=item * __clang__
+
+=item * __BORLANDC__
+
+=item * __INTEL_COMPILER
+
+=item * __unix
+
+=item * __unix__
+
+=item * __linux
+
+=item * __linux__
+
+=item * __FreeBSD__
+
+=item * __NetBSD__
+
+=item * __OpenBSD__
+
+=item * _WIN32
+
+=item * WIN32
+
+=item * _WIN64
+
+=item * _WINDOWS
+
+=item * _CONSOLE
+
+=item * WINVER
+
+=item * _WIN32_WINDOWS
+
+=item * _WIN32_WINNT
+
+=item * WINCEOSVER
+
+=item * __CYGWIN__
+
+=item * __CYGWIN32__
+
+=item * __MINGW32__
+
+=item * __MINGW64__
+
+=item * __APPLE__
+
+=item * __MACH__
+
+=item * __solaris
+
+=back
+
+=head1 get_osname
+
+  static method get_osname : string ()
+
+Gets the OS name(Perl's L<$^O|https://perldoc.perl.org/perlvar#$%5EO> ). The list of the OS names are described at L<PLATFORMS - perlport|https://perldoc.perl.org/perlport#PLATFORMS>.
+
+The C<get_osname> in the C<Sys> class supports the following os names.
+
+=over 2
+
+=item * linux
+
+=item * freebsd
+
+=item * openbsd
+
+=item * solaris
+
+=item * MSWin32
+
+=item * darwin
+
+=back
 
 =head1 Author
 

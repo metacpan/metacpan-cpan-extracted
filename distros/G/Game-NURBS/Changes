@@ -1,0 +1,6 @@
+Revision history for Perl extension Game::NURBS.
+
+0.1.1  Tue Oct 18 09:30:17 2022
+	- original version; created by h2xs 1.23 with options
+		-X -n Game::NURBS
+

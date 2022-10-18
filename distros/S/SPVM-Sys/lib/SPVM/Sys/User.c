@@ -7,8 +7,8 @@
 #ifdef _WIN32
   
 #else
-#  include <pwd.h>
-#  include <grp.h>
+  #include <pwd.h>
+  #include <grp.h>
 #endif
 
 const char* FILE_NAME = "Sys/User.c";

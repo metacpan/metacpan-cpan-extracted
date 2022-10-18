@@ -1013,6 +1013,22 @@ class TestCase::Sys::IO {
     my $file = "$test_dir/ftest/dir_empty/../file_empty.txt";
     
     {
+      my $ret_resolved_path = Sys::IO->realpath($file, undef);
+      
+      unless ($ret_resolved_path) {
+        return 0;
+      }
+      
+      Fn->shorten_null_char($ret_resolved_path);
+      
+      warn "[Test Output]realpath(undef):Expected:$test_dir/ftest/file_empty.txt,Got:$ret_resolved_path";
+      
+      unless ($ret_resolved_path eq "$test_dir/ftest/file_empty.txt") {
+        return 0;
+      }
+    }
+    
+    {
       my $resolved_path = (mutable string)new_string_len 100;
       my $ret_resolved_path = Sys::IO->realpath($file, $resolved_path);
       
@@ -1022,25 +1038,13 @@ class TestCase::Sys::IO {
       
       Fn->shorten_null_char($ret_resolved_path);
       
+      warn "[Test Output]realpath:Expected:$test_dir/ftest/file_empty.txt,Got:$ret_resolved_path";
+      
       unless ($ret_resolved_path eq "$test_dir/ftest/file_empty.txt") {
         return 0;
       }
     }
 
-    {
-      my $ret_resolved_path = Sys::IO->realpath($file, undef);
-      
-      unless ($ret_resolved_path) {
-        return 0;
-      }
-      
-      Fn->shorten_null_char($ret_resolved_path);
-      
-      unless ($ret_resolved_path eq "$test_dir/ftest/file_empty.txt") {
-        return 0;
-      }
-    }
-    
     return 1;
   }
   

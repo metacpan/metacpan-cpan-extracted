@@ -1,14 +1,16 @@
 package Complete::Fish::Gen::FromGetoptLong;
 
-our $DATE = '2016-10-27'; # DATE
-our $VERSION = '0.09'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-use Getopt::Long::Util qw(parse_getopt_long_opt_spec);
+use Getopt::Long::Util qw(parse_getopt_long_opt_spec array_getopt_long_spec_to_hash);
 use String::ShellQuote;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-11'; # DATE
+our $DIST = 'Complete-Fish-Gen-FromGetoptLong'; # DIST
+our $VERSION = '0.100'; # VERSION
 
 our %SPEC;
 
@@ -70,7 +72,8 @@ sub gen_fish_complete_from_getopt_long_spec {
 
     my @cmds;
     my $prefix = "complete -c ".shell_quote($cmdname);
-    my $a_val  = shell_quote("(begin; set -lx COMP_SHELL fish; set -lx COMP_LINE (commandline); set -lx COMP_POINT (commandline -C); ".shell_quote($compname)."; end)")
+    my $a_val;
+    $a_val = shell_quote("(begin; set -lx COMP_SHELL fish; set -lx COMP_LINE (commandline); set -lx COMP_POINT (commandline -C); ".shell_quote($compname)."; end)")
         if $compname;
     push @cmds, "$prefix -e"; # currently does not work (fish bug?)
     for my $ospec (sort {
@@ -165,7 +168,7 @@ sub gen_fish_complete_from_getopt_long_script {
     }
     my $compname = $args{compname};
 
-    my $glspec = $dump_res->[2];
+    my $glspec = array_getopt_long_spec_to_hash($dump_res->[2]);
 
     # GL:Complete scripts can also complete arguments
     my $mod = $dump_res->[3]{'func.detect_res'}[3]{'func.module'} // '';
@@ -196,14 +199,18 @@ Complete::Fish::Gen::FromGetoptLong - Generate fish completion script from Getop
 
 =head1 VERSION
 
-This document describes version 0.09 of Complete::Fish::Gen::FromGetoptLong (from Perl distribution Complete-Fish-Gen-FromGetoptLong), released on 2016-10-27.
+This document describes version 0.100 of Complete::Fish::Gen::FromGetoptLong (from Perl distribution Complete-Fish-Gen-FromGetoptLong), released on 2022-08-11.
 
 =head1 SYNOPSIS
 
 =head1 FUNCTIONS
 
 
-=head2 gen_fish_complete_from_getopt_long_script(%args) -> [status, msg, result, meta]
+=head2 gen_fish_complete_from_getopt_long_script
+
+Usage:
+
+ gen_fish_complete_from_getopt_long_script(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Generate fish completion script from Getopt::Long script.
 
@@ -230,21 +237,27 @@ Completer name.
 
 =item * B<skip_detect> => I<bool>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value: A script that can be fed to the fish shell (str)
 
 
-=head2 gen_fish_complete_from_getopt_long_spec(%args) -> [status, msg, result, meta]
+
+=head2 gen_fish_complete_from_getopt_long_spec
+
+Usage:
+
+ gen_fish_complete_from_getopt_long_spec(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 From Getopt::Long spec, generate tab completion commands for the fish shell.
 
@@ -274,16 +287,17 @@ C<s>, C<long>.
 
 Getopt::Long options specification.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value: A script that can be fed to the fish shell (str)
 
@@ -295,6 +309,43 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-F
 
 Source repository is at L<https://github.com/perlancar/perl-Complete-Fish-Gen-FromGetoptLong>.
 
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Fish-Gen-FromGetoptLong>
@@ -302,18 +353,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

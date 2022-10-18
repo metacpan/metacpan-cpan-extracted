@@ -6,9 +6,9 @@
 #include <assert.h>
 
 #ifdef _WIN32
-# include <ws2tcpip.h>
-# include <winsock2.h>
-# include <io.h>
+  #include <ws2tcpip.h>
+  #include <winsock2.h>
+  #include <io.h>
 #else
 #include <sys/types.h>
 #include <sys/socket.h>

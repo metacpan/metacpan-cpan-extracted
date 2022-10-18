@@ -4,7 +4,7 @@ Email::Simple::Markdown - simple email creation with auto text and html multipar
 
 # VERSION
 
-version 0.7.2
+version 0.7.3
 
 # SYNOPSIS
 
@@ -25,22 +25,22 @@ print $email->as_string;
 
 # DESCRIPTION
 
-_Email::Simple::Markdown_ behaves almost exactly like [Email::Simple](https://metacpan.org/pod/Email::Simple),
+_Email::Simple::Markdown_ behaves almost exactly like [Email::Simple](https://metacpan.org/pod/Email%3A%3ASimple),
 excepts for one detail: when its method `as_string()` is invoked, the
 returned string representation of the email has multipart body with a 
 _text/plain_ element (the original body), and a _text/html_ element,
 the markdown rendering of the text body.
 
-The markdown convertion is done using [Text::MultiMarkdown](https://metacpan.org/pod/Text::MultiMarkdown).
+The markdown convertion is done using [Text::MultiMarkdown](https://metacpan.org/pod/Text%3A%3AMultiMarkdown).
 
 # METHODS
 
-_Email::Simple::Markdown_ inherits all the methods if [Email::Simple](https://metacpan.org/pod/Email::Simple). 
+_Email::Simple::Markdown_ inherits all the methods if [Email::Simple](https://metacpan.org/pod/Email%3A%3ASimple). 
 In addition, it provides one more method: _with\_markdown_.
 
 ## create( ... ) 
 
-Behaves like [Email::Simple](https://metacpan.org/pod/Email::Simple)'s `create()`, but accepts the following
+Behaves like [Email::Simple](https://metacpan.org/pod/Email%3A%3ASimple)'s `create()`, but accepts the following
 additional arguments:
 
 - markdown\_engine => $module
@@ -68,11 +68,11 @@ Returns the markdown engine used by the object.
 ## markdown\_engine\_set( $module )
 
 Sets the markdown engine to be used by the object. 
-Accepts `auto`, [Text::MultiMarkdown](https://metacpan.org/pod/Text::MultiMarkdown), [Text::Markdown](https://metacpan.org/pod/Text::Markdown), or any module
+Accepts `auto`, [Text::MultiMarkdown](https://metacpan.org/pod/Text%3A%3AMultiMarkdown), [Text::Markdown](https://metacpan.org/pod/Text%3A%3AMarkdown), or any module
 implementing a `markdown` method.
 
 If not specified or set to `auto`, the object will use the first markdown module it finds
-between [Text::MultiMarkdown](https://metacpan.org/pod/Text::MultiMarkdown) and [Text::Markdown](https://metacpan.org/pod/Text::Markdown).
+between [Text::MultiMarkdown](https://metacpan.org/pod/Text%3A%3AMultiMarkdown) and [Text::Markdown](https://metacpan.org/pod/Text%3A%3AMarkdown).
 
 ## css
 
@@ -121,7 +121,7 @@ Sets the charset to be used by the email.
 
 ## with\_markdown()
 
-Returns an [Email::Abstract](https://metacpan.org/pod/Email::Abstract) representation of the email, with 
+Returns an [Email::Abstract](https://metacpan.org/pod/Email%3A%3AAbstract) representation of the email, with 
 its multipart body.
 
 # AUTHOR
@@ -130,7 +130,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2022, 2017, 2014, 2013, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

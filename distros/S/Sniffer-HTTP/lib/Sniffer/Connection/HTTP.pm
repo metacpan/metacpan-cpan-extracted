@@ -29,7 +29,7 @@ which encapsulates most of this.
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 my @callbacks = qw(request response closed log);
 __PACKAGE__->mk_accessors(qw(tcp_connection sent_buffer recv_buffer _response _response_chunk_size _response_len _request prev_request),
