@@ -34,9 +34,12 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
- t/11isa.t
  t/50arraylike.t
  t/51hashlike.t
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/11isa.t
  t/52codelike.t
  t/53stringlike.t
 Copyright: Copyright 2020 Toby Inkster.
@@ -53,31 +56,35 @@ Files: README
 Copyright: This software is copyright (c) 2014, 2018-2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: dist.ini
-Copyright: Copyright 2014 Toby Inkster.
+Files: t/gh8.t
+Copyright: This software is copyright (c) 2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/10bool.t
-Copyright: This software is copyright (c) 2018 by Toby Inkster.
+Files: t/12scalarref.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2014 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/03positiveint.t
 Copyright: This software is copyright (c) 2014, 2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/gh8.t
-Copyright: This software is copyright (c) 2019 by Toby Inkster.
+Files: t/10bool.t
+Copyright: This software is copyright (c) 2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

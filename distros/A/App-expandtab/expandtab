@@ -1,22 +1,26 @@
 #!/usr/bin/perl
 
 #  expandtab
-#   2021-06-11
+#   2021-06-11(fri) , 2022-10-19(wed)
 
 use 5.014 ; 
 use strict ; 
 use warnings ; # also confirmed on 5.011 5.014 5.018  
-#use Encode qw[ decode_utf8 encode_utf8 ] ; 
-use FindBin qw [ $Script ] ; 
-use Getopt::Std ; getopts 'R:b:c:i:s:x' => \my %o ;
-use Term::ANSIColor qw [ :constants color ]  ; $Term::ANSIColor::AUTORESET = 1 ; 
-#use Time::HiRes qw [ gettimeofday tv_interval ] ; my ${ dt_start } = [ gettimeofday ] ; 
-use Text::VisualWidth::UTF8 qw[ trim width ] ;
+use FindBin qw [ $Bin $Script ] ; 
+#my @argv = @ARGV ;
+use Getopt::Std ; getopts 'C:D:R:b:c:fi:rs:x' => \my %o ;
 use List::Util qw [ min max ] ; 
-
-sub dc ($) {  $_[0] =~ s{ \e\[ [\d;]* m }{}xmsgr }  # Delete Color の頭文字を取った。
-
+use Term::ANSIColor qw [ :constants color ]  ; $Term::ANSIColor::AUTORESET = 1 ; 
 #my $sdt = sprintf '%04d-%02d-%02d %02d:%02d:%02d', do{my @t= @{[localtime]}[5,4,3,2,1,0]; $t[0]+=1900; $t[1]++; @t } ; 
+#use Time::HiRes qw [ gettimeofday tv_interval ] ; my ${ dt_start } = [ gettimeofday ] ; 
+BEGIN { 
+  *width = eval'use Text::VisualWidth::UTF8 qw[width];1'? *Text::VisualWidth::UTF8::width : sub{length $_[0]} ; 
+}  
+
+& demo if exists $o{D} ; 
+
+sub delColor ($) {  $_[0] =~ s{ \e\[ [\d;]* m }{}xmsgr }  # ASCIIエスケープシーケンスによる着色を消す。
+if ( 0 eq ($o{C}//'') ) { while ( <> ) { print delColor $_ } ; exit } # -C0の指定で、単に色を取るというお節介な機能。
 
 $o{b} //= ' ' ; # 間に埋める文字
 $o{c} //= ' ' ; # 列間で、列の直前に入れる文字
@@ -32,34 +36,61 @@ while ( <> ) {
   chomp ; 
   s/\r$//o unless $optR0 ; 
   $C [ $rcnt ] = [ my @F = split /$o{i}/, $_ , -1 ] ; 
-  $L [ $rcnt ] = [ map { Text::VisualWidth::UTF8::width dc $_ } @F ]  ; 
-
-  $cmax = @F if @F > $cmax ; 
+  $L [ $rcnt ] = [ map { width ( delColor $_ ) } @F ]  ;  # <-- - length/width
+  $cmax = @F if @F > $cmax ; # 列数の最大値
   $rcnt ++ 
 }
 
-## 各列のVisual幅を算出する。 cmw は The Column's Max Widthのつもり(やや強引だが)
+## 各列において、Visual幅を算出する。 cmw は The Column's Max Width 
 my @cmw = map { my $c = $_ ; max map { $L[$_][$c] // 0 } 0 .. $rcnt - 1 }  0 .. $cmax - 1 ; 
 
-
+# -x の指定があれば、less に渡す引数(-xによるタブ位置の指定)のみを出力して、終了。
 if ( $o{x} ) { my $s = 0 ; say "-x",join "," , map {$s += $_ + 1 } @cmw ; exit } 
 
 ## 出力
 for my $r ( 0 .. $rcnt -1 ) { 
-  my @out ; 
-  my $spare0 = 0 ; 
-  for my $c ( 0 .. $#{$C[$r]} ) { 
-    #( $C[$r][$c] , $L[$r][$c] ) = ( '' , 0 ) if ! defined $C[$r][$c] ; 
-    my $spare = exists $o{s} ? min $cmw[$c]  , $o{s} : $cmw[$c] ;
-    my $addlen = $spare -$L[$r][$c] + $spare0 ; # if $cmw[$c] > $o{s}
-    $spare0 = 0 + min 0 , $addlen ; 
-    my $tmp = $C[$r][$c] . $o{b} x max 0, $addlen  ; 
-    push @out, $tmp ; 
+  my @oneRow ; # ひとつの各行に、どんな列値を出すかを格納。
+  my $spaceSpare = 0 ; # 「柔軟な伸び縮み」をするための仕組みを導入している。
+  for my $c ( 0 .. ( $o{f} ? $#cmw : $#{$C[$r]}) ) { 
+  #for my $c ( 0 ..  $#{$C[$r]} ) { 
+    ( $C[$r][$c] , $L[$r][$c] ) = ( '' , 0 ) if  ! defined $C[$r][$c] ; #! $L[$r][$c] ; #
+    my $space = exists $o{s} ? min $cmw[$c] , $o{s} : $cmw[$c] ; # 仮の割り当て空間(半角何文字分にするか)の長さ
+    my $addlen = $space + $spaceSpare - $L[$r][$c]; # 半角空白文字を何個ほど追加するか; --# if $cmw[$c] > $o{s}
+    $spaceSpare = $addlen < 0 ? $addlen : 0 ; # 0 + min 0 , $addlen ; 
+    my $addStr = $o{b} x max 0, $addlen ; # (前か後ろに)追加する文字列 (通常は、半角空白文字の連続)
+    push @oneRow, $o{r} ? $addStr . $C[$r][$c] : $C[$r][$c] . $addStr  ; # $o{b} : 間に埋める文字列。未指定なら半角空白' '。
+    #push @oneRow, $tmp ; 
   }
-  say join $o{c} , @out ; 
+  say join $o{c} , @oneRow ; # $o{c} : 列間で、列の直前に入れる文字。未指定なら半角空白 ' '。(connector)
+}
+exit 0 ;
+
+sub demo () {
+  #print $0 ; exit ;
+  $o{D} //= '' ;
+  #@ARGV = @argv ; getopts 'D:' , \my%o ; 
+  if ( $o{D} eq 1 ) { 
+    say YELLOW '>  ' , my $cmd = "$0 @ARGV" ;
+    open my $FH, '|-', $0, @ARGV ; #"$Bin/$Script @argv" ; 
+    print {$FH} join "\n" , map { join "\t" , map { int exp rand(8)} 1..6 } 1..3 ; 
+  }
+  if ( $o{D} eq 2 ) { 
+    open my $FH, '|-' ,  "tr [0-9] あいうえおかきくけこ | $0 -c '|'" ;
+    print {$FH} join "\n" , map { join "\t" , map { int exp rand(12)} 1..6 } 1..3 ; 
+  }
+  if ( $o{D} eq 3 ) { 
+    say YELLOW '>　' , my $cmd = "$0 -c '|' -s9 " ; 
+    open my $FH, '|-' ,  "tr [0-9] あいうえおかきくけこ | $cmd ";
+    print {$FH} join "\n" , map { join "\t" , map { int exp rand(12)} 1..6 } 1..3 ; 
+  }
+  if ( $o{D} eq 4 ) { 
+    #my $cmd = "perl -e ''" ; 
+    open my $FH , '|-' , "$0 -c'|' -b. -f " ; 
+    say {$FH} join "\t" , map { "$_"x(1+rand 3) } 1 .. $_ for 0..5 ;
+  }
+  exit ;
 }
 
-exit 0 ;
 
 ## ヘルプの扱い
 sub VERSION_MESSAGE {}
@@ -84,17 +115,23 @@ sub HELP_MESSAGE {
 
   -b char ; 間に埋める文字列。未指定なら半角空白 ' ' 。例として　 -b "-" 。betweenのbのつもり。
   -c char ; 列間で、列の直前に入れる文字。未指定なら半角空白 ' ' 。例として　 -c "|" 。connectorのcのつもり。
+  -f : ある行が列の数が少ないときに、最も列数の多い行に合わせて、列の数を増やす指定。
   -i delim : 区切り文字の変更。未指定なら、タブ文字。(出力は空白文字うめであり、変えない。)
-  -s N : 出力の各セルにおいて、可能であれば(長い値は変えないで)埋めた空白をさらに幅何文字分(半角相当)まで縮めるか指定。
-  -x : less に渡す引数(-xによるタブ位置の指定)のみを出力して終了。特に便利。
+  -r : 右揃えにする。この指定が無いと、左揃えである。
+  -s N : 出力の各セルにおいて、長すぎるセルを可能であれば埋めた空白をさらに幅何文字分(半角相当)まで縮めるか指定。
+  -x : less に渡す引数(-xによるタブ位置の指定)のみを出力して終了。時には、とても便利。
+  -C0 : 単に入力の着色(ASCIIエスケープシーケンスによるもの)を取り除く。$0の主題と直接関係ないが、$0のテスト機能であり、おまけの機能でもある。
+  -D num : このコマンドの動作についてのデモを表示して終了。numは1〜4。(開発上テストでも使う。)
   -R0 : 通常Windows形式の改行文字であるCRLFはCFの部分を取り除く。しかし-R0指定でその処理をわざと行わない(通常時に利用は想定されていない, テスト目的などを想定)。
 
   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
 
   開発メモ: 
-   * 右揃えのオプションが欲しいかも。
-   * 行列として変数Cを参照するときに値が未定義の時にどうする。
+   * 行列として変数Cを参照するときに値が未定義の時にどうすれば良いか。
+   * INT{ALRM}を使って15秒ごとに、一旦出力する機能を付けたい。
+   * Ctrl+ZやCtrl+Cに対する機能を付けたい。
+   * -x による less の -xに渡す数の配列を STDERR に出力したい。その場合、2次情報の出力を抑制する -20も実装することになるであろう。
+   * -rにおいて、特定の列だけ、または、特定の列以外を右寄せに出来ないだろうか?
 
-  Text::VisualWidth のインスートルがあらかじめ必要である。
 =cut

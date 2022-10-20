@@ -11,10 +11,12 @@ use App::Schema::Data;
 @ARGV = (
         'dbi:SQLite:dbname=sqlite.db',
         'Schema::Data::Commons::Vote',
+        'creator_name=Michal Josef Špaček',
+        'creator_email=michal.josef.spacek@wikimedia.cz',
 );
 
 # Run.
 exit App::Schema::Data->new->run;
 
 # Output like:
-# Schema data from 'Schema::Data::Commons::Vote' was inserted to 'dbi:SQLite:dbname=sqlite.db'.
+# Schema data (v0.1.0) from 'Schema::Data::Commons::Vote' was inserted to 'dbi:SQLite:dbname=sqlite.db'.

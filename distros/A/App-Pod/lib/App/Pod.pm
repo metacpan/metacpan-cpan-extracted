@@ -30,11 +30,11 @@ App::Pod - Quickly show available class methods and documentation.
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 
 =head1 SYNOPSIS
@@ -411,32 +411,32 @@ sub _show_help {
 }
 
 sub _define_help_template {
-    <<~HELP;
+    <<"HELP";
 
-    ##_neon:Syntax:
-      <SCRIPT> module_name [method_name] [options]
+##_neon:Syntax:
+  <SCRIPT> module_name [method_name] [options]
 
-    ##_neon:Options:
-      <OPTIONS>
+##_neon:Options:
+  <OPTIONS>
 
-    ##_neon:Examples:
-      ##_grey:# All or a method
-      <SCRIPT> Mojo::UserAgent
-      <SCRIPT> Mojo::UserAgent prepare
+##_neon:Examples:
+  ##_grey:# All or a method
+  <SCRIPT> Mojo::UserAgent
+  <SCRIPT> Mojo::UserAgent prepare
 
-      ##_grey:# Documentation
-      <SCRIPT> Mojo::UserAgent -d
+  ##_grey:# Documentation
+  <SCRIPT> Mojo::UserAgent -d
 
-      ##_grey:# Edit class or method
-      <SCRIPT> Mojo::UserAgent -e
-      <SCRIPT> Mojo::UserAgent prepare -e
+  ##_grey:# Edit class or method
+  <SCRIPT> Mojo::UserAgent -e
+  <SCRIPT> Mojo::UserAgent prepare -e
 
-      ##_grey:# List all methods
-      <SCRIPT> Mojo::UserAgent --class_options
+  ##_grey:# List all methods
+  <SCRIPT> Mojo::UserAgent --class_options
 
-      ##_grey:# List all Module::Build actions.
-      <SCRIPT> Module::Build --query head1=ACTIONS/item-text
-    HELP
+  ##_grey:# List all Module::Build actions.
+  <SCRIPT> Module::Build --query head1=ACTIONS/item-text
+HELP
 }
 
 sub _process_template {

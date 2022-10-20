@@ -5,7 +5,7 @@ use Scalar::Util qw();
 use Tie::IxHash qw{};
 use Path::Class qw{};
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -43,11 +43,11 @@ Creates a new blank object for creating files or loading data from other sources
 Creates a new object and loads data from other sources
 
   my $antenna = RF::Antenna::Planet::MSI::Format->new(
-                                                      name          => "My Antenna Name",
-                                                      make          => "My Manufacturer Name",
-                                                      frequency     => "2437" || "2437 MHz" || "2.437 GHz",
-                                                      gain          => "10.0" || "10.0 dBd" || "12.14 dBi",
-                                                      comment       => "My Comment",
+                                                      NAME          => "My Antenna Name",
+                                                      MAKE          => "My Manufacturer Name",
+                                                      FREQUENCY     => "2437" || "2437 MHz" || "2.437 GHz",
+                                                      GAIN          => "10.0" || "10.0 dBd" || "12.14 dBi",
+                                                      COMMENT       => "My Comment",
                                                       horizontal    => [[0.00, 0.96], [1.00, 0.04], ..., [180.00, 31.10], ..., [359.00, 0.04]],
                                                       vertical      => [[0.00, 1.08], [1.00, 0.18], ..., [180.00, 31.23], ..., [359.00, 0.18]],
                                                      );
@@ -67,13 +67,12 @@ sub new {
     my $value = shift;
     if ($key eq 'header') {
       if (ref($value) eq 'HASH') {
-        my @order = qw{NAME MAKE FREQUENCY H_WIDTH V_WIDTH FRONT_TO_BACK GAIN TILT POLARIZATION COMMENT};
-        my %uc    = map {uc($_) => $value->{$_}} keys %$value;
+        my @order = qw{NAME MAKE FREQUENCY GAIN TILT POLARIZATION COMMENT};
+        my %copy  = %$value;
         foreach my $key (@order) {
-          next unless exists $uc{$key};
-          $self->header($key => delete($uc{$key}));
+          $self->header($key => delete($copy{$key})) if exists $copy{$key};
         }
-        $self->header(%uc); #appends unknown keys to header
+        $self->header(%copy); #appends the rest in hash order
       } elsif (ref($value) eq 'ARRAY') {
         $self->header(@$value); #preserves order
       } else {
@@ -100,6 +99,11 @@ sub new {
 Reads an antenna pattern file and parses the data into the object data structure. Returns the object so that the call can be chained.
 
   $antenna->read($filename);
+  $antenna->read(\$scalar);
+
+Assumptions:
+  The first line in the MSI file contains the name of the antenna.  It appears that some vendors suppress the "NAME" token but we always write the NAME token.
+  The keys can be mixed case but convention appears to be all upper case keys for common keys and lower case keys for vendor extensions.
 
 =cut
 
@@ -108,29 +112,63 @@ sub read {
   my $file  = shift;
   my $blob  = ref($file) eq 'SCALAR' ? ${$file} : Path::Class::file($file)->slurp;
   my @lines = split(/[\n\r]+/, $blob);
+  my $loop  = 0;
   while (1) {
     my $line = shift @lines;
     $line =~ s/\A\s*//; #ltrim
     $line =~ s/\s*\Z//; #rtrim
     next unless $line;
+    $loop++;
     my ($key, $value) = split /\s+/, $line, 2; #split with limit returns undef value if empty string
-    $value = '' unless defined $value; 
-    #printf "Key: $key, Value: $value\n";
-    if ($key =~ m/\AHORIZONTAL\Z/i) {
-      my @data = map {s/\s+\Z//; s/\A\s+//; [split /\s+/, $_, 2]} splice @lines, 0, $value;
-      die(sprintf('Error: HORIZONTAL records with %s records returned %s records', $value, scalar(@data))) unless scalar(@data) == $value;
-      $self->horizontal(\@data);
-    } elsif ($key =~ m/\AVERTICAL\Z/i) {
-      my @data = map {s/\s+\Z//; s/\A\s+//; [split /\s+/, $_, 2]} splice @lines, 0, $value;
-      die unless @data == $value;
-      die(sprintf('Error: VERTICAL records with %s records returned %s records', $value, scalar(@data))) unless scalar(@data) == $value;
-      $self->vertical(\@data);
+    $value = '' unless defined $value;
+
+    if ($loop == 1 and $key ne 'NAME') { #First line of file is NAME even if NAME token is surpessed
+      $self->header(NAME => $line);
     } else {
-      $self->header($key => $value);
+      #printf "Key: $key, Value: $value\n";
+      if ($key =~ m/\AHORIZONTAL\Z/i) {
+        my @data = map {s/\s+\Z//; s/\A\s+//; [split /\s+/, $_, 2]} splice @lines, 0, $value;
+        die(sprintf('Error: HORIZONTAL records with %s records returned %s records', $value, scalar(@data))) unless scalar(@data) == $value;
+        $self->horizontal(\@data);
+      } elsif ($key =~ m/\AVERTICAL\Z/i) {
+        my @data = map {s/\s+\Z//; s/\A\s+//; [split /\s+/, $_, 2]} splice @lines, 0, $value;
+        die unless @data == $value;
+        die(sprintf('Error: VERTICAL records with %s records returned %s records', $value, scalar(@data))) unless scalar(@data) == $value;
+        $self->vertical(\@data);
+      } else {
+        $self->header($key => $value);
+      }
     }
     last unless @lines;
   }
   return $self;
+}
+
+=head2 read_fromZipMember
+
+Reads an antenna pattern file from a zipped archive and parses the data into the object data structure.
+
+  $antenna->read_fromZipMember($zip_filename, $member_filename);
+
+=cut
+
+sub read_fromZipMember {
+  my $self            = shift;
+  my $zip_filename    = shift or die("Error: zip filename required");
+  my $member_filename = shift or die("Error: zip member name requried");
+
+  require Archive::Zip;
+  require Archive::Zip::MemberRead;
+
+  my $zip_archive = Archive::Zip->new;
+  unless ( $zip_archive->read("$zip_filename") == Archive::Zip::AZ_OK() ) {die "Error: $zip_filename read error"};
+
+  my $blob  = '';
+  my $fh    = Archive::Zip::MemberRead->new($zip_archive, "$member_filename");
+  while (defined(my $line = $fh->getline)) {$blob .= "$line$/"}; #getline chomps but preserve_line_ending does not work for foreign line endings
+  $fh->close;
+
+  return $self->read(\$blob);
 }
 
 =head2 write
@@ -139,17 +177,19 @@ Writes the object's data to an antenna pattern file and returns a Path::Class fi
 
   my $file     = $antenna->write($filename); #isa Path::Class::file
   my $tempfile = $antenna->write;            #isa Path::Class::file in temp directory
-  $antenna->write(\my $scalar_ref);          #returns undef with data writen to the variable
+  $antenna->write(\$scalar);                 #returns undef with data writen to the variable
 
 =cut
 
 sub write {
   my $self     = shift;
   my $filename = shift;
+
+  #Open file handle
   my $fh;
   my $file;
   if (ref($filename) eq 'SCALAR') {
-    $file = undef;
+    $file            = undef;
     open $fh, '>', $filename;
   } elsif (length $filename) {
     $file            = Path::Class::file($filename);
@@ -160,6 +200,8 @@ sub write {
     $file            = Path::Class::file($filename);
   }
 
+  #Print to file handle
+
   sub _print_fh_key_value {
     my $fh    = shift;
     my $key   = shift;
@@ -168,7 +210,13 @@ sub write {
   }
 
   my $header = $self->header; #isa Tie::IxHash ordered hash
+
+  ##Print NAME as first line
+  _print_fh_key_value($fh, 'NAME', $header->{'NAME'});
+
+  ##Print rest of the headers
   foreach my $key (keys %$header) {
+    next if $key eq 'NAME'; #written above
     my $value = $header->{$key};
     _print_fh_key_value($fh, $key, $value) if defined $value;
   }
@@ -187,6 +235,7 @@ sub write {
     }
   }
 
+  ##Print antenna pattern angle and loss values
   foreach my $method (qw{horizontal vertical}) {
     my $array = $self->$method;
     next unless $array;
@@ -194,6 +243,7 @@ sub write {
     _print_fh_key_array($fh, $key, $array);
   }
 
+  #Close file handle and Return file object
   close $fh;
   return $file;
 }
@@ -206,7 +256,7 @@ Set header values and returns the header data structure which is a hash referenc
 
 Set a key/value pair
 
-  $antenna->header(Comment => "My comment");          #will upper case all keys
+  $antenna->header(COMMENT => "My comment");          #upper case keys are common/reserved whereas mixed/lower case keys are vendor extensions
 
 Set multiple keys/values with one call
 
@@ -214,11 +264,13 @@ Set multiple keys/values with one call
 
 Read arbitrary values
 
-  my $value = $antenna->header->{uc($key)};
+  my $value = $antenna->header->{$key};
 
 Returns ordered list of header keys
 
   my @keys = keys %{$antenna->header};
+
+Common Header Keys: NAME MAKE FREQUENCY GAIN TILT POLARIZATION COMMENT
 
 =cut
 
@@ -233,7 +285,7 @@ sub header {
   while (@_) {
     my $key   = shift;
     my $value = shift;
-    $self->{'header'}->{uc($key)} = $value;
+    $self->{'header'}->{$key} = $value;
   }
   return $self->{'header'};
 }
@@ -242,7 +294,7 @@ sub header {
 
 Horizontal or vertical data structure for the angle and relative loss values from the specified gain in the header.
 
-Each methods sets and returns an array reference of array references [[$angle1, $value1], $angle2, $value2], ...]
+Each methods sets and returns an array reference of array references [[$angle1, $value1], [$angle2, $value2], ...]
 
 Please note that the format uses equal spacing of data points by angle.  Most files that I have seen use 360 one degree measurements from 0 (i.e. boresight) to 359 degrees with values in dB down from the maximum lobe even if that lobe is not the boresight.
 
@@ -262,7 +314,7 @@ sub vertical {
 
 =head1 HELPER METHODS
 
-Helper methods are wrappers around the header data structure to aid in usability. 
+Helper methods are wrappers around the header data structure to aid in usability.
 
 =head2 name
 
@@ -315,31 +367,87 @@ sub frequency {
   return $self->header->{'FREQUENCY'};
 }
 
-=head2 frequency_mhz, frequency_ghz
+=head2 frequency_mhz, frequency_ghz, frequency_mhz_lower, frequency_mhz_upper, frequency_ghz_lower, frequency_ghz_upper
 
 Attempts to read and parse the string header value and return the frequency as a number in the requested unit of measure.
 
 =cut
 
+#supported formats
+#123.1 => assumed MHz
+#123.1 MHz
+#123.1 GHz
+#123.1 kHz
+#123.1-124.1 => assumed MHz
+#123.1-124.1 MHz
+#123.1-124.1 GHz
+#123.1-124.1 kHz
+#123x124
+#123x124 MHz
+#123x124 GHz
+#123x124 kHz
+
 sub frequency_mhz {
   my $self   = shift;
   my $string = $self->frequency;
-  if (Scalar::Util::looks_like_number($string)) {
-    return $string + 0; #convert from string to number
-  } elsif ($string =~ m/([0-9\.]+)\s*MHz/i) {
-    return $1 + 0; #pulls the number out before the string for you ... try it perl -e 'print "2314.23 MHz" + 0'
-  } elsif ($string =~ m/([0-9\.]+)\s*GHz/i) {
-    return ($1 + 0) * 1000;
-  } elsif ($string =~ m/([0-9\.]+)\s*kHz/i) {
-    return eval{($1 + 0) / 1000}; #eval will return undef on divide by zero
-  } else {
-    return undef;
+  my $scale  = 1; #MHz
+  my $number = undef; #return undef if cannot parse
+  my $upper  = undef;
+  my $lower  = undef;
+  if ($string =~ m/GHz/i) {
+    $scale = 1e3;
+  } elsif ($string =~ m/kHz/i) {
+    $scale = 1e-3;
+  } elsif ($string =~ m/MHz/i) {
+    $scale = 1;
   }
+
+  if (Scalar::Util::looks_like_number($string)) {
+    $number = $scale * $string; #convert from string to number
+    $lower  = $number;
+    $upper  = $number;
+  } elsif ($string =~ m/([0-9]*\.?[0-9]+)[^0-9.]+([0-9]*\.?[0-9]+)/) { #two decimals or floats with any separator
+    $lower  = $scale * $1;
+    $upper  = $scale * $2;
+    $number = ($lower + $upper) / 2;
+  } elsif ($string =~ m/([0-9\.]+)/) { #single float
+    $number = $scale * $1;
+    $lower  = $number;
+    $upper  = $number;
+  }
+  $self->{'frequency_mhz'}       = $number;
+  $self->{'frequency_mhz_lower'} = $lower;
+  $self->{'frequency_mhz_upper'} = $upper;
+  return $number;
 }
 
 sub frequency_ghz {
   my $self = shift;
   my $mhz  = $self->frequency_mhz;
+  return $mhz ? $mhz/1000 : undef;
+}
+
+sub frequency_mhz_lower {
+  my $self = shift;
+  $self->frequency_mhz; #initialize
+  return $self->{'frequency_mhz_lower'};
+}
+
+sub frequency_mhz_upper {
+  my $self = shift;
+  $self->frequency_mhz; #initialize
+  return $self->{'frequency_mhz_upper'};
+}
+
+sub frequency_ghz_lower {
+  my $self = shift;
+  my $mhz  = $self->frequency_mhz_lower;
+  return $mhz ? $mhz/1000 : undef;
+}
+
+sub frequency_ghz_upper {
+  my $self = shift;
+  my $mhz  = $self->frequency_mhz_upper;
   return $mhz ? $mhz/1000 : undef;
 }
 
@@ -420,6 +528,8 @@ sub comment {
 Format Definition: L<http://radiomobile.pe1mew.nl/?The_program:Definitions:MSI>
 
 Antenna Pattern File Library L<https://www.wireless-planning.com/msi-antenna-pattern-file-library>
+
+Format Definition from RCC: L<https://web.archive.org/web/20080821041142/http://www.rcc.com/msiplanetformat.html>
 
 =head1 AUTHOR
 

@@ -36,6 +36,7 @@ sub new {
     $self->{'tab'}{'pen'}       = Wx::Panel->new($self->{'tabs'});
     $self->{'tabs'}->AddPage( $self->{'tab'}{'linear'},   'Lateral Pendulum Settings');
     $self->{'tabs'}->AddPage( $self->{'tab'}{'circular'}, 'Rotary Pendulum Settings');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'mod'},      'Modulation Matrix');
     $self->{'tabs'}->AddPage( $self->{'tab'}{'pen'},      'Pen Settings');
 
     $self->{'pendulum'}{'x'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'linear'}, 'x','pendulum in x direction (left to right)', 1, 100);

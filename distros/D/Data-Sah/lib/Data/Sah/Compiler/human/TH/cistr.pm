@@ -11,9 +11,9 @@ use Role::Tiny::With;
 extends 'Data::Sah::Compiler::human::TH::str';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.913'; # VERSION
+our $VERSION = '0.914'; # VERSION
 
 1;
 # ABSTRACT: perl's type handler for type "cistr"
@@ -30,7 +30,7 @@ Data::Sah::Compiler::human::TH::cistr - perl's type handler for type "cistr"
 
 =head1 VERSION
 
-This document describes version 0.913 of Data::Sah::Compiler::human::TH::cistr (from Perl distribution Data-Sah), released on 2022-09-30.
+This document describes version 0.914 of Data::Sah::Compiler::human::TH::cistr (from Perl distribution Data-Sah), released on 2022-10-19.
 
 =for Pod::Coverage ^(name|clause_.+|superclause_.+|before_.+|after_.+)$
 

@@ -2,12 +2,24 @@ package MooseX::Types::Parameterizable;
 
 use 5.008;
 
-our $VERSION   = '0.08';
+our $VERSION   = '0.10';
 $VERSION = eval $VERSION;
 
 use Moose::Util::TypeConstraints;
 use MooseX::Meta::TypeConstraint::Parameterizable;
 use MooseX::Types -declare => [qw(Parameterizable)];
+
+Moose::Util::TypeConstraints::get_type_constraint_registry->add_type_constraint(
+  MooseX::Meta::TypeConstraint::Parameterizable->new(
+    name => 'MooseX::Types::Parameterizable::Parameterizable',
+    parent => find_type_constraint('Any'),
+    constraint => sub {1},
+  )
+);
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -44,6 +56,7 @@ Coerce an ArrayRef to a string via concatenation.
       };
 
     has 'varchar_five' => (isa=>Varchar[5], is=>'ro', coerce=>1);
+
     has 'varchar_ten' => (isa=>Varchar[10], is=>'ro');
 
 Object created since attributes are valid
@@ -68,6 +81,27 @@ varchar_five coerces as expected
     );
 
 See t/05-pod-examples.t for runnable versions of all POD code
+
+=head1 VERSION 0.09 RELEASE NOTES
+
+In trying to solve a critical incompatibility with newer versions of L<Moose>
+I've had to increase the minimum L<Moose> and L<MooseX::Types> required
+versions dramatically.  I just had no good option to maintain L<Moose> version
+back compatibility down to VERSION 1.08 (the version of L<Moose> when I first
+released this package).  Please test carefully before upgrading your production
+code with this version!
+
+Options and code are welcomed to help with this.  Thanks!
+
+B<Update from 2022>:  Its been ten years and we never figured out all these issues that
+arose from Moose 2.0.  I got all the tests to pass except for some issues around
+parameterized types and coercions.   In the interests of not having failed code
+on CPAN I'm releasing all the modern updates and skipping that one block of tests.
+However I recommend considering this an interesting proof of concept and building
+a new implementation from start, probably based on L<Type::Tiny> which also works
+with L<Moo>.
+
+As a result I recomend not using this module for new code.
 
 =head1 DESCRIPTION
 
@@ -324,16 +358,6 @@ we default to the 'Any' type constraint (see L<Moose::Util::TypeConstraints>).
 This is useful if you are creating some base Parameterizable type constraints
 that you intend to sub class.
 
-=cut
-
-Moose::Util::TypeConstraints::get_type_constraint_registry->add_type_constraint(
-    MooseX::Meta::TypeConstraint::Parameterizable->new(
-        name => 'MooseX::Types::Parameterizable::Parameterizable',
-        parent => find_type_constraint('Any'),
-        constraint => sub {1},
-    )
-);
-
 =head1 SEE ALSO
 
 The following modules or resources may be of interest.
@@ -351,4 +375,3 @@ it under the same terms as Perl itself.
 
 =cut
 
-1;

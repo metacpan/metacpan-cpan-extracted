@@ -1,3 +1,30 @@
+1.925   2022-10-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Warn multiple cmdline instances in a single process.
+
+
+1.924   2022-10-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump prereq Perinci::CmdLine::Util::Config to 1.725 (RT#138237).
+
+
+1.923   2022-10-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Turn off marking of different language in help message because
+          currently we don't support translation (RT#144733).
+
+        - Add usage in POD syntax to common options.
+
+        - [internal] Add devnotes.org.
+
+
+1.922   2022-08-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Fix typo in description of --log-level.
+
+
 1.921   2022-05-27  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

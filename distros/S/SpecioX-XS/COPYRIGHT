@@ -1,0 +1,90 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: SpecioX-XS
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/SpecioX-XS
+
+Files: Changes
+ META.json
+ META.yml
+ bin/benchmark.pl
+ dist.ini
+ doap.ttl
+ t/upstream/additional-exports.t
+ t/upstream/anon.t
+ t/upstream/any-does-isa.t
+ t/upstream/builtins-sanity.t
+ t/upstream/builtins.t
+ t/upstream/coercion.t
+ t/upstream/combines.t
+ t/upstream/conflicts.t
+ t/upstream/declare-helpers.t
+ t/upstream/dict.t
+ t/upstream/does-type.t
+ t/upstream/exception.t
+ t/upstream/import-twice.t
+ t/upstream/inheritance.t
+ t/upstream/inline-environment.t
+ t/upstream/inline.t
+ t/upstream/intersection.t
+ t/upstream/lib/Specio/Library/CannotSub.pm
+ t/upstream/lib/Specio/Library/Coercions.pm
+ t/upstream/lib/Specio/Library/Combines.pm
+ t/upstream/lib/Specio/Library/Conflict.pm
+ t/upstream/lib/Specio/Library/NoInline.pm
+ t/upstream/lib/Specio/Library/Union.pm
+ t/upstream/lib/Specio/Library/WithSubs.pm
+ t/upstream/lib/Specio/Library/XY.pm
+ t/upstream/library-with-subs.t
+ t/upstream/map.t
+ t/upstream/multiple-libraries.t
+ t/upstream/numeric-sanity.t
+ t/upstream/overloading-moose-bug.t
+ t/upstream/overloading.t
+ t/upstream/parameterized.t
+ t/upstream/perl-sanity.t
+ t/upstream/string-sanity.t
+ t/upstream/subs.t
+ t/upstream/t-clean.t
+ t/upstream/tuple.t
+ t/upstream/union-library.t
+ t/upstream/union.t
+ t/upstream/with-moo.t
+ t/upstream/with-moose.t
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/SpecioX/XS.pm
+ t/01basic.t
+ t/02works.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2022 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2022 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

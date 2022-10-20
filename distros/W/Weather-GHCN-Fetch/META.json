@@ -93,51 +93,51 @@
    "provides" : {
       "Weather::GHCN::App::Extremes" : {
          "file" : "lib/Weather/GHCN/App/Extremes.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       },
       "Weather::GHCN::App::Fetch" : {
          "file" : "lib/Weather/GHCN/App/Fetch.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       },
       "Weather::GHCN::App::StationCounts" : {
          "file" : "lib/Weather/GHCN/App/StationCounts.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       },
       "Weather::GHCN::CacheURI" : {
          "file" : "lib/Weather/GHCN/CacheURI.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       },
       "Weather::GHCN::Common" : {
          "file" : "lib/Weather/GHCN/Common.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       },
       "Weather::GHCN::CountryCodes" : {
          "file" : "lib/Weather/GHCN/CountryCodes.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       },
       "Weather::GHCN::Fetch" : {
          "file" : "lib/Weather/GHCN/Fetch.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       },
       "Weather::GHCN::Measures" : {
          "file" : "lib/Weather/GHCN/Measures.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       },
       "Weather::GHCN::Options" : {
          "file" : "lib/Weather/GHCN/Options.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       },
       "Weather::GHCN::Station" : {
          "file" : "lib/Weather/GHCN/Station.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       },
       "Weather::GHCN::StationTable" : {
          "file" : "lib/Weather/GHCN/StationTable.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       },
       "Weather::GHCN::TimingStats" : {
          "file" : "lib/Weather/GHCN/TimingStats.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.0.8"
       }
    },
    "release_status" : "stable",
@@ -153,7 +153,7 @@
          "web" : "https://github.com/jgpuckering/Weather-GHCN-Fetch.git"
       }
    },
-   "version" : "v0.0.007",
+   "version" : "v0.0.008",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -27,9 +27,9 @@ has_clause 'is',
     };
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.913'; # VERSION
+our $VERSION = '0.914'; # VERSION
 
 1;
 # ABSTRACT: Comparable type role
@@ -46,7 +46,7 @@ Data::Sah::Type::Comparable - Comparable type role
 
 =head1 VERSION
 
-This document describes version 0.913 of Data::Sah::Type::Comparable (from Perl distribution Data-Sah), released on 2022-09-30.
+This document describes version 0.914 of Data::Sah::Type::Comparable (from Perl distribution Data-Sah), released on 2022-10-19.
 
 =head1 DESCRIPTION
 

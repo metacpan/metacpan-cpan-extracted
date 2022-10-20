@@ -1,14 +1,14 @@
 ---
 abstract: unknown
 author:
-  - 'Toshiyuki SHIMONO (bin4tsv at gmail.com)'
+  - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.143240'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,4 +19,5 @@ no_index:
     - inc
 requires:
   Text::VisualWidth: '0.02'
-version: '0.020'
+version: '0.031'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

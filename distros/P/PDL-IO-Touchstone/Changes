@@ -1,5 +1,17 @@
 Revision history for PDL-IO-Touchstone
 
+1.008   Wed, 19 Oct 2022 18:13:59 -0700
+	Add support for wsnp() to take n-port z0 vectors
+	Updated documentation to reference RF::Component
+	Fixed 1.007 changelog
+
+1.007   Wed, 19 Oct 2022 17:41:41 -0700
+	Fixed abcd_is* functions that were calling Re($pdl) instead of $pdl->re()
+	rsnp: Return a $z0 n-port vector from rsnp instead of a single-value scalar.
+	Added :ALL export tag
+	Added y_esr to EXPORT_OK
+	Added exports for m_to_pos_vecs and pos_vecs_to_m
+
 1.006   Fri, 07 Oct 2022 21:41:30 -0700
 	Added Y-parameter calculation functions for cap/inductance, etc
 	Added version dependency for PDL::LinearAlgebra 0.35

@@ -1,3 +1,23 @@
+0.14 2022-10-20
+  [Test Improvement]
+    * Added the TestUtil::Scope::Guard class for socket tests and use it.
+    * Add the TestUtil::Socket module for the tests of socket.
+  [Test Fix]
+    * Fixed the logic of searching an available port in Sys_Socket.t, Sys_Poll.t, Sys_Select.t and Sys_Ioctl.t
+0.13 2022-10-19
+  [New Features]
+    * Added the set method to the Sys::Select::Fd_set class.
+  [Bug Fix]
+    * Fixed the bugs that the following methods are not implemented.
+      static method FD_ZERO : void ($set : Sys::Select::Fd_set);
+      
+      static method FD_SET : void ($fd : int, $set : Sys::Select::Fd_set);
+      
+      static method FD_CLR : void ($fd : int, $set : Sys::Select::Fd_set);
+      
+      static method FD_ISSET : int ($fd : int, $set : Sys::Select::Fd_set);
+  [Test Improvement]
+    * Improved the tests of the Sys::Select class.
 0.12 2022-10-18
   [Bug Fix]
     * Try to fix the bug on FreeBSD error: invalid application of 'sizeof' to an incomplete type 'struct sockaddr_in'

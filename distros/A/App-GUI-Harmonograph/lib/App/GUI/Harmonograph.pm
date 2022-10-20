@@ -6,7 +6,7 @@ use FindBin;
 
 package App::GUI::Harmonograph;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 use base qw/Wx::App/;
 use App::GUI::Harmonograph::Frame;
@@ -81,9 +81,9 @@ creating together spiraling pictures :
 
 =for HTML <p>
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/wirbel.jpg"    alt=""  width="300" height="300">
+<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/baum.png"      alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/hose.png"      alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/wirbel_4.png"  alt=""  width="300" height="300">
-<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/df.png"        alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/wolke.png"     alt=""  width="300" height="300">
 </p>
 
@@ -226,10 +226,15 @@ the sum of the checked.
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/GUI2.png"   alt=""  width="630" height="410">
 </p>
 
-The second tab on the right side has knobs that set the properties of the pen.
-First how many rotations will be drawn. Secondly the distance between dots. 
+The third tab on the right side has knobs that set the properties of the pen.
+In left upper corder ist the slide to set the amount of rotations to be
+drawn. Right beside is the distance between dots. 
 Greater distances, together with color changes, help to clearify
-muddled up drawings. The third selector sets the dot size in pixel.
+muddled up drawings. Also - many rotations and little distance between
+dots will slow down the computation. In the second row left is a checkbox
+to answer if the dots should be connected. 
+The fourth selector sets the dot size in pixel. Zero mens here very thin
+= one half of an pixel - which is still somewhat visible, but very airy.
 
 =head2 Colors
 

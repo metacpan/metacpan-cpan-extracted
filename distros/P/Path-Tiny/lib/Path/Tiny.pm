@@ -5,7 +5,7 @@ use warnings;
 package Path::Tiny;
 # ABSTRACT: File path utility
 
-our $VERSION = '0.124';
+our $VERSION = '0.130';
 
 # Dependencies
 use Config;
@@ -1113,6 +1113,54 @@ sub filehandle {
     return $fh;
 }
 
+#pod =method has_same_bytes
+#pod
+#pod     if ( path("foo.txt")->has_same_bytes("bar.txt") ) {
+#pod        # ...
+#pod     }
+#pod
+#pod This method returns true if both the invocant and the argument can be opened as
+#pod file handles and the handles contain the same bytes.  It returns false if their
+#pod contents differ.  If either can't be opened as a file (e.g. a directory or
+#pod non-existent file), the method throws an exception.  If both can be opened and
+#pod both have the same C<realpath>, the method returns true without scanning any
+#pod data.
+#pod
+#pod Current API available since 0.125.
+#pod
+#pod =cut
+
+sub has_same_bytes {
+    my ($self, $other_path) = @_;
+    my $other = path($other_path);
+
+    my $fh1 = $self->openr_raw({ locked => 1 });
+    my $fh2 = $other->openr_raw({ locked => 1 });
+
+    # check for directories
+    if (-d $fh1) {
+        $self->_throw('has_same_bytes', $self->[PATH], "directory not allowed");
+    }
+    if (-d $fh2) {
+        $self->_throw('has_same_bytes', $other->[PATH], "directory not allowed");
+    }
+
+    # Now that handles are open, we know the inputs are readable files that
+    # exist, so it's safe to compare via realpath
+    if ($self->realpath eq $other->realpath) {
+        return 1
+    }
+
+    # result is 0 for equal, 1 for unequal, -1 for error
+    require File::Compare;
+    my $res = File::Compare::compare($fh1, $fh2, 65536);
+    if ($res < 0) {
+        $self->_throw('has_same_bytes')
+    }
+
+    return $res == 0;
+}
+
 #pod =method is_absolute, is_relative
 #pod
 #pod     if ( path("/tmp")->is_absolute ) { ... }
@@ -1341,20 +1389,50 @@ sub lines_utf8 {
     }
 }
 
-#pod =method mkpath
+#pod =method mkdir
 #pod
-#pod     path("foo/bar/baz")->mkpath;
-#pod     path("foo/bar/baz")->mkpath( \%options );
+#pod     path("foo/bar/baz")->mkdir;
+#pod     path("foo/bar/baz")->mkdir( \%options );
 #pod
 #pod Like calling C<make_path> from L<File::Path>.  An optional hash reference
 #pod is passed through to C<make_path>.  Errors will be trapped and an exception
-#pod thrown.  Returns the list of directories created or an empty list if
+#pod thrown.  Returns the the path object to facilitate chaining.
+#pod
+#pod B<NOTE>: unlike Perl's builtin C<mkdir>, this will create intermediate paths
+#pod similar to the Unix C<mkdir -p> command.  It will not error if applied to an
+#pod existing directory.
+#pod
+#pod Current API available since 0.125.
+#pod
+#pod =cut
+
+sub mkdir {
+    my ( $self, $args ) = @_;
+    $args = {} unless ref $args eq 'HASH';
+    my $err;
+    $args->{error} = \$err unless defined $args->{error};
+    require File::Path;
+    my @dirs;
+    my $ok = eval {
+        File::Path::make_path( $self->[PATH], $args );
+        1;
+    };
+    if (!$ok) {
+        $self->_throw('mkdir', $self->[PATH], "error creating path: $@");
+    }
+    if ( $err && @$err ) {
+        my ( $file, $message ) = %{ $err->[0] };
+        $self->_throw('mkdir', $file, $message);
+    }
+    return $self;
+}
+
+#pod =method mkpath (deprecated)
+#pod
+#pod Like calling C<mkdir>, but returns the list of directories created or an empty list if
 #pod the directories already exist, just like C<make_path>.
 #pod
-#pod See also L</touchpath> as a chainable alternative to create a writeable file path
-#pod (though without options).
-#pod
-#pod Current API available since 0.001.
+#pod Deprecated in 0.125.
 #pod
 #pod =cut
 
@@ -2119,8 +2197,12 @@ sub touch {
 #pod
 #pod     path("bar/baz/foo.txt")->touchpath;
 #pod
-#pod Combines C<mkpath> and C<touch>.  Creates the parent directory if it doesn't exist,
+#pod Combines C<mkdir> and C<touch>.  Creates the parent directory if it doesn't exist,
 #pod before touching the file.  Returns the path object like C<touch> does.
+#pod
+#pod If you need to pass options, use C<mkdir> and C<touch> separately:
+#pod
+#pod     path("bar/baz")->mkdir( \%options )->child("foo.txt")->touch($epoch_secs);
 #pod
 #pod Current API available since 0.022.
 #pod
@@ -2129,7 +2211,7 @@ sub touch {
 sub touchpath {
     my ($self) = @_;
     my $parent = $self->parent;
-    $parent->mkpath unless $parent->exists;
+    $parent->mkdir unless $parent->exists;
     $self->touch;
 }
 
@@ -2248,46 +2330,46 @@ Path::Tiny - File path utility
 
 =head1 VERSION
 
-version 0.124
+version 0.130
 
 =head1 SYNOPSIS
 
   use Path::Tiny;
 
-  # creating Path::Tiny objects
+  # Creating Path::Tiny objects
 
-  $dir = path("/tmp");
-  $foo = path("foo.txt");
+  my $dir = path("/tmp");
+  my $foo = path("foo.txt");
 
-  $subdir = $dir->child("foo");
-  $bar = $subdir->child("bar.txt");
+  my $subdir = $dir->child("foo");
+  my $bar = $subdir->child("bar.txt");
 
-  # stringifies as cleaned up path
+  # Stringifies as cleaned up path
 
-  $file = path("./foo.txt");
+  my $file = path("./foo.txt");
   print $file; # "foo.txt"
 
-  # reading files
+  # Reading files
 
-  $guts = $file->slurp;
-  $guts = $file->slurp_utf8;
+  my $guts = $file->slurp;
+  my $guts = $file->slurp_utf8;
 
-  @lines = $file->lines;
-  @lines = $file->lines_utf8;
+  my @lines = $file->lines;
+  my @lines = $file->lines_utf8;
 
-  ($head) = $file->lines( {count => 1} );
-  ($tail) = $file->lines( {count => -1} );
+  my ($head) = $file->lines( {count => 1} );
+  my ($tail) = $file->lines( {count => -1} );
 
-  # writing files
+  # Writing files
 
-  $bar->spew( @data );
-  $bar->spew_utf8( @data );
+  my $bar->spew( @data );
+  my $bar->spew_utf8( @data );
 
-  # reading directories
+  # Reading directories
 
   for ( $dir->children ) { ... }
 
-  $iter = $dir->iterator;
+  my $iter = $dir->iterator;
   while ( my $next = $iter->() ) { ... }
 
 =head1 DESCRIPTION
@@ -2751,6 +2833,21 @@ See C<openr>, C<openw>, C<openrw>, and C<opena> for sugar.
 
 Current API available since 0.066.
 
+=head2 has_same_bytes
+
+    if ( path("foo.txt")->has_same_bytes("bar.txt") ) {
+       # ...
+    }
+
+This method returns true if both the invocant and the argument can be opened as
+file handles and the handles contain the same bytes.  It returns false if their
+contents differ.  If either can't be opened as a file (e.g. a directory or
+non-existent file), the method throws an exception.  If both can be opened and
+both have the same C<realpath>, the method returns true without scanning any
+data.
+
+Current API available since 0.125.
+
 =head2 is_absolute, is_relative
 
     if ( path("/tmp")->is_absolute ) { ... }
@@ -2851,20 +2948,27 @@ iterating directly on the handle.
 
 Current API available since 0.065.
 
-=head2 mkpath
+=head2 mkdir
 
-    path("foo/bar/baz")->mkpath;
-    path("foo/bar/baz")->mkpath( \%options );
+    path("foo/bar/baz")->mkdir;
+    path("foo/bar/baz")->mkdir( \%options );
 
 Like calling C<make_path> from L<File::Path>.  An optional hash reference
 is passed through to C<make_path>.  Errors will be trapped and an exception
-thrown.  Returns the list of directories created or an empty list if
+thrown.  Returns the the path object to facilitate chaining.
+
+B<NOTE>: unlike Perl's builtin C<mkdir>, this will create intermediate paths
+similar to the Unix C<mkdir -p> command.  It will not error if applied to an
+existing directory.
+
+Current API available since 0.125.
+
+=head2 mkpath (deprecated)
+
+Like calling C<mkdir>, but returns the list of directories created or an empty list if
 the directories already exist, just like C<make_path>.
 
-See also L</touchpath> as a chainable alternative to create a writeable file path
-(though without options).
-
-Current API available since 0.001.
+Deprecated in 0.125.
 
 =head2 move
 
@@ -3198,8 +3302,12 @@ Current API available since 0.015.
 
     path("bar/baz/foo.txt")->touchpath;
 
-Combines C<mkpath> and C<touch>.  Creates the parent directory if it doesn't exist,
+Combines C<mkdir> and C<touch>.  Creates the parent directory if it doesn't exist,
 before touching the file.  Returns the path object like C<touch> does.
+
+If you need to pass options, use C<mkdir> and C<touch> separately:
+
+    path("bar/baz")->mkdir( \%options )->child("foo.txt")->touch($epoch_secs);
 
 Current API available since 0.022.
 
@@ -3453,7 +3561,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dan Book Dave Rolsky David Steinbrunner Doug Bell Flavio Poletti Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin H. Sluka Kjeldsen Michael G. Schwern Nigel Gregoire Philippe Bruhat (BooK) regina-verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
+=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dan Book Dave Rolsky David Steinbrunner Doug Bell Elvin Aslanov Flavio Poletti Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin H. Sluka Kjeldsen Michael G. Schwern Nigel Gregoire Philippe Bruhat (BooK) regina-verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
 
 =over 4
 
@@ -3484,6 +3592,10 @@ David Steinbrunner <dsteinbrunner@pobox.com>
 =item *
 
 Doug Bell <madcityzen@gmail.com>
+
+=item *
+
+Elvin Aslanov <rwp.primary@gmail.com>
 
 =item *
 

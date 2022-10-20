@@ -8,9 +8,9 @@ use warnings;
 require Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.913'; # VERSION
+our $VERSION = '0.914'; # VERSION
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -43,7 +43,7 @@ Data::Sah::Util::TypeX - Sah utility routines for type extensions
 
 =head1 VERSION
 
-This document describes version 0.913 of Data::Sah::Util::TypeX (from Perl distribution Data-Sah), released on 2022-09-30.
+This document describes version 0.914 of Data::Sah::Util::TypeX (from Perl distribution Data-Sah), released on 2022-10-19.
 
 =head1 DESCRIPTION
 

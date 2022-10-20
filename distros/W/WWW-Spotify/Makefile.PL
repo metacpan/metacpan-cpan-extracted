@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "WWW::Spotify",
   "PREREQ_PM" => {
     "Data::Dumper" => 0,
+    "HTTP::Status" => 0,
     "IO::CaptureOutput" => 0,
     "JSON::MaybeXS" => 0,
     "JSON::Path" => 0,
@@ -25,8 +26,7 @@ my %WriteMakefileArgs = (
     "MIME::Base64" => 0,
     "Moo" => "2.002004",
     "Types::Standard" => 0,
-    "WWW::Mechanize" => 0,
-    "XML::Simple" => 0
+    "WWW::Mechanize" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +49,7 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "HTTP::Status" => 0,
   "IO::CaptureOutput" => 0,
   "JSON::MaybeXS" => 0,
   "JSON::Path" => 0,
@@ -61,7 +62,6 @@ my %FallbackPrereqs = (
   "Try::Tiny" => 0,
   "Types::Standard" => 0,
   "WWW::Mechanize" => 0,
-  "XML::Simple" => 0,
   "strict" => 0,
   "warnings" => 0
 );

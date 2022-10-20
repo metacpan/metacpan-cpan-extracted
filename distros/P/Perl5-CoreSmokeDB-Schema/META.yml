@@ -9,9 +9,9 @@ build_requires:
   Test::Simple: '0.88'
   Test::Warnings: '0.028'
 configure_requires:
-  ExtUtils::MakeMaker: '6.5502'
+  ExtUtils::MakeMaker: 6.55_02
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,8 +23,10 @@ no_index:
     - inc
 requires:
   DBD::Pg: v3.14.0
+  DBD::SQLite: '1.60'
   DBIx::Class: '0.08271'
   DBIx::Class::Schema::Loader: '0.07049'
+  DateTime: '1.53'
   DateTime::Format::Pg: '0.16013'
   DateTime::Format::SQLite: '0.11'
   Exception::Class: '1.44'
@@ -32,5 +34,5 @@ requires:
 resources:
   homepage: https://github.com/abeltje/Perl5-CoreSmokeDB-Schema.git
   repository: https://github.com:abeltje/Perl5-CoreSmokeDB-Schema.git
-version: 1.08
+version: 1.0802
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -26,11 +26,13 @@
 ########################################################################
 use v5.18;  # minimum for Object::Pad
 
-our $VERSION = 'v0.0.007';
+our $VERSION = 'v0.0.008';
 
 use Weather::GHCN::App::Fetch;
 
-Weather::GHCN::App::Fetch->run( \@ARGV );
+# we set stdin to true to enable station id filtering via pipe or file 
+# using stdin
+Weather::GHCN::App::Fetch->run( \@ARGV, stdin => 1 );
 
 ########################################################################
 # Documentation
@@ -43,7 +45,7 @@ ghcn_fetch.pl - Fetch station and weather data from the NOAA GHCN repository
 
 =head1 VERSION
 
-version v0.0.007
+version v0.0.008
 
 =head1 SYNOPSIS
 

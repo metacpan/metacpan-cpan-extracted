@@ -1,3 +1,9 @@
+0.03 2022-10-20T11:25:56+02:00
+ - Add plugin support.
+ - Fix example in doc.
+ - Remove trailing whitespace.
+ - Update META.yml file.
+
 0.02 2022-09-09T17:28:55+02:00
  - Support variables for insert().
 

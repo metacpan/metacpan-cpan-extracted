@@ -200,10 +200,14 @@ t/lib/SPVM/TestCase/Sys/IO.spvm
 t/lib/SPVM/TestCase/Sys/Ioctl.spvm
 t/lib/SPVM/TestCase/Sys/Poll.spvm
 t/lib/SPVM/TestCase/Sys/Process.spvm
+t/lib/SPVM/TestCase/Sys/Select.spvm
 t/lib/SPVM/TestCase/Sys/Socket.spvm
 t/lib/SPVM/TestCase/Sys/Time.spvm
 t/lib/SPVM/TestCase/Sys/User.spvm
+t/lib/SPVM/TestUtil/Scope/Guard.spvm
+t/lib/SPVM/TestUtil/Scope/Guard/Handler.spvm
 t/lib/SPVM/TestUtil/SocketAutoClose.spvm
+t/lib/TestUtil/Socket.pm
 t/print_hello.pl
 t/Sys.t
 t/Sys_FileTest.t
@@ -211,6 +215,7 @@ t/Sys_IO.t
 t/Sys_Ioctl.t
 t/Sys_Poll.t
 t/Sys_Process.t
+t/Sys_Select.t
 t/Sys_Socket.t
 t/Sys_Time.t
 t/Sys_User.t

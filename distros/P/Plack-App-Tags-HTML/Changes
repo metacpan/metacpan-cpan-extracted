@@ -1,3 +1,7 @@
+0.08 2022-10-20T11:15:43+02:00
+ - API change: Add 'data_css' accessor.
+ - Regen README file.
+
 0.07 2022-08-16T13:19:57+02:00
  - API change: 'data' parameter was changed to reference to array of
    arguments for process().

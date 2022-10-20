@@ -14,9 +14,9 @@ use Role::Tiny;
 #use Sah::Schema::Sah;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.913'; # VERSION
+our $VERSION = '0.914'; # VERSION
 
 our $sch_filter_elem = ['any', {of=>[
     ['str', {req=>1}],
@@ -174,11 +174,11 @@ has_clause 'examples',
     prio       => 99,
     schema     => ['array', {of=>['any', {}]}], # XXX non-hash or defhash with 'value' property specified
     ;
-has_clause 'invalid_examples',
+has_clause 'links',
     v => 2,
     tags       => ['meta'],
     prio       => 99,
-    schema     => ['array', {of=>['any', {}]}], # XXX non-hash or defhash with 'value' property specified
+    schema     => ['array', {of=>['hash', {}]}], # XXX defhash, with at leasts 'url' property specified
     ;
 
 1;
@@ -196,7 +196,7 @@ Data::Sah::Type::BaseType - Base type
 
 =head1 VERSION
 
-This document describes version 0.913 of Data::Sah::Type::BaseType (from Perl distribution Data-Sah), released on 2022-09-30.
+This document describes version 0.914 of Data::Sah::Type::BaseType (from Perl distribution Data-Sah), released on 2022-10-19.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 

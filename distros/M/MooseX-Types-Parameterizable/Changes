@@ -1,4 +1,16 @@
-Revision history for MooseX-Types-Parameterized
+Revision history for MooseX-Types-Parameterizable
+
+0.10  20 October 2022
+        - Fixed broken metadata
+
+0.09  18 October 2022
+        - SKIP tests busted by Moose 2.0
+        - Added warning note to avoid for new code
+        - Convert to Dist::Zilla
+        - code formating sytle changes
+        - Upped dependencies to modern values (this might break your older
+          applications so please test before releasing to production!)
+
 
 0.08  08 February 2012
         - POD fixes (chocolateboy++)

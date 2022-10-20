@@ -52,11 +52,49 @@ ok( is_valid_json($result), 'search' );
 
 #------------------#
 
+my $crh_check = 0;
+
+eval { $obj->custom_request_handler('string'); };
+
+if ($@) {
+    $crh_check = 1;
+}
+
+ok( $crh_check == 1, 'customer_request_handler requires code ref' );
+
+$obj->custom_request_handler(
+    sub {
+        my $m = shift;
+        if ( $m->status() == 401 ) {
+            return 2;
+        }
+    }
+);
+
 $result = $obj->album('0sNOF9WDwhWunNAHPD3Baj');
 
 ok( is_valid_json( $result, 'album' ), 'album' );
 
+ok(
+    $obj->custom_request_handler_result() == 2,
+    'custom_request_handler_result'
+);
+
 show_and_pause($result);
+
+#------------------#
+
+$obj->die_on_response_error(1);
+
+eval { $result = $obj->album('0sNOF9WDwhWunNAHPD3Baj'); };
+
+if ($@) {
+    ok( 1, 'die_on_response_error' );
+}
+
+show_and_pause($result);
+
+$obj->die_on_response_error(0);
 
 #------------------#
 

@@ -16,9 +16,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-16'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Perinci-CmdLine-Gen'; # DIST
-our $VERSION = '0.501'; # VERSION
+our $VERSION = '0.502'; # VERSION
 
 our %SPEC;
 
@@ -464,11 +464,11 @@ sub gen_pericmd_script {
             if ($cmdline_mod eq 'Perinci::CmdLine::Lite') {
                 $cmdline_mod_ver = "1.915";
             } else {
-                $extra_modules->{"Perinci::CmdLine::Any"} = "0.152";
-                $extra_modules->{"Perinci::CmdLine::Lite"} = "1.915";
+                $extra_modules->{"Perinci::CmdLine::Any"} = "0.154";
+                $extra_modules->{"Perinci::CmdLine::Lite"} = "1.924";
             }
         } elsif ($cmdline_mod =~ /\APerinci::CmdLine::Classic\z/) {
-            $extra_modules->{"Perinci::CmdLine::Base"} = "1.827";
+            $extra_modules->{"Perinci::CmdLine::Base"} = "1.924";
             $extra_modules->{"Perinci::CmdLine::Classic"} = "1.770";
         }
 
@@ -613,7 +613,7 @@ Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.501 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2022-01-16.
+This document describes version 0.502 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2022-10-19.
 
 =head1 FUNCTIONS
 
@@ -652,7 +652,11 @@ Specify module to use.
 
 =item * B<code_after_end> => I<str>
 
+(No description)
+
 =item * B<code_before_instantiate_cmdline> => I<str>
+
+(No description)
 
 =item * B<config_dirs> => I<array[str]>
 
@@ -664,17 +668,31 @@ Will be passed to Perinci::CmdLine constructor.
 
 =item * B<copt_help_enable> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<copt_help_getopt> => I<str>
+
+(No description)
 
 =item * B<copt_naked_res_default> => I<bool>
 
+(No description)
+
 =item * B<copt_naked_res_enable> => I<bool> (default: 1)
+
+(No description)
 
 =item * B<copt_naked_res_getopt> => I<str>
 
+(No description)
+
 =item * B<copt_version_enable> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<copt_version_getopt> => I<str>
+
+(No description)
 
 =item * B<default_dry_run> => I<bool>
 
@@ -685,6 +703,8 @@ Whether to set default_dry_run, will be passed to Perinci::CmdLine constructor.
 Set default format.
 
 =item * B<default_log_level> => I<str>
+
+(No description)
 
 =item * B<default_subcommand> => I<str>
 
@@ -767,7 +787,11 @@ Will be passed to Perinci::CmdLine constructor.
 
 =item * B<script_name> => I<str>
 
+(No description)
+
 =item * B<script_summary> => I<str>
+
+(No description)
 
 =item * B<script_version> => I<str>
 
@@ -878,7 +902,11 @@ Specify module to use.
 
 =item * B<code_after_end> => I<str>
 
+(No description)
+
 =item * B<code_before_instantiate_cmdline> => I<str>
+
+(No description)
 
 =item * B<config_dirs> => I<array[str]>
 
@@ -890,17 +918,31 @@ Will be passed to Perinci::CmdLine constructor.
 
 =item * B<copt_help_enable> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<copt_help_getopt> => I<str>
+
+(No description)
 
 =item * B<copt_naked_res_default> => I<bool>
 
+(No description)
+
 =item * B<copt_naked_res_enable> => I<bool> (default: 1)
+
+(No description)
 
 =item * B<copt_naked_res_getopt> => I<str>
 
+(No description)
+
 =item * B<copt_version_enable> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<copt_version_getopt> => I<str>
+
+(No description)
 
 =item * B<default_dry_run> => I<bool>
 
@@ -911,6 +953,8 @@ Whether to set default_dry_run, will be passed to Perinci::CmdLine constructor.
 Set default format.
 
 =item * B<default_log_level> => I<str>
+
+(No description)
 
 =item * B<default_subcommand> => I<str>
 
@@ -993,7 +1037,11 @@ Will be passed to Perinci::CmdLine constructor.
 
 =item * B<script_name> => I<str>
 
+(No description)
+
 =item * B<script_summary> => I<str>
+
+(No description)
 
 =item * B<script_version> => I<str>
 
@@ -1093,9 +1141,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

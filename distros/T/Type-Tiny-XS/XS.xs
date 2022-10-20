@@ -492,9 +492,83 @@ typetiny_parameterized_ArrayRef(pTHX_ SV* const param, SV* const sv) {
 }
 
 static int
+typetiny_parameterized_ArrayLike(pTHX_ SV* const param, SV* const sv) {
+    HV *stash;
+    MAGIC *mg;
+    AMT *amtp;
+    CV **cvp;
+   
+    assert(sv);
+    
+    if( IsArrayRef(sv) ) {
+        return typetiny_parameterized_ArrayRef( aTHX_ param, sv );
+    }
+    
+    if( SvAMAGIC(sv)
+        && ( stash = SvSTASH(SvRV(sv)) )
+        && Gv_AMG(stash)
+        && ( mg = mg_find((const SV*)stash, PERL_MAGIC_overload_table) )
+        && AMT_AMAGIC( amtp = (AMT*)mg->mg_ptr )
+        && ( cvp = amtp->table )
+        && cvp[0x02]  // AMG_TO_AV
+    ) {
+        SV* const retsv = amagic_call( sv, &PL_sv_undef, 0x02, AMGf_noright | AMGf_unary );
+        AV* const av    = (AV*)SvRV(retsv);
+        I32 const len   = av_len(av) + 1;
+        I32 i;
+        for(i = 0; i < len; i++){
+            SV* const value = *av_fetch(av, i, TRUE);
+            if(!typetiny_tc_check(aTHX_ param, value)){
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static int
 typetiny_parameterized_HashRef(pTHX_ SV* const param, SV* const sv) {
     if(IsHashRef(sv)){
         HV* const hv  = (HV*)SvRV(sv);
+        HE* he;
+
+        hv_iterinit(hv);
+        while((he = hv_iternext(hv))){
+            SV* const value = hv_iterval(hv, he);
+            if(!typetiny_tc_check(aTHX_ param, value)){
+                hv_iterinit(hv); /* reset */
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static int
+typetiny_parameterized_HashLike(pTHX_ SV* const param, SV* const sv) {
+    HV *stash;
+    MAGIC *mg;
+    AMT *amtp;
+    CV **cvp;
+   
+    assert(sv);
+    
+    if( IsHashRef(sv) ) {
+        return typetiny_parameterized_HashRef( aTHX_ param, sv );
+    }
+    
+    if( SvAMAGIC(sv)
+        && ( stash = SvSTASH(SvRV(sv)) )
+        && Gv_AMG(stash)
+        && ( mg = mg_find((const SV*)stash, PERL_MAGIC_overload_table) )
+        && AMT_AMAGIC( amtp = (AMT*)mg->mg_ptr )
+        && ( cvp = amtp->table )
+        && cvp[0x03]  // AMG_TO_HV
+    ) {
+        SV* const retsv = amagic_call( sv, &PL_sv_undef, 0x03, AMGf_noright | AMGf_unary );
+        HV* const hv    = (HV*)SvRV(retsv);
         HE* he;
 
         hv_iterinit(hv);
@@ -967,18 +1041,22 @@ CODE:
 #define TYPETINY_TC_ENUM      5
 #define TYPETINY_TC_ANYOF     6
 #define TYPETINY_TC_ALLOF     7
+#define TYPETINY_TC_ARRAYLIKE 8
+#define TYPETINY_TC_HASHLIKE  9
 
 CV*
 _parameterize_ArrayRef_for(SV* param)
 ALIAS:
-    _parameterize_ArrayRef_for = TYPETINY_TC_ARRAY_REF
-    _parameterize_HashRef_for  = TYPETINY_TC_HASH_REF
-    _parameterize_Maybe_for    = TYPETINY_TC_MAYBE
-    _parameterize_Map_for      = TYPETINY_TC_MAP
-    _parameterize_Tuple_for    = TYPETINY_TC_TUPLE
-    _parameterize_Enum_for     = TYPETINY_TC_ENUM
-    _parameterize_AnyOf_for    = TYPETINY_TC_ANYOF
-    _parameterize_AllOf_for    = TYPETINY_TC_ALLOF
+    _parameterize_ArrayRef_for   = TYPETINY_TC_ARRAY_REF
+    _parameterize_HashRef_for    = TYPETINY_TC_HASH_REF
+    _parameterize_Maybe_for      = TYPETINY_TC_MAYBE
+    _parameterize_Map_for        = TYPETINY_TC_MAP
+    _parameterize_Tuple_for      = TYPETINY_TC_TUPLE
+    _parameterize_Enum_for       = TYPETINY_TC_ENUM
+    _parameterize_AnyOf_for      = TYPETINY_TC_ANYOF
+    _parameterize_AllOf_for      = TYPETINY_TC_ALLOF
+    _parameterize_ArrayLike_for  = TYPETINY_TC_ARRAYLIKE
+    _parameterize_HashLike_for   = TYPETINY_TC_HASHLIKE
 CODE:
 {
     check_fptr_t fptr;
@@ -1019,6 +1097,12 @@ CODE:
             break;
         case TYPETINY_TC_ALLOF:
             fptr = typetiny_parameterized_AllOf;
+            break;
+        case TYPETINY_TC_ARRAYLIKE:
+            fptr = typetiny_parameterized_ArrayLike;
+            break;
+        case TYPETINY_TC_HASHLIKE:
+            fptr = typetiny_parameterized_HashLike;
             break;
         default: /* Maybe type */
             fptr = typetiny_parameterized_Maybe;

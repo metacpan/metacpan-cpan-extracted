@@ -10,7 +10,7 @@ use Net::HL7::Connection;
 use Net::HL7::Message;
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -73,7 +73,7 @@ sub run {
 	$conn->send($msg);
 	print "Message was send.\n";
 
-	return;
+	return 0;
 }
 
 1;
@@ -92,23 +92,27 @@ App::HL7::Send - Base class for hl7send script.
 =head1 SYNOPSIS
 
  use App::HL7::Send;
+
  my $app = App::HL7::Send->new;
- $app->run;
+ my $exit_code = $app->run;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $app = App::HL7::Send->new;
 
- Constructor.
+Constructor.
 
-=item C<run()>
+Returns instance of object.
 
- Run method.
- Returns undef.
+=head2 C<run>
 
-=back
+ my $exit_code = $app->run;
+
+Run method.
+
+Returns 1 for error, 0 for success.
 
 =head1 ERRORS
 
@@ -122,6 +126,8 @@ App::HL7::Send - Base class for hl7send script.
                  File: %s
 
 =head1 EXAMPLE
+
+=for comment filename=send_test_orm_to_dcm4chee.pl
 
  use strict;
  use warnings;
@@ -176,7 +182,7 @@ L<Perl6::Slurp>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/App-HL7-Send>
+L<https://github.com/michal-josef-spacek/App-HL7-Send>
 
 =head1 AUTHOR
 
@@ -192,6 +198,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

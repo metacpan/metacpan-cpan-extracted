@@ -2,8 +2,8 @@ NAME
     App::MysqlUtils - CLI utilities related to MySQL
 
 VERSION
-    This document describes version 0.021 of App::MysqlUtils (from Perl
-    distribution App-MysqlUtils), released on 2022-10-12.
+    This document describes version 0.022 of App::MysqlUtils (from Perl
+    distribution App-MysqlUtils), released on 2022-10-19.
 
 SYNOPSIS
     This distribution includes the following CLI utilities:
@@ -99,11 +99,15 @@ FUNCTIONS
 
     *   database* => *str*
 
+        (No description)
+
     *   from* => *str*
 
         Name of source table.
 
     *   host => *str* (default: "localhost")
+
+        (No description)
 
     *   password => *str*
 
@@ -114,6 +118,8 @@ FUNCTIONS
         Name of PK column.
 
     *   port => *int* (default: 3306)
+
+        (No description)
 
     *   to* => *str*
 
@@ -161,13 +167,19 @@ FUNCTIONS
 
     *   database* => *str*
 
+        (No description)
+
     *   host => *str* (default: "localhost")
+
+        (No description)
 
     *   password => *str*
 
         Will try to get default from "~/.my.cnf".
 
     *   port => *int* (default: 3306)
+
+        (No description)
 
     *   username => *str*
 
@@ -222,9 +234,15 @@ FUNCTIONS
 
     *   db_pattern => *re*
 
+        (No description)
+
     *   dbs => *array[str]*
 
+        (No description)
+
     *   host => *str* (default: "localhost")
+
+        (No description)
 
     *   limit => *posint*
 
@@ -235,6 +253,8 @@ FUNCTIONS
         Will try to get default from "~/.my.cnf".
 
     *   port => *int* (default: 3306)
+
+        (No description)
 
     *   username => *str*
 
@@ -289,7 +309,11 @@ FUNCTIONS
 
     *   database* => *str*
 
+        (No description)
+
     *   host => *str* (default: "localhost")
+
+        (No description)
 
     *   limit => *posint*
 
@@ -301,9 +325,15 @@ FUNCTIONS
 
     *   port => *int* (default: 3306)
 
+        (No description)
+
     *   table_pattern => *re*
 
+        (No description)
+
     *   tables => *array[str]*
+
+        (No description)
 
     *   username => *str*
 
@@ -361,6 +391,8 @@ FUNCTIONS
 
     *   database* => *str*
 
+        (No description)
+
     *   escape_char => *str*
 
         Specify character to escape value in field in input CSV, will be
@@ -384,13 +416,19 @@ FUNCTIONS
 
     *   host => *str* (default: "localhost")
 
+        (No description)
+
     *   password => *str*
 
         Will try to get default from "~/.my.cnf".
 
     *   port => *int* (default: 3306)
 
+        (No description)
+
     *   query* => *str*
+
+        (No description)
 
     *   quote_char => *str*
 
@@ -451,17 +489,23 @@ FUNCTIONS
 
     *   database* => *str*
 
+        (No description)
+
     *   exclude_columns => *array[str]*
 
         What column(s) to exclude from comparison.
 
     *   host => *str* (default: "localhost")
 
+        (No description)
+
     *   password => *str*
 
         Will try to get default from "~/.my.cnf".
 
     *   port => *int* (default: 3306)
+
+        (No description)
 
     *   return_column* => *str*
 
@@ -528,7 +572,11 @@ FUNCTIONS
 
     *   database* => *str*
 
+        (No description)
+
     *   host => *str* (default: "localhost")
+
+        (No description)
 
     *   password => *str*
 
@@ -536,7 +584,11 @@ FUNCTIONS
 
     *   port => *int* (default: 3306)
 
+        (No description)
+
     *   query* => *str*
+
+        (No description)
 
     *   username => *str*
 
@@ -573,6 +625,8 @@ FUNCTIONS
 
     *   database* => *str*
 
+        (No description)
+
     *   directory => *dirname* (default: ".")
 
         Specify directory for the resulting *.txt files.
@@ -590,6 +644,8 @@ FUNCTIONS
         .sql file. "always" means to always overwrite existing .txt file.
 
     *   pl_files* => *array[filename]*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -618,6 +674,8 @@ FUNCTIONS
 
     *   database* => *str*
 
+        (No description)
+
     *   directory => *dirname* (default: ".")
 
         Specify directory for the resulting *.txt files.
@@ -635,6 +693,8 @@ FUNCTIONS
         .sql file. "always" means to always overwrite existing .txt file.
 
     *   sql_files* => *array[filename]*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -667,17 +727,31 @@ FUNCTIONS
 
     *   exclude_table_patterns => *array[re]*
 
+        (No description)
+
     *   exclude_tables => *array[str]*
+
+        (No description)
 
     *   include_table_patterns => *array[re]*
 
+        (No description)
+
     *   include_tables => *array[str]*
+
+        (No description)
 
     *   overwrite => *bool*
 
+        (No description)
+
     *   stop_after_table => *str*
 
+        (No description)
+
     *   stop_after_table_pattern => *re*
+
+        (No description)
 
     Returns an enveloped result (an array).
 

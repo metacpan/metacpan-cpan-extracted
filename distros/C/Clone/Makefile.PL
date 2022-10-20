@@ -1,14 +1,16 @@
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 
-WriteMakefile(
+my %WriteMakefile_params = (
     'NAME'          => 'Clone',
     'AUTHOR'        => 'Ray Finch <rdf@cpan.org>',
     'VERSION_FROM'  => 'Clone.pm',
     'ABSTRACT_FROM' => 'Clone.pm',
-    'LICENSE'       => 'perl',
+    'LICENSE'       => 'perl_5',
     'PL_FILES'      => {},
     'TEST_REQUIRES' => {
-      'Test::More' => 0,
+      'Test::More' => '0.88',
       'B::COW'     => '0.004',
     },
     'LIBS'          => [''],     # e.g., '-lm'
@@ -26,3 +28,16 @@ WriteMakefile(
     },
 );
 
+my $EUMM_VERSION = eval $ExtUtils::MakeMaker::VERSION;
+
+$WriteMakefile_params{BUILD_REQUIRES} = {
+  %{delete $WriteMakefile_params{TEST_REQUIRES} || {} },
+  %{delete $WriteMakefile_params{BUILD_REQUIRES} || {} },
+} if $EUMM_VERSION < 6.63_03;
+
+$WriteMakefile_params{PREREQ_PM} = {
+  %{delete $WriteMakefile_params{TEST_REQUIRES} || {} },
+  %{delete $WriteMakefile_params{PREREQ_PM} || {} },
+} if $EUMM_VERSION < 6.55_01;
+
+WriteMakefile(%WriteMakefile_params);

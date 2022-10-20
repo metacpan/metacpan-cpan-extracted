@@ -9,7 +9,7 @@ use namespace::autoclean;
 use Expect;
 use utf8;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 #------------------------------------------------------------------------------
 # 注册 Expect 为 Moose 对象类型

@@ -8,7 +8,7 @@ Weather::GHCN::StationTable - collect station objects and weather data
 
 =head1 VERSION
 
-version v0.0.007
+version v0.0.008
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::StationTable;
 class   Weather::GHCN::StationTable;
 
-our $VERSION = 'v0.0.007';
+our $VERSION = 'v0.0.008';
 
 # directly used by this module
 use Carp                qw( carp croak );
@@ -1307,7 +1307,7 @@ method set_options (%user_options) {
 
     if ( defined $user_options{'profile'} ) {
         # save the expanded profile file path in the object
-        $_profile_file = path( $user_options{'profile'} )->absolute( $FindBin::Bin )->stringify;
+        $_profile_file = path( $user_options{'profile'} )->absolute()->stringify;
         $_profile_href = _get_profile_options($_profile_file);
     }
 
@@ -1316,8 +1316,7 @@ method set_options (%user_options) {
     ($_opt_href, $_opt_obj) = $_ghcn_opt_obj->combine_options(\%user_options, $_profile_href);
 
     if ( $_opt_href->{'cachedir'} ) {
-        $_cachedir = path( $_opt_href->{'cachedir'} )->absolute( $FindBin::Bin )->stringify;
-
+        $_cachedir = path( $_opt_href->{'cachedir'} )->absolute()->stringify;
         $_cache_obj = Weather::GHCN::CacheURI->new($_cachedir, $_opt_obj->refresh);
     } else {
         $_cache_obj = Weather::GHCN::CacheURI->new($EMPTY, $_opt_obj->refresh);

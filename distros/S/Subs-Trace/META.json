@@ -21,7 +21,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "v5.10.1"
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -33,7 +33,7 @@
    "provides" : {
       "Subs::Trace" : {
          "file" : "lib/Subs/Trace.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "url" : "https://github.com/poti1/subs-trace"
       }
    },
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,3 +1,10 @@
+0.009   2022-08-11  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc][cli google-search] Add Description & some more examples.
+
+
 0.008   2022-08-11  Released-By: PERLANCAR; Urgency: high
 
         [cli google-search]

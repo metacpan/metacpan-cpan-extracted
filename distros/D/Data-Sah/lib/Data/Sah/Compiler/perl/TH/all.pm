@@ -19,9 +19,9 @@ use parent (
 );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.913'; # VERSION
+our $VERSION = '0.914'; # VERSION
 
 1;
 # ABSTRACT: perl's type handler for type "all"
@@ -38,7 +38,7 @@ Data::Sah::Compiler::perl::TH::all - perl's type handler for type "all"
 
 =head1 VERSION
 
-This document describes version 0.913 of Data::Sah::Compiler::perl::TH::all (from Perl distribution Data-Sah), released on 2022-09-30.
+This document describes version 0.914 of Data::Sah::Compiler::perl::TH::all (from Perl distribution Data-Sah), released on 2022-10-19.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

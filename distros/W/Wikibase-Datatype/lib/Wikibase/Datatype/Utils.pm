@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(check_entity check_language check_lexeme check_property);
 
-our $VERSION = 0.21;
+our $VERSION = 0.22;
 
 sub check_entity {
 	my ($self, $key) = @_;
@@ -299,6 +299,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.21
+0.22
 
 =cut

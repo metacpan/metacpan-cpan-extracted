@@ -8,7 +8,7 @@ use English;
 use Error::Pure qw(err);
 use List::Util qw(none);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub new {
 	my ($class, @params) = @_;
@@ -132,6 +132,12 @@ sub required_variables {
 
 	err 'Package __PACKAGE__ is abstract class. required_variables() method must be '.
 		'defined in inherited class.';
+}
+
+sub schema {
+	my $self = shift;
+
+	return $self->{'_schema'};
 }
 
 1;

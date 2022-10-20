@@ -1,6 +1,6 @@
 package App::MysqlUtils;
 
-use 5.010001;
+use 5.034; # uses new octal notation 0o123
 use strict;
 use warnings;
 use Log::ger;
@@ -12,9 +12,9 @@ use Perinci::Object;
 use String::ShellQuote;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-12'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 our %SPEC;
 
@@ -1124,7 +1124,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.021 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2022-10-12.
+This document describes version 0.022 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2022-10-19.
 
 =head1 SYNOPSIS
 
@@ -1234,11 +1234,15 @@ Currently the choices are:
 
 =item * B<database>* => I<str>
 
+(No description)
+
 =item * B<from>* => I<str>
 
 Name of source table.
 
 =item * B<host> => I<str> (default: "localhost")
+
+(No description)
 
 =item * B<password> => I<str>
 
@@ -1249,6 +1253,8 @@ Will try to get default from C<~/.my.cnf>.
 Name of PK column.
 
 =item * B<port> => I<int> (default: 3306)
+
+(No description)
 
 =item * B<to>* => I<str>
 
@@ -1306,13 +1312,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<database>* => I<str>
 
+(No description)
+
 =item * B<host> => I<str> (default: "localhost")
+
+(No description)
 
 =item * B<password> => I<str>
 
 Will try to get default from C<~/.my.cnf>.
 
 =item * B<port> => I<int> (default: 3306)
+
+(No description)
 
 =item * B<username> => I<str>
 
@@ -1377,9 +1389,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_pattern> => I<re>
 
+(No description)
+
 =item * B<dbs> => I<array[str]>
 
+(No description)
+
 =item * B<host> => I<str> (default: "localhost")
+
+(No description)
 
 =item * B<limit> => I<posint>
 
@@ -1390,6 +1408,8 @@ Don't delete more than this number of databases.
 Will try to get default from C<~/.my.cnf>.
 
 =item * B<port> => I<int> (default: 3306)
+
+(No description)
 
 =item * B<username> => I<str>
 
@@ -1454,7 +1474,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<database>* => I<str>
 
+(No description)
+
 =item * B<host> => I<str> (default: "localhost")
+
+(No description)
 
 =item * B<limit> => I<posint>
 
@@ -1466,9 +1490,15 @@ Will try to get default from C<~/.my.cnf>.
 
 =item * B<port> => I<int> (default: 3306)
 
+(No description)
+
 =item * B<table_pattern> => I<re>
 
+(No description)
+
 =item * B<tables> => I<array[str]>
+
+(No description)
 
 =item * B<username> => I<str>
 
@@ -1535,6 +1565,8 @@ Instead of returning the CSV rows, just return the count of rows that get filled
 
 =item * B<database>* => I<str>
 
+(No description)
+
 =item * B<escape_char> => I<str>
 
 Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
@@ -1557,13 +1589,19 @@ and so on.
 
 =item * B<host> => I<str> (default: "localhost")
 
+(No description)
+
 =item * B<password> => I<str>
 
 Will try to get default from C<~/.my.cnf>.
 
 =item * B<port> => I<int> (default: 3306)
 
+(No description)
+
 =item * B<query>* => I<str>
+
+(No description)
 
 =item * B<quote_char> => I<str>
 
@@ -1630,17 +1668,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<database>* => I<str>
 
+(No description)
+
 =item * B<exclude_columns> => I<array[str]>
 
 What column(s) to exclude from comparison.
 
 =item * B<host> => I<str> (default: "localhost")
 
+(No description)
+
 =item * B<password> => I<str>
 
 Will try to get default from C<~/.my.cnf>.
 
 =item * B<port> => I<int> (default: 3306)
+
+(No description)
 
 =item * B<return_column>* => I<str>
 
@@ -1711,7 +1755,11 @@ Add first field containing number from 1, 2, ...
 
 =item * B<database>* => I<str>
 
+(No description)
+
 =item * B<host> => I<str> (default: "localhost")
+
+(No description)
 
 =item * B<password> => I<str>
 
@@ -1719,7 +1767,11 @@ Will try to get default from C<~/.my.cnf>.
 
 =item * B<port> => I<int> (default: 3306)
 
+(No description)
+
 =item * B<query>* => I<str>
+
+(No description)
 
 =item * B<username> => I<str>
 
@@ -1760,6 +1812,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<database>* => I<str>
 
+(No description)
+
 =item * B<directory> => I<dirname> (default: ".")
 
 Specify directory for the resulting *.txt files.
@@ -1777,6 +1831,8 @@ C<none> means to never overwrite existing .txt file. C<older> overwrites existin
 always overwrite existing .txt file.
 
 =item * B<pl_files>* => I<array[filename]>
+
+(No description)
 
 
 =back
@@ -1810,6 +1866,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<database>* => I<str>
 
+(No description)
+
 =item * B<directory> => I<dirname> (default: ".")
 
 Specify directory for the resulting *.txt files.
@@ -1827,6 +1885,8 @@ C<none> means to never overwrite existing .txt file. C<older> overwrites existin
 always overwrite existing .txt file.
 
 =item * B<sql_files>* => I<array[filename]>
+
+(No description)
 
 
 =back
@@ -1864,17 +1924,31 @@ Directory to put the SQL files into.
 
 =item * B<exclude_table_patterns> => I<array[re]>
 
+(No description)
+
 =item * B<exclude_tables> => I<array[str]>
+
+(No description)
 
 =item * B<include_table_patterns> => I<array[re]>
 
+(No description)
+
 =item * B<include_tables> => I<array[str]>
+
+(No description)
 
 =item * B<overwrite> => I<bool>
 
+(No description)
+
 =item * B<stop_after_table> => I<str>
 
+(No description)
+
 =item * B<stop_after_table_pattern> => I<re>
+
+(No description)
 
 
 =back

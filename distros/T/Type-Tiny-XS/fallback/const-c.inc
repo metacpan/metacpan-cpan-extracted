@@ -33,18 +33,18 @@ constant (pTHX_ const char *name, STRLEN len) {
      Regenerate these constant functions by feeding this entire source file to
      perl -x
 
-#!/home/tai/perl5/perlbrew/perls/perl-5.16.2/bin/perl -w
+#!/home/tai/perl5/perlbrew/perls/perl-5.34.0/bin/perl -w
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 my $types = {map {($_, 1)} qw()};
 my @names = (qw());
 
 print constant_types(), "\n"; # macro defs
-foreach (C_constant ("PerlX::Maybe::XS", 'constant', 'IV', $types, undef, 3, @names) ) {
+foreach (C_constant ("Type::Tiny::XS", 'constant', 'IV', $types, undef, 3, @names) ) {
     print $_, "\n"; # C constant subs
 }
 print "\n#### XS Section:\n";
-print XS_constant ("PerlX::Maybe::XS", $types);
+print XS_constant ("Type::Tiny::XS", $types);
 __END__
    */
 

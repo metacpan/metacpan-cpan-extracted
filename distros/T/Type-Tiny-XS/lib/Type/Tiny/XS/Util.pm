@@ -1,4 +1,4 @@
-use 5.010001;
+use 5.008005;
 use strict;
 use warnings;
 use Type::Tiny::XS ();
@@ -6,7 +6,7 @@ use Type::Tiny::XS ();
 package Type::Tiny::XS::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.022';
+our $VERSION   = '0.025';
 
 1;
 
@@ -50,4 +50,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

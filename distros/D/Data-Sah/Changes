@@ -1,3 +1,8 @@
+0.914   2022-10-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Remove 'invalid_examples' clause definition, add 'links'.
+
+
 0.913   2022-09-30  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Fix escaping mistake in generating type check for

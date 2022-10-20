@@ -6,9 +6,9 @@ use strict;
 # END IFUNBUILT
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-01'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Perinci-CmdLine-Any'; # DIST
-our $VERSION = '0.153'; # VERSION
+our $VERSION = '0.154'; # VERSION
 
 my %Opts = (
     -prefer_lite => 1,
@@ -39,7 +39,7 @@ sub new {
 
     for my $i (1..@mods) {
         my $mod = $mods[$i-1];
-        my $modpm = $mod; $modpm =~ s!::!/!g; $modpm .= ".pm";
+        (my $modpm = "$mod.pm") =~ s!::!/!g;
         if ($i == @mods) {
             require $modpm;
             return $mod->new(@_);
@@ -50,6 +50,7 @@ sub new {
                 $res = $mod->new(@_);
             };
             if ($@) {
+                warn "Can't load $mod: $@";
                 next;
             } else {
                 return $res;
@@ -73,7 +74,7 @@ Perinci::CmdLine::Any - Choose Perinci::CmdLine implementation (::Lite or ::Clas
 
 =head1 VERSION
 
-This document describes version 0.153 of Perinci::CmdLine::Any (from Perl distribution Perinci-CmdLine-Any), released on 2021-12-01.
+This document describes version 0.154 of Perinci::CmdLine::Any (from Perl distribution Perinci-CmdLine-Any), released on 2022-10-19.
 
 =head1 SYNOPSIS
 
@@ -153,13 +154,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

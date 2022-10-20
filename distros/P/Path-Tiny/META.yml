@@ -36,10 +36,10 @@ no_index:
 provides:
   Path::Tiny:
     file: lib/Path/Tiny.pm
-    version: '0.124'
+    version: '0.130'
   Path::Tiny::Error:
     file: lib/Path/Tiny.pm
-    version: '0.124'
+    version: '0.130'
 recommends:
   Unicode::UTF8: '0.58'
 requires:
@@ -50,6 +50,7 @@ requires:
   Encode: '0'
   Exporter: '5.57'
   Fcntl: '0'
+  File::Compare: '0'
   File::Copy: '0'
   File::Glob: '0'
   File::Path: '2.07'
@@ -66,7 +67,7 @@ resources:
   bugtracker: https://github.com/dagolden/Path-Tiny/issues
   homepage: https://github.com/dagolden/Path-Tiny
   repository: https://github.com/dagolden/Path-Tiny.git
-version: '0.124'
+version: '0.130'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Alex Efros <powerman@powerman.name>'
@@ -76,6 +77,7 @@ x_contributors:
   - 'Dave Rolsky <autarch@urth.org>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
   - 'Doug Bell <madcityzen@gmail.com>'
+  - 'Elvin Aslanov <rwp.primary@gmail.com>'
   - 'Flavio Poletti <flavio@polettix.it>'
   - 'Gabor Szabo <szabgab@cpan.org>'
   - 'Gabriel Andrade <gabiruh@gmail.com>'

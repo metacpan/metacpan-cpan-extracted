@@ -5,7 +5,7 @@ use warnings;
 
 use App::Schema::Data;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Run.
 exit App::Schema::Data->new->run;
@@ -28,7 +28,7 @@ schema-data - Script to manipulation with data for Schema.
 
 =head1 SYNOPSIS
 
- schema-data [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_data_module var_key=var_value ..
+ schema-data [-h] [-l plugin:...] [-p password] [-u user] [-v schema_version] [--version] dsn schema_data_module var_key=var_value ..
 
 =head1 ARGUMENTS
 
@@ -37,6 +37,13 @@ schema-data - Script to manipulation with data for Schema.
 =item * C<-h>
 
 Print help.
+
+=item * C<-l plugin:...>
+
+List of plugins to load separated by ':' character.
+
+Each plugin must be in Schema module namespace like C<__SCHEMA_MODULE_NS__::Plugin::__PLUGIN__>.
+And must inherit L<Schema::Data::Plugin>.
 
 =item * C<-p password>
 
@@ -74,7 +81,7 @@ Variable keys with values for insert.
 =head1 EXAMPLE
 
  schema-deploy dbi:SQLite:dbname=commons.vote.db Schema::Commons::Vote
- schema-data dbi:SQLite:dbname=commons.vote.db Schema::Data::Commons::Vote
+ schema-data -l DefaultTheme dbi:SQLite:dbname=commons.vote.db Schema::Data::Commons::Vote 'creator_name=Michal Josef Špaček' creator_email=michal.josef.spacek@wikimedia.cz
 
 =head1 REPOSITORY
 
@@ -94,6 +101,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

@@ -4,7 +4,7 @@
       "Ray Finch <rdf@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,7 +33,7 @@
       "test" : {
          "requires" : {
             "B::COW" : "0.004",
-            "Test::More" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
@@ -49,6 +49,6 @@
          "url" : "http://github.com/garu/Clone"
       }
    },
-   "version" : "0.45",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.46",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

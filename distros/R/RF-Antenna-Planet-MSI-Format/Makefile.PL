@@ -3,9 +3,13 @@ WriteMakefile(
     NAME           => 'RF::Antenna::Planet::MSI::Format',
     VERSION_FROM   => 'lib/RF/Antenna/Planet/MSI/Format.pm',
     PREREQ_PM      => {
-                       'Scalar::Util' => 0,
-                       'Tie::IxHash'  => 0,
-                       'Path::Class'  => 0.12, #chomp while you slurp
+                       'Test::Simple'             => 0,    #Test::More
+                       'Scalar::Util'             => 0,    #looks_like_number
+                       'Tie::IxHash'              => 0,    #ordered header
+                       'Path::Class'              => 0.12, #slurp
+                       'File::Temp'               => 0,    #write to tmp file  #optional
+                       'Archive::Zip'             => 0,    #read_fromZipMember #optional
+                       'Archive::Zip::MemberRead' => 0,    #read_fromZipMember #optional
                       },
     ABSTRACT_FROM  => 'lib/RF/Antenna/Planet/MSI/Format.pm',
     AUTHOR         => 'Michael R. Davis',

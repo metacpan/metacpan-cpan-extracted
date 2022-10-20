@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build);
 use Wikibase::Datatype::Utils qw(check_property);
 
-our $VERSION = 0.21;
+our $VERSION = 0.22;
 
 extends 'Wikibase::Datatype::Value';
 
@@ -153,6 +153,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.21
+0.22
 
 =cut

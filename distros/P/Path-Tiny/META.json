@@ -74,6 +74,7 @@
             "Encode" : "0",
             "Exporter" : "5.57",
             "Fcntl" : "0",
+            "File::Compare" : "0",
             "File::Copy" : "0",
             "File::Glob" : "0",
             "File::Path" : "2.07",
@@ -112,11 +113,11 @@
    "provides" : {
       "Path::Tiny" : {
          "file" : "lib/Path/Tiny.pm",
-         "version" : "0.124"
+         "version" : "0.130"
       },
       "Path::Tiny::Error" : {
          "file" : "lib/Path/Tiny.pm",
-         "version" : "0.124"
+         "version" : "0.130"
       }
    },
    "release_status" : "stable",
@@ -131,7 +132,7 @@
          "web" : "https://github.com/dagolden/Path-Tiny"
       }
    },
-   "version" : "0.124",
+   "version" : "0.130",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Alex Efros <powerman@powerman.name>",
@@ -141,6 +142,7 @@
       "Dave Rolsky <autarch@urth.org>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",
       "Doug Bell <madcityzen@gmail.com>",
+      "Elvin Aslanov <rwp.primary@gmail.com>",
       "Flavio Poletti <flavio@polettix.it>",
       "Gabor Szabo <szabgab@cpan.org>",
       "Gabriel Andrade <gabiruh@gmail.com>",

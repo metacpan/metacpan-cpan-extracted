@@ -22,17 +22,25 @@ This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
 
 =head1 Class Methods
 
+=head2 new
+
   static method new : Sys::Select::Fd_set ();
 
 Create a new C<Sys::Select::Fd_set> object.
 
 =head1 Instance Methods
 
-=head2 
+=head2 DESTROY
 
   method DESTROY : void ();
 
 The destructor.
+
+=head2 set
+
+  method set : void ($set : Sys::Select::Fd_set);
+
+Sets the value of this object by copying the C<$set>.
 
 =head1 Copyright & License
 

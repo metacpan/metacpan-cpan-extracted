@@ -32,7 +32,14 @@ METHODS
 
     *       "data"
 
-            Data structure as input argument of Tags::HTML::process().
+            Array data structure as input argument of Tags::HTML::process().
+
+            Default value is undef.
+
+    *       "data_css"
+
+            Reference to array with structure for input argument of
+            "Tags::HTML::process_css()".
 
             Default value is undef.
 
@@ -59,11 +66,11 @@ EXAMPLE1
      # Run application.
      my $app = Plack::App::Tags::HTML->new(
              'component' => 'Tags::HTML::Stars',
-             'data' => {
+             'data' => [{
                      1 => 'full',
                      2 => 'half',
                      3 => 'nothing',
-             },
+             }],
      )->to_app;
      Plack::Runner->new->run($app);
 
@@ -115,9 +122,9 @@ EXAMPLE2
      # Run application.
      my $app = Plack::App::Tags::HTML->new(
              'component' => 'App',
-             'data' => {
+             'data' => [{
                      'foo' => [1, 2],
-             },
+             }],
      )->to_app;
      Plack::Runner->new->run($app);
 
@@ -151,5 +158,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

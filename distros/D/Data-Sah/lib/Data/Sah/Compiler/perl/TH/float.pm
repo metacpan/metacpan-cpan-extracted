@@ -12,9 +12,9 @@ extends 'Data::Sah::Compiler::perl::TH::num';
 with 'Data::Sah::Type::float';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.913'; # VERSION
+our $VERSION = '0.914'; # VERSION
 
 sub handle_type {
     my ($self, $cd) = @_;
@@ -197,7 +197,7 @@ Data::Sah::Compiler::perl::TH::float - perl's type handler for type "float"
 
 =head1 VERSION
 
-This document describes version 0.913 of Data::Sah::Compiler::perl::TH::float (from Perl distribution Data-Sah), released on 2022-09-30.
+This document describes version 0.914 of Data::Sah::Compiler::perl::TH::float (from Perl distribution Data-Sah), released on 2022-10-19.
 
 =for Pod::Coverage ^(compiler|clause_.+|handle_.+)$
 

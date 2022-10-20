@@ -163,7 +163,7 @@ sub paint {
                                                           : $dtz * $self->{'data'}{'z'}{'freq_damp'}/ 20_000 / $step_in_circle;
     my $frdamp  = (not $self->{'data'}{'r'}{'freq_damp'}) ? 0 : 
           ($self->{'data'}{'r'}{'freq_damp_type'} eq '*') ? 1 - ($self->{'data'}{'r'}{'freq_damp'}  / 20_000 / $step_in_circle) 
-                                                          : $dtr * $self->{'data'}{'r'}{'freq_damp'}/ 40_000 / $step_in_circle;
+                                                          : $dtr * $self->{'data'}{'r'}{'freq_damp'}/ 20_000 / $step_in_circle;
 
     my $tx = my $ty = my $tz = my $tr = 0;
     $tx += $TAU * $self->{'data'}{'x'}{'offset'} if $self->{'data'}{'x'}{'offset'};
@@ -253,8 +253,8 @@ sub paint {
     $code .= '$dtx -= $fxdamp if $dtx > 0;' if $fxdamp and $self->{'data'}{'x'}{'freq_damp_type'} eq '-';
     $code .= '$dty -= $fydamp if $dty > 0;' if $fydamp and $self->{'data'}{'y'}{'freq_damp_type'} eq '-';
     $code .= '$dtz -= $fzdamp if $dtz > 0;' if $fzdamp and $self->{'data'}{'z'}{'freq_damp_type'} eq '-';
-    $code .= '$dtr += $frdamp if $dtr < 0;' if $frdamp and $self->{'data'}{'r'}{'freq_damp_type'} eq '-';
-
+    $code .= '$dtr -= $frdamp if $dtr < 0;' if $frdamp and $self->{'data'}{'r'}{'freq_damp_type'} eq '-';
+    
     $code .= '$dc->SetPen( Wx::Pen->new( Wx::Colour->new( @{$color[++$color_index]} ),'.
              ' $thickness, &Wx::wxPENSTYLE_SOLID)) unless $_ % $color_change_time;' if $cflow->{'type'} ne 'no' and @color;
     $code .= '$progress->add_percentage( $_ / $t_iter * 100, $color[$color_index] ) unless $_ % $step_in_circle;' unless defined $self->{'data'}{'sketch'};

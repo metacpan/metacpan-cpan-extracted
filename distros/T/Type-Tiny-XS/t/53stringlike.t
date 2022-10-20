@@ -27,4 +27,8 @@ ok Type::Tiny::XS::StringLike($obj), '$obj';
 ok !Type::Tiny::XS::StringLike($obj2), 'NOT $obj2';
 ok !Type::Tiny::XS::StringLike({}), 'NOT {}';
 
+my $arrayof = Type::Tiny::XS::get_coderef_for('ArrayRef[StringLike]');
+ok $arrayof->( [ "", "123", $obj ] ), '$arrayof : 1';
+ok !$arrayof->( [ "", "123", $obj, $obj2 ]), '$arrayof : 2';
+
 done_testing;

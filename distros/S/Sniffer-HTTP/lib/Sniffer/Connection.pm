@@ -31,7 +31,7 @@ for sniffing some out-of-order TCP connection.
 
 =cut
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 my @callbacks = qw(sent_data received_data closed teardown log);
 __PACKAGE__->mk_accessors(qw(

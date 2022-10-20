@@ -25,11 +25,13 @@ t/exports.t
 t/fakelib/PerlIO/utf8_strict.pm
 t/fakelib/Unicode/UTF8.pm
 t/filesystem.t
+t/has_same_bytes.t
 t/input_output.t
 t/input_output_no_PU_UU.t
 t/input_output_no_UU.t
 t/lib/TestUtils.pm
 t/locking.t
+t/mkdir.t
 t/mkpath.t
 t/mutable_tree_while_iterating.t
 t/normalize.t

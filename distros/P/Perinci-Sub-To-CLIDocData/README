@@ -3,9 +3,9 @@ NAME
     structure convenient for producing CLI documentation (help/usage/POD)
 
 VERSION
-    This document describes version 0.303 of Perinci::Sub::To::CLIDocData
+    This document describes version 0.304 of Perinci::Sub::To::CLIDocData
     (from Perl distribution Perinci-Sub-To-CLIDocData), released on
-    2022-10-12.
+    2022-10-19.
 
 SYNOPSIS
      use Perinci::Sub::To::CLIDocData qw(gen_cli_doc_data_from_meta);
@@ -195,9 +195,19 @@ FUNCTIONS
 
     *   lang => *str*
 
+        (No description)
+
+    *   mark_different_lang => *bool* (default: 1)
+
+        (No description)
+
     *   meta* => *hash*
 
+        (No description)
+
     *   meta_is_normalized => *bool*
+
+        (No description)
 
     *   per_arg_json => *bool*
 

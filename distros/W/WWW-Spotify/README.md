@@ -4,7 +4,7 @@ WWW::Spotify - Spotify Web API Wrapper
 
 # VERSION
 
-version 0.011
+version 0.012
 
 # SYNOPSIS
 
@@ -67,10 +67,10 @@ version 0.011
 
     # $link is an arrayfef of the all the playlist urls
 
-    foreach my $for_tracks (@{$link}) {
+    foreach my $playlist (@{$link}) {
         # make sure the links look valid
-        next if $for_tracks !~ /spotify\/play/;
-        $spotify->query_full_url($for_tracks,1);
+        next if $playlist !~ /playlists/;
+        $spotify->query_full_url($playlist,1);
         my $pl_name = $spotify->get('name');
         my $tracks  = $spotify->get('tracks.items[*].track.id');
         foreach my $track (@{$tracks}) {
@@ -112,12 +112,6 @@ debugging information, you can do something like this:
 When true results will be returned as JSON instead of a perl data structure
 
     $spotify->auto_json_decode(1);
-
-## auto\_xml\_decode
-
-When true results will be returned as JSON instead of a perl data structure
-
-    $spotify->auto_xml_decode(1);
 
 ## get
 
@@ -280,11 +274,70 @@ needed for requests that require OAuth, see Spotify API documentation for more i
 
 Can also be set via environment variable, SPOTIFY\_CLIENT\_SECRET
 
+## response\_status
+
+returns the response code for the last request made
+
+    my $status = $spotify->response_status();
+
+## response\_content\_type
+
+returns the response type for the last request made, helpful to verify JSON
+
+    my $content_type = $spotify->response_content_type();
+
+## custom\_request\_handler
+
+pass a callback subroutine to this method that will be run at the end of the
+request prior to die\_on\_response\_error, if enabled
+
+    # $m is the WWW::Mechanize object
+    $spotify->custom_request_handler(
+        sub { my $m = shift;
+            if ($m->status() == 401) {
+                return 1;
+            }
+        }
+    );
+
+## custom\_request\_handler\_result
+
+returns the result of the most recent execution of the custom\_request\_handler callback
+this allows you to determine the success/failure criteria of your callback
+
+    my $callback_result = $spotify->custom_request_handler_result();
+
+## die\_on\_response\_error
+
+Boolean - default 0
+
+added to provide minimal automated checking of responses
+
+    $spotify->die_on_response_error(1);
+
+eval {
+    # run assuming you do NOT have proper authentication setup
+    $result = $spotify->album('0sNOF9WDwhWunNAHPD3Baj');
+};
+
+if ($@) {
+    warn $spotify->last\_error();
+}
+
+## last\_error
+
+returns last\_error (if applicable) from the most recent request.
+reset to empty string on each request
+
+    print $spotify->last_error() , "\n";
+
 # THANKS
 
 Paul Lamere at The Echo Nest / Spotify
 
 All the great Perl community members that keep Perl fun
+
+Olaf Alders for all his help and support in maintaining this module
 
 # AUTHOR
 

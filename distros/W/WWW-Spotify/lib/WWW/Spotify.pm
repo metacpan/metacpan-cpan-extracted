@@ -2,14 +2,15 @@ package WWW::Spotify;
 
 use Moo 2.002004;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use Data::Dumper      qw( Dumper );
 use IO::CaptureOutput qw( capture );
 use JSON::Path        ();
 use JSON::MaybeXS     qw( decode_json );
 use MIME::Base64      qw( encode_base64 );
-use Types::Standard   qw( Bool InstanceOf Int Str );
+use Types::Standard   qw( Bool InstanceOf Int Str CodeRef );
+use HTTP::Status      qw( HTTP_OK );
 
 has 'oauth_authorize_url' => (
     is      => 'rw',
@@ -95,60 +96,54 @@ has 'force_client_auth' => (
     default => 0
 );
 
-has uri_hostname => (
+has 'uri_hostname' => (
     is      => 'rw',
     isa     => Str,
     default => 'api.spotify.com'
 );
 
-has uri_domain_path => (
+has 'uri_domain_path' => (
     is      => 'rw',
     isa     => Str,
     default => 'api'
 );
 
-has call_type => (
+has 'call_type' => (
     is  => 'rw',
     isa => Str
 );
 
-has auto_json_decode => (
+has 'auto_json_decode' => (
     is      => 'rw',
     isa     => Int,
     default => 0
 );
 
-has auto_xml_decode => (
-    is      => 'rw',
-    isa     => Int,
-    default => 0
-);
-
-has last_result => (
+has 'last_result' => (
     is      => 'rw',
     isa     => Str,
     default => q{}
 );
 
-has last_error => (
+has 'last_error' => (
     is      => 'rw',
     isa     => Str,
     default => q{}
 );
 
-has response_headers => (
+has 'response_headers' => (
     is      => 'rw',
     isa     => Str,
     default => q{}
 );
 
-has problem => (
+has 'problem' => (
     is      => 'rw',
     isa     => Str,
     default => q{}
 );
 
-has ua => (
+has 'ua' => (
     is      => 'ro',
     isa     => InstanceOf ['LWP::UserAgent'],
     handles => { _mech => 'clone' },
@@ -157,6 +152,33 @@ has ua => (
         require WWW::Mechanize;
         WWW::Mechanize->new( autocheck => 0 );
     },
+);
+
+has 'response_status' => (
+    is  => 'rw',
+    isa => Int
+);
+
+has 'response_content_type' => (
+    is  => 'rw',
+    isa => Str
+);
+
+has 'custom_request_handler' => (
+    is        => 'rw',
+    isa       => CodeRef,
+    predicate => '_has_custom_request_handler',
+);
+
+has 'custom_request_handler_result' => (
+    is     => 'ro',
+    writer => '_set_custom_request_handler_result'
+);
+
+has 'die_on_response_error' => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0
 );
 
 my %api_call_options = (
@@ -312,6 +334,9 @@ sub send_get_request {
 
     my $uri_params = q{};
 
+    # reset last error
+    $self->last_error(q{});
+
     if ( defined $attributes->{extras}
         and ref $attributes->{extras} eq 'HASH' ) {
         my @tmp = ();
@@ -323,7 +348,7 @@ sub send_get_request {
     }
 
     if ( exists $attributes->{format}
-        && $attributes->{format} =~ /json|xml|xspf|jsonp/ ) {
+        && $attributes->{format} =~ /json|jsonp/ ) {
         $self->result_format( $attributes->{format} );
         delete $attributes->{format};
     }
@@ -410,7 +435,38 @@ sub send_get_request {
     if ( $self->grab_response_header() == 1 ) {
         $self->_set_response_headers($mech);
     }
-    return $self->format_results( $mech->content );
+
+    $self->response_status( $mech->status() );
+    $self->response_content_type( $mech->content_type() );
+
+    if ( $self->_has_custom_request_handler() ) {
+        $self->_set_custom_request_handler_result(
+            $self->custom_request_handler()->($mech) );
+    }
+
+    # the original code did not provide adequate built in validation
+    # of the response for an API call.
+    # Adding a new method (die_on_response_error) with a default of 0 to avoid
+    # breaking/changing
+    # existing code using older versions of this module.
+    # verify the status and content_type of the response
+    if (   $self->response_content_type() =~ /application\/json/i
+        && $self->response_status() != HTTP_OK ) {
+        warn "content type is ", $self->response_content_type(), "\n"
+            if $self->debug();
+        $self->last_error( "request failed, status("
+                . $self->response_status()
+                . ") examine last_result for details" );
+    }
+
+    if ( $self->die_on_response_error() == 1 && $self->last_error ne '' ) {
+        die $self->last_error();
+    }
+
+    return $self->format_results(
+        $mech->content, $mech->ct(),
+        $mech->status()
+    );
 
 }
 
@@ -444,16 +500,8 @@ sub format_results {
         return decode_json $content;
     }
 
-    if ( $self->auto_xml_decode && $self->result_format eq 'xml' ) {
-
-        # FIX ME
-        require XML::Simple;
-        my $xs = XML::Simple->new();
-        return $xs->XMLin($content);
-    }
-
-    # results are not altered in this cass and would be either
-    # json or xml instead of a perl data structure
+    # results are not altered in this case and would be
+    # json instead of a perl data structure
 
     return $content;
 }
@@ -976,7 +1024,7 @@ WWW::Spotify - Spotify Web API Wrapper
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -1039,10 +1087,10 @@ version 0.011
 
     # $link is an arrayfef of the all the playlist urls
 
-    foreach my $for_tracks (@{$link}) {
+    foreach my $playlist (@{$link}) {
         # make sure the links look valid
-        next if $for_tracks !~ /spotify\/play/;
-        $spotify->query_full_url($for_tracks,1);
+        next if $playlist !~ /playlists/;
+        $spotify->query_full_url($playlist,1);
         my $pl_name = $spotify->get('name');
         my $tracks  = $spotify->get('tracks.items[*].track.id');
         foreach my $track (@{$tracks}) {
@@ -1084,12 +1132,6 @@ debugging information, you can do something like this:
 When true results will be returned as JSON instead of a perl data structure
 
     $spotify->auto_json_decode(1);
-
-=head2 auto_xml_decode
-
-When true results will be returned as JSON instead of a perl data structure
-
-    $spotify->auto_xml_decode(1);
 
 =head2 get
 
@@ -1252,11 +1294,70 @@ needed for requests that require OAuth, see Spotify API documentation for more i
 
 Can also be set via environment variable, SPOTIFY_CLIENT_SECRET
 
+=head2 response_status
+
+returns the response code for the last request made
+
+    my $status = $spotify->response_status();
+
+=head2 response_content_type
+
+returns the response type for the last request made, helpful to verify JSON
+
+    my $content_type = $spotify->response_content_type();
+
+=head2 custom_request_handler
+
+pass a callback subroutine to this method that will be run at the end of the
+request prior to die_on_response_error, if enabled
+
+    # $m is the WWW::Mechanize object
+    $spotify->custom_request_handler(
+        sub { my $m = shift;
+            if ($m->status() == 401) {
+                return 1;
+            }
+        }
+    );
+
+=head2 custom_request_handler_result
+
+returns the result of the most recent execution of the custom_request_handler callback
+this allows you to determine the success/failure criteria of your callback
+
+    my $callback_result = $spotify->custom_request_handler_result();
+
+=head2 die_on_response_error
+
+Boolean - default 0
+
+added to provide minimal automated checking of responses
+
+    $spotify->die_on_response_error(1);
+
+eval {
+    # run assuming you do NOT have proper authentication setup
+    $result = $spotify->album('0sNOF9WDwhWunNAHPD3Baj');
+};
+
+if ($@) {
+    warn $spotify->last_error();
+}
+
+=head2 last_error
+
+returns last_error (if applicable) from the most recent request.
+reset to empty string on each request
+
+    print $spotify->last_error() , "\n";
+
 =head1 THANKS
 
 Paul Lamere at The Echo Nest / Spotify
 
 All the great Perl community members that keep Perl fun
+
+Olaf Alders for all his help and support in maintaining this module
 
 =head1 AUTHOR
 

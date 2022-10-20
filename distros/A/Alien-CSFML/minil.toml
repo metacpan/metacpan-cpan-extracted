@@ -1,0 +1,11 @@
+name = "Alien-CSFML"
+badges = ["github-actions/linux.yaml", "github-actions/windows.yaml", "github-actions/osx.yaml", "github-actions/freebsd.yaml", "metacpan"]
+module_maker="ModuleBuildTiny"
+license="artistic_2"
+authority="cpan:SANKO"
+requires_external_bin=["sh');\nuse lib 'inc';\nuse MBCSFML;\n('1"]
+
+[release]
+hook=[
+    'tidyall -a'
+]

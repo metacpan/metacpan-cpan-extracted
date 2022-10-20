@@ -1,27 +1,15 @@
-BEGIN {
-    use strict;
-    use warnings;
 
-    use Test::More;  
-    eval "use MooseX::Types::Structured qw(Tuple Dict slurpy)"; if($@) {
-        plan skip_all => "MooseX::Types:Structured Required for advanced Tests";
-    } else {
-        eval "use Set::Scalar"; if($@) {
-            plan skip_all => "Set::Scalar Required for advanced Tests";
-        } else {
-            plan tests => 37;
-        }
-    }
-} 
-
+use Test::Most;  
 use MooseX::Types::Parameterizable qw(Parameterizable);
 use MooseX::Types::Moose qw(Int Str);
 use Moose::Util::TypeConstraints;
-
 use MooseX::Types -declare=>[qw(
     Set UniqueInt UniqueInSet Range RangedInt PositiveRangedInt1
     PositiveRangedInt2 PositiveInt PositiveRange NameAge NameBetween18and35Age
 )];
+use MooseX::Types::Structured qw(Dict Tuple slurpy);
+
+use Test::Requires qw/MooseX::Types::Structured Set::Scalar/;
 
 ok class_type("Set::Scalar"), 'Created Set::Scalar class_type';
 ok subtype( Set, as "Set::Scalar"), 'Created Set subtype';
@@ -169,3 +157,4 @@ ok NameBetween18and35Age->check(['John',28]), 'Good NameBetween18and35Age';
 ok !NameBetween18and35Age->check(['John','Napiorkowski']), 'Bad NameBetween18and35Age';
 ok !NameBetween18and35Age->check(['John',99]), 'Bad NameBetween18and35Age';
 
+done_testing;

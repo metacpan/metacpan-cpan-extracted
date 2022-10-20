@@ -2,13 +2,12 @@ NAME
     Sah::Schemas::Int - Sah schemas for various integers
 
 VERSION
-    This document describes version 0.076 of Sah::Schemas::Int (from Perl
-    distribution Sah-Schemas-Int), released on 2021-07-16.
-
-CONTRIBUTOR
-    Steven Haryanto <sharyanto@cpan.org>
+    This document describes version 0.077 of Sah::Schemas::Int (from Perl
+    distribution Sah-Schemas-Int), released on 2022-10-19.
 
 SAH SCHEMAS
+    The following schemas are included in this distribution:
+
     *   byte
 
         Same as uint8.
@@ -60,11 +59,11 @@ SAH SCHEMAS
 
     *   nonnegint
 
-        Non-negative integer (0, 1, 2, ...) [DEPRECATED].
+        Non-negative integer (0, 1, 2, ...), same as uint.
 
-        This schema is DEPRECATED. Please use the new name "uint".
+    *   nonposint
 
-        See also "posint" for integers that start from 1.
+        Non-positive integer (0, -1, -2, ...).
 
     *   odd
 
@@ -119,29 +118,48 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Sah-Schemas-Int>.
 
+SEE ALSO
+    Sah::Schemas::IntRange
+
+    Sah::PSchemas::IntRange
+
+    Sah - schema specification
+
+    Data::Sah - Perl implementation of Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2014
+    by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Int>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-    Sah::Schemas::IntRange
-
-    Sah::PSchemas::IntRange
-
-    Sah - specification
-
-    Data::Sah
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2014 by
-    perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

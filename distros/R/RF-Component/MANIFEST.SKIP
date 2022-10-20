@@ -1,0 +1,7 @@
+^.*\.sh$
+^\.gitignore
+^\.github
+^\.git
+^ignore\.txt
+^MANIFEST\.SKIP
+^ignoredeps

@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.501 of Perinci::CmdLine::Gen (from
-    Perl distribution Perinci-CmdLine-Gen), released on 2022-01-16.
+    This document describes version 0.502 of Perinci::CmdLine::Gen (from
+    Perl distribution Perinci-CmdLine-Gen), released on 2022-10-19.
 
 FUNCTIONS
   gen_pericmd_script
@@ -39,7 +39,11 @@ FUNCTIONS
 
     *   code_after_end => *str*
 
+        (No description)
+
     *   code_before_instantiate_cmdline => *str*
+
+        (No description)
 
     *   config_dirs => *array[str]*
 
@@ -51,17 +55,31 @@ FUNCTIONS
 
     *   copt_help_enable => *bool* (default: 1)
 
+        (No description)
+
     *   copt_help_getopt => *str*
+
+        (No description)
 
     *   copt_naked_res_default => *bool*
 
+        (No description)
+
     *   copt_naked_res_enable => *bool* (default: 1)
+
+        (No description)
 
     *   copt_naked_res_getopt => *str*
 
+        (No description)
+
     *   copt_version_enable => *bool* (default: 1)
 
+        (No description)
+
     *   copt_version_getopt => *str*
+
+        (No description)
 
     *   default_dry_run => *bool*
 
@@ -73,6 +91,8 @@ FUNCTIONS
         Set default format.
 
     *   default_log_level => *str*
+
+        (No description)
 
     *   default_subcommand => *str*
 
@@ -155,7 +175,11 @@ FUNCTIONS
 
     *   script_name => *str*
 
+        (No description)
+
     *   script_summary => *str*
+
+        (No description)
 
     *   script_version => *str*
 
@@ -266,7 +290,11 @@ FUNCTIONS
 
     *   code_after_end => *str*
 
+        (No description)
+
     *   code_before_instantiate_cmdline => *str*
+
+        (No description)
 
     *   config_dirs => *array[str]*
 
@@ -278,17 +306,31 @@ FUNCTIONS
 
     *   copt_help_enable => *bool* (default: 1)
 
+        (No description)
+
     *   copt_help_getopt => *str*
+
+        (No description)
 
     *   copt_naked_res_default => *bool*
 
+        (No description)
+
     *   copt_naked_res_enable => *bool* (default: 1)
+
+        (No description)
 
     *   copt_naked_res_getopt => *str*
 
+        (No description)
+
     *   copt_version_enable => *bool* (default: 1)
 
+        (No description)
+
     *   copt_version_getopt => *str*
+
+        (No description)
 
     *   default_dry_run => *bool*
 
@@ -300,6 +342,8 @@ FUNCTIONS
         Set default format.
 
     *   default_log_level => *str*
+
+        (No description)
 
     *   default_subcommand => *str*
 
@@ -382,7 +426,11 @@ FUNCTIONS
 
     *   script_name => *str*
 
+        (No description)
+
     *   script_summary => *str*
+
+        (No description)
 
     *   script_version => *str*
 
@@ -482,10 +530,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016,

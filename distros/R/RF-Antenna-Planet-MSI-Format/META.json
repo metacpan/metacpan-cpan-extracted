@@ -32,8 +32,12 @@
       },
       "runtime" : {
          "requires" : {
+            "Archive::Zip" : "0",
+            "Archive::Zip::MemberRead" : "0",
+            "File::Temp" : "0",
             "Path::Class" : "0.12",
             "Scalar::Util" : "0",
+            "Test::Simple" : "0",
             "Tie::IxHash" : "0"
          }
       }
@@ -49,5 +53,5 @@
          "web" : "https://github.com/mrdvt92/perl-RF-Antenna-Planet-MSI-Format.git"
       }
    },
-   "version" : "0.02"
+   "version" : "0.05"
 }

@@ -1,0 +1,26 @@
+class TestUtil::Scope::Guard {
+  
+  use TestUtil::Scope::Guard::Handler;
+  
+  has handler : ro TestUtil::Scope::Guard::Handler;
+  has dismiss : rw byte;
+  
+  static method new : TestUtil::Scope::Guard ($handler : TestUtil::Scope::Guard::Handler) {
+    
+    my $self = new TestUtil::Scope::Guard;
+    
+    unless ($handler) {
+      die "The \$handler must be defined";
+    }
+    
+    $self->{handler} = $handler;
+    
+    return $self;
+  }
+  
+  method DESTROY : void () {
+    unless ($self->{dismiss}) {
+      $self->{handler}->();
+    }
+  }
+}

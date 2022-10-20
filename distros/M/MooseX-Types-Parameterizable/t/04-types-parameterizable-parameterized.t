@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test::Most;
 use MooseX::Types::Parameterizable qw(Parameterizable);
 use MooseX::Types::Moose qw( Int ArrayRef );
 use MooseX::Types -declare=>[qw( EvenInt ArrayOfEvenIntsWithLength )];

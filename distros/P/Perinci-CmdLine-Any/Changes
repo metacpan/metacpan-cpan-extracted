@@ -1,3 +1,13 @@
+0.154   2022-10-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Update test to handle multiple instances of plugin-based
+          Perinci::CmdLine which caches old cmdline objects.
+
+        - [ux] Warn when failing to load a cmdline backend.
+
+        - Bump prereq Perinci::CmdLine::Lite=1.924.
+
+
 0.153   2021-12-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump prereq version Perinci::CmdLine::Lite -> 1.912.

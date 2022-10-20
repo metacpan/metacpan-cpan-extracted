@@ -1,3 +1,9 @@
+0.022   2022-10-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump perl minimum version to 5.034 because we use new octal
+          notation 0o123 (RT#144763).
+
+
 0.021   2022-10-12  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Fix pos for argument 'dbs'.

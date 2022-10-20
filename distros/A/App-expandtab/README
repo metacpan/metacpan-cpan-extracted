@@ -1,11 +1,10 @@
 
 This module provides a Unix-like command `expandtab'.
 
-=head1 DESCRIPTION
+TSV形式(タブ区切り)のテキストデータに対して、各列が同じ位置に揃うように出力する。
 
-
-Text::VisualWidth を利用して、全角文字が混ざっていても、さらにはASCIIカラーコード付きの文字が混ざっていても、TSV形式(タブ区切り)のテキストデータに対して、各列が同じ位置に揃うように出力する。
-
+全角文字が混ざっていても、さらにはASCIIカラーコード付きの文字が混ざっていても、
+各列が揃って見えるようにする。ただし、Text::VisualWidth のモジュールを利用している。
 
  Copyright (c) 2021 Toshiyuki SHIMONO. All rights reserved.
  This program is free software; you can redistribute it and/or

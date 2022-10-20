@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.034000;
 
 use ExtUtils::MakeMaker;
 
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "script/mysql-sql-dump-extract-tables"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.034000",
   "NAME" => "App::MysqlUtils",
   "PREREQ_PM" => {
     "App::CSVUtils" => "0.032",
@@ -47,8 +47,8 @@ my %WriteMakefileArgs = (
     "IPC::System::Options" => "0.339",
     "List::MoreUtils" => 0,
     "Log::ger" => "0.038",
-    "Perinci::CmdLine::Any" => "0.152",
-    "Perinci::CmdLine::Lite" => "1.915",
+    "Perinci::CmdLine::Any" => "0.154",
+    "Perinci::CmdLine::Lite" => "1.924",
     "Perinci::Object" => "0.311",
     "Perinci::Sub::DepChecker" => 0,
     "Sah::Schema::dirname" => 0,
@@ -66,7 +66,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.021",
+  "VERSION" => "0.022",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -95,8 +95,8 @@ my %FallbackPrereqs = (
   "IPC::System::Options" => "0.339",
   "List::MoreUtils" => 0,
   "Log::ger" => "0.038",
-  "Perinci::CmdLine::Any" => "0.152",
-  "Perinci::CmdLine::Lite" => "1.915",
+  "Perinci::CmdLine::Any" => "0.154",
+  "Perinci::CmdLine::Lite" => "1.924",
   "Perinci::Object" => "0.311",
   "Perinci::Sub::DepChecker" => 0,
   "Sah::Schema::dirname" => 0,

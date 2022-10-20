@@ -222,6 +222,7 @@ lib/PDK/Firewall/Element/Zone/Role.pm
 lib/PDK/Firewall/Element/Zone/Srx.pm
 lib/PDK/Firewall/Element/Zone/Topsec.pm
 lib/PDK/Firewall/Element/Zone/tests/Srx.t
+lib/PDK/Utils/BlockIpaddr.pm
 lib/PDK/Utils/Cache.pm
 lib/PDK/Utils/Date.pm
 lib/PDK/Utils/Ip.pm

@@ -5,7 +5,7 @@ package PDK::Config::Context::Role;
 #------------------------------------------------------------------------------
 use Moose::Role;
 use namespace::autoclean;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 #------------------------------------------------------------------------------
 # 定义 PDK::Config::Context::Role 通用属性

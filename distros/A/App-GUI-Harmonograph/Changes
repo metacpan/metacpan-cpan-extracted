@@ -1,7 +1,14 @@
-0.55  2022-10-15  lichtkind
+0.56  2022-10-18  lichtkind
+-------
+    * = maintenance
+    * ~ corrected R frequency damping factor
+    * / corrected changes file
+    * ? rewrote pen line section in documentation
+
+0.55  2022-10-17  lichtkind
 -------
     * = feature enhancement and refinement
-    * * draw lines (connect dots) (good vor vector graphics)
+    * * draw lines (connect dots) (good for vector graphics)
     * + radius damping acceleration
     * + independent frequency damping
     * + added Gamma(1/2) to frequency factor constants
@@ -9,6 +16,7 @@
     * / ranemed all damping related setting keys
     * " separate linear and circular pendula in two tabs
     * " cleaner GUI
+    * ? rewrote pendulum section in documentation
     * ! fixed tests srezic++
     * ! bug in rotation matrix
 

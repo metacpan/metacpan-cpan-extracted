@@ -17,22 +17,21 @@ my $meta = {
   "name"           => "Type-Tiny-XS",
   "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
   "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => {
-                          requires => { perl => 5.010001 },
-                          suggests => { "Type::Parser" => 0 },
-                        },
-                        test => { requires => { "Test::More" => 0.92 } },
+                        build     => { requires => { "ExtUtils::ParseXS" => 3.16 } },
+                        configure => { requires => { "ExtUtils::MakeMaker" => 6.58 } },
+                        runtime   => {
+                                       requires => { perl => 5.008005 },
+                                       suggests => { "Type::Parser" => 0 },
+                                     },
+                        test      => { requires => { "Test::More" => 0.92 } },
                       },
   "provides"       => {
-                        "Type::Tiny::XS"       => { file => "lib/Type/Tiny/XS.pm", version => 0.022 },
-                        "Type::Tiny::XS::Util" => { file => "lib/Type/Tiny/XS/Util.pm", version => 0.022 },
+                        "Type::Tiny::XS"       => { file => "lib/Type/Tiny/XS.pm", version => 0.025 },
+                        "Type::Tiny::XS::Util" => { file => "lib/Type/Tiny/XS/Util.pm", version => 0.025 },
                       },
   "release_status" => "stable",
   "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny-XS",
-                                        },
+                        bugtracker   => { web => "https://github.com/tobyink/p5-type-tiny-xs/issues" },
                         homepage     => "https://metacpan.org/release/Type-Tiny-XS",
                         license      => ["http://dev.perl.org/licenses/"],
                         repository   => {
@@ -42,7 +41,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/project",
                       },
-  "version"        => 0.022,
+  "version"        => 0.025,
   "x_contributors" => [
                         "Graham Knop (HAARG) <haarg\@cpan.org>",
                         "Tomasz Konojacki (XENU) <xenu\@cpan.org>",
@@ -79,6 +78,10 @@ do {
 			my $fallback = File::Spec->catfile('fallback', $file);
 			copy($fallback, $file) or die "Can't copy $fallback to $file: $!";
 		}
+	}
+	
+	if ( $] < '5.010000' ) {
+		$meta->{prereqs}{runtime}{requires}{'MRO::Compat'} = 0;
 	}
 
 };
@@ -152,28 +155,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

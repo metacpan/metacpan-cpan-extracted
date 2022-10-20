@@ -2,45 +2,45 @@ NAME
     Path::Tiny - File path utility
 
 VERSION
-    version 0.124
+    version 0.130
 
 SYNOPSIS
       use Path::Tiny;
 
-      # creating Path::Tiny objects
+      # Creating Path::Tiny objects
 
-      $dir = path("/tmp");
-      $foo = path("foo.txt");
+      my $dir = path("/tmp");
+      my $foo = path("foo.txt");
 
-      $subdir = $dir->child("foo");
-      $bar = $subdir->child("bar.txt");
+      my $subdir = $dir->child("foo");
+      my $bar = $subdir->child("bar.txt");
 
-      # stringifies as cleaned up path
+      # Stringifies as cleaned up path
 
-      $file = path("./foo.txt");
+      my $file = path("./foo.txt");
       print $file; # "foo.txt"
 
-      # reading files
+      # Reading files
 
-      $guts = $file->slurp;
-      $guts = $file->slurp_utf8;
+      my $guts = $file->slurp;
+      my $guts = $file->slurp_utf8;
 
-      @lines = $file->lines;
-      @lines = $file->lines_utf8;
+      my @lines = $file->lines;
+      my @lines = $file->lines_utf8;
 
-      ($head) = $file->lines( {count => 1} );
-      ($tail) = $file->lines( {count => -1} );
+      my ($head) = $file->lines( {count => 1} );
+      my ($tail) = $file->lines( {count => -1} );
 
-      # writing files
+      # Writing files
 
-      $bar->spew( @data );
-      $bar->spew_utf8( @data );
+      my $bar->spew( @data );
+      my $bar->spew_utf8( @data );
 
-      # reading directories
+      # Reading directories
 
       for ( $dir->children ) { ... }
 
-      $iter = $dir->iterator;
+      my $iter = $dir->iterator;
       while ( my $next = $iter->() ) { ... }
 
 DESCRIPTION
@@ -478,6 +478,20 @@ METHODS
 
     Current API available since 0.066.
 
+  has_same_bytes
+        if ( path("foo.txt")->has_same_bytes("bar.txt") ) {
+           # ...
+        }
+
+    This method returns true if both the invocant and the argument can be
+    opened as file handles and the handles contain the same bytes. It
+    returns false if their contents differ. If either can't be opened as a
+    file (e.g. a directory or non-existent file), the method throws an
+    exception. If both can be opened and both have the same "realpath", the
+    method returns true without scanning any data.
+
+    Current API available since 0.125.
+
   is_absolute, is_relative
         if ( path("/tmp")->is_absolute ) { ... }
         if ( path("/tmp")->is_relative ) { ... }
@@ -575,19 +589,25 @@ METHODS
 
     Current API available since 0.065.
 
-  mkpath
-        path("foo/bar/baz")->mkpath;
-        path("foo/bar/baz")->mkpath( \%options );
+  mkdir
+        path("foo/bar/baz")->mkdir;
+        path("foo/bar/baz")->mkdir( \%options );
 
     Like calling "make_path" from File::Path. An optional hash reference is
     passed through to "make_path". Errors will be trapped and an exception
-    thrown. Returns the list of directories created or an empty list if the
-    directories already exist, just like "make_path".
+    thrown. Returns the the path object to facilitate chaining.
 
-    See also "touchpath" as a chainable alternative to create a writeable
-    file path (though without options).
+    NOTE: unlike Perl's builtin "mkdir", this will create intermediate paths
+    similar to the Unix "mkdir -p" command. It will not error if applied to
+    an existing directory.
 
-    Current API available since 0.001.
+    Current API available since 0.125.
+
+  mkpath (deprecated)
+    Like calling "mkdir", but returns the list of directories created or an
+    empty list if the directories already exist, just like "make_path".
+
+    Deprecated in 0.125.
 
   move
         path("foo.txt")->move("bar.txt");
@@ -891,9 +911,13 @@ METHODS
   touchpath
         path("bar/baz/foo.txt")->touchpath;
 
-    Combines "mkpath" and "touch". Creates the parent directory if it
-    doesn't exist, before touching the file. Returns the path object like
-    "touch" does.
+    Combines "mkdir" and "touch". Creates the parent directory if it doesn't
+    exist, before touching the file. Returns the path object like "touch"
+    does.
+
+    If you need to pass options, use "mkdir" and "touch" separately:
+
+        path("bar/baz")->mkdir( \%options )->child("foo.txt")->touch($epoch_secs);
 
     Current API available since 0.022.
 
@@ -1109,6 +1133,8 @@ CONTRIBUTORS
     *   David Steinbrunner <dsteinbrunner@pobox.com>
 
     *   Doug Bell <madcityzen@gmail.com>
+
+    *   Elvin Aslanov <rwp.primary@gmail.com>
 
     *   Flavio Poletti <flavio@polettix.it>
 

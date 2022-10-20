@@ -38,6 +38,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Data::Dumper' => '0',
+                                      'HTTP::Status' => '0',
                                       'IO::CaptureOutput' => '0',
                                       'JSON::MaybeXS' => '0',
                                       'JSON::Path' => '0',
@@ -46,7 +47,6 @@ do { my $x = {
                                       'Moo' => '2.002004',
                                       'Types::Standard' => '0',
                                       'WWW::Mechanize' => '0',
-                                      'XML::Simple' => '0',
                                       'perl' => '5.010'
                                     }
                     },

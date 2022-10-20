@@ -13,9 +13,9 @@ use Text::sprintfn;
 extends 'Data::Sah::Compiler';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.913'; # VERSION
+our $VERSION = '0.914'; # VERSION
 
 # every type extension is registered here
 our %typex; # key = type, val = [clause, ...]
@@ -540,7 +540,7 @@ Data::Sah::Compiler::human - Compile Sah schema to human language
 
 =head1 VERSION
 
-This document describes version 0.913 of Data::Sah::Compiler::human (from Perl distribution Data-Sah), released on 2022-09-30.
+This document describes version 0.914 of Data::Sah::Compiler::human (from Perl distribution Data-Sah), released on 2022-10-19.
 
 =head1 SYNOPSIS
 

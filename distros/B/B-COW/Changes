@@ -1,5 +1,9 @@
 Revision history for B-COW
 
+0.007     2022-10-20 08:59:44-06:00 America/Denver
+
+* Advertise XSLoader dependency
+
 0.006     2022-10-17 09:20:52-06:00 America/Denver
 
 * Disable prototypes to silence warning (haarg)

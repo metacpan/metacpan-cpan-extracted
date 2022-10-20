@@ -2,12 +2,20 @@ NAME
     schema-data - Script to manipulation with data for Schema.
 
 SYNOPSIS
-     schema-data [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_data_module var_key=var_value ..
+     schema-data [-h] [-l plugin:...] [-p password] [-u user] [-v schema_version] [--version] dsn schema_data_module var_key=var_value ..
 
 ARGUMENTS
     *       "-h"
 
             Print help.
+
+    *       "-l plugin:..."
+
+            List of plugins to load separated by ':' character.
+
+            Each plugin must be in Schema module namespace like
+            "__SCHEMA_MODULE_NS__::Plugin::__PLUGIN__". And must inherit
+            Schema::Data::Plugin.
 
     *       "-p password"
 
@@ -41,7 +49,7 @@ ARGUMENTS
 
 EXAMPLE
      schema-deploy dbi:SQLite:dbname=commons.vote.db Schema::Commons::Vote
-     schema-data dbi:SQLite:dbname=commons.vote.db Schema::Data::Commons::Vote
+     schema-data -l DefaultTheme dbi:SQLite:dbname=commons.vote.db Schema::Data::Commons::Vote 'creator_name=Michal Josef Špaček' creator_email=michal.josef.spacek@wikimedia.cz
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/App-Schema-Data>
@@ -57,5 +65,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

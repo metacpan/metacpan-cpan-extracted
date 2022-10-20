@@ -1,5 +1,11 @@
 Revision history for Perl module cPanel::APIClient
 
+0.09 - 19 Oct 2022
+- Add UAPI response documentation.
+- Add HTTP transport SYNOPSIS.
+- Trivial spelling fix.
+- Convert to cpanfile.
+
 0.08 - 26 Oct 2020
 - Fix tests that 0.07 broke.
 - Add the ability to call cPanel UAPI from WHM.

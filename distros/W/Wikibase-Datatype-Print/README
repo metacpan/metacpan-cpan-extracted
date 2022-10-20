@@ -1,0 +1,94 @@
+NAME
+    Wikibase::Datatype::Print - Wikibase datatype print helpers.
+
+DESCRIPTION
+    This distributions is set of print helpers for Wikibase::Datatype
+    objects.
+
+SEE ALSO
+    Wikibase::Datatype::Print::Form
+        TODO
+
+    Wikibase::Datatype::Print::Item
+        TODO
+
+    Wikibase::Datatype::Print::Lexeme
+        TODO
+
+    Wikibase::Datatype::Print::Mediainfo
+        TODO
+
+    Wikibase::Datatype::Print::MediainfoSnak
+        TODO
+
+    Wikibase::Datatype::Print::Property
+        TODO
+
+    Wikibase::Datatype::Print::Reference
+        TODO
+
+    Wikibase::Datatype::Print::Sense
+        TODO
+
+    Wikibase::Datatype::Print::Sitelink
+        TODO
+
+    Wikibase::Datatype::Print::Snak
+        TODO
+
+    Wikibase::Datatype::Print::Statement
+        TODO
+
+    Wikibase::Datatype::Print::Utils
+        TODO
+
+    Wikibase::Datatype::Print::Value
+        TODO
+
+    Wikibase::Datatype::Print::Value::Globecoordinate
+        TODO
+
+    Wikibase::Datatype::Print::Value::Item
+        TODO
+
+    Wikibase::Datatype::Print::Value::Monolingual
+        TODO
+
+    Wikibase::Datatype::Print::Value::Property
+        TODO
+
+    Wikibase::Datatype::Print::Value::Quantity
+        TODO
+
+    Wikibase::Datatype::Print::Value::String
+        TODO
+
+    Wikibase::Datatype::Print::Value::Time
+        TODO
+
+SEE ALSO
+    Wikibase::Datatype
+        Wikibase datatypes.
+
+    Wikibase::Datatype::JSON
+        Wikibase structure JSON serialization.
+
+    Wikibase::Datatype::Struct
+        Wikibase structure serialization.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Wikibase-Datatype-Print>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2020-2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

@@ -1,3 +1,12 @@
+0.077   2022-10-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: nonposint.
+
+        - Undeprecate nonnegint, make it as alias to uint.
+
+        - [doc] [ux] Link to related Type::Tiny type libraries & constraints.
+
+
 0.076   2021-07-16  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+devnotes.org
 dist.ini
 lib/Perinci/CmdLine/Base.pm
 lib/Perinci/CmdLine/Lite.pm

@@ -9,6 +9,27 @@ use warnings;
 
 cPanel::APIClient::Transport::HTTPSync - Synchronous HTTP transport
 
+=head1 SYNOPSIS
+
+    my $remote_cp = cPanel::APIClient->create(
+        service => 'cpanel',
+
+        transport => [
+            'HTTPSync',
+            hostname => 'somewhere.out.there',
+
+            # Not for production:
+            # tls_verification => 'off',
+        ],
+
+        credentials => {
+            username => 'johnny',
+            password => '$3kr1t',
+        },
+    );
+
+    my $resp = $remote_cp->call_uapi( 'Email', 'list_forwarders' );
+
 =head1 DESCRIPTION
 
 This transport mechanism implements access to cPanel & WHM’s APIs

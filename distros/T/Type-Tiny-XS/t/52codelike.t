@@ -28,4 +28,8 @@ ok !Type::Tiny::XS::CodeLike($obj2), 'NOT $obj2';
 ok !Type::Tiny::XS::CodeLike({}), 'NOT {}';
 ok !Type::Tiny::XS::CodeLike(1), 'NOT 1';
 
+my $arrayof = Type::Tiny::XS::get_coderef_for('ArrayRef[CodeLike]');
+ok $arrayof->( [ sub{}, sub(){}, $obj ] ), '$arrayof : 1';
+ok !$arrayof->( [ sub{}, sub(){}, $obj, $obj2 ]), '$arrayof : 2';
+
 done_testing;

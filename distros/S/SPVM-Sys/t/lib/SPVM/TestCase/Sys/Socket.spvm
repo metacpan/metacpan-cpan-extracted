@@ -16,6 +16,7 @@ class TestCase::Sys::Socket {
   use Sys::Socket::Error::InetInvalidNetworkAddress;
   
   use TestUtil::SocketAutoClose;
+  use TestUtil::Scope::Guard;
   
   static method htonl : int () {
     my $host_int = 20000;
@@ -493,8 +494,10 @@ class TestCase::Sys::Socket {
     }
     
     # Close socket at the end of this scope
-    my $socket_auto_close = TestUtil::SocketAutoClose->new($socket);
-    
+    my $socket_auto_close = TestUtil::Scope::Guard->new([$socket : int] method : void () {
+      Sys::Socket->close($socket);
+    });
+
     # IPv4 address
     my $address = Sys::Socket::Sockaddr::In->new;
     $address->set_sin_family((byte)SOCKET->AF_INET);

@@ -7,6 +7,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Test::More: '0'
+  XSLoader: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -19,13 +20,13 @@ name: B-COW
 provides:
   B::COW:
     file: lib/B/COW.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   perl: '5.008'
 resources:
   bugtracker: https://github.com/atoomic/B-COW/issues
   repository: https://github.com/atoomic/B-COW.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -272,7 +273,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.006
+          tag: v0.007
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

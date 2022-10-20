@@ -22,7 +22,7 @@ requires 'Class::Utils' => 0.03;
 requires 'Error::Pure' => 0.15;
 requires 'Exporter' => 0;
 requires 'Mo' => 0;
-requires 'Mo::utils' => 0.03;
+requires 'Mo::utils' => 0.14;
 requires 'List::MoreUtils' => 0;
 requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
@@ -36,7 +36,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.21';
+version '0.22';
 
 # Run.
 WriteAll();

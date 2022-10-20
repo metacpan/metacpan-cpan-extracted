@@ -2,10 +2,10 @@
 
 use strict;
 use warnings;
-use Capture::Tiny 'capture';
 use Test::More 0.98;
 use Test::Needs;
 
+use Capture::Tiny 'capture_merged';
 use Perinci::CmdLine::Any;
 
 our %SPEC;
@@ -16,11 +16,17 @@ $SPEC{get_cmdline_class} = {
 };
 sub get_cmdline_class {
     my %args = @_;
+    note $args{-cmdline};
     ref($args{-cmdline});
 }
 
+sub reset_plugins {
+    no warnings 'once';
+    %Perinci::CmdLine::Base::Handlers = ();
+}
+
 subtest "sanity" => sub {
-    my ($stdout, $stderr, $exit) = capture {
+    my ($stdout, $stderr, $exit) = capture_merged {
         Perinci::CmdLine::Any->new(
             url => '/main/get_cmdline_class',
             pass_cmdline_object => 1,
@@ -35,7 +41,8 @@ subtest "env" => sub {
         test_needs "Perinci::CmdLine::Classic";
         for my $val ("Perinci::CmdLine::Classic", "classic") {
             local $ENV{PERINCI_CMDLINE_ANY} = $val;
-            my ($stdout, $stderr, $exit) = capture {
+            my ($stdout, $stderr, $exit) = capture_merged {
+                reset_plugins();
                 Perinci::CmdLine::Any->new(
                     url => '/main/get_cmdline_class',
                     pass_cmdline_object => 1,

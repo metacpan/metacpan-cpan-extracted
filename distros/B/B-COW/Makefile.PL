@@ -21,9 +21,10 @@ my %WriteMakefileArgs = (
     "Devel::Peek" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "XSLoader" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,7 +35,8 @@ my %FallbackPrereqs = (
   "Devel::Peek" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "XSLoader" => 0
 );
 
 

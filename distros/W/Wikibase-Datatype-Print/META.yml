@@ -1,0 +1,54 @@
+---
+abstract: 'Wikibase data types print.'
+author:
+  - 'Michal Josef Spacek <skim@cpan.org>'
+build_requires:
+  English: 0
+  Error::Pure::Utils: 0
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+  Test::NoWarnings: 0
+  Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog: 0.16
+  Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun: 0.17
+  Test::Shared::Fixture::Wikibase::Datatype::Mediainfo::Commons::ImageOfHuman: 0.15
+  Test::Shared::Fixture::Wikibase::Datatype::MediainfoSnak::Commons::Depicts::Human: 0.15
+  Test::Shared::Fixture::Wikibase::Datatype::MediainfoStatement::Commons::Depicts::Human: 0.15
+  Test::Shared::Fixture::Wikibase::Datatype::Property::Wikidata::InstanceOf: 0.17
+  Unicode::UTF8: 0
+  Wikibase::Cache::Backend::Basic: 0
+  Wikibase::Datatype: 0.12
+  Wikibase::Datatype::Form: 0
+  Wikibase::Datatype::Snak: 0
+  Wikibase::Datatype::Statement: 0
+  Wikibase::Datatype::Value::Item: 0
+  Wikibase::Datatype::Value::Monolingual: 0
+  Wikibase::Datatype::Value::String: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Wikibase-Datatype-Print
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Utils: 0.03
+  DateTime::Format::ISO8601: 0
+  Error::Pure: 0.15
+  List::MoreUtils: 0
+  Unicode::UTF8: 0
+  Wikibase::Cache: 0
+  perl: 5.6.2
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/Wikibase-Datatype-Print/issues
+  homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype-Print
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/michal-josef-spacek/Wikibase-Datatype-Print
+version: '0.01'

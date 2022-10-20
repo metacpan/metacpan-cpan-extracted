@@ -1,5 +1,17 @@
 Revision history for Perl extension RF::Antenna::Planet::MSI::Format.
 
+0.05 2022-10-18
+  - Updated method frequency_mhz to support frequency ranges found in many MSI files
+  - Added methods frequency_mhz_lower, frequency_mhz_upper, frequency_ghz_lower, frequency_ghz_upper
+
+0.04 2022-10-12
+  - Header keys are no longer forced to be upper case as vendor extensions are lower/mixed case - NOT 100% backward compatable
+  - NAME is assumed to be first line even when NAME key token is surpressed - NOT 100% backward compatable
+  - NAME is always written as first line with NAME key token
+
+0.03 2022-10-11
+  - Added method read_fromZipMember with tests
+
 0.02 2022-09-30
   - Updated gain_dbd method to parse different formats of text based storage of gain header
   - Updated t/005_gain_freq.t to test all the formats that I know about

@@ -1,3 +1,10 @@
+0.04 2022-10-19T09:21:05+02:00
+ - Rename example to better name.
+ - Rewrite bugtracker to github.
+ - Rewrite Send to use =head2 in POD.
+ - run() returns exit code.
+ - Update github author user name.
+
 0.03 2022-01-06T15:05:35+01:00
  - Add test for constructor.
  - Add test for help.

@@ -60,6 +60,7 @@
       "runtime" : {
          "requires" : {
             "Data::Dumper" : "0",
+            "HTTP::Status" : "0",
             "IO::CaptureOutput" : "0",
             "JSON::MaybeXS" : "0",
             "JSON::Path" : "0",
@@ -68,7 +69,6 @@
             "Moo" : "2.002004",
             "Types::Standard" : "0",
             "WWW::Mechanize" : "0",
-            "XML::Simple" : "0",
             "perl" : "5.010"
          }
       },
@@ -101,7 +101,7 @@
          "web" : "https://github.com/trs-80/WWW-Spotify"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -664,7 +664,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.011",
+                  "tag" : "v0.012",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

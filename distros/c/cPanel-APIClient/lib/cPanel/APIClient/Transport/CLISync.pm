@@ -44,7 +44,7 @@ Call WHM for reseller C<sue> as root:
 =head1 DESCRIPTION
 
 This module implements synchronous local transport (via cPanel & WHM’s
-CLI API commans) for API requests.
+CLI API commands) for API requests.
 
 =cut
 

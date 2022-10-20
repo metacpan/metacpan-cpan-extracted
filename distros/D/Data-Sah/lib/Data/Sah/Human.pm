@@ -6,9 +6,9 @@ use warnings;
 #use Log::Any::IfLOG qw($log);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.913'; # VERSION
+our $VERSION = '0.914'; # VERSION
 
 our $Log_Validator_Code = $ENV{LOG_SAH_VALIDATOR_CODE} // 0;
 
@@ -47,7 +47,7 @@ Data::Sah::Human - Some functions to use Data::Sah human compiler
 
 =head1 VERSION
 
-This document describes version 0.913 of Data::Sah::Human (from Perl distribution Data-Sah), released on 2022-09-30.
+This document describes version 0.914 of Data::Sah::Human (from Perl distribution Data-Sah), released on 2022-10-19.
 
 =head1 SYNOPSIS
 

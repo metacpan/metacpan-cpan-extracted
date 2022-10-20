@@ -15,6 +15,7 @@ doap.ttl
 lib/LINQ.pm
 lib/LINQ/Array.pm
 lib/LINQ/Collection.pm
+lib/LINQ/DSL.pm
 lib/LINQ/Exception.pm
 lib/LINQ/Field.pm
 lib/LINQ/FieldSet.pm
@@ -29,6 +30,7 @@ t/01basic.t
 t/02linq.t
 t/03range.t
 t/04repeat.t
+t/05dsl.t
 t/09exceptional.t
 t/1020.pl
 t/10array-aggregate.t

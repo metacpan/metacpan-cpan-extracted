@@ -19,7 +19,7 @@ name: Perinci-CmdLine-Gen
 provides:
   Perinci::CmdLine::Gen:
     file: lib/Perinci/CmdLine/Gen.pm
-    version: '0.501'
+    version: '0.502'
 recommends:
   Perinci::CmdLine::Inline: '0.547'
 requires:
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Gen
   homepage: https://metacpan.org/release/Perinci-CmdLine-Gen
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Gen.git
-version: '0.501'
+version: '0.502'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -127,8 +127,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.064'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -310,7 +314,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -318,7 +322,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

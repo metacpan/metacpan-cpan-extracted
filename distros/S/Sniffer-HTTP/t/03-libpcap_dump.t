@@ -72,6 +72,7 @@ my $request1 = bless({
                }, 'HTTP::Request' );
 my $request2 = bless( {
                    '_protocol' => 'HTTP/1.1',
+                 @http_message_641,
                    '_content' => '',
                    '_uri' => bless( do{\(my $o = 'http://corion.net/favicon.ico')}, 'URI::http' ),
                    '_headers' => bless( {
@@ -89,6 +90,7 @@ my $request2 = bless( {
 
 my $response1 = bless( {
                      '_protocol' => 'HTTP/1.1',
+                     @http_message_641,
                      '_content' => '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <HTML><HEAD>
 <TITLE>404 Not Found</TITLE>

@@ -12,7 +12,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-08-11'; # DATE
 our $DIST = 'App-GoogleSearchUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/GoogleSearchUtils/google_search",
@@ -36,7 +36,7 @@ google-search - Open google search page in browser
 
 =head1 VERSION
 
-This document describes version 0.008 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2022-08-11.
+This document describes version 0.009 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2022-08-11.
 
 =head1 SYNOPSIS
 
@@ -45,6 +45,16 @@ This document describes version 0.008 of google-search (from Perl distribution A
 
 
 See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+This utility can save you time when you want to open multiple queries (with
+added common prefix/suffix words) or specify some options like time limit. It
+will formulate the search URL(s) then open them for you in browser. You can also
+specify to print out the URLs instead.
+
+Aside from standard web search, you can also generate/open other searches like
+image, video, news, or map.
 
 =head1 OPTIONS
 
@@ -441,6 +451,14 @@ String. Specify additional command-line options.
 =head2 Print map search URLs as Org links
 
  % google-search --map --print-org-link "jakarta selatan" "kebun raya bogor"
+
+=head2 Prepend prefix words to each query
+
+ % google-search --prepend "imdb " "carrie" "hocus pocus" "raya"
+
+=head2 Append suffix words to each query
+
+ % google-search --append " net worth" "lewis capaldi" "beyonce" "lee mack" "mariah carey"
 
 =head1 HOMEPAGE
 

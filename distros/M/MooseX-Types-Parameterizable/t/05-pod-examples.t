@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test::Most;
 
 {
     package Test::MooseX::Types::Parameterizable::Synopsis;
@@ -228,7 +225,7 @@ use Test::More;
 
     coerce MySpecialVarchar,
       from HashRef,
-      via { join '', keys %$_ };
+      via { join '', sort keys %$_ };
 
 
     Test::More::is Varchar([40])->coerce("abc"), 'abc';

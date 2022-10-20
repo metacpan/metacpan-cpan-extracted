@@ -20,8 +20,9 @@ if ($OSNAME eq 'MSWin32') {
 	$script =~ s/\\/\//msg;
 }
 my $right_ret_stderr = <<"END";
-Usage: $script [-h] [-p password] [-u user] [-v schema_version] [--version] dsn schema_data_module var_key=var_value ..
+Usage: $script [-h] [-l plugin:...] [-p password] [-u user] [-v schema_version] [--version] dsn schema_data_module var_key=var_value ..
 	-h			Print help.
+	-l plugin:...		Load data from plugin.
 	-p password		Database password.
 	-u user			Database user.
 	-v schema_version	Schema version (default is latest version).

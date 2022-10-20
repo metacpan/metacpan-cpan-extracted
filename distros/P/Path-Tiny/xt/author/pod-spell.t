@@ -14,6 +14,7 @@ AIX
 Alex
 Andrade
 Aristotle
+Aslanov
 BENCHMARKING
 Bell
 BooK
@@ -29,6 +30,7 @@ David
 Doug
 Efros
 Ellis
+Elvin
 Etheridge
 Fish
 Flavio
@@ -118,6 +120,7 @@ madcityzen
 mark
 miyagawa
 mk
+mkdir
 mkpath
 mschwern
 nigelgregoire
@@ -132,6 +135,7 @@ powerman
 realpath
 regina
 rivy
+rwp
 shlomif
 si
 stat

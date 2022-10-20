@@ -1,36 +1,35 @@
 ---
-abstract: 'Create your own Parameterizable Types.'
+abstract: 'Create your own Parameterizable Types for Moose'
 author:
-  - 'John Napiorkowski, C<< <jjnapiork@cpan.org> >>'
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.62
-  Test::Exception: 0.29
-  Test::More: 0.94
+  MooseX::Types: '0.35'
+  MooseX::Types::Structured: '0'
+  Set::Scalar: '0'
+  Test::Most: '0'
+  Test::Requires: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.62
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.04'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: MooseX::Types::Parameterizable
+  version: '1.4'
 name: MooseX-Types-Parameterizable
-no_index:
-  directory:
-    - inc
-    - t
 requires:
-  Data::Dump: 1.17
-  Devel::PartialDump: 0.13
-  Digest::MD5: 2.39
-  Moose: 1.08
-  MooseX::Types: 0.22
-  Scalar::Util: 1.19
-  perl: 5.8.0
+  Data::Dump: '1.17'
+  Devel::PartialDump: '0.13'
+  Digest::MD5: '2.39'
+  Moose: '2.0604'
+  MooseX::NonMoose: '0.22'
+  MooseX::Types: '0.35'
+  Scalar::Util: '1.19'
 resources:
-  homepage: http://search.cpan.org/dist/MooseX-Types-Parameterizable/
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/jjn1056/MooseX-Types-Parameterizable.git
-version: 0.08
+  bugtracker: https://github.com/jjn1056/MooseX-Types-Parameterizable/issues
+  homepage: https://github.com/jjn1056/MooseX-Types-Parameterizable
+  repository: https://github.com/jjn1056/MooseX-Types-Parameterizable.git
+version: '0.09'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

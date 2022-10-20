@@ -3,7 +3,8 @@ abstract: 'Be your own SSL certificate authority'
 author:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 build_requires:
-  Test::More: '0.88'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.30'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -17,17 +18,22 @@ no_index:
   directory:
     - t
     - inc
+    - examples
+    - t
 requires:
   Applify: '0.12'
   File::umask: '0.01'
   IO::Socket::IP: '0.38'
   Path::Tiny: '0.05'
+  perl: '5.016'
 resources:
+  IRC:
+    url: irc://irc.libera.chat/#convos
+    web: https://web.libera.chat/#convos
   bugtracker: https://github.com/jhthorsen/app-sslmaker/issues
   homepage: https://github.com/jhthorsen/app-sslmaker
+  license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/app-sslmaker.git
-version: '0.16'
-x_contributors:
-  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
-  - __DATA__
+version: '0.17'
+x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

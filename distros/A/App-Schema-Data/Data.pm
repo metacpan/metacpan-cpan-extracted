@@ -6,9 +6,9 @@ use warnings;
 use English;
 use Error::Pure qw(err);
 use Getopt::Std;
-use Unicode::UTF8 qw(decode_utf8);
+use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -28,17 +28,19 @@ sub run {
 	# Process arguments.
 	$self->{'_opts'} = {
 		'h' => 0,
+		'l' => undef,
 		'p' => '',
 		'u' => '',
 		'v' => undef,
 	};
-	if (! getopts('hp:u:v:', $self->{'_opts'})
+	if (! getopts('hl:p:u:v:', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
 		|| @ARGV < 2) {
 
-		print STDERR "Usage: $0 [-h] [-p password] [-u user] [-v schema_version] [--version] dsn ".
+		print STDERR "Usage: $0 [-h] [-l plugin:...] [-p password] [-u user] [-v schema_version] [--version] dsn ".
 			"schema_data_module var_key=var_value ..\n";
 		print STDERR "\t-h\t\t\tPrint help.\n";
+		print STDERR "\t-l plugin:...\t\tLoad data from plugin.\n";
 		print STDERR "\t-p password\t\tDatabase password.\n";
 		print STDERR "\t-u user\t\t\tDatabase user.\n";
 		print STDERR "\t-v schema_version\tSchema version (default is ".
@@ -82,7 +84,7 @@ sub run {
 	my $data = eval {
 		$data_module->new(
 			'db_options' => {},
-			'db_password' => $self->{'_opts'}->{'p'}, 
+			'db_password' => $self->{'_opts'}->{'p'},
 			'db_user' => $self->{'_opts'}->{'u'},
 			'dsn' => $self->{'_dsn'},
 		);
@@ -106,6 +108,40 @@ sub run {
 	}
 	print "Schema data ${print_version}from '$self->{'_schema_data_module'}' was ".
 		"inserted to '$self->{'_dsn'}'.\n";
+
+	my @plugins = split m/:/ms, $self->{'_opts'}->{'l'};
+	foreach my $plugin (@plugins) {
+
+		# Load plugin object.
+		my $plugin_module = "$self->{'_schema_data_module'}::Plugin::$plugin";
+		eval "require $plugin_module";
+		if ($EVAL_ERROR) {
+			err 'Cannot load Schema data plugin module.',
+				'Module name', $plugin_module,
+				'Error', $EVAL_ERROR,
+			;
+		}
+
+		# Create plugin object.
+		my $plugin = eval {
+			$plugin_module->new(
+				'schema' => $data->schema,
+				'verbose_cb' => sub {
+					my $message = shift;
+					print encode_utf8($message)."\n";
+					return;
+				},
+			);
+		};
+		if ($EVAL_ERROR) {
+			err "Cannot create '$plugin_module' object.",
+				'Error', $EVAL_ERROR,
+			;
+		}
+
+		# Load plugin data.
+		$plugin->load($self->{'_variables'});
+	}
 
 	return 0;
 }
@@ -173,13 +209,15 @@ Returns 1 for error, 0 for success.
  @ARGV = (
          'dbi:SQLite:dbname=sqlite.db',
          'Schema::Data::Commons::Vote',
+         'creator_name=Michal Josef Špaček',
+         'creator_email=michal.josef.spacek@wikimedia.cz',
  );
 
  # Run.
  exit App::Schema::Data->new->run;
 
  # Output like:
- # Schema data from 'Schema::Data::Commons::Vote' was inserted to 'dbi:SQLite:dbname=sqlite.db'.
+ # Schema data (v0.1.0) from 'Schema::Data::Commons::Vote' was inserted to 'dbi:SQLite:dbname=sqlite.db'.
 
 =head1 DEPENDENCIES
 
@@ -206,6 +244,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

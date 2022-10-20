@@ -20,7 +20,7 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::IO::Touchstone;
-$VERSION = 1.006;
+$VERSION = 1.008;
 
 use 5.010;
 use strict;
@@ -59,6 +59,7 @@ BEGIN {
 		y_inductance
 		y_ind_nH
 		y_resistance
+		y_esr
 		y_capacitance
 		y_cap_pF
 		y_qfactor_l
@@ -76,7 +77,12 @@ BEGIN {
 		abcd_is_open_circuit
 		abcd_is_short_circuit
 
+		pos_vec
+		m_to_pos_vecs
+		pos_vecs_to_m
 		/;
+
+	our %EXPORT_TAGS = (ALL => [ @EXPORT, @EXPORT_OK ]);
 }
 
 sub rsnp
@@ -216,6 +222,9 @@ sub rsnp
 
 	($f, $m) = m_interpolate($f, $m, $args);
 
+	# Make z0 an n-vector:
+	$z0 = zeroes($n_ports) + $z0;
+
 	return ($f, $m, $param_type, $z0, $comments, $fmt, $funit, $orig_funit);
 }
 
@@ -241,6 +250,28 @@ sub wsnp_fh
 
 	my $n_ports = n_ports($m);
 	my $n_freqs = $f->nelem;
+
+	if (ref($z0) eq 'PDL')
+	{
+		my $numz = $z0->nelem;
+
+		if ($numz > 1 && $numz != $n_ports)
+		{
+			croak("\$z0: must be single valued, or a vector of one z0 value per port: n_ports=$n_ports, z0=$z0");
+		}
+		elsif ($numz == $n_ports)
+		{
+			my $z01 = $z0->slice(0)->sclr;
+
+			my $zx = zeroes($numz)+$z01;
+			if (any $zx != $z0)
+			{
+				croak("All port impedances must be identical when writing Touchstone files: z0=$z0");
+			}
+		}
+
+		$z0 = $z0->slice(0)->sclr;
+	}
 
 	# Assume $f frequencies are in Hz if from_hz is not defined
 	# and always default writing in MHz if the user does not specify.
@@ -518,7 +549,7 @@ sub s_to_abcd
 	my $z01_conj = $z01->conj;
 	my $z02_conj = $z02->conj;
 
-	my ($S11, $S12, $S21, $S22) = _m_to_pos_vecs($S);
+	my ($S11, $S12, $S21, $S22) = m_to_pos_vecs($S);
 
 	# https://www.researchgate.net/publication/3118645
 	# "Conversions Between S, Z, Y, h, ABCD, and T Parameters
@@ -539,7 +570,7 @@ sub s_to_abcd
 	#		)
 	#
 	#	see https://m.perl.bot/p/qycs8z
-	return _pos_vecs_to_m(
+	return pos_vecs_to_m(
 			# A
 			(($z01_conj + $S11*$z01) * (1 - $S22) + $S12*$S21*$z01)
 				/ # over
@@ -579,9 +610,9 @@ sub abcd_to_s
 	my $z01_conj = $z01->conj;
 	my $z02_conj = $z02->conj;
 
-	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+	my ($A, $B, $C, $D) = m_to_pos_vecs($ABCD);
 
-	return _pos_vecs_to_m(
+	return pos_vecs_to_m(
 			# S11
 			($A*$z02 + $B - $C*$z01_conj*$z02 - $D*$z01_conj)
 				/ # over
@@ -623,8 +654,8 @@ sub s_port_z
 
 	$z0 = _to_diagonal($z0, $n_ports);
 
-	my $z_port = _pos_vec($z0, $port, $port);
-	my $s_port = _pos_vec($S, $port, $port);
+	my $z_port = pos_vec($z0, $port, $port);
+	my $s_port = pos_vec($S, $port, $port);
 
 	return $z_port * ( (1+$s_port) / (1-$s_port) );
 }
@@ -639,13 +670,13 @@ sub y_inductance
 {
 	my ($Y, $f_hz) = @_;
 
-	my $y12 = _pos_vec($Y, 1, 2);
+	my $y12 = pos_vec($Y, 1, 2);
 
 	return -(1/$y12)->im / (2*PI*$f_hz);
 }
 
 # Return a vector of inductance for each frequency in nH:
-sub y_ind_nH { return inductance(@_) * 1e9; }
+sub y_ind_nH { return y_inductance(@_) * 1e9; }
 
 # Return ESR in Ohms:
 # $Y - the Y parameter matrix (N,N,M)
@@ -658,7 +689,7 @@ sub y_resistance
 {
 	my ($Y) = @_;
 
-	my $y12 = _pos_vec($Y, 1, 2);
+	my $y12 = pos_vec($Y, 1, 2);
 
 	return (-1/$y12)->re;
 }
@@ -673,7 +704,7 @@ sub y_capacitance
 {
 	my ($Y, $f_hz) = @_;
 
-	my $y11 = _pos_vec($Y, 1, 1);
+	my $y11 = pos_vec($Y, 1, 1);
 
 	return $y11->im / (2*PI*$f_hz);
 }
@@ -875,15 +906,15 @@ sub abcd_is_lossless
 {
 	my ($ABCD, $tolerance) = @_;
 
-	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+	my ($A, $B, $C, $D) = m_to_pos_vecs($ABCD);
 
 	# How small should Im/Re be to be considered zero?
 	$tolerance //= 1e-6;
 
 	# Lossless when diagonal elements are purely Real and off-diagonal are
 	# purely imaginary: https://youtu.be/rfbvmGwN_8o
-	return (abs(Im($A)) < $tolerance && abs(Im($D)) < $tolerance
-		&& abs(Re($B)) < $tolerance && abs(Re($C)) < $tolerance);
+	return (all(abs($A->im) < $tolerance) && all(abs($D->im) < $tolerance)
+		&& all(abs($B->re) < $tolerance) && all(abs($C->re) < $tolerance));
 }
 
 # See reference for symmetrical, reciprocal, open_circuit, short_circuit:
@@ -892,52 +923,52 @@ sub abcd_is_symmetrical
 {
 	my ($ABCD, $tolerance) = @_;
 
-	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+	my ($A, $B, $C, $D) = m_to_pos_vecs($ABCD);
 
 	# How small should Im/Re be to be considered zero?
 	$tolerance //= 1e-6;
 
 	# A =~ D:
-	return abs($A - $D) < $tolerance;
+	return all abs($A - $D) < $tolerance;
 }
 
 sub abcd_is_reciprocal
 {
 	my ($ABCD, $tolerance) = @_;
 
-	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+	my ($A, $B, $C, $D) = m_to_pos_vecs($ABCD);
 
 	# How small should Im/Re be to be considered zero?
 	$tolerance //= 1e-6;
 
 	# AD-BC=1
-	return abs($ABCD->det()) < $tolerance;
+	return all abs($ABCD->det()) < $tolerance;
 }
 
 sub abcd_is_open_circuit
 {
 	my ($ABCD, $tolerance) = @_;
 
-	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+	my ($A, $B, $C, $D) = m_to_pos_vecs($ABCD);
 
 	# How small should Im/Re be to be considered zero?
 	$tolerance //= 1e-6;
 
 	# A=C=0
-	return (abs($A) < $tolerance && abs($C) < $tolerance);
+	return (all(abs($A) < $tolerance) && all(abs($C) < $tolerance));
 }
 
 sub abcd_is_short_circuit
 {
 	my ($ABCD, $tolerance) = @_;
 
-	my ($A, $B, $C, $D) = _m_to_pos_vecs($ABCD);
+	my ($A, $B, $C, $D) = m_to_pos_vecs($ABCD);
 
 	# How small should Im/Re be to be considered zero?
 	$tolerance //= 1e-6;
 
 	# B=D=0
-	return (abs($B) < $tolerance && abs($D) < $tolerance);
+	return (all(abs($B) < $tolerance) && all abs($D) < $tolerance);
 }
 
 ###############################################################################
@@ -979,7 +1010,7 @@ sub m_interpolate
 		my $funit = $args->{units} || 'Hz';
 		$f_new = _si_scale_hz('Hz', $funit, $f_new);
 
-		my @cx_cols = _m_to_pos_vecs($m);
+		my @cx_cols = m_to_pos_vecs($m);
 		my @cx_cols_new;
 		foreach my $cx (@cx_cols)
 		{
@@ -991,7 +1022,7 @@ sub m_interpolate
 			push @cx_cols_new, $cx_new;
 		}
 
-		return ($f_new, _pos_vecs_to_m(@cx_cols_new));
+		return ($f_new, pos_vecs_to_m(@cx_cols_new));
 	}
 	elsif (defined $args->{freq_min_hz} || defined $args->{freq_max_hz} || defined $args->{freq_count})
 	{
@@ -1060,7 +1091,7 @@ sub _n_meas
 # conversion.
 #
 # For example:
-# 	my ($S11, $S12, $S21, $S22) = _m_to_pos_vecs($S)
+# 	my ($S11, $S12, $S21, $S22) = m_to_pos_vecs($S)
 #
 # 	$T11 = -$S->det / $S21
 # 	$T12 = ...
@@ -1068,19 +1099,19 @@ sub _n_meas
 # 	$T22 = ...
 #
 # @sivoais on irc.perl.org/#pdl calls these "index slices":
-sub _m_to_pos_vecs
+sub m_to_pos_vecs
 {
 	my $m = shift;
 
 	return $m->dummy(0,1)->clump(0..2)->transpose->dog;
 }
 
-# inverse of _m_to_pos_vecs:
-# 	$m = _pos_vecs_to_m(_m_to_pos_vecs($m))
+# inverse of m_to_pos_vecs:
+# 	$m = pos_vecs_to_m(m_to_pos_vecs($m))
 #
 # for example, re-compose $T from the above:
-# 	$T = _pos_vecs_to_m($T11, $T12, $T21, $T22)
-sub _pos_vecs_to_m
+# 	$T = pos_vecs_to_m($T11, $T12, $T21, $T22)
+sub pos_vecs_to_m
 {
 	my @veclist = @_;
 	my $n = sqrt(scalar(@veclist));
@@ -1091,18 +1122,19 @@ sub _pos_vecs_to_m
 
 # Return the position vector at (i,j).
 # Note that i,j start at 1 so this is the first element:
-# 	$s11 = _pos_vec($S, 1, 1)
-sub _pos_vec
+# 	$s11 = pos_vec($S, 1, 1)
+sub pos_vec
 {
 	my ($m, $i, $j) = @_;
 
 	my $n_ports = n_ports($m);
 
+	croak "position indexes (i,j) must be defined" if !defined($i) || !defined($j);
 	croak "position indexes start at 1: i=$i j=$j" if $i < 1 || $j < 1;
 	croak "requested position index than the matrix: i=$i > $n_ports" if ($i> $n_ports);
 	croak "requested position index than the matrix: j=$j > $n_ports" if ($j> $n_ports);
 
-	my @pos_vecs = _m_to_pos_vecs($m);
+	my @pos_vecs = m_to_pos_vecs($m);
 
 	# Expect port numbers like (1,1) or (2,1) but perl expects indexes at 0:
 	$i--;
@@ -1186,6 +1218,11 @@ The resulting files are usually provided by manufacturers so RF design
 engineers can estimate signal behavior at various frequencies in their circuit
 designs.  Examples of RF components include capacitors, inductors, resistors,
 filters, power splitters, etc.
+
+This C<PDL::IO::Touchstone> module is very low-level and returns lots of
+variables to keep track of.  Instead, I recommend that you use L<RF::Component>
+module for an object-oriented approach which encapsulates the data returned by
+C<rsnp()> and will, most likely, simplify your RF component implementation.
 
 =head1 SYNOPSIS
 
@@ -1540,10 +1577,10 @@ Return value:
 Notice: In almost all cases you will want C<y_srf> instead of C<y_srf_ideal>.
 
 This is included for ideal Y-matrices only and may not be accurate.  While the
-equation is a classic SRF calculation (1/(2*pi*sqrt(LC)), srf should scan the
+equation is a classic SRF calculation (1/(2*pi*sqrt(LC)), SRF should scan the
 frequency lines as follows: "The SRF is determined to be the frequency at which
 the insertion (S21) phase changes from negative through zero to positive."
-[ https://www.coilcraft.com/getmedia/8ef1bd18-d092-40e8-a3c8-929bec6adfc9/doc363_measuringsrf.pdf ]
+[ L<https://www.coilcraft.com/getmedia/8ef1bd18-d092-40e8-a3c8-929bec6adfc9/doc363_measuringsrf.pdf> ]
 
 =head1 Circuit Composition
 
@@ -1565,7 +1602,7 @@ ABCD matrices converted by a function like C<s_to_abcd>.
 
 Given any matrix (N,N,M) formatted matrix, this function will return N.
 
-=head2 C<($f_new, $m_new) = m_interpolate($f, $m, $args)> - return the number of ports represented by the matrix.
+=head2 C<($f_new, $m_new) = m_interpolate($f, $m, $args)> - Interpolate C<$m> to a different frequency set
 
 This function rescales the X-parameter matrix (C<$m>) and frequency set (C<$f>)
 to fit the requested frequency bounds.  This example will return the
@@ -1607,9 +1644,44 @@ Return true if the provided frequency set is uniform within a Hz value.
 We assume C<$f> is provided in Hz, so adjust C<$tolerance_hz> accordingly if
 $f is in a different unit.
 
+=head2 C<@vecs = m_to_pos_vecs($m)> - Convert N,N,M piddle to row-ordered index slices.
+
+Converts a NxNxM pdl where M is the number of frequency samples to a
+N^2-length list of M-sized vectors, each representing a row-ordered position
+in the NxN matrix.  ROW ORDERED!  @sivoais on irc.perl.org/#pdl calls these
+"index slices".
+
+This enables mutiplying vector positions for things like 2-port S-to-T
+conversion.
+
+For example:
+
+	my ($S11, $S12, $S21, $S22) = m_to_pos_vecs($S)
+
+	$T11 = -$S->det / $S21
+	$T12 = ...
+	$T21 = ...
+	$T22 = ...
+
+See also the inverse C<pos_vecs_to_m> function.
+
+=head2 C<$m = pos_vecs_to_m(@vecs)> - Convert row-ordered index slices to an N,N,M piddle.
+
+This is the inverse of C<m_to_pos_vecs>, here is the identity transform:
+
+	$m = pos_vecs_to_m(m_to_pos_vecs($m))
+
+For example, re-compose $T from the C<m_to_pos_vecs> example.
+
+	$T = pos_vecs_to_m($T11, $T12, $T21, $T22)
+
+
+
 =head1 SEE ALSO
 
 =over 4
+
+=item L<RF::Component> - An object-oriented encapsulation of C<PDL::IO::Touchstone>.
 
 =item Touchstone specification: L<https://ibis.org/connector/touchstone_spec11.pdf>
 

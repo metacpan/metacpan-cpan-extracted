@@ -10,9 +10,9 @@ use Log::ger;
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-27'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.921'; # VERSION
+our $VERSION = '1.925'; # VERSION
 
 sub meta {
     return {
@@ -84,7 +84,7 @@ Perinci::CmdLine::Plugin::Plugin::Disable - Prevent the loading (activation) of 
 
 =head1 VERSION
 
-This document describes version 1.921 of Perinci::CmdLine::Plugin::Plugin::Disable (from Perl distribution Perinci-CmdLine-Lite), released on 2022-05-27.
+This document describes version 1.925 of Perinci::CmdLine::Plugin::Plugin::Disable (from Perl distribution Perinci-CmdLine-Lite), released on 2022-10-19.
 
 =head1 SYNOPSIS
 
@@ -129,9 +129,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

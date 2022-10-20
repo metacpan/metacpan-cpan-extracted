@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/LINQ>
 Bug tracker:  <https://github.com/tobyink/p5-linq/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003	2022-10-20
+
+ - Added: New `LINQ::DSL` module to provide a function-based syntax for
+   working with LINQ.
+
 0.002	2021-04-19
 
  - Added: Add `field()` to LINQ::Util, and a LINQ::FieldSet::Single class.

@@ -1,5 +1,9 @@
-Revision history for Complete-Zsh-Gen-FromGetoptLong
+0.002   2022-08-11  Released-By: PERLANCAR; Urgency: medium
 
-0.001    2016-10-27 (PERLANCAR)
+        - Update to Getopt::Long::Dump 0.112+ (spec now dumped as array not
+          hash).
+
+
+0.001    2016-10-27  Released-By: PERLANCAR
 
          - First release.

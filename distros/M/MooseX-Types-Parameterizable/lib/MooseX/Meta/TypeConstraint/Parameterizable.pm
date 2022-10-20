@@ -2,6 +2,7 @@ package ## Hide from PAUSE
  MooseX::Meta::TypeConstraint::Parameterizable;
 
 use Moose;
+use MooseX::NonMoose;
 use Moose::Util::TypeConstraints ();
 use MooseX::Meta::TypeCoercion::Parameterizable;
 use Scalar::Util qw(blessed);
@@ -81,13 +82,11 @@ Do some post build stuff, mostly make sure we set the correct coercion object.
 
 =cut
 
-around 'new' => sub {
-    my ($new, $class, @args) = @_;
-    my $self = $class->$new(@args);
-    my $coercion = MooseX::Meta::TypeCoercion::Parameterizable->new(type_constraint => $self);
+sub BUILD {
+  my $self = shift;
+  my $coercion = MooseX::Meta::TypeCoercion::Parameterizable->new(type_constraint => $self);
     $self->coercion($coercion);
-    return $self;
-};
+}
 
 =head2 parameterize (@args)
 
@@ -132,6 +131,8 @@ sub parameterize {
                     constraining_value_type_constraint => $arg2,
                 );
                 Moose::Util::TypeConstraints::get_type_constraint_registry->add_type_constraint($type_constraint);
+
+
                 return $type_constraint;
             }
         } else {
@@ -338,8 +339,32 @@ More method modification to support dispatch coerce to a parent.
 
 =cut
 
-around 'coerce' => sub {
-    my ($coerce, $self, @args) = @_;
+#around 'has_coercion', sub {
+#  my ($orig, $self) = @_;
+#  $self->$orig ? 1 : $self->parent->has_coercion;
+#};
+
+sub assert_coerce {
+    my $self = shift;
+ 
+    my $coercion = $self->coercion || $self->parent->coercion;
+ 
+    unless ($coercion) {
+        require Moose;
+        Moose->throw_error("Cannot coerce without a type coercion");
+    }
+ 
+    return $_[0] if $self->check($_[0]);
+ 
+    my $result = $self->coerce(@_);
+
+    $self->assert_valid($result);
+ 
+    return $result;
+}
+
+sub coerce  {
+    my ($self, @args) = @_;
     if($self->has_constraining_value) {
         push @args, $self->constraining_value;
     }
@@ -356,7 +381,7 @@ around 'coerce' => sub {
         my $parent = $self->parent;
         return $parent->coerce(@args);
     }
-};
+}
 
 =head1 SEE ALSO
 

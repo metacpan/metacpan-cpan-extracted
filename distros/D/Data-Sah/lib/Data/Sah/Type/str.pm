@@ -12,9 +12,9 @@ with 'Data::Sah::Type::Sortable';
 with 'Data::Sah::Type::HasElems';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.913'; # VERSION
+our $VERSION = '0.914'; # VERSION
 
 # currently we only support regex instead of hash of regexes
 #my $t_re = 'regex*|{*=>regex*}';
@@ -54,7 +54,7 @@ Data::Sah::Type::str - str type
 
 =head1 VERSION
 
-This document describes version 0.913 of Data::Sah::Type::str (from Perl distribution Data-Sah), released on 2022-09-30.
+This document describes version 0.914 of Data::Sah::Type::str (from Perl distribution Data-Sah), released on 2022-10-19.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 

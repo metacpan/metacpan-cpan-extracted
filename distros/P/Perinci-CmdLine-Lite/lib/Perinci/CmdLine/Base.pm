@@ -12,9 +12,9 @@ use IO::Interactive qw(is_interactive);
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-27'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.921'; # VERSION
+our $VERSION = '1.925'; # VERSION
 
 # TODO: this class can actually be a role instead of base class for pericmd &
 # pericmd-lite.
@@ -151,7 +151,10 @@ our %copts = (
     version => {
         getopt  => "version|v",
         summary => "Display program's version and exit",
+        # XXX when option is changed, we need to update this. we should generate
+        # usage automatically instead.
         usage   => "--version (or -v)",
+        'usage.alt.fmt.pod' => qq{L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)},
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{action} = 'version';
@@ -163,7 +166,10 @@ our %copts = (
     help => {
         getopt  => 'help|h|?',
         summary => 'Display help message and exit',
+        # XXX when option is changed, we need to update this. we should generate
+        # usage automatically instead.
         usage   => "--help (or -h, -?)",
+        'usage.alt.fmt.pod' => qq{L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)},
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{action} = 'help';
@@ -275,7 +281,10 @@ _
     subcommands => {
         getopt  => 'subcommands',
         summary => 'List available subcommands',
+        # XXX when option is changed, we need to update this. we should generate
+        # usage automatically instead.
         usage   => "--subcommands",
+        'usage.alt.fmt.pod' => qq{L<--subcommands|/"--subcommands">},
         show_in_usage => sub {
             my ($self, $r) = @_;
             !$r->{subcommand_name};
@@ -464,7 +473,7 @@ importance, from least important to most): `trace`, `debug`, `info`,
 `warn`/`warning`, `error`, `fatal`. By default, the level is usually set to
 `warn`, which means that log statements with level `info` and less important
 levels will not be shown. To increase verbosity, choose `info`, `debug`, or
-`fatal`.
+`trace`.
 
 For more details on log level and logging, as well as how new logging levels can
 be defined or existing ones modified, see <pm:Log::ger>.
@@ -525,8 +534,18 @@ _
 
 );
 
+our @CmdLine_Instances;
+
 sub BUILD {
     my ($self, $args) = @_;
+
+    push @CmdLine_Instances, $self;
+    if (@CmdLine_Instances > 1) {
+        warn "Multiple cmdline instances in a process can be problematic ".
+            "because plugins installed as handlers retain the cmdline object ".
+            "with which they were instantiated with. Please make sure you ".
+            "know what you are doing with multiple cmdline objects.";
+    }
 
     $self->{plugins} //= [];
     # always add these plugins
@@ -1968,7 +1987,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.921 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2022-05-27.
+This document describes version 1.925 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2022-10-19.
 
 =head1 DESCRIPTION
 
@@ -3087,9 +3106,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

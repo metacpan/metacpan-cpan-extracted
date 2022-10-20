@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "Encode" => 0,
     "Exporter" => "5.57",
     "Fcntl" => 0,
+    "File::Compare" => 0,
     "File::Copy" => 0,
     "File::Glob" => 0,
     "File::Path" => "2.07",
@@ -48,7 +49,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "open" => 0
   },
-  "VERSION" => "0.124",
+  "VERSION" => "0.130",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -66,6 +67,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "Fcntl" => 0,
   "File::Basename" => 0,
+  "File::Compare" => 0,
   "File::Copy" => 0,
   "File::Glob" => 0,
   "File::Path" => "2.07",

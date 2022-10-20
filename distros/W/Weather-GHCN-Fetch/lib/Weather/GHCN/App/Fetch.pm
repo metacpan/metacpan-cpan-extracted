@@ -8,7 +8,7 @@ Weather::GHCN::App::Fetch - Fetch station and weather data from the NOAA GHCN re
 
 =head1 VERSION
 
-version v0.0.007
+version v0.0.008
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::App::Fetch;
 
-our $VERSION = 'v0.0.007';
+our $VERSION = 'v0.0.008';
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
@@ -159,18 +159,37 @@ __PACKAGE__->run( \@ARGV ) unless caller;
 
 =head1 SUBROUTINES
 
-=head2 run ( \@ARGV )
+=head2 run ( \@ARGV, stdin => 0 )
 
 Invoke this subroutine, passing in a reference to @ARGV, in order to
 fetch NOAA GHCN station data or daily weather data.
 
 See ghnc_fetch.pl -help for details.
 
+Stations are filtered by various options, such as -country and -location.
+But Fetch->run can also receive a list of station id's via a pipe or
+a file.  To enable this feature, set the B<stdin> parameter to 1 (true).
+
+When calling Fetch->run inside a test script, it's usually best to leave
+this option disabled as some test harnesses may fool the algorithm used
+to detect stdin from a file or pipe.  This can be done by omitting
+the stdin => <bool> parameter, or setting it to false.
+
+
 =cut
 
-sub run ($progname, $argv_aref) {
+sub run ($progname, $argv_aref, %args) {
 
     local @ARGV = $argv_aref->@*;
+
+    # these persist across calls to run() in the unit tests, so we
+    # need to reset them each time
+    $Opt_savegui = $FALSE;
+    $Opt_gui     = $FALSE;     
+    $Opt_help    = $FALSE;    
+    $Opt_readme  = $FALSE;  
+    $Opt_usage   = $FALSE;   
+    $Opt_outclip = $FALSE; 
 
     my $ghcn = Weather::GHCN::StationTable->new;
 
@@ -201,7 +220,7 @@ sub run ($progname, $argv_aref) {
     # parse out the script options into $Opt_ fields, letting the rest
     # pass through to get_user_options below
     GetOptions( %script_args );
-    
+
     if ($Opt_outclip and not $USE_WINCLIP) {
         die "*E* -outclip not available (needs Win32::Clipboard)\n";
     }
@@ -262,19 +281,23 @@ sub run ($progname, $argv_aref) {
 
     # get a list of station id's from stdin if it's a pipe or file
     # (but not if stdin is pointing to the terminal)
-    if ( -p *STDIN || -f *STDIN ) {
+    if ( $args{'stdin'} && ( -p *STDIN || -f *STDIN ) ) {
         my $ii;
-        $ghcn->stnid_filter_href( {} );
+        my %f;
         while (my $line = <STDIN>) {       ## no critic [ProhibitExplicitStdin]
             chomp;
             my @id_list = $line =~ m{ $STN_ID_RE }xmsg;
             foreach my $id ( @id_list ) {
-                $ghcn->stnid_filter_href->{$id}++;
+                $f{$id}++;
                 $ii++;
             }
         }
-        die '*E* no station id\'s found in the input'
-            unless $ii;
+        
+        if ($ii == 0) {
+            die '*W* no station ids found in the input';            
+        } else {
+            $ghcn->stnid_filter_href( \%f );            
+        }
     }
 
     $ghcn->load_stations;
@@ -284,10 +307,14 @@ sub run ($progname, $argv_aref) {
     say {*STDERR} '*I* ', $ghcn->stn_filtered_count, ' stations matched range and measurement options';
 
     if ($ghcn->stn_filtered_count > $STN_THRESHOLD ) {
-        print {*STDERR} ">>>> There are a lot of stations to process. Continue (y/n)?\n>>>> ";
-        my $reply = <>;
-        chomp $reply;
-        exit if $reply =~ m{ \A ( n | no ) }xmsi;
+        if (-t *STDIN) {                
+            print {*STDERR} ">>>> There are a lot of stations to process. Continue (y/n)?\n>>>> ";
+            my $reply = <*STDIN>;
+            chomp $reply;
+            exit if $reply =~ m{ \A ( n | no ) }xmsi;
+        } else {
+            die '*E* too many stations to process';
+        }
     }
 
     if ( $Opt->report eq 'kml' ) {
@@ -303,11 +330,11 @@ sub run ($progname, $argv_aref) {
         goto WRAP_UP;
     }
     elsif ( $Opt->report eq 'stn' ) {
-        say $ghcn->get_stations();
+        say $ghcn->get_stations( kept => 1 );
         goto WRAP_UP;        
     }
     elsif ( $Opt->report eq 'id' ) {
-        my @stn_list = $ghcn->get_stations( list => 1, no_header => 1 );
+        my @stn_list = $ghcn->get_stations( list => 1, kept => 1, no_header => 1 );
         my @id_list = map { $_->[0] } @stn_list;
         say join $NL, @id_list;
         goto WRAP_UP;        

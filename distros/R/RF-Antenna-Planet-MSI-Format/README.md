@@ -34,11 +34,11 @@ Creates a new blank object for creating files or loading data from other sources
 Creates a new object and loads data from other sources
 
     my $antenna = RF::Antenna::Planet::MSI::Format->new(
-                                                        name          => "My Antenna Name",
-                                                        make          => "My Manufacturer Name",
-                                                        frequency     => "2437" || "2437 MHz" || "2.437 GHz",
-                                                        gain          => "10.0" || "10.0 dBd" || "12.14 dBi",
-                                                        comment       => "My Comment",
+                                                        NAME          => "My Antenna Name",
+                                                        MAKE          => "My Manufacturer Name",
+                                                        FREQUENCY     => "2437" || "2437 MHz" || "2.437 GHz",
+                                                        GAIN          => "10.0" || "10.0 dBd" || "12.14 dBi",
+                                                        COMMENT       => "My Comment",
                                                         horizontal    => [[0.00, 0.96], [1.00, 0.04], ..., [180.00, 31.10], ..., [359.00, 0.04]],
                                                         vertical      => [[0.00, 1.08], [1.00, 0.18], ..., [180.00, 31.23], ..., [359.00, 0.18]],
                                                        );
@@ -48,6 +48,17 @@ Creates a new object and loads data from other sources
 Reads an antenna pattern file and parses the data into the object data structure. Returns the object so that the call can be chained.
 
     $antenna->read($filename);
+    $antenna->read(\$scalar);
+
+Assumptions:
+  The first line in the MSI file contains the name of the antenna.  It appears that some vendors suppress the "NAME" token but we always write the NAME token.
+  The keys can be mixed case but convention appears to be all upper case keys for common keys and lower case keys for vendor extensions.
+
+## read\_fromZipMember
+
+Reads an antenna pattern file from a zipped archive and parses the data into the object data structure.
+
+    $antenna->read_fromZipMember($zip_filename, $member_filename);
 
 ## write
 
@@ -55,7 +66,7 @@ Writes the object's data to an antenna pattern file and returns a Path::Class fi
 
     my $file     = $antenna->write($filename); #isa Path::Class::file
     my $tempfile = $antenna->write;            #isa Path::Class::file in temp directory
-    $antenna->write(\my $scalar_ref);          #returns undef with data writen to the variable
+    $antenna->write(\$scalar);                 #returns undef with data writen to the variable
 
 # DATA STRUCTURE METHODS
 
@@ -65,7 +76,7 @@ Set header values and returns the header data structure which is a hash referenc
 
 Set a key/value pair
 
-    $antenna->header(Comment => "My comment");          #will upper case all keys
+    $antenna->header(COMMENT => "My comment");          #upper case keys are common/reserved whereas mixed/lower case keys are vendor extensions
 
 Set multiple keys/values with one call
 
@@ -73,23 +84,25 @@ Set multiple keys/values with one call
 
 Read arbitrary values
 
-    my $value = $antenna->header->{uc($key)};
+    my $value = $antenna->header->{$key};
 
 Returns ordered list of header keys
 
     my @keys = keys %{$antenna->header};
 
+Common Header Keys: NAME MAKE FREQUENCY GAIN TILT POLARIZATION COMMENT
+
 ## horizontal, vertical
 
 Horizontal or vertical data structure for the angle and relative loss values from the specified gain in the header.
 
-Each methods sets and returns an array reference of array references \[\[$angle1, $value1\], $angle2, $value2\], ...\]
+Each methods sets and returns an array reference of array references \[\[$angle1, $value1\], \[$angle2, $value2\], ...\]
 
 Please note that the format uses equal spacing of data points by angle.  Most files that I have seen use 360 one degree measurements from 0 (i.e. boresight) to 359 degrees with values in dB down from the maximum lobe even if that lobe is not the boresight.
 
 # HELPER METHODS
 
-Helper methods are wrappers around the header data structure to aid in usability. 
+Helper methods are wrappers around the header data structure to aid in usability.
 
 ## name
 
@@ -149,6 +162,8 @@ Antenna comment string as displayed in file.
 Format Definition: [http://radiomobile.pe1mew.nl/?The\_program:Definitions:MSI](http://radiomobile.pe1mew.nl/?The_program:Definitions:MSI)
 
 Antenna Pattern File Library [https://www.wireless-planning.com/msi-antenna-pattern-file-library](https://www.wireless-planning.com/msi-antenna-pattern-file-library)
+
+Format Definition from RCC: [https://web.archive.org/web/20080821041142/http://www.rcc.com/msiplanetformat.html](https://web.archive.org/web/20080821041142/http://www.rcc.com/msiplanetformat.html)
 
 # AUTHOR
 

@@ -4,4 +4,6 @@ class Sys::Select::Fd_set {
   
   # Instance methods
   native method DESTROY : void ();
+
+  native method set : void ($set : Sys::Select::Fd_set);
 }

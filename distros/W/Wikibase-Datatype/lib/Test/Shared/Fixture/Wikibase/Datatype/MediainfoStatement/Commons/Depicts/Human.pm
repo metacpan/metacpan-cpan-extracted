@@ -6,7 +6,7 @@ use warnings;
 
 use Test::Shared::Fixture::Wikibase::Datatype::MediainfoSnak::Commons::Depicts::Human;
 
-our $VERSION = 0.21;
+our $VERSION = 0.22;
 
 sub new {
 	my $class = shift;

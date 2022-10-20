@@ -3,14 +3,14 @@
    "author" : [
       "cPanel, L. L. C. (CPANEL)"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "cPanel-APIClient",
    "no_index" : {
@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
          }
       },
       "runtime" : {
@@ -37,10 +37,16 @@
             "URI::Escape" : "0",
             "X::Tiny" : "0",
             "parent" : "0",
-            "perl" : "5.01"
+            "perl" : "5.010"
          }
       },
       "test" : {
+         "recommends" : {
+            "AnyEvent" : "0",
+            "IO::Async" : "0",
+            "IPC::Run" : "0",
+            "Net::Curl::Promiser" : "0"
+         },
          "requires" : {
             "FindBin" : "0",
             "Promise::ES6" : "0.23",
@@ -65,6 +71,6 @@
          "web" : "https://github.com/cpanel/p5-cPanel-APIClient"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -8,6 +8,7 @@ requires "Digest::SHA" => "5.45";
 requires "Encode" => "0";
 requires "Exporter" => "5.57";
 requires "Fcntl" => "0";
+requires "File::Compare" => "0";
 requires "File::Copy" => "0";
 requires "File::Glob" => "0";
 requires "File::Path" => "2.07";

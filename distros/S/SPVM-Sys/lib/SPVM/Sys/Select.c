@@ -1,5 +1,12 @@
 #include "spvm_native.h"
 
+// The maximum number of sockets that a Windows Sockets application can use is not affected by the manifest constant FD_SETSIZE
+// See https://learn.microsoft.com/en-us/windows/win32/winsock/maximum-number-of-sockets-supported-2
+#ifdef _WIN32
+  #undef FD_SETSIZE
+  #define FD_SETSIZE 1024
+#endif
+
 #ifdef _WIN32
   #include <winsock2.h>
   #include <winerror.h>
@@ -56,6 +63,94 @@ static const char* socket_strerror(SPVM_ENV* env, SPVM_VALUE* stack, int32_t err
   }
   
   return ret_socket_strerror;
+}
+
+int32_t SPVM__Sys__Select__FD_ZERO(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+  void* obj_set = stack[0].oval;
+
+  fd_set* set = env->get_pointer(env, stack, obj_set);
+
+  FD_ZERO(set);
+
+  return 0;
+}
+
+int32_t SPVM__Sys__Select__FD_SET(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+  int32_t fd = stack[0].ival;
+
+  if (!(fd >= 0)) {
+    return env->die(env, stack, "The $fd must be greater than or equal to 0", FILE_NAME, __LINE__);
+  }
+
+  if (!(fd < FD_SETSIZE)) {
+    return env->die(env, stack, "The $fd must be less than FD_SETSIZE", FILE_NAME, __LINE__);
+  }
+
+  void* obj_set = stack[1].oval;
+
+  if (!obj_set) {
+    return env->die(env, stack, "The $set must be defined", FILE_NAME, __LINE__);
+  }
+
+  fd_set* set = env->get_pointer(env, stack, obj_set);
+
+  FD_SET(fd, set);
+
+  return 0;
+}
+
+int32_t SPVM__Sys__Select__FD_CLR(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+  int32_t fd = stack[0].ival;
+
+  if (!(fd >= 0)) {
+    return env->die(env, stack, "The $fd must be greater than or equal to 0", FILE_NAME, __LINE__);
+  }
+
+  if (!(fd < FD_SETSIZE)) {
+    return env->die(env, stack, "The $fd must be less than FD_SETSIZE", FILE_NAME, __LINE__);
+  }
+
+  void* obj_set = stack[1].oval;
+
+  if (!obj_set) {
+    return env->die(env, stack, "The $set must be defined", FILE_NAME, __LINE__);
+  }
+
+  fd_set* set = env->get_pointer(env, stack, obj_set);
+
+  FD_CLR(fd, set);
+
+  return 0;
+}
+
+int32_t SPVM__Sys__Select__FD_ISSET(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+  int32_t fd = stack[0].ival;
+
+  if (!(fd >= 0)) {
+    return env->die(env, stack, "The $fd must be greater than or equal to 0", FILE_NAME, __LINE__);
+  }
+
+  if (!(fd < FD_SETSIZE)) {
+    return env->die(env, stack, "The $fd must be less than FD_SETSIZE", FILE_NAME, __LINE__);
+  }
+
+  void* obj_set = stack[1].oval;
+
+  if (!obj_set) {
+    return env->die(env, stack, "The $set must be defined", FILE_NAME, __LINE__);
+  }
+
+  fd_set* set = env->get_pointer(env, stack, obj_set);
+
+  int32_t isset = FD_ISSET(fd, set);
+
+  stack[0].ival = isset;
+
+  return 0;
 }
 
 int32_t SPVM__Sys__Select__select(SPVM_ENV* env, SPVM_VALUE* stack) {

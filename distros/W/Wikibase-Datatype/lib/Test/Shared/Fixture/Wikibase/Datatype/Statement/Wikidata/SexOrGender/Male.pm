@@ -7,7 +7,7 @@ use warnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::VIAF;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::SexOrGender::Male;
 
-our $VERSION = 0.21;
+our $VERSION = 0.22;
 
 sub new {
 	my $class = shift;

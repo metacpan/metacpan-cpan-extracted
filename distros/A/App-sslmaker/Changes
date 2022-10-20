@@ -1,5 +1,9 @@
 Revision history for perl distribution App-sslmaker
 
+0.17 2022-10-20T13:33:12
+ - Add "--days" argument when signing too
+   Contributor: Bjørn Mork
+
 0.16 2021-10-21T12:01:29+0900
  - Try to fix sslmaker.t by clearing OPENSSL_CONF
    http://www.cpantesters.org/cpan/report/31620414-3171-11ec-88fe-b2691f24ea8f

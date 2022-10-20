@@ -3,6 +3,7 @@ LICENSE
 MANIFEST
 Makefile.PL
 README.md
+cpanfile
 examples/http_sync.pl
 examples/local_cpanel.pl
 examples/local_whm.pl

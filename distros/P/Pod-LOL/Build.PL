@@ -19,7 +19,7 @@ my $builder = Module::Build->new(
         'Test::More' => '0',
     },
     requires => {
-      # 'Mojolicious' => '9.19',
+        'perl' => '5.012',
     },
     add_to_cleanup     => [ 'Pod-LOL-*' ],
     meta_merge     => {

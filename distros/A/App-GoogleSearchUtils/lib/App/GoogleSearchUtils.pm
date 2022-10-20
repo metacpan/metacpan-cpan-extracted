@@ -10,13 +10,24 @@ use Perinci::Object 'envresmulti';
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-08-11'; # DATE
 our $DIST = 'App-GoogleSearchUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our %SPEC;
 
 $SPEC{google_search} = {
     v => 1.1,
     summary => 'Open google search page in browser',
+    description => <<'_',
+
+This utility can save you time when you want to open multiple queries (with
+added common prefix/suffix words) or specify some options like time limit. It
+will formulate the search URL(s) then open them for you in browser. You can also
+specify to print out the URLs instead.
+
+Aside from standard web search, you can also generate/open other searches like
+image, video, news, or map.
+
+_
     args => {
         queries => {
             'x.name.is_plural' => 1,
@@ -131,6 +142,20 @@ _
         {
             summary => 'Print map search URLs as Org links',
             src => '[[prog]] --map --print-org-link "jakarta selatan" "kebun raya bogor"',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Prepend prefix words to each query',
+            src => '[[prog]] --prepend "imdb " "carrie" "hocus pocus" "raya"',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Append suffix words to each query',
+            src => '[[prog]] --append " net worth" "lewis capaldi" "beyonce" "lee mack" "mariah carey"',
             src_plang => 'bash',
             test => 0,
             'x.doc.show_result' => 0,
@@ -250,7 +275,7 @@ App::GoogleSearchUtils - CLI utilites related to google searching
 
 =head1 VERSION
 
-This document describes version 0.008 of App::GoogleSearchUtils (from Perl distribution App-GoogleSearchUtils), released on 2022-08-11.
+This document describes version 0.009 of App::GoogleSearchUtils (from Perl distribution App-GoogleSearchUtils), released on 2022-08-11.
 
 =head1 SYNOPSIS
 
@@ -272,6 +297,14 @@ Usage:
  google_search(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Open google search page in browser.
+
+This utility can save you time when you want to open multiple queries (with
+added common prefix/suffix words) or specify some options like time limit. It
+will formulate the search URL(s) then open them for you in browser. You can also
+specify to print out the URLs instead.
+
+Aside from standard web search, you can also generate/open other searches like
+image, video, news, or map.
 
 This function is not exported.
 

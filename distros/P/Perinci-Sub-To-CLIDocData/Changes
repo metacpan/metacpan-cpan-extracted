@@ -1,3 +1,8 @@
+0.304   2022-10-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option: mark_different_lang.
+
+
 0.303   2022-10-12  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] In generated POD usage line, link to option description.

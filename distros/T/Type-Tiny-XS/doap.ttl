@@ -13,10 +13,16 @@
 <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ];
+	doap-deps:build-requirement [
+		doap-deps:on "ExtUtils::ParseXS 3.16"^^doap-deps:CpanId;
+	];
+	doap-deps:configure-requirement [
+		doap-deps:on "ExtUtils::MakeMaker 6.58"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008005"^^doap-deps:CpanId ];
 	doap-deps:runtime-suggestion [ doap-deps:on "Type::Parser"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.92"^^doap-deps:CpanId ];
-	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny-XS>;
+	doap:bug-database    <https://github.com/tobyink/p5-type-tiny-xs/issues>;
 	doap:created         "2014-07-10"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:download-page   <https://metacpan.org/release/Type-Tiny-XS>;
@@ -25,7 +31,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Type-Tiny-XS";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-022>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-023>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-025>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-type-tiny-xs>;
@@ -396,6 +402,60 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-XS-0.022.tar.gz>;
 	doap:revision        "0.022"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-023>
+	a                    doap:Version;
+	dc:identifier        "Type-Tiny-XS-0.023"^^xsd:string;
+	dc:issued            "2022-10-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Parameterized versions of ArrayLike and HashLike.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Improved tests for ScalarRef.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-XS-0.023.tar.gz>;
+	doap:revision        "0.023"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-024>
+	a                    doap:Version;
+	dc:identifier        "Type-Tiny-XS-0.024"^^xsd:string;
+	dc:issued            "2022-10-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Properly handle deep magic (in particular: overloaded objects returning references to tied arrays/hashes) in parameterized versions of ArrayLike and HashLike.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Update bundled ppport.h";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix the files in ./fallback";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-XS-0.024.tar.gz>;
+	doap:revision        "0.024"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tiny-XS/v_0-025>
+	a                    doap:Version;
+	dc:identifier        "Type-Tiny-XS-0.025"^^xsd:string;
+	dc:issued            "2022-10-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix issues building on Debian.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "The `amagic_deref_call` macro is not available in older Perl, so use `amagic_call` instead.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tiny-XS-0.025.tar.gz>;
+	doap:revision        "0.025"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/aeruder>
 	a                    foaf:Person;

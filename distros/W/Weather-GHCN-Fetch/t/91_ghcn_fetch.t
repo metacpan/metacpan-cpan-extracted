@@ -109,7 +109,6 @@ subtest 'output to clipboard' => sub {
     my $clip = Win32::Clipboard();
     $clip->Empty();
     @args = (
-        @cmd,
         '-country',     'US',
         '-state',       'NY',
         '-location',    'New York',
@@ -121,14 +120,14 @@ subtest 'output to clipboard' => sub {
         '-outclip',
     );
     ($stdout, $stderr) = capture {
-        system(@args) == 0 or syserror();
+        Weather::GHCN::App::Fetch->run( \@args );
     };
     my $got = $clip->Get();
     like $got, qr/Year\s+Decade\s+TMAX\s+TMIN.*?\d{4}/ms, 'clipboard output';
 };
 
 subtest 'kml and color options' => sub {
-    my @args = (
+    @args = (
         '-report',      'kml',
         '-kmlcolor',    'azure',
         '-location',    'CA006105976,CA006105978',
@@ -162,21 +161,23 @@ subtest 'station ids from file' => sub {
     );
    
     *STDIN_SAVED = *STDIN;
-    open *STDIN, '<', $tempfile1 or die;
+    open *STDIN, '<', $tempfile1 
+        or die '*E* cannot open tempfile: ' . $tempfile1;
 
     throws_ok {
-        Weather::GHCN::App::Fetch->run( \@args );
-    } qr/no station id's found/, 'no stnids found in input';
+        Weather::GHCN::App::Fetch->run( \@args, stdin => $TRUE );
+    } qr/no station ids found/, 'no station ids found in stdin';
 
     close *STDIN or warn $!;
     *STDIN = *STDIN_SAVED;
 
 
     *STDIN_SAVED = *STDIN;
-    open *STDIN, '<', $tempfile2 or die;
+    open *STDIN, '<', $tempfile2 
+        or die '*E* cannot open tempfile: ' . $tempfile2;
 
     ($stdout, $stderr) = capture {
-        Weather::GHCN::App::Fetch->run( \@args );
+        Weather::GHCN::App::Fetch->run( \@args, stdin => $TRUE );
     };
 
     like $stderr, qr/2\s+stations/, 'found 2 stations';

@@ -3,7 +3,7 @@ NAME
     Climatology Network repository
 
 VERSION
-    version v0.0.007
+    version v0.0.008
 
 DESCRIPTION
     The Weather::GHCN module library provides classes that can be used to

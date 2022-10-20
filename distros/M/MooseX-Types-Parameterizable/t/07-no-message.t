@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More;
+use Test::Most;
 
 {
     package Test::MyMooseClass;

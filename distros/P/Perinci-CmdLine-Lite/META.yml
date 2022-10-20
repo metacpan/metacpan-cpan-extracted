@@ -22,40 +22,40 @@ name: Perinci-CmdLine-Lite
 provides:
   Perinci::CmdLine::Base:
     file: lib/Perinci/CmdLine/Base.pm
-    version: '1.921'
+    version: '1.925'
   Perinci::CmdLine::Lite:
     file: lib/Perinci/CmdLine/Lite.pm
-    version: '1.921'
+    version: '1.925'
   Perinci::CmdLine::Plugin::Debug::DumpArgs:
     file: lib/Perinci/CmdLine/Plugin/Debug/DumpArgs.pm
-    version: '1.921'
+    version: '1.925'
   Perinci::CmdLine::Plugin::Debug::DumpR:
     file: lib/Perinci/CmdLine/Plugin/Debug/DumpR.pm
-    version: '1.921'
+    version: '1.925'
   Perinci::CmdLine::Plugin::Debug::DumpRes:
     file: lib/Perinci/CmdLine/Plugin/Debug/DumpRes.pm
-    version: '1.921'
+    version: '1.925'
   Perinci::CmdLine::Plugin::Flow::Exit:
     file: lib/Perinci/CmdLine/Plugin/Flow/Exit.pm
-    version: '1.921'
+    version: '1.925'
   Perinci::CmdLine::Plugin::Plugin::Disable:
     file: lib/Perinci/CmdLine/Plugin/Plugin/Disable.pm
-    version: '1.921'
+    version: '1.925'
   Perinci::CmdLine::Plugin::Run::Completion:
     file: lib/Perinci/CmdLine/Plugin/Run/Completion.pm
-    version: '1.921'
+    version: '1.925'
   Perinci::CmdLine::Plugin::Run::DebugCompletion:
     file: lib/Perinci/CmdLine/Plugin/Run/DebugCompletion.pm
-    version: '1.921'
+    version: '1.925'
   Perinci::CmdLine::Plugin::Run::DumpObject:
     file: lib/Perinci/CmdLine/Plugin/Run/DumpObject.pm
-    version: '1.921'
+    version: '1.925'
   Perinci::CmdLine::Plugin::Run::Normal:
     file: lib/Perinci/CmdLine/Plugin/Run/Normal.pm
-    version: '1.921'
+    version: '1.925'
   Perinci::CmdLine::PluginBase:
     file: lib/Perinci/CmdLine/PluginBase.pm
-    version: '1.921'
+    version: '1.925'
 recommends:
   Data::Dump::Color: '0.246'
   Perinci::Sub::DepChecker: '0'
@@ -87,11 +87,11 @@ requires:
   MIME::Base64: '0'
   Moo: '0'
   Perinci::Access::Lite: '0.09'
-  Perinci::CmdLine::Help: '0.172'
-  Perinci::CmdLine::Util::Config: '1.724'
+  Perinci::CmdLine::Help: '0.175'
+  Perinci::CmdLine::Util::Config: '1.725'
   Perinci::Object: '0.311'
   Perinci::Result::Format::Lite: '0.286'
-  Perinci::Sub::Complete: '0.935'
+  Perinci::Sub::Complete: '0.944'
   Perinci::Sub::GetArgs::Argv: '0.846'
   Progress::Any::Output: '0'
   Progress::Any::Output::TermProgressBarColor: '0.17'
@@ -106,7 +106,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite
   homepage: https://metacpan.org/release/Perinci-CmdLine-Lite
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Lite.git
-version: '1.921'
+version: '1.925'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -392,7 +392,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -400,7 +400,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

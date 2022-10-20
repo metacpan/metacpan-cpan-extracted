@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_run_sql_files
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-12'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MysqlUtils/mysql_run_sql_files",
@@ -41,9 +41,13 @@ mysql-run-sql-files - Feed each .sql file to `mysql` command and write result to
 
 =head1 VERSION
 
-This document describes version 0.021 of mysql-run-sql-files (from Perl distribution App-MysqlUtils), released on 2022-10-12.
+This document describes version 0.022 of mysql-run-sql-files (from Perl distribution App-MysqlUtils), released on 2022-10-19.
 
 =head1 SYNOPSIS
+
+B<mysql-run-sql-files> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+
+B<mysql-run-sql-files> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
 
 B<mysql-run-sql-files> [L<--config-path|/"--config-path=s, -c">=I<path>|L<-c|/"--config-path=s, -c">|L<--no-config|/"--no-config, -C">|L<-C|/"--no-config, -C">] [L<--config-profile|/"--config-profile=s, -P">=I<profile>|L<-P|/"--config-profile=s, -P">] [L<--database|/"--database=s*, --db">=I<str>|L<--db|/"--database=s*, --db">=I<str>] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--directory|/"--directory=s, -d">=L<dirname|Sah::Schema::dirname>|L<-d|/"--directory=s, -d">=L<dirname|Sah::Schema::dirname>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--mkdir|/"--mkdir, -p">|L<-p|/"--mkdir, -p">] [L<--(no)naked-res|/"--naked-res">] [L<--no-env|/"--no-env">] [L<--overwrite-when|/"--overwrite-when=s">=I<str>|L<-O|/"--overwrite-when=s">|L<-o|/"--overwrite-when=s">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] -- E<lt>L<sql_files|/"--sql-files=s@*">E<gt> ...
 
@@ -56,6 +60,9 @@ C<*> marks required options.
 =over
 
 =item B<--database>=I<s>*, B<--db>
+
+(No description)
+
 
 =item B<--directory>=I<s>, B<-d>
 
@@ -97,6 +104,9 @@ See C<--sql-files>.
 Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--sql-files>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 

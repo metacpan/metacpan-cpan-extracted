@@ -17,6 +17,8 @@ README.md
 support/create_db.sql
 support/dbicdump.conf
 support/git_describe_as_plevel.mysql
+support/schema.pgerd
+support/schema.png
 support/upgradedb_0_to_1.sql
 support/upgradedb_1_to_2.sql
 support/upgradedb_2_to_3.sql

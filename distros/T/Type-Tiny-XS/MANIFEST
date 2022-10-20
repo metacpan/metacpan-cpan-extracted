@@ -29,6 +29,7 @@ t/08enum.t
 t/09anyof_allof.t
 t/10bool.t
 t/11isa.t
+t/12scalarref.t
 t/50arraylike.t
 t/51hashlike.t
 t/52codelike.t

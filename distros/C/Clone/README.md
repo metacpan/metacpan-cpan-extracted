@@ -63,7 +63,7 @@ with 3 or fewer levels, while `dclone()` can be faster for structures
 COPYRIGHT
 ---------
 
-Copyright 2001-2019 Ray Finch. All Rights Reserved.
+Copyright 2001-2022 Ray Finch. All Rights Reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -73,6 +73,7 @@ AUTHOR
 
 Ray Finch `<rdf@cpan.org>`
 
-Breno G. de Oliveira `<garu@cpan.org>` and
+Breno G. de Oliveira `<garu@cpan.org>`,
+Nicolas Rochelemagne `<atoomic@cpan.org>` and
 Florian Ragwitz `<rafl@debian.org>` perform routine maintenance
 releases since 2012.

@@ -45,67 +45,67 @@
    "provides" : {
       "App::GUI::Harmonograph" : {
          "file" : "lib/App/GUI/Harmonograph.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Config" : {
          "file" : "lib/App/GUI/Harmonograph/Config.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Dialog::About" : {
          "file" : "lib/App/GUI/Harmonograph/Dialog/About.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Dialog::Function" : {
          "file" : "lib/App/GUI/Harmonograph/Dialog/Function.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Dialog::Interface" : {
          "file" : "lib/App/GUI/Harmonograph/Dialog/Interface.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Frame" : {
          "file" : "lib/App/GUI/Harmonograph/Frame.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Frame::Part::Board" : {
          "file" : "lib/App/GUI/Harmonograph/Frame/Part/Board.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Frame::Part::ColorBrowser" : {
          "file" : "lib/App/GUI/Harmonograph/Frame/Part/ColorBrowser.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Frame::Part::ColorFlow" : {
          "file" : "lib/App/GUI/Harmonograph/Frame/Part/ColorFlow.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Frame::Part::ColorPicker" : {
          "file" : "lib/App/GUI/Harmonograph/Frame/Part/ColorPicker.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Frame::Part::PenLine" : {
          "file" : "lib/App/GUI/Harmonograph/Frame/Part/PenLine.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Frame::Part::Pendulum" : {
          "file" : "lib/App/GUI/Harmonograph/Frame/Part/Pendulum.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Settings" : {
          "file" : "lib/App/GUI/Harmonograph/Settings.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Widget::ColorDisplay" : {
          "file" : "lib/App/GUI/Harmonograph/Widget/ColorDisplay.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Widget::ProgressBar" : {
          "file" : "lib/App/GUI/Harmonograph/Widget/ProgressBar.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       },
       "App::GUI::Harmonograph::Widget::SliderCombo" : {
          "file" : "lib/App/GUI/Harmonograph/Widget/SliderCombo.pm",
-         "version" : "0.55"
+         "version" : "0.56"
       }
    },
    "release_status" : "stable",
@@ -116,7 +116,7 @@
          "web" : "https://github.com/lichtkind/App-Harmonograph"
       }
    },
-   "version" : "0.55",
+   "version" : "0.56",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "GPL-3.0-only"

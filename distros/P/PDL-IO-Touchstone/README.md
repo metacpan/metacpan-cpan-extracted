@@ -14,6 +14,11 @@ engineers can estimate signal behavior at various frequencies in their circuit
 designs.  Examples of RF components include capacitors, inductors, resistors,
 filters, power splitters, etc.
 
+This `PDL::IO::Touchstone` module is very low-level and returns lots of
+variables to keep track of.  Instead, I recommend that you use [RF::Component](https://metacpan.org/pod/RF::Component)
+module for an object-oriented approach which encapsulates the data returned by
+`rsnp()` and will, most likely, simplify your RF component implementation.
+
 # SYNOPSIS
 
         use PDL::IO::Touchstone;
@@ -266,10 +271,10 @@ Return value:
 Notice: In almost all cases you will want `y_srf` instead of `y_srf_ideal`.
 
 This is included for ideal Y-matrices only and may not be accurate.  While the
-equation is a classic SRF calculation (1/(2\*pi\*sqrt(LC)), srf should scan the
+equation is a classic SRF calculation (1/(2\*pi\*sqrt(LC)), SRF should scan the
 frequency lines as follows: "The SRF is determined to be the frequency at which
 the insertion (S21) phase changes from negative through zero to positive."
-\[ https://www.coilcraft.com/getmedia/8ef1bd18-d092-40e8-a3c8-929bec6adfc9/doc363\_measuringsrf.pdf \]
+\[ [https://www.coilcraft.com/getmedia/8ef1bd18-d092-40e8-a3c8-929bec6adfc9/doc363\_measuringsrf.pdf](https://www.coilcraft.com/getmedia/8ef1bd18-d092-40e8-a3c8-929bec6adfc9/doc363_measuringsrf.pdf) \]
 
 # Circuit Composition
 
@@ -291,7 +296,7 @@ ABCD matrices converted by a function like `s_to_abcd`.
 
 Given any matrix (N,N,M) formatted matrix, this function will return N.
 
-## `($f_new, $m_new) = m_interpolate($f, $m, $args)` - return the number of ports represented by the matrix.
+## `($f_new, $m_new) = m_interpolate($f, $m, $args)` - Interpolate `$m` to a different frequency set
 
 This function rescales the X-parameter matrix (`$m`) and frequency set (`$f`)
 to fit the requested frequency bounds.  This example will return the
@@ -325,8 +330,40 @@ Return true if the provided frequency set is uniform within a Hz value.
 We assume `$f` is provided in Hz, so adjust `$tolerance_hz` accordingly if
 $f is in a different unit.
 
+## `@vecs = m_to_pos_vecs($m)` - Convert N,N,M piddle to row-ordered index slices.
+
+Converts a NxNxM pdl where M is the number of frequency samples to a
+N^2-length list of M-sized vectors, each representing a row-ordered position
+in the NxN matrix.  ROW ORDERED!  @sivoais on irc.perl.org/#pdl calls these
+"index slices".
+
+This enables mutiplying vector positions for things like 2-port S-to-T
+conversion.
+
+For example:
+
+        my ($S11, $S12, $S21, $S22) = m_to_pos_vecs($S)
+
+        $T11 = -$S->det / $S21
+        $T12 = ...
+        $T21 = ...
+        $T22 = ...
+
+See also the inverse `pos_vecs_to_m` function.
+
+## `$m = pos_vecs_to_m(@vecs)` - Convert row-ordered index slices to an N,N,M piddle.
+
+This is the inverse of `m_to_pos_vecs`, here is the identity transform:
+
+        $m = pos_vecs_to_m(m_to_pos_vecs($m))
+
+For example, re-compose $T from the `m_to_pos_vecs` example.
+
+        $T = pos_vecs_to_m($T11, $T12, $T21, $T22)
+
 # SEE ALSO
 
+- [RF::Component](https://metacpan.org/pod/RF::Component) - An object-oriented encapsulation of `PDL::IO::Touchstone`.
 - Touchstone specification: [https://ibis.org/connector/touchstone\_spec11.pdf](https://ibis.org/connector/touchstone_spec11.pdf)
 - S-parameter matrix transform equations: [http://qucs.sourceforge.net/tech/node98.html](http://qucs.sourceforge.net/tech/node98.html)
 - Building MDF files from multiple S2P files: [https://youtu.be/q1ixcb\_mgeM](https://youtu.be/q1ixcb_mgeM), [https://github.com/KJ7NLL/mdf/](https://github.com/KJ7NLL/mdf/)

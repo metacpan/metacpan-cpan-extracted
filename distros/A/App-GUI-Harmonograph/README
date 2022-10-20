@@ -128,11 +128,15 @@ GUI
     the sum of the checked.
 
   Line
-    The second tab on the right side has knobs that set the properties of
-    the pen. First how many rotations will be drawn. Secondly the distance
-    between dots. Greater distances, together with color changes, help to
-    clearify muddled up drawings. The third selector sets the dot size in
-    pixel.
+    The third tab on the right side has knobs that set the properties of the
+    pen. In left upper corder ist the slide to set the amount of rotations
+    to be drawn. Right beside is the distance between dots. Greater
+    distances, together with color changes, help to clearify muddled up
+    drawings. Also - many rotations and little distance between dots will
+    slow down the computation. In the second row left is a checkbox to
+    answer if the dots should be connected. The fourth selector sets the dot
+    size in pixel. Zero mens here very thin = one half of an pixel - which
+    is still somewhat visible, but very airy.
 
   Colors
     Below that on the second tab are the options for colorization and this

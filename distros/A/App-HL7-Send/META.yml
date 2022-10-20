@@ -34,8 +34,8 @@ requires:
   Perl6::Slurp: 0
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-HL7-Send
-  homepage: https://github.com/tupinek/App-HL7-Send
+  bugtracker: https://github.com/michal-josef-spacek/App-HL7-Send/issues
+  homepage: https://github.com/michal-josef-spacek/App-HL7-Send
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/App-HL7-Send
-version: '0.03'
+  repository: git://github.com/michal-josef-spacek/App-HL7-Send
+version: '0.04'

@@ -1,13 +1,21 @@
 Revision history for Perl module libary Windows-GHCN-Fetch
 
 
+v0.0.008       2022-10-18
+  - added keyword parameter stdin (=> 0) to App::Fetch so station ids from stdin can be disabled in unit tests
+  - fixed a bug causing unit tests to fail because command-line option variables weren't being reset
+  - added GitHub Actions configuration from Gabor Szabo, for CI testing
+  - added t\ghcn_cache to the git repository
+  - made filepaths for -profile and -cachedir relative to the current working directory
+  - fix -report stn and -report id so only the selected stations are reported
+
 v0.0.007       2022-10-17
+  - removed the file extension in the bin scripts for proper Windows and *nix deployment
   - replaced -kml <file> with -report kml and user-directed stdout
+  - added #!/usr/bin/perl to ghch_fetch.pl
   - added report types kml, id (just station id's), stn (station tsv only), url, curl
   - renamed -color to -kmlcolor
   - removed -label
-  - added #!/usr/bin/perl to ghch_fetch.pl
-  - removed the file extension in the bin scripts for proper Windows and *nix deployment
   - (hopefully) fixed "Failed test -help at t/91_ghcn_fetch.t" caused when PERLDOC=-MPod::Perldoc::ToTextOverstrike
   
 v0.0.006       2022-10-16

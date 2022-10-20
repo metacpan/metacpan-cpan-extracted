@@ -97,7 +97,8 @@ The requested URL /does_not_exist was not found on this server.<P>
                                             'date' => 'Sun, 23 Oct 2005 19:58:38 GMT',
                                             'server' => 'Apache/1.3.31 (Unix)'
                                           }, 'HTTP::Headers' ),
-                     '_msg' => "Not Found"
+                     '_msg' => "Not Found",
+                      @http_message_641,
                    }, 'HTTP::Response' );
 
 is_deeply(\@requests, [$request], "Got the expected requests");

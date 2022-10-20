@@ -182,6 +182,7 @@ sub action_sign {
       ca_key     => $home->child(qw(private ca.key.pem)),
       cert       => $cert,
       csr        => $csr,
+      days       => $self->days,
       extensions => 'usr_cert',
       passphrase => $home->child(qw(private passphrase)),
     }

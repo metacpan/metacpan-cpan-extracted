@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.99"
+            "Rinci" : "v1.1.102"
          }
       },
       "runtime" : {
@@ -59,7 +59,7 @@
    "provides" : {
       "Perinci::CmdLine::Gen" : {
          "file" : "lib/Perinci/CmdLine/Gen.pm",
-         "version" : "0.501"
+         "version" : "0.502"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Gen"
       }
    },
-   "version" : "0.501",
+   "version" : "0.502",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -188,8 +188,14 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.062"
+            "version" : "0.064"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
@@ -420,7 +426,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
@@ -430,7 +436,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.780"
+                        "version" : "0.784"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

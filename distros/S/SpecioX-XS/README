@@ -1,0 +1,58 @@
+NAME
+    SpecioX::XS - [PROOF OF CONCEPT] speed boost for Specio using
+    Type::Tiny::XS
+
+SYNOPSIS
+    A rather contrived benchmark, using a type constraint which in
+    Types::Common would be called ArrayLike[HashLike[StringLike]], so an
+    arrayref of hashrefs of strings, but which allows objects overloading
+    `%{}`, `@{}`, and "".
+
+      # bin/benchmark.pl
+      #
+      use Benchmark;
+  
+      timethis( -3, q{
+        use Specio::Library::Builtins;
+        my $type = t( 'ArrayRef', of => t( 'HashRef', of => t( 'Str' ) ) );
+        my $arr  = [ map { foo => $_ }, 1 .. 100 ];
+        for ( 0 .. 100 ) {
+          $type->check( $arr ) or die;
+        }
+      } );
+
+    And running the benchmarks:
+
+      $ perl -Ilib bin/benchmark.pl
+      timethis for 3:  3 wallclock secs ( 3.20 usr +  0.00 sys =  3.20 CPU) @ 271.25/s (n=868)
+      $ perl -Ilib -MSpecioX::XS bin/benchmark.pl
+      timethis for 3:  4 wallclock secs ( 3.48 usr +  0.01 sys =  3.49 CPU) @ 918.91/s (n=3207)
+
+    On my laptop, the check runs more than three times faster with
+    SpecioX::XS.
+
+DESCRIPTION
+    This module pokes around in Specio internals quite badly. Do not use it in
+    production situations.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=SpecioX-XS>.
+
+SEE ALSO
+    Specio, Type::Tiny::XS.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2022 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,6 +1,6 @@
 bin/hl7send
 Changes
-examples/ex1.pl
+examples/send_test_orm_to_dcm4chee.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

@@ -1,4 +1,5 @@
 #! perl -w
+use v5.10.1;
 use warnings;
 use strict;
 
@@ -12,7 +13,7 @@ WriteMakefile(
     LICENSE       => 'perl',
 
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => 6.55_02,
+        'ExtUtils::MakeMaker' => '6.55_02',
     },
     BUILD_REQUIRES => {
         'Test::Fatal'        => '0.01',
@@ -22,9 +23,11 @@ WriteMakefile(
         'JSON'               => '4.09',
     },
     PREREQ_PM => {
+        'DBD::Pg'                     => '3.14.0',
+        'DBD::SQLite'                 => '1.60',
         'DBIx::Class'                 => '0.08271',
         'DBIx::Class::Schema::Loader' => '0.07049',
-        'DBD::Pg'                     => '3.14.0',
+        'DateTime'                    => '1.53',    # rfc3339
         'DateTime::Format::Pg'        => '0.16013',
         'DateTime::Format::SQLite'    => '0.11',
         'Exception::Class'            => '1.44',

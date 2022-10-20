@@ -19,6 +19,11 @@
             "Module::Build" : "0.4004"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.012"
+         }
+      },
       "test" : {
          "requires" : {
             "Test::More" : "0"
@@ -28,7 +33,7 @@
    "provides" : {
       "Pod::LOL" : {
          "file" : "lib/Pod/LOL.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -43,6 +48,6 @@
          "url" : "https://github.com/poti1/pod-lol"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

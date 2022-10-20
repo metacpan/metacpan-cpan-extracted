@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_copy_rows_adjust_pk
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-12'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MysqlUtils/mysql_copy_rows_adjust_pk",
@@ -41,9 +41,13 @@ mysql-copy-rows-adjust-pk - Copy rows from one table to another, adjust PK colum
 
 =head1 VERSION
 
-This document describes version 0.021 of mysql-copy-rows-adjust-pk (from Perl distribution App-MysqlUtils), released on 2022-10-12.
+This document describes version 0.022 of mysql-copy-rows-adjust-pk (from Perl distribution App-MysqlUtils), released on 2022-10-19.
 
 =head1 SYNOPSIS
+
+B<mysql-copy-rows-adjust-pk> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+
+B<mysql-copy-rows-adjust-pk> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
 
 B<mysql-copy-rows-adjust-pk> [L<--adjust|/"--adjust=s*">=I<str>] [L<--config-path|/"--config-path=s, -c">=I<path>|L<-c|/"--config-path=s, -c">|L<--no-config|/"--no-config, -C">|L<-C|/"--no-config, -C">] [L<--config-profile|/"--config-profile=s, -P">=I<profile>|L<-P|/"--config-profile=s, -P">] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--dry-run|/"--dry-run, -n">|L<-n|/"--dry-run, -n">] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--from|/"--from=s*">=I<str>] [L<--host|/"--host=s">=I<str>] [L<--(no)naked-res|/"--naked-res">] [L<--no-env|/"--no-env">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--password|/"--password=s">=I<str>] [L<--pk-column|/"--pk-column=s*">=I<str>] [L<--port|/"--port=s">=I<int>] [L<--to|/"--to=s*">=I<str>] [L<--username|/"--username=s">=I<str>] -- E<lt>L<database|/"--database=s*">E<gt>
 
@@ -117,6 +121,9 @@ Currently the choices are:
 
 
 =item B<--database>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 

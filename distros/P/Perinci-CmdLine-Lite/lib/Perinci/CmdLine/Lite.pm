@@ -16,9 +16,9 @@ extends 'Perinci::CmdLine::Base';
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-27'; # DATE
+our $DATE = '2022-10-19'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.921'; # VERSION
+our $VERSION = '1.925'; # VERSION
 
 has default_prompt_template => (
     is=>'rw',
@@ -602,6 +602,7 @@ sub action_help {
         common_opts => $common_opts,
         per_arg_json => $self->per_arg_json,
         per_arg_yaml => $self->per_arg_yaml,
+        mark_different_lang => 0,
     );
 
     $res->[3]{"cmdline.skip_format"} = 1;
@@ -654,7 +655,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.921 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2022-05-27.
+This document describes version 1.925 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2022-10-19.
 
 =head1 SYNOPSIS
 
@@ -896,9 +897,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

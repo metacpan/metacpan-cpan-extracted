@@ -15,9 +15,9 @@ build_requires:
   autodie: '0'
   mro: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,9 +33,9 @@ requires:
   URI::Escape: '0'
   X::Tiny: '0'
   parent: '0'
-  perl: '5.01'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/cpanel/p5-cPanel-APIClient/issues
   repository: https://github.com/cpanel/p5-cPanel-APIClient
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

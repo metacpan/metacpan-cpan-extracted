@@ -16,12 +16,16 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -33,12 +37,13 @@
             "Applify" : "0.12",
             "File::umask" : "0.01",
             "IO::Socket::IP" : "0.38",
-            "Path::Tiny" : "0.05"
+            "Path::Tiny" : "0.05",
+            "perl" : "5.016"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test::More" : "1.30"
          }
       }
    },
@@ -48,16 +53,20 @@
          "web" : "https://github.com/jhthorsen/app-sslmaker/issues"
       },
       "homepage" : "https://github.com/jhthorsen/app-sslmaker",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jhthorsen/app-sslmaker.git",
          "web" : "https://github.com/jhthorsen/app-sslmaker"
+      },
+      "x_IRC" : {
+         "url" : "irc://irc.libera.chat/#convos",
+         "web" : "https://web.libera.chat/#convos"
       }
    },
-   "version" : "0.16",
-   "x_contributors" : [
-      "Jan Henning Thorsen <jhthorsen@cpan.org>",
-      "__DATA__"
-   ],
+   "version" : "0.17",
+   "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

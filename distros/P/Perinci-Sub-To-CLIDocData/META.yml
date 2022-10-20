@@ -19,7 +19,7 @@ name: Perinci-Sub-To-CLIDocData
 provides:
   Perinci::Sub::To::CLIDocData:
     file: lib/Perinci/Sub/To/CLIDocData.pm
-    version: '0.303'
+    version: '0.304'
 requires:
   Exporter: '5.57'
   Getopt::Long::Negate::EN: '0.060'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-To-CLIDocData
   homepage: https://metacpan.org/release/Perinci-Sub-To-CLIDocData
   repository: git://github.com/perlancar/perl-Perinci-Sub-To-CLIOptSpec.git
-version: '0.303'
+version: '0.304'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -47,7 +47,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertCodeResult
       name: InsertCodeResult
-      version: '0.054'
+      version: '0.055'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
