@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20220920';
+our $VERSION = '5.20221020';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -397,6 +397,7 @@ sub changes_between {
     5.037002 => '2022-07-20',
     5.037003 => '2022-08-20',
     5.037004 => '2022-09-20',
+    5.037005 => '2022-10-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -19761,6 +19762,33 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.037005 => {
+        delta_from => 5.037004,
+        changed => {
+            'B::Deparse'            => '1.70',
+            'B::Op_private'         => '5.037005',
+            'Config'                => '5.037005',
+            'JSON::PP'              => '4.12',
+            'JSON::PP::Boolean'     => '4.12',
+            'Math::Complex'         => '1.5903',
+            'Math::Trig'            => '1.2301',
+            'Memoize'               => '1.14',
+            'Memoize::AnyDBM_File'  => '1.14',
+            'Memoize::Expire'       => '1.14',
+            'Memoize::NDBM_File'    => '1.14',
+            'Memoize::SDBM_File'    => '1.14',
+            'Memoize::Storable'     => '1.14',
+            'Module::CoreList'      => '5.20221020',
+            'Module::CoreList::Utils'=> '5.20221020',
+            'Net::Ping'             => '2.75',
+            'POSIX'                 => '2.07',
+            'Unicode'               => '15.0.0',
+            'threads'               => '2.31',
+            'warnings'              => '1.59',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -21099,6 +21127,13 @@ sub is_core
         removed => {
         }
     },
+    5.037005 => {
+        delta_from => 5.037004,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -21290,8 +21325,6 @@ sub is_core
     'Math::BigInt::Trace'   => 'cpan',
     'Math::BigRat'          => 'cpan',
     'Math::BigRat::Trace'   => 'cpan',
-    'Math::Complex'         => 'cpan',
-    'Math::Trig'            => 'cpan',
     'Memoize'               => 'cpan',
     'Memoize::AnyDBM_File'  => 'cpan',
     'Memoize::Expire'       => 'cpan',
@@ -21718,8 +21751,6 @@ sub is_core
     'Math::BigInt::Trace'   => undef,
     'Math::BigRat'          => undef,
     'Math::BigRat::Trace'   => undef,
-    'Math::Complex'         => undef,
-    'Math::Trig'            => undef,
     'Memoize'               => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
     'Memoize::AnyDBM_File'  => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',
     'Memoize::Expire'       => 'https://rt.cpan.org/Dist/Display.html?Name=Memoize',

@@ -20,6 +20,8 @@ t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
+t/eof.t
+t/eol.t
 t/gv.t
 t/kwalitee.t
 t/links.t

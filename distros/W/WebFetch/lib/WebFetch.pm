@@ -18,7 +18,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch;
-$WebFetch::VERSION = '0.15.3';
+$WebFetch::VERSION = '0.15.4';
 
 use Carp qw(croak);
 use Getopt::Long;
@@ -1837,7 +1837,7 @@ WebFetch - Perl module to download/fetch and save information from the Web
 
 =head1 VERSION
 
-version 0.15.3
+version 0.15.4
 
 =head1 SYNOPSIS
 

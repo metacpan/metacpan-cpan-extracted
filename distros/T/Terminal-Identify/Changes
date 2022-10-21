@@ -1,5 +1,20 @@
 Revision history for Perl extension Terminal::Identify.
 
+0.08  2022-10-21
+        - Minor changes in code. Minor changes in documentation.
+
+0.07  2022-10-21
+        - Minor changes in code. Major changes in documentation.
+
+0.06  2022-10-20
+        - Major changes in code. Major changes in documentation.
+
+0.05  2022-10-20
+        - Major changes in code. Major changes in documentation.
+
+0.04  2022-10-20
+        - Bug fixing.
+
 0.03  2022-09-17
         - Bug fixing.
 

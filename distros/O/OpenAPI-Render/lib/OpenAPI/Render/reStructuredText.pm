@@ -3,7 +3,7 @@ package OpenAPI::Render::reStructuredText;
 use strict;
 use warnings;
 
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
 
 use Text::ASCIITable;
 
@@ -29,11 +29,10 @@ sub path_header
     }
     if( @url_parameters ) {
         $text .= _h( 'URL parameters', '+' );
-        $self->_start_table( 'Name', 'Description', 'Format', 'Example' );
+        $self->_start_table( 'Name', 'Description', 'Example' );
         foreach (@url_parameters) {
             $self->{table}->addRow( $_->{name},
                                     $_->{description},
-                                    $_->{format},
                                     $_->{example} );
         }
         $text .= $self->parameters_footer;

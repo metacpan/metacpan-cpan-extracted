@@ -1,5 +1,10 @@
 Revision history for Geo-Coder-CA
 
+0.13	Fri Oct 21 10:04:43 EDT 2022
+	Fix RT#141487 (SREZIC)
+	Move to GitHub to track bugs
+	Use JSON::MaybeXS instead of JSON
+
 0.12	Wed Feb  9 14:43:26 EST 2022
 	Compress the traffic
 

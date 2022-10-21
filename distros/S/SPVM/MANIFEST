@@ -653,6 +653,9 @@ t/default/lib/SPVM/TestCase/Pointer.config
 t/default/lib/SPVM/TestCase/Pointer.spvm
 t/default/lib/SPVM/TestCase/PointerChild.spvm
 t/default/lib/SPVM/TestCase/PointerEmpty.spvm
+t/default/lib/SPVM/TestCase/PointerNoNeedFree.c
+t/default/lib/SPVM/TestCase/PointerNoNeedFree.config
+t/default/lib/SPVM/TestCase/PointerNoNeedFree.spvm
 t/default/lib/SPVM/TestCase/PointForTest.spvm
 t/default/lib/SPVM/TestCase/PointInterface.spvm
 t/default/lib/SPVM/TestCase/Precedence.spvm

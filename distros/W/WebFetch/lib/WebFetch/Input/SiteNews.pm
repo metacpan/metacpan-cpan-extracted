@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Input::SiteNews;
-$WebFetch::Input::SiteNews::VERSION = '0.15.3';
+$WebFetch::Input::SiteNews::VERSION = '0.15.4';
 use base "WebFetch";
 
 use Carp;
@@ -444,7 +444,7 @@ WebFetch::Input::SiteNews - download and save SiteNews headlines from a local fi
 
 =head1 VERSION
 
-version 0.15.3
+version 0.15.4
 
 =head1 SYNOPSIS
 

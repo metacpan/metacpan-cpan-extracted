@@ -1,5 +1,5 @@
 ---
-abstract: 'Module with methods for the control of the terminal window'
+abstract: 'Perl extension for identifying the terminal emulator'
 author:
   - 'Dr. Peter Netz <ztenretep@cpan.org>'
 build_requires:
@@ -19,7 +19,6 @@ no_index:
     - inc
 requires:
   Inline::C: '0.82'
-  Time::HiRes: '1.9764'
-  Try::Catch: v1.1.0
-version: '0.03'
+  POSIX: '1.88'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

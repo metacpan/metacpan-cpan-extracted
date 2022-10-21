@@ -8,15 +8,27 @@ use Log::ger;
 use Perinci::Object 'envresmulti';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-11'; # DATE
+our $DATE = '2022-10-21'; # DATE
 our $DIST = 'App-GoogleSearchUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our %SPEC;
 
+sub _fmt_html_link {
+    my ($url, $query) = @_;
+    require HTML::Entities;
+    my $query_htmlesc = HTML::Entities::encode_entities($query // "(query)");
+    qq(<a href="$url">$query_htmlesc<</a>);
+}
+
+sub _fmt_org_link {
+    my ($url, $query) = @_;
+    qq([[$url][$query]]);
+}
+
 $SPEC{google_search} = {
     v => 1.1,
-    summary => 'Open google search page in browser',
+    summary => '(DEPRECATED) Open google search page in browser',
     description => <<'_',
 
 This utility can save you time when you want to open multiple queries (with
@@ -32,12 +44,35 @@ _
         queries => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'query',
-            schema => ['array*', of=>'str*'],
-            req => 1,
+            schema => ['array*', of=>'str*', min_len=>1],
             pos => 0,
             slurpy => 1,
         },
+        queries_from => {
+            summary => 'Supply queries from lines of text file (specify "-" for stdin)',
+            schema => 'filename*',
+        },
         delay => {
+            summary => 'Delay between opening each query',
+            schema => 'duration*',
+            description => <<'_',
+
+As an alternative to the `--delay` option, you can also use `--min-delay` and
+`--max-delay` to set a random delay between a minimum and maximum value.
+
+_
+        },
+        min_delay => {
+            summary => 'Delay between opening each query',
+            schema => 'duration*',
+            description => <<'_',
+
+As an alternative to the `--mindelay` and `--max-delay` options, you can also
+use `--delay` to set a constant delay between requests.
+
+_
+        },
+        max_delay => {
             summary => 'Delay between opening each query',
             schema => 'duration*',
         },
@@ -69,20 +104,53 @@ _
         },
         action => {
             summary => 'What to do with the URLs',
-            schema => ['str*', in=>[qw/open_url print_url print_html_link print_org_link/]],
+            schema => ['str*', in=>[qw/
+                                          open_url
+                                          print_url print_html_link print_org_link
+                                          save_html
+                                          print_result_link
+                                          print_result_html_link
+                                          print_result_org_link
+                                      /]],
             default => 'open_url',
             cmdline_aliases => {
-                open_url        => {is_flag=>1, summary=>'Alias for --action=open_url'       , code=>sub {$_[0]{action}='open_url'       }},
-                print_url       => {is_flag=>1, summary=>'Alias for --action=print_url'      , code=>sub {$_[0]{action}='print_url'      }},
-                print_html_link => {is_flag=>1, summary=>'Alias for --action=print_html_link', code=>sub {$_[0]{action}='print_html_link'}},
-                print_org_link  => {is_flag=>1, summary=>'Alias for --action=print_org_link' , code=>sub {$_[0]{action}='print_org_link' }},
+                open_url               => {is_flag=>1, summary=>'Alias for --action=open_url'       , code=>sub {$_[0]{action}='open_url'       }},
+                print_url              => {is_flag=>1, summary=>'Alias for --action=print_url'      , code=>sub {$_[0]{action}='print_url'      }},
+                print_html_link        => {is_flag=>1, summary=>'Alias for --action=print_html_link', code=>sub {$_[0]{action}='print_html_link'}},
+                print_org_link         => {is_flag=>1, summary=>'Alias for --action=print_org_link' , code=>sub {$_[0]{action}='print_org_link' }},
+                save_html              => {is_flag=>1, summary=>'Alias for --action=save_html'      , code=>sub {$_[0]{action}='save_html'      }},
+                print_result_link      => {is_flag=>1, summary=>'Alias for --action=extract_links'  , code=>sub {$_[0]{action}='print_result_link'      }},
+                print_result_html_link => {is_flag=>1, summary=>'Alias for --action=extract_links'  , code=>sub {$_[0]{action}='print_result_html_link' }},
+                print_result_org_link  => {is_flag=>1, summary=>'Alias for --action=extract_links'  , code=>sub {$_[0]{action}='print_result_org_link'  }},
             },
             description => <<'_',
 
-Instead of opening the queries in browser, you can also do other action instead.
-For example, `print_url` will print the search URL. `print_html_link` will print
-the HTML link (the <a> tag). And `print_org_link` will print the Org-mode link,
-e.g. `[[url...][query]]`.
+Instead of opening the queries in browser (`open_url`), you can also do other
+action instead.
+
+**Printing search URLs**: `print_url` will print the search URL.
+`print_html_link` will print the HTML link (the <a> tag). And `print_org_link`
+will print the Org-mode link, e.g. `[[url...][query]]`.
+
+**Saving search result HTMLs**: `save_html` will first visit each search URL
+(currently using <pm:Firefox::Marionette>) then save each result page to a file
+named `<num>-<query>.html` in the current directory. Existing files will not be
+overwritten; the utility will save to `*.html.1`, `*.html.2` and so on instead.
+
+**Extracting search result links**: `print_result_link` will first will first
+visit each search URL (currently using <pm:Firefox::Marionette>) then extract
+result links and print them. `print_result_html_link` and
+`print_result_org_link` are similar but will instead format each link as HTML
+and Org link, respectively.
+
+Currently the `print_result_*link` actions are not very useful because result
+HTML page is now obfuscated by Google. Thus we can only extract all links in
+each page instead of selecting (via DOM) only the actual search result entry
+links, etc.
+
+If you want to filter the links further by domain, path, etc. you can use
+<prog:grep-url>.
+
 
 _
         },
@@ -100,8 +168,15 @@ _
         },
     },
     args_rels => {
-        choose_all => [qw/time_start time_end/],
-        choose_one => [qw/time_start time_past/],
+        'choose_all&' => [
+            [qw/time_start time_end/],
+            [qw/min_delay max_delay/],
+        ],
+        'choose_one&' => [
+            [qw/delay min_delay/],
+            [qw/time_start time_past/],
+        ],
+        req_one => [qw/queries queries_from/],
     },
     examples => [
         {
@@ -114,6 +189,20 @@ _
         {
             summary => 'Open several queries, limit time period all search to the past month',
             src => '[[prog]] "query one" query2 "query number three" --time-past month',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Open queries from each line of file, add delay 3s after each query (e.g. to avoid getting rate-limited by Google)',
+            src => '[[prog]] --queries-from phrases.txt --delay 3s',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Open queries from each line of stdin',
+            src => 'prog-that-produces-lines-of-phrases | [[prog]] --queries-from -',
             src_plang => 'bash',
             test => 0,
             'x.doc.show_result' => 0,
@@ -160,6 +249,30 @@ _
             test => 0,
             'x.doc.show_result' => 0,
         },
+        {
+            summary => 'Visit the search URL for each query using Firefox::Marionette then extract and print the links',
+            description => <<'_',
+
+Currently not very useful because result HTML page is now obfuscated by Google
+so we can just extract all links in each page instead of selecting (via DOM)
+only the result links, etc.
+
+If you want to filter the links further by domain, path, etc. you can use
+<prog:grep-url>.
+
+_
+            src => '[[prog]] "lee mack" --print-result-link',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Get the IMDB URL for Lee Mack',
+            src => '[[prog]] "lee mack imdb" --print-result-link | grep-url --host-contains imdb.com | head -n1',
+            src_plang => 'bash',
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
     ],
     links => [
         {url=>'prog:firefox-container'},
@@ -176,14 +289,33 @@ sub google_search {
     my $action = $args{action} // 'web';
     my $type = $args{type} // 'web';
 
+    my @queries;
+    if (defined $args{queries_from}) {
+        require File::Slurper::Dash;
+        my $content = File::Slurper::Dash::read_text($args{queries_from});
+        @queries = map { chomp(my $line = $_); $line } split /^/m, $content;
+    } elsif ($args{queries} && @{ $args{queries} }) {
+        @queries = @{ $args{queries} };
+    } else {
+        return [400, "Please specify either queries or queries_from"];
+    }
+
     my @rows;
     my $envres = envresmulti();
     my $i = -1;
-    for my $query0 (@{ $args{queries} }) {
+    for my $query0 (@queries) {
         $i++;
-        if ($i > 0 && $args{delay}) {
-            log_trace "Sleeping %s second(s) ...", $args{delay};
-            sleep $args{delay};
+        if ($i > 0) {
+            if ($args{delay}) {
+                log_trace "Sleeping %s second(s) ...", $args{delay};
+                sleep $args{delay};
+            } elsif ($args{min_delay} && $args{max_delay}) {
+                my $delay = $args{min_delay} +
+                    int(rand($args{max_delay} - $args{min_delay} + 1));
+                log_trace "Sleeping between %s and %s second(s): %s second(s) ...",
+                    $args{min_delay}, $args{max_delay}, $delay;
+                sleep $delay;
+            }
         }
         my $query = join(
             "",
@@ -231,7 +363,7 @@ sub google_search {
             $url = "https://www.google.com/search?num=$num&q=$query_esc&tbm=nws" .
                 ($time_param ? "&$time_param" : "");
         } elsif ($type eq 'map') {
-            return [409, "Can't specify time period for map search"];
+            return [409, "Can't specify time period for map search"] if length $time_param;
             $url = "https://www.google.com/maps/search/$query_esc/";
         } else {
             return [400, "Unknown type '$type'"];
@@ -244,11 +376,43 @@ sub google_search {
         } elsif ($action eq 'print_url') {
             push @rows, $url;
         } elsif ($action eq 'print_html_link') {
-            require HTML::Entities;
-            my $query_htmlesc = HTML::Entities::encode_entities($query);
-            push @rows, qq(<a href="$url">$query_htmlesc<</a>);
+            push @rows, _fmt_html_link($url, $query);
         } elsif ($action eq 'print_org_link') {
-            push @rows, qq([[$url][$query]]);
+            push @rows, _fmt_org_link($url, $query);
+        } elsif ($action =~ /\A(save_html|(print_result_(|html_|org_)link))\z/) {
+            state $ff1 = do {
+                require Firefox::Marionette;
+                log_trace "Instantiating Firefox::Marionette instance ...";
+                Firefox::Marionette->new;
+            };
+            log_trace "Retrieving URL $url ...";
+            my $ff2 = $ff1->go($url);
+            if ($action eq 'save_html') {
+                require File::Slurper;
+                (my $query_save = $query) =~ s/[^A-Za-z0-9_-]+/_/g;
+                my $filename0 = sprintf "%d-%s.%s.html", $i+1, $query_save, $type;
+                my $filename;
+                my $j = -1;
+                while (1) {
+                    $j++;
+                    $filename = $filename0 . ($j ? ".$j" : "");
+                    last unless -f $filename;
+                }
+                log_trace "Saving query[%d] result to %s ...", $i, $filename;
+                File::Slurper::write_text($filename, $ff2->html);
+            } else {
+                # extract links first
+                my @links = $ff2->links;
+                for my $link (@links) {
+                    if ($action =~ /html/) {
+                        push @rows, _fmt_html_link($link->url_abs . "", $link->text);
+                    } elsif ($action =~ /html/) {
+                        push @rows, _fmt_org_link($link->url_abs . "", $link->text);
+                    } else {
+                        push @rows, $link->url_abs . "";
+                    }
+                }
+            }
         } else {
             return [400, "Unknown action '$action'"];
         }
@@ -261,7 +425,7 @@ sub google_search {
 }
 
 1;
-# ABSTRACT: CLI utilites related to google searching
+# ABSTRACT: (DEPRECATED) CLI utilites related to google searching
 
 __END__
 
@@ -271,11 +435,11 @@ __END__
 
 =head1 NAME
 
-App::GoogleSearchUtils - CLI utilites related to google searching
+App::GoogleSearchUtils - (DEPRECATED) CLI utilites related to google searching
 
 =head1 VERSION
 
-This document describes version 0.009 of App::GoogleSearchUtils (from Perl distribution App-GoogleSearchUtils), released on 2022-08-11.
+This document describes version 0.016 of App::GoogleSearchUtils (from Perl distribution App-GoogleSearchUtils), released on 2022-10-21.
 
 =head1 SYNOPSIS
 
@@ -287,6 +451,11 @@ This distribution provides the following utilities:
 
 =back
 
+=head1 DESCRIPTION
+
+*DEPRECATION NOTICE*: Deprecated in favor of L<App::WebSearchUtils> and
+ L<web-search>.
+
 =head1 FUNCTIONS
 
 
@@ -296,7 +465,7 @@ Usage:
 
  google_search(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Open google search page in browser.
+(DEPRECATED) Open google search page in browser.
 
 This utility can save you time when you want to open multiple queries (with
 added common prefix/suffix words) or specify some options like time limit. It
@@ -316,10 +485,31 @@ Arguments ('*' denotes required arguments):
 
 What to do with the URLs.
 
-Instead of opening the queries in browser, you can also do other action instead.
-For example, C<print_url> will print the search URL. C<print_html_link> will print
-the HTML link (the <a> tag). And C<print_org_link> will print the Org-mode link,
-e.g. C<[[url...][query]]>.
+Instead of opening the queries in browser (C<open_url>), you can also do other
+action instead.
+
+B<Printing search URLs>: C<print_url> will print the search URL.
+C<print_html_link> will print the HTML link (the <a> tag). And C<print_org_link>
+will print the Org-mode link, e.g. C<[[url...][query]]>.
+
+B<Saving search result HTMLs>: C<save_html> will first visit each search URL
+(currently using L<Firefox::Marionette>) then save each result page to a file
+named C<< E<lt>numE<gt>-E<lt>queryE<gt>.html >> in the current directory. Existing files will not be
+overwritten; the utility will save to C<*.html.1>, C<*.html.2> and so on instead.
+
+B<Extracting search result links>: C<print_result_link> will first will first
+visit each search URL (currently using L<Firefox::Marionette>) then extract
+result links and print them. C<print_result_html_link> and
+C<print_result_org_link> are similar but will instead format each link as HTML
+and Org link, respectively.
+
+Currently the C<print_result_*link> actions are not very useful because result
+HTML page is now obfuscated by Google. Thus we can only extract all links in
+each page instead of selecting (via DOM) only the actual search result entry
+links, etc.
+
+If you want to filter the links further by domain, path, etc. you can use
+L<grep-url>.
 
 =item * B<append> => I<str>
 
@@ -329,6 +519,20 @@ String to add at the end of each query.
 
 Delay between opening each query.
 
+As an alternative to the C<--delay> option, you can also use C<--min-delay> and
+C<--max-delay> to set a random delay between a minimum and maximum value.
+
+=item * B<max_delay> => I<duration>
+
+Delay between opening each query.
+
+=item * B<min_delay> => I<duration>
+
+Delay between opening each query.
+
+As an alternative to the C<--mindelay> and C<--max-delay> options, you can also
+use C<--delay> to set a constant delay between requests.
+
 =item * B<num> => I<posint> (default: 100)
 
 Number of results per page.
@@ -337,15 +541,25 @@ Number of results per page.
 
 String to add at the beginning of each query.
 
-=item * B<queries>* => I<array[str]>
+=item * B<queries> => I<array[str]>
+
+(No description)
+
+=item * B<queries_from> => I<filename>
+
+Supply queries from lines of text file (specify "-" for stdin).
 
 =item * B<time_end> => I<date>
+
+(No description)
 
 =item * B<time_past> => I<str>
 
 Limit time period to the past hourE<sol>24hourE<sol>weekE<sol>monthE<sol>year.
 
 =item * B<time_start> => I<date>
+
+(No description)
 
 =item * B<type> => I<str> (default: "web")
 
@@ -374,6 +588,11 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Google
 Source repository is at L<https://github.com/perlancar/perl-App-GoogleSearchUtils>.
 
 =head1 SEE ALSO
+
+L<App::WebSearchUtils>, L<App::DDGSearchUtils>, L<App::BraveSearchUtils>,
+L<App::BingSearchUtils> - I'm sick of getting CAPTCHA's with Google (how many
+times in a few minutes do I have to prove that I'm human?), so lately been
+switching to other search engines when I have to do many searches.
 
 
 L<App::FirefoxMultiAccountContainersUtils>.

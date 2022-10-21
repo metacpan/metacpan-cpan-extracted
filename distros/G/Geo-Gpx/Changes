@@ -1,5 +1,18 @@
 Revision history for Geo-Gpx
 
+1.04 [2022-10-20]
+    The waypoints() method now gets but no longer sets:
+        - call waypoints_add() to set instead
+        - users would need to replace calls to waypoints with waypoints_add but only if they were setting
+
+    Renamed method waypoints_add(), was add_waypoint():
+        - this change was necessary for consistency in method naming
+        - users should replace all calls to add_waypoint with waypoints_add
+
+    New methods to replace current accessors: routes(), tracks()
+
+    New methods: routes_add(), tracks_add(), clone()
+
 1.03 [2022-10-16]
     new()'s 'input' key now accepts a filename as argument and a work_dir key can be specified to set the instance's working directory. Has no effect on the caller's current working directory.
 

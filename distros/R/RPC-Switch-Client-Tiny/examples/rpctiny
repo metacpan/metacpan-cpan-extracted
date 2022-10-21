@@ -34,6 +34,7 @@ usage: $0 [-w] [-H <host:port>] [-S] [-C <rpccert>] [-l <login>] [-c <config>] [
 USAGE
 
 use strict;
+use warnings;
 use JSON;
 use IO::Socket;
 use IO::Socket::SSL;

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Perl implementation of L<nanoid|https://github.com/ai/nanoid>",
+   "abstract" : "Perl implementation of L<Nano ID|https://github.com/ai/nanoid>",
    "author" : [
       "tkzwtks <tkzwtks@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.7",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "mit"
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Bytes::Random::Secure" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "Nanoid" : {
          "file" : "lib/Nanoid.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -65,11 +65,16 @@
       },
       "homepage" : "https://github.com/tkzwtks/Nanoid-perl",
       "repository" : {
-         "url" : "git://github.com/tkzwtks/Nanoid-perl.git",
+         "type" : "git",
+         "url" : "https://github.com/tkzwtks/Nanoid-perl.git",
          "web" : "https://github.com/tkzwtks/Nanoid-perl"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "version" : "0.03",
+   "x_contributors" : [
+      "AnaTofuZ <anatofuz@gmail.com>",
+      "Eugene Alvin Villar <seav80@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

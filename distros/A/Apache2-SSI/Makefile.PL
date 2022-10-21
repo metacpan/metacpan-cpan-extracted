@@ -62,12 +62,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@git.deguest.jp:jack/Apache2-SSI.git',
-                web         => 'https://git.deguest.jp/jack/Apache2-SSI',
+                url         => 'git@gitlab.com:jackdeguest/Apache2-SSI.git',
+                web         => 'https://gitlab.com/jackdeguest/Apache2-SSI',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://git.deguest.jp/jack/Apache2-SSI/issues',
+                web         => 'https://gitlab.com/jackdeguest/Apache2-SSI/issues',
             },
         },
     }) : ()),

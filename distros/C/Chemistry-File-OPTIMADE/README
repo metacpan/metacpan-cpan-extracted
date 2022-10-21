@@ -1,10 +1,13 @@
-Chemistry/File/OPTIMADE version 0.10
+Chemistry/File/OPTIMADE version 0.11
 ====================================
 
 This module reads OPTIMADE structure files.
 
 For more information about OPTIMADE, see OPTIMADE Home Page at
 https://www.optimade.org
+
+CHANGES SINCE VERSION 0.10
+        - Specified versioned dependency on List::Util.
 
 INSTALLATION
 
@@ -20,6 +23,7 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
     Chemistry::Mol      0.35
+    List::Util          1.33
 
 COPYRIGHT AND LICENSE
 

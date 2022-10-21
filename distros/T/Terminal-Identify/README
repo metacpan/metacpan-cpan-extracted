@@ -25,7 +25,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  sys/ioctl.ph
+  'Inline::C' => '0.82'
 
 COPYRIGHT AND LICENCE
 

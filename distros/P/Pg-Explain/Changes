@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+2.3     2022/10/21
+        - Fix extracting settings from verbose plan
+          Per report from Yaroslav Schekin
+
 2.2     2022/09/25
         - Handle WorkTable Scans in non-text plans.
           Per report from Jamey Courtney

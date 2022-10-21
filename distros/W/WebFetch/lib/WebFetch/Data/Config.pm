@@ -19,7 +19,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Data::Config;
-$WebFetch::Data::Config::VERSION = '0.15.3';
+$WebFetch::Data::Config::VERSION = '0.15.4';
 use Carp qw(croak confess);
 use base 'Class::Singleton';
 
@@ -117,7 +117,7 @@ WebFetch::Data::Config - WebFetch configuration data management
 
 =head1 VERSION
 
-version 0.15.3
+version 0.15.4
 
 =head1 SYNOPSIS
 

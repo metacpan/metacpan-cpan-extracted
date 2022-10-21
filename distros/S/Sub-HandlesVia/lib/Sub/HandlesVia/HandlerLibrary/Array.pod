@@ -88,7 +88,7 @@ This is a library of methods for L<Sub::HandlesVia>.
 
 Arguments: B<< Int >>, B<< Optional[Any] >>.
 
-Acts like C<get> if given one argument, or C<set> if given two arguments.
+Acts like C<get> if given just an index, or C<set> if given an index and value.
 
   my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
   $object->my_accessor( 1, 'quux' );

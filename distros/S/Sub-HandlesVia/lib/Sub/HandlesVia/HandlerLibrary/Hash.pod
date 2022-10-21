@@ -48,7 +48,7 @@ This is a library of methods for L<Sub::HandlesVia>.
 
 Arguments: B<< Str >>, B<< Optional[Any] >>.
 
-Acts like C<get> if given one argument, or C<set> if given two arguments.
+Acts like C<get> if given just a key, or C<set> if given a key and a value.
 
 =head2 C<< all() >>
 

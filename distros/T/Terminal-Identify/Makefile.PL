@@ -5,11 +5,11 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Terminal::Identify',
     VERSION_FROM      => 'lib/Terminal/Identify.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => {'Inline::C' => '0.82', 'Time::HiRes' => '1.9764', 'Try::Catch' => '1.1.0'}, # e.g., Module::Name => 1.1
-    ABSTRACT          => 'Module with methods for the control of the terminal window',
-    #ABSTRACT_FROM     => 'lib/Terminal/Identify.pm', # retrieve abstract from module
+    PREREQ_PM         => {'Inline::C' => '0.82', 'POSIX' => '1.88'}, # e.g., Module::Name => 1.1
+    ABSTRACT          => 'Perl extension for identifying the terminal emulator',
+    # ABSTRACT_FROM   => 'lib/Terminal/Identify.pm', # retrieve abstract from module
     AUTHOR            => 'Dr. Peter Netz <ztenretep@cpan.org>',
     LICENSE           => 'perl',
-    #Value must be from legacy list of licenses here
-    #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
+    # Value must be from legacy list of licenses here
+    # http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
 );

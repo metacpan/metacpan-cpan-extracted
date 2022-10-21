@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.038	2022-10-21
+
+ [ Documentation ]
+ - Minor changes to documentation for Hash:accessor and Array:accessor.
+
 0.037	2022-09-26
 
  [ Bug Fixes ]

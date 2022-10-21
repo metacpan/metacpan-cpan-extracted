@@ -17,7 +17,7 @@ use RPC::Switch::Client::Tiny::Netstring;
 use RPC::Switch::Client::Tiny::Async;
 use RPC::Switch::Client::Tiny::SessionCache;
 
-our $VERSION = '1.63';
+our $VERSION = '1.64';
 
 sub new {
 	my ($class, %args) = @_;
@@ -460,8 +460,10 @@ sub _worker_child_read_and_finish {
 
 			if (my $sessioncache = $self->{sessioncache}) {
 				if (my $set_session = $self->is_session_resp($params)) {
-					$child->{session} = $sessioncache->session_new($set_session);
-					$sessioncache->expire_insert($child->{session});
+					if (!exists $child->{session} || ($child->{session}{id} ne $set_session->{id})) {
+						$child->{session} = $sessioncache->session_new($set_session);
+						$sessioncache->expire_insert($child->{session});
+					}
 				}
 
 				if ($sessioncache->session_put($child)) {

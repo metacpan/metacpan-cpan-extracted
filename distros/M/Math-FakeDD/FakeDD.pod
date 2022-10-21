@@ -72,10 +72,33 @@
 
    Returns a Math::FakeDD object with the value represented by $arg,
    or zero if no argument is provided.
+   $arg must be one of PV (string), IV (integer), UV (unsigned integer),
+   or NV (perl floating point type).
 
   dd_assign($obj, $arg);
 
    Assigns the value represented by $arg, to the Math::FakeDD object.
+   $arg must be one of PV (string), IV (integer), UV (unsigned integer),
+   NV (perl floating point type) or Math::MPFR object.
+
+  $obj2 = dd_clone($obj1);
+  $obj2 = dd_copy ($obj1);
+
+   Both dd_clone() and dd_copy() return a copy of the Math::FakeDD
+   object that was given to them. dd_clone is an alias for dd_copy.
+
+  $obj = any2dd(@args);
+
+   Converts all of the arguments to Math::FakeDD objects and returns
+   the sum of all of those objects.
+   Each argument must be one of PV (string), IV (integer), UV (unsigned
+   integer), NV (perl floating point type) or Math::MPFR object, but
+   they don't all have to be of the same type.
+   Strings beginning with (+/-) '0x' or '0X' will be evaluated as hex
+   values. This is handy for re-creating values that have been displayed
+   using (s)printx.
+   Strings begining with '(+/-) '0b' will be evaluated as base 2 values.
+
 
 =head1 ARITHMETIC FUNCTIONS
 
@@ -141,7 +164,7 @@
   $obj = dd_catalan();
 
   Return (respectively) pi (3.141...), Euler's constant (0.577...)
-  and Catalan's constant (0.577...) .
+  and Catalan's constant (0.915...) .
 
 =head1 TRIGONOMETRY FUNCTIONS
 
@@ -300,18 +323,20 @@
 
   The following operations are currently overloaded:
    "", 0+, ==, !=, *, *=, **, **=, +, +=, -, -=, /, /=, <, <=, <=>, >, >=,
-   abs, int, exp, log, sqrt,
+   ++, --,
    bool, !,
    atan2, cos, sin
    eq, ne
+   =
 
   Run
     my %oloads = Math::FakeDD::oload();
 
-  The keys are the overloaded operations, and their respective values
-  name the functions used in the respective operation.
-  These functions are documented above - except for dd_true() and
-  dd_false() which are documented here:
+  The keys of %oloads are the overloaded operations, and their
+  respective values name the functions used in the respective operation.
+  These functions are documented above - except for dd_true(),
+  dd_false() overload_inc, overload_dec,and overload_copy(), which
+  are documented here:
 
   $iv = dd_true($obj);
 
@@ -329,35 +354,44 @@
    (This is the same criterion as used by Math::MPFR's overloading
    of '!'.)
 
+  $obj2 = $obj1; # Utilizes overload_copy()
+   Use the unexported overload_copy() sub to copy $obj1 to $obj2.
+
+  $obj1++; # Utilizes overload_inc()
+  $obj1--; # Utilizes overload_dec()
+   Add or (respectively) subtract 1e0 to/from $obj1.
+
 =head1 OTHER FUNCTIONS
 
   $obj = dd_inf([$iv]); # $iv is an optional arg, which will be
                         # evaluated in (signed) numeric context
 
-    If the optional arg $iv, is less than 0 (in numeric context, then
-    a Math::FakeDD object with value -Inf is returned.
-    Else return a +Inf Math::FakeDD object.
+   If the optional arg $iv, is less than 0 (in numeric context, then
+   a Math::FakeDD object with value -Inf is returned.
+   Else return a +Inf Math::FakeDD object.
 
   $obj = dd_nan();
 
-    Return a NaN Math::FakeDD object.
+   Return a NaN Math::FakeDD object.
 
   $iv = dd_is_inf($obj);
 
-    Returns 1 if $obj is an infinity.
-    Else returns 0.
+   Returns 1 if $obj is an infinity.
+   Else returns 0.
 
   $iv = dd_is_nan($obj);
 
-    Returns 1 if $obj is a NaN.
-    Else returns 0.
+   Returns 1 if $obj is a NaN.
+   Else returns 0.
 
-  $obj = mpfr2dd         ($mpfr); # Precision of $mpfr is 2098 bits.
+  $obj = mpfr2dd($mpfr);          # Precision of $mpfr is 2098 bits.
   $obj = mpfr_any_prec2dd($mpfr); # Precision of $mpfr is unrestricted.
 
-   Return the value held by the 2 Math::MPFR object $mpfr as the
+   Return the value held by the Math::MPFR object $mpfr as the
    Math::FakeDD object $obj.
-   Precision can be (and often is) lost in this conversion.
+   Precision can be (and often is) lost in this conversion if the
+   precision of $mpfr is greater than 107, or if $mpfr contains a
+   value outside of the double precision range.
 
   $mpfr = dd2mpfr($obj);
 
@@ -373,6 +407,34 @@
    a perl floating point (NV) - but not a Math::FakeDD object.
    To convert a Math::FakeDD object to a 2098-bit precision Math::MPFR
    object, use dd2mpfr() instead.
+
+  $obj2 = dd_nextup($obj1);
+  $obj2 = dd_nextdown($obj1);
+
+   Return the value that is greater than, or (respectively) less than,
+   the given argument by the smallest amount possible.
+   Return dd_nan() if $obj1 is NaN.
+   If $obj1 is +Inf, dd_nextup() returns dd_inf(), dd_nextdown() returns
+   $Math::FakeDD::DD_MAX.
+   If $obj1 is -Inf, dd_nextup() returns -$Math::FakeDD::DD_MAX and
+   dd_nextdown() returns dd_inf(-1).
+
+  $iv = ulp_exponent($obj, [$bool]);
+   If no second argument, return the signed integer value ($iv) such that
+   2**$iv equates to the value of ULP of the given argument's less
+   significant double.
+   If a second argument is given, and it evaluates to TRUE, then the value
+   of the ULP of the given argument's more sigfificant double is returned.
+   NOTE:
+     ULP is aka "unit in last place" or, synonymously, "unit of least
+     precision".
+
+  $iv = is_subnormal($double);
+   $double is evaluated to double precision.
+   If that value is subnormal (abs($double) < 2**-1022) return 1.
+   Else 0 is returned.
+   NOTE:
+     This function returns 1 if $double is zero.
 
 
 =head1 ARITHMETIC IMPLEMENTATION

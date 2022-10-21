@@ -1029,7 +1029,7 @@ class TestCase::Sys::IO {
     }
     
     {
-      my $resolved_path = (mutable string)new_string_len 100;
+      my $resolved_path = (mutable string)new_string_len 256;
       my $ret_resolved_path = Sys::IO->realpath($file, $resolved_path);
       
       unless ($ret_resolved_path) {

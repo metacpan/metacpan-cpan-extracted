@@ -1,9 +1,9 @@
 package Nanoid;
-use 5.008001;
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use strict;
 use warnings;
@@ -65,15 +65,15 @@ __END__
 
 =head1 NAME
 
-Nanoid - Perl implementation of L<nanoid|https://github.com/ai/nanoid>
+Nanoid - Perl implementation of L<Nano ID|https://github.com/ai/nanoid>
 
 =head1 SYNOPSIS
 
     use Nanoid;
 
-    my $default = Nanoid::generate();                    # length 21 / use URL-friendry character
-    my $custom1 = Nanoid::generate(10);                  # length 10 / use URL-friendry character
-    my $custom2 = Nanoid::generate(10, 'abcdef012345');  # length 10 / use 'abcdef012345'
+    my $default = Nanoid::generate();                                        # length 21 / use URL-friendly characters
+    my $custom1 = Nanoid::generate(size => 10);                              # length 10 / use URL-friendly characters
+    my $custom2 = Nanoid::generate(size => 10, alphabet => 'abcdef012345');  # length 10 / use 'abcdef012345' characters
 
 
 =head1 DESCRIPTION

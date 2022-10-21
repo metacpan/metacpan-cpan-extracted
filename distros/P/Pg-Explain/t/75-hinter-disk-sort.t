@@ -21,15 +21,15 @@ $explain->parse_source;
 my $hinter = Pg::Explain::Hinter->new( $explain );
 ok( $hinter->any_hints, 'There are some hints' );
 
-is( scalar @{ $hinter->hints }, 1, 'One hint!');
+is( scalar @{ $hinter->hints }, 1, 'One hint!' );
 
-my $hint = $hinter->hints->[0];
-isa_ok($hint, 'Pg::Explain::Hinter::Hint');
+my $hint = $hinter->hints->[ 0 ];
+isa_ok( $hint, 'Pg::Explain::Hinter::Hint' );
 
-isa_ok($hint->node, 'Pg::Explain::Node');
-is( $hint->type, 'DISK_SORT', 'Hint for disk sort');
+isa_ok( $hint->node, 'Pg::Explain::Node' );
+is( $hint->type, 'DISK_SORT', 'Hint for disk sort' );
 ok( defined $hint->details, 'There are details' );
-is( ref $hint->details, 'ARRAY', 'Details are an array' );
-is( $hint->details->[0], '3840', 'Disk space used for sort' );
+is( ref $hint->details,    'ARRAY', 'Details are an array' );
+is( $hint->details->[ 0 ], '3840',  'Disk space used for sort' );
 
 exit;

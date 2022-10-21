@@ -1,0 +1,290 @@
+
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Sniffer-HTTP?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Sniffer-HTTP)
+[![Windows](https://github.com/Corion/Sniffer-HTTP/workflows/windows/badge.svg)](https://github.com/Corion/Sniffer-HTTP/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Sniffer-HTTP/workflows/macos/badge.svg)](https://github.com/Corion/Sniffer-HTTP/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Sniffer-HTTP/workflows/linux/badge.svg)](https://github.com/Corion/Sniffer-HTTP/actions?query=workflow%3Alinux)
+
+# NAME
+
+Sniffer::HTTP - multi-connection sniffer driver
+
+# SYNOPSIS
+
+    use Sniffer::HTTP;
+    my $VERBOSE = 0;
+
+    my $sniffer = Sniffer::HTTP->new(
+      callbacks => {
+        request  => sub { my ($req,$conn) = @_; print $req->uri,"\n" if $req },
+        response => sub { my ($res,$req,$conn) = @_; print $res->code,"\n" },
+        log      => sub { print $_[0] if $VERBOSE },
+        tcp_log  => sub { print $_[0] if $VERBOSE > 1 },
+      },
+      timeout => 5*60, # seconds after which a connection is considered stale
+      stale_connection
+        => sub { my ($s,$conn,$key);
+                 $s->log->("Connection $key is stale.");
+                 $s->remove_connection($key);
+               },
+    );
+
+    $sniffer->run(); # uses the "best" default device
+
+    # Or, if you want to feed it the packets yourself:
+
+    while (1) {
+
+      # retrieve ethernet packet into $eth,
+      # for example via Net::Pcap
+      my $eth = sniff_ethernet_packet;
+
+      # And handle the packet. Callbacks will be invoked as soon
+      # as complete data is available
+      $sniffer->handle_eth_packet($eth);
+    };
+
+This driver gives you callbacks with the completely accumulated
+[HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest)s or [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse)s as sniffed from the
+TCP traffic. You need to feed it the Ethernet, IP or TCP packets
+either from a dump file or from [Net::Pcap](https://metacpan.org/pod/Net%3A%3APcap) by unpacking them via
+[NetPacket](https://metacpan.org/pod/NetPacket).
+
+As the whole response data is accumulated in memory you should
+be aware of memory issues. If you want to write stuff
+directly to disk, you will need to submit patches to [Sniffer::Connection::HTTP](https://metacpan.org/pod/Sniffer%3A%3AConnection%3A%3AHTTP).
+
+A good example to start from is the `live-http-headers.pl`
+script that comes with the distribution.
+
+# METHODS
+
+## `new %ARGS`
+
+Creates a new object for handling many HTTP requests.
+You can pass in the following arguments:
+
+- `connections`     - preexisting connections (optional)
+- `callbacks`        - callbacks for the new connections (hash reference)
+- `timeout`          - timeout in seconds after which a connection is considered stale
+- `stale_connection` - callback for stale connections
+- `snaplen` - maximum size of data to capture per packet. The default is 16384,
+which should be plenty for all cases.
+
+Usually, you will want to create a new object like this:
+
+    my $sniffer = Sniffer::HTTP->new( callbacks => {
+      request  => sub { my ($req, $conn) = @_; print $req->uri,"\n"; },
+      response => sub { my ($res,$req,$conn) = @_; print $res->code,"\n"; },
+    });
+
+except that you will likely do more work than this example.
+
+## `$sniffer->remove_connection KEY`
+
+Removes a connection (or a key) from the list
+of connections. This will not have the intended
+effect if the connection is still alive, as it
+will be recreated as soon as the next packet
+for it is received.
+
+## `$sniffer->find_or_create_connection TCP, %ARGS`
+
+This parses a TCP packet and creates the TCP connection
+to keep track of the packet order and resent packets.
+
+## `$sniffer->stale_connections( TIMEOUT, TIMESTAMP, HANDLER )`
+
+Will call the handler HANDLER for all connections that
+have a `last_activity` before TIMESTAMP - TIMEOUT.
+
+All parameters are optional and default to:
+
+    TIMEOUT   - $sniffer->timeout
+    TIMESTAMP - time()
+    HANDLER   - $sniffer->stale_connection
+
+It returns all stale connections.
+
+## `$sniffer->live_connections TIMEOUT, TIMESTAMP`
+
+Returns all live connections. No callback
+mechanism is provided here.
+
+The defaults are
+  TIMEOUT   - $sniffer->timeout
+  TIMESTAMP - time()
+
+## `$sniffer->handle_eth_packet ETH [, TIMESTAMP]`
+
+Processes a raw ethernet packet. [Net::PCap](https://metacpan.org/pod/Net%3A%3APCap) will return
+this kind of packet for most Ethernet network cards.
+
+You need to call this method (or one of the other protocol
+methods) for every packet you wish to handle.
+
+The optional TIMESTAMP corresponds to the epoch time
+the packet was captured at. It defaults to the value
+of `time()`.
+
+## `$sniffer->handle_ip_packet IP [, TIMESTAMP]`
+
+Processes a raw ip packet.
+
+The optional TIMESTAMP corresponds to the epoch time
+the packet was captured at. It defaults to the value
+of `time()`.
+
+## `$sniffer->handle_tcp_packet TCP [, TIMESTAMP]`
+
+Processes a raw tcp packet. This processes the packet
+by handing it off to the [Sniffer::Connection](https://metacpan.org/pod/Sniffer%3A%3AConnection) which handles
+the reordering of TCP packets.
+
+It returns the [Sniffer::Connection::HTTP](https://metacpan.org/pod/Sniffer%3A%3AConnection%3A%3AHTTP) object that
+handled the packet.
+
+The optional TIMESTAMP corresponds to the epoch time
+the packet was captured at. It defaults to the value
+of `time()`.
+
+## `run DEVICE_NAME, PCAP_FILTER, %OPTIONS`
+
+Listens on the given device for all TCP
+traffic from and to port 80 and invokes the callbacks
+as necessary. If you want finer control
+over what `Net::Pcap` does, you need to set up
+Net::Pcap yourself.
+
+The `DEVICE_NAME` parameter is used to determine
+the device via `find_device` from [Net::Pcap::FindDevice](https://metacpan.org/pod/Net%3A%3APcap%3A%3AFindDevice).
+
+The `%OPTIONS` can be the following options:
+
+- `capture_file` - filename to which the whole capture stream is
+written, in [Net::Pcap](https://metacpan.org/pod/Net%3A%3APcap) format.
+
+    This is mostly
+    useful for remote debugging of a problematic
+    sequence of connections.
+
+- `device` - a preconfigured Net::Pcap device.
+
+    This skips the detection of the device by name. If you have special
+    configuration options, configure the device to your needs in your
+    code and then pass it in.
+
+- `netmask` - the netmask to capture on.
+
+    If you want to skip netmask detection, for example because your
+    capture device has no IP address, you can pass in the netmask
+    through this option.
+
+- `snaplen` - size of the [Net::Pcap](https://metacpan.org/pod/Net%3A%3APcap) capture buffer
+
+    The size of this buffer can determine whether you lose packets
+    while processing. A large value led to lost packets in at least one case.
+    The default value is 16384.
+
+- `timeout` - the read timeout in ms while waiting for packets. The default is
+500 ms.
+
+## `run_file FILENAME, PCAP_FILTER`
+
+"Listens" to the packets dumped into
+a file. This is convenient to use if you
+have packet captures from a remote machine
+or want to test new protocol sniffers.
+
+The file is presumed to contain an ethernet
+stream of packets.
+
+# CALLBACKS
+
+## `request REQ, CONN`
+
+The `request` callback is called with the parsed request and the connection
+object. The request will be an instance of [HTTP::Request](https://metacpan.org/pod/HTTP%3A%3ARequest) and will
+have an absolute URI if possible. Currently, the hostname for the absolute URI
+is constructed from the `Host:` header.
+
+## `response RES, REQ, CONN`
+
+The `response` callback is called with the parsed response, the request
+and the connection object.
+
+## `log MESSAGE`
+
+The `log` callback is called whenever the connection makes progress
+and in other various situations.
+
+## `tcp_log MESSAGE`
+
+The `tcp_log` callback is passed on to the underlying `Sniffer::Connection`
+object and can be used to monitor the TCP connection.
+
+## `stale_connection SNIFFER, CONN`
+
+Is called whenever a connection goes over the `timeout` limit
+without any activity. The default handler weeds out stale
+connections with the following code:
+
+    sub {
+      my ($self,$conn,$key);
+      $self->log->("Connection $key is stale.");
+      delete $self->connections->{ $key }
+    }
+
+# EXAMPLE PCAP FILTERS
+
+Here are some example Net::Pcap filters for common things:
+
+Capture all HTTP traffic between your machine and `www.example.com`:
+
+       (dest www.example.com && (tcp port 80))
+    || (src  www.example.com && (tcp port 80))
+
+Capture all HTTP traffic between your machine
+and `www1.example.com` or `www2.example.com`:
+
+      (dest www1.example.com && (tcp port 80))
+    ||(src www1.example.com  && (tcp port 80))
+    ||(dest www2.example.com && (tcp port 80))
+    ||(src www2.example.com  && (tcp port 80))
+
+Note that Net::Pcap resolves the IP addresses before using them, so you might
+actually get more data than you asked for.
+
+# BUGS
+
+## Closing Connections Properly
+
+Currently, it is not well-detected when a connection is closed by the
+starting side and no `FIN ACK` packet is received from the remote side. This
+can even happen is you close the browser window instead of waiting
+for the connections to auto-close.
+
+I'm not sure how to fix this besides employing better guesswork
+and "closing" connections as soon as the `FIN` packet gets sent.
+
+## Small Testsuite
+
+The whole module suite has almost no tests.
+
+If you experience problems, _please_ supply me with a complete,
+relevant packet dump as the included `dump-raw.pl` creates. Even
+better, supply me with (failing) tests.
+
+# AUTHOR
+
+Max Maischein (corion@cpan.org)
+
+# COPYRIGHT
+
+Copyright (C) 2005-2021 Max Maischein.  All Rights Reserved.
+
+This code is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+# SEE ALSO
+
+[HTTP::Proxy](https://metacpan.org/pod/HTTP%3A%3AProxy), [http://wireshark.org|Wireshark](http://wireshark.org|Wireshark), [Sniffer::Connnection](https://metacpan.org/pod/Sniffer%3A%3AConnnection)

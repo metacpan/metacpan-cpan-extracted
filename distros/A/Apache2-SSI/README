@@ -1393,7 +1393,7 @@ AUTHOR
 
     CPAN ID: jdeguest
 
-    <https://git.deguest.jp/jack/Apache2-SSI>
+    <https://gitlab.com/jackdeguest/Apache2-SSI>
 
 SEE ALSO
     Apache2::SSI::File, Apache2::SSI::Finfo, Apache2::SSI::Notes,

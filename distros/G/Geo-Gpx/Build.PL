@@ -19,7 +19,7 @@ my %module_build_args = (
     "Patrick Joly <patjol\@cpan.org>"
   ],
   "dist_name" => "Geo-Gpx",
-  "dist_version" => "1.03",
+  "dist_version" => "1.04",
   "license" => "perl",
   "module_name" => "Geo::Gpx",
   "recursive_test_files" => 1,

@@ -28,7 +28,7 @@ my $test_requires = {
 	'Test::NoWarnings' => 0,
 	'Test::Number::Delta' => 0,
 	'Test::Carp' => 0,
-	'Test::Script' => 0,
+	'Test::Script' => 1.12,
 	'WWW::RT::CPAN' => 0
 };
 
@@ -53,7 +53,7 @@ WriteMakefile(
 	TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'Encode' => 0,
-		'JSON' => 0,
+		'JSON::MaybeXS' => 0,
 		'HTTP::Request' => 0,
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
@@ -61,16 +61,18 @@ WriteMakefile(
 	},
 	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean		=> { FILES => 'Geo-Coder-CA-*' },
-	META_MERGE		=> {
+	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
-			type => 'git',
-			url => 'git://github.com/nigelhorne/Geo-Coder-CA.git',
-			web => 'https://github.com/nigelhorne/Geo-Coder-CA',
-			},
-			bugtracker => {
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-CA',
+				type => 'git',
+				url => 'git://github.com/nigelhorne/Geo-Coder-CA.git',
+				web => 'https://github.com/nigelhorne/Geo-Coder-CA',
+				repository => 'https://github.com/nigelhorne/Geo-Coder-CA',
+			}, bugtracker => {
+				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-CA',
+				web => 'https://github.com/nigelhorne/Geo-Coder-CA/issues',
+				url => 'https://github.com/nigelhorne/Geo-Coder-CA/issues',
 				mailto => 'bug-Geo-Coder-CA@rt.cpan.org'
 			}
 		},
@@ -80,8 +82,7 @@ WriteMakefile(
 
 sub are_online
 {
-	return 0 if($ENV{'AUTOMATED_TESTING'});
-	return 0 if($ENV{'NO_NETWORK_TESTING'});
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'TRAVIS_PERL_VERSION'});
 	return 0 if(!-t STDIN);
 
 	my $s = IO::Socket::INET->new(
@@ -89,7 +90,7 @@ sub are_online
 		Timeout => 10
 	);
 	if($s) {
-		if($ENV{'PERL_MM_USE_DEFAULT'}) {
+		if($ENV{'PERL_MM_USE_DEFAULT'} || $ENV{'AUTOMATED_TESTING'}) {
 			close($s);
 			return 1;
 		}
@@ -105,7 +106,7 @@ EOF
 		# Timeout inspired by Mail::IMAPClient
 		my $rc;
 		eval {
-			local $SIG{ALRM} = sub { die "alarm\n" };
+			local $SIG{ALRM} = sub { die 'alarm' };
 			alarm(60);
 			$rc = prompt('Do you want to enable these tests?', 'y') =~ /^y/i ? 1 : 0;
 			alarm(0);
@@ -115,8 +116,7 @@ EOF
 			return 1;	# The default is 'y'
 		}
 		return $rc;
-	} else {
-		print "On-line tests disabled because I couldn't detect an Internet connexion\n";
-		return 0;
 	}
+	print "On-line tests disabled because I couldn't detect an Internet connexion\n";
+	return 0;
 }

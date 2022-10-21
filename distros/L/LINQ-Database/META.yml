@@ -1,0 +1,52 @@
+---
+abstract: 'LINQ extension for working with databases'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Modern: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LINQ-Database
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  LINQ::Database:
+    file: lib/LINQ/Database.pm
+    version: '0.001'
+  LINQ::Database::Table:
+    file: lib/LINQ/Database/Table.pm
+    version: '0.001'
+  LINQ::Database::Util:
+    file: lib/LINQ/Database/Util.pm
+    version: '0.001'
+requires:
+  Class::Tiny: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  LINQ: '0.003'
+  Object::Adhoc: '0'
+  Role::Tiny: '0'
+  Scalar::Util: '0'
+  perl: '5.008003'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/LINQ-Database/project
+  bugtracker: https://github.com/tobyink/p5-linq-database/issues
+  homepage: https://metacpan.org/release/LINQ-Database
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-linq-database.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

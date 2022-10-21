@@ -43,13 +43,13 @@ my @wpt  = (
 
 {
   my $gpx = new Geo::Gpx;
-  $gpx->add_waypoint( @wpt );
-  is_deeply $gpx->waypoints, \@wpt, "add_waypoint adds waypoints";
+  $gpx->waypoints_add( @wpt );
+  is_deeply $gpx->waypoints, \@wpt, "waypoints_add adds waypoints";
 }
 
 {
   my $gpx = new Geo::Gpx;
-  eval { $gpx->add_waypoint( [] ) };
+  eval { $gpx->waypoints_add( [] ) };
   like $@, qr/waypoint argument must be a hash reference/,
    "type check OK";
 }
@@ -57,14 +57,14 @@ my @wpt  = (
 {
   for my $wpt ( {}, { lat => 1 }, { lon => 1 } ) {
     my $gpx = new Geo::Gpx;
-    eval { $gpx->add_waypoint( $wpt ) };
+    eval { $gpx->waypoints_add( $wpt ) };
     like $@, qr/mandatory in waypoint/, "mandatory lat, lon OK";
   }
 }
 
 {
   my $gpx = Geo::Gpx->new;
-  $gpx->add_waypoint( @wpt );
+  $gpx->waypoints_add( @wpt );
   my $bounds = {
     'maxlat' => 54.786989,
     'maxlon' => -2.344214,
@@ -80,7 +80,7 @@ my @wpt  = (
   # Violate encapsulation, avoid clock skew.
   $gpx->{time} = $time;
 
-  $gpx->add_waypoint( @wpt );
+  $gpx->waypoints_add( @wpt );
   my $expect = {
     waypoints => \@wpt,
     bounds    => {

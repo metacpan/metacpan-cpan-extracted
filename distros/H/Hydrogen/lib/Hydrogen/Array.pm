@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::Array;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016';
+our $VERSION   = '0.017';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::Array - a standard library for arrays
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Array 0.016,
-which is based on Sub::HandlesVia::HandlerLibrary::Array 0.037.
+This documentation is for Hydrogen::Array 0.017,
+which is based on Sub::HandlesVia::HandlerLibrary::Array 0.038.
 
 =cut
 
@@ -97,7 +97,7 @@ use Exporter::Shiny qw(
 
 Additional arguments: B<< Int >>, B<< Optional[Any] >>.
 
-Acts like C<get> if given one argument, or C<set> if given two arguments.
+Acts like C<get> if given just an index, or C<set> if given an index and value.
 
 =cut
 

@@ -21,21 +21,21 @@ $explain->parse_source;
 my $hinter = Pg::Explain::Hinter->new( $explain );
 ok( $hinter->any_hints, "There are some hints : ${mid_line}" );
 
-is( scalar @{ $hinter->hints }, 1, "One hint! : ${mid_line}");
+is( scalar @{ $hinter->hints }, 1, "One hint! : ${mid_line}" );
 
-my $hint = $hinter->hints->[0];
-isa_ok($hint, 'Pg::Explain::Hinter::Hint');
+my $hint = $hinter->hints->[ 0 ];
+isa_ok( $hint, 'Pg::Explain::Hinter::Hint' );
 
-isa_ok($hint->node, 'Pg::Explain::Node');
+isa_ok( $hint->node, 'Pg::Explain::Node' );
 is( $hint->type, 'INDEXABLE_SEQSCAN_MULTI_EQUAL_AND', 'Correct hint type' );
 ok( defined $hint->details, 'There are details' );
 is( ref $hint->details, 'ARRAY', 'Details are an array' );
 cmp_deeply(
     $hint->details,
     [
-        { 'column' => 'projet', 'value' => '10317' },
+        { 'column' => 'projet',  'value' => '10317' },
         { 'column' => 'section', 'value' => '29' },
-        { 'column' => 'zone', 'value' => '4' },
+        { 'column' => 'zone',    'value' => '4' },
     ],
     'Expected details for hint'
 );

@@ -1844,7 +1844,7 @@ Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x564839326528)"}\>
 
 CPAN ID: jdeguest
 
-<https://git.deguest.jp/jack/Apache2-SSI>
+<https://gitlab.com/jackdeguest/Apache2-SSI>
 
 SEE ALSO
 ========

@@ -52,6 +52,11 @@ sub does    { return 1 }
 sub payload { return { fake => 'payload' } }
 sub ident   {'fake-exception'}
 
+package Your::X::Array;
+use base qw(Your::X);
+
+sub payload { my $s = shift; return { array => $s->{array} } }
+
 # The fake we use for testing
 package main;
 use HTTP::Throwable::Factory qw(http_throw);
@@ -101,6 +106,10 @@ my $app = sub {
     }
     elsif ( $path eq '/redirect/307' ) {
         return [ 307, [ 'Location' => '/ok' ], ['red'] ];
+    }
+    elsif ( $path eq '/with_array' ) {
+        my $x = bless { array => [qw(apple banana cherry)]}, 'Your::X::Array';
+        die $x;
     }
 
 };
@@ -254,6 +263,15 @@ test_psgi
             is( $res->header('Location'), '/ok', 'Location header' );
             is( $res->content,            'red', 'some http content' );
 
+        };
+
+        subtest 'app return array' => sub {
+            my $res = $cb->( GET "http://localhost/with_array" );
+            like( $res->content, qr{<li>array:<ul>}, 'list header' );
+            like( $res->content, qr{<li>apple</li>}, 'list item' );
+            like( $res->content, qr{<li>banana</li>}, 'list item' );
+            like( $res->content, qr{<li>cherry</li>}, 'list item' );
+            like( $res->content, qr{</ul></li>}, 'close list' );
         };
     }
     };

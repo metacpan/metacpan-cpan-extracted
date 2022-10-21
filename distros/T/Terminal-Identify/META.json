@@ -1,5 +1,5 @@
 {
-   "abstract" : "Module with methods for the control of the terminal window",
+   "abstract" : "Perl extension for identifying the terminal emulator",
    "author" : [
       "Dr. Peter Netz <ztenretep@cpan.org>"
    ],
@@ -33,12 +33,11 @@
       "runtime" : {
          "requires" : {
             "Inline::C" : "0.82",
-            "Time::HiRes" : "1.9764",
-            "Try::Catch" : "v1.1.0"
+            "POSIX" : "1.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.11"
 }

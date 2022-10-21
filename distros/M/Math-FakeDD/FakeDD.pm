@@ -9,9 +9,12 @@ use 5.022; # for $Config{longdblkind}
 
 use constant MPFR_LIB_VERSION   => MPFR_VERSION;
 
-use constant NAN_COMPARE_BUG    => $Math::MPFR::VERSION < 4.23 ? 1 : 0;
+use constant NAN_COMPARE_BUG    => $Math::MPFR::VERSION < 4.23  ? 1 : 0;
 
-use constant NV_IS_DOUBLE       => $Config{nvsize} == 8        ? 1 : 0;
+# The dd_repro() sub requires Math-MPFR-4.24
+use constant M_MPFR_VER_OK      => $Math::MPFR::VERSION >= 4.24 ? 1 : 0;
+
+use constant NV_IS_DOUBLE       => $Config{nvsize} == 8         ? 1 : 0;
 
 use constant NV_IS_DOUBLEDOUBLE => $Config{nvsize} != 8 &&
                                    ($Config{longdblkind} >=5 && $Config{longdblkind} <= 8) ? 1 : 0;
@@ -22,6 +25,10 @@ use constant NV_IS_QUAD => $Config{nvtype} eq '__float128' ||
 
 use constant NV_IS_80BIT_LD => $Config{nvtype} eq 'long double' &&
                                $Config{longdblkind} > 2 && $Config{longdblkind} < 5         ? 1 : 0;
+
+use constant M_FDD_DBL_MAX  => Rmpfr_get_d(Math::MPFR->new('1.fffffffffffffp+1023', 16), 0);
+use constant M_FDD_P2_970   => 2 ** 970;
+use constant DBL_DENORM_MIN => 2 ** -1074;
 
 use overload
 'abs'   => \&dd_abs,
@@ -55,6 +62,9 @@ use overload
 '-'     => \&dd_sub,
 '-='    => \&dd_sub_eq,
 '!'     => \&dd_false,
+'='     => \&overload_copy,
+'++'    => \&overload_inc,
+'--'    => \&overload_dec,
 ;
 
 require Exporter;
@@ -62,21 +72,23 @@ require Exporter;
 
 my @tags = qw(
   NV_IS_DOUBLE NV_IS_DOUBLEDOUBLE NV_IS_QUAD NV_IS_80BIT_LD MPFR_LIB_VERSION
-  dd_abs dd_add dd_add_eq dd_assign dd_atan2 dd_catalan dd_cmp dd_cos dd_dec dd_div dd_div_eq
-  dd_eq dd_euler dd_exp dd_exp2 dd_exp10
+  dd_abs dd_add dd_add_eq dd_assign dd_atan2 dd_catalan dd_cmp dd_clone dd_copy dd_cos dd_dec
+  dd_div dd_div_eq dd_eq dd_euler dd_exp dd_exp2 dd_exp10
   dd_gt dd_gte dd_hex dd_inf dd_is_inf dd_is_nan dd_int dd_log dd_log2 dd_log10 dd_lt dd_lte
-  dd_mul dd_mul_eq dd_nan dd_neq dd_numify dd_pi dd_pow dd_pow_eq dd_repro dd_repro_test
+  dd_mul dd_mul_eq dd_nan dd_neq
+  dd_nextup dd_nextdown dd_numify dd_pi dd_pow dd_pow_eq dd_repro dd_repro_test
   dd_sin dd_spaceship dd_sqrt dd_streq dd_stringify dd_strne
   dd_sub dd_sub_eq
   dd2mpfr mpfr2dd mpfr_any_prec2dd mpfr2098
-  printx sprintx unpackx
+  printx sprintx any2dd unpackx
+  ulp_exponent is_subnormal
 );
 
 @Math::FakeDD::EXPORT_OK = (@tags);
 
 %Math::FakeDD::EXPORT_TAGS = (all => [@tags]);
 
-$Math::FakeDD::VERSION =  '0.05';
+$Math::FakeDD::VERSION =  '0.06';
 
 # Whenever dd_repro($obj) returns its string representation of
 # the value of $obj, $Math::FakeDD::REPRO_PREC is set to the
@@ -86,6 +98,10 @@ $Math::FakeDD::VERSION =  '0.05';
 # that dd_repro() has not been called at all.
 
 $Math::FakeDD::REPRO_PREC = -1;
+$Math::FakeDD::DD_MAX = Math::FakeDD->new(Rmpfr_get_d(Math::MPFR->new('1.fffffffffffffp+1023', 16), MPFR_RNDN))
+                        + Rmpfr_get_d(Math::MPFR->new('1.fffffffffffffp+969', 16), MPFR_RNDN);
+
+
 
 sub new {
 
@@ -111,6 +127,11 @@ sub new {
 sub dd_repro {
   die "Arg given to dd_repro() must be a Math::FakeDD object"
     unless ref($_[0]) eq 'Math::FakeDD';
+
+  unless(M_MPFR_VER_OK) {
+    warn "dd_repro() needs Math-MPFR-4.24 or later, but you have only $Math::MPFR::VERSION\n";
+    die "Please update Math::MPFR if you wish to call dd_repro()";
+  }
 
   my $arg = shift;
   my $prec = 0;
@@ -692,6 +713,16 @@ sub dd_cmp {
 
   return $rop1 <=> $rop2; # "<=>" is "Math::MPFR::overload_spaceship"
                           # and will return undef if a NaN is involved.
+}
+
+*dd_clone = \&dd_copy;
+sub dd_copy {
+  die "Arg given to dd_clone or dd_copy must be a Math::FakeDD object"
+    unless ref($_[0]) eq 'Math::FakeDD';
+
+  my $ret = Math::FakeDD->new();
+  dd_assign($ret, $_[0]);
+  return $ret;
 }
 
 sub dd_cos {
@@ -1291,6 +1322,8 @@ sub dd_stringify {
   return "[" . nvtoa($self->{msd}) . " " . nvtoa($self->{lsd}) . "]"
     if NV_IS_DOUBLE;
 
+  return "[0.0 0.0]" if($self->{msd} == 0 && $self->{lsd} == 0); # Don't look at the exponent of a
+                                                                 # Math::MPFR object whose value is 0.
   my($mpfrm, $mpfrl) = (Rmpfr_init2(53), Rmpfr_init2(53));
   Rmpfr_set_d($mpfrm, $self->{msd}, MPFR_RNDN);
   Rmpfr_set_d($mpfrl, $self->{lsd}, MPFR_RNDN);
@@ -1421,15 +1454,30 @@ sub mpfr2dd {
 
   my $mpfr = Rmpfr_init2(2098);
   Rmpfr_set($mpfr, shift, MPFR_RNDN);
-
   my $msd = Rmpfr_get_d($mpfr, MPFR_RNDN);
+
+  # $msd could be an Inf or Zero, even though $mpfr was not.
+  # Also cater for the possibility that $msd is Nan - though
+  # I don't think that can happen.
   if($msd == 0 || $msd != $msd || $msd / $msd != 1) { # $msd is zero, nan, or inf.
     $h{msd} = $msd;
     $h{lsd} = 0;
     return bless(\%h);
   }
+
   Rmpfr_sub_d($mpfr, $mpfr, $msd, MPFR_RNDN);
   my $lsd = Rmpfr_get_d($mpfr, MPFR_RNDN);
+
+  # If abs($msd) is DBL_MAX && abs($lsd) is 2**970
+  # && $msd has the same sign as $lsd, then return
+  # an Inf that has the same sign as $msd.
+  # This is a bit murky. See:
+  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61399
+  if(abs($msd) == M_FDD_DBL_MAX && abs($lsd) == M_FDD_P2_970) {
+    if($msd < 0 && $lsd < 0) { return dd_inf(-1) }
+    if($msd > 0 && $lsd > 0) { return dd_inf()   }
+  }
+
   $h{msd} = $msd;
   $h{lsd} = $lsd;
   return bless(\%h);
@@ -1491,6 +1539,27 @@ sub mpfr2098 {
 
 }
 
+sub overload_copy {
+  # Not exported
+  my $ret = Math::FakeDD->new();
+  dd_assign($ret, $_[0]);
+  return $ret;
+}
+
+sub overload_inc {
+  # Not exported
+  my $rop1 = dd2mpfr($_[0]);
+  Rmpfr_add_ui($rop1, $rop1, 1, MPFR_RNDN);
+  dd_assign($_[0], mpfr2dd($rop1));
+}
+
+sub overload_dec {
+  # Not exported
+  my $rop1 = dd2mpfr($_[0]);
+  Rmpfr_sub_ui($rop1, $rop1, 1, MPFR_RNDN);
+  dd_assign($_[0], mpfr2dd($rop1));
+}
+
 sub oload {
   # Not exported.
   # Return a list of the operator-function pairs for the overloaded
@@ -1528,6 +1597,9 @@ sub oload {
     '-'     => 'dd_sub',
     '-='    => 'dd_sub_eq',
     '!'     => 'dd_false',
+    '='     => 'overload_copy',
+    '++'    => 'overload_inc',
+    '--'    => 'overload_dec',
 );
 
   return %h
@@ -1589,6 +1661,15 @@ sub sprintx {
   die "Wrong arg given to sprintx()";
 }
 
+sub any2dd {
+  my $mpfr = Rmpfr_init2(2098);
+  Rmpfr_set_ui($mpfr, 0, MPFR_RNDN);
+  for(@_) {
+    $mpfr += $_;
+  }
+  return mpfr2dd($mpfr);
+}
+
 sub unpackx {
   if(ref($_[0]) eq 'Math::FakeDD') {
     my $self = shift;
@@ -1613,5 +1694,108 @@ sub unpackx {
 #  return 1;                      # pass
 #}
 
+sub dd_nextup {
+  my $dd = shift;
+  return Math::FakeDD->new(2 ** -1074) if $dd == 0;
+  return dd_nan() if dd_is_nan($dd);
+  if(dd_is_inf($dd)) {
+    return dd_inf() if $dd > 0;
+    return -$Math::FakeDD::DD_MAX;
+  }
+
+  # We now need to check the first 12 bits of the lsd
+  my $is_neg = 0;
+  my $leading_12_bits = hex(substr(unpack("H*", pack("d>", $dd->{lsd})), 0, 3));
+  $is_neg = 1 if $leading_12_bits > 2048; # ignore signed zero
+  my $raw_exponent = $leading_12_bits & 2047;
+  unless($raw_exponent) {
+    # The lsd can never be an inf or a nan
+    # Therefore must be a subnormal (or zero),
+    # so we return $dd plus DBL_DENORM_MIN
+    return $dd + DBL_DENORM_MIN;
+  }
+
+  my $exp = $raw_exponent - 1023 - 52;
+  my $pow = 2 ** $exp;
+
+  # Check that $dd + $pow > $dd.
+  while($dd + $pow == $dd) {
+    $pow *= 2;
+  }
+
+  my $keep = $pow;
+
+  while($dd + $pow > $dd) {
+    $keep = $pow;
+    die "Error (bug) in dd_nextup(" . sprintx($dd) . ")" unless $keep;
+    $pow /= 2;
+  }
+
+return $dd + $keep;
+}
+
+sub dd_nextdown {
+  my $dd = shift;
+  return Math::FakeDD->new(-(2 ** -1074)) if $dd == 0;
+  return dd_nan() if dd_is_nan($dd);
+  if(dd_is_inf($dd)) {
+    return dd_inf(-1) if $dd < 0;
+    return $Math::FakeDD::DD_MAX;
+  }
+
+  # We now need to check the first 12 bits of the lsd
+  my $is_neg = 0;
+  my $leading_12_bits = hex(substr(unpack("H*", pack("d>", $dd->{lsd})), 0, 3));
+  $is_neg = 1 if $leading_12_bits > 2048; # ignore signed zero
+  my $raw_exponent = $leading_12_bits & 2047;
+  unless($raw_exponent) {
+    # The lsd can never be an inf or a nan.
+    # Therefore must be a subnormal (or zero),
+    # so we return $dd minus DBL_DENORM_MIN
+    return $dd - DBL_DENORM_MIN;
+  }
+
+  my $exp = $raw_exponent - 1023 - 52;
+  my $pow = 2 ** $exp;
+
+  # Check that $dd - $pow < $dd.
+  while($dd - $pow == $dd) {
+    $pow *= 2;
+  }
+
+  my $keep = $pow;
+
+  while($dd - $pow < $dd) {
+    $keep = $pow;
+    die "Error (bug) in dd_nextup(" . sprintx($dd) . ")" unless $keep;
+    $pow /= 2;
+  }
+
+return $dd - $keep;
+}
+
+sub ulp_exponent {
+  my $dd = shift;
+  my $exp;
+  if($_[0]) {
+    # If a second (and true) argument was provided
+    $exp = hex(substr(unpack("H*", pack("d>", $dd->{msd})), 0, 3)) & 2047;
+  }
+  else {
+    $exp = hex(substr(unpack("H*", pack("d>", $dd->{lsd})), 0, 3)) & 2047;
+  }
+  return $exp - 1075 if $exp;
+  return -1074;
+}
+
+sub is_subnormal {
+  # Takes an NV as its argument.
+  my $d = shift;
+  die "Bad argument passed to is_subnormal()"
+    unless Math::MPFR::_itsa($d) == 3;
+  # NOTE:  # We return 1 if $d == 0.
+  return 1 if((hex(substr(unpack("H*", pack("d>", $d)), 0, 3)) & 2047) == 0);
+  return 0;
+}
 
 1;

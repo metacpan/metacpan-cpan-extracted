@@ -29,27 +29,53 @@ Geo::Gpx - Create and parse GPX files
 
     The working directory can be supplied as a relative (to [Cwd::cwd](https://metacpan.org/pod/Cwd%3A%3Acwd)) or absolute path but is internally stored by `set_wd()` as a full path. If `work_dir` is ommitted, it is set based on the path of the _$filename_ supplied or the current working directory if the constructor is called with an XML string or a filehandle.
 
+- clone()
+
+    Returns a deep copy of a `Geo::Gpx` instance.
+
+        $clone = $self->clone;
+
 ## Methods
 
-- waypoints( \\@waypoints )
+- waypoints( integer or name => 'name' )
 
-    Initialize waypoints based on an array reference containing either a list of [Geo::Gpx::Point](https://metacpan.org/pod/Geo%3A%3AGpx%3A%3APoint)s or hash references with fields that can be parsed by [Geo::Gpx::Point](https://metacpan.org/pod/Geo%3A%3AGpx%3A%3APoint)'s `new()` constructor. See the later for the possible fields.
+    Returns the array reference of waypoints when called without argument. Optionally accepts a single integer refering to the waypoint number from waypoints aref (1-indexed) or a key value pair with the name of the waypoint to be returned.
 
-    Returns the array reference of [Geo::Gpx::Points](https://metacpan.org/pod/Geo%3A%3AGpx%3A%3APoints) stored as waypoints.
-
-- add\_waypoint( \\%point \[, \\%point, … \] )
+- waypoints\_add( \\%point \[, \\%point, … \] )
 
     Add one or more waypoints. Each waypoint must be either a [Geo::Gpx::Point](https://metacpan.org/pod/Geo%3A%3AGpx%3A%3APoint) or a hash reference with fields that can be parsed by [Geo::Gpx::Point](https://metacpan.org/pod/Geo%3A%3AGpx%3A%3APoint)'s `new()` constructor. See the later for the possible fields.
 
         %point = ( lat => 54.786989, lon => -2.344214, ele => 512, time => 1164488503, name => 'My house', desc => 'There\'s no place like home' );
-        $gpx->add_waypoint( \%point );
+        $gpx->waypoints_add( \%point );
 
           or
 
         $pt = Geo::Gpx::Point->new( %point );
-        $gpx->add_waypoint( $pt );
+        $gpx->waypoints_add( $pt );
 
     Time values may either be an epoch offset or a [DateTime](https://metacpan.org/pod/DateTime). If you wish to specify the timezone use a [DateTime](https://metacpan.org/pod/DateTime). (This behaviour may change in the future.)
+
+- routes( integer or name => 'name' )
+
+    Returns the array reference of routes when called without argument. Optionally accepts a single integer refering to the route number from routes aref (1-indexed) or a key value pair with the name of the route to be returned.
+
+- routes\_add( $route or $points\_aref \[, name => $route\_name )
+
+    Add a route to a `Geo::Gpx` object. The _$route_ is expected to be an existing route (i.e. a hash ref). Returns true. A new route can also be created based an array reference(s) of [Geo::Gpx::Point](https://metacpan.org/pod/Geo%3A%3AGpx%3A%3APoint) objects and added to the `Geo::Gpx` instance.
+
+    `name` and all other meta fields supported by routes can be provided and will overwrite any existing fields in _$route_.
+
+- tracks( integer or name => 'name' )
+
+    Returns the array reference of tracks when called without argument. Optionally accepts a single integer refering to the track number from tracks aref (1-indexed) or a key value pair with the name of the track to be returned.
+
+- tracks\_add( $track or $points\_aref \[, $points\_aref, … \], name => $track\_name )
+
+    Add a track to a `Geo::Gpx` object. The _$track_ is expected to be an existing track (i.e. a hash ref). Returns true.
+
+    A new track can also be created based an array reference(s) of [Geo::Gpx::Point](https://metacpan.org/pod/Geo%3A%3AGpx%3A%3APoint) objects and added to the `Geo::Gpx` instance. If more than one array reference is supplied, the resulting track will contain as many segments as the number of aref's provided.
+
+    `name` and all other meta fields supported by tracks can be provided and will overwrite any existing fields in _$track_.
 
 - iterate\_waypoints()
 - iterate\_trackpoints()
@@ -101,13 +127,17 @@ Geo::Gpx - Create and parse GPX files
 
     With one difference: the keys will only be set if they are defined.
 
-- save( filename => $fname, force => $bool, encoding => $enc )
+- save( filename => $fname, key/values )
 
     Saves the `Geo::Gpx` instance as a file.
 
-    All fields are optional unless the instance was created without a filename (i.e with an XML string or a filehandle) and `set_filename()` has not been called yet. If the filename is a relative path, the file will be saved in the instance's working directory (not the caller's, `Cwd`).
+    The filename field is optional unless the instance was created without a filename (i.e with an XML string or a filehandle) and `set_filename()` has not been called yet. If the filename is a relative path, the file will be saved in the instance's working directory (not the caller's, `Cwd`).
 
-    `encoding` can be either `utf-8` (the default) or `latin1`.
+    _key/values_ are (all optional):
+
+        `force`:      overwrites existing files if true, otherwise it won't.
+        `extensions`: save `<extensions>…</extension>` tags if true (defaults to false).
+        `meta_time`:  save the `<time>…</time>` tag in the file's meta information tags if true (defaults to false). Some applications like MapSource return an error if this tags is present. (All other time tags elsewhere are kept.)
 
 - set\_filename( $filename )
 
@@ -149,38 +179,6 @@ Geo::Gpx - Create and parse GPX files
     Accessor for the &lt;time> element of a GPX. The time is converted to a Unix epoch time when a GPX document is parsed unless the `use_datetime` option is specified in which case times will be represented as [DateTime](https://metacpan.org/pod/DateTime) objects.
 
     When setting the time you may supply either an epoch time or a [DateTime](https://metacpan.org/pod/DateTime) object.
-
-- routes( $aref )
-
-    Return an array reference containing the routes of the instance. In the future, methods will be provided to set routes. In the meantime, to set the routes of the GPX instance, supply an array of hash references structured as:
-
-        my $aref = [
-          { 'name' => 'Route 1',
-            'points' => [ <list_of_Geo_Gpx_Point> ]
-          },
-          { 'name' => 'Route 2',
-            'points' => [ <list_of_Geo_Gpx_Point> ]
-          },
-        ];
-
-- tracks( $aref )
-
-    Returns an array reference containing the routes of the instance. In the future, methods will be provided to set tracks. In the meantime, to set the tracks of the GPX instance, supply an array of hash references structured as:
-
-        my $aref = [
-          { 'name' => 'Track 1',
-            'segments' => [
-              { 'points' => [ <list_of_Geo_Gpx_Point> ] },
-              { 'points' => [ <list_of_Geo_Gpx_Point> ] },
-            ]
-          }
-          { 'name' => 'Track 2',
-            'segments' => [
-              { 'points' => [ <list_of_Geo_Gpx_Point> ] },
-              { 'points' => [ <list_of_Geo_Gpx_Point> ] },
-            ]
-          }
-        ];
 
 - version()
 
@@ -228,7 +226,7 @@ Please visit the project page at: [https://github.com/patjoly/geo-gpx](https://g
 
 # VERSION
 
-1.03
+1.04
 
 # LICENSE AND COPYRIGHT
 

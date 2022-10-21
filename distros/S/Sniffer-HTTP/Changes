@@ -7,6 +7,11 @@ Sniffer::HTTP
     - implement multiple outstanding requests/responses for one connection
     - find out why it doesn't listen on just port 80
 
+0.28 2022-10-20:
+      - More test fix for versions of HTTP::Message onwards. This addresses 144847,
+        reported by Andreas Koenig
+      - No code changes, no upgrade necessary
+
 0.27 2022-10-19:
       - More test fix for versions of HTTP::Message onwards. This addresses 144847,
         reported by Andreas Koenig

@@ -1,5 +1,8 @@
 Revision history for Acme-Affinity
 
+0.0114 2022-10-20 16:03:18
+    - Avoid implicit imports.
+
 0.0113 2022-02-18 06:46:03
     - Attempt to appease cpantesters...
 

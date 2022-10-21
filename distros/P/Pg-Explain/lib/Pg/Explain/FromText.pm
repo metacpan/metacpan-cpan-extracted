@@ -9,7 +9,7 @@ use utf8;
 use open qw( :std :utf8 );
 use Unicode::Normalize qw( NFC );
 use Unicode::Collate;
-use Encode qw( decode );
+use Encode  qw( decode );
 use English qw( -no_match_vars );
 
 if ( grep /\P{ASCII}/ => @ARGV ) {
@@ -29,11 +29,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 2.2
+Version 2.3
 
 =cut
 
-our $VERSION = '2.2';
+our $VERSION = '2.3';
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ sub split_into_lines {
         if ( $l =~ m{ \A Trigger \s+ }xms ) {
             push @out, $l;
         }
-        elsif ( $l =~ m{ \A (?: Total \s+ runtime | Planning \s+ time | Execution \s+ time | Time | Filter | Output | JIT | Planning | Settings ): }xmsi ) {
+        elsif ( $l =~ m{ \A (?: Total \s+ runtime | Planning \s+ time | Execution \s+ time | Time | Filter | Output | JIT | Planning | Settings | Query \s+ Identifier ): }xmsi ) {
             push @out, $l;
         }
         elsif ( $l =~ m{\A\S} ) {

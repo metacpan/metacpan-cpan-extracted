@@ -2,7 +2,7 @@ package Geo::Gpx::Point;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =encoding utf8
 
@@ -20,8 +20,10 @@ L<Geo::Gpx::Point> provides a data structure for GPX points and provides accesso
 
 =cut
 
+use DateTime::Format::ISO8601;
 use Geo::Calc;
 use Geo::Coordinates::Transform;
+use Scalar::Util qw( blessed );
 use Carp qw(confess croak cluck);
 use vars qw($AUTOLOAD %possible_attr);
 use overload ('""' => 'as_string');
@@ -62,6 +64,13 @@ sub new {
         if ( $possible_attr{ $key } ) {
             $wpt->{ $key } = $fields { $key }
         } else { croak "field '$key' not supported" }
+    }
+
+    if (defined $wpt->{time} and ! blessed $wpt->{time}) {  # i.e could already be a DateTime object
+        if ($wpt->{time} =~ /-|:/) {
+            my $dt = DateTime::Format::ISO8601->parse_datetime( $wpt->{time} );
+            $wpt->{time} = $dt->epoch
+        }
     }
     return $wpt
 }
@@ -254,7 +263,7 @@ Patrick Joly C<< <patjol@cpan.org> >>.
 
 =head1 VERSION
 
-1.03
+1.04
 
 =head1 SEE ALSO
 

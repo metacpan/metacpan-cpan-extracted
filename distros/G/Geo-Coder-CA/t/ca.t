@@ -17,7 +17,7 @@ CA: {
 				skip('Author tests not required for installation', 6);
 			} else {
 				diag('Test requires Internet access');
-				skip 'Test requires Internet access', 6;
+				skip('Test requires Internet access', 6);
 			}
 		}
 
@@ -34,7 +34,9 @@ CA: {
 		like($address->{'city'}, qr/Richibucto/i, 'test reverse city');
 		# like($address->{'country'}, qr/Canada/i, 'test reverse country');
 
-		# This gives invalid JSON. It has been reported to geocoder.ca.
-		# $location = $geocoder->geocode('Nassagaweya, Halton, Ontario, Canada');
+		TODO: {
+			local $TODO = 'This gives invalid JSON. It has been reported to geocoder.ca';
+			$location = $geocoder->geocode('Nassagaweya, Halton, Ontario, Canada');
+		}
 	}
 }

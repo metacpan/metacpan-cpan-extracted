@@ -7,7 +7,7 @@ use warnings;
 use Time::HiRes qw(time);
 use Time::Local;
 
-our $VERSION = 1.20;
+our $VERSION = 1.22;
 
 sub new {
 	my ($class, %args) = @_;
@@ -52,6 +52,18 @@ sub bin_search {
         return (0, $lo);
 }
 
+sub _expire_find_session_idx {
+	my ($self, $session, $idx) = @_;
+
+	do {
+		if ($self->{expiring}[$idx]->{id} eq $session->{id}) {
+			return $idx;
+		}
+		last if (--$idx < 0);
+	} while ($self->{expiring}[$idx]->{expiretime} eq $session->{expiretime});
+	return;
+}
+
 sub expire_insert {
 	my ($self, $session) = @_;
 
@@ -60,6 +72,14 @@ sub expire_insert {
 	#
 	my ($found, $idx) = bin_search($self->{expiring}, sub { $_[0]->{expiretime} - $_[1]->{expiretime} }, $session);
 	if ($found) {
+		# Update expire entry if session exists.
+		# (there should be just one session per id)
+		#
+		my $sessionidx = $self->_expire_find_session_idx($session, $idx);
+		if (defined $sessionidx) {
+			$self->{expiring}[$sessionidx] = $session;
+			return;
+		}
 		splice(@{$self->{expiring}}, $idx+1, 0, $session);
 	} else {
 		splice(@{$self->{expiring}}, $idx, 0, $session);
@@ -74,13 +94,10 @@ sub expire_remove {
 	#
 	my ($found, $idx) = bin_search($self->{expiring}, sub { $_[0]->{expiretime} - $_[1]->{expiretime} }, $session);
 	if ($found) {
-		do {
-			if ($self->{expiring}[$idx]->{id} eq $session->{id}) {
-				splice(@{$self->{expiring}}, $idx, 1);
-				last;
-			}
-			last if (--$idx < 0);
-		} while ($self->{expiring}[$idx]->{expiretime} eq $session->{expiretime});
+		my $sessionidx = $self->_expire_find_session_idx($session, $idx);
+		if (defined $sessionidx) {
+			splice(@{$self->{expiring}}, $sessionidx, 1);
+		}
 	}
 }
 
@@ -153,6 +170,9 @@ sub session_get {
 			my $user = $child->{session}{user};
 			if (exists $self->{per_user}{$user}) {
 				delete $self->{per_user}{$user}{$child->{session}{id}};
+				if (scalar keys %{$self->{per_user}{$user}} == 0) {
+					delete $self->{per_user}{$user};
+				}
 			}
 		}
 
@@ -243,14 +263,14 @@ sub expired_dequeue {
 
 	# Use sorted expire list to expire sessions.
 	#
-	if (scalar @{$self->{expiring}}) {
+	while (scalar @{$self->{expiring}}) {
 		my $session = $self->{expiring}[0];
 		my $diff = $session->{expiretime} - time();
 		return if ($diff >= 0);
 
 		$session = shift @{$self->{expiring}};
 		my $child = $self->session_get($session->{id});
-		return $child;
+		return $child if $child;
 	}
 	return;
 }

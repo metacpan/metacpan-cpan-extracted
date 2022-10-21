@@ -13,8 +13,7 @@ my @correct_order = qw(
  hdop vdop pdop ageofdgpsdata dgpsid
 );
 
-$gpx->waypoints(
-  [
+$gpx->waypoints_add(
     {
       # All standard GPX fields
       lat         => 54.786989,
@@ -42,7 +41,6 @@ $gpx->waypoints(
       ageofdgpsdata => 45,
       dgpsid        => 247
     }
-  ]
 );
 
 my $xml = $gpx->xml( '1.1' );

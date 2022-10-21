@@ -6,11 +6,10 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   IPC::System::Simple: '0'
   Test::Carp: '0'
-  Test::LWP::UserAgent: '0'
   Test::Most: '0'
   Test::NoWarnings: '0'
   Test::Number::Delta: '0'
-  Test::Script: '0'
+  Test::Script: '1.12'
   WWW::RT::CPAN: '0'
   autodie: '0'
 configure_requires:
@@ -29,13 +28,13 @@ no_index:
 requires:
   Encode: '0'
   HTTP::Request: '0'
-  JSON: '0'
+  JSON::MaybeXS: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   URI: '0'
   perl: '5.006002'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-CA
+  bugtracker: https://github.com/nigelhorne/Geo-Coder-CA/issues
   repository: git://github.com/nigelhorne/Geo-Coder-CA.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

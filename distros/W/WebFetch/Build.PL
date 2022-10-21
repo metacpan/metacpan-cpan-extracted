@@ -18,7 +18,7 @@ my %module_build_args = (
     "Ian Kluft <https://github.com/ikluft>"
   ],
   "dist_name" => "WebFetch",
-  "dist_version" => "0.15.3",
+  "dist_version" => "0.15.4",
   "license" => "gpl",
   "module_name" => "WebFetch",
   "recursive_test_files" => 1,

@@ -1,5 +1,10 @@
 Revision history for WebFetch
 
+0.15.4 2022-10-20T18:37:17-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - clear WebFetch::Output::Capture buffer after reading it, to support
+   tests which run it more than once
+
 0.15.3 2022-09-20T15:19:50-07:00 America/Los_Angeles
  [BUG FIXES]
  - CPAN Testers report: t/020-sitenews.t changed interpolate() from OO to
@@ -106,7 +111,7 @@ Revision history for WebFetch
  - updated WebFetch::CNNsearch to allow keyword-only searches. This became
    necessary when a Linux story got on all the
  - "in other news" pages at CNN and suddenly all pages on CNN
- - matched a search for Linux.	      This release also fixed a bug
+ - matched a search for Linux.		 This release also fixed a bug
  - with non-Linux searches, reported by Jamie Heilman.
  - New --style command line option was added to control the internal HTML
    style parameter.  Some new style strings were added

@@ -3,13 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the affinity between two people
 
-our $VERSION = '0.0113';
+our $VERSION = '0.0114';
 
+use Math::BigRat ();
 use Moo;
 use strictures 2;
 use namespace::clean;
-
-use Math::BigRat;
 
 
 has questions => (
@@ -104,7 +103,7 @@ Acme::Affinity - Compute the affinity between two people
 
 =head1 VERSION
 
-version 0.0113
+version 0.0114
 
 =head1 SYNOPSIS
 

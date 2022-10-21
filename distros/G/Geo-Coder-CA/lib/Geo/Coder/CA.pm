@@ -7,7 +7,7 @@ use warnings;
 
 use Carp;
 use Encode;
-use JSON;
+use JSON::MaybeXS;
 use HTTP::Request;
 use LWP::UserAgent;
 use LWP::Protocol::https;
@@ -19,11 +19,11 @@ Geo::Coder::CA - Provides a Geo-Coding functionality using http:://geocoder.ca f
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -55,12 +55,12 @@ sub new {
 		$class = __PACKAGE__;
 	}
 
-	my $ua = delete $param{ua};
+	my $ua = $param{ua};
 	if(!defined($ua)) {
 		$ua = LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
 		$ua->default_header(accept_encoding => 'gzip,deflate');
 	}
-	my $host = delete $param{host} || 'geocoder.ca';
+	my $host = $param{host} || 'geocoder.ca';
 
 	return bless { ua => $ua, host => $host }, $class;
 }
@@ -109,12 +109,12 @@ sub geocode {
 	my $res = $self->{ua}->get($url);
 
 	if($res->is_error()) {
-		Carp::croak("$url API returned error: " . $res->status_line());
+		Carp::croak("$url API returned error: ", $res->status_line());
 		return;
 	}
 	# $res->content_type('text/plain');	# May be needed to decode correctly
 
-	my $json = JSON->new->utf8();
+	my $json = JSON::MaybeXS->new()->utf8();
 	if(my $rc = $json->decode($res->decoded_content())) {
 		if($rc->{'error'}) {
 			# Sorry - you lose the error code, but HTML::GoogleMaps::V3 relies on this
@@ -211,9 +211,11 @@ sub run {
 
 	my @rc = $class->new()->geocode($location);
 
-	die "$0: geo-coding failed" unless(scalar(@rc));
-
-	print Data::Dumper->new([\@rc])->Dump();
+	if(scalar(@rc)) {
+		print Data::Dumper->new([\@rc])->Dump();
+	} else {
+		die "$0: geo-coding failed";
+	}
 }
 
 =head1 AUTHOR

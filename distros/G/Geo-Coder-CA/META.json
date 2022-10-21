@@ -34,7 +34,7 @@
          "requires" : {
             "Encode" : "0",
             "HTTP::Request" : "0",
-            "JSON" : "0",
+            "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "URI" : "0",
@@ -45,11 +45,10 @@
          "requires" : {
             "IPC::System::Simple" : "0",
             "Test::Carp" : "0",
-            "Test::LWP::UserAgent" : "0",
             "Test::Most" : "0",
             "Test::NoWarnings" : "0",
             "Test::Number::Delta" : "0",
-            "Test::Script" : "0",
+            "Test::Script" : "1.12",
             "WWW::RT::CPAN" : "0",
             "autodie" : "0"
          }
@@ -59,14 +58,16 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Geo-Coder-CA@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-CA"
+         "web" : "https://github.com/nigelhorne/Geo-Coder-CA/issues",
+         "x_url" : "https://github.com/nigelhorne/Geo-Coder-CA/issues"
       },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/nigelhorne/Geo-Coder-CA.git",
-         "web" : "https://github.com/nigelhorne/Geo-Coder-CA"
+         "web" : "https://github.com/nigelhorne/Geo-Coder-CA",
+         "x_repository" : "https://github.com/nigelhorne/Geo-Coder-CA"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

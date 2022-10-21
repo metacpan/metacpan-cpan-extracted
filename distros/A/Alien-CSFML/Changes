@@ -1,5 +1,18 @@
 Revision history for Perl extension Alien-CSFML
 
+v0.0.5 2022-10-21T12:34:19Z
+
+  - Bump required version of perl to 5.32 because 5 years is enough
+  - Kill over in ./Build if cmake fails
+
+v0.0.4 2022-10-21T04:15:08Z
+
+  - Fixing Windows broke *BSD and macOS in CI
+
+v0.0.3 2022-10-21T03:43:22Z
+
+  - Aim to use prebuilt libs on Windows (MSVC and GCC)
+
 v0.0.2 2022-10-19T18:41:44Z
 
   - Document dependencies on FreeBSD

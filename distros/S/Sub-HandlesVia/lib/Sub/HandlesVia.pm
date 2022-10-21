@@ -7,7 +7,7 @@ package Sub::HandlesVia;
 use Exporter::Shiny qw( delegations );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.037';
+our $VERSION   = '0.038';
 
 sub _generate_delegations {
 	my ($me, $name, $args, $globals) = (shift, @_);
@@ -312,27 +312,9 @@ Your project will still have a dependency on Sub::HandlesVia.
    );
  }
 
- You should be able to use Sub::HandlesVia with L<Mite> 0.001011 or above.
- Your project will still have a dependency on Sub::HandlesVia.
-
-  package MyApp::Kitchen {
-    use MyApp::Mite;
-    use Sub::HandlesVia;
-    
-    has food => (
-      is          => 'ro',
-      isa         => 'ArrayRef[Str]',
-      handles_via => 'Array',
-      default     => sub { [] },
-      handles     => {
-        'add_food'    => 'push',
-        'find_food'   => 'grep',
-      },
-    );
-  }
-
-If you have Mite 0.009000 or above, you can probably use its C<handles_via>
-support, and avoid your project having a Sub::HandlesVia dependency!
+If you have Mite 0.009000 or above, you can probably use its built-in
+C<handles_via> support, and avoid your project having a Sub::HandlesVia
+dependency!
 
  package MyApp::Kitchen {
    use MyApp::Mite;
@@ -498,13 +480,13 @@ native traits, and L<MouseX::NativeTraits>.
   
   Code ===============================================
                 execute : SubHV  DataP  Moose  Mouse  
-           execute_list : SubHV             ..........
-         execute_scalar : SubHV             ..........
-           execute_void : SubHV             ..........
+           execute_list : SubHV                       
+         execute_scalar : SubHV                       
+           execute_void : SubHV                       
          execute_method : SubHV         Moose  Mouse  
-    execute_method_list : SubHV             ..........
-  execute_method_scalar : SubHV             ..........
-    execute_method_void : SubHV             ..........
+    execute_method_list : SubHV                       
+  execute_method_scalar : SubHV                       
+    execute_method_void : SubHV                       
   
   Counter ============================================
                     dec : SubHV  DataP  Moose  Mouse  

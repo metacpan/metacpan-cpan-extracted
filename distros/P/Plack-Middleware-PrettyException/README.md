@@ -4,7 +4,7 @@ Plack::Middleware::PrettyException - Capture exceptions and present them as HTML
 
 # VERSION
 
-version 1.009
+version 1.010
 
 # SYNOPSIS
 
@@ -249,7 +249,7 @@ Thomas Klausner <domm@plix.at>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 - 2021 by Thomas Klausner.
+This software is copyright (c) 2016 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

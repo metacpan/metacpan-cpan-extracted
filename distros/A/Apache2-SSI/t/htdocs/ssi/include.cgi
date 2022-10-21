@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
 local $| = 0;
 print "Content-type: text/html\n";
 print "MyCGI: Test 5\n\n";

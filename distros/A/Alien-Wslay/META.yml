@@ -7,12 +7,13 @@ build_requires:
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
 configure_requires:
-  Alien::Build: '1.19'
+  Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Download::GitHub: '0.09'
   ExtUtils::CBuilder: '0'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,11 +24,12 @@ requires:
   base: '0'
   strict: '0'
   warnings: '0'
-version: '0.1'
+version: '0.2'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
     share:
+      Alien::Build::Plugin::Download::Negotiate: '1.30'
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Archive::Tar: '0'
       Config: '0'
@@ -35,11 +37,11 @@ x_alienfile:
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
-      Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_generated_by_perl: v5.34.0
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

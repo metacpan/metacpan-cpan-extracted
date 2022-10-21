@@ -61,18 +61,18 @@ no_index:
 provides:
   Alien::CSFML:
     file: lib/Alien/CSFML.pm
-    version: v0.0.2
+    version: v0.0.5
 requires:
   File::ShareDir: '0'
   File::Slurp: '0'
   File::Spec::Functions: '0'
   JSON::Tiny: '0'
-  perl: '5.010000'
+  perl: '5.026000'
 resources:
   bugtracker: https://github.com/sanko/alien-csfml/issues
   homepage: https://github.com/sanko/alien-csfml
   repository: https://github.com/sanko/alien-csfml.git
-version: v0.0.2
+version: v0.0.5
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

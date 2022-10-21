@@ -1,3 +1,48 @@
+0.016   2022-10-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Mark the main module's Abstract as Deprecated also.
+
+
+0.015   2022-10-21  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Mark deprecated in favor of App::WebSearchUtils.
+
+
+0.014   2022-10-10  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention App::WebSearchUtils, App::DDGSearchUtils,
+          App::BraveSearchUtils, App::BingSearchUtils.
+
+
+0.013   2022-09-15  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli google-search] Add options --min-delay & --max-delay as
+          alternative to --delay.
+
+
+0.012   2022-08-12  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli google-search][bugfix] Fix logic bug when checking time
+          period for type=map.
+
+
+0.011   2022-08-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Add actions: save_html, print_result_link,
+          print_result_html_link, print_result_org_link.
+
+
+0.010   2022-08-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli google-search] Add option: --queries-from.
+
+
 0.009   2022-08-11  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

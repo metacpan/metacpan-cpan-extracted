@@ -25,11 +25,11 @@ Pg::Explain::Hinter::Hint - Single hint for Pg::Explain plan
 
 =head1 VERSION
 
-Version 2.2
+Version 2.3
 
 =cut
 
-our $VERSION = '2.2';
+our $VERSION = '2.3';
 
 =head1 SYNOPSIS
 

@@ -372,10 +372,11 @@ sub open
         my $newflags = ( $flags & IPC_CREAT ) ? $flags : ( $flags | IPC_CREAT );
         my $limit = ( $serial + 10 );
         ## IPC::SysV::ftok has likely made the serial unique, but as stated in the manual page, there is no guarantee
-        while( ++$serial <= $limit )
+        while( $serial <= $limit )
         {
             $id = shmget( $serial, $opts->{size}, $newflags | IPC_CREAT );
             ## $self->message( 3, "Shared memory key '$serial' worked ? ", defined( $serial ) ? 'yes' : 'no' );
+            $serial++;
             last if( defined( $id ) );
         }
     }
@@ -400,9 +401,10 @@ sub open
     }
     ## $self->message( 3, "Semaphore id is '$semid'" );
     my $new = $self->new(
-        key => $opts->{key} || $self->key,
-        debug => $self->debug,
-        mode => $self->mode,
+        key     => $opts->{key} || $self->key,
+        debug   => $self->debug,
+        mode    => $self->mode,
+        destroy => $self->destroy,
     ) || return;
     $new->id( $id );
     $new->semid( $semid );

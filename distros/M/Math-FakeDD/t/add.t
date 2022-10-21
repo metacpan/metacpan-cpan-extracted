@@ -23,4 +23,20 @@ cmp_ok($obj3, '==', $obj4, '1: += ok');
 dd_add_eq($obj3, '0.125');
 cmp_ok($obj3, '==', Math::FakeDD->new(8.375), '2: += ok');
 
+my $dbl_max = Math::MPFR::Rmpfr_get_d(Math::MPFR->new('1.fffffffffffffp+1023', 16), 0);
+$obj1 = Math::FakeDD->new($dbl_max);
+cmp_ok(dd_is_inf($obj1), '==', 0, "DBL_MAX is not an Inf");
+$obj2 = $obj1 + (2 ** 970);
+cmp_ok(dd_is_inf($obj2)  , '!=', 0, "addition (+) results in Inf");
+$obj1 += 2 ** 970;
+cmp_ok(dd_is_inf($obj1)  , '!=', 0, "addition (+=) results in Inf");
+
+$obj1 = Math::FakeDD->new(-$dbl_max);
+cmp_ok(dd_is_inf($obj1), '==', 0, "-DBL_MAX is not an Inf");
+$obj2 = $obj1 - (2 ** 970);
+cmp_ok($obj2, '==', dd_inf(-1), "subtraction (-) results in -Inf");
+$obj1 -= 2 ** 970;
+cmp_ok($obj1, '==', dd_inf(-1), "subtraction (-=) results in -Inf");
+
+
 done_testing();

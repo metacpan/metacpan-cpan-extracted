@@ -3,13 +3,14 @@
 # Overloading of '-' and '-=' is tested in t/sub.t
 # Overloading of '*' and '*=' is tested in t/mul.t
 # Overloading of '/' and '/=' is tested in t/div.t
+# Overloading of '='          is tested in t/assign.t
 
 use strict;
 use warnings;
 use Math::FakeDD qw(:all);
 use Test::More;
 
-cmp_ok($Math::FakeDD::VERSION, '==', 0.05, "Version number is correct");
+cmp_ok($Math::FakeDD::VERSION, '==', 0.06, "Version number is correct");
 
 my $obj = Math::FakeDD->new();
 
@@ -98,7 +99,7 @@ cmp_ok($fudd1, '==', int($fudd2), "(2 ** 100) < int((2 ** 100) + (2 **-100))");
 
 my %oload = Math::FakeDD::oload();
 
-cmp_ok(scalar keys(%oload), '==', 31, "Math::FakeDD::oload relative sizes ok");
+cmp_ok(scalar keys(%oload), '==', 34, "Math::FakeDD::oload relative sizes ok");
 
 for(0.2, 0.3, 0.4, 0.50, 0.6, 0.8, 1, 2) {
 
@@ -146,6 +147,26 @@ cmp_ok(Math::FakeDD->new('1.4'), 'ne', '[1.3 -4.4408920985006264e-17]', "dd_strn
 
 my $dd = dd_numify(Math::FakeDD->new(2 ** 10) + Math::FakeDD->new(2 ** 70));
 cmp_ok( $dd, '==', (2 ** 10) + (2 ** 70), "'dd_numify' ok");
+
+my $dbl_max = Math::MPFR::Rmpfr_get_d(Math::MPFR->new('1.7976931348623157e+308'), 0);
+
+$dd = Math::FakeDD->new($dbl_max);
+like(dd_repro($dd), qr/8368\.0$/, "DBL_MAX looks correct");
+my $dd_base = $dd;
+
+$dd++;
+cmp_ok($dd, '>', $dd_base, "overloaded '++' raised value");
+like(dd_repro($dd), qr/8369\.0$/, "DBL_MAX++ looks correct");
+$dd_base += 1;
+cmp_ok($dd, '==', $dd_base, "overloaded '++' raised value by 1e0");
+
+$dd--;
+cmp_ok($dd, '==', $dd_base - 1, "overloaded '--' reduced value by 1e0");
+$dd--;
+like(dd_repro($dd), qr/8367\.0$/, "DBL_MAX-- looks correct");
+cmp_ok($dd, '<', $dd_base - 1, "overloaded '--' reduced value");
+$dd_base -= 2;
+cmp_ok($dd, '==', $dd_base, "overloaded '--' all correct");
 
 done_testing();
 

@@ -7,9 +7,10 @@
   #include <winsock2.h>
   #include <io.h>
 #else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
+  #include <sys/types.h>
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/ip.h>
 #endif
 
 const char* FILE_NAME = "Sys/Socket/Ip_mreq.c";

@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 use Test::Number::Delta within => 1e-2;
-use Test::Most tests => 16;
+use Test::Most tests => 19;
 use Test::Carp;
 
 BEGIN {
@@ -16,13 +16,15 @@ US: {
 			use_ok('Test::LWP::UserAgent');
 		} else {
 			diag('On-line tests have been disabled');
-			skip('On-line tests have been disabled', 15);
+			skip('On-line tests have been disabled', 18);
 		}
 
 		my $geocoder = new_ok('Geo::Coder::CA');
 		my $location = $geocoder->geocode('1600 Pennsylvania Avenue NW, Washington DC');
 		delta_ok($location->{latt}, 38.90);
 		delta_ok($location->{longt}, -77.04);
+
+		sleep(1);	# Don't overload the server
 
 		$location = $geocoder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
 		delta_ok($location->{latt}, 38.90);
@@ -31,6 +33,8 @@ US: {
 		TODO: {
 			# Test counties
 			local $TODO = "geocoder.ca doesn't support counties";
+
+			sleep(1);	# Don't overload the server
 
 			if($location = $geocoder->geocode(location => 'Greene County, Indiana, USA')) {
 				# delta_ok($location->{latt}, 39.04);
@@ -42,6 +46,8 @@ US: {
 				fail('Counties Long');
 			}
 
+			sleep(1);	# Don't overload the server
+
 			if($location = $geocoder->geocode(location => 'Greene, Indiana, USA')) {
 				# delta_ok($location->{latt}, 39.04);
 				# delta_ok($location->{longt}, -86.96);
@@ -52,6 +58,15 @@ US: {
 				fail('Counties Long');
 			}
 		}
+
+		$location = $geocoder->geocode('');
+		ok(!defined($location));
+
+		$location = $geocoder->geocode(location => '');
+		ok(!defined($location));
+
+		$location = $geocoder->geocode({ location => '' });
+		ok(!defined($location));
 
 		$location = $geocoder->geocode(location => 'XYZZY');
 		ok(!defined($location));

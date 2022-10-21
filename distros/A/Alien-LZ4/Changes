@@ -1,4 +1,8 @@
 Revision history for Alien-LZ4
 
+0.02      2022-10-21 09:07:46-05:00 America/Chicago
+  - Use GitHub plugin to download rt#144870 gh#4 (SREZIC++, plicease++).
+  - Set bugtracker to GitHub gh#5 (plicease++).
+
 0.01      2022-05-12 11:47:29-04:00 America/New_York
   - initial version

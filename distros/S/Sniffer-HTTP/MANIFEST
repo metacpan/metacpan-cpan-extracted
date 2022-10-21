@@ -3,6 +3,7 @@ bin/dump-raw.pl
 bin/live-http-headers.pl
 bin/replay-dump.pl
 Changes
+cpanfile
 lib/Net/Pcap/FindDevice.pm
 lib/Sniffer/Connection.pm
 lib/Sniffer/Connection/HTTP.pm
@@ -12,6 +13,8 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
 META.yml			Module meta-data (added by MakeMaker)
+README
+README.mkdn
 t/01-find_device.t
 t/01-use.t
 t/02-chunked.t

@@ -4,9 +4,8 @@ probe sub { $_[0]->runtime_prop->{ffi_name} = 'wslay' };
 plugin qw'Probe::CBuilder libs -lwslay';
 
 share {
-    start_url 'https://github.com/tatsuhiro-t/wslay/releases';
-    plugin 'Download' => (filter => qr/wslay-(?:[0-9\.]+)\.tar\.gz$/, version => qr/([0-9\.]+)/);
-    plugin qw'Extract tar.gz';
+    plugin qw'Download::GitHub github_user tatsuhiro-t github_repo wslay asset 1';
+    # plugin qw'Extract tar.gz';
     plugin 'Build::Autoconf';
     build ['%{configure}', '%{make}', '%{make} install'];
     plugin 'Gather::IsolateDynamic';

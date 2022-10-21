@@ -1,6 +1,8 @@
 Changes
 bin/denomfind
 bin/primefind
+bin/color0
+bin/transpose
 denomfind.pm
 INSTALL
 Makefile.PL

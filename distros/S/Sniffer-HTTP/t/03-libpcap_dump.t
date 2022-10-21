@@ -114,6 +114,7 @@ The requested URL /does_not_exists was not found on this server.<P>
 
 my $response2 = bless( {
                    '_protocol' => 'HTTP/1.1',
+                     @http_message_641,
                    '_content' => qq{<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">\n<HTML><HEAD>\n<TITLE>404 Not Found</TITLE>\n</HEAD><BODY>\n<H1>Not Found</H1>\nThe requested URL /favicon.ico was not found on this server.<P>\n</BODY></HTML>\n},
                                        '_rc' => '404',
                     '_headers' => bless( {

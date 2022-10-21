@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Output::Dump;
-$WebFetch::Output::Dump::VERSION = '0.15.3';
+$WebFetch::Output::Dump::VERSION = '0.15.4';
 use base "WebFetch";
 
 use Data::Dumper;
@@ -48,7 +48,7 @@ WebFetch::Output::Dump - save WebFetch data in a Perl structure dump
 
 =head1 VERSION
 
-version 0.15.3
+version 0.15.4
 
 =head1 SYNOPSIS
 

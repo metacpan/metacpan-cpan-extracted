@@ -5,7 +5,8 @@ BEGIN
     use warnings;
     use Test::More;
     use lib './lib';
-    use_ok( 'Apache2::SSI::Notes' ) || BAIL_OUT( "Unable to load Apache2::SSI::File" );
+    use_ok( 'Apache2::SSI::Notes' ) || BAIL_OUT( "Unable to load Apache2::SSI::Notes" );
+    use_ok( 'Apache2::SSI::SharedMem' ) || BAIL_OUT( "Unable to load Apache2::SSI::SharedMem" );
     our $IS_SUPPORTED = 1;
     if( !Apache2::SSI::SharedMem->supported )
     {

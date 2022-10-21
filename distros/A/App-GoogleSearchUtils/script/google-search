@@ -1,27 +1,29 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GoogleSearchUtils/google_search
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-11'; # DATE
+our $DATE = '2022-10-21'; # DATE
 our $DIST = 'App-GoogleSearchUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/GoogleSearchUtils/google_search",
     program_name => "google-search",
+    log => 1,
 );
 
 $cmdline->run;
 
-# ABSTRACT: Open google search page in browser
+# ABSTRACT: (DEPRECATED) Open google search page in browser
 # PODNAME: google-search
 
 __END__
@@ -32,21 +34,28 @@ __END__
 
 =head1 NAME
 
-google-search - Open google search page in browser
+google-search - (DEPRECATED) Open google search page in browser
 
 =head1 VERSION
 
-This document describes version 0.009 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2022-08-11.
+This document describes version 0.016 of google-search (from Perl distribution App-GoogleSearchUtils), released on 2022-10-21.
 
 =head1 SYNOPSIS
 
-% B<google-search> [B<--action>=I<str>|B<--open-url>|B<--print-html-link>|B<--print-org-link>|B<--print-url>] [B<--append>=I<str>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--delay>=I<duration>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--num>=I<posint>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--prepend>=I<str>] [(B<--query>=I<str>)+|B<--queries-json>=I<json>] [B<--time-end>=I<date>] [B<--time-past>=I<str>] [B<--time-start>=I<date>] [B<--type>=I<str>|B<--image>|B<--map>|B<--news>|B<--video>|B<--web>] -- E<lt>I<query>E<gt> ...
+B<google-search> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+
+B<google-search> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+
+B<google-search> [L<--action|/"--save-html">=I<str>|L<--open-url|/"--save-html">|L<--print-html-link|/"--save-html">|L<--print-org-link|/"--save-html">|L<--print-result-html-link|/"--save-html">|L<--print-result-link|/"--save-html">|L<--print-result-org-link|/"--save-html">|L<--print-url|/"--save-html">|L<--save-html|/"--save-html">] [L<--append|/"--append=s">=I<str>] [L<--config-path|/"--config-path=s, -c">=I<path>|L<-c|/"--config-path=s, -c">|L<--no-config|/"--no-config, -C">|L<-C|/"--no-config, -C">] [L<--config-profile|/"--config-profile=s, -P">=I<profile>|L<-P|/"--config-profile=s, -P">] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--delay|/"--delay=s">=I<duration>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--max-delay|/"--max-delay=s">=I<duration>] [L<--min-delay|/"--min-delay=s">=I<duration>] [L<--(no)naked-res|/"--naked-res">] [L<--no-env|/"--no-env">] [L<--num|/"--num=s">=L<posint|Sah::Schema::posint>] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--prepend|/"--prepend=s">=I<str>] [L<--queries-from|/"--queries-from=s">=L<filename|Sah::Schema::filename>] [(L<--query|/"--query=s@">=I<str>)+|L<--queries-json|/"--query=s@">=I<json>] [L<--time-end|/"--time-end=s">=I<date>] [L<--time-past|/"--time-past=s">=I<str>] [L<--time-start|/"--time-start=s">=I<date>] [L<--type|/"--web">=I<str>|L<--image|/"--web">|L<--map|/"--web">|L<--news|/"--web">|L<--video|/"--web">|L<--web|/"--web">] -- [L<query|/"--query=s@">] ...
 
 
 
 See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
+
+I<DEPRECATION NOTICE>: Deprecated in favor of L<web-search> from
+L<App::WebSearchUtils>.
 
 This utility can save you time when you want to open multiple queries (with
 added common prefix/suffix words) or specify some options like time limit. It
@@ -74,12 +83,33 @@ Default value:
 
 Valid values:
 
- ["open_url","print_url","print_html_link","print_org_link"]
+ ["open_url","print_url","print_html_link","print_org_link","save_html","print_result_link","print_result_html_link","print_result_org_link"]
 
-Instead of opening the queries in browser, you can also do other action instead.
-For example, C<print_url> will print the search URL. C<print_html_link> will print
-the HTML link (the <a> tag). And C<print_org_link> will print the Org-mode link,
-e.g. C<[[url...][query]]>.
+Instead of opening the queries in browser (C<open_url>), you can also do other
+action instead.
+
+B<Printing search URLs>: C<print_url> will print the search URL.
+C<print_html_link> will print the HTML link (the <a> tag). And C<print_org_link>
+will print the Org-mode link, e.g. C<[[url...][query]]>.
+
+B<Saving search result HTMLs>: C<save_html> will first visit each search URL
+(currently using L<Firefox::Marionette>) then save each result page to a file
+named C<< E<lt>numE<gt>-E<lt>queryE<gt>.html >> in the current directory. Existing files will not be
+overwritten; the utility will save to C<*.html.1>, C<*.html.2> and so on instead.
+
+B<Extracting search result links>: C<print_result_link> will first will first
+visit each search URL (currently using L<Firefox::Marionette>) then extract
+result links and print them. C<print_result_html_link> and
+C<print_result_org_link> are similar but will instead format each link as HTML
+and Org link, respectively.
+
+Currently the C<print_result_*link> actions are not very useful because result
+HTML page is now obfuscated by Google. Thus we can only extract all links in
+each page instead of selecting (via DOM) only the actual search result entry
+links, etc.
+
+If you want to filter the links further by domain, path, etc. you can use
+L<grep-url>.
 
 
 =item B<--append>=I<s>
@@ -89,6 +119,10 @@ String to add at the end of each query.
 =item B<--delay>=I<s>
 
 Delay between opening each query.
+
+As an alternative to the C<--delay> option, you can also use C<--min-delay> and
+C<--max-delay> to set a random delay between a minimum and maximum value.
+
 
 =item B<--image>
 
@@ -101,6 +135,18 @@ See C<--type>.
 Alias for --type=map.
 
 See C<--type>.
+
+=item B<--max-delay>=I<s>
+
+Delay between opening each query.
+
+=item B<--min-delay>=I<s>
+
+Delay between opening each query.
+
+As an alternative to the C<--mindelay> and C<--max-delay> options, you can also
+use C<--delay> to set a constant delay between requests.
+
 
 =item B<--news>
 
@@ -138,11 +184,33 @@ Alias for --action=print_org_link.
 
 See C<--action>.
 
+=item B<--print-result-html-link>
+
+Alias for --action=extract_links.
+
+See C<--action>.
+
+=item B<--print-result-link>
+
+Alias for --action=extract_links.
+
+See C<--action>.
+
+=item B<--print-result-org-link>
+
+Alias for --action=extract_links.
+
+See C<--action>.
+
 =item B<--print-url>
 
 Alias for --action=print_url.
 
 See C<--action>.
+
+=item B<--queries-from>=I<s>
+
+Supply queries from lines of text file (specify "-" for stdin).
 
 =item B<--queries-json>=I<s>
 
@@ -150,11 +218,20 @@ See C<--query>.
 
 Can also be specified as the 1st command-line argument and onwards.
 
-=item B<--query>=I<s@>*
+=item B<--query>=I<s@>
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
+
+=item B<--save-html>
+
+Alias for --action=save_html.
+
+See C<--action>.
 
 =item B<--type>=I<s>
 
@@ -238,6 +315,43 @@ variable.
 
 =back
 
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
 =head2 Output options
 
 =over
@@ -306,6 +420,9 @@ suitable default, e.g. the browser, is chosen.
 
 =item B<--time-end>=I<s>
 
+(No description)
+
+
 =item B<--time-past>=I<s>
 
 Limit time period to the past hour/24hour/week/month/year.
@@ -315,6 +432,9 @@ Valid values:
  ["hour","24hour","day","week","month","year"]
 
 =item B<--time-start>=I<s>
+
+(No description)
+
 
 =back
 
@@ -403,10 +523,14 @@ List of available configuration parameters:
  append (see --append)
  delay (see --delay)
  format (see --format)
+ log_level (see --log-level)
+ max_delay (see --max-delay)
+ min_delay (see --min-delay)
  naked_res (see --naked-res)
  num (see --num)
  prepend (see --prepend)
  queries (see --query)
+ queries_from (see --queries-from)
  time_end (see --time-end)
  time_past (see --time-past)
  time_start (see --time-start)
@@ -436,6 +560,14 @@ String. Specify additional command-line options.
 
  % google-search "query one" query2 "query number three" --time-past month
 
+=head2 Open queries from each line of file, add delay 3s after each query (e.g. to avoid getting rate-limited by Google)
+
+ % google-search --queries-from phrases.txt --delay 3s
+
+=head2 Open queries from each line of stdin
+
+ % prog-that-produces-lines-of-phrases | google-search --queries-from -
+
 =head2 Use a custom browser
 
  % BROWSER=lynx google-search "a query"
@@ -459,6 +591,22 @@ String. Specify additional command-line options.
 =head2 Append suffix words to each query
 
  % google-search --append " net worth" "lewis capaldi" "beyonce" "lee mack" "mariah carey"
+
+=head2 Visit the search URL for each query using Firefox::Marionette then extract and print the links
+
+ % google-search "lee mack" --print-result-link
+
+Currently not very useful because result HTML page is now obfuscated by Google
+so we can just extract all links in each page instead of selecting (via DOM)
+only the result links, etc.
+
+If you want to filter the links further by domain, path, etc. you can use
+L<grep-url>.
+
+
+=head2 Get the IMDB URL for Lee Mack
+
+ % google-search "lee mack imdb" --print-result-link | grep-url --host-contains imdb.com | head -n1
 
 =head1 HOMEPAGE
 

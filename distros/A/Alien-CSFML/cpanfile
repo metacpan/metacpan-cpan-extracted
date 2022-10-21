@@ -1,4 +1,4 @@
-requires 'perl', '5.010000';
+requires 'perl', '5.026000';
 on configure => sub {
     requires 'Archive::Extract';
     requires 'CPAN::Meta', '0';

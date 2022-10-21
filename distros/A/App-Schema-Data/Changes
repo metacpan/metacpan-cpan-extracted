@@ -1,3 +1,6 @@
+0.04 2022-10-21T14:02:40+02:00
+ - Fix minimal version of Test::Warn to 0.31.
+
 0.03 2022-10-20T11:25:56+02:00
  - Add plugin support.
  - Fix example in doc.

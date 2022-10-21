@@ -1,0 +1,24 @@
+LINQ-Database
+=============
+
+Created:      2021-04-11
+Home page:    <https://metacpan.org/release/LINQ-Database>
+Bug tracker:  <https://github.com/tobyink/p5-linq-database/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.001	2022-10-20
+
+ - Implement some simple SQL joins in the database instead of in Perl.
+
+0.000_002	2021-04-12
+
+ [ Bug Fixes ]
+ - If `where` is called on a LINQ::Table that already has an SQL select,
+   `where` should be applied to the output of `select`, not to the `input`.
+ - `sql_where` should be passed through `assertion_to_sql`, not
+   `selection_to_sql`.
+
+ [ Test Suite ]
+ - More test cases for WHERE and combining SELECT with WHERE.
+
+0.000_001	2021-04-12	Initial release

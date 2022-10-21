@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:gpxdata="http://www.cluetrust.com/XML/GPXDATA/1/0" xmlns:t="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" creator="pytrainer http://sourceforge.net/projects/pytrainer" version="1.1">
+<metadata>
+<name>Biking2020-10-25</name>
+<link href="http://sourceforge.net/projects/pytrainer"/>
+<time>2020-10-25T20:36:07Z</time>
+</metadata>
+<trk>
+<trkseg>
+<trkpt lat="45.405258" lon="-75.139257">
+<ele>0.446</ele>
+<time>2020-10-25T20:36:07Z</time>
+</trkpt>
+<trkpt lat="45.405359" lon="-75.139244">
+<ele>0.842</ele>
+<time>2020-10-25T20:36:11Z</time>
+</trkpt>
+<trkpt lat="45.405525" lon="-75.139261">
+<ele>0.677</ele>
+<time>2020-10-25T20:36:16Z</time>
+</trkpt>
+<trkpt lat="45.405647" lon="-75.139343">
+<ele>0.537</ele>
+<time>2020-10-25T20:36:21Z</time>
+</trkpt>
+<trkpt lat="45.405682" lon="-75.139371">
+<ele>0.744</ele>
+<time>2020-10-25T20:36:22Z</time>
+</trkpt>
+
+</trkseg>
+</trk>
+
+</gpx>

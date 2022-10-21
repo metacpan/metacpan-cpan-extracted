@@ -17,7 +17,7 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 
 # UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
 
-use Clone qw( clone );
+use Clone      qw( clone );
 use HOP::Lexer qw( string_lexer );
 use Carp;
 
@@ -31,11 +31,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 2.2
+Version 2.3
 
 =cut
 
-our $VERSION = '2.2';
+our $VERSION = '2.3';
 
 # Start counter for all node ids.
 our $base_id = 1;

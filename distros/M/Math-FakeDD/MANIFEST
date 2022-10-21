@@ -15,6 +15,7 @@ t/log_exp.t
 t/mul.t
 t/mpfr2dd.t
 t/new.t
+t/next.t
 t/overload.t
 t/print.t
 t/sparse.t

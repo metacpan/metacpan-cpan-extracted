@@ -1,5 +1,10 @@
 Revision history for Perl extension Nanoid
 
+0.03 2022-10-21T02:51:26Z
+    - Update minium required perl version.
+    - Update README. (seav)
+    - Fix pod to make usage more realistic. (AnaTofuZ)
+
 0.02 2019-12-25T16:33:57Z
     - some fix
 

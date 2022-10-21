@@ -61,115 +61,115 @@
    "provides" : {
       "Hydrogen" : {
          "file" : "lib/Hydrogen.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Array" : {
          "file" : "lib/Hydrogen/Array.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::ArrayRef" : {
          "file" : "lib/Hydrogen/ArrayRef.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Bool" : {
          "file" : "lib/Hydrogen/Bool.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Code" : {
          "file" : "lib/Hydrogen/Code.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::CodeRef" : {
          "file" : "lib/Hydrogen/CodeRef.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Counter" : {
          "file" : "lib/Hydrogen/Counter.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Curry::ArrayRef" : {
          "file" : "lib/Hydrogen/Curry/ArrayRef.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Curry::Bool" : {
          "file" : "lib/Hydrogen/Curry/Bool.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Curry::CodeRef" : {
          "file" : "lib/Hydrogen/Curry/CodeRef.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Curry::Counter" : {
          "file" : "lib/Hydrogen/Curry/Counter.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Curry::HashRef" : {
          "file" : "lib/Hydrogen/Curry/HashRef.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Curry::Number" : {
          "file" : "lib/Hydrogen/Curry/Number.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Curry::Scalar" : {
          "file" : "lib/Hydrogen/Curry/Scalar.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Curry::String" : {
          "file" : "lib/Hydrogen/Curry/String.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Hash" : {
          "file" : "lib/Hydrogen/Hash.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::HashRef" : {
          "file" : "lib/Hydrogen/HashRef.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Number" : {
          "file" : "lib/Hydrogen/Number.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Scalar" : {
          "file" : "lib/Hydrogen/Scalar.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::String" : {
          "file" : "lib/Hydrogen/String.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Topic::ArrayRef" : {
          "file" : "lib/Hydrogen/Topic/ArrayRef.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Topic::Bool" : {
          "file" : "lib/Hydrogen/Topic/Bool.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Topic::CodeRef" : {
          "file" : "lib/Hydrogen/Topic/CodeRef.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Topic::Counter" : {
          "file" : "lib/Hydrogen/Topic/Counter.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Topic::HashRef" : {
          "file" : "lib/Hydrogen/Topic/HashRef.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Topic::Number" : {
          "file" : "lib/Hydrogen/Topic/Number.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Topic::Scalar" : {
          "file" : "lib/Hydrogen/Topic/Scalar.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Hydrogen::Topic::String" : {
          "file" : "lib/Hydrogen/Topic/String.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
@@ -188,7 +188,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Hydrogen/project"
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_serialization_backend" : "JSON::PP version 4.09",
    "x_static_install" : 1
 }

@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Array;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.037';
+our $VERSION   = '0.038';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -460,7 +460,7 @@ sub accessor {
 				arg => $arg,
 			};
 		},
-	documentation => 'Acts like C<get> if given one argument, or C<set> if given two arguments.',
+	documentation => 'Acts like C<get> if given just an index, or C<set> if given an index and value.',
 	_examples => sub {
 		my ( $class, $attr, $method ) = @_;
 		return CORE::join "",

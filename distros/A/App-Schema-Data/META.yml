@@ -10,7 +10,7 @@ build_requires:
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 0
-  Test::Warn: 0
+  Test::Warn: 0.31
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -38,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Schema-Data
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Schema-Data
-version: '0.03'
+version: '0.04'

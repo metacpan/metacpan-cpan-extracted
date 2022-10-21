@@ -3,7 +3,7 @@
 Thank you for considering contributing to this distribution.
 I welcome any contribution to Apache2::Expression, including, but not limited to bug reports, feature requests, general comments, and patches.
 
-Feel free to clone it from its gitlab repository at <https://git.deguest.jp/jack/Apache2-SSI> and issue a pull request.
+Feel free to clone it from its gitlab repository at <https://gitlab.com/jackdeguest/Apache2-SSI> and issue a pull request.
 
 I am very flexible to collaboration and always eager to learn from others.
 

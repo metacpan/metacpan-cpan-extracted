@@ -125,7 +125,7 @@ To list all used shared memory, at least on Unix type systems such as Linux or F
 
 =head2 new
 
-This instantiates a notes object. It takes the following parameters:
+This instantiates a shared memory object. It takes the following parameters:
 
 =over 4
 
@@ -207,7 +207,7 @@ Set or get the boolean value to indicate that the shared memory should be automa
 
 =head2 detach
 
-Quoting the IPC documentation, this Detaches the shared memory segment located at the address specified by L</attach> from this address space.
+Quoting the IPC documentation, this detaches the shared memory segment located at the address specified by L</attach> from this address space.
 
 It returns C<undef> if it is not attached anymore, but without setting an error.
 
@@ -417,7 +417,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 CPAN ID: jdeguest
 
-L<https://git.deguest.jp/jack/Apache2-SSI>
+L<https://gitlab.com/jackdeguest/Apache2-SSI>
 
 =head1 SEE ALSO
 

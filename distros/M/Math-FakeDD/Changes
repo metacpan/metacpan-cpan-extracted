@@ -1,11 +1,31 @@
 Revision history for Perl module Math::FakeDD
 
+0.06
+ - Doc fix for FakeDD.pod -see https://github.com/sisyphus/math-fakedd/issues/1
+   Thanks, Peter Acklam.
+ - Add overload_copy() which overloads the assignment operator ('=')
+   Also add dd_copy() and dd_clone() - both of which return a copy of their
+   Math::FakeDD object argument.
+   Thanks again, Peter Acklam.
+ - Have dd_repro() check that Math::MPFR is at version 4.24 or later. (This is done
+   in case Math::FakeDD is installed into a location where it becomes accessible to
+   a perl whose version of Math::MPFR is pre-4.24.)
+ - Have mpfr2dd() return an (appropriately signed) Inf whenever it has calculated
+   the DoubleDouble to be either [DBL_MAX, 2**970] or [-DBL_MAX, -(2**970)].
+   (DBL_MAX is 0x1.fffffffffffffp+1023, which is the largest possible finite double.)
+   Add checks for this to t/assign.t and t/add.t.
+   Thanks, Peter Acklam.
+ - Add overloading of '++' and '--'.
+ - Add dd_nextup() and dd_nextdown().
+ - Add is_subnormal() and ulp_exponent().
+ - Add any2dd()
+
 0.05
  - Extra test (for correct handling of trailing zeros) added to dd_repro_test()
  - Add dd_exp2, dd_exp10, dd_log2 and dd_log10 functions.
  - Add dd_pi, dd_euler and dd_catalan functions.
  - In Makefile.PL, overwrite INSTALLSITELIB to $Config::Config{installsitearch} to
-   ensure that Math::FakeDD is installed into site/lib/<archname>.
+   ensure that Math::FakeDD is installed into site/lib/<archname> when applicable.
 
 0.04
  - More corrections to dd_repro().

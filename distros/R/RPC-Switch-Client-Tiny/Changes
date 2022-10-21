@@ -1,5 +1,8 @@
 Revision history for Perl extension RPC::Switch::Client::Tiny.
 
+1.64  2022-10-21
+	- fixed memory leak in session expire list
+
 1.63  2022-09-09
 	- added session_persist_user option to reuse active user sessions for given param
 	- added session_idle option to set session idle timeout for user session update

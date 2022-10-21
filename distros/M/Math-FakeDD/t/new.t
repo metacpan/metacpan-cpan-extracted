@@ -1,4 +1,3 @@
-
 use strict;
 use warnings;
 use Math::FakeDD qw(:all);
@@ -7,7 +6,7 @@ use Test::More;
 warn "\nmpfr version: ", MPFR_LIB_VERSION . " (", Math::MPFR::MPFR_VERSION_STRING .")\n";
 warn "min prec    : ", Math::MPFR::RMPFR_PREC_MIN(), "\n";
 
-cmp_ok($Math::FakeDD::VERSION, '==', 0.05, "Version number is correct");
+cmp_ok($Math::FakeDD::VERSION, '==', 0.06, "Version number is correct");
 
 eval { Math::FakeDD->new(1,2) };
 like($@, qr/Too many args given to new/, "method call: To many args");

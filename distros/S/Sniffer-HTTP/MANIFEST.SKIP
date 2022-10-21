@@ -19,3 +19,4 @@ t/gmail_http_sniffer.pcap
 .*.bak$
 ^MYMETA
 ^[\w-]+.pcap
+^.carmel/

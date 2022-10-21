@@ -1,0 +1,84 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/LINQ-Database/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008003"^^doap-deps:CpanId ], [ doap-deps:on "LINQ 0.003"^^doap-deps:CpanId ], [ doap-deps:on "Class::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Object::Adhoc"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ], [ doap-deps:on "DBI"^^doap-deps:CpanId ], [ doap-deps:on "DBD::SQLite"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::Modern"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/tobyink/p5-linq-database/issues>;
+	doap:created         "2021-04-11"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/LINQ-Database>;
+	doap:homepage        <https://metacpan.org/release/LINQ-Database>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "LINQ-Database";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/LINQ-Database/v_0-000_001>, <http://purl.org/NET/cpan-uri/dist/LINQ-Database/v_0-000_002>, <http://purl.org/NET/cpan-uri/dist/LINQ-Database/v_0-001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-linq-database>;
+	];
+	doap:shortdesc       "LINQ extension for working with databases".
+
+<http://purl.org/NET/cpan-uri/dist/LINQ-Database/v_0-000_001>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "LINQ-Database-0.000_001"^^xsd:string;
+	dc:issued            "2021-04-12"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/LINQ-Database-0.000_001.tar.gz>;
+	doap:revision        "0.000_001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LINQ-Database/v_0-000_002>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "LINQ-Database-0.000_002"^^xsd:string;
+	dc:issued            "2021-04-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "More test cases for WHERE and combining SELECT with WHERE.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "If `where` is called on a LINQ::Table that already has an SQL select, `where` should be applied to the output of `select`, not to the `input`.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "`sql_where` should be passed through `assertion_to_sql`, not `selection_to_sql`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/LINQ-Database-0.000_002.tar.gz>;
+	doap:revision        "0.000_002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/LINQ-Database/v_0-001>
+	a                    doap:Version;
+	dc:identifier        "LINQ-Database-0.001"^^xsd:string;
+	dc:issued            "2022-10-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Implement some simple SQL joins in the database instead of in Perl.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/LINQ-Database-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 e5dd3995bee69dc8c653edb5d1a187bd6c07ba5f974cf53fd056cb560a92f216 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 676e5a8da487552c66c537b0ccb8bd7b6f8f4c2f2ff6e26eec4cb7183a6ddec5 Changes
+SHA256 bcd9de9c5aba9c71ed64b0e953108e0923346257aebdf6f1048f54e14f7c54ef INSTALL
+SHA256 a4f85c6f4d6e8bdd37b7ab08013e3e3bee1fe8e910e20f8f54d5025ffe40f384 LICENSE
+SHA256 fa60e5e701ef7f6ed11a624c55f0e2ea0f8454b86758e8a8ba6d54cdffdd676e MANIFEST
+SHA256 d3eb2510215aead42f4eda9874e1014a067c5d389133f59ab9370008edb89e44 META.json
+SHA256 c6bf4b03805a04aa7cf210c58b2e0f186488e66b526c1456296266c91396ae3a META.yml
+SHA256 6357c448c7ef35040e1e774c03a979efdd1e8a95e7d5e747270bb6c020917c1c Makefile.PL
+SHA256 6d067a5e29026c60a69c6b0683b3b0ba707d48b9670786654401e0c348a9e47a README
+SHA256 67ae89f9500d351d6a9eb7ec330e86f1bb93980a5439cb3c08e84b53999914e0 dist.ini
+SHA256 0c5b150a147cdbdc9c3fa58b7e699e02df8f7fd79c0fb2d3f8ea4547dceae38f doap.ttl
+SHA256 6d6bab4ad9356e01fbebe68d3cc97e4dc96765931b80b4a792a344c6b0cc0690 lib/LINQ/Database.pm
+SHA256 38947bf72f75094da5f964963f6b4f14eabd6726be0b20e5ae05e4236460a7a8 lib/LINQ/Database/Table.pm
+SHA256 a563a0fca6f0cb4e4d77795c124062c1ee49c865df43900e60a8d5ee66c812fa lib/LINQ/Database/Util.pm
+SHA256 896644752a862109beac52f55a9cc63061b81aadcae47ae28701c8b2b945bf61 t/01basic.t
+SHA256 70b93d880df14259ef90ab596dcea0b6435408961e23a6ae1023d150b8782ac5 t/02join.t
+SHA256 94450943016a94b5a838b28cfb540490998eef0691ac4c28fa8619dd1dbcb531 t/data/disney.sqlite
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCY1F3TAAKCRDOv4Eoaip9
+OZ9tAJsEMd4kHvenhLQ++J+ei1Y59+VU2gCePegc8b7VL1KD5bjcEh+53IQ9a2w=
+=wtMc
+-----END PGP SIGNATURE-----

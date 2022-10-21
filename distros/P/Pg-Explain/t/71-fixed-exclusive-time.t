@@ -20,14 +20,11 @@ for my $test ( @tests ) {
     my $plan = Pg::Explain->new( 'source_file' => $data_dir . '/' . $test . '.plan' );
     $plan->parse_source();
 
-    my $sum_exclusive = sum(
-        map { $_->total_exclusive_time // 0 }
-        ( $plan->top_node, $plan->top_node->all_recursive_subnodes )
-    );
+    my $sum_exclusive = sum( map { $_->total_exclusive_time // 0 } ( $plan->top_node, $plan->top_node->all_recursive_subnodes ) );
 
     # These are floats, and there are some roundings, so I accept values in range
     my $real_time_last = $plan->top_node->actual_time_last;
-    my $expected_min = $real_time_last * 0.99;
+    my $expected_min   = $real_time_last * 0.99;
     $expected_min = $real_time_last - 0.002 if $real_time_last - 0.002 < $expected_min;
     my $expected_max = $real_time_last * 1.01;
     $expected_max = $real_time_last + 0.002 if $real_time_last + 0.002 > $expected_max;
@@ -35,11 +32,11 @@ for my $test ( @tests ) {
     ok(
         ( $sum_exclusive >= $expected_min ) && ( $sum_exclusive <= $expected_max ),
         "($test) Sum of exclusive times ($sum_exclusive) is withing expected range [ $expected_min, $expected_max ]"
-    );
+      );
     ok(
         $plan->top_node->total_exclusive_time > 0,
         "($test) top node has non-zero exclusive time (" . $plan->top_node->total_exclusive_time . ")"
-    );
+      );
 
 }
 

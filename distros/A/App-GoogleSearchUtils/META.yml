@@ -1,5 +1,5 @@
 ---
-abstract: 'CLI utilites related to google searching'
+abstract: '(DEPRECATED) CLI utilites related to google searching'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -19,7 +19,9 @@ name: App-GoogleSearchUtils
 provides:
   App::GoogleSearchUtils:
     file: lib/App/GoogleSearchUtils.pm
-    version: '0.009'
+    version: '0.016'
+recommends:
+  Firefox::Marionette: '1.13'
 requires:
   Browser::Open: '0'
   Data::Sah::Coerce::perl::To_date::From_float::epoch: '0'
@@ -29,18 +31,24 @@ requires:
   Data::Sah::Coerce::perl::To_date::From_str::natural: '0'
   Data::Sah::Coerce::perl::To_duration::From_float::seconds: '0'
   Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration: '0'
+  Data::Sah::Coerce::perl::To_duration::From_str::hms: '0'
   Data::Sah::Coerce::perl::To_duration::From_str::human: '0'
   Data::Sah::Coerce::perl::To_duration::From_str::iso8601: '0'
-  Data::Sah::Compiler::perl::TH::array: '0.911'
-  Data::Sah::Compiler::perl::TH::date: '0.911'
-  Data::Sah::Compiler::perl::TH::duration: '0.911'
-  Data::Sah::Compiler::perl::TH::int: '0.911'
-  Data::Sah::Compiler::perl::TH::str: '0.911'
+  Data::Sah::Compiler::perl::TH::array: '0.914'
+  Data::Sah::Compiler::perl::TH::date: '0.914'
+  Data::Sah::Compiler::perl::TH::duration: '0.914'
+  Data::Sah::Compiler::perl::TH::int: '0.914'
+  Data::Sah::Compiler::perl::TH::str: '0.914'
+  Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
+  Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
+  File::Slurper: '0'
+  File::Slurper::Dash: '0'
   HTML::Entities: '0'
   Log::ger: '0.038'
-  Perinci::CmdLine::Any: '0.152'
-  Perinci::CmdLine::Lite: '1.915'
+  Perinci::CmdLine::Any: '0.154'
+  Perinci::CmdLine::Lite: '1.924'
   Perinci::Object: '0.311'
+  Sah::Schema::filename: '0'
   Sah::Schema::posint: '0'
   URI::Escape: '0'
   perl: '5.010001'
@@ -50,11 +58,19 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GoogleSearchUtils
   homepage: https://metacpan.org/release/App-GoogleSearchUtils
   repository: git://github.com/perlancar/perl-App-GoogleSearchUtils.git
-version: '0.009'
+version: '0.016'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::Deprecated
+      config:
+        Dist::Zilla::Plugin::Deprecated:
+          all: 1
+          modules: []
+      name: Deprecated
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript google-search'
@@ -459,6 +475,14 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: recommends
+      name: RuntimeRecommends
+      version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
           phase: develop
           type: x_spec
       name: DevelopX_spec
@@ -513,6 +537,7 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.024'
 x_authority: cpan:PERLANCAR
+x_deprecated: 1
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

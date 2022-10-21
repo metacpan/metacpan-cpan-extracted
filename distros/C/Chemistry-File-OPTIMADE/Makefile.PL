@@ -18,12 +18,13 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Chemistry::Mol" => "0.35",
     "JSON" => 0,
+    "List::Util" => "1.33",
     "URL::Encode" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,6 +34,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Chemistry::Mol" => "0.35",
   "JSON" => 0,
+  "List::Util" => "1.33",
   "Test::More" => 0,
   "URL::Encode" => 0
 );

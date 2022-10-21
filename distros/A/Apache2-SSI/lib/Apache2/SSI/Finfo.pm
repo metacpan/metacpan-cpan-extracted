@@ -919,7 +919,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 CPAN ID: jdeguest
 
-L<https://git.deguest.jp/jack/Apache2-SSI>
+L<https://gitlab.com/jackdeguest/Apache2-SSI>
 
 =head1 SEE ALSO
 

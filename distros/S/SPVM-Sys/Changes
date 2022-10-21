@@ -1,3 +1,12 @@
+0.15 2022-10-21
+  [Bug Fix]
+    * Fixed the bug that FreeBSD can't compile SPVM::Sys for the following error.
+      error: unknown type name 'u_char'
+      http://www.cpantesters.org/cpan/report/535be3d8-5046-11ed-9e69-69166e8775ea
+  [Test Fix]
+    * Fixed the test bug that the test of the realpath method failed.
+      Failed test at t/Sys_IO.t line 95.
+      http://www.cpantesters.org/cpan/report/dd28d0f2-5060-11ed-aba6-9a79f339625c
 0.14 2022-10-20
   [Test Improvement]
     * Added the TestUtil::Scope::Guard class for socket tests and use it.

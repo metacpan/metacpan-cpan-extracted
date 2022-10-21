@@ -3,12 +3,19 @@ abstract: 'multi-connection sniffer driver'
 author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
+  Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
+  Image::Info: '0'
+  Test::Deep: '0'
+  Test::HTTP::LocalServer: '0.61'
+  Test::More: '0'
+  URI: '0'
+  URI::file: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -28,5 +35,10 @@ requires:
   NetPacket::TCP: '0'
   parent: '0'
   perl: '5.006'
-version: '0.27'
+resources:
+  bugtracker: https://github.com/Corion/Sniffer-HTTP/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/Sniffer-HTTP.git
+version: '0.28'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

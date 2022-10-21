@@ -3,10 +3,10 @@
    "author" : [
       "Max Maischein <corion@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -43,9 +43,34 @@
             "parent" : "0",
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Image::Info" : "0",
+            "Test::Deep" : "0",
+            "Test::HTTP::LocalServer" : "0.61",
+            "Test::More" : "0",
+            "URI" : "0",
+            "URI::file" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.27",
-   "x_serialization_backend" : "JSON::PP version 4.11"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Corion/Sniffer-HTTP/issues"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Corion/Sniffer-HTTP.git",
+         "web" : "https://github.com/Corion/Sniffer-HTTP"
+      }
+   },
+   "version" : "0.28",
+   "x_serialization_backend" : "JSON::PP version 4.11",
+   "x_static_install" : 1
 }

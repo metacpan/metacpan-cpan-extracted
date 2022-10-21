@@ -7,7 +7,6 @@ LICENSE
 MANIFEST
 META.json
 META.yml
-README
 README.md
 TODO
 build/perlcritic.rc

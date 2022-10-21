@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -55,7 +55,7 @@ requires:
   version: '0'
   warnings: '0'
 resources:
-  bugtracker: https://git.deguest.jp/jack/Apache2-SSI/issues
-  repository: https://git.deguest.jp/jack/Apache2-SSI
-version: v0.2.4
+  bugtracker: https://gitlab.com/jackdeguest/Apache2-SSI/issues
+  repository: https://gitlab.com/jackdeguest/Apache2-SSI
+version: v0.2.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,48 @@
+{
+   "abstract" : "Render OpenAPI specifications as documents",
+   "author" : [
+      "Andrius Merkys <merkys@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OpenAPI-Render",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "File::Basename" : "0",
+            "Getopt::Long::Descriptive" : "0",
+            "JSON" : "0",
+            "Text::ASCIITable" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/merkys/openapi-render/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/merkys/openapi-render.git",
+         "web" : "https://github.com/merkys/openapi-render"
+      }
+   },
+   "version" : "0.2.0",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+}
+

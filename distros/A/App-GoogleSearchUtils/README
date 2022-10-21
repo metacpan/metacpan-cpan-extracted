@@ -1,14 +1,19 @@
 NAME
-    App::GoogleSearchUtils - CLI utilites related to google searching
+    App::GoogleSearchUtils - (DEPRECATED) CLI utilites related to google
+    searching
 
 VERSION
-    This document describes version 0.009 of App::GoogleSearchUtils (from
-    Perl distribution App-GoogleSearchUtils), released on 2022-08-11.
+    This document describes version 0.016 of App::GoogleSearchUtils (from
+    Perl distribution App-GoogleSearchUtils), released on 2022-10-21.
 
 SYNOPSIS
     This distribution provides the following utilities:
 
     *   google-search
+
+DESCRIPTION
+    *DEPRECATION NOTICE*: Deprecated in favor of App::WebSearchUtils and
+    web-search.
 
 FUNCTIONS
   google_search
@@ -16,7 +21,7 @@ FUNCTIONS
 
      google_search(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    Open google search page in browser.
+    (DEPRECATED) Open google search page in browser.
 
     This utility can save you time when you want to open multiple queries
     (with added common prefix/suffix words) or specify some options like
@@ -34,11 +39,33 @@ FUNCTIONS
 
         What to do with the URLs.
 
-        Instead of opening the queries in browser, you can also do other
-        action instead. For example, "print_url" will print the search URL.
+        Instead of opening the queries in browser ("open_url"), you can also
+        do other action instead.
+
+        Printing search URLs: "print_url" will print the search URL.
         "print_html_link" will print the HTML link (the <a> tag). And
         "print_org_link" will print the Org-mode link, e.g.
         "[[url...][query]]".
+
+        Saving search result HTMLs: "save_html" will first visit each search
+        URL (currently using Firefox::Marionette) then save each result page
+        to a file named "<num>-<query>.html" in the current directory.
+        Existing files will not be overwritten; the utility will save to
+        "*.html.1", "*.html.2" and so on instead.
+
+        Extracting search result links: "print_result_link" will first will
+        first visit each search URL (currently using Firefox::Marionette)
+        then extract result links and print them. "print_result_html_link"
+        and "print_result_org_link" are similar but will instead format each
+        link as HTML and Org link, respectively.
+
+        Currently the "print_result_*link" actions are not very useful
+        because result HTML page is now obfuscated by Google. Thus we can
+        only extract all links in each page instead of selecting (via DOM)
+        only the actual search result entry links, etc.
+
+        If you want to filter the links further by domain, path, etc. you
+        can use grep-url.
 
     *   append => *str*
 
@@ -48,6 +75,21 @@ FUNCTIONS
 
         Delay between opening each query.
 
+        As an alternative to the "--delay" option, you can also use
+        "--min-delay" and "--max-delay" to set a random delay between a
+        minimum and maximum value.
+
+    *   max_delay => *duration*
+
+        Delay between opening each query.
+
+    *   min_delay => *duration*
+
+        Delay between opening each query.
+
+        As an alternative to the "--mindelay" and "--max-delay" options, you
+        can also use "--delay" to set a constant delay between requests.
+
     *   num => *posint* (default: 100)
 
         Number of results per page.
@@ -56,15 +98,25 @@ FUNCTIONS
 
         String to add at the beginning of each query.
 
-    *   queries* => *array[str]*
+    *   queries => *array[str]*
+
+        (No description)
+
+    *   queries_from => *filename*
+
+        Supply queries from lines of text file (specify "-" for stdin).
 
     *   time_end => *date*
+
+        (No description)
 
     *   time_past => *str*
 
         Limit time period to the past hour/24hour/week/month/year.
 
     *   time_start => *date*
+
+        (No description)
 
     *   type => *str* (default: "web")
 
@@ -93,6 +145,12 @@ SOURCE
     <https://github.com/perlancar/perl-App-GoogleSearchUtils>.
 
 SEE ALSO
+    App::WebSearchUtils, App::DDGSearchUtils, App::BraveSearchUtils,
+    App::BingSearchUtils - I'm sick of getting CAPTCHA's with Google (how
+    many times in a few minutes do I have to prove that I'm human?), so
+    lately been switching to other search engines when I have to do many
+    searches.
+
     App::FirefoxMultiAccountContainersUtils.
 
 AUTHOR

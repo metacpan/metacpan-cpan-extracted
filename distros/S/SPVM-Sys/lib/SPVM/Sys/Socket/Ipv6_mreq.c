@@ -7,6 +7,7 @@
   #include <winsock2.h>
   #include <io.h>
 #else
+  #include <sys/types.h>
   #include <sys/socket.h>
   #include <netinet/in.h>
 #endif

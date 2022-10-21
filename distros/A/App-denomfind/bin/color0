@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+use 5.014 ; use warnings ;
+
+while ( <> )  { 
+  s{ \e\[ [\d;]* m }{}xmsg ;
+  print $_ ;
+}
+
+exit ;
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+=encoding utf8
+
+=head1 $0 
+
+  入力(標準入力またはファイル)を読み取り、ASCIIエスケープシーケンにスよる色を除去する。
+  下線もイタリックも太文字であることも無くなるし、256段階やRGB指定による色にも対応している。
+  このことで、「色」付きのテキストを、単純なプレーンテキストにする。
+ 
+ [オプション] :
+
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+
+  開発メモ: 
+
+=cut

@@ -33,7 +33,7 @@ my $source = do { local $/; <DATA> };
 
 {
   my $gpx = Geo::Gpx->new;
-  $gpx->add_waypoint(
+  $gpx->waypoints_add(
     {
       lat  => 54.786989,
       lon  => -2.344214,

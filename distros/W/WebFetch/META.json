@@ -82,7 +82,7 @@
          "web" : "https://github.com/ikluft/WebFetch"
       }
    },
-   "version" : "0.15.3",
+   "version" : "0.15.4",
    "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "GPL-3.0-only"

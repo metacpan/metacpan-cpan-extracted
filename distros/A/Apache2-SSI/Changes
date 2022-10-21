@@ -1,33 +1,36 @@
 Revision history for Perl module Apache2::SSI
 
-0.2.4 2021-03-29T23:15:37+0900
+v0.2.5 2022-10-21T15:15:02+0900
+    - Update issue tracker
+
+v0.2.4 2021-03-29T23:15:37+0900
     - Corrected bugs under Windows related OS
     - Added Apache2::SSI::File::Type
     - Added the mime_type method in Apache2::SSI::Finfo
 
-0.2.3 2021-03-19T12:09:54+0900
+v0.2.3 2021-03-19T12:09:54+0900
     - Removed use of Path::Tiny that was not declared as dependency in test unit 37.flastmod.t.
     - Adjusted Apache2::SSI::SharedMem for lack of support for threaded perl.
 
-0.2.2 2021-03-18T15:02:07+0900
+v0.2.2 2021-03-18T15:02:07+0900
     - Corrected too short timeout
 
-0.2.1 2021-03-17T12:11:59+0900
+v0.2.1 2021-03-17T12:11:59+0900
     - Removing use of Devel::Confess used initially for debugging
 
-0.2.0 2021-03-11T21:53:05+0900
+v0.2.0 2021-03-11T21:53:05+0900
     - Major overhaul with improvements and using powerful expression engine Apache2::Expression
 
-0.1.3 2021-02-01T14:50:48+0900
+v0.1.3 2021-02-01T14:50:48+0900
     - Corrected test 35.exec.t unit that used an assumed perl binary location
     - Initial stable release for Apache2::Expression
 
-0.1.2 2021-02-01T12:47:51+0900
+v0.1.2 2021-02-01T12:47:51+0900
     - Removed dependency on buggy URI::XS
     - Removed dependency on unused module
 
-0.1.1 2021-01-31T12:44:19+0900
+v0.1.1 2021-01-31T12:44:19+0900
     - Corrected a test unit for server_version and improved upon the documentation
 
-0.1.0 2020-12-18T21:38:11+0900
+v0.1.0 2020-12-18T21:38:11+0900
     - original version; created by ExtUtils::ModuleMaker 0.63

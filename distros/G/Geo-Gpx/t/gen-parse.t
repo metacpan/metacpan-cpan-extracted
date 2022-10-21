@@ -62,7 +62,7 @@ my @wpt = (
   }
 );
 
-$gpx->waypoints( \@wpt );
+$gpx->waypoints_add( @wpt );
 
 # Quick fix for dumbass dependency on RNG being the same everywhere
 my $rp = 0;
@@ -129,7 +129,9 @@ my @rte = (
   }
 );
 
-$gpx->routes( \@rte );
+# $gpx->routes( \@trk );
+# ... routes no longer sets
+$gpx->{routes} = \@rte ;
 
 my @trk = (
   {
@@ -145,7 +147,9 @@ my @trk = (
   }
 );
 
-$gpx->tracks( \@trk );
+# $gpx->tracks( \@trk );
+# ... tracks no longer sets
+$gpx->{tracks} = \@trk;
 
 $gpx->name( 'Test' );
 $gpx->desc( 'Test data' );

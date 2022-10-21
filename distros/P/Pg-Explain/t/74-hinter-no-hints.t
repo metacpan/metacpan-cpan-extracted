@@ -14,6 +14,6 @@ my $explain = Pg::Explain->new( 'source' => $plan );
 $explain->parse_source;
 
 my $hinter = Pg::Explain::Hinter->new( $explain );
-ok( ! $hinter->any_hints, 'No hints for explain plans' );
+ok( !$hinter->any_hints, 'No hints for explain plans' );
 
 exit;

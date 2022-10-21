@@ -149,6 +149,7 @@ $response1->{_content} =~ s!\r\n!\n!mg;
 
 my $response2 = bless( {
                      '_protocol' => 'HTTP/1.1',
+                     @http_message_641,
                      '_content' => qq{<?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

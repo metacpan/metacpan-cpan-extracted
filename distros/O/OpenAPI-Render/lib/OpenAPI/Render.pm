@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Render OpenAPI specifications as documents
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
 
 sub new
 {
@@ -113,10 +113,10 @@ sub RequestBody2Parameters
                       schema => $schema->{properties}{$_} } }
                  sort keys %{$schema->{properties}} ),
            ( map { {
-                      in          => 'query',
-                      name        => $_,
-                      schema      => $schema->{patternProperties}{$_},
-                      _is_pattern => 1 } }
+                      in             => 'query',
+                      name           => $_,
+                      schema         => $schema->{patternProperties}{$_},
+                      'x-is-pattern' => 1 } }
                  sort keys %{$schema->{patternProperties}} );
 }
 

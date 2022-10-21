@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::Topic::ArrayRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016';
+our $VERSION   = '0.017';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::Topic::ArrayRef - functions from Hydrogen::ArrayRef applied to C<$_>
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Topic::ArrayRef 0.016,
-which is based on Sub::HandlesVia::HandlerLibrary::Array 0.037.
+This documentation is for Hydrogen::Topic::ArrayRef 0.017,
+which is based on Sub::HandlesVia::HandlerLibrary::Array 0.038.
 
 =cut
 
@@ -97,7 +97,7 @@ Operates on C<< $_ >>, which must be a reference to an array.
 
 Arguments: B<< Int >>, B<< Optional[Any] >>.
 
-Acts like C<get> if given one argument, or C<set> if given two arguments.
+Acts like C<get> if given just an index, or C<set> if given an index and value.
 
 =cut
 

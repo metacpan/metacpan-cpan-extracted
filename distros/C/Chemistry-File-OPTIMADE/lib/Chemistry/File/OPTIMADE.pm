@@ -1,6 +1,6 @@
 package Chemistry::File::OPTIMADE;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 # $Id$
 
 use strict;
@@ -91,6 +91,8 @@ sub parse_string {
     for my $description (@molecule_descriptions) {
         my $mol = $mol_class->new( name => $description->{id} );
         my $attributes = $description->{attributes};
+
+        # TODO: Warn about disorder
 
         if( any { !exists $attributes->{$_} } @mandatory_fields ) {
             warn 'one or more of the mandatory fields (' .
